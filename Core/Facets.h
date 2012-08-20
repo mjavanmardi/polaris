@@ -341,9 +341,9 @@ struct member_function_ptr_types<Type,getter_type>
 	tag_getter(FACET_NAME);\
 	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched)))
 
-#define declare_facet_getter(FACET_NAME,...)\
+#define declare_facet_getter(FACET_NAME,ADDITIONAL_REQUIREMENTS)\
 	tag_getter(FACET_NAME);\
-	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (__VA_ARGS__)))
+	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS)))
 
 #define tag_getter(FACET_NAME) NULLTYPE FACET_NAME##_tag(void);
 
@@ -365,24 +365,24 @@ struct member_function_ptr_types<Type,setter_type>
 	tag_setter(FACET_NAME);\
 	template<typename ThisType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched)))
 
-#define declare_facet_setter(FACET_NAME,...)\
+#define declare_facet_setter(FACET_NAME,ADDITIONAL_REQUIREMENTS)\
 	tag_setter(FACET_NAME);\
-	template<typename ThisType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (__VA_ARGS__)))
+	template<typename ThisType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS)))
 
 ///============================================================================
 /// declare_facet_getter_setter - catches the standard get and set dispatches meeting concepts
 ///============================================================================
 
 #define declare_facet_getter_setter_basic(FACET_NAME) declare_facet_getter(FACET_NAME);declare_facet_setter(FACET_NAME)
-#define declare_facet_getter_setter(FACET_NAME,...) declare_facet_getter(FACET_NAME,__VA_ARGS__);declare_facet_setter(FACET_NAME,__VA_ARGS__)
+#define declare_facet_getter_setter(FACET_NAME,ADDITIONAL_REQUIREMENTS_GETTER,ADDITIONAL_REQUIREMENTS_SETTER) declare_facet_getter(FACET_NAME,ADDITIONAL_REQUIREMENTS_GETTER);declare_facet_setter(FACET_NAME,ADDITIONAL_REQUIREMENTS_SETTER)
 
 #define tag_getter_setter(FACET_NAME) tag_getter(FACET_NAME);tag_setter(FACET_NAME)
 
 ///============================================================================
-/// data_member – data member creator, type-definition and basic accessors
+/// member_data – data member creator, type-definition and basic accessors
 ///============================================================================
 
-#define data_member(DATA_TYPE,FACET_NAME)\
+#define member_data_basic(DATA_TYPE,FACET_NAME)\
 	protected:\
 	typedef DATA_TYPE FACET_NAME##_type;\
 	DATA_TYPE _##FACET_NAME;\
@@ -392,13 +392,13 @@ struct member_function_ptr_types<Type,setter_type>
 	tag_getter(FACET_NAME);\
 	public:
 
-#define data_member_ext(DATA_TYPE,FACET_NAME,...)\
+#define member_data(DATA_TYPE,FACET_NAME,ADDITIONAL_REQUIREMENTS_GETTER,ADDITIONAL_REQUIREMENTS_SETTER)\
 	protected:\
 	typedef DATA_TYPE FACET_NAME##_type;\
 	DATA_TYPE _##FACET_NAME;\
-	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (__VA_ARGS__))){_##FACET_NAME=(DATA_TYPE)set_value;}\
+	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS_SETTER))){_##FACET_NAME=(DATA_TYPE)set_value;}\
 	tag_setter(FACET_NAME);\
-	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (__VA_ARGS__))){return (TargetType)_##FACET_NAME;}\
+	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS_GETTER))){return (TargetType)_##FACET_NAME;}\
 	tag_getter(FACET_NAME);\
 	public:
 
