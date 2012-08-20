@@ -24,7 +24,7 @@
 ///============================================================================
 
 #define declare_facet_event(FACET_NAME)\
-	void FACET_NAME##_tag(NULLTYPE*)\
+	void FACET_NAME##_tag(NULLTYPE*);\
 	template<typename ThisType,typename CallerType,typename TargetType> static void FACET_NAME(ThisType* pthis)
 
 struct event_type{};
@@ -40,7 +40,7 @@ struct member_function_ptr_types<Type,event_type>
 ///============================================================================
 
 #define declare_facet_conditional(FACET_NAME)\
-	void FACET_NAME##_tag(NULLTYPE* pthis,Conditional_Response& response)\
+	void FACET_NAME##_tag(NULLTYPE* pthis,Conditional_Response& response);\
 	template<typename ThisType,typename CallerType,typename TargetType> static void FACET_NAME(ThisType* pthis,Conditional_Response& response)
 
 struct conditional_type{};
