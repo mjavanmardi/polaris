@@ -5,11 +5,13 @@
 /// General Definitions
 ///============================================================================
 
-#define concept template<typename T=NULLTYPE,typename V=NULLTYPE,bool assert_requirements=false> struct
+#define concept template<typename TYPE_A=NULLTYPE,typename TYPE_B=NULLTYPE,bool assert_requirements=false> struct
 
 static const int success=sizeof(small_type);
 
-#define begin_requirements_list typedef true_type none; typedef TYPELIST_1(none) auto_check_list_none
+#define strip_modifiers(TYPE) typename remove_reference<typename remove_pointer<typename remove_extent<typename remove_volatile<typename remove_const<TYPE>::type>::type>::type>::type>::type
+
+#define begin_requirements_list typedef strip_modifiers(TYPE_A) T; typedef strip_modifiers(TYPE_B) V; typedef true_type none; typedef TYPELIST_1(none) auto_check_list_none
 #define end_requirements_list(LAST_CONCEPT) static const bool value=IsTrue<auto_check_list_##LAST_CONCEPT>::value;typedef typename test_condition<value>::type type;
 
 ///============================================================================
