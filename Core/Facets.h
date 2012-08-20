@@ -386,11 +386,13 @@ struct member_function_ptr_types<Type,setter_type>
 	protected:\
 	typedef DATA_TYPE FACET_NAME##_type;\
 	DATA_TYPE _##FACET_NAME;\
-	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS_SETTER))){_##FACET_NAME=(DATA_TYPE)set_value;}\
-	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && !(ADDITIONAL_REQUIREMENTS_SETTER))){static_assert("\n\n\n[--------- one or more unmatched setter requirements: "##ADDITIONAL_REQUIREMENTS_SETTER##" ---------]\n\n");}\
+	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && ( ADDITIONAL_REQUIREMENTS_SETTER ))){_##FACET_NAME=(DATA_TYPE)set_value;}\
+	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && !( ADDITIONAL_REQUIREMENTS_SETTER ))){static_assert(false,"\n\n\n[--------- one or more unmatched setter requirements: " #ADDITIONAL_REQUIREMENTS_SETTER " ---------]\n\n");}\
 	tag_setter(FACET_NAME);\
-	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS_GETTER))){return (TargetType)_##FACET_NAME;}\
-	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && !(ADDITIONAL_REQUIREMENTS_GETTER))){static_assert("\n\n\n[--------- one or more unmatched getter requirements: "##ADDITIONAL_REQUIREMENTS_GETTER##" ---------]\n\n");}\
+	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && ( ADDITIONAL_REQUIREMENTS_GETTER ))){return (TargetType)_##FACET_NAME;}\
+	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && !( ADDITIONAL_REQUIREMENTS_GETTER ))){static_assert(false,"\n\n\n[--------- one or more unmatched getter requirements: " #ADDITIONAL_REQUIREMENTS_GETTER " ---------]\n\n");}\
 	tag_getter(FACET_NAME);\
 	public:
+	
+
 
