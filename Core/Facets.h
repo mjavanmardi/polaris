@@ -337,12 +337,7 @@ struct member_function_ptr_types<Type,getter_type>
 	typedef NULLTYPE (Type::* type)(void);
 };
 
-#define declare_facet_getter_basic(FACET_NAME)\
-	tag_getter(FACET_NAME);\
-	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched)))
-
 #define declare_facet_getter(FACET_NAME,ADDITIONAL_REQUIREMENTS)\
-	tag_getter(FACET_NAME);\
 	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS)))
 
 #define tag_getter(FACET_NAME) NULLTYPE FACET_NAME##_tag(void);
@@ -361,12 +356,7 @@ struct member_function_ptr_types<Type,setter_type>
 
 #define tag_setter(FACET_NAME) void FACET_NAME##_tag(NULLTYPE);
 
-#define declare_facet_setter_basic(FACET_NAME)\
-	tag_setter(FACET_NAME);\
-	template<typename ThisType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched)))
-
 #define declare_facet_setter(FACET_NAME,ADDITIONAL_REQUIREMENTS)\
-	tag_setter(FACET_NAME);\
 	template<typename ThisType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS)))
 
 ///============================================================================
@@ -397,8 +387,10 @@ struct member_function_ptr_types<Type,setter_type>
 	typedef DATA_TYPE FACET_NAME##_type;\
 	DATA_TYPE _##FACET_NAME;\
 	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS_SETTER))){_##FACET_NAME=(DATA_TYPE)set_value;}\
+	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && !(ADDITIONAL_REQUIREMENTS_SETTER))){static_assert("\n\n\n[--------- one or more unmatched setter requirements: "##ADDITIONAL_REQUIREMENTS_SETTER##" ---------]\n\n");}\
 	tag_setter(FACET_NAME);\
 	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS_GETTER))){return (TargetType)_##FACET_NAME;}\
+	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && !(ADDITIONAL_REQUIREMENTS_GETTER))){static_assert("\n\n\n[--------- one or more unmatched getter requirements: "##ADDITIONAL_REQUIREMENTS_GETTER##" ---------]\n\n");}\
 	tag_getter(FACET_NAME);\
 	public:
 
