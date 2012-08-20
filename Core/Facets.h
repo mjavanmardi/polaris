@@ -25,15 +25,15 @@
 
 #define facet_event(FACET_NAME) template<typename ThisType,typename CallerType,typename TargetType> static void FACET_NAME(ThisType* pthis)
 
-struct type_event{};
+struct event_type{};
 
 template<typename Type>
-struct member_function_ptr_types<Type,type_event>
+struct member_function_ptr_types<Type,event_type>
 {
 	typedef void (Type::* type)(NULLTYPE*);
 };
 
-#define tag_event(FACET_NAME) void tag_##FACET_NAME(NULLTYPE*);
+#define tag_event(FACET_NAME) void FACET_NAME##_tag(NULLTYPE*);
 
 ///============================================================================
 /// facet_conditional - header for a basic condition facet
@@ -51,8 +51,8 @@ struct member_function_ptr_types<Type,type_event>
 	template<typename T>\
 	struct FACET_NAME##_get_check\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,type_getter>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,type_getter>::type> struct interface_tester{};\
+		template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
 		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static large_type has_matching_function_member(...);\
@@ -67,8 +67,8 @@ struct member_function_ptr_types<Type,type_event>
 	template<typename T>\
 	struct FACET_NAME##_set_check\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,type_setter>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,type_setter>::type> struct interface_tester{};\
+		template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
 		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static large_type has_matching_function_member(...);\
@@ -103,8 +103,8 @@ struct member_function_ptr_types<Type,type_event>
 	template<typename T>\
 	struct FACET_NAME##_get_check\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,type_getter>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,type_getter>::type> struct interface_tester{};\
+		template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
 		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static large_type has_matching_function_member(...);\
@@ -119,8 +119,8 @@ struct member_function_ptr_types<Type,type_event>
 	template<typename T>\
 	struct FACET_NAME##_set_check\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,type_setter>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,type_setter>::type> struct interface_tester{};\
+		template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
 		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static large_type has_matching_function_member(...);\
@@ -145,8 +145,8 @@ struct member_function_ptr_types<Type,type_event>
 	template<typename T>\
 	struct FACET_NAME##_get_check\
 	{\
-			template<typename member_function_ptr_types<typename T::Base_Type,type_getter>::type> struct base_tester{};\
-			template<typename member_function_ptr_types<typename T::Interface_Type,type_getter>::type> struct interface_tester{};\
+			template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
+			template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
 			template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 			template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 			template<typename U> static large_type has_matching_function_member(...);\
@@ -161,8 +161,8 @@ struct member_function_ptr_types<Type,type_event>
 	template<typename T>\
 	struct FACET_NAME##_set_check\
 	{\
-			template<typename member_function_ptr_types<typename T::Base_Type,type_setter>::type> struct base_tester{};\
-			template<typename member_function_ptr_types<typename T::Interface_Type,type_setter>::type> struct interface_tester{};\
+			template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
+			template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
 			template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 			template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 			template<typename U> static large_type has_matching_function_member(...);\
@@ -198,8 +198,8 @@ struct member_function_ptr_types<Type,type_event>
 	template<typename T>\
 	struct FACET_NAME##_get_check\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,type_getter>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,type_getter>::type> struct interface_tester{};\
+		template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
 		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static large_type has_matching_function_member(...);\
@@ -214,8 +214,8 @@ struct member_function_ptr_types<Type,type_event>
 	template<typename T>\
 	struct FACET_NAME##_set_check\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,type_setter>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,type_setter>::type> struct interface_tester{};\
+		template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
 		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static large_type has_matching_function_member(...);\
@@ -244,10 +244,10 @@ struct member_function_ptr_types<Type,type_event>
 /// facet_getter - catches the standard get dispatches meeting concepts
 ///============================================================================
 
-struct type_getter{};
+struct getter_type{};
 
 template<typename Type>
-struct member_function_ptr_types<Type,type_getter>
+struct member_function_ptr_types<Type,getter_type>
 {
 	typedef NULLTYPE (Type::* type)(void);
 };
@@ -260,21 +260,21 @@ struct member_function_ptr_types<Type,type_getter>
 	tag_getter(FACET_NAME);\
 	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (__VA_ARGS__)))
 
-#define tag_getter(FACET_NAME) NULLTYPE tag_##FACET_NAME(void);
+#define tag_getter(FACET_NAME) NULLTYPE FACET_NAME##_tag(void);
 
 ///============================================================================
 /// facet_setter - catches the standard set dispatches meeting N concepts
 ///============================================================================
 
-struct type_setter{};
+struct setter_type{};
 
 template<typename Type>
-struct member_function_ptr_types<Type,type_setter>
+struct member_function_ptr_types<Type,setter_type>
 {
 	typedef void (Type::* type)(NULLTYPE);
 };
 
-#define tag_setter(FACET_NAME) void tag_##FACET_NAME(NULLTYPE);
+#define tag_setter(FACET_NAME) void FACET_NAME##_tag(NULLTYPE);
 
 #define facet_setter_basic(FACET_NAME)\
 	tag_setter(FACET_NAME);\
@@ -288,10 +288,10 @@ struct member_function_ptr_types<Type,type_setter>
 /// facet_getter_setter - catches the standard get and set dispatches meeting concepts
 ///============================================================================
 
-#define tag_getter_setter(FACET_NAME) tag_getter(FACET_NAME);tag_setter(FACET_NAME)
-
 #define facet_getter_setter_basic(FACET_NAME) facet_getter(FACET_NAME);facet_setter(FACET_NAME)
 #define facet_getter_setter(FACET_NAME,...) facet_getter(FACET_NAME,__VA_ARGS__);facet_setter(FACET_NAME,__VA_ARGS__)
+
+#define tag_getter_setter(FACET_NAME) tag_getter(FACET_NAME);tag_setter(FACET_NAME)
 
 ///============================================================================
 /// data_member – data member creator, type-definition and basic accessors
@@ -299,7 +299,7 @@ struct member_function_ptr_types<Type,type_setter>
 
 #define data_member(DATA_TYPE,FACET_NAME)\
 	protected:\
-	typedef DATA_TYPE type_##FACET_NAME;\
+	typedef DATA_TYPE FACET_NAME##_type;\
 	DATA_TYPE _##FACET_NAME;\
 	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched))){_##FACET_NAME=(DATA_TYPE)set_value;}\
 	tag_setter(FACET_NAME);\
@@ -309,7 +309,7 @@ struct member_function_ptr_types<Type,type_setter>
 
 #define data_member_ext(DATA_TYPE,FACET_NAME,...)\
 	protected:\
-	typedef DATA_TYPE type_##FACET_NAME;\
+	typedef DATA_TYPE FACET_NAME##_type;\
 	DATA_TYPE _##FACET_NAME;\
 	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (__VA_ARGS__))){_##FACET_NAME=(DATA_TYPE)set_value;}\
 	tag_setter(FACET_NAME);\
