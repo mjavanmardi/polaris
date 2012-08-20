@@ -69,12 +69,12 @@ public:
 
 
 ///============================================================================
-/// Polaris_Data_Component - adds interface
+/// Polaris_Component_Data - adds interface
 ///============================================================================
 
 template<typename InterfaceType=NULLTYPE,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename EntityType=NULLTYPE>
-class Polaris_Data_Component:
-	public Polaris_Data_Component<NULLTYPE,BaseType,ParentType,EntityType>,
+class Polaris_Component_Data:
+	public Polaris_Component_Data<NULLTYPE,BaseType,ParentType,EntityType>,
 	public InterfaceType
 {
 public:
@@ -86,15 +86,15 @@ public:
 
 	typedef false_type Dispatched;
 	typedef InterfaceType Interface_Type;
-	typedef Polaris_Data_Component This_Type;
+	typedef Polaris_Component_Data This_Type;
 };
 
 ///============================================================================
-/// Polaris_Data_Component - adds object and entity tag, without parent
+/// Polaris_Component_Data - adds object and entity tag, without parent
 ///============================================================================
 
 template<typename EntityType>
-class Polaris_Data_Component<NULLTYPE,NULLTYPE,NULLTYPE,EntityType>:
+class Polaris_Component_Data<NULLTYPE,NULLTYPE,NULLTYPE,EntityType>:
 	public Data_Object
 {
 public:
@@ -104,11 +104,11 @@ public:
 };
 
 ///============================================================================
-/// Polaris_Data_Component - adds object and entity tag, with parent
+/// Polaris_Component_Data - adds object and entity tag, with parent
 ///============================================================================
 
 template<typename ParentType,typename EntityType>
-class Polaris_Data_Component<NULLTYPE,NULLTYPE,ParentType,EntityType>:
+class Polaris_Component_Data<NULLTYPE,NULLTYPE,ParentType,EntityType>:
 	public Data_Object
 {
 public:
@@ -119,12 +119,12 @@ public:
 };
 
 ///============================================================================
-/// Polaris_Data_Component - adds base
+/// Polaris_Component_Data - adds base
 ///============================================================================
 
 template<typename BaseType,typename ParentType,typename EntityType>
-class Polaris_Data_Component<NULLTYPE,BaseType,ParentType,EntityType>:
-	public Polaris_Data_Component<NULLTYPE,NULLTYPE,ParentType,EntityType>,
+class Polaris_Component_Data<NULLTYPE,BaseType,ParentType,EntityType>:
+	public Polaris_Component_Data<NULLTYPE,NULLTYPE,ParentType,EntityType>,
 	public BaseType
 {
 public:
@@ -133,12 +133,12 @@ public:
 
 
 ///============================================================================
-/// Polaris_Execution_Component - adds interface
+/// Polaris_Component_Execution - adds interface
 ///============================================================================
 
 template<typename InterfaceType=NULLTYPE,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename EntityType=NULLTYPE>
-class Polaris_Execution_Component:
-	public Polaris_Execution_Component<NULLTYPE,BaseType,ParentType,EntityType>,
+class Polaris_Component_Execution:
+	public Polaris_Component_Execution<NULLTYPE,BaseType,ParentType,EntityType>,
 	public InterfaceType
 {
 public:
@@ -150,15 +150,15 @@ public:
 
 	typedef false_type Dispatched;
 	typedef InterfaceType Interface_Type;
-	typedef Polaris_Execution_Component This_Type;
+	typedef Polaris_Component_Execution This_Type;
 };
 
 ///============================================================================
-/// Polaris_Execution_Component - adds object and entity tag, without parent
+/// Polaris_Component_Execution - adds object and entity tag, without parent
 ///============================================================================
 
 template<typename EntityType>
-class Polaris_Execution_Component<NULLTYPE,NULLTYPE,NULLTYPE,EntityType>:
+class Polaris_Component_Execution<NULLTYPE,NULLTYPE,NULLTYPE,EntityType>:
 	public Execution_Object
 {
 public:
@@ -168,11 +168,11 @@ public:
 };
 
 ///============================================================================
-/// Polaris_Execution_Component - adds object and entity tag, with parent
+/// Polaris_Component_Execution - adds object and entity tag, with parent
 ///============================================================================
 
 template<typename ParentType,typename EntityType>
-class Polaris_Execution_Component<NULLTYPE,NULLTYPE,ParentType,EntityType>:
+class Polaris_Component_Execution<NULLTYPE,NULLTYPE,ParentType,EntityType>:
 	public Execution_Object
 {
 public:
@@ -183,12 +183,12 @@ public:
 };
 
 ///============================================================================
-/// Polaris_Execution_Component - adds base
+/// Polaris_Component_Execution - adds base
 ///============================================================================
 
 template<typename BaseType,typename ParentType,typename EntityType>
-class Polaris_Execution_Component<NULLTYPE,BaseType,ParentType,EntityType>:
-	public Polaris_Execution_Component<NULLTYPE,NULLTYPE,ParentType,EntityType>,
+class Polaris_Component_Execution<NULLTYPE,BaseType,ParentType,EntityType>:
+	public Polaris_Component_Execution<NULLTYPE,NULLTYPE,ParentType,EntityType>,
 	public BaseType
 {
 public:
@@ -202,10 +202,10 @@ public:
 /// basic schedule macro
 ///============================================================================
 
-#define schedule_local_event(SELF_AWARE_TYPE,CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,TARGET_TYPES,...) \
+#define schedule_event_local(SELF_AWARE_TYPE,CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,TARGET_TYPES,...) \
        ((SELF_AWARE_TYPE::This_Type*)this)->Load_Register<SELF_AWARE_TYPE::This_Type>((Conditional)(&CONDITIONAL_FUNCTION<SELF_AWARE_TYPE::This_Type,SELF_AWARE_TYPE::This_Type,NULLTYPE>),(Event)(&SELF_AWARE_TYPE::This_Type::LOCAL_EVENT_FUNCTION<SELF_AWARE_TYPE::This_Type,SELF_AWARE_TYPE::This_Type,TARGET_TYPES,__VA_ARGS__>),FIRST_ITERATION)
 
-#define schedule_plocal_event(SELF_AWARE_TYPE,CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,TARGET_TYPES,...) \
+#define schedule_event_plocal(SELF_AWARE_TYPE,CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,TARGET_TYPES,...) \
        ((SELF_AWARE_TYPE::This_Type*)pthis)->Load_Register<SELF_AWARE_TYPE::This_Type>((Conditional)(&CONDITIONAL_FUNCTION<SELF_AWARE_TYPE::This_Type,SELF_AWARE_TYPE::This_Type,NULLTYPE>),(Event)(&SELF_AWARE_TYPE::This_Type::LOCAL_EVENT_FUNCTION<SELF_AWARE_TYPE::This_Type,SELF_AWARE_TYPE::This_Type,TARGET_TYPES,__VA_ARGS__>),FIRST_ITERATION)
 
 ///============================================================================

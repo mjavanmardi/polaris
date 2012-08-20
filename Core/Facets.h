@@ -8,54 +8,51 @@
 #define facet public: template<typename ThisType,typename CallerType,typename TargetType>
 
 ///============================================================================
-/// local_facet - standard declarator for all local facets
+/// facet_local - standard declarator for all local facets
 ///============================================================================
 
-#define local_facet protected: template<typename ThisType,typename TargetType>
+#define facet_local protected: template<typename ThisType,typename TargetType>
 
 ///============================================================================
-/// simple_facet - standard declarator for all simple facets
+/// facet_simple - standard declarator for all simple facets
 ///============================================================================
 
-#define simple_facet public: template<typename ThisType>
-
-
-
+#define facet_simple public: template<typename ThisType>
 
 ///============================================================================
-/// event_facet - header for a basic event facet
+/// facet_event - header for a basic event facet
 ///============================================================================
 
-#define event_facet(FACET_NAME) template<typename ThisType,typename CallerType,typename TargetType> static void FACET_NAME(ThisType* pthis)
+#define facet_event(FACET_NAME) template<typename ThisType,typename CallerType,typename TargetType> static void FACET_NAME(ThisType* pthis)
 
-struct event_type{};
+struct type_event{};
 
 template<typename Type>
-struct member_function_ptr_types<Type,event_type>
+struct member_function_ptr_types<Type,type_event>
 {
 	typedef void (Type::* type)(NULLTYPE*);
 };
 
-#define event_tag(FACET_NAME) void FACET_NAME##_tag(NULLTYPE*);
+#define tag_event(FACET_NAME) void tag_##FACET_NAME(NULLTYPE*);
 
 ///============================================================================
-/// conditional_facet - header for a basic condition facet
+/// facet_conditional - header for a basic condition facet
 ///============================================================================
 
-#define conditional_facet(FACET_NAME) template<typename ThisType,typename CallerType,typename TargetType> static void FACET_NAME(ThisType* pthis,Conditional_Response& response)
+#define facet_conditional(FACET_NAME) template<typename ThisType,typename CallerType,typename TargetType> static void FACET_NAME(ThisType* pthis,Conditional_Response& response)
 
 ///============================================================================
-/// accessor_facet - implements the standard get and set dispatch facets
+/// facet_accessor - implements the standard get and set dispatch facets
 ///		includes a check on whether the base has corresponding dispatch
 ///============================================================================
 
-#define accessor_facet(FACET_NAME)\
+#define facet_accessor(FACET_NAME)\
 	public:\
 	template<typename T>\
 	struct FACET_NAME##_get_check\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
+		template<typename member_function_ptr_types<typename T::Base_Type,type_getter>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,type_getter>::type> struct interface_tester{};\
 		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static large_type has_matching_function_member(...);\
@@ -70,8 +67,8 @@ struct member_function_ptr_types<Type,event_type>
 	template<typename T>\
 	struct FACET_NAME##_set_check\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
+		template<typename member_function_ptr_types<typename T::Base_Type,type_setter>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,type_setter>::type> struct interface_tester{};\
 		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static large_type has_matching_function_member(...);\
@@ -97,17 +94,17 @@ struct member_function_ptr_types<Type,event_type>
 	public:
 
 ///============================================================================
-/// local_accessor_facet - implements the standard get and set dispatch facets
+/// facet_accessor_local - implements the standard get and set dispatch facets
 ///		local implies that only the protected versions are created
 ///============================================================================
 
-#define local_accessor_facet_test(FACET_NAME)\
+#define facet_accessor_local(FACET_NAME)\
 	protected:\
 	template<typename T>\
 	struct FACET_NAME##_get_check\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
+		template<typename member_function_ptr_types<typename T::Base_Type,type_getter>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,type_getter>::type> struct interface_tester{};\
 		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static large_type has_matching_function_member(...);\
@@ -122,8 +119,8 @@ struct member_function_ptr_types<Type,event_type>
 	template<typename T>\
 	struct FACET_NAME##_set_check\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
+		template<typename member_function_ptr_types<typename T::Base_Type,type_setter>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,type_setter>::type> struct interface_tester{};\
 		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 		template<typename U> static large_type has_matching_function_member(...);\
@@ -138,18 +135,18 @@ struct member_function_ptr_types<Type,event_type>
 	public:
 
 ///============================================================================
-/// interface_accessor_facet - implements the standard get and set dispatch facets
+/// facet_accessor_interface - implements the standard get and set dispatch facets
 ///		takes the TargetType as the component so checks can be performed
 ///		returns the interface implied by TargetType
 ///============================================================================
 
-#define interface_accessor_facet(FACET_NAME)\
+#define facet_accessor_interface(FACET_NAME)\
 	public:\
 	template<typename T>\
 	struct FACET_NAME##_get_check\
 	{\
-			template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
-			template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
+			template<typename member_function_ptr_types<typename T::Base_Type,type_getter>::type> struct base_tester{};\
+			template<typename member_function_ptr_types<typename T::Interface_Type,type_getter>::type> struct interface_tester{};\
 			template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 			template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 			template<typename U> static large_type has_matching_function_member(...);\
@@ -164,8 +161,8 @@ struct member_function_ptr_types<Type,event_type>
 	template<typename T>\
 	struct FACET_NAME##_set_check\
 	{\
-			template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
-			template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
+			template<typename member_function_ptr_types<typename T::Base_Type,type_setter>::type> struct base_tester{};\
+			template<typename member_function_ptr_types<typename T::Interface_Type,type_setter>::type> struct interface_tester{};\
 			template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
 			template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
 			template<typename U> static large_type has_matching_function_member(...);\
@@ -191,112 +188,110 @@ struct member_function_ptr_types<Type,event_type>
 	public:
 
 ///============================================================================
-/// ptr_accessor_facet - implements the standard get and set dispatch facets
+/// facet_accessor_ptr - implements the standard get and set dispatch facets
 ///		takes the TargetType as the component so checks can be performed
 ///		returns the pointer implied by TargetType
 ///============================================================================
 
-#define ptr_accessor_facet(FACET_NAME)\
+#define facet_accessor_ptr(FACET_NAME)\
 	public:\
 	template<typename T>\
 	struct FACET_NAME##_get_check\
 	{\
-			template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
-			template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
-			template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
-			template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
-			template<typename U> static large_type has_matching_function_member(...);\
-			static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
+		template<typename member_function_ptr_types<typename T::Base_Type,type_getter>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,type_getter>::type> struct interface_tester{};\
+		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
+		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
+		template<typename U> static large_type has_matching_function_member(...);\
+		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
 	};\
 	template<typename ThisType,typename CallerType,typename TargetType>\
 	TargetType* FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
 	{\
-			static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
-			return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>();\
+		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
+		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>();\
 	}\
 	template<typename T>\
 	struct FACET_NAME##_set_check\
 	{\
-			template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
-			template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
-			template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
-			template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
-			template<typename U> static large_type has_matching_function_member(...);\
-			static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
+		template<typename member_function_ptr_types<typename T::Base_Type,type_setter>::type> struct base_tester{};\
+		template<typename member_function_ptr_types<typename T::Interface_Type,type_setter>::type> struct interface_tester{};\
+		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
+		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
+		template<typename U> static large_type has_matching_function_member(...);\
+		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
 	};\
 	template<typename ThisType,typename CallerType,typename TargetType>\
 	void FACET_NAME(TargetType* set_value,call_requires(ThisType,Is_Dispatchable))\
 	{\
-			static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
-			PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>(set_value);\
+		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
+		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>(set_value);\
 	}\
 	protected:\
 	template<typename ThisType,typename TargetType>\
 	typename TargetType* FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
 	{\
-			return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>();\
+		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>();\
 	}\
 	template<typename ThisType,typename TargetType>\
 	void FACET_NAME(TargetType* set_value,call_requires(ThisType,Is_Dispatchable))\
 	{\
-			PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>(set_value);\
+		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>(set_value);\
 	}\
 	public:
 
 ///============================================================================
-/// getter_facet - catches the standard get dispatches meeting concepts
+/// facet_getter - catches the standard get dispatches meeting concepts
 ///============================================================================
 
-struct getter_type{};
+struct type_getter{};
 
 template<typename Type>
-struct member_function_ptr_types<Type,getter_type>
+struct member_function_ptr_types<Type,type_getter>
 {
 	typedef NULLTYPE (Type::* type)(void);
 };
 
-#define getter_tag(FACET_NAME) NULLTYPE FACET_NAME##_tag(void);
+#define facet_getter_basic(FACET_NAME)\
+	tag_getter(FACET_NAME);\
+	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched)))
 
-#define getter_facet(FACET_NAME,DATA_NAME) \
-	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched))){return DATA_NAME;}\
-	getter_tag(FACET_NAME);
+#define facet_getter(FACET_NAME,...)\
+	tag_getter(FACET_NAME);\
+	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (__VA_ARGS__)))
 
-#define getter_facet_ext(FACET_NAME,DATA_NAME,...) \
-	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && ( __VA_ARGS__ ))){return DATA_NAME;}\
-	getter_tag(FACET_NAME);
+#define tag_getter(FACET_NAME) NULLTYPE tag_##FACET_NAME(void);
 
 ///============================================================================
-/// setter_facet - catches the standard set dispatches meeting N concepts
+/// facet_setter - catches the standard set dispatches meeting N concepts
 ///============================================================================
 
-struct setter_type{};
+struct type_setter{};
 
 template<typename Type>
-struct member_function_ptr_types<Type,setter_type>
+struct member_function_ptr_types<Type,type_setter>
 {
 	typedef void (Type::* type)(NULLTYPE);
 };
 
-#define setter_tag(FACET_NAME) void FACET_NAME##_tag(NULLTYPE);
+#define tag_setter(FACET_NAME) void tag_##FACET_NAME(NULLTYPE);
 
-#define setter_facet(FACET_NAME,DATA_NAME) \
-	template<typename ThisType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched))){DATA_NAME=set_value;}\
-	setter_tag(FACET_NAME);
+#define facet_setter_basic(FACET_NAME)\
+	tag_setter(FACET_NAME);\
+	template<typename ThisType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched)))
 
-#define setter_facet_ext(FACET_NAME,DATA_NAME,...) template<typename ThisType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && ( __VA_ARGS__ ))){DATA_NAME=set_value;}\
-	setter_tag(FACET_NAME);
+#define facet_setter(FACET_NAME,...)\
+	tag_setter(FACET_NAME);\
+	template<typename ThisType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (__VA_ARGS__)))
 
 ///============================================================================
-/// getter_setter_facet - catches the standard get and set dispatches meeting concepts
+/// facet_getter_setter - catches the standard get and set dispatches meeting concepts
 ///============================================================================
 
-#define getter_setter_facet(FACET_NAME,DATA_NAME) getter_facet(FACET_NAME,DATA_NAME);setter_facet(FACET_NAME,DATA_NAME)
+#define tag_getter_setter(FACET_NAME) tag_getter(FACET_NAME);tag_setter(FACET_NAME)
 
-#define getter_setter_facet_ext(FACET_NAME,DATA_NAME,...) getter_facet(FACET_NAME,DATA_NAME,__VA_ARGS__);setter_facet(FACET_NAME,DATA_NAME,__VA_ARGS__)
-
-
-
-
+#define facet_getter_setter_basic(FACET_NAME) facet_getter(FACET_NAME);facet_setter(FACET_NAME)
+#define facet_getter_setter(FACET_NAME,...) facet_getter(FACET_NAME,__VA_ARGS__);facet_setter(FACET_NAME,__VA_ARGS__)
 
 ///============================================================================
 /// data_member – data member creator, type-definition and basic accessors
@@ -304,21 +299,21 @@ struct member_function_ptr_types<Type,setter_type>
 
 #define data_member(DATA_TYPE,FACET_NAME)\
 	protected:\
-	typedef DATA_TYPE FACET_NAME##_type;\
+	typedef DATA_TYPE type_##FACET_NAME;\
 	DATA_TYPE _##FACET_NAME;\
 	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched))){_##FACET_NAME=(DATA_TYPE)set_value;}\
-	setter_tag(FACET_NAME);\
+	tag_setter(FACET_NAME);\
 	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_##FACET_NAME;}\
-	getter_tag(FACET_NAME);\
+	tag_getter(FACET_NAME);\
 	public:
 
 #define data_member_ext(DATA_TYPE,FACET_NAME,...)\
 	protected:\
-	typedef DATA_TYPE FACET_NAME##_type;\
+	typedef DATA_TYPE type_##FACET_NAME;\
 	DATA_TYPE _##FACET_NAME;\
 	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (__VA_ARGS__))){_##FACET_NAME=(DATA_TYPE)set_value;}\
-	setter_tag(FACET_NAME);\
+	tag_setter(FACET_NAME);\
 	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (__VA_ARGS__))){return (TargetType)_##FACET_NAME;}\
-	getter_tag(FACET_NAME);\
+	tag_getter(FACET_NAME);\
 	public:
 
