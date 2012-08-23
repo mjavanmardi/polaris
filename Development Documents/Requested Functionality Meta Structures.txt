@@ -1,0 +1,1 @@
+1.  Add reference and pointer return options for automatically generated accessors using the 'member_data' macro:
