@@ -71,7 +71,7 @@ struct member_function_ptr_types<Type,conditional_type>
 	template<typename ThisType,typename CallerType,typename TargetType>\
 	TargetType FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
 	{\
-		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
+		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
 		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>();\
 	}\
 	template<typename T>\
@@ -87,20 +87,20 @@ struct member_function_ptr_types<Type,conditional_type>
 	template<typename ThisType,typename CallerType,typename TargetType>\
 	void FACET_NAME(TargetType set_value,call_requires(ThisType,Is_Dispatchable))\
 	{\
-		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
+		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
 		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>(set_value);\
 	}\
 	protected:\
 	template<typename ThisType,typename TargetType>\
 	TargetType FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
 	{\
-		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
+		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
 		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>();\
 	}\
 	template<typename ThisType,typename TargetType>\
 	void FACET_NAME(TargetType set_value,call_requires(ThisType,Is_Dispatchable))\
 	{\
-		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
+		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
 		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>(set_value);\
 	}\
 	public:
@@ -126,7 +126,7 @@ struct member_function_ptr_types<Type,conditional_type>
 	template<typename ThisType,typename CallerType,typename TargetType>\
 	typename TargetType::Interface_Type* FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
 	{\
-		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
+		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
 		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>();\
 	}\
 	template<typename T>\
@@ -142,188 +142,23 @@ struct member_function_ptr_types<Type,conditional_type>
 	template<typename ThisType,typename CallerType,typename TargetType>\
 	void FACET_NAME(typename TargetType::Interface_Type* set_value,call_requires(ThisType,Is_Dispatchable))\
 	{\
-		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
+		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
 		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>(set_value);\
 	}\
 	protected:\
 	template<typename ThisType,typename TargetType>\
 	typename TargetType::Interface_Type* FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
 	{\
-		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
+		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
 		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>();\
 	}\
 	template<typename ThisType,typename TargetType>\
 	void FACET_NAME(typename TargetType::Interface_Type* set_value,call_requires(ThisType,Is_Dispatchable))\
 	{\
-		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
+		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
 		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>(set_value);\
 	}\
 	public:
-
-/////============================================================================
-///// facet_accessor_ptr - implements the standard get and set dispatch facets
-/////		takes the TargetType as the component so checks can be performed
-/////		returns the pointer implied by TargetType
-/////============================================================================
-//
-//#define facet_accessor_ptr(FACET_NAME)\
-//	public:\
-//	template<typename T>\
-//	struct FACET_NAME##_get_check\
-//	{\
-//		template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
-//		template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
-//		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static large_type has_matching_function_member(...);\
-//		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
-//	};\
-//	template<typename ThisType,typename CallerType,typename TargetType>\
-//	TargetType* FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
-//		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>();\
-//	}\
-//	template<typename T>\
-//	struct FACET_NAME##_set_check\
-//	{\
-//		template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
-//		template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
-//		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static large_type has_matching_function_member(...);\
-//		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
-//	};\
-//	template<typename ThisType,typename CallerType,typename TargetType>\
-//	void FACET_NAME(TargetType* set_value,call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
-//		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>(set_value);\
-//	}\
-//	protected:\
-//	template<typename ThisType,typename TargetType>\
-//	typename TargetType* FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
-//		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>();\
-//	}\
-//	template<typename ThisType,typename TargetType>\
-//	void FACET_NAME(TargetType* set_value,call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
-//		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>(set_value);\
-//	}\
-//	public:
-//
-/////============================================================================
-///// facet_accessor_ref - implements the standard get and set dispatch facets
-/////		takes the TargetType as the component so checks can be performed
-/////		returns the reference implied by TargetType
-/////============================================================================
-//
-//#define facet_accessor_ref(FACET_NAME)\
-//	public:\
-//	template<typename T>\
-//	struct FACET_NAME##_get_check\
-//	{\
-//		template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
-//		template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
-//		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static large_type has_matching_function_member(...);\
-//		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
-//	};\
-//	template<typename ThisType,typename CallerType,typename TargetType>\
-//	TargetType& FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
-//		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>();\
-//	}\
-//	template<typename T>\
-//	struct FACET_NAME##_set_check\
-//	{\
-//		template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
-//		template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
-//		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static large_type has_matching_function_member(...);\
-//		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
-//	};\
-//	template<typename ThisType,typename CallerType,typename TargetType>\
-//	void FACET_NAME(TargetType& set_value,call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
-//		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>(set_value);\
-//	}\
-//	protected:\
-//	template<typename ThisType,typename TargetType>\
-//	typename TargetType& FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
-//		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>();\
-//	}\
-//	template<typename ThisType,typename TargetType>\
-//	void FACET_NAME(TargetType& set_value,call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
-//		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>(set_value);\
-//	}\
-//	public:
-//
-/////============================================================================
-///// facet_accessor_ptr_ref - implements the standard get and set dispatch facets
-/////		takes the TargetType as the component so checks can be performed
-/////		returns the pointer reference implied by TargetType
-/////============================================================================
-//
-//#define facet_accessor_ptr_ref(FACET_NAME)\
-//	public:\
-//	template<typename T>\
-//	struct FACET_NAME##_get_check\
-//	{\
-//		template<typename member_function_ptr_types<typename T::Base_Type,getter_type>::type> struct base_tester{};\
-//		template<typename member_function_ptr_types<typename T::Interface_Type,getter_type>::type> struct interface_tester{};\
-//		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static large_type has_matching_function_member(...);\
-//		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
-//	};\
-//	template<typename ThisType,typename CallerType,typename TargetType>\
-//	TargetType*& FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
-//		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>();\
-//	}\
-//	template<typename T>\
-//	struct FACET_NAME##_set_check\
-//	{\
-//		template<typename member_function_ptr_types<typename T::Base_Type,setter_type>::type> struct base_tester{};\
-//		template<typename member_function_ptr_types<typename T::Interface_Type,setter_type>::type> struct interface_tester{};\
-//		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
-//		template<typename U> static large_type has_matching_function_member(...);\
-//		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
-//	};\
-//	template<typename ThisType,typename CallerType,typename TargetType>\
-//	void FACET_NAME(TargetType*& set_value,call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
-//		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>(set_value);\
-//	}\
-//	protected:\
-//	template<typename ThisType,typename TargetType>\
-//	typename TargetType*& FACET_NAME(call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target to Dispatch To! ---------]\n\n");\
-//		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>();\
-//	}\
-//	template<typename ThisType,typename TargetType>\
-//	void FACET_NAME(TargetType*& set_value,call_requires(ThisType,Is_Dispatchable))\
-//	{\
-//		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target to Dispatch To! ---------]\n\n");\
-//		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,ThisType,TargetType>(set_value);\
-//	}\
-//	public:
 
 ///============================================================================
 /// facet_getter - catches the standard get dispatches meeting concepts

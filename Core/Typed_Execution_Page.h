@@ -150,7 +150,7 @@ public:
 				execution_root_ptr->Activate_Type((Typed_Execution_Pages<>*)this);
 				type_activated=true;
 			}
-			else assert(false);
+			else if(!type_activated) return nullptr;
 
 			Typed_Execution_Page<DataType>* new_page=(Typed_Execution_Page<DataType>*)memory_root_ptr->Allocate();
 

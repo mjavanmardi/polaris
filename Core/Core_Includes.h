@@ -29,6 +29,8 @@ typedef char Page[Page_Size];
 static volatile long long* request_sum=new volatile long long();
 static volatile long long* exec_sum=new volatile long long();
 
+__declspec(thread) int thread_id;
+
 typedef char Byte;
 
 //unsigned int thread_stats[num_threads];

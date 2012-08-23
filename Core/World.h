@@ -88,6 +88,8 @@ DWORD WINAPI Thread_Loop(LPVOID package_ptr)
 	World* world=((Thread_Package*)package_ptr)->world_ptr;
 	int id=((Thread_Package*)package_ptr)->id;
 
+	thread_id=id;
+
 	Execution_Root* const exe=execution_root_ptr;
 
 	while(world->run)
