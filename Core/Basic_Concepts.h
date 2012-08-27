@@ -13,8 +13,8 @@ concept Is_Polaris_Component
 	requires_typename_defined(none,This_Type,"Type is not self-aware");
 	requires_typename_defined(This_Type,Parent_Type,"Type is not aware of parent type");
 	requires_typename_defined(Parent_Type,Object_Type,"Type is not aware of object type");
-	requires_typename_defined(Object_Type,Base_Type,"Type is not aware of interface type");
-	requires_typename_defined(Base_Type,Interface_Type,"Type is not aware of base type");
+	requires_typename_defined(Object_Type,Base_Type,"Type is not aware of base type");
+	requires_typename_defined(Base_Type,Interface_Type,"Type is not aware of interface type");
 	requires_typename_defined(Interface_Type,Dispatched,"Type is not aware of dispatch capability");
 	requires_typename_defined(Dispatched,Entity_Tag,"Type is not aware of entity");
 

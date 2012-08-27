@@ -23,6 +23,7 @@ public:
 	typedef false_type Dispatched;
 	typedef InterfaceType Interface_Type;
 	typedef Polaris_Component This_Type;
+	typedef BaseType Base_Type;
 };
 
 ///============================================================================
@@ -64,7 +65,7 @@ class Polaris_Component<NULLTYPE,BaseType,ParentType,EntityType,ObjectType>:
 	public BaseType
 {
 public:
-	typedef BaseType Base_Type;
+
 };
 
 
@@ -87,6 +88,7 @@ public:
 	typedef false_type Dispatched;
 	typedef InterfaceType Interface_Type;
 	typedef Polaris_Component_Data This_Type;
+	typedef BaseType Base_Type;
 };
 
 ///============================================================================
@@ -128,7 +130,6 @@ class Polaris_Component_Data<NULLTYPE,BaseType,ParentType,EntityType>:
 	public BaseType
 {
 public:
-	typedef BaseType Base_Type;
 };
 
 
@@ -151,6 +152,7 @@ public:
 	typedef false_type Dispatched;
 	typedef InterfaceType Interface_Type;
 	typedef Polaris_Component_Execution This_Type;
+	typedef BaseType Base_Type;
 };
 
 ///============================================================================
@@ -192,7 +194,6 @@ class Polaris_Component_Execution<NULLTYPE,BaseType,ParentType,EntityType>:
 	public BaseType
 {
 public:
-	typedef BaseType Base_Type;
 };
 
 ///============================================================================

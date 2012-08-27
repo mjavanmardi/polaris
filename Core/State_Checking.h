@@ -21,9 +21,9 @@
 
 //#define requires_local_var_equals(VAR_NAME,VALUE,ERROR_MESSAGE) if(pthis->VAR_NAME!=VALUE){cout << ERROR_MESSAGE << endl << endl; no_error=false;}
 
-#define requires_condition(CONDITION,ERROR_MESSAGE) \
-	try{ if(!CONDITION){cout << ERROR_MESSAGE << endl << endl; no_error=false;} } \
-	catch(exception& e){cout << ERROR_MESSAGE << " and Standard Exception: " << e.what() << endl; no_error=false;}
+#define requires_condition(CONDITION,ERROR_MESSAGE,EXIT,LOGSTREAM) \
+	try{ if(!CONDITION){LOGSTREAM << ERROR_MESSAGE << endl << endl; no_error=!EXIT;} } \
+	catch(exception& e){LOGSTREAM << ERROR_MESSAGE << " and Standard Exception: " << e.what() << endl; no_error=!EXIT;}
 
 #define requires_thistype_match \
 	try{if(typeid(ThisType)!=typeid(*pthis)){cout << "Type Mismatch: " << endl << endl << "Actual Type: " << typeid(*pthis).name() << endl << endl << "Stated Type: " << typeid(ThisType).name() << endl << endl; no_error=false;} }\
