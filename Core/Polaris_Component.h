@@ -24,6 +24,8 @@ public:
 	typedef InterfaceType Interface_Type;
 	typedef Polaris_Component This_Type;
 	typedef BaseType Base_Type;
+	typedef ObjectType Object_Type;
+	typedef EntityType Entity_Tag;
 };
 
 ///============================================================================
@@ -36,8 +38,6 @@ class Polaris_Component<NULLTYPE,NULLTYPE,NULLTYPE,EntityType,ObjectType>:
 {
 public:
 	typedef NULLTYPE Parent_Type;
-	typedef ObjectType Object_Type;
-	typedef EntityType Entity_Tag;
 };
 
 ///============================================================================
@@ -50,8 +50,6 @@ class Polaris_Component<NULLTYPE,NULLTYPE,ParentType,EntityType,ObjectType>:
 {
 public:
 	typedef ParentType Parent_Type;
-	typedef ObjectType Object_Type;
-	typedef EntityType Entity_Tag;
 	Parent_Type* _parent;
 };
 
@@ -88,6 +86,8 @@ public:
 	typedef false_type Dispatched;
 	typedef InterfaceType Interface_Type;
 	typedef Polaris_Component_Data This_Type;
+	typedef Data_Object Object_Type;
+	typedef EntityType Entity_Tag;
 	typedef BaseType Base_Type;
 };
 
@@ -101,8 +101,6 @@ class Polaris_Component_Data<NULLTYPE,NULLTYPE,NULLTYPE,EntityType>:
 {
 public:
 	typedef NULLTYPE Parent_Type;
-	typedef Data_Object Object_Type;
-	typedef EntityType Entity_Tag;
 };
 
 ///============================================================================
@@ -115,8 +113,6 @@ class Polaris_Component_Data<NULLTYPE,NULLTYPE,ParentType,EntityType>:
 {
 public:
 	typedef ParentType Parent_Type;
-	typedef Data_Object Object_Type;
-	typedef EntityType Entity_Tag;
 	Parent_Type* _parent;
 };
 
@@ -152,6 +148,8 @@ public:
 	typedef false_type Dispatched;
 	typedef InterfaceType Interface_Type;
 	typedef Polaris_Component_Execution This_Type;
+	typedef Execution_Object Object_Type;
+	typedef EntityType Entity_Tag;
 	typedef BaseType Base_Type;
 };
 
@@ -165,8 +163,6 @@ class Polaris_Component_Execution<NULLTYPE,NULLTYPE,NULLTYPE,EntityType>:
 {
 public:
 	typedef NULLTYPE Parent_Type;
-	typedef Execution_Object Object_Type;
-	typedef EntityType Entity_Tag;
 };
 
 ///============================================================================
@@ -179,8 +175,6 @@ class Polaris_Component_Execution<NULLTYPE,NULLTYPE,ParentType,EntityType>:
 {
 public:
 	typedef ParentType Parent_Type;
-	typedef Execution_Object Object_Type;
-	typedef EntityType Entity_Tag;
 	Parent_Type* _parent;
 };
 
@@ -195,6 +189,68 @@ class Polaris_Component_Execution<NULLTYPE,BaseType,ParentType,EntityType>:
 {
 public:
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+///============================================================================
+/// Polaris_Component_Basic - adds base
+///============================================================================
+
+template<typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename EntityType=NULLTYPE>
+class Polaris_Component_Basic:
+	public Polaris_Component_Basic<NULLTYPE,ParentType,EntityType>,
+	public BaseType
+{
+public:
+#if STATE_CHECKS
+	virtual void State_Check(){};
+#endif
+	friend BaseType;
+
+	typedef false_type Dispatched;
+	typedef BaseType Interface_Type;
+	typedef Polaris_Component_Basic This_Type;
+	typedef BaseType Base_Type;
+	typedef Execution_Object Object_Type;
+	typedef EntityType Entity_Tag;
+};
+
+///============================================================================
+/// Polaris_Component_Basic - adds object and entity tag, without parent
+///============================================================================
+
+template<typename EntityType>
+class Polaris_Component_Basic<NULLTYPE,NULLTYPE,EntityType>:
+	public Data_Object
+{
+public:
+	typedef NULLTYPE Parent_Type;
+};
+
+///============================================================================
+/// Polaris_Component_Basic - adds object and entity tag, with parent
+///============================================================================
+
+template<typename ParentType,typename EntityType>
+class Polaris_Component_Basic<NULLTYPE,ParentType,EntityType>:
+	public Data_Object
+{
+public:
+	typedef ParentType Parent_Type;
+	Parent_Type* _parent;
+};
+
+
 
 ///============================================================================
 /// basic schedule macro
