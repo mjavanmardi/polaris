@@ -4,7 +4,7 @@
 
 //=============================================================
 /// POLARIS LOCATION INTERFACE
-namespace Location_API
+namespace Location_Components
 {
 	namespace Types
 	{
@@ -66,13 +66,13 @@ namespace Location_API
 	{
 		struct Location_Struct
 		{
-			typedef Location_API::Types::Transims_Location Transims_Location;
+			typedef Types::Transims_Location Transims_Location;
 			int location;
 		};
 		
 		struct VLocation_Struct
 		{
-			typedef Location_API::Types::Vadim_Location Vadim_Location;
+			typedef Types::Vadim_Location Vadim_Location;
 			char* location;
 		};
 	}

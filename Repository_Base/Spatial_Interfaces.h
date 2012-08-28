@@ -4,7 +4,7 @@
 
 //=============================================================
 /// POLARIS SPATIAL INTERFACES
-namespace Spatial_API
+namespace Spatial_Components
 {
 	namespace Types
 	{
@@ -84,32 +84,32 @@ namespace Spatial_API
 	{
 		struct XY_Coord_Struct
 		{
-			typedef Spatial_API::Types::Coordinate_Types::XY_Type XY_Type;
+			typedef Types::Coordinate_Types::XY_Type XY_Type;
 			float x;
 			float y;
 		};
 		
 		struct UTM_Zone
 		{
-			typedef Spatial_API::Types::Coordinate_Types::UTM_Type UTM_Type;
+			typedef Types::Coordinate_Types::UTM_Type UTM_Type;
 			int zone;
 			char dir;
 		};
 		struct State_Plane_Zone
 		{
-			typedef Spatial_API::Types::Coordinate_Types::State_Plane_Type State_Plane_Type;
+			typedef Types::Coordinate_Types::State_Plane_Type State_Plane_Type;
 			int zone;
 		};
 
 		struct UTM_Coord_Struct
 		{
-			typedef Spatial_API::Types::Coordinate_Types::UTM_Type UTM_Type;
+			typedef Types::Coordinate_Types::UTM_Type UTM_Type;
 			int zone;
 			char dir;
 		};
 		struct State_Plane_Coord_Struct
 		{
-			typedef Spatial_API::Types::Coordinate_Types::State_Plane_Type State_Plane_Type;
+			typedef Types::Coordinate_Types::State_Plane_Type State_Plane_Type;
 			string zone;
 		};
 

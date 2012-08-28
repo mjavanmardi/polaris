@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Repository_Base_Includes.h"
-#include "Time_API.h"
+#include "Time_Interfaces.h"
 
 //=============================================================
 /// POLARIS TRIP INTERFACE
-namespace Trip_API
+namespace Trip_Components
 {
 	namespace Types
 	{
@@ -58,5 +58,8 @@ namespace Trip_API
 			facet_accessor_interface(Origin);
 			facet_accessor_interface(Destination);
 		};
+	}
+	namespace Data_Structures
+	{
 	}
 }

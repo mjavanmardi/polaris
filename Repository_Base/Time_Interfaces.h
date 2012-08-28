@@ -5,7 +5,7 @@
 //=============================================================
 /// POLARIS TIME CLASS INTERFACE
 ///
-namespace Time_API
+namespace Time_Components
 {
 	//=============================================================
 	/// Useful types related to Time.
@@ -128,7 +128,7 @@ namespace Time_API
 			//===========================================================================
 			/// Convert base time to Days.  Requires that Time_Base has a 'Total_Seconds' accessor to convert base time to seconds
 			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Time_API::Concepts::Time_In_Days)))
+			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Concepts::Time_In_Days)))
 			{
 				OutputTimeStructType t;
 				t.Time = this->Total_Seconds<ThisType, ThisType, OutputTimeStructType::Value_Type>() / (OutputTimeStructType::Value_Type)86400.0;
@@ -136,7 +136,7 @@ namespace Time_API
 			}
 			/// Convert base time to Hours.  Requires that Time_Base has a 'Total_Seconds' accessor to convert base time to seconds
 			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Time_API::Concepts::Time_In_Hours)))
+			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Concepts::Time_In_Hours)))
 			{
 				OutputTimeStructType t;
 				t.Time = this->Total_Seconds<ThisType, ThisType, OutputTimeStructType::ValueType>() / (OutputTimeStructType::ValueType)1440.0;
@@ -144,7 +144,7 @@ namespace Time_API
 			}
 			/// Convert base time to Minutes.  Requires that Time_Base has a 'Total_Seconds' accessor to convert base time to seconds
 			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Time_API::Concepts::Time_In_Minutes)))
+			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Concepts::Time_In_Minutes)))
 			{
 				OutputTimeStructType t;
 				t.Time = this->Total_Seconds<ThisType, ThisType, OutputTimeStructType::Value_Type>() / (OutputTimeStructType::Value_Type)60.0;
@@ -152,7 +152,7 @@ namespace Time_API
 			}
 			/// Convert base time to Seconds.  Requires that Time_Base has a 'Total_Seconds' accessor to convert base time to seconds
 			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Time_API::Concepts::Time_In_Seconds)))
+			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Concepts::Time_In_Seconds)))
 			{
 				OutputTimeStructType t;
 				t.Time = this->Total_Seconds<ThisType, ThisType, OutputTimeStructType::Value_Type>();
@@ -160,7 +160,7 @@ namespace Time_API
 			}
 			/// Convert base time to DRSeconds.  Requires that Time_Base has a 'Total_Seconds' accessor to convert base time to seconds
 			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Time_API::Concepts::Time_In_DRSeconds)))
+			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Concepts::Time_In_DRSeconds)))
 			{
 				OutputTimeStructType t;
 				t.Time = this->Total_Seconds<ThisType, ThisType, OutputTimeStructType::ValueType>() * (OutputTimeStructType::ValueType)10.0;
@@ -171,11 +171,11 @@ namespace Time_API
 			/// Either the requested OutputTimeStructType was not valid, or the requested TargetType was non-arithmetic
 			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
 			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, !is_arithmetic) || (
-				requires(OutputTimeStructType,!Time_API::Concepts::Time_In_Days) &&
-				requires(OutputTimeStructType,!Time_API::Concepts::Time_In_Hours) &&
-				requires(OutputTimeStructType,!Time_API::Concepts::Time_In_Minutes) &&
-				requires(OutputTimeStructType,!Time_API::Concepts::Time_In_Seconds) &&
-				requires(OutputTimeStructType,!Time_API::Concepts::Time_In_DRSeconds)
+				requires(OutputTimeStructType,!Concepts::Time_In_Days) &&
+				requires(OutputTimeStructType,!Concepts::Time_In_Hours) &&
+				requires(OutputTimeStructType,!Concepts::Time_In_Minutes) &&
+				requires(OutputTimeStructType,!Concepts::Time_In_Seconds) &&
+				requires(OutputTimeStructType,!Concepts::Time_In_DRSeconds)
 				)))
 			{
 				TargetType t;

@@ -3,7 +3,7 @@
 #include "Repository_User_Includes.h"
 #include "Transims_Demand_API.h"
 
-namespace Demand_API
+namespace Demand_Components
 {
 	//==================================================================================================================
 	/// TYPE Of interest to the Demand Interface.
@@ -148,12 +148,12 @@ namespace Demand_API
 			/// Notice the function requires that it is attached to a transims compliant base using a concept check
 			facet void Get_Current_Trips_From_External(call_requirements(requires(ThisType, Is_Dispatchable) && requires(ThisType, Concepts::Is_Transims)))
 			{
-				Time_API::Interfaces::Time_Interface* tstart = timestep_start<ThisType,CallerType,Time_API::Time>();
-				Time_API::Interfaces::Time_Interface* tend = timestep_end<ThisType,CallerType,Time_API::Time>();
+				Time_Components::Interfaces::Time_Interface* tstart = timestep_start<ThisType,CallerType,Time_Components::Components::Time>();
+				Time_Components::Interfaces::Time_Interface* tend = timestep_end<ThisType,CallerType,Time_Components::Components::Time>();
 				
-				tstart->Write<Time_API::Time,CallerType,int>();
-				auto s = tstart->Convert_Time<Time_API::Time, CallerType, Time_API::Data_Structures::Time_DRSeconds>();
-				auto e = tend->Convert_Time<Time_API::Time, CallerType, Time_API::Data_Structures::Time_DRSeconds>();
+				tstart->Write<Time_Components::Components::Time,CallerType,int>();
+				auto s = tstart->Convert_Time<Time_Components::Components::Time, CallerType, Time_Components::Data_Structures::Time_DRSeconds>();
+				auto e = tend->Convert_Time<Time_Components::Components::Time, CallerType, Time_Components::Data_Structures::Time_DRSeconds>();
 
 				Time start = Time((int)s.Time);
 				Time end = Time((int)e.Time);
@@ -167,7 +167,7 @@ namespace Demand_API
 				
 				for (itr=v.begin(); itr != v.end(); itr++)
 				{
-					this->push_trip<ThisType,ThisType,Trip_API::Trip>(*itr);
+					this->push_trip<ThisType,ThisType,Trip_Components::Components::Trip>(*itr);
 					trip_count++;
 				}
 				cout <<endl<<endl<<"TIMESTEP "<<iteration<<endl<<"Trip count = "<<this->Trip_Count<ThisType,CallerType,int>()<<endl;
@@ -175,26 +175,26 @@ namespace Demand_API
 			/// Time incrementing facet
 			facet void Increment_Time()
 			{
-				auto start = timestep_start<ThisType,CallerType,Time_API::Time>();
-				auto end = timestep_end<ThisType,CallerType,Time_API::Time>();
-				auto tstep = this->t_step<ThisType,CallerType,Time_API::Data_Structures::Time_Seconds&>();
+				auto start = timestep_start<ThisType,CallerType,Time_Components::Components::Time>();
+				auto end = timestep_end<ThisType,CallerType,Time_Components::Components::Time>();
+				auto tstep = this->t_step<ThisType,CallerType,Time_Components::Data_Structures::Time_Seconds&>();
 
-				start->Add_Time<Time_API::Time,CallerType>(tstep);
-				end->Add_Time<Time_API::Time,CallerType>(tstep);
+				start->Add_Time<Time_Components::Components::Time,CallerType>(tstep);
+				end->Add_Time<Time_Components::Components::Time,CallerType>(tstep);
 			}
 			/// Display the current timestep information
 			facet void Display_Timestep()
 			{
 				cout<<"Timestep Start:  ";
-				timestep_start<ThisType,ThisType,Time_API::Time>()->Write<Time_API::Time,CallerType,int>();
+				timestep_start<ThisType,ThisType,Time_Components::Components::Time>()->Write<Time_Components::Components::Time,CallerType,int>();
 				cout<<endl<<"Timestep End:  ";
-				timestep_end<ThisType,ThisType,Time_API::Time>()->Write<Time_API::Time,CallerType,int>();			
+				timestep_end<ThisType,ThisType,Time_Components::Components::Time>()->Write<Time_Components::Components::Time,CallerType,int>();			
 			}
 			//------------------------------------------------------------------------------------------------------------------
 			//  Base function dispatchers
 			//------------------------------------------------------------------------------------------------------------------
 			/// Push a trip returned from external source into the local trip list through a base function call
-			facet void push_trip(Trip_Info* trip, call_requirements(requires(ThisType,Is_Dispatchable) && requires(TargetType, Trip_API::Concepts::Is_Trip)))
+			facet void push_trip(Trip_Info* trip, call_requirements(requires(ThisType,Is_Dispatchable) && requires(TargetType, Trip_Components::Concepts::Is_Trip)))
 			{
 				PTHIS(ThisType)->push_trip<Dispatch<ThisType>,CallerType,TargetType>(trip);
 			}
@@ -244,37 +244,37 @@ namespace Demand_API
 	{
 		struct Transims_Control_File_CSV_Struct
 		{
-			typedef Demand_API::Types::ModelTypes::TransimsType TransimsType;
-			typedef Demand_API::Types::FileFormatTypes::CSV_Delimited CSV_Delimited;
-			typedef Demand_API::Types::FileTypes::ControlFile ControlFile;
+			typedef Types::ModelTypes::TransimsType TransimsType;
+			typedef Types::FileFormatTypes::CSV_Delimited CSV_Delimited;
+			typedef Types::FileTypes::ControlFile ControlFile;
 			char* filename;
 		};
 		struct Transims_Control_File_TAB_Struct
 		{
-			typedef Demand_API::Types::ModelTypes::TransimsType TransimsType;
-			typedef Demand_API::Types::FileFormatTypes::Tab_Delimited Tab_Delimited;
-			typedef Demand_API::Types::FileTypes::ControlFile ControlFile;
+			typedef Types::ModelTypes::TransimsType TransimsType;
+			typedef Types::FileFormatTypes::Tab_Delimited Tab_Delimited;
+			typedef Types::FileTypes::ControlFile ControlFile;
 			char* filename;
 		};
 		struct Transims_Trip_File_CSV_Struct
 		{
-			typedef Demand_API::Types::ModelTypes::TransimsType TransimsType;
-			typedef Demand_API::Types::FileFormatTypes::CSV_Delimited CSV_Delimited;
-			typedef Demand_API::Types::FileTypes::TripFile TripFile;
+			typedef Types::ModelTypes::TransimsType TransimsType;
+			typedef Types::FileFormatTypes::CSV_Delimited CSV_Delimited;
+			typedef Types::FileTypes::TripFile TripFile;
 			char* filename;
 		};
 		struct Transims_Trip_File_TAB_Struct
 		{
-			typedef Demand_API::Types::ModelTypes::TransimsType TransimsType;
-			typedef Demand_API::Types::FileFormatTypes::Tab_Delimited Tab_Delimited;
-			typedef Demand_API::Types::FileTypes::TripFile TripFile;
+			typedef Types::ModelTypes::TransimsType TransimsType;
+			typedef Types::FileFormatTypes::Tab_Delimited Tab_Delimited;
+			typedef Types::FileTypes::TripFile TripFile;
 			char* filename;
 		};
 		struct Transims_Trip_File_BIN_Struct
 		{
-			typedef Demand_API::Types::ModelTypes::TransimsType TransimsType;
-			typedef Demand_API::Types::FileFormatTypes::Binary Binary;
-			typedef Demand_API::Types::FileTypes::TripFile TripFile;
+			typedef Types::ModelTypes::TransimsType TransimsType;
+			typedef Types::FileFormatTypes::Binary Binary;
+			typedef Types::FileTypes::TripFile TripFile;
 			char* filename;
 		};
 	}
