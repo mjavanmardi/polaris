@@ -23,14 +23,14 @@
     <ClInclude Include="Repository_User_Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Demand_Base.h">
-      <Filter>Bases</Filter>
-    </ClInclude>
-    <ClInclude Include="Demand_API.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="Transims_Demand_API.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Demand_Bases.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
+    <ClInclude Include="Demand_Interfaces.h">
+      <Filter>Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

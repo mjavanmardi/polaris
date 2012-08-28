@@ -23,18 +23,6 @@
     <ClInclude Include="Repository_Base_Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Location_API.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Spatial_API.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Time_API.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Trip_API.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="Location_Base.h">
       <Filter>Bases</Filter>
     </ClInclude>
@@ -46,6 +34,27 @@
     </ClInclude>
     <ClInclude Include="Trip_Base.h">
       <Filter>Bases</Filter>
+    </ClInclude>
+    <ClInclude Include="Time_Interfaces.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Trip_Interfaces.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Location_Interfaces.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Signal_Interfaces.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Spatial_Interfaces.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="TEMPLATE_interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TEMPLATE_Bases.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

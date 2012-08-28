@@ -115,15 +115,18 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Location_API.h" />
+    <ClInclude Include="TEMPLATE_Bases.h" />
+    <ClInclude Include="TEMPLATE_interface.h" />
+    <ClInclude Include="Location_Interfaces.h" />
     <ClInclude Include="Location_Base.h" />
     <ClInclude Include="Repository_Base.h" />
     <ClInclude Include="Repository_Base_Includes.h" />
-    <ClInclude Include="Spatial_API.h" />
+    <ClInclude Include="Signal_Interfaces.h" />
+    <ClInclude Include="Spatial_Interfaces.h" />
     <ClInclude Include="Spatial_Base.h" />
-    <ClInclude Include="Time_API.h" />
+    <ClInclude Include="Time_Interfaces.h" />
     <ClInclude Include="Time_Base.h" />
-    <ClInclude Include="Trip_API.h" />
+    <ClInclude Include="Trip_Interfaces.h" />
     <ClInclude Include="Trip_Base.h" />
   </ItemGroup>
   <ItemGroup>

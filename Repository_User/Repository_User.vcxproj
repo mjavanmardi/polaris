@@ -118,8 +118,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Demand_API.h" />
-    <ClInclude Include="Demand_Base.h" />
+    <ClInclude Include="Demand_Interfaces.h" />
+    <ClInclude Include="Demand_Bases.h" />
     <ClInclude Include="Repository_User.h" />
     <ClInclude Include="Repository_User_Includes.h" />
     <ClInclude Include="Transims_Demand_API.h" />
