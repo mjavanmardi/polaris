@@ -1,3 +1,5 @@
 1.) DEALLOCATION!!!!
 
-1.)	Garbage Collection
+2.)	Garbage Collection
+
+3.) Thread-safe structures
