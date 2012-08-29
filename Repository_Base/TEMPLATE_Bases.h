@@ -24,7 +24,7 @@ namespace EXAMPLE_COMPONENTS
 			/// Error Handler for general Initializers.  In this case, stops the initializer from being called directly
 			facet void Initialize(call_requirements(requires(ThisType,!Is_Dispatched)))
 			{
-				assert_requirements(TargetType,Is_Dispatched,"TargetType is not dispatched");
+				assert_requirements(ThisType,Is_Dispatched,"ThisType is not dispatched");
 			}
 
 
@@ -45,7 +45,7 @@ namespace EXAMPLE_COMPONENTS
 			// Make sure to create an error handler for the accessors by negating the requirements
 			facet void ACCESSOR_NAME(TargetType set_value, call_requirements(!(requires(ThisType,Is_Dispatched))))
 			{
-				assert_requirements(TargetType,Is_Dispatched,"TargetType is not dispatched");
+				assert_requirements(ThisType,Is_Dispatched,"ThisType is not dispatched");
 			}
 			// create a tag that says the getter and setter have been defined - the existence of this tag is checked if the interface accessors are invoked
 			tag_getter_setter(ACCESSOR_NAME);
