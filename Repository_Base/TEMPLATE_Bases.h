@@ -33,17 +33,17 @@ namespace EXAMPLE_COMPONENTS
 			int _EXAMPLE_DATA; // create the data
 			// create a handler for the GET version of the ACCESSOR_NAME accessor created in the interface
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType ACCESSOR_NAME(call_requirements(requires(TargetType,Is_Dispatched)))
+			TargetType ACCESSOR_NAME(call_requirements(requires(ThisType,Is_Dispatched)))
 			{
 				return (TargetType)_EXAMPLE_DATA; // return the local data member cast to the TargetType
 			}
 			// create a handler for the SET version of the ACCESSOR_NAME accessor created in the interface, 'facet' macro replaces the template definition, giving the same typenames as above
-			facet void ACCESSOR_NAME(TargetType set_value, call_requirements(requires(TargetType,Is_Dispatched)))
+			facet void ACCESSOR_NAME(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched)))
 			{
 				_EXAMPLE_DATA = (int)set_value; // return the local data member cast to the TargetType
 			}
 			// Make sure to create an error handler for the accessors by negating the requirements
-			facet void ACCESSOR_NAME(TargetType set_value, call_requirements(!(requires(TargetType,Is_Dispatched))))
+			facet void ACCESSOR_NAME(TargetType set_value, call_requirements(!(requires(ThisType,Is_Dispatched))))
 			{
 				assert_requirements(TargetType,Is_Dispatched,"TargetType is not dispatched");
 			}
