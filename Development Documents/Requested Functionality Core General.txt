@@ -1,7 +1,7 @@
 1.) DEALLOCATION!!!!
 
-2.)	Garbage Collection
+	1a.) Garbage Collection
 
-3.) Thread-safe structures
+2.) Thread-safe structures
 
-4.) Enable conversion of warning 4717 into error - infinite recursion
+3.) Enable conversion of warning 4717 into error - infinite recursion

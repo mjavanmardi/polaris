@@ -1,16 +1,17 @@
-1.  Add reference and pointer return options for automatically generated accessors using the 'member_data' macro:
+1.)  Add reference and pointer return options for automatically generated accessors using the 'member_data' macro:
 
-2.  Need a member_interface macro analagous to member_data for when bases hold interfaces to other components.
+2.)  Need a member_interface macro analagous to member_data for when bases hold interfaces to other components.
 
-3.  In the event facet rename pthis to _pthis
+3.)  In the event facet rename pthis to _pthis
 
-4.  Make components inherit a protected interface so that the user will not allocate a component on the stack and attempt to use it without an interface
+4.)  Make components inherit a protected interface so that the user will not allocate a component on the stack and attempt to use it without an interface
 
-5.  Update state checks to match wiki description
+5.)  Update state checks to match wiki description
 
-6.  Implement "namespace" within interface structs (i.e. nesting structs to replace macros)
+6.)  Implement "namespace" within interface structs (i.e. nesting structs to replace macros)
 
-7.  Generic Container interface and concept
+7.)  Generic Container interface and concept
 
-8.  Formalize parent-child development, structure, use-patterns
-	- How to refer to child types in parent class:  Macro for replacing "typedef Child_Itf; typedef Child_Base; polaris_component<Child_Itf, Child_Base,ThisType>
+8.)  Formalize parent-child development, structure, use-patterns
+
+	8a.) How to refer to child types in parent class:  Macro for replacing "typedef Child_Itf; typedef Child_Base; polaris_component<Child_Itf, Child_Base,ThisType>
