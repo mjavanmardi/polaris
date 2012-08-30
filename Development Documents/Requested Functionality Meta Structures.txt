@@ -13,3 +13,4 @@
 7.  Generic Container interface and concept
 
 8.  Formalize parent-child development, structure, use-patterns
+	- How to refer to child types in parent class:  Macro for replacing "typedef Child_Itf; typedef Child_Base; polaris_component<Child_Itf, Child_Base,ThisType>

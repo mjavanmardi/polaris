@@ -3,3 +3,5 @@
 2.)	Garbage Collection
 
 3.) Thread-safe structures
+
+4.) Enable conversion of warning 4717 into error - infinite recursion
