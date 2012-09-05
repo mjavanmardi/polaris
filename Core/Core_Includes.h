@@ -2,6 +2,7 @@
 
 #include <list>
 #include <vector>
+#include <deque>
 #include <string>
 #include <Windows.h>
 #include <WinBase.h>
@@ -19,6 +20,9 @@ class NULLCLASS{};
 #define nullptr NULL
 
 struct NULLTYPE{};
+
+template<typename A> struct NULLTEMPLATE{};
+template<typename A,typename B> struct NULLTEMPLATE_2{};
 
 struct UNKNOWN{};
 

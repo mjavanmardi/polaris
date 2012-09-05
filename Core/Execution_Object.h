@@ -32,6 +32,11 @@ struct Execution_Object
 
 	permit_state_checking;
 
+	__forceinline void Swap_Event(Event new_event)
+	{
+		event_register=new_event;
+	}
+
 	template<typename ThisType>
 	void Load_Register(Conditional conditional,Event p_event,int start)
 	{

@@ -10,6 +10,7 @@
 static const int success=sizeof(small_type);
 
 #define strip_modifiers(TYPE) typename remove_cv<typename remove_pointer<typename remove_extent<typename remove_reference<typename TYPE>::type>::type>::type>::type
+#define strip_modifiers_nontemplate(TYPE) remove_cv<typename remove_pointer<typename remove_extent<typename remove_reference<typename TYPE>::type>::type>::type>::type
 
 #define begin_requirements_list typedef strip_modifiers(TYPE_A) T; typedef strip_modifiers(TYPE_B) V; typedef true_type none; typedef TYPELIST_1(none) auto_check_list_none
 #define end_requirements_list(LAST_CONCEPT) static const bool value=IsTrue<auto_check_list_##LAST_CONCEPT>::value;typedef typename test_condition<value>::type type;
@@ -29,15 +30,25 @@ static const int success=sizeof(small_type);
 	};\
 	typedef typename Append<auto_check_list_##LINKED_CONCEPT,REQUIREMENT_NAME>::Result auto_check_list_##REQUIREMENT_NAME;
 
+//#define requires_facet(LINKED_CONCEPT,FACET_NAME,FACET_TYPE,ERROR_MESSAGE)\
+//	struct FACET_NAME\
+//	{\
+//		template<typename member_function_ptr_types<typename T::Base_Type,FACET_TYPE>::type> struct base_tester{};\
+//		template<typename member_function_ptr_types<typename T::Interface_Type,FACET_TYPE>::type> struct interface_tester{};\
+//		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
+//		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
+//		template<typename U> static large_type has_matching_function_member(...);\
+//		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
+//		static_assert(value || !assert_requirements,"\n\n\n[--------- "##ERROR_MESSAGE##" ---------]\n\n");\
+//	};\
+//	typedef typename Append<auto_check_list_##LINKED_CONCEPT,FACET_NAME>::Result auto_check_list_##FACET_NAME;
+
 #define requires_facet(LINKED_CONCEPT,FACET_NAME,FACET_TYPE,ERROR_MESSAGE)\
 	struct FACET_NAME\
 	{\
-		template<typename member_function_ptr_types<typename T::Base_Type,FACET_TYPE>::type> struct base_tester{};\
-		template<typename member_function_ptr_types<typename T::Interface_Type,FACET_TYPE>::type> struct interface_tester{};\
-		template<typename U> static small_type has_matching_function_member(base_tester<&U::FACET_NAME##_tag>*);\
-		template<typename U> static small_type has_matching_function_member(interface_tester<&U::FACET_NAME##_tag>*);\
-		template<typename U> static large_type has_matching_function_member(...);\
-		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
+	template<typename U> static small_type has_matching_typename(typename U::FACET_NAME##_FACET_TYPE*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
 		static_assert(value || !assert_requirements,"\n\n\n[--------- "##ERROR_MESSAGE##" ---------]\n\n");\
 	};\
 	typedef typename Append<auto_check_list_##LINKED_CONCEPT,FACET_NAME>::Result auto_check_list_##FACET_NAME;
@@ -148,6 +159,6 @@ static const int success=sizeof(small_type);
 #define call_requires(TYPE_TO_TEST,CONCEPT_NAME) char(*)[CONCEPT_NAME<TYPE_TO_TEST>::value]=NULL
 #define call_requires_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) char(*)[CONCEPT_NAME<CALL_REQUIREMENTS_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::value]=NULL
 
-#define call_requirements(...) char(*)[__VA_ARGS__]=NULL
+#define call_requirements(...) char(*)[__VA_ARGS__ && True_Concept<TargetType>::value]=NULL
 #define requires(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<TYPE_TO_TEST>::value
 #define requires_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<CALL_REQUIREMENTS_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::value

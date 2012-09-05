@@ -15,7 +15,6 @@ struct member_function_ptr_types
 	typedef void (Type::* type)(void);
 };
 
-
 ///============================================================================
 /// Type_Info Wrapper Class
 ///============================================================================
@@ -33,7 +32,7 @@ public:
 	const type_info* pInfo_;
 };
 
-bool operator==(const Type_Info& A,const Type_Info& B){return (*A.pInfo_)==(*B.pInfo_);}
+static bool operator==(const Type_Info& A,const Type_Info& B){return (*A.pInfo_)==(*B.pInfo_);}
 
 ///============================================================================
 /// Basic Type Traits
