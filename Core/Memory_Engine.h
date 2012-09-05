@@ -77,9 +77,9 @@ static Memory_Root* memory_root_ptr;
 ///============================================================================
 
 template<typename DataType>
-typename DataType::Interface_Type* Allocate(void)
+typename DataType::Interface_Type<DataType,NULLTYPE>::type* Allocate(void)
 {
-	return (DataType::Interface_Type*)DataType::allocator_template<DataType>::allocator_reference.Allocate();
+	return (DataType::Interface_Type<DataType,NULLTYPE>::type*)DataType::allocator_template<DataType>::allocator_reference.Allocate();
 }
 
 //template<typename DataType>

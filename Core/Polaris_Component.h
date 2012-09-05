@@ -22,7 +22,11 @@ public:
 	friend BaseType;
 
 	typedef false_type Dispatched;
-	typedef InterfaceTemplate<Polaris_Component,NULLTYPE> Interface_Type;
+	//typedef InterfaceTemplate<Polaris_Component,NULLTYPE> Interface_Type;
+
+	template<typename ThisType=Polaris_Component,typename CallerType=NULLTYPE>
+	struct Interface_Type{typedef InterfaceTemplate<ThisType,CallerType> type;};
+
 	typedef Polaris_Component This_Type;
 	typedef BaseType Base_Type;
 	typedef ObjectType Object_Type;
@@ -87,7 +91,10 @@ public:
 	friend BaseType;
 
 	typedef false_type Dispatched;
-	typedef InterfaceTemplate<Polaris_Component_Data,Polaris_Component_Data> Interface_Type;
+
+	template<typename ThisType=Polaris_Component_Data,typename CallerType=NULLTYPE>
+	struct Interface_Type{typedef InterfaceTemplate<ThisType,CallerType> type;};
+	
 	typedef Polaris_Component_Data This_Type;
 	typedef BaseType Base_Type;
 	typedef Data_Object Object_Type;
@@ -150,7 +157,9 @@ public:
 	friend BaseType;
 
 	typedef false_type Dispatched;
-	typedef InterfaceTemplate<Polaris_Component_Execution,Polaris_Component_Execution> Interface_Type;
+	template<typename ThisType=Polaris_Component_Execution,typename CallerType=NULLTYPE>
+	struct Interface_Type{typedef InterfaceTemplate<ThisType,CallerType> type;};
+
 	typedef Polaris_Component_Execution This_Type;
 	typedef BaseType Base_Type;
 	typedef Data_Object Object_Type;
