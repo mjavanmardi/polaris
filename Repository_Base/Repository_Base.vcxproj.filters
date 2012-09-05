@@ -56,6 +56,9 @@
     <ClInclude Include="TEMPLATE_Bases.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Signal_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository_Base.cpp">

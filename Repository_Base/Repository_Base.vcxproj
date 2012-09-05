@@ -115,6 +115,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Signal_Base.h" />
     <ClInclude Include="TEMPLATE_Bases.h" />
     <ClInclude Include="TEMPLATE_interface.h" />
     <ClInclude Include="Location_Interfaces.h" />
