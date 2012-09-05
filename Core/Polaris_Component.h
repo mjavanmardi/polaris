@@ -10,8 +10,7 @@
 
 template<template<typename ThisType,typename CallerType> class InterfaceTemplate=NULLTEMPLATE_2,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename EntityType=NULLTYPE,typename ObjectType=Data_Object>
 class Polaris_Component:
-	public Polaris_Component<NULLTEMPLATE_2,BaseType,ParentType,EntityType,ObjectType>,
-	public InterfaceTemplate<NULLTYPE,NULLTYPE>
+	public Polaris_Component<NULLTEMPLATE_2,BaseType,ParentType,EntityType,ObjectType>
 {
 public:
 #if STATE_CHECKS
@@ -22,7 +21,6 @@ public:
 	friend BaseType;
 
 	typedef false_type Dispatched;
-	//typedef InterfaceTemplate<Polaris_Component,NULLTYPE> Interface_Type;
 
 	template<typename ThisType=Polaris_Component,typename CallerType=NULLTYPE>
 	struct Interface_Type{typedef InterfaceTemplate<ThisType,CallerType> type;};
@@ -78,8 +76,7 @@ public:
 
 template<template<typename ThisType,typename CallerType> class InterfaceTemplate=NULLTEMPLATE_2,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename EntityType=NULLTYPE>
 class Polaris_Component_Data:
-	public Polaris_Component_Data<NULLTEMPLATE_2,BaseType,ParentType,EntityType>,
-	public InterfaceTemplate<NULLTYPE,NULLTYPE>
+	public Polaris_Component_Data<NULLTEMPLATE_2,BaseType,ParentType,EntityType>
 {
 public:
 #if STATE_CHECKS
@@ -145,8 +142,7 @@ public:
 
 template<template<typename ThisType,typename CallerType> class InterfaceTemplate=NULLTEMPLATE_2,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename EntityType=NULLTYPE>
 class Polaris_Component_Execution:
-	public Polaris_Component_Execution<NULLTEMPLATE_2,BaseType,ParentType,EntityType>,
-	public InterfaceTemplate<NULLTYPE,NULLTYPE>
+	public Polaris_Component_Execution<NULLTEMPLATE_2,BaseType,ParentType,EntityType>
 {
 public:
 #if STATE_CHECKS
