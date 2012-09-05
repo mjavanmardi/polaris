@@ -131,7 +131,7 @@ namespace Signal_Components
 		};
 		#pragma endregion
 
-		#pragma region Units Checks
+		#pragma region Units Concepts
 		concept Is_Percentage
 		{
 			begin_requirements_list;
@@ -203,13 +203,13 @@ namespace Signal_Components
 		define_state_check(is_0_to_100_percentage, float value)
 		{
 			begin_state_checks;
-			requires_condition(value >= 0.0 && value < 100.0,"Warning, must be a percentage between 0 and 100");
+			requires_condition(value >= 0.0 && value < 100.0,"Warning, must be a percentage between 0 and 100",true,cout);
 			end_state_checks;
 		}
 		define_state_check(ispositive, float value)
 		{
 			begin_state_checks;
-			requires_condition(value >= 0.0,"Warning, must be a positive number");
+			requires_condition(value >= 0.0,"Warning, must be a positive number",true,cout);
 			end_state_checks;
 		}
 
@@ -219,25 +219,25 @@ namespace Signal_Components
 		define_state_check(valid_lane_width, float width)
 		{
 			begin_state_checks;
-			requires_condition((width >= 8.0 && width < 16.0),"Warning, lane widths less than 8.0ft or over 16ft are not allowed");
+			requires_condition((width >= 8.0 && width < 16.0),"Warning, lane widths less than 8.0ft or over 16ft are not allowed",true,cout);
 			end_state_checks;
 		};
 		define_state_check(valid_grade, float grade)
 		{
 			begin_state_checks;
-			requires_condition(grade >= -6.0 && grade <= 10.0 ,"Warning, grade must be between -6.0% and 10.0%");
+			requires_condition(grade >= -6.0 && grade <= 10.0 ,"Warning, grade must be between -6.0% and 10.0%",true,cout);
 			end_state_checks;
 		};
 		define_state_check(valid_parking_manuevers, float Nm)
 		{
 			begin_state_checks;
-			requires_condition(Nm >= 0.0 && Nm <= 180.0 ,"Warning, parking maneuvers must be less than 180/hour");
+			requires_condition(Nm >= 0.0 && Nm <= 180.0 ,"Warning, parking maneuvers must be less than 180/hour",true,cout);
 			end_state_checks;
 		};
 		define_state_check(valid_num_bus_stops, float Nb)
 		{
 			begin_state_checks;
-			requires_condition(Nb >= 0.0 && Nb<= 250.0 ,"Warning, number of buses stopping must be less than 250/hour");
+			requires_condition(Nb >= 0.0 && Nb<= 250.0 ,"Warning, number of buses stopping must be less than 250/hour",true,cout);
 			end_state_checks;
 		};
 		#pragma endregion
@@ -253,6 +253,7 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		/// Inteface to the basic POLARIS Lane Group component as defined in HCM
 		//------------------------------------------------------------------------------------------------------------------
+		template<typename ThisType=NULLTYPE, typename CallerType=NULLTYPE>
 		struct Lane_Group_Interface
 		{
 			facet void Initialize()
@@ -260,13 +261,12 @@ namespace Signal_Components
 				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
 			}
 
-
 			//=======================================================
 			// General Lane Group Calculation Facets
 			//-------------------------------------------------------
 			facet TargetType Calculate_VC_ratio(call_requires(TargetType,is_arithmetic))
 			{
-				return this->cycle_length<ThisType,TargetType>() * this->demand_lane_group<ThisType,TargetType>() / this->_Calculate_Saturation_Flow_Rate<ThisType,float>() / this->green_time<ThisType,TargetType>();
+				return this->cycle_length<TargetType>() * this->demand_lane_group<TargetType>() / this->_Calculate_Saturation_Flow_Rate<TargetType>() / this->green_time<TargetType>();
 			}
 			facet TargetType Calculate_VC_ratio(call_requires(TargetType,!is_arithmetic))
 			{
@@ -274,7 +274,7 @@ namespace Signal_Components
 			}
 			facet TargetType Calculate_VS_ratio(call_requires(TargetType,is_arithmetic))
 			{
-				return this->demand_lane_group<ThisType,Data_Structures::Flow_Per_Hour>() / this->Calculate_Saturation_Flow_Rate<ThisType,ThisType,TargetType>();
+				return this->demand_lane_group<Data_Structures::Flow_Per_Hour>() / this->Calculate_Saturation_Flow_Rate<TargetType>();
 			}
 			facet TargetType Calculate_VS_ratio(call_requires(TargetType,!is_arithmetic))
 			{
@@ -298,28 +298,28 @@ namespace Signal_Components
 				// fLpb = pedestrian adjustment factor for left-turn movements
 				// fRpb = pedestrian-bicycle adjustment factor for right-turn movements.
 
-				TargetType s = this->base_saturation_flow<ThisType, TargetType>() *
-					this->number_of_lanes<ThisType,TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fw<ThisType, TargetType>()*
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fHV<ThisType, TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fg<ThisType, TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fp<ThisType, TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fbb<ThisType, TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fa<ThisType, TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fLU<ThisType, TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fLT<ThisType, TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fRT<ThisType, TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fLpb<ThisType, TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fRpb<ThisType, float>();
+				TargetType s = this->base_saturation_flow<Data_Structures::Flow_Per_Hour>() *
+					this->number_of_lanes<TargetType>() *
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fw<TargetType>()*
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fHV<TargetType>() *
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fg<TargetType>() *
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fp<TargetType>() *
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fbb<TargetType>() *
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fa<TargetType>() *
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fLU<TargetType>() *
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fLT<TargetType>() *
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fRT<TargetType>() *
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fLpb<TargetType>() *
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fRpb<TargetType>();
 
 				return s;
 			}
 			facet TargetType Calculate_Saturation_Flow_Rate(call_requires(ThisType,Concepts::Is_HCM_Simple_Solution))
 			{
-				TargetType s = this->base_saturation_flow<ThisType, Data_Structures::Flow_Per_Hour>() *
-					this->number_of_lanes<ThisType,TargetType>() *
-					this->peak_hour_factor<ThisType,TargetType>() * 
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fa<ThisType,CallerType, TargetType>();
+				TargetType s = this->base_saturation_flow<Data_Structures::Flow_Per_Hour>() *
+					this->number_of_lanes<TargetType>() *
+					this->peak_hour_factor<TargetType>() * 
+					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fa<TargetType>();
 				return s;
 			}
 
@@ -331,57 +331,57 @@ namespace Signal_Components
 				// adjustment factor for lane width
 				facet float HCM_adjustment_fw()
 				{				
-					float width = THIS->avg_lane_width<ThisType,Data_Structures::Length_Foot>().value;
-					State_Checks::valid_lane_width<ThisType,CallerType,TargetType>(this,width);
+					float width = THIS->avg_lane_width<Data_Structures::Length_Foot>().value;
+					State_Checks::valid_lane_width<TargetType>(this,width);
 					return (1.0f + (width - 12.0f)/30.0f);
 				}
 				// adjustment factor for heavy vehicles in traffic stream
 				facet float HCM_adjustment_fHV()
 				{
-					return 100.0/(100.0 + (THIS->percent_heavy_vehicles<ThisType,Percentage_Struct>()).value);
+					return 100.0/(100.0 + THIS->percent_heavy_vehicles<Data_Structures::Percentage>());
 				}
 				// adjustment factor for approach grade
 				facet float HCM_adjustment_fg()
 				{
-					float grade = (THIS->grade<ThisType,Percentage_Struct>()).value;
-					Concepts::valid_grade<ThisType,CallerType,TargetType>(grade);
+					float grade = THIS->grade<Data_Structures::Percentage>();
+					Concepts::valid_grade<TargetType>(grade);
 					return 1.0 - grade / 200.0;
 				}
 				// adjustment factor for existence of a parking lane and parking activity adjacent to lane group
 				facet float HCM_adjustment_fp()
 				{
-					float parking = THIS->parking_activity<ThisType,float>();
-					Concepts::valid_parking_manuevers<ThisType,CallerType,float>(parking);
-					float lanes = THIS->number_of_lanes<ThisType,float>();
+					float parking = THIS->parking_activity<float>();
+					Concepts::valid_parking_manuevers<float>(parking);
+					float lanes = THIS->number_of_lanes<float>();
 					return (lanes - 0.1 - 18.0 * parking /3600.0)/lanes;
 				}
 				// adjustment factor for blocking effect of local buses that stop within intersection area
 				facet float HCM_adjustment_fbb()
 				{
-					float buses = THIS->buses_per_hour<ThisType,float>();
-					Concepts::valid_num_bus_stops<ThisType,CallerType,float>(buses);
-					float lanes = THIS->number_of_lanes<ThisType,float>();
+					float buses = THIS->buses_per_hour<float>();
+					Concepts::valid_num_bus_stops<float>(buses);
+					float lanes = THIS->number_of_lanes<float>();
 					return (lanes - 14.4 * buses /3600.0)/lanes;
 				}
 				// adjustment factor for area type
 				facet float HCM_adjustment_fa()
 				{
-					bool in_cbd = THIS->in_CBD<ThisType,bool>();
+					bool in_cbd = THIS->in_CBD<bool>();
 					if (in_cbd) return 0.9;
 					else return 1.0;
 				}
 				//  adjustment factor for lane utilization
 				facet float HCM_adjustment_fLU()
 				{
-					return THIS->demand_lane_group<ThisType,float>() / (THIS->demand_lane_max<ThisType,float>() * THIS->number_of_lanes<ThisType,float>());
+					return THIS->demand_lane_group<Data_Structures::Flow_Per_Hour>() / (THIS->demand_lane_max<Data_Structures::Flow_Per_Hour>() * THIS->number_of_lanes<float>());
 				}
 				// adjustment factor for left turns in lane group
 				facet float HCM_adjustment_fLT()
 				{
 					bool has_left, has_right, has_thru;
-					has_left = THIS->has_left_turn<ThisType,bool>();
-					has_right = THIS->has_right_turn<ThisType,bool>();
-					has_thru = THIS->has_thru_move<ThisType,bool>();
+					has_left = THIS->has_left_turn<bool>();
+					has_right = THIS->has_right_turn<bool>();
+					has_thru = THIS->has_thru_move<bool>();
 
 					if (has_left && !has_thru)
 					{
@@ -389,7 +389,7 @@ namespace Signal_Components
 					}
 					else if (has_left && has_thru)
 					{
-						return 1.0 / (1.0 + 0.05 * THIS->demand_left<ThisType, float>() / THIS->demand_lane_group<ThisType,float>());
+						return 1.0 / (1.0 + 0.05 * THIS->demand_left<Data_Structures::Flow_Per_Hour>() / THIS->demand_lane_group<Data_Structures::Flow_Per_Hour>());
 					}
 					else
 					{
@@ -400,9 +400,9 @@ namespace Signal_Components
 				facet float HCM_adjustment_fRT()
 				{
 					bool has_left, has_right, has_thru;
-					has_left = THIS->has_left_turn<ThisType,bool>();
-					has_right = THIS->has_right_turn<ThisType,bool>();
-					has_thru = THIS->has_thru_move<ThisType,bool>();
+					has_left = THIS->has_left_turn<bool>();
+					has_right = THIS->has_right_turn<bool>();
+					has_thru = THIS->has_thru_move<bool>();
 
 					if (has_right && !has_thru)
 					{
@@ -410,14 +410,14 @@ namespace Signal_Components
 					}
 					else if (has_right && has_thru)
 					{
-						int nlane = THIS->number_of_lanes<ThisType,int>();
+						int nlane = THIS->number_of_lanes<int>();
 						if (nlane > 1)
 						{
-							return 1.0 - 0.15 * THIS->demand_right<ThisType, float>() / THIS->demand_lane_group<ThisType,float>();
+							return 1.0 - 0.15 * THIS->demand_right<Data_Structures::Flow_Per_Hour>() / THIS->demand_lane_group<Data_Structures::Flow_Per_Hour>();
 						}
 						else
 						{
-							return 1.0 - 0.135 * THIS->demand_right<ThisType, float>() / THIS->demand_lane_group<ThisType,float>();
+							return 1.0 - 0.135 * THIS->demand_right<Data_Structures::Flow_Per_Hour>() / THIS->demand_lane_group<Data_Structures::Flow_Per_Hour>();
 						}
 					}
 					else
@@ -494,6 +494,7 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		/// Inteface to the basic POLARIS Signal Phase Component
 		//------------------------------------------------------------------------------------------------------------------
+		template<typename ThisType=NULLTYPE, typename CallerType=NULLTYPE>
 		struct Phase_Interface
 		{
 			facet void Initialize(TargetType number_of_lane_groups)
@@ -508,13 +509,14 @@ namespace Signal_Components
 			//------------------------------------------------------------
 			/// Get the maximum saturation ratio from amonst the individual lane_group in the phase
 			facet TargetType Find_Critical_VS_Ratio(call_requirements(
-				requires(ThisType,Concepts::Has_Child_Lane_Group) && 
+				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
 				requires(ThisType, Concepts::Is_HCM_Full_Solution) && 
 				requires(TargetType, is_arithmetic) && 
-				requires_2(typename ThisType::Lane_Group_Interface&, Interfaces::Lane_Group_Interface&, is_convertible)))
+				requires_2(typename ThisType::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>&, is_convertible)))
 			{
-				vector<Interfaces::Lane_Group_Interface*>& lane_group = this->Lane_Groups<ThisType, CHILD(Lane_Group_Interface,Lane_Group_Base)>();
-				vector<Interfaces::Lane_Group_Interface*>::iterator itr = lane_group.begin();
+				Typedef Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type<ThisType>::type, CallerType>* LaneGroupItf;
+				vector<LaneGroupItf>& lane_group = this->Lane_Groups<typename ThisType::Lane_Group_Type<ThisType>::type>();
+				vector<LaneGroupItf>::iterator itr = lane_group.begin();
 
 				// initialize critical vs ratio
 				TargetType vs_crit = 0;
@@ -522,7 +524,7 @@ namespace Signal_Components
 				// search each lane group in the phase, return the one with highest vs
 				for (itr; itr != lane_group.end(); itr++)
 				{
-					TargetType vs_i = (*itr)->Calculate_VS_ratio<CHILD(Lane_Group_Interface,Lane_Group_Base),ThisType,TargetType>();
+					TargetType vs_i = (*itr)->Calculate_VS_ratio<TargetType>();
 					if (vs_i > vs_crit) vs_crit = vs_i;
 				}
 				return vs_crit;
@@ -532,7 +534,7 @@ namespace Signal_Components
 				requires(ThisType,Concepts::Has_Child_Lane_Group) && 
 				requires(ThisType, Concepts::Is_HCM_Full_Solution) && 
 				requires(TargetType, is_arithmetic) && 
-				requires_2(typename ThisType::Lane_Group_Interface&, Interfaces::Lane_Group_Interface&, is_convertible))))
+				requires_2(typename ThisType::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, is_convertible))))
 			{
 				assert_requirements(ThisType,Concepts::Has_Child_Lane_Group,"Your Phase component does not have a Child LaneGroupType defined.  Please add a child lane group type to the base.");
 				assert_requirements_2(typename ThisType::Lane_Group_Interface&, Interfaces::Lane_Group_Interface&, is_convertible,"Error - your lane group type is not convertible to the base lane group interface.");
@@ -542,11 +544,12 @@ namespace Signal_Components
 				requires(ThisType,Concepts::Has_Child_Lane_Group) && 
 				requires(ThisType, Concepts::Is_HCM_Simple_Solution) && 
 				requires(TargetType, is_arithmetic) && 
-				requires_2(typename ThisType::Lane_Group_Interface&, Interfaces::Lane_Group_Interface&, is_convertible)))
+				requires_2(typename ThisType::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, is_convertible)))
 			{
-				vector<Interfaces::Lane_Group_Interface*>& lane_group = this->Lane_Groups<ThisType, CallerType, CHILD(Lane_Group_Interface, Lane_Group_Base)>();
-				vector<Interfaces::Lane_Group_Interface*>::iterator itr = lane_group.begin();
-
+				Typedef Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type<ThisType>::type, CallerType>* LaneGroupItf;
+				vector<LaneGroupItf>& lane_group = this->Lane_Groups<typename ThisType::Lane_Group_Type<ThisType>::type>();
+				vector<LaneGroupItf>::iterator itr = lane_group.begin();
+				
 				// initialize critical vs ratio
 				TargetType vs_crit = 0;
 
@@ -554,9 +557,9 @@ namespace Signal_Components
 				for (itr; itr != lane_group.end(); itr++)
 				{
 					typedef Data_Structures::Left_Turn_Types LeftType;
-					LeftType left = (*itr)->left_turn_type<CHILD(Lane_Group_Interface, Lane_Group_Base),ThisType,LeftType>();
+					LeftType left = (*itr)->left_turn_type<LeftType>();
 
-					TargetType vs_i = (*itr)->Calculate_VS_ratio<CHILD(Lane_Group_Interface, Lane_Group_Base),ThisType,TargetType>();
+					TargetType vs_i = (*itr)->Calculate_VS_ratio<TargetType>();
 					if (vs_i > vs_crit) vs_crit = vs_i;
 				}
 				return vs_crit;
@@ -566,7 +569,7 @@ namespace Signal_Components
 				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
 				requires(ThisType, Concepts::Is_HCM_Simple_Solution) && 
 				requires(TargetType, is_arithmetic) && 
-				requires_2(typename ThisType::Lane_Group_Interface&, Interfaces::Lane_Group_Interface&, is_convertible))))
+				requires_2(typename ThisType::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, is_convertible))))
 			{
 				assert_requirements(ThisType,Concepts::Has_LaneGroupType,"Your Phase component does not have a LaneGroupType defined.  Please add a lane group type to the base.");
 				assert_requirements(ThisType::LaneGroupType,Is_Polaris_Component,"Your lane group is not a valid polaris component");
@@ -583,7 +586,8 @@ namespace Signal_Components
 			facet_accessor(yellow_and_all_red_time);	///< Y (s)
 			/// Local facet to return the list of lane groups associated with phase
 			facet vector<typename TargetType::Interface_Type*>& Lane_Groups(call_requirements(
-				requires(ThisType, Is_Dispatchable)&& requires(TargetType, Is_Polaris_Component) && requires_2(typename TargetType::Interface_Type&, Interfaces::Lane_Group_Interface&, is_convertible)))
+				requires(ThisType, Is_Dispatchable)&& requires(TargetType, Is_Polaris_Component) && 
+				requires_2(typename TargetType::Interface_Type<typename ThisType::Lane_Group_Type<>::type>&, Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type<>::type>&, is_convertible)))
 			{
 				return PTHIS(ThisType)->Lane_Groups<Dispatch<ThisType>,CallerType, TargetType>();
 			}
@@ -600,6 +604,7 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		/// Inteface to the basic POLARIS Signal component
 		//------------------------------------------------------------------------------------------------------------------
+		template<typename ThisType=NULLTYPE, typename CallerType=NULLTYPE>
 		struct Signal_Interface
 		{
 			//=======================================================
@@ -622,7 +627,7 @@ namespace Signal_Components
 				requires(ThisType,Concepts::Has_Child_Phase) && 
 				requires(TargetType, is_arithmetic) && 
 				requires(typename ThisType, Concepts::Is_HCM_Full_Solution) && 
-				requires_2(ThisType::Phase_Interface&, Interfaces::Phase_Interface&, is_convertible)))
+				requires_2(typename ThisType::Phase_Interface<typename ThisType::Phase_Type<>::type>&, Interfaces::Phase_Interface<typename ThisType::Phase_Type<>::type>&, is_convertible)))
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
@@ -661,7 +666,7 @@ namespace Signal_Components
 				requires(ThisType,Concepts::Has_Child_Phase) && 
 				requires(TargetType, is_arithmetic) && 
 				requires(typename ThisType, Concepts::Is_HCM_Simple_Solution) && 
-				requires_2(ThisType::Phase_Interface&, Interfaces::Phase_Interface&, is_convertible)))
+				requires_2(ThisType::Phase_Interface<typename ThisType::Phase_Type<>::type>&, Interfaces::Phase_Interface<typename ThisType::Phase_Type<>::type>&, is_convertible)))
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
@@ -700,7 +705,7 @@ namespace Signal_Components
 				requires(ThisType,Concepts::Has_Child_Phase) && 
 				requires(TargetType, is_arithmetic) && 
 				(requires(ThisType, Concepts::Is_HCM_Full_Solution) || requires(ThisType, Concepts::Is_HCM_Simple_Solution)) &&
-				requires_2(ThisType::Phase_Interface&, Interfaces::Phase_Interface&, is_convertible))))
+				requires_2(ThisType::Phase_Interface<typename ThisType::Phase_Type<>::type>&, Interfaces::Phase_Interface<typename ThisType::Phase_Type<>::type>&, is_convertible))))
 			{
 				assert_requirements(ThisType, Concepts::Has_Child_Phase,"Your Signal Type does not have a Phase child class type defined.");
 				assert_requirements(TargetType, is_arithmetic, "Your TargetType is not arithmetic.");
@@ -722,12 +727,15 @@ namespace Signal_Components
 			facet_accessor(in_CBD);
 			/// Signal ID accessor
 			facet_accessor(Signal_ID);
+
+
+
 			/// Local facet to return the list of lane groups associated with signal
-			facet vector<typename TargetType::Interface_Type*>& Phases(call_requirements(requires(ThisType, Is_Dispatchable) && requires(TargetType, Is_Polaris_Component)))
+			facet vector<typename TargetType::Interface_Type<ThisType::Phase_Type<ThisType>::type,CallerType>*>& Phases(call_requirements(requires(ThisType, Is_Dispatchable) && requires(TargetType, Is_Polaris_Component)))
 			{
 				return PTHIS(ThisType)->Phases<Dispatch<ThisType>,CallerType,TargetType>();
 			}
-			facet vector<typename TargetType::Interface_Type*>& Phases(call_requirements(!(requires(ThisType, Is_Dispatchable) && requires(TargetType, Is_Polaris_Component))))
+			facet vector<typename TargetType::Interface_Type<ThisType::Phase_Type<ThisType>::type,CallerType>*>& Phases(call_requirements(!(requires(ThisType, Is_Dispatchable) && requires(TargetType, Is_Polaris_Component))))
 			{
 				assert_requirements(ThisType,Is_Dispatchable,"ThisType is not dispatchable.");
 				assert_requirements(TargetType, Is_Polaris_Component,"TargetType is not a polaris component");
