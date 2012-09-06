@@ -9,7 +9,7 @@
 #define COUNT_ARGUMENTS_IMPL(x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,N,...) N
 #define count_arguments(...) EXPAND(COUNT_ARGUMENTS_IMPL(__VA_ARGS__,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0))
 
-#define define_state_check(CHECK_NAME,...) template<typename TargetType> inline static void CHECK_NAME(void* tthis,__VA_ARGS__)
+#define define_state_check(CHECK_NAME,...) template<typename ThisType,typename CallerType,typename TargetType> inline static void CHECK_NAME(void* tthis,__VA_ARGS__)
 
 #define begin_state_checks if(STATE_CHECKS){__assume(STATE_CHECKS);ThisType* pthis=(ThisType*)tthis; bool no_error=true
 
@@ -39,4 +39,4 @@
 #define permit_state_checking typedef true_type state_checking_permitted
 #endif
 
-#define state_check(CHECK_NAME) CHECK_NAME<TargetType>
+#define state_check(CHECK_NAME) CHECK_NAME<ThisType,CallerType,TargetType>
