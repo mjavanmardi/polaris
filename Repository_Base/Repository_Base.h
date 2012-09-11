@@ -2,6 +2,7 @@
 
 #pragma warning(disable : 4482)
 #pragma warning(disable : 4305)
+#pragma warning(disable : 4503)
 
 
 

@@ -5,6 +5,20 @@
 
 namespace Signal_Components
 {
+	struct HCM_Signal_Full;
+	struct HCM_Signal_Simple;
+
+	//------------------
+	// Phases
+	struct HCM_Phase_Full;
+	struct HCM_Phase_Simple;
+
+	//------------------
+	// Lane Groups
+	struct HCM_LaneGroup_Full;
+	struct HCM_LaneGroup_Simple;
+
+
 	//==================================================================================================================
 	/// Namespace of Base classes and Components related to the Interface(s) from the component namespace.
 	/// The bases are combined with the interfaces to create components by adding data.
@@ -70,6 +84,26 @@ namespace Signal_Components
 			{
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
 			}
+			tag_getter(max_cycle_length);
+			facet_base TargetType max_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			{
+				Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
+				return parent->max_cycle_length<TargetType>();
+			}
+			facet_base TargetType max_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			{
+				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+			}
+			tag_getter(min_cycle_length);
+			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,is_arithmetic)))			
+			{
+				Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
+				return parent->min_cycle_length<TargetType>();
+			}
+			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,!is_arithmetic)))			
+			{
+				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+			}
 			tag_getter(green_time);
 			facet_base TargetType green_time(call_requirements(requires(TargetType,is_arithmetic)))			
 			{
@@ -101,6 +135,19 @@ namespace Signal_Components
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
 			}
 
+			//-------------------------------------
+			// Opposing lane_group interface 
+			void* _opposing_lane;
+			tag_getter_setter(opposing_lane);
+			facet_base typename TargetType::Interface_Type<TargetType,CallerType>::type* opposing_lane(call_requirements(requires(ThisType,Is_Dispatched) && requires_2(ThisType,TargetType,Is_Same_Component)))			
+			{
+				return  (typename TargetType::Interface_Type<TargetType,CallerType>::type*) _opposing_lane;
+			}
+			facet_base void opposing_lane(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value, call_requirements(requires(ThisType,Is_Dispatched) && requires_2(ThisType,TargetType,Is_Same_Component)))			
+			{
+				_opposing_lane = (void*) set_value;
+			}
+			//member_component_basic(Components::HCM_LaneGroup_Simple,opposing_lane);
 
 			//-------------------------------------
 			//Common Geometry conditions 
@@ -113,7 +160,7 @@ namespace Signal_Components
 			tag_getter_setter(avg_lane_width);
 			facet_base  void avg_lane_width(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,Concepts::Is_Foot_Measure)))
 			{
-				State_Checks::valid_lane_width<ThisType,CallerType,TargetType>(this,set_value.value);
+				State_Checks::valid_lane_width<ThisType>(this,set_value.value);
 				_avg_lane_width=(float)set_value.value;
 			}
 			facet_base  void avg_lane_width(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,Concepts::Is_Meter_Measure)))
@@ -183,16 +230,16 @@ namespace Signal_Components
 
 			//-------------------------------------
 			// Common Geometry conditions specific to Full analysis
-			member_data(float,grade,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));					///< G(%)
-			member_data(float,length_left_turn,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));		///< Ls s (ft)
-			member_data(float,length_right_turn,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));		///< Lr (ft)
+			member_data(float,grade,requires(TargetType,Concepts::Is_Percentage),requires(TargetType,Concepts::Is_Percentage));					///< G(%)
+			member_data(float,length_left_turn,requires(TargetType,Concepts::Is_Foot_Measure),requires(TargetType,Concepts::Is_Foot_Measure));		///< Ls s (ft)
+			member_data(float,length_right_turn,requires(TargetType,Concepts::Is_Foot_Measure),requires(TargetType,Concepts::Is_Foot_Measure));		///< Lr (ft)
 
 			//-------------------------------------
 			// Traffic conditions specific to the Full analysis
 			member_data(float,peak_hour_left,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< PHF
 			member_data(float,peak_hour_right,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));		///< PHF
 			member_data(float,peak_hour_thru,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< PHF
-			member_data(float,percent_heavy_vehicles,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic)); ///< HV for the entire lane group (%)
+			member_data(float,percent_heavy_vehicles,requires(TargetType,Concepts::Is_Percentage),requires(TargetType,Concepts::Is_Percentage)); ///< HV for the entire lane group (%)
 			member_data(float,percent_heavy_veh_left,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic)); ///< HV for left turn lanes in the group(%)
 			member_data(float,percent_heavy_veh_right,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));///< HV for right turn lanes in the group(%)
 			member_data(float,percent_heavy_veh_thru,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));	///< HV for through lanes in teh group(%)
@@ -200,7 +247,7 @@ namespace Signal_Components
 			member_data(float,buses_per_hour,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< N_b (buses/h)
 			member_data(float,parking_activity,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));		///< Nm (maneuvers/h)
 			member_data(float,arrival_type,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< AT
-			member_data(float,percent_arrive_on_green,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));///< P
+			member_data(float,percent_arrive_on_green,requires(TargetType,Concepts::Is_Percentage),requires(TargetType,Concepts::Is_Percentage));///< P
 			member_data(float,approach_speed,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< S_a	(mi/h)
 
 			//-------------------------------------
@@ -226,7 +273,6 @@ namespace Signal_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Bases
 	{
-
 		//==================================================================================================================
 		/// HCM Phase Base class.
 		/// Used to store common functionality for HCM Phase bases
@@ -253,6 +299,7 @@ namespace Signal_Components
 			//============================================================
 			//  BASIC LOCAL DATA AND ACCESSOR
 			//------------------------------------------------------------
+			member_data_basic(Data_Structures::Signal_State, signal_state);
 			/// Phase green time
 			member_data(float, green_time, requires(TargetType, Concepts::Is_Time_Seconds), requires(TargetType, Concepts::Is_Time_Seconds));	///< G (s)
 			/// Phase lost time
@@ -302,6 +349,26 @@ namespace Signal_Components
 			{
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
 			}
+			tag_getter(max_cycle_length);
+			facet_base TargetType max_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			{
+				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
+				return parent->max_cycle_length<TargetType>();
+			}
+			facet_base TargetType max_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			{
+				assert_requirements_std(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+			}
+			tag_getter(min_cycle_length);
+			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,is_arithmetic)))			
+			{
+				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
+				return parent->min_cycle_length<TargetType>();
+			}
+			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,!is_arithmetic)))			
+			{
+				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+			}
 			tag_getter(analysis_period);
 			facet_base TargetType analysis_period(call_requirements(requires(TargetType,is_arithmetic)))			
 			{
@@ -322,6 +389,7 @@ namespace Signal_Components
 			{
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
 			}	
+
 		};
 		//------------------------------------------------------------------------------------------------------------------
 		/// HCM Phase class.
@@ -336,10 +404,9 @@ namespace Signal_Components
 
 				for (int i=0; i<(int)number_of_lane_groups; i++)
 				{
-					Phase_HCM_Full_Base::Lane_Group_Interface* itf = Allocate<CHILD(Lane_Group_Interface,Lane_Group_Base)>();
-					((CHILD(Lane_Group_Interface,Lane_Group_Base)*)itf)->_parent = PTHIS(ThisType);
-
-					this->_Lane_Groups.push_back(itf);
+					ThisType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type,NULLTYPE>::type* itf = Allocate<Lane_Group_Type<Execution_Object, typename ThisType::This_Type>::type>();
+					((Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(typename ThisType::This_Type);
+					this->_Lane_Groups.push_back((double*)itf);
 				}
 
 			}
@@ -352,11 +419,20 @@ namespace Signal_Components
 
 			typedef Bases::Lane_Group_HCM_Full_Base Lane_Group_Base;
 
-			template<typename ParentType=NULLTYPE>
+			//=============================================================
+			// CHILD CLASS TYPE DEFINITION - required to create a child class interface for use in the phase interface
+			//-------------------------------------------------------------
+			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Lane_Group_Type
 			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface,Lane_Group_Base,ParentType> type;
+				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,typename ParentType::Entity_Tag,ObjectType> type;
 			};	
+			template<typename ObjectType>
+			struct Lane_Group_Type<ObjectType,NULLTYPE>
+			{
+				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,NULLTYPE,NULLTYPE,ObjectType> type;
+			};	
+
 		};
 		//------------------------------------------------------------------------------------------------------------------
 		/// HCM Phase class.
@@ -371,14 +447,9 @@ namespace Signal_Components
 
 				for (int i=0; i<(int)number_of_lane_groups; i++)
 				{
-
 					ThisType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type,NULLTYPE>::type* itf = Allocate<Lane_Group_Type<Execution_Object, typename ThisType::This_Type>::type>();
-
 					((Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(typename ThisType::This_Type);
-
 					this->_Lane_Groups.push_back((double*)itf);
-
-					bool error=true;
 				}
 
 			}
@@ -387,17 +458,20 @@ namespace Signal_Components
 			typedef Types::Solution_Types::HCM_Simple HCM_Simple;	///< The solution type applied to this base
 
 
-			/// CHILD CLASS TYPE DEFINITION - required to create a child class interface for use in the phase interface
 			typedef Bases::Lane_Group_HCM_Simple_Base Lane_Group_Base;
+
+			//=============================================================
+			// CHILD CLASS TYPE DEFINITION - required to create a child class interface for use in the phase interface
+			//-------------------------------------------------------------
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Lane_Group_Type
 			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface,Lane_Group_Base,ParentType,typename ParentType::Entity_Tag,ObjectType> type;
+				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,typename ParentType::Entity_Tag,ObjectType> type;
 			};	
 			template<typename ObjectType>
 			struct Lane_Group_Type<ObjectType,NULLTYPE>
 			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface,Lane_Group_Base,NULLTYPE,NULLTYPE,ObjectType> type;
+				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,NULLTYPE,NULLTYPE,ObjectType> type;
 			};	
 		};
 	}
@@ -450,8 +524,13 @@ namespace Signal_Components
 			//==========================================================================================
 			// Signal local data members
 			//------------------------------------------------------------------------------------------
+			member_data(int, active_phase,requires(TargetType, is_integral),requires(TargetType,is_integral));
 			/// Total cycle length
 			member_data(float,cycle_length,requires(TargetType,Concepts::Is_Time_Seconds),requires(TargetType,Concepts::Is_Time_Seconds));			///< C (s)
+			/// Total cycle length
+			member_data(float,max_cycle_length,requires(TargetType,Concepts::Is_Time_Seconds),requires(TargetType,Concepts::Is_Time_Seconds));	
+			/// Total cycle length
+			member_data(float,min_cycle_length,requires(TargetType,Concepts::Is_Time_Seconds),requires(TargetType,Concepts::Is_Time_Seconds));	
 			/// Total cycle length
 			member_data(float,degree_of_saturation,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));	///< X (s)
 			/// Area type
@@ -460,6 +539,7 @@ namespace Signal_Components
 			member_data(float,Signal_ID,requires(TargetType,is_arithmetic),false);
 			/// Analyisis Period accessor
 			member_data(float,analysis_period,requires(TargetType,Concepts::Is_Time_Minutes),requires(TargetType,Concepts::Is_Time_Minutes));
+			member_data(float,peak_hour_factor,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));
 
 
 	
@@ -480,8 +560,10 @@ namespace Signal_Components
 			{
 				for (int i=0; i<(int)number_of_phases; i++)
 				{
-					Signal_HCM_Full_Base::Phase_Interface* itf= Allocate<CHILD(Phase_Interface,Phase_Base)>();
-					this->_Phases.push_back(itf);
+					ThisType::Phase_Interface<Phase_Type<Execution_Object, typename ThisType::This_Type>::type,NULLTYPE>::type* itf= Allocate<Phase_Type<Execution_Object, typename ThisType::This_Type>::type>();
+					((Phase_Type<Execution_Object, typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(ThisType::This_Type);
+
+					_Phases.push_back((void*)itf);
 				}
 			}
 
@@ -489,11 +571,16 @@ namespace Signal_Components
 			//typedef Components::HCM_Phase_Full PhaseType;		///< The type of the child phase class	
 
 			typedef Bases::Phase_HCM_Full_Base Phase_Base;
-			template<typename ParentType=NULLTYPE>
+			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Phase_Type
 			{
-				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType> type;
+				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,typename ParentType::Entity_Tag,ObjectType> type;
 			};	
+			template<typename ObjectType>
+			struct Phase_Type<ObjectType,NULLTYPE>
+			{
+				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,NULLTYPE,NULLTYPE,ObjectType> type;
+			};
 
 			// GETTER OVERLOADS UNTIL CHECK IS FIXED
 			tag_getter(Phases);
