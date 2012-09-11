@@ -65,6 +65,9 @@
     <ClInclude Include="Core_Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Containers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">

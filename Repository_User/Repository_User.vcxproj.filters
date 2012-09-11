@@ -32,10 +32,17 @@
     <ClInclude Include="Demand_Interfaces.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Repository_User.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="Intersection_Interface.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Link_Interface.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenario_Interface.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Vehicle_Interface.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

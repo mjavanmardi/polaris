@@ -113,6 +113,7 @@
   <ItemGroup>
     <ClInclude Include="Basic_Concepts.h" />
     <ClInclude Include="Concepts.h" />
+    <ClInclude Include="Containers.h" />
     <ClInclude Include="Core_Includes.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="Data_Engine.h" />

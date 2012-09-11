@@ -120,12 +120,13 @@
   <ItemGroup>
     <ClInclude Include="Demand_Interfaces.h" />
     <ClInclude Include="Demand_Bases.h" />
+    <ClInclude Include="Intersection_Interface.h" />
+    <ClInclude Include="Link_Interface.h" />
     <ClInclude Include="Repository_User.h" />
     <ClInclude Include="Repository_User_Includes.h" />
+    <ClInclude Include="Scenario_Interface.h" />
     <ClInclude Include="Transims_Demand_API.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Repository_User.cpp" />
+    <ClInclude Include="Vehicle_Interface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
