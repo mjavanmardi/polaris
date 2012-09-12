@@ -103,17 +103,18 @@ namespace Link_Components
 			facet_accessor(jam_density);
 			facet_accessor(critical_density);
 
+
 			//facet TargetType pull_vehicle(call_requirements(requires_2(ThisType,CallerType,Is_Same_Entity)))
 			//{
 			//	PTHIS(ThisType)->offer_vehicle<Dispatch<ThisType>,TargetType>();
 			//}
 
-			facet void push_vehicle(Vehicle_Components::Interfaces::Vehicle_Interface* vehicle)
+			facet void push_vehicle(void* vehicle)
 			{
 				accept_vehicle<TargetType>(vehicle);
 			}
 
-			facet void accept_vehicle(Vehicle_Components::Interfaces::Vehicle_Interface* veh)
+			facet void accept_vehicle(void* veh)
 			{
 				typedef typename ThisType::scenario_reference_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
@@ -188,6 +189,8 @@ namespace Link_Components
 						t_minus_one_fftt = ((current_simulation_interval_index-1))%(link_fftt_cached_simulation_interval_size<int>());
 						link_upstream_cumulative_vehicles_by_t_minus_one = cached_link_upstream_cumulative_vehicles_array<int*>()[t_minus_one_fftt];
 					}
+
+					vechiles_array<vector<int>>().push_back()
 					
 					//N(a,L(a),t-bwtt)
 					if (current_simulation_interval_index >= (link_bwtt_cached_simulation_interval_size<int>()) )
@@ -219,7 +222,7 @@ namespace Link_Components
 				Intersection_Interface* intersection=downstream_intersection<Intersection_Interface*>();
 
 				VehicleQueueIteratorType vehicle_itr;
-				VehicleQueueType current_vehicle_queue=current_vehicle_queue<VehicleQueueType>();
+				VehicleQueueType& current_vehicle_queue=current_vehicle_queue<VehicleQueueType&>();
 
 				for(vehicle_itr=current_vehicle_queue.begin();vehicle_itr!=current_vehicle_queue.end();vehicle_itr++)
 				{
@@ -263,18 +266,18 @@ namespace Link_Components
 				//arrived vehicles at current interval
 				int current_position = link_origin_vehicle_current_position<int>();
 				
-				if(current_position<(int)link_origin_vehicle_index_array<VehicleOriginContainerType>().size())
+				if(current_position<(int)link_origin_vehicle_index_array<VehicleOriginContainerType&>().size())
 				{
-					for(int iv=current_position;iv<(int)link_origin_vehicle_index_array<VehicleOriginContainerType>().size();iv++)
+					for(int iv=current_position;iv<(int)link_origin_vehicle_index_array<VehicleOriginContainerType&>().size();iv++)
 					{
 						//udpate current position
 						link_origin_vehicle_current_position_array<int&>()++;
 
-						vehicle=link_origin_vehicle_index_array<VehicleOriginContainerType>()[iv];
+						vehicle=link_origin_vehicle_index_array<VehicleOriginContainerType&>()[iv];
 
 						if(vehicle->departure_simulation_interval_index<int>() == current_simulation_interval_index)
 						{
-							link_origin_vehicle_queue<VehicleOriginQueueType>().push_back(vehicle);
+							link_origin_vehicle_queue<VehicleOriginQueueType&>().push_back(vehicle);
 							link_origin_arrived_vehicles<int&>()++;
 							link_origin_cumulative_arrived_vehicles<int&>()++;
 							//loaded_vehicles++;
@@ -307,8 +310,8 @@ namespace Link_Components
 						int num_departed_vehicles = min(link_origin_arrived_vehicles<int>(),num_link_origin_departed_vehicles_allowed);
 						for (int iv=0;iv<num_departed_vehicles;iv++)
 						{//
-							vehicle=link_origin_vehicle_queue<VehicleOriginQueueType>().front();
-							link_origin_vehicle_queue<VehicleOriginQueueType>().pop_front();
+							vehicle=link_origin_vehicle_queue<VehicleOriginQueueType&>().front();
+							link_origin_vehicle_queue<VehicleOriginQueueType&>().pop_front();
 
 							//update vehicle state
 							vehicle->load_to_origin_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
