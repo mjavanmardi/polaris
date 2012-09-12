@@ -6,6 +6,15 @@ namespace Link_Components
 {
 	namespace Types
 	{
+		enum Link_Type_Keys
+		{
+			FREEWAY=0,
+			ON_RAMP,
+			OFF_RAMP,
+			EXPRESSWAY,
+			ARTERIAL,
+		};
+
 	}
 
 	namespace Concepts
