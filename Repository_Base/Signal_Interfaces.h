@@ -377,15 +377,15 @@ namespace Signal_Components
 					float plan_lt_adj;
 					if (this->left_turn_type<Data_Structures::Left_Turn_Types>() == Data_Structures::Left_Turn_Types::Permitted && N >= 2.0)
 					{
-						plan_lt_adj = max(  ((nt-1) + exp((-nt*vol_left*thru_car_equivalent)/600.0))/nt,  ((nt-1) + exp((-vol_left*this->max_cycle_length<Data_Structures::Time_Second>())/3600.0))/nt  ) ;
+						plan_lt_adj = (float)max(  ((nt-1) + exp((-nt*vol_left*thru_car_equivalent)/600.0))/nt,  ((nt-1) + exp((-vol_left*this->max_cycle_length<Data_Structures::Time_Second>())/3600.0))/nt  ) ;
 					}
 					else if (this->left_turn_type<Data_Structures::Left_Turn_Types>() == Data_Structures::Left_Turn_Types::Permitted && N < 2.0)
 					{
-						plan_lt_adj = exp( -0.02 * (thru_car_equivalent + 10.0*left_proportion) * (vol_left * this->max_cycle_length<Data_Structures::Time_Second>()) / 3600.0);
+						plan_lt_adj = (float)exp( -0.02 * (thru_car_equivalent + 10.0*left_proportion) * (vol_left * this->max_cycle_length<Data_Structures::Time_Second>()) / 3600.0);
 					}
 					else
 					{
-						if (vol_opposing < 1220.0) plan_lt_adj = 1.0 / ( 1.0 + (left_proportion * (235.0 + 0.435 * vol_opposing) / (1400.0 - vol_opposing)) );
+						if (vol_opposing < 1220.0) plan_lt_adj = 1.0f / ( 1.0f + (left_proportion * (235.0 + 0.435 * vol_opposing) / (1400.0 - vol_opposing)) );
 						else plan_lt_adj = 1.0 / (1.0 + 4.525 * left_proportion);
 					}
 
@@ -781,8 +781,9 @@ namespace Signal_Components
 			//-------------------------------------------------------
 			/// Dispatch the Initialize function call to the component base
 			facet void Initialize(TargetType num_phases)
-			{
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(num_phases);
+			{		
+				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(num_phases);
+				schedule_event_local(ThisType,Signal_Check_Conditional, Change_Signal_State, 0, NULLTYPE);
 			}
 
 			/// Add a new lane group to the signal controller
@@ -894,7 +895,62 @@ namespace Signal_Components
 			//=======================================================
 			// Signal Events
 			//-------------------------------------------------------
-			declare_facet_event
+			declare_facet_conditional(Signal_Check_Conditional)
+			{
+				// Get Current Interface
+				typedef ThisType T;
+				Signal_Interface<ThisType,NULLTYPE>* _this=(Signal_Interface<ThisType,NULLTYPE>*)pthis;
+			
+				// Get interface to phases in signal
+				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = _this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
+				Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>* phase;
+
+				// Get the currently active phase
+				int active_phase = _this->active_phase<int>();
+				phase = (*phases)[active_phase];
+
+				if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::RED)
+				{
+					response.result=true;
+					response.next=(int)phase->green_time<Data_Structures::Time_Second>();
+				}
+				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN)
+				{
+					response.result=true;
+					response.next=(int)phase->yellow_and_all_red_time<Data_Structures::Time_Second>();
+				}
+			}
+
+			declare_facet_event(Change_Signal_State)
+			{
+				typedef ThisType T;
+
+				// Get Current Interface
+				Signal_Interface<ThisType,NULLTYPE>* _this = (Signal_Interface<ThisType,NULLTYPE>*)pthis;
+
+				// Get interface to phases in signal
+				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = _this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
+				Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>* phase;
+
+				// Get the currently active phase
+				int active_phase = _this->active_phase<int>();
+				phase = (*phases)[active_phase];
+
+				// wait until green time for current phase is expired then continue
+				if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::RED)
+				{
+					phase->signal_state<Data_Structures::Signal_State>(Data_Structures::GREEN);
+				}
+				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN)
+				{
+					// change active phase state
+					phase->signal_state<Data_Structures::Signal_State>(Data_Structures::RED);
+					// Move to next phase
+					active_phase++;
+					if (active_phase >= phases->size()) active_phase=0;
+					_this->active_phase<int>(active_phase);
+				}
+			}
 
 
 			//=======================================================
