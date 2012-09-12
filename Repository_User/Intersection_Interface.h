@@ -22,12 +22,6 @@ namespace Intersection_Components
 		//	facet_accessor(num_movements);
 		//};
 
-		template<typename ThisType,typename CallerType>
-		struct Outbound_Inbound_Movements_Interface
-		{
-			facet_accessor(outbound_movement_reference);
-			facet_accessor(inbound_movements);
-		};
 		
 		template<typename ThisType,typename CallerType>
 		struct Movement_Interface
@@ -60,9 +54,19 @@ namespace Intersection_Components
 		};
 
 		template<typename ThisType,typename CallerType>
+		struct Outbound_Inbound_Movements_Interface
+		{
+			facet_accessor(outbound_movement_reference);
+			facet_accessor(inbound_movements);
+		};
+
+
+		template<typename ThisType,typename CallerType>
 		struct Intersection_Interface
 		{
 			facet_accessor(uuid);
+
+			facet_accessor(inbound_links);
 
 			facet_accessor(inbound_outbound_movements);
 			facet_accessor(outbound_inbound_movements);
@@ -80,12 +84,12 @@ namespace Intersection_Components
 			//	PTHIS(ThisType)->offer_vehicle<Dispatch<ThisType>,TargetType>();
 			//}
 
-			facet void push_vehicle(Vehicle_Components::Interfaces::Vehicle_Interface<ThisType,CallerType>* vehicle)
+			facet void push_vehicle(void* vehicle)
 			{
 				accept_vehicle<TargetType>(vehicle);
 			}
 			
-			facet void accept_vehicle(Vehicle_Components::Interfaces::Vehicle_Interface* vehicle)
+			facet void accept_vehicle(void* vehicle)
 			{
 				typedef typename ThisType::scenario_reference_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
@@ -98,17 +102,21 @@ namespace Intersection_Components
 				
 				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
 				
-				typedef typename OutboundInboundType::element_type::inbound_movements_type InboundMovementsType;
-				typedef typename InboundMovementsType::element_type InboundMovementType;
+				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+
+				typedef typename ThisType::inbound_movement_type InboundMovementType;
+
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
-				typedef typename OutboundInboundType::outbound_movement_reference_type LinkType;
+				typedef typename ThisType::outbound_movement_reference_type LinkType;
+
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
 				
-				typedef typename InboundMovementType::vehicles_container::Element_Type VehicleType;
+				typedef typename ThisType::vehicle_type VehicleType;
+
 				typedef typename Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
 
-				typedef typename InboundMovementType::vehicles_container_type VehiclesContainerType;
+				typedef typename ThisType::vehicles_container_type VehiclesContainerType;
 
 
 
@@ -643,15 +651,33 @@ namespace Intersection_Components
 				}
 			}
 
-			facet_local bool adjacent_link_supply_finished()
+			facet bool adjacent_link_supply_finished()
 			{
 
 			}
 
-			facet_local bool adjacent_link_moving_finished()
+			facet bool adjacent_link_moving_finished()
 			{
 
 			}
+
+
+			facet void Do_Stuff()
+			{
+				typedef typename ThisType::inbound_link_type LinkType;
+				typedef typename ThisType::links_container_type links_container_type;
+				typedef typename links_container_type::iterator links_iterator_type;
+
+				links_iterator_type itr;
+
+				links_container_type* container=inbound_links<links_container_type*>();
+
+				for(itr=container->begin();itr!=container->end();itr++)
+				{
+					cout << (*itr)->length<int&>() << endl;
+				}
+			}
+
 
 			declare_facet_conditional(Newells_Conditional)
 			{
