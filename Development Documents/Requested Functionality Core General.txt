@@ -7,3 +7,5 @@
 3.)  Enable conversion of warning 4717 into error - infinite recursion
 
 4.)  Set parent pointer on allocation
+
+5.)  Handle user submitting iterations < current_iteration in the execution_engine
