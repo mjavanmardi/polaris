@@ -7,6 +7,30 @@ namespace Intersection_Components
 {
 	namespace Types
 	{
+		enum Turn_Movement_Type_Keys
+		{
+			LEFT_TURN=0,
+			THROUGH_TURN,
+			RIGHT_TURN,
+			U_TURN,
+		};
+
+		enum Turn_Movement_Rule_Keys
+		{
+			PROHIBITED=0,
+			ALLOWED,
+		};
+
+		enum Node_Type_Keys
+		{
+			NO_CONTROL=0,
+			YIELD_SIGN,
+			ALL_WAY_STOP_SIGN,
+			TWO_WAY_STOP_SIGN,
+			PRE_TIMED_SIGNAL_CONTROL, 
+			ACTUATED_SIGNAL_CONTROL, 
+			ADAPTIVE_SIGNAL_CONTROL,
+		};
 	}
 
 	namespace Concepts
