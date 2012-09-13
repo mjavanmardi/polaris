@@ -29,9 +29,6 @@
     <ClInclude Include="Demand_Bases.h">
       <Filter>Bases</Filter>
     </ClInclude>
-    <ClInclude Include="Demand_Interfaces.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="Intersection_Interface.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
@@ -48,6 +45,15 @@
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="Routing_Interface.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Traveler_Interface.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Activity_Location_Interface.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Demand_Interface.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
   </ItemGroup>

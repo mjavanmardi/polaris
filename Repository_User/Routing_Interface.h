@@ -13,8 +13,6 @@ namespace Routing_Components
 	
 	namespace Interfaces
 	{
-
-		
 		enum Scan_List_Status_Keys
 		{
 				UNSCANNED=0,
