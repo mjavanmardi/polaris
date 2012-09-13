@@ -23,14 +23,11 @@ namespace Signal_Components
 	/// Namespace of Base classes and Components related to the Interface(s) from the component namespace.
 	/// The bases are combined with the interfaces to create components by adding data.
 	//------------------------------------------------------------------------------------------------------------------
-
-	//==================================================================================================================
-	/// Lane Group Bases
-	//------------------------------------------------------------------------------------------------------------------
 	namespace Bases
 	{
 		//==================================================================================================================
-		/// HCM Lane Group BASE class.
+		/// Lane Group Bases
+		//------------------------------------------------------------------------------------------------------------------
 		/// Holds common data for all HCM Lanegroup Bases
 		//------------------------------------------------------------------------------------------------------------------
 		struct Lane_Group_HCM_Base
@@ -59,7 +56,6 @@ namespace Signal_Components
 				this->_number_of_right_lanes = 0;
 				this->_peak_hour_factor = 1.0;
 			}
-
 
 			//============================================================
 			//  PARENT CLASS ACCESS HANDLERS
@@ -135,8 +131,14 @@ namespace Signal_Components
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
 			}
 
-			//-------------------------------------
+			//member_component_basic(Intersection_Components::Components::Polaris_Movement_Component,Demand_Source_Left);
+			//member_component_basic(Intersection_Components::Components::Polaris_Movement_Component,Demand_Source_Right);
+			//member_component_basic(Intersection_Components::Components::Polaris_Movement_Component,Demand_Source_Thru);
+
+
+			//============================================================
 			// Opposing lane_group interface 
+			//------------------------------------------------------------
 			void* _opposing_lane;
 			tag_getter_setter(opposing_lane);
 			facet_base typename TargetType::Interface_Type<TargetType,CallerType>::type* opposing_lane(call_requirements(requires(ThisType,Is_Dispatched) && requires_2(ThisType,TargetType,Is_Same_Component)))			
@@ -149,13 +151,16 @@ namespace Signal_Components
 			}
 			//member_component_basic(Components::HCM_LaneGroup_Simple,opposing_lane);
 
-			//-------------------------------------
-			//Common Geometry conditions 
+			//============================================================
+			// Common Geometry conditions 
+			//------------------------------------------------------------
 			member_data(int,number_of_lanes,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));		///< N
 			member_data(int,number_of_right_lanes,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));	
 			member_data(int,number_of_left_lanes,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));	
 
+			//============================================================
 			/// Lane width data member
+			//------------------------------------------------------------
 			float _avg_lane_width;
 			tag_getter_setter(avg_lane_width);
 			facet_base  void avg_lane_width(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,Concepts::Is_Foot_Measure)))
@@ -187,8 +192,9 @@ namespace Signal_Components
 				assert_requirements(TargetType,Concepts::Is_Foot_Measure,"TargetType is not a foot or meter measure");
 			}
 
-
-			/// Other geometry data members
+			//============================================================
+			// Other geometry data members
+			//------------------------------------------------------------
 			member_data(bool,has_left_turn,requires(TargetType,is_integral),requires(TargetType,is_integral));			///<
 			member_data(Data_Structures::Left_Turn_Types,left_turn_type,requires_2(TargetType,Data_Structures::Left_Turn_Types,is_convertible),requires_2(TargetType,Data_Structures::Left_Turn_Types,is_convertible));		///< Protected, Permitted, Unopposed, None
 			member_data(Data_Structures::Turn_Lane_Types,left_turn_lane_type,requires_2(TargetType,Data_Structures::Turn_Lane_Types,is_convertible),requires_2(TargetType,Data_Structures::Turn_Lane_Types,is_convertible));		///< Protected, Permitted, Unopposed, None
@@ -198,8 +204,9 @@ namespace Signal_Components
 			member_data(bool,has_thru_move,requires(TargetType,is_integral),requires(TargetType,is_integral));			///<
 			member_data(bool,has_parking,requires(TargetType,is_integral),requires(TargetType,is_integral));			///<
 
-			//-------------------------------------
-			//Traffic conditions 
+			//============================================================
+			// Traffic conditions 
+			//------------------------------------------------------------
 			member_data(float,demand_left,requires(TargetType,Concepts::Is_Flow_Per_Hour),requires(TargetType,Concepts::Is_Flow_Per_Hour));			///< V_l (veh/h)
 			member_data(float,demand_right,requires(TargetType,Concepts::Is_Flow_Per_Hour),requires(TargetType,Concepts::Is_Flow_Per_Hour));			///< V_r (veh/h)
 			member_data(float,demand_thru,requires(TargetType,Concepts::Is_Flow_Per_Hour),requires(TargetType,Concepts::Is_Flow_Per_Hour));			///< V (veh/h)
@@ -208,12 +215,14 @@ namespace Signal_Components
 			member_data(float,base_saturation_flow,requires(TargetType,Concepts::Is_Flow_Per_Hour),requires(TargetType,Concepts::Is_Flow_Per_Hour));	///< s_o (pc/h/ln)
 			member_data(float,peak_hour_factor,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));		///< PHF
 			
-			//-------------------------------------
-			//Signalization conditions 
+			//============================================================
+			// Signalization conditions 
+			//------------------------------------------------------------
 			member_data(bool,is_actuated,requires(TargetType,is_integral),requires(TargetType,is_integral));			///< true if actuated, false if pre-timed
 			member_data(float,min_pedestrian_green,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));	///< G_p (s)	
 
 		};
+		//------------------------------------------------------------------------------------------------------------------
 		/// HCM Lane Group Full Base
 		/// A signalized intersection Lane Group class which calculates saturated flow rates 
 		/// according to HCM 2000 CH16
@@ -265,15 +274,12 @@ namespace Signal_Components
 			/// Type definitions to define the context of the base class
 			typedef Types::Solution_Types::HCM_Simple HCM_Simple;	///< The solution type applied to this base
 		};
-	}
+
 	
 
-	//==================================================================================================================
-	/// Phase of a signal Bases 
-	//------------------------------------------------------------------------------------------------------------------
-	namespace Bases
-	{
 		//==================================================================================================================
+		/// Phase of a signal Bases 
+		//------------------------------------------------------------------------------------------------------------------
 		/// HCM Phase Base class.
 		/// Used to store common functionality for HCM Phase bases
 		//------------------------------------------------------------------------------------------------------------------
@@ -474,15 +480,12 @@ namespace Signal_Components
 				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,NULLTYPE,NULLTYPE,ObjectType> type;
 			};	
 		};
-	}
 
 
-	//==================================================================================================================
-	/// Signal Bases 
-	//------------------------------------------------------------------------------------------------------------------
-	namespace Bases
-	{
+
 		//==================================================================================================================
+		/// Signal Bases 
+		//------------------------------------------------------------------------------------------------------------------
 		/// HCM_Signal class.
 		/// Used to store common base functionality amonst all HCM signal bases
 		//------------------------------------------------------------------------------------------------------------------
@@ -496,8 +499,14 @@ namespace Signal_Components
 			{
 				typedef Interfaces::Phase_Interface<ThisType, CallerType> type;
 				typedef void* unknown_component;
-			};	
+			};
 
+			member_data_basic(int, Next_Event_Iteration);
+			member_data_basic(int, Next_Timing_Event_Iteration);
+			member_data_basic(bool, Event_Has_Fired);
+			member_data_basic(bool, Timing_Event_Has_Fired);
+			member_data_basic(bool, Event_Conditional_Hit);
+			member_data_basic(bool, Timing_Event_Conditional_Hit);
 
 			//============================================================
 			// CHILD CLASS ACCESS HANDLERS
@@ -524,6 +533,9 @@ namespace Signal_Components
 			//==========================================================================================
 			// Signal local data members
 			//------------------------------------------------------------------------------------------
+			/// Number of cycles to run before the timing plan is updated, currently defaults to infinity (no timing updates)
+			member_data(int, num_cycles_between_updates,requires(TargetType, is_integral),requires(TargetType,is_integral));
+			/// Currently active phase
 			member_data(int, active_phase,requires(TargetType, is_integral),requires(TargetType,is_integral));
 			/// Total cycle length
 			member_data(float,cycle_length,requires(TargetType,Concepts::Is_Time_Seconds),requires(TargetType,Concepts::Is_Time_Seconds));			///< C (s)
@@ -641,8 +653,8 @@ namespace Signal_Components
 			//tag_getter_setter(analysis_period);
 			//tag_getter(Signal_ID);
 		};
-	}
 
+	}
 
 	//==================================================================================================================
 	/// COMPONENT Namespace:  Namespace for the creation of All signal components
@@ -663,5 +675,46 @@ namespace Signal_Components
 		// Lane Groups
 		typedef Polaris_Component_Execution<Interfaces::Lane_Group_Interface,Bases::Lane_Group_HCM_Full_Base,HCM_Phase_Full> HCM_LaneGroup_Full;
 		typedef Polaris_Component_Execution<Interfaces::Lane_Group_Interface,Bases::Lane_Group_HCM_Simple_Base, HCM_Phase_Simple> HCM_LaneGroup_Simple;
+	}	
+
+
+	namespace Bases
+	{
+		//==================================================================================================================
+		/// Signal Indicator Base
+		//------------------------------------------------------------------------------------------------------------------
+		struct Signal_Indicator_Display_Base
+		{
+			member_data_basic(bool,Conditional_Has_Fired);
+			//member_component_basic(Signal_Components::Components::HCM_Signal_Simple,Signal);
+
+			// Local data member for signal interface
+			void* _signal;
+			tag_getter_setter(Signal);
+			facet_base void Signal(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value, call_requires(TargetType,Is_Polaris_Component))
+			{
+				_signal = (void*)set_value;
+			}
+			facet_base typename TargetType::Interface_Type<TargetType,NULLTYPE>::type* Signal(call_requires(TargetType,Is_Polaris_Component))
+			{
+				return (typename TargetType::Interface_Type<TargetType,NULLTYPE>::type*)_signal;
+			}
+
+
+		};
+		struct Signal_Indicator_Base
+		{
+			member_component_basic(Signal_Components::Components::HCM_Signal_Simple,Signal);
+		};
+		
+	}
+
+	//==================================================================================================================
+	/// COMPONENT Namespace:  Namespace for the creation of All signal components
+	//------------------------------------------------------------------------------------------------------------------
+	namespace Components
+	{
+		typedef Polaris_Component_Execution<Interfaces::Signal_Indicator_Interface,Bases::Signal_Indicator_Display_Base> Signal_Indicator_Display;
+		typedef Polaris_Component<Interfaces::Signal_Indicator_Interface,Bases::Signal_Indicator_Base> Signal_Indicator;
 	}	
 }

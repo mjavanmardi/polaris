@@ -269,6 +269,10 @@ namespace Signal_Components
 			//=======================================================
 			// General Lane Group Calculation Facets
 			//-------------------------------------------------------
+			facet void Update_Demand()
+			{
+
+			}
 			// Get the volumeto capacity ratio for lane group
 			facet TargetType Calculate_VC_ratio(call_requires(TargetType,is_arithmetic))
 			{
@@ -580,6 +584,12 @@ namespace Signal_Components
 				}
 			};
 
+			//=======================================================
+			// Demand data source Facets
+			//-------------------------------------------------------
+			facet_accessor(Demand_Source_Left);
+			facet_accessor(Demand_Source_Right);
+			facet_accessor(Demand_Source_Thru);
 
 			//=======================================================
 			// DATA Access Facets
@@ -658,6 +668,7 @@ namespace Signal_Components
 			//------------------------------------------------------------
 			facet void Initialize(TargetType number_of_lane_groups)
 			{
+				this->signal_state<Data_Structures::Signal_State>(Data_Structures::Signal_State::RED);
 				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(number_of_lane_groups);
 			}
 
@@ -741,6 +752,22 @@ namespace Signal_Components
 				//assert_requirements_2(ThisType::LaneGroupType::Interface_Type&,Lange_Group_Interface,is_convertible,"Error - your lane group type is not convertible to the base lane group interface.");
 			}
 
+			facet void Update_Demand(call_requirements(
+				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
+				requires(ThisType, Concepts::Is_HCM_Simple_Solution) && 
+				requires(TargetType, Concepts::Is_Flow_Per_Hour)))
+			{
+				// Get reference to the Lane Groups in the current phase
+				typedef ThisType T;
+				typedef Interfaces::Lane_Group_Interface<typename T::Lane_Group_Type<Execution_Object,T>::type, CallerType>* LaneGroupItf;
+				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
+				vector<LaneGroupItf>::iterator itr = lane_group->begin();
+				
+				for (itr; itr!=lane_group->end(); itr++)
+				{
+					(*itr)->Update_Demand<NULLTYPE>();
+				}
+			}
 
 			//============================================================
 			//  SIGNAL STATUS ACCESSORS
@@ -783,6 +810,14 @@ namespace Signal_Components
 			facet void Initialize(TargetType num_phases)
 			{		
 				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(num_phases);
+				this->Next_Event_Iteration<int>(0);
+				this->Event_Has_Fired<bool>(false);
+				this->Event_Conditional_Hit<bool>(false);
+				this->Next_Timing_Event_Iteration<int>(0);
+				this->Timing_Event_Has_Fired<bool>(false);
+				this->Timing_Event_Conditional_Hit<bool>(false);
+				this->active_phase<int>(0);
+				this->num_cycles_between_updates<int>(0);
 				schedule_event_local(ThisType,Signal_Check_Conditional, Change_Signal_State, 0, NULLTYPE);
 			}
 
@@ -791,13 +826,35 @@ namespace Signal_Components
 			{
 				PTHIS(ThisType)->Add_Lane_Group(new_lane_group);
 			}
+			facet void Display_Timing()
+			{
+				// Simplify ThisType name
+				typedef ThisType T;
 
-			/// HCM Retiming calculations
+				// Get reference to the phases in the signal phase diagram
+				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
+				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = phases->begin();
+
+				cout <<"Cycle Length: "<< this->cycle_length<Data_Structures::Time_Second>();
+				
+				int i=0; 
+				for (itr; itr != phases->end(); itr++, i++)
+				{
+					cout <<endl<<"Phase "<<i+1<<endl;
+					cout <<"Green: "<<(*phases)[i]->green_time<Data_Structures::Time_Second>()<<endl;
+					cout <<"Yellow/red: "<<(*phases)[i]->yellow_and_all_red_time<Data_Structures::Time_Second>()<<endl;
+				}
+				
+			}
+
+			//=======================================================
+			// HCM Retiming calculations
+			//-------------------------------------------------------
+			/// HCM Retiming calculations for complex signals, with full information
 			facet void Update_Timing(call_requirements(
 				requires(ThisType,Concepts::Has_Child_Phase) && 
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
-				requires(typename ThisType, Concepts::Is_HCM_Full_Solution) /*&& 
-				requires_2(typename ThisType::Phase_Interface<typename ThisType::Phase_Type<>::type>&, Interfaces::Phase_Interface<typename ThisType::Phase_Type<>::type>&, is_convertible)*/))
+				requires(typename ThisType, Concepts::Is_HCM_Full_Solution)))
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
@@ -830,13 +887,11 @@ namespace Signal_Components
 					(*itr)->green_time<TargetType>(effective_cycle * vs / vs_sum);
 				}
 			}
-
-			/// HCM Retiming calculations
+			/// HCM Retiming calculations for simple signals
 			facet void Update_Timing(call_requirements(
 				requires(ThisType,Concepts::Has_Child_Phase) && 
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
-				requires(typename ThisType, Concepts::Is_HCM_Simple_Solution) /*&& 
-				requires_2(typename ThisType::Phase_Interface<typename ThisType::Phase_Type<>::type>&, Interfaces::Phase_Interface<typename ThisType::Phase_Type<>::type>&, is_convertible)*/))
+				requires(typename ThisType, Concepts::Is_HCM_Simple_Solution)))
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
@@ -850,13 +905,13 @@ namespace Signal_Components
 				float critical_sum = 0;
 				for (itr; itr != phases->end(); itr++)
 				{
+					(*itr)->Update_Demand<Data_Structures::Flow_Per_Hour>();
 					lost_time += (*itr)->yellow_and_all_red_time<Data_Structures::Time_Second>();
 					critical_sum += (*itr)->Find_Critical_Phase_Volume<Data_Structures::Flow_Per_Hour>();
 				}
 
-				//=============================================================================================
-				// Get estimated cycle length
 				//---------------------------------------------------------------------------------------------
+				// Get estimated cycle length	
 				TargetType cycle;
 				// area factor
 				float f_a = 1.0;
@@ -865,24 +920,31 @@ namespace Signal_Components
 				float reference_sum = 1530 * this->peak_hour_factor<float>() * f_a;
 				// cycle length calculation
 				cycle = (TargetType)((float)lost_time) / (1.0f - critical_sum / reference_sum);
-				this->cycle_length<Data_Structures::Time_Second>(cycle);
 				TargetType effective_cycle = cycle - lost_time;
 				
 
 				// Set green time for each phase
+				TargetType cycle_rounded = 0;
 				for (itr=phases->begin(); itr != phases->end(); itr++)
 				{
 					float vol = (*itr)->Find_Critical_Phase_Volume<Data_Structures::Flow_Per_Hour>();
-					(*itr)->green_time<Data_Structures::Time_Second>((TargetType)((float)effective_cycle * vol / critical_sum));
-				}
-			}
 
-			/// HCM Retiming calculations
+					float temp_green = (float)effective_cycle * vol / critical_sum;
+					int num_5second_intervals = (int)temp_green / 5;
+					float remain = temp_green / (float)num_5second_intervals - (float)((int)temp_green);
+					if (remain >=2.5f) num_5second_intervals++;
+					temp_green = num_5second_intervals * 5;
+					(*itr)->green_time<Data_Structures::Time_Second>((TargetType)temp_green);
+					cycle_rounded = cycle_rounded + (TargetType)temp_green;
+				}
+				cycle_rounded = cycle_rounded + lost_time;
+				this->cycle_length<Data_Structures::Time_Second>(cycle_rounded);
+			}
+			/// HCM Retiming calculation error handler
 			facet void Update_Timing(call_requirements(!(
 				requires(ThisType,Concepts::Has_Child_Phase) && 
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
-				(requires(ThisType, Concepts::Is_HCM_Full_Solution) || requires(ThisType, Concepts::Is_HCM_Simple_Solution)) /*&&
-				requires_2(ThisType::Phase_Interface<typename ThisType::Phase_Type<>::type>&, Interfaces::Phase_Interface<typename ThisType::Phase_Type<>::type>&, is_convertible)*/)))
+				(requires(ThisType, Concepts::Is_HCM_Full_Solution) || requires(ThisType, Concepts::Is_HCM_Simple_Solution)))))
 			{
 				assert_requirements(ThisType, Concepts::Has_Child_Phase,"Your Signal Type does not have a Phase child class type defined.");
 				assert_requirements(TargetType, Concepts::Is_Time_Seconds, "Your TargetType is not a measure of time in seconds.");
@@ -909,23 +971,82 @@ namespace Signal_Components
 				int active_phase = _this->active_phase<int>();
 				phase = (*phases)[active_phase];
 
-				if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::RED)
+
+				//=======================================================================================================================
+				// If timing updating is turned off (num_cycles = 0) then set the time of the next timing update to infinity so it is never called
+				//-----------------------------------------------------------------------------------------------------------------------
+				if (_this->num_cycles_between_updates<int>() == 0) _this->Next_Timing_Event_Iteration<int>(INT_MAX);
+
+
+				//=======================================================================================================================
+				// Handle the timing update sequence - occurs once every analysis period (calculated as a multiple of the current cycle length
+				//-----------------------------------------------------------------------------------------------------------------------
+				if (iteration == _this->Next_Timing_Event_Iteration<int>() && _this->Timing_Event_Conditional_Hit<bool>()==false)
+				{
+
+					((Execution_Object*)pthis)->Swap_Event((Event)&Signal_Interface<ThisType,NULLTYPE>::Change_Signal_Timing<NULLTYPE>);
+					response.result = false;
+					response.next = iteration;
+					_this->Timing_Event_Conditional_Hit<bool>(true);
+					return;
+				}
+				// Check to see if a signal update event is needed
+				else if (iteration == _this->Next_Timing_Event_Iteration<int>() && _this->Timing_Event_Conditional_Hit<bool>()==true && _this->Timing_Event_Has_Fired<bool>()==false)
+				{
+					response.result = true;
+					response.next = iteration;
+					return;
+				}
+
+				else if (iteration == _this->Next_Timing_Event_Iteration<int>() && _this->Timing_Event_Has_Fired<bool>()==true)
+				{
+					((Execution_Object*)pthis)->Swap_Event((Event)&Signal_Interface<ThisType,NULLTYPE>::Change_Signal_State<NULLTYPE>);
+					response.result = false;
+					response.next = iteration;
+					int next = iteration + (int)_this->cycle_length<Data_Structures::Time_Second>() * _this->num_cycles_between_updates<int>();
+					_this->Next_Timing_Event_Iteration<int>(next);
+					return;
+				}
+
+
+				//=======================================================================================================================
+				// Handle the regular signal state updating sequence (happens every time the conditional is called)
+				//-----------------------------------------------------------------------------------------------------------------------
+				if (_this->Event_Has_Fired<bool>() == true)
+				{
+					response.result = false;
+					response.next = _this->Next_Event_Iteration<int>();
+					_this->Event_Has_Fired<bool>(false);
+					_this->Event_Conditional_Hit<bool>(false);
+					_this->Timing_Event_Conditional_Hit<bool>(false);
+					_this->Timing_Event_Has_Fired<bool>(false);
+				}
+				/// INITIALIZE THE ITERATION AND GO INTO PROCESSING
+				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::RED)
 				{
 					response.result=true;
-					response.next=(int)phase->green_time<Data_Structures::Time_Second>();
+					response.next=iteration;
+					//_this->Next_Event_Iteration<int>(iteration + (int)phase->green_time<Data_Structures::Time_Second>());
+					_this->Event_Has_Fired<bool>(false);
 				}
 				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN)
 				{
 					response.result=true;
-					response.next=(int)phase->yellow_and_all_red_time<Data_Structures::Time_Second>();
+					response.next=iteration; // increment the iteration by one to turn of the event has fired indicator
+					//_this->Next_Event_Iteration<int>(iteration + (int)phase->yellow_and_all_red_time<Data_Structures::Time_Second>());
+					_this->Event_Has_Fired<bool>(false);
+				}
+				else
+				{
+					assert("Error, should not get here");
 				}
 			}
-
 			declare_facet_event(Change_Signal_State)
 			{
-				typedef ThisType T;
+				cout <<endl<<endl<<"---------- CHANGE SIGNAL STATE CALLED --------------"<<endl;
 
 				// Get Current Interface
+				typedef ThisType T;
 				Signal_Interface<ThisType,NULLTYPE>* _this = (Signal_Interface<ThisType,NULLTYPE>*)pthis;
 
 				// Get interface to phases in signal
@@ -940,22 +1061,50 @@ namespace Signal_Components
 				if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::RED)
 				{
 					phase->signal_state<Data_Structures::Signal_State>(Data_Structures::GREEN);
+					_this->Next_Event_Iteration<int>(iteration + (int)phase->green_time<Data_Structures::Time_Second>());
 				}
 				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN)
 				{
 					// change active phase state
 					phase->signal_state<Data_Structures::Signal_State>(Data_Structures::RED);
+					_this->Next_Event_Iteration<int>(iteration + (int)phase->yellow_and_all_red_time<Data_Structures::Time_Second>());
+
 					// Move to next phase
 					active_phase++;
 					if (active_phase >= phases->size()) active_phase=0;
 					_this->active_phase<int>(active_phase);
 				}
+
+				_this->Event_Has_Fired<bool>(true);
+				
+
 			}
+			declare_facet_event(Change_Signal_Timing)
+			{
+				cout <<endl<<endl<<"===================================================================";
+				cout <<endl<<" CHANGE SIGNAL TIMING CALLED ";
+				cout <<endl<<"==================================================================="<<endl<<endl;
+				// Get Current Interface
+				typedef ThisType T;
+				Signal_Interface<ThisType,NULLTYPE>* _this = (Signal_Interface<ThisType,NULLTYPE>*)pthis;
+				_this->Update_Timing<Data_Structures::Time_Second>();
+				_this->Timing_Event_Has_Fired<bool>(true);
+
+				_this->Display_Timing<NULLTYPE>();
+				cout <<endl<<"==================================================================="<<endl<<endl;
+			}
+			facet_accessor(Next_Event_Iteration);
+			facet_accessor(Next_Timing_Event_Iteration);
+			facet_accessor(Event_Has_Fired);
+			facet_accessor(Event_Conditional_Hit);
+			facet_accessor(Timing_Event_Has_Fired);
+			facet_accessor(Timing_Event_Conditional_Hit);
 
 
 			//=======================================================
 			// Accessor facets
 			//-------------------------------------------------------
+			facet_accessor(num_cycles_between_updates)  /// Number of cycles until signal update is called
 			/// Analysis Period
 			facet_accessor(analysis_period);		///< T (h)
 			/// Total cycle length
@@ -977,6 +1126,122 @@ namespace Signal_Components
 
 			// Currently active (green) signal phase
 			facet_accessor(active_phase);
+		};
+
+
+		//============================================================================================================
+		// Signal Indicator Component
+		//------------------------------------------------------------------------------------------------------------
+		template <typename ThisType, typename CallerType>
+		struct Signal_Indicator_Interface
+		{
+			// Initialize the signal indicator
+			facet void Initialize(call_requirements(requires(ThisType,Is_Execution_Object)))
+			{
+				schedule_event_local(ThisType,Signal_Indicator_Conditional,Signal_Indicator_Event,0,NULLTYPE);
+				this->Conditional_Has_Fired<bool>(false);
+			}
+			facet void Initialize(call_requirements(requires(ThisType,Is_Data_Object)))
+			{
+
+			}
+			facet void Initialize(call_requirements(requires(ThisType,!Is_Data_Object) && requires(ThisType,!Is_Execution_Object)))
+			{
+				assert_requirements(ThisType,Is_Data_Object,"ThisType is not a data object or an execution object.");
+			}
+
+			// Initialize the signal indicator and provide its linked signal
+			facet void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements(requires(ThisType,Is_Execution_Object) && requires(TargetType, Is_Polaris_Component)))
+			{
+				schedule_event_local(ThisType,Signal_Indicator_Conditional,Signal_Indicator_Event,0,NULLTYPE);
+				this->Conditional_Has_Fired<bool>(false);
+				this->Signal<TargetType>(signal_interface);
+			}
+			facet void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements(requires(ThisType,Is_Data_Object) && requires(TargetType, Is_Polaris_Component)))
+			{
+
+			}
+			facet void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements((requires(ThisType,!Is_Data_Object) && requires(ThisType,!Is_Execution_Object)) || requires(TargetType, !Is_Polaris_Component)))
+			{
+				assert_requirements(ThisType,Is_Data_Object,"ThisType is not a data object or an execution object.");
+				assert_requirements(TargetType,Is_Polaris_Component,"TargetType is not a polaris component.");
+			}
+
+			// Signal Interface accessor
+			facet_accessor_interface(Signal);
+			facet_accessor(Conditional_Has_Fired);
+
+			// Event definition
+			declare_facet_conditional(Signal_Indicator_Conditional)
+			{
+				//response.result = false;
+				//response.next = iteration+1;
+				//return;
+
+				// Get Current Interface
+				Signal_Indicator_Interface<ThisType,NULLTYPE>* _this=(Signal_Indicator_Interface<ThisType,NULLTYPE>*)pthis;
+
+				// Get Signal Interface from this
+				Signal_Components::Interfaces::Signal_Interface<Signal_Components::Components::HCM_Signal_Simple,NULLTYPE>* signal = _this->Signal<Signal_Components::Components::HCM_Signal_Simple>();
+
+				if (iteration == signal->Next_Event_Iteration<int>())
+				{
+					response.result = false;
+					response.next = iteration;
+
+					//if (_this->Conditional_Has_Fired<bool>() == false)
+					//{
+					//	response.result = false;
+					//	response.next = iteration;
+					//	_this->Conditional_Has_Fired<bool>(true);
+					//}
+					//else
+					//{
+					//	response.result = true;
+					//	response.next = iteration + 1;
+					//	_this->Conditional_Has_Fired<bool>(false);
+					//}
+				}
+				else
+				{
+					response.result = true;
+					response.next = iteration + 1;
+				}
+
+				//if (signal->Next_Event_Iteration<int>() == iteration && signal->Event_Has_Fired<bool>()==false)
+				//{
+				//	response.result=false;
+				//	response.next=iteration;
+				//}
+				//else
+				//{
+				//	response.result=true;
+				//	response.next=iteration+1;
+				//}
+			}
+			declare_facet_event(Signal_Indicator_Event)
+			{
+				// Get Current Interface
+				Signal_Indicator_Interface<ThisType,NULLTYPE>* _this=(Signal_Indicator_Interface<ThisType,NULLTYPE>*)pthis;
+
+				// Get Signal Interface from this
+				Signal_Components::Interfaces::Signal_Interface<Signal_Components::Components::HCM_Signal_Simple,NULLTYPE>* signal = _this->Signal<Signal_Components::Components::HCM_Signal_Simple>();
+
+				// Get reference to the phases in the signal phase diagram
+				vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>* phases = signal->Phases<vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>*>();
+				vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>::iterator itr = phases->begin();
+
+				cout <<endl<<"ITERATION: " <<iteration;
+
+				int i;
+				for (itr, i=0; itr != phases->end(); itr++, i++)
+				{
+					char* signal_status = "RED";
+					if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = "GREEN";
+					cout <<", Phase "<<i<<": "<<signal_status;
+				}
+
+			}
 		};
 	}
 
