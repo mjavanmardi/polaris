@@ -71,7 +71,7 @@ namespace Intersection_Components
 			facet_accessor(turn_movement_cumulative_vehicles);
 			facet_accessor(cached_turn_movement_cumulative_shifted_arrival_vehicles_array);
 			facet_accessor(turn_movement_cumulative_shifted_arrival_vehicles);
-			
+
 			facet_accessor(vehicles_container);
 
 			facet_accessor(minimum_merge_rate);
@@ -82,6 +82,7 @@ namespace Intersection_Components
 		{
 			facet_accessor(outbound_movement_reference);
 			facet_accessor(inbound_movements);
+			facet_accessor(forward_link_turn_travel_time);
 		};
 
 
@@ -684,24 +685,6 @@ namespace Intersection_Components
 			{
 
 			}
-
-
-			facet void Do_Stuff()
-			{
-				typedef typename ThisType::inbound_link_type LinkType;
-				typedef typename ThisType::links_container_type links_container_type;
-				typedef typename links_container_type::iterator links_iterator_type;
-
-				links_iterator_type itr;
-
-				links_container_type* container=inbound_links<links_container_type*>();
-
-				for(itr=container->begin();itr!=container->end();itr++)
-				{
-					cout << (*itr)->length<int&>() << endl;
-				}
-			}
-
 
 			declare_facet_conditional(Newells_Conditional)
 			{

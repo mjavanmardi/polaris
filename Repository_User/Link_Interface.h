@@ -27,6 +27,7 @@ namespace Link_Components
 		struct Link_Interface
 		{
 			facet_accessor(uuid);
+			facet_accessor(id);
 
 			facet_accessor(scenario_reference);
 
@@ -48,7 +49,9 @@ namespace Link_Components
 			facet_accessor(inbound_turn_movement_size);
 			facet_accessor(outbound_turn_movement_size);
 			
-			
+			facet_accessor(link_travel_time);
+
+
 			//link state			
 			facet_accessor(link_fftt);
 			facet_accessor(link_bwtt);
@@ -112,18 +115,33 @@ namespace Link_Components
 			facet_accessor(jam_density);
 			facet_accessor(critical_density);
 
+			//routing interface
+			facet_accessor(f_cost);
+			facet_accessor(h_cost);
+			facet_accessor(label_pointer);
+			facet_accessor(label_cost);
+			facet_accessor(scan_list_status);
+			facet_accessor(network_link_reference);
 
 			//facet TargetType pull_vehicle(call_requirements(requires_2(ThisType,CallerType,Is_Same_Entity)))
 			//{
 			//	PTHIS(ThisType)->offer_vehicle<Dispatch<ThisType>,TargetType>();
 			//}
 
-			facet void push_vehicle(void* vehicle)
+			facet void push_vehicle(TargetType* vehicle)
 			{
 				accept_vehicle<TargetType>(vehicle);
 			}
 
-			facet void accept_vehicle(void* veh)
+			facet void accept_vehicle(TargetType* veh/*,requires(TargetType,IsUnloaded)*/)
+			{
+				link_origin_cumulative_arrived_vehicles<int&>()++;
+				typedef typename ThisType::link_origin_vehicle_index_array_type LinkOriginVehiclesType;
+				link_origin_vehicle_index_array<LinkOriginVehiclesType>().push_back(veh);
+				veh->load_to_entry_queue<NULLTYPE>();
+			}
+
+			facet void accept_vehicle(TargetType* veh/*,requires(TargetType,IsLoaded)*/)
 			{
 				typedef typename ThisType::scenario_reference_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;

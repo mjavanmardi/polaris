@@ -122,8 +122,10 @@
     <ClInclude Include="Demand_Bases.h" />
     <ClInclude Include="Intersection_Interface.h" />
     <ClInclude Include="Link_Interface.h" />
+    <ClInclude Include="Network_Interface.h" />
     <ClInclude Include="Repository_User.h" />
     <ClInclude Include="Repository_User_Includes.h" />
+    <ClInclude Include="Routing_Interface.h" />
     <ClInclude Include="Scenario_Interface.h" />
     <ClInclude Include="Transims_Demand_API.h" />
     <ClInclude Include="Vehicle_Interface.h" />

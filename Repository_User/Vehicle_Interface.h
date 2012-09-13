@@ -52,18 +52,40 @@ namespace Vehicle_Components
 			typedef typename ThisType::trajectory_unit_type TrajectoryUnitType;
 			typedef typename ThisType::trajectory_container_type TrajectoryContainerType;
 
-
-
 			facet_accessor(trajectory);
 			facet_accessor(trajectory_position);
 			facet_accessor(current_trajectory_unit_index);
 			facet_accessor(departure_simulation_interval_index);
-			facet_accessor(original_link);
+			facet_accessor(origin_link);
 			facet_accessor(destination_link);
 			facet_accessor(next_link);
 			facet_accessor(simulation_status);
 			facet_accessor(arrival_time);
 			facet_accessor(arrival_simulation_interval_index);
+			facet_accessor(departure_assignment_interval_index);
+			facet_accessor(origin_activity_location);
+			facet_accessor(destination_activity_location);
+
+			facet void set_route_links(TargetType& path_container/*,requires(TargetType,IsReversed)*/)
+			{
+				typedef typename ThisType::trajectory_type TrajectoryType;
+				typedef typename ThisType::trajectory_element_type TrajectoryElementType;
+				typedef typename TrajectoryElementType::link_type LinkType;
+
+				int route_link_size=path_container.size();
+
+				TrajectoryType& trajectory_container=trajectory<TrajectoryType&>();
+
+				for(int i=route_link_size-1;i>=0;i--)
+				{
+					Trajectory_Unit_Interface<TrajectoryElementType,ThisType>* vehicle_trajectory_data=Allocate<TrajectoryElementType>();
+					vehicle_trajectory_data->link<LinkType>(path_container[i]);
+					vehicle_trajectory_data->enter_time<int>(0);
+					vehicle_trajectory_data->delayed_time<int>(0);
+
+					trajectory_container.push_back(vehicle_trajectory_data);
+				}
+			};
 
 			facet TrajectoryUnitType advance_trajectory()
 			{
@@ -114,7 +136,7 @@ namespace Vehicle_Components
 				}
 				else
 				{
-					return NULL;
+					return nullptr;
 				}
 			}
 
@@ -126,13 +148,12 @@ namespace Vehicle_Components
 				}
 				else
 				{
-					return NULL;
+					return nullptr;
 				}
 			}
 
 			facet void arrive_to_destination_link(int simulation_interval_index, int simulation_interval_length)
 			{
-				
 				int current_time_in_seconds = simulation_interval_index*simulation_interval_length;
 
 				simulation_status<Simulation_Vehicle_Status_Keys>(OUT_NETWORK);

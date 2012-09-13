@@ -44,5 +44,11 @@
     <ClInclude Include="Vehicle_Interface.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="Network_Interface.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Routing_Interface.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
