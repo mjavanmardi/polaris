@@ -157,7 +157,7 @@ public:
 
 	typedef Polaris_Component_Execution This_Type;
 	typedef BaseType Base_Type;
-	typedef Data_Object Object_Type;
+	typedef Execution_Object Object_Type;
 	typedef EntityType Entity_Tag;
 };
 
