@@ -17,3 +17,5 @@
 	8a.) How to refer to child types in parent class:  Macro for replacing "typedef Child_Itf; typedef Child_Base; polaris_component<Child_Itf, Child_Base,ThisType>
 	
 9.)  Formalize type standards for references i.e. should typeof(obj*) be obj or obj* 
+
+10.)  Break "Facet_Accessor", "Member_Data" and others into component parts in order to provide 'path' from no macros to all in macros
