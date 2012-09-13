@@ -131,9 +131,6 @@ namespace Signal_Components
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
 			}
 
-			//member_component_basic(Intersection_Components::Components::Polaris_Movement_Component,Demand_Source_Left);
-			//member_component_basic(Intersection_Components::Components::Polaris_Movement_Component,Demand_Source_Right);
-			//member_component_basic(Intersection_Components::Components::Polaris_Movement_Component,Demand_Source_Thru);
 
 
 			//============================================================
@@ -699,14 +696,48 @@ namespace Signal_Components
 			{
 				return (typename TargetType::Interface_Type<TargetType,NULLTYPE>::type*)_signal;
 			}
-
-
 		};
 		struct Signal_Indicator_Base
 		{
 			member_component_basic(Signal_Components::Components::HCM_Signal_Simple,Signal);
 		};
-		
+
+		//==================================================================================================================
+		/// Signal Detector Base
+		//------------------------------------------------------------------------------------------------------------------
+		struct Signal_Detector_Base
+		{
+			Data_Structures::Time_Second _last_access;
+			int _count;
+
+			facet_base typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
+				requires(typename TargetType::ReturnType,Concepts::Is_Flow_Per_Hour) &&
+				requires(typename TargetType::ParamType,Concepts::Is_Time_Seconds)))
+			{
+				Data_Structures::Time_Second time_since = time - _last_access;
+				_last_access = time;
+				_count = 0;
+				return (_count / time_since / 3600.f);
+			}
+			facet_base typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
+				requires(typename TargetType::ReturnType,Concepts::Is_Flow_Per_15_Minutes) &&
+				requires(typename TargetType::ParamType,Concepts::Is_Time_Seconds)))
+			{
+				Data_Structures::Time_Second time_since = time - _last_access;
+				_last_access = time;
+				_count = 0;
+				return (_count / time_since / 900.f);
+			}
+
+			facet_base void detect_vehicle(TargetType vehicle_detection_count)
+			{
+				_count += (int)vehicle_detection_count;
+			}
+			facet_base void detect_vehicle()
+			{
+				_count ++;
+			}
+		};
 	}
 
 	//==================================================================================================================

@@ -176,6 +176,14 @@ namespace Signal_Components
 			requires_typename_defined(Flow,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
 			end_requirements_list(ValueType);
 		};
+		concept Is_Flow_Per_15_Minutes
+		{
+			begin_requirements_list;
+			requires_typename_defined(none, Unit_Per_15_Minute, "Type does not model a Flow per 15 minute time period concept.");
+			requires_typename_defined(Unit_Per_15_Minute, Flow, "Type does not model a Flow concept.");
+			requires_typename_defined(Flow,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
+			end_requirements_list(ValueType);
+		};
 
 
 
@@ -195,6 +203,15 @@ namespace Signal_Components
 			end_requirements_list(HCM_Full);
 		};
 		#pragma endregion
+
+		concept Is_Target_Type_Struct
+		{
+			begin_requirements_list;
+			requires_typename_defined(none, ReturnType,"Type does not model an HCM simple solution type.");
+			requires_typename_defined(ReturnType, ParamType,"Type does not model an HCM simple solution type.");
+			requires_typename_defined(ParamType, Param2Type,"Type does not model an HCM simple solution type.");
+			end_requirements_list(Param2Type);
+		};
 	}
 	
 
@@ -269,9 +286,14 @@ namespace Signal_Components
 			//=======================================================
 			// General Lane Group Calculation Facets
 			//-------------------------------------------------------
-			facet void Update_Demand()
+			facet void Update_Demand(call_requires(TargetType,Concepts::Is_Flow_Per_Hour))
 			{
-
+			}
+			facet void Update_Demand(call_requires(TargetType,Concepts::Is_Flow_Per_15_Minutes))
+			{
+				this->demand_left<Data_Structures::Flow_Per_Hour>(Left*4.0f);
+				this->demand_right<Data_Structures::Flow_Per_Hour>(Right*4.0f);
+				this->demand_thru<Data_Structures::Flow_Per_Hour>(Thru*4.0f);
 			}
 			// Get the volumeto capacity ratio for lane group
 			facet TargetType Calculate_VC_ratio(call_requires(TargetType,is_arithmetic))
@@ -765,7 +787,7 @@ namespace Signal_Components
 				
 				for (itr; itr!=lane_group->end(); itr++)
 				{
-					(*itr)->Update_Demand<NULLTYPE>();
+					(*itr)->Update_Demand<Data_Structures::Flow_Per_Hour>();
 				}
 			}
 
@@ -1129,9 +1151,9 @@ namespace Signal_Components
 		};
 
 
-		//============================================================================================================
-		// Signal Indicator Component
-		//------------------------------------------------------------------------------------------------------------
+		//------------------------------------------------------------------------------------------------------------------
+		/// Signal Indicator Component
+		//------------------------------------------------------------------------------------------------------------------
 		template <typename ThisType, typename CallerType>
 		struct Signal_Indicator_Interface
 		{
@@ -1241,6 +1263,31 @@ namespace Signal_Components
 					cout <<", Phase "<<i<<": "<<signal_status;
 				}
 
+			}
+		};
+
+
+
+		//------------------------------------------------------------------------------------------------------------------
+		/// Detector Interface
+		//------------------------------------------------------------------------------------------------------------------
+		template <typename ThisType, typename CallerType>
+		struct Detector_Interface
+		{
+			// Getter for the detector count data
+			facet typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(requires(ThisType,Is_Execution_Object) && requires(TargetType, Concepts::Is_Target_Type_Struct)))
+			{
+				return PTHIS(ThisType)->count<dispatch<ThisType>, CallerType, TargetType>(time);
+			}
+
+			// Updater for the detector count data - call whenever a vehicle crosses detector (or use for aggregate updates by passing a vehicle count value in)
+			facet void detect_vehicle(TargetType vehicle_detection_count)
+			{
+				PTHIS(ThisType)->detect_vehicle<dispatch<ThisType>,CallerType,TargetType>(vehicle_detection_count);
+			}
+			facet void detect_vehicle()
+			{
+				PTHIS(ThisType)->detect_vehicle<dispatch<ThisType>,CallerType,TargetType>();
 			}
 		};
 	}
