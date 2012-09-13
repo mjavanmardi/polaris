@@ -9,30 +9,7 @@ namespace Intersection_Components
 {
 	namespace Types
 	{
-		enum Turn_Movement_Type_Keys
-		{
-			LEFT_TURN=0,
-			THROUGH_TURN,
-			RIGHT_TURN,
-			U_TURN,
-		};
-
-		enum Turn_Movement_Rule_Keys
-		{
-			PROHIBITED=0,
-			ALLOWED,
-		};
-
-		enum Node_Type_Keys
-		{
-			NO_CONTROL=0,
-			YIELD_SIGN,
-			ALL_WAY_STOP_SIGN,
-			TWO_WAY_STOP_SIGN,
-			PRE_TIMED_SIGNAL_CONTROL, 
-			ACTUATED_SIGNAL_CONTROL, 
-			ADAPTIVE_SIGNAL_CONTROL,
-		};
+	
 	}
 
 	namespace Concepts
@@ -44,7 +21,23 @@ namespace Intersection_Components
 
 		struct Polaris_Movement_Base
 		{
-			facet_accessor(movement_reference);
+
+			//========================================================================================================
+			//start implementation of memeber_data(Link_Interface*, movement_reference)
+			//--------------------------------------------------------------------------------------------------------
+		public:
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType movement_reference(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType)_movement_reference;
+			}
+ 
+			tag_getter(movement_reference);
+	
+		protected:
+			Link_Components::Interfaces::Link_Interface<Link_Components::Components::Polaris_Link_Component, NULLTYPE>* _movement_reference;
+			//end
+			//--------------------------------------------------------------------------------------------------------
 
 			member_data_basic(float, movement_capacity);
 			member_data_basic(float, movement_supply);
@@ -190,6 +183,41 @@ namespace Intersection_Components
 			typedef Polaris_Movement_Base::vehicles_container_type vehicles_container_type;
 
 			member_data_basic(int, uuid);
+
+			typedef vector<Link_Components::Interfaces::Link_Interface<Link_Components::Components::Polaris_Link_Component, NULLTYPE>*> LinkContainerType;
+			//========================================================================================================
+			//start implementation of memeber_data(vector<Link_Interface>, inbound_links)
+			//--------------------------------------------------------------------------------------------------------
+		public:
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType inbound_links(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType)_inbound_links;
+			}
+
+			tag_getter(inbound_links);
+			
+		protected:
+			LinkContainerType _inbound_links;
+			//end
+			//--------------------------------------------------------------------------------------------------------
+
+			//========================================================================================================
+			//start implementation of memeber_data(vector<Link_Interface>, outbound_links)
+			//--------------------------------------------------------------------------------------------------------
+		public:
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType outbound_links(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType)_outbound_links;
+			}
+
+			tag_getter(outbound_links);
+			
+		protected:
+			LinkContainerType _outbound_links;
+			//end
+			//--------------------------------------------------------------------------------------------------------
 
 			//========================================================================================================
 			//start implementation of memeber_data(Vector<Outbound_Inbound_Movements_Interface*>, outbound_inbound_movements)

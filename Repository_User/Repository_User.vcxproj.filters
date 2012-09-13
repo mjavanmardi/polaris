@@ -56,5 +56,20 @@
     <ClInclude Include="Demand_Interface.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="Polaris_Intersection_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Link_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Network_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Scenario_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Vechicle_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -23,6 +23,18 @@ namespace Link_Components
 	
 	namespace Interfaces
 	{
+		
+
+		template<typename ThisType, typename CallerType>
+		struct Turn_Movement_Interface {
+			facet_accessor(inbound_link);
+			facet_accessor(outbound_link);
+			facet_accessor(turn_movement_type);
+			facet_accessor(turn_movement_rule);
+			facet_accessor(turn_travel_penalty);
+			facet_accessor(forward_link_turn_travel_time);
+		};
+		
 		template<typename ThisType,typename CallerType>
 		struct Link_Interface
 		{
@@ -30,6 +42,12 @@ namespace Link_Components
 			facet_accessor(id);
 
 			facet_accessor(scenario_reference);
+
+			// inbound_links and outbound_links might belong to Link_Base for network construction which we may implement later
+			facet_accessor(inbound_turn_movements);
+			facet_accessor(outbound_turn_movements);
+			
+			facet_accessor(travel_time);
 
 			facet_accessor(upstream_intersection);
 			facet_accessor(downstream_intersection);

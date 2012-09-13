@@ -92,6 +92,7 @@ namespace Intersection_Components
 			facet_accessor(uuid);
 
 			facet_accessor(inbound_links);
+			facet_accessor(outbound_links);
 
 			facet_accessor(inbound_outbound_movements);
 			facet_accessor(outbound_inbound_movements);

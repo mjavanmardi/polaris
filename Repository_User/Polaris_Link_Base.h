@@ -8,14 +8,6 @@ namespace Link_Components
 { 
 	namespace Types
 	{
-		enum Link_Type_Keys
-		{
-			FREEWAY=0,
-			ON_RAMP,
-			OFF_RAMP,
-			EXPRESSWAY,
-			ARTERIAL,
-		};
 
 	}
 
@@ -25,15 +17,125 @@ namespace Link_Components
 	
 	namespace Bases
 	{
+		struct Polaris_Turn_Movement_Base {
+
+			//========================================================================================================
+			//start implementation of memeber_data(Link_Interface*, inbound_link)
+			//--------------------------------------------------------------------------------------------------------
+		public:
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType inbound_link(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType)_inbound_link;
+			}
+
+			tag_getter(inbound_link);
+			
+		protected:
+			Link_Components::Interfaces::Link_Interface<Link_Components::Components::Polaris_Link_Component, NULLTYPE>* _inbound_link;
+			//end
+			//--------------------------------------------------------------------------------------------------------
+
+			//========================================================================================================
+			//start implementation of memeber_data(Link_Interface*, outbound_link)
+			//--------------------------------------------------------------------------------------------------------
+		public:
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType outbound_link(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType)_outbound_link;
+			}
+
+			tag_getter(outbound_link);
+			
+		protected:
+			Link_Components::Interfaces::Link_Interface<Link_Components::Components::Polaris_Link_Component, NULLTYPE>* _outbound_link;
+			//end
+			//--------------------------------------------------------------------------------------------------------
+
+			member_data_basic(Intersection_Components::Types::Turn_Movement_Type_Keys, turn_movement_type);
+			member_data_basic(Intersection_Components::Types::Turn_Movement_Rule_Keys, turn_movement_rule);
+			member_data_basic(float, turn_travel_penalty);
+			member_data_basic(float, forward_link_turn_travel_time);
+		};
+
 		struct Polaris_Link_Base
 		{
 			member_data_basic(int, uuid);
 
 			member_data_basic(int, scenario_reference);
 
-			member_data_basic(int, upstream_intersection);
-			member_data_basic(int, downstream_intersection);
+			typedef vector<Link_Components::Interfaces::Turn_Movement_Interface<Link_Components::Components::Polaris_Turn_Movement_Component, NULLTYPE>*> turn_movements_container_type;
+			//========================================================================================================
+			//start implementation of memeber_data(vector<int>, inbound_movements)
+			//--------------------------------------------------------------------------------------------------------
+		public:
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType inbound_turn_movements(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType)_inbound_turn_movements;
+			}
+
+			tag_getter(inbound_turn_movements);
 			
+		protected:
+			turn_movements_container_type _inbound_turn_movements;
+			//end
+			//--------------------------------------------------------------------------------------------------------
+
+			//========================================================================================================
+			//start implementation of memeber_data(vector<Link_Interface>, outbound_links)
+			//--------------------------------------------------------------------------------------------------------
+		public:
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType outbound_turn_movements(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType)_outbound_turn_movements;
+			}
+
+			tag_getter(outbound_turn_movements);
+			
+		protected:
+			turn_movements_container_type _outbound_turn_movements;
+			//end
+			//--------------------------------------------------------------------------------------------------------
+
+			member_data_basic(float, travel_time);
+
+			//========================================================================================================
+			//start implementation of memeber_data(Intersection_Interface*, upstream_intersection)
+			//--------------------------------------------------------------------------------------------------------
+		public:
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType upstream_intersection(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType)_upstream_intersection;
+			}
+ 
+			tag_getter(upstream_intersection);
+	
+		protected:
+			Intersection_Components::Interfaces::Intersection_Interface<Intersection_Components::Components::Polaris_Intersection_Component, NULLTYPE>* _upstream_intersection;
+			//end
+			//--------------------------------------------------------------------------------------------------------
+
+			//========================================================================================================
+			//start implementation of memeber_data(Intersection_Interface*, downstream_intersection)
+			//--------------------------------------------------------------------------------------------------------
+		public:
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType downstream_intersection(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType)_downstream_intersection;
+			}
+ 
+			tag_getter(downstream_intersection);
+	
+		protected:
+			Intersection_Components::Interfaces::Intersection_Interface<Intersection_Components::Components::Polaris_Intersection_Component, NULLTYPE>* _downstream_intersection;
+			//end
+			//--------------------------------------------------------------------------------------------------------
+
 			member_data_basic(int, num_lanes);
 			member_data_basic(float, length);
 			member_data_basic(float, speed_limit);
@@ -223,6 +325,7 @@ namespace Link_Components
 	namespace Components
 	{
 		typedef Polaris_Component<Link_Components::Interfaces::Link_Interface, Link_Components::Bases::Polaris_Link_Base> Polaris_Link_Component;
+		typedef Polaris_Component<Link_Components::Interfaces::Turn_Movement_Interface, Link_Components::Bases::Polaris_Turn_Movement_Base> Polaris_Turn_Movement_Component;
 	}	
 
 }
