@@ -43,6 +43,26 @@ concept Is_Polaris_Component
 	end_requirements_list(Entity_Tag);
 };
 
+concept Is_Data_Object
+{
+	begin_requirements_list;
+
+	requires_concept(none,Is_Polaris_Component);
+	requires_typename_state(Is_Polaris_Component,Object_Type,Data_Object,"Type is not a Data_Object");
+
+	end_requirements_list(Object_Type);
+};
+
+concept Is_Execution_Object
+{
+	begin_requirements_list;
+
+	requires_concept(none,Is_Polaris_Component);
+	requires_typename_state(Is_Polaris_Component,Object_Type,Execution_Object,"Type is not an Execution_Object");
+
+	end_requirements_list(Object_Type);
+};
+
 ///============================================================================
 /// Is_Dispatchable - detects whether type can be dispatched
 ///============================================================================
