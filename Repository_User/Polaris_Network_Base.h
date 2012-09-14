@@ -1,4 +1,5 @@
 #pragma once
+#include "Network_Interface.h"
 #include "Polaris_Intersection_Base.h"
 
 namespace Network_Components
@@ -39,8 +40,8 @@ namespace Network_Components
 			//end
 			//--------------------------------------------------------------------------------------------------------
 			
-			typedef Link_Components::Components::Polaris_Link_Component intersections_element_type;
-			typedef Link_Components::Interfaces::Link_Interface<intersections_element_type, NULLTYPE> link_interface_type;
+			typedef Link_Components::Components::Polaris_Link_Component links_element_type;
+			typedef Link_Components::Interfaces::Link_Interface<links_element_type, NULLTYPE> link_interface_type;
 			typedef vector<link_interface_type*> links_container_type;
 			//========================================================================================================
 			//start implementation of memeber_data(vector<Link_Interface*>, links)
@@ -79,6 +80,14 @@ namespace Network_Components
 			//end
 			//--------------------------------------------------------------------------------------------------------			
 		};
+
+		typedef Intersection_Components::Components::Polaris_Outbound_Inbound_Movements_Component outbound_inbound_movements_element_type;
+		typedef Intersection_Components::Components::Polaris_Inbound_Outbound_Movements_Component inbound_outbound_movements_element_type;
+		typedef Intersection_Components::Bases::Polaris_Intersection_Base::inbound_outbound_movements_container_type inbound_outbound_movements_container_type;
+		typedef Intersection_Components::Bases::Polaris_Intersection_Base::outbound_inbound_movements_container_type outbound_inbound_movements_container_type;
+		typedef Intersection_Components::Bases::movements_container_type movements_container_type;
+		typedef Intersection_Components::Bases::movements_element_type movements_element_type;
+
 	}
 	
 	namespace Components

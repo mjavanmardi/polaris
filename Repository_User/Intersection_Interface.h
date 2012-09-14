@@ -39,12 +39,6 @@ namespace Intersection_Components
 	
 	namespace Interfaces
 	{
-		//struct Inbound_Outbound_Movements_Interface
-		//{
-		//	facet_accessor(inbound_movement_reference);
-		//	facet_accessor(outbound_movements);
-		//	facet_accessor(num_movements);
-		//};
 
 		
 		template<typename ThisType,typename CallerType>
@@ -79,6 +73,14 @@ namespace Intersection_Components
 
 		template<typename ThisType,typename CallerType>
 		struct Outbound_Inbound_Movements_Interface
+		{
+			facet_accessor(outbound_movement_reference);
+			facet_accessor(inbound_movements);
+			facet_accessor(forward_link_turn_travel_time);
+		};
+
+		template<typename ThisType,typename CallerType>
+		struct Inbound_Outbound_Movements_Interface
 		{
 			facet_accessor(outbound_movement_reference);
 			facet_accessor(inbound_movements);
@@ -127,29 +129,19 @@ namespace Intersection_Components
 
 				
 				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
-				
 				typedef typename ThisType::inbound_movements_type InboundMovementsType;
-
 				typedef typename ThisType::inbound_movement_type InboundMovementType;
-
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
-
 				typedef typename ThisType::outbound_movement_reference_type LinkType;
-
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
-				
 				typedef typename ThisType::vehicle_type VehicleType;
-
 				typedef typename Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
-
 				typedef typename ThisType::vehicles_container_type VehiclesContainerType;
-
-
 
 				Link_Interface* outbound_link;
 
 				OutboundInboundType& outbound_links_container=outbound_inbound_movements<OutboundInboundType&>();
-				typename OutboundInboundType::iterator outbound_itr;
+				typename ThisType::outbound_inbound_movements_container_iterator outbound_itr;
 
 				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
@@ -184,11 +176,11 @@ namespace Intersection_Components
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
 
 				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
-				typedef typename OutboundInboundType::outbound_movement_reference_type LinkType;
+				typedef typename ThisType::outbound_movement_reference_type LinkType;
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
 				
-				typedef typename OutboundInboundType::element_type::inbound_movements_type InboundMovementsType;
-				typedef typename InboundMovementsType::element_type InboundMovementType;
+				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
 				// y_capacity(a,t) = q_max(a,t) * delta_t * nlanes(a);
@@ -234,11 +226,11 @@ namespace Intersection_Components
 			facet void turn_movement_supply_allocation()
 			{
 				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
-				typedef typename OutboundInboundType::outbound_movement_reference_type LinkType;
+				typedef typename ThisType::outbound_movement_reference_type LinkType;
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
 				
-				typedef typename OutboundInboundType::element_type::inbound_movements_type InboundMovementsType;
-				typedef typename InboundMovementsType::element_type InboundMovementType;
+				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
 				// y_capacity(a,t) = q_max(a,t) * delta_t * nlanes(a);
@@ -372,11 +364,11 @@ namespace Intersection_Components
 				int current_time = scenario->current_time<int>();
 
 				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
-				typedef typename OutboundInboundType::outbound_movement_reference_type LinkType;
+				typedef typename ThisType::outbound_movement_reference_type LinkType;
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
 
-				typedef typename OutboundInboundType::element_type::inbound_movements_type InboundMovementsType;
-				typedef typename InboundMovementsType::element_type InboundMovementType;
+				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
 				LinkType* outbound_link;
@@ -449,11 +441,11 @@ namespace Intersection_Components
 
 				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
 
-				typedef typename OutboundInboundType::outbound_movement_reference_type LinkType;
+				typedef typename ThisType::outbound_movement_reference_type LinkType;
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
 
-				typedef typename OutboundInboundType::element_type::inbound_movements_type InboundMovementsType;
-				typedef typename InboundMovementsType::element_type InboundMovementType;
+				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
 				// apply transfers of y(a,a''t) for each turn;
@@ -610,11 +602,11 @@ namespace Intersection_Components
 
 				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
 
-				typedef typename OutboundInboundType::outbound_movement_reference_type LinkType;
+				typedef typename ThisType::outbound_movement_reference_type LinkType;
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
 
-				typedef typename OutboundInboundType::element_type::inbound_movements_type InboundMovementsType;
-				typedef typename InboundMovementsType::element_type InboundMovementType;
+				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
 
