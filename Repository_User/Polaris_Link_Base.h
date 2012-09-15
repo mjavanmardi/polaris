@@ -29,18 +29,18 @@ namespace Link_Components
 		struct Polaris_Turn_Movement_Base
 		{
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType inbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_link;}
-			
-			tag_getter(inbound_link);
+			TargetType inbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_link;} tag_getter(inbound_link);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void inbound_link(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_inbound_link=(TargetType)value;} tag_setter(inbound_link);
 
-			Interfaces::Link_Interface<typename MasterType::link_type, NULLTYPE>* _inbound_link;
+			void* _inbound_link;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType outbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_outbound_link;}
-			
-			tag_getter(outbound_link);
+			TargetType outbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_outbound_link;} tag_getter(outbound_link);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void outbound_link(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_outbound_link=(TargetType)value;} tag_setter(outbound_link);
 
-			Interfaces::Link_Interface<typename MasterType::link_type, NULLTYPE>* _outbound_link;
+			void* _outbound_link;
 
 			member_data_basic(Intersection_Components::Types::Turn_Movement_Type_Keys, turn_movement_type);
 			member_data_basic(Intersection_Components::Types::Turn_Movement_Rule_Keys, turn_movement_rule);
@@ -152,16 +152,22 @@ namespace Link_Components
 			typedef typename MasterType::intersection_type intersection_type;
 			
 			template<typename ThisType, typename CallerType, typename TargetType>
+			void upstream_intersection(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_upstream_intersection=(TargetType)value;}
+			tag_setter(upstream_intersection);
+			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType upstream_intersection(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_upstream_intersection;}
 			tag_getter(upstream_intersection);
 			typedef intersection_type upstream_intersection_type;
-			Intersection_Components::Interfaces::Intersection_Interface<intersection_type, NULLTYPE>* _upstream_intersection;
+			void* _upstream_intersection;
 
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void downstream_intersection(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_downstream_intersection=(TargetType)value;}
+			tag_setter(downstream_intersection);
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType downstream_intersection(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_downstream_intersection;}
 			tag_getter(downstream_intersection);
 			typedef intersection_type upstream_intersection_type;
-			Intersection_Components::Interfaces::Intersection_Interface<intersection_type, NULLTYPE>* _downstream_intersection;
+			void* _downstream_intersection;
 			
 
 

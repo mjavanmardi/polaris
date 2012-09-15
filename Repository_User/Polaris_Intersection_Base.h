@@ -26,22 +26,6 @@ namespace Intersection_Components
 			typedef typename MasterType::link_type link_type;
 			typedef typename MasterType::vehicle_type vehicle_type;
 
-			//========================================================================================================
-			//start implementation of memeber_data(Link_Interface*, movement_reference)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType movement_reference(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)_movement_reference;
-			}
- 
-			tag_getter(movement_reference);
-	
-		protected:
-			Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>* _movement_reference;
-			//end
-			//--------------------------------------------------------------------------------------------------------
 
 			member_data_basic(float, movement_capacity);
 			member_data_basic(float, movement_supply);
@@ -52,137 +36,94 @@ namespace Intersection_Components
 			member_data_basic(Intersection_Components::Types::Turn_Movement_Type_Keys, movement_type);
 			member_data_basic(Intersection_Components::Types::Turn_Movement_Rule_Keys, movement_rule);
 
-			//========================================================================================================
-			//start implementation of memeber_data(vector<float>, cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)&(_cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array.front());
-			}
-
-			tag_getter(cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array);
-	
-		protected:
-			vector<float> _cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array;
-			//--------------------------------------------------------------------------------------------------------
-
-			//========================================================================================================
-			//start implementation of memeber_data(vector<float>, cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)&(_cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array.front());
-			}
-
-			tag_getter(cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array);
-	
-		protected:
-			vector<float> _cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array;
-			//--------------------------------------------------------------------------------------------------------
-
-			//========================================================================================================
-			//start implementation of memeber_data(vector<float>, cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)&(_cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array.front());
-			}
-
-			tag_getter(cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array);
-	
-		protected:
-			vector<float> _cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array;
-			//--------------------------------------------------------------------------------------------------------
-
 			member_data_basic(float, inbound_link_departure_time_based_experienced_link_turn_travel_delay);
 			member_data_basic(float, outbound_link_arrival_time_based_experienced_link_turn_travel_delay);
 			
 			member_data_basic(int, turn_movement_cumulative_arrival_vehicles);
 			member_data_basic(int, turn_movement_cumulative_vehicles);
 
-			//========================================================================================================
-			//start implementation of memeber_data(vector<float>, cached_turn_movement_cumulative_shifted_arrival_vehicles_array)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_turn_movement_cumulative_shifted_arrival_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)&(_cached_turn_movement_cumulative_shifted_arrival_vehicles_array.front());
-			}
-
-			tag_getter(cached_turn_movement_cumulative_shifted_arrival_vehicles_array);
-	
-		protected:
-			vector<int> _cached_turn_movement_cumulative_shifted_arrival_vehicles_array;
-			//--------------------------------------------------------------------------------------------------------
-			
 			member_data_basic(int, turn_movement_cumulative_shifted_arrival_vehicles);
-
-			//========================================================================================================
-			//start implementation of memeber_data(vector<Vehicle_Interface>, vehicles_container)
-			//--------------------------------------------------------------------------------------------------------			
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType vehicles_container(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_vehicles_container);
-			}
-
-			tag_getter(vehicles_container);
-			typedef vector<Vehicle_Components::Interfaces::Vehicle_Interface<vehicle_type,NULLTYPE>*> vehicles_container_type;
-		protected:
-			vehicles_container_type _vehicles_container;
-			//--------------------------------------------------------------------------------------------------------
-
+			
 			member_data_basic(float, minimum_merge_rate);
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_movement_reference;}
+			tag_getter(movement_reference);
+
+			void* _movement_reference;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)&(_cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array.front());}
+			tag_getter(cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array);
+
+			vector<float> _cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)&(_cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array.front());}
+			tag_getter(cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array);
+
+			vector<float> _cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)&(_cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array.front());}
+			tag_getter(cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array);
+
+			vector<float> _cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType cached_turn_movement_cumulative_shifted_arrival_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)&(_cached_turn_movement_cumulative_shifted_arrival_vehicles_array.front());}
+			tag_getter(cached_turn_movement_cumulative_shifted_arrival_vehicles_array);
+
+			vector<int> _cached_turn_movement_cumulative_shifted_arrival_vehicles_array;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType vehicles_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_vehicles_container);}
+			tag_getter(vehicles_container);
+
+			typedef vector<void*> vehicles_container_type;
+			
+			vehicles_container_type _vehicles_container;
 		};
 		
+
+
 		template<typename MasterType>
 		struct Polaris_Outbound_Inbound_Movements_Base
 		{
 		public:
 			typedef typename MasterType::link_type link_type;
 
-			typedef Polaris_Component<Interfaces::Movement_Interface,Polaris_Movement_Base<MasterType>,NULLTYPE,MasterType> movements_element_type;
+			typedef typename MasterType::movement_type movements_element_type;
 
-			typedef vector<Intersection_Components::Interfaces::Movement_Interface<movements_element_type, NULLTYPE>*> movements_container_type;
-			//========================================================================================================
-			//start implementation of memeber_data(Link_Interface*, outbound_movement_reference)
-			//--------------------------------------------------------------------------------------------------------
-		public:
+			typedef vector<void*> movements_container_type;
+
+
+
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType outbound_movement_reference(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_outbound_movement_reference);
-			}
-			typedef Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>* outbound_movement_reference_type;
+			TargetType outbound_movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_movement_reference);}
 			tag_getter(outbound_movement_reference);
-	
-		protected:
-			outbound_movement_reference_type _outbound_movement_reference;
-			//--------------------------------------------------------------------------------------------------------
-
-			//========================================================================================================
-			//start implementation of memeber_data(Vector<Movement_Interface*>, inbound_movements)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType inbound_movements(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_inbound_movements);
-			}
 			
+			void* _outbound_movement_reference;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType inbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_movements);}
 			tag_getter(outbound_movement_reference);
-	
-		protected:
+
 			movements_container_type _inbound_movements;
-			//--------------------------------------------------------------------------------------------------------
 		};
 		
 		template<typename MasterType>
@@ -194,37 +135,21 @@ namespace Intersection_Components
 			typedef Polaris_Component<Interfaces::Movement_Interface,Polaris_Movement_Base<MasterType>,NULLTYPE,MasterType> movements_element_type;
 
 			typedef vector<Intersection_Components::Interfaces::Movement_Interface<movements_element_type, NULLTYPE>*> movements_container_type;
-			//========================================================================================================
-			//start implementation of memeber_data(Link_Interface*, outbound_movement_reference)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType inbound_movement_reference(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_inbound_movement_reference);
-			}
-			typedef Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>* inbound_movement_reference_type;
-			tag_getter(inbound_movement_reference);
-	
-		protected:
-			movements_container_type _inbound_movement_reference;
-			//--------------------------------------------------------------------------------------------------------
 
-			//========================================================================================================
-			//start implementation of memeber_data(Vector<Movement_Interface*>, outbound_movements)
-			//--------------------------------------------------------------------------------------------------------
-		public:
+
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType outbound_movements(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_outbound_movements);
-			}
-			
+			TargetType inbound_movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_movement_reference);}
+			tag_getter(inbound_movement_reference);
+
+			movements_container_type _inbound_movement_reference;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType outbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_movements);}
 			tag_getter(outbound_movement_reference);
-	
-		protected:
+
 			movements_container_type _outbound_movements;
-			//--------------------------------------------------------------------------------------------------------
 		};
 		
 
@@ -233,11 +158,11 @@ namespace Intersection_Components
 		{
 			typedef typename MasterType::link_type link_type;
 
-			typedef Polaris_Component<Interfaces::Outbound_Inbound_Movements_Interface,Polaris_Outbound_Inbound_Movements_Base<MasterType>,NULLTYPE,MasterType> outbound_inbound_movements_element_type;
-			typedef vector<Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_element_type,NULLTYPE>*> outbound_inbound_movements_type;
+			typedef Polaris_Component<Interfaces::Outbound_Inbound_Movements_Interface,Polaris_Outbound_Inbound_Movements_Base<MasterType>,NULLTYPE,MasterType> outbound_inbound_movements_container_element_type;
+			typedef vector<Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_container_element_type,NULLTYPE>*> outbound_inbound_movements_container_type;
 
-			typedef Polaris_Component<Interfaces::Inbound_Outbound_Movements_Interface,Polaris_Inbound_Outbound_Movements_Base<MasterType>,NULLTYPE,MasterType> inbound_outbound_movements_element_type;
-			typedef vector<Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_element_type,NULLTYPE>*> inbound_outbound_movements_type;
+			typedef Polaris_Component<Interfaces::Inbound_Outbound_Movements_Interface,Polaris_Inbound_Outbound_Movements_Base<MasterType>,NULLTYPE,MasterType> inbound_outbound_movements_container_element_type;
+			typedef vector<Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_container_element_type,NULLTYPE>*> inbound_outbound_movements_container_type;
 
 			//typedef movements_container_type inbound_movements_type;
 			//typedef movements_container_type outbound_movements_type;
@@ -297,7 +222,7 @@ namespace Intersection_Components
 			tag_getter(outbound_inbound_movements);
 		
 		protected:
-			outbound_inbound_movements_type _outbound_inbound_movements;
+			outbound_inbound_movements_container_type _outbound_inbound_movements;
 
 			//========================================================================================================
 			//start implementation of memeber_data(Vector<Inbound_Outbound_Movements_Interface*>, inbound_outbound_movements)
@@ -314,7 +239,7 @@ namespace Intersection_Components
 			tag_getter(inbound_outbound_movements);
 	
 		protected:
-			inbound_outbound_movements_type _inbound_outbound_movements;
+			inbound_outbound_movements_container_type _inbound_outbound_movements;
 			//--------------------------------------------------------------------------------------------------------
 
 			member_data_basic(float, x_position);
@@ -334,9 +259,9 @@ namespace Intersection_Components
 			}
 
 			tag_getter(scenario_reference);
-			typedef Scenario_Components::Interfaces::Scenario_Interface<Scenario_Components::Components::Polaris_Scenario_Component, NULLTYPE>* scenario_reference_type;
+			typedef typename MasterType::scenario_type scenario_type;
 		protected:
-			scenario_reference_type _scenario_reference;
+			void* _scenario_reference;
 			//--------------------------------------------------------------------------------------------------------
 		};
 	}

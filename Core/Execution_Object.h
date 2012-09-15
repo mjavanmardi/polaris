@@ -348,7 +348,7 @@ static void Execution_Loop(Bytes<stride>* __restrict page, Revision& ptex_respon
 
 			if(optex_response.result) ((Execution_Object*)page)->event_register(page);
 
-			((Execution_Object*)page)->current_iteration=this_iteration;
+			((Execution_Object*)page)->current_revision=this_iteration;
 		}
 
 		if(((Execution_Object*)page)->next_iteration < ptex_response.iteration_revision)

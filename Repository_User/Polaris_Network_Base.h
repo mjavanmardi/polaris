@@ -21,65 +21,48 @@ namespace Network_Components
 		{
 			member_data_basic(float, max_free_flow_speed);
 
-			typedef typename MasterType::intersection_type intersections_element_type;
-			typedef Intersection_Components::Interfaces::Intersection_Interface<intersections_element_type, NULLTYPE> intersection_interface_type;
-			typedef vector<intersection_interface_type*> intersections_container_type;
-			//========================================================================================================
-			//start implementation of memeber_data(vector<Intersection_Interface*>, intersections)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType intersections(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)_intersections;
-			}
+			typedef typename MasterType::intersection_type intersection_type;
+			typedef intersection_type intersections_container_element_type;
+			typedef vector<void*> intersections_container_type;
 
-			tag_getter(intersections);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType intersections_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_intersections;} tag_getter(intersections_container);
 			
-		protected:
 			intersections_container_type _intersections;
-			//end
-			//--------------------------------------------------------------------------------------------------------
 			
-			typedef typename MasterType::links_type links_element_type;
-			typedef Link_Components::Interfaces::Link_Interface<links_element_type, NULLTYPE> link_interface_type;
-			typedef vector<link_interface_type*> links_container_type;
-			//========================================================================================================
-			//start implementation of memeber_data(vector<Link_Interface*>, links)
-			//--------------------------------------------------------------------------------------------------------
-		public:
+
+
+			typedef typename MasterType::link_type link_type;
+			typedef link_type links_container_element_type;
+			typedef vector<void*> links_container_type;
+
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType links(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)_links;
-			}
-
-			tag_getter(links);
+			TargetType links_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_links_container;} tag_getter(links_container);
 			
-		protected:
-			links_container_type _links;
-			//end
-			//--------------------------------------------------------------------------------------------------------	
+			links_container_type _links_container;
 
-			typedef typename MasterType::turn_movement_type turn_movements_element_type;
-			typedef Link_Components::Interfaces::Turn_Movement_Interface<turn_movements_element_type, NULLTYPE> turn_movement_interface_type;
-			typedef vector<turn_movement_interface_type*> turn_movements_container_type;
-			//========================================================================================================
-			//start implementation of memeber_data(vector<Turn_Movement_Interface*>, turn_movements)
-			//--------------------------------------------------------------------------------------------------------
-		public:
+
+			typedef typename MasterType::turn_movement_type turn_movement_type;
+			typedef turn_movement_type turn_movements_element_type;
+			typedef vector<void*> turn_movements_container_type;
+
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType turn_movements(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)_turn_movements;
-			}
-
-			tag_getter(turn_movements);
+			TargetType turn_movements_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_turn_movements_container;}
+			tag_getter(turn_movements_container);
 			
-		protected:
-			turn_movements_container_type _turn_movements;
-			//end
-			//--------------------------------------------------------------------------------------------------------			
+
+
+
+			typedef typename intersection_type::outbound_inbound_movements_container_element_type outbound_inbound_movements_container_element_type;
+			typedef typename intersection_type::outbound_inbound_movements_container_type outbound_inbound_movements_container_type;
+
+			typedef typename intersection_type::inbound_outbound_movements_container_element_type inbound_outbound_movements_container_element_type;
+			typedef typename intersection_type::inbound_outbound_movements_container_type inbound_outbound_movements_container_type;
+			
+
+			typedef typename outbound_inbound_movements_container_element_type::movements_element_type movements_type;
+			
+			turn_movements_container_type _turn_movements_container;
 		};
 
 		//typedef Intersection_Components::Components::Polaris_Outbound_Inbound_Movements_Component outbound_inbound_movements_element_type;
