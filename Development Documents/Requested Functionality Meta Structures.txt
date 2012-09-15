@@ -19,3 +19,5 @@
 9.)  Formalize type standards for references i.e. should typeof(obj*) be obj or obj* 
 
 10.)  Break "Facet_Accessor", "Member_Data" and others into component parts in order to provide 'path' from no macros to all in macros
+
+11.)  Greatly ease dependency information by collecting all major component types into a "MasterType" and reference it to find out of component types
