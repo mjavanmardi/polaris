@@ -167,7 +167,7 @@ namespace Network_Components
 				link_0->num_right_turn_bays<int>(0);
 				links<LinksContainerType&>().push_back(link_0);
 
-				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_0->free_flow_speed<float>());
+				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_0->free_flow_speed<float>()));
 				
 				i = 1;
 
@@ -188,7 +188,7 @@ namespace Network_Components
 				link_1->num_right_turn_bays<int>(0);
 				links<LinksContainerType&>().push_back(link_0);
 
-				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_1->free_flow_speed<float>());
+				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_1->free_flow_speed<float>()));
 
 				i = 2;
 
@@ -209,7 +209,7 @@ namespace Network_Components
 				link_2->num_right_turn_bays<int>(0);
 				links<LinksContainerType&>().push_back(link_2);
 
-				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_2->free_flow_speed<float>());
+				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_2->free_flow_speed<float>()));
 
 				i = 3;
 
@@ -230,7 +230,7 @@ namespace Network_Components
 				link_3->num_right_turn_bays<int>(0);
 				links<LinksContainerType&>().push_back(link_3);
 
-				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_3->free_flow_speed<float>());
+				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_3->free_flow_speed<float>()));
 
 
 				i = 4;
@@ -252,7 +252,7 @@ namespace Network_Components
 				link_4->num_right_turn_bays<int>(0);
 				links<LinksContainerType&>().push_back(link_4);
 
-				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_4->free_flow_speed<float>());
+				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_4->free_flow_speed<float>()));
 
 				i = 5;
 
@@ -273,7 +273,7 @@ namespace Network_Components
 				link_5->num_right_turn_bays<int>(0);
 				links<LinksContainerType&>().push_back(link_5);
 
-				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_5->free_flow_speed<float>());
+				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_5->free_flow_speed<float>()));
 
 				//========================================================================================================
 				//Create inbound/outbound links for each intersection
@@ -491,7 +491,7 @@ namespace Network_Components
 					LinkInterface* inboundLink = turn_movements<TurnMovementsContainerType&>()[i].inbound_link<LinkInterface*>();
 					LinkInterface* outboundLink = turn_movements<TurnMovementsContainerType&>()[i].outbound_link<LinkInterface*>();
 
-					float turn_travel_penalty = (float) ((inboundLink->travel_time<float>() + outboundLink->travel_time<float>()*0.10);
+					float turn_travel_penalty = (float) (inboundLink->travel_time<float>() + outboundLink->travel_time<float>()*0.10);
 					float forward_link_turn_travel_time = inboundLink->travel_time<float>() + turn_travel_penalty;
 
 					turn_movements<TurnMovementsContainerType&>()[i].turn_travel_penalty<float>(turn_travel_penalty);

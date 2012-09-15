@@ -151,13 +151,13 @@ namespace Link_Components
 				accept_vehicle<TargetType>(vehicle);
 			}
 
-			facet void accept_vehicle(TargetType* veh/*,requires(TargetType,IsUnloaded)*/)
-			{
-				link_origin_cumulative_arrived_vehicles<int&>()++;
-				typedef typename ThisType::link_origin_vehicle_index_array_type LinkOriginVehiclesType;
-				link_origin_vehicle_index_array<LinkOriginVehiclesType>().push_back(veh);
-				veh->load_to_entry_queue<NULLTYPE>();
-			}
+			//facet void accept_vehicle(TargetType* veh/*,requires(TargetType,IsUnloaded)*/)
+			//{
+			//	link_origin_cumulative_arrived_vehicles<int&>()++;
+			//	typedef typename ThisType::link_origin_vehicle_index_array_type LinkOriginVehiclesType;
+			//	link_origin_vehicle_index_array<LinkOriginVehiclesType>().push_back(veh);
+			//	veh->load_to_entry_queue<NULLTYPE>();
+			//}
 
 			facet void accept_vehicle(TargetType* veh/*,requires(TargetType,IsLoaded)*/)
 			{

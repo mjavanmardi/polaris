@@ -19,8 +19,12 @@ namespace Intersection_Components
 	namespace Bases
 	{
 
+		template<typename MasterType>
 		struct Polaris_Movement_Base
 		{
+		public:
+			typedef typename MasterType::link_type link_type;
+			typedef typename MasterType::vehicle_type vehicle_type;
 
 			//========================================================================================================
 			//start implementation of memeber_data(Link_Interface*, movement_reference)
@@ -35,7 +39,7 @@ namespace Intersection_Components
 			tag_getter(movement_reference);
 	
 		protected:
-			Link_Components::Interfaces::Link_Interface<Link_Components::Components::Polaris_Link_Component, NULLTYPE>* _movement_reference;
+			Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>* _movement_reference;
 			//end
 			//--------------------------------------------------------------------------------------------------------
 
@@ -131,20 +135,23 @@ namespace Intersection_Components
 			}
 
 			tag_getter(vehicles_container);
-			typedef vector<Vehicle_Components::Interfaces::Vehicle_Interface<Vehicle_Components::Components::Polaris_Vehicle_Component,NULLTYPE>*> vehicles_container_type;
+			typedef vector<Vehicle_Components::Interfaces::Vehicle_Interface<vehicle_type,NULLTYPE>*> vehicles_container_type;
 		protected:
 			vehicles_container_type _vehicles_container;
 			//--------------------------------------------------------------------------------------------------------
 
 			member_data_basic(float, minimum_merge_rate);
 		};
-
-		typedef Intersection_Components::Components::Polaris_Movement_Component movements_element_type;
-		typedef vector<Intersection_Components::Interfaces::Movement_Interface<movements_element_type, NULLTYPE>*> movements_container_type;
 		
+		template<typename MasterType>
 		struct Polaris_Outbound_Inbound_Movements_Base
 		{
+		public:
+			typedef typename MasterType::link_type link_type;
 
+			typedef Polaris_Component<Interfaces::Movement_Interface,Polaris_Movement_Base<MasterType>,NULLTYPE,MasterType> movements_element_type;
+
+			typedef vector<Intersection_Components::Interfaces::Movement_Interface<movements_element_type, NULLTYPE>*> movements_container_type;
 			//========================================================================================================
 			//start implementation of memeber_data(Link_Interface*, outbound_movement_reference)
 			//--------------------------------------------------------------------------------------------------------
@@ -154,7 +161,7 @@ namespace Intersection_Components
 			{
 				return (TargetType)(_outbound_movement_reference);
 			}
-			typedef Link_Components::Interfaces::Link_Interface<Link_Components::Components::Polaris_Link_Component, NULLTYPE>* outbound_movement_reference_type;
+			typedef Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>* outbound_movement_reference_type;
 			tag_getter(outbound_movement_reference);
 	
 		protected:
@@ -178,10 +185,15 @@ namespace Intersection_Components
 			//--------------------------------------------------------------------------------------------------------
 		};
 		
-
+		template<typename MasterType>
 		struct Polaris_Inbound_Outbound_Movements_Base
 		{
+		public:
+			typedef typename MasterType::link_type link_type;
 
+			typedef Polaris_Component<Interfaces::Movement_Interface,Polaris_Movement_Base<MasterType>,NULLTYPE,MasterType> movements_element_type;
+
+			typedef vector<Intersection_Components::Interfaces::Movement_Interface<movements_element_type, NULLTYPE>*> movements_container_type;
 			//========================================================================================================
 			//start implementation of memeber_data(Link_Interface*, outbound_movement_reference)
 			//--------------------------------------------------------------------------------------------------------
@@ -191,7 +203,7 @@ namespace Intersection_Components
 			{
 				return (TargetType)(_inbound_movement_reference);
 			}
-			typedef Link_Components::Interfaces::Link_Interface<Link_Components::Components::Polaris_Link_Component, NULLTYPE>* inbound_movement_reference_type;
+			typedef Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>* inbound_movement_reference_type;
 			tag_getter(inbound_movement_reference);
 	
 		protected:
@@ -216,17 +228,26 @@ namespace Intersection_Components
 		};
 		
 
+		template<typename MasterType>
 		struct Polaris_Intersection_Base
 		{
-			typedef movements_container_type inbound_movements_type;
-			typedef movements_container_type outbound_movements_type;
-			typedef Polaris_Movement_Base inbound_movement_type;
-			typedef Vehicle_Components::Components::Polaris_Vehicle_Component vehicle_type; 
-			typedef Polaris_Movement_Base::vehicles_container_type vehicles_container_type;
+			typedef typename MasterType::link_type link_type;
+
+			typedef Polaris_Component<Interfaces::Outbound_Inbound_Movements_Interface,Polaris_Outbound_Inbound_Movements_Base<MasterType>,NULLTYPE,MasterType> outbound_inbound_movements_element_type;
+			typedef vector<Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_element_type,NULLTYPE>*> outbound_inbound_movements_type;
+
+			typedef Polaris_Component<Interfaces::Inbound_Outbound_Movements_Interface,Polaris_Inbound_Outbound_Movements_Base<MasterType>,NULLTYPE,MasterType> inbound_outbound_movements_element_type;
+			typedef vector<Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_element_type,NULLTYPE>*> inbound_outbound_movements_type;
+
+			//typedef movements_container_type inbound_movements_type;
+			//typedef movements_container_type outbound_movements_type;
+			//typedef Polaris_Movement_Base inbound_movement_type;
+			//typedef Vehicle_Components::Components::Polaris_Vehicle_Component vehicle_type; 
+			//typedef Polaris_Movement_Base::vehicles_container_type vehicles_container_type;
 
 			member_data_basic(int, uuid);
 
-			typedef vector<Link_Components::Interfaces::Link_Interface<Link_Components::Components::Polaris_Link_Component, NULLTYPE>*> LinkContainerType;
+			typedef vector<Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>*> LinkContainerType;
 			//========================================================================================================
 			//start implementation of memeber_data(vector<Link_Interface>, inbound_links)
 			//--------------------------------------------------------------------------------------------------------
@@ -270,13 +291,13 @@ namespace Intersection_Components
 			{
 				return (TargetType)(_outbound_inbound_movements);
 			}
-			typedef Intersection_Components::Components::Polaris_Outbound_Inbound_Movements_Component outbound_inbound_movements_element_type;
-			typedef vector<Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_element_type, NULLTYPE>*> outbound_inbound_movements_container_type;
-			typedef outbound_inbound_movements_container_type::iterator outbound_inbound_movements_container_iterator;
+			//typedef OutboundInboundType outbound_inbound_movements_element_type;
+			//typedef vector<Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_element_type, NULLTYPE>*> outbound_inbound_movements_container_type;
+			//typedef outbound_inbound_movements_container_type::iterator outbound_inbound_movements_container_iterator;
 			tag_getter(outbound_inbound_movements);
 		
 		protected:
-			outbound_inbound_movements_container_type _inbound_outbound_movements;
+			outbound_inbound_movements_type _outbound_inbound_movements;
 
 			//========================================================================================================
 			//start implementation of memeber_data(Vector<Inbound_Outbound_Movements_Interface*>, inbound_outbound_movements)
@@ -287,13 +308,13 @@ namespace Intersection_Components
 			{
 				return (TargetType)(_inbound_outbound_movements);
 			}
-			typedef Intersection_Components::Components::Polaris_Inbound_Outbound_Movements_Component inbound_outbound_movements_element_type;
-			typedef vector<Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<inbound_outbound_movements_element_type, NULLTYPE>*> inbound_outbound_movements_container_type;
-			typedef inbound_outbound_movements_container_type::iterator inbound_outbound_movements_container_iterator;
+			//typedef Intersection_Components::Components::Polaris_Inbound_Outbound_Movements_Component inbound_outbound_movements_element_type;
+			//typedef vector<Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<inbound_outbound_movements_element_type, NULLTYPE>*> inbound_outbound_movements_container_type;
+			//typedef inbound_outbound_movements_container_type::iterator inbound_outbound_movements_container_iterator;
 			tag_getter(inbound_outbound_movements);
 	
 		protected:
-			inbound_outbound_movements_container_type _inbound_outbound_movements;
+			inbound_outbound_movements_type _inbound_outbound_movements;
 			//--------------------------------------------------------------------------------------------------------
 
 			member_data_basic(float, x_position);
@@ -322,10 +343,34 @@ namespace Intersection_Components
 
 	namespace Components
 	{
-		typedef Polaris_Component<Intersection_Components::Interfaces::Intersection_Interface, Intersection_Components::Bases::Polaris_Intersection_Base> Polaris_Intersection_Component;
-		typedef Polaris_Component<Intersection_Components::Interfaces::Movement_Interface, Intersection_Components::Bases::Polaris_Movement_Base> Polaris_Movement_Component;
-		typedef Polaris_Component<Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface, Intersection_Components::Bases::Polaris_Outbound_Inbound_Movements_Base> Polaris_Outbound_Inbound_Movements_Component;
-		typedef Polaris_Component<Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface, Intersection_Components::Bases::Polaris_Inbound_Outbound_Movements_Base> Polaris_Inbound_Outbound_Movements_Component;
+		template<typename MasterType>
+		struct Polaris_Intersection_Component
+		{
+			typedef Polaris_Component<Interfaces::Intersection_Interface,Bases::Polaris_Intersection_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
+
+		template<typename MasterType>
+		struct Polaris_Movement_Component
+		{
+			typedef Polaris_Component<Interfaces::Movement_Interface, Bases::Polaris_Movement_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
+		
+		template<typename MasterType>
+		struct Polaris_Outbound_Inbound_Movements_Component
+		{
+			typedef Polaris_Component<Interfaces::Outbound_Inbound_Movements_Interface, Bases::Polaris_Outbound_Inbound_Movements_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
+		
+		template<typename MasterType>
+		struct Polaris_Inbound_Outbound_Movements_Component
+		{
+			typedef Polaris_Component<Interfaces::Inbound_Outbound_Movements_Interface, Bases::Polaris_Inbound_Outbound_Movements_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
+
+		//typedef Polaris_Component<Intersection_Components::Interfaces::Intersection_Interface, Intersection_Components::Bases::Polaris_Intersection_Base> Polaris_Intersection_Component;
+		//typedef Polaris_Component<Intersection_Components::Interfaces::Movement_Interface, Intersection_Components::Bases::Polaris_Movement_Base> Polaris_Movement_Component;
+		//typedef Polaris_Component<Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface, Intersection_Components::Bases::Polaris_Outbound_Inbound_Movements_Base> Polaris_Outbound_Inbound_Movements_Component;
+		//typedef Polaris_Component<Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface, Intersection_Components::Bases::Polaris_Inbound_Outbound_Movements_Base> Polaris_Inbound_Outbound_Movements_Component;
 	}	
 
 }

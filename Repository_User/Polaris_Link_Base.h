@@ -2,10 +2,11 @@
 #include "Repository_User_Includes.h"
 #include "Polaris_Scenario_Base.h"
 #include "Link_Interface.h"
-#include "Polaris_Vechicle_Base.h"
+#include "Intersection_Interface.h"
+#include "Polaris_Vehicle_Base.h"
 
 namespace Link_Components
-{ 
+{
 	namespace Types
 	{
 
@@ -15,9 +16,15 @@ namespace Link_Components
 	{
 	}
 	
+	namespace Components
+	{
+	}
+
 	namespace Bases
 	{
-		struct Polaris_Turn_Movement_Base {
+		template<typename MasterType>
+		struct Polaris_Turn_Movement_Base
+		{
 
 			//========================================================================================================
 			//start implementation of memeber_data(Link_Interface*, inbound_link)
@@ -32,7 +39,7 @@ namespace Link_Components
 			tag_getter(inbound_link);
 			
 		protected:
-			Link_Components::Interfaces::Link_Interface<Link_Components::Components::Polaris_Link_Component, NULLTYPE>* _inbound_link;
+			Interfaces::Link_Interface<typename MasterType::link_type, NULLTYPE>* _inbound_link;
 			//end
 			//--------------------------------------------------------------------------------------------------------
 
@@ -49,7 +56,7 @@ namespace Link_Components
 			tag_getter(outbound_link);
 			
 		protected:
-			Link_Components::Interfaces::Link_Interface<Link_Components::Components::Polaris_Link_Component, NULLTYPE>* _outbound_link;
+			Interfaces::Link_Interface<typename MasterType::link_type, NULLTYPE>* _outbound_link;
 			//end
 			//--------------------------------------------------------------------------------------------------------
 
@@ -59,13 +66,14 @@ namespace Link_Components
 			member_data_basic(float, forward_link_turn_travel_time);
 		};
 
+		template<typename MasterType>
 		struct Polaris_Link_Base
 		{
 			member_data_basic(int, uuid);
 
-			member_data_basic(int, scenario_reference);
+			typedef Polaris_Component<Interfaces::Turn_Movement_Interface,Polaris_Turn_Movement_Base<MasterType>,NULLTYPE,MasterType> turn_movements_type;
 
-			typedef vector<Link_Components::Interfaces::Turn_Movement_Interface<Link_Components::Components::Polaris_Turn_Movement_Component, NULLTYPE>*> turn_movements_container_type;
+			typedef vector<Interfaces::Turn_Movement_Interface<turn_movements_type, NULLTYPE>*> turn_movements_container_type;
 			//========================================================================================================
 			//start implementation of memeber_data(vector<int>, inbound_movements)
 			//--------------------------------------------------------------------------------------------------------
@@ -101,7 +109,10 @@ namespace Link_Components
 			//--------------------------------------------------------------------------------------------------------
 
 			member_data_basic(float, travel_time);
-
+		
+		public:
+			typedef typename MasterType::intersection_type intersection_type;
+			
 			//========================================================================================================
 			//start implementation of memeber_data(Intersection_Interface*, upstream_intersection)
 			//--------------------------------------------------------------------------------------------------------
@@ -111,11 +122,12 @@ namespace Link_Components
 			{
 				return (TargetType)_upstream_intersection;
 			}
- 
+			
 			tag_getter(upstream_intersection);
-	
+
+			typedef intersection_type upstream_intersection_type;			
 		protected:
-			Intersection_Components::Interfaces::Intersection_Interface<Intersection_Components::Components::Polaris_Intersection_Component, NULLTYPE>* _upstream_intersection;
+			Intersection_Components::Interfaces::Intersection_Interface<intersection_type, NULLTYPE>* _upstream_intersection;
 			//end
 			//--------------------------------------------------------------------------------------------------------
 
@@ -130,9 +142,10 @@ namespace Link_Components
 			}
  
 			tag_getter(downstream_intersection);
-	
+			typedef intersection_type upstream_intersection_type;	
 		protected:
-			Intersection_Components::Interfaces::Intersection_Interface<Intersection_Components::Components::Polaris_Intersection_Component, NULLTYPE>* _downstream_intersection;
+
+			Intersection_Components::Interfaces::Intersection_Interface<intersection_type, NULLTYPE>* _downstream_intersection;
 			//end
 			//--------------------------------------------------------------------------------------------------------
 
@@ -202,7 +215,7 @@ namespace Link_Components
 			//--------------------------------------------------------------------------------------------------------
 		public:
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_link_upstream_cumulative_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer) && requires(strip_modifiers(TargetType),is_integral))))
+			TargetType cached_link_upstream_cumulative_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer) && requires(strip_modifiers(TargetType),is_integral)))
 			{
 				return (TargetType)&(_cached_link_upstream_cumulative_vehicles_array.front());
 			}
@@ -250,7 +263,9 @@ namespace Link_Components
 			}
 
 			tag_getter(link_origin_vehicle_index_array);
-			typedef vector<Vehicle_Components::Interfaces::Vehicle_Interface<Vehicle_Components::Components::Polaris_Vehicle_Component, NULLTYPE>*> link_origin_vehicle_index_arrary_type;
+			typedef typename MasterType::vehicle_type vehicle_type;
+
+			typedef vector<Vehicle_Components::Interfaces::Vehicle_Interface<vehicle_type, NULLTYPE>*> link_origin_vehicle_index_arrary_type;
 
 		protected:
 			link_origin_vehicle_index_arrary_type _link_origin_vehicle_index_array;
@@ -270,7 +285,7 @@ namespace Link_Components
 
 			tag_getter(link_origin_vehicle_queue);
 			queue<int> a;
-			typedef queue<Vehicle_Components::Interfaces::Vehicle_Interface<Vehicle_Components::Components::Polaris_Vehicle_Component, NULLTYPE>*> link_origin_vehicle_index_queue_type;
+			typedef queue<Vehicle_Components::Interfaces::Vehicle_Interface<vehicle_type, NULLTYPE>*> link_origin_vehicle_index_queue_type;
 
 		protected:
 			link_origin_vehicle_index_queue_type _link_origin_vehicle_queue;
@@ -290,7 +305,7 @@ namespace Link_Components
 			}
 
 			tag_getter(current_vehicle_queue);
-			typedef Vehicle_Components::Interfaces::Vehicle_Interface<Vehicle_Components::Components::Polaris_Vehicle_Component, NULLTYPE>* current_vehicle_queue_element_type;
+			typedef Vehicle_Components::Interfaces::Vehicle_Interface<vehicle_type, NULLTYPE>* current_vehicle_queue_element_type;
 			typedef vector<current_vehicle_queue_element_type> current_vehicle_queue_type;
 		protected:
 			current_vehicle_queue_type _current_vehicle_queue;
@@ -314,7 +329,9 @@ namespace Link_Components
 			}
 
 			tag_getter(scenario_reference);
-			typedef Scenario_Components::Interfaces::Scenario_Interface<Scenario_Components::Components::Polaris_Scenario_Component, NULLTYPE>* scenario_reference_type;
+			typedef typename MasterType::scenario_type scenario_type;
+
+			typedef Scenario_Components::Interfaces::Scenario_Interface<scenario_type, NULLTYPE>* scenario_reference_type;
 		protected:
 			scenario_reference_type _scenario_reference;
 
@@ -324,8 +341,20 @@ namespace Link_Components
 
 	namespace Components
 	{
-		typedef Polaris_Component<Link_Components::Interfaces::Link_Interface, Link_Components::Bases::Polaris_Link_Base> Polaris_Link_Component;
-		typedef Polaris_Component<Link_Components::Interfaces::Turn_Movement_Interface, Link_Components::Bases::Polaris_Turn_Movement_Base> Polaris_Turn_Movement_Component;
+		template<typename MasterType>
+		struct Polaris_Link_Component
+		{
+			typedef Polaris_Component_Execution<Interfaces::Link_Interface, Bases::Polaris_Link_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
+
+		template<typename MasterType>
+		struct Polaris_Turn_Movement_Component
+		{
+			typedef Polaris_Component<Interfaces::Turn_Movement_Interface, Bases::Polaris_Turn_Movement_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
+
+		//typedef Polaris_Component_Execution<Interfaces::Link_Interface, Bases::Polaris_Link_Base> Polaris_Link_Component;
+		//typedef Polaris_Component_Execution<Link_Components::Interfaces::Turn_Movement_Interface, Link_Components::Bases::Polaris_Turn_Movement_Base> Polaris_Turn_Movement_Component;
 	}	
 
 }

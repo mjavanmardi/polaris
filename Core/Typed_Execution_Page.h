@@ -16,8 +16,9 @@ struct Typed_Execution_Page
 		const int stride=sizeof(DataType);
 		const int num_cells=(Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType);
 		
-		ptex_current_revision=LLONG_MAX;
+		ptex_current_revision=-1;
 		ptex_next_revision=LLONG_MAX;
+		ptex_next_next_revision=LLONG_MAX;
 		ptex_lock=0;
 		ptex_threads_counter=0;
 
@@ -26,7 +27,8 @@ struct Typed_Execution_Page
 		for(int i=0;i<num_cells;i++)
 		{
 			current_cell->next_free_cell=(Execution_Object*)((Byte*)current_cell+stride);
-			current_cell->current_iteration=INT_MAX;
+			current_cell->next_iteration=INT_MAX;
+			current_cell->current_revision=-1;
 			current_cell=(Execution_Object*)((Byte*)current_cell+stride);
 		}
 	}
@@ -40,8 +42,10 @@ struct Typed_Execution_Page
 		return return_val;
 	}
 
-	Revision ptex_next_revision;
 	Revision ptex_current_revision;
+	Revision ptex_next_revision;
+	Revision ptex_next_next_revision;
+
 	volatile long ptex_threads_counter;
 	volatile long ptex_lock;
 
@@ -67,12 +71,18 @@ public:
 	{
 		tex_lock=0;
 
-		tex_current_revision=LLONG_MAX;
+		tex_current_revision=-1;
 		tex_next_revision=LLONG_MAX;
+		tex_next_next_revision=LLONG_MAX;
 		
 		tex_threads_counter=0;
 	}
 	
+	//__forceinline int next_iteration()
+	//{
+	//	return tex_next_next_revision.iteration_revision;
+	//}
+
 	void Process(Revision& tex_response)
 	{
 		Revision this_revision;
@@ -97,11 +107,11 @@ public:
 			{
 				// allow one thread into this page per iteration / sub_iteration				
 				
-				Revision ptex_response=execution_page->ptex_current_revision;
+				Revision ptex_response=execution_page->ptex_next_revision;
 
 				if(ptex_response == this_revision)
 				{
-					ptex_response=execution_page->ptex_next_revision;
+					ptex_response=execution_page->ptex_next_next_revision;
 
 					current_page=((Byte*)execution_page)+header_size;
 
@@ -113,15 +123,16 @@ public:
 					
 					while(_InterlockedExchange(&execution_page->ptex_lock,1)) Sleep(0); // lock the page
 
-					if(ptex_response < execution_page->ptex_next_revision)
+					if(ptex_response < execution_page->ptex_next_next_revision)
 					{
 						// PTEX wishes to return sooner in the future than already assumed
-						// should be assumed that these are strictly ordered: execution_page->ptex_current_revision < execution_page->ptex_next_revision
-						execution_page->ptex_next_revision=ptex_response;
+						// should be assumed that these are strictly ordered: execution_page->ptex_next_revision < execution_page->ptex_next_next_revision
+						execution_page->ptex_next_next_revision=ptex_response;
 					}
 
-					execution_page->ptex_current_revision=execution_page->ptex_next_revision;
-					execution_page->ptex_next_revision=LLONG_MAX;
+					execution_page->ptex_current_revision=this_revision;
+					execution_page->ptex_next_revision=execution_page->ptex_next_next_revision;
+					execution_page->ptex_next_next_revision=LLONG_MAX;
 
 					execution_page->ptex_lock=0; // unlock the page
 				}
@@ -185,6 +196,7 @@ public:
 
 	volatile long tex_threads_counter;
 
+	Revision tex_next_next_revision;
 	Revision tex_next_revision;
 	Revision tex_current_revision;
 

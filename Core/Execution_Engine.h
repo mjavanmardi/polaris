@@ -12,8 +12,9 @@ class Execution_Root
 public:
 	Execution_Root()
 	{
-		ex_current_revision=LLONG_MAX;
+		ex_current_revision=-1;
 		ex_next_revision=LLONG_MAX;
+		ex_next_next_revision=LLONG_MAX;
 
 		ex_lock=0;
 
@@ -40,14 +41,11 @@ public:
 		this_revision.sub_iteration_revision = sub_iteration;
 		this_revision.iteration_revision = iteration;
 
-		// you are guaranteed that EX::current_revision will not change until the final thread has finished this EX
+		// you are guaranteed that EX::next_revision will not change until the final thread has finished this EX
 
-		while(ex_current_revision == this_revision)
+		while(ex_next_revision == this_revision)
 		{
-			
-
-
-			Revision ex_response=ex_next_revision;
+			Revision ex_response=ex_next_next_revision;
 
 			list<Execution_Type>::iterator itr;
 
@@ -55,13 +53,13 @@ public:
 			{
 				Typed_Execution_Pages<>* execution_type=itr->typed_execution_pages;
 				
-				Revision tex_response=execution_type->tex_current_revision;
+				Revision tex_response=execution_type->tex_next_revision;
 
-				// you are guaranteed that TEX::current_revision will not change until the final thread has finished this TEX
+				// you are guaranteed that TEX::next_revision will not change until the final thread has finished this TEX
 
 				if(tex_response == this_revision)
 				{
-					tex_response=execution_type->tex_next_revision;
+					tex_response=execution_type->tex_next_next_revision;
 
 					// process one slice of the TEX
 
@@ -71,17 +69,18 @@ public:
 
 					// TEX slice has revealed that it wishes to return some time in the future
 
-					if(tex_response < execution_type->tex_next_revision)
+					if(tex_response < execution_type->tex_next_next_revision)
 					{
 						// TEX slice wishes to return sooner in the future than already assumed
-						execution_type->tex_next_revision=tex_response;
+						execution_type->tex_next_next_revision=tex_response;
 					}
 
 					if(++execution_type->tex_threads_counter == num_threads)
 					{
-						// final thread, in charge of getting ready for the next revision, but only if something actually happend this revision
-						execution_type->tex_current_revision=execution_type->tex_next_revision;
-						execution_type->tex_next_revision=LLONG_MAX;
+						// final thread, in charge of getting ready for the next revision, but only if something actually happened this revision
+						execution_type->tex_current_revision=this_revision;
+						execution_type->tex_next_revision=execution_type->tex_next_next_revision;
+						execution_type->tex_next_next_revision=LLONG_MAX;
 						execution_type->tex_threads_counter=0;
 					}
 
@@ -98,10 +97,10 @@ public:
 
 			// EX slice has revealed that it wishes to return some time in the future
 			
-			if(ex_response < ex_next_revision)
+			if(ex_response < ex_next_next_revision)
 			{
 				// EX slice wishes to return sooner in the future than already assumed
-				ex_next_revision=ex_response;
+				ex_next_next_revision=ex_response;
 			}
 
 			ex_lock=0; // unlock the execution engine
@@ -113,8 +112,9 @@ public:
 
 			if(_InterlockedIncrement(&ex_threads_counter_begin) == num_threads)
 			{
-				ex_current_revision=ex_next_revision;
-				ex_next_revision=LLONG_MAX;
+				ex_current_revision=this_revision;
+				ex_next_revision=ex_next_next_revision;
+				ex_next_next_revision=LLONG_MAX;
 
 				sub_tick_tock=!sub_tick_tock;
 				sub_iteration++;
@@ -131,7 +131,7 @@ public:
 
 			
 			
-			if(ex_current_revision == this_revision)
+			if(ex_next_revision == this_revision)
 			{
 				// if the iteration will be repeated, make sure all threads are collected before starting the new loop
 				// this prevents threads from getting stuck in the previous _InterlockedCompareExchange
@@ -150,6 +150,7 @@ public:
 
 	list<Execution_Type> active_types;
 
+	Revision ex_next_next_revision;
 	Revision ex_next_revision;
 	Revision ex_current_revision;
 

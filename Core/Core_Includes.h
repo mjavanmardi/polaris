@@ -3,6 +3,7 @@
 #include <list>
 #include <vector>
 #include <deque>
+#include <queue>
 #include <string>
 #include <Windows.h>
 #include <WinBase.h>
@@ -44,8 +45,7 @@ struct Bytes{char bytes[Size];};
 
 static unsigned int tick_tock=false;
 static unsigned int sub_tick_tock=false;
-static unsigned int sub_iteration=0;
-static long iteration=0;
+
 
 typedef void (*Event)(void*);
 
@@ -59,6 +59,10 @@ struct Conditional_Response
 
 union Revision
 {
+	Revision():revision(0){};
+	Revision(long sub_revision,long revision):sub_iteration_revision(sub_revision),iteration_revision(revision){};
+	Revision(Revision& copy):revision(copy.revision){};
+
 	inline void operator = (const long long val){revision=val;}
 	inline operator long long&(){return revision;}
 
@@ -70,6 +74,11 @@ union Revision
 
 	long long revision;
 };
+
+static Revision revision;
+static long& sub_iteration=revision.sub_iteration_revision;
+static long& iteration=revision.iteration_revision;
+
 typedef void (*Conditional)(void*,Conditional_Response&);
 
 

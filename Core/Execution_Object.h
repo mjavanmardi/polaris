@@ -28,9 +28,65 @@ static World* world_ptr;
 
 struct Execution_Object
 {
-	Execution_Object():current_iteration(INT_MAX){};
+	Execution_Object():next_iteration(INT_MAX){};
 
 	permit_state_checking;
+
+	inline Revision&& object_current_revision()
+	{
+		return Revision(0,current_revision);
+	}
+
+	inline Revision&& object_next_check()
+	{
+		if(next_iteration==iteration)
+		{
+			return Revision(sub_iteration+1,next_iteration);
+		}
+		else
+		{
+			return Revision(0,next_iteration);
+		}
+	}
+	
+	template<typename ThisType>
+	inline Revision&& type_current_revision()
+	{
+		return Revision(allocator_template<ThisType>::allocator_reference.current_revision);
+	}
+
+	template<typename ThisType>
+	inline Revision&& type_next_check()
+	{
+		return Revision(allocator_template<ThisType>::allocator_reference.next_revision);
+	}
+
+	//inline long object_current_revision()
+	//{
+	//	return current_revision;
+	//}
+
+	//inline long object_next_iteration()
+	//{
+	//	return next_iteration;
+	//}
+
+	//template<typename ThisType>
+	//inline long type_current_revision()
+	//{
+	//	return allocator_template<ThisType>::allocator_reference.current_revision.iteration;
+	//}
+
+	//template<typename ThisType>
+	//inline long type_next_revision()
+	//{
+	//	return allocator_template<ThisType>::allocator_reference.next_revision.iteration;
+	//}	
+
+
+
+
+
 
 	__forceinline void Swap_Event(Event new_event)
 	{
@@ -56,12 +112,12 @@ struct Execution_Object
 			
 			while(_InterlockedExchange(&execution_root_ptr->ex_lock,1)) Sleep(0); // lock the execution engine
 			// At this point we are assuming the following:
-			// execution_root_ptr->ex_next_revision will not change
+			// execution_root_ptr->ex_next_next_revision will not change
 
-			if(starting_iteration < execution_root_ptr->ex_next_revision)
+			if(starting_iteration < execution_root_ptr->ex_next_next_revision)
 			{
 				// This update is acceptable as it is indistinguishable from a different thread updating normally
-				execution_root_ptr->ex_next_revision=starting_iteration;
+				execution_root_ptr->ex_next_next_revision=starting_iteration;
 			}
 
 			execution_root_ptr->ex_lock=0; // unlock the execution engine
@@ -75,45 +131,45 @@ struct Execution_Object
 
 			// At this point we are assuming the following:
 			// execution_type->tex_threads_counter will not change
-			// execution_type->current_revision will not change
 			// execution_type->next_revision will not change
+			// execution_type->next_next_revision will not change
 
 			if(execution_type->tex_threads_counter > 0)
 			{
 				// one possible case here, we are mid-update
 
-				if(starting_iteration < execution_type->tex_next_revision)
+				if(starting_iteration < execution_type->tex_next_next_revision)
 				{
 					// this can be safely updated as appears indistinguishable from a different thread updating normally
-					execution_type->tex_next_revision=starting_iteration;
+					execution_type->tex_next_next_revision=starting_iteration;
 				}
 			}
 			else
 			{
 				// two possible cases here, either pre-update or post-update
-				// distinguish by checking the current_revision
+				// distinguish by checking the next_revision
 
-				if(execution_type->tex_current_revision == this_revision)
+				if(execution_type->tex_next_revision == this_revision)
 				{
 					// we are slated to visit this iteration, cannot be post-update as this would be invalid
 				
-					if(starting_iteration < execution_type->tex_next_revision)
+					if(starting_iteration < execution_type->tex_next_next_revision)
 					{
 						// this can be safely updated as it is assumed to be volatile
 
-						execution_type->tex_next_revision=starting_iteration;
+						execution_type->tex_next_next_revision=starting_iteration;
 					}
 				}
 				else
 				{
 					// only remaining option is that we are post-update as we cannot be mid-update
 
-					if(starting_iteration < execution_type->tex_current_revision)
+					if(starting_iteration < execution_type->tex_next_revision)
 					{
 						// we will not otherwise be updated this revision
 
-						execution_type->tex_current_revision=starting_iteration;
-						execution_type->tex_next_revision=LLONG_MAX;
+						execution_type->tex_next_revision=starting_iteration;
+						execution_type->tex_next_next_revision=LLONG_MAX;
 					}
 				}
 			}
@@ -144,31 +200,31 @@ struct Execution_Object
 
 			
 			// At this point we are assuming the following:
-			// execution_page->current_revision will not change
 			// execution_page->next_revision will not change
+			// execution_page->next_next_revision will not change
 			
 
 			// two possible cases here, either pre-update or post-update
-			// distinguish by checking the current_revision
+			// distinguish by checking the next_revision
 			
-			if(execution_page->ptex_current_revision == this_revision)
+			if(execution_page->ptex_next_revision == this_revision)
 			{
 				// we are slated to visit this iteration, cannot be post-update as this would be invalid
 				
-				if(starting_iteration < execution_page->ptex_next_revision)
+				if(starting_iteration < execution_page->ptex_next_next_revision)
 				{
 					// this can be safely updated as it is assumed to be volatile
-					execution_page->ptex_next_revision=starting_iteration;
+					execution_page->ptex_next_next_revision=starting_iteration;
 				}
 			}
 			else
 			{
 				// we will not be otherwise updated this revision
 
-				if(starting_iteration < execution_page->ptex_current_revision)
+				if(starting_iteration < execution_page->ptex_next_revision)
 				{
-					execution_page->ptex_current_revision=starting_iteration;
-					execution_page->ptex_next_revision=LLONG_MAX;
+					execution_page->ptex_next_revision=starting_iteration;
+					execution_page->ptex_next_next_revision=LLONG_MAX;
 				}
 			}
 
@@ -176,9 +232,9 @@ struct Execution_Object
 
 			// Following makes OPTEX aware
 			// there should be no problem making this assignment as it doesn't matter whether it is acknowledged or not this revision
-		
-			current_iteration=starting_iteration.iteration_revision;
-		
+			
+			next_iteration=starting_iteration.iteration_revision;
+			
 
 			//============================END==========================
 
@@ -188,28 +244,28 @@ struct Execution_Object
 		else
 		{
 
-			if(starting_iteration <= execution_root_ptr->ex_current_revision)
-			{
-				execution_root_ptr->ex_current_revision=starting_iteration;
-				execution_root_ptr->ex_next_revision=LLONG_MAX;
-			}
-			else if(starting_iteration < execution_root_ptr->ex_next_revision)
+			if(starting_iteration <= execution_root_ptr->ex_next_revision)
 			{
 				execution_root_ptr->ex_next_revision=starting_iteration;
+				execution_root_ptr->ex_next_next_revision=LLONG_MAX;
+			}
+			else if(starting_iteration < execution_root_ptr->ex_next_next_revision)
+			{
+				execution_root_ptr->ex_next_next_revision=starting_iteration;
 			}
 
 
 			
 			Typed_Execution_Pages<ThisType>* execution_type=&allocator_template<ThisType>::allocator_reference;
 
-			if(starting_iteration <= execution_type->tex_current_revision)
-			{
-				execution_type->tex_current_revision=starting_iteration;
-				execution_type->tex_next_revision=LLONG_MAX;
-			}
-			else if(starting_iteration < execution_type->tex_next_revision)
+			if(starting_iteration <= execution_type->tex_next_revision)
 			{
 				execution_type->tex_next_revision=starting_iteration;
+				execution_type->tex_next_next_revision=LLONG_MAX;
+			}
+			else if(starting_iteration < execution_type->tex_next_next_revision)
+			{
+				execution_type->tex_next_next_revision=starting_iteration;
 			}
 
 
@@ -219,18 +275,18 @@ struct Execution_Object
 			pthis=((dist/Page_Size)*Page_Size+(Byte*)memory_root_ptr->pages);
 			Typed_Execution_Page<ThisType>* execution_page=(Typed_Execution_Page<ThisType>*)pthis;
 
-			if(starting_iteration <= execution_page->ptex_current_revision)
-			{
-				execution_page->ptex_current_revision=starting_iteration;
-				execution_page->ptex_next_revision=LLONG_MAX;
-			}
-			else if(starting_iteration < execution_page->ptex_next_revision)
+			if(starting_iteration <= execution_page->ptex_next_revision)
 			{
 				execution_page->ptex_next_revision=starting_iteration;
+				execution_page->ptex_next_next_revision=LLONG_MAX;
+			}
+			else if(starting_iteration < execution_page->ptex_next_next_revision)
+			{
+				execution_page->ptex_next_next_revision=starting_iteration;
 			}
 
 
-			current_iteration=starting_iteration.iteration_revision;
+			next_iteration=starting_iteration.iteration_revision;
 		}
 		
 
@@ -248,7 +304,8 @@ struct Execution_Object
 	
 	Conditional conditional_register;
 
-	int current_iteration;
+	int next_iteration;
+	int current_revision;
 
 	union
 	{
@@ -283,18 +340,20 @@ static void Execution_Loop(Bytes<stride>* __restrict page, Revision& ptex_respon
 		//response.next=INT_MAX;
 		//response.result=false;
 
-		if(((Execution_Object*)page)->current_iteration==this_iteration)
+		if(((Execution_Object*)page)->next_iteration==this_iteration)
 		{
 			((Execution_Object*)page)->conditional_register(page,optex_response);
 			
-			((Execution_Object*)page)->current_iteration=optex_response.next;
+			((Execution_Object*)page)->next_iteration=optex_response.next;
 
 			if(optex_response.result) ((Execution_Object*)page)->event_register(page);
+
+			((Execution_Object*)page)->current_iteration=this_iteration;
 		}
 
-		if(((Execution_Object*)page)->current_iteration < ptex_response.iteration_revision)
+		if(((Execution_Object*)page)->next_iteration < ptex_response.iteration_revision)
 		{
-			ptex_response.iteration_revision=((Execution_Object*)page)->current_iteration;
+			ptex_response.iteration_revision=((Execution_Object*)page)->next_iteration;
 		}
 	}
 	while(++page<end_page);

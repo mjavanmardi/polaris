@@ -8,9 +8,9 @@
 /// Polaris_Component - adds interface
 ///============================================================================
 
-template<template<typename ThisType,typename CallerType> class InterfaceTemplate=NULLTEMPLATE_2,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename EntityType=NULLTYPE,typename ObjectType=Data_Object>
+template<template<typename ThisType,typename CallerType> class InterfaceTemplate=NULLTEMPLATE_2,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename MasterType=NULLTYPE,typename ObjectType=Data_Object>
 class Polaris_Component:
-	public Polaris_Component<NULLTEMPLATE_2,BaseType,ParentType,EntityType,ObjectType>
+	public Polaris_Component<NULLTEMPLATE_2,BaseType,ParentType,MasterType,ObjectType>
 {
 public:
 #if STATE_CHECKS
@@ -28,15 +28,15 @@ public:
 	typedef Polaris_Component This_Type;
 	typedef BaseType Base_Type;
 	typedef ObjectType Object_Type;
-	typedef EntityType Entity_Tag;
+	typedef MasterType Master_Type;
 };
 
 ///============================================================================
 /// Polaris_Component - adds object and entity tag, without parent
 ///============================================================================
 
-template<typename EntityType,typename ObjectType>
-class Polaris_Component<NULLTEMPLATE_2,NULLTYPE,NULLTYPE,EntityType,ObjectType>:
+template<typename MasterType,typename ObjectType>
+class Polaris_Component<NULLTEMPLATE_2,NULLTYPE,NULLTYPE,MasterType,ObjectType>:
 	public ObjectType
 {
 public:
@@ -47,8 +47,8 @@ public:
 /// Polaris_Component - adds object and entity tag, with parent
 ///============================================================================
 
-template<typename ParentType,typename EntityType,typename ObjectType>
-class Polaris_Component<NULLTEMPLATE_2,NULLTYPE,ParentType,EntityType,ObjectType>:
+template<typename ParentType,typename MasterType,typename ObjectType>
+class Polaris_Component<NULLTEMPLATE_2,NULLTYPE,ParentType,MasterType,ObjectType>:
 	public ObjectType
 {
 public:
@@ -60,9 +60,9 @@ public:
 /// Polaris_Component - adds base
 ///============================================================================
 
-template<typename BaseType,typename ParentType,typename EntityType,typename ObjectType>
-class Polaris_Component<NULLTEMPLATE_2,BaseType,ParentType,EntityType,ObjectType>:
-	public Polaris_Component<NULLTEMPLATE_2,NULLTYPE,ParentType,EntityType,ObjectType>,
+template<typename BaseType,typename ParentType,typename MasterType,typename ObjectType>
+class Polaris_Component<NULLTEMPLATE_2,BaseType,ParentType,MasterType,ObjectType>:
+	public Polaris_Component<NULLTEMPLATE_2,NULLTYPE,ParentType,MasterType,ObjectType>,
 	public BaseType
 {
 public:
@@ -73,9 +73,9 @@ public:
 /// Polaris_Component_Data - adds interface
 ///============================================================================
 
-template<template<typename ThisType,typename CallerType> class InterfaceTemplate=NULLTEMPLATE_2,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename EntityType=NULLTYPE>
+template<template<typename ThisType,typename CallerType> class InterfaceTemplate=NULLTEMPLATE_2,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename MasterType=NULLTYPE>
 class Polaris_Component_Data:
-	public Polaris_Component_Data<NULLTEMPLATE_2,BaseType,ParentType,EntityType>
+	public Polaris_Component_Data<NULLTEMPLATE_2,BaseType,ParentType,MasterType>
 {
 public:
 #if STATE_CHECKS
@@ -94,15 +94,15 @@ public:
 	typedef Polaris_Component_Data This_Type;
 	typedef BaseType Base_Type;
 	typedef Data_Object Object_Type;
-	typedef EntityType Entity_Tag;
+	typedef MasterType Master_Type;
 };
 
 ///============================================================================
 /// Polaris_Component_Data - adds object and entity tag, without parent
 ///============================================================================
 
-template<typename EntityType>
-class Polaris_Component_Data<NULLTEMPLATE_2,NULLTYPE,NULLTYPE,EntityType>:
+template<typename MasterType>
+class Polaris_Component_Data<NULLTEMPLATE_2,NULLTYPE,NULLTYPE,MasterType>:
 	public Data_Object
 {
 public:
@@ -113,8 +113,8 @@ public:
 /// Polaris_Component_Data - adds object and entity tag, with parent
 ///============================================================================
 
-template<typename ParentType,typename EntityType>
-class Polaris_Component_Data<NULLTEMPLATE_2,NULLTYPE,ParentType,EntityType>:
+template<typename ParentType,typename MasterType>
+class Polaris_Component_Data<NULLTEMPLATE_2,NULLTYPE,ParentType,MasterType>:
 	public Data_Object
 {
 public:
@@ -126,9 +126,9 @@ public:
 /// Polaris_Component_Data - adds base
 ///============================================================================
 
-template<typename BaseType,typename ParentType,typename EntityType>
-class Polaris_Component_Data<NULLTEMPLATE_2,BaseType,ParentType,EntityType>:
-	public Polaris_Component_Data<NULLTEMPLATE_2,NULLTYPE,ParentType,EntityType>,
+template<typename BaseType,typename ParentType,typename MasterType>
+class Polaris_Component_Data<NULLTEMPLATE_2,BaseType,ParentType,MasterType>:
+	public Polaris_Component_Data<NULLTEMPLATE_2,NULLTYPE,ParentType,MasterType>,
 	public BaseType
 {
 public:
@@ -139,9 +139,9 @@ public:
 /// Polaris_Component_Execution - adds interface
 ///============================================================================
 
-template<template<typename ThisType,typename CallerType> class InterfaceTemplate=NULLTEMPLATE_2,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename EntityType=NULLTYPE>
+template<template<typename ThisType,typename CallerType> class InterfaceTemplate=NULLTEMPLATE_2,typename BaseType=NULLTYPE,typename ParentType=NULLTYPE,typename MasterType=NULLTYPE>
 class Polaris_Component_Execution:
-	public Polaris_Component_Execution<NULLTEMPLATE_2,BaseType,ParentType,EntityType>
+	public Polaris_Component_Execution<NULLTEMPLATE_2,BaseType,ParentType,MasterType>
 {
 public:
 #if STATE_CHECKS
@@ -158,15 +158,15 @@ public:
 	typedef Polaris_Component_Execution This_Type;
 	typedef BaseType Base_Type;
 	typedef Execution_Object Object_Type;
-	typedef EntityType Entity_Tag;
+	typedef MasterType Master_Type;
 };
 
 ///============================================================================
 /// Polaris_Component_Execution - adds object and entity tag, without parent
 ///============================================================================
 
-template<typename EntityType>
-class Polaris_Component_Execution<NULLTEMPLATE_2,NULLTYPE,NULLTYPE,EntityType>:
+template<typename MasterType>
+class Polaris_Component_Execution<NULLTEMPLATE_2,NULLTYPE,NULLTYPE,MasterType>:
 	public Execution_Object
 {
 public:
@@ -177,8 +177,8 @@ public:
 /// Polaris_Component_Execution - adds object and entity tag, with parent
 ///============================================================================
 
-template<typename ParentType,typename EntityType>
-class Polaris_Component_Execution<NULLTEMPLATE_2,NULLTYPE,ParentType,EntityType>:
+template<typename ParentType,typename MasterType>
+class Polaris_Component_Execution<NULLTEMPLATE_2,NULLTYPE,ParentType,MasterType>:
 	public Execution_Object
 {
 public:
@@ -190,9 +190,9 @@ public:
 /// Polaris_Component_Execution - adds base
 ///============================================================================
 
-template<typename BaseType,typename ParentType,typename EntityType>
-class Polaris_Component_Execution<NULLTEMPLATE_2,BaseType,ParentType,EntityType>:
-	public Polaris_Component_Execution<NULLTEMPLATE_2,NULLTYPE,ParentType,EntityType>,
+template<typename BaseType,typename ParentType,typename MasterType>
+class Polaris_Component_Execution<NULLTEMPLATE_2,BaseType,ParentType,MasterType>:
+	public Polaris_Component_Execution<NULLTEMPLATE_2,NULLTYPE,ParentType,MasterType>,
 	public BaseType
 {
 public:

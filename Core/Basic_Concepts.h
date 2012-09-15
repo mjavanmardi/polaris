@@ -38,9 +38,9 @@ concept Is_Polaris_Component
 	requires_typename_defined(Object_Type,Base_Type,"Type is not aware of base type");
 	requires_typename_defined(Base_Type,Interface_Type,"Type is not aware of interface type");
 	requires_typename_defined(Interface_Type,Dispatched,"Type is not aware of dispatch capability");
-	requires_typename_defined(Dispatched,Entity_Tag,"Type is not aware of entity");
+	requires_typename_defined(Dispatched,Master_Type,"Type is not aware of entity");
 
-	end_requirements_list(Entity_Tag);
+	end_requirements_list(Master_Type);
 };
 
 concept Is_Data_Object
@@ -110,9 +110,9 @@ concept Is_Same_Entity
 	begin_requirements_list;
 
 	requires_concept(none,Is_Polaris_Component);
-	requires_typename_match(Is_Polaris_Component,Entity_Tag,"Entity tags do not match!");
+	requires_typename_match(Is_Polaris_Component,Master_Type,"Entity tags do not match!");
 	
-	end_requirements_list(Entity_Tag);
+	end_requirements_list(Master_Type);
 };
 
 ///============================================================================

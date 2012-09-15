@@ -68,7 +68,7 @@
     <ClInclude Include="Polaris_Scenario_Base.h">
       <Filter>Bases</Filter>
     </ClInclude>
-    <ClInclude Include="Polaris_Vechicle_Base.h">
+    <ClInclude Include="Polaris_Vehicle_Base.h">
       <Filter>Bases</Filter>
     </ClInclude>
   </ItemGroup>
