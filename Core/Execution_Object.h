@@ -52,13 +52,13 @@ struct Execution_Object
 	template<typename ThisType>
 	inline Revision&& type_current_revision()
 	{
-		return Revision(allocator_template<ThisType>::allocator_reference.current_revision);
+		return Revision(allocator_template<ThisType>::allocator_reference.tex_current_revision);
 	}
 
 	template<typename ThisType>
 	inline Revision&& type_next_check()
 	{
-		return Revision(allocator_template<ThisType>::allocator_reference.next_revision);
+		return Revision(allocator_template<ThisType>::allocator_reference.tex_next_revision);
 	}
 
 	//inline long object_current_revision()
@@ -97,16 +97,16 @@ struct Execution_Object
 	void Load_Register(Conditional conditional,Event p_event,int start)
 	{
 		Revision starting_iteration;
-		starting_iteration.iteration_revision=start;
-		starting_iteration.sub_iteration_revision=0;
+		starting_iteration.iteration=start;
+		starting_iteration.sub_iteration=0;
 		
 		if(world_ptr->run)
 		{
-			if(starting_iteration.iteration_revision <= iteration) starting_iteration.iteration_revision=iteration+1;
+			if(starting_iteration.iteration <= iteration) starting_iteration.iteration=iteration+1;
 
 			Revision this_revision;
-			this_revision.iteration_revision=iteration;
-			this_revision.sub_iteration_revision=sub_iteration;
+			this_revision.iteration=iteration;
+			this_revision.sub_iteration=sub_iteration;
 
 			// Following makes EX aware, can catch EX in 2 states which are handled identically: A) Pre-Update B) Mid-Update
 			
@@ -233,7 +233,7 @@ struct Execution_Object
 			// Following makes OPTEX aware
 			// there should be no problem making this assignment as it doesn't matter whether it is acknowledged or not this revision
 			
-			next_iteration=starting_iteration.iteration_revision;
+			next_iteration=starting_iteration.iteration;
 			
 
 			//============================END==========================
@@ -286,7 +286,7 @@ struct Execution_Object
 			}
 
 
-			next_iteration=starting_iteration.iteration_revision;
+			next_iteration=starting_iteration.iteration;
 		}
 		
 
@@ -351,9 +351,9 @@ static void Execution_Loop(Bytes<stride>* __restrict page, Revision& ptex_respon
 			((Execution_Object*)page)->current_revision=this_iteration;
 		}
 
-		if(((Execution_Object*)page)->next_iteration < ptex_response.iteration_revision)
+		if(((Execution_Object*)page)->next_iteration < ptex_response.iteration)
 		{
-			ptex_response.iteration_revision=((Execution_Object*)page)->next_iteration;
+			ptex_response.iteration=((Execution_Object*)page)->next_iteration;
 		}
 	}
 	while(++page<end_page);

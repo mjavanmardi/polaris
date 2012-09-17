@@ -114,7 +114,7 @@ namespace Link_Components
 			member_data_basic(float, jam_density);
 			member_data_basic(float, critical_density);
 
-
+			member_data_basic(Interfaces::Link_Simulation_Status, link_simulation_status);
 
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members

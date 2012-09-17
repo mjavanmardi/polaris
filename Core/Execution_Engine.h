@@ -38,8 +38,8 @@ public:
 		// log the current revision
 
 		Revision this_revision;
-		this_revision.sub_iteration_revision = sub_iteration;
-		this_revision.iteration_revision = iteration;
+		this_revision.sub_iteration = sub_iteration;
+		this_revision.iteration = iteration;
 
 		// you are guaranteed that EX::next_revision will not change until the final thread has finished this EX
 
@@ -126,8 +126,8 @@ public:
 				while(_InterlockedCompareExchange(&ex_threads_counter_begin,0,0)) Sleep(0);
 			}
 
-			this_revision.sub_iteration_revision = sub_iteration;
-			this_revision.iteration_revision = iteration;
+			this_revision.sub_iteration = sub_iteration;
+			this_revision.iteration = iteration;
 
 			
 			

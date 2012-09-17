@@ -35,17 +35,17 @@ void main()
 	
 	//DemandData demand_data;
 
-	////data input
+	//data input
 	cout << "reading input data..." <<endl;	
 	scenario->read_scenario_data<NULLTYPE>();
 	network->read_network_data<NULLTYPE>();
 	//read_demand_data();
 
-	////network cost
+	//network cost
 	cout << "constructing network cost..." <<endl;
 	network->construct_network_cost<NULLTYPE>();
 	
-	////initialize network agents
+	//initialize network agents
 
 	Master_Type::network_type::links_container_type::iterator links_itr;
 	typedef Master_Type::link_type link_type;
@@ -71,8 +71,5 @@ void main()
 
 	world->Start_Turning();
 
-	//if (scenario_data.assignment_mode == ONE_SHOT_ASSIGNMENT_SIMULATION_MODE)
-	//{
-	//	one_shot_assignment_simulation_model(scenario_data,network_data,demand_data);
-	//}
+	cout << "Finished!" << endl;
 }

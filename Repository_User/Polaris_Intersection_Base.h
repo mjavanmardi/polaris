@@ -47,7 +47,6 @@ namespace Intersection_Components
 			member_data_basic(float, minimum_merge_rate);
 
 
-
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_movement_reference;}
 			tag_getter(movement_reference);
@@ -181,6 +180,7 @@ namespace Intersection_Components
 
 			member_data_basic(Intersection_Components::Types::Intersection_Type_Keys, intersection_type);
 
+			member_data_basic(Interfaces::Intersection_Simulation_Status, intersection_simulation_status);
 
 
 			typedef vector<Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>*> LinkContainerType;

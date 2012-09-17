@@ -136,7 +136,6 @@ namespace Vehicle_Components
 			{
 				simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>(Vehicle_Components::Types::Vehicle_Status_Keys::IN_ENTRY_QUEUE);
 			};
-
 			
 			facet TargetType get_next_link()
 			{
@@ -216,7 +215,8 @@ namespace Vehicle_Components
 				return trajectory_poistion<TrajectoryUnitType>().enter_time<int>();
 			}
 			
-			facet int get_current_link_enter_interval_index() {
+			facet int get_current_link_enter_interval_index()
+			{
 				return trajectory_position<TrajectoryUnitType>().enter_interval_index<int>();
 			}
 		};

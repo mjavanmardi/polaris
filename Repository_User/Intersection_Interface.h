@@ -104,6 +104,13 @@ namespace Intersection_Components
 			facet_accessor(forward_link_turn_travel_time);
 		};
 
+			
+		enum Intersection_Simulation_Status
+		{
+			NONE_COMPLETE,
+			COMPUTE_STEP_FLOW_COMPLETE,
+			NETWORK_STATE_UPDATE_COMPLETE
+		};
 
 		template<typename ThisType,typename CallerType>
 		struct Intersection_Interface
@@ -716,16 +723,9 @@ namespace Intersection_Components
 				}
 			}
 
-			facet bool adjacent_link_supply_finished()
-			{
-				return false;
-			}
 
-			facet bool adjacent_link_moving_finished()
-			{
-				return false;
-			}
-			
+			facet_accessor(intersection_simulation_status);
+
 			facet void Initialize()
 			{
 				schedule_event_local(ThisType,Newells_Conditional,Compute_Step_Flow,0,NULLTYPE);
@@ -735,26 +735,128 @@ namespace Intersection_Components
 			{
 				Intersection_Interface* _this=(Intersection_Interface*)pthis;
 				
-				if(_this->adjacent_link_supply_finished<NULLTYPE>())
-				{
-					if(! _this->adjacent_link_moving_finished<NULLTYPE>())
-					{
+				Revision intersection_current_revision=pthis->object_current_revision();
+				
+				typedef typename ThisType::link_type link_type;
+				
+				
+				typedef Link_Components::Interfaces::Link_Simulation_Status link_simulation_status_type;
 
-						((Execution_Object*)pthis)->Swap_Event((Event)&Intersection_Interface::Compute_Step_Flow<NULLTYPE>);
-						response.result=true;
-						response.next=iteration;
+
+
+				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundType;
+				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundElementType;
+				typedef typename Outbound_Inbound_Movements_Interface<OutboundInboundElementType,ThisType> Outbound_Inbound_Movement_Interface;
+
+				typedef typename OutboundInboundElementType::outbound_movement_reference_type LinkType;
+				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+				
+				typedef typename ThisType::inbound_movements_container_type InboundMovementsType;
+				typedef typename ThisType::inbound_movement_type InboundMovementType;
+				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
+
+
+
+				if(intersection_current_revision.iteration!=iteration)
+				{
+					//first visit this iteration, update status
+
+					_this->intersection_simulation_status<Intersection_Simulation_Status>(NONE_COMPLETE);
+
+					Revision links_current_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_current_revision();
+
+					if(links_current_revision.iteration==iteration)
+					{
+						//links visited at least once, link_simulation_status is accurate
+
+						//necessary condition is that all intersection's downstream/upstream links are done
+
+						Link_Interface* outbound_link;
+						OutboundInboundType& outbound_links_container=_this->outbound_inbound_movements<OutboundInboundType&>();
+						typename OutboundInboundType::iterator outbound_itr;
+
+						bool done=false;
+
+						for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
+						{
+							outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_movement_reference<Link_Interface*>();
+
+							Link_Interface* inbound_link;
+							Movement_Interface* inbound_movement;
+							InboundMovementsType& inbound_links_container = ((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->inbound_movements<InboundMovementsType&>();
+							
+							typename InboundMovementsType::iterator inbound_itr;
+
+							for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
+							{
+								inbound_movement=(Movement_Interface*)(*inbound_itr);
+								inbound_link=inbound_movement->movement_reference<Link_Interface*>();
+
+								done=done &&
+									(inbound_link->link_simulation_status<link_simulation_status_type>()
+									 == link_simulation_status_type::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE);
+
+								if(!done) break;
+							}
+							
+							if(!done) break;
+						}
+
+						if(done)
+						{
+							pthis->Swap_Event((Event)&Intersection_Interface::Compute_Step_Flow<NULLTYPE>);
+							response.result=true;
+							response.next=iteration;
+						}
+						else
+						{
+							response.result=false;
+							response.next=iteration;
+						}
+
 					}
 					else
 					{
-						((Execution_Object*)pthis)->Swap_Event((Event)&Intersection_Interface::Network_State_Update<NULLTYPE>);
-						response.result=true;
-						response.next=iteration+1;
+						//link not visited yet, current setup should not be here
 					}
+
+
+
+
+
+
 				}
 				else
 				{
-					response.result=false;
-					response.next=iteration;
+					//have visited at least once, intersection_simulation_status is accurate
+
+					if(_this->intersection_simulation_status<Intersection_Simulation_Status>()==COMPUTE_STEP_FLOW_COMPLETE)
+					{
+						//have performed "phase 1: Compute_Step_Flow_Supply_Update"
+
+
+						//although not ideal, simply check whether links are completely done this iteration
+
+						Revision link_next_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_next_check();
+
+						if(link_next_revision.iteration>iteration)
+						{
+							//ready for "phase 2: Network_State_Update"
+
+							pthis->Swap_Event((Event)&Intersection_Interface::Network_State_Update<NULLTYPE>);
+							response.result=true;
+							response.next=iteration+1;
+						}
+						else
+						{
+							response.result=false;
+							response.next=iteration;
+						}
+					}
+					else
+					{
+						//should be no case where you are here
+					}
 				}
 			}
 
@@ -773,6 +875,8 @@ namespace Intersection_Components
 
 				//step 6: node transfer
 				_this->node_transfer<NULLTYPE>();
+
+				_this->intersection_simulation_status<Intersection_Simulation_Status>(COMPUTE_STEP_FLOW_COMPLETE);
 			}
 
 			declare_facet_event(Network_State_Update)
@@ -781,6 +885,8 @@ namespace Intersection_Components
 
 				//step 9: intersection network state update
 				_this->network_state_update<NULLTYPE>();
+
+				_this->intersection_simulation_status<Intersection_Simulation_Status>(NETWORK_STATE_UPDATE_COMPLETE);
 			}
 
 		};

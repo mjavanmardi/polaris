@@ -60,7 +60,7 @@ struct Conditional_Response
 union Revision
 {
 	Revision():revision(0){};
-	Revision(long sub_revision,long revision):sub_iteration_revision(sub_revision),iteration_revision(revision){};
+	Revision(long sub_revision,long revision):sub_iteration(sub_revision),iteration(revision){};
 	Revision(Revision& copy):revision(copy.revision){};
 
 	inline void operator = (const long long val){revision=val;}
@@ -68,16 +68,16 @@ union Revision
 
 	struct
 	{
-		long sub_iteration_revision;
-		long iteration_revision;
+		long sub_iteration;
+		long iteration;
 	};
 
 	long long revision;
 };
 
 static Revision revision;
-static long& sub_iteration=revision.sub_iteration_revision;
-static long& iteration=revision.iteration_revision;
+static long& sub_iteration=revision.sub_iteration;
+static long& iteration=revision.iteration;
 
 typedef void (*Conditional)(void*,Conditional_Response&);
 

@@ -78,16 +78,26 @@ public:
 		tex_threads_counter=0;
 	}
 	
+	inline Revision&& type_current_revision()
+	{
+		return Revision(tex_current_revision);
+	}
+
+	inline Revision&& type_next_check()
+	{
+		return Revision(tex_next_revision);
+	}
+
 	//__forceinline int next_iteration()
 	//{
-	//	return tex_next_next_revision.iteration_revision;
+	//	return tex_next_next_revision.iteration;
 	//}
 
 	void Process(Revision& tex_response)
 	{
 		Revision this_revision;
-		this_revision.sub_iteration_revision = sub_iteration;
-		this_revision.iteration_revision = iteration;
+		this_revision.sub_iteration = sub_iteration;
+		this_revision.iteration = iteration;
 
 		list<Typed_Execution_Page<DataType>*>::iterator itr;
 
@@ -118,8 +128,8 @@ public:
 					(*process_directive)(current_page,ptex_response);
 					
 					// extend shorthand iteration to include sub_iteration
-					if(ptex_response.iteration_revision == this_revision.iteration_revision) ptex_response.sub_iteration_revision=this_revision.sub_iteration_revision+1;
-					else ptex_response.sub_iteration_revision=0;
+					if(ptex_response.iteration == this_revision.iteration) ptex_response.sub_iteration=this_revision.sub_iteration+1;
+					else ptex_response.sub_iteration=0;
 					
 					while(_InterlockedExchange(&execution_page->ptex_lock,1)) Sleep(0); // lock the page
 
@@ -207,4 +217,6 @@ public:
 	const unsigned int num_cells;
 
 	const Execution_Condition process_directive;
+
+	Event event_register;
 };
