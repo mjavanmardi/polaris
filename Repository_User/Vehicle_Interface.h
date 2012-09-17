@@ -52,8 +52,8 @@ namespace Vehicle_Components
 			typedef typename ThisType::trajectory_unit_type TrajectoryUnitType;
 			typedef typename ThisType::trajectory_container_type TrajectoryContainerType;
 
-			facet_accessor(trajectory);
-			facet_accessor(trajectory_position);
+			facet_accessor(trajectory_container);
+			//facet_accessor(trajectory_position);
 			facet_accessor(current_trajectory_unit_index);
 			facet_accessor(departure_simulation_interval_index);
 			facet_accessor(origin_link);
@@ -65,6 +65,8 @@ namespace Vehicle_Components
 			facet_accessor(departure_assignment_interval_index);
 			facet_accessor(origin_activity_location);
 			facet_accessor(destination_activity_location);
+			facet_accessor(current_link_enter_time);
+			facet_accessor(current_link_enter_interval_index);
 
 			facet void set_route_links(TargetType& path_container/*,requires(TargetType,IsReversed)*/)
 			{
@@ -86,19 +88,27 @@ namespace Vehicle_Components
 					trajectory_container.push_back(vehicle_trajectory_data);
 				}
 			};
-
-			facet TrajectoryUnitType advance_trajectory()
+			
+			facet TargetType trajectory_position()
 			{
+				typedef typename ThisType::trajectory_container_type trajectory_container_type;
+
+				return (TargetType)(trajectory_container<trajectory_container_type&>()[current_trajectory_unit_index<int>()]);
+			}
+
+			facet TargetType advance_trajectory()
+			{
+				typedef typename ThisType::trajectory_container_type trajectory_container_type;
+
 				current_trajectory_unit_index<int&>()++;
 
-				trajectory_position<TrajectoryUnitType>(trajectory<TrajectoryUnitContainerType>()[current_trajectory_unit_index<int>()]);
-				return trajectory_position<TrajectoryUnitType>();
+				return (TargetType)trajectory_container<trajectory_container_type&>()[current_trajectory_unit_index<int>()];
 			}
 			
-			facet TrajectoryUnitType initialize_trajectory()
+			facet TargetType initialize_trajectory()
 			{
 				current_trajectory_unit_index<int>(-1);
-				return advance_trajectory();
+				return (TargetType)advance_trajectory<TargetType>();
 			}
 
 			facet void init()
@@ -127,12 +137,12 @@ namespace Vehicle_Components
 				simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>(Vehicle_Components::Types::Vehicle_Status_Keys::IN_ENTRY_QUEUE);
 			};
 
-			typedef typename ThisType::link_type LinkType;
-			facet LinkType get_next_link()
+			
+			facet TargetType get_next_link()
 			{
 				if (current_trajectory_init_index<int>() < trajectory<TrajectoryUnitContainerType>().size())
 				{
-					return trajectory<TrajectoryUnitContainerType>()[current_trajectory_unit_index<int>() + 1].link<LinkType>();
+					return trajectory<TrajectoryUnitContainerType>()[current_trajectory_unit_index<int>() + 1].link<TargetType>();
 				}
 				else
 				{
@@ -140,11 +150,11 @@ namespace Vehicle_Components
 				}
 			}
 
-			facet LinkType get_current_link()
+			facet TargetType get_current_link()
 			{
 				if (current_trajectory_init_index<int>() != -1)
 				{
-					return trajectory_position<TrajectoryUnitType>().link<LinkType>();
+					return trajectory_position<TrajectoryUnitType>().link<TargetType>();
 				}
 				else
 				{
@@ -156,9 +166,12 @@ namespace Vehicle_Components
 			{
 				int current_time_in_seconds = simulation_interval_index*simulation_interval_length;
 
-				simulation_status<Simulation_Vehicle_Status_Keys>(OUT_NETWORK);
+				simulation_status<Types::Vehicle_Status_Keys>(Types::Vehicle_Status_Keys::OUT_NETWORK);
 				
-				TrajectoryUnitType current=trajectory_position<TrajectoryUnitType>();
+				typedef typename ThisType::trajectory_unit_type trajectory_unit_type;
+
+				Trajectory_Unit_Interface<trajectory_unit_type,ThisType>* current=trajectory_position<Trajectory_Unit_Interface<trajectory_unit_type,ThisType>*>();
+				
 				current->delayed_time<int>(0);
 
 				arrival_time<int>(current_time_in_seconds);
@@ -169,27 +182,32 @@ namespace Vehicle_Components
 			{
 				int current_time_in_seconds = simulation_interval_index*simulation_interval_length;
 
-				simulation_status<Simulation_Vehicle_Status_Keys>(IN_NETWORK);
+				simulation_status<Types::Vehicle_Status_Keys>(Types::Vehicle_Status_Keys::IN_NETWORK);
 
-				TrajectoryUnitType current=initialize_trajectory<TrajectoryUnitType>();
+				typedef typename ThisType::trajectory_unit_type trajectory_unit_type;
+
+				Trajectory_Unit_Interface<trajectory_unit_type,ThisType>* current=initialize_trajectory<Trajectory_Unit_Interface<trajectory_unit_type,ThisType>*>();
 				
 				current->enter_time<int>(current_time_in_seconds);
 				current->enter_interval_index<int>(simulation_interval_index);
 			}
 			
-			facet void transfer_to_next_link(int current_simulation_interval_index,int simulation_interval_length,int delayed_time)
+			facet void transfer_to_next_link(int simulation_interval_index,int simulation_interval_length,int delayed_time)
 			{
 
 				int current_time_in_seconds = simulation_interval_index*simulation_interval_length;
 
 				//add exit time to trajectory data
-				TrajectoryUnitType current = trajectory_position<TrajectoryUnitType>();
+				typedef typename ThisType::trajectory_unit_type Trajectory_Unit_Type;
+
+				Trajectory_Unit_Interface<Trajectory_Unit_Type,ThisType>* current=trajectory_position<Trajectory_Unit_Interface<Trajectory_Unit_Type,ThisType>*>();
+
 				current->delayed_time<int>(delayed_time);
 				
-				current = advance_trajectory<TrajectoryUnitType>();
+				current = advance_trajectory<Trajectory_Unit_Interface<Trajectory_Unit_Type,ThisType>*>();
 
 				//add enter time to the trajectory data
-				current->enter_time<int>(current_time_in_scecond);
+				current->enter_time<int>(current_time_in_seconds);
 				current->enter_interval_index<int>(simulation_interval_index);
 			}
 

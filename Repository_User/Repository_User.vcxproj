@@ -137,6 +137,9 @@
     <ClInclude Include="Traveler_Interface.h" />
     <ClInclude Include="Vehicle_Interface.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Repository_User.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -130,6 +130,9 @@
     <ClInclude Include="Trip_Interfaces.h" />
     <ClInclude Include="Trip_Base.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Repository_Base.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

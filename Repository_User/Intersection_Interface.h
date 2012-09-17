@@ -21,7 +21,7 @@ namespace Intersection_Components
 			ALLOWED,
 		};
 
-		enum Node_Type_Keys
+		enum Intersection_Type_Keys
 		{
 			NO_CONTROL=0,
 			YIELD_SIGN,
@@ -68,6 +68,23 @@ namespace Intersection_Components
 
 			facet_accessor(vehicles_container);
 
+			facet TargetType pull_vehicle()
+			{
+				return offer_vehicle<TargetType>();
+			}
+			
+			facet TargetType offer_vehicle()
+			{
+				typedef ThisType::vehicles_container_type VehiclesContainerType;
+				typedef ThisType::vehicles_container_element_type VehiclesContainerElementType;
+				typedef Vehicle_Components::Interfaces::Vehicle_Interface<VehiclesContainerElementType,ThisType> Vehicle_Interface;
+
+				Vehicle_Interface* veh=(Vehicle_Interface*)vehicles_container<VehiclesContainerType&>().front();
+				vehicles_container<VehiclesContainerType&>().pop_front();
+
+				return (TargetType)veh;
+			}
+
 			facet_accessor(minimum_merge_rate);
 		};
 
@@ -107,9 +124,9 @@ namespace Intersection_Components
 
 			facet_accessor(scenario_reference);
 
-			//facet TargetType pull_vehicle(call_requirements(requires_2(CallerType,Is_Same_Entity)))
+			//facet TargetType pull_vehicle()
 			//{
-			//	PTHIS(ThisType)->offer_vehicle<Dispatch<ThisType>,TargetType>();
+			//	//PTHIS(ThisType)->offer_vehicle<Dispatch<ThisType>,TargetType>();
 			//}
 
 			facet void push_vehicle(void* vehicle)
@@ -119,49 +136,58 @@ namespace Intersection_Components
 			
 			facet void accept_vehicle(void* vehicle)
 			{
-				typedef typename ThisType::scenario_reference_type ScenarioType;
+				typedef typename ThisType::scenario_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
-				int current_simulation_interval_index = scenario->current_simulation_interval_index<ScenarioType,int>();
-				int simulation_interval_length = scenario->simulation_interval_length<ScenarioType,int>();
-				int current_time = scenario->current_time<ScenarioType,int>();
+				int current_simulation_interval_index = scenario->current_simulation_interval_index<int>();
+				int simulation_interval_length = scenario->simulation_interval_length<int>();
+				int current_time = scenario->current_time<int>();
 
-				
-				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
-				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundType;
+				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundElementType;
+				typedef typename Outbound_Inbound_Movements_Interface<OutboundInboundElementType,ThisType> Outbound_Inbound_Movement_Interface;
+
+
+				typedef typename OutboundInboundElementType::outbound_movement_reference_type LinkType;
+				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+
+
+				typedef typename ThisType::inbound_movements_container_type InboundMovementsType;
 				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
-				typedef typename ThisType::outbound_movement_reference_type LinkType;
-				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+				
+
+				
+				
 				typedef typename ThisType::vehicle_type VehicleType;
 				typedef typename Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
-				typedef typename ThisType::vehicles_container_type VehiclesContainerType;
+				typedef typename InboundMovementType::vehicles_container_type VehiclesContainerType;
 
 				Link_Interface* outbound_link;
 
 				OutboundInboundType& outbound_links_container=outbound_inbound_movements<OutboundInboundType&>();
-				typename ThisType::outbound_inbound_movements_container_iterator outbound_itr;
+				typename OutboundInboundType::iterator outbound_itr;
 
 				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
-					outbound_link=(*outbound_itr)->outbound_movement_reference<Link_Interface*>();
+					outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_movement_reference<Link_Interface*>();
 
 					Movement_Interface* inbound_movement;
 					Link_Interface* inbound_link;
 
-					InboundMovementsType& inbound_movements = (*outbound_itr)->inbound_movements<InboundMovementsType&>();
+					InboundMovementsType& inbound_movements = ((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->inbound_movements<InboundMovementsType&>();
 					InboundMovementsType::iterator inbound_itr;
 
 					for(inbound_itr=inbound_movements.begin();inbound_itr!=inbound_movements.end();inbound_itr++)
 					{
-						inbound_movement=(*inbound_itr);
+						inbound_movement=(Movement_Interface*)(*inbound_itr);
 
 						inbound_link=inbound_movement->movement_reference<Link_Interface*>();
 
-						if(vehicle->next_link<Link_Interface*>()==inbound_link)
+						if(((Vehicle_Interface*)vehicle)->next_link<Link_Interface*>()==inbound_link)
 						{
-							inbound_movement->vehicles_container<VehicleQueueType&>().push_back(vehicle);
+							inbound_movement->vehicles_container<VehiclesContainerType&>().push_back(vehicle);
 							inbound_movement->turn_movement_cumulative_arrival_vehicles<int&>()++;
 						}
 					}
@@ -170,16 +196,19 @@ namespace Intersection_Components
 
 			facet void turn_movement_capacity_update()
 			{
-				typedef typename ThisType::scenario_reference_type ScenarioType;
+				typedef typename ThisType::scenario_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
 
-				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
-				typedef typename ThisType::outbound_movement_reference_type LinkType;
+				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundType;
+				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundElementType;
+				typedef typename Outbound_Inbound_Movements_Interface<OutboundInboundElementType,ThisType> Outbound_Inbound_Movement_Interface;
+
+				typedef typename OutboundInboundElementType::outbound_movement_reference_type LinkType;
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
 				
-				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				typedef typename ThisType::inbound_movements_container_type InboundMovementsType;
 				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
@@ -195,23 +224,23 @@ namespace Intersection_Components
 				
 				for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
-					outbound_link=(*outbound_itr)->outbound_movement_reference<Link_Interface*>();
+					outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_movement_reference<Link_Interface*>();
 
-					float outbound_link_capacity = (float)(scenario->simulation_interval_length<int> * outbound_link->num_lanes<int>() * (outbound_link->maximum_flow_rate<float>()/3600.0));
+					float outbound_link_capacity = (float)(scenario->simulation_interval_length<int>() * outbound_link->num_lanes<int>() * (outbound_link->maximum_flow_rate<float>()/3600.0));
 
 					Link_Interface* inbound_link;
-					InboundMovementsType& inbound_links_container=(*outbound_itr)->inbound_movements<InboundMovementsType&>();
+					InboundMovementsType& inbound_links_container=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->inbound_movements<InboundMovementsType&>();
 					typename InboundMovementsType::iterator inbound_itr;
 					Movement_Interface* inbound_movement;
 
 					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 					{
-						inbound_movement=(*inbound_itr);
+						inbound_movement=(Movement_Interface*)(*inbound_itr);
 
-						inbound_link=(*inbound_itr)->movement_reference<Link_Interface*>();
+						inbound_link=inbound_movement->movement_reference<Link_Interface*>();
 						float inbound_link_capacity = inbound_link->link_capacity<float>(); 
 						
-						if(intersection_type<Intersection_Type_Keys>() == NO_CONTROL)
+						if(intersection_type<Types::Intersection_Type_Keys>() == Types::Intersection_Type_Keys::NO_CONTROL)
 						{
 							inbound_movement->movement_capacity<float>(min(inbound_link_capacity,outbound_link_capacity));
 						}
@@ -225,11 +254,19 @@ namespace Intersection_Components
 
 			facet void turn_movement_supply_allocation()
 			{
-				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
-				typedef typename ThisType::outbound_movement_reference_type LinkType;
+				typedef typename ThisType::scenario_type ScenarioType;
+				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
+
+				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
+
+				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundType;
+				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundElementType;
+				typedef typename Outbound_Inbound_Movements_Interface<OutboundInboundElementType,ThisType> Outbound_Inbound_Movement_Interface;
+
+				typedef typename OutboundInboundElementType::outbound_movement_reference_type LinkType;
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
 				
-				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				typedef typename ThisType::inbound_movements_container_type InboundMovementsType;
 				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
@@ -250,18 +287,18 @@ namespace Intersection_Components
 
 				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
-					outbound_link=(*outbound_itr)->outbound_movement_reference<Link_Interface*>();
+					outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_movement_reference<Link_Interface*>();
 					
 					Movement_Interface* inbound_movement;
 					Link_Interface* inbound_link;
-					InboundMovementsType& inbound_links_container=(*outbound_itr)->inbound_movements<InboundMovementsType&>();
+					InboundMovementsType& inbound_links_container=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->inbound_movements<InboundMovementsType&>();
 					typename InboundMovementsType::iterator inbound_itr;
 
-					int inbound_turn_movement_size=inbound_links_container.size();
+					int inbound_turn_movement_size=(int)inbound_links_container.size();
 					
 					if(inbound_turn_movement_size==1)
 					{
-						inbound_links_container[0]->movement_supply<float>(outbound_link->link_supply<float>());
+						((Movement_Interface*)inbound_links_container[0])->movement_supply<float>(outbound_link->link_supply<float>());
 					}
 					else
 					{
@@ -274,7 +311,7 @@ namespace Intersection_Components
 
 						for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 						{
-							inbound_movement=(*inbound_itr);
+							inbound_movement=(Movement_Interface*)(*inbound_itr);
 
 							inbound_link=inbound_movement->movement_reference<Link_Interface*>();
 
@@ -288,7 +325,7 @@ namespace Intersection_Components
 									num_merge_lanes = num_lanes_inbound_link;
 								}
 							}
-							if (inbound_movement->turn_movement_type<Turn_Movement_Type_Keys>() == THROUGH_TURN)
+							if (inbound_movement->movement_type<Types::Turn_Movement_Type_Keys>() == Types::Turn_Movement_Type_Keys::THROUGH_TURN)
 							{
 								num_through_turns++;
 							}
@@ -329,14 +366,14 @@ namespace Intersection_Components
 
 						for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 						{
-							inbound_movement=(*inbound_itr);
+							inbound_movement=(Movement_Interface*)(*inbound_itr);
 
 							inbound_link=inbound_movement->movement_reference<Link_Interface*>();
 
-							int link_type_inbound_link = inbound_link->link_type<LinkType,int>();
+							int link_type_inbound_link = inbound_link->link_type<int>();
 							float merge_ratio = 0;
 
-							if(link_type_inbound_link == link_type_outbound_link && inbound_movement->movement_type<Turn_Movement_Type_Keys>() == THROUGH_TURN)
+							if(link_type_inbound_link == link_type_outbound_link && inbound_movement->movement_type<Types::Turn_Movement_Type_Keys>() == Types::Turn_Movement_Type_Keys::THROUGH_TURN)
 							{
 								merge_ratio = major_approach_merge_ratio;
 							}
@@ -354,7 +391,7 @@ namespace Intersection_Components
 
 			facet void turn_movement_flow_calculation()
 			{
-				typedef typename ThisType::scenario_reference_type ScenarioType;
+				typedef typename ThisType::scenario_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
@@ -363,31 +400,34 @@ namespace Intersection_Components
 				int simulation_interval_length = scenario->simulation_interval_length<int>();
 				int current_time = scenario->current_time<int>();
 
-				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
-				typedef typename ThisType::outbound_movement_reference_type LinkType;
-				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundType;
+				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundElementType;
+				typedef typename Outbound_Inbound_Movements_Interface<OutboundInboundElementType,ThisType> Outbound_Inbound_Movement_Interface;
 
-				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				typedef typename OutboundInboundElementType::outbound_movement_reference_type LinkType;
+				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+				
+				typedef typename ThisType::inbound_movements_container_type InboundMovementsType;
 				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
-				LinkType* outbound_link;
+				Link_Interface* outbound_link;
 				OutboundInboundType& outbound_links_container=outbound_inbound_movements<OutboundInboundType&>();
 				typename OutboundInboundType::iterator outbound_itr;
 
 				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
-					outbound_link=(*outbound_itr)->outbound_movement_reference<Link_Interface*>();
+					outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_movement_reference<Link_Interface*>();
 
 					Movement_Interface* inbound_movement;
 					Link_Interface* inbound_link;
 
-					InboundMovementsType& inbound_links_container = (*outbound_itr)->inbound_movements<InboundMovementsType&>();
+					InboundMovementsType& inbound_links_container = ((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->inbound_movements<InboundMovementsType&>();
 					InboundMovementsType::iterator inbound_itr;
 
 					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 					{
-						inbound_movement=(*inbound_itr);
+						inbound_movement=(Movement_Interface*)(*inbound_itr);
 
 						inbound_link=inbound_movement->movement_reference<Link_Interface*>();
 
@@ -402,7 +442,7 @@ namespace Intersection_Components
 
 						if (t_minus_fftt > -1)
 						{
-							int cached_turn_movement_cumulative_shifted_arrival_vehicles=((*inbound_itr)->cached_turn_movement_cumulative_shifted_arrival_vehicles<int*>())[t_minus_fftt];
+							int cached_turn_movement_cumulative_shifted_arrival_vehicles=(inbound_movement->cached_turn_movement_cumulative_shifted_arrival_vehicles_array<int*>())[t_minus_fftt];
 							inbound_movement->turn_movement_cumulative_shifted_arrival_vehicles<int>(cached_turn_movement_cumulative_shifted_arrival_vehicles);
 						}
 						else
@@ -430,7 +470,7 @@ namespace Intersection_Components
 
 			facet void node_transfer()
 			{
-				typedef typename ThisType::scenario_reference_type ScenarioType;
+				typedef typename ThisType::scenario_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
@@ -439,12 +479,14 @@ namespace Intersection_Components
 				int simulation_interval_length = scenario->simulation_interval_length<int>();
 				int current_time = scenario->current_time<int>();
 
-				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
+				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundType;
+				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundElementType;
+				typedef typename Outbound_Inbound_Movements_Interface<OutboundInboundElementType,ThisType> Outbound_Inbound_Movement_Interface;
 
-				typedef typename ThisType::outbound_movement_reference_type LinkType;
+				typedef typename OutboundInboundElementType::outbound_movement_reference_type LinkType;
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
-
-				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				
+				typedef typename ThisType::inbound_movements_container_type InboundMovementsType;
 				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
@@ -458,12 +500,12 @@ namespace Intersection_Components
 
 				for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
-					outbound_link=(*outbound_itr)->outbound_movement_reference<Link_Interface*>();
+					outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_movement_reference<Link_Interface*>();
 
 					Movement_Interface* inbound_movement;
 					Link_Interface* inbound_link;
 
-					InboundMovementsType& inbound_links_container = (*outbound_itr)->inbound_movements<InboundMovementsType>();
+					InboundMovementsType& inbound_links_container = ((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->inbound_movements<InboundMovementsType>();
 					typename InboundMovementsType::iterator inbound_itr;
 					
 					//initialization -> move to network state update
@@ -472,7 +514,8 @@ namespace Intersection_Components
 
 					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 					{
-						inbound_movement=(*inbound_itr);
+						inbound_movement=(Movement_Interface*)(*inbound_itr);
+
 						inbound_link=inbound_movement->movement_reference<Link_Interface*>();
 
 						inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(0);
@@ -502,7 +545,7 @@ namespace Intersection_Components
 						
 						if (num_transfer_vehicles_of_turn_movement>0)
 						{
-							typedef typename InboundMovementType::turn_movement_vehicles_element_type VehicleType;
+							typedef typename InboundMovementType::vehicle_type VehicleType;
 							typedef typename Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
 							
 							//move vehicles for this turn movement
@@ -542,7 +585,7 @@ namespace Intersection_Components
 
 								inbound_movement->cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array<float*>()[departure_time_position]+=delayed_interval*simulation_interval_length;
 								
-								outbound_link->push_vehicle<NULLTYPE>(vehicle);
+								outbound_link->push_vehicle<Vehicle_Interface*>(vehicle);
 							}
 						}
 
@@ -553,7 +596,7 @@ namespace Intersection_Components
 						}
 						else
 						{
-							if(inbound_movement->turn_movement_rule<Turn_Movement_Rule_Keys>() == PROHIBITED)
+							if(inbound_movement->movement_rule<Types::Turn_Movement_Rule_Keys>() == Types::Turn_Movement_Rule_Keys::PROHIBITED)
 							{
 								inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(FLT_MAX);
 							}
@@ -573,11 +616,11 @@ namespace Intersection_Components
 										float delay = simulation_interval_length +
 											inbound_movement->cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<float*>()[t_minus_one];
 
-										inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<float>(delay);
+										inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(delay);
 									}
 									else
 									{
-										inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<float>(0);
+										inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(0);
 									}
 								}
 							}
@@ -591,7 +634,7 @@ namespace Intersection_Components
 
 			facet void network_state_update()
 			{
-				typedef typename ThisType::scenario_reference_type ScenarioType;
+				typedef typename ThisType::scenario_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
@@ -600,32 +643,19 @@ namespace Intersection_Components
 				int simulation_interval_length = scenario->simulation_interval_length<int>();
 				int current_time = scenario->current_time<int>();
 
-				typedef typename ThisType::outbound_inbound_movements_type OutboundInboundType;
+				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundType;
+				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundElementType;
+				typedef typename Outbound_Inbound_Movements_Interface<OutboundInboundElementType,ThisType> Outbound_Inbound_Movement_Interface;
 
-				typedef typename ThisType::outbound_movement_reference_type LinkType;
+				typedef typename OutboundInboundElementType::outbound_movement_reference_type LinkType;
 				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
-
-				typedef typename ThisType::inbound_movements_type InboundMovementsType;
+				
+				typedef typename ThisType::inbound_movements_container_type InboundMovementsType;
 				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
 
-				int t_fftt = -1;
-				int t_bwtt = -1;
-				int t_cached_delay = -1;
 
-				if (current_simulation_interval_index>0)
-				{
-					t_fftt = (current_simulation_interval_index)%fftt_cached_simulation_interval_size;
-					t_bwtt = (current_simulation_interval_index)%bwtt_cached_simulation_interval_size;
-					t_cached_delay = (current_simulation_interval_index)%scenario->num_simulation_intervals_per_assignment_interval<int>();
-				}
-				else
-				{
-					t_fftt = 0;
-					t_bwtt = 0;
-					t_cached_delay = 0;
-				}
 
 				Link_Interface* outbound_link;
 				OutboundInboundType& outbound_links_container=outbound_inbound_movements<OutboundInboundType&>();
@@ -633,17 +663,34 @@ namespace Intersection_Components
 
 				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
-					outbound_link=(*outbound_itr)->outbound_movement_reference<Link_Interface*>();
+					outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_movement_reference<Link_Interface*>();
+
+					int t_fftt = -1;
+					int t_bwtt = -1;
+					int t_cached_delay = -1;
+
+					if (current_simulation_interval_index>0)
+					{
+						t_fftt = (current_simulation_interval_index)%outbound_link->link_fftt_cached_simulation_interval_size<int>();
+						t_bwtt = (current_simulation_interval_index)%outbound_link->link_bwtt_cached_simulation_interval_size<int>();
+						t_cached_delay = (current_simulation_interval_index)%scenario->num_simulation_intervals_per_assignment_interval<int>();
+					}
+					else
+					{
+						t_fftt = 0;
+						t_bwtt = 0;
+						t_cached_delay = 0;
+					}
 
 					Movement_Interface* inbound_movement;
 					Link_Interface* inbound_link;
 
-					InboundMovementsType& inbound_links_container = (*outbound_itr)->inbound_movements<InboundMovementsType&>();
+					InboundMovementsType& inbound_links_container = ((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->inbound_movements<InboundMovementsType&>();
 					typename InboundMovementsType::iterator inbound_itr;
 
 					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 					{
-						inbound_movement=(*inbound_itr);
+						inbound_movement=(Movement_Interface*)(*inbound_itr);
 
 						inbound_link=inbound_movement->movement_reference<Link_Interface*>();
 
@@ -671,30 +718,35 @@ namespace Intersection_Components
 
 			facet bool adjacent_link_supply_finished()
 			{
-
+				return false;
 			}
 
 			facet bool adjacent_link_moving_finished()
 			{
-
+				return false;
+			}
+			
+			facet void Initialize()
+			{
+				schedule_event_local(ThisType,Newells_Conditional,Compute_Step_Flow,0,NULLTYPE);
 			}
 
 			declare_facet_conditional(Newells_Conditional)
 			{
-				Intersection_Interface* _this=pthis;
+				Intersection_Interface* _this=(Intersection_Interface*)pthis;
 				
 				if(_this->adjacent_link_supply_finished<NULLTYPE>())
 				{
 					if(! _this->adjacent_link_moving_finished<NULLTYPE>())
 					{
 
-						((Execution_Object*)pthis)->Swap_Event(&Intersection_Interface::Compute_Step_Flow);
+						((Execution_Object*)pthis)->Swap_Event((Event)&Intersection_Interface::Compute_Step_Flow<NULLTYPE>);
 						response.result=true;
 						response.next=iteration;
 					}
 					else
 					{
-						((Execution_Object*)pthis)->Swap_Event(&Intersection_Interface::Network_State_Update);
+						((Execution_Object*)pthis)->Swap_Event((Event)&Intersection_Interface::Network_State_Update<NULLTYPE>);
 						response.result=true;
 						response.next=iteration+1;
 					}
@@ -708,27 +760,27 @@ namespace Intersection_Components
 
 			declare_facet_event(Compute_Step_Flow)
 			{
-				Intersection_Interface* _this=pthis;
+				Intersection_Interface* _this=(Intersection_Interface*)pthis;
 
 				//step 2: turn vehicles updating based on node control and link management, inbound link demand, and outbound link supply
-				_this->turn_movement_capacity_update(); 
+				_this->turn_movement_capacity_update<NULLTYPE>(); 
 
 				//step 3: allocate link supply to inbound turn movements according to a given merging policy
-				_this->turn_movement_supply_allocation();
+				_this->turn_movement_supply_allocation<NULLTYPE>();
 
 				//step 4: determine turn movement flow rate based on demand, capacity, and supply
-				_this->turn_movement_flow_calculation();
+				_this->turn_movement_flow_calculation<NULLTYPE>();
 
 				//step 6: node transfer
-				_this->node_transfer();
+				_this->node_transfer<NULLTYPE>();
 			}
 
 			declare_facet_event(Network_State_Update)
 			{
-				Intersection_Interface* _this=pthis;
+				Intersection_Interface* _this=(Intersection_Interface*)pthis;
 
 				//step 9: intersection network state update
-				_this->network_state_update();
+				_this->network_state_update<NULLTYPE>();
 			}
 
 		};

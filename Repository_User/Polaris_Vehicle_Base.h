@@ -46,55 +46,6 @@ namespace Vehicle_Components
 		template<typename MasterType>
 		struct Polaris_Vehicle_Base
 		{
-			//========================================================================================================
-			//start implementation of member_data(vector<Trajectory_Unit_Interface*>, trajectory)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType trajectory(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_trajectory);
-			}
-
-			tag_getter(trajectory);
-
-			//template<typename ThisType,typename CallerType,typename TargetType>
-			//struct link_type
-			//{
-			//	typedef NULLTYPE type;
-			//};
-			//
-			//template<typename ThisType,typename CallerType,typename TargetType>
-			//struct link_type
-			//{
-			//	typedef NULLTYPE type;
-			//};
-
-			typedef typename MasterType::trajectory_unit_type trajectory_unit_type;
-
-			typedef vector<trajectory_unit_type> trajectory_container_type;
-
-		protected:
-			trajectory_container_type _trajectory;
-			//end
-			//--------------------------------------------------------------------------------------------------------
-
-			//========================================================================================================
-			//start implementation of member_data(Trajectory_Unit_Interface*, trajectory_position)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType trajectory_position(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_trajectory_position);
-			}
-
-			tag_getter(trajectory);
-		protected:
-			trajectory_unit_type _trajectory_position;
-			//end
-			//--------------------------------------------------------------------------------------------------------
-
 			member_data_basic(int, current_trajectory_unit_index);
 			member_data_basic(int, departure_simulation_interval_index);
 			member_data_basic(void*, origin_link);
@@ -103,6 +54,17 @@ namespace Vehicle_Components
 			member_data_basic(Vehicle_Components::Types::Vehicle_Status_Keys, simulation_status);
 			member_data_basic(int, arrival_time);
 			member_data_basic(int, arrival_simulation_interval_index);
+			member_data_basic(int, current_link_enter_time);
+			member_data_basic(int, current_link_enter_interval_index);
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType trajectory_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_trajectory_container);} tag_getter(trajectory_container);
+
+			typedef Polaris_Component<Interfaces::Trajectory_Unit_Interface, Bases::Polaris_Trajectory_Unit_Base<MasterType>,NULLTYPE,MasterType> trajectory_unit_type;
+
+			typedef vector<void*> trajectory_container_type;
+
+			trajectory_container_type _trajectory_container;
 		};
 	}
 

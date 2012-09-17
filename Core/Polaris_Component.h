@@ -205,7 +205,7 @@ public:
 ///============================================================================
 
 #define schedule_event_local(SELF_AWARE_TYPE,CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,TARGET_TYPES,...) \
-       ((SELF_AWARE_TYPE::This_Type*)this)->Load_Register<SELF_AWARE_TYPE::This_Type>((Conditional)(&CONDITIONAL_FUNCTION<NULLTYPE>),(Event)(&LOCAL_EVENT_FUNCTION<TARGET_TYPES,__VA_ARGS__>),FIRST_ITERATION)
+       ((SELF_AWARE_TYPE::This_Type*)this)->Load_Register<SELF_AWARE_TYPE::This_Type>((Conditional)(&CONDITIONAL_FUNCTION<NULLTYPE>),(Event)(&LOCAL_EVENT_FUNCTION<TARGET_TYPES>),FIRST_ITERATION)
 
 //#define schedule_event_plocal(SELF_AWARE_TYPE,CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,TARGET_TYPES,...) \
 //       ((SELF_AWARE_TYPE::This_Type*)pthis)->Load_Register<SELF_AWARE_TYPE::This_Type>((Conditional)(&CONDITIONAL_FUNCTION<SELF_AWARE_TYPE::This_Type,SELF_AWARE_TYPE::This_Type,NULLTYPE>),(Event)(&SELF_AWARE_TYPE::This_Type::LOCAL_EVENT_FUNCTION<SELF_AWARE_TYPE::This_Type,SELF_AWARE_TYPE::This_Type,TARGET_TYPES,__VA_ARGS__>),FIRST_ITERATION)

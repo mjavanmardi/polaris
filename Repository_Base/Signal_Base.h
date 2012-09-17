@@ -428,7 +428,7 @@ namespace Signal_Components
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Lane_Group_Type
 			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,typename ParentType::Entity_Tag,ObjectType> type;
+				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,typename ParentType::Master_Type,ObjectType> type;
 			};	
 			template<typename ObjectType>
 			struct Lane_Group_Type<ObjectType,NULLTYPE>
@@ -469,7 +469,7 @@ namespace Signal_Components
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Lane_Group_Type
 			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,typename ParentType::Entity_Tag,ObjectType> type;
+				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,typename ParentType::Master_Type,ObjectType> type;
 			};	
 			template<typename ObjectType>
 			struct Lane_Group_Type<ObjectType,NULLTYPE>
@@ -583,7 +583,7 @@ namespace Signal_Components
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Phase_Type
 			{
-				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,typename ParentType::Entity_Tag,ObjectType> type;
+				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,typename ParentType::Master_Type,ObjectType> type;
 			};	
 			template<typename ObjectType>
 			struct Phase_Type<ObjectType,NULLTYPE>
@@ -634,7 +634,7 @@ namespace Signal_Components
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Phase_Type
 			{
-				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,typename ParentType::Entity_Tag,ObjectType> type;
+				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,typename ParentType::Master_Type,ObjectType> type;
 			};	
 			template<typename ObjectType>
 			struct Phase_Type<ObjectType,NULLTYPE>
@@ -699,7 +699,7 @@ namespace Signal_Components
 		};
 		struct Signal_Indicator_Base
 		{
-			member_component_basic(Signal_Components::Components::HCM_Signal_Simple,Signal);
+			//member_component_basic(Signal_Components::Components::HCM_Signal_Simple,Signal);
 		};
 
 		//==================================================================================================================

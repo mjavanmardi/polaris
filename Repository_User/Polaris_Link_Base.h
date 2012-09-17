@@ -202,34 +202,33 @@ namespace Link_Components
 			member_data_basic(int, link_origin_vehicle_current_position);
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType link_origin_vehicle_index_array(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_link_origin_vehicle_index_array);}
+			TargetType link_origin_vehicle_array(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_link_origin_vehicle_array);}
 
-			tag_getter(link_origin_vehicle_index_array);
+			tag_getter(link_origin_vehicle_array);
 			typedef typename MasterType::vehicle_type vehicle_type;
-			typedef vehicle_type link_origin_vehicle_index_array_element_type;
-			typedef vector<void*> link_origin_vehicle_index_array_type;
+			typedef vehicle_type link_origin_vehicle_array_element_type;
+			typedef vector<void*> link_origin_vehicle_array_type;
 
-			link_origin_vehicle_index_array_type _link_origin_vehicle_index_array;
+			link_origin_vehicle_array_type _link_origin_vehicle_array;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType link_origin_vehicle_queue(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_link_origin_vehicle_queue);}
 
 			tag_getter(link_origin_vehicle_queue);
-			typedef queue<void*> link_origin_vehicle_index_queue_type;
+			typedef deque<void*> link_origin_vehicle_queue_type;
 
-			link_origin_vehicle_index_queue_type _link_origin_vehicle_queue;
+			link_origin_vehicle_queue_type _link_origin_vehicle_queue;
 
 			
 			
 		//==================================================================================================================
 		/// Current Vehicles Containers
 		//------------------------------------------------------------------------------------------------------------------
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType current_vehicle_queue(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_current_vehicle_queue);}
-
-			tag_getter(current_vehicle_queue);
 			typedef vehicle_type current_vehicle_queue_element_type;
 			typedef vector<void*> current_vehicle_queue_type;
+			
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType current_vehicle_queue(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_current_vehicle_queue);}tag_getter(current_vehicle_queue);
 
 			current_vehicle_queue_type _current_vehicle_queue;
 		};

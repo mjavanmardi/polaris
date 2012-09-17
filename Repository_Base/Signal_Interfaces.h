@@ -633,7 +633,7 @@ namespace Signal_Components
 			facet_accessor(length_right_turn);		///< Lr (ft)
 			facet_accessor(has_parking);			///<
 
-			facet_accessor_interface(opposing_lane);
+			//facet_accessor_interface(opposing_lane);
 
 			//-------------------------------------
 			//Traffic conditions 
@@ -1190,7 +1190,7 @@ namespace Signal_Components
 			}
 
 			// Signal Interface accessor
-			facet_accessor_interface(Signal);
+			//facet_accessor_interface(Signal);
 			facet_accessor(Conditional_Has_Fired);
 
 			// Event definition

@@ -120,7 +120,7 @@ namespace Link_Components
 
 
 			facet_accessor(link_origin_vehicle_current_position);
-			facet_accessor(link_origin_vehicle_index_array);
+			facet_accessor(link_origin_vehicle_array);
 			facet_accessor(link_origin_vehicle_queue);
 
 
@@ -146,7 +146,7 @@ namespace Link_Components
 			//	PTHIS(ThisType)->offer_vehicle<Dispatch<ThisType>,TargetType>();
 			//}
 
-			facet void push_vehicle(TargetType* vehicle)
+			facet void push_vehicle(TargetType vehicle)
 			{
 				accept_vehicle<TargetType>(vehicle);
 			}
@@ -159,9 +159,9 @@ namespace Link_Components
 			//	veh->load_to_entry_queue<NULLTYPE>();
 			//}
 
-			facet void accept_vehicle(TargetType* veh/*,requires(TargetType,IsLoaded)*/)
+			facet void accept_vehicle(TargetType veh/*,requires(TargetType,IsLoaded)*/)
 			{
-				typedef typename ThisType::scenario_reference_type ScenarioType;
+				typedef typename ThisType::scenario_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
@@ -170,11 +170,12 @@ namespace Link_Components
 				int simulation_interval_length = scenario->simulation_interval_length<int>();
 				int current_time = scenario->current_time<int>();
 
+				typedef typename ThisType::current_vehicle_queue_element_type VehicleType;
 				typedef typename Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
 				typedef typename ThisType::current_vehicle_queue_type VehicleQueueType;
-				typedef typename ThisType::current_vehicle_queue_element_type VehicleType;
 
-				Vehicle_Interface* vehicle=veh;
+
+				Vehicle_Interface* vehicle=(Vehicle_Interface*)veh;
 
 				vehicle->transfer_to_next_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length,current_time);
 
@@ -184,11 +185,11 @@ namespace Link_Components
 
 				if(this==vehicle->destination_link<Link_Interface*>())
 				{
-					vehicle->arrive_to_destination_link(current_simulation_interval_index,simulation_interval_length);
+					vehicle->arrive_to_destination_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
 					
 					//update link state: N_destination(a,t)
-					link_destination_cumulative_arrival_vehicles<ThisType,int&>()++;
-					link_destination_arrived_vehicles<ThisType,int&>()++;
+					link_destination_cumulative_arrival_vehicles<int&>()++;
+					link_destination_arrived_vehicles<int&>()++;
 					
 					//update network state:
 					//arrived_vehicles++;
@@ -202,7 +203,7 @@ namespace Link_Components
 			
 			facet void link_supply_update()
 			{
-				typedef typename ThisType::scenario_reference_type ScenarioType;
+				typedef typename ThisType::scenario_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
@@ -214,7 +215,7 @@ namespace Link_Components
 				//Newell's model
 				if(true)
 				{
-					int outbound_turn_movement_size = outbound_turn_movement_size<int>();
+					//int outbound_turn_movement_size = outbound_turn_movement_size<int>();
 					
 					//jam density * length * num_lanes = Kj(a,t)*L(a)*nlanes(a,t)
 					
@@ -234,8 +235,6 @@ namespace Link_Components
 						t_minus_one_fftt = ((current_simulation_interval_index-1))%(link_fftt_cached_simulation_interval_size<int>());
 						link_upstream_cumulative_vehicles_by_t_minus_one = cached_link_upstream_cumulative_vehicles_array<int*>()[t_minus_one_fftt];
 					}
-
-					vechiles_array<vector<int>>().push_back()
 					
 					//N(a,L(a),t-bwtt)
 					if (current_simulation_interval_index >= (link_bwtt_cached_simulation_interval_size<int>()) )
@@ -256,29 +255,31 @@ namespace Link_Components
 
 			facet void link_moving()
 			{
-				typedef typename Vehicle_Components::Interfaces::Vehicle_Interface Vehicle_Interface;
 				typedef typename ThisType::current_vehicle_queue_type VehicleQueueType;
-				typedef typename ThisType::current_vehicle_queue_type::iterator VehicleQueueIteratorType;
 				typedef typename ThisType::current_vehicle_queue_element_type VehicleType;
+				typedef typename Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
+
 				
-				typedef typename ThisType::downstream_intersection_type IntersectionType;
+				typedef typename ThisType::intersection_type IntersectionType;
 				typedef typename Intersection_Components::Interfaces::Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
 
 				Intersection_Interface* intersection=downstream_intersection<Intersection_Interface*>();
 
-				VehicleQueueIteratorType vehicle_itr;
-				VehicleQueueType& current_vehicle_queue=current_vehicle_queue<VehicleQueueType&>();
+				typename VehicleQueueType::iterator vehicle_itr;
 
-				for(vehicle_itr=current_vehicle_queue.begin();vehicle_itr!=current_vehicle_queue.end();vehicle_itr++)
+				VehicleQueueType& cur_vehicle_queue=current_vehicle_queue<VehicleQueueType&>();
+
+				for(vehicle_itr=cur_vehicle_queue.begin();vehicle_itr!=cur_vehicle_queue.end();vehicle_itr++)
 				{
 					intersection->push_vehicle<NULLTYPE>((*vehicle_itr));
 				}
 
-				current_vehicle_queue.clear();
+				cur_vehicle_queue.clear();
 			}
 
 			facet void origin_link_loading()
 			{
+				typedef typename ThisType::scenario_type ScenarioType;
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
@@ -303,22 +304,22 @@ namespace Link_Components
 				typedef typename ThisType::current_vehicle_queue_type VehicleQueueType;
 				typedef typename ThisType::current_vehicle_queue_element_type VehicleType;
 				typedef Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
-				typedef typename ThisType::link_origin_vehicle_index_array_type VehicleOriginContainerType;
-				typedef typename ThisType::link_origin_vehicle_index_queue_type VehicleOriginQueueType;
+				typedef typename ThisType::link_origin_vehicle_array_type VehicleOriginContainerType;
+				typedef typename ThisType::link_origin_vehicle_queue_type VehicleOriginQueueType;
 
 				Vehicle_Interface* vehicle;
 
 				//arrived vehicles at current interval
 				int current_position = link_origin_vehicle_current_position<int>();
 				
-				if(current_position<(int)link_origin_vehicle_index_array<VehicleOriginContainerType&>().size())
+				if(current_position<(int)link_origin_vehicle_array<VehicleOriginContainerType&>().size())
 				{
-					for(int iv=current_position;iv<(int)link_origin_vehicle_index_array<VehicleOriginContainerType&>().size();iv++)
+					for(int iv=current_position;iv<(int)link_origin_vehicle_array<VehicleOriginContainerType&>().size();iv++)
 					{
-						//udpate current position
-						link_origin_vehicle_current_position_array<int&>()++;
+						//update current position
+						link_origin_vehicle_current_position<int&>()++;
 
-						vehicle=link_origin_vehicle_index_array<VehicleOriginContainerType&>()[iv];
+						vehicle=(Vehicle_Interface*)link_origin_vehicle_array<VehicleOriginContainerType&>()[iv];
 
 						if(vehicle->departure_simulation_interval_index<int>() == current_simulation_interval_index)
 						{
@@ -355,7 +356,7 @@ namespace Link_Components
 						int num_departed_vehicles = min(link_origin_arrived_vehicles<int>(),num_link_origin_departed_vehicles_allowed);
 						for (int iv=0;iv<num_departed_vehicles;iv++)
 						{//
-							vehicle=link_origin_vehicle_queue<VehicleOriginQueueType&>().front();
+							vehicle=(Vehicle_Interface*)link_origin_vehicle_queue<VehicleOriginQueueType&>().front();
 							link_origin_vehicle_queue<VehicleOriginQueueType&>().pop_front();
 
 							//update vehicle state
@@ -366,7 +367,7 @@ namespace Link_Components
 							link_origin_departed_vehicles<int&>()++;
 							link_origin_arrived_vehicles<int&>()--;
 
-							push_vehicle<NULLTYPE>(vehicle);
+							push_vehicle<Vehicle_Interface*>(vehicle);
 							
 							//update network state
 							//departed_vehicles++;
@@ -438,7 +439,7 @@ namespace Link_Components
 				//this->cached_turn_movement_upstream_cumulative_vehicles_array;			//[V(a,a',t-fftt),V(a,a',t-1]
 
 				//time
-				
+				typedef typename ThisType::scenario_type ScenarioType;				
 				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
@@ -455,7 +456,7 @@ namespace Link_Components
 				int bwtt_cached_simulation_interval_size=link_bwtt_cached_simulation_interval_size<int>();
 				int fftt_cached_simulation_interval_size=link_fftt_cached_simulation_interval_size<int>();
 				
-				if(current_simulation_interval_index >= cached_simulation_interval_size)
+				if(current_simulation_interval_index >= bwtt_cached_simulation_interval_size)
 				{
 					t_minus_bwtt = (current_simulation_interval_index + 1- bwtt_cached_simulation_interval_size)%bwtt_cached_simulation_interval_size;
 				}
@@ -526,7 +527,7 @@ namespace Link_Components
 			
 			facet bool link_supply_finished()
 			{
-
+				return false;
 			}
 
 			facet void link_supply_finished(bool val)
@@ -536,24 +537,29 @@ namespace Link_Components
 
 			facet bool adjacent_compute_flow_finished()
 			{
-
+				return false;
 			}
 			
+			facet void Initialize()
+			{
+				schedule_event_local(ThisType,Newells_Conditional,Compute_Step_Flow_Supply_Update,0,NULLTYPE);
+			}
+
 			//USE REVISIONS FOR THESE FINISHED CHECKS!!!!
 
 			declare_facet_conditional(Newells_Conditional)
 			{
-				Link_Interface* _this=pthis;
+				Link_Interface* _this=(Link_Interface*)pthis;
 				
 				if(! _this->link_supply_finished<NULLTYPE>())
 				{
-					((Execution_Object*)pthis)->Swap_Event(&Link_Interface::Compute_Step_Flow_Supply_Update);
+					((Execution_Object*)pthis)->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Supply_Update<NULLTYPE>);
 					response.result=true;
 					response.next=iteration;
 				}
 				else if(_this->adjacent_compute_flow_finished<NULLTYPE>())
 				{
-					((Execution_Object*)pthis)->Swap_Event(&Link_Interface::Compute_Step_Flow_Link_Moving);
+					((Execution_Object*)pthis)->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Link_Moving<NULLTYPE>);
 					response.result=true;
 					response.next=iteration+1;
 				}
@@ -566,20 +572,24 @@ namespace Link_Components
 
 			declare_facet_event(Compute_Step_Flow_Supply_Update)
 			{
+				Link_Interface* _this=(Link_Interface*)pthis;
+
 				//step 1: link supply update based on a given traffic flow model
-				_this->link_supply_update();
+				_this->link_supply_update<ThisType>();
 			}
 
 			declare_facet_event(Compute_Step_Flow_Link_Moving)
 			{
+				Link_Interface* _this=(Link_Interface*)pthis;
+
 				//step 7: load vehicles to origin links
-				_this->origin_link_loading();
+				_this->origin_link_loading<ThisType>();
 				
 				//step 7.5: link moving -- no link moving in Newell's simplified model -- it can be used to determine turn bay curve
-				_this->link_moving();
+				_this->link_moving<ThisType>();
 
 				//step 8: link network state update
-				_this->network_state_update();
+				_this->network_state_update<ThisType>();
 			}
 		};
 

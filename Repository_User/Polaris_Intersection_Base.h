@@ -92,8 +92,9 @@ namespace Intersection_Components
 			TargetType vehicles_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_vehicles_container);}
 			tag_getter(vehicles_container);
 
-			typedef vector<void*> vehicles_container_type;
-			
+			typedef deque<void*> vehicles_container_type;
+			typedef vehicle_type vehicles_container_element_type;
+
 			vehicles_container_type _vehicles_container;
 		};
 		
@@ -112,16 +113,15 @@ namespace Intersection_Components
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType outbound_movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_movement_reference);}
-			tag_getter(outbound_movement_reference);
+			TargetType outbound_movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_movement_reference);} tag_getter(outbound_movement_reference);
 			
 			void* _outbound_movement_reference;
 
+			typedef link_type outbound_movement_reference_type;
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType inbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_movements);}
-			tag_getter(outbound_movement_reference);
+			TargetType inbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_movements);} tag_getter(inbound_movements);
 
 			movements_container_type _inbound_movements;
 		};
@@ -157,112 +157,66 @@ namespace Intersection_Components
 		struct Polaris_Intersection_Base
 		{
 			typedef typename MasterType::link_type link_type;
+			typedef typename MasterType::vehicle_type vehicle_type;
 
 			typedef Polaris_Component<Interfaces::Outbound_Inbound_Movements_Interface,Polaris_Outbound_Inbound_Movements_Base<MasterType>,NULLTYPE,MasterType> outbound_inbound_movements_container_element_type;
-			typedef vector<Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_container_element_type,NULLTYPE>*> outbound_inbound_movements_container_type;
+			typedef vector<void*> outbound_inbound_movements_container_type;
 
 			typedef Polaris_Component<Interfaces::Inbound_Outbound_Movements_Interface,Polaris_Inbound_Outbound_Movements_Base<MasterType>,NULLTYPE,MasterType> inbound_outbound_movements_container_element_type;
-			typedef vector<Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_container_element_type,NULLTYPE>*> inbound_outbound_movements_container_type;
+			typedef vector<void*> inbound_outbound_movements_container_type;
 
-			//typedef movements_container_type inbound_movements_type;
-			//typedef movements_container_type outbound_movements_type;
-			//typedef Polaris_Movement_Base inbound_movement_type;
+			typedef vector<void*> inbound_movements_container_type;
+			typedef vector<void*> outbound_movements_container_type;
+			
+			
+			typedef Polaris_Component<Interfaces::Movement_Interface,Polaris_Movement_Base<MasterType>,NULLTYPE,MasterType> inbound_movement_type;
+			
 			//typedef Vehicle_Components::Components::Polaris_Vehicle_Component vehicle_type; 
 			//typedef Polaris_Movement_Base::vehicles_container_type vehicles_container_type;
 
 			member_data_basic(int, uuid);
-
-			typedef vector<Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>*> LinkContainerType;
-			//========================================================================================================
-			//start implementation of memeber_data(vector<Link_Interface>, inbound_links)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType inbound_links(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)_inbound_links;
-			}
-
-			tag_getter(inbound_links);
-			
-		protected:
-			LinkContainerType _inbound_links;
-			//end
-			//--------------------------------------------------------------------------------------------------------
-
-			//========================================================================================================
-			//start implementation of memeber_data(vector<Link_Interface>, outbound_links)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType outbound_links(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)_outbound_links;
-			}
-
-			tag_getter(outbound_links);
-			
-		protected:
-			LinkContainerType _outbound_links;
-			//end
-			//--------------------------------------------------------------------------------------------------------
-
-			//========================================================================================================
-			//start implementation of memeber_data(Vector<Outbound_Inbound_Movements_Interface*>, outbound_inbound_movements)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType outbound_inbound_movements(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_outbound_inbound_movements);
-			}
-			//typedef OutboundInboundType outbound_inbound_movements_element_type;
-			//typedef vector<Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<outbound_inbound_movements_element_type, NULLTYPE>*> outbound_inbound_movements_container_type;
-			//typedef outbound_inbound_movements_container_type::iterator outbound_inbound_movements_container_iterator;
-			tag_getter(outbound_inbound_movements);
-		
-		protected:
-			outbound_inbound_movements_container_type _outbound_inbound_movements;
-
-			//========================================================================================================
-			//start implementation of memeber_data(Vector<Inbound_Outbound_Movements_Interface*>, inbound_outbound_movements)
-			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType inbound_outbound_movements(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_inbound_outbound_movements);
-			}
-			//typedef Intersection_Components::Components::Polaris_Inbound_Outbound_Movements_Component inbound_outbound_movements_element_type;
-			//typedef vector<Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<inbound_outbound_movements_element_type, NULLTYPE>*> inbound_outbound_movements_container_type;
-			//typedef inbound_outbound_movements_container_type::iterator inbound_outbound_movements_container_iterator;
-			tag_getter(inbound_outbound_movements);
-	
-		protected:
-			inbound_outbound_movements_container_type _inbound_outbound_movements;
-			//--------------------------------------------------------------------------------------------------------
-
 			member_data_basic(float, x_position);
 			member_data_basic(float, y_position);
 			member_data_basic(float, z_position);
 
-			member_data_basic(Intersection_Components::Types::Node_Type_Keys, intersection_type);
+			member_data_basic(Intersection_Components::Types::Intersection_Type_Keys, intersection_type);
 
-			//========================================================================================================
-			//start implementation of memeber_data(Scenario_Interface*, scenario_reference)
-			//--------------------------------------------------------------------------------------------------------
-		public:
+
+
+			typedef vector<Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>*> LinkContainerType;
+
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType scenario_reference(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_scenario_reference);
-			}
+			TargetType inbound_links(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_links;} tag_getter(inbound_links);
 
-			tag_getter(scenario_reference);
+			LinkContainerType _inbound_links;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType outbound_links(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_outbound_links;} tag_getter(outbound_links);
+
+			LinkContainerType _outbound_links;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType outbound_inbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_inbound_movements);} tag_getter(outbound_inbound_movements);
+
+			outbound_inbound_movements_container_type _outbound_inbound_movements;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType inbound_outbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_outbound_movements);} tag_getter(inbound_outbound_movements);
+
+			inbound_outbound_movements_container_type _inbound_outbound_movements;
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType scenario_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_scenario_reference);} tag_getter(scenario_reference);
+
 			typedef typename MasterType::scenario_type scenario_type;
-		protected:
 			void* _scenario_reference;
-			//--------------------------------------------------------------------------------------------------------
 		};
 	}
 
@@ -271,7 +225,7 @@ namespace Intersection_Components
 		template<typename MasterType>
 		struct Polaris_Intersection_Component
 		{
-			typedef Polaris_Component<Interfaces::Intersection_Interface,Bases::Polaris_Intersection_Base<MasterType>,NULLTYPE,MasterType> type;
+			typedef Polaris_Component_Execution<Interfaces::Intersection_Interface,Bases::Polaris_Intersection_Base<MasterType>,NULLTYPE,MasterType> type;
 		};
 
 		template<typename MasterType>

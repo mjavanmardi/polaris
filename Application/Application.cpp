@@ -45,6 +45,29 @@ void main()
 	cout << "constructing network cost..." <<endl;
 	network->construct_network_cost<NULLTYPE>();
 	
+	////initialize network agents
+
+	Master_Type::network_type::links_container_type::iterator links_itr;
+	typedef Master_Type::link_type link_type;
+	typedef Link_Components::Interfaces::Link_Interface<link_type,NULLTYPE> Link_Interface;
+
+	for(links_itr=network->links_container<Master_Type::network_type::links_container_type&>().begin();
+		links_itr!=network->links_container<Master_Type::network_type::links_container_type&>().end();
+		links_itr++)
+	{
+		((Link_Interface*)(*links_itr))->Initialize<NULLTYPE>();
+	}
+
+	Master_Type::network_type::intersections_container_type::iterator intersections_itr;
+	typedef Master_Type::intersection_type intersection_type;
+	typedef Intersection_Components::Interfaces::Intersection_Interface<intersection_type,NULLTYPE> Intersection_Interface;
+
+	for(intersections_itr=network->intersections_container<Master_Type::network_type::intersections_container_type&>().begin();
+		intersections_itr!=network->intersections_container<Master_Type::network_type::intersections_container_type&>().end();
+		intersections_itr++)
+	{
+		((Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
+	}
 
 	world->Start_Turning();
 
