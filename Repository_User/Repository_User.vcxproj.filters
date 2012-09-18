@@ -26,9 +26,6 @@
     <ClInclude Include="Transims_Demand_API.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Demand_Bases.h">
-      <Filter>Bases</Filter>
-    </ClInclude>
     <ClInclude Include="Intersection_Interface.h">
       <Filter>Interfaces</Filter>
     </ClInclude>

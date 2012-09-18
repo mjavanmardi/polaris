@@ -53,11 +53,11 @@
     <ClInclude Include="TEMPLATE_Bases.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Signal_Base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Signal_Interfaces.h">
-      <Filter>Header Files</Filter>
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Signal_Base.h">
+      <Filter>Bases</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
