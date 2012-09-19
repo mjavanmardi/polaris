@@ -138,51 +138,74 @@ namespace Signal_Components
 			requires_typename_state(none, Percent, true_type,"Type does not model a percentage concept.");
 			end_requirements_list(Percent);
 		};
+
+
+		concept Is_Measure
+		{
+			begin_requirements_list;
+			requires_typename_defined(none, Length, "Type does not model a measurement concept.");
+			requires_typename_defined(Length,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
+			end_requirements_list(ValueType);
+		};
 		concept Is_Foot_Measure
 		{
 			begin_requirements_list;
-			requires_typename_defined(none, Feet, "Type does not model a foot measurement concept.");
-			requires_typename_defined(Feet,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
-			end_requirements_list(ValueType);
+			requires_concept(none, Is_Measure);
+			requires_typename_defined(Is_Measure, Feet, "Type does not model a foot measurement concept.");
+			end_requirements_list(Feet);
 		};
 		concept Is_Meter_Measure
 		{
 			begin_requirements_list;
-			requires_typename_defined(none, Meters, "Type does not model a meter measure concept.");
-			requires_typename_defined(Meters,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
+			requires_concept(none, Is_Measure);
+			requires_typename_defined(Is_Measure, Meters, "Type does not model a meter measure concept.");
+			end_requirements_list(Meters);
+		};
+
+
+		concept Is_Time
+		{
+			begin_requirements_list;
+			requires_typename_defined(none, Time, "Type does not model a Time concept.");
+			requires_typename_defined(Time,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
 			end_requirements_list(ValueType);
 		};
 		concept Is_Time_Seconds
 		{
 			begin_requirements_list;
-			requires_typename_defined(none, Time, "Type does not model a Time concept.");
-			requires_typename_defined(Time, Seconds, "Type does not model a Time in Seconds concept.");
-			requires_typename_defined(Seconds,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
-			end_requirements_list(ValueType);
+			requires_concept(none, Is_Time);
+			requires_typename_defined(Is_Time, Seconds, "Type does not model a Time in Seconds concept.");
+			end_requirements_list(Seconds);
 		};
 		concept Is_Time_Minutes
 		{
 			begin_requirements_list;
-			requires_typename_defined(none, Time, "Type does not model a Time concept.");
-			requires_typename_defined(Time, Minutes, "Type does not model a Time in Seconds concept.");
-			requires_typename_defined(Minutes,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
+			requires_concept(none, Is_Time);
+			requires_typename_defined(Is_Time, Minutes, "Type does not model a Time in Seconds concept.");
+			end_requirements_list(Minutes);
+		};
+
+
+		concept Is_Flow
+		{
+			begin_requirements_list;
+			requires_typename_defined(none, Flow, "Type does not model a Flow concept.");
+			requires_typename_defined(Flow,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
 			end_requirements_list(ValueType);
 		};
 		concept Is_Flow_Per_Hour
 		{
 			begin_requirements_list;
-			requires_typename_defined(none, Unit_Per_Hour, "Type does not model a Flow per hour concept.");
-			requires_typename_defined(Unit_Per_Hour, Flow, "Type does not model a Flow concept.");
-			requires_typename_defined(Flow,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
-			end_requirements_list(ValueType);
+			requires_concept(none, Is_Flow);
+			requires_typename_defined(Is_Flow, Unit_Per_Hour, "Type does not model a Flow per hour concept.");
+			end_requirements_list(Unit_Per_Hour);
 		};
 		concept Is_Flow_Per_15_Minutes
 		{
 			begin_requirements_list;
-			requires_typename_defined(none, Unit_Per_15_Minute, "Type does not model a Flow per 15 minute time period concept.");
-			requires_typename_defined(Unit_Per_15_Minute, Flow, "Type does not model a Flow concept.");
-			requires_typename_defined(Flow,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
-			end_requirements_list(ValueType);
+			requires_concept(none, Is_Flow);
+			requires_typename_defined(Is_Flow, Unit_Per_15_Minute, "Type does not model a Flow per 15 minute time period concept.");
+			end_requirements_list(Unit_Per_15_Minute);
 		};
 
 
@@ -286,14 +309,18 @@ namespace Signal_Components
 			//=======================================================
 			// General Lane Group Calculation Facets
 			//-------------------------------------------------------
-			facet void Update_Demand(call_requires(TargetType,Concepts::Is_Flow_Per_Hour))
+			facet void Update_Demand(TargetType time, call_requires(TargetType, Concepts::Is_Time))
 			{
-			}
-			facet void Update_Demand(call_requires(TargetType,Concepts::Is_Flow_Per_15_Minutes))
-			{
-				this->demand_left<Data_Structures::Flow_Per_Hour>(Left*4.0f);
-				this->demand_right<Data_Structures::Flow_Per_Hour>(Right*4.0f);
-				this->demand_thru<Data_Structures::Flow_Per_Hour>(Thru*4.0f);
+				Interfaces::Detector_Interface<typename ThisType::Detector_Type,NULLTYPE>* left = this->Detector_Left<typename ThisType::Detector_Type>();
+				Interfaces::Detector_Interface<typename ThisType::Detector_Type,NULLTYPE>* right = this->Detector_Right<typename ThisType::Detector_Type>();
+				Interfaces::Detector_Interface<typename ThisType::Detector_Type,NULLTYPE>* thru = this->Detector_Thru<typename ThisType::Detector_Type>();
+				Data_Structures::Flow_Per_Hour flow;
+				flow = left->count<Target_Type<Data_Structures::Flow_Per_Hour,Data_Structures::Time_Second>>(time);
+				this->demand_left<Data_Structures::Flow_Per_Hour>(flow);
+				flow = right->count<Target_Type<Data_Structures::Flow_Per_Hour,Data_Structures::Time_Second>>(time);
+				this->demand_right<Data_Structures::Flow_Per_Hour>(flow);
+				flow = thru->count<Target_Type<Data_Structures::Flow_Per_Hour,Data_Structures::Time_Second>>(time);
+				this->demand_thru<Data_Structures::Flow_Per_Hour>(flow);
 			}
 			// Get the volumeto capacity ratio for lane group
 			facet TargetType Calculate_VC_ratio(call_requires(TargetType,is_arithmetic))
@@ -332,6 +359,7 @@ namespace Signal_Components
 
 				float rt_adj, lt_adj, park_adj;
 				park_adj = 1.0;
+				if (this->has_parking<bool>()) park_adj = 0.9;
 
 
 
@@ -345,8 +373,16 @@ namespace Signal_Components
 				{
 					nr = 1;
 					vol_right_shared = vol_right / (nr * rt_adj);
+					vol_right = vol_right_shared;
 				}
-				vol_right = vol_right / (nr * rt_adj);
+				else if (this->right_turn_lane_type<Data_Structures::Turn_Lane_Types>() == Data_Structures::Turn_Lane_Types::No_Turn)
+				{
+					vol_right = 0;
+				}
+				else
+				{
+					vol_right = vol_right / (nr * rt_adj);
+				}
 
 
 
@@ -357,16 +393,21 @@ namespace Signal_Components
 				//----------------------------------------------------------------
 				// get the adjusted left turn volume - for protected / unopposed lanes
 				else
-				{
-					if (nl > 1) lt_adj = 0.92;
-					else lt_adj = 0.95;
+				{			
+
+					if (this->left_turn_lane_type<Data_Structures::Turn_Lane_Types>() == Data_Structures::Turn_Lane_Types::Shared) nl = 1;
 
 					if (this->left_turn_type<Data_Structures::Left_Turn_Types>() == Data_Structures::Left_Turn_Types::Unopposed)
 					{
 						if (nl > 1) lt_adj = 0.75;
-						else lt_adj = 0.85;
-						vol_left_unopposed = vol_left / (nl * lt_adj);
+						else lt_adj = 0.85;		
 					}
+					else
+					{
+						if (nl > 1) lt_adj = 0.92;
+						else lt_adj = 0.95;
+					}
+					vol_left_unopposed = vol_left / (nl * lt_adj);
 					vol_left = vol_left / (nl * lt_adj);
 				}
 
@@ -374,10 +415,12 @@ namespace Signal_Components
 				//=====================================================================================================
 				// get the adjusted thru movement volume - with exclusive LT lane
 				//----------------------------------------------------------------
-				vol_thru = (vol_right_shared + vol_thru + vol_left_unopposed);
+				vol_thru = (vol_right_shared + vol_thru + vol_left_unopposed) / park_adj;
 				if (this->left_turn_lane_type<Data_Structures::Turn_Lane_Types>() == Data_Structures::Turn_Lane_Types::Exclusive)
 				{
-					vol_thru = vol_thru / nt;
+					if (nt == 0) vol_thru = 0;
+					else vol_thru = vol_thru / nt;
+
 					return (max(vol_left_unopposed,max(vol_right-vol_right_shared,vol_thru)));
 				}
 				//----------------------------------------------------------------
@@ -385,12 +428,13 @@ namespace Signal_Components
 				else
 				{
 					// left turn proportion
-					left_proportion = vol_left / (vol_left + vol_right + vol_thru);
+					left_proportion = vol_left / (max(vol_left + vol_right + vol_thru,1));
 
 					// through car equivalence
-					float thru_car_equivalent;
+					float thru_car_equivalent=1.0;
 					Interfaces::Lane_Group_Interface<ThisType,NULLTYPE>* opposing = this->opposing_lane<ThisType>();
-					vol_opposing = opposing->demand_thru<TargetType>();
+					if (opposing == NULL) vol_opposing = 0;
+					else vol_opposing = opposing->demand_thru<TargetType>();
 					if (vol_opposing < 200) thru_car_equivalent = 1.4;
 					else if (vol_opposing < 400) thru_car_equivalent = 1.7;
 					else if (vol_opposing < 600) thru_car_equivalent = 2.1;
@@ -416,7 +460,8 @@ namespace Signal_Components
 					}
 
 					// thru volume per lane
-					vol_thru = vol_tot / (nt * plan_lt_adj);
+					if (nt == 0) vol_thru = 0;
+					else vol_thru = vol_thru / (nt * plan_lt_adj);
 					return (max(vol_right-vol_right_shared,vol_thru));
 				}
 
@@ -457,19 +502,7 @@ namespace Signal_Components
 				TargetType  fLpb = SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fLpb<TargetType>() ;
 				TargetType  fRpb = SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fRpb<TargetType>();
 
-				TargetType s = this->base_saturation_flow<Data_Structures::Flow_Per_Hour>() *
-					this->number_of_lanes<TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fw<TargetType>()*
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fHV<TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fg<TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fp<TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fbb<TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fa<TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fLU<TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fLT<TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fRT<TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fLpb<TargetType>() *
-					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fRpb<TargetType>();
+				TargetType s = s_o * N * fw * fHV * fg * fp * fbb * fa * fLU * fLT * fRT * fLpb * fRpb;
 
 				return s;
 			}
@@ -495,7 +528,7 @@ namespace Signal_Components
 				facet float HCM_adjustment_fw()
 				{				
 					float width = THIS->avg_lane_width<Data_Structures::Length_Foot>().value;
-					State_Checks::valid_lane_width<ThisType>(this, width);
+					State_Checks::valid_lane_width<ThisType,CallerType,TargetType>(this, width);
 					return (1.0f + (width - 12.0f)/30.0f);
 				}
 				// adjustment factor for heavy vehicles in traffic stream
@@ -507,14 +540,15 @@ namespace Signal_Components
 				facet float HCM_adjustment_fg()
 				{
 					float grade = THIS->grade<Data_Structures::Percentage>();
-					State_Checks::valid_grade<ThisType>(this, grade);
+					State_Checks::valid_grade<ThisType,CallerType,TargetType>(this, grade);
 					return 1.0f - grade / 200.0f;
 				}
 				// adjustment factor for existence of a parking lane and parking activity adjacent to lane group
 				facet float HCM_adjustment_fp()
 				{
 					float parking = THIS->parking_activity<float>();
-					State_Checks::valid_parking_manuevers<ThisType>(this, parking);
+					State_Checks::valid_parking_manuevers<ThisType,CallerType,TargetType>(this, parking);
+					if (parking == 0.0f) return 1.0f;
 					float lanes = THIS->number_of_lanes<float>();
 					return (lanes - 0.1f - 18.0f * parking /3600.0f)/lanes;
 				}
@@ -522,7 +556,7 @@ namespace Signal_Components
 				facet float HCM_adjustment_fbb()
 				{
 					float buses = THIS->buses_per_hour<float>();
-					State_Checks::valid_num_bus_stops<ThisType>(this, buses);
+					State_Checks::valid_num_bus_stops<ThisType,CallerType,TargetType>(this, buses);
 					float lanes = THIS->number_of_lanes<float>();
 					return (lanes - 14.4f * buses /3600.0f)/lanes;
 				}
@@ -609,9 +643,9 @@ namespace Signal_Components
 			//=======================================================
 			// Demand data source Facets
 			//-------------------------------------------------------
-			facet_accessor(Demand_Source_Left);
-			facet_accessor(Demand_Source_Right);
-			facet_accessor(Demand_Source_Thru);
+			facet_accessor_interface(Detector_Left);
+			facet_accessor_interface(Detector_Right);
+			facet_accessor_interface(Detector_Thru);
 
 			//=======================================================
 			// DATA Access Facets
@@ -755,6 +789,7 @@ namespace Signal_Components
 				// search each lane group in the phase, return the one with highest volume
 				for (itr; itr != lane_group->end(); itr++)
 				{
+					//TargetType v_i = (*itr)->demand_lane_max<TargetType>();
 					TargetType v_i = (*itr)->Calculate_Lane_Volume<TargetType>();
 					if (v_i > v_crit) v_crit = v_i;
 				}
@@ -774,20 +809,20 @@ namespace Signal_Components
 				//assert_requirements_2(ThisType::LaneGroupType::Interface_Type&,Lange_Group_Interface,is_convertible,"Error - your lane group type is not convertible to the base lane group interface.");
 			}
 
-			facet void Update_Demand(call_requirements(
+			facet void Update_Demand(TargetType time, call_requirements(
 				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
 				requires(ThisType, Concepts::Is_HCM_Simple_Solution) && 
-				requires(TargetType, Concepts::Is_Flow_Per_Hour)))
+				requires(TargetType, Concepts::Is_Time)))
 			{
 				// Get reference to the Lane Groups in the current phase
 				typedef ThisType T;
 				typedef Interfaces::Lane_Group_Interface<typename T::Lane_Group_Type<Execution_Object,T>::type, CallerType>* LaneGroupItf;
 				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
 				vector<LaneGroupItf>::iterator itr = lane_group->begin();
-				
+
 				for (itr; itr!=lane_group->end(); itr++)
 				{
-					(*itr)->Update_Demand<Data_Structures::Flow_Per_Hour>();
+					(*itr)->Update_Demand<TargetType>(time);
 				}
 			}
 
@@ -852,20 +887,24 @@ namespace Signal_Components
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
+				
 
 				// Get reference to the phases in the signal phase diagram
 				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
 				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = phases->begin();
 
-				cout <<"Cycle Length: "<< this->cycle_length<Data_Structures::Time_Second>();
+				
+				ofstream* out = this->output_stream<ofstream*>();		
+				(*out) <<"Cycle Length:\t"<< this->cycle_length<Data_Structures::Time_Second>();
 				
 				int i=0; 
 				for (itr; itr != phases->end(); itr++, i++)
 				{
-					cout <<endl<<"Phase "<<i+1<<endl;
-					cout <<"Green: "<<(*phases)[i]->green_time<Data_Structures::Time_Second>()<<endl;
-					cout <<"Yellow/red: "<<(*phases)[i]->yellow_and_all_red_time<Data_Structures::Time_Second>()<<endl;
+					(*out) <<"\t"<<"Phase "<<i+1<<":\t";
+					(*out) <<"Green:\t"<<(*phases)[i]->green_time<Data_Structures::Time_Second>()<<"\t";
+					(*out) <<"Yellow/red:\t"<<(*phases)[i]->yellow_and_all_red_time<Data_Structures::Time_Second>()<<"\t";
 				}
+				(*out)<<endl;
 				
 			}
 
@@ -927,7 +966,8 @@ namespace Signal_Components
 				float critical_sum = 0;
 				for (itr; itr != phases->end(); itr++)
 				{
-					(*itr)->Update_Demand<Data_Structures::Flow_Per_Hour>();
+					(*itr)->Update_Demand<Data_Structures::Time_Second>(iteration);
+
 					lost_time += (*itr)->yellow_and_all_red_time<Data_Structures::Time_Second>();
 					critical_sum += (*itr)->Find_Critical_Phase_Volume<Data_Structures::Flow_Per_Hour>();
 				}
@@ -939,7 +979,7 @@ namespace Signal_Components
 				float f_a = 1.0;
 				if (this->in_CBD<bool>()) f_a = 0.9;
 				// calculate reference sum
-				float reference_sum = 1530 * this->peak_hour_factor<float>() * f_a;
+				float reference_sum = 1710 * this->peak_hour_factor<float>() * f_a;
 				// cycle length calculation
 				cycle = (TargetType)((float)lost_time) / (1.0f - critical_sum / reference_sum);
 				TargetType effective_cycle = cycle - lost_time;
@@ -951,11 +991,11 @@ namespace Signal_Components
 				{
 					float vol = (*itr)->Find_Critical_Phase_Volume<Data_Structures::Flow_Per_Hour>();
 
-					float temp_green = (float)effective_cycle * vol / critical_sum;
-					int num_5second_intervals = (int)temp_green / 5;
-					float remain = temp_green / (float)num_5second_intervals - (float)((int)temp_green);
-					if (remain >=2.5f) num_5second_intervals++;
-					temp_green = num_5second_intervals * 5;
+					float temp_green = max(3.0f,(float)effective_cycle * vol / critical_sum);
+					int num_2second_intervals = max(1,(int)temp_green / 2);
+					float remain = temp_green / (float)num_2second_intervals - (float)((int)temp_green);
+					if (remain >=1.0f) num_2second_intervals++;
+					temp_green = num_2second_intervals * 2;
 					(*itr)->green_time<Data_Structures::Time_Second>((TargetType)temp_green);
 					cycle_rounded = cycle_rounded + (TargetType)temp_green;
 				}
@@ -1044,28 +1084,35 @@ namespace Signal_Components
 					_this->Timing_Event_Has_Fired<bool>(false);
 				}
 				/// INITIALIZE THE ITERATION AND GO INTO PROCESSING
-				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::RED)
+				else
 				{
 					response.result=true;
 					response.next=iteration;
 					//_this->Next_Event_Iteration<int>(iteration + (int)phase->green_time<Data_Structures::Time_Second>());
 					_this->Event_Has_Fired<bool>(false);
+
 				}
-				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN)
-				{
-					response.result=true;
-					response.next=iteration; // increment the iteration by one to turn of the event has fired indicator
-					//_this->Next_Event_Iteration<int>(iteration + (int)phase->yellow_and_all_red_time<Data_Structures::Time_Second>());
-					_this->Event_Has_Fired<bool>(false);
-				}
-				else
-				{
-					assert("Error, should not get here");
-				}
+				//else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::RED)
+				//{
+				//	response.result=true;
+				//	response.next=iteration;
+				//	//_this->Next_Event_Iteration<int>(iteration + (int)phase->green_time<Data_Structures::Time_Second>());
+				//	_this->Event_Has_Fired<bool>(false);
+				//}
+				//else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN)
+				//{
+				//	response.result=true;
+				//	response.next=iteration; // increment the iteration by one to turn of the event has fired indicator
+				//	//_this->Next_Event_Iteration<int>(iteration + (int)phase->yellow_and_all_red_time<Data_Structures::Time_Second>());
+				//	_this->Event_Has_Fired<bool>(false);
+				//}
+				//else
+				//{
+				//	assert("Error, should not get here");
+				//}
 			}
 			declare_facet_event(Change_Signal_State)
 			{
-				cout <<endl<<endl<<"---------- CHANGE SIGNAL STATE CALLED --------------"<<endl;
 
 				// Get Current Interface
 				typedef ThisType T;
@@ -1088,8 +1135,19 @@ namespace Signal_Components
 				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN)
 				{
 					// change active phase state
+					//phase->signal_state<Data_Structures::Signal_State>(Data_Structures::RED);
+					phase->signal_state<Data_Structures::Signal_State>(Data_Structures::YELLOW);
+					_this->Next_Event_Iteration<int>(iteration + (int)phase->yellow_and_all_red_time<Data_Structures::Time_Second>()-2);
+
+					// Move to next phase
+					//active_phase++;
+					//if (active_phase >= phases->size()) active_phase=0;
+					//_this->active_phase<int>(active_phase);
+				}
+				else
+				{
 					phase->signal_state<Data_Structures::Signal_State>(Data_Structures::RED);
-					_this->Next_Event_Iteration<int>(iteration + (int)phase->yellow_and_all_red_time<Data_Structures::Time_Second>());
+					_this->Next_Event_Iteration<int>(iteration + 2);
 
 					// Move to next phase
 					active_phase++;
@@ -1103,17 +1161,20 @@ namespace Signal_Components
 			}
 			declare_facet_event(Change_Signal_Timing)
 			{
-				cout <<endl<<endl<<"===================================================================";
-				cout <<endl<<" CHANGE SIGNAL TIMING CALLED ";
-				cout <<endl<<"==================================================================="<<endl<<endl;
 				// Get Current Interface
 				typedef ThisType T;
 				Signal_Interface<ThisType,NULLTYPE>* _this = (Signal_Interface<ThisType,NULLTYPE>*)pthis;
 				_this->Update_Timing<Data_Structures::Time_Second>();
 				_this->Timing_Event_Has_Fired<bool>(true);
 
+				ofstream* out = _this->output_stream<ofstream*>();
+
+				//(*out) <<endl<<endl<<"===================================================================";
+				//(*out) <<endl<<" CHANGE SIGNAL TIMING CALLED ";
+				//(*out) <<endl<<"==================================================================="<<endl<<endl;
+				(*out) << iteration<<"\t";
 				_this->Display_Timing<NULLTYPE>();
-				cout <<endl<<"==================================================================="<<endl<<endl;
+				//(*out) <<endl<<"==================================================================="<<endl<<endl;
 			}
 			facet_accessor(Next_Event_Iteration);
 			facet_accessor(Next_Timing_Event_Iteration);
@@ -1126,7 +1187,10 @@ namespace Signal_Components
 			//=======================================================
 			// Accessor facets
 			//-------------------------------------------------------
-			facet_accessor(num_cycles_between_updates)  /// Number of cycles until signal update is called
+			/// Stream to write messages to
+			facet_accessor(output_stream);
+			/// Number of cycles until signal update is called
+			facet_accessor(num_cycles_between_updates);  
 			/// Analysis Period
 			facet_accessor(analysis_period);		///< T (h)
 			/// Total cycle length
@@ -1160,12 +1224,13 @@ namespace Signal_Components
 			// Initialize the signal indicator
 			facet void Initialize(call_requirements(requires(ThisType,Is_Execution_Object)))
 			{
+				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
 				schedule_event_local(ThisType,Signal_Indicator_Conditional,Signal_Indicator_Event,0,NULLTYPE);
 				this->Conditional_Has_Fired<bool>(false);
 			}
 			facet void Initialize(call_requirements(requires(ThisType,Is_Data_Object)))
 			{
-
+				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
 			}
 			facet void Initialize(call_requirements(requires(ThisType,!Is_Data_Object) && requires(ThisType,!Is_Execution_Object)))
 			{
@@ -1175,13 +1240,15 @@ namespace Signal_Components
 			// Initialize the signal indicator and provide its linked signal
 			facet void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements(requires(ThisType,Is_Execution_Object) && requires(TargetType, Is_Polaris_Component)))
 			{
+				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
 				schedule_event_local(ThisType,Signal_Indicator_Conditional,Signal_Indicator_Event,0,NULLTYPE);
 				this->Conditional_Has_Fired<bool>(false);
 				this->Signal<TargetType>(signal_interface);
 			}
 			facet void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements(requires(ThisType,Is_Data_Object) && requires(TargetType, Is_Polaris_Component)))
 			{
-
+				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
+				this->Signal<TargetType>(signal_interface);
 			}
 			facet void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements((requires(ThisType,!Is_Data_Object) && requires(ThisType,!Is_Execution_Object)) || requires(TargetType, !Is_Polaris_Component)))
 			{
@@ -1192,6 +1259,7 @@ namespace Signal_Components
 			// Signal Interface accessor
 			//facet_accessor_interface(Signal);
 			facet_accessor(Conditional_Has_Fired);
+			facet_accessor(output_stream);
 
 			// Event definition
 			declare_facet_conditional(Signal_Indicator_Conditional)
@@ -1245,6 +1313,7 @@ namespace Signal_Components
 			{
 				// Get Current Interface
 				Signal_Indicator_Interface<ThisType,NULLTYPE>* _this=(Signal_Indicator_Interface<ThisType,NULLTYPE>*)pthis;
+				ofstream* out = _this->output_stream<ofstream*>();
 
 				// Get Signal Interface from this
 				Signal_Components::Interfaces::Signal_Interface<Signal_Components::Components::HCM_Signal_Simple,NULLTYPE>* signal = _this->Signal<Signal_Components::Components::HCM_Signal_Simple>();
@@ -1253,19 +1322,19 @@ namespace Signal_Components
 				vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>* phases = signal->Phases<vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>*>();
 				vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>::iterator itr = phases->begin();
 
-				cout <<endl<<"ITERATION: " <<iteration;
+				(*out) <<endl<<"ITERATION: " <<iteration;
 
 				int i;
 				for (itr, i=0; itr != phases->end(); itr++, i++)
 				{
-					char* signal_status = "RED";
-					if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = "GREEN";
-					cout <<", Phase "<<i<<": "<<signal_status;
+					char* signal_status = "RED   ";
+					if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = "GREEN ";
+					else if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = "YELLOW";
+					(*out) <<", Phase "<<i<<": "<<signal_status;
 				}
 
 			}
 		};
-
 
 
 		//------------------------------------------------------------------------------------------------------------------
@@ -1275,19 +1344,31 @@ namespace Signal_Components
 		struct Detector_Interface
 		{
 			// Getter for the detector count data
-			facet typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(requires(ThisType,Is_Execution_Object) && requires(TargetType, Concepts::Is_Target_Type_Struct)))
+			facet typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
+				requires(ThisType, Is_Dispatchable) &&
+				requires(TargetType, Concepts::Is_Target_Type_Struct) &&
+				requires(typename TargetType::ParamType, Concepts::Is_Time)))
 			{
-				return PTHIS(ThisType)->count<dispatch<ThisType>, CallerType, TargetType>(time);
+				return PTHIS(ThisType)->count<Dispatch<ThisType>, CallerType, TargetType>(time);
+			}
+			// Getter for the detector count data
+			facet typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(!(
+				requires(ThisType, Is_Dispatchable) &&
+				requires(TargetType, Concepts::Is_Target_Type_Struct) &&
+				requires(typename TargetType::ParamType, Concepts::Is_Time))))
+			{
+				assert_requirements(TargetType, Concepts::Is_Target_Type_Struct, "TargetType is not an Target_Type struct");
+				assert_requirements(typename TargetType::ParamType, Concepts::Is_Time, "TargetType::ParamType is not a time data structure");
 			}
 
 			// Updater for the detector count data - call whenever a vehicle crosses detector (or use for aggregate updates by passing a vehicle count value in)
-			facet void detect_vehicle(TargetType vehicle_detection_count)
+			facet void detect_vehicles(TargetType vehicle_detection_count)
 			{
-				PTHIS(ThisType)->detect_vehicle<dispatch<ThisType>,CallerType,TargetType>(vehicle_detection_count);
+				PTHIS(ThisType)->detect_vehicle<Dispatch<ThisType>,CallerType,TargetType>(vehicle_detection_count);
 			}
 			facet void detect_vehicle()
 			{
-				PTHIS(ThisType)->detect_vehicle<dispatch<ThisType>,CallerType,TargetType>();
+				PTHIS(ThisType)->detect_vehicle<dispatch<ThisType>,CallerType,TargetType>(1);
 			}
 		};
 	}
@@ -1323,7 +1404,7 @@ namespace Signal_Components
 
 		enum Left_Turn_Types { Protected, Permitted, Unopposed, None };
 
-		enum Turn_Lane_Types { Exclusive, Shared };
+		enum Turn_Lane_Types { Exclusive, Shared, No_Turn };
 
 		enum Signal_State { GREEN, YELLOW, RED };
 
