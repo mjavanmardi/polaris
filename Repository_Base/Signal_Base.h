@@ -5,23 +5,59 @@
 
 namespace Signal_Components
 {
-	struct HCM_Signal_Full;
-	struct HCM_Signal_Simple;
+	//==================================================================================================================
+	/// BASE Namespace of Base classes and Components related to the Interface(s) from the component namespace.
+	//------------------------------------------------------------------------------------------------------------------
+	namespace Bases
+	{
+		//==================================================================================================================
+		/// Signal Detector Base
+		//------------------------------------------------------------------------------------------------------------------
+		struct Signal_Detector_Base
+		{
+			Signal_Detector_Base() : _last_access(Data_Structures::Time_Second(0)){}
+			Data_Structures::Time_Second _last_access;
+			int _count;
 
-	//------------------
-	// Phases
-	struct HCM_Phase_Full;
-	struct HCM_Phase_Simple;
+			facet_base typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
+				requires(typename TargetType::ReturnType,Concepts::Is_Flow_Per_Hour) &&
+				requires(typename TargetType::ParamType,Concepts::Is_Time_Seconds)))
+			{
+				//Data_Structures::Time_Second time_since = time - _last_access;
+				//if (time_since <=0) return 0;
+				//_last_access = time;
+				//_count = 0;
+				//return (_count / time_since / 3600.f);
+				return _count;
+			}
+			facet_base typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
+				requires(typename TargetType::ReturnType,Concepts::Is_Flow_Per_15_Minutes) &&
+				requires(typename TargetType::ParamType,Concepts::Is_Time_Seconds)))
+			{
+				Data_Structures::Time_Second time_since = time - _last_access;
+				_last_access = time;
+				_count = 0;
+				return (_count / time_since / 900.f);
+			}
 
-	//------------------
-	// Lane Groups
-	struct HCM_LaneGroup_Full;
-	struct HCM_LaneGroup_Simple;
+			facet_base void detect_vehicle(TargetType vehicle_detection_count)
+			{
+				_count = (int)vehicle_detection_count;
+			}
+		};
+	}
+	//==================================================================================================================
+	/// COMPONENT Namespace:  Namespace for the creation of All signal components
+	//------------------------------------------------------------------------------------------------------------------
+	namespace Components
+	{
+		typedef Polaris_Component<Interfaces::Detector_Interface,Bases::Signal_Detector_Base> Signal_Detector;	
+	}
+
 
 
 	//==================================================================================================================
-	/// Namespace of Base classes and Components related to the Interface(s) from the component namespace.
-	/// The bases are combined with the interfaces to create components by adding data.
+	/// BASE Namespace of Base classes and Components related to the Interface(s) from the component namespace.
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Bases
 	{
@@ -32,6 +68,9 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		struct Lane_Group_HCM_Base
 		{
+			// Lane Group Base general type names
+			typedef Components::Signal_Detector Detector_Type;
+
 			//============================================================
 			//  Lane Group Initializer
 			//------------------------------------------------------------
@@ -55,6 +94,7 @@ namespace Signal_Components
 				this->_number_of_left_lanes = 0;
 				this->_number_of_right_lanes = 0;
 				this->_peak_hour_factor = 1.0;
+				this->_opposing_lane = NULL;
 			}
 
 			//============================================================
@@ -148,6 +188,15 @@ namespace Signal_Components
 			}
 			//member_component_basic(Components::HCM_LaneGroup_Simple,opposing_lane);
 
+
+			//============================================================
+			// Detector information
+			//------------------------------------------------------------
+			member_component_basic(Components::Signal_Detector,Detector_Left);
+			member_component_basic(Components::Signal_Detector,Detector_Right);
+			member_component_basic(Components::Signal_Detector,Detector_Thru);
+
+
 			//============================================================
 			// Common Geometry conditions 
 			//------------------------------------------------------------
@@ -162,7 +211,7 @@ namespace Signal_Components
 			tag_getter_setter(avg_lane_width);
 			facet_base  void avg_lane_width(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,Concepts::Is_Foot_Measure)))
 			{
-				State_Checks::valid_lane_width<ThisType>(this,set_value.value);
+				State_Checks::valid_lane_width<ThisType,CallerType,TargetType>(this,set_value.value);
 				_avg_lane_width=(float)set_value.value;
 			}
 			facet_base  void avg_lane_width(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,Concepts::Is_Meter_Measure)))
@@ -407,7 +456,8 @@ namespace Signal_Components
 
 				for (int i=0; i<(int)number_of_lane_groups; i++)
 				{
-					ThisType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type,NULLTYPE>::type* itf = Allocate<Lane_Group_Type<Execution_Object, typename ThisType::This_Type>::type>();
+					typedef ThisType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type,NULLTYPE>::type* ITF_TYPE;
+					 ITF_TYPE itf = (ITF_TYPE)Allocate<Lane_Group_Type<Execution_Object, typename ThisType::This_Type>::type>();
 					((Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(typename ThisType::This_Type);
 					this->_Lane_Groups.push_back((double*)itf);
 				}
@@ -428,7 +478,7 @@ namespace Signal_Components
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Lane_Group_Type
 			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,typename ParentType::Master_Type,ObjectType> type;
+				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,NULLTYPE,ObjectType> type;
 			};	
 			template<typename ObjectType>
 			struct Lane_Group_Type<ObjectType,NULLTYPE>
@@ -450,7 +500,7 @@ namespace Signal_Components
 
 				for (int i=0; i<(int)number_of_lane_groups; i++)
 				{
-					ThisType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type,NULLTYPE>::type* itf = Allocate<Lane_Group_Type<Execution_Object, typename ThisType::This_Type>::type>();
+					ThisType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type,NULLTYPE>::type* itf = (ThisType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type,NULLTYPE>::type*)Allocate<Lane_Group_Type<Execution_Object, typename ThisType::This_Type>::type>();
 					((Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(typename ThisType::This_Type);
 					this->_Lane_Groups.push_back((double*)itf);
 				}
@@ -469,7 +519,7 @@ namespace Signal_Components
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Lane_Group_Type
 			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,typename ParentType::Master_Type,ObjectType> type;
+				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,NULLTYPE,ObjectType> type;
 			};	
 			template<typename ObjectType>
 			struct Lane_Group_Type<ObjectType,NULLTYPE>
@@ -504,6 +554,8 @@ namespace Signal_Components
 			member_data_basic(bool, Timing_Event_Has_Fired);
 			member_data_basic(bool, Event_Conditional_Hit);
 			member_data_basic(bool, Timing_Event_Conditional_Hit);
+			member_data_basic(std::ostream*, output_stream);
+
 
 			//============================================================
 			// CHILD CLASS ACCESS HANDLERS
@@ -567,9 +619,12 @@ namespace Signal_Components
 			/// Handler for a general Initializer dispatched from an Interface
 			facet_base void Initialize(TargetType number_of_phases, call_requirements(requires(ThisType,Is_Dispatched)))
 			{
+				this->_output_stream = &cout;
+
 				for (int i=0; i<(int)number_of_phases; i++)
 				{
-					ThisType::Phase_Interface<Phase_Type<Execution_Object, typename ThisType::This_Type>::type,NULLTYPE>::type* itf= Allocate<Phase_Type<Execution_Object, typename ThisType::This_Type>::type>();
+					typedef ThisType::Phase_Interface<Phase_Type<Execution_Object, typename ThisType::This_Type>::type,NULLTYPE>::type* ITF_TYPE;
+					ITF_TYPE itf= (ITF_TYPE)Allocate<Phase_Type<Execution_Object, typename ThisType::This_Type>::type>();
 					((Phase_Type<Execution_Object, typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(ThisType::This_Type);
 
 					_Phases.push_back((void*)itf);
@@ -583,7 +638,7 @@ namespace Signal_Components
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Phase_Type
 			{
-				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,typename ParentType::Master_Type,ObjectType> type;
+				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,NULLTYPE,ObjectType> type;
 			};	
 			template<typename ObjectType>
 			struct Phase_Type<ObjectType,NULLTYPE>
@@ -611,6 +666,8 @@ namespace Signal_Components
 			/// Handler for a general Initializer dispatched from an Interface
 			facet_base void Initialize(TargetType number_of_phases, call_requirements(requires(ThisType,Is_Dispatched)))
 			{
+				this->_output_stream = &cout;
+
 				// Set member variables to defaults
 				this->_in_CBD = false;
 				this->_cycle_length = 0.0;
@@ -621,7 +678,7 @@ namespace Signal_Components
 				for (int i=0; i<(int)number_of_phases; i++)
 				{
 					
-					ThisType::Phase_Interface<Phase_Type<Execution_Object, typename ThisType::This_Type>::type,NULLTYPE>::type* itf= Allocate<Phase_Type<Execution_Object, typename ThisType::This_Type>::type>();
+					ThisType::Phase_Interface<Phase_Type<Execution_Object, typename ThisType::This_Type>::type,NULLTYPE>::type* itf= (ThisType::Phase_Interface<Phase_Type<Execution_Object, typename ThisType::This_Type>::type,NULLTYPE>::type*)Allocate<Phase_Type<Execution_Object, typename ThisType::This_Type>::type>();
 					((Phase_Type<Execution_Object, typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(ThisType::This_Type);
 
 					_Phases.push_back((void*)itf);
@@ -634,7 +691,7 @@ namespace Signal_Components
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Phase_Type
 			{
-				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,typename ParentType::Master_Type,ObjectType> type;
+				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,NULLTYPE,ObjectType> type;
 			};	
 			template<typename ObjectType>
 			struct Phase_Type<ObjectType,NULLTYPE>
@@ -652,7 +709,6 @@ namespace Signal_Components
 		};
 
 	}
-
 	//==================================================================================================================
 	/// COMPONENT Namespace:  Namespace for the creation of All signal components
 	//------------------------------------------------------------------------------------------------------------------
@@ -675,6 +731,10 @@ namespace Signal_Components
 	}	
 
 
+
+	//==================================================================================================================
+	/// BASE Namespace of Base classes and Components related to the Interface(s) from the component namespace.
+	//------------------------------------------------------------------------------------------------------------------
 	namespace Bases
 	{
 		//==================================================================================================================
@@ -682,8 +742,14 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		struct Signal_Indicator_Display_Base
 		{
+			facet_base void Initialize(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				this->_output_stream = (ofstream*)&cout;
+				this->_signal = NULL;
+			}
+
 			member_data_basic(bool,Conditional_Has_Fired);
-			//member_component_basic(Signal_Components::Components::HCM_Signal_Simple,Signal);
+			member_data_basic(ofstream*, output_stream);
 
 			// Local data member for signal interface
 			void* _signal;
@@ -699,47 +765,30 @@ namespace Signal_Components
 		};
 		struct Signal_Indicator_Base
 		{
-			//member_component_basic(Signal_Components::Components::HCM_Signal_Simple,Signal);
+			facet_base void Initialize(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				this->_output_stream = (ofstream*)&cout;
+				this->_signal = NULL;
+			}
+
+			member_data_basic(ofstream*, output_stream);
+			member_component_basic(Signal_Components::Components::HCM_Signal_Simple,Signal);
+
+			// Local data member for signal interface
+			void* _signal;
+			tag_getter_setter(Signal);
+			facet_base void Signal(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value, call_requires(TargetType,Is_Polaris_Component))
+			{
+				_signal = (void*)set_value;
+			}
+			facet_base typename TargetType::Interface_Type<TargetType,NULLTYPE>::type* Signal(call_requires(TargetType,Is_Polaris_Component))
+			{
+				return (typename TargetType::Interface_Type<TargetType,NULLTYPE>::type*)_signal;
+			}
+
 		};
 
-		//==================================================================================================================
-		/// Signal Detector Base
-		//------------------------------------------------------------------------------------------------------------------
-		struct Signal_Detector_Base
-		{
-			Data_Structures::Time_Second _last_access;
-			int _count;
-
-			facet_base typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
-				requires(typename TargetType::ReturnType,Concepts::Is_Flow_Per_Hour) &&
-				requires(typename TargetType::ParamType,Concepts::Is_Time_Seconds)))
-			{
-				Data_Structures::Time_Second time_since = time - _last_access;
-				_last_access = time;
-				_count = 0;
-				return (_count / time_since / 3600.f);
-			}
-			facet_base typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
-				requires(typename TargetType::ReturnType,Concepts::Is_Flow_Per_15_Minutes) &&
-				requires(typename TargetType::ParamType,Concepts::Is_Time_Seconds)))
-			{
-				Data_Structures::Time_Second time_since = time - _last_access;
-				_last_access = time;
-				_count = 0;
-				return (_count / time_since / 900.f);
-			}
-
-			facet_base void detect_vehicle(TargetType vehicle_detection_count)
-			{
-				_count += (int)vehicle_detection_count;
-			}
-			facet_base void detect_vehicle()
-			{
-				_count ++;
-			}
-		};
 	}
-
 	//==================================================================================================================
 	/// COMPONENT Namespace:  Namespace for the creation of All signal components
 	//------------------------------------------------------------------------------------------------------------------
