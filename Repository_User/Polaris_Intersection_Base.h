@@ -27,8 +27,6 @@ namespace Intersection_Components
 			typedef typename MasterType::vehicle_type vehicle_type;
 
 			member_data_basic(float, turn_travel_penalty);
-			
-			member_data_basic(float, forward_link_turn_travel_time);
 
 			member_data_basic(float, movement_capacity);
 			member_data_basic(float, movement_supply);
@@ -74,7 +72,7 @@ namespace Intersection_Components
 				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
 				{
 					replica_interface* replica = (replica_interface*)(*replica_itr);
-					replica->forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
+					//replica->forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
 				}
 			}
 			tag_setter(forward_link_turn_travel_time);
@@ -153,7 +151,9 @@ namespace Intersection_Components
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType outbound_link_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_link_reference);} tag_getter(outbound_link_reference);
-			
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void outbound_link_reference(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_outbound_link_reference=(TargetType)value;} tag_setter(outbound_link_reference);
+
 			void* _outbound_link_reference;
 
 			typedef link_type outbound_link_reference_type;
@@ -177,16 +177,16 @@ namespace Intersection_Components
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType inbound_movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_movement_reference);}
-			tag_getter(inbound_movement_reference);
+			TargetType inbound_link_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_link_reference);} tag_getter(inbound_link_reference);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void inbound_link_reference(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_inbound_link_reference=(TargetType)value;} tag_setter(inbound_link_reference);
 
-			movements_container_type _inbound_movement_reference;
+			void* _inbound_link_reference;
 
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType outbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_movements);}
-			tag_getter(outbound_link_reference);
+			TargetType outbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_movements);} tag_getter(outbound_movements);
 
 			movements_container_type _outbound_movements;
 		};

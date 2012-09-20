@@ -14,6 +14,7 @@
 #include <type_traits>
 #include <assert.h>
 #include <cstdarg>
+#include <set>
 #include "Run_Parameters.h"
 using namespace std;
 

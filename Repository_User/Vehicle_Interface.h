@@ -74,18 +74,18 @@ namespace Vehicle_Components
 				typedef typename ThisType::trajectory_element_type TrajectoryElementType;
 				typedef typename TrajectoryElementType::link_type LinkType;
 
-				int route_link_size=path_container.size();
+				int route_link_size=(int)path_container.size();
 
-				TrajectoryType& trajectory_container=trajectory<TrajectoryType&>();
+				TrajectoryType& trajectory=trajectory_container<TrajectoryType&>();
 
 				for(int i=route_link_size-1;i>=0;i--)
 				{
-					Trajectory_Unit_Interface<TrajectoryElementType,ThisType>* vehicle_trajectory_data=Allocate<TrajectoryElementType>();
-					vehicle_trajectory_data->link<LinkType>(path_container[i]);
+					Trajectory_Unit_Interface<TrajectoryElementType,ThisType>* vehicle_trajectory_data=(Trajectory_Unit_Interface<TrajectoryElementType,ThisType>*)Allocate<TrajectoryElementType>();
+					vehicle_trajectory_data->link<LinkType*>((LinkType*)(path_container[i]));
 					vehicle_trajectory_data->enter_time<int>(0);
 					vehicle_trajectory_data->delayed_time<int>(0);
 
-					trajectory_container.push_back(vehicle_trajectory_data);
+					trajectory.push_back(vehicle_trajectory_data);
 				}
 			};
 			

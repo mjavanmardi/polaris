@@ -368,7 +368,7 @@ namespace Network_Components
 					{
 						OutboundInboundMovementsInterface* outboundInboundMovements = (OutboundInboundMovementsInterface*)Allocate<OutboundInboundMovementsType>();
 						Link_Interface* outboundLink = (Link_Interface*)intersection->outbound_links<LinksContainerType&>()[i];
-						outboundInboundMovements->outbound_movement_reference<Link_Interface*>(outboundLink);
+						outboundInboundMovements->outbound_link_reference<Link_Interface*>(outboundLink);
 						TurnMovementsContainerType& inboundTurnMovements = outboundLink->inbound_turn_movements<TurnMovementsContainerType&>();
 						
 						for (k = 0; k < (int)inboundTurnMovements.size(); k++)
@@ -397,7 +397,7 @@ namespace Network_Components
 					{
 						InboundOutboundMovementsInterface* inboundOutboundMovements = (InboundOutboundMovementsInterface*)Allocate<InboundOutboundMovementsType>();
 						Link_Interface* inboundLink = (Link_Interface*)intersection->inbound_links<LinksContainerType&>()[i];
-						inboundOutboundMovements->inbound_movement_reference<Link_Interface*>(inboundLink);
+						inboundOutboundMovements->inbound_link_reference<Link_Interface*>(inboundLink);
 						TurnMovementsContainerType& outboundTurnMovements = inboundLink->outbound_turn_movements<TurnMovementsContainerType&>();
 						for (k = 0; k < outboundTurnMovements.size(); k++)
 						{

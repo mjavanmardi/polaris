@@ -75,6 +75,8 @@ namespace Intersection_Components
 			facet_accessor(turn_movement_cumulative_shifted_arrival_vehicles);
 			
 			facet_accessor(forward_link_turn_travel_time);
+			
+			facet_accessor(replicas_container);
 
 			facet_accessor(vehicles_container);
 

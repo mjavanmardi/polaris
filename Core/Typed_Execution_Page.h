@@ -75,6 +75,9 @@ public:
 		tex_next_revision=LLONG_MAX;
 		tex_next_next_revision=LLONG_MAX;
 		
+		//event_register=nullptr;
+		//conditional_register=nullptr;
+
 		tex_threads_counter=0;
 	}
 	
@@ -86,6 +89,13 @@ public:
 	inline Revision&& type_next_check()
 	{
 		return Revision(tex_next_revision);
+	}
+
+	template<typename ThisType>
+	void Load_Register(Conditional conditional,Event p_event,int start)
+	{
+		conditional_register=conditional;
+		event_register=p_event;
 	}
 
 	//__forceinline int next_iteration()
@@ -218,5 +228,6 @@ public:
 
 	const Execution_Condition process_directive;
 
-	Event event_register;
+	//Event event_register;
+	//Conditional conditional_register;
 };

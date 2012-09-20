@@ -58,7 +58,6 @@ namespace Link_Components
 		/// Simple Link Members
 		//------------------------------------------------------------------------------------------------------------------
 			member_data_basic(int, uuid);
-			member_data_basic(float, travel_time);
 
 			member_data_basic(int, num_lanes);
 			member_data_basic(float, length);

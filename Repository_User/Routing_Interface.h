@@ -157,9 +157,9 @@ namespace Routing_Components
 						RoutableInboundOutboundMovementsInterface* routable_inbound_outbound_movements = (RoutableInboundOutboundMovementsInterface*)Allocate<RoutableInboundOutboundMovementsType>();
 						//float forward_link_turn_travel_time = regular_outbound_inbound_movements->forward_link_turn_travel_time<float>();
 						//routable_outbound_inbound_movements->forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
-						RegularLinkInterface* regular_link = regular_inbound_outbound_movements->inbound_movement_reference<RegularLinkInterface*>();
+						RegularLinkInterface* regular_link = regular_inbound_outbound_movements->inbound_link_reference<RegularLinkInterface*>();
 						RoutableLinkInterface* routable_link = linksMap.find(regular_link)->second;
-						routable_inbound_outbound_movements->inbound_movement_reference<RoutableLinkInterface*>(routable_link);
+						routable_inbound_outbound_movements->inbound_link_reference<RoutableLinkInterface*>(routable_link);
 						//another level of loop
 						RegularMovementsContainerType& regular_outbound_movements_container = regular_inbound_outbound_movements->outbound_movements<RegularMovementsContainerType&>();
 						RegularMovementsContainerType::iterator regular_outbound_movement_itr;
@@ -320,7 +320,7 @@ namespace Routing_Components
 					for(inbound_itr=inbound_outbound_movements_container.begin(); inbound_itr!=inbound_outbound_movements_container.end(); inbound_itr++)
 					{
 						InboundOutboundMovementsInterface* inbound_outbound_movements = (InboundOutboundMovementsInterface*)(*inbound_itr);
-						RoutableLinkInterface* inbound_link = inbound_outbound_movements->inbound_movement_reference<RoutableLinkInterface*>();
+						RoutableLinkInterface* inbound_link = inbound_outbound_movements->inbound_link_reference<RoutableLinkInterface*>();
 						if (inbound_link == current_link)
 						{
 							MovementsContainerType& outbound_movements_container = inbound_outbound_movements->outbound_movements<MovementsContainerType&>();

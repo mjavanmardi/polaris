@@ -82,6 +82,14 @@ public:
 						execution_type->tex_next_revision=execution_type->tex_next_next_revision;
 						execution_type->tex_next_next_revision=LLONG_MAX;
 						execution_type->tex_threads_counter=0;
+
+						// fire the post-event
+						//if(execution_type->conditional_register!=nullptr)
+						//{
+						//	((Execution_Object*)page)->conditional_register(page,optex_response);
+						//	((Execution_Object*)page)->next_iteration=optex_response.next;
+						//	if(optex_response.result) ((Execution_Object*)page)->event_register(page);
+						//}
 					}
 
 					execution_type->tex_lock=0; // unlock the type

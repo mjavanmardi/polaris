@@ -63,13 +63,13 @@ namespace Intersection_Components
 		{
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType inbound_movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_movement_reference);}
-			tag_setter(inbound_movement_reference);
+			TargetType inbound_link_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_link_reference);}
+			tag_setter(inbound_link_reference);
 			template<typename ThisType, typename CallerType, typename TargetType>
-			void inbound_movement_reference(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_inbound_movement_reference = (void*)set_value;}
-			tag_getter(inbound_movement_reference);
+			void inbound_link_reference(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_inbound_link_reference = (void*)set_value;}
+			tag_getter(inbound_link_reference);
 			
-			void* _inbound_movement_reference;
+			void* _inbound_link_reference;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType outbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_movements);}
