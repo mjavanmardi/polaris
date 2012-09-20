@@ -66,7 +66,11 @@ namespace Intersection_Components
 			facet_accessor(cached_turn_movement_cumulative_shifted_arrival_vehicles_array);
 			facet_accessor(turn_movement_cumulative_shifted_arrival_vehicles);
 
+			facet_accessor(forward_link_turn_travel_time);
+
 			facet_accessor(vehicles_container);
+
+			facet_accessor(replicas_container);
 
 			facet TargetType pull_vehicle()
 			{
@@ -93,16 +97,14 @@ namespace Intersection_Components
 		{
 			facet_accessor(outbound_movement_reference);
 			facet_accessor(inbound_movements);
-			facet_accessor(forward_link_turn_travel_time);
+
 		};
 
 		template<typename ThisType,typename CallerType>
 		struct Inbound_Outbound_Movements_Interface
 		{
-			facet_accessor(outbound_movement_reference);
-			facet_accessor(inbound_movements);
-			facet_accessor(forward_link_turn_travel_time);
-		};
+			facet_accessor(inbound_movement_reference);
+			facet_accessor(outbound_movements);
 
 			
 		enum Intersection_Simulation_Status
@@ -111,6 +113,7 @@ namespace Intersection_Components
 			COMPUTE_STEP_FLOW_COMPLETE,
 			NETWORK_STATE_UPDATE_COMPLETE
 		};
+
 
 		template<typename ThisType,typename CallerType>
 		struct Intersection_Interface

@@ -19,28 +19,30 @@ namespace Vehicle_Components
 		template<typename MasterType>
 		struct Polaris_Trajectory_Unit_Base
 		{
+			member_data_basic(int, delayed_time);
+			member_data_basic(int, enter_time);
+			member_data_basic(int, enter_interval_index);
+			
 			//========================================================================================================
 			//start implementation of member_data(LinkInterface*, link)
 			//--------------------------------------------------------------------------------------------------------
-		public:
+		
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType link(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_link);
-			}
+			void link(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_link = (void*)set_value;}
+			tag_setter(link);
 
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_link);}
 			tag_getter(link);
-			
+
 			typedef typename MasterType::link_type link_type;
 
-		protected:
+
 			void* _link;
 			//end
 			//--------------------------------------------------------------------------------------------------------
 
-			member_data_basic(int, delayed_time);
-			member_data_basic(int, enter_time);
-			member_data_basic(int, enter_interval_index);
+
 		};
 
 		template<typename MasterType>
@@ -48,6 +50,7 @@ namespace Vehicle_Components
 		{
 			member_data_basic(int, current_trajectory_unit_index);
 			member_data_basic(int, departure_simulation_interval_index);
+			member_data_basic(int, departure_assignment_interval_index);
 			member_data_basic(void*, origin_link);
 			member_data_basic(void*, destination_link);
 			member_data_basic(void*, next_link);
@@ -65,6 +68,30 @@ namespace Vehicle_Components
 			typedef vector<void*> trajectory_container_type;
 
 			trajectory_container_type _trajectory_container;
+
+			typedef trajectory_container_type trajectory_type;
+			typedef trajectory_unit_type trajectory_element_type; 
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void origin_activity_location(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_origin_activity_location = (void *)(set_value);}
+			tag_setter(origin_activity_location);
+			
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType origin_activity_location(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_origin_activity_location);}
+			tag_getter(origin_activity_location);
+			
+			void* _origin_activity_location;
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void destination_activity_location(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_destination_activity_location = (void *)(set_value);}
+			tag_setter(destination_activity_location);
+			
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType destination_activity_location(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_destination_activity_location);}
+			tag_getter(destination_activity_location);
+			
+			void* _destination_activity_location;
+
 		};
 	}
 

@@ -23,6 +23,8 @@ namespace Link_Components
 	
 	namespace Interfaces
 	{
+		
+
 		template<typename ThisType, typename CallerType>
 		struct Turn_Movement_Interface {
 			facet_accessor(inbound_link);
@@ -32,19 +34,10 @@ namespace Link_Components
 			facet_accessor(turn_travel_penalty);
 			facet_accessor(forward_link_turn_travel_time);
 		};
-			
-		enum Link_Simulation_Status
-		{
-			NONE_COMPLETE,
-			COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE,
-			COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE
-		};
-
-
+		
 		template<typename ThisType,typename CallerType>
 		struct Link_Interface
 		{
-
 			facet_accessor(uuid);
 			facet_accessor(id);
 
@@ -74,7 +67,7 @@ namespace Link_Components
 			facet_accessor(inbound_turn_movement_size);
 			facet_accessor(outbound_turn_movement_size);
 			
-			facet_accessor(link_travel_time);
+
 
 
 			//link state			
@@ -139,6 +132,9 @@ namespace Link_Components
 			facet_accessor(backward_wave_speed);
 			facet_accessor(jam_density);
 			facet_accessor(critical_density);
+
+			//for holding mirror links in routable networks
+			facet_accessor(replicas_container);
 
 			//routing interface
 			facet_accessor(f_cost);
@@ -531,8 +527,21 @@ namespace Link_Components
 				//network_data.link_origin_cumulative_depature_curve_array[outbound_link_index] = this->link_origin_cumulative_departure_vehicles_array[outbound_link_index];
 				//network_data.link_destination_cumulative_arrival_curve_array[outbound_link_index] = this->link_destination_cumulative_arrival_vehicles_array[outbound_link_index];
 			}
+			
+			facet bool link_supply_finished()
+			{
+				return false;
+			}
 
-			facet_accessor(link_simulation_status);
+			facet void link_supply_finished(bool val)
+			{
+
+			}
+
+			facet bool adjacent_compute_flow_finished()
+			{
+				return false;
+			}
 			
 			facet void Initialize()
 			{
