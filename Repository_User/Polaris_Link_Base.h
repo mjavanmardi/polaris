@@ -28,6 +28,8 @@ namespace Link_Components
 		template<typename MasterType>
 		struct Polaris_Turn_Movement_Base
 		{
+			member_data_basic(int, id);
+
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType inbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_link;} tag_getter(inbound_link);
 			template<typename ThisType, typename CallerType, typename TargetType>
@@ -46,6 +48,11 @@ namespace Link_Components
 			member_data_basic(Intersection_Components::Types::Turn_Movement_Rule_Keys, turn_movement_rule);
 			member_data_basic(float, turn_travel_penalty);
 			member_data_basic(float, forward_link_turn_travel_time);
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType replicas_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_replicas_container;} tag_getter(replicas_container);
+			vector<void*> _replicas_container;
+
 		};
 		
 	//==================================================================================================================

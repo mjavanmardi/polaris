@@ -38,6 +38,8 @@ namespace Link_Components
 			facet_accessor(turn_movement_rule);
 			facet_accessor(turn_travel_penalty);
 			facet_accessor(forward_link_turn_travel_time);
+			facet_accessor(id);
+			facet_accessor(replicas_container);
 		};
 
 
