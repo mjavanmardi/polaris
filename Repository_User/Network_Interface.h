@@ -3,6 +3,7 @@
 #include "Routing_Interface.h"
 #include "Intersection_Interface.h"
 #include "Traveler_Interface.h"
+#include <map>
 
 namespace Network_Components
 {
@@ -25,6 +26,8 @@ namespace Network_Components
 			facet_accessor(links_container);
 			facet_accessor(turn_movements_container);
 			facet_accessor(activity_locations_container);
+			facet_accessor(routable_network);
+			
 
 			facet void read_network_data()
 			{
@@ -50,18 +53,11 @@ namespace Network_Components
 				//node
 				//network_information::network_data_information::NodeData node_data;
 				
-				Intersection_Interface* intersection_0 = (Intersection_Interface*)Allocate<IntersectionType>();
-				Intersection_Interface* intersection_1 = (Intersection_Interface*)Allocate<IntersectionType>();
-				Intersection_Interface* intersection_2 = (Intersection_Interface*)Allocate<IntersectionType>();
-				Intersection_Interface* intersection_3 = (Intersection_Interface*)Allocate<IntersectionType>();
-				Intersection_Interface* intersection_4 = (Intersection_Interface*)Allocate<IntersectionType>();
-				Intersection_Interface* intersection_5 = (Intersection_Interface*)Allocate<IntersectionType>();
-				Intersection_Interface* intersection_6 = (Intersection_Interface*)Allocate<IntersectionType>();
 
 				i = 0;
 				//node_data.node_index = i;
 				//node_data.uuid = "1";
-				
+				Intersection_Interface* intersection_0=(Intersection_Interface*)Allocate<IntersectionType>();
 				intersection_0->x_position<float>(0.0);
 				intersection_0->y_position<float>((float) 2.0*link_length);
 				intersection_0->intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
@@ -72,7 +68,7 @@ namespace Network_Components
 				//node_data.node_index = i;
 				//node_data.uuid = "2";
 
-				intersection_1=(Intersection_Interface*)Allocate<IntersectionType>();
+				Intersection_Interface* intersection_1=(Intersection_Interface*)Allocate<IntersectionType>();
 				intersection_1->x_position<float>(i * link_length);
 				intersection_1->y_position<float>((float) 2.0*link_length);
 				intersection_1->intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
@@ -83,7 +79,7 @@ namespace Network_Components
 				//node_data.node_index = i;
 				//node_data.uuid = "3";
 
-				intersection_2=(Intersection_Interface*)Allocate<IntersectionType>();
+				Intersection_Interface* intersection_2=(Intersection_Interface*)Allocate<IntersectionType>();
 				intersection_2->x_position<float>(i * link_length);
 				intersection_2->y_position<float>((float) 2.0*link_length);
 				intersection_2->intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
@@ -94,7 +90,7 @@ namespace Network_Components
 				//node_data.node_index = i;
 				//node_data.uuid = "4";
 
-				intersection_3=(Intersection_Interface*)Allocate<IntersectionType>();
+				Intersection_Interface* intersection_3=(Intersection_Interface*)Allocate<IntersectionType>();
 				intersection_3->x_position<float>(i * link_length);
 				intersection_3->y_position<float>((float) 2.0*link_length);
 				intersection_3->intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
@@ -105,7 +101,7 @@ namespace Network_Components
 				//node_data.node_index = i;
 				//node_data.uuid = "5";
 
-				intersection_4=(Intersection_Interface*)Allocate<IntersectionType>();
+				Intersection_Interface* intersection_4=(Intersection_Interface*)Allocate<IntersectionType>();
 				intersection_4->x_position<float>(i * link_length);
 				intersection_4->y_position<float>((float) 2.0*link_length);
 				intersection_4->intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
@@ -116,7 +112,7 @@ namespace Network_Components
 				//node_data.node_index = i;
 				//node_data.uuid = "6";
 
-				intersection_5=(Intersection_Interface*)Allocate<IntersectionType>();
+				Intersection_Interface* intersection_5=(Intersection_Interface*)Allocate<IntersectionType>();
 				intersection_5->x_position<float>((float) 1.0 * link_length);
 				intersection_5->y_position<float>((float) 1.0 * link_length);
 				intersection_5->intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
@@ -127,7 +123,7 @@ namespace Network_Components
 				//node_data.node_index = i;
 				//node_data.uuid = "7";
 
-				intersection_6=(Intersection_Interface*)Allocate<IntersectionType>();
+				Intersection_Interface* intersection_6=(Intersection_Interface*)Allocate<IntersectionType>();
 				intersection_6->x_position<float>(0.0);
 				intersection_6->y_position<float>(0.0);
 				intersection_6->intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
@@ -345,123 +341,106 @@ namespace Network_Components
 					Link_Interface* outbound_link = turn_mvmt->outbound_link<Link_Interface*>();
 					outbound_link->inbound_turn_movements<TurnMovementsContainerType&>().push_back(turn_mvmt->inbound_link<Link_Interface*>());
 				}
-
 				
-				//typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundMovementsContainerType;
-				//typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundMovementsType;
-				//typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<OutboundInboundMovementsType,ThisType> OutboundInboundMovementsInterface;
+				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundMovementsContainerType;
+				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundMovementsType;
+				typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<OutboundInboundMovementsType,ThisType> OutboundInboundMovementsInterface;
 
-				//typedef typename ThisType::outbound_inbound_movements_container_type InboundOutboundMovementsContainerType
-				//typedef typename ThisType::inbound_outbound_movements_type InboundOutboundMovementsType;
-				//typedef typename Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
+				typedef typename ThisType::inbound_outbound_movements_container_type InboundOutboundMovementsContainerType;
+				typedef typename ThisType::inbound_outbound_movements_container_element_type InboundOutboundMovementsType;
+				typedef typename Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
 
-				//typedef typename ThisType::movements_container_type MovementsContainerType;
-				//typedef typename ThisType::movements_type MovementType;
-				//typedef typename Intersection_Components::Interfaces::Movement_Interface<MovementType,ThisType> MovementInterface;
+				typedef typename ThisType::movements_container_type MovementsContainerType;
+				typedef typename ThisType::movements_container_element_type MovementType;
+				typedef typename Intersection_Components::Interfaces::Movement_Interface<MovementType,ThisType> MovementInterface;
 
-				//int j, k;
+				int j, k;
 
-				//// configure outbound_inbound_movements
-				//for (i = 0; i < (int)intersections_container<IntersectionsContainerType&>().size(); i++)
-				//{
-				//	Intersection_Interface* intersection = (Intersection_Interface*)intersections_container<IntersectionsContainerType&>()[i];
-				//	// skip intersections_container that do not have any outbound links
-				//	if (intersection->outbound_links<LinksContainerType&>().size() == 0)
-				//		continue;
-				//	
-				//	for (j = 0; j < (int)intersection->outbound_links<LinksContainerType&>().size(); j++) 
-				//	{
-				//		OutboundInboundMovementsInterface* outboundInboundMovements = (OutboundInboundMovementsInterface*)Allocate<OutboundInboundMovementsType>();
-				//		Link_Interface* outboundLink = (Link_Interface*)intersection->outbound_links<LinksContainerType&>()[i];
-				//		outboundInboundMovements->outbound_movement_reference<Link_Interface*>(outboundLink);
-				//		TurnMovementsContainerType& inboundTurnMovements = outboundLink->inbound_turn_movements<TurnMovementsContainerType&>();
-				//		
-				//		for (k = 0; k < (int)inboundTurnMovements.size(); k++)
-				//		{
-				//			TurnMovementInterface* inboundMovement = (TurnMovementInterface*)inboundTurnMovements[k];
-
-				//			MovementInterface* movement = (MovementInterface*)Allocate<MovementType>();
-				//			movement->movement_reference<Link_Interface*>(inboundMovement->inbound_link<Link_Interface*>());
-				//			movement->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(inboundMovement->turn_movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>());
-				//			movement->movement_type<Intersection_Components::Types::Turn_Movement_Rule_Keys>(inboundMovement->turn_movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>());
-				//			outboundInboundMovements->inbound_movements<MovementsContainerType&>().push_back(movement);
-				//		}
-				//		intersection->outbound_inbound_movements<OutboundInboundMovementsContainerType>.push_back(outboundInboundMovements);
-				//	}
-				//}
-				//		
-				//// configure inbound_outbound_movements
-				//for (i = 0; i < intersections_container<IntersectionsContainerType>().size(); i++)
-				//{
-				//	Intersection_Interface* intersection = intersections_container<IntersectionsContainerType>()[i];
-				//	// skip intersections_container that do not have any inbound links
-				//	if (intersection->inboundLinks<LinksContainerType&>().size() == 0)
-				//		continue;
-				//	
-				//	for (j = 0; j < intersection->inboundLinks<LinksContainerType&>().size(); j++) 
-				//	{
-				//		InboundOutboundMovementsInterface* inboundOutboundMovements = (InboundOutboundMovementsInterface*)Allocate<InboundOutboundMovementsType>();
-				//		Link_Interface* inboundLink = intersection->inboundLinks<LinksContainerType&>()[i];
-				//		inboundOutboundMovements->inbound_movement_reference<Link_Interface*>(inboundLink);
-				//		TurnMovementsContainerType& outboundTurnMovements = inboundLink->outbound_turn_movements<TurnMovementsContainerType&>();
-				//		for (k = 0; k < outboundTurnMovements.size(); k++)
-				//		{
-				//			Turn_Movement_Interface* outboundMovement = outboundTurnMovements[k];
-
-				//			MovementInterface* movement = Allocate<MovementType>();
-				//			movement->movement_reference<Link_Interface*>(outboundMovement->outbound_link<Link_Interface*>());
-				//			movement->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(outboundMovement->turn_movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>());
-				//			movement->movement_type<Intersection_Components::Types::Turn_Movement_Rule_Keys>(outboundMovement->turn_movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>());
-				//			inboundOutboundMovements->outbound_movements<MovementsContainerType&>().push_back(movement);
-				//		}
-				//		intersection->inbound_outbound_movements<OutboundInboundMovementsContainerType>.push_back(inboundInboundMovements);
-				//	}
-				//}
+				// configure outbound_inbound_movements
+				for (i = 0; i < (int)intersections_container<IntersectionsContainerType&>().size(); i++)
+				{
+					Intersection_Interface* intersection = (Intersection_Interface*)intersections_container<IntersectionsContainerType&>()[i];
+					// skip intersections_container that do not have any outbound links
+					if (intersection->outbound_links<LinksContainerType&>().size() == 0)
+						continue;
+					
+					for (j = 0; j < (int)intersection->outbound_links<LinksContainerType&>().size(); j++) 
+					{
+						OutboundInboundMovementsInterface* outboundInboundMovements = (OutboundInboundMovementsInterface*)Allocate<OutboundInboundMovementsType>();
+						Link_Interface* outboundLink = (Link_Interface*)intersection->outbound_links<LinksContainerType&>()[i];
+						outboundInboundMovements->outbound_movement_reference<Link_Interface*>(outboundLink);
+						TurnMovementsContainerType& inboundTurnMovements = outboundLink->inbound_turn_movements<TurnMovementsContainerType&>();
 						
-				////intersection_1; outboundInboundMovements={{outbound=link_1, inbound={link_0}}}
-				//
-				//outboundInboundMovementsForIntersection1->outbound_movement_reference<Link_Interface*>(link_1);
-				//MovementInterface* inbound_link0_for_outbound_link1 = Allocate<MovementType>();
-				//inbound_link0_for_outbound_link1->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
-				//inbound_link0_for_outbound_link1->movement_type<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-				//outboundInboundMovementsForIntersection0->inbound_movements<InboundMovementsType&>().push_back(inbound_link0_for_outbound_link1);
-				//intersection_1->inbound_outbound_movements<OutboundInboundMovementsType&>().push_back(outboundInboundMovementsForIntersection1);
+						for (k = 0; k < (int)inboundTurnMovements.size(); k++)
+						{
+							TurnMovementInterface* inboundMovement = (TurnMovementInterface*)inboundTurnMovements[k];
 
-				//
-				////intersection_2; outboundInboundMovements={{outbound=link_2, inbound={link_1, link_4}}}
-				//OutboundInboundMovementsInterface* outboundInboundMovementsForIntersection2 = Allocate<OutboundInboundMovementsType>();
-				//outboundInboundMovementsForIntersection2->outbound_movement_reference<Link_Interface*>(link_2);
-				//
-				//MovementInterface* inbound_link1_for_outbound_link2 = Allocate<MovementType>();
-				//inbound_link1_for_outbound_link2->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
-				//inbound_link1_for_outbound_link2->movement_type<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-				//outboundInboundMovementsForIntersection1->inbound_movements<InboundMovementsType&>().push_back(inbound_link_1_for_outbound_link2);
+							MovementInterface* movement = (MovementInterface*)Allocate<MovementType>();
+							movement->movement_reference<Link_Interface*>(inboundMovement->inbound_link<Link_Interface*>());
+							movement->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(inboundMovement->turn_movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>());
+							movement->movement_type<Intersection_Components::Types::Turn_Movement_Rule_Keys>(inboundMovement->turn_movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>());
+							outboundInboundMovements->inbound_movements<MovementsContainerType&>().push_back(movement);
+						}
+						intersection->outbound_inbound_movements<OutboundInboundMovementsContainerType>().push_back(outboundInboundMovements);
+					}
+				}
+						
+				// configure inbound_outbound_movements
+				for (i = 0; i < intersections_container<IntersectionsContainerType>().size(); i++)
+				{
+					Intersection_Interface* intersection = (Intersection_Interface*)intersections_container<IntersectionsContainerType>()[i];
+					// skip intersections_container that do not have any inbound links
+					if (intersection->inbound_links<LinksContainerType&>().size() == 0)
+						continue;
+					
+					for (j = 0; j < intersection->inbound_links<LinksContainerType&>().size(); j++) 
+					{
+						InboundOutboundMovementsInterface* inboundOutboundMovements = (InboundOutboundMovementsInterface*)Allocate<InboundOutboundMovementsType>();
+						Link_Interface* inboundLink = (Link_Interface*)intersection->inbound_links<LinksContainerType&>()[i];
+						inboundOutboundMovements->inbound_movement_reference<Link_Interface*>(inboundLink);
+						TurnMovementsContainerType& outboundTurnMovements = inboundLink->outbound_turn_movements<TurnMovementsContainerType&>();
+						for (k = 0; k < outboundTurnMovements.size(); k++)
+						{
+							TurnMovementInterface* outboundMovement = (TurnMovementInterface*)outboundTurnMovements[k];
 
-				//MovementInterface* inbound_link4_for_outbound_link2 = Allocate<MovementType>();
-				//inbound_link4_for_outbound_link2->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::RIGHT_TURN);
-				//inbound_link4_for_outbound_link2->movement_type<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-				//outboundInboundMovementsForIntersection1->inbound_movements<InboundMovementsType&>().push_back(inbound_link4_for_outbound_link2);
-				//
-				//intersection_2->inbound_outbound_movements<OutboundInboundMovementsType&>().push_back(outboundInboundMovementsForIntersection2);
+							MovementInterface* movement = (MovementInterface*)Allocate<MovementType>();
+							movement->movement_reference<Link_Interface*>(outboundMovement->outbound_link<Link_Interface*>());
+							movement->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(outboundMovement->turn_movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>());
+							movement->movement_type<Intersection_Components::Types::Turn_Movement_Rule_Keys>(outboundMovement->turn_movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>());
+							inboundOutboundMovements->outbound_movements<MovementsContainerType&>().push_back(movement);
+						}
+						intersection->inbound_outbound_movements<OutboundInboundMovementsContainerType>().push_back(inboundOutboundMovements);
+					}
+				}
 
-				////intersection_3; outboundInboundMovements={{outbound=link_3, inbound={link_2}}}
-				//OutboundInboundMovementsInterface* outboundInboundMovementsForIntersection3 = Allocate<OutboundInboundMovementsType>();
-				//outboundInboundMovementsForIntersection3->outbound_movement_reference<Link_Interface*>(link_3);
-				//MovementInterface* inbound_link2_for_outbound_link3 = Allocate<MovementType>();
-				//inbound_link2_for_outbound_link3->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
-				//inbound_link2_for_outbound_link3->movement_type<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-				//outboundInboundMovementsForIntersection0->inbound_movements<InboundMovementsType&>().push_back(inbound_link2_for_outbound_link3);
-				//intersection_3->inbound_outbound_movements<OutboundInboundMovementsType&>().push_back(outboundInboundMovementsForIntersection3);
-				//
-				////intersection_5; outboundInboundMovements={{outbound=link_4, inbound={link_5}}}
-				//OutboundInboundMovementsInterface* outboundInboundMovementsForIntersection5 = Allocate<OutboundInboundMovementsType>();
-				//outboundInboundMovementsForIntersection5->outbound_movement_reference<Link_Interface*>(link_5);
-				//MovementInterface* inbound_link4_for_outbound_link5 = Allocate<MovementType>();
-				//inbound_link4_for_outbound_link5->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
-				//inbound_link4_for_outbound_link5->movement_type<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-				//outboundInboundMovementsForIntersection5->inbound_movements<InboundMovementsType&>().push_back(inbound_link5_for_outbound_link4);
-				//intersection_5->inbound_outbound_movements<OutboundInboundMovementsType&>().push_back(outboundInboundMovementsForIntersection5);
+				//activity location
 
+				typedef typename ThisType::activity_locations_container_type ActivityLocationsContainerType;
+				typedef typename ThisType::activity_locations_container_element_type ActivityLocationType;
+				typedef typename Activity_Location_Components::Interfaces::Activity_Location_Interface<ActivityLocationType,ThisType> ActivityLocationInterface;
+
+
+				activity_locations_container<ActivityLocationsContainerType&>().clear();
+				
+				ActivityLocationInterface* activity_location_0 = (ActivityLocationInterface*)Allocate<ActivityLocationType>();
+				ActivityLocationInterface* activity_location_1 = (ActivityLocationInterface*)Allocate<ActivityLocationType>();
+				ActivityLocationInterface* activity_location_2 = (ActivityLocationInterface*)Allocate<ActivityLocationType>();
+
+				i=0;
+				activity_location_0->origin_links<LinksContainerType&>().push_back(link_0);
+				activity_location_0->zone<int&>(i);
+				activity_locations_container<ActivityLocationsContainerType&>().push_back(activity_location_0);
+
+				i=1;
+				activity_location_1->destination_links<LinksContainerType&>().push_back(link_3);
+				activity_location_1->zone<int&>(i);
+				activity_locations_container<ActivityLocationsContainerType&>().push_back(activity_location_1);
+
+				i=2;
+				activity_location_2->origin_links<LinksContainerType&>().push_back(link_5);
+				activity_location_2->zone<int&>(i);
+				activity_locations_container<ActivityLocationsContainerType&>().push_back(activity_location_2);
+						
 			}
 
 			facet void construct_network_cost()
@@ -502,6 +481,8 @@ namespace Network_Components
 					mvmt_itf->forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
 				}
 			}
+
+
 		};
 	}
 }
