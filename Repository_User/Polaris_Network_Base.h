@@ -30,8 +30,6 @@ namespace Network_Components
 			
 			intersections_container_type _intersections;
 			
-
-
 			typedef typename MasterType::link_type link_type;
 			typedef link_type links_container_element_type;
 			typedef vector<void*> links_container_type;
@@ -41,6 +39,17 @@ namespace Network_Components
 			
 			links_container_type _links_container;
 
+			typedef typename MasterType::routable_network_type routable_network_type;
+			typedef routable_network_type routable_networks_container_element_type;
+			typedef vector<void*> routable_networks_container_type;
+
+			vector<void*> _routable_networks_container;
+						
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType routable_network(call_requirements(requires(ThisType,Is_Dispatched))){
+				return (TargetType)_routable_networks_container[thread_id];
+			}
+			void* _routable_network;
 
 			typedef typename MasterType::turn_movement_type turn_movement_type;
 			typedef turn_movement_type turn_movements_element_type;
@@ -50,8 +59,15 @@ namespace Network_Components
 			TargetType turn_movements_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_turn_movements_container;}
 			tag_getter(turn_movements_container);
 			
+			typedef typename MasterType::activity_location_type activity_location_type;
+			typedef activity_location_type activity_locations_container_element_type;
+			typedef vector<void*> activity_locations_container_type;
 
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType activity_locations_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_activity_locations_container;}
+			tag_getter(activity_locations_container);
 
+			activity_locations_container_type _activity_locations_container;
 
 			typedef typename intersection_type::outbound_inbound_movements_container_element_type outbound_inbound_movements_container_element_type;
 			typedef typename intersection_type::outbound_inbound_movements_container_type outbound_inbound_movements_container_type;
@@ -63,6 +79,14 @@ namespace Network_Components
 			typedef typename outbound_inbound_movements_container_element_type::movements_element_type movements_type;
 			
 			turn_movements_container_type _turn_movements_container;
+
+			
+			typedef typename MasterType::movement_type movement_type;
+			typedef movement_type movements_container_element_type;
+			typedef vector<void*> movements_container_type;
+
+
+
 		};
 
 		//typedef Intersection_Components::Components::Polaris_Outbound_Inbound_Movements_Component outbound_inbound_movements_element_type;
