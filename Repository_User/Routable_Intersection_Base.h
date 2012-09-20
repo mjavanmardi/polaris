@@ -81,6 +81,7 @@ namespace Intersection_Components
 		template<typename MasterType>
 		struct Routable_Intersection_Base
 		{
+			member_data_basic(int, uuid);
 			member_data_basic(float, x_position);
 			member_data_basic(float, y_position);
 			member_data_basic(float, z_position);
