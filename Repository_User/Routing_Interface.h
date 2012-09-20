@@ -39,22 +39,164 @@ namespace Routing_Components
 				typedef typename ThisType::reversed_path_container_type ReversedPathContainerType;
 				reversed_path_container<ReversedPathContainerType&>().clear();
 
-				typedef typename ThisType::links_type RoutableLinksType;
-				typedef typename ThisType::links_element_type RoutableLinkType;
+				typedef typename ThisType::links_container_type RoutableLinksType;
+				typedef typename ThisType::link_type RoutableLinkType;
 				typedef Link_Components::Interfaces::Link_Interface<RoutableLinkType,ThisType> RoutableLinkInterface;
 				
 				RoutableLinksType& links_container=links<RoutableLinksType&>();
 				typename RoutableLinksType::iterator link_itr;
 
-				for(link_itr=links_container.begin();link_itr!=links_container.end();links_itr++)
+				for(link_itr=links_container.begin();link_itr!=links_container.end();link_itr++)
 				{
-					link_itr->label_cost<float>(FLT_MAX);
-					link_itr->label_pointer<RoutableLinkInterface*>(nullptr);
-					link_itr->scan_list_status<Scan_List_Status_Keys>(UNSCANNED);
-					link_itr->f_cost<float>(0);
-					link_itr->h_cost<float>(0);
+					RoutableLinkInterface* link_ptr = (RoutableLinkInterface*)(*link_itr);
+					link_ptr->label_cost<float>(FLT_MAX);
+					link_ptr->label_pointer<RoutableLinkInterface*>(nullptr);
+					link_ptr->scan_list_status<Scan_List_Status_Keys>(UNSCANNED);
+					link_ptr->f_cost<float>(0);
+					link_ptr->h_cost<float>(0);
 				}
 			}
+
+			facet void read_routable_network_data(void* regular_network)
+			{
+				typedef typename ThisType::regular_network_type RegularNetworkType;
+				typedef typename Network_Components::Interfaces::Network_Interface<RegularNetworkType, ThisType> RegularNetworkInterface;
+				
+				typedef typename ThisType::regular_links_container_type RegularLinksContainerType;
+				typedef typename ThisType::regular_links_container_element_type RegularLinkType;
+				typedef typename Link_Components::Interfaces::Link_Interface<RegularLinkType, ThisType> RegularLinkInterface;
+
+				typedef typename ThisType::regular_intersections_container_type RegularIntersectionsContainerType;
+				typedef typename ThisType::regular_intersections_container_element_type RegularIntersectionType;
+				typedef typename Intersection_Components::Interfaces::Intersection_Interface<RegularIntersectionType, ThisType> RegularIntersectionInterface;
+
+				typedef typename ThisType::routable_links_container_element_type RoutableLinkType;
+				typedef typename ThisType::routable_links_container_type RoutableLinksContainerType;
+				typedef typename Link_Components::Interfaces::Link_Interface<RoutableLinkType, ThisType> RoutableLinkInterface;
+
+				typedef typename ThisType::routable_intersections_container_element_type RoutableIntersectionType;
+				typedef typename ThisType::routable_intersections_container_type RoutableIntersectionsContainerType;
+				typedef typename Intersection_Components::Interfaces::Intersection_Interface<RoutableIntersectionType, ThisType> RoutableIntersectionInterface;
+
+				//typedef typename ThisType::regular_outbound_inbound_movements_container_type RegularOutboundInboundMovementsContainerType;
+				//typedef typename ThisType::routable_outbound_inbound_movements_container_type RoutableOutboundInboundMovementsContainerType;
+				//typedef typename ThisType::regular_outbound_inbound_movements_container_element_type RegularOutboundInboundMovementsType;
+				//typedef typename ThisType::routable_outbound_inbound_movements_container_element_type RoutableOutboundInboundMovementsType;
+				//typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<RegularOutboundInboundMovementsType, ThisType> RegularOutboundInboundMovementsInterface;
+				//typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<RoutableOutboundInboundMovementsType, ThisType> RoutableOutboundInboundMovementsInterface;
+
+				typedef typename ThisType::regular_inbound_outbound_movements_container_type RegularInboundOutboundMovementsContainerType;
+				typedef typename ThisType::routable_inbound_outbound_movements_container_type RoutableInboundOutboundMovementsContainerType;
+				typedef typename ThisType::regular_inbound_outbound_movements_container_element_type RegularInboundOutboundMovementsType;
+				typedef typename ThisType::routable_inbound_outbound_movements_container_element_type RoutableInboundOutboundMovementsType;
+				typedef typename Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<RegularInboundOutboundMovementsType, ThisType> RegularInboundOutboundMovementsInterface;
+				typedef typename Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<RoutableInboundOutboundMovementsType, ThisType> RoutableInboundOutboundMovementsInterface;
+
+				typedef typename ThisType::regular_movements_container_type RegularMovementsContainerType;
+				typedef typename ThisType::regular_movements_container_element_type RegularMovementType;
+				typedef typename Intersection_Components::Interfaces::Movement_Interface<RegularMovementType, ThisType> RegularMovementInterface;
+
+				typedef typename ThisType::routable_movements_container_type RoutableMovementsContainerType;
+				typedef typename ThisType::routable_movements_container_element_type RoutableMovementType;
+				typedef typename Intersection_Components::Interfaces::Movement_Interface<RoutableMovementType, ThisType> RoutableMovementInterface;
+
+
+				
+				max_free_flow_speed<float>(((RegularNetworkInterface*)regular_network)->max_free_flow_speed<float>());
+
+				RegularLinksContainerType& regular_links_container = ((RegularNetworkInterface*)regular_network)->links_container<RegularLinksContainerType&>();
+				
+				// copy all links
+				map<RegularLinkInterface*, RoutableLinkInterface*> linksMap;
+				RegularLinksContainerType::iterator regular_link_itr;
+				for(regular_link_itr=regular_links_container.begin(); regular_link_itr!=regular_links_container.end(); regular_link_itr++)
+				{
+					RegularLinkInterface* regular_link = (RegularLinkInterface*)(*regular_link_itr);
+					RoutableLinkInterface* routable_link =  (RoutableLinkInterface*)Allocate<RoutableLinkType>();
+					routable_link->network_link_reference<RegularLinkInterface*>(regular_link);
+					routable_link->f_cost<float>(0);
+					routable_link->h_cost<float>(0);
+					routable_link->label_pointer<void*>(nullptr);
+					routable_link->label_cost<float>(0);
+					links<RoutableIntersectionsContainerType&>().push_back(routable_link);
+					linksMap.insert(pair<RegularLinkInterface*, RoutableLinkInterface*>(regular_link, routable_link));
+					regular_link->replicas_container<RoutableLinksContainerType&>().push_back(routable_link);
+				}
+
+				// copy all intersections
+				RegularIntersectionsContainerType& regular_intersections_container = ((RegularNetworkInterface*)regular_network)->intersections_container<RegularIntersectionsContainerType&>();
+				map<RegularIntersectionInterface*, RoutableIntersectionInterface*> intersectionsMap;
+				RegularIntersectionsContainerType::iterator regular_intersection_itr;
+				for(regular_intersection_itr=regular_intersections_container.begin(); regular_intersection_itr!=regular_intersections_container.end(); regular_intersection_itr++)
+				{
+					RegularIntersectionInterface* regular_intersection = (RegularIntersectionInterface*)(*regular_intersection_itr);
+					RoutableIntersectionInterface* routable_intersection =  (RoutableIntersectionInterface*)Allocate<RoutableIntersectionType>();
+					routable_intersection->x_position<float>(regular_intersection->x_position<float>());
+					routable_intersection->y_position<float>(regular_intersection->y_position<float>());
+
+					// now add movements for the intersection
+					//RegularOutboundInboundMovementsContainerType& regular_outbound_inbound_movements_container = regular_intersection->inbound_outbound_movements<RegularOutboundInboundMovementsContainerType&>();
+					//RegularOutboundInboundMovementsContainerType::iterator regular_outbound_inbound_movements_itr;
+					//for(regular_outbound_inbound_movements_itr=regular_outbound_inbound_movements_container.begin(); regular_outbound_inbound_movements_itr!=regular_outbound_inbound_movements_container.end(); regular_outbound_inbound_movements_itr++)
+					//{
+					//	RegularOutboundInboundMovementsInterface* regular_outbound_inbound_movements = (RegularOutboundInboundMovementsInterface*)(*regular_outbound_inbound_movements_itr);
+					//	RoutableOutboundInboundMovementsInterface* routable_outbound_inbound_movements = (RoutableOutboundInboundMovementsInterface*)Allocate<RoutableOutboundInboundMovementsType>();
+					//	//float forward_link_turn_travel_time = regular_outbound_inbound_movements->forward_link_turn_travel_time<float>();
+					//	//routable_outbound_inbound_movements->forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
+					//	RegularLinkInterface* regular_link = NULL;//regular_outbound_inbound_movements->outbound_movement_reference<RegularLinkInterface*>();
+					//	RoutableLinkInterface* routable_link = linksMap.find(regular_link)->second;
+					//	routable_outbound_inbound_movements->outbound_movement_reference<RoutableLinkInterface*>(routable_link);
+					//	routable_intersection->outbound_inbound_movements<RoutableOutboundInboundMovementsContainerType&>().push_back(routable_outbound_inbound_movements);
+					//}
+					
+					RegularInboundOutboundMovementsContainerType& regular_inbound_outbound_movements_container = regular_intersection->inbound_outbound_movements<RegularInboundOutboundMovementsContainerType&>();
+					RegularInboundOutboundMovementsContainerType::iterator regular_inbound_outbound_movements_itr;
+					for(regular_inbound_outbound_movements_itr=regular_inbound_outbound_movements_container.begin(); regular_inbound_outbound_movements_itr!=regular_inbound_outbound_movements_container.end(); regular_inbound_outbound_movements_itr++)
+					{
+						RegularInboundOutboundMovementsInterface* regular_inbound_outbound_movements = (RegularInboundOutboundMovementsInterface*)(*regular_inbound_outbound_movements_itr);
+						RoutableInboundOutboundMovementsInterface* routable_inbound_outbound_movements = (RoutableInboundOutboundMovementsInterface*)Allocate<RoutableInboundOutboundMovementsType>();
+						//float forward_link_turn_travel_time = regular_outbound_inbound_movements->forward_link_turn_travel_time<float>();
+						//routable_outbound_inbound_movements->forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
+						RegularLinkInterface* regular_link = regular_inbound_outbound_movements->inbound_movement_reference<RegularLinkInterface*>();
+						RoutableLinkInterface* routable_link = linksMap.find(regular_link)->second;
+						routable_inbound_outbound_movements->inbound_movement_reference<RoutableLinkInterface*>(routable_link);
+						//another level of loop
+						RegularMovementsContainerType& regular_outbound_movements_container = regular_inbound_outbound_movements->outbound_movements<RegularMovementsContainerType&>();
+						RegularMovementsContainerType::iterator regular_outbound_movement_itr;
+						for(regular_outbound_movement_itr=regular_outbound_movements_container.begin(); regular_outbound_movement_itr!=regular_outbound_movements_container.end(); regular_outbound_movement_itr++)
+						{
+							RegularMovementInterface* regular_outbound_movement = (RegularMovementInterface*)(*regular_outbound_movement_itr);
+							RoutableMovementInterface* routable_outbound_movement = (RoutableMovementInterface*)Allocate<RoutableMovementType>();
+							routable_outbound_movement->forward_link_turn_travel_time<float>(regular_outbound_movement->forward_link_turn_travel_time<float>());
+							RegularLinkInterface* regular_outbound_link = regular_outbound_movement->movement_reference<RegularLinkInterface*>();
+							RoutableLinkInterface* routable_outbound_link = linksMap.find(regular_outbound_link)->second;
+							routable_outbound_movement->movement_reference<RoutableLinkInterface*>(routable_outbound_link);
+							regular_outbound_movement->replicas_container<RoutableMovementsContainerType&>().push_back(routable_outbound_movement);
+							routable_inbound_outbound_movements->outbound_movements<RoutableMovementsContainerType&>().push_back(routable_outbound_movement);
+						}
+						routable_intersection->inbound_outbound_movements<RoutableInboundOutboundMovementsContainerType&>().push_back(routable_inbound_outbound_movements);
+					}
+					intersectionsMap.insert(pair<RegularIntersectionInterface*, RoutableIntersectionInterface*>(regular_intersection, routable_intersection));
+				}
+
+				// add upstream and downstream to each link
+				RoutableLinksContainerType::iterator routable_link_itr;
+				for(routable_link_itr=links<RoutableLinksContainerType&>().begin(); routable_link_itr!=links<RoutableLinksContainerType&>().end(); routable_link_itr++)
+				{
+					RoutableLinkInterface* routable_link = (RoutableLinkInterface*)(*routable_link_itr);
+					RegularLinkInterface* regular_link = routable_link->network_link_reference<RegularLinkInterface*>();
+					
+					RegularIntersectionInterface* regular_upstream_intersection = regular_link->upstream_intersection<RegularIntersectionInterface*>();
+					RoutableIntersectionInterface* routable_upstream_intersection = intersectionsMap.find(regular_upstream_intersection)->second;
+					routable_link->upstream_intersection<RoutableIntersectionInterface*>(routable_upstream_intersection);
+
+					RegularIntersectionInterface* regular_downstream_intersection = regular_link->downstream_intersection<RegularIntersectionInterface*>();
+					RoutableIntersectionInterface* routable_downstream_intersection = intersectionsMap.find(regular_downstream_intersection)->second;
+					routable_link->downstream_intersection<RoutableIntersectionInterface*>(routable_downstream_intersection);
+				}
+				
+			}
+
 		};
 		
 		template<typename ThisType,typename CallerType>
@@ -73,6 +215,7 @@ namespace Routing_Components
 
 			facet void one_to_one_link_based_least_time_path_a_star()
 			{
+				
 				typedef typename ThisType::routable_network_type RoutableNetworkType;
 				typedef Routable_Network_Interface<RoutableNetworkType,ThisType> RoutableNetworkInterface;
 
@@ -80,51 +223,57 @@ namespace Routing_Components
 				//typedef typename RoutableNetworkType::num_searches_type NumSearchesType;
 				typedef Routable_Network_Interface<RoutableNetworkType,ThisType> RoutableNetworkInterface;
 				
-				typedef typename RoutableNetworkType::links_type RoutableLinksType;
-				typedef typename RoutableNetworkType::links_element_type RoutableLinkType;
+				typedef typename RoutableNetworkType::links_container_type RoutableLinksContainerType;
+				typedef typename RoutableNetworkType::links_container_element_type RoutableLinkType;
 				
-				typedef typename LinkType::network_link_reference_type NetworkLinkType;
+				typedef typename RoutableLinkType::network_link_type NetworkLinkType;
 				
 				typedef Link_Components::Interfaces::Link_Interface<RoutableLinkType,ThisType> RoutableLinkInterface;
 				typedef Link_Components::Interfaces::Link_Interface<NetworkLinkType,ThisType> NetworkLinkInterface;
 
-				typedef typename RoutableNetworkType::intersections_type IntersectionsType;
-				typedef typename RoutableNetworkType::intersections_element_type IntersectionType;
+				typedef typename RoutableNetworkType::intersections_container_type IntersectionsContainerType;
+				typedef typename RoutableNetworkType::intersections_container_element_type IntersectionType;
 				typedef Intersection_Components::Interfaces::Intersection_Interface<IntersectionType,ThisType> IntersectionInterface;
 				
-				typedef typename IntersectionType::outbound_inbound_movements_type OutboundInboundType;
-				typedef typename IntersectionType::outbound_inbound_movements_element_type OutboundInboundMovementsType;
-				typedef Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<OutboundInboundElementType,ThisType> OutboundInboundMovementsInterface;			
+				typedef typename IntersectionType::inbound_outbound_movements_container_type InboundOutboundMovementsContainerType;
+				typedef typename IntersectionType::inbound_outbound_movements_container_element_type InboundOutboundMovementsType;
+				typedef Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
+
+				typedef typename IntersectionType::movements_container_type MovementsContainerType;
+				typedef typename IntersectionType::movements_container_element_type MovementType;
+				typedef Intersection_Components::Interfaces::Movement_Interface<MovementType,ThisType> MovementInterface;
 				
 
-				RoutableNetworkInterface* routable_network=routable_network<RoutableNetworkInterface*>();
-				routable_network->Reset<NULLTYPE>();
+				RoutableNetworkInterface* routable_net=routable_network<RoutableNetworkInterface*>();
+				routable_net->Reset<NULLTYPE>();
 
-				RoutableNetworkInterface* routable_network=routable_network<RoutableNetworkInterface*>();
-				float max_free_flow_speed=routable_network->max_free_flow_speed<float>();
-				ScanListType& scan_list=routable_network->scan_list<ScanListType&>();
+				//RoutableNetworkInterface* routable_network=routable_network<RoutableNetworkInterface*>();
+				float max_free_flow_speed=routable_net->max_free_flow_speed<float>();
+				ScanListType& scan_list=routable_net->scan_list<ScanListType&>();
 				//NumSearchesType& num_searches=routable_network->num_searches<NumSearchesType&>();
 
-				RoutableLinkInterface* origin_link=origin_link<RoutableLinkInterface*>();
-				RoutableLinkInterface* destination_link=destination_link<RoutableLinkInterface*>();
-				NetworkLinkInterface* destination_reference=destination_link->network_link_reference<NetworkLinkInterface*>();
-
-				int outbound_turn_movement_size = origin_link->outbound_turn_movement_size<int>();
+				RoutableLinkInterface* origin_link_ptr=origin_link<RoutableLinkInterface*>();
+				RoutableLinkInterface* destination_link_ptr=destination_link<RoutableLinkInterface*>();
+				NetworkLinkInterface* destination_reference=destination_link_ptr->network_link_reference<NetworkLinkInterface*>();
+				typedef ThisType::turn_movements_container_type TurnMovementsContainerType;
+				int outbound_turn_movement_size = (int)origin_link_ptr->network_link_reference<NetworkLinkInterface*>()->outbound_turn_movements<TurnMovementsContainerType&>().size();
 				if (outbound_turn_movement_size == 0){return;}
 
 				//initialization
-				int icurlink,nextlink,iturn_movement;
+				RoutableLinkInterface* nextlink;
+				//int icurlink;
+				//int iturn_movement;
 				float next_cost,new_cost;
 				float dx,dy;
 				float destination_x,destination_y;
 
-				IntersectionInterface* destination_upstream_intersection=destination_link->upstream_intersection<IntersectionInterface*>();
-				destination_upstream_intersection->x_position<float>();
-				destination_upstream_intersection->y_position<float>();
+				IntersectionInterface* destination_upstream_intersection=destination_link_ptr->upstream_intersection<IntersectionInterface*>();
+				destination_x = destination_upstream_intersection->x_position<float>();
+				destination_y = destination_upstream_intersection->y_position<float>();
 				
-				next_cost=origin_link->link_travel_time<float>();
+				next_cost=origin_link_ptr->network_link_reference<NetworkLinkInterface*>()->travel_time<float>();
 				new_cost = next_cost;
-				RoutableLinkInterface* current_link=origin_link;
+				RoutableLinkInterface* current_link=origin_link_ptr;
 
 				current_link->label_cost<float>(new_cost); // g - label_cost
 
@@ -152,9 +301,9 @@ namespace Routing_Components
 				{
 					//selection
 					//num_searches++;
-					current_link = scan_list.begin()->second;
+					current_link = (RoutableLinkInterface*)(scan_list.begin()->second);
 					
-					if(current_link == destination_link)
+					if(current_link == destination_link_ptr)
 					{
 						break;
 					}
@@ -164,48 +313,58 @@ namespace Routing_Components
 
 					current_intersection=current_link->downstream_intersection<IntersectionInterface*>();
 
-					//for all outbound turn movements
 					
-					OutboundInboundType& outbound_links_container=current_intersection->outbound_inbound_movements<OutboundInboundType&>();
-					typename OutboundInboundType::iterator outbound_itr;
-
-					for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
+					//for all outbound turn movements
+					InboundOutboundMovementsContainerType& inbound_outbound_movements_container = current_intersection->inbound_outbound_movements<InboundOutboundMovementsContainerType&>();
+					InboundOutboundMovementsContainerType::iterator inbound_itr;
+					for(inbound_itr=inbound_outbound_movements_container.begin(); inbound_itr!=inbound_outbound_movements_container.end(); inbound_itr++)
 					{
-						OutboundInboundMovementsInterface* outbound=(*outbound_itr);
-						RoutableLinkInterface* next_link=outbound->outbound_movement_reference<RoutableLinkInterface*>();
-						next_cost=outbound->forward_link_turn_travel_time<float>();
-						new_cost=current_link->label_cost<float>();
-
-						if(next_link->label_cost<float>()>new_cost)
+						InboundOutboundMovementsInterface* inbound_outbound_movements = (InboundOutboundMovementsInterface*)(*inbound_itr);
+						RoutableLinkInterface* inbound_link = inbound_outbound_movements->inbound_movement_reference<RoutableLinkInterface*>();
+						if (inbound_link == current_link)
 						{
-							if(next_link->scan_list_status<Scan_List_Status_Keys>()==INSELIST)
+							MovementsContainerType& outbound_movements_container = inbound_outbound_movements->outbound_movements<MovementsContainerType&>();
+							MovementsContainerType::iterator outbound_itr;
+							for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
 							{
-								scan_list.erase(make_pair(next_link->f_cost<float>(),nextlink)); // delete the old cost
+								MovementInterface* outbound_movement = (MovementInterface*)(*outbound_itr);
+								RoutableLinkInterface* next_link=outbound_movement->movement_reference<RoutableLinkInterface*>();
+								next_cost=outbound_movement->forward_link_turn_travel_time<float>();
+								new_cost=current_link->label_cost<float>();
+
+								if(next_link->label_cost<float>()>new_cost)
+								{
+									if(next_link->scan_list_status<Scan_List_Status_Keys>()==INSELIST)
+									{
+										scan_list.erase(make_pair(next_link->f_cost<float>(),nextlink)); // delete the old cost
+									}
+
+									next_link->label_cost<float>(new_cost);
+									next_link->label_pointer<RoutableLinkInterface*>(current_link);
+
+									if(next_link->network_link_reference<NetworkLinkInterface*>()!=destination_reference)
+									{
+										dx=destination_x - next_link->downstream_intersection<IntersectionInterface*>()->x_position<float>();
+										dy=destination_y - next_link->downstream_intersection<IntersectionInterface*>()->y_position<float>();
+										next_link->h_cost<float>(sqrt(dx*dx+dy*dy)/max_free_flow_speed);
+									}
+									else
+									{
+										next_link->h_cost<float>(0);
+									}
+
+									next_link->f_cost<float>(next_link->label_cost<float>() + next_link->h_cost<float>());
+
+									scan_list.insert(make_pair(next_link->f_cost<float>(),nextlink)); // update with the new cost
+									next_link->scan_list_status<Scan_List_Status_Keys>(INSELIST);
+								}
 							}
-
-							next_link->label_cost<float>(new_cost);
-							next_link->label_pointer<RoutableLinkInterface*>(current_link);
-
-							if(next_link->network_link_reference<NetworkLinkInterface*>()!=destination_reference)
-							{
-								dx=destination_x - next_link->downstream_intersection<IntersectionInterface*>()->x_position();
-								dy=destination_y - next_link->downstream_intersection<IntersectionInterface*>()->y_position();
-								next_link->h_cost<float>(sqrt(dx*dx+dy*dy)/max_free_flow_speed);
-							}
-							else
-							{
-								next_link->h_cost<float>(0);
-							}
-
-							next_link->f_cost<float>(next_link->label_cost<float>() + next_link->h_cost<float>());
-
-							scan_list.insert(make_pair(next_link->f_cost<float>(),nextlink)); // update with the new cost
-							next_link->scan_list_status<Scan_List_Status_Keys>(INSELIST);
+							break;
 						}
 					}
 
 					typedef typename RoutableNetworkType::reversed_path_container_type ReversedPathContainerType;
-					ReversedPathContainerType& reversed_path_container=routable_network->reversed_path_container<ReversedPathContainerType&>()
+					ReversedPathContainerType& reversed_path_container=routable_network<RoutableNetworkInterface*>()->reversed_path_container<ReversedPathContainerType&>();
 
 					current_link=destination_link<RoutableLinkInterface*>();
 					reversed_path_container.push_back(current_link->network_link_reference<NetworkLinkInterface*>());
@@ -219,15 +378,22 @@ namespace Routing_Components
 				}
 			};
 
+
+			facet void Initialize()
+			{
+				schedule_event_local(ThisType,Compute_Route_Condition,Compute_Route,0,NULLTYPE);
+			}
+
 			declare_facet_event(Compute_Route)
 			{
+				Routing_Interface* _this=(Routing_Interface*)pthis;
 				typedef typename ThisType::vehicle_type VehicleType;
 				typedef Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> VehicleInterface;	
-				VehicleInterface* veh=vehicle<VehicleInterface*>();
+				VehicleInterface* veh=_this->vehicle<VehicleInterface*>();
 				
 				typedef typename ThisType::routable_network_type RoutableNetworkType;
-				typedef typename RoutableNetworkType::links_element_type RoutableLinkType;
-				typedef typename RoutableLinkType::network_link_reference_type NetworkLinkType;
+				typedef typename RoutableNetworkType::links_container_element_type RoutableLinkType;
+				typedef typename RoutableLinkType::network_link_type NetworkLinkType;
 
 				typedef Link_Components::Interfaces::Link_Interface<NetworkLinkType,ThisType> NetworkLinkInterface;	
 				typedef Link_Components::Interfaces::Link_Interface<RoutableLinkType,ThisType> RoutableLinkInterface;
@@ -235,17 +401,17 @@ namespace Routing_Components
 				NetworkLinkInterface* origin_link=veh->origin_link<NetworkLinkInterface*>();
 				NetworkLinkInterface* destination_link=veh->destination_link<NetworkLinkInterface*>();
 				
-				origin_link<NetworkLinkInterface*>();
-				destination_link<NetworkLinkInterface*>();
+				_this->origin_link<NetworkLinkInterface*>();
+				_this->destination_link<NetworkLinkInterface*>();
 
-				one_to_one_link_based_least_time_path_a_star<NULLTYPE>();
+				_this->one_to_one_link_based_least_time_path_a_star<NULLTYPE>();
 				
 				typedef Routable_Network_Interface<RoutableNetworkType,ThisType> RoutableNetworkInterface;
-				RoutableNetworkInterface* routable_network=routable_network<RoutableNetworkInterface*>();
+				RoutableNetworkInterface* routable_network_ptr=_this->routable_network<RoutableNetworkInterface*>();
 				
 				typedef typename RoutableNetworkType::reversed_path_container_type ReversedPathContainerType;
 
-				veh->set_route_links(routable_network->reversed_path_container<ReversedPathContainerType&>());
+				veh->set_route_links(routable_network_ptr->reversed_path_container<ReversedPathContainerType&>());
 
 				origin_link->push_vehicle(veh);
 			}
