@@ -37,6 +37,7 @@ struct Master_Type
 	typedef Intersection_Components::Components::Polaris_Outbound_Inbound_Movements_Component<T>::type outbound_inbound_movements_type;
 
 	typedef Intersection_Components::Components::Routable_Inbound_Outbound_Movements_Component<T>::type routable_inbound_outbound_movements_type;
+	typedef Intersection_Components::Components::Routable_Outbound_Inbound_Movements_Component<T>::type routable_outbound_inbound_movements_type;
 
 	typedef Intersection_Components::Components::Routable_Movement_Component<T>::type routable_movement_type;
 
@@ -69,10 +70,12 @@ void main()
 	cout << "reading input data..." <<endl;	
 	scenario->read_scenario_data<NULLTYPE>();
 	network->read_network_data<NULLTYPE>();
+	
 
 	////network cost
 	cout << "constructing network cost..." <<endl;
 	network->construct_network_cost<NULLTYPE>();
+	network->printNetwork<NULLTYPE>();
 	
 	////routable network
 	network->construct_routable_network<NULLTYPE>();
