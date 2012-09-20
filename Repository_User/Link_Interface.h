@@ -137,6 +137,9 @@ namespace Link_Components
 			facet_accessor(jam_density);
 			facet_accessor(critical_density);
 
+			//for holding mirror links in routable networks
+			facet_accessor(replicas_container);
+
 			//routing interface
 			facet_accessor(f_cost);
 			facet_accessor(h_cost);

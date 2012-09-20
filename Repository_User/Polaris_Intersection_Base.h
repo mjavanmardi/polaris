@@ -48,11 +48,46 @@ namespace Intersection_Components
 			member_data_basic(int, turn_movement_cumulative_shifted_arrival_vehicles);
 			
 			member_data_basic(float, minimum_merge_rate);
+			
+		//==================================================================================================================
+		/// Replicas Containers
+		//------------------------------------------------------------------------------------------------------------------
+			typedef typename MasterType::routable_movement_type replicas_container_element_type;
+			typedef vector<void*> replicas_container_type;
+			typedef Intersection_Components::Interfaces::Intersection_Interface<replicas_container_element_type, NULLTYPE>* replica_interface;
+			
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType replicas_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_replicas_container);} tag_getter(replicas_container);
+			replicas_container_type _replicas_container;
+
+		//==================================================================================================================
+		/// forward_link_turn_travel_time
+		//------------------------------------------------------------------------------------------------------------------
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType forward_link_turn_travel_time(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_forward_link_turn_travel_time);} tag_getter(forward_link_turn_travel_time);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void forward_link_turn_travel_time(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				_forward_link_turn_travel_time = (float)set_value;
+				// update replicas
+				replicas_container_type::iterator replica_itr;
+				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
+				{
+					replica_interface* replica = (replica_interface*)(*replica_itr);
+					replica->forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
+				}
+			}
+			tag_setter(forward_link_turn_travel_time);
+
+			float _forward_link_turn_travel_time;
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_movement_reference;}
 			tag_getter(movement_reference);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void movement_reference(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_movement_reference=(void*)set_value;}
+			tag_setter(movement_reference);
 
 			void* _movement_reference;
 
@@ -98,6 +133,8 @@ namespace Intersection_Components
 			typedef vehicle_type vehicles_container_element_type;
 
 			vehicles_container_type _vehicles_container;
+
+
 		};
 		
 
