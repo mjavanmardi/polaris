@@ -78,12 +78,12 @@ namespace Routing_Components
 				typedef typename ThisType::routable_intersections_container_type RoutableIntersectionsContainerType;
 				typedef typename Intersection_Components::Interfaces::Intersection_Interface<RoutableIntersectionType, ThisType> RoutableIntersectionInterface;
 
-				//typedef typename ThisType::regular_outbound_inbound_movements_container_type RegularOutboundInboundMovementsContainerType;
-				//typedef typename ThisType::routable_outbound_inbound_movements_container_type RoutableOutboundInboundMovementsContainerType;
-				//typedef typename ThisType::regular_outbound_inbound_movements_container_element_type RegularOutboundInboundMovementsType;
-				//typedef typename ThisType::routable_outbound_inbound_movements_container_element_type RoutableOutboundInboundMovementsType;
-				//typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<RegularOutboundInboundMovementsType, ThisType> RegularOutboundInboundMovementsInterface;
-				//typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<RoutableOutboundInboundMovementsType, ThisType> RoutableOutboundInboundMovementsInterface;
+				typedef typename ThisType::regular_outbound_inbound_movements_container_type RegularOutboundInboundMovementsContainerType;
+				typedef typename ThisType::routable_outbound_inbound_movements_container_type RoutableOutboundInboundMovementsContainerType;
+				typedef typename ThisType::regular_outbound_inbound_movements_container_element_type RegularOutboundInboundMovementsType;
+				typedef typename ThisType::routable_outbound_inbound_movements_container_element_type RoutableOutboundInboundMovementsType;
+				typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<RegularOutboundInboundMovementsType, ThisType> RegularOutboundInboundMovementsInterface;
+				typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<RoutableOutboundInboundMovementsType, ThisType> RoutableOutboundInboundMovementsInterface;
 
 				typedef typename ThisType::regular_inbound_outbound_movements_container_type RegularInboundOutboundMovementsContainerType;
 				typedef typename ThisType::routable_inbound_outbound_movements_container_type RoutableInboundOutboundMovementsContainerType;
@@ -152,6 +152,7 @@ namespace Routing_Components
 					//	routable_intersection->outbound_inbound_movements<RoutableOutboundInboundMovementsContainerType&>().push_back(routable_outbound_inbound_movements);
 					//}
 					
+					// create inbound_outbound_movements
 					RegularInboundOutboundMovementsContainerType& regular_inbound_outbound_movements_container = regular_intersection->inbound_outbound_movements<RegularInboundOutboundMovementsContainerType&>();
 					RegularInboundOutboundMovementsContainerType::iterator regular_inbound_outbound_movements_itr;
 					
@@ -180,6 +181,37 @@ namespace Routing_Components
 						}
 						routable_intersection->inbound_outbound_movements<RoutableInboundOutboundMovementsContainerType&>().push_back(routable_inbound_outbound_movements);
 					}
+					
+					// create outbound_inbound_movements
+					RegularOutboundInboundMovementsContainerType& regular_outbound_inbound_movements_container = regular_intersection->outbound_inbound_movements<RegularOutboundInboundMovementsContainerType&>();
+					RegularOutboundInboundMovementsContainerType::iterator regular_outbound_inbound_movements_itr;
+					
+					for(regular_outbound_inbound_movements_itr=regular_outbound_inbound_movements_container.begin(); regular_outbound_inbound_movements_itr!=regular_outbound_inbound_movements_container.end(); regular_outbound_inbound_movements_itr++)
+					{
+						RegularOutboundInboundMovementsInterface* regular_outbound_inbound_movements = (RegularOutboundInboundMovementsInterface*)(*regular_outbound_inbound_movements_itr);
+						RoutableOutboundInboundMovementsInterface* routable_outbound_inbound_movements = (RoutableOutboundInboundMovementsInterface*)Allocate<RoutableOutboundInboundMovementsType>();
+						//float forward_link_turn_travel_time = regular_outbound_inbound_movements->forward_link_turn_travel_time<float>();
+						//routable_outbound_inbound_movements->forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
+						RegularLinkInterface* regular_link = regular_outbound_inbound_movements->outbound_link_reference<RegularLinkInterface*>();
+						RoutableLinkInterface* routable_link = linksMap.find(regular_link)->second;
+						routable_outbound_inbound_movements->outbound_link_reference<RoutableLinkInterface*>(routable_link);
+						//another level of loop
+						RegularMovementsContainerType& regular_inbound_movements_container = regular_outbound_inbound_movements->inbound_movements<RegularMovementsContainerType&>();
+						RegularMovementsContainerType::iterator regular_inbound_movement_itr;
+						for(regular_inbound_movement_itr=regular_inbound_movements_container.begin(); regular_inbound_movement_itr!=regular_inbound_movements_container.end(); regular_inbound_movement_itr++)
+						{
+							RegularMovementInterface* regular_inbound_movement = (RegularMovementInterface*)(*regular_inbound_movement_itr);
+							RoutableMovementInterface* routable_inbound_movement = (RoutableMovementInterface*)Allocate<RoutableMovementType>();
+							routable_inbound_movement->forward_link_turn_travel_time<float>(regular_inbound_movement->forward_link_turn_travel_time<float>());
+							RegularLinkInterface* regular_outbound_link = regular_inbound_movement->movement_reference<RegularLinkInterface*>();
+							RoutableLinkInterface* routable_outbound_link = linksMap.find(regular_outbound_link)->second;
+							routable_inbound_movement->movement_reference<RoutableLinkInterface*>(routable_outbound_link);
+							regular_inbound_movement->replicas_container<RoutableMovementsContainerType&>().push_back(routable_inbound_movement);
+							routable_outbound_inbound_movements->inbound_movements<RoutableMovementsContainerType&>().push_back(routable_inbound_movement);
+						}
+						routable_intersection->outbound_inbound_movements<RoutableInboundOutboundMovementsContainerType&>().push_back(routable_outbound_inbound_movements);
+					}
+
 					intersections<RoutableIntersectionsContainerType&>().push_back(routable_intersection);
 					intersectionsMap.insert(pair<RegularIntersectionInterface*, RoutableIntersectionInterface*>(regular_intersection, routable_intersection));
 				}
@@ -202,7 +234,7 @@ namespace Routing_Components
 				
 				// for debug, we printout everything of the network
 				
-				cout <<"*********************************Routable Network**************************************************"<<endl;
+				cout <<endl<<"*********************************Routable Network**************************************************"<<endl;
 				cout<<"all links"<<endl;
 				int i;
 				for (i = 0; i < (int)links<RoutableLinksContainerType&>().size(); i++)
@@ -215,7 +247,7 @@ namespace Routing_Components
 					cout<<"\t\t -----------------------------------"<<endl<<endl;
 				}
 
-				cout <<"***********************************************************************************"<<endl;
+				cout <<"-------------------------------------------------------------------------------------"<<endl;
 				cout << "all intersections" << endl;
 				for (i = 0; i < intersections<RoutableIntersectionsContainerType&>().size(); i++)
 				{
@@ -229,7 +261,7 @@ namespace Routing_Components
 					for (j=0, inbound_outbound_movements_itr=inbound_outbound_movements_container.begin();inbound_outbound_movements_itr!=inbound_outbound_movements_container.end();inbound_outbound_movements_itr++,j++)
 					{
 						RoutableInboundOutboundMovementsInterface* inbound_outbound_movements = (RoutableInboundOutboundMovementsInterface*)(*inbound_outbound_movements_itr);
-						cout<<"\t\tinbound_outbound_movements_"<<j<<endl;
+						cout<<"\t\t inbound_outbound_movements_"<<j<<endl;
 						cout<<"\t\t\t inbound_link: "<<inbound_outbound_movements->inbound_link_reference<RoutableLinkInterface*>()->uuid<int>()<<endl;
 						cout<<"\t\t\t outbound_movements: "<<endl;
 						RoutableMovementsContainerType& outbound_movements_container = inbound_outbound_movements->outbound_movements<RoutableMovementsContainerType&>();
@@ -239,6 +271,27 @@ namespace Routing_Components
 						{
 							RoutableMovementInterface* outbound_movement = (RoutableMovementInterface*)(*outbound_movement_itr);
 							cout<<"\t\t\t\t outbound_movements_"<<k<<endl;
+							cout<<"\t\t\t\t\t movement_reference: "<<outbound_movement->movement_reference<RoutableLinkInterface*>()->uuid<int>()<<endl;
+							cout<<"\t\t\t\t\t forward_link_turn_travel_time: "<<outbound_movement->forward_link_turn_travel_time<float>()<<endl;
+						}
+					}
+
+					RoutableOutboundInboundMovementsContainerType& outbound_inbound_movements_container = intersection->outbound_inbound_movements<RoutableOutboundInboundMovementsContainerType&>();
+					RoutableOutboundInboundMovementsContainerType::iterator outbound_inbound_movements_itr;
+
+					for (j=0, outbound_inbound_movements_itr=outbound_inbound_movements_container.begin();outbound_inbound_movements_itr!=outbound_inbound_movements_container.end();outbound_inbound_movements_itr++,j++)
+					{
+						RoutableOutboundInboundMovementsInterface* outbound_inbound_movements = (RoutableOutboundInboundMovementsInterface*)(*outbound_inbound_movements_itr);
+						cout<<"\t\t outbound_inbound_movements_"<<j<<endl;
+						cout<<"\t\t\t outbound_link: "<<outbound_inbound_movements->outbound_link_reference<RoutableLinkInterface*>()->uuid<int>()<<endl;
+						cout<<"\t\t\t inbound_movements: "<<endl;
+						RoutableMovementsContainerType& inbound_movements_container = outbound_inbound_movements->inbound_movements<RoutableMovementsContainerType&>();
+						RoutableMovementsContainerType::iterator outbound_movement_itr;
+						int k;
+						for (k=0,outbound_movement_itr=inbound_movements_container.begin();outbound_movement_itr!=inbound_movements_container.end();outbound_movement_itr++,k++)
+						{
+							RoutableMovementInterface* outbound_movement = (RoutableMovementInterface*)(*outbound_movement_itr);
+							cout<<"\t\t\t\t inbound_movements_"<<k<<endl;
 							cout<<"\t\t\t\t\t movement_reference: "<<outbound_movement->movement_reference<RoutableLinkInterface*>()->uuid<int>()<<endl;
 							cout<<"\t\t\t\t\t forward_link_turn_travel_time: "<<outbound_movement->forward_link_turn_travel_time<float>()<<endl;
 						}

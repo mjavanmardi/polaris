@@ -79,6 +79,26 @@ namespace Intersection_Components
 		};
 
 		template<typename MasterType>
+		struct Routable_Outbound_Inbound_Movements_Base
+		{
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType outbound_link_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_link_reference);}
+			tag_setter(outbound_link_reference);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void outbound_link_reference(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_outbound_link_reference = (void*)set_value;}
+			tag_getter(outbound_link_reference);
+			
+			void* _outbound_link_reference;
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType inbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_movements);}
+			tag_getter(inbound_movements);
+
+			vector<void*> _inbound_movements;
+		};
+
+		template<typename MasterType>
 		struct Routable_Intersection_Base
 		{
 			member_data_basic(int, uuid);
@@ -86,19 +106,19 @@ namespace Intersection_Components
 			member_data_basic(float, y_position);
 			member_data_basic(float, z_position);
 
-			//typedef Polaris_Component<Interfaces::Outbound_Inbound_Movements_Interface,Routable_Outbound_Inbound_Movements_Base<MasterType>,NULLTYPE,MasterType> outbound_inbound_movements_container_element_type;
-			//typedef vector<void*> outbound_inbound_movements_container_type;
-			//
-			////--------------------------------------------------------
-			//// member_data<vector<void*>, outbound_inbound_movements>
-			////--------------------------------------------------------
+			typedef Polaris_Component<Interfaces::Outbound_Inbound_Movements_Interface,Routable_Outbound_Inbound_Movements_Base<MasterType>,NULLTYPE,MasterType> outbound_inbound_movements_container_element_type;
+			typedef vector<void*> outbound_inbound_movements_container_type;
+			
+			//--------------------------------------------------------
+			// member_data<vector<void*>, outbound_inbound_movements>
+			//--------------------------------------------------------
 
-			//template<typename ThisType, typename CallerType, typename TargetType>
-			//TargetType outbound_inbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_inbound_movements);} 
-			//tag_getter(outbound_inbound_movements);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType outbound_inbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_inbound_movements);} 
+			tag_getter(outbound_inbound_movements);
 
-			//outbound_inbound_movements_container_type _outbound_inbound_movements;
-			////--------------------------------------------------------
+			outbound_inbound_movements_container_type _outbound_inbound_movements;
+			//--------------------------------------------------------
 
 			typedef Polaris_Component<Interfaces::Inbound_Outbound_Movements_Interface,Routable_Inbound_Outbound_Movements_Base<MasterType>,NULLTYPE,MasterType> inbound_outbound_movements_container_element_type;
 			typedef vector<void*> inbound_outbound_movements_container_type;
@@ -141,6 +161,11 @@ namespace Intersection_Components
 		struct Routable_Inbound_Outbound_Movements_Component
 		{
 			typedef Polaris_Component<Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface, Intersection_Components::Bases::Routable_Inbound_Outbound_Movements_Base<MasterType>, NULLTYPE, MasterType> type;
+		};
+		template<typename MasterType>
+		struct Routable_Outbound_Inbound_Movements_Component
+		{
+			typedef Polaris_Component<Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface, Intersection_Components::Bases::Routable_Outbound_Inbound_Movements_Base<MasterType>, NULLTYPE, MasterType> type;
 		};
 	}	
 

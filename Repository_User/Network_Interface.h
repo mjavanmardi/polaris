@@ -397,7 +397,7 @@ namespace Network_Components
 							outboundInboundMovements->inbound_movements<MovementsContainerType&>().push_back(movement);
 							inboundMovement->replicas_container<MovementsContainerType&>().push_back(movement);
 						}
-						intersection->outbound_inbound_movements<OutboundInboundMovementsContainerType>().push_back(outboundInboundMovements);
+						intersection->outbound_inbound_movements<OutboundInboundMovementsContainerType&>().push_back(outboundInboundMovements);
 					}
 				}
 						
@@ -489,9 +489,13 @@ namespace Network_Components
 				typedef typename ThisType::movements_container_type MovementsContainerType;
 				typedef typename ThisType::movements_container_element_type MovementType;
 				typedef typename Intersection_Components::Interfaces::Movement_Interface<MovementType,ThisType> MovementInterface;
+
+				typedef typename ThisType::activity_locations_container_type ActivityLocationsContainerType;
+				typedef typename ThisType::activity_locations_container_element_type ActivityLocationType;
+				typedef typename Activity_Location_Components::Interfaces::Activity_Location_Interface<ActivityLocationType,ThisType> ActivityLocationInterface;
 				
 				
-				cout <<"***********************************Regular Network************************************************"<<endl;
+				cout<<endl<<"***********************************Regular Network************************************************"<<endl;
 				cout<<"all links"<<endl;
 				int i, j, k;
 				for (i = 0; i < (int)links_container<LinksContainerType&>().size(); i++)
@@ -516,7 +520,7 @@ namespace Network_Components
 					cout<<"\t\t -----------------------------------"<<endl<<endl;
 				}
 
-				cout <<"***********************************************************************************"<<endl;
+				cout <<"-------------------------------------------------------------------------------------"<<endl;
 				cout << "all intersections" << endl;
 				for (i = 0; i < intersections_container<IntersectionsContainerType>().size(); i++)
 				{
@@ -525,12 +529,13 @@ namespace Network_Components
 					cout<<"\t\t x_position: "<<intersection->x_position<float>()<<endl;
 					cout<<"\t\t y_position: "<<intersection->y_position<float>()<<endl;
 					cout<<"\t\t intersection_type: "<<intersection->intersection_type<int>()<<endl;
+					cout<<"\t\t all inbound_outbound_movements: "<<endl;
 					InboundOutboundMovementsContainerType& inbound_outbound_movements_container = intersection->inbound_outbound_movements<InboundOutboundMovementsContainerType&>();
 					InboundOutboundMovementsContainerType::iterator inbound_outbound_movements_itr;
 					for (inbound_outbound_movements_itr=inbound_outbound_movements_container.begin(),j=0;inbound_outbound_movements_itr!=inbound_outbound_movements_container.end();inbound_outbound_movements_itr++,j++)
 					{
 						InboundOutboundMovementsInterface* inbound_outbound_movements = (InboundOutboundMovementsInterface*)(*inbound_outbound_movements_itr);
-						cout<<"\t\tinbound_outbound_movements_"<<j<<endl;
+						cout<<"\t\t inbound_outbound_movements_"<<j<<endl;
 						cout<<"\t\t\t inbound_link: "<<inbound_outbound_movements->inbound_link_reference<Link_Interface*>()->uuid<int>()<<endl;
 						cout<<"\t\t\t outbound_movements: "<<endl;
 						MovementsContainerType& outbound_movements_container = inbound_outbound_movements->outbound_movements<MovementsContainerType&>();
@@ -544,8 +549,55 @@ namespace Network_Components
 							cout<<"\t\t\t\t\t forward_link_turn_travel_time: "<<outbound_movement->forward_link_turn_travel_time<float>()<<endl;
 						}
 					}
+
+					cout<<"\t\t all outbound_inbound_movements: " <<endl;
+					OutboundInboundMovementsContainerType& outbound_inbound_movements_container = intersection->outbound_inbound_movements<OutboundInboundMovementsContainerType&>();
+					OutboundInboundMovementsContainerType::iterator outbound_inbound_movements_itr;
+					for (outbound_inbound_movements_itr=outbound_inbound_movements_container.begin(),j=0;outbound_inbound_movements_itr!=outbound_inbound_movements_container.end();outbound_inbound_movements_itr++,j++)
+					{
+						OutboundInboundMovementsInterface* outbound_inbound_movements = (OutboundInboundMovementsInterface*)(*outbound_inbound_movements_itr);
+						cout<<"\t\t outbound_inbound_movements_"<<j<<endl;
+						cout<<"\t\t\t outbound_link: "<<outbound_inbound_movements->outbound_link_reference<Link_Interface*>()->uuid<int>()<<endl;
+						cout<<"\t\t\t inbound_movements: "<<endl;
+						MovementsContainerType& inbound_movements_container = outbound_inbound_movements->inbound_movements<MovementsContainerType&>();
+						MovementsContainerType::iterator inbound_movement_itr;
+						for (inbound_movement_itr=inbound_movements_container.begin(),k=0;inbound_movement_itr!=inbound_movements_container.end();inbound_movement_itr++,k++)
+						{
+							MovementInterface* inbound_movement = (MovementInterface*)(*inbound_movement_itr);
+							cout<<"\t\t\t\t inbound_movements_"<<k<<endl;
+							cout<<"\t\t\t\t\t movement_reference: "<<inbound_movement->movement_reference<Link_Interface*>()->uuid<int>()<<endl;
+							cout<<"\t\t\t\t\t movement_type: "<<inbound_movement->movement_type<int>()<<endl;
+							cout<<"\t\t\t\t\t forward_link_turn_travel_time: "<<inbound_movement->forward_link_turn_travel_time<float>()<<endl;
+						}
+					}
 					cout<<"\t\t --------------------------------"<<endl<<endl;
 				}
+
+				cout <<"***********************************************************************************"<<endl;
+				cout << "all activity locations" << endl;
+
+				ActivityLocationsContainerType::iterator activity_location_itr;
+				for (activity_location_itr=activity_locations_container<ActivityLocationsContainerType&>().begin(),i=0; activity_location_itr!=activity_locations_container<ActivityLocationsContainerType&>().end(); activity_location_itr++,i++)
+				{
+					ActivityLocationInterface* activity_location = (ActivityLocationInterface*)(*activity_location_itr);
+					cout<<"\t activity_location_"<<i<<endl;
+					cout<<"\t\t zone: "<<activity_location->zone<int>()<<endl;
+					cout<<"\t\t origin_links:"<<endl;
+					LinksContainerType::iterator origin_link_itr;
+					LinksContainerType& origin_links_container = activity_location->origin_links<LinksContainerType&>();
+					for (origin_link_itr=origin_links_container.begin(); origin_link_itr!=origin_links_container.end(); origin_link_itr++)
+					{
+						cout<<"\t\t link_"<<((Link_Interface*)(*origin_link_itr))->uuid<int>()<<endl;
+					}
+					cout<<"\t\t destination_links:"<<endl;
+					LinksContainerType::iterator destination_link_itr;
+					LinksContainerType& destination_links_container = activity_location->destination_links<LinksContainerType&>();
+					for (destination_link_itr=destination_links_container.begin(); destination_link_itr!=destination_links_container.end(); destination_link_itr++)
+					{
+						cout<<"\t\t link_"<<((Link_Interface*)(*destination_link_itr))->uuid<int>()<<endl;
+					}
+				}
+
 			}
 
 			facet void construct_network_cost()

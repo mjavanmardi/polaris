@@ -85,6 +85,12 @@ namespace Routing_Components
 			typedef typename MasterType::routable_inbound_outbound_movements_type routable_inbound_outbound_movements_container_element_type;
 			typedef typename vector<void*> routable_inbound_outbound_movements_container_type;
 
+			typedef typename MasterType::outbound_inbound_movements_type regular_outbound_inbound_movements_container_element_type;
+			typedef typename vector<void*> regular_outbound_inbound_movements_container_type;
+
+			typedef typename MasterType::routable_outbound_inbound_movements_type routable_outbound_inbound_movements_container_element_type;
+			typedef typename vector<void*> routable_outbound_inbound_movements_container_type;
+
 			typedef typename MasterType::movement_type regular_movements_container_element_type;
 			typedef typename vector<void*> regular_movements_container_type;
 			
