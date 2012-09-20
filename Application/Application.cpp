@@ -61,26 +61,22 @@ void main()
 
 	typedef Master_Type::network_type network_type;
 	typedef Network_Components::Interfaces::Network_Interface<network_type,NULLTYPE> Network_Interface;
-	typedef Master_Type::routable_network_type routable_network_type;
-	typedef Routing_Components::Interfaces::Routable_Network_Interface<routable_network_type, NULLTYPE> Routable_Network_Interface;
+
 	
 	Network_Interface* network=(Network_Interface*)Allocate<network_type>();
 	
-	Routable_Network_Interface* routable_network = (Routable_Network_Interface*)Allocate<routable_network_type>();
-
-
-
 	////data input
 	cout << "reading input data..." <<endl;	
 	scenario->read_scenario_data<NULLTYPE>();
 	network->read_network_data<NULLTYPE>();
-	routable_network->read_routable_network_data<NULLTYPE>(nullptr);
-	//read_demand_data();
 
 	////network cost
 	cout << "constructing network cost..." <<endl;
 	network->construct_network_cost<NULLTYPE>();
 	
+	////routable network
+	network->construct_routable_network<NULLTYPE>();
+
 	//DemandData demand_data;
 	typedef Master_Type::demand_type demand_type;
 	typedef Demand_Components::Interfaces::Demand_Interface<demand_type, NULLTYPE> Demand_Interface;

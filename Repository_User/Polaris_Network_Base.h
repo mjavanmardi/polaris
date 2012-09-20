@@ -39,18 +39,23 @@ namespace Network_Components
 			
 			links_container_type _links_container;
 
+
+
+
 			typedef typename MasterType::routable_network_type routable_network_type;
 			typedef routable_network_type routable_networks_container_element_type;
 			typedef vector<void*> routable_networks_container_type;
 
 			vector<void*> _routable_networks_container;
-						
+			
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType routable_network(call_requirements(requires(ThisType,Is_Dispatched))){
-				return (TargetType)_routable_networks_container[thread_id];
-			}
-			void* _routable_network;
+			TargetType routable_network(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_routable_networks_container[thread_id]);}tag_getter(routable_network);
 
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType routable_networks_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_routable_networks_container);}tag_getter(routable_networks_container);
+
+			
+			
 			typedef typename MasterType::turn_movement_type turn_movement_type;
 			typedef turn_movement_type turn_movements_element_type;
 			typedef vector<void*> turn_movements_container_type;

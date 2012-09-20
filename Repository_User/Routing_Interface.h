@@ -107,7 +107,7 @@ namespace Routing_Components
 				RegularLinksContainerType& regular_links_container = ((RegularNetworkInterface*)regular_network)->links_container<RegularLinksContainerType&>();
 				
 				// copy all links
-				map<RegularLinkInterface*, RoutableLinkInterface*> linksMap;
+				hash_map<RegularLinkInterface*, RoutableLinkInterface*> linksMap;
 				RegularLinksContainerType::iterator regular_link_itr;
 				for(regular_link_itr=regular_links_container.begin(); regular_link_itr!=regular_links_container.end(); regular_link_itr++)
 				{
@@ -125,7 +125,7 @@ namespace Routing_Components
 
 				// copy all intersections
 				RegularIntersectionsContainerType& regular_intersections_container = ((RegularNetworkInterface*)regular_network)->intersections_container<RegularIntersectionsContainerType&>();
-				map<RegularIntersectionInterface*, RoutableIntersectionInterface*> intersectionsMap;
+				hash_map<RegularIntersectionInterface*, RoutableIntersectionInterface*> intersectionsMap;
 				RegularIntersectionsContainerType::iterator regular_intersection_itr;
 				for(regular_intersection_itr=regular_intersections_container.begin(); regular_intersection_itr!=regular_intersections_container.end(); regular_intersection_itr++)
 				{
@@ -151,6 +151,7 @@ namespace Routing_Components
 					
 					RegularInboundOutboundMovementsContainerType& regular_inbound_outbound_movements_container = regular_intersection->inbound_outbound_movements<RegularInboundOutboundMovementsContainerType&>();
 					RegularInboundOutboundMovementsContainerType::iterator regular_inbound_outbound_movements_itr;
+					
 					for(regular_inbound_outbound_movements_itr=regular_inbound_outbound_movements_container.begin(); regular_inbound_outbound_movements_itr!=regular_inbound_outbound_movements_container.end(); regular_inbound_outbound_movements_itr++)
 					{
 						RegularInboundOutboundMovementsInterface* regular_inbound_outbound_movements = (RegularInboundOutboundMovementsInterface*)(*regular_inbound_outbound_movements_itr);
@@ -176,6 +177,7 @@ namespace Routing_Components
 						}
 						routable_intersection->inbound_outbound_movements<RoutableInboundOutboundMovementsContainerType&>().push_back(routable_inbound_outbound_movements);
 					}
+					
 					intersectionsMap.insert(pair<RegularIntersectionInterface*, RoutableIntersectionInterface*>(regular_intersection, routable_intersection));
 				}
 

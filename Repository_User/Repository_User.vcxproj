@@ -123,6 +123,8 @@
     <ClInclude Include="Intersection_Interface.h" />
     <ClInclude Include="Link_Interface.h" />
     <ClInclude Include="Network_Interface.h" />
+    <ClInclude Include="Polaris_Activity_Location_Base.h" />
+    <ClInclude Include="Polaris_Demand_Base.h" />
     <ClInclude Include="Polaris_Intersection_Base.h" />
     <ClInclude Include="Polaris_Link_Base.h" />
     <ClInclude Include="Polaris_Network_Base.h" />

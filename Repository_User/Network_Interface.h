@@ -3,7 +3,7 @@
 #include "Routing_Interface.h"
 #include "Intersection_Interface.h"
 #include "Traveler_Interface.h"
-#include <map>
+#include <hash_map>
 
 namespace Network_Components
 {
@@ -17,7 +17,6 @@ namespace Network_Components
 	
 	namespace Interfaces
 	{
-
 		template<typename ThisType,typename CallerType>
 		struct Network_Interface
 		{
@@ -27,7 +26,8 @@ namespace Network_Components
 			facet_accessor(turn_movements_container);
 			facet_accessor(activity_locations_container);
 			facet_accessor(routable_network);
-			
+
+			facet_accessor(routable_networks_container);
 
 			facet void read_network_data()
 			{
@@ -482,7 +482,20 @@ namespace Network_Components
 				}
 			}
 
+			facet void construct_routable_network()
+			{
+				typedef typename ThisType::routable_networks_container_type RoutableNetworksContainerType;
+				RoutableNetworksContainerType& routable_networks=routable_networks_container<RoutableNetworksContainerType&>();
+				typedef typename ThisType::routable_network_type routable_network_type;
+				typedef Routing_Components::Interfaces::Routable_Network_Interface<routable_network_type, NULLTYPE> Routable_Network_Interface;
 
+				for(int i=0;i<num_threads;i++)
+				{
+					Routable_Network_Interface* routable_network = (Routable_Network_Interface*)Allocate<routable_network_type>();
+					routable_network->read_routable_network_data<NULLTYPE>(PTHIS(ThisType));
+					routable_networks.push_back(routable_network);
+				}
+			}
 		};
 	}
 }
