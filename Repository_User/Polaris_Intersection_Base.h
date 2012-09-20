@@ -26,6 +26,9 @@ namespace Intersection_Components
 			typedef typename MasterType::link_type link_type;
 			typedef typename MasterType::vehicle_type vehicle_type;
 
+			member_data_basic(float, turn_travel_penalty);
+			
+			member_data_basic(float, forward_link_turn_travel_time);
 
 			member_data_basic(float, movement_capacity);
 			member_data_basic(float, movement_supply);
@@ -45,46 +48,11 @@ namespace Intersection_Components
 			member_data_basic(int, turn_movement_cumulative_shifted_arrival_vehicles);
 			
 			member_data_basic(float, minimum_merge_rate);
-			
-		//==================================================================================================================
-		/// Replicas Containers
-		//------------------------------------------------------------------------------------------------------------------
-			typedef typename MasterType::routable_movement_type replicas_container_element_type;
-			typedef vector<void*> replicas_container_type;
-			typedef Intersection_Components::Interfaces::Intersection_Interface<replicas_container_element_type, NULLTYPE>* replica_interface;
-			
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType replicas_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_replicas_container);} tag_getter(replicas_container);
-			replicas_container_type _replicas_container;
-
-		//==================================================================================================================
-		/// forward_link_turn_travel_time
-		//------------------------------------------------------------------------------------------------------------------
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType forward_link_turn_travel_time(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_forward_link_turn_travel_time);} tag_getter(forward_link_turn_travel_time);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			void forward_link_turn_travel_time(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				_forward_link_turn_travel_time = (float)set_value;
-				// update replicas
-				replicas_container_type::iterator replica_itr;
-				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
-				{
-					replica_interface* replica = (replica_interface*)(*replica_itr);
-					replica->forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
-				}
-			}
-			tag_setter(forward_link_turn_travel_time);
-
-			float _forward_link_turn_travel_time;
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_movement_reference;}
 			tag_getter(movement_reference);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			void movement_reference(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_movement_reference=(void*)set_value;}
-			tag_setter(movement_reference);
 
 			void* _movement_reference;
 
@@ -130,8 +98,6 @@ namespace Intersection_Components
 			typedef vehicle_type vehicles_container_element_type;
 
 			vehicles_container_type _vehicles_container;
-
-
 		};
 		
 
@@ -149,13 +115,11 @@ namespace Intersection_Components
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType outbound_movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_movement_reference);} tag_getter(outbound_movement_reference);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			void outbound_movement_reference(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_outbound_movement_reference = (void*)set_value;} tag_setter(outbound_movement_reference);
+			TargetType outbound_link_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_link_reference);} tag_getter(outbound_link_reference);
+			
+			void* _outbound_link_reference;
 
-			void* _outbound_movement_reference;
-
-			typedef link_type outbound_movement_reference_type;
+			typedef link_type outbound_link_reference_type;
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
@@ -177,16 +141,15 @@ namespace Intersection_Components
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType inbound_movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_movement_reference);}
-			tag_setter(inbound_movement_reference);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			void inbound_movement_reference(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_inbound_movement_reference = (void*)set_value;}
 			tag_getter(inbound_movement_reference);
-			
-			void* _inbound_movement_reference;
+
+			movements_container_type _inbound_movement_reference;
+
+
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType outbound_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_movements);}
-			tag_getter(outbound_movements);
+			tag_getter(outbound_link_reference);
 
 			movements_container_type _outbound_movements;
 		};
@@ -220,6 +183,7 @@ namespace Intersection_Components
 
 			member_data_basic(Intersection_Components::Types::Intersection_Type_Keys, intersection_type);
 
+			member_data_basic(Types::Intersection_Simulation_Status, intersection_simulation_status);
 
 
 			typedef vector<Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>*> LinkContainerType;

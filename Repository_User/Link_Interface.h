@@ -14,7 +14,13 @@ namespace Link_Components
 			EXPRESSWAY,
 			ARTERIAL,
 		};
-
+		
+		enum Link_Simulation_Status
+		{
+			NONE_COMPLETE,
+			COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE,
+			COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE
+		};
 	}
 
 	namespace Concepts
@@ -23,10 +29,9 @@ namespace Link_Components
 	
 	namespace Interfaces
 	{
-		
-
 		template<typename ThisType, typename CallerType>
-		struct Turn_Movement_Interface {
+		struct Turn_Movement_Interface
+		{
 			facet_accessor(inbound_link);
 			facet_accessor(outbound_link);
 			facet_accessor(turn_movement_type);
@@ -34,7 +39,8 @@ namespace Link_Components
 			facet_accessor(turn_travel_penalty);
 			facet_accessor(forward_link_turn_travel_time);
 		};
-		
+
+
 		template<typename ThisType,typename CallerType>
 		struct Link_Interface
 		{
@@ -66,8 +72,6 @@ namespace Link_Components
 
 			facet_accessor(inbound_turn_movement_size);
 			facet_accessor(outbound_turn_movement_size);
-			
-
 
 
 			//link state			
@@ -132,9 +136,6 @@ namespace Link_Components
 			facet_accessor(backward_wave_speed);
 			facet_accessor(jam_density);
 			facet_accessor(critical_density);
-
-			//for holding mirror links in routable networks
-			facet_accessor(replicas_container);
 
 			//routing interface
 			facet_accessor(f_cost);
@@ -527,21 +528,8 @@ namespace Link_Components
 				//network_data.link_origin_cumulative_depature_curve_array[outbound_link_index] = this->link_origin_cumulative_departure_vehicles_array[outbound_link_index];
 				//network_data.link_destination_cumulative_arrival_curve_array[outbound_link_index] = this->link_destination_cumulative_arrival_vehicles_array[outbound_link_index];
 			}
-			
-			facet bool link_supply_finished()
-			{
-				return false;
-			}
 
-			facet void link_supply_finished(bool val)
-			{
-
-			}
-
-			facet bool adjacent_compute_flow_finished()
-			{
-				return false;
-			}
+			facet_accessor(link_simulation_status);
 			
 			facet void Initialize()
 			{
@@ -555,16 +543,11 @@ namespace Link_Components
 
 
 
-
 			ADD EVENT REGISTER TO TYPE!!!
 
 
 
-
 			*/
-
-
-
 
 			declare_facet_conditional(Newells_Conditional)
 			{
@@ -576,7 +559,7 @@ namespace Link_Components
 				{
 					//first visit this iteration, update status
 
-					_this->link_simulation_status<Link_Simulation_Status>(NONE_COMPLETE);
+					_this->link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::NONE_COMPLETE);
 
 					if(true)
 					{
@@ -589,13 +572,13 @@ namespace Link_Components
 				{
 					//have visited at least once, link_simulation_status is accurate
 
-					if(_this->link_simulation_status<Link_Simulation_Status>()==COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE)
+					if(_this->link_simulation_status<Types::Link_Simulation_Status>()==Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE)
 					{
 						//have performed "phase 1: Compute_Step_Flow_Supply_Update"
 						
 						typedef typename ThisType::intersection_type intersection_type;
 						typedef Intersection_Components::Interfaces::Intersection_Interface<intersection_type,ThisType> Intersection_Interface;
-						typedef Intersection_Components::Interfaces::Intersection_Simulation_Status intersection_simulation_status_type;
+						typedef Intersection_Components::Types::Intersection_Simulation_Status intersection_simulation_status_type;
 
 						Revision intersection_current_revision=Execution_Object::allocator_template<intersection_type>::allocator_reference.type_current_revision();
 
@@ -647,7 +630,7 @@ namespace Link_Components
 				//step 1: link supply update based on a given traffic flow model
 				_this->link_supply_update<ThisType>();
 
-				_this->link_simulation_status<Link_Simulation_Status>(COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE);
+				_this->link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE);
 			}
 
 			declare_facet_event(Compute_Step_Flow_Link_Moving)
@@ -663,7 +646,7 @@ namespace Link_Components
 				//step 8: link network state update
 				_this->network_state_update<ThisType>();
 
-				_this->link_simulation_status<Link_Simulation_Status>(COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE);
+				_this->link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE);
 			}
 		};
 

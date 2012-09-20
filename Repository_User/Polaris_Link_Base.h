@@ -31,14 +31,14 @@ namespace Link_Components
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType inbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_link;} tag_getter(inbound_link);
 			template<typename ThisType, typename CallerType, typename TargetType>
-			void inbound_link(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_inbound_link=(void*)value;} tag_setter(inbound_link);
+			void inbound_link(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_inbound_link=(TargetType)value;} tag_setter(inbound_link);
 
 			void* _inbound_link;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType outbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_outbound_link;} tag_getter(outbound_link);
 			template<typename ThisType, typename CallerType, typename TargetType>
-			void outbound_link(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_outbound_link=(void*)value;} tag_setter(outbound_link);
+			void outbound_link(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_outbound_link=(TargetType)value;} tag_setter(outbound_link);
 
 			void* _outbound_link;
 
@@ -58,6 +58,7 @@ namespace Link_Components
 		/// Simple Link Members
 		//------------------------------------------------------------------------------------------------------------------
 			member_data_basic(int, uuid);
+			member_data_basic(float, travel_time);
 
 			member_data_basic(int, num_lanes);
 			member_data_basic(float, length);
@@ -113,7 +114,7 @@ namespace Link_Components
 			member_data_basic(float, jam_density);
 			member_data_basic(float, critical_density);
 
-
+			member_data_basic(Types::Link_Simulation_Status, link_simulation_status);
 
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
@@ -123,11 +124,13 @@ namespace Link_Components
 			typedef vector<Interfaces::Turn_Movement_Interface<turn_movements_type, NULLTYPE>*> turn_movements_container_type;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType inbound_turn_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_turn_movements;} tag_getter(inbound_turn_movements);
+			TargetType inbound_turn_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_turn_movements;}
+			tag_getter(inbound_turn_movements);
 			turn_movements_container_type _inbound_turn_movements;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType outbound_turn_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_outbound_turn_movements;} tag_getter(outbound_turn_movements);
+			TargetType outbound_turn_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_outbound_turn_movements;}
+			tag_getter(outbound_turn_movements);
 			turn_movements_container_type _outbound_turn_movements;
 
 
@@ -136,7 +139,8 @@ namespace Link_Components
 		/// Scenario Reference
 		//------------------------------------------------------------------------------------------------------------------
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType scenario_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_scenario_reference);} tag_getter(scenario_reference);
+			TargetType scenario_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_scenario_reference);}
+			tag_getter(scenario_reference);
 			typedef typename MasterType::scenario_type scenario_type;
 			void* _scenario_reference;
 
@@ -148,16 +152,20 @@ namespace Link_Components
 			typedef typename MasterType::intersection_type intersection_type;
 			
 			template<typename ThisType, typename CallerType, typename TargetType>
-			void upstream_intersection(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_upstream_intersection=(TargetType)value;} tag_setter(upstream_intersection);
+			void upstream_intersection(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_upstream_intersection=(TargetType)value;}
+			tag_setter(upstream_intersection);
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType upstream_intersection(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_upstream_intersection;} tag_getter(upstream_intersection);
+			TargetType upstream_intersection(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_upstream_intersection;}
+			tag_getter(upstream_intersection);
 			typedef intersection_type upstream_intersection_type;
 			void* _upstream_intersection;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			void downstream_intersection(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_downstream_intersection=(TargetType)value;}	tag_setter(downstream_intersection);
+			void downstream_intersection(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_downstream_intersection=(TargetType)value;}
+			tag_setter(downstream_intersection);
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType downstream_intersection(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_downstream_intersection;} tag_getter(downstream_intersection);
+			TargetType downstream_intersection(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_downstream_intersection;}
+			tag_getter(downstream_intersection);
 			typedef intersection_type upstream_intersection_type;
 			void* _downstream_intersection;
 			
@@ -170,16 +178,23 @@ namespace Link_Components
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType cached_link_upstream_cumulative_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer) && requires(strip_modifiers(TargetType),is_integral)))
 			{return (TargetType)&(_cached_link_upstream_cumulative_vehicles_array.front());}
+
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType cached_link_upstream_cumulative_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched) && !(requires(TargetType,is_pointer) && requires(strip_modifiers(TargetType),is_integral))))
 			{return (TargetType&)(_cached_link_upstream_cumulative_vehicles_array);}
+ 
 			tag_getter(cached_link_upstream_cumulative_vehicles_array);
+
 			vector<int> _cached_link_upstream_cumulative_vehicles_array;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType cached_link_downstream_cumulative_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)&(_cached_link_downstream_cumulative_vehicles_array.front());}
+
 			tag_getter(cached_link_downstream_cumulative_vehicles_array);
+
 			vector<int> _cached_link_downstream_cumulative_vehicles_array;
+
+
 
 		//==================================================================================================================
 		/// Vehicle Origin Containers
@@ -213,42 +228,11 @@ namespace Link_Components
 			typedef vector<void*> current_vehicle_queue_type;
 			
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType current_vehicle_queue(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_current_vehicle_queue);} tag_getter(current_vehicle_queue);
+			TargetType current_vehicle_queue(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_current_vehicle_queue);}tag_getter(current_vehicle_queue);
+
 			current_vehicle_queue_type _current_vehicle_queue;
-			
-		//==================================================================================================================
-		/// Replicas Containers
-		//------------------------------------------------------------------------------------------------------------------
-			typedef typename MasterType::routable_link_type replicas_container_element_type;
-			typedef vector<void*> replicas_container_type;
-			typedef Link_Components::Interfaces::Link_Interface<replicas_container_element_type, NULLTYPE> replica_interface;
-			
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType replicas_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_replicas_container);} tag_getter(replicas_container);
-			replicas_container_type _replicas_container;
-
-		//==================================================================================================================
-		/// travel_time
-		//------------------------------------------------------------------------------------------------------------------
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType travel_time(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_travel_time);} tag_getter(travel_time);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			void travel_time(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				_travel_time = (int)set_value;
-				// update replicas
-				replicas_container_type::iterator replica_itr;
-				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
-				{
-					replica_interface* replica = (replica_interface*)(*replica_itr);
-					replica->travel_time<float>(_travel_time);
-				}
-			}
-			tag_setter(travel_time);
-
-			int _travel_time;
 		};
-			
+
 	}
 
 	namespace Components
