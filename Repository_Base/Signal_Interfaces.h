@@ -667,7 +667,7 @@ namespace Signal_Components
 			facet_accessor(length_right_turn);		///< Lr (ft)
 			facet_accessor(has_parking);			///<
 
-			//facet_accessor_interface(opposing_lane);
+			facet_accessor_interface(opposing_lane);
 
 			//-------------------------------------
 			//Traffic conditions 
@@ -861,7 +861,7 @@ namespace Signal_Components
 		struct Signal_Interface
 		{
 			//=======================================================
-			// Initialization and Calculations
+			// Initialization
 			//-------------------------------------------------------
 			/// Dispatch the Initialize function call to the component base
 			facet void Initialize(TargetType num_phases)
@@ -878,36 +878,7 @@ namespace Signal_Components
 				schedule_event_local(ThisType,Signal_Check_Conditional, Change_Signal_State, 0, NULLTYPE);
 			}
 
-			/// Add a new lane group to the signal controller
-			facet void Add_Phase(typename TargetType::Interface_Type* new_lane_group)
-			{
-				PTHIS(ThisType)->Add_Lane_Group(new_lane_group);
-			}
-			facet void Display_Timing()
-			{
-				// Simplify ThisType name
-				typedef ThisType T;
-				
-
-				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
-				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = phases->begin();
-
-				
-				ofstream* out = this->output_stream<ofstream*>();		
-				(*out) <<"Cycle Length:\t"<< this->cycle_length<Data_Structures::Time_Second>();
-				
-				int i=0; 
-				for (itr; itr != phases->end(); itr++, i++)
-				{
-					(*out) <<"\t"<<"Phase "<<i+1<<":\t";
-					(*out) <<"Green:\t"<<(*phases)[i]->green_time<Data_Structures::Time_Second>()<<"\t";
-					(*out) <<"Yellow/red:\t"<<(*phases)[i]->yellow_and_all_red_time<Data_Structures::Time_Second>()<<"\t";
-				}
-				(*out)<<endl;
-				
-			}
-
+			
 			//=======================================================
 			// HCM Retiming calculations
 			//-------------------------------------------------------
@@ -961,15 +932,20 @@ namespace Signal_Components
 				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
 				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = phases->begin();
 
+				ofstream* out = this->output_stream<ofstream*>();
+
 				// Sum total lost time and critical vs for all phases
 				float lost_time = 0;
 				float critical_sum = 0;
+				float vol;
 				for (itr; itr != phases->end(); itr++)
 				{
 					(*itr)->Update_Demand<Data_Structures::Time_Second>(iteration);
 
 					lost_time += (*itr)->yellow_and_all_red_time<Data_Structures::Time_Second>();
-					critical_sum += (*itr)->Find_Critical_Phase_Volume<Data_Structures::Flow_Per_Hour>();
+					vol = (*itr)->Find_Critical_Phase_Volume<Data_Structures::Flow_Per_Hour>();
+					if (out != NULL) (*out) << "\t"<<vol;
+					critical_sum += vol;
 				}
 
 				//---------------------------------------------------------------------------------------------
@@ -1013,6 +989,33 @@ namespace Signal_Components
 				assert_requirements(ThisType, Concepts::Is_HCM_Full_Solution, "Your SignalType does not specify a full HCM solution, and");
 				assert_requirements(ThisType, Concepts::Is_HCM_Full_Solution, "Your SignalType does not specify a simple HCM solution");
 				assert_requirements_2(ThisType::Phase_Interface&, Interfaces::Phase_Interface&, is_convertible, "Your ThisType::Phase_Interface specifies can not be cast to a Interface::Phase_Interface.");
+			}
+			facet void Display_Timing()
+			{
+				// Simplify ThisType name
+				typedef ThisType T;
+				
+
+				// Get reference to the phases in the signal phase diagram
+				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
+				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = phases->begin();
+
+				
+				ofstream* out = this->output_stream<ofstream*>();		
+
+				if (out == NULL) return;
+
+				(*out) <<"Cycle Length:\t"<< this->cycle_length<Data_Structures::Time_Second>();
+				
+				int i=0; 
+				for (itr; itr != phases->end(); itr++, i++)
+				{
+					(*out) <<"\t"<<"Phase "<<i+1<<":\t";
+					(*out) <<"Green:\t"<<(*phases)[i]->green_time<Data_Structures::Time_Second>()<<"\t";
+					(*out) <<"Yellow/red:\t"<<(*phases)[i]->yellow_and_all_red_time<Data_Structures::Time_Second>()<<"\t";
+				}
+				(*out)<<endl;
+				
 			}
 
 
@@ -1126,24 +1129,21 @@ namespace Signal_Components
 				int active_phase = _this->active_phase<int>();
 				phase = (*phases)[active_phase];
 
-				// wait until green time for current phase is expired then continue
+				// If state of active phase is RED (i.e. All Red) Change current phase to Green (Each phases starts in all red)
 				if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::RED)
 				{
 					phase->signal_state<Data_Structures::Signal_State>(Data_Structures::GREEN);
 					_this->Next_Event_Iteration<int>(iteration + (int)phase->green_time<Data_Structures::Time_Second>());
 				}
+
+				// Else If state of active phase is GREEN change current phase to YELLOW
 				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN)
 				{
-					// change active phase state
-					//phase->signal_state<Data_Structures::Signal_State>(Data_Structures::RED);
 					phase->signal_state<Data_Structures::Signal_State>(Data_Structures::YELLOW);
 					_this->Next_Event_Iteration<int>(iteration + (int)phase->yellow_and_all_red_time<Data_Structures::Time_Second>()-2);
-
-					// Move to next phase
-					//active_phase++;
-					//if (active_phase >= phases->size()) active_phase=0;
-					//_this->active_phase<int>(active_phase);
 				}
+
+				// Else if active phase is YELLOW, change state to RED and transition to next phase (Start of next all read period)
 				else
 				{
 					phase->signal_state<Data_Structures::Signal_State>(Data_Structures::RED);
@@ -1155,27 +1155,37 @@ namespace Signal_Components
 					_this->active_phase<int>(active_phase);
 				}
 
+				// Set has fired to true, indicates signal events done for current iteration
 				_this->Event_Has_Fired<bool>(true);
-				
-
 			}
 			declare_facet_event(Change_Signal_Timing)
 			{
 				// Get Current Interface
 				typedef ThisType T;
 				Signal_Interface<ThisType,NULLTYPE>* _this = (Signal_Interface<ThisType,NULLTYPE>*)pthis;
+
+				// Call the routine to update the signal timing
 				_this->Update_Timing<Data_Structures::Time_Second>();
+
+				// Indicate that the routine has been performed so that control can pass to the 'Change_Signal_State' routine
 				_this->Timing_Event_Has_Fired<bool>(true);
 
-				ofstream* out = _this->output_stream<ofstream*>();
 
-				//(*out) <<endl<<endl<<"===================================================================";
-				//(*out) <<endl<<" CHANGE SIGNAL TIMING CALLED ";
-				//(*out) <<endl<<"==================================================================="<<endl<<endl;
-				(*out) << iteration<<"\t";
-				_this->Display_Timing<NULLTYPE>();
-				//(*out) <<endl<<"==================================================================="<<endl<<endl;
+				// Display the signal information if the output stream is not null
+				ofstream* out = _this->output_stream<ofstream*>();
+				if (out != NULL)
+				{
+					//(*out) <<endl<<endl<<"===================================================================";
+					//(*out) <<endl<<" CHANGE SIGNAL TIMING CALLED ";
+					//(*out) <<endl<<"==================================================================="<<endl<<endl;
+					(*out) <<"\t"<< iteration<<"\t";
+					_this->Display_Timing<NULLTYPE>();
+					//(*out) <<endl<<"==================================================================="<<endl<<endl;
+				}
 			}
+			//--------------------------------------------
+			// Signal Event timing and iteration accessors
+			//--------------------------------------------
 			facet_accessor(Next_Event_Iteration);
 			facet_accessor(Next_Timing_Event_Iteration);
 			facet_accessor(Event_Has_Fired);
@@ -1209,7 +1219,6 @@ namespace Signal_Components
 			facet_accessor(Phases);
 			// phf for the signal as a whole
 			facet_accessor(peak_hour_factor);
-
 			// Currently active (green) signal phase
 			facet_accessor(active_phase);
 		};
@@ -1257,17 +1266,13 @@ namespace Signal_Components
 			}
 
 			// Signal Interface accessor
-			//facet_accessor_interface(Signal);
+			facet_accessor_interface(Signal);
 			facet_accessor(Conditional_Has_Fired);
 			facet_accessor(output_stream);
 
 			// Event definition
 			declare_facet_conditional(Signal_Indicator_Conditional)
 			{
-				//response.result = false;
-				//response.next = iteration+1;
-				//return;
-
 				// Get Current Interface
 				Signal_Indicator_Interface<ThisType,NULLTYPE>* _this=(Signal_Indicator_Interface<ThisType,NULLTYPE>*)pthis;
 
@@ -1278,36 +1283,12 @@ namespace Signal_Components
 				{
 					response.result = false;
 					response.next = iteration;
-
-					//if (_this->Conditional_Has_Fired<bool>() == false)
-					//{
-					//	response.result = false;
-					//	response.next = iteration;
-					//	_this->Conditional_Has_Fired<bool>(true);
-					//}
-					//else
-					//{
-					//	response.result = true;
-					//	response.next = iteration + 1;
-					//	_this->Conditional_Has_Fired<bool>(false);
-					//}
 				}
 				else
 				{
 					response.result = true;
 					response.next = iteration + 1;
 				}
-
-				//if (signal->Next_Event_Iteration<int>() == iteration && signal->Event_Has_Fired<bool>()==false)
-				//{
-				//	response.result=false;
-				//	response.next=iteration;
-				//}
-				//else
-				//{
-				//	response.result=true;
-				//	response.next=iteration+1;
-				//}
 			}
 			declare_facet_event(Signal_Indicator_Event)
 			{
@@ -1322,17 +1303,19 @@ namespace Signal_Components
 				vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>* phases = signal->Phases<vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>*>();
 				vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>::iterator itr = phases->begin();
 
-				(*out) <<endl<<"ITERATION: " <<iteration;
-
-				int i;
-				for (itr, i=0; itr != phases->end(); itr++, i++)
+				// Display the signal state info if the output stream is not null
+				if (out != NULL)
 				{
-					char* signal_status = "RED   ";
-					if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = "GREEN ";
-					else if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = "YELLOW";
-					(*out) <<", Phase "<<i<<": "<<signal_status;
+					(*out) <<endl<<"ITERATION: " <<iteration;
+					int i;
+					for (itr, i=0; itr != phases->end(); itr++, i++)
+					{
+						char* signal_status = "RED   ";
+						if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = "GREEN ";
+						else if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = "YELLOW";
+						(*out) <<", Phase "<<i<<": "<<signal_status;
+					}
 				}
-
 			}
 		};
 
