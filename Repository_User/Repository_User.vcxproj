@@ -126,10 +126,14 @@
     <ClInclude Include="Polaris_Intersection_Base.h" />
     <ClInclude Include="Polaris_Link_Base.h" />
     <ClInclude Include="Polaris_Network_Base.h" />
+    <ClInclude Include="Polaris_Routing_Base.h" />
     <ClInclude Include="Polaris_Scenario_Base.h" />
+    <ClInclude Include="Polaris_Traveler_Base.h" />
     <ClInclude Include="Polaris_Vehicle_Base.h" />
     <ClInclude Include="Repository_User.h" />
     <ClInclude Include="Repository_User_Includes.h" />
+    <ClInclude Include="Routable_Intersection_Base.h" />
+    <ClInclude Include="Routable_Link_Base.h" />
     <ClInclude Include="Routing_Interface.h" />
     <ClInclude Include="Scenario_Interface.h" />
     <ClInclude Include="Transims_Demand_API.h" />
