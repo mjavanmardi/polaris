@@ -20,53 +20,35 @@ namespace Traveler_Components
 			//========================================================================================================
 			//start implementation of member_data(Routing_Interface*, routing)
 			//--------------------------------------------------------------------------------------------------------
-		public:
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType routing(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				_routing = (void *)(set_value);
-			}
-			
-			tag_setter(routing);
+			void router(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_router = (void *)(set_value);}
+			tag_setter(router);
 			
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType routing(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_routing);
-			}
-
-			tag_getter(routing);
+			TargetType router(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_router);}
+			tag_getter(router);
 			
+			void* _router;
 			typedef typename MasterType::routing_type routing_type;
 
-		protected:
-			void* _routing;
+
 			//end
 			//--------------------------------------------------------------------------------------------------------
 
 			//========================================================================================================
 			//start implementation of member_data(Vehicle_Interface*, vehicle)
 			//--------------------------------------------------------------------------------------------------------
-		public:
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType vehicle(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				_vehicle = (void *)(set_value);
-			}
-			
-			tag_setter(routing);
-			
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType routing(call_requirements(requires(ThisType,Is_Dispatched)))
-			{
-				return (TargetType)(_vehicle);
-			}
 
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void vehicle(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_vehicle = (void *)(set_value);}
+			tag_setter(vehicle);
+			
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType vehicle(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_vehicle);}
 			tag_getter(vehicle);
 			
 			typedef typename MasterType::vehicle_type vehicle_type;
 
-		protected:
 			void* _vehicle;
 			//end
 			//--------------------------------------------------------------------------------------------------------
@@ -75,6 +57,10 @@ namespace Traveler_Components
 
 	namespace Components
 	{
-		typedef Polaris_Component<Traveler_Components::Interfaces::Traveler_Interface, Traveler_Components::Bases::Polaris_Traveler_Base> Polaris_Traveler_Component;
+		template<typename MasterType>
+		struct Polaris_Traveler_Component
+		{
+			typedef Polaris_Component<Traveler_Components::Interfaces::Traveler_Interface, Traveler_Components::Bases::Polaris_Traveler_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
 	}
 }
