@@ -21,7 +21,7 @@ namespace Link_Components
 
 			typedef typename MasterType::link_type network_link_type;
 
-
+			member_data_basic(int, uuid);
 			member_data_basic(float, travel_time);
 			member_data_basic(float, f_cost);
 			member_data_basic(float, h_cost);
