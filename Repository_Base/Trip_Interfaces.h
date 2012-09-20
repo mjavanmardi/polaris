@@ -27,23 +27,18 @@ namespace Trip_Components
 	}
 	namespace Interfaces
 	{
+		template<typename ThisType, typename CallerType>
 		struct Trip_Interface
 		{
 			/// Tells everyone that this interface is a trip type
 			typedef Types::TripType TripType ;
+			typedef ThisType This_Type;
 
 			/// Trip Initializers requires valid Time and Location Types
-			template<typename ThisType, typename CallerType, typename TimeType, typename LocationType>
-			void Initialize(int ID, typename TimeType::Interface_Type* start_time_val, typename TimeType::Interface_Type* end_time_val, typename LocationType::Interface_Type* origin, typename LocationType::Interface_Type* destination, call_requirements(
-				(requires(ThisType, Is_Dispatchable))))
+			facet void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
+				(requires(ThisType, Is_Dispatchable) && requires(TargetType, Is_Target_Type_Struct))))
 			{
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TimeType,LocationType>(ID,start_time_val, end_time_val, origin, destination);
-			}
-			template<typename ThisType, typename CallerType, typename IDType, typename TimeStructType, typename LocationStructType>
-			void Initialize(IDType ID, TimeStructType start_time_struct, TimeStructType end_time_struct, LocationStructType origin_struct, LocationStructType destination_struct, call_requirements(
-				(requires(ThisType, Is_Dispatchable))))
-			{
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,IDType,TimeStructType,LocationStructType>(ID,start_time_struct, end_time_struct, origin_struct, destination_struct);
+				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(ID,start_time_val, end_time_val, origin, destination);
 			}
 		
 

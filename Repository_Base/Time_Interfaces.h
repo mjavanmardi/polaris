@@ -33,54 +33,48 @@ namespace Time_Components
 		concept Has_Time
 		{
 			begin_requirements_list;
-			//requires_named_member(none,Time,"An arithmetic 'Time' data member has not been defined.");
-			requires_concept_checked_member(none, Time, is_arithmetic,"An arithmetic 'Time' data member has not been defined.");
-
-			end_requirements_list(Time);
+			requires_typename_state(none,TimeType,true_type,"Type is not a Time data structure");
+			//requires_concept_checked_member(TimeType, value, is_arithmetic,"An arithmetic 'Time' data member has not been defined.");
+			end_requirements_list(TimeType);
 		};
 		/// Check if initializing struct is tagged as DRSeconds (i.e. 1/10th of a second)
 		concept Time_In_DRSeconds
 		{
 			begin_requirements_list;
-
-			requires_typename_state(none,DRSeconds,true_type,"Type is not in DRSeconds");
-	
+			requires_concept(none,Has_Time);
+			requires_typename_state(Has_Time,DRSeconds,true_type,"Type is not in DRSeconds");
 			end_requirements_list(DRSeconds);
 		};
 		/// Check if initializing struct is tagged as Seconds
 		concept Time_In_Seconds
 		{
 			begin_requirements_list;
-
-			requires_typename_state(none,Seconds,true_type,"Type is not in Seconds");
-	
+			requires_concept(none,Has_Time);
+			requires_typename_state(Has_Time,Seconds,true_type,"Type is not in Seconds");
 			end_requirements_list(Seconds);
 		};
 		/// Check if initializing struct is tagged as Minutes
 		concept Time_In_Minutes
 		{
 			begin_requirements_list;
-
-			requires_typename_state(none,Minutes,true_type,"Type is not in Minutes");
-	
+			requires_concept(none,Has_Time);
+			requires_typename_state(Has_Time,Minutes,true_type,"Type is not in Minutes");
 			end_requirements_list(Minutes);
 		};
 		/// Check if initializing struct is tagged as Hours
 		concept Time_In_Hours
 		{
 			begin_requirements_list;
-
-			requires_typename_state(none,Hours,true_type,"Type is not in Hours");
-	
+			requires_concept(none,Has_Time);
+			requires_typename_state(Has_Time,Hours,true_type,"Type is not in Hours");
 			end_requirements_list(Hours);
 		};
 		/// Check if initializing struct is tagged as Days
 		concept Time_In_Days
 		{
 			begin_requirements_list;
-
-			requires_typename_state(none,Days,true_type,"Type is not in Hours");
-	
+			requires_concept(none,Has_Time);
+			requires_typename_state(Has_Time,Days,true_type,"Type is not in Hours");
 			end_requirements_list(Days);
 		};
 		/// Check if a type meets the requirements of being a basic 'Time' class
@@ -99,19 +93,21 @@ namespace Time_Components
 		//=============================================================
 		/// Basic Time Interface
 		/// This is the core time object in polaris.  It implements, initialization, addition, display and conversion routines
+		template<typename ThisType, typename CallerType>
 		struct Time_Interface
 		{
 			/// Communicates that this time interface is a time type
+			typedef ThisType This_Type;
 			typedef true_type TimeType;
 
 			/// Initializer
-			facet void Initialize(TargetType& t, call_requires(ThisType,Is_Dispatchable))
+			facet void Initialize(TargetType t, call_requires(ThisType,Is_Dispatchable))
 			{
 				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(t);
 			}
 
 			/// Adding time
-			facet void Add_Time(TargetType& t, call_requires(ThisType,Is_Dispatchable))
+			facet void Add_Time(TargetType t, call_requires(ThisType,Is_Dispatchable))
 			{
 				return PTHIS(ThisType)->Add_Time<Dispatch<ThisType>,CallerType,TargetType>(t);
 			}
@@ -119,84 +115,18 @@ namespace Time_Components
 			/// Display the time
 			facet void Write()
 			{
-				Time_Interface* pthis = PTHIS(ThisType);
 				//cout <<"Total Seconds: "<<pthis->Total_Seconds<ThisType, CallerType, TargetType>()<<endl;
-				cout << "Day "<< pthis->Days<ThisType, CallerType, TargetType>()<<":  ";
-				cout << pthis->Hours<ThisType, CallerType, TargetType>()<<":"<<pthis->Minutes<ThisType, CallerType, TargetType>()<<":"<<pthis->Seconds<ThisType, CallerType, TargetType>()<<"."<< pthis->DRseconds<ThisType, CallerType, TargetType>();
-			}
-
-			//===========================================================================
-			/// Convert base time to Days.  Requires that Time_Base has a 'Total_Seconds' accessor to convert base time to seconds
-			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Concepts::Time_In_Days)))
-			{
-				OutputTimeStructType t;
-				t.Time = this->Total_Seconds<ThisType, ThisType, OutputTimeStructType::Value_Type>() / (OutputTimeStructType::Value_Type)86400.0;
-				return t ;
-			}
-			/// Convert base time to Hours.  Requires that Time_Base has a 'Total_Seconds' accessor to convert base time to seconds
-			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Concepts::Time_In_Hours)))
-			{
-				OutputTimeStructType t;
-				t.Time = this->Total_Seconds<ThisType, ThisType, OutputTimeStructType::ValueType>() / (OutputTimeStructType::ValueType)1440.0;
-				return t ;
-			}
-			/// Convert base time to Minutes.  Requires that Time_Base has a 'Total_Seconds' accessor to convert base time to seconds
-			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Concepts::Time_In_Minutes)))
-			{
-				OutputTimeStructType t;
-				t.Time = this->Total_Seconds<ThisType, ThisType, OutputTimeStructType::Value_Type>() / (OutputTimeStructType::Value_Type)60.0;
-				return t ;
-			}
-			/// Convert base time to Seconds.  Requires that Time_Base has a 'Total_Seconds' accessor to convert base time to seconds
-			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Concepts::Time_In_Seconds)))
-			{
-				OutputTimeStructType t;
-				t.Time = this->Total_Seconds<ThisType, ThisType, OutputTimeStructType::Value_Type>();
-				return t ;
-			}
-			/// Convert base time to DRSeconds.  Requires that Time_Base has a 'Total_Seconds' accessor to convert base time to seconds
-			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, is_arithmetic) && requires(OutputTimeStructType,Concepts::Time_In_DRSeconds)))
-			{
-				OutputTimeStructType t;
-				t.Time = this->Total_Seconds<ThisType, ThisType, OutputTimeStructType::ValueType>() * (OutputTimeStructType::ValueType)10.0;
-				return t ;
-			}
-			//===========================================================================
-			/// Time conversion error handler.
-			/// Either the requested OutputTimeStructType was not valid, or the requested TargetType was non-arithmetic
-			template <typename ThisType, typename CallerType, typename OutputTimeStructType>
-			OutputTimeStructType Convert_Time(call_requirements(requires(typename OutputTimeStructType::ValueType, !is_arithmetic) || (
-				requires(OutputTimeStructType,!Concepts::Time_In_Days) &&
-				requires(OutputTimeStructType,!Concepts::Time_In_Hours) &&
-				requires(OutputTimeStructType,!Concepts::Time_In_Minutes) &&
-				requires(OutputTimeStructType,!Concepts::Time_In_Seconds) &&
-				requires(OutputTimeStructType,!Concepts::Time_In_DRSeconds)
-				)))
-			{
-				TargetType t;
-				t = (TargetType)this->Total_Seconds<ThisType, ThisType, TargetType>();
-				return  t * (TargetType)10.0;
+				cout << "Day "<< this->Time_Component<Data_Structures::Time_Days>()<<":  ";
+				cout << this->Time_Component<Data_Structures::Time_Hours>()<<":"<<this->Time_Component<Data_Structures::Time_Minutes>()<<":"<<this->Time_Component<Data_Structures::Time_Seconds>()<<"."<< this->Time_Component<Data_Structures::Time_DRSeconds>();
 			}
 
 			//================================================================================================
 			// Time value accessors for:
-			/// Days accessor - returns the Days portion of the time
-			facet_accessor(Days);
-			/// Returns the hours portion of the time i.e. if time was 14:23:10, would return (TargetType)14
-			facet_accessor(Hours);
-			/// Returns the hours portion of the time i.e. if time was 14:23:10, would return (TargetType)23
-			facet_accessor(Minutes);
-			/// Returns the hours portion of the time i.e. if time was 14:23:10, would return (TargetType)10
-			facet_accessor(Seconds);
-			/// Returns the hours portion of the time i.e. if time was 14:23:10.5, would return (TargetType)5
-			facet_accessor(DRseconds);
-			/// Returns the absolute time converted to seconds i.e. if time was 'Day 2, 14:23:10.5', would return (TargetType)(2*86400 + 14*3600 + 23*60 + 10.5)
-			facet_accessor(Total_Seconds);
+			//------------------------------------------------------------------------------------------------
+			/// Time component accessor - returns the requested portion of the current time
+			facet_accessor(Time_Component);
+			/// Returns the value of the current time converted to the requested time units
+			facet_accessor(Total_Time);
 		};
 	}		
 	//=============================================================
@@ -208,41 +138,10 @@ namespace Time_Components
 	/// than using only basic value types.
 	namespace Data_Structures
 	{
-		/// Time in DRSeconds
-		struct Time_DRSeconds
-		{
-			typedef Types::Time_Types::DRSeconds DRSeconds;
-			typedef float ValueType;
-			ValueType Time;
-		};
-		/// Time in Seconds
-		struct Time_Seconds
-		{
-			typedef Types::Time_Types::Seconds Seconds;
-			typedef float ValueType;
-			ValueType Time;
-		};
-		/// Time in Minutes
-		struct Time_Minutes
-		{
-			typedef Types::Time_Types::Minutes Minutes;
-			typedef float ValueType;
-			ValueType Time;
-		};
-		/// Time in Hours
-		struct Time_Hours
-		{
-			typedef Types::Time_Types::Hours Hours;
-			typedef float ValueType;
-			ValueType Time;
-		};
-		/// Time in Days
-		struct Time_Days
-		{
-			typedef Types::Time_Types::Days Days;
-			typedef float ValueType;
-			ValueType Time;
-		};
-
+		Basic_Data_Struct(Time_DRSeconds,float,TimeType,DRSeconds);
+		Basic_Data_Struct(Time_Seconds,float,TimeType,Seconds);
+		Basic_Data_Struct(Time_Minutes,float,TimeType,Minutes);
+		Basic_Data_Struct(Time_Hours,float,TimeType,Hours);
+		Basic_Data_Struct(Time_Days,float,TimeType,Days);
 	}
 }

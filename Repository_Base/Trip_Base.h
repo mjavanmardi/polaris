@@ -13,205 +13,83 @@ namespace Trip_Components
 
 			///====================================================================
 			/// Trip Initializers requires valid Time and Location Types
-			template<typename ThisType, typename CallerType, typename TimeType, typename LocationType>
-			void Initialize(int ID, typename TimeType::Interface_Type* start_time_val, typename TimeType::Interface_Type* end_time_val, typename LocationType::Interface_Type* origin, typename LocationType::Interface_Type* destination, call_requirements(
+			facet_base void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
 				requires(ThisType,Is_Dispatched) &&
-				requires(TimeType,Time_Components::Concepts::Is_Time) &&
-				requires(LocationType,Location_Components::Concepts::Is_Location)))
+				requires(typename TargetType::ParamType, is_arithmetic) &&
+				requires(strip_modifiers(typename TargetType::Param2Type),Time_Components::Concepts::Is_Time) &&
+				requires(strip_modifiers(typename TargetType::Param3Type),Location_Components::Concepts::Is_Location)))
 			{
-				this->ID<ThisType,ThisType,int>(ID);
-				this->Start_Time<ThisType,TimeType>(start_time_val);
-				this->End_Time<ThisType,TimeType>(end_time_val);
-				this->Origin<ThisType,LocationType>(origin);
-				this->Destination<ThisType,LocationType>(destination);
-
+				this->_ID = ID;
+				this->Start_Time<ThisType, NULLTYPE, strip_modifiers(TargetType::Param2Type)::This_Type>(start_time_val);
+				this->End_Time<ThisType, NULLTYPE, strip_modifiers(TargetType::Param2Type)::This_Type>(end_time_val);
+				this->Origin<ThisType, NULLTYPE, strip_modifiers(TargetType::Param3Type)::This_Type>(origin);
+				this->Destination<ThisType, NULLTYPE, strip_modifiers(TargetType::Param3Type)::This_Type>(destination);
 			}
-			template<typename ThisType, typename CallerType, typename TimeType, typename LocationType>
-			void Initialize(int ID, typename TimeType::Interface_Type* start_time_val, typename TimeType::Interface_Type* end_time_val, typename LocationType::Interface_Type* origin, typename LocationType::Interface_Type* destination, call_requirements(
+
+			facet_base void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
+				requires(ThisType,Is_Dispatched) &&
+				requires(typename TargetType::ParamType, is_arithmetic) &&
+				requires(strip_modifiers(typename TargetType::Param2Type),Time_Components::Concepts::Has_Time) &&
+				requires(strip_modifiers(typename TargetType::Param3Type),Location_Components::Concepts::Is_Transims_Location)))
+			{
+				this->_ID = (int)ID;
+				
+				this->_Origin = (Location_Components::Components::Location::Interface_Type<Location_Components::Components::Location>::type*)Allocate<Location_Components::Components::Location>();
+				this->_Origin->Initialize<typename TargetType::Param3Type>(origin);
+
+				this->_Destination = (Location_Components::Components::Location::Interface_Type<Location_Components::Components::Location>::type*)Allocate<Location_Components::Components::Location>();
+				this->_Destination->Initialize<typename TargetType::Param3Type>(destination);
+
+				this->_Start_Time = (Time_Components::Components::Time::Interface_Type<Time_Components::Components::Time>::type*)Allocate<Time_Components::Components::Time>();
+				this->_Start_Time->Initialize<typename TargetType::Param2Type>(start_time_val);
+
+				this->_End_Time = (Time_Components::Components::Time::Interface_Type<Time_Components::Components::Time>::type*)Allocate<Time_Components::Components::Time>();
+				this->_End_Time->Initialize<typename TargetType::Param2Type>(end_time_val);
+			}
+
+			facet_base void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
 				requires(ThisType,!Is_Dispatched) ||
-				requires(TimeType,!Time_Components::Concepts::Is_Time) ||
-				requires(LocationType,!Location_Components::Concepts::Is_Location)))
+				requires(typename TargetType::ParamType, !is_arithmetic) ||
+				(requires(strip_modifiers(typename TargetType::Param2Type),!Time_Components::Concepts::Has_Time) && requires(strip_modifiers(typename TargetType::Param2Type), !Time_Components::Concepts::Is_Time)) ||
+				(requires(strip_modifiers(typename TargetType::Param3Type),!Location_Components::Concepts::Is_Transims_Location) && requires(strip_modifiers(typename TargetType::Param3Type),!Location_Components::Concepts::Is_Location))))
 			{
 				assert_requirements(ThisType, Is_Dispatched, " - ThisType is not dispatched - ");
-				assert_requirements(TimeType, Time_Components::Concepts::Is_Time, " - TimeType is not a Time Type - ");
-				assert_requirements(LocationType, Location_Components::Concepts::Is_Location, " - LocationType is not a Location Type - ");
-			}		
-			template<typename ThisType, typename CallerType, typename IDType, typename TimeStructType, typename LocationStructType>
-			void Initialize(IDType ID, TimeStructType start_time_struct, TimeStructType end_time_struct, LocationStructType origin_struct, LocationStructType destination_struct, call_requirements(
-				requires(ThisType,Is_Dispatched) &&
-				requires(TimeStructType,Time_Components::Concepts::Has_Time) &&
-				(requires(LocationStructType,Location_Components::Concepts::Is_Transims_Location) || requires(LocationStructType,Location_Components::Concepts::Is_Vadim_Location))))
-			{
-				this->_id = (int)ID;
-
-				this->_orig = Allocate<Location_Components::Components::Location>();
-				this->_orig->Initialize<Location_Components::Components::Location,ThisType,LocationStructType>(origin_struct);
-
-				this->_dest = Allocate<Location_Components::Components::Location>();
-				this->_dest->Initialize<Location_Components::Components::Location,ThisType,LocationStructType>(destination_struct);
-
-				this->_start = Allocate<Time_Components::Components::Time>();
-				this->_start->Initialize<Time_Components::Components::Time,ThisType,TimeStructType>(start_time_struct);
-
-				this->_end = Allocate<Time_Components::Components::Time>();
-				this->_end->Initialize<Time_Components::Components::Time,ThisType,TimeStructType>(end_time_struct);
-			}
-			template<typename ThisType, typename CallerType, typename IDType, typename TimeStructType, typename LocationStructType>
-			void Initialize(IDType ID, TimeStructType start_time_struct, TimeStructType end_time_struct, LocationStructType origin_struct, LocationStructType destination_struct, call_requirements(
-				requires(ThisType,!Is_Dispatched) ||
-				requires(TimeStructType,!Time_Components::Concepts::Has_Time) ||
-				(requires(LocationStructType,!Location_Components::Concepts::Is_Transims_Location) && requires(LocationStructType,!Location_Components::Concepts::Is_Vadim_Location))))
-			{
-				assert_requirements(ThisType, Is_Dispatched, " - ThisType is not dispatched - ");
-				assert_requirements(TimeStructType, Time_Components::Concepts::Has_Time, " - TimeType is not a Time Type - ");
-				assert_requirements(LocationType, Location_Components::Concepts::Is_Location, " - LocationType is not a Location Type - ");
+				assert_requirements_std(typename TargetType::ParamType, is_arithmetic, " - TargetType::ParamType is not arithmetic - ");
+				assert_requirements(strip_modifiers(typename TargetType::Param2Type), Time_Components::Concepts::Has_Time, " - TimeType is not a Time Type - ");
+				assert_requirements(strip_modifiers(typename TargetType::Param3Type), Location_Components::Concepts::Is_Location, " - LocationType is not a Location Type - ");
 			}		
 
 
-			///====================================================================
+			//==================================================================================================================
+			// Trip Component Accessors and local data members
+			//------------------------------------------------------------------------------------------------------------------
 			/// Local ID Variable
-			int _id;
-			declare_facet_getter(ID,requires(ThisType,Is_Dispatched)&&requires(TargetType,is_arithmetic))
-			{
-				return (TargetType)_id;
-			}
-			facet TargetType ID(call_requirements(requires(ThisType,!Is_Dispatched)||requires(TargetType,!is_arithmetic)))
-			{
-				assert_requirements(ThisType, Is_Dispatched, "Your ThisType is not dispatched");
-				assert_requirements(TargetType, is_arithmetic, "Your TargetType is not arithmetic");
-			}
-			declare_facet_setter(ID,requires(ThisType,Is_Dispatched)&&requires(TargetType,is_arithmetic))
-			{
-				_id = (int)set_value;
-			}
-			facet TargetType ID(TargetType set_value, call_requirements(requires(ThisType,!Is_Dispatched)||requires(TargetType,!is_arithmetic)))
-			{
-				assert_requirements(ThisType, Is_Same_Component, "Invalid access, Set Accessor can only be called by same component");
-				assert_requirements(ThisType, Is_Dispatched, "Your ThisType is not dispatched");
-				assert_requirements(TargetType, is_arithmetic, "Your TargetType is not arithmetic");
-			}
-
-			///====================================================================
+			member_data(int, ID, requires(TargetType,is_arithmetic), requires(TargetType,is_arithmetic));
+			///-------------------------------------------------------------------
 			/// Trip start and end time variables
-			Time_Components::Interfaces::Time_Interface* _start;
-			tag_getter(Start_Time);
-			tag_setter(Start_Time);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			typename TargetType::Interface_Type* Start_Time(call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,Time_Components::Concepts::Is_Time)))
-			{
-				return (TargetType::Interface_Type*)_start;
-			}
-			template<typename ThisType, typename CallerType, typename TargetType>
-			typename TargetType::Interface_Type* Start_Time(call_requirements(requires(ThisType,!Is_Dispatched)||requires(TargetType,!Time_Components::Concepts::Is_Time)))
-			{
-				assert_requirements(ThisType, Is_Dispatched, "Your ThisType is not dispatched");
-				assert_requirements(TargetType, Time_Components::Concepts::Is_Time, "Your TargetType is not a valid TimeType");
-			}
-			template<typename ThisType, typename TargetType>
-			void Start_Time(typename TargetType::Interface_Type* set_value, call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,Time_Components::Concepts::Is_Time)))
-			{
-				_start = (Time_Components::Interfaces::Time_Interface*)set_value;
-			}
-			template<typename ThisType, typename TargetType>
-			void Start_Time(typename TargetType::Interface_Type* set_value, call_requirements(requires(ThisType,!Is_Dispatched)||requires(TargetType,!Time_Components::Concepts::Is_Time)))
-			{
-				assert_requirements(ThisType, Is_Dispatched, "Your ThisType is not dispatched");
-				assert_requirements(TargetType, Time_Components::Concepts::Is_Time, "Your TargetType is not a valid TimeType");
-			}
-
-			Time_Components::Interfaces::Time_Interface* _end;
-			tag_getter(End_Time);
-			tag_setter(End_Time);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			typename TargetType::Interface_Type* End_Time(call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,Time_Components::Concepts::Is_Time)))
-			{
-				return (TargetType::Interface_Type*)_end;
-			}
-			template<typename ThisType, typename CallerType, typename TargetType>
-			typename TargetType::Interface_Type* End_Time(call_requirements(requires(ThisType,!Is_Dispatched)&&requires(TargetType,!Time_Components::Concepts::Is_Time)))
-			{
-				assert_requirements(ThisType, Is_Dispatched, "Your ThisType is not dispatched");
-				assert_requirements(TargetType, Time_Components::Concepts::Is_Time, "Your TargetType is not a valid TimeType");
-			}
-			template<typename ThisType, typename TargetType>
-			void End_Time(typename TargetType::Interface_Type* set_value, call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,Time_Components::Concepts::Is_Time)))
-			{
-				_end = (Time_Components::Interfaces::Time_Interface*)set_value;
-			}
-			template<typename ThisType, typename TargetType>
-			void End_Time(typename TargetType::Interface_Type* set_value, call_requirements(requires(ThisType,!Is_Dispatched)&&requires(TargetType,!Time_Components::Concepts::Is_Time)))
-			{
-				assert_requirements(ThisType, Is_Dispatched, "Your ThisType is not dispatched");
-				assert_requirements(TargetType, Time_Components::Concepts::Is_Time, "Your TargetType is not a valid TimeType");
-			}
-
-			///====================================================================
-			/// Trip origin and destination location variables
-			Location_Components::Interfaces::Location_Interface* _orig;
-			tag_getter(Origin);
-			tag_setter(Origin);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			typename TargetType::Interface_Type* Origin(call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,Location_Components::Concepts::Is_Location)))
-			{
-				return (TargetType::Interface_Type*)_orig;
-			}
-			template<typename ThisType, typename CallerType, typename TargetType>
-			typename TargetType::Interface_Type* Origin(call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,!Location_Components::Concepts::Is_Location)))
-			{
-				assert_requirements(TargetType, Time_Components::Concepts::Is_Time, "Your TargetType is not a valid TimeType");
-			}
-			template<typename ThisType, typename TargetType>
-			void Origin(typename TargetType::Interface_Type* set_value, call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,Location_Components::Concepts::Is_Location)))
-			{
-				_orig = (Location_Components::Interfaces::Location_Interface*)set_value;
-			}
-			template<typename ThisType, typename TargetType>
-			void Origin(typename TargetType::Interface_Type* set_value, call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,!Location_Components::Concepts::Is_Location)))
-			{
-				assert_requirements(TargetType, Time_Components::Concepts::Is_Time, "Your TargetType is not a valid TimeType");
-			}
-
-			Location_Components::Interfaces::Location_Interface* _dest;
-			tag_getter(Destination);
-			tag_setter(Destination);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			typename TargetType::Interface_Type* Destination(call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,Location_Components::Concepts::Is_Location)))
-			{
-				return (TargetType::Interface_Type*)_dest;
-			}
-			template<typename ThisType, typename CallerType, typename TargetType>
-			typename TargetType::Interface_Type* Destination(call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,!Location_Components::Concepts::Is_Location)))
-			{
-				assert_requirements(TargetType, Time_Components::Concepts::Is_Time, "Your TargetType is not a valid TimeType");
-			}
-			template<typename ThisType, typename TargetType>
-			void Destination(typename TargetType::Interface_Type* set_value, call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,Location_Components::Concepts::Is_Location)))
-			{
-				_dest = (Location_Components::Interfaces::Location_Interface*)set_value;
-			}
-			template<typename ThisType, typename TargetType>
-			void Destination(typename TargetType::Interface_Type* set_value, call_requirements(requires(ThisType,Is_Dispatched)&&requires(TargetType,!Location_Components::Concepts::Is_Location)))
-			{
-				assert_requirements(TargetType, Time_Components::Concepts::Is_Time, "Your TargetType is not a valid TimeType");
-			}
+			member_component(Time_Components::Components::Time, Start_Time, requires(TargetType,Time_Components::Concepts::Is_Time), requires(TargetType,Time_Components::Concepts::Is_Time));
+			member_component(Time_Components::Components::Time, End_Time, requires(TargetType,Time_Components::Concepts::Is_Time), requires(TargetType,Time_Components::Concepts::Is_Time));
+			///-------------------------------------------------------------------
+			/// Trip origin and destination variables
+			member_component(Location_Components::Components::Location,Origin, requires(TargetType,Location_Components::Concepts::Is_Location), requires(TargetType,Location_Components::Concepts::Is_Location));
+			member_component(Location_Components::Components::Location,Destination, requires(TargetType,Location_Components::Concepts::Is_Location), requires(TargetType,Location_Components::Concepts::Is_Location));
 
 
-			template<typename ThisType, typename CallerType, typename TargetType>
-			void Write()
+			facet_base void Write()
 			{
 				cout<<endl<<"TRIP:"<<endl;
-				cout <<"ID: "<<_id<<endl;
+				cout <<"ID: "<<_ID<<endl;
 
 				cout <<"Start Time: "<<endl;
-				_start->Write<Time_Components::Components::Time,CallerType,TargetType>();
+				_Start_Time->Write<TargetType>();
 				cout <<endl<<"End Time: "<<endl;
-				_end->Write<Time_Components::Components::Time,CallerType,TargetType>();
+				_End_Time->Write<TargetType>();
 				cout<<endl;
 				cout <<"Origin: ";
-				_orig->Write<Location_Components::Components::Location, CallerType, TargetType>();
+				_Origin->Write<TargetType>();
 				cout<<endl;
 				cout <<"Destination: ";
-				_dest->Write<Location_Components::Components::Location, CallerType, TargetType>();
+				_Destination->Write<TargetType>();
 				cout<<endl;
 			}
 		};
