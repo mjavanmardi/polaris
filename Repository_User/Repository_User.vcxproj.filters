@@ -86,6 +86,9 @@
     <ClInclude Include="Polaris_Demand_Base.h">
       <Filter>Bases</Filter>
     </ClInclude>
+    <ClInclude Include="Demand_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository_User.cpp">

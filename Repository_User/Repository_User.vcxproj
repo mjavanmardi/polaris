@@ -119,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Activity_Location_Interface.h" />
+    <ClInclude Include="Demand_Base.h" />
     <ClInclude Include="Demand_Interface.h" />
     <ClInclude Include="Intersection_Interface.h" />
     <ClInclude Include="Link_Interface.h" />
