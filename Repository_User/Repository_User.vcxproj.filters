@@ -68,6 +68,18 @@
     <ClInclude Include="Polaris_Vehicle_Base.h">
       <Filter>Bases</Filter>
     </ClInclude>
+    <ClInclude Include="Routable_Link_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
+    <ClInclude Include="Routable_Intersection_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Routing_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Traveler_Base.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository_User.cpp">
