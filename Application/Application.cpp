@@ -46,13 +46,6 @@ struct Master_Type
 
 void main()
 {
-	Routing_Components::Interfaces::Routing_Interface<Master_Type::routing_type,NULLTYPE>* itf;
-
-	itf=(Routing_Components::Interfaces::Routing_Interface<Master_Type::routing_type,NULLTYPE>*)Allocate<Master_Type::routing_type>();
-
-	itf->Initialize<NULLTYPE>();
-
-
 	//data
 	cout << "allocating data structures..." <<endl;	
 	typedef Master_Type::scenario_type scenario_type;
@@ -84,6 +77,9 @@ void main()
 	typedef Master_Type::demand_type demand_type;
 	typedef Demand_Components::Interfaces::Demand_Interface<demand_type, NULLTYPE> Demand_Interface;
 	Demand_Interface* demand = (Demand_Interface*)Allocate<demand_type>();
+	demand->scenario_reference<Scenario_Interface*>(scenario);
+	demand->network_reference<Network_Interface*>(network);
+
 	demand->read_demand_data<NULLTYPE>();
 
 	////initialize network agents

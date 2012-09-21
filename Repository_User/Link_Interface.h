@@ -566,7 +566,8 @@ namespace Link_Components
 
 					_this->link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::NONE_COMPLETE);
 
-					if(true)
+					//if vehicles are done
+					if(sub_iteration>0)
 					{
 						pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Supply_Update<NULLTYPE>);
 						response.result=true;

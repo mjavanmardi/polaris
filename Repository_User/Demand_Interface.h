@@ -200,6 +200,8 @@ namespace Demand_Components
 
 								traveler->router<Routing_Interface*>(router);
 								traveler->vehicle<Vehicle_Interface*>(vehicle);
+								router->vehicle<Vehicle_Interface*>(vehicle);
+								router->network<Network_Interface*>(network);
 
 								vehicle->origin_link<Link_Interface*>(origin_link);
 								vehicle->destination_link<Link_Interface*>(destination_link);
@@ -228,6 +230,8 @@ namespace Demand_Components
 
 									traveler->router<Routing_Interface*>(router);
 									traveler->vehicle<Vehicle_Interface*>(vehicle);
+									router->vehicle<Vehicle_Interface*>(vehicle);
+									router->network<Network_Interface*>(network);
 
 									vehicle->origin_link<Link_Interface*>(origin_link);
 									vehicle->destination_link<Link_Interface*>(destination_link);
@@ -245,18 +249,6 @@ namespace Demand_Components
 							}
 						}
 					}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -279,6 +271,8 @@ namespace Demand_Components
 
 								traveler->router<Routing_Interface*>(router);
 								traveler->vehicle<Vehicle_Interface*>(vehicle);
+								router->vehicle<Vehicle_Interface*>(vehicle);
+								router->network<Network_Interface*>(network);
 
 								vehicle->origin_link<Link_Interface*>(origin_link);
 								vehicle->destination_link<Link_Interface*>(destination_link);
@@ -300,13 +294,14 @@ namespace Demand_Components
 								r1 = 0.23;
 								if (r1<=cur_vehicle_rate_per_simulation_interval)
 								{
-
 									traveler=(Traveler_Interface*)Allocate<TravelerType>();
 									vehicle=(Vehicle_Interface*)Allocate<VehicleType>();
 									router=(Routing_Interface*)Allocate<RoutingType>();
 
 									traveler->router<Routing_Interface*>(router);
 									traveler->vehicle<Vehicle_Interface*>(vehicle);
+									router->vehicle<Vehicle_Interface*>(vehicle);
+									router->network<Network_Interface*>(network);
 
 									vehicle->origin_link<Link_Interface*>(origin_link);
 									vehicle->destination_link<Link_Interface*>(destination_link);

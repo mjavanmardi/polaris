@@ -402,14 +402,14 @@ namespace Network_Components
 				}
 						
 				// configure inbound_outbound_movements
-				for (i = 0; i < intersections_container<IntersectionsContainerType>().size(); i++)
+				for (i = 0; i < (int)intersections_container<IntersectionsContainerType>().size(); i++)
 				{
 					Intersection_Interface* intersection = (Intersection_Interface*)intersections_container<IntersectionsContainerType>()[i];
 					// skip intersections_container that do not have any inbound links
 					if (intersection->inbound_links<LinksContainerType&>().size() == 0)
 						continue;
 					
-					for (j = 0; j < intersection->inbound_links<LinksContainerType&>().size(); j++) 
+					for (j = 0; j < (int)intersection->inbound_links<LinksContainerType&>().size(); j++) 
 					{
 						InboundOutboundMovementsInterface* inboundOutboundMovements = (InboundOutboundMovementsInterface*)Allocate<InboundOutboundMovementsType>();
 						Link_Interface* inboundLink = (Link_Interface*)intersection->inbound_links<LinksContainerType&>()[j];
@@ -417,7 +417,7 @@ namespace Network_Components
 						TurnMovementsContainerType& outboundTurnMovements = inboundLink->outbound_turn_movements<TurnMovementsContainerType&>();
 						cout<<"link id = " << inboundLink->uuid<int>()<<endl;
 						cout<<"intersection id = " << intersection->uuid<int>()<<endl;
-						for (k = 0; k < outboundTurnMovements.size(); k++)
+						for (k = 0; k < (int)outboundTurnMovements.size(); k++)
 						{
 							TurnMovementInterface* outboundMovement = (TurnMovementInterface*)outboundTurnMovements[k];
 							MovementInterface* movement = (MovementInterface*)Allocate<MovementType>();
@@ -522,7 +522,7 @@ namespace Network_Components
 
 				cout <<"-------------------------------------------------------------------------------------"<<endl;
 				cout << "all intersections" << endl;
-				for (i = 0; i < intersections_container<IntersectionsContainerType>().size(); i++)
+				for (i = 0; i < (int)intersections_container<IntersectionsContainerType>().size(); i++)
 				{
 					Intersection_Interface* intersection = (Intersection_Interface*)intersections_container<IntersectionsContainerType>()[i];
 					cout<<"\t intersection_"<<intersection->uuid<int>()<<endl;

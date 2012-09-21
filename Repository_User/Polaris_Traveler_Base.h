@@ -29,7 +29,7 @@ namespace Traveler_Components
 			tag_getter(router);
 			
 			void* _router;
-			typedef typename MasterType::routing_type routing_type;
+			typedef typename MasterType::routing_type router_type;
 
 
 			//end

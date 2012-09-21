@@ -249,7 +249,7 @@ namespace Routing_Components
 
 				cout <<"-------------------------------------------------------------------------------------"<<endl;
 				cout << "all intersections" << endl;
-				for (i = 0; i < intersections<RoutableIntersectionsContainerType&>().size(); i++)
+				for (i = 0; i < (int)intersections<RoutableIntersectionsContainerType&>().size(); i++)
 				{
 					RoutableIntersectionInterface* intersection = (RoutableIntersectionInterface*)intersections<RoutableIntersectionsContainerType>()[i];
 					cout<<"\t intersection_"<<intersection->uuid<int>()<<endl;
@@ -306,6 +306,7 @@ namespace Routing_Components
 		struct Routing_Interface
 		{
 			facet_accessor(vehicle);
+			facet_accessor(network);
 			facet_accessor(routable_network);
 			facet_accessor(origin_link);
 			facet_accessor(destination_link);
@@ -359,7 +360,9 @@ namespace Routing_Components
 				RoutableLinkInterface* destination_link_ptr=destination_link<RoutableLinkInterface*>();
 				NetworkLinkInterface* destination_reference=destination_link_ptr->network_link_reference<NetworkLinkInterface*>();
 				typedef ThisType::turn_movements_container_type TurnMovementsContainerType;
-				int outbound_turn_movement_size = (int)origin_link_ptr->network_link_reference<NetworkLinkInterface*>()->outbound_turn_movements<TurnMovementsContainerType&>().size();
+				NetworkLinkInterface* net_origin_link=origin_link_ptr->network_link_reference<NetworkLinkInterface*>();
+				TurnMovementsContainerType& turn_mvmt_container=net_origin_link->outbound_turn_movements<TurnMovementsContainerType&>();
+				int outbound_turn_movement_size = turn_mvmt_container.size();
 				if (outbound_turn_movement_size == 0){return;}
 
 				//initialization
@@ -465,26 +468,27 @@ namespace Routing_Components
 							break;
 						}
 					}
+				}
 
-					typedef typename RoutableNetworkType::reversed_path_container_type ReversedPathContainerType;
-					ReversedPathContainerType& reversed_path_container=routable_network<RoutableNetworkInterface*>()->reversed_path_container<ReversedPathContainerType&>();
 
-					current_link=destination_link<RoutableLinkInterface*>();
+				typedef typename RoutableNetworkType::reversed_path_container_type ReversedPathContainerType;
+				ReversedPathContainerType& reversed_path_container=routable_network<RoutableNetworkInterface*>()->reversed_path_container<ReversedPathContainerType&>();
+
+				current_link=destination_link<RoutableLinkInterface*>();
+				reversed_path_container.push_back(current_link->network_link_reference<NetworkLinkInterface*>());
+				current_link=current_link->label_pointer<RoutableLinkInterface*>();
+					
+				while(current_link != nullptr)
+				{
 					reversed_path_container.push_back(current_link->network_link_reference<NetworkLinkInterface*>());
 					current_link=current_link->label_pointer<RoutableLinkInterface*>();
-					
-					while(current_link != nullptr)
-					{
-						reversed_path_container.push_back(current_link->network_link_reference<NetworkLinkInterface*>());
-						current_link=current_link->label_pointer<RoutableLinkInterface*>();
-					}
 				}
 			};
 
 
-			facet void Initialize()
+			facet void Schedule_Route_Computation(int departure_time)
 			{
-				schedule_event_local(ThisType,Compute_Route_Condition,Compute_Route,0,NULLTYPE);
+				schedule_event_local(ThisType,Compute_Route_Condition,Compute_Route,departure_time,NULLTYPE);
 			}
 
 			declare_facet_event(Compute_Route)
@@ -504,8 +508,8 @@ namespace Routing_Components
 				NetworkLinkInterface* origin_link=veh->origin_link<NetworkLinkInterface*>();
 				NetworkLinkInterface* destination_link=veh->destination_link<NetworkLinkInterface*>();
 				
-				_this->origin_link<NetworkLinkInterface*>();
-				_this->destination_link<NetworkLinkInterface*>();
+				_this->origin_link<NetworkLinkInterface*>(origin_link);
+				_this->destination_link<NetworkLinkInterface*>(destination_link);
 
 				_this->one_to_one_link_based_least_time_path_a_star<NULLTYPE>();
 				
