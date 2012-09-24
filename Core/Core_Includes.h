@@ -15,6 +15,8 @@
 #include <assert.h>
 #include <cstdarg>
 #include <set>
+#include <random>
+#include <fstream>
 #include "Run_Parameters.h"
 using namespace std;
 
@@ -93,6 +95,6 @@ typedef void (*Conditional)(void*,Conditional_Response&);
 
 #define template_type(TYPE,TYPEDEF_NAME) TYPEDEF_NAME::Type
 
+//static ofstream logger=ofstream("log.txt");
 
-
-
+#define PRINT(X) cout << X << endl;

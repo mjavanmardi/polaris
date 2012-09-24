@@ -144,6 +144,8 @@ namespace Link_Components
 		//------------------------------------------------------------------------------------------------------------------
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType scenario_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_scenario_reference);} tag_getter(scenario_reference);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void scenario_reference(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_scenario_reference=(TargetType)value;} tag_setter(scenario_reference);
 			typedef typename MasterType::scenario_type scenario_type;
 			void* _scenario_reference;
 
@@ -184,7 +186,11 @@ namespace Link_Components
 			vector<int> _cached_link_upstream_cumulative_vehicles_array;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_link_downstream_cumulative_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)&(_cached_link_downstream_cumulative_vehicles_array.front());}
+			TargetType cached_link_downstream_cumulative_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer) && requires(strip_modifiers(TargetType),is_integral)))
+			{return (TargetType)&(_cached_link_downstream_cumulative_vehicles_array.front());}
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType cached_link_downstream_cumulative_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched) && !(requires(TargetType,is_pointer) && requires(strip_modifiers(TargetType),is_integral))))
+			{return (TargetType&)(_cached_link_downstream_cumulative_vehicles_array);}
 			tag_getter(cached_link_downstream_cumulative_vehicles_array);
 			vector<int> _cached_link_downstream_cumulative_vehicles_array;
 

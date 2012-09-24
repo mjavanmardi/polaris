@@ -137,7 +137,7 @@ namespace Demand_Components
 				typedef typename ThisType::routing_type RoutingType;
 				typedef Routing_Components::Interfaces::Routing_Interface<RoutingType,ThisType> Routing_Interface;
 
-
+				int traveler_id_counter=-1;
 
 				for(int simulation_interval_index=0;simulation_interval_index<scenario->num_simulation_intervals<int>();simulation_interval_index++)
 				{// generate vehicles for each simulation interval
@@ -197,10 +197,11 @@ namespace Demand_Components
 								traveler=(Traveler_Interface*)Allocate<TravelerType>();
 								vehicle=(Vehicle_Interface*)Allocate<VehicleType>();
 								router=(Routing_Interface*)Allocate<RoutingType>();
-
+									
+								traveler->uuid<int>(++traveler_id_counter);
 								traveler->router<Routing_Interface*>(router);
 								traveler->vehicle<Vehicle_Interface*>(vehicle);
-								router->vehicle<Vehicle_Interface*>(vehicle);
+								router->traveler<Traveler_Interface*>(traveler);
 								router->network<Network_Interface*>(network);
 
 								vehicle->origin_link<Link_Interface*>(origin_link);
@@ -227,10 +228,11 @@ namespace Demand_Components
 									traveler=(Traveler_Interface*)Allocate<TravelerType>();
 									vehicle=(Vehicle_Interface*)Allocate<VehicleType>();
 									router=(Routing_Interface*)Allocate<RoutingType>();
-
+									
+									traveler->uuid<int>(++traveler_id_counter);
 									traveler->router<Routing_Interface*>(router);
 									traveler->vehicle<Vehicle_Interface*>(vehicle);
-									router->vehicle<Vehicle_Interface*>(vehicle);
+									router->traveler<Traveler_Interface*>(traveler);
 									router->network<Network_Interface*>(network);
 
 									vehicle->origin_link<Link_Interface*>(origin_link);
@@ -268,10 +270,11 @@ namespace Demand_Components
 								traveler=(Traveler_Interface*)Allocate<TravelerType>();
 								vehicle=(Vehicle_Interface*)Allocate<VehicleType>();
 								router=(Routing_Interface*)Allocate<RoutingType>();
-
+									
+								traveler->uuid<int>(++traveler_id_counter);
 								traveler->router<Routing_Interface*>(router);
 								traveler->vehicle<Vehicle_Interface*>(vehicle);
-								router->vehicle<Vehicle_Interface*>(vehicle);
+								router->traveler<Traveler_Interface*>(traveler);
 								router->network<Network_Interface*>(network);
 
 								vehicle->origin_link<Link_Interface*>(origin_link);
@@ -297,10 +300,11 @@ namespace Demand_Components
 									traveler=(Traveler_Interface*)Allocate<TravelerType>();
 									vehicle=(Vehicle_Interface*)Allocate<VehicleType>();
 									router=(Routing_Interface*)Allocate<RoutingType>();
-
+									
+									traveler->uuid<int>(++traveler_id_counter);
 									traveler->router<Routing_Interface*>(router);
 									traveler->vehicle<Vehicle_Interface*>(vehicle);
-									router->vehicle<Vehicle_Interface*>(vehicle);
+									router->traveler<Traveler_Interface*>(traveler);
 									router->network<Network_Interface*>(network);
 
 									vehicle->origin_link<Link_Interface*>(origin_link);

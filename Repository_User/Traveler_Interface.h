@@ -18,6 +18,7 @@ namespace Traveler_Components
 		{
 			facet_accessor(router);
 			facet_accessor(vehicle);
+			facet_accessor(uuid);
 
 			facet void Schedule_New_Departure(int departure_time)
 			{

@@ -52,6 +52,7 @@ void main()
 	typedef Scenario_Components::Interfaces::Scenario_Interface<scenario_type,NULLTYPE> Scenario_Interface;
 	
 	Scenario_Interface* scenario=(Scenario_Interface*)Allocate<scenario_type>();
+	scenario->current_simulation_interval_index<int>(0);
 
 	typedef Master_Type::network_type network_type;
 	typedef Network_Components::Interfaces::Network_Interface<network_type,NULLTYPE> Network_Interface;
@@ -63,12 +64,13 @@ void main()
 	cout << "reading input data..." <<endl;	
 	scenario->read_scenario_data<NULLTYPE>();
 	network->read_network_data<NULLTYPE>();
+	network->simulation_initialize<NULLTYPE>(scenario);
 	
 
 	////network cost
 	cout << "constructing network cost..." <<endl;
 	network->construct_network_cost<NULLTYPE>();
-	network->printNetwork<NULLTYPE>();
+	//network->printNetwork<NULLTYPE>();
 	
 	////routable network
 	network->construct_routable_network<NULLTYPE>();
@@ -103,7 +105,9 @@ void main()
 		intersections_itr!=network->intersections_container<Master_Type::network_type::intersections_container_type&>().end();
 		intersections_itr++)
 	{
-		((Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
+		int id=((Intersection_Interface*)(*intersections_itr))->uuid<int>();
+		if(id!=0 && id!=4 && id!=6) ((Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();		
+		else ((Intersection_Interface*)(*intersections_itr))->intersection_simulation_status<Intersection_Components::Types::Intersection_Simulation_Status>(Intersection_Components::Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE);
 	}
 
 	world->Start_Turning();

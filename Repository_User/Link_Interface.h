@@ -50,6 +50,7 @@ namespace Link_Components
 			facet_accessor(id);
 
 			facet_accessor(scenario_reference);
+			facet_accessor(network);
 
 			// inbound_links and outbound_links might belong to Link_Base for network construction which we may implement later
 			facet_accessor(inbound_turn_movements);
@@ -132,6 +133,9 @@ namespace Link_Components
 
 			facet_accessor(current_vehicle_queue);			
 
+			facet_accessor(detector);
+			facet_accessor(lane_groups);
+
 
 			facet_accessor(maximum_flow_rate);
 			facet_accessor(free_flow_speed);
@@ -160,13 +164,13 @@ namespace Link_Components
 				accept_vehicle<TargetType>(vehicle);
 			}
 
-			//facet void accept_vehicle(TargetType* veh/*,requires(TargetType,IsUnloaded)*/)
-			//{
-			//	link_origin_cumulative_arrived_vehicles<int&>()++;
-			//	typedef typename ThisType::link_origin_vehicle_index_array_type LinkOriginVehiclesType;
-			//	link_origin_vehicle_index_array<LinkOriginVehiclesType>().push_back(veh);
-			//	veh->load_to_entry_queue<NULLTYPE>();
-			//}
+			facet void p_vehicle(TargetType* veh/*,requires(TargetType,IsUnloaded)*/)
+			{
+				link_origin_cumulative_arrived_vehicles<int&>()++;
+				typedef typename ThisType::link_origin_vehicle_array_type LinkOriginVehiclesType;
+				link_origin_vehicle_array<LinkOriginVehiclesType>().push_back(veh);
+				veh->load_to_entry_queue<NULLTYPE>();
+			}
 
 			facet void accept_vehicle(TargetType veh/*,requires(TargetType,IsLoaded)*/)
 			{
@@ -260,6 +264,9 @@ namespace Link_Components
 					current_link_capacity =  (float) (simulation_interval_length * num_lanes<int>() * maximum_flow_rate<float>()/3600.0);
 					link_capacity<float>(current_link_capacity);
 				}
+
+
+				PRINT("\t\t" << "link N has supply " << link_supply<float>());
 			}
 
 			facet void link_moving()
@@ -541,9 +548,6 @@ namespace Link_Components
 				schedule_event_local(ThisType,Newells_Conditional,Compute_Step_Flow_Supply_Update,0,NULLTYPE);
 			}
 
-
-
-
 			/*
 
 
@@ -560,71 +564,65 @@ namespace Link_Components
 				
 				Revision link_current_revision=pthis->object_current_revision();
 				
+				PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting link: " << _this->uuid<int>());
+
 				if(link_current_revision.iteration!=iteration)
 				{
 					//first visit this iteration, update status
 
 					_this->link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::NONE_COMPLETE);
-
-					//if vehicles are done
-					if(sub_iteration>0)
-					{
-						pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Supply_Update<NULLTYPE>);
-						response.result=true;
-						response.next=iteration;
-					}
 				}
-				else
+
+
+				if(sub_iteration==0)
 				{
-					//have visited at least once, link_simulation_status is accurate
+					PRINT("\t" << "Compute_Route Not Finished, Return This Iteration");
 
-					if(_this->link_simulation_status<Types::Link_Simulation_Status>()==Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE)
+					pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Supply_Update<NULLTYPE>);
+					response.result=false;
+					response.next=iteration;
+				}
+				else if(_this->link_simulation_status<Types::Link_Simulation_Status>()==Types::Link_Simulation_Status::NONE_COMPLETE)
+				{
+					PRINT("\t" << "Run Compute_Step_Flow_Supply_Update, Return This Iteration");
+
+					pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Supply_Update<NULLTYPE>);
+					response.result=true;
+					response.next=iteration;
+				}
+				else if(_this->link_simulation_status<Types::Link_Simulation_Status>()==Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE)
+				{
+					typedef typename ThisType::intersection_type intersection_type;
+					typedef Intersection_Components::Interfaces::Intersection_Interface<intersection_type,ThisType> Intersection_Interface;
+					typedef Intersection_Components::Types::Intersection_Simulation_Status intersection_simulation_status_type;
+
+					Revision intersection_current_revision=Execution_Object::allocator_template<intersection_type>::allocator_reference.type_current_revision();
+
+					Intersection_Interface* upstream=_this->upstream_intersection<Intersection_Interface*>();
+					Intersection_Interface* downstream=_this->downstream_intersection<Intersection_Interface*>();
+
+					if(upstream->intersection_simulation_status<intersection_simulation_status_type>()
+						==intersection_simulation_status_type::COMPUTE_STEP_FLOW_COMPLETE
+						&&
+						downstream->intersection_simulation_status<intersection_simulation_status_type>()
+						==intersection_simulation_status_type::COMPUTE_STEP_FLOW_COMPLETE)
 					{
-						//have performed "phase 1: Compute_Step_Flow_Supply_Update"
+						//upstream and downstream intersections check out, ready for "phase 2: Compute_Step_Flow_Link_Moving"
 						
-						typedef typename ThisType::intersection_type intersection_type;
-						typedef Intersection_Components::Interfaces::Intersection_Interface<intersection_type,ThisType> Intersection_Interface;
-						typedef Intersection_Components::Types::Intersection_Simulation_Status intersection_simulation_status_type;
+						PRINT("\t" << "Run Compute_Step_Flow_Link_Moving, Return Next Iteration");
 
-						Revision intersection_current_revision=Execution_Object::allocator_template<intersection_type>::allocator_reference.type_current_revision();
-
-						if(intersection_current_revision.iteration==iteration)
-						{
-							//intersection visited at least once, intersection_simulation_status is accurate
-
-							Intersection_Interface* upstream=_this->upstream_intersection<Intersection_Interface*>();
-							Intersection_Interface* downstream=_this->downstream_intersection<Intersection_Interface*>();
-
-							if(upstream->intersection_simulation_status<intersection_simulation_status_type>()
-								==intersection_simulation_status_type::COMPUTE_STEP_FLOW_COMPLETE
-								&&
-								downstream->intersection_simulation_status<intersection_simulation_status_type>()
-								==intersection_simulation_status_type::COMPUTE_STEP_FLOW_COMPLETE)
-							{
-								//upstream and downstream intersections check out, ready for "phase 2: Compute_Step_Flow_Link_Moving"
-								
-								pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Link_Moving<NULLTYPE>);
-								response.result=true;
-								response.next=iteration+1;
-							}
-							else
-							{
-								//either upstream and/or downstream intersection is not done, come back later
-
-								response.result=false;
-								response.next=iteration;
-							}
-
-						}
-						else
-						{
-							//intersection not visited yet, current setup should not be here
-						}
-
+						pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Link_Moving<NULLTYPE>);
+						response.result=true;
+						response.next=iteration+1;
 					}
 					else
 					{
-						//should be no case where you are here
+						//either upstream and/or downstream intersection is not done, come back later
+						
+						PRINT("\t" << "Compute_Step_Flow Not Finished, Return This Iteration");
+
+						response.result=false;
+						response.next=iteration;
 					}
 				}
 			}
@@ -637,6 +635,8 @@ namespace Link_Components
 				_this->link_supply_update<ThisType>();
 
 				_this->link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE);
+
+				PRINT("\t\t" << "COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE");
 			}
 
 			declare_facet_event(Compute_Step_Flow_Link_Moving)
@@ -653,6 +653,8 @@ namespace Link_Components
 				_this->network_state_update<ThisType>();
 
 				_this->link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE);
+
+				PRINT("\t\t" << "COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE");
 			}
 		};
 

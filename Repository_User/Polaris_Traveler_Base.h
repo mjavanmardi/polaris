@@ -17,9 +17,8 @@ namespace Traveler_Components
 		template<typename MasterType>
 		struct Polaris_Traveler_Base
 		{
-			//========================================================================================================
-			//start implementation of member_data(Routing_Interface*, routing)
-			//--------------------------------------------------------------------------------------------------------
+			member_data_basic(int,uuid);
+
 			template<typename ThisType, typename CallerType, typename TargetType>
 			void router(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_router = (void *)(set_value);}
 			tag_setter(router);
@@ -30,14 +29,6 @@ namespace Traveler_Components
 			
 			void* _router;
 			typedef typename MasterType::routing_type router_type;
-
-
-			//end
-			//--------------------------------------------------------------------------------------------------------
-
-			//========================================================================================================
-			//start implementation of member_data(Vehicle_Interface*, vehicle)
-			//--------------------------------------------------------------------------------------------------------
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			void vehicle(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_vehicle = (void *)(set_value);}
@@ -50,8 +41,6 @@ namespace Traveler_Components
 			typedef typename MasterType::vehicle_type vehicle_type;
 
 			void* _vehicle;
-			//end
-			//--------------------------------------------------------------------------------------------------------
 		};
 	}
 

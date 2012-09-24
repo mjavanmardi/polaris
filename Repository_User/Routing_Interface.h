@@ -20,7 +20,6 @@ namespace Routing_Components
 				INSELIST,
 		};
 
-
 		template<typename ThisType,typename CallerType>
 		struct Routable_Network_Interface
 		{
@@ -233,7 +232,7 @@ namespace Routing_Components
 				}
 				
 				// for debug, we printout everything of the network
-				
+				/*
 				cout <<endl<<"*********************************Routable Network**************************************************"<<endl;
 				cout<<"all links"<<endl;
 				int i;
@@ -298,6 +297,7 @@ namespace Routing_Components
 					}
 					cout<<"\t\t --------------------------------"<<endl<<endl;
 				}	
+				*/
 			}
 
 		};
@@ -307,12 +307,18 @@ namespace Routing_Components
 		{
 			facet_accessor(vehicle);
 			facet_accessor(network);
+			facet_accessor(traveler);
 			facet_accessor(routable_network);
 			facet_accessor(origin_link);
 			facet_accessor(destination_link);
 
 			declare_facet_conditional(Compute_Route_Condition)
 			{
+				Routing_Interface* _this=(Routing_Interface*)pthis;
+				int uuid=_this->traveler<Traveler_Components::Interfaces::Traveler_Interface<typename ThisType::traveler_type,NULLTYPE>* >()->uuid<int>();
+
+				PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting traveler: " << uuid);
+
 				response.next=INT_MAX;
 				response.result=true;
 			}
@@ -351,6 +357,8 @@ namespace Routing_Components
 				RoutableNetworkInterface* routable_net=routable_network<RoutableNetworkInterface*>();
 				routable_net->Reset<NULLTYPE>();
 
+				//
+
 				//RoutableNetworkInterface* routable_network=routable_network<RoutableNetworkInterface*>();
 				float max_free_flow_speed=routable_net->max_free_flow_speed<float>();
 				ScanListType& scan_list=routable_net->scan_list<ScanListType&>();
@@ -362,11 +370,11 @@ namespace Routing_Components
 				typedef ThisType::turn_movements_container_type TurnMovementsContainerType;
 				NetworkLinkInterface* net_origin_link=origin_link_ptr->network_link_reference<NetworkLinkInterface*>();
 				TurnMovementsContainerType& turn_mvmt_container=net_origin_link->outbound_turn_movements<TurnMovementsContainerType&>();
-				int outbound_turn_movement_size = turn_mvmt_container.size();
+				int outbound_turn_movement_size = (int)turn_mvmt_container.size();
 				if (outbound_turn_movement_size == 0){return;}
 
 				//initialization
-				RoutableLinkInterface* nextlink;
+				//RoutableLinkInterface* nextlink;
 				//int icurlink;
 				//int iturn_movement;
 				float next_cost,new_cost;
@@ -402,13 +410,14 @@ namespace Routing_Components
 
 				scan_list.insert(make_pair(current_link->f_cost<float>(),current_link));
 				current_link->scan_list_status<Scan_List_Status_Keys>(INSELIST);
+				int cur_link_id;
 
 				while(!scan_list.empty())
 				{
 					//selection
 					//num_searches++;
 					current_link = (RoutableLinkInterface*)(scan_list.begin()->second);
-					
+					cur_link_id=current_link->network_link_reference<NetworkLinkInterface*>()->uuid<int>();
 					if(current_link == destination_link_ptr)
 					{
 						break;
@@ -442,7 +451,7 @@ namespace Routing_Components
 								{
 									if(next_link->scan_list_status<Scan_List_Status_Keys>()==INSELIST)
 									{
-										scan_list.erase(make_pair(next_link->f_cost<float>(),nextlink)); // delete the old cost
+										scan_list.erase(make_pair(next_link->f_cost<float>(),next_link)); // delete the old cost
 									}
 
 									next_link->label_cost<float>(new_cost);
@@ -461,7 +470,7 @@ namespace Routing_Components
 
 									next_link->f_cost<float>(next_link->label_cost<float>() + next_link->h_cost<float>());
 
-									scan_list.insert(make_pair(next_link->f_cost<float>(),nextlink)); // update with the new cost
+									scan_list.insert(make_pair(next_link->f_cost<float>(),next_link)); // update with the new cost
 									next_link->scan_list_status<Scan_List_Status_Keys>(INSELIST);
 								}
 							}
@@ -484,7 +493,6 @@ namespace Routing_Components
 					current_link=current_link->label_pointer<RoutableLinkInterface*>();
 				}
 			};
-
 
 			facet void Schedule_Route_Computation(int departure_time)
 			{
@@ -520,7 +528,9 @@ namespace Routing_Components
 
 				veh->set_route_links(routable_network_ptr->reversed_path_container<ReversedPathContainerType&>());
 
-				origin_link->push_vehicle(veh);
+				origin_link->p_vehicle(veh);
+
+				PRINT("\t\t" << "COMPUTE_ROUTE_COMPLETE");
 			}
 		};
 	}

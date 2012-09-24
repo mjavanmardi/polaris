@@ -168,7 +168,12 @@ namespace Network_Components
 				link_0->right_turn_bay_length<float>(0.0);
 				link_0->num_left_turn_bays<int>(0);
 				link_0->num_right_turn_bays<int>(0);
+				
+
+
 				links_container<LinksContainerType&>().push_back(link_0);
+
+				
 
 				max_free_flow_speed<float>(max(max_free_flow_speed<float>(),link_0->free_flow_speed<float>()));
 				
@@ -460,6 +465,187 @@ namespace Network_Components
 				activity_locations_container<ActivityLocationsContainerType&>().push_back(activity_location_2);
 				
 
+			}
+
+			facet void simulation_initialize(void* scenario_data)
+			{
+				typedef typename ThisType::intersections_container_type IntersectionsContainerType;
+				typedef typename ThisType::intersections_container_element_type IntersectionType;
+				typedef typename Intersection_Components::Interfaces::Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
+
+				typedef typename ThisType::links_container_type LinksContainerType;
+				typedef typename ThisType::links_container_element_type LinkType;
+				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+
+				typedef typename ThisType::turn_movements_container_type TurnMovementsContainerType;
+				typedef typename ThisType::turn_movements_element_type TurnMovementType;
+				typedef typename Link_Components::Interfaces::Turn_Movement_Interface<TurnMovementType, NULLTYPE> TurnMovementInterface;
+
+				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundMovementsContainerType;
+				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundMovementsType;
+				typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<OutboundInboundMovementsType,ThisType> OutboundInboundMovementsInterface;
+
+				typedef typename ThisType::inbound_outbound_movements_container_type InboundOutboundMovementsContainerType;
+				typedef typename ThisType::inbound_outbound_movements_container_element_type InboundOutboundMovementsType;
+				typedef typename Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
+
+				typedef typename ThisType::movements_container_type MovementsContainerType;
+				typedef typename ThisType::movements_container_element_type MovementType;
+				typedef typename Intersection_Components::Interfaces::Movement_Interface<MovementType,ThisType> MovementInterface;
+
+				typedef typename ThisType::activity_locations_container_type ActivityLocationsContainerType;
+				typedef typename ThisType::activity_locations_container_element_type ActivityLocationType;
+				typedef typename Activity_Location_Components::Interfaces::Activity_Location_Interface<ActivityLocationType,ThisType> ActivityLocationInterface;
+				
+				typedef typename ThisType::scenario_data_type ScenarioDataType;
+				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioDataType, ThisType> ScenarioInterface;
+
+			
+
+				//initialized outside
+				//scenario_data.current_assignment_interval_index = 0;
+
+				////network_data
+
+
+
+				////simulation data
+				////network
+				//this->network_cumulative_loaded_vehicles = 0;
+				//this->network_cumulative_departed_vehicles = 0;
+				//this->network_cumulative_arrived_vehicles = 0;
+				//this->network_in_network_vehicles = 0;
+
+				////link
+
+
+				////turn movement
+
+
+				////link
+
+				////turn movement
+				int i, j;
+				for (i = 0; i < (int)links_container<LinksContainerType&>().size(); i++)
+				{
+					Link_Interface* link = (Link_Interface*)links_container<LinksContainerType&>()[i];
+					
+					//network_data
+					link->link_origin_cumulative_arrived_vehicles<int>(0);
+					link->link_origin_vehicle_array<vector<void*>&>().clear();
+					
+					link->scenario_reference<ScenarioInterface*>((ScenarioInterface*)scenario_data);
+
+					//init link simulation model
+					link->link_capacity<int>(0);
+					//link_simulation_model: in Kuilin's code but not converted
+					link->link_upstream_arrived_vehicles<int>(0);
+					link->link_downstream_departed_vehicles<int>(0);
+					link->link_origin_arrived_vehicles<int>(0);
+					link->link_origin_departed_vehicles<int>(0);
+					link->link_destination_arrived_vehicles<int>(0);
+					link->link_origin_vehicle_current_position<int>(0);
+					
+					//supply
+					link->link_supply<float>(link->num_lanes<int>() * link->length<float>() * link->jam_density<float>());
+					
+					//cumulative vehicles
+					link->link_destination_arrived_vehicles<int>(0);
+					link->link_origin_cumulative_arrived_vehicles<int>(0);
+					link->link_origin_cumulative_departure_vehicles<int>(0);
+					link->link_upstream_cumulative_arrival_vehicles<int>(0);
+					link->link_upstream_cumulative_vehicles<int>(0);
+				
+					////bwtt and fftt
+					float bwtt = (float) (link->length<float>()/(link->backward_wave_speed<float>()*5280.0/3600.0)); // in seconds
+					float fftt = (float) (link->length<float>()/(link->free_flow_speed<float>()*5280.0/3600.0)); //in seconds
+					link->link_fftt<float>(fftt);
+					link->link_bwtt<float>(bwtt);
+				
+					link->link_fftt_cached_simulation_interval_size<int>(int(ceil(float(fftt/(float(((ScenarioInterface*)scenario_data)->simulation_interval_length<float>()))))));
+					link->link_bwtt_cached_simulation_interval_size<int>(int(ceil(float(bwtt/(float(((ScenarioInterface*)scenario_data)->simulation_interval_length<float>()))))));
+
+					//downstream cumulative vehicles
+					link->cached_link_downstream_cumulative_vehicles_array<vector<int>&>().clear();
+					link->cached_link_downstream_cumulative_vehicles_array<vector<int>&>().resize(link->link_bwtt_cached_simulation_interval_size<int>());
+					for (j = 0; j < (int)link->cached_link_downstream_cumulative_vehicles_array<vector<int>&>().size(); j++)
+					{
+						link->cached_link_downstream_cumulative_vehicles_array<vector<int>&>()[j] = 0;
+					}
+
+					//upstream cumulative vehicles
+					link->cached_link_upstream_cumulative_vehicles_array<vector<int>&>().clear();
+					link->cached_link_upstream_cumulative_vehicles_array<vector<int>&>().resize(link->link_fftt_cached_simulation_interval_size<int>());
+					for (j = 0; j < (int)link->cached_link_upstream_cumulative_vehicles_array<vector<int>&>().size(); j++)
+					{
+						link->cached_link_upstream_cumulative_vehicles_array<vector<int>&>()[j] = 0;
+					}
+					
+				}
+				//determine minimum merge rate
+
+
+				for (i = 0; i < (int)intersections_container<IntersectionsContainerType>().size(); i++)
+				{
+					Intersection_Interface* intersection = (Intersection_Interface*)intersections_container<IntersectionsContainerType>()[i];
+
+					intersection->scenario_reference<ScenarioInterface*>((ScenarioInterface*)scenario_data);
+
+					OutboundInboundMovementsContainerType& outbound_inbound_movements_container = intersection->outbound_inbound_movements<OutboundInboundMovementsContainerType&>();
+					OutboundInboundMovementsContainerType::iterator outbound_inbound_movements_itr;
+					for (outbound_inbound_movements_itr=outbound_inbound_movements_container.begin(),j=0;outbound_inbound_movements_itr!=outbound_inbound_movements_container.end();outbound_inbound_movements_itr++,j++)
+					{
+						OutboundInboundMovementsInterface* outbound_inbound_movements = (OutboundInboundMovementsInterface*)(*outbound_inbound_movements_itr);
+
+						MovementsContainerType& inbound_movements_container = outbound_inbound_movements->inbound_movements<MovementsContainerType&>();
+						MovementsContainerType::iterator inbound_movement_itr;
+						for (inbound_movement_itr=inbound_movements_container.begin();inbound_movement_itr!=inbound_movements_container.end();inbound_movement_itr++)
+						{
+							MovementInterface* inbound_movement = (MovementInterface*)(*inbound_movement_itr);
+							inbound_movement->movement_capacity<float>(0.0);
+							inbound_movement->movement_demand<float>(0.0);
+							inbound_movement->movement_supply<float>(0.0);
+							inbound_movement->movement_flow<float>(0.0);
+							inbound_movement->movement_transferred<int>(0);
+							inbound_movement->turn_movement_cumulative_vehicles<int>(0);
+							inbound_movement->turn_movement_cumulative_arrival_vehicles<int>(0);
+							inbound_movement->turn_movement_cumulative_shifted_arrival_vehicles<int>(0);
+							
+							inbound_movement->vehicles_container<deque<void*>&>().clear();
+							
+							inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(0.0);
+							inbound_movement->inbound_link_departure_time_based_experienced_link_turn_travel_delay<float>(0.0);
+							inbound_movement->cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().clear();
+							inbound_movement->cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().clear();
+							inbound_movement->cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().resize(((ScenarioInterface*)scenario_data)->num_simulation_intervals_per_assignment_interval<int>());
+							inbound_movement->cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().resize(((ScenarioInterface*)scenario_data)->num_simulation_intervals_per_assignment_interval<int>());
+							
+							
+							for (j=0;j<((ScenarioInterface*)scenario_data)->num_simulation_intervals_per_assignment_interval<int>();j++)
+							{
+								inbound_movement->cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<vector<int>&>()[j] = 0.0;
+								inbound_movement->cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array<vector<int>&>()[j] = 0.0;
+							}
+									
+							Link_Interface* inbound_link = inbound_movement->movement_reference<Link_Interface*>();
+							inbound_movement->cached_turn_movement_cumulative_shifted_arrival_vehicles_array<vector<int>&>().clear();
+							inbound_movement->cached_turn_movement_cumulative_shifted_arrival_vehicles_array<vector<int>&>().resize(inbound_link->link_bwtt_cached_simulation_interval_size<int>());
+							for (j=0;j<inbound_link->link_bwtt_cached_simulation_interval_size<int>();j++)
+							{
+								inbound_movement->cached_turn_movement_cumulative_shifted_arrival_vehicles_array<vector<int>&>()[j] = 0; 
+							}
+
+							if (inbound_movement->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>() == Intersection_Components::Types::THROUGH_TURN)
+							{
+								inbound_movement->minimum_merge_rate<float>(1.0);
+							}
+							else
+							{
+								inbound_movement->minimum_merge_rate<float>(0.2);
+							}
+						}
+					}
+				}
 			}
 
 			facet void printNetwork()

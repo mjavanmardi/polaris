@@ -46,7 +46,6 @@ namespace Intersection_Components
 	
 	namespace Interfaces
 	{
-
 		template<typename ThisType,typename CallerType>
 		struct Movement_Interface
 		{
@@ -111,15 +110,16 @@ namespace Intersection_Components
 		struct Inbound_Outbound_Movements_Interface
 		{
 			facet_accessor(inbound_link_reference);
+			facet_accessor(lane_groups);
 			facet_accessor(outbound_movements);
 		};
-
-		
 
 		template<typename ThisType,typename CallerType>
 		struct Intersection_Interface
 		{
 			facet_accessor(uuid);
+			
+			facet_accessor(signal);
 
 			facet_accessor(inbound_links);
 			facet_accessor(outbound_links);
@@ -134,6 +134,11 @@ namespace Intersection_Components
 			facet_accessor(intersection_type);
 
 			facet_accessor(scenario_reference);
+			
+			facet_accessor(network);
+			
+			
+			facet_accessor(intersection_simulation_status);
 
 			//facet TargetType pull_vehicle()
 			//{
@@ -744,9 +749,6 @@ namespace Intersection_Components
 				}
 			}
 
-
-			facet_accessor(intersection_simulation_status);
-
 			facet void Initialize()
 			{
 				schedule_event_local(ThisType,Newells_Conditional,Compute_Step_Flow,0,NULLTYPE);
@@ -756,14 +758,13 @@ namespace Intersection_Components
 			{
 				Intersection_Interface* _this=(Intersection_Interface*)pthis;
 				
+				PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting intersection: " << _this->uuid<int>());
+				
 				Revision intersection_current_revision=pthis->object_current_revision();
 				
 				typedef typename ThisType::link_type link_type;
 				
-				
 				typedef Link_Components::Types::Link_Simulation_Status link_simulation_status_type;
-
-
 
 				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundType;
 				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundElementType;
@@ -781,9 +782,11 @@ namespace Intersection_Components
 				if(intersection_current_revision.iteration!=iteration)
 				{
 					//first visit this iteration, update status
-
 					_this->intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::NONE_COMPLETE);
+				}
 
+				if(_this->intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::NONE_COMPLETE)
+				{
 					Revision links_current_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_current_revision();
 
 					if(links_current_revision.iteration==iteration)
@@ -796,7 +799,7 @@ namespace Intersection_Components
 						OutboundInboundType& outbound_links_container=_this->outbound_inbound_movements<OutboundInboundType&>();
 						typename OutboundInboundType::iterator outbound_itr;
 
-						bool done=false;
+						bool done=true;
 
 						for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 						{
@@ -825,51 +828,46 @@ namespace Intersection_Components
 
 						if(done)
 						{
+							PRINT("\t" << "Run Compute_Step_Flow, Return This Iteration");
+							
 							pthis->Swap_Event((Event)&Intersection_Interface::Compute_Step_Flow<NULLTYPE>);
 							response.result=true;
 							response.next=iteration;
 						}
 						else
 						{
+							PRINT("\t" << "Compute_Step_Flow_Supply_Update Not Finished, Return This Iteration");
 							response.result=false;
 							response.next=iteration;
 						}
 					}
 					else
 					{
-						//link not visited yet, current setup should not be here
+						//link not visited yet
+
+						PRINT("\t" << "Link Not Visited, Return This Iteration");
+						response.result=false;
+						response.next=iteration;
 					}
 				}
-				else
+				else if(_this->intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE)
 				{
-					//have visited at least once, intersection_simulation_status is accurate
+					//although not ideal, simply check whether links are completely done this iteration
 
-					if(_this->intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE)
+					Revision link_next_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_next_check();
+
+					if(link_next_revision.iteration>iteration)
 					{
-						//have performed "phase 1: Compute_Step_Flow_Supply_Update"
-
-
-						//although not ideal, simply check whether links are completely done this iteration
-
-						Revision link_next_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_next_check();
-
-						if(link_next_revision.iteration>iteration)
-						{
-							//ready for "phase 2: Network_State_Update"
-
-							pthis->Swap_Event((Event)&Intersection_Interface::Network_State_Update<NULLTYPE>);
-							response.result=true;
-							response.next=iteration+1;
-						}
-						else
-						{
-							response.result=false;
-							response.next=iteration;
-						}
+						PRINT("\t" << "Run Network_State_Update, Return Next Iteration");
+						pthis->Swap_Event((Event)&Intersection_Interface::Network_State_Update<NULLTYPE>);
+						response.result=true;
+						response.next=iteration+1;
 					}
 					else
 					{
-						//should be no case where you are here
+						PRINT("\t" << "Compute_Step_Flow_Link_Moving Not Finished, Return This Iteration");
+						response.result=false;
+						response.next=iteration;
 					}
 				}
 			}
@@ -891,6 +889,8 @@ namespace Intersection_Components
 				_this->node_transfer<NULLTYPE>();
 
 				_this->intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE);
+
+				PRINT("\t\t" << "COMPUTE_STEP_FLOW_COMPLETE");
 			}
 
 			declare_facet_event(Network_State_Update)
@@ -901,8 +901,9 @@ namespace Intersection_Components
 				_this->network_state_update<NULLTYPE>();
 
 				_this->intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::NETWORK_STATE_UPDATE_COMPLETE);
-			}
 
+				PRINT("\t\t" << "NETWORK_STATE_UPDATE_COMPLETE");
+			}
 		};
 	}
 }

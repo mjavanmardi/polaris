@@ -85,12 +85,13 @@ namespace Network_Components
 			
 			turn_movements_container_type _turn_movements_container;
 
+			typedef typename MasterType::scenario_type scenario_data_type;
 			
 			typedef typename MasterType::movement_type movement_type;
 			typedef movement_type movements_container_element_type;
 			typedef vector<void*> movements_container_type;
 
-
+			typedef vector<void*> link_origin_vehicle_array_type;
 
 		};
 

@@ -87,14 +87,29 @@ namespace Routing_Components
 		template<typename MasterType>
 		struct Polaris_Routing_Base
 		{
+			//template<typename ThisType, typename CallerType, typename TargetType>
+			//void vehicle(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_vehicle = (void*)set_value;} tag_setter(vehicle);
+			
+			typedef typename MasterType::traveler_type traveler_type;
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType traveler(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_traveler;} tag_getter(traveler);
+			
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void traveler(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_traveler = (void*)set_value;} tag_setter(traveler);
+
+			void* _traveler;
+			
 			typedef typename MasterType::vehicle_type vehicle_type;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			void vehicle(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_vehicle = (void*)set_value;} tag_setter(vehicle);
-
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType vehicle(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_vehicle;} tag_getter(vehicle);
-	
+			TargetType vehicle(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return ((Traveler_Components::Interfaces::Traveler_Interface<traveler_type,CallerType>*)_traveler)->vehicle<TargetType>();
+			}
+			
+			tag_getter(vehicle);
+			
 			void* _vehicle;
 
 			typedef typename MasterType::routable_network_type routable_network_type;
