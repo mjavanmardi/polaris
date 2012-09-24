@@ -98,8 +98,8 @@ namespace Demand_Components
 				float freeway_demand_rate = 1800.0;
 				float ramp_demand_rate = 900.0;
 				
-				//RngStream g1("Demand");
-				//g1.SetSeed(1);
+				RngStream g1("Demand");
+				g1.SetSeed(1);
 				
 				//int vehilce_index = -1;
 
@@ -219,9 +219,7 @@ namespace Demand_Components
 							}
 							else
 							{//monte carlo
-								double r1;
-								//r1 = (double) g1.RandU01();
-								r1 = 5.8;
+								double r1 = (double) g1.RandU01();
 								if (r1<=cur_vehicle_rate_per_simulation_interval)
 								{
 
@@ -292,9 +290,7 @@ namespace Demand_Components
 							}
 							else
 							{//monte carlo
-								double r1;
-								//r1 = (double) g1.RandU01();
-								r1 = 0.23;
+								double r1 = (double) g1.RandU01();
 								if (r1<=cur_vehicle_rate_per_simulation_interval)
 								{
 									traveler=(Traveler_Interface*)Allocate<TravelerType>();

@@ -23,14 +23,24 @@ namespace Intersection_Components
 			member_data_basic(float, forward_link_turn_travel_time);
 			
 			template<typename ThisType, typename CallerType, typename TargetType>
-			void movement_reference(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_movement_reference = (void *)(set_value);} 
-			tag_setter(movement_reference);
+			void inbound_link(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_inbound_link = (void *)(set_value);} 
+			tag_setter(inbound_link);
 			
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_movement_reference);} 
-			tag_getter(movement_reference);
+			TargetType inbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_inbound_link);} 
+			tag_getter(inbound_link);
 			
-			void* _movement_reference;
+			void* _inbound_link;
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void outbound_link(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_outbound_link = (void *)(set_value);} 
+			tag_setter(outbound_link);
+			
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType outbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_outbound_link);} 
+			tag_getter(outbound_link);
+			
+			void* _outbound_link;
 		};
 			
 		//template<typename MasterType>

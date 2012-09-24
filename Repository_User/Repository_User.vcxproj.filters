@@ -89,6 +89,9 @@
     <ClInclude Include="Demand_Base.h">
       <Filter>Bases</Filter>
     </ClInclude>
+    <ClInclude Include="RngStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository_User.cpp">

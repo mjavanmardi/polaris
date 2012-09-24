@@ -25,36 +25,36 @@ namespace Link_Components
 	//==================================================================================================================
 	/// Polaris_Turn_Movement_Base
 	//------------------------------------------------------------------------------------------------------------------
-		template<typename MasterType>
-		struct Polaris_Turn_Movement_Base
-		{
-			member_data_basic(int, id);
+		//template<typename MasterType>
+		//struct Polaris_Turn_Movement_Base
+		//{
+		//	member_data_basic(int, id);
 
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType inbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_link;} tag_getter(inbound_link);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			void inbound_link(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_inbound_link=(TargetType)value;} tag_setter(inbound_link);
+		//	template<typename ThisType, typename CallerType, typename TargetType>
+		//	TargetType inbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_link;} tag_getter(inbound_link);
+		//	template<typename ThisType, typename CallerType, typename TargetType>
+		//	void inbound_link(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_inbound_link=(TargetType)value;} tag_setter(inbound_link);
 
-			void* _inbound_link;
+		//	void* _inbound_link;
 
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType outbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_outbound_link;} tag_getter(outbound_link);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			void outbound_link(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_outbound_link=(TargetType)value;} tag_setter(outbound_link);
+		//	template<typename ThisType, typename CallerType, typename TargetType>
+		//	TargetType outbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_outbound_link;} tag_getter(outbound_link);
+		//	template<typename ThisType, typename CallerType, typename TargetType>
+		//	void outbound_link(TargetType value,call_requirements(requires(ThisType,Is_Dispatched))){_outbound_link=(TargetType)value;} tag_setter(outbound_link);
 
-			void* _outbound_link;
+		//	void* _outbound_link;
 
-			member_data_basic(Intersection_Components::Types::Turn_Movement_Type_Keys, turn_movement_type);
-			member_data_basic(Intersection_Components::Types::Turn_Movement_Rule_Keys, turn_movement_rule);
-			member_data_basic(float, turn_travel_penalty);
-			member_data_basic(float, forward_link_turn_travel_time);
+		//	member_data_basic(Intersection_Components::Types::Turn_Movement_Type_Keys, turn_movement_type);
+		//	member_data_basic(Intersection_Components::Types::Turn_Movement_Rule_Keys, turn_movement_rule);
+		//	member_data_basic(float, turn_travel_penalty);
+		//	member_data_basic(float, forward_link_turn_travel_time);
 
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType replicas_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_replicas_container;} tag_getter(replicas_container);
-			vector<void*> _replicas_container;
+		//	template<typename ThisType, typename CallerType, typename TargetType>
+		//	TargetType replicas_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_replicas_container;} tag_getter(replicas_container);
+		//	vector<void*> _replicas_container;
 
-		};
-		
+		//};
+		//
 	//==================================================================================================================
 	/// Polaris_Link_Base
 	//------------------------------------------------------------------------------------------------------------------
@@ -125,9 +125,9 @@ namespace Link_Components
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
 		//------------------------------------------------------------------------------------------------------------------
-			typedef Polaris_Component<Interfaces::Turn_Movement_Interface,Polaris_Turn_Movement_Base<MasterType>,NULLTYPE,MasterType> turn_movements_type;
+			typedef typename MasterType::turn_movement_type turn_movements_type;
 
-			typedef vector<Interfaces::Turn_Movement_Interface<turn_movements_type, NULLTYPE>*> turn_movements_container_type;
+			typedef vector<Intersection_Components::Interfaces::Movement_Interface<turn_movements_type, NULLTYPE>*> turn_movements_container_type;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType inbound_turn_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_turn_movements;} tag_getter(inbound_turn_movements);
@@ -200,7 +200,9 @@ namespace Link_Components
 			member_data_basic(int, link_origin_vehicle_current_position);
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType link_origin_vehicle_array(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_link_origin_vehicle_array);}
+			TargetType link_origin_vehicle_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_reference))){return (TargetType)(_link_origin_vehicle_array);}
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType link_origin_vehicle_array(call_requirements(requires(ThisType,Is_Dispatched) && !requires(TargetType,is_reference))){assert_requirements_std(TargetType,is_reference,"Can't return container as a non-reference!");}
 
 			tag_getter(link_origin_vehicle_array);
 			typedef typename MasterType::vehicle_type vehicle_type;
@@ -210,7 +212,9 @@ namespace Link_Components
 			link_origin_vehicle_array_type _link_origin_vehicle_array;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType link_origin_vehicle_queue(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_link_origin_vehicle_queue);}
+			TargetType link_origin_vehicle_queue(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_reference))){return (TargetType)(_link_origin_vehicle_queue);}
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType link_origin_vehicle_queue(call_requirements(requires(ThisType,Is_Dispatched) && !requires(TargetType,is_reference))){assert_requirements_std(TargetType,is_reference,"Can't return container as a non-reference!");}
 
 			tag_getter(link_origin_vehicle_queue);
 			typedef deque<void*> link_origin_vehicle_queue_type;
@@ -272,11 +276,11 @@ namespace Link_Components
 			typedef Polaris_Component_Execution<Interfaces::Link_Interface, Bases::Polaris_Link_Base<MasterType>,NULLTYPE,MasterType> type;
 		};
 
-		template<typename MasterType>
-		struct Polaris_Turn_Movement_Component
-		{
-			typedef Polaris_Component<Interfaces::Turn_Movement_Interface, Bases::Polaris_Turn_Movement_Base<MasterType>,NULLTYPE,MasterType> type;
-		};
+		//template<typename MasterType>
+		//struct Polaris_Turn_Movement_Component
+		//{
+		//	typedef Polaris_Component<Interfaces::Turn_Movement_Interface, Bases::Polaris_Turn_Movement_Base<MasterType>,NULLTYPE,MasterType> type;
+		//};
 	}	
 
 }

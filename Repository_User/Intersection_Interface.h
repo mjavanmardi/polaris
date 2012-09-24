@@ -49,7 +49,10 @@ namespace Intersection_Components
 		template<typename ThisType,typename CallerType>
 		struct Movement_Interface
 		{
-			facet_accessor(movement_reference);
+
+			facet_accessor(id);
+			facet_accessor(inbound_link);
+			facet_accessor(outbound_link);
 
 			facet_accessor(movement_capacity);
 			facet_accessor(movement_supply);
@@ -118,8 +121,10 @@ namespace Intersection_Components
 		struct Intersection_Interface
 		{
 			facet_accessor(uuid);
-			
+
 			facet_accessor(signal);
+
+			//facet_accessor(rng_stream);
 
 			facet_accessor(inbound_links);
 			facet_accessor(outbound_links);
@@ -134,7 +139,7 @@ namespace Intersection_Components
 			facet_accessor(intersection_type);
 
 			facet_accessor(scenario_reference);
-			
+
 			facet_accessor(network);
 			
 			
@@ -199,7 +204,7 @@ namespace Intersection_Components
 					{
 						inbound_movement=(Movement_Interface*)(*inbound_itr);
 
-						inbound_link=inbound_movement->movement_reference<Link_Interface*>();
+						inbound_link=inbound_movement->inbound_link<Link_Interface*>();
 
 						if(((Vehicle_Interface*)vehicle)->next_link<Link_Interface*>()==inbound_link)
 						{
@@ -238,6 +243,8 @@ namespace Intersection_Components
 				OutboundInboundType& outbound_links_container=outbound_inbound_movements<OutboundInboundType&>();
 				typename OutboundInboundType::iterator outbound_itr;
 				
+				//PRINT("\t" << "turn movement capacities of node " << uuid<int>());
+
 				for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
 					outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_link_reference<Link_Interface*>();
@@ -248,12 +255,14 @@ namespace Intersection_Components
 					InboundMovementsType& inbound_links_container=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->inbound_movements<InboundMovementsType&>();
 					typename InboundMovementsType::iterator inbound_itr;
 					Movement_Interface* inbound_movement;
+					
+					//PRINT("\t\t" << "for outbound link " << outbound_link->uuid<int>());
 
 					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 					{
 						inbound_movement=(Movement_Interface*)(*inbound_itr);
 
-						inbound_link=inbound_movement->movement_reference<Link_Interface*>();
+						inbound_link=inbound_movement->inbound_link<Link_Interface*>();
 						float inbound_link_capacity = inbound_link->link_capacity<float>(); 
 						
 						if(intersection_type<Types::Intersection_Type_Keys>() == Types::Intersection_Type_Keys::NO_CONTROL)
@@ -264,6 +273,8 @@ namespace Intersection_Components
 						{
 							inbound_movement->movement_capacity<float>(min(inbound_link_capacity,outbound_link_capacity));
 						}
+
+						//PRINT("\t\t\t" << "for inbound link " << inbound_link->uuid<int>() << " is: " << inbound_movement->movement_capacity<float>());
 					}
 				}
 			}
@@ -301,10 +312,14 @@ namespace Intersection_Components
 				OutboundInboundType& outbound_links_container=outbound_inbound_movements<OutboundInboundType&>();
 				typename OutboundInboundType::iterator outbound_itr;
 
+				//PRINT("\t" << "turn movement supplies of node " << uuid<int>());
+
 				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
 					outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_link_reference<Link_Interface*>();
 					
+					//PRINT("\t\t" << "for outbound link " << outbound_link->uuid<int>());
+
 					Movement_Interface* inbound_movement;
 					Link_Interface* inbound_link;
 					InboundMovementsType& inbound_links_container=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->inbound_movements<InboundMovementsType&>();
@@ -329,7 +344,7 @@ namespace Intersection_Components
 						{
 							inbound_movement=(Movement_Interface*)(*inbound_itr);
 
-							inbound_link=inbound_movement->movement_reference<Link_Interface*>();
+							inbound_link=inbound_movement->inbound_link<Link_Interface*>();
 
 							int num_lanes_inbound_link = inbound_link->num_lanes<int>();
 							int link_type_inbound_link = inbound_link->link_type<int>();
@@ -384,7 +399,7 @@ namespace Intersection_Components
 						{
 							inbound_movement=(Movement_Interface*)(*inbound_itr);
 
-							inbound_link=inbound_movement->movement_reference<Link_Interface*>();
+							inbound_link=inbound_movement->inbound_link<Link_Interface*>();
 
 							int link_type_inbound_link = inbound_link->link_type<int>();
 							float merge_ratio = 0;
@@ -399,6 +414,8 @@ namespace Intersection_Components
 							}
 
 							inbound_movement->movement_supply<float>(merge_ratio*outbound_link->link_supply<float>());
+
+							//PRINT("\t\t\t" << "for inbound link " << inbound_link->uuid<int>() << " is: " << inbound_movement->movement_supply<float>());
 						}
 						///simple rule as Daganzo
 					}
@@ -445,7 +462,7 @@ namespace Intersection_Components
 					{
 						inbound_movement=(Movement_Interface*)(*inbound_itr);
 
-						inbound_link=inbound_movement->movement_reference<Link_Interface*>();
+						inbound_link=inbound_movement->inbound_link<Link_Interface*>();
 
 						int t_minus_fftt = -1;
 
@@ -480,6 +497,8 @@ namespace Intersection_Components
 						float turn_movement_supply =  inbound_movement->movement_supply<float>();
 						float turn_movement_flow = (float) min(min((double)turn_movement_demand,(double)turn_movement_capacity),(double)turn_movement_supply);
 						inbound_movement->movement_flow<float>(turn_movement_flow);
+
+						PRINT("\t" << "Turn movement flow: " << turn_movement_flow);
 					}
 				}
 			}
@@ -532,7 +551,7 @@ namespace Intersection_Components
 					{
 						inbound_movement=(Movement_Interface*)(*inbound_itr);
 
-						inbound_link=inbound_movement->movement_reference<Link_Interface*>();
+						inbound_link=inbound_movement->inbound_link<Link_Interface*>();
 
 						inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(0);
 						inbound_movement->inbound_link_departure_time_based_experienced_link_turn_travel_delay<float>(0);
@@ -551,7 +570,10 @@ namespace Intersection_Components
 						
 						if(transfer_flow_turn_movement > 0.0)
 						{
-							if(rand()%2==0)
+							std::uniform_real_distribution<double> distribution(0,1);
+							double rng=distribution(generator);
+
+							if(rng<=transfer_flow_turn_movement)
 							{//partial vehicle, incomplete implementation
 								++num_transfer_vehicles_of_turn_movement;
 							}
@@ -714,7 +736,7 @@ namespace Intersection_Components
 					{
 						inbound_movement=(Movement_Interface*)(*inbound_itr);
 
-						inbound_link=inbound_movement->movement_reference<Link_Interface*>();
+						inbound_link=inbound_movement->inbound_link<Link_Interface*>();
 
 						int t_plus_fftt = -1;
 
@@ -748,7 +770,7 @@ namespace Intersection_Components
 					}
 				}
 			}
-
+			
 			facet void Initialize()
 			{
 				schedule_event_local(ThisType,Newells_Conditional,Compute_Step_Flow,0,NULLTYPE);
@@ -814,7 +836,7 @@ namespace Intersection_Components
 							for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 							{
 								inbound_movement=(Movement_Interface*)(*inbound_itr);
-								inbound_link=inbound_movement->movement_reference<Link_Interface*>();
+								inbound_link=inbound_movement->inbound_link<Link_Interface*>();
 
 								done=done &&
 									(inbound_link->link_simulation_status<link_simulation_status_type>()
@@ -828,7 +850,7 @@ namespace Intersection_Components
 
 						if(done)
 						{
-							PRINT("\t" << "Run Compute_Step_Flow, Return This Iteration");
+							//PRINT("\t" << "Run Compute_Step_Flow, Return This Iteration");
 							
 							pthis->Swap_Event((Event)&Intersection_Interface::Compute_Step_Flow<NULLTYPE>);
 							response.result=true;
@@ -836,7 +858,7 @@ namespace Intersection_Components
 						}
 						else
 						{
-							PRINT("\t" << "Compute_Step_Flow_Supply_Update Not Finished, Return This Iteration");
+							//PRINT("\t" << "Compute_Step_Flow_Supply_Update Not Finished, Return This Iteration");
 							response.result=false;
 							response.next=iteration;
 						}
@@ -845,7 +867,7 @@ namespace Intersection_Components
 					{
 						//link not visited yet
 
-						PRINT("\t" << "Link Not Visited, Return This Iteration");
+						//PRINT("\t" << "Link Not Visited, Return This Iteration");
 						response.result=false;
 						response.next=iteration;
 					}
@@ -858,14 +880,14 @@ namespace Intersection_Components
 
 					if(link_next_revision.iteration>iteration)
 					{
-						PRINT("\t" << "Run Network_State_Update, Return Next Iteration");
+						//PRINT("\t" << "Run Network_State_Update, Return Next Iteration");
 						pthis->Swap_Event((Event)&Intersection_Interface::Network_State_Update<NULLTYPE>);
 						response.result=true;
 						response.next=iteration+1;
 					}
 					else
 					{
-						PRINT("\t" << "Compute_Step_Flow_Link_Moving Not Finished, Return This Iteration");
+						//PRINT("\t" << "Compute_Step_Flow_Link_Moving Not Finished, Return This Iteration");
 						response.result=false;
 						response.next=iteration;
 					}
@@ -890,7 +912,7 @@ namespace Intersection_Components
 
 				_this->intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE);
 
-				PRINT("\t\t" << "COMPUTE_STEP_FLOW_COMPLETE");
+				//PRINT("\t\t" << "COMPUTE_STEP_FLOW_COMPLETE");
 			}
 
 			declare_facet_event(Network_State_Update)
@@ -902,7 +924,7 @@ namespace Intersection_Components
 
 				_this->intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::NETWORK_STATE_UPDATE_COMPLETE);
 
-				PRINT("\t\t" << "NETWORK_STATE_UPDATE_COMPLETE");
+				//PRINT("\t\t" << "NETWORK_STATE_UPDATE_COMPLETE");
 			}
 		};
 	}

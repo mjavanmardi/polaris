@@ -13,7 +13,7 @@ struct Master_Type
 	typedef Intersection_Components::Components::Polaris_Movement_Component<T>::type movement_type;
 
 	typedef Link_Components::Components::Polaris_Link_Component<T>::type link_type;
-	typedef Link_Components::Components::Polaris_Turn_Movement_Component<T>::type turn_movement_type;
+	typedef Intersection_Components::Components::Polaris_Movement_Component<T>::type turn_movement_type;
 
 	typedef Vehicle_Components::Components::Polaris_Vehicle_Component<T>::type vehicle_type;
 
@@ -46,13 +46,15 @@ struct Master_Type
 
 void main()
 {
+	generator.seed(1);
+
 	//data
 	cout << "allocating data structures..." <<endl;	
 	typedef Master_Type::scenario_type scenario_type;
 	typedef Scenario_Components::Interfaces::Scenario_Interface<scenario_type,NULLTYPE> Scenario_Interface;
 	
 	Scenario_Interface* scenario=(Scenario_Interface*)Allocate<scenario_type>();
-	scenario->current_simulation_interval_index<int>(0);
+	//scenario->current_simulation_interval_index<int>(0);
 
 	typedef Master_Type::network_type network_type;
 	typedef Network_Components::Interfaces::Network_Interface<network_type,NULLTYPE> Network_Interface;

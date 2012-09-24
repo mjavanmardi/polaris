@@ -46,7 +46,7 @@ namespace Intersection_Components
 			member_data_basic(int, turn_movement_cumulative_shifted_arrival_vehicles);
 			
 			member_data_basic(float, minimum_merge_rate);
-			
+
 		//==================================================================================================================
 		/// Replicas Containers
 		//------------------------------------------------------------------------------------------------------------------
@@ -78,17 +78,6 @@ namespace Intersection_Components
 			tag_setter(forward_link_turn_travel_time);
 
 			float _forward_link_turn_travel_time;
-
-
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType movement_reference(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_movement_reference;}
-			tag_getter(movement_reference);
-			template<typename ThisType, typename CallerType, typename TargetType>
-			void movement_reference(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_movement_reference=(void*)set_value;}
-			tag_setter(movement_reference);
-
-			void* _movement_reference;
-
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
@@ -145,7 +134,25 @@ namespace Intersection_Components
 
 			vehicles_container_type _vehicles_container;
 
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType inbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_link;}
+			tag_getter(inbound_link);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void inbound_link(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_inbound_link=(void*)set_value;}
+			tag_setter(inbound_link);
 
+			void* _inbound_link;
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType outbound_link(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_outbound_link;}
+			tag_getter(outbound_link);
+			template<typename ThisType, typename CallerType, typename TargetType>
+			void outbound_link(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched))){_outbound_link=(void*)set_value;}
+			tag_setter(outbound_link);
+
+			void* _outbound_link;
+
+			member_data_basic(int, id);
 		};
 		
 
@@ -234,7 +241,8 @@ namespace Intersection_Components
 			member_data_basic(Intersection_Components::Types::Intersection_Type_Keys, intersection_type);
 
 			member_data_basic(Types::Intersection_Simulation_Status, intersection_simulation_status);
-
+			
+			//member_data_basic(RngStream, rng_stream);
 
 			typedef vector<Link_Components::Interfaces::Link_Interface<link_type, NULLTYPE>*> LinkContainerType;
 

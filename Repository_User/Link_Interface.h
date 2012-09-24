@@ -29,18 +29,18 @@ namespace Link_Components
 	
 	namespace Interfaces
 	{
-		template<typename ThisType, typename CallerType>
-		struct Turn_Movement_Interface
-		{
-			facet_accessor(inbound_link);
-			facet_accessor(outbound_link);
-			facet_accessor(turn_movement_type);
-			facet_accessor(turn_movement_rule);
-			facet_accessor(turn_travel_penalty);
-			facet_accessor(forward_link_turn_travel_time);
-			facet_accessor(id);
-			facet_accessor(replicas_container);
-		};
+		//template<typename ThisType, typename CallerType>
+		//struct Turn_Movement_Interface
+		//{
+		//	facet_accessor(inbound_link);
+		//	facet_accessor(outbound_link);
+		//	facet_accessor(turn_movement_type);
+		//	facet_accessor(turn_movement_rule);
+		//	facet_accessor(turn_travel_penalty);
+		//	facet_accessor(forward_link_turn_travel_time);
+		//	facet_accessor(id);
+		//	facet_accessor(replicas_container);
+		//};
 
 
 		template<typename ThisType,typename CallerType>
@@ -167,8 +167,8 @@ namespace Link_Components
 			facet void p_vehicle(TargetType* veh/*,requires(TargetType,IsUnloaded)*/)
 			{
 				link_origin_cumulative_arrived_vehicles<int&>()++;
-				typedef typename ThisType::link_origin_vehicle_array_type LinkOriginVehiclesType;
-				link_origin_vehicle_array<LinkOriginVehiclesType>().push_back(veh);
+				typedef typename ThisType::link_origin_vehicle_array_type VehicleOriginContainerType;
+				link_origin_vehicle_array<VehicleOriginContainerType&>().push_back(veh);
 				veh->load_to_entry_queue<NULLTYPE>();
 			}
 
@@ -266,7 +266,7 @@ namespace Link_Components
 				}
 
 
-				PRINT("\t\t" << "link N has supply " << link_supply<float>());
+				//PRINT("\t" << "link " << uuid<int>() << " has supply " << link_supply<float>());
 			}
 
 			facet void link_moving()
@@ -327,7 +327,7 @@ namespace Link_Components
 
 				//arrived vehicles at current interval
 				int current_position = link_origin_vehicle_current_position<int>();
-				
+
 				if(current_position<(int)link_origin_vehicle_array<VehicleOriginContainerType&>().size())
 				{
 					for(int iv=current_position;iv<(int)link_origin_vehicle_array<VehicleOriginContainerType&>().size();iv++)
@@ -358,10 +358,12 @@ namespace Link_Components
 					float link_available_spaces = link_supply<float>() - link_upstream_arrived_vehicles<float>();
 					int num_link_origin_departed_vehicles_allowed = (int) link_available_spaces;
 					float link_origin_departed_flow_allowed = (float) (link_available_spaces - num_link_origin_departed_vehicles_allowed);
-						
+					
 					if (link_origin_departed_flow_allowed>0.0)
 					{//partial vehicle
-						if(rand()%2==0)
+						std::uniform_real_distribution<double> distribution(0,1);
+						double rng=distribution(generator);
+						if(rng<=link_origin_departed_flow_allowed)
 						{//partial vehicle, incomplete implementation
 							++num_link_origin_departed_vehicles_allowed;
 						}
@@ -576,7 +578,7 @@ namespace Link_Components
 
 				if(sub_iteration==0)
 				{
-					PRINT("\t" << "Compute_Route Not Finished, Return This Iteration");
+					//PRINT("\t" << "Compute_Route Not Finished, Return This Iteration");
 
 					pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Supply_Update<NULLTYPE>);
 					response.result=false;
@@ -584,7 +586,7 @@ namespace Link_Components
 				}
 				else if(_this->link_simulation_status<Types::Link_Simulation_Status>()==Types::Link_Simulation_Status::NONE_COMPLETE)
 				{
-					PRINT("\t" << "Run Compute_Step_Flow_Supply_Update, Return This Iteration");
+					//PRINT("\t" << "Run Compute_Step_Flow_Supply_Update, Return This Iteration");
 
 					pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Supply_Update<NULLTYPE>);
 					response.result=true;
@@ -608,8 +610,8 @@ namespace Link_Components
 						==intersection_simulation_status_type::COMPUTE_STEP_FLOW_COMPLETE)
 					{
 						//upstream and downstream intersections check out, ready for "phase 2: Compute_Step_Flow_Link_Moving"
-						
-						PRINT("\t" << "Run Compute_Step_Flow_Link_Moving, Return Next Iteration");
+								
+						//PRINT("\t" << "Run Compute_Step_Flow_Link_Moving, Return Next Iteration");
 
 						pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Link_Moving<NULLTYPE>);
 						response.result=true;
@@ -618,8 +620,8 @@ namespace Link_Components
 					else
 					{
 						//either upstream and/or downstream intersection is not done, come back later
-						
-						PRINT("\t" << "Compute_Step_Flow Not Finished, Return This Iteration");
+
+						//PRINT("\t" << "Compute_Step_Flow Not Finished, Return This Iteration");
 
 						response.result=false;
 						response.next=iteration;
@@ -636,7 +638,7 @@ namespace Link_Components
 
 				_this->link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE);
 
-				PRINT("\t\t" << "COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE");
+				//PRINT("\t\t" << "COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE");
 			}
 
 			declare_facet_event(Compute_Step_Flow_Link_Moving)
@@ -654,7 +656,7 @@ namespace Link_Components
 
 				_this->link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE);
 
-				PRINT("\t\t" << "COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE");
+				//PRINT("\t\t" << "COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE");
 			}
 		};
 

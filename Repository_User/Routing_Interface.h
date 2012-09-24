@@ -172,9 +172,9 @@ namespace Routing_Components
 							RegularMovementInterface* regular_outbound_movement = (RegularMovementInterface*)(*regular_outbound_movement_itr);
 							RoutableMovementInterface* routable_outbound_movement = (RoutableMovementInterface*)Allocate<RoutableMovementType>();
 							routable_outbound_movement->forward_link_turn_travel_time<float>(regular_outbound_movement->forward_link_turn_travel_time<float>());
-							RegularLinkInterface* regular_outbound_link = regular_outbound_movement->movement_reference<RegularLinkInterface*>();
+							RegularLinkInterface* regular_outbound_link = regular_outbound_movement->outbound_link<RegularLinkInterface*>();
 							RoutableLinkInterface* routable_outbound_link = linksMap.find(regular_outbound_link)->second;
-							routable_outbound_movement->movement_reference<RoutableLinkInterface*>(routable_outbound_link);
+							routable_outbound_movement->outbound_link<RoutableLinkInterface*>(routable_outbound_link);
 							regular_outbound_movement->replicas_container<RoutableMovementsContainerType&>().push_back(routable_outbound_movement);
 							routable_inbound_outbound_movements->outbound_movements<RoutableMovementsContainerType&>().push_back(routable_outbound_movement);
 						}
@@ -202,9 +202,9 @@ namespace Routing_Components
 							RegularMovementInterface* regular_inbound_movement = (RegularMovementInterface*)(*regular_inbound_movement_itr);
 							RoutableMovementInterface* routable_inbound_movement = (RoutableMovementInterface*)Allocate<RoutableMovementType>();
 							routable_inbound_movement->forward_link_turn_travel_time<float>(regular_inbound_movement->forward_link_turn_travel_time<float>());
-							RegularLinkInterface* regular_outbound_link = regular_inbound_movement->movement_reference<RegularLinkInterface*>();
-							RoutableLinkInterface* routable_outbound_link = linksMap.find(regular_outbound_link)->second;
-							routable_inbound_movement->movement_reference<RoutableLinkInterface*>(routable_outbound_link);
+							RegularLinkInterface* regular_inbound_link = regular_inbound_movement->inbound_link<RegularLinkInterface*>();
+							RoutableLinkInterface* routable_inbound_link = linksMap.find(regular_inbound_link)->second;
+							routable_inbound_movement->inbound_link<RoutableLinkInterface*>(routable_inbound_link);
 							regular_inbound_movement->replicas_container<RoutableMovementsContainerType&>().push_back(routable_inbound_movement);
 							routable_outbound_inbound_movements->inbound_movements<RoutableMovementsContainerType&>().push_back(routable_inbound_movement);
 						}
@@ -270,7 +270,7 @@ namespace Routing_Components
 						{
 							RoutableMovementInterface* outbound_movement = (RoutableMovementInterface*)(*outbound_movement_itr);
 							cout<<"\t\t\t\t outbound_movements_"<<k<<endl;
-							cout<<"\t\t\t\t\t movement_reference: "<<outbound_movement->movement_reference<RoutableLinkInterface*>()->uuid<int>()<<endl;
+							cout<<"\t\t\t\t\t outbound_link: "<<outbound_movement->outbound_link<RoutableLinkInterface*>()->uuid<int>()<<endl;
 							cout<<"\t\t\t\t\t forward_link_turn_travel_time: "<<outbound_movement->forward_link_turn_travel_time<float>()<<endl;
 						}
 					}
@@ -291,7 +291,7 @@ namespace Routing_Components
 						{
 							RoutableMovementInterface* outbound_movement = (RoutableMovementInterface*)(*outbound_movement_itr);
 							cout<<"\t\t\t\t inbound_movements_"<<k<<endl;
-							cout<<"\t\t\t\t\t movement_reference: "<<outbound_movement->movement_reference<RoutableLinkInterface*>()->uuid<int>()<<endl;
+							cout<<"\t\t\t\t\t inbound_link: "<<outbound_movement->inbound_link<RoutableLinkInterface*>()->uuid<int>()<<endl;
 							cout<<"\t\t\t\t\t forward_link_turn_travel_time: "<<outbound_movement->forward_link_turn_travel_time<float>()<<endl;
 						}
 					}
@@ -443,7 +443,7 @@ namespace Routing_Components
 							for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
 							{
 								MovementInterface* outbound_movement = (MovementInterface*)(*outbound_itr);
-								RoutableLinkInterface* next_link=outbound_movement->movement_reference<RoutableLinkInterface*>();
+								RoutableLinkInterface* next_link=outbound_movement->outbound_link<RoutableLinkInterface*>();
 								next_cost=outbound_movement->forward_link_turn_travel_time<float>();
 								new_cost=current_link->label_cost<float>();
 
@@ -530,7 +530,7 @@ namespace Routing_Components
 
 				origin_link->p_vehicle(veh);
 
-				PRINT("\t\t" << "COMPUTE_ROUTE_COMPLETE");
+				//PRINT("\t\t" << "COMPUTE_ROUTE_COMPLETE");
 			}
 		};
 	}
