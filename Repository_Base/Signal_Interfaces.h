@@ -478,8 +478,8 @@ namespace Signal_Components
 				// adjustment factor for lane width
 				facet float HCM_adjustment_fw()
 				{				
-					float width = THIS->avg_lane_width<Data_Structures::Length_Foot>().value;
-					State_Checks::valid_lane_width<ThisType,CallerType,TargetType>(this, width);
+					float width = THIS->avg_lane_width<Data_Structures::Length_Foot>();
+					State_Checks::valid_lane_width<ThisType, CallerType, TargetType>(this, width);
 					return (1.0f + (width - 12.0f)/30.0f);
 				}
 				// adjustment factor for heavy vehicles in traffic stream
@@ -597,6 +597,7 @@ namespace Signal_Components
 			facet_accessor_interface(Detector_Left);
 			facet_accessor_interface(Detector_Right);
 			facet_accessor_interface(Detector_Thru);
+			facet_accessor(Lane_Group_LOS);
 
 			//=======================================================
 			// DATA Access Facets
@@ -681,7 +682,7 @@ namespace Signal_Components
 
 
 			//============================================================
-			//  Member functions
+			//  Phase Calculation Members
 			//------------------------------------------------------------
 			/// Get the maximum saturation ratio from amonst the individual lane_group in the phase
 			facet TargetType Find_Critical_VS_Ratio(call_requirements(
@@ -762,7 +763,6 @@ namespace Signal_Components
 
 			facet void Update_Demand(TargetType time, call_requirements(
 				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
-				requires(ThisType, Concepts::Is_HCM_Simple_Solution) && 
 				requires(TargetType, Concepts::Is_Time)))
 			{
 				// Get reference to the Lane Groups in the current phase
@@ -776,6 +776,14 @@ namespace Signal_Components
 					(*itr)->Update_Demand<TargetType>(time);
 				}
 			}
+			facet void Update_Demand(TargetType time, call_requirements(!(
+				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
+				requires(TargetType, Concepts::Is_Time))))
+			{
+				assert_requirements(ThisType, Concepts::Has_Child_Lane_Group, "ThisType does not have an associated LaneGroupType as a child element.");
+				assert_requirements(TargetType, Concepts::Is_Time, "The TargetType specified is not  a Time object.");
+			}
+
 
 			//============================================================
 			//  SIGNAL STATUS ACCESSORS
@@ -828,8 +836,7 @@ namespace Signal_Components
 				this->num_cycles_between_updates<int>(0);
 				schedule_event_local(ThisType,Signal_Check_Conditional, Change_Signal_State, 0, NULLTYPE);
 			}
-
-			
+	
 			//=======================================================
 			// HCM Retiming calculations
 			//-------------------------------------------------------
@@ -842,6 +849,9 @@ namespace Signal_Components
 				// Simplify ThisType name
 				typedef ThisType T;
 
+				ofstream* out = this->output_stream<ofstream*>();
+
+
 				// Get reference to the phases in the signal phase diagram
 				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
 				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = phases->begin();
@@ -849,26 +859,40 @@ namespace Signal_Components
 				// Sum total lost time and critical vs for all phases
 				float lost_time = 0;
 				float vs_sum = 0;
+				float vs_i=0;
 				for (itr; itr != phases->end(); itr++)
 				{
+					(*itr)->Update_Demand<Data_Structures::Time_Second>(iteration);
 					lost_time += (*itr)->yellow_and_all_red_time<TargetType>();
-					vs_sum += (*itr)->Find_Critical_VS_Ratio<float>();
+					vs_i= (*itr)->Find_Critical_VS_Ratio<float>();
+					vs_sum += vs_i;
+					if (out != NULL) (*out) << "\t"<<vs_i;
 				}
 
 				// Get estimated cycle length
 				TargetType cycle;
-				cycle = (TargetType)((float)lost_time) * (this->degree_of_saturation<float>()) / (1.0f - vs_sum);
+				cycle = (TargetType)((float)lost_time) * (this->degree_of_saturation<float>()) / (this->degree_of_saturation<float>() - vs_sum);
 				this->cycle_length<TargetType>(cycle);
 				TargetType effective_cycle = cycle - lost_time;
 				
 
 				// Set green time for each phase
-				TargetType vs;
+				TargetType cycle_rounded = 0;
 				for (itr=phases->begin(); itr != phases->end(); itr++)
 				{
-					vs = (*itr)->Find_Critical_VS_Ratio<float>();
-					(*itr)->green_time<TargetType>(effective_cycle * vs / vs_sum);
+					float vs;
+					if (vs_sum > 0)	vs = (*itr)->Find_Critical_VS_Ratio<float>()/vs_sum;
+					else vs = 0;
+
+					float temp_green = max(5.0f,(float)effective_cycle * vs);
+					float remain = temp_green - (float)((int)temp_green);
+					if (remain >=0.5f) temp_green = (int)temp_green + 1;
+					else temp_green = (int)temp_green;
+					(*itr)->green_time<Data_Structures::Time_Second>((TargetType)temp_green);
+					cycle_rounded = cycle_rounded + (TargetType)temp_green;
 				}
+				cycle_rounded = cycle_rounded + lost_time;
+				this->cycle_length<Data_Structures::Time_Second>(cycle_rounded);
 			}
 			/// HCM Retiming calculations for simple signals
 			facet void Update_Timing(call_requirements(
@@ -918,11 +942,10 @@ namespace Signal_Components
 				{
 					float vol = (*itr)->Find_Critical_Phase_Volume<Data_Structures::Flow_Per_Hour>();
 
-					float temp_green = max(3.0f,(float)effective_cycle * vol / critical_sum);
-					int num_2second_intervals = max(1,(int)temp_green / 2);
-					float remain = temp_green / (float)num_2second_intervals - (float)((int)temp_green);
-					if (remain >=1.0f) num_2second_intervals++;
-					temp_green = num_2second_intervals * 2;
+					float temp_green = max(5.0f,(float)effective_cycle * vol / max(1.0f,critical_sum));
+					float remain = temp_green - (float)((int)temp_green);
+					if (remain >=0.5f) temp_green = (int)temp_green + 1;
+					else temp_green = (int)temp_green;
 					(*itr)->green_time<Data_Structures::Time_Second>((TargetType)temp_green);
 					cycle_rounded = cycle_rounded + (TargetType)temp_green;
 				}
@@ -967,6 +990,13 @@ namespace Signal_Components
 				}
 				(*out)<<endl;
 				
+			}
+			/// HCM LOS Calculation
+			facet void Calculate_Signal_LOS(call_requirements(
+				requires(ThisType,Concepts::Has_Child_Phase) && 
+				requires(typename ThisType, Concepts::Is_HCM_Simple_Solution)))
+			{
+
 			}
 
 

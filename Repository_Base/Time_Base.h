@@ -61,27 +61,27 @@ namespace Time_Components
 			/// Add a DRSeconds time value to the current time
 			facet_base void Add_Time(TargetType t, call_requirements(requires(ThisType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_DRSeconds)))
 			{
-				this->_local_time += (float)t.Time / (float)10.0;
+				this->_local_time = this->_local_time + (float)t/ (float)10.0;
 			}
 			/// Add a Seconds time value to the current time
 			facet_base void Add_Time(TargetType& t, call_requirements(requires(ThisType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Seconds)))
 			{
-				this->_local_time+=(float)t.Time;
+				this->_local_time = this->_local_time + (float)t;
 			}
 			/// Add a Minutes time value to the current time
 			facet_base void Add_Time(TargetType& t, call_requirements(requires(ThisType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Minutes)))
 			{
-				this->local_time+=(float)t.Time * (float)60.0;
+				this->local_time=this->_local_time + (float)t * (float)60.0;
 			}
 			/// Add a Hours time value to the current time
 			facet_base void Add_Time(TargetType& t, call_requirements(requires(ThisType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Hours)))
 			{
-				this->_local_time+=(float)t.Time * (float)3600.0;
+				this->_local_time=this->_local_time + (float)t.Time * (float)3600.0;
 			}
 			/// Add a Days time value to the current time
 			facet_base void Add_Time(TargetType& t, call_requirements(requires(ThisType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Days)))
 			{
-				this->_local_time+=(float)t.Time / (float)86400.0;
+				this->local_time=this->_local_time + (float)t  / (float)86400.0;
 			}
 			/// Adding time Error Handler
 			facet_base void Add_Time(TargetType& t, call_requirements(

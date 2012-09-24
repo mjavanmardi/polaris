@@ -9,7 +9,8 @@ namespace Trip_Components
 	{
 		struct Trip_Base
 		{
-		protected:
+			typedef true_type TripType;
+
 
 			///====================================================================
 			/// Trip Initializers requires valid Time and Location Types

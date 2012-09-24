@@ -35,11 +35,11 @@ struct DATA_STRUCT_NAME \
 {													\
 	typedef true_type TYPE_TRAIT_TAGS, __VA_ARGS__; \
 	typedef DATA_VALUE_TYPE ValueType; \
-	DATA_STRUCT_NAME(DATA_VALUE_TYPE val): value(val){} \
-	DATA_STRUCT_NAME(): value(0){} \
-	DATA_VALUE_TYPE value; \
-	operator DATA_VALUE_TYPE(){return value;}; \
-	DATA_STRUCT_NAME& operator=(const DATA_VALUE_TYPE& obj){value = obj; return *this;}  \
+	DATA_STRUCT_NAME(DATA_VALUE_TYPE val): Value(val){} \
+	DATA_STRUCT_NAME(): Value(0){} \
+	DATA_VALUE_TYPE Value; \
+	operator DATA_VALUE_TYPE(){return Value;}; \
+	DATA_STRUCT_NAME& operator=(DATA_VALUE_TYPE& obj){Value = obj; return *this;}  \
 };
 
 concept Is_Target_Type_Struct

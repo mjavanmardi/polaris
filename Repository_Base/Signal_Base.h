@@ -211,8 +211,8 @@ namespace Signal_Components
 			tag_getter_setter(avg_lane_width);
 			facet_base  void avg_lane_width(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,Concepts::Is_Foot_Measure)))
 			{
-				State_Checks::valid_lane_width<ThisType,CallerType,TargetType>(this,set_value.value);
-				_avg_lane_width=(float)set_value.value;
+				State_Checks::valid_lane_width<ThisType,CallerType,TargetType>(this,set_value);
+				_avg_lane_width=(float)set_value;
 			}
 			facet_base  void avg_lane_width(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,Concepts::Is_Meter_Measure)))
 			{
