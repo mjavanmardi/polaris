@@ -76,8 +76,8 @@ namespace Signal_Components
 		concept Has_Child_Phase
 		{
 			begin_requirements_list;
-			requires_typename_defined(none, Phase_Base, "ThisType does not have a Phase child type: no Phase_Base type is defined.");
-			end_requirements_list(Phase_Base);
+			requires_named_member(none, Phases, "ThisType does not have a Phase child type: no Phase_Base type is defined.");
+			end_requirements_list(Phases);
 		};
 		#pragma endregion
 
@@ -85,8 +85,8 @@ namespace Signal_Components
 		concept Has_Child_Lane_Group
 		{
 			begin_requirements_list;
-			requires_typename_defined(none, Lane_Group_Base, "ThisType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
-			end_requirements_list(Lane_Group_Base);
+			requires_named_member(none, Lane_Groups, "ThisType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
+			end_requirements_list(Lane_Groups);
 		};
 		#pragma endregion
 
@@ -686,14 +686,12 @@ namespace Signal_Components
 			//------------------------------------------------------------
 			/// Get the maximum saturation ratio from amonst the individual lane_group in the phase
 			facet TargetType Find_Critical_VS_Ratio(call_requirements(
-				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
 				requires(ThisType, Concepts::Is_HCM_Full_Solution) && 
-				requires(TargetType, is_arithmetic) /*&& 
-				requires_2(typename ThisType::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>&, is_convertible)*/))
+				requires(TargetType, is_arithmetic)))
 			{
 				// Get reference to the Lane Groups in the current phase
 				typedef ThisType T;
-				typedef Interfaces::Lane_Group_Interface<typename T::Lane_Group_Type<Execution_Object,T>::type, CallerType>* LaneGroupItf;
+				typedef Interfaces::Lane_Group_Interface<typename ThisType::Master_Type::LANE_GROUP_TYPE, CallerType>* LaneGroupItf;
 				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
 				vector<LaneGroupItf>::iterator itr = lane_group->begin();
 
@@ -711,10 +709,8 @@ namespace Signal_Components
 			}
 
 			facet TargetType Find_Critical_VS_Ratio(call_requirements(!(
-				requires(ThisType,Concepts::Has_Child_Lane_Group) && 
 				requires(ThisType, Concepts::Is_HCM_Full_Solution) && 
-				requires(TargetType, is_arithmetic) /*&& 
-				requires_2(typename ThisType::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, is_convertible)*/)))
+				requires(TargetType, is_arithmetic))))
 			{
 				assert_requirements(ThisType,Concepts::Has_Child_Lane_Group,"Your Phase component does not have a LaneGroupType defined.  Please add a lane group type to the base.");
 				assert_requirements(ThisType,Concepts::Is_HCM_Full_Solution,"Your Phase component does not have a solution type defined.  Please add 'HCM_Simple' or HCM_Full' type tag.");
@@ -723,14 +719,12 @@ namespace Signal_Components
 
 			/// Get the maximum critical phase volume from amonst the individual lane_group in the phase
 			facet TargetType Find_Critical_Phase_Volume(call_requirements(
-				requires(ThisType,Concepts::Has_Child_Lane_Group) && 
 				requires(ThisType, Concepts::Is_HCM_Simple_Solution) && 
-				requires(TargetType, Concepts::Is_Flow_Per_Hour) /*&& 
-				requires_2(typename ThisType::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, is_convertible)*/))
+				requires(TargetType, Concepts::Is_Flow_Per_Hour)))
 			{
 				// Get reference to the Lane Groups in the current phase
 				typedef ThisType T;
-				typedef Interfaces::Lane_Group_Interface<typename T::Lane_Group_Type<Execution_Object,T>::type, CallerType>* LaneGroupItf;
+				typedef Interfaces::Lane_Group_Interface<typename ThisType::Master_Type::LANE_GROUP_TYPE, CallerType>* LaneGroupItf;
 				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
 				vector<LaneGroupItf>::iterator itr = lane_group->begin();
 
@@ -749,25 +743,21 @@ namespace Signal_Components
 			}
 			
 			facet TargetType Find_Critical_Phase_Volume(call_requirements(!(
-				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
 				requires(ThisType, Concepts::Is_HCM_Simple_Solution) && 
-				requires(TargetType, Concepts::Is_Flow_Per_Hour) /*&& 
-				requires_2(typename ThisType::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, Interfaces::Lane_Group_Interface<typename ThisType::Lane_Group_Type::type>::type&, is_convertible)*/)))
+				requires(TargetType, Concepts::Is_Flow_Per_Hour))))
 			{
-				assert_requirements(ThisType,Concepts::Has_Child_Lane_Group,"Your Phase component does not have a LaneGroupType defined.  Please add a lane group type to the base.");
 				assert_requirements(ThisType,Concepts::Is_HCM_Simple_Solution,"Your Phase component does not have a solution type defined.  Please add 'HCM_Simple' or HCM_Full' type tag.");
-				assert_requirements_std(TargetType,Concepts::Is_Flow_Per_Hour,"Your TargetType is not a flow per hour measure.");
+				assert_requirements(TargetType,Concepts::Is_Flow_Per_Hour,"Your TargetType is not a flow per hour measure.");
 				//assert_requirements(ThisType::Lane_Group_Type::type,Is_Polaris_Component,"Your lane group is not a valid polaris component");
 				//assert_requirements_2(ThisType::LaneGroupType::Interface_Type&,Lange_Group_Interface,is_convertible,"Error - your lane group type is not convertible to the base lane group interface.");
 			}
 
 			facet void Update_Demand(TargetType time, call_requirements(
-				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
 				requires(TargetType, Concepts::Is_Time)))
 			{
 				// Get reference to the Lane Groups in the current phase
 				typedef ThisType T;
-				typedef Interfaces::Lane_Group_Interface<typename T::Lane_Group_Type<Execution_Object,T>::type, CallerType>* LaneGroupItf;
+				typedef Interfaces::Lane_Group_Interface<typename ThisType::Master_Type::LANE_GROUP_TYPE, CallerType>* LaneGroupItf;
 				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
 				vector<LaneGroupItf>::iterator itr = lane_group->begin();
 
@@ -776,8 +766,8 @@ namespace Signal_Components
 					(*itr)->Update_Demand<TargetType>(time);
 				}
 			}
+	
 			facet void Update_Demand(TargetType time, call_requirements(!(
-				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
 				requires(TargetType, Concepts::Is_Time))))
 			{
 				assert_requirements(ThisType, Concepts::Has_Child_Lane_Group, "ThisType does not have an associated LaneGroupType as a child element.");
@@ -836,26 +826,27 @@ namespace Signal_Components
 			//------------------------------------------------------------
 			/// Get the maximum saturation ratio from amonst the individual lane_group in the phase
 			facet void Calculate_Approach_LOS(call_requirements(
-				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
 				requires(TargetType, is_arithmetic)))
 			{
 				// Get reference to the Lane Groups in the current phase
 				typedef ThisType T;
-				typedef Interfaces::Lane_Group_Interface<typename T::Lane_Group_Type<Execution_Object, typename T::Lane_Group_Parent>::type, CallerType>* LaneGroupItf;
+				typedef Interfaces::Lane_Group_Interface<typename ThisType::Master_Type::LANE_GROUP_TYPE, CallerType>* LaneGroupItf;
 				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
 				vector<LaneGroupItf>::iterator itr = lane_group->begin();
 
 				// initialize critical vs ratio
-				TargetType sum_delay = 0;
-				TargetType sum_flow = 0;
+				float sum_delay = 0;
+				float sum_flow = 0;
 
 				// search each lane group in the approach and set the LOS and delay
 				for (itr; itr != lane_group->end(); itr++)
 				{
 					LaneGroupItf lg = *itr;
+					float g = lg->green_time<Data_Structures::Time_Second>();
+					float cycle = lg->cycle_length<Data_Structures::Time_Second>();
 					float v = lg->demand_lane_group<Data_Structures::Flow_Per_Hour>();
-					float gC = lg->green_time<Data_Structures::Time_Second>() / lg->cycle_length<Data_Structures::Time_Second>();
-					float c = lg->Calculate_Saturation_Flow_Rate<Data_Structures::Flow_Per_Hour>() * gC;
+					float gC = g / cycle;
+					float c = lg->Calculate_Saturation_Flow_Rate<float>() * gC;
 					float X = v/c;
 
 					float d1 = 0.5 * lg->cycle_length<Data_Structures::Time_Second>() * pow((1.0f - gC),2.0f) / (1.0f - min(1.0,X)*gC);
@@ -867,19 +858,16 @@ namespace Signal_Components
 					float d3 = 0.0f;
 
 					sum_flow += v;
-					sum_delay += d1*PF + d2 + d3;
+					sum_delay += (d1*PF + d2 + d3) * v;
 				}
 
-				this->delay<Data_Structures::Time_Second>(sum_delay/sum_flow);
+				sum_flow > 0 ? this->delay<Data_Structures::Time_Second>(sum_delay/sum_flow) : this->delay<Data_Structures::Time_Second>(0.0f);
 				this->approach_flow_rate<Data_Structures::Flow_Per_Hour>(sum_flow);
 			}
 
 			facet void Calculate_Approach_LOS(call_requirements(!(
-				requires(ThisType,Concepts::Has_Child_Lane_Group) && 
 				requires(TargetType, is_arithmetic))))
 			{
-				assert_requirements(ThisType,Concepts::Has_Child_Lane_Group,"Your Phase component does not have a LaneGroupType defined.  Please add a lane group type to the base.");
-				assert_requirements(ThisType,Concepts::Is_HCM_Full_Solution,"Your Phase component does not have a solution type defined.  Please add 'HCM_Simple' or HCM_Full' type tag.");
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not arithmetic.");
 			}
 
@@ -938,25 +926,20 @@ namespace Signal_Components
 			//-------------------------------------------------------
 			/// HCM Retiming calculations for complex signals, with full information
 			facet void Update_Timing(call_requirements(
-				requires(ThisType,Concepts::Has_Child_Phase) && 
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
 				requires(typename ThisType, Concepts::Is_HCM_Full_Solution)))
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
 
-				Interfaces::Signal_Interface<Components::HCM_Signal_Simple,NULLTYPE>* simple_signal = (Interfaces::Signal_Interface<Components::HCM_Signal_Simple,NULLTYPE>*)this;
+				Interfaces::Signal_Interface<typename ThisType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>* simple_signal = (Interfaces::Signal_Interface<typename ThisType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>*)this;
 				simple_signal->Update_Timing<Data_Structures::Time_Second>();
-
 
 				ofstream* out = this->output_stream<ofstream*>();
 
-				// FIRST, output the LOS information
-				Calculate_Signal_LOS<char>();
-
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
-				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = phases->begin();
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::FULL_PHASE_TYPE,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::FULL_PHASE_TYPE,NULLTYPE>*>*>();
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::FULL_PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
 
 				// Sum total lost time and critical vs for all phases
 				float lost_time = 0;
@@ -995,10 +978,12 @@ namespace Signal_Components
 				}
 				cycle_rounded = cycle_rounded + lost_time;
 				this->cycle_length<Data_Structures::Time_Second>(cycle_rounded);
+
+				// Finally, output the LOS information
+				this->Calculate_Signal_LOS<char>();
 			}
 			/// HCM Retiming calculations for simple signals
 			facet void Update_Timing(call_requirements(
-				requires(ThisType,Concepts::Has_Child_Phase) && 
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
 				requires(typename ThisType, Concepts::Is_HCM_Simple_Solution)))
 			{
@@ -1006,13 +991,10 @@ namespace Signal_Components
 				typedef ThisType T;
 
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
-				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = phases->begin();
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>*>();
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
 
 				ofstream* out = this->output_stream<ofstream*>();
-
-				// FIRST, output the LOS information
-				Calculate_Signal_LOS<char>();
 
 				// Sum total lost time and critical vs for all phases
 				float lost_time = 0;
@@ -1056,14 +1038,15 @@ namespace Signal_Components
 				}
 				cycle_rounded = cycle_rounded + lost_time;
 				this->cycle_length<Data_Structures::Time_Second>(cycle_rounded);
+
+				// FIRST, output the LOS information
+				Calculate_Signal_LOS<char>();
 			}
 			/// HCM Retiming calculation error handler
 			facet void Update_Timing(call_requirements(!(
-				requires(ThisType,Concepts::Has_Child_Phase) && 
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
 				(requires(ThisType, Concepts::Is_HCM_Full_Solution) || requires(ThisType, Concepts::Is_HCM_Simple_Solution)))))
 			{
-				assert_requirements(ThisType, Concepts::Has_Child_Phase,"Your Signal Type does not have a Phase child class type defined.");
 				assert_requirements(TargetType, Concepts::Is_Time_Seconds, "Your TargetType is not a measure of time in seconds.");
 				assert_requirements(ThisType, Concepts::Is_HCM_Full_Solution, "Your SignalType does not specify a full HCM solution, and");
 				assert_requirements(ThisType, Concepts::Is_HCM_Full_Solution, "Your SignalType does not specify a simple HCM solution");
@@ -1076,8 +1059,8 @@ namespace Signal_Components
 				
 
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
-				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = phases->begin();
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
 
 				
 				ofstream* out = this->output_stream<ofstream*>();		
@@ -1098,14 +1081,14 @@ namespace Signal_Components
 			}
 			/// HCM LOS Calculation
 			facet void Calculate_Signal_LOS(call_requirements(
-				requires(ThisType,Concepts::Has_Child_Phase)))
+				requires(TargetType,is_integral)))
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
 
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Approach_Interface<typename T::Approach_Type<Execution_Object,T>::type,NULLTYPE>*>* approaches = this->Approaches<vector<Interfaces::Approach_Interface<T::Approach_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
-				vector<Interfaces::Approach_Interface<typename T::Approach_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = approaches->begin();
+				vector<Interfaces::Approach_Interface<typename ThisType::Master_Type::APPROACH_TYPE,NULLTYPE>*>* approaches = this->Approaches<vector<Interfaces::Approach_Interface<typename ThisType::Master_Type::APPROACH_TYPE,NULLTYPE>*>*>();
+				vector<Interfaces::Approach_Interface<typename ThisType::Master_Type::APPROACH_TYPE,NULLTYPE>*>::iterator itr = approaches->begin();
 
 				ofstream* out = this->output_stream<ofstream*>();
 
@@ -1134,8 +1117,8 @@ namespace Signal_Components
 				Signal_Interface<ThisType,NULLTYPE>* _this=(Signal_Interface<ThisType,NULLTYPE>*)pthis;
 			
 				// Get interface to phases in signal
-				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = _this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
-				Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>* phase;
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = _this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
+				Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>* phase;
 
 				// Get the currently active phase
 				int active_phase = _this->active_phase<int>();
@@ -1227,8 +1210,8 @@ namespace Signal_Components
 				Signal_Interface<ThisType,NULLTYPE>* _this = (Signal_Interface<ThisType,NULLTYPE>*)pthis;
 
 				// Get interface to phases in signal
-				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = _this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
-				Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>* phase;
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = _this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
+				Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>* phase;
 
 				// Get the currently active phase
 				int active_phase = _this->active_phase<int>();

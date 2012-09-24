@@ -6,7 +6,7 @@
 namespace Signal_Components
 {
 	//==================================================================================================================
-	/// BASE Namespace of Base classes and Components related to the Interface(s) from the component namespace.
+	/// DETECTOR BASE Namespace of Base classes and Components related to the Interface(s) from the component namespace.
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Bases
 	{
@@ -47,7 +47,7 @@ namespace Signal_Components
 		};
 	}
 	//==================================================================================================================
-	/// COMPONENT Namespace:  Namespace for the creation of All signal components
+	/// DETECTOR COMPONENT Namespace:  Namespace for the creation of All signal components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Components
 	{
@@ -57,7 +57,7 @@ namespace Signal_Components
 
 
 	//==================================================================================================================
-	/// BASE Namespace of Base classes and Components related to the Interface(s) from the component namespace.
+	/// SIGNAL ELEMENTS BASES Namespace of Base classes and Components related to the Interface(s) from the component namespace.
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Bases
 	{
@@ -66,6 +66,7 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		/// Holds common data for all HCM Lanegroup Bases
 		//------------------------------------------------------------------------------------------------------------------
+		template<typename MasterType>
 		struct Lane_Group_HCM_Base
 		{
 			// Lane Group Base general type names
@@ -273,7 +274,8 @@ namespace Signal_Components
 		/// A signalized intersection Lane Group class which calculates saturated flow rates 
 		/// according to HCM 2000 CH16
 		//------------------------------------------------------------------------------------------------------------------
-		struct Lane_Group_HCM_Full_Base : public Lane_Group_HCM_Base
+		template<typename MasterType>
+		struct Lane_Group_HCM_Full_Base : public Lane_Group_HCM_Base<MasterType>
 		{
 			facet_base  void Initialize()
 			{
@@ -315,7 +317,8 @@ namespace Signal_Components
 		/// A signalized intersection Lane Group class which calculates saturated flow rates 
 		/// according to HCM 2000 CH10 - simplified method
 		//------------------------------------------------------------------------------------------------------------------
-		struct Lane_Group_HCM_Simple_Base : public Lane_Group_HCM_Base
+		template<typename MasterType>
+		struct Lane_Group_HCM_Simple_Base : public Lane_Group_HCM_Base<MasterType>
 		{
 			/// Type definitions to define the context of the base class
 			typedef Types::Solution_Types::HCM_Simple HCM_Simple;	///< The solution type applied to this base
@@ -329,6 +332,7 @@ namespace Signal_Components
 		/// HCM Phase Base class.
 		/// Used to store common functionality for HCM Phase bases
 		//------------------------------------------------------------------------------------------------------------------
+		template<typename MasterType>
 		struct Phase_HCM_Base
 		{
 			facet_base void Initialize(TargetType number_of_lane_groups)
@@ -336,16 +340,6 @@ namespace Signal_Components
 				this->_green_time = 0.0;
 				this->_yellow_and_all_red_time = 4.0;
 			}
-
-			//===========================================================
-			// Lane Group Related Typedefs
-			//-----------------------------------------------------------
-			template<typename ThisType=NULLTYPE,typename CallerType=NULLTYPE>
-			struct Lane_Group_Interface
-			{
-				typedef Interfaces::Lane_Group_Interface<ThisType, CallerType> type;
-				typedef double* unknown_component;
-			};	
 
 
 			//============================================================
@@ -362,7 +356,7 @@ namespace Signal_Components
 			// CHILD CLASS ACCESS HANDLERS
 			//-------------------------------------------------------------
 			// Phase lane groups container
-			vector<Lane_Group_Interface<>::unknown_component> _Lane_Groups; 
+			vector<void*> _Lane_Groups; 
 			// create a tag that says the getter and setter have been defined - the existence of this tag is checked if the interface accessors are invoked
 			tag_getter_setter(Lane_Groups);
 			// create a handler for the GET version of the lane groups accessor created in the interface
@@ -448,7 +442,8 @@ namespace Signal_Components
 		/// A signalized intersection phase class which links to LaneGroup child classes and calculates 
 		/// phasing according to HCM 2000 CH16
 		//------------------------------------------------------------------------------------------------------------------
-		struct Phase_HCM_Full_Base : public Phase_HCM_Base
+		template<typename MasterType>
+		struct Phase_HCM_Full_Base : public Phase_HCM_Base<MasterType>
 		{
 			facet_base  void Initialize(TargetType number_of_lane_groups)
 			{
@@ -456,43 +451,24 @@ namespace Signal_Components
 
 				for (int i=0; i<(int)number_of_lane_groups; i++)
 				{
-					typedef ThisType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type,NULLTYPE>::type* ITF_TYPE;
-					 ITF_TYPE itf = (ITF_TYPE)Allocate<Lane_Group_Type<Execution_Object, typename ThisType::This_Type>::type>();
-					((Lane_Group_Type<Execution_Object,typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(typename ThisType::This_Type);
+					typedef Interfaces::Lane_Group_Interface<typename MasterType::LANE_GROUP_TYPE,NULLTYPE>* ITF_TYPE;
+					 ITF_TYPE itf = (ITF_TYPE)Allocate<typename MasterType::LANE_GROUP_TYPE>();
+					((typename MasterType::LANE_GROUP_TYPE*)itf)->_parent = PTHIS(ThisType);
 					this->_Lane_Groups.push_back((double*)itf);
 				}
 
 			}
 
-			//============================================================
 			// TYPEDEFS to define the context of the base class
-			//------------------------------------------------------------
 			typedef Types::Solution_Types::HCM_Full HCM_Full;		///< The solution type applied to this base
-			//typedef Components::HCM_LaneGroup_Full LaneGroupType;	///< The type of the child phase class	
-
-			typedef Bases::Lane_Group_HCM_Full_Base Lane_Group_Base;
-
-			//=============================================================
-			// CHILD CLASS TYPE DEFINITION - required to create a child class interface for use in the phase interface
-			//-------------------------------------------------------------
-			template<typename ObjectType, typename ParentType=NULLTYPE>
-			struct Lane_Group_Type
-			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,NULLTYPE,ObjectType> type;
-			};	
-			template<typename ObjectType>
-			struct Lane_Group_Type<ObjectType,NULLTYPE>
-			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,NULLTYPE,NULLTYPE,ObjectType> type;
-			};	
-
 		};
 		//------------------------------------------------------------------------------------------------------------------
 		/// HCM Phase class.
 		/// A signalized intersection phase class which links to LaneGroup child classes and calculates 
 		/// phasing according to HCM 2000 CH10 - simplified method
 		//------------------------------------------------------------------------------------------------------------------
-		struct Phase_HCM_Simple_Base : public Phase_HCM_Base
+		template<typename MasterType>
+		struct Phase_HCM_Simple_Base : public Phase_HCM_Base<MasterType>
 		{
 			facet_base void Initialize(TargetType number_of_lane_groups)
 			{
@@ -509,23 +485,6 @@ namespace Signal_Components
 
 			/// Type definitions to define the context of the base class
 			typedef Types::Solution_Types::HCM_Simple HCM_Simple;	///< The solution type applied to this base
-
-
-			typedef Bases::Lane_Group_HCM_Simple_Base Lane_Group_Base;
-
-			//=============================================================
-			// CHILD CLASS TYPE DEFINITION - required to create a child class interface for use in the phase interface
-			//-------------------------------------------------------------
-			template<typename ObjectType, typename ParentType=NULLTYPE>
-			struct Lane_Group_Type
-			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,ParentType,NULLTYPE,ObjectType> type;
-			};	
-			template<typename ObjectType>
-			struct Lane_Group_Type<ObjectType,NULLTYPE>
-			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,NULLTYPE,NULLTYPE,ObjectType> type;
-			};	
 		};
 
 
@@ -550,16 +509,6 @@ namespace Signal_Components
 			{
 				this->_Lane_Groups.push_back(lane_group);
 			}
-			
-			//===========================================================
-			// Lane Group Related Typedefs
-			//-----------------------------------------------------------
-			template<typename ThisType=NULLTYPE,typename CallerType=NULLTYPE>
-			struct Lane_Group_Interface
-			{
-				typedef Interfaces::Lane_Group_Interface<ThisType, CallerType> type;
-				typedef double* unknown_component;
-			};	
 
 
 			//============================================================
@@ -658,34 +607,6 @@ namespace Signal_Components
 			}	
 
 		};
-		template<typename MasterType>
-		struct Approach_HCM_Simple_Base : public Approach_HCM_Base<MasterType>
-		{
-			//=============================================================
-			// CHILD CLASS TYPE DEFINITION - required to create a child class interface for use in the phase interface
-			//-------------------------------------------------------------
-			typedef Bases::Lane_Group_HCM_Simple_Base Lane_Group_Base;
-			template<typename ObjectType>
-			struct Lane_Group_Type
-			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Bases::Lane_Group_HCM_Simple_Base,typename MasterType::PHASE_TYPE,NULLTYPE,ObjectType> type;
-			};	
-
-		};
-		template<typename MasterType>
-		struct Approach_HCM_Full_Base : public Approach_HCM_Base<MasterType>
-		{		
-			//=============================================================
-			// CHILD CLASS TYPE DEFINITION - required to create a child class interface for use in the phase interface
-			//-------------------------------------------------------------
-			typedef Bases::Lane_Group_HCM_Full_Base Lane_Group_Base;
-
-			template<typename ObjectType>
-			struct Lane_Group_Type
-			{
-				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,typename MasterType::PHASE_TYPE,NULLTYPE,ObjectType> type;
-			};	
-		};
 
 
 
@@ -695,24 +616,12 @@ namespace Signal_Components
 		/// HCM_Signal class.
 		/// Used to store common base functionality amonst all HCM signal bases
 		//------------------------------------------------------------------------------------------------------------------
+		template<typename MasterType>
 		struct Signal_HCM_Base
 		{
 			//===========================================================
-			// PHASE Related Typedefs
+			// SIGNAL event info
 			//-----------------------------------------------------------
-			template<typename ThisType=NULLTYPE,typename CallerType=NULLTYPE>
-			struct Phase_Interface
-			{
-				typedef Interfaces::Phase_Interface<ThisType, CallerType> type;
-				typedef void* unknown_component;
-			};
-			template<typename ThisType=NULLTYPE,typename CallerType=NULLTYPE>
-			struct Approach_Interface
-			{
-				typedef Interfaces::Approach_Interface<ThisType, CallerType> type;
-				typedef void* unknown_component;
-			};
-
 			member_data_basic(int, Next_Event_Iteration);
 			member_data_basic(int, Next_Timing_Event_Iteration);
 			member_data_basic(bool, Event_Has_Fired);
@@ -786,7 +695,8 @@ namespace Signal_Components
 		/// HCM_Signal class.
 		/// A signalized intersection base class which links to phase child classes and recalculates signal timing accoriding to HCM 2000 ch16
 		//------------------------------------------------------------------------------------------------------------------
-		struct Signal_HCM_Full_Base : public Signal_HCM_Base
+		template<typename MasterType>
+		struct Signal_HCM_Full_Base : public Signal_HCM_Base<MasterType>
 		{
 			/// Type definitions to define the context of the base class
 			typedef Types::Solution_Types::HCM_Full HCM_Full;	///< The solution type applied to this base
@@ -799,55 +709,28 @@ namespace Signal_Components
 
 				for (int i=0; i<(int)number_of_phases; i++)
 				{
-					typedef ThisType::Phase_Interface<Phase_Type<Execution_Object, typename ThisType::This_Type>::type,NULLTYPE>::type* ITF_TYPE;
-					ITF_TYPE itf= (ITF_TYPE)Allocate<Phase_Type<Execution_Object, typename ThisType::This_Type>::type>();
-					((Phase_Type<Execution_Object, typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(ThisType::This_Type);
+					typedef Interfaces::Phase_Interface<typename MasterType::PHASE_TYPE, NULLTYPE>* ITF_TYPE;
+					ITF_TYPE itf= (ITF_TYPE)Allocate<typename MasterType::PHASE_TYPE>();
+					((typename MasterType::PHASE_TYPE*)itf)->_parent = PTHIS(ThisType);
 
 					_Phases.push_back((void*)itf);
 				}
 				for (int i=0; i<(int)number_of_approaches; i++)
 				{
-					typedef ThisType::Approach_Interface<Approach_Type<Execution_Object, typename ThisType::This_Type>::type,NULLTYPE>::type* ITF_TYPE;
-					ITF_TYPE itf= (ITF_TYPE)Allocate<Approach_Type<Execution_Object, typename ThisType::This_Type>::type>();
-					((Approach_Type<Execution_Object, typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(ThisType::This_Type);
+					typedef Interfaces::Approach_Interface<typename MasterType::APPROACH_TYPE,NULLTYPE>* ITF_TYPE;
+					ITF_TYPE itf= (ITF_TYPE)Allocate<typename MasterType::APPROACH_TYPE>();
+					((typename MasterType::APPROACH_TYPE*)itf)->_parent = PTHIS(ThisType);
 
 					_Approaches.push_back((void*)itf);
 				}
 			}
-
-			
-			//======================================
-			// The type of the child phase class	
-			typedef Bases::Phase_HCM_Full_Base Phase_Base;
-			template<typename ObjectType, typename ParentType=NULLTYPE>
-			struct Phase_Type
-			{
-				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,NULLTYPE,ObjectType> type;
-			};	
-			template<typename ObjectType>
-			struct Phase_Type<ObjectType,NULLTYPE>
-			{
-				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,NULLTYPE,NULLTYPE,ObjectType> type;
-			};
-			//======================================
-			// The type of the child phase class	
-			typedef Bases::Approach_HCM_Full_Base Approach_Base;
-			template<typename ObjectType, typename ParentType=NULLTYPE>
-			struct Approach_Type
-			{
-				typedef Polaris_Component<Interfaces::Approach_Interface,Approach_Base,ParentType,NULLTYPE,ObjectType> type;
-			};	
-			template<typename ObjectType>
-			struct Approach_Type<ObjectType,NULLTYPE>
-			{
-				typedef Polaris_Component<Interfaces::Approach_Interface,Approach_Base,NULLTYPE,NULLTYPE,ObjectType> type;
-			};
 		};
 		//------------------------------------------------------------------------------------------------------------------
 		/// HCM_Signal class.
 		/// A Simple signalized intersection base class which links to phase child classes and recalculates signal timing accoriding to HCM 2000 ch 10
-		//------------------------------------------------------------------------------------------------------------------
-		struct Signal_HCM_Simple_Base : public Signal_HCM_Base
+		//------------------------------------------------------------------------------------------------------------------	
+		template<typename MasterType>
+		struct Signal_HCM_Simple_Base : public Signal_HCM_Base<MasterType>
 		{
 			/// Type definitions to define the context of the base class
 			typedef Types::Solution_Types::HCM_Simple HCM_Simple;	///< The solution type applied to this base
@@ -883,81 +766,78 @@ namespace Signal_Components
 				}
 
 			}
-
-			//======================================
-			// Child class type definition - required so that parent class can utilize child class interface
-			typedef Bases::Phase_HCM_Simple_Base Phase_Base;
-			template<typename ObjectType, typename ParentType=NULLTYPE>
-			struct Phase_Type
-			{
-				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,ParentType,NULLTYPE,ObjectType> type;
-			};	
-			template<typename ObjectType>
-			struct Phase_Type<ObjectType,NULLTYPE>
-			{
-				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,NULLTYPE,NULLTYPE,ObjectType> type;
-			};
-
-			//======================================
-			// The type of the child approach class	
-			typedef Bases::Approach_HCM_Simple_Base Approach_Base;
-			template<typename ObjectType, typename ParentType=NULLTYPE>
-			struct Approach_Type
-			{
-				typedef Polaris_Component<Interfaces::Approach_Interface,Approach_Base,ParentType,NULLTYPE,ObjectType> type;
-			};	
-			template<typename ObjectType>
-			struct Approach_Type<ObjectType,NULLTYPE>
-			{
-				typedef Polaris_Component<Interfaces::Approach_Interface,Approach_Base,NULLTYPE,NULLTYPE,ObjectType> type;
-			};
 		};
 
 	}
 	//==================================================================================================================
-	/// COMPONENT Namespace:  Namespace for the creation of All signal components
+	/// SIGNAL ELEMENTS COMPONENTS Namespace:  Namespace for the creation of All signal components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Components
 	{
 		//------------------
 		// Signals
-		typedef Polaris_Component_Execution<Interfaces::Signal_Interface,Bases::Signal_HCM_Full_Base> HCM_Signal_Full;
-		typedef Polaris_Component_Execution<Interfaces::Signal_Interface,Bases::Signal_HCM_Simple_Base> HCM_Signal_Simple;
+		template<typename MasterType>
+		struct HCM_Signal_Full
+		{
+			typedef Polaris_Component_Execution<Interfaces::Signal_Interface, Bases::Signal_HCM_Full_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
+		template<typename MasterType>
+		struct HCM_Signal_Simple
+		{
+			typedef Polaris_Component_Execution<Interfaces::Signal_Interface, Bases::Signal_HCM_Simple_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
 
 		//------------------
 		// Approaches
 		template<typename MasterType>
 		struct HCM_Approach_Full
 		{
-			typedef Polaris_Component<Interfaces::Approach_Interface, Bases::Approach_HCM_Full_Base<MasterType>,NULLTYPE,MasterType> type;
+			typedef Polaris_Component_Execution<Interfaces::Approach_Interface, Bases::Approach_HCM_Base<MasterType>,typename HCM_Signal_Full<MasterType>::type,MasterType> type;
 		};
 		template<typename MasterType>
 		struct HCM_Approach_Simple
 		{
-			typedef Polaris_Component<Interfaces::Approach_Interface, Bases::Approach_HCM_Simple_Base<MasterType>,NULLTYPE,MasterType> type;
+			typedef Polaris_Component_Execution<Interfaces::Approach_Interface, Bases::Approach_HCM_Base<MasterType>,typename HCM_Signal_Simple<MasterType>::type,MasterType> type;
 		};
 
 		//------------------
 		// Phases
-		typedef Polaris_Component_Execution<Interfaces::Phase_Interface,Bases::Phase_HCM_Full_Base, HCM_Signal_Full> HCM_Phase_Full;
-		typedef Polaris_Component_Execution<Interfaces::Phase_Interface,Bases::Phase_HCM_Simple_Base, HCM_Signal_Simple> HCM_Phase_Simple;
+		template<typename MasterType>
+		struct HCM_Phase_Full
+		{
+			typedef Polaris_Component_Execution<Interfaces::Phase_Interface, Bases::Phase_HCM_Full_Base<MasterType>,typename HCM_Signal_Full<MasterType>::type,MasterType> type;
+		};
+		template<typename MasterType>
+		struct HCM_Phase_Simple
+		{
+			typedef Polaris_Component_Execution<Interfaces::Phase_Interface, Bases::Phase_HCM_Simple_Base<MasterType>,typename HCM_Signal_Simple<MasterType>::type,MasterType> type;
+		};
 
 		//------------------
 		// Lane Groups
-		typedef Polaris_Component_Execution<Interfaces::Lane_Group_Interface,Bases::Lane_Group_HCM_Full_Base,HCM_Phase_Full> HCM_LaneGroup_Full;
-		typedef Polaris_Component_Execution<Interfaces::Lane_Group_Interface,Bases::Lane_Group_HCM_Simple_Base, HCM_Phase_Simple> HCM_LaneGroup_Simple;
+		template<typename MasterType>
+		struct HCM_LaneGroup_Full
+		{
+			typedef Polaris_Component_Execution<Interfaces::Lane_Group_Interface, Bases::Lane_Group_HCM_Full_Base<MasterType>,typename HCM_Phase_Full<MasterType>::type,MasterType> type;
+		};
+		template<typename MasterType>
+		struct HCM_LaneGroup_Simple
+		{
+			typedef Polaris_Component_Execution<Interfaces::Lane_Group_Interface, Bases::Lane_Group_HCM_Simple_Base<MasterType>,typename HCM_Phase_Simple<MasterType>::type,MasterType> type;
+		};
 	}	
 
 
 
 	//==================================================================================================================
-	/// BASE Namespace of Base classes and Components related to the Interface(s) from the component namespace.
+	/// INDICATOR BASE Namespace of Base classes and Components related to the Interface(s) from the component namespace.
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Bases
 	{
 		//==================================================================================================================
 		/// Signal Indicator Base
 		//------------------------------------------------------------------------------------------------------------------
+		template <typename MasterType>
 		struct Signal_Indicator_Display_Base
 		{
 			facet_base void Initialize(call_requirements(requires(ThisType,Is_Dispatched)))
@@ -981,6 +861,7 @@ namespace Signal_Components
 				return (typename TargetType::Interface_Type<TargetType,NULLTYPE>::type*)_signal;
 			}
 		};
+		template <typename MasterType>
 		struct Signal_Indicator_Base
 		{
 			facet_base void Initialize(call_requirements(requires(ThisType,Is_Dispatched)))
@@ -990,7 +871,7 @@ namespace Signal_Components
 			}
 
 			member_data_basic(ofstream*, output_stream);
-			member_component_basic(Signal_Components::Components::HCM_Signal_Simple,Signal);
+			member_component_basic(typename MasterType::SIGNAL_TYPE,Signal);
 
 			// Local data member for signal interface
 			void* _signal;
@@ -1008,11 +889,19 @@ namespace Signal_Components
 
 	}
 	//==================================================================================================================
-	/// COMPONENT Namespace:  Namespace for the creation of All signal components
+	/// INDICATOR COMPONENT Namespace:  Namespace for the creation of All signal components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Components
 	{
-		typedef Polaris_Component_Execution<Interfaces::Signal_Indicator_Interface,Bases::Signal_Indicator_Display_Base> Signal_Indicator_Display;
-		typedef Polaris_Component<Interfaces::Signal_Indicator_Interface,Bases::Signal_Indicator_Base> Signal_Indicator;
+		template<typename MasterType>
+		struct Signal_Indicator_Display
+		{
+			typedef Polaris_Component_Execution<Interfaces::Signal_Indicator_Interface, Bases::Signal_Indicator_Display_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
+		template<typename MasterType>
+		struct Signal_Indicator
+		{
+			typedef Polaris_Component<Interfaces::Signal_Indicator_Interface, Bases::Signal_Indicator_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
 	}	
 }
