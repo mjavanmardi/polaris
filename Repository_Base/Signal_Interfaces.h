@@ -814,6 +814,102 @@ namespace Signal_Components
 
 
 		//------------------------------------------------------------------------------------------------------------------
+		/// Inteface to the basic POLARIS Signal Phase Component
+		//------------------------------------------------------------------------------------------------------------------
+		template<typename ThisType=NULLTYPE, typename CallerType=NULLTYPE>
+		struct Approach_Interface
+		{
+			//============================================================
+			//  Intialize dispatched
+			//------------------------------------------------------------
+			facet void Initialize()
+			{
+				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
+			}
+			facet void Add_Lane_Group(typename TargetType::Interface_Type<TargetType,NULLTYPE>::type* lane_group)
+			{
+				PTHIS(ThisType)->Add_Lane_Group<Dispatch<ThisType>,CallerType,TargetType>(lane_group);
+			}
+
+			//============================================================
+			//  Approach LOS and Delay Members
+			//------------------------------------------------------------
+			/// Get the maximum saturation ratio from amonst the individual lane_group in the phase
+			facet void Calculate_Approach_LOS(call_requirements(
+				requires(ThisType, Concepts::Has_Child_Lane_Group) && 
+				requires(TargetType, is_arithmetic)))
+			{
+				// Get reference to the Lane Groups in the current phase
+				typedef ThisType T;
+				typedef Interfaces::Lane_Group_Interface<typename T::Lane_Group_Type<Execution_Object, typename T::Lane_Group_Parent>::type, CallerType>* LaneGroupItf;
+				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
+				vector<LaneGroupItf>::iterator itr = lane_group->begin();
+
+				// initialize critical vs ratio
+				TargetType sum_delay = 0;
+				TargetType sum_flow = 0;
+
+				// search each lane group in the approach and set the LOS and delay
+				for (itr; itr != lane_group->end(); itr++)
+				{
+					LaneGroupItf lg = *itr;
+					float v = lg->demand_lane_group<Data_Structures::Flow_Per_Hour>();
+					float gC = lg->green_time<Data_Structures::Time_Second>() / lg->cycle_length<Data_Structures::Time_Second>();
+					float c = lg->Calculate_Saturation_Flow_Rate<Data_Structures::Flow_Per_Hour>() * gC;
+					float X = v/c;
+
+					float d1 = 0.5 * lg->cycle_length<Data_Structures::Time_Second>() * pow((1.0f - gC),2.0f) / (1.0f - min(1.0,X)*gC);
+
+					float T = lg->analysis_period<Data_Structures::Time_Minute>()/60.0f;
+					float k = 0.5f;
+					float d2 = 900.0f * T * ((X-1.0f) + sqrt(pow((X-1.0f),2.0f) + 8.0f*k*1.0*X/(c*T)));
+					float PF = 1.0;
+					float d3 = 0.0f;
+
+					sum_flow += v;
+					sum_delay += d1*PF + d2 + d3;
+				}
+
+				this->delay<Data_Structures::Time_Second>(sum_delay/sum_flow);
+				this->approach_flow_rate<Data_Structures::Flow_Per_Hour>(sum_flow);
+			}
+
+			facet void Calculate_Approach_LOS(call_requirements(!(
+				requires(ThisType,Concepts::Has_Child_Lane_Group) && 
+				requires(TargetType, is_arithmetic))))
+			{
+				assert_requirements(ThisType,Concepts::Has_Child_Lane_Group,"Your Phase component does not have a LaneGroupType defined.  Please add a lane group type to the base.");
+				assert_requirements(ThisType,Concepts::Is_HCM_Full_Solution,"Your Phase component does not have a solution type defined.  Please add 'HCM_Simple' or HCM_Full' type tag.");
+				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not arithmetic.");
+			}
+
+
+			//============================================================
+			//  BASIC ACCESSORS
+			//------------------------------------------------------------
+			/// Phase green time
+			facet_accessor(delay);					///< d (s)
+			/// Flow rate for combined lane groups in the approach
+			facet_accessor(approach_flow_rate);
+			/// Phase lost time
+			facet_accessor(LOS);					
+			/// Local facet to return the list of lane groups associated with phase
+			facet_accessor(Lane_Groups);
+			/// Local facet to return the approach name (if applicable)
+			facet_accessor(Name);
+
+			//============================================================
+			//  PARENT CLASS ACCESSORS
+			//------------------------------------------------------------
+			facet_accessor(cycle_length);				///< C (s)
+			facet_accessor(max_cycle_length);			///< C (s)
+			facet_accessor(min_cycle_length);			///< C (s)
+			facet_accessor(in_CBD);						///< 0.9 for CBD else 1.0
+			facet_accessor(analysis_period);			///< T (h)
+		};
+
+
+		//------------------------------------------------------------------------------------------------------------------
 		/// Inteface to the basic POLARIS Signal component
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename ThisType=NULLTYPE, typename CallerType=NULLTYPE>
@@ -823,9 +919,9 @@ namespace Signal_Components
 			// Initialization
 			//-------------------------------------------------------
 			/// Dispatch the Initialize function call to the component base
-			facet void Initialize(TargetType num_phases)
+			facet void Initialize(TargetType num_phases, TargetType number_of_approaches)
 			{		
-				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(num_phases);
+				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(num_phases, number_of_approaches);
 				this->Next_Event_Iteration<int>(0);
 				this->Event_Has_Fired<bool>(false);
 				this->Event_Conditional_Hit<bool>(false);
@@ -849,8 +945,14 @@ namespace Signal_Components
 				// Simplify ThisType name
 				typedef ThisType T;
 
+				Interfaces::Signal_Interface<Components::HCM_Signal_Simple,NULLTYPE>* simple_signal = (Interfaces::Signal_Interface<Components::HCM_Signal_Simple,NULLTYPE>*)this;
+				simple_signal->Update_Timing<Data_Structures::Time_Second>();
+
+
 				ofstream* out = this->output_stream<ofstream*>();
 
+				// FIRST, output the LOS information
+				Calculate_Signal_LOS<char>();
 
 				// Get reference to the phases in the signal phase diagram
 				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
@@ -908,6 +1010,9 @@ namespace Signal_Components
 				vector<Interfaces::Phase_Interface<typename T::Phase_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = phases->begin();
 
 				ofstream* out = this->output_stream<ofstream*>();
+
+				// FIRST, output the LOS information
+				Calculate_Signal_LOS<char>();
 
 				// Sum total lost time and critical vs for all phases
 				float lost_time = 0;
@@ -993,10 +1098,29 @@ namespace Signal_Components
 			}
 			/// HCM LOS Calculation
 			facet void Calculate_Signal_LOS(call_requirements(
-				requires(ThisType,Concepts::Has_Child_Phase) && 
-				requires(typename ThisType, Concepts::Is_HCM_Simple_Solution)))
+				requires(ThisType,Concepts::Has_Child_Phase)))
 			{
+				// Simplify ThisType name
+				typedef ThisType T;
 
+				// Get reference to the phases in the signal phase diagram
+				vector<Interfaces::Approach_Interface<typename T::Approach_Type<Execution_Object,T>::type,NULLTYPE>*>* approaches = this->Approaches<vector<Interfaces::Approach_Interface<T::Approach_Type<Execution_Object,T>::type,NULLTYPE>*>*>();
+				vector<Interfaces::Approach_Interface<typename T::Approach_Type<Execution_Object,T>::type,NULLTYPE>*>::iterator itr = approaches->begin();
+
+				ofstream* out = this->output_stream<ofstream*>();
+
+				// Sum total lost time and critical vs for all phases
+				float sum_delay = 0;
+				float sum_flow = 0;
+				for (itr; itr != approaches->end(); itr++)
+				{
+					(*itr)->Calculate_Approach_LOS<char>();
+
+					sum_delay += (*itr)->delay<Data_Structures::Time_Second>() * (*itr)->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
+					sum_flow += (*itr)->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
+				}
+
+				(*out) << endl<<"Intersection Delay = "<<sum_delay / sum_flow << endl;
 			}
 
 
@@ -1196,12 +1320,18 @@ namespace Signal_Components
 			facet_accessor(in_CBD);
 			/// Signal ID accessor
 			facet_accessor(Signal_ID);
-			/// Local facet to return the list of phases associated with signal
-			facet_accessor(Phases);
 			// phf for the signal as a whole
 			facet_accessor(peak_hour_factor);
 			// Currently active (green) signal phase
 			facet_accessor(active_phase);
+
+			//========================================================================
+			// COLLECTIONS
+			//------------------------------------------------------------------------
+			/// Local facet to return the list of phases associated with signal
+			facet_accessor(Phases);
+			/// Local facet to return the list of phases associated with signal
+			facet_accessor(Approaches);
 		};
 
 

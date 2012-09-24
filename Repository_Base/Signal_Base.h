@@ -111,14 +111,14 @@ namespace Signal_Components
 				assert_requirements_std(TargetType,is_integral,"Your TargetType is not an integral type.");
 			}
 			tag_getter(cycle_length);
-			facet_base TargetType cycle_length(call_requirements(requires(TargetType,is_arithmetic)))			
+			facet_base TargetType cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
 				Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
 				return parent->cycle_length<TargetType>();
 			}
-			facet_base TargetType cycle_length(call_requirements(requires(TargetType,!is_arithmetic)))			
+			facet_base TargetType cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
 			{
-				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+				assert_requirements_std(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(max_cycle_length);
 			facet_base TargetType max_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
@@ -128,45 +128,45 @@ namespace Signal_Components
 			}
 			facet_base TargetType max_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
 			{
-				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+				assert_requirements_std(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(min_cycle_length);
-			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,is_arithmetic)))			
+			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
 				Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
 				return parent->min_cycle_length<TargetType>();
 			}
-			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,!is_arithmetic)))			
+			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
 			{
-				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(green_time);
-			facet_base TargetType green_time(call_requirements(requires(TargetType,is_arithmetic)))			
+			facet_base TargetType green_time(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
 				Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
 				return parent->green_time<TargetType>();
 			}
-			facet_base TargetType green_time(call_requirements(requires(TargetType,!is_arithmetic)))			
+			facet_base TargetType green_time(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
 			{
-				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(yellow_and_all_red_time);
-			facet_base TargetType yellow_and_all_red_time(call_requirements(requires(TargetType,is_arithmetic)))			
+			facet_base TargetType yellow_and_all_red_time(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
 				Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
 				return parent->yellow_and_all_red_time<TargetType>();
 			}
-			facet_base TargetType yellow_and_all_red_time(call_requirements(requires(TargetType,!is_arithmetic)))			
+			facet_base TargetType yellow_and_all_red_time(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
 			{
-				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(analysis_period);
-			facet_base TargetType analysis_period(call_requirements(requires(TargetType,is_arithmetic)))			
+			facet_base TargetType analysis_period(call_requirements(requires(TargetType,Concepts::Is_Time_Minutes)))			
 			{
 				Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
 				return parent->analysis_period<TargetType>();
 			}
-			facet_base TargetType analysis_period(call_requirements(requires(TargetType,!is_arithmetic)))			
+			facet_base TargetType analysis_period(call_requirements(requires(TargetType,!Concepts::Is_Time_Minutes)))			
 			{
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
 			}
@@ -392,14 +392,14 @@ namespace Signal_Components
 				assert_requirements_std(TargetType,is_integral,"Your TargetType is not an integral type.");
 			}
 			tag_getter(cycle_length);
-			facet_base TargetType cycle_length(call_requirements(requires(TargetType,is_arithmetic)))			
+			facet_base TargetType cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
 				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
 				return parent->cycle_length<TargetType>();
 			}
-			facet_base TargetType cycle_length(call_requirements(requires(TargetType,!is_arithmetic)))			
+			facet_base TargetType cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
 			{
-				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(max_cycle_length);
 			facet_base TargetType max_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
@@ -409,27 +409,27 @@ namespace Signal_Components
 			}
 			facet_base TargetType max_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
 			{
-				assert_requirements_std(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(min_cycle_length);
-			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,is_arithmetic)))			
+			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
 				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
 				return parent->min_cycle_length<TargetType>();
 			}
-			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,!is_arithmetic)))			
+			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
 			{
-				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(analysis_period);
-			facet_base TargetType analysis_period(call_requirements(requires(TargetType,is_arithmetic)))			
+			facet_base TargetType analysis_period(call_requirements(requires(TargetType,Concepts::Is_Time_Minutes)))			
 			{
 				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
 				return parent->analysis_period<TargetType>();
 			}
-			facet_base TargetType analysis_period(call_requirements(requires(TargetType,!is_arithmetic)))			
+			facet_base TargetType analysis_period(call_requirements(requires(TargetType,!Concepts::Is_Time_Minutes)))			
 			{
-				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Concepts::Is_Time_Minutes,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(degree_of_saturation);
 			facet_base TargetType degree_of_saturation(call_requirements(requires(TargetType,is_arithmetic)))			
@@ -531,6 +531,165 @@ namespace Signal_Components
 
 
 		//==================================================================================================================
+		/// Approach of a signal Base
+		//------------------------------------------------------------------------------------------------------------------
+		/// HCM Approach Base class.
+		/// Used to store common functionality for HCM Approach base
+		//------------------------------------------------------------------------------------------------------------------
+		template<typename MasterType>
+		struct Approach_HCM_Base
+		{
+			facet_base void Initialize(TargetType number_of_lane_groups)
+			{
+				this->_approach_flow_rate = 0.0;
+				this->_delay = 0.0;
+				this->_LOS = 'A';
+				this->_name = "";
+			}
+			facet_base void Add_Lane_Group(typename TargetType::Interface_Type<TargetType,NULLTYPE>::type* lane_group)
+			{
+				this->_Lane_Groups.push_back(lane_group);
+			}
+			
+			//===========================================================
+			// Lane Group Related Typedefs
+			//-----------------------------------------------------------
+			template<typename ThisType=NULLTYPE,typename CallerType=NULLTYPE>
+			struct Lane_Group_Interface
+			{
+				typedef Interfaces::Lane_Group_Interface<ThisType, CallerType> type;
+				typedef double* unknown_component;
+			};	
+
+
+			//============================================================
+			//  BASIC LOCAL DATA AND ACCESSOR
+			//------------------------------------------------------------
+			member_data(Data_Structures::Flow_Per_Hour, approach_flow_rate, requires(TargetType, Concepts::Is_Flow_Per_Hour), requires(TargetType, Concepts::Is_Flow_Per_Hour));
+			/// Phase green time
+			member_data(Data_Structures::Time_Second, delay, requires(TargetType, Concepts::Is_Time_Seconds), requires(TargetType, Concepts::Is_Time_Seconds));	///< G (s)
+			/// Phase lost time
+			member_data(char, LOS, requires(TargetType, is_integral), requires(TargetType, is_integral));	///< Y (s)
+			/// Phase lost time
+			member_data_basic(char*, name);	///< Y (s)
+
+			//============================================================
+			// CHILD CLASS ACCESS HANDLERS
+			//-------------------------------------------------------------
+			// Phase lane groups container
+			vector<void*> _Lane_Groups; 
+			// create a tag that says the getter and setter have been defined - the existence of this tag is checked if the interface accessors are invoked
+			tag_getter_setter(Lane_Groups);
+			// create a handler for the GET version of the lane groups accessor created in the interface
+			facet_base TargetType Lane_Groups(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType) &_Lane_Groups; // return the local data member cast to the TargetType
+			}
+			// Make sure to create an error handler for the accessors by negating the requirements
+			facet_base TargetType Lane_Groups(call_requirements(!(requires(ThisType,Is_Dispatched))))
+			{
+				assert_requirements(ThisType,Is_Dispatched,"ThisType is not dispatched");
+				assert_requirements(TargetType, Is_Polaris_Component,"TargetType is not a polaris component");
+			}
+			
+
+			//============================================================
+			//  PARENT CLASS ACCESS HANDLERS
+			//------------------------------------------------------------
+			tag_getter(in_CBD);
+			facet_base TargetType in_CBD(call_requirements(requires(TargetType,is_integral)))			
+			{
+				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
+				return parent->in_CBD<TargetType>();
+			}
+			facet_base TargetType in_CBD(call_requirements(requires(TargetType,!is_integral)))			
+			{
+				assert_requirements_std(TargetType,is_integral,"Your TargetType is not an integral type.");
+			}
+			tag_getter(cycle_length);
+			facet_base TargetType cycle_length(call_requirements(requires(TargetType,is_arithmetic)))			
+			{
+				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
+				return parent->cycle_length<TargetType>();
+			}
+			facet_base TargetType cycle_length(call_requirements(requires(TargetType,!is_arithmetic)))			
+			{
+				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+			}
+			tag_getter(max_cycle_length);
+			facet_base TargetType max_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			{
+				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
+				return parent->max_cycle_length<TargetType>();
+			}
+			facet_base TargetType max_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			{
+				assert_requirements_std(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+			}
+			tag_getter(min_cycle_length);
+			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,is_arithmetic)))			
+			{
+				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
+				return parent->min_cycle_length<TargetType>();
+			}
+			facet_base TargetType min_cycle_length(call_requirements(requires(TargetType,!is_arithmetic)))			
+			{
+				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+			}
+			tag_getter(analysis_period);
+			facet_base TargetType analysis_period(call_requirements(requires(TargetType,Concepts::Is_Time_Minutes)))			
+			{
+				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
+				return parent->analysis_period<TargetType>();
+			}
+			facet_base TargetType analysis_period(call_requirements(requires(TargetType,!Concepts::Is_Time_Minutes)))			
+			{
+				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+			}
+			tag_getter(degree_of_saturation);
+			facet_base TargetType degree_of_saturation(call_requirements(requires(TargetType,is_arithmetic)))			
+			{
+				Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ThisType::Parent_Type,NULLTYPE>*)(((ThisType*)this)->_parent);
+				return parent->degree_of_saturation<TargetType>();
+			}
+			facet_base TargetType degree_of_saturation(call_requirements(requires(TargetType,!is_arithmetic)))			
+			{
+				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+			}	
+
+		};
+		template<typename MasterType>
+		struct Approach_HCM_Simple_Base : public Approach_HCM_Base<MasterType>
+		{
+			//=============================================================
+			// CHILD CLASS TYPE DEFINITION - required to create a child class interface for use in the phase interface
+			//-------------------------------------------------------------
+			typedef Bases::Lane_Group_HCM_Simple_Base Lane_Group_Base;
+			template<typename ObjectType>
+			struct Lane_Group_Type
+			{
+				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Bases::Lane_Group_HCM_Simple_Base,typename MasterType::PHASE_TYPE,NULLTYPE,ObjectType> type;
+			};	
+
+		};
+		template<typename MasterType>
+		struct Approach_HCM_Full_Base : public Approach_HCM_Base<MasterType>
+		{		
+			//=============================================================
+			// CHILD CLASS TYPE DEFINITION - required to create a child class interface for use in the phase interface
+			//-------------------------------------------------------------
+			typedef Bases::Lane_Group_HCM_Full_Base Lane_Group_Base;
+
+			template<typename ObjectType>
+			struct Lane_Group_Type
+			{
+				typedef Polaris_Component<Interfaces::Lane_Group_Interface, Lane_Group_Base,typename MasterType::PHASE_TYPE,NULLTYPE,ObjectType> type;
+			};	
+		};
+
+
+
+		//==================================================================================================================
 		/// Signal Bases 
 		//------------------------------------------------------------------------------------------------------------------
 		/// HCM_Signal class.
@@ -545,6 +704,12 @@ namespace Signal_Components
 			struct Phase_Interface
 			{
 				typedef Interfaces::Phase_Interface<ThisType, CallerType> type;
+				typedef void* unknown_component;
+			};
+			template<typename ThisType=NULLTYPE,typename CallerType=NULLTYPE>
+			struct Approach_Interface
+			{
+				typedef Interfaces::Approach_Interface<ThisType, CallerType> type;
 				typedef void* unknown_component;
 			};
 
@@ -564,7 +729,6 @@ namespace Signal_Components
 			vector<void*> _Phases; 
 			// create a tag that says the getter and setter have been defined - the existence of this tag is checked if the interface accessors are invoked
 			tag_getter(Phases);
-
 			// create a handler for the GET version of the ACCESSOR_NAME accessor created in the interface
 			facet_base TargetType Phases(call_requirements(requires(ThisType,Is_Dispatched)))
 			{
@@ -578,6 +742,22 @@ namespace Signal_Components
 				assert_requirements(TargetType,Is_Dispatched,"TargetType is not polaris component");
 			}
 			
+			// Create Approaches data member
+			vector<void*> _Approaches; 
+			// create a tag that says the getter and setter have been defined - the existence of this tag is checked if the interface accessors are invoked
+			tag_getter(Approaches);
+			// create a handler for the GET version of the ACCESSOR_NAME accessor created in the interface
+			facet_base TargetType Approaches(call_requirements(requires(ThisType,Is_Dispatched)))
+			{
+				return (TargetType) &_Approaches; // return the local data member cast to the TargetType
+			}
+			// Make sure to create an error handler for the accessors by negating the requirements
+			facet_base TargetType Approaches(call_requirements(!(requires(ThisType,Is_Dispatched))))
+			{
+				assert_requirements(ThisType,Is_Dispatched,"ThisType is not dispatched");
+				assert_requirements(TargetType,Is_Dispatched,"TargetType is not polaris component");
+			}
+
 
 			//==========================================================================================
 			// Signal local data members
@@ -601,9 +781,6 @@ namespace Signal_Components
 			/// Analyisis Period accessor
 			member_data(float,analysis_period,requires(TargetType,Concepts::Is_Time_Minutes),requires(TargetType,Concepts::Is_Time_Minutes));
 			member_data(float,peak_hour_factor,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));
-
-
-	
 		};
 		//------------------------------------------------------------------------------------------------------------------
 		/// HCM_Signal class.
@@ -615,9 +792,8 @@ namespace Signal_Components
 			typedef Types::Solution_Types::HCM_Full HCM_Full;	///< The solution type applied to this base
 
 
-
 			/// Handler for a general Initializer dispatched from an Interface
-			facet_base void Initialize(TargetType number_of_phases, call_requirements(requires(ThisType,Is_Dispatched)))
+			facet_base void Initialize(TargetType number_of_phases, TargetType number_of_approaches, call_requirements(requires(ThisType,Is_Dispatched)))
 			{
 				this->_output_stream = &cout;
 
@@ -629,11 +805,19 @@ namespace Signal_Components
 
 					_Phases.push_back((void*)itf);
 				}
+				for (int i=0; i<(int)number_of_approaches; i++)
+				{
+					typedef ThisType::Approach_Interface<Approach_Type<Execution_Object, typename ThisType::This_Type>::type,NULLTYPE>::type* ITF_TYPE;
+					ITF_TYPE itf= (ITF_TYPE)Allocate<Approach_Type<Execution_Object, typename ThisType::This_Type>::type>();
+					((Approach_Type<Execution_Object, typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(ThisType::This_Type);
+
+					_Approaches.push_back((void*)itf);
+				}
 			}
 
 			
-			//typedef Components::HCM_Phase_Full PhaseType;		///< The type of the child phase class	
-
+			//======================================
+			// The type of the child phase class	
 			typedef Bases::Phase_HCM_Full_Base Phase_Base;
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Phase_Type
@@ -645,13 +829,19 @@ namespace Signal_Components
 			{
 				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,NULLTYPE,NULLTYPE,ObjectType> type;
 			};
-
-			// GETTER OVERLOADS UNTIL CHECK IS FIXED
-			tag_getter(Phases);
-			tag_getter_setter(cycle_length);
-			tag_getter_setter(degree_of_saturation);
-			tag_getter(in_CBD);
-			tag_getter(Signal_ID);
+			//======================================
+			// The type of the child phase class	
+			typedef Bases::Approach_HCM_Full_Base Approach_Base;
+			template<typename ObjectType, typename ParentType=NULLTYPE>
+			struct Approach_Type
+			{
+				typedef Polaris_Component<Interfaces::Approach_Interface,Approach_Base,ParentType,NULLTYPE,ObjectType> type;
+			};	
+			template<typename ObjectType>
+			struct Approach_Type<ObjectType,NULLTYPE>
+			{
+				typedef Polaris_Component<Interfaces::Approach_Interface,Approach_Base,NULLTYPE,NULLTYPE,ObjectType> type;
+			};
 		};
 		//------------------------------------------------------------------------------------------------------------------
 		/// HCM_Signal class.
@@ -664,7 +854,7 @@ namespace Signal_Components
 
 
 			/// Handler for a general Initializer dispatched from an Interface
-			facet_base void Initialize(TargetType number_of_phases, call_requirements(requires(ThisType,Is_Dispatched)))
+			facet_base void Initialize(TargetType number_of_phases, TargetType number_of_approaches, call_requirements(requires(ThisType,Is_Dispatched)))
 			{
 				this->_output_stream = &cout;
 
@@ -683,10 +873,19 @@ namespace Signal_Components
 
 					_Phases.push_back((void*)itf);
 				}
+				for (int i=0; i<(int)number_of_approaches; i++)
+				{
+					typedef ThisType::Approach_Interface<Approach_Type<Execution_Object, typename ThisType::This_Type>::type,NULLTYPE>::type* ITF_TYPE;
+					ITF_TYPE itf= (ITF_TYPE)Allocate<Approach_Type<Execution_Object, typename ThisType::This_Type>::type>();
+					((Approach_Type<Execution_Object, typename ThisType::This_Type>::type*)itf)->_parent = PTHIS(ThisType::This_Type);
+
+					_Approaches.push_back((void*)itf);
+				}
 
 			}
 
-			/// Child class type definition - required so that parent class can utilize child class interface
+			//======================================
+			// Child class type definition - required so that parent class can utilize child class interface
 			typedef Bases::Phase_HCM_Simple_Base Phase_Base;
 			template<typename ObjectType, typename ParentType=NULLTYPE>
 			struct Phase_Type
@@ -699,13 +898,19 @@ namespace Signal_Components
 				typedef Polaris_Component<Interfaces::Phase_Interface,Phase_Base,NULLTYPE,NULLTYPE,ObjectType> type;
 			};
 
-			//// GETTER OVERLOADS UNTIL CHECK IS FIXED
-			//tag_getter(Phases);
-			//tag_getter_setter(cycle_length);
-			//tag_getter_setter(degree_of_saturation);
-			//tag_getter_setter(in_CBD);
-			//tag_getter_setter(analysis_period);
-			//tag_getter(Signal_ID);
+			//======================================
+			// The type of the child approach class	
+			typedef Bases::Approach_HCM_Simple_Base Approach_Base;
+			template<typename ObjectType, typename ParentType=NULLTYPE>
+			struct Approach_Type
+			{
+				typedef Polaris_Component<Interfaces::Approach_Interface,Approach_Base,ParentType,NULLTYPE,ObjectType> type;
+			};	
+			template<typename ObjectType>
+			struct Approach_Type<ObjectType,NULLTYPE>
+			{
+				typedef Polaris_Component<Interfaces::Approach_Interface,Approach_Base,NULLTYPE,NULLTYPE,ObjectType> type;
+			};
 		};
 
 	}
@@ -718,6 +923,19 @@ namespace Signal_Components
 		// Signals
 		typedef Polaris_Component_Execution<Interfaces::Signal_Interface,Bases::Signal_HCM_Full_Base> HCM_Signal_Full;
 		typedef Polaris_Component_Execution<Interfaces::Signal_Interface,Bases::Signal_HCM_Simple_Base> HCM_Signal_Simple;
+
+		//------------------
+		// Approaches
+		template<typename MasterType>
+		struct HCM_Approach_Full
+		{
+			typedef Polaris_Component<Interfaces::Approach_Interface, Bases::Approach_HCM_Full_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
+		template<typename MasterType>
+		struct HCM_Approach_Simple
+		{
+			typedef Polaris_Component<Interfaces::Approach_Interface, Bases::Approach_HCM_Simple_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
 
 		//------------------
 		// Phases
