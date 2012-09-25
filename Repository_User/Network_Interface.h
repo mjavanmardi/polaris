@@ -31,6 +31,17 @@ namespace Network_Components
 
 			facet void read_network_data()
 			{
+				using namespace Signal_Components::Data_Structures;
+				//===============
+				// OUTPUT OPTIONS
+				//----------------
+				//typedef ofstream STREAM_TYPE;
+				//STREAM_TYPE log_file("log2.txt");
+				//STREAM_TYPE* stream_ptr = &log_file;
+				typedef ostream STREAM_TYPE;
+				STREAM_TYPE* stream_ptr = &cout;
+				//----------------
+
 				int i = 0;
 				float link_length = 5280.0;
 				float speed_limit = 60.0;
@@ -47,6 +58,16 @@ namespace Network_Components
 				typedef typename ThisType::intersections_container_type IntersectionsContainerType;
 				typedef typename ThisType::intersections_container_element_type IntersectionType;
 				typedef typename Intersection_Components::Interfaces::Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
+				typedef typename ThisType::Master_Type::SIGNAL_TYPE Signal_Type;
+				typedef typename Signal_Components::Interfaces::Signal_Interface<Signal_Type,NULLTYPE> Signal_Interface;
+				typedef typename ThisType::Master_Type::PHASE_TYPE Phase_Type;
+				typedef typename Signal_Components::Interfaces::Phase_Interface<Phase_Type,NULLTYPE> Phase_Interface;
+				typedef typename ThisType::Master_Type::APPROACH_TYPE Approach_Type;
+				typedef typename Signal_Components::Interfaces::Approach_Interface<Approach_Type,NULLTYPE> Approach_Interface;
+				typedef typename ThisType::Master_Type::LANE_GROUP_TYPE Lane_Group_Type;
+				typedef typename Signal_Components::Interfaces::Lane_Group_Interface<Lane_Group_Type,NULLTYPE> Lane_Group_Interface;
+				typedef typename ThisType::Master_Type::DETECTOR_TYPE Detector_Type;
+				typedef typename Signal_Components::Interfaces::Detector_Interface<Detector_Type,NULLTYPE> Detector_Interface;
 
 				intersections_container<IntersectionsContainerType&>().clear();
 				
@@ -87,6 +108,75 @@ namespace Network_Components
 				intersection_2->y_position<float>((float) 2.0*link_length);
 				intersection_2->intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
 				intersections_container<IntersectionsContainerType&>().push_back(intersection_2);
+
+				// Signal at intersection 2
+				Signal_Interface* signal = (Signal_Interface*)Allocate<Signal_Type>();
+				signal->Initialize<int>(2,2);
+				signal->output_stream<STREAM_TYPE*>(stream_ptr);
+				signal->in_CBD<bool>(false);
+				signal->analysis_period<Time_Minute>(15.0);
+				signal->degree_of_saturation<float>(0.9);
+				signal->peak_hour_factor<float>(0.95);
+				signal->max_cycle_length<Time_Second>(100.0);
+				signal->min_cycle_length<Time_Second>(30.0);
+				signal->num_cycles_between_updates<int>(15);
+				vector<Phase_Interface*>* phases = signal->Phases<vector<Phase_Interface*>*>();
+				vector<Approach_Interface*>* approaches = signal->Approaches<vector<Approach_Interface*>*>();
+				Phase_Interface *phase;
+				Lane_Group_Interface *lane;
+				// Initialize phase 1
+				phase = (*phases)[0];
+				phase->Initialize<int>(1);
+				phase->yellow_and_all_red_time<Time_Second>(4.0);
+				vector<Lane_Group_Interface*>* lanes = phase->Lane_Groups<vector<Lane_Group_Interface*>*>();
+				lane = (*lanes)[0];
+				(*approaches)[0]->Add_Lane_Group<Lane_Group_Type>(lane);
+				lane->Initialize<float>();
+				lane->avg_lane_width<Length_Foot>(11.0);
+				lane->demand_left<Flow_Per_Hour>(0);
+				lane->demand_right<Flow_Per_Hour>(0);
+				lane->demand_thru<Flow_Per_Hour>(0);
+				lane->has_left_turn<bool>(false);
+				lane->has_parking<bool>(false);
+				lane->has_right_turn<bool>(false);
+				lane->has_thru_move<bool>(true);
+				lane->is_actuated<bool>(false);
+				lane->right_turn_lane_type<Turn_Lane_Types>(Turn_Lane_Types::No_Turn);
+				lane->left_turn_lane_type<Turn_Lane_Types>(Turn_Lane_Types::No_Turn);
+				lane->left_turn_type<Left_Turn_Types>(Left_Turn_Types::None);
+				lane->number_of_left_lanes(0);
+				lane->number_of_lanes<int>(1);
+				lane->opposing_lane<Lane_Group_Type>((Lane_Group_Interface*)NULL);
+				lane->Detector_Left<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+				lane->Detector_Right<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+				lane->Detector_Thru<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+				// Initialize phase 2
+				phase = (*phases)[1];
+				phase->Initialize<int>(1);
+				phase->yellow_and_all_red_time<Time_Second>(4.0);
+				lane = (*lanes)[0];
+				(*approaches)[0]->Add_Lane_Group<Lane_Group_Type>(lane);
+				lane->Initialize<float>();
+				lane->avg_lane_width<Length_Foot>(11.0);
+				lane->demand_left<Flow_Per_Hour>(0);
+				lane->demand_right<Flow_Per_Hour>(0);
+				lane->demand_thru<Flow_Per_Hour>(0);
+				lane->has_left_turn<bool>(true);
+				lane->has_parking<bool>(false);
+				lane->has_right_turn<bool>(false);
+				lane->has_thru_move<bool>(false);
+				lane->is_actuated<bool>(false);
+				lane->right_turn_lane_type<Turn_Lane_Types>(Turn_Lane_Types::No_Turn);
+				lane->left_turn_lane_type<Turn_Lane_Types>(Turn_Lane_Types::Exclusive);
+				lane->left_turn_type<Left_Turn_Types>(Left_Turn_Types::Unopposed);
+				lane->number_of_left_lanes(1);
+				lane->number_of_lanes<int>(1);
+				lane->opposing_lane<Lane_Group_Type>((Lane_Group_Interface*)NULL);
+				lane->Detector_Left<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+				lane->Detector_Right<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+				lane->Detector_Thru<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+
+				intersection_2->signal<Signal_Interface*>(signal);
 
 				i = 3;
 

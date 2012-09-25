@@ -2,9 +2,14 @@
 
 #include "Repository_User_Includes.h"
 
+#define Simple
+
+
+
 #ifdef Advanced
 #include "Transims_Demand_API.h"
 #endif
+
 
 namespace Demand_Components
 {
@@ -46,15 +51,15 @@ namespace Demand_Components
 		{
 			begin_requirements_list;
 			requires_typename_state(none,TripFile,true_type,"Type is not in a TripFile");
-			requires_typed_member(TripFile, filename,char*,"Type does not have a 'filename' member of char* type");
-			end_requirements_list(filename);
+			requires_typed_member(TripFile, Value,char*,"Type does not have a 'filename' member of char* type");
+			end_requirements_list(Value);
 		};
 		concept Is_Control_File
 		{
 			begin_requirements_list;
 			requires_typename_state(none,ControlFile,true_type,"Type is not in a ControlFile");
-			requires_typed_member(ControlFile, filename, char*,"Type does not have a 'filename' member of char* type");
-			end_requirements_list(filename);
+			requires_typed_member(ControlFile, Value, char*,"Type does not have a 'filename' member of char* type");
+			end_requirements_list(Value);
 		};
 		concept Is_CSV_Delimited
 		{
@@ -85,6 +90,7 @@ namespace Demand_Components
 
 	}
 	
+	#ifdef Simple
 	namespace Interfaces
 	{
 		template<typename ThisType,typename CallerType>
@@ -332,26 +338,41 @@ namespace Demand_Components
 		};
 	}
 
-#ifdef Advanced
+	#endif
+
+
+	#ifdef Advanced
 	//==================================================================================================================
 	/// Demand interfaces namespace
 	/// Usually just one interface here, unless a logical split develops at some point.
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Interfaces
 	{
+		template<typename ThisType,typename CallerType>
 		struct Demand_Interface
 		{
 			//==================================================================================================================
 			/// Demand initializer
 			/// Calls the initializer in the connected base, given an input file structure and an iteration time-type structure.
-			//------------------------------------------------------------------------------------------------------------------
-			template<typename ThisType, typename CallerType, typename TripType, typename InputFileType, typename TimeStructType>
-			void Initialize(InputFileType& input_file_struct, TimeStructType& iteration_step_struct, call_requires(ThisType, Is_Dispatchable))
+			//------------------------------------------------------------------------------------------------------------------	
+			facet void Initialize(typename TargetType::ParamType input_file_struct, typename TargetType::Param2Type iteration_step_struct, call_requirements(
+				requires(ThisType, Is_Dispatchable) &&
+				requires(TargetType, Is_Target_Type_Struct) && 
+				requires(typename TargetType::Param3Type, Trip_Components::Concepts::Is_Trip)))
 			{
 				cout <<endl<<"GETTING DEMAND FROM TRANSIMS..."<<endl;
-				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TripType,InputFileType,TimeStructType>(input_file_struct,iteration_step_struct);
+				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(input_file_struct,iteration_step_struct);
 				cout <<endl<<"DONE."<<endl<<endl;
-				schedule_event_local(ThisType,Get_Trips_Conditional,Get_Trips_Event,0,TripType);
+				schedule_event_local(ThisType,Get_Trips_Conditional,Get_Trips_Event,0,typename TargetType::Param3Type);
+			}
+			facet void Initialize(typename TargetType::ParamType input_file_struct, typename TargetType::Param2Type iteration_step_struct, call_requirements(!(
+				requires(ThisType, Is_Dispatchable) &&
+				requires(TargetType,Is_Target_Type_Struct) &&
+				requires(typename TargetType::Param3Type, Trip_Components::Concepts::Is_Trip))))
+			{
+				assert_requirements(ThisType,Is_Dispatchable,"ThisType is not dispatchable.");
+				assert_requirements(TargetType, Is_Target_Type_Struct,"TargetType is not a valid Target_Type_Struct.");
+				assert_requirements(typename TargetType::Param3Type, Trip_Components::Concepts::Is_Trip,"TargetType does not have a valid trip type for template parameter 3.");
 			}
 
 
@@ -364,24 +385,25 @@ namespace Demand_Components
 			{
 				char print;
 				cout <<endl<<"Getting Trips"<<endl;
-				Demand_Interface* demand = pthis;
-				demand->Get_Current_Trips_From_External<ThisType,CallerType,TargetType>();
-				demand->Display_Timestep<ThisType,CallerType,TargetType>();
-				demand->Increment_Time<ThisType,CallerType,TargetType>();
+				Demand_Interface<ThisType,NULLTYPE>* demand = (Demand_Interface<ThisType,NULLTYPE>*)pthis;
+				demand->Get_Current_Trips_From_External<TargetType>();
+				demand->Display_Timestep<TargetType>();
+				demand->Increment_Time<TargetType>();
 
-				cout <<endl<<"Print trips to screen ('y' or 'n'): ";
-				cin >> print;
+				//cout <<endl<<"Print trips to screen ('y' or 'n'): ";
+				//cin >> print;
 
-				if (print == 'y' || print == 'Y') demand->Print_Trips<ThisType,CallerType,TargetType>();
+				if (print == 'y' || print == 'Y') demand->Print_Trips<TargetType>();
 
-				demand->Clear_Trips<ThisType,CallerType,TargetType>();
+				demand->Clear_Trips<TargetType>();
 
 			}
 			/// Conditional function used to trigger the event facet - currently check every iteration
 			declare_facet_conditional(Get_Trips_Conditional)
 			{
+				Interfaces::Demand_Interface<ThisType,CallerType>* _this = (Interfaces::Demand_Interface<ThisType,CallerType>*)pthis;
 				response.result = true;
-				response.next = iteration + 1;			
+				response.next = iteration + _this->timestep_length<int>();			
 			}
 
 
@@ -394,15 +416,15 @@ namespace Demand_Components
 			/// Notice the function requires that it is attached to a transims compliant base using a concept check
 			facet void Get_Current_Trips_From_External(call_requirements(requires(ThisType, Is_Dispatchable) && requires(ThisType, Concepts::Is_Transims)))
 			{
-				Time_Components::Interfaces::Time_Interface* tstart = timestep_start<ThisType,CallerType,Time_Components::Components::Time>();
-				Time_Components::Interfaces::Time_Interface* tend = timestep_end<ThisType,CallerType,Time_Components::Components::Time>();
+				Time_Components::Interfaces::Time_Interface<Time_Components::Components::Time,NULLTYPE>* tstart = timestep_start<Time_Components::Components::Time>();
+				Time_Components::Interfaces::Time_Interface<Time_Components::Components::Time,NULLTYPE>* tend = timestep_end<Time_Components::Components::Time>();
 				
-				tstart->Write<Time_Components::Components::Time,CallerType,int>();
-				auto s = tstart->Convert_Time<Time_Components::Components::Time, CallerType, Time_Components::Data_Structures::Time_DRSeconds>();
-				auto e = tend->Convert_Time<Time_Components::Components::Time, CallerType, Time_Components::Data_Structures::Time_DRSeconds>();
+				tstart->Write<int>();
+				auto s = tstart->Total_Time<Time_Components::Data_Structures::Time_DRSeconds>();
+				auto e = tend->Total_Time<Time_Components::Data_Structures::Time_DRSeconds>();
 
-				Time start = Time((int)s.Time);
-				Time end = Time((int)e.Time);
+				Time start = Time((int)s);
+				Time end = Time((int)e);
 
 				vector<Trip_Info*> v;
 				vector<Trip_Info*>::iterator itr;
@@ -413,28 +435,28 @@ namespace Demand_Components
 				
 				for (itr=v.begin(); itr != v.end(); itr++)
 				{
-					this->push_trip<ThisType,ThisType,Trip_Components::Components::Trip>(*itr);
+					this->push_trip<Trip_Components::Components::Trip>(*itr);
 					trip_count++;
 				}
-				cout <<endl<<endl<<"TIMESTEP "<<iteration<<endl<<"Trip count = "<<this->Trip_Count<ThisType,CallerType,int>()<<endl;
+				cout <<endl<<endl<<"TIMESTEP "<<iteration<<endl<<"Trip count = "<<this->Trip_Count<int>()<<endl;
 			}
 			/// Time incrementing facet
 			facet void Increment_Time()
 			{
-				auto start = timestep_start<ThisType,CallerType,Time_Components::Components::Time>();
-				auto end = timestep_end<ThisType,CallerType,Time_Components::Components::Time>();
-				auto tstep = this->t_step<ThisType,CallerType,Time_Components::Data_Structures::Time_Seconds&>();
+				auto start = timestep_start<Time_Components::Components::Time>();
+				auto end = timestep_end<Time_Components::Components::Time>();
+				auto tstep = this->t_step<Time_Components::Data_Structures::Time_Seconds&>();
 
-				start->Add_Time<Time_Components::Components::Time,CallerType>(tstep);
-				end->Add_Time<Time_Components::Components::Time,CallerType>(tstep);
+				start->Add_Time<>(tstep);
+				end->Add_Time<>(tstep);
 			}
 			/// Display the current timestep information
 			facet void Display_Timestep()
 			{
 				cout<<"Timestep Start:  ";
-				timestep_start<ThisType,ThisType,Time_Components::Components::Time>()->Write<Time_Components::Components::Time,CallerType,int>();
+				timestep_start<Time_Components::Components::Time>()->Write<int>();
 				cout<<endl<<"Timestep End:  ";
-				timestep_end<ThisType,ThisType,Time_Components::Components::Time>()->Write<Time_Components::Components::Time,CallerType,int>();			
+				timestep_end<Time_Components::Components::Time>()->Write<int>();			
 			}
 			//------------------------------------------------------------------------------------------------------------------
 			//  Base function dispatchers
@@ -443,6 +465,11 @@ namespace Demand_Components
 			facet void push_trip(Trip_Info* trip, call_requirements(requires(ThisType,Is_Dispatchable) && requires(TargetType, Trip_Components::Concepts::Is_Trip)))
 			{
 				PTHIS(ThisType)->push_trip<Dispatch<ThisType>,CallerType,TargetType>(trip);
+			}
+			facet void push_trip(Trip_Info* trip, call_requirements(requires(ThisType,!Is_Dispatchable) || requires(TargetType, !Trip_Components::Concepts::Is_Trip)))
+			{
+				assert_requirements(ThisType, Is_Dispatchable, "ThisType not dispatchable.");
+				assert_requirements(TargetType, Trip_Components::Concepts::Is_Trip, "TargetType is not a TripType.");
 			}
 			/// Print the current trip list usign base function call
 			facet void Print_Trips(call_requires(ThisType, Is_Dispatchable))
@@ -479,7 +506,7 @@ namespace Demand_Components
 
 		};
 	}
-
+	#endif
 
 
 	//==================================================================================================================
@@ -488,41 +515,11 @@ namespace Demand_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Data_Structures
 	{
-		struct Transims_Control_File_CSV_Struct
-		{
-			typedef Types::ModelTypes::TransimsType TransimsType;
-			typedef Types::FileFormatTypes::CSV_Delimited CSV_Delimited;
-			typedef Types::FileTypes::ControlFile ControlFile;
-			char* filename;
-		};
-		struct Transims_Control_File_TAB_Struct
-		{
-			typedef Types::ModelTypes::TransimsType TransimsType;
-			typedef Types::FileFormatTypes::Tab_Delimited Tab_Delimited;
-			typedef Types::FileTypes::ControlFile ControlFile;
-			char* filename;
-		};
-		struct Transims_Trip_File_CSV_Struct
-		{
-			typedef Types::ModelTypes::TransimsType TransimsType;
-			typedef Types::FileFormatTypes::CSV_Delimited CSV_Delimited;
-			typedef Types::FileTypes::TripFile TripFile;
-			char* filename;
-		};
-		struct Transims_Trip_File_TAB_Struct
-		{
-			typedef Types::ModelTypes::TransimsType TransimsType;
-			typedef Types::FileFormatTypes::Tab_Delimited Tab_Delimited;
-			typedef Types::FileTypes::TripFile TripFile;
-			char* filename;
-		};
-		struct Transims_Trip_File_BIN_Struct
-		{
-			typedef Types::ModelTypes::TransimsType TransimsType;
-			typedef Types::FileFormatTypes::Binary Binary;
-			typedef Types::FileTypes::TripFile TripFile;
-			char* filename;
-		};
+		Basic_Data_Struct(Transims_Control_File_CSV, char*,TransimsType,CSV_Delimited,ControlFile);
+		Basic_Data_Struct(Transims_Control_File_TAB, char*,TransimsType,Tab_Delimited,ControlFile);
+		Basic_Data_Struct(Transims_Trip_File_CSV_Struct, char*,TransimsType,CSV_Delimited,TripFile);
+		Basic_Data_Struct(Transims_Trip_File_TAB_Struct, char*,TransimsType,Tab_Delimited,TripFile);
+		Basic_Data_Struct(Transims_Trip_File_BIN_Struct, char*,TransimsType,Binary,TripFile);
 	}
-#endif
+	
 }

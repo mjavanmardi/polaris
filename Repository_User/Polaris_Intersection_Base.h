@@ -229,9 +229,15 @@ namespace Intersection_Components
 			
 			
 			typedef Polaris_Component<Interfaces::Movement_Interface,Polaris_Movement_Base<MasterType>,NULLTYPE,MasterType> inbound_movement_type;
+
+			typedef Signal_Components::Interfaces::Signal_Interface<typename MasterType::SIGNAL_TYPE,NULLTYPE> signal_interface;
 			
 			//typedef Vehicle_Components::Components::Polaris_Vehicle_Component vehicle_type; 
 			//typedef Polaris_Movement_Base::vehicles_container_type vehicles_container_type;
+
+			signal_interface* _signal;
+			facet_base TargetType signal(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_signal;} tag_getter(signal);
+			facet_base void signal(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched))){_signal = (signal_interface*)set_value;} tag_setter(signal);
 
 			member_data_basic(int, uuid);
 			member_data_basic(float, x_position);
