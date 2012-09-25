@@ -145,7 +145,7 @@ namespace Network_Components
 				lane->left_turn_lane_type<Turn_Lane_Types>(Turn_Lane_Types::No_Turn);
 				lane->left_turn_type<Left_Turn_Types>(Left_Turn_Types::None);
 				lane->number_of_left_lanes(0);
-				lane->number_of_lanes<int>(1);
+				lane->number_of_lanes<int>(2);
 				lane->opposing_lane<Lane_Group_Type>((Lane_Group_Interface*)NULL);
 				lane->Detector_Left<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
 				lane->Detector_Right<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());

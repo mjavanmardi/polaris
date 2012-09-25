@@ -49,6 +49,7 @@ namespace Intersection_Components
 		template<typename ThisType,typename CallerType>
 		struct Movement_Interface
 		{
+			facet_accessor(detector);
 			facet_accessor(id);
 			facet_accessor(inbound_link);
 			facet_accessor(outbound_link);
@@ -141,7 +142,7 @@ namespace Intersection_Components
 
 			facet_accessor(network);
 			
-			
+
 			facet_accessor(intersection_simulation_status);
 
 			//facet TargetType pull_vehicle()
