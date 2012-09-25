@@ -338,18 +338,18 @@ namespace Link_Components
 						vehicle=(Vehicle_Interface*)link_origin_vehicle_array<VehicleOriginContainerType&>()[iv];
 						
 						int departure_interval=vehicle->departed_simulation_interval_index<int>();
-						if(vehicle->departed_simulation_interval_index<int>() == current_time)
-						{
-							//PRINT(iteration << "loading traveler");
+						//if(vehicle->departed_simulation_interval_index<int>() == current_time)
+						//{
+							//PRINT(iteration << ": loading traveler");
 							link_origin_vehicle_queue<VehicleOriginQueueType&>().push_back(vehicle);
 							link_origin_arrived_vehicles<int&>()++;
 							link_origin_cumulative_arrived_vehicles<int&>()++;
 							//loaded_vehicles++;
-						}
-						else
-						{
-							break;
-						}
+						//}
+						//else
+						//{
+						//	break;
+						//}
 					}
 				}
 

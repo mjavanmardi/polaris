@@ -210,11 +210,12 @@ namespace Demand_Components
 								vehicle->destination_activity_location<Activity_Location_Interface*>(destination_activity_location);
 								//vehicle_data.set_seed(scenario_data.iseed);simulation_interval_index
 
-								vehicle->departed_assignment_interval_index<int>(assignment_interval_index);
+								
 
 								departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
 								traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
 								vehicle->departed_simulation_interval_index<int>(departed_time);
+								vehicle->departed_assignment_interval_index<int>(departed_time);
 								//cout << endl<<traveler->uuid<int>() <<"\t"<<departed_time;
 
 								cur_vehicle_rate_per_simulation_interval = (float) (cur_vehicle_rate_per_simulation_interval - 1.0);
@@ -240,12 +241,13 @@ namespace Demand_Components
 									vehicle->origin_activity_location<Activity_Location_Interface*>(origin_activity_location);
 									vehicle->destination_activity_location<Activity_Location_Interface*>(destination_activity_location);
 									//vehicle_data.set_seed(scenario_data.iseed);
-									vehicle->departed_simulation_interval_index<int>(simulation_interval_index);
+									
 
 
 									departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
 									traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
 									vehicle->departed_assignment_interval_index<int>(departed_time);
+									vehicle->departed_simulation_interval_index<int>(departed_time);
 									//cout << endl<<traveler->uuid<int>() <<"\t"<<departed_time;
 								}
 
@@ -285,12 +287,13 @@ namespace Demand_Components
 								vehicle->destination_activity_location<Activity_Location_Interface*>(destination_activity_location);
 								//vehicle_data.set_seed(scenario_data.iseed);
 
-								vehicle->departed_assignment_interval_index<int>(assignment_interval_index);
+								
 
 								departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
 								traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
 								vehicle->departed_simulation_interval_index<int>(departed_time);
-								
+								vehicle->departed_assignment_interval_index<int>(departed_time);
+
 								cur_vehicle_rate_per_simulation_interval = (float) (cur_vehicle_rate_per_simulation_interval - 1.0);
 								//cout << endl<<"RAMP\t"<<traveler->uuid<int>() <<"\t"<<departed_time;
 							}
@@ -315,11 +318,12 @@ namespace Demand_Components
 									vehicle->destination_activity_location<Activity_Location_Interface*>(destination_activity_location);
 									//vehicle_data.set_seed(scenario_data.iseed);
 
-									vehicle->departed_assignment_interval_index<int>(assignment_interval_index);
+									
 
 									departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
 									traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
 									vehicle->departed_simulation_interval_index<int>(departed_time);
+									vehicle->departed_assignment_interval_index<int>(departed_time);
 									//cout << endl<<"RAMP\t"<<traveler->uuid<int>() <<"\t"<<departed_time;
 								}
 
