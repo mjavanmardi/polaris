@@ -49,13 +49,6 @@ namespace Signal_Components
 			typedef true_type Feet;
 			typedef true_type Meters;
 		}
-		//namespace Left_Turn_Types
-		//{
-		//	typedef true_type Left_Turn_Permitted;
-		//	typedef true_type Left_Turn_Protected;
-		//	typedef true_type Left_Turn_Unopposed;
-		//	typedef true_type Left_Turn_None;
-		//}
 	}
 
 
@@ -548,6 +541,7 @@ namespace Signal_Components
 							return 1.0f;
 						}
 					}
+					return 1.0f;
 				}
 				// adjustment factor for right turns in lane group
 				facet float HCM_adjustment_fRT()
@@ -1484,11 +1478,9 @@ namespace Signal_Components
 		// Numerical Types
 		Basic_Data_Struct(Percentage,float,Percent);
 
-
+		// Enumerations
 		enum Left_Turn_Types { Protected, Permitted, Unopposed, None };
-
 		enum Turn_Lane_Types { Exclusive, Shared, No_Turn };
-
 		enum Signal_State { GREEN, YELLOW, RED };
 
 	}
