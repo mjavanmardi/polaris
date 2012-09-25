@@ -86,9 +86,6 @@
     <ClInclude Include="Polaris_Demand_Base.h">
       <Filter>Bases</Filter>
     </ClInclude>
-    <ClInclude Include="Demand_Base.h">
-      <Filter>Bases</Filter>
-    </ClInclude>
     <ClInclude Include="RngStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>

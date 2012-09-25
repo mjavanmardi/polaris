@@ -25,6 +25,12 @@ namespace Intersection_Components
 		public:
 			typedef typename MasterType::link_type link_type;
 			typedef typename MasterType::vehicle_type vehicle_type;
+			typedef typename MasterType::DETECTOR_TYPE detector_type;
+
+			typedef Signal_Components::Interfaces::Detector_Interface<typename MasterType::DETECTOR_TYPE,NULLTYPE> detector_interface;
+			detector_interface* _detector;
+			facet_base TargetType detector(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_detector;} tag_getter(detector);
+			facet_base void detector(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched))){_detector = (detector_interface*)set_value;} tag_setter(detector);
 
 			member_data_basic(float, turn_travel_penalty);
 

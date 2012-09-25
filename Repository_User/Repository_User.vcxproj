@@ -81,6 +81,9 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>$(SolutionDir)libs\Demand_Generator.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -120,7 +123,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Activity_Location_Interface.h" />
-    <ClInclude Include="Demand_Base.h" />
     <ClInclude Include="Demand_Interface.h" />
     <ClInclude Include="Intersection_Interface.h" />
     <ClInclude Include="Link_Interface.h" />

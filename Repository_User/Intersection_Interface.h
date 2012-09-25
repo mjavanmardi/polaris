@@ -49,6 +49,7 @@ namespace Intersection_Components
 		template<typename ThisType,typename CallerType>
 		struct Movement_Interface
 		{
+			facet_accessor(detector);
 
 			facet_accessor(id);
 			facet_accessor(inbound_link);
@@ -213,6 +214,9 @@ namespace Intersection_Components
 
 						if(((Vehicle_Interface*)vehicle)->next_link<Link_Interface*>()==outbound_link && ((Vehicle_Interface*)vehicle)->current_link<Link_Interface*>()==inbound_link)
 						{
+							Signal_Components::Interfaces::Detector_Interface<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* detector;
+							detector = inbound_movement->detector<Signal_Components::Interfaces::Detector_Interface<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>*>();
+							if (detector != NULL) detector->detect_vehicle<int>();
 							inbound_movement->vehicles_container<VehiclesContainerType&>().push_back(vehicle);
 							inbound_movement->turn_movement_cumulative_arrived_vehicles<int&>()++;
 						}
