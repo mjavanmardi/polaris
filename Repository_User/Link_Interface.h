@@ -336,10 +336,11 @@ namespace Link_Components
 						link_origin_vehicle_current_position<int&>()++;
 
 						vehicle=(Vehicle_Interface*)link_origin_vehicle_array<VehicleOriginContainerType&>()[iv];
-
+						
 						int departure_interval=vehicle->departed_simulation_interval_index<int>();
-						if(vehicle->departed_simulation_interval_index<int>() == current_simulation_interval_index)
+						if(vehicle->departed_simulation_interval_index<int>() == current_time)
 						{
+							//PRINT(iteration << "loading traveler");
 							link_origin_vehicle_queue<VehicleOriginQueueType&>().push_back(vehicle);
 							link_origin_arrived_vehicles<int&>()++;
 							link_origin_cumulative_arrived_vehicles<int&>()++;
@@ -610,7 +611,7 @@ namespace Link_Components
 						==intersection_simulation_status_type::COMPUTE_STEP_FLOW_COMPLETE)
 					{
 						//upstream and downstream intersections check out, ready for "phase 2: Compute_Step_Flow_Link_Moving"
-								
+						
 						//PRINT("\t" << "Run Compute_Step_Flow_Link_Moving, Return Next Iteration");
 
 						pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Link_Moving<NULLTYPE>);

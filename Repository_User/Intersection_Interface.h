@@ -456,10 +456,6 @@ namespace Intersection_Components
 				OutboundInboundType& outbound_links_container=outbound_inbound_movements<OutboundInboundType&>();
 				typename OutboundInboundType::iterator outbound_itr;
 
-				if(uuid<int>()==1)
-				{
-					bool pause=true;
-				}
 				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
 					outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_link_reference<Link_Interface*>();
@@ -510,7 +506,7 @@ namespace Intersection_Components
 						float turn_movement_flow = (float) min(min((double)turn_movement_demand,(double)turn_movement_capacity),(double)turn_movement_supply);
 						inbound_movement->movement_flow<float>(turn_movement_flow);
 
-						//PRINT("\t" << "Turn movement flow: " << turn_movement_flow);
+						//PRINT("\t" << iteration << ": turn movement flow: " << turn_movement_flow);
 					}
 				}
 			}

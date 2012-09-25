@@ -210,7 +210,7 @@ namespace Demand_Components
 
 								vehicle->departed_assignment_interval_index<int>(assignment_interval_index);
 
-								departed_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
+								departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
 								traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
 								vehicle->departed_simulation_interval_index<int>(departed_time);
 
@@ -240,7 +240,7 @@ namespace Demand_Components
 									vehicle->departed_simulation_interval_index<int>(simulation_interval_index);
 
 
-									departed_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
+									departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
 									traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
 									vehicle->departed_assignment_interval_index<int>(departed_time);
 								}
@@ -283,10 +283,10 @@ namespace Demand_Components
 
 								vehicle->departed_assignment_interval_index<int>(assignment_interval_index);
 
-								departed_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
+								departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
 								traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
 								vehicle->departed_simulation_interval_index<int>(departed_time);
-
+								
 								cur_vehicle_rate_per_simulation_interval = (float) (cur_vehicle_rate_per_simulation_interval - 1.0);
 							}
 							else
@@ -312,7 +312,7 @@ namespace Demand_Components
 
 									vehicle->departed_assignment_interval_index<int>(assignment_interval_index);
 
-									departed_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
+									departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
 									traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
 									vehicle->departed_simulation_interval_index<int>(departed_time);
 								}

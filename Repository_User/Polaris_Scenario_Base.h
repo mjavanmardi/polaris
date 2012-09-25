@@ -25,7 +25,7 @@ namespace Scenario_Components
 			facet_base TargetType current_simulation_interval_index(call_requirements(requires(ThisType,Is_Dispatched))){return iteration/_simulation_interval_length;}
 			tag_getter(current_simulation_interval_index);
 
-			facet_base TargetType current_time(call_requirements(requires(ThisType,Is_Dispatched))){return iteration*_simulation_interval_length;}
+			facet_base TargetType current_time(call_requirements(requires(ThisType,Is_Dispatched))){return iteration;}
 			tag_getter(current_time);
 
 			member_data_basic(int, planning_horizon);
