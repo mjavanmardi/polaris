@@ -109,7 +109,7 @@ namespace Network_Components
 		template<typename MasterType>
 		struct Polaris_Network_Component
 		{
-			typedef Polaris_Component<Network_Components::Interfaces::Network_Interface, Network_Components::Bases::Polaris_Network_Base<MasterType>,NULLTYPE,MasterType> type;
+			typedef Polaris_Component<Network_Interface, Network_Components::Bases::Polaris_Network_Base<MasterType>,NULLTYPE,MasterType> type;
 		};
 	}	
 }

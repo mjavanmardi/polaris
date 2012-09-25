@@ -27,7 +27,7 @@ namespace Link_Components
 			member_data_basic(float, h_cost);
 			member_data_basic(void*, label_pointer);
 			member_data_basic(float, label_cost);
-			member_data_basic(Routing_Components::Interfaces::Scan_List_Status_Keys, scan_list_status);
+			member_data_basic(Scan_List_Status_Keys, scan_list_status);
 
 			//--------------------------------------------------------
 			// member_data<void*, network_link_reference>
@@ -73,7 +73,7 @@ namespace Link_Components
 		template<typename MasterType>
 		struct Routable_Link_Component
 		{
-			typedef Polaris_Component<Link_Components::Interfaces::Link_Interface, Link_Components::Bases::Routable_Link_Base<MasterType>, NULLTYPE, MasterType> type;
+			typedef Polaris_Component<Link_Interface, Link_Components::Bases::Routable_Link_Base<MasterType>, NULLTYPE, MasterType> type;
 		};
 	}	
 

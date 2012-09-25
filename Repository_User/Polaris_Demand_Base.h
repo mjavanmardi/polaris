@@ -57,7 +57,7 @@ namespace Demand_Components
 		template<typename MasterType>
 		struct Polaris_Demand_Component
 		{
-			typedef Polaris_Component<Demand_Components::Interfaces::Demand_Interface, Demand_Components::Bases::Polaris_Demand_Base<MasterType>,NULLTYPE,MasterType> type;
+			typedef Polaris_Component<Demand_Interface, Demand_Components::Bases::Polaris_Demand_Base<MasterType>,NULLTYPE,MasterType> type;
 		};
 	}	
 }

@@ -57,7 +57,7 @@ namespace Network_Components
 
 				typedef typename ThisType::intersections_container_type IntersectionsContainerType;
 				typedef typename ThisType::intersections_container_element_type IntersectionType;
-				typedef typename Intersection_Components::Interfaces::Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
+				typedef typename Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
 				typedef typename ThisType::Master_Type::SIGNAL_TYPE Signal_Type;
 				typedef typename Signal_Components::Interfaces::Signal_Interface<Signal_Type,NULLTYPE> Signal_Interface;
 				typedef typename ThisType::Master_Type::PHASE_TYPE Phase_Type;
@@ -231,7 +231,7 @@ namespace Network_Components
 				//network_data.link_data_array.clear();
 				typedef typename ThisType::links_container_type LinksContainerType;
 				typedef typename ThisType::links_container_element_type LinkType;
-				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+				typedef typename Link_Interface<LinkType,ThisType> Link_Interface;
 
 				links_container<LinksContainerType&>().clear();
 				
@@ -393,7 +393,7 @@ namespace Network_Components
 				//turn connectivities
 				typedef typename ThisType::turn_movements_container_type TurnMovementsContainerType;
 				typedef typename ThisType::turn_movements_element_type TurnMovementType;
-				typedef typename Intersection_Components::Interfaces::Movement_Interface<TurnMovementType, NULLTYPE> TurnMovementInterface;
+				typedef typename Movement_Interface<TurnMovementType, NULLTYPE> TurnMovementInterface;
 				
 				TurnMovementInterface* turn_movement_0 = (TurnMovementInterface*)Allocate<TurnMovementType>();
 				turn_movement_0->inbound_link<Link_Interface*>((Link_Interface*)links_container<LinksContainerType&>()[0]);
@@ -417,7 +417,6 @@ namespace Network_Components
 				// assign the detector
 				turn_movement_1->detector<Detector_Interface*>(lane->Detector_Thru<typename Master_Type::DETECTOR_TYPE>());
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_1);
-				
 
 				TurnMovementInterface* turn_movement_2 = (TurnMovementInterface*)Allocate<TurnMovementType>();
 				turn_movement_2->inbound_link<Link_Interface*>((Link_Interface*)links_container<LinksContainerType&>()[2]);
@@ -463,15 +462,15 @@ namespace Network_Components
 
 				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundMovementsContainerType;
 				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundMovementsType;
-				typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<OutboundInboundMovementsType,ThisType> OutboundInboundMovementsInterface;
+				typedef typename Outbound_Inbound_Movements_Interface<OutboundInboundMovementsType,ThisType> OutboundInboundMovementsInterface;
 
 				typedef typename ThisType::inbound_outbound_movements_container_type InboundOutboundMovementsContainerType;
 				typedef typename ThisType::inbound_outbound_movements_container_element_type InboundOutboundMovementsType;
-				typedef typename Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
+				typedef typename Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
 
 				typedef typename ThisType::movements_container_type MovementsContainerType;
 				typedef typename ThisType::movements_container_element_type MovementType;
-				typedef typename Intersection_Components::Interfaces::Movement_Interface<MovementType,ThisType> MovementInterface;
+				typedef typename Movement_Interface<MovementType,ThisType> MovementInterface;
 
 				int j, k;
 
@@ -557,32 +556,32 @@ namespace Network_Components
 			{
 				typedef typename ThisType::intersections_container_type IntersectionsContainerType;
 				typedef typename ThisType::intersections_container_element_type IntersectionType;
-				typedef typename Intersection_Components::Interfaces::Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
+				typedef typename Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
 
 				typedef typename ThisType::links_container_type LinksContainerType;
 				typedef typename ThisType::links_container_element_type LinkType;
-				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+				typedef typename Link_Interface<LinkType,ThisType> Link_Interface;
 
 
 
 				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundMovementsContainerType;
 				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundMovementsType;
-				typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<OutboundInboundMovementsType,ThisType> OutboundInboundMovementsInterface;
+				typedef typename Outbound_Inbound_Movements_Interface<OutboundInboundMovementsType,ThisType> OutboundInboundMovementsInterface;
 
 				typedef typename ThisType::inbound_outbound_movements_container_type InboundOutboundMovementsContainerType;
 				typedef typename ThisType::inbound_outbound_movements_container_element_type InboundOutboundMovementsType;
-				typedef typename Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
+				typedef typename Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
 
 				typedef typename ThisType::movements_container_type MovementsContainerType;
 				typedef typename ThisType::movements_container_element_type MovementType;
-				typedef typename Intersection_Components::Interfaces::Movement_Interface<MovementType,ThisType> MovementInterface;
+				typedef typename Movement_Interface<MovementType,ThisType> MovementInterface;
 
 				typedef typename ThisType::activity_locations_container_type ActivityLocationsContainerType;
 				typedef typename ThisType::activity_locations_container_element_type ActivityLocationType;
 				typedef typename Activity_Location_Components::Interfaces::Activity_Location_Interface<ActivityLocationType,ThisType> ActivityLocationInterface;
 				
 				typedef typename ThisType::scenario_data_type ScenarioDataType;
-				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioDataType, ThisType> ScenarioInterface;
+				typedef typename Scenario_Interface<ScenarioDataType, ThisType> ScenarioInterface;
 
 			
 
@@ -740,27 +739,27 @@ namespace Network_Components
 				
 				typedef typename ThisType::intersections_container_type IntersectionsContainerType;
 				typedef typename ThisType::intersections_container_element_type IntersectionType;
-				typedef typename Intersection_Components::Interfaces::Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
+				typedef typename Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
 
 				typedef typename ThisType::links_container_type LinksContainerType;
 				typedef typename ThisType::links_container_element_type LinkType;
-				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+				typedef typename Link_Interface<LinkType,ThisType> Link_Interface;
 
 				typedef typename ThisType::turn_movements_container_type TurnMovementsContainerType;
 				typedef typename ThisType::turn_movements_element_type TurnMovementType;
-				typedef typename Intersection_Components::Interfaces::Movement_Interface<TurnMovementType, NULLTYPE> TurnMovementInterface;
+				typedef typename Movement_Interface<TurnMovementType, NULLTYPE> TurnMovementInterface;
 
 				typedef typename ThisType::outbound_inbound_movements_container_type OutboundInboundMovementsContainerType;
 				typedef typename ThisType::outbound_inbound_movements_container_element_type OutboundInboundMovementsType;
-				typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<OutboundInboundMovementsType,ThisType> OutboundInboundMovementsInterface;
+				typedef typename Outbound_Inbound_Movements_Interface<OutboundInboundMovementsType,ThisType> OutboundInboundMovementsInterface;
 
 				typedef typename ThisType::inbound_outbound_movements_container_type InboundOutboundMovementsContainerType;
 				typedef typename ThisType::inbound_outbound_movements_container_element_type InboundOutboundMovementsType;
-				typedef typename Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
+				typedef typename Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
 
 				typedef typename ThisType::movements_container_type MovementsContainerType;
 				typedef typename ThisType::movements_container_element_type MovementType;
-				typedef typename Intersection_Components::Interfaces::Movement_Interface<MovementType,ThisType> MovementInterface;
+				typedef typename Movement_Interface<MovementType,ThisType> MovementInterface;
 
 				typedef typename ThisType::activity_locations_container_type ActivityLocationsContainerType;
 				typedef typename ThisType::activity_locations_container_element_type ActivityLocationType;
@@ -876,11 +875,11 @@ namespace Network_Components
 			{
 				typedef typename ThisType::links_container_type LinksContainerType;
 				typedef typename ThisType::links_container_element_type LinkType;
-				typedef typename Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+				typedef typename Link_Interface<LinkType,ThisType> Link_Interface;
 
 				typedef typename ThisType::movements_container_type MovementsContainerType;
 				typedef typename ThisType::movements_container_element_type MovementType;
-				typedef typename Intersection_Components::Interfaces::Movement_Interface<MovementType,ThisType> MovementInterface;
+				typedef typename Movement_Interface<MovementType,ThisType> MovementInterface;
 			
 				for (int i=0; i < (int)links_container<LinksContainerType&>().size(); i++)
 				{
@@ -896,7 +895,7 @@ namespace Network_Components
 				//turn penalty
 				typedef typename ThisType::turn_movements_container_type TurnMovementsContainerType;
 				typedef typename ThisType::turn_movement_type TurnMovementType;
-				typedef typename Intersection_Components::Interfaces::Movement_Interface<TurnMovementType, NULLTYPE> TurnMovementInterface;
+				typedef typename Movement_Interface<TurnMovementType, NULLTYPE> TurnMovementInterface;
 				//network_data.turn_travel_penalty_array.clear();
 				//network_data.turn_travel_penalty_array.resize(network_data.network_turn_movement_size);
 				//network_data.forward_link_turn_travel_time_array.clear();
@@ -925,7 +924,7 @@ namespace Network_Components
 				typedef typename ThisType::routable_networks_container_type RoutableNetworksContainerType;
 				RoutableNetworksContainerType& routable_networks=routable_networks_container<RoutableNetworksContainerType&>();
 				typedef typename ThisType::routable_network_type routable_network_type;
-				typedef Routing_Components::Interfaces::Routable_Network_Interface<routable_network_type, NULLTYPE> Routable_Network_Interface;
+				typedef Routable_Network_Interface<routable_network_type, NULLTYPE> Routable_Network_Interface;
 
 				for(int i=0;i<num_threads;i++)
 				{
@@ -937,3 +936,5 @@ namespace Network_Components
 		};
 	}
 }
+
+using namespace Network_Components::Interfaces;

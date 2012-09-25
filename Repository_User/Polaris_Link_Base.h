@@ -127,7 +127,7 @@ namespace Link_Components
 		//------------------------------------------------------------------------------------------------------------------
 			typedef typename MasterType::turn_movement_type turn_movements_type;
 
-			typedef vector<Intersection_Components::Interfaces::Movement_Interface<turn_movements_type, NULLTYPE>*> turn_movements_container_type;
+			typedef vector<Movement_Interface<turn_movements_type, NULLTYPE>*> turn_movements_container_type;
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType inbound_turn_movements(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_inbound_turn_movements;} tag_getter(inbound_turn_movements);
@@ -238,7 +238,7 @@ namespace Link_Components
 		//------------------------------------------------------------------------------------------------------------------
 			typedef typename MasterType::routable_link_type replicas_container_element_type;
 			typedef vector<void*> replicas_container_type;
-			typedef Link_Components::Interfaces::Link_Interface<replicas_container_element_type, NULLTYPE> replica_interface;
+			typedef Link_Interface<replicas_container_element_type, NULLTYPE> replica_interface;
 			
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType replicas_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_replicas_container);} tag_getter(replicas_container);

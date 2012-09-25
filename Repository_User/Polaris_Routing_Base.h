@@ -118,7 +118,7 @@ namespace Routing_Components
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType routable_network(call_requirements(requires(ThisType,Is_Dispatched)))
 			{
-				return ((Network_Components::Interfaces::Network_Interface<network_type,CallerType>*)_network)->routable_network<TargetType>();
+				return ((Network_Interface<network_type,CallerType>*)_network)->routable_network<TargetType>();
 			}
 			tag_getter(routable_network);
 			
@@ -139,7 +139,7 @@ namespace Routing_Components
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType origin_link(call_requirements(requires(ThisType,Is_Dispatched)))
 			{
-				return (TargetType)(((Network_Components::Interfaces::Network_Interface<network_type,CallerType>*)_network)->routable_network<Interfaces::Routable_Network_Interface<routable_network_type,CallerType>*>()->links<routable_network_type::links_container_type&>()[_origin_link]);
+				return (TargetType)(((Network_Interface<network_type,CallerType>*)_network)->routable_network<Interfaces::Routable_Network_Interface<routable_network_type,CallerType>*>()->links<routable_network_type::links_container_type&>()[_origin_link]);
 			}
 			tag_getter(origin_link);
 
@@ -155,7 +155,7 @@ namespace Routing_Components
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType destination_link(call_requirements(requires(ThisType,Is_Dispatched)))
 			{
-				return (TargetType)(((Network_Components::Interfaces::Network_Interface<network_type,CallerType>*)_network)->routable_network<Interfaces::Routable_Network_Interface<routable_network_type,CallerType>*>()->links<routable_network_type::links_container_type&>()[_destination_link]);
+				return (TargetType)(((Network_Interface<network_type,CallerType>*)_network)->routable_network<Interfaces::Routable_Network_Interface<routable_network_type,CallerType>*>()->links<routable_network_type::links_container_type&>()[_destination_link]);
 			}
 			tag_getter(destination_link);
 
@@ -170,13 +170,13 @@ namespace Routing_Components
 		template<typename MasterType>
 		struct Routable_Network_Component
 		{
-			typedef Polaris_Component<Routing_Components::Interfaces::Routable_Network_Interface, Routing_Components::Bases::Routable_Network_Base<MasterType>, NULLTYPE, MasterType> type;
+			typedef Polaris_Component<Routable_Network_Interface, Routing_Components::Bases::Routable_Network_Base<MasterType>, NULLTYPE, MasterType> type;
 		};
 
 		template<typename MasterType>
 		struct Polaris_Routing_Component
 		{
-			typedef Polaris_Component_Execution<Routing_Components::Interfaces::Routing_Interface, Routing_Components::Bases::Polaris_Routing_Base<MasterType>, NULLTYPE, MasterType> type;
+			typedef Polaris_Component_Execution<Routing_Interface, Routing_Components::Bases::Polaris_Routing_Base<MasterType>, NULLTYPE, MasterType> type;
 	
 		};	
 	}	

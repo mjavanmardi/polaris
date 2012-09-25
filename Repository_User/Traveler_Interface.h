@@ -23,7 +23,7 @@ namespace Traveler_Components
 			facet void Schedule_New_Departure(int departed_time)
 			{
 				typedef typename ThisType::router_type RouterType;
-				typedef Routing_Components::Interfaces::Routing_Interface<RouterType,ThisType> Routing_Interface;
+				typedef Routing_Interface<RouterType,ThisType> Routing_Interface;
 
 				Routing_Interface* itf=router<Routing_Interface*>();
 
@@ -32,3 +32,5 @@ namespace Traveler_Components
 		};
 	}
 }
+
+using namespace Traveler_Components::Interfaces;

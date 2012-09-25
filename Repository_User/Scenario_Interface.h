@@ -59,3 +59,5 @@ namespace Scenario_Components
 		};
 	}
 }
+
+using namespace Scenario_Components::Interfaces;

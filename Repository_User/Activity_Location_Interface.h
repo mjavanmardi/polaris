@@ -22,3 +22,5 @@ namespace Activity_Location_Components
 		};
 	}
 }
+
+using namespace Activity_Location_Components::Interfaces;

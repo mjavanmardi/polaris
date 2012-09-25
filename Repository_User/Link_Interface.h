@@ -175,7 +175,7 @@ namespace Link_Components
 			facet void accept_vehicle(TargetType veh/*,requires(TargetType,IsLoaded)*/)
 			{
 				typedef typename ThisType::scenario_type ScenarioType;
-				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
+				typedef typename Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
 				
@@ -184,7 +184,7 @@ namespace Link_Components
 				int current_time = scenario->current_time<int>();
 
 				typedef typename ThisType::current_vehicle_queue_element_type VehicleType;
-				typedef typename Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
+				typedef typename Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
 				typedef typename ThisType::current_vehicle_queue_type VehicleQueueType;
 
 
@@ -217,7 +217,7 @@ namespace Link_Components
 			facet void link_supply_update()
 			{
 				typedef typename ThisType::scenario_type ScenarioType;
-				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
+				typedef typename Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
 
@@ -273,11 +273,11 @@ namespace Link_Components
 			{
 				typedef typename ThisType::current_vehicle_queue_type VehicleQueueType;
 				typedef typename ThisType::current_vehicle_queue_element_type VehicleType;
-				typedef typename Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
+				typedef typename Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
 
 				
 				typedef typename ThisType::intersection_type IntersectionType;
-				typedef typename Intersection_Components::Interfaces::Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
+				typedef typename Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
 
 				Intersection_Interface* intersection=downstream_intersection<Intersection_Interface*>();
 
@@ -296,7 +296,7 @@ namespace Link_Components
 			facet void origin_link_loading()
 			{
 				typedef typename ThisType::scenario_type ScenarioType;
-				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
+				typedef typename Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
 
@@ -319,7 +319,7 @@ namespace Link_Components
 				
 				typedef typename ThisType::current_vehicle_queue_type VehicleQueueType;
 				typedef typename ThisType::current_vehicle_queue_element_type VehicleType;
-				typedef Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
+				typedef Vehicle_Interface<VehicleType,ThisType> Vehicle_Interface;
 				typedef typename ThisType::link_origin_vehicle_array_type VehicleOriginContainerType;
 				typedef typename ThisType::link_origin_vehicle_queue_type VehicleOriginQueueType;
 
@@ -455,7 +455,7 @@ namespace Link_Components
 
 				//time
 				typedef typename ThisType::scenario_type ScenarioType;				
-				typedef typename Scenario_Components::Interfaces::Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
+				typedef typename Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
 
@@ -560,6 +560,9 @@ namespace Link_Components
 			declare_facet_conditional(Newells_Conditional)
 			{
 				Link_Interface* _this=(Link_Interface*)pthis;
+
+				typedef typename ThisType::scenario_type Scenario_Type;
+				typedef Scenario_Interface<Scenario_Type,ThisType> Scenario_Interface;
 				
 				Revision link_current_revision=pthis->object_current_revision();
 				
@@ -592,7 +595,7 @@ namespace Link_Components
 				else if(_this->link_simulation_status<Types::Link_Simulation_Status>()==Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE)
 				{
 					typedef typename ThisType::intersection_type intersection_type;
-					typedef Intersection_Components::Interfaces::Intersection_Interface<intersection_type,ThisType> Intersection_Interface;
+					typedef Intersection_Interface<intersection_type,ThisType> Intersection_Interface;
 					typedef Intersection_Components::Types::Intersection_Simulation_Status intersection_simulation_status_type;
 
 					Revision intersection_current_revision=Execution_Object::allocator_template<intersection_type>::allocator_reference.type_current_revision();
@@ -612,7 +615,7 @@ namespace Link_Components
 
 						pthis->Swap_Event((Event)&Link_Interface::Compute_Step_Flow_Link_Moving<NULLTYPE>);
 						response.result=true;
-						response.next=iteration+1;
+						response.next=iteration+_this->scenario_reference<Scenario_Interface*>()->simulation_interval_length<int>();
 					}
 					else
 					{
@@ -659,3 +662,5 @@ namespace Link_Components
 
 	}
 }
+
+using namespace Link_Components::Interfaces;

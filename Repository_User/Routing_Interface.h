@@ -40,7 +40,7 @@ namespace Routing_Components
 
 				typedef typename ThisType::links_container_type RoutableLinksType;
 				typedef typename ThisType::link_type RoutableLinkType;
-				typedef Link_Components::Interfaces::Link_Interface<RoutableLinkType,ThisType> RoutableLinkInterface;
+				typedef Link_Interface<RoutableLinkType,ThisType> RoutableLinkInterface;
 				
 				RoutableLinksType& links_container=links<RoutableLinksType&>();
 				typename RoutableLinksType::iterator link_itr;
@@ -59,45 +59,45 @@ namespace Routing_Components
 			facet void read_routable_network_data(void* regular_network)
 			{
 				typedef typename ThisType::regular_network_type RegularNetworkType;
-				typedef typename Network_Components::Interfaces::Network_Interface<RegularNetworkType, ThisType> RegularNetworkInterface;
+				typedef typename Network_Interface<RegularNetworkType, ThisType> RegularNetworkInterface;
 				
 				typedef typename ThisType::regular_links_container_type RegularLinksContainerType;
 				typedef typename ThisType::regular_links_container_element_type RegularLinkType;
-				typedef typename Link_Components::Interfaces::Link_Interface<RegularLinkType, ThisType> RegularLinkInterface;
+				typedef typename Link_Interface<RegularLinkType, ThisType> RegularLinkInterface;
 
 				typedef typename ThisType::regular_intersections_container_type RegularIntersectionsContainerType;
 				typedef typename ThisType::regular_intersections_container_element_type RegularIntersectionType;
-				typedef typename Intersection_Components::Interfaces::Intersection_Interface<RegularIntersectionType, ThisType> RegularIntersectionInterface;
+				typedef typename Intersection_Interface<RegularIntersectionType, ThisType> RegularIntersectionInterface;
 
 				typedef typename ThisType::routable_links_container_element_type RoutableLinkType;
 				typedef typename ThisType::routable_links_container_type RoutableLinksContainerType;
-				typedef typename Link_Components::Interfaces::Link_Interface<RoutableLinkType, ThisType> RoutableLinkInterface;
+				typedef typename Link_Interface<RoutableLinkType, ThisType> RoutableLinkInterface;
 
 				typedef typename ThisType::routable_intersections_container_element_type RoutableIntersectionType;
 				typedef typename ThisType::routable_intersections_container_type RoutableIntersectionsContainerType;
-				typedef typename Intersection_Components::Interfaces::Intersection_Interface<RoutableIntersectionType, ThisType> RoutableIntersectionInterface;
+				typedef typename Intersection_Interface<RoutableIntersectionType, ThisType> RoutableIntersectionInterface;
 
 				typedef typename ThisType::regular_outbound_inbound_movements_container_type RegularOutboundInboundMovementsContainerType;
 				typedef typename ThisType::routable_outbound_inbound_movements_container_type RoutableOutboundInboundMovementsContainerType;
 				typedef typename ThisType::regular_outbound_inbound_movements_container_element_type RegularOutboundInboundMovementsType;
 				typedef typename ThisType::routable_outbound_inbound_movements_container_element_type RoutableOutboundInboundMovementsType;
-				typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<RegularOutboundInboundMovementsType, ThisType> RegularOutboundInboundMovementsInterface;
-				typedef typename Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface<RoutableOutboundInboundMovementsType, ThisType> RoutableOutboundInboundMovementsInterface;
+				typedef typename Outbound_Inbound_Movements_Interface<RegularOutboundInboundMovementsType, ThisType> RegularOutboundInboundMovementsInterface;
+				typedef typename Outbound_Inbound_Movements_Interface<RoutableOutboundInboundMovementsType, ThisType> RoutableOutboundInboundMovementsInterface;
 
 				typedef typename ThisType::regular_inbound_outbound_movements_container_type RegularInboundOutboundMovementsContainerType;
 				typedef typename ThisType::routable_inbound_outbound_movements_container_type RoutableInboundOutboundMovementsContainerType;
 				typedef typename ThisType::regular_inbound_outbound_movements_container_element_type RegularInboundOutboundMovementsType;
 				typedef typename ThisType::routable_inbound_outbound_movements_container_element_type RoutableInboundOutboundMovementsType;
-				typedef typename Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<RegularInboundOutboundMovementsType, ThisType> RegularInboundOutboundMovementsInterface;
-				typedef typename Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<RoutableInboundOutboundMovementsType, ThisType> RoutableInboundOutboundMovementsInterface;
+				typedef typename Inbound_Outbound_Movements_Interface<RegularInboundOutboundMovementsType, ThisType> RegularInboundOutboundMovementsInterface;
+				typedef typename Inbound_Outbound_Movements_Interface<RoutableInboundOutboundMovementsType, ThisType> RoutableInboundOutboundMovementsInterface;
 
 				typedef typename ThisType::regular_movements_container_type RegularMovementsContainerType;
 				typedef typename ThisType::regular_movements_container_element_type RegularMovementType;
-				typedef typename Intersection_Components::Interfaces::Movement_Interface<RegularMovementType, ThisType> RegularMovementInterface;
+				typedef typename Movement_Interface<RegularMovementType, ThisType> RegularMovementInterface;
 
 				typedef typename ThisType::routable_movements_container_type RoutableMovementsContainerType;
 				typedef typename ThisType::routable_movements_container_element_type RoutableMovementType;
-				typedef typename Intersection_Components::Interfaces::Movement_Interface<RoutableMovementType, ThisType> RoutableMovementInterface;
+				typedef typename Movement_Interface<RoutableMovementType, ThisType> RoutableMovementInterface;
 
 
 				
@@ -338,20 +338,20 @@ namespace Routing_Components
 				
 				typedef typename RoutableLinkType::network_link_type NetworkLinkType;
 				
-				typedef Link_Components::Interfaces::Link_Interface<RoutableLinkType,ThisType> RoutableLinkInterface;
-				typedef Link_Components::Interfaces::Link_Interface<NetworkLinkType,ThisType> NetworkLinkInterface;
+				typedef Link_Interface<RoutableLinkType,ThisType> RoutableLinkInterface;
+				typedef Link_Interface<NetworkLinkType,ThisType> NetworkLinkInterface;
 
 				typedef typename RoutableNetworkType::intersections_container_type IntersectionsContainerType;
 				typedef typename RoutableNetworkType::intersections_container_element_type IntersectionType;
-				typedef Intersection_Components::Interfaces::Intersection_Interface<IntersectionType,ThisType> IntersectionInterface;
+				typedef Intersection_Interface<IntersectionType,ThisType> IntersectionInterface;
 				
 				typedef typename IntersectionType::inbound_outbound_movements_container_type InboundOutboundMovementsContainerType;
 				typedef typename IntersectionType::inbound_outbound_movements_container_element_type InboundOutboundMovementsType;
-				typedef Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
+				typedef Inbound_Outbound_Movements_Interface<InboundOutboundMovementsType,ThisType> InboundOutboundMovementsInterface;
 
 				typedef typename IntersectionType::movements_container_type MovementsContainerType;
 				typedef typename IntersectionType::movements_container_element_type MovementType;
-				typedef Intersection_Components::Interfaces::Movement_Interface<MovementType,ThisType> MovementInterface;
+				typedef Movement_Interface<MovementType,ThisType> MovementInterface;
 				
 
 				RoutableNetworkInterface* routable_net=routable_network<RoutableNetworkInterface*>();
@@ -503,15 +503,15 @@ namespace Routing_Components
 			{
 				Routing_Interface* _this=(Routing_Interface*)pthis;
 				typedef typename ThisType::vehicle_type VehicleType;
-				typedef Vehicle_Components::Interfaces::Vehicle_Interface<VehicleType,ThisType> VehicleInterface;	
+				typedef Vehicle_Interface<VehicleType,ThisType> VehicleInterface;	
 				VehicleInterface* veh=_this->vehicle<VehicleInterface*>();
 				
 				typedef typename ThisType::routable_network_type RoutableNetworkType;
 				typedef typename RoutableNetworkType::links_container_element_type RoutableLinkType;
 				typedef typename RoutableLinkType::network_link_type NetworkLinkType;
 
-				typedef Link_Components::Interfaces::Link_Interface<NetworkLinkType,ThisType> NetworkLinkInterface;	
-				typedef Link_Components::Interfaces::Link_Interface<RoutableLinkType,ThisType> RoutableLinkInterface;
+				typedef Link_Interface<NetworkLinkType,ThisType> NetworkLinkInterface;	
+				typedef Link_Interface<RoutableLinkType,ThisType> RoutableLinkInterface;
 				
 				NetworkLinkInterface* origin_link=veh->origin_link<NetworkLinkInterface*>();
 				NetworkLinkInterface* destination_link=veh->destination_link<NetworkLinkInterface*>();
@@ -535,3 +535,5 @@ namespace Routing_Components
 		};
 	}
 }
+
+using namespace Routing_Components::Interfaces;

@@ -154,28 +154,28 @@ namespace Intersection_Components
 		template<typename MasterType>
 		struct Routable_Intersection_Component
 		{
-			typedef Polaris_Component<Intersection_Components::Interfaces::Intersection_Interface, Intersection_Components::Bases::Routable_Intersection_Base<MasterType>, NULLTYPE, MasterType> type;
+			typedef Polaris_Component<Intersection_Interface, Intersection_Components::Bases::Routable_Intersection_Base<MasterType>, NULLTYPE, MasterType> type;
 		};
 
 		//template<typename MasterType>
 		//struct Routable_Outbound_Inbound_Movements_Component
 		//{
-		//	typedef Polaris_Component<Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface, Intersection_Components::Bases::Routable_Outbound_Inbound_Movements_Base<MasterType>, NULLTYPE, MasterType> type;
+		//	typedef Polaris_Component<Outbound_Inbound_Movements_Interface, Intersection_Components::Bases::Routable_Outbound_Inbound_Movements_Base<MasterType>, NULLTYPE, MasterType> type;
 		//};
 		template<typename MasterType>
 		struct Routable_Movement_Component
 		{
-			typedef Polaris_Component<Intersection_Components::Interfaces::Movement_Interface, Intersection_Components::Bases::Routable_Movement_Base<MasterType>, NULLTYPE, MasterType> type;
+			typedef Polaris_Component<Movement_Interface, Intersection_Components::Bases::Routable_Movement_Base<MasterType>, NULLTYPE, MasterType> type;
 		};
 		template<typename MasterType>
 		struct Routable_Inbound_Outbound_Movements_Component
 		{
-			typedef Polaris_Component<Intersection_Components::Interfaces::Inbound_Outbound_Movements_Interface, Intersection_Components::Bases::Routable_Inbound_Outbound_Movements_Base<MasterType>, NULLTYPE, MasterType> type;
+			typedef Polaris_Component<Inbound_Outbound_Movements_Interface, Intersection_Components::Bases::Routable_Inbound_Outbound_Movements_Base<MasterType>, NULLTYPE, MasterType> type;
 		};
 		template<typename MasterType>
 		struct Routable_Outbound_Inbound_Movements_Component
 		{
-			typedef Polaris_Component<Intersection_Components::Interfaces::Outbound_Inbound_Movements_Interface, Intersection_Components::Bases::Routable_Outbound_Inbound_Movements_Base<MasterType>, NULLTYPE, MasterType> type;
+			typedef Polaris_Component<Outbound_Inbound_Movements_Interface, Intersection_Components::Bases::Routable_Outbound_Inbound_Movements_Base<MasterType>, NULLTYPE, MasterType> type;
 		};
 	}	
 

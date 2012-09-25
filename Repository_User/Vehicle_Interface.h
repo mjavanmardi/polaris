@@ -73,7 +73,7 @@ namespace Vehicle_Components
 				typedef typename ThisType::trajectory_type TrajectoryType;
 				typedef typename ThisType::trajectory_element_type TrajectoryElementType;
 				typedef typename TrajectoryElementType::link_type LinkType;
-				typedef Link_Components::Interfaces::Link_Interface<LinkType,ThisType> Link_Interface;
+				typedef Link_Interface<LinkType,ThisType> Link_Interface;
 
 				int route_link_size=(int)path_container.size();
 
@@ -200,7 +200,7 @@ namespace Vehicle_Components
 				
 				initialize_trajectory<NULLTYPE>();
 
-				//typedef Link_Components::Interfaces::Link_Interface<typename Trajectory_Unit_Type::link_type,ThisType> Link_Interface;
+				//typedef Link_Interface<typename Trajectory_Unit_Type::link_type,ThisType> Link_Interface;
 
 				//PRINT("origin link " << current->link<Link_Interface*>()->uuid<int>());
 
@@ -221,7 +221,7 @@ namespace Vehicle_Components
 				
 				current = advance_trajectory<Trajectory_Unit_Interface<Trajectory_Unit_Type,ThisType>*>();
 				
-				typedef Link_Components::Interfaces::Link_Interface<typename Trajectory_Unit_Type::link_type,ThisType> Link_Interface;
+				typedef Link_Interface<typename Trajectory_Unit_Type::link_type,ThisType> Link_Interface;
 
 				//PRINT("transferring to next link " << current->link<Link_Interface*>()->uuid<int>());
 
@@ -242,3 +242,5 @@ namespace Vehicle_Components
 		};
 	}
 }
+
+using namespace Vehicle_Components::Interfaces;
