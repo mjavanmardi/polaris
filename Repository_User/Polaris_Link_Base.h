@@ -100,18 +100,18 @@ namespace Link_Components
 			member_data_basic(int, link_destination_arrived_vehicles);
 
 			//cumulative - Mid-Trip
-			member_data_basic(int, link_upstream_cumulative_arrival_vehicles);
-			member_data_basic(int, link_shifted_cumulative_arrival_vehicles);
+			member_data_basic(int, link_upstream_cumulative_arrived_vehicles);
+			member_data_basic(int, link_shifted_cumulative_arrived_vehicles);
 			member_data_basic(int, link_upstream_cumulative_vehicles);
 			member_data_basic(int, link_downstream_cumulative_vehicles);
 			
 			//cumulative - Begin/End-Trip
 			member_data_basic(int, link_origin_cumulative_arrived_vehicles);
-			member_data_basic(int, link_origin_cumulative_departure_vehicles);
-			member_data_basic(int, link_destination_cumulative_arrival_vehicles);
+			member_data_basic(int, link_origin_cumulative_departed_vehicles);
+			member_data_basic(int, link_destination_cumulative_arrived_vehicles);
 
 			//cached cumulative state - Mid-Trip
-			member_data_basic(int, cached_link_shifted_cumulative_arrival_vehicles);
+			member_data_basic(int, cached_link_shifted_cumulative_arrived_vehicles);
 
 			//other attributes
 			member_data_basic(float, maximum_flow_rate);

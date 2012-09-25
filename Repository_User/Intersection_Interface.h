@@ -65,16 +65,16 @@ namespace Intersection_Components
 
 			facet_accessor(turn_travel_penalty);
 
-			facet_accessor(cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array);
-			facet_accessor(cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array);
-			facet_accessor(cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array);
-			facet_accessor(inbound_link_departure_time_based_experienced_link_turn_travel_delay);
-			facet_accessor(outbound_link_arrival_time_based_experienced_link_turn_travel_delay);
+			facet_accessor(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array);
+			facet_accessor(cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array);
+			facet_accessor(cached_outbound_link_departed_time_based_experienced_link_turn_travel_delay_array);
+			facet_accessor(inbound_link_departed_time_based_experienced_link_turn_travel_delay);
+			facet_accessor(outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 			
-			facet_accessor(turn_movement_cumulative_arrival_vehicles);
+			facet_accessor(turn_movement_cumulative_arrived_vehicles);
 			facet_accessor(turn_movement_cumulative_vehicles);
-			facet_accessor(cached_turn_movement_cumulative_shifted_arrival_vehicles_array);
-			facet_accessor(turn_movement_cumulative_shifted_arrival_vehicles);
+			facet_accessor(cached_turn_movement_cumulative_shifted_arrived_vehicles_array);
+			facet_accessor(turn_movement_cumulative_shifted_arrived_vehicles);
 			
 			facet_accessor(forward_link_turn_travel_time);
 			
@@ -187,6 +187,8 @@ namespace Intersection_Components
 
 				Link_Interface* outbound_link;
 
+				//PRINT(uuid<int>());
+
 				OutboundInboundType& outbound_links_container=outbound_inbound_movements<OutboundInboundType&>();
 				typename OutboundInboundType::iterator outbound_itr;
 
@@ -206,10 +208,13 @@ namespace Intersection_Components
 
 						inbound_link=inbound_movement->inbound_link<Link_Interface*>();
 
-						if(((Vehicle_Interface*)vehicle)->next_link<Link_Interface*>()==inbound_link)
+						//PRINT(((Vehicle_Interface*)vehicle)->next_link<Link_Interface*>()->uuid<int>() << "," << outbound_link->uuid<int>());
+						//PRINT(((Vehicle_Interface*)vehicle)->current_link<Link_Interface*>()->uuid<int>() << "," << inbound_link->uuid<int>());
+
+						if(((Vehicle_Interface*)vehicle)->next_link<Link_Interface*>()==outbound_link && ((Vehicle_Interface*)vehicle)->current_link<Link_Interface*>()==inbound_link)
 						{
 							inbound_movement->vehicles_container<VehiclesContainerType&>().push_back(vehicle);
-							inbound_movement->turn_movement_cumulative_arrival_vehicles<int&>()++;
+							inbound_movement->turn_movement_cumulative_arrived_vehicles<int&>()++;
 						}
 					}
 				}
@@ -448,6 +453,10 @@ namespace Intersection_Components
 				OutboundInboundType& outbound_links_container=outbound_inbound_movements<OutboundInboundType&>();
 				typename OutboundInboundType::iterator outbound_itr;
 
+				if(uuid<int>()==1)
+				{
+					bool pause=true;
+				}
 				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
 					outbound_link=((Outbound_Inbound_Movement_Interface*)(*outbound_itr))->outbound_link_reference<Link_Interface*>();
@@ -475,15 +484,15 @@ namespace Intersection_Components
 
 						if (t_minus_fftt > -1)
 						{
-							int cached_turn_movement_cumulative_shifted_arrival_vehicles=(inbound_movement->cached_turn_movement_cumulative_shifted_arrival_vehicles_array<int*>())[t_minus_fftt];
-							inbound_movement->turn_movement_cumulative_shifted_arrival_vehicles<int>(cached_turn_movement_cumulative_shifted_arrival_vehicles);
+							int cached_turn_movement_cumulative_shifted_arrived_vehicles=(inbound_movement->cached_turn_movement_cumulative_shifted_arrived_vehicles_array<int*>())[t_minus_fftt];
+							inbound_movement->turn_movement_cumulative_shifted_arrived_vehicles<int>(cached_turn_movement_cumulative_shifted_arrived_vehicles);
 						}
 						else
 						{
-							inbound_movement->turn_movement_cumulative_shifted_arrival_vehicles<int>(0);
+							inbound_movement->turn_movement_cumulative_shifted_arrived_vehicles<int>(0);
 						}
 						
-						int movement_demand = inbound_movement->turn_movement_cumulative_shifted_arrival_vehicles<int>() - inbound_movement->turn_movement_cumulative_vehicles<int>();
+						int movement_demand = inbound_movement->turn_movement_cumulative_shifted_arrived_vehicles<int>() - inbound_movement->turn_movement_cumulative_vehicles<int>();
 						
 						inbound_movement->movement_demand<float>(movement_demand);
 
@@ -498,7 +507,7 @@ namespace Intersection_Components
 						float turn_movement_flow = (float) min(min((double)turn_movement_demand,(double)turn_movement_capacity),(double)turn_movement_supply);
 						inbound_movement->movement_flow<float>(turn_movement_flow);
 
-						PRINT("\t" << "Turn movement flow: " << turn_movement_flow);
+						//PRINT("\t" << "Turn movement flow: " << turn_movement_flow);
 					}
 				}
 			}
@@ -553,8 +562,8 @@ namespace Intersection_Components
 
 						inbound_link=inbound_movement->inbound_link<Link_Interface*>();
 
-						inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(0);
-						inbound_movement->inbound_link_departure_time_based_experienced_link_turn_travel_delay<float>(0);
+						inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(0);
+						inbound_movement->inbound_link_departed_time_based_experienced_link_turn_travel_delay<float>(0);
 
 						if(outbound_itr==outbound_links_container.begin())
 						{
@@ -605,23 +614,23 @@ namespace Intersection_Components
 								inbound_movement->turn_movement_cumulative_vehicles<int&>()++;
 
 								//update link_turn_travel_delay
-								inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float&>()+=delayed_time;
+								inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float&>()+=delayed_time;
 
-								//find the departure time
-								int departure_time_position = -1;
+								//find the departed time
+								int departed_time_position = -1;
 								
 								int num_intervals=scenario->num_simulation_intervals_per_assignment_interval<int>();
 
 								if (current_simulation_interval_index>=num_intervals)
 								{
-									departure_time_position = (current_simulation_interval_index+num_intervals-delayed_interval)%num_intervals;
+									departed_time_position = (current_simulation_interval_index+num_intervals-delayed_interval)%num_intervals;
 								}
 								else
 								{
-									departure_time_position = enter_interval_index;
+									departed_time_position = enter_interval_index;
 								}
 
-								inbound_movement->cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array<float*>()[departure_time_position]+=delayed_interval*simulation_interval_length;
+								inbound_movement->cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array<float*>()[departed_time_position]+=delayed_interval*simulation_interval_length;
 								
 								outbound_link->push_vehicle<Vehicle_Interface*>(vehicle);
 							}
@@ -629,20 +638,20 @@ namespace Intersection_Components
 
 						if (num_transfer_vehicles_of_turn_movement>0)
 						{
-							float delay=inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>()/((float)num_transfer_vehicles_of_turn_movement);
-							inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(delay);
+							float delay=inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>()/((float)num_transfer_vehicles_of_turn_movement);
+							inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(delay);
 						}
 						else
 						{
 							if(inbound_movement->movement_rule<Types::Turn_Movement_Rule_Keys>() == Types::Turn_Movement_Rule_Keys::PROHIBITED)
 							{
-								inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(FLT_MAX);
+								inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(FLT_MAX);
 							}
 							else
 							{
 								if(inbound_movement->movement_demand<float>() == 0)
 								{//no demand
-									inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(0);
+									inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(0);
 								}
 								else
 								{//no supply for this turn -- need a prediction -- need to work it later
@@ -652,13 +661,13 @@ namespace Intersection_Components
 										t_minus_one = (current_simulation_interval_index-1)%scenario->num_simulation_intervals_per_assignment_interval<int>();
 
 										float delay = simulation_interval_length +
-											inbound_movement->cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<float*>()[t_minus_one];
+											inbound_movement->cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<float*>()[t_minus_one];
 
-										inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(delay);
+										inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(delay);
 									}
 									else
 									{
-										inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(0);
+										inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(0);
 									}
 								}
 							}
@@ -749,19 +758,19 @@ namespace Intersection_Components
 							t_plus_fftt = 0;
 						}
 
-						//cached cumulative shifted arrival vehicles
-						inbound_movement->cached_turn_movement_cumulative_shifted_arrival_vehicles_array<int*>()[t_plus_fftt] = inbound_movement->turn_movement_cumulative_arrival_vehicles<int>();
+						//cached cumulative shifted arrived vehicles
+						inbound_movement->cached_turn_movement_cumulative_shifted_arrived_vehicles_array<int*>()[t_plus_fftt] = inbound_movement->turn_movement_cumulative_arrived_vehicles<int>();
 						
 						//turn movement delayed time update
-						inbound_movement->cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<int*>()[t_cached_delay] = inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<int>();
+						inbound_movement->cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<int*>()[t_cached_delay] = inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<int>();
 						
-						inbound_movement->turn_travel_penalty<float>(inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>());
+						inbound_movement->turn_travel_penalty<float>(inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>());
 						
 						float turn_travel_penalty = 0.0;
 
 						for (int t_cached_time=0;t_cached_time<scenario->num_simulation_intervals_per_assignment_interval<int>();t_cached_time++)
 						{
-							turn_travel_penalty += inbound_movement->cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<int*>()[t_cached_time];
+							turn_travel_penalty += inbound_movement->cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<int*>()[t_cached_time];
 						}
 
 						turn_travel_penalty = (float) ( turn_travel_penalty/((float)scenario->num_simulation_intervals_per_assignment_interval<int>()) );
@@ -780,7 +789,7 @@ namespace Intersection_Components
 			{
 				Intersection_Interface* _this=(Intersection_Interface*)pthis;
 				
-				PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting intersection: " << _this->uuid<int>());
+				//PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting intersection: " << _this->uuid<int>());
 				
 				Revision intersection_current_revision=pthis->object_current_revision();
 				

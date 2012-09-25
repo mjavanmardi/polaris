@@ -303,7 +303,7 @@ namespace Signal_Components
 			member_data(float,pedestrian_flow_rate,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));	///< v_ped (p/h)
 			member_data(float,buses_per_hour,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< N_b (buses/h)
 			member_data(float,parking_activity,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));		///< Nm (maneuvers/h)
-			member_data(float,arrival_type,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< AT
+			member_data(float,arrived_type,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< AT
 			member_data(float,percent_arrive_on_green,requires(TargetType,Concepts::Is_Percentage),requires(TargetType,Concepts::Is_Percentage));///< P
 			member_data(float,approach_speed,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< S_a	(mi/h)
 

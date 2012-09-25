@@ -536,8 +536,8 @@ namespace Network_Components
 					//cumulative vehicles
 					link->link_destination_arrived_vehicles<int>(0);
 					link->link_origin_cumulative_arrived_vehicles<int>(0);
-					link->link_origin_cumulative_departure_vehicles<int>(0);
-					link->link_upstream_cumulative_arrival_vehicles<int>(0);
+					link->link_origin_cumulative_departed_vehicles<int>(0);
+					link->link_upstream_cumulative_arrived_vehicles<int>(0);
 					link->link_upstream_cumulative_vehicles<int>(0);
 				
 					////bwtt and fftt
@@ -594,31 +594,31 @@ namespace Network_Components
 							inbound_movement->movement_flow<float>(0.0);
 							inbound_movement->movement_transferred<int>(0);
 							inbound_movement->turn_movement_cumulative_vehicles<int>(0);
-							inbound_movement->turn_movement_cumulative_arrival_vehicles<int>(0);
-							inbound_movement->turn_movement_cumulative_shifted_arrival_vehicles<int>(0);
+							inbound_movement->turn_movement_cumulative_arrived_vehicles<int>(0);
+							inbound_movement->turn_movement_cumulative_shifted_arrived_vehicles<int>(0);
 							
 							inbound_movement->vehicles_container<deque<void*>&>().clear();
 							
-							inbound_movement->outbound_link_arrival_time_based_experienced_link_turn_travel_delay<float>(0.0);
-							inbound_movement->inbound_link_departure_time_based_experienced_link_turn_travel_delay<float>(0.0);
-							inbound_movement->cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().clear();
-							inbound_movement->cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().clear();
-							inbound_movement->cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().resize(((ScenarioInterface*)scenario_data)->num_simulation_intervals_per_assignment_interval<int>());
-							inbound_movement->cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().resize(((ScenarioInterface*)scenario_data)->num_simulation_intervals_per_assignment_interval<int>());
+							inbound_movement->outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(0.0);
+							inbound_movement->inbound_link_departed_time_based_experienced_link_turn_travel_delay<float>(0.0);
+							inbound_movement->cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().clear();
+							inbound_movement->cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().clear();
+							inbound_movement->cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().resize(((ScenarioInterface*)scenario_data)->num_simulation_intervals_per_assignment_interval<int>());
+							inbound_movement->cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array<vector<int>&>().resize(((ScenarioInterface*)scenario_data)->num_simulation_intervals_per_assignment_interval<int>());
 							
 							
 							for (j=0;j<((ScenarioInterface*)scenario_data)->num_simulation_intervals_per_assignment_interval<int>();j++)
 							{
-								inbound_movement->cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array<vector<int>&>()[j] = 0.0;
-								inbound_movement->cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array<vector<int>&>()[j] = 0.0;
+								inbound_movement->cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<vector<int>&>()[j] = 0.0;
+								inbound_movement->cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array<vector<int>&>()[j] = 0.0;
 							}
 									
 							Link_Interface* inbound_link = inbound_movement->inbound_link<Link_Interface*>();
-							inbound_movement->cached_turn_movement_cumulative_shifted_arrival_vehicles_array<vector<int>&>().clear();
-							inbound_movement->cached_turn_movement_cumulative_shifted_arrival_vehicles_array<vector<int>&>().resize(inbound_link->link_bwtt_cached_simulation_interval_size<int>());
+							inbound_movement->cached_turn_movement_cumulative_shifted_arrived_vehicles_array<vector<int>&>().clear();
+							inbound_movement->cached_turn_movement_cumulative_shifted_arrived_vehicles_array<vector<int>&>().resize(inbound_link->link_bwtt_cached_simulation_interval_size<int>());
 							for (j=0;j<inbound_link->link_bwtt_cached_simulation_interval_size<int>();j++)
 							{
-								inbound_movement->cached_turn_movement_cumulative_shifted_arrival_vehicles_array<vector<int>&>()[j] = 0; 
+								inbound_movement->cached_turn_movement_cumulative_shifted_arrived_vehicles_array<vector<int>&>()[j] = 0; 
 							}
 
 							if (inbound_movement->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>() == Intersection_Components::Types::THROUGH_TURN)

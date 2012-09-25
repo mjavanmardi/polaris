@@ -317,7 +317,7 @@ namespace Routing_Components
 				Routing_Interface* _this=(Routing_Interface*)pthis;
 				int uuid=_this->traveler<Traveler_Components::Interfaces::Traveler_Interface<typename ThisType::traveler_type,NULLTYPE>* >()->uuid<int>();
 
-				PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting traveler: " << uuid);
+				//PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting traveler: " << uuid);
 
 				response.next=INT_MAX;
 				response.result=true;
@@ -494,9 +494,9 @@ namespace Routing_Components
 				}
 			};
 
-			facet void Schedule_Route_Computation(int departure_time)
+			facet void Schedule_Route_Computation(int departed_time)
 			{
-				schedule_event_local(ThisType,Compute_Route_Condition,Compute_Route,departure_time,NULLTYPE);
+				schedule_event_local(ThisType,Compute_Route_Condition,Compute_Route,departed_time,NULLTYPE);
 			}
 
 			declare_facet_event(Compute_Route)

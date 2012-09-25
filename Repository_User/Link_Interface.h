@@ -95,32 +95,32 @@ namespace Link_Components
 			facet_accessor(link_origin_departed_vehicles);
 			
 			facet_accessor(link_destination_arrived_vehicles);
-			facet_accessor(link_destination_departed_vehicles);//Not Used
+			//facet_accessor(link_destination_departed_vehicles);//Not Used
 
 
 			//cumulative - Mid-Trip
-			facet_accessor(link_upstream_cumulative_arrival_vehicles);
-			facet_accessor(link_downstream_cumulative_departure_vehicles);//Not Used
+			facet_accessor(link_upstream_cumulative_arrived_vehicles);
+			//facet_accessor(link_downstream_cumulative_departed_vehicles);//Not Used
 
-			facet_accessor(link_shifted_cumulative_arrival_vehicles);
-			facet_accessor(link_shifted_cumulative_departure_vehicles);//Not Used
+			facet_accessor(link_shifted_cumulative_arrived_vehicles);
+			//facet_accessor(link_shifted_cumulative_departed_vehicles);//Not Used
 
 			facet_accessor(link_upstream_cumulative_vehicles);
 			facet_accessor(link_downstream_cumulative_vehicles);
 			
 			//cumulative - Begin/End-Trip
 			facet_accessor(link_origin_cumulative_arrived_vehicles);
-			facet_accessor(link_origin_cumulative_departure_vehicles);
+			facet_accessor(link_origin_cumulative_departed_vehicles);
 
-			facet_accessor(link_destination_cumulative_arrival_vehicles);
-			facet_accessor(link_destination_cumulative_departure_vehicles);//Not Used
+			facet_accessor(link_destination_cumulative_arrived_vehicles);
+			//facet_accessor(link_destination_cumulative_departed_vehicles);//Not Used
 
 			//cached cumulative state - Mid-Trip
-			facet_accessor(cached_link_upstream_cumulative_arrival_vehicles);//Not Used
-			facet_accessor(cached_link_downstream_cumulative_departure_vehicles);//Not Used
+			//facet_accessor(cached_link_upstream_cumulative_arrived_vehicles);//Not Used
+			//facet_accessor(cached_link_downstream_cumulative_departed_vehicles);//Not Used
 
-			facet_accessor(cached_link_shifted_cumulative_arrival_vehicles);
-			facet_accessor(cached_link_shifted_cumulative_departure_vehicles);//Not Used
+			facet_accessor(cached_link_shifted_cumulative_arrived_vehicles);
+			//facet_accessor(cached_link_shifted_cumulative_departed_vehicles);//Not Used
 			
 			facet_accessor(cached_link_upstream_cumulative_vehicles_array);
 			facet_accessor(cached_link_downstream_cumulative_vehicles_array);
@@ -193,7 +193,7 @@ namespace Link_Components
 				vehicle->transfer_to_next_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length,current_time);
 
 				//update outbound link state: A(a,0,t)
-				link_upstream_cumulative_arrival_vehicles<int&>()++;
+				link_upstream_cumulative_arrived_vehicles<int&>()++;
 				link_upstream_arrived_vehicles<int&>()++;
 
 				if(this==vehicle->destination_link<Link_Interface*>())
@@ -201,7 +201,7 @@ namespace Link_Components
 					vehicle->arrive_to_destination_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
 					
 					//update link state: N_destination(a,t)
-					link_destination_cumulative_arrival_vehicles<int&>()++;
+					link_destination_cumulative_arrived_vehicles<int&>()++;
 					link_destination_arrived_vehicles<int&>()++;
 					
 					//update network state:
@@ -337,7 +337,8 @@ namespace Link_Components
 
 						vehicle=(Vehicle_Interface*)link_origin_vehicle_array<VehicleOriginContainerType&>()[iv];
 
-						if(vehicle->departure_simulation_interval_index<int>() == current_simulation_interval_index)
+						int departure_interval=vehicle->departed_simulation_interval_index<int>();
+						if(vehicle->departed_simulation_interval_index<int>() == current_simulation_interval_index)
 						{
 							link_origin_vehicle_queue<VehicleOriginQueueType&>().push_back(vehicle);
 							link_origin_arrived_vehicles<int&>()++;
@@ -381,7 +382,7 @@ namespace Link_Components
 							vehicle->load_to_origin_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
 							
 							//update link state
-							link_origin_cumulative_departure_vehicles<int&>()++;
+							//link_origin_cumulative_departed_vehicles<int&>()++;
 							link_origin_departed_vehicles<int&>()++;
 							link_origin_arrived_vehicles<int&>()--;
 
@@ -396,16 +397,12 @@ namespace Link_Components
 								vehicle->arrive_to_destination_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
 								
 								//update link state: N_destination(a,t)
-								link_destination_cumulative_arrival_vehicles<int&>()++;
+								link_destination_cumulative_arrived_vehicles<int&>()++;
 								link_destination_arrived_vehicles<int&>()++;
 								
 								//update network state:
 								//arrived_vehicles++;
 								//in_network_vehicles--;
-							}
-							else
-							{
-								current_vehicle_queue<VehicleQueueType&>().push_back(vehicle);
 							}
 						}
 					}
@@ -429,18 +426,18 @@ namespace Link_Components
 				//input states
 				
 				//this->link_destination_arrived_vehicles_array;				//y_destination(a,t) at time t
-				//this->link_destination_cumulative_arrival_vehicles_array;		//N_destination(a,t) by time t
+				//this->link_destination_cumulative_arrived_vehicles_array;		//N_destination(a,t) by time t
 
 				//this->link_origin_arrived_vehicles_array;						//y_origin_a(a,t) at time t
 				//this->link_origin_departed_vehicles_array;					//y_origin_d(a,t) at time t
 
 				//this->link_origin_cumulative_arrive_vehicles_array;			//N_origin(a,t) by time t
-				//this->link_origin_cumulative_departure_vehicles_array;		//N_origin(a,t) by time t
+				//this->link_origin_cumulative_departed_vehicles_array;		//N_origin(a,t) by time t
 				
 				//this->link_downstream_departed_vehicles_array;				//y_departed(a,t) at time t
 				//this->link_upstream_arrived_vehicles_array;					//y_arrived(a,t) at time t
 
-				//this->link_upstream_cumulative_arrival_vehicles_array;		//A(a,t) by time t
+				//this->link_upstream_cumulative_arrived_vehicles_array;		//A(a,t) by time t
 				//this->link_downstream_cumulative_vehicles_array;				//N(a,L,t) by time t
 
 				//updated states
@@ -448,11 +445,11 @@ namespace Link_Components
 				//link
 				//this->cached_link_downstream_cumulative_vehicles_array;			//[N(a,L,t-bwtt),N(a,L,t-1)] done
 				//this->cached_link_upstream_cumulative_vehicles_array;				//[N(a,0,t-fftt),N(a,0,t-1)] done
-				//this->cached_link_shifted_cumulative_arrival_vehicles_array;		//[V(a,t-fftt),V(a,t-1)]
+				//this->cached_link_shifted_cumulative_arrived_vehicles_array;		//[V(a,t-fftt),V(a,t-1)]
 
 				//this->link_upstream_cumulative_vehicles_array;					//N(a,0,t)
 				//turn movement
-				//this->cached_turn_movement_cumulative_shifted_arrival_vehicles_array;	//[N(a,a',0,t-fftt),N(a,a',0,t-1)]
+				//this->cached_turn_movement_cumulative_shifted_arrived_vehicles_array;	//[N(a,a',0,t-fftt),N(a,a',0,t-1)]
 				//this->cached_turn_movement_downstream_cumulative_vehicles_array;		//[N(a,a',L,t-bwtt),N(a,a',L,t-1)]
 				//this->cached_turn_movement_upstream_cumulative_vehicles_array;			//[V(a,a',t-fftt),V(a,a',t-1]
 
@@ -479,24 +476,24 @@ namespace Link_Components
 					t_minus_bwtt = (current_simulation_interval_index + 1- bwtt_cached_simulation_interval_size)%bwtt_cached_simulation_interval_size;
 				}
 
-				int upstream_cumulative_departure_vehicles = 0;
-				upstream_cumulative_departure_vehicles = 
-					link_upstream_cumulative_arrival_vehicles<int>() + 
-					link_origin_cumulative_departure_vehicles<int>() - 
-					link_destination_cumulative_arrival_vehicles<int>();
+				int upstream_cumulative_departed_vehicles = 0;
+				upstream_cumulative_departed_vehicles = 
+					link_upstream_cumulative_arrived_vehicles<int>() + 
+					link_origin_cumulative_departed_vehicles<int>() - 
+					link_destination_cumulative_arrived_vehicles<int>();
 
-				upstream_cumulative_departure_vehicles = max(0,upstream_cumulative_departure_vehicles);
+				upstream_cumulative_departed_vehicles = max(0,upstream_cumulative_departed_vehicles);
 
 				if (t_minus_bwtt>-1)
 				{
 					int jam_vehicles = (int) (num_lanes<int>() * length<float>() * jam_density<float>());
 
 					int cached=cached_link_downstream_cumulative_vehicles_array<int*>()[t_minus_bwtt]+jam_vehicles;
-					link_upstream_cumulative_vehicles<int>(min(upstream_cumulative_departure_vehicles,cached));
+					link_upstream_cumulative_vehicles<int>(min(upstream_cumulative_departed_vehicles,cached));
 				}
 				else
 				{
-					link_upstream_cumulative_vehicles<int>(upstream_cumulative_departure_vehicles);
+					link_upstream_cumulative_vehicles<int>(upstream_cumulative_departed_vehicles);
 				}
 
 				int t_fftt = -1;
@@ -521,26 +518,26 @@ namespace Link_Components
 
 				//network data
 				int t_minus_fftt = -1;
-				int link_shifted_cumulative_arrive_vehicles = 0;
+				int link_shifted_cumulative_arrived_vehicles = 0;
 
 				int cached_fftt=link_fftt_cached_simulation_interval_size<int>();
 
 				if((current_simulation_interval_index+1) >= cached_fftt)
 				{
 					t_minus_fftt = (current_simulation_interval_index + 1 - cached_fftt) % cached_fftt;
-					link_shifted_cumulative_arrive_vehicles = cached_link_upstream_cumulative_vehicles_array<int*>()[t_minus_fftt];
+					link_shifted_cumulative_arrived_vehicles = cached_link_upstream_cumulative_vehicles_array<int*>()[t_minus_fftt];
 				}
 				else
 				{
-					link_shifted_cumulative_arrive_vehicles = 0;
+					link_shifted_cumulative_arrived_vehicles = 0;
 				}
 				
-				//network_data.link_upstream_cumulative_arrival_curve_array[outbound_link_index] = this->link_upstream_cumulative_arrival_vehicles_array[outbound_link_index];
+				//network_data.link_upstream_cumulative_arrived_curve_array[outbound_link_index] = this->link_upstream_cumulative_arrived_vehicles_array[outbound_link_index];
 				//network_data.link_upstream_cumulative_depature_curve_array[outbound_link_index] = this->link_upstream_cumulative_vehicles_array[outbound_link_index];
-				//network_data.link_downstream_cumulative_arrival_curve_array[outbound_link_index] = link_shifted_cumulative_arrive_vehicles;
+				//network_data.link_downstream_cumulative_arrived_curve_array[outbound_link_index] = link_shifted_cumulative_arrive_vehicles;
 				//network_data.link_downstream_cumulative_depature_curve_array[outbound_link_index] = this->link_downstream_cumulative_vehicles_array[outbound_link_index];
-				//network_data.link_origin_cumulative_depature_curve_array[outbound_link_index] = this->link_origin_cumulative_departure_vehicles_array[outbound_link_index];
-				//network_data.link_destination_cumulative_arrival_curve_array[outbound_link_index] = this->link_destination_cumulative_arrival_vehicles_array[outbound_link_index];
+				//network_data.link_origin_cumulative_depature_curve_array[outbound_link_index] = this->link_origin_cumulative_departed_vehicles_array[outbound_link_index];
+				//network_data.link_destination_cumulative_arrived_curve_array[outbound_link_index] = this->link_destination_cumulative_arrived_vehicles_array[outbound_link_index];
 			}
 
 			facet_accessor(link_simulation_status);
@@ -566,7 +563,7 @@ namespace Link_Components
 				
 				Revision link_current_revision=pthis->object_current_revision();
 				
-				PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting link: " << _this->uuid<int>());
+				//PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting link: " << _this->uuid<int>());
 
 				if(link_current_revision.iteration!=iteration)
 				{

@@ -646,7 +646,7 @@ namespace Signal_Components
 			facet_accessor(pedestrian_flow_rate);	///< v_ped (p/h)
 			facet_accessor(buses_per_hour);			///< N_b (buses/h)
 			facet_accessor(parking_activity);		///< Nm (maneuvers/h)
-			facet_accessor(arrival_type);			///< AT
+			facet_accessor(arrived_type);			///< AT
 			facet_accessor(percent_arrive_on_green);///< P
 			facet_accessor(approach_speed);			///< S_a	(mi/h)
 

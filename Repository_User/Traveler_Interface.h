@@ -20,14 +20,14 @@ namespace Traveler_Components
 			facet_accessor(vehicle);
 			facet_accessor(uuid);
 
-			facet void Schedule_New_Departure(int departure_time)
+			facet void Schedule_New_Departure(int departed_time)
 			{
 				typedef typename ThisType::router_type RouterType;
 				typedef Routing_Components::Interfaces::Routing_Interface<RouterType,ThisType> Routing_Interface;
 
 				Routing_Interface* itf=router<Routing_Interface*>();
 
-				itf->Schedule_Route_Computation<NULLTYPE>(departure_time);
+				itf->Schedule_Route_Computation<NULLTYPE>(departed_time);
 			}
 		};
 	}

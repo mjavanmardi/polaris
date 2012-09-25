@@ -49,14 +49,14 @@ namespace Vehicle_Components
 		struct Polaris_Vehicle_Base
 		{
 			member_data_basic(int, current_trajectory_unit_index);
-			member_data_basic(int, departure_simulation_interval_index);
-			member_data_basic(int, departure_assignment_interval_index);
+			member_data_basic(int, departed_simulation_interval_index);
+			member_data_basic(int, departed_assignment_interval_index);
 			member_data_basic(void*, origin_link);
 			member_data_basic(void*, destination_link);
 			member_data_basic(void*, next_link);
 			member_data_basic(Vehicle_Components::Types::Vehicle_Status_Keys, simulation_status);
-			member_data_basic(int, arrival_time);
-			member_data_basic(int, arrival_simulation_interval_index);
+			member_data_basic(int, arrived_time);
+			member_data_basic(int, arrived_simulation_interval_index);
 			member_data_basic(int, current_link_enter_time);
 			member_data_basic(int, current_link_enter_interval_index);
 

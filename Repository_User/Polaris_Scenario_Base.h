@@ -19,12 +19,14 @@ namespace Scenario_Components
 		{
 			//member_data_basic(int, current_simulation_interval_index);
 			
+			member_data_basic(int, simulation_interval_length);
+			member_data_basic(int, assignment_interval_length);
+
 			facet_base TargetType current_simulation_interval_index(call_requirements(requires(ThisType,Is_Dispatched))){return iteration;}
 			tag_getter(current_simulation_interval_index);
 
-			member_data_basic(int, simulation_interval_length);
-			member_data_basic(int, assignment_interval_length);
-			member_data_basic(int, current_time);
+			facet_base TargetType current_time(call_requirements(requires(ThisType,Is_Dispatched))){return iteration*_simulation_interval_length;}
+			tag_getter(current_time);
 
 			member_data_basic(int, planning_horizon);
 			member_data_basic(int, simulation_start_time);

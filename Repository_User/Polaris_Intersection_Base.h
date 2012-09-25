@@ -37,13 +37,13 @@ namespace Intersection_Components
 			member_data_basic(Intersection_Components::Types::Turn_Movement_Type_Keys, movement_type);
 			member_data_basic(Intersection_Components::Types::Turn_Movement_Rule_Keys, movement_rule);
 
-			member_data_basic(float, inbound_link_departure_time_based_experienced_link_turn_travel_delay);
-			member_data_basic(float, outbound_link_arrival_time_based_experienced_link_turn_travel_delay);
+			member_data_basic(float, inbound_link_departed_time_based_experienced_link_turn_travel_delay);
+			member_data_basic(float, outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 			
-			member_data_basic(int, turn_movement_cumulative_arrival_vehicles);
+			member_data_basic(int, turn_movement_cumulative_arrived_vehicles);
 			member_data_basic(int, turn_movement_cumulative_vehicles);
 
-			member_data_basic(int, turn_movement_cumulative_shifted_arrival_vehicles);
+			member_data_basic(int, turn_movement_cumulative_shifted_arrived_vehicles);
 			
 			member_data_basic(float, minimum_merge_rate);
 
@@ -81,47 +81,47 @@ namespace Intersection_Components
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && !requires(TargetType,is_pointer))){return (TargetType)(_cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array);}
-			tag_getter(cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array);
+			TargetType cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && !requires(TargetType,is_pointer))){return (TargetType)(_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array);}
+			tag_getter(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array);
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer))){return (TargetType)&(_cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array.front());}
+			TargetType cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer))){return (TargetType)&(_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array.front());}
 
-			vector<float> _cached_outbound_link_arrival_time_based_experienced_link_turn_travel_delay_array;
+			vector<float> _cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array;
 
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && !requires(TargetType,is_pointer))){return (TargetType)(_cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array);}
-			tag_getter(cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array);
+			TargetType cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && !requires(TargetType,is_pointer))){return (TargetType)(_cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array);}
+			tag_getter(cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array);
 			
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer))){return (TargetType)&(_cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array.front());}
+			TargetType cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer))){return (TargetType)&(_cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array.front());}
 
-			vector<float> _cached_inbound_link_departure_time_based_experienced_link_turn_travel_delay_array;
-
-
-
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && !requires(TargetType,is_pointer))){return (TargetType)_cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array;}
-			tag_getter(cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array);
-
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer))){return (TargetType)&(_cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array.front());}
-			//tag_getter(cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array);
-
-			vector<float> _cached_outbound_link_departure_time_based_experienced_link_turn_travel_delay_array;
+			vector<float> _cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array;
 
 
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_turn_movement_cumulative_shifted_arrival_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched) && !requires(TargetType,is_pointer))){return (TargetType)_cached_turn_movement_cumulative_shifted_arrival_vehicles_array;}
-			tag_getter(cached_turn_movement_cumulative_shifted_arrival_vehicles_array);
+			TargetType cached_outbound_link_departed_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && !requires(TargetType,is_pointer))){return (TargetType)_cached_outbound_link_departed_time_based_experienced_link_turn_travel_delay_array;}
+			tag_getter(cached_outbound_link_departed_time_based_experienced_link_turn_travel_delay_array);
 
 			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType cached_turn_movement_cumulative_shifted_arrival_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer))){return (TargetType)&(_cached_turn_movement_cumulative_shifted_arrival_vehicles_array.front());}
-			//tag_getter(cached_turn_movement_cumulative_shifted_arrival_vehicles_array);
+			TargetType cached_outbound_link_departed_time_based_experienced_link_turn_travel_delay_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer))){return (TargetType)&(_cached_outbound_link_departed_time_based_experienced_link_turn_travel_delay_array.front());}
+			//tag_getter(cached_outbound_link_departed_time_based_experienced_link_turn_travel_delay_array);
 
-			vector<int> _cached_turn_movement_cumulative_shifted_arrival_vehicles_array;
+			vector<float> _cached_outbound_link_departed_time_based_experienced_link_turn_travel_delay_array;
+
+
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType cached_turn_movement_cumulative_shifted_arrived_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched) && !requires(TargetType,is_pointer))){return (TargetType)_cached_turn_movement_cumulative_shifted_arrived_vehicles_array;}
+			tag_getter(cached_turn_movement_cumulative_shifted_arrived_vehicles_array);
+
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType cached_turn_movement_cumulative_shifted_arrived_vehicles_array(call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,is_pointer))){return (TargetType)&(_cached_turn_movement_cumulative_shifted_arrived_vehicles_array.front());}
+			//tag_getter(cached_turn_movement_cumulative_shifted_arrived_vehicles_array);
+
+			vector<int> _cached_turn_movement_cumulative_shifted_arrived_vehicles_array;
 
 
 

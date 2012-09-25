@@ -105,7 +105,7 @@ namespace Demand_Components
 
 
 
-				//sort demand by departure time
+				//sort demand by departed time
 				//demand_data.time_dependent_vehicle_index_array.resize(scenario_data.num_simulation_intervals*scenario_data.simulation_interval_length);
 
 				typedef typename ThisType::network_type NetworkType;
@@ -175,7 +175,7 @@ namespace Demand_Components
 					Routing_Interface* router;
 
 					float vehicle_rate_per_simulation_interval;
-					int departure_time = -1;
+					int departed_time = -1;
 					Link_Interface* origin_link;
 					Activity_Location_Interface* origin_activity_location;
 					int assignment_interval_index;
@@ -208,12 +208,13 @@ namespace Demand_Components
 								vehicle->destination_link<Link_Interface*>(destination_link);
 								vehicle->origin_activity_location<Activity_Location_Interface*>(origin_activity_location);
 								vehicle->destination_activity_location<Activity_Location_Interface*>(destination_activity_location);
-								//vehicle_data.set_seed(scenario_data.iseed);
-								vehicle->departure_simulation_interval_index<int>(assignment_interval_index);
-								vehicle->departure_assignment_interval_index<int>(simulation_interval_index);
+								//vehicle_data.set_seed(scenario_data.iseed);simulation_interval_index
 
-								departure_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
-								traveler->Schedule_New_Departure<NULLTYPE>(departure_time);
+								vehicle->departed_assignment_interval_index<int>(assignment_interval_index);
+
+								departed_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
+								traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
+								vehicle->departed_simulation_interval_index<int>(departed_time);
 
 								cur_vehicle_rate_per_simulation_interval = (float) (cur_vehicle_rate_per_simulation_interval - 1.0);
 							}
@@ -238,11 +239,12 @@ namespace Demand_Components
 									vehicle->origin_activity_location<Activity_Location_Interface*>(origin_activity_location);
 									vehicle->destination_activity_location<Activity_Location_Interface*>(destination_activity_location);
 									//vehicle_data.set_seed(scenario_data.iseed);
-									vehicle->departure_simulation_interval_index<int>(assignment_interval_index);
-									vehicle->departure_assignment_interval_index<int>(simulation_interval_index);
+									vehicle->departed_simulation_interval_index<int>(simulation_interval_index);
 
-									departure_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
-									traveler->Schedule_New_Departure<NULLTYPE>(departure_time);
+
+									departed_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
+									traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
+									vehicle->departed_assignment_interval_index<int>(departed_time);
 								}
 
 								cur_vehicle_rate_per_simulation_interval = (float)(cur_vehicle_rate_per_simulation_interval - 1.0);
@@ -280,11 +282,12 @@ namespace Demand_Components
 								vehicle->origin_activity_location<Activity_Location_Interface*>(origin_activity_location);
 								vehicle->destination_activity_location<Activity_Location_Interface*>(destination_activity_location);
 								//vehicle_data.set_seed(scenario_data.iseed);
-								vehicle->departure_simulation_interval_index<int>(assignment_interval_index);
-								vehicle->departure_assignment_interval_index<int>(simulation_interval_index);
 
-								departure_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
-								traveler->Schedule_New_Departure<NULLTYPE>(departure_time);
+								vehicle->departed_assignment_interval_index<int>(assignment_interval_index);
+
+								departed_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
+								traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
+								vehicle->departed_simulation_interval_index<int>(departed_time);
 
 								cur_vehicle_rate_per_simulation_interval = (float) (cur_vehicle_rate_per_simulation_interval - 1.0);
 							}
@@ -308,11 +311,12 @@ namespace Demand_Components
 									vehicle->origin_activity_location<Activity_Location_Interface*>(origin_activity_location);
 									vehicle->destination_activity_location<Activity_Location_Interface*>(destination_activity_location);
 									//vehicle_data.set_seed(scenario_data.iseed);
-									vehicle->departure_simulation_interval_index<int>(assignment_interval_index);
-									vehicle->departure_assignment_interval_index<int>(simulation_interval_index);
 
-									departure_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
-									traveler->Schedule_New_Departure<NULLTYPE>(departure_time);
+									vehicle->departed_assignment_interval_index<int>(assignment_interval_index);
+
+									departed_time = simulation_interval_index * scenario->simulation_interval_length<int>()  + i;
+									traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
+									vehicle->departed_simulation_interval_index<int>(departed_time);
 								}
 
 								cur_vehicle_rate_per_simulation_interval = (float)(cur_vehicle_rate_per_simulation_interval - 1.0);
