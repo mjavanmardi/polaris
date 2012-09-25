@@ -123,7 +123,7 @@ namespace Network_Components
 				vector<Phase_Interface*>* phases = signal->Phases<vector<Phase_Interface*>*>();
 				vector<Approach_Interface*>* approaches = signal->Approaches<vector<Approach_Interface*>*>();
 				Phase_Interface *phase;
-				Lane_Group_Interface *lane;
+				Lane_Group_Interface *lane, *lane2;
 				// Initialize phase 1
 				phase = (*phases)[0];
 				phase->Initialize<int>(1);
@@ -154,27 +154,28 @@ namespace Network_Components
 				phase = (*phases)[1];
 				phase->Initialize<int>(1);
 				phase->yellow_and_all_red_time<Time_Second>(4.0);
-				lane = (*lanes)[0];
+				lanes = phase->Lane_Groups<vector<Lane_Group_Interface*>*>();
+				lane2 = (*lanes)[0];
 				(*approaches)[0]->Add_Lane_Group<Lane_Group_Type>(lane);
-				lane->Initialize<float>();
-				lane->avg_lane_width<Length_Foot>(11.0);
-				lane->demand_left<Flow_Per_Hour>(0);
-				lane->demand_right<Flow_Per_Hour>(0);
-				lane->demand_thru<Flow_Per_Hour>(0);
-				lane->has_left_turn<bool>(true);
-				lane->has_parking<bool>(false);
-				lane->has_right_turn<bool>(false);
-				lane->has_thru_move<bool>(false);
-				lane->is_actuated<bool>(false);
-				lane->right_turn_lane_type<Turn_Lane_Types>(Turn_Lane_Types::No_Turn);
-				lane->left_turn_lane_type<Turn_Lane_Types>(Turn_Lane_Types::Exclusive);
-				lane->left_turn_type<Left_Turn_Types>(Left_Turn_Types::Unopposed);
-				lane->number_of_left_lanes(1);
-				lane->number_of_lanes<int>(1);
-				lane->opposing_lane<Lane_Group_Type>((Lane_Group_Interface*)NULL);
-				lane->Detector_Left<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
-				lane->Detector_Right<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
-				lane->Detector_Thru<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+				lane2->Initialize<float>();
+				lane2->avg_lane_width<Length_Foot>(11.0);
+				lane2->demand_left<Flow_Per_Hour>(0);
+				lane2->demand_right<Flow_Per_Hour>(0);
+				lane2->demand_thru<Flow_Per_Hour>(0);
+				lane2->has_left_turn<bool>(true);
+				lane2->has_parking<bool>(false);
+				lane2->has_right_turn<bool>(false);
+				lane2->has_thru_move<bool>(false);
+				lane2->is_actuated<bool>(false);
+				lane2->right_turn_lane_type<Turn_Lane_Types>(Turn_Lane_Types::No_Turn);
+				lane2->left_turn_lane_type<Turn_Lane_Types>(Turn_Lane_Types::Exclusive);
+				lane2->left_turn_type<Left_Turn_Types>(Left_Turn_Types::Unopposed);
+				lane2->number_of_left_lanes(1);
+				lane2->number_of_lanes<int>(1);
+				lane2->opposing_lane<Lane_Group_Type>((Lane_Group_Interface*)NULL);
+				lane2->Detector_Left<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+				lane2->Detector_Right<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+				lane2->Detector_Thru<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
 
 				intersection_2->signal<Signal_Interface*>(signal);
 
@@ -403,6 +404,8 @@ namespace Network_Components
 				turn_movement_0->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
 				turn_movement_0->movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
 				turn_movement_0->id<int>(7);
+				// assign the detector
+				turn_movement_0->detector<Detector_Interface*>(NULL);
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_0);
 
 				TurnMovementInterface* turn_movement_1 = (TurnMovementInterface*)Allocate<TurnMovementType>();
@@ -411,7 +414,10 @@ namespace Network_Components
 				turn_movement_1->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
 				turn_movement_1->movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
 				turn_movement_1->id<int>(8);
+				// assign the detector
+				turn_movement_1->detector<Detector_Interface*>(lane->Detector_Thru<typename Master_Type::DETECTOR_TYPE>());
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_1);
+				
 
 				TurnMovementInterface* turn_movement_2 = (TurnMovementInterface*)Allocate<TurnMovementType>();
 				turn_movement_2->inbound_link<Link_Interface*>((Link_Interface*)links_container<LinksContainerType&>()[2]);
@@ -419,6 +425,7 @@ namespace Network_Components
 				turn_movement_2->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
 				turn_movement_2->movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
 				turn_movement_2->id<int>(9);
+				turn_movement_2->detector<Detector_Interface*>(NULL);
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_2);
 
 				TurnMovementInterface* turn_movement_3 = (TurnMovementInterface*)Allocate<TurnMovementType>();
@@ -427,6 +434,8 @@ namespace Network_Components
 				turn_movement_3->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::RIGHT_TURN);
 				turn_movement_3->movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
 				turn_movement_3->id<int>(10);
+				// assign the detector
+				turn_movement_3->detector<Detector_Interface*>(lane2->Detector_Left<typename Master_Type::DETECTOR_TYPE>());
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_3);
 
 				
@@ -436,6 +445,7 @@ namespace Network_Components
 				turn_movement_4->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
 				turn_movement_4->movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
 				turn_movement_4->id<int>(11);
+				turn_movement_4->detector<Detector_Interface*>(NULL);
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_4);
 
 
