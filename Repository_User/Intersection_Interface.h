@@ -213,11 +213,19 @@ namespace Intersection_Components
 
 						if(((Vehicle_Interface*)vehicle)->next_link<Link_Interface*>()==outbound_link && ((Vehicle_Interface*)vehicle)->current_link<Link_Interface*>()==inbound_link)
 						{
+							
 							Signal_Components::Interfaces::Detector_Interface<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* detector;
 							detector = inbound_movement->detector<Signal_Components::Interfaces::Detector_Interface<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>*>();
 							if (detector != NULL) detector->detect_vehicle<int>();
 							inbound_movement->vehicles_container<VehiclesContainerType&>().push_back(vehicle);
 							inbound_movement->turn_movement_cumulative_arrived_vehicles<int&>()++;
+
+							if (outbound_link->uuid<int>() == 2 && inbound_link->uuid<int>() == 1)
+							{
+								int count;
+								count = detector->Get_Count<int>();
+								bool test = false;
+							}
 						}
 					}
 				}

@@ -529,8 +529,6 @@ namespace Routing_Components
 				veh->set_route_links(routable_network_ptr->reversed_path_container<ReversedPathContainerType&>());
 
 				origin_link->p_vehicle(veh);
-
-				//PRINT("\t\t" << "COMPUTE_ROUTE_COMPLETE");
 			}
 		};
 	}
