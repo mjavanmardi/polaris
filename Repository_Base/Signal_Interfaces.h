@@ -262,9 +262,9 @@ namespace Signal_Components
 			//-------------------------------------------------------
 			facet void Update_Demand(TargetType time, call_requires(TargetType, Concepts::Is_Time))
 			{
-				Interfaces::Detector_Interface<typename ThisType::Detector_Type,NULLTYPE>* left = this->Detector_Left<typename ThisType::Detector_Type>();
-				Interfaces::Detector_Interface<typename ThisType::Detector_Type,NULLTYPE>* right = this->Detector_Right<typename ThisType::Detector_Type>();
-				Interfaces::Detector_Interface<typename ThisType::Detector_Type,NULLTYPE>* thru = this->Detector_Thru<typename ThisType::Detector_Type>();
+				Interfaces::Detector_Interface<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* left = this->Detector_Left<typename ThisType::Master_Type::DETECTOR_TYPE>();
+				Interfaces::Detector_Interface<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* right = this->Detector_Right<typename ThisType::Master_Type::DETECTOR_TYPE>();
+				Interfaces::Detector_Interface<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* thru = this->Detector_Thru<typename ThisType::Master_Type::DETECTOR_TYPE>();
 				Data_Structures::Flow_Per_Hour flow;
 				flow = left->count<Target_Type<Data_Structures::Flow_Per_Hour,Data_Structures::Time_Second>>(time);
 				this->demand_left<Data_Structures::Flow_Per_Hour>(flow);
@@ -646,7 +646,7 @@ namespace Signal_Components
 			facet_accessor(pedestrian_flow_rate);	///< v_ped (p/h)
 			facet_accessor(buses_per_hour);			///< N_b (buses/h)
 			facet_accessor(parking_activity);		///< Nm (maneuvers/h)
-			facet_accessor(arrived_type);			///< AT
+			facet_accessor(arrival_type);			///< AT
 			facet_accessor(percent_arrive_on_green);///< P
 			facet_accessor(approach_speed);			///< S_a	(mi/h)
 
@@ -947,7 +947,7 @@ namespace Signal_Components
 				float vs_i=0;
 				for (itr; itr != phases->end(); itr++)
 				{
-					(*itr)->Update_Demand<Data_Structures::Time_Second>(iteration);
+					//(*itr)->Update_Demand<Data_Structures::Time_Second>(iteration);
 					lost_time += (*itr)->yellow_and_all_red_time<TargetType>();
 					vs_i= (*itr)->Find_Critical_VS_Ratio<float>();
 					vs_sum += vs_i;
@@ -956,7 +956,9 @@ namespace Signal_Components
 
 				// Get estimated cycle length
 				TargetType cycle;
-				cycle = (TargetType)((float)lost_time) * (this->degree_of_saturation<float>()) / (this->degree_of_saturation<float>() - vs_sum);
+				if (this->degree_of_saturation<float>() - vs_sum <= 0.0f) cycle = this->max_cycle_length<TargetType>();
+				else cycle = (TargetType)((float)lost_time) * (this->degree_of_saturation<float>()) / (this->degree_of_saturation<float>() - vs_sum);
+				if (cycle < this->max_cycle_length<TargetType>()) cycle = this->max_cycle_length<TargetType>();
 				this->cycle_length<TargetType>(cycle);
 				TargetType effective_cycle = cycle - lost_time;
 				
@@ -967,7 +969,7 @@ namespace Signal_Components
 				{
 					float vs;
 					if (vs_sum > 0)	vs = (*itr)->Find_Critical_VS_Ratio<float>()/vs_sum;
-					else vs = 0;
+					else vs = 1.0f / (float)phases->size();
 
 					float temp_green = max(5.0f,(float)effective_cycle * vs);
 					float remain = temp_green - (float)((int)temp_green);
@@ -1103,7 +1105,7 @@ namespace Signal_Components
 					sum_flow += (*itr)->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
 				}
 
-				(*out) << endl<<"Intersection Delay = "<<sum_delay / sum_flow << endl;
+				//(*out) << endl<<"Intersection Delay = "<<sum_delay / sum_flow << endl;
 			}
 
 
@@ -1445,7 +1447,7 @@ namespace Signal_Components
 			}
 			facet void detect_vehicle()
 			{
-				PTHIS(ThisType)->detect_vehicle<dispatch<ThisType>,CallerType,TargetType>(1);
+				PTHIS(ThisType)->detect_vehicle<Dispatch<ThisType>,CallerType,TargetType>(1);
 			}
 		};
 	}

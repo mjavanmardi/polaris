@@ -13,9 +13,10 @@ namespace Signal_Components
 		//==================================================================================================================
 		/// Signal Detector Base
 		//------------------------------------------------------------------------------------------------------------------
+		template<typename MasterType>
 		struct Signal_Detector_Base
 		{
-			Signal_Detector_Base() : _last_access(Data_Structures::Time_Second(0)){}
+			Signal_Detector_Base() : _last_access(Data_Structures::Time_Second(0)), _count(0){}
 			Data_Structures::Time_Second _last_access;
 			int _count;
 
@@ -23,12 +24,14 @@ namespace Signal_Components
 				requires(typename TargetType::ReturnType,Concepts::Is_Flow_Per_Hour) &&
 				requires(typename TargetType::ParamType,Concepts::Is_Time_Seconds)))
 			{
-				//Data_Structures::Time_Second time_since = time - _last_access;
-				//if (time_since <=0) return 0;
-				//_last_access = time;
-				//_count = 0;
-				//return (_count / time_since / 3600.f);
-				return _count;
+				typename TargetType::ReturnType value = 0;
+				Data_Structures::Time_Second time_since = (float)time.Value - (float)_last_access.Value;
+				if (time_since <=0) return value;
+				_last_access.Value = time.Value;
+				value = (_count / time_since * 3600.f);
+				_count = 0;
+				return value;
+				//return _count;
 			}
 			facet_base typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
 				requires(typename TargetType::ReturnType,Concepts::Is_Flow_Per_15_Minutes) &&
@@ -42,7 +45,7 @@ namespace Signal_Components
 
 			facet_base void detect_vehicle(TargetType vehicle_detection_count)
 			{
-				_count = (int)vehicle_detection_count;
+				_count += (int)vehicle_detection_count;
 			}
 		};
 	}
@@ -51,7 +54,11 @@ namespace Signal_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Components
 	{
-		typedef Polaris_Component<Interfaces::Detector_Interface,Bases::Signal_Detector_Base> Signal_Detector;	
+		template<typename MasterType>
+		struct Signal_Detector
+		{
+			typedef Polaris_Component<Interfaces::Detector_Interface, Bases::Signal_Detector_Base<MasterType>,NULLTYPE,MasterType> type;
+		};
 	}
 
 
@@ -69,9 +76,6 @@ namespace Signal_Components
 		template<typename MasterType>
 		struct Lane_Group_HCM_Base
 		{
-			// Lane Group Base general type names
-			typedef Components::Signal_Detector Detector_Type;
-
 			//============================================================
 			//  Lane Group Initializer
 			//------------------------------------------------------------
@@ -193,9 +197,9 @@ namespace Signal_Components
 			//============================================================
 			// Detector information
 			//------------------------------------------------------------
-			member_component_basic(Components::Signal_Detector,Detector_Left);
-			member_component_basic(Components::Signal_Detector,Detector_Right);
-			member_component_basic(Components::Signal_Detector,Detector_Thru);
+			member_component_basic(typename MasterType::DETECTOR_TYPE,Detector_Left);
+			member_component_basic(typename MasterType::DETECTOR_TYPE,Detector_Right);
+			member_component_basic(typename MasterType::DETECTOR_TYPE,Detector_Thru);
 
 
 			//============================================================
@@ -303,7 +307,7 @@ namespace Signal_Components
 			member_data(float,pedestrian_flow_rate,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));	///< v_ped (p/h)
 			member_data(float,buses_per_hour,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< N_b (buses/h)
 			member_data(float,parking_activity,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));		///< Nm (maneuvers/h)
-			member_data(float,arrived_type,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< AT
+			member_data(float,arrival_type,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< AT
 			member_data(float,percent_arrive_on_green,requires(TargetType,Concepts::Is_Percentage),requires(TargetType,Concepts::Is_Percentage));///< P
 			member_data(float,approach_speed,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));			///< S_a	(mi/h)
 

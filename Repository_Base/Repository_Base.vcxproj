@@ -116,6 +116,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Repository_User\Demand_Bases.h" />
     <ClInclude Include="Signal_Base.h" />
     <ClInclude Include="TEMPLATE_Bases.h" />
     <ClInclude Include="TEMPLATE_interface.h" />
