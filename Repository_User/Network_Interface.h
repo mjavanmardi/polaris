@@ -118,7 +118,7 @@ namespace Network_Components
 				signal->degree_of_saturation<float>(0.9);
 				signal->peak_hour_factor<float>(0.95);
 				signal->max_cycle_length<Time_Second>(100.0);
-				signal->min_cycle_length<Time_Second>(30.0);
+				signal->min_cycle_length<Time_Second>(20.0);
 				signal->num_cycles_between_updates<int>(15);
 				vector<Phase_Interface*>* phases = signal->Phases<vector<Phase_Interface*>*>();
 				vector<Approach_Interface*>* approaches = signal->Approaches<vector<Approach_Interface*>*>();
