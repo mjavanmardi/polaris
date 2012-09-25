@@ -958,7 +958,7 @@ namespace Signal_Components
 				TargetType cycle;
 				if (this->degree_of_saturation<float>() - vs_sum <= 0.0f) cycle = this->max_cycle_length<TargetType>();
 				else cycle = (TargetType)((float)lost_time) * (this->degree_of_saturation<float>()) / (this->degree_of_saturation<float>() - vs_sum);
-				if (cycle < this->max_cycle_length<TargetType>()) cycle = this->max_cycle_length<TargetType>();
+				if (cycle < this->min_cycle_length<TargetType>()) cycle = this->min_cycle_length<TargetType>();
 				this->cycle_length<TargetType>(cycle);
 				TargetType effective_cycle = cycle - lost_time;
 				
@@ -1448,6 +1448,10 @@ namespace Signal_Components
 			facet void detect_vehicle()
 			{
 				PTHIS(ThisType)->detect_vehicle<Dispatch<ThisType>,CallerType,TargetType>(1);
+			}
+			facet TargetType Get_Count()
+			{
+				return PTHIS(ThisType)->Get_Count<Dispatch<ThisType>,CallerType,TargetType>();
 			}
 		};
 	}

@@ -47,6 +47,10 @@ namespace Signal_Components
 			{
 				_count += (int)vehicle_detection_count;
 			}
+			facet_base TargetType Get_Count()
+			{
+				return (TargetType)_count;
+			}
 		};
 	}
 	//==================================================================================================================
