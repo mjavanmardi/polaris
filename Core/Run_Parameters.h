@@ -2,7 +2,7 @@
 
 
 static const unsigned int Megabytes_To_Allocate=1000;
-static const unsigned int num_iterations=50;
+static const unsigned int num_iterations=86400;
 static const int num_threads=1;
 
 static const int Page_Size=4096;
