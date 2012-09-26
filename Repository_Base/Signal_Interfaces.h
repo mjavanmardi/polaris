@@ -1462,8 +1462,8 @@ namespace Signal_Components
 					{
 						(*out) << "signal_state:"<<(*itr)->phase_id<int>()<<":"<<signal->Signal_ID<int>()<<":";
 						int signal_status = 1;
-						if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = 2;
-						else if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = 3;
+						if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = 3;
+						else if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = 2;
 						(*out) <<signal_status<<":"<<iteration<<endl;
 						(*out).flush();
 						
