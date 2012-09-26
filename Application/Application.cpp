@@ -7,12 +7,12 @@ struct Master_Type
 
 	//==============================================================================================
 	// Signalization Types
-	typedef Signal_Components::Components::HCM_Signal_Full<T>::type			SIGNAL_TYPE;
-	typedef Signal_Components::Components::HCM_Phase_Full<T>::type			PHASE_TYPE;
-	typedef Signal_Components::Components::HCM_LaneGroup_Full<T>::type		LANE_GROUP_TYPE;
-	typedef Signal_Components::Components::HCM_Approach_Full<T>::type		APPROACH_TYPE;
-	typedef Signal_Components::Components::Signal_Indicator<T>::type		INDICATOR_TYPE;
-	typedef Signal_Components::Components::Signal_Detector<T>::type			DETECTOR_TYPE;
+	typedef Signal_Components::Components::HCM_Signal_Full<T>::type				SIGNAL_TYPE;
+	typedef Signal_Components::Components::HCM_Phase_Full<T>::type				PHASE_TYPE;
+	typedef Signal_Components::Components::HCM_LaneGroup_Full<T>::type			LANE_GROUP_TYPE;
+	typedef Signal_Components::Components::HCM_Approach_Full<T>::type			APPROACH_TYPE;
+	typedef Signal_Components::Components::Signal_Indicator_Display<T>::type	INDICATOR_TYPE;
+	typedef Signal_Components::Components::Signal_Detector<T>::type				DETECTOR_TYPE;
 
 	typedef Signal_Components::Components::HCM_Signal_Full<T>::type			FULL_SIGNAL_TYPE;
 	typedef Signal_Components::Components::HCM_Signal_Simple<T>::type		SIMPLE_SIGNAL_TYPE;	
