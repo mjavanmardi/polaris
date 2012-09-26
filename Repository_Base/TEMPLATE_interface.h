@@ -53,6 +53,7 @@ namespace EXAMPLE_COMPONENTS
 		//------------------------------------------------------------------------------------------------------------------
 		/// RENAME THE Inteface struct below.  This is the inteface to a POLARIS component
 		//------------------------------------------------------------------------------------------------------------------
+		template <typename ThisType, typename CallerType>
 		struct INTERFACE_NAME
 		{
 			/// INTERFACE FUNCTION EXAMPLE - this example dispatched the Initialize function call to the component base
@@ -74,14 +75,13 @@ namespace EXAMPLE_COMPONENTS
 	{
 		//------------------------------------------------------------------------------------------------------------------
 		// Example of a useful structure
+		// Access structure by 'Name'
+		// Structure has a 'Value' member of type 'Data_Type'
+		// Structure gets true_type tags of Type_Trait_1, Type_Trait_2, etc. which can be concept checked.
+		// i.e. Type_Trait_1 could be "Feet", or "Length";
 		//------------------------------------------------------------------------------------------------------------------
-		struct STRUCT_NAME
-		{
-			// to tag a datastructure give it knowledge of a type from the API type list, by redefining the API type as a new type with the scope information removed
-			typedef EXAMPLE_COMPONENTS::Types::MY_TYPE TYPENAME;
-			typedef int VALUE_TYPE;
-			// then define the data member(s) that the struct contains
-			VALUE_TYPE MEMBER_NAME;
-		};
+		typedef float Data_Type;
+		Basic_Data_Struct(Name, Data_Type, Type_Trait_1, Type_Trait_2, Type_Trait_3);
+		Basic_Data_Struct(Length_Measurement, float, length, feet);
 	}
 }

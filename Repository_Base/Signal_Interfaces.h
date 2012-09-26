@@ -782,8 +782,12 @@ namespace Signal_Components
 			facet_accessor(green_time);					///< G (s)
 			/// Phase lost time
 			facet_accessor(yellow_and_all_red_time);	///< Y (s)
+			/// Weight factor used when setting the phase green times (multiplier for the phase volume)
+			facet_accessor(weight);
 			/// Local facet to return the list of lane groups associated with phase
 			facet_accessor(Lane_Groups);
+			facet_accessor(name);
+			facet_accessor(phase_id);
 
 
 			//============================================================
@@ -856,6 +860,17 @@ namespace Signal_Components
 				}
 
 				sum_flow > 0 ? this->delay<Data_Structures::Time_Second>(sum_delay/sum_flow) : this->delay<Data_Structures::Time_Second>(0.0f);
+
+				// convert delay to LOS
+				float delay = this->delay<Data_Structures::Time_Second>();
+				if (delay < 10) this->LOS<char>('A');
+				else if (delay < 20) this->LOS<char>('B');
+				else if (delay < 35) this->LOS<char>('C');
+				else if (delay < 55) this->LOS<char>('D');
+				else if (delay < 80) this->LOS<char>('E');
+				else this->LOS<char>('F');
+
+				// get total approach flow rate, for use in calculating signal LOS
 				this->approach_flow_rate<Data_Structures::Flow_Per_Hour>(sum_flow);
 			}
 
@@ -878,7 +893,7 @@ namespace Signal_Components
 			/// Local facet to return the list of lane groups associated with phase
 			facet_accessor(Lane_Groups);
 			/// Local facet to return the approach name (if applicable)
-			facet_accessor(Name);
+			facet_accessor(name);
 
 			//============================================================
 			//  PARENT CLASS ACCESSORS
@@ -923,13 +938,18 @@ namespace Signal_Components
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
 				requires(typename ThisType, Concepts::Is_HCM_Full_Solution)))
 			{
+
+				//float weight;
+				//cout <<endl<< "Enter a weight: ";
+				//cin >> weight;
+
 				// Simplify ThisType name
 				typedef ThisType T;
 
 				Interfaces::Signal_Interface<typename ThisType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>* simple_signal = (Interfaces::Signal_Interface<typename ThisType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>*)this;
 				simple_signal->Update_Timing<Data_Structures::Time_Second>();
 
-				ofstream* out = this->output_stream<ofstream*>();
+				//ofstream* out = this->output_stream<ofstream*>();
 
 				// Get reference to the phases in the signal phase diagram
 				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::FULL_PHASE_TYPE,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::FULL_PHASE_TYPE,NULLTYPE>*>*>();
@@ -943,9 +963,9 @@ namespace Signal_Components
 				{
 					//(*itr)->Update_Demand<Data_Structures::Time_Second>(iteration);
 					lost_time += (*itr)->yellow_and_all_red_time<TargetType>();
-					vs_i= (*itr)->Find_Critical_VS_Ratio<float>();
+					vs_i= (*itr)->Find_Critical_VS_Ratio<float>()*(*itr)->weight<float>();
 					vs_sum += vs_i;
-					if (out != NULL) (*out) << "\t"<<vs_i;
+					//if (out != NULL) (*out) << "\t"<<vs_i;
 				}
 
 				// Get estimated cycle length
@@ -962,7 +982,7 @@ namespace Signal_Components
 				for (itr=phases->begin(); itr != phases->end(); itr++)
 				{
 					float vs;
-					if (vs_sum > 0)	vs = (*itr)->Find_Critical_VS_Ratio<float>()/vs_sum;
+					if (vs_sum > 0)	vs = (*itr)->Find_Critical_VS_Ratio<float>()/vs_sum * (*itr)->weight<float>();
 					else vs = 1.0f / (float)phases->size();
 
 					float temp_green = max(5.0f,(float)effective_cycle * vs);
@@ -977,6 +997,7 @@ namespace Signal_Components
 
 				// Finally, output the LOS information
 				this->Calculate_Signal_LOS<char>();
+				//this->Display_Signal_LOS<NULLTYPE>();
 			}
 			/// HCM Retiming calculations for simple signals
 			facet void Update_Timing(call_requirements(
@@ -990,7 +1011,7 @@ namespace Signal_Components
 				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>*>();
 				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
 
-				ofstream* out = this->output_stream<ofstream*>();
+				//ofstream* out = this->output_stream<ofstream*>();
 
 				// Sum total lost time and critical vs for all phases
 				float lost_time = 0;
@@ -1002,7 +1023,7 @@ namespace Signal_Components
 
 					lost_time += (*itr)->yellow_and_all_red_time<Data_Structures::Time_Second>();
 					vol = (*itr)->Find_Critical_Phase_Volume<Data_Structures::Flow_Per_Hour>();
-					if (out != NULL) (*out) << "\t"<<vol;
+					//if (out != NULL) (*out) << "\t"<<vol;
 					critical_sum += vol;
 				}
 
@@ -1048,6 +1069,43 @@ namespace Signal_Components
 				assert_requirements(ThisType, Concepts::Is_HCM_Full_Solution, "Your SignalType does not specify a simple HCM solution");
 				assert_requirements_2(ThisType::Phase_Interface&, Interfaces::Phase_Interface&, is_convertible, "Your ThisType::Phase_Interface specifies can not be cast to a Interface::Phase_Interface.");
 			}
+			/// HCM LOS Calculation
+			facet void Calculate_Signal_LOS(call_requirements(requires(TargetType,is_integral)))
+			{
+				// Simplify ThisType name
+				typedef ThisType T;
+
+				// Get reference to the phases in the signal phase diagram
+				vector<Interfaces::Approach_Interface<typename ThisType::Master_Type::APPROACH_TYPE,NULLTYPE>*>* approaches = this->Approaches<vector<Interfaces::Approach_Interface<typename ThisType::Master_Type::APPROACH_TYPE,NULLTYPE>*>*>();
+				vector<Interfaces::Approach_Interface<typename ThisType::Master_Type::APPROACH_TYPE,NULLTYPE>*>::iterator itr = approaches->begin();
+
+				// Sum total lost time and critical vs for all approaches
+				float sum_delay = 0;
+				float sum_flow = 0;
+				for (itr; itr != approaches->end(); itr++)
+				{
+					(*itr)->Calculate_Approach_LOS<char>();
+
+					sum_delay += (*itr)->delay<Data_Structures::Time_Second>() * (*itr)->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
+					sum_flow += (*itr)->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
+				}
+
+				// convert delay to LOS
+				float delay = sum_delay / sum_flow;
+				this->delay<Data_Structures::Time_Second>(delay);
+				if (delay < 10) this->LOS<char>('A');
+				else if (delay < 20) this->LOS<char>('B');
+				else if (delay < 35) this->LOS<char>('C');
+				else if (delay < 55) this->LOS<char>('D');
+				else if (delay < 80) this->LOS<char>('E');
+				else this->LOS<char>('F');
+			}
+
+
+			//=======================================================
+			// Display functionality
+			//-------------------------------------------------------
+			/// Output the cycle length and phasing plan information for signal	
 			facet void Display_Timing()
 			{
 				// Simplify ThisType name
@@ -1074,10 +1132,9 @@ namespace Signal_Components
 				}
 				(*out)<<endl;
 				
-			}
-			/// HCM LOS Calculation
-			facet void Calculate_Signal_LOS(call_requirements(
-				requires(TargetType,is_integral)))
+			}	
+			/// Display the signal LOS to the output stream
+			facet void Display_Signal_LOS()
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
@@ -1085,21 +1142,15 @@ namespace Signal_Components
 				// Get reference to the phases in the signal phase diagram
 				vector<Interfaces::Approach_Interface<typename ThisType::Master_Type::APPROACH_TYPE,NULLTYPE>*>* approaches = this->Approaches<vector<Interfaces::Approach_Interface<typename ThisType::Master_Type::APPROACH_TYPE,NULLTYPE>*>*>();
 				vector<Interfaces::Approach_Interface<typename ThisType::Master_Type::APPROACH_TYPE,NULLTYPE>*>::iterator itr = approaches->begin();
+				Interfaces::Approach_Interface<typename ThisType::Master_Type::APPROACH_TYPE,NULLTYPE>* approach_ptr;
 
-				ofstream* out = this->output_stream<ofstream*>();
-
-				// Sum total lost time and critical vs for all phases
-				float sum_delay = 0;
-				float sum_flow = 0;
+				// Sum total lost time and critical vs for all approaches
+				cout<<endl<<this->name<char*>()<<" LOS = "<<this->LOS<char>();
 				for (itr; itr != approaches->end(); itr++)
 				{
-					(*itr)->Calculate_Approach_LOS<char>();
-
-					sum_delay += (*itr)->delay<Data_Structures::Time_Second>() * (*itr)->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
-					sum_flow += (*itr)->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
+					approach_ptr = (*itr);
+					cout<<endl<<approach_ptr->name<char*>()<<" Approach LOS = "<<approach_ptr->LOS<char>();
 				}
-
-				//(*out) << endl<<"Intersection Delay = "<<sum_delay / sum_flow << endl;
 			}
 
 
@@ -1262,8 +1313,8 @@ namespace Signal_Components
 					//(*out) <<endl<<endl<<"===================================================================";
 					//(*out) <<endl<<" CHANGE SIGNAL TIMING CALLED ";
 					//(*out) <<endl<<"==================================================================="<<endl<<endl;
-					(*out) <<"\t"<< iteration<<"\t";
-					_this->Display_Timing<NULLTYPE>();
+					//(*out) <<"\t"<< iteration<<"\t";
+					//_this->Display_Timing<NULLTYPE>();
 					//(*out) <<endl<<"==================================================================="<<endl<<endl;
 				}
 			}
@@ -1299,10 +1350,16 @@ namespace Signal_Components
 			facet_accessor(in_CBD);
 			/// Signal ID accessor
 			facet_accessor(Signal_ID);
+			/// Signal name accessor
+			facet_accessor(name);
 			// phf for the signal as a whole
 			facet_accessor(peak_hour_factor);
 			// Currently active (green) signal phase
 			facet_accessor(active_phase);
+			// Current signal delay per vehicle
+			facet_accessor(delay);
+			// Current signal LOS
+			facet_accessor(LOS);
 
 			//========================================================================
 			// COLLECTIONS
@@ -1367,7 +1424,7 @@ namespace Signal_Components
 				Signal_Indicator_Interface<ThisType,NULLTYPE>* _this=(Signal_Indicator_Interface<ThisType,NULLTYPE>*)pthis;
 
 				// Get Signal Interface from this
-				Signal_Components::Interfaces::Signal_Interface<Signal_Components::Components::HCM_Signal_Simple,NULLTYPE>* signal = _this->Signal<Signal_Components::Components::HCM_Signal_Simple>();
+				Signal_Components::Interfaces::Signal_Interface<typename ThisType::Master_Type::SIGNAL_TYPE,NULLTYPE>* signal = _this->Signal<typename ThisType::Master_Type::SIGNAL_TYPE>();
 
 				if (iteration == signal->Next_Event_Iteration<int>())
 				{
@@ -1382,28 +1439,38 @@ namespace Signal_Components
 			}
 			declare_facet_event(Signal_Indicator_Event)
 			{
+				// Sleep Now
+				Sleep(100);
+
 				// Get Current Interface
 				Signal_Indicator_Interface<ThisType,NULLTYPE>* _this=(Signal_Indicator_Interface<ThisType,NULLTYPE>*)pthis;
 				ofstream* out = _this->output_stream<ofstream*>();
 
 				// Get Signal Interface from this
-				Signal_Components::Interfaces::Signal_Interface<Signal_Components::Components::HCM_Signal_Simple,NULLTYPE>* signal = _this->Signal<Signal_Components::Components::HCM_Signal_Simple>();
+				Signal_Components::Interfaces::Signal_Interface<typename ThisType::Master_Type::SIGNAL_TYPE,NULLTYPE>* signal = _this->Signal<typename ThisType::Master_Type::SIGNAL_TYPE>();
 
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>* phases = signal->Phases<vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>*>();
-				vector<Interfaces::Phase_Interface<Signal_Components::Components::HCM_Phase_Simple,NULLTYPE>*>::iterator itr = phases->begin();
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = signal->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
 
 				// Display the signal state info if the output stream is not null
 				if (out != NULL)
 				{
-					(*out) <<endl<<"ITERATION: " <<iteration;
+					//(*out) <<endl<<"ITERATION: " <<iteration <<", "<< signal->name<char*>();
 					int i;
 					for (itr, i=0; itr != phases->end(); itr++, i++)
 					{
-						char* signal_status = "RED   ";
-						if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = "GREEN ";
-						else if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = "YELLOW";
-						(*out) <<", Phase "<<i<<": "<<signal_status;
+						(*out) << "signal_state:"<<(*itr)->phase_id<int>()<<":"<<signal->Signal_ID<int>()<<":";
+						int signal_status = 1;
+						if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = 2;
+						else if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = 3;
+						(*out) <<signal_status<<":"<<iteration<<endl;
+						(*out).flush();
+						
+						//char* signal_status = "RED   ";
+						//if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = "GREEN ";
+						//else if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = "YELLOW";
+						//(*out) <<", Phase "<<(*itr)->name<char*>()<<": "<<signal_status;
 					}
 				}
 			}

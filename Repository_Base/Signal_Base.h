@@ -347,6 +347,9 @@ namespace Signal_Components
 			{
 				this->_green_time = 0.0;
 				this->_yellow_and_all_red_time = 4.0;
+				this->_name = "";
+				this->_phase_id = 0;
+				this->_weight = 1.0f;
 			}
 
 
@@ -358,6 +361,9 @@ namespace Signal_Components
 			member_data(float, green_time, requires(TargetType, Concepts::Is_Time_Seconds), requires(TargetType, Concepts::Is_Time_Seconds));	///< G (s)
 			/// Phase lost time
 			member_data(float, yellow_and_all_red_time, requires(TargetType, Concepts::Is_Time_Seconds), requires(TargetType, Concepts::Is_Time_Seconds));	///< Y (s)
+			member_data_basic(int, phase_id);
+			member_data_basic(char*,name);
+			member_data(float, weight, requires(TargetType, is_arithmetic), requires(TargetType, is_arithmetic));
 			
 
 			//============================================================
@@ -685,19 +691,26 @@ namespace Signal_Components
 			member_data(int, active_phase,requires(TargetType, is_integral),requires(TargetType,is_integral));
 			/// Total cycle length
 			member_data(float,cycle_length,requires(TargetType,Concepts::Is_Time_Seconds),requires(TargetType,Concepts::Is_Time_Seconds));			///< C (s)
-			/// Total cycle length
+			/// maximum cycle length
 			member_data(float,max_cycle_length,requires(TargetType,Concepts::Is_Time_Seconds),requires(TargetType,Concepts::Is_Time_Seconds));	
-			/// Total cycle length
+			/// minimum cycle length
 			member_data(float,min_cycle_length,requires(TargetType,Concepts::Is_Time_Seconds),requires(TargetType,Concepts::Is_Time_Seconds));	
-			/// Total cycle length
+			/// target degree of saturation (default of 0.9)
 			member_data(float,degree_of_saturation,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));	///< X (s)
 			/// Area type
 			member_data(bool,in_CBD,requires(TargetType,is_integral),requires(TargetType,is_integral));/// 0.9 for CBD otherwise 1.0
 			/// Signal ID accessor
-			member_data(float,Signal_ID,requires(TargetType,is_arithmetic),false);
+			member_data(float,Signal_ID,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));
+			/// Signal name accessor
+			member_data(char*,name,true,true);
 			/// Analyisis Period accessor
 			member_data(float,analysis_period,requires(TargetType,Concepts::Is_Time_Minutes),requires(TargetType,Concepts::Is_Time_Minutes));
+			/// Peak hour factor used to convert hourly to 15 minute maximum volume
 			member_data(float,peak_hour_factor,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));
+			/// Overall Signal Level of service
+			member_data(char,LOS,requires(TargetType,is_integral), requires(TargetType, is_integral));
+			/// Average intersection delay in seconds / vehicle
+			member_data(char,delay,requires(TargetType,Concepts::Is_Time_Seconds), requires(TargetType, Concepts::Is_Time_Seconds));
 		};
 		//------------------------------------------------------------------------------------------------------------------
 		/// HCM_Signal class.
@@ -709,12 +722,17 @@ namespace Signal_Components
 			/// Type definitions to define the context of the base class
 			typedef Types::Solution_Types::HCM_Full HCM_Full;	///< The solution type applied to this base
 
-
 			/// Handler for a general Initializer dispatched from an Interface
 			facet_base void Initialize(TargetType number_of_phases, TargetType number_of_approaches, call_requirements(requires(ThisType,Is_Dispatched)))
 			{
+				Signal_HCM_Base<MasterType>* _this = ((Signal_HCM_Base<MasterType>*)this);
+				this->_Signal_ID = 0;
+				this->_name = "";
 				this->_output_stream = &cout;
-
+				this->_in_CBD = false;
+				this->_cycle_length = 0.0;
+				this->_degree_of_saturation = 0.9;
+				
 				for (int i=0; i<(int)number_of_phases; i++)
 				{
 					typedef Interfaces::Phase_Interface<typename MasterType::PHASE_TYPE, NULLTYPE>* ITF_TYPE;
@@ -747,13 +765,15 @@ namespace Signal_Components
 			/// Handler for a general Initializer dispatched from an Interface
 			facet_base void Initialize(TargetType number_of_phases, TargetType number_of_approaches, call_requirements(requires(ThisType,Is_Dispatched)))
 			{
-				this->_output_stream = &cout;
-
+				Signal_HCM_Base<MasterType>* _this = ((Signal_HCM_Base<MasterType>*)this);
+				
 				// Set member variables to defaults
+				this->_Signal_ID = 0;
+				this->_name = "";
+				this->_output_stream = &cout;
 				this->_in_CBD = false;
 				this->_cycle_length = 0.0;
 				this->_degree_of_saturation = 0.9;
-				this->_Signal_ID = 0;
 
 				// Create new phases according to specified number of phases
 				for (int i=0; i<(int)number_of_phases; i++)
