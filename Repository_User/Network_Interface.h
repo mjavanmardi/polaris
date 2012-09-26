@@ -122,7 +122,7 @@ namespace Network_Components
 				signal->peak_hour_factor<float>(0.95);
 				signal->max_cycle_length<Time_Second>(100.0);
 				signal->min_cycle_length<Time_Second>(20.0);
-				signal->num_cycles_between_updates<int>(15);
+				signal->num_cycles_between_updates<int>(5);
 
 				// signal indicator
 				Indicator_Interface* indicator = (Indicator_Interface*)Allocate<Indicator_Type>();

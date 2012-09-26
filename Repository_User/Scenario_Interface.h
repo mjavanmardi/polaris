@@ -65,7 +65,8 @@ namespace Scenario_Components
 			facet void output(std::string s)
 			{
 				typedef typename ThisType::output_writer_type OutputWriterType;
-				output_writer<OutputWriterType&>() << s;
+				//output_writer<OutputWriterType&>() << s;
+				//cout << s;
 			}
 		};
 	}
