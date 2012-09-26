@@ -13,7 +13,6 @@ namespace Scenario_Components
 	
 	namespace Interfaces
 	{
-
 		template<typename ThisType,typename CallerType>
 		struct Scenario_Interface
 		{
@@ -40,13 +39,11 @@ namespace Scenario_Components
 
 			facet_accessor(iseed);
 
-			facet_accessor(output_writer);
-
 			facet void read_scenario_data()
 			{
 				simulation_interval_length<int>(6); //6 seconds
 				assignment_interval_length<int>(50*simulation_interval_length<int>()); // 5 minutes
-				planning_horizon<int>(600*simulation_interval_length<int>()); // 1 hour
+				planning_horizon<int>(14400*simulation_interval_length<int>()); // 1 hour
 				
 				simulation_start_time<int>(0);
 				simulation_end_time<int>(planning_horizon<int>()+simulation_start_time<int>());
@@ -58,17 +55,9 @@ namespace Scenario_Components
 				assignment_mode<Assignment_Simulation_Mode_Keys>(ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
 				
 				iseed<int>(1);
-				
-				typedef typename ThisType::output_writer_type OutputWriterType;
-				output_writer<OutputWriterType&>().open("Polaris_Output.log");
 			}
-
-			facet void output(std::string s)
-			{
-				typedef typename ThisType::output_writer_type OutputWriterType;
-				output_writer<OutputWriterType&>() << s;
-			}
-
 		};
 	}
 }
+
+using namespace Scenario_Components::Interfaces;
