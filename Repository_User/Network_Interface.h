@@ -68,7 +68,8 @@ namespace Network_Components
 				typedef typename Signal_Components::Interfaces::Lane_Group_Interface<Lane_Group_Type,NULLTYPE> Lane_Group_Interface;
 				typedef typename ThisType::Master_Type::DETECTOR_TYPE Detector_Type;
 				typedef typename Signal_Components::Interfaces::Detector_Interface<Detector_Type,NULLTYPE> Detector_Interface;
-
+				typedef typename ThisType::Master_Type::INDICATOR_TYPE Indicator_Type;
+				typedef typename Signal_Components::Interfaces::Signal_Indicator_Interface<Indicator_Type,NULLTYPE> Indicator_Interface;
 				intersections_container<IntersectionsContainerType&>().clear();
 				
 				//node
@@ -112,6 +113,8 @@ namespace Network_Components
 				// Signal at intersection 2
 				Signal_Interface* signal = (Signal_Interface*)Allocate<Signal_Type>();
 				signal->Initialize<int>(2,2);
+				signal->Signal_ID<int>(2);
+				signal->name<char*>("Signal_1");
 				signal->output_stream<STREAM_TYPE*>(stream_ptr);
 				signal->in_CBD<bool>(false);
 				signal->analysis_period<Time_Minute>(15.0);
@@ -120,6 +123,12 @@ namespace Network_Components
 				signal->max_cycle_length<Time_Second>(100.0);
 				signal->min_cycle_length<Time_Second>(20.0);
 				signal->num_cycles_between_updates<int>(15);
+
+				// signal indicator
+				Indicator_Interface* indicator = (Indicator_Interface*)Allocate<Indicator_Type>();
+				indicator->Initialize<NULLTYPE>();
+				indicator->Signal<Signal_Type>(signal);
+
 				vector<Phase_Interface*>* phases = signal->Phases<vector<Phase_Interface*>*>();
 				vector<Approach_Interface*>* approaches = signal->Approaches<vector<Approach_Interface*>*>();
 				Phase_Interface *phase;
@@ -127,10 +136,13 @@ namespace Network_Components
 				// Initialize phase 1
 				phase = (*phases)[0];
 				phase->Initialize<int>(1);
+				phase->phase_id<int>(1);
+				phase->name<char*>("EB-Thru");
 				phase->yellow_and_all_red_time<Time_Second>(4.0);
 				vector<Lane_Group_Interface*>* lanes = phase->Lane_Groups<vector<Lane_Group_Interface*>*>();
 				lane = (*lanes)[0];
 				(*approaches)[0]->Add_Lane_Group<Lane_Group_Type>(lane);
+				(*approaches)[0]->name<char*>("EB");
 				lane->Initialize<float>();
 				lane->avg_lane_width<Length_Foot>(11.0);
 				lane->demand_left<Flow_Per_Hour>(0);
@@ -154,9 +166,12 @@ namespace Network_Components
 				phase = (*phases)[1];
 				phase->Initialize<int>(1);
 				phase->yellow_and_all_red_time<Time_Second>(4.0);
+				phase->phase_id<int>(4);
+				phase->name<char*>("SB-Left");
 				lanes = phase->Lane_Groups<vector<Lane_Group_Interface*>*>();
 				lane2 = (*lanes)[0];
-				(*approaches)[0]->Add_Lane_Group<Lane_Group_Type>(lane);
+				(*approaches)[1]->Add_Lane_Group<Lane_Group_Type>(lane);
+				(*approaches)[1]->name<char*>("SB");
 				lane2->Initialize<float>();
 				lane2->avg_lane_width<Length_Foot>(11.0);
 				lane2->demand_left<Flow_Per_Hour>(0);
