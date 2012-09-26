@@ -226,6 +226,14 @@ namespace Intersection_Components
 								count = detector->Get_Count<int>();
 								bool test = false;
 							}
+
+							char s[100];
+							sprintf_s(s, "advanced:%i:%i:%i\n", inbound_link->uuid<int>(), this->uuid<int>(), scenario_reference<Scenario_Interface*>()->current_time<int>());
+							std::string s1 = s;
+							scenario_reference<Scenario_Interface*>()->output<NULLTYPE>(s1);
+							sprintf_s(s, "stop:%i:%i:%i\n", outbound_link->uuid<int>(), this->uuid<int>(), scenario_reference<Scenario_Interface*>()->current_time<int>());
+							std::string s2 = s;
+							scenario_reference<Scenario_Interface*>()->output<NULLTYPE>(s2);
 						}
 					}
 				}

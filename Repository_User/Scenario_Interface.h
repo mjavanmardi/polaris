@@ -39,6 +39,8 @@ namespace Scenario_Components
 
 			facet_accessor(iseed);
 
+			facet_accessor(output_writer);
+
 			facet void read_scenario_data()
 			{
 				simulation_interval_length<int>(6); //6 seconds
@@ -55,6 +57,15 @@ namespace Scenario_Components
 				assignment_mode<Assignment_Simulation_Mode_Keys>(ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
 				
 				iseed<int>(1);
+
+				typedef typename ThisType::output_writer_type OutputWriterType;
+				output_writer<OutputWriterType&>().open("Polaris_Output.log");
+			}
+
+			facet void output(std::string s)
+			{
+				typedef typename ThisType::output_writer_type OutputWriterType;
+				output_writer<OutputWriterType&>() << s;
 			}
 		};
 	}

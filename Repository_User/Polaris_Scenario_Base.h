@@ -39,6 +39,11 @@ namespace Scenario_Components
 			member_data_basic(int, assignment_mode);
 
 			member_data_basic(int, iseed);
+
+			typedef ofstream output_writer_type;
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType output_writer(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_output_writer;} tag_getter(output_writer);
+			output_writer_type _output_writer;
 		};
 	}
 
