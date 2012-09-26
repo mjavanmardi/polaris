@@ -62,6 +62,9 @@
     <ClInclude Include="..\Repository_User\Demand_Bases.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Traffic_Management_Interfaces.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository_Base.cpp">

@@ -129,6 +129,7 @@
     <ClInclude Include="Spatial_Base.h" />
     <ClInclude Include="Time_Interfaces.h" />
     <ClInclude Include="Time_Base.h" />
+    <ClInclude Include="Traffic_Management_Interfaces.h" />
     <ClInclude Include="Trip_Interfaces.h" />
     <ClInclude Include="Trip_Base.h" />
   </ItemGroup>

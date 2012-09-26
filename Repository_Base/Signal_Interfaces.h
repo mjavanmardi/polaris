@@ -997,6 +997,7 @@ namespace Signal_Components
 
 				// Finally, output the LOS information
 				this->Calculate_Signal_LOS<char>();
+				//this->Display_Timing<NULLTYPE>();
 				//this->Display_Signal_LOS<NULLTYPE>();
 			}
 			/// HCM Retiming calculations for simple signals
@@ -1251,17 +1252,21 @@ namespace Signal_Components
 			}
 			declare_facet_event(Change_Signal_State)
 			{
-
 				// Get Current Interface
 				typedef ThisType T;
 				Signal_Interface<ThisType,NULLTYPE>* _this = (Signal_Interface<ThisType,NULLTYPE>*)pthis;
 
+				// Display the signal information if the output stream is not null
+				ofstream* out = _this->output_stream<ofstream*>();
+
 				// Get interface to phases in signal
 				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = _this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
+				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator phase_itr = phases->begin();
 				Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>* phase;
 
 				// Get the currently active phase
 				int active_phase = _this->active_phase<int>();
+
 				phase = (*phases)[active_phase];
 
 				// If state of active phase is RED (i.e. All Red) Change current phase to Green (Each phases starts in all red)
@@ -1278,7 +1283,7 @@ namespace Signal_Components
 					_this->Next_Event_Iteration<int>(iteration + (int)phase->yellow_and_all_red_time<Data_Structures::Time_Second>()-2);
 				}
 
-				// Else if active phase is YELLOW, change state to RED and transition to next phase (Start of next all read period)
+				// Else if active phase is YELLOW, change state to RED and transition to next phase (Start of next all red period)
 				else
 				{
 					phase->signal_state<Data_Structures::Signal_State>(Data_Structures::RED);
@@ -1288,6 +1293,19 @@ namespace Signal_Components
 					active_phase++;
 					if (active_phase >= phases->size()) active_phase=0;
 					_this->active_phase<int>(active_phase);
+				}
+
+				// print out end of previous cycle message
+				if (active_phase == 0 && phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN)
+				{
+					int start_time = iteration - _this->cycle_length<Data_Structures::Time_Second>();
+					int cur_time = start_time;
+					
+					for (phase_itr; phase_itr != phases->end(); phase_itr++)
+					{
+						(*out) << "cycle_end:"<<(*phase_itr)->phase_id<int>()<<":"<<_this->Signal_ID<int>()<<":"<<start_time<<":"<<cur_time<<":"<<cur_time+(*phase_itr)->green_time<Data_Structures::Time_Second>()<<":"<<iteration<<endl;
+						cur_time = cur_time+(*phase_itr)->green_time<Data_Structures::Time_Second>() + (*phase_itr)->yellow_and_all_red_time<Data_Structures::Time_Second>();
+					}
 				}
 
 				// Set has fired to true, indicates signal events done for current iteration
@@ -1440,7 +1458,7 @@ namespace Signal_Components
 			declare_facet_event(Signal_Indicator_Event)
 			{
 				// Sleep Now
-				Sleep(100);
+				Sleep(50);
 
 				// Get Current Interface
 				Signal_Indicator_Interface<ThisType,NULLTYPE>* _this=(Signal_Indicator_Interface<ThisType,NULLTYPE>*)pthis;
