@@ -61,10 +61,21 @@ struct Master_Type
 
 };
 
+ostream* stream_ptr;
 
 void main()
 {
 	generator.seed(1);
+
+	//===============
+	// OUTPUT OPTIONS
+	//----------------
+	ofstream log_file("signal_log3.txt");
+	ostream output_stream(log_file.rdbuf());
+	stream_ptr = &output_stream;	
+	//----------------
+	//stream_ptr = &cout;
+
 
 	//data
 	cout << "allocating data structures..." <<endl;	
