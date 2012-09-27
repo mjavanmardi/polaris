@@ -67,6 +67,7 @@ namespace Scenario_Components
 				typedef typename ThisType::output_writer_type OutputWriterType;
 				//output_writer<OutputWriterType&>() << s;
 				cout << s;
+				cout.flush();
 			}
 		};
 	}
