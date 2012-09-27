@@ -949,7 +949,7 @@ namespace Signal_Components
 				Interfaces::Signal_Interface<typename ThisType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>* simple_signal = (Interfaces::Signal_Interface<typename ThisType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>*)this;
 				simple_signal->Update_Timing<Data_Structures::Time_Second>();
 
-				//ofstream* out = this->output_stream<ofstream*>();
+				ostream* out = this->output_stream<ostream*>();
 
 				// Get reference to the phases in the signal phase diagram
 				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::FULL_PHASE_TYPE,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::FULL_PHASE_TYPE,NULLTYPE>*>*>();
@@ -965,7 +965,7 @@ namespace Signal_Components
 					lost_time += (*itr)->yellow_and_all_red_time<TargetType>();
 					vs_i= (*itr)->Find_Critical_VS_Ratio<float>()*(*itr)->weight<float>();
 					vs_sum += vs_i;
-					//if (out != NULL) (*out) << "\t"<<vs_i;
+					if (out != NULL) (*out) << "\t"<<vs_i;
 				}
 
 				// Get estimated cycle length
@@ -1012,7 +1012,7 @@ namespace Signal_Components
 				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>*>();
 				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
 
-				//ofstream* out = this->output_stream<ofstream*>();
+				ostream* out = this->output_stream<ostream*>();
 
 				// Sum total lost time and critical vs for all phases
 				float lost_time = 0;
@@ -1024,7 +1024,7 @@ namespace Signal_Components
 
 					lost_time += (*itr)->yellow_and_all_red_time<Data_Structures::Time_Second>();
 					vol = (*itr)->Find_Critical_Phase_Volume<Data_Structures::Flow_Per_Hour>();
-					//if (out != NULL) (*out) << "\t"<<vol;
+					if (out != NULL) (*out) << "\t"<<vol;
 					critical_sum += vol;
 				}
 
@@ -1118,7 +1118,7 @@ namespace Signal_Components
 				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
 
 				
-				ofstream* out = this->output_stream<ofstream*>();		
+				ostream* out = this->output_stream<ostream*>();	
 
 				if (out == NULL) return;
 
@@ -1132,6 +1132,7 @@ namespace Signal_Components
 					(*out) <<"Yellow/red:\t"<<(*phases)[i]->yellow_and_all_red_time<Data_Structures::Time_Second>()<<"\t";
 				}
 				(*out)<<endl;
+				//(*out).flush();
 				
 			}	
 			/// Display the signal LOS to the output stream
@@ -1257,7 +1258,7 @@ namespace Signal_Components
 				Signal_Interface<ThisType,NULLTYPE>* _this = (Signal_Interface<ThisType,NULLTYPE>*)pthis;
 
 				// Display the signal information if the output stream is not null
-				ofstream* out = _this->output_stream<ofstream*>();
+				ostream* out = _this->output_stream<ostream*>();
 
 				// Get interface to phases in signal
 				vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = _this->Phases<vector<Interfaces::Phase_Interface<typename ThisType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
@@ -1303,7 +1304,7 @@ namespace Signal_Components
 					
 					for (phase_itr; phase_itr != phases->end(); phase_itr++)
 					{
-						(*out) << "cycle_end:"<<(*phase_itr)->phase_id<int>()<<":"<<_this->Signal_ID<int>()<<":"<<start_time<<":"<<cur_time<<":"<<cur_time+(*phase_itr)->green_time<Data_Structures::Time_Second>()<<":"<<iteration<<endl;
+						cout << "cycle_end:"<<(*phase_itr)->phase_id<int>()<<":"<<_this->Signal_ID<int>()<<":"<<start_time<<":"<<cur_time<<":"<<cur_time+(*phase_itr)->green_time<Data_Structures::Time_Second>()<<":"<<iteration<<endl;
 						cur_time = cur_time+(*phase_itr)->green_time<Data_Structures::Time_Second>() + (*phase_itr)->yellow_and_all_red_time<Data_Structures::Time_Second>();
 					}
 				}
@@ -1325,14 +1326,14 @@ namespace Signal_Components
 
 
 				// Display the signal information if the output stream is not null
-				ofstream* out = _this->output_stream<ofstream*>();
+				ostream* out = _this->output_stream<ostream*>();
 				if (out != NULL)
 				{
 					//(*out) <<endl<<endl<<"===================================================================";
 					//(*out) <<endl<<" CHANGE SIGNAL TIMING CALLED ";
 					//(*out) <<endl<<"==================================================================="<<endl<<endl;
 					//(*out) <<"\t"<< iteration<<"\t";
-					//_this->Display_Timing<NULLTYPE>();
+					_this->Display_Timing<NULLTYPE>();
 					//(*out) <<endl<<"==================================================================="<<endl<<endl;
 				}
 			}
@@ -1458,11 +1459,11 @@ namespace Signal_Components
 			declare_facet_event(Signal_Indicator_Event)
 			{
 				// Sleep Now
-				Sleep(300);
+				Sleep(50);
 
 				// Get Current Interface
 				Signal_Indicator_Interface<ThisType,NULLTYPE>* _this=(Signal_Indicator_Interface<ThisType,NULLTYPE>*)pthis;
-				ofstream* out = _this->output_stream<ofstream*>();
+				ostream* out = _this->output_stream<ostream*>();
 
 				// Get Signal Interface from this
 				Signal_Components::Interfaces::Signal_Interface<typename ThisType::Master_Type::SIGNAL_TYPE,NULLTYPE>* signal = _this->Signal<typename ThisType::Master_Type::SIGNAL_TYPE>();

@@ -643,7 +643,7 @@ namespace Signal_Components
 			member_data_basic(bool, Event_Conditional_Hit);
 			member_data_basic(bool, Timing_Event_Conditional_Hit);
 			member_data_basic(std::ostream*, output_stream);
-
+			
 
 			//============================================================
 			// CHILD CLASS ACCESS HANDLERS
@@ -875,7 +875,7 @@ namespace Signal_Components
 			}
 
 			member_data_basic(bool,Conditional_Has_Fired);
-			member_data_basic(ofstream*, output_stream);
+			member_data_basic(ostream*, output_stream);
 
 			// Local data member for signal interface
 			void* _signal;
@@ -894,11 +894,11 @@ namespace Signal_Components
 		{
 			facet_base void Initialize(call_requirements(requires(ThisType,Is_Dispatched)))
 			{
-				this->_output_stream = (ofstream*)&cout;
+				this->_output_stream = (ostream*)&cout;
 				this->_signal = NULL;
 			}
 
-			member_data_basic(ofstream*, output_stream);
+			member_data_basic(ostream*, output_stream);
 			member_component_basic(typename MasterType::SIGNAL_TYPE,Signal);
 
 			// Local data member for signal interface
