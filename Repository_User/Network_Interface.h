@@ -32,15 +32,7 @@ namespace Network_Components
 			facet void read_network_data()
 			{
 				using namespace Signal_Components::Data_Structures;
-				//===============
-				// OUTPUT OPTIONS
-				//----------------
-				//typedef ofstream STREAM_TYPE;
-				//STREAM_TYPE log_file("log2.txt");
-				//STREAM_TYPE* stream_ptr = &log_file;
-				typedef ostream STREAM_TYPE;
-				STREAM_TYPE* stream_ptr = &cout;
-				//----------------
+				
 
 				int i = 0;
 				float link_length = 5280.0;
@@ -115,7 +107,7 @@ namespace Network_Components
 				signal->Initialize<int>(2,2);
 				signal->Signal_ID<int>(2);
 				signal->name<char*>("Signal_1");
-				signal->output_stream<STREAM_TYPE*>(stream_ptr);
+				signal->output_stream<ostream*>(stream_ptr);
 				signal->in_CBD<bool>(false);
 				signal->analysis_period<Time_Minute>(15.0);
 				signal->degree_of_saturation<float>(0.9);
@@ -133,6 +125,7 @@ namespace Network_Components
 				vector<Approach_Interface*>* approaches = signal->Approaches<vector<Approach_Interface*>*>();
 				Phase_Interface *phase;
 				Lane_Group_Interface *lane, *lane2;
+
 				// Initialize phase 1
 				phase = (*phases)[0];
 				phase->Initialize<int>(1);
