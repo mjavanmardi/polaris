@@ -1459,7 +1459,7 @@ namespace Signal_Components
 			declare_facet_event(Signal_Indicator_Event)
 			{
 				// Sleep Now
-				Sleep(50);
+				Sleep(100);
 
 				// Get Current Interface
 				Signal_Indicator_Interface<ThisType,NULLTYPE>* _this=(Signal_Indicator_Interface<ThisType,NULLTYPE>*)pthis;
