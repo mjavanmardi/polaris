@@ -889,6 +889,7 @@ namespace Signal_Components
 				return (typename TargetType::Interface_Type<TargetType,NULLTYPE>::type*)_signal;
 			}
 		};
+
 		template <typename MasterType>
 		struct Signal_Indicator_Base
 		{

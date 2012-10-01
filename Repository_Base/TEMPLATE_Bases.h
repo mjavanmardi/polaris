@@ -13,37 +13,40 @@ namespace EXAMPLE_COMPONENTS
 	{
 		//------------------------------------------------------------------------------------------------------------------
 		/// Example of a Base class.  There can be many versions of a base class for a given Interface
+		/// The template parameter MasterType contains information about all types defined int the current application, and
+		/// be used to reference other types in the program
 		//------------------------------------------------------------------------------------------------------------------
+		template<typename MasterType>
 		struct BASE_NAME
 		{
+			//==========================================================================================
 			/// Handler for a general Initializer dispatched from an Interface
-			facet void Initialize(call_requirements(requires(ThisType,Is_Dispatched)))
+			facet_base void Initialize(call_requirements(requires(ThisType,Is_Dispatched)))
 			{
 				// DO STUFF TO LOCAL DATA MEMBERS HERE
 			}
 			/// Error Handler for general Initializers.  In this case, stops the initializer from being called directly
-			facet void Initialize(call_requirements(requires(ThisType,!Is_Dispatched)))
+			facet_base void Initialize(call_requirements(requires(ThisType,!Is_Dispatched)))
 			{
 				assert_requirements(ThisType,Is_Dispatched,"ThisType is not dispatched");
 			}
 
 
 			//==========================================================================================
-			/// Local data is created and the accessors defined manually as follows:
+			/// Local data is created and the accessors defined MANUALLY as follows:
 			int _EXAMPLE_DATA; // create the data
 			// create a handler for the GET version of the ACCESSOR_NAME accessor created in the interface
-			template<typename ThisType, typename CallerType, typename TargetType>
-			TargetType ACCESSOR_NAME(call_requirements(requires(ThisType,Is_Dispatched)))
+			facet_base TargetType ACCESSOR_NAME(call_requirements(requires(ThisType,Is_Dispatched)))
 			{
 				return (TargetType)_EXAMPLE_DATA; // return the local data member cast to the TargetType
 			}
 			// create a handler for the SET version of the ACCESSOR_NAME accessor created in the interface, 'facet' macro replaces the template definition, giving the same typenames as above
-			facet void ACCESSOR_NAME(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched)))
+			facet_base void ACCESSOR_NAME(TargetType set_value, call_requirements(requires(ThisType,Is_Dispatched)))
 			{
 				_EXAMPLE_DATA = (int)set_value; // return the local data member cast to the TargetType
 			}
 			// Make sure to create an error handler for the accessors by negating the requirements
-			facet void ACCESSOR_NAME(TargetType set_value, call_requirements(!(requires(ThisType,Is_Dispatched))))
+			facet_base void ACCESSOR_NAME(TargetType set_value, call_requirements(!(requires(ThisType,Is_Dispatched))))
 			{
 				assert_requirements(ThisType,Is_Dispatched,"ThisType is not dispatched");
 			}
@@ -56,6 +59,12 @@ namespace EXAMPLE_COMPONENTS
 			// The process can be simplified as shown below using the 'member_data' macro, which creates the variable "double _GETTER_DATA" and its accessors
 			member_data(double,GETTER_DATA,true,false);  // to turn the getter/setter to on, either enter a requirement or 'true' when requested.  'false' turns the accessor off
 			member_data(double,GETTER_SETTER_DATA,requires(TargetType,is_arithmetic),true);  //this version has both accessors and requires the target of the getter to be arithmetic
+
+
+			//==========================================================================================
+			// Finally, type information for other types can be accessed through MasterType.  The example below
+			// Creates a base member of SOME_OTHER_TYPE and creates accessors to its interface.
+			member_component_basic(typename MasterType::SOME_OTHER_TYPE, some_other_type);
 		};
 	}
 
@@ -65,6 +74,24 @@ namespace EXAMPLE_COMPONENTS
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Components
 	{
-		typedef Polaris_Component<Interfaces::INTERFACE_NAME,Bases::BASE_NAME> COMPONENT_NAME;
-	}	
+		//==========================================================================================
+		/// The struct below creates the polaris component comprised of the interface/base and any parent types.
+		/// The polaris component can be accessed through the "type" member of the struct;
+		template<typename MasterType>
+		struct COMPONENT_NAME
+		{
+			typedef Polaris_Component<Interfaces::INTERFACE_NAME, Bases::BASE_NAME<MasterType>,PARENT_TYPE,MasterType, DATA_OBJECT_TYPE> type;
+		};
+		/// After the above component is defined it can be added to MasterType, which should reside in the application project, as follows:
+		struct Master_Type
+		{
+			typedef Master_Type T;
+
+			//==============================================================================================
+			// Signalization Types
+			typedef EXAMPLE_COMPONENTS::Components::COMPONENT_NAME<T>::type	COMPONENT_TYPE;
+		};
+		/// This can then be accessed in other components as shown above: i.e.
+		/// MasterType::COMPONENT_TYPE
+	}
 }

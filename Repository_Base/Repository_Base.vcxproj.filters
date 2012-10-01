@@ -65,6 +65,12 @@
     <ClInclude Include="Traffic_Management_Interfaces.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="Choice_Model_Interface.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Choice_Model_Bases.h">
+      <Filter>Bases</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository_Base.cpp">
