@@ -914,7 +914,7 @@ namespace Network_Components
 					Link_Interface* inboundLink = mvmt_itf->inbound_link<Link_Interface*>();
 					Link_Interface* outboundLink = mvmt_itf->outbound_link<Link_Interface*>();
 
-					float turn_travel_penalty = (float) (inboundLink->travel_time<float>() + outboundLink->travel_time<float>()*0.10);
+					float turn_travel_penalty = (float) ((inboundLink->travel_time<float>() + outboundLink->travel_time<float>())*0.10);
 					float forward_link_turn_travel_time = inboundLink->travel_time<float>() + turn_travel_penalty;
 
 					mvmt_itf->turn_travel_penalty<float>(turn_travel_penalty);
