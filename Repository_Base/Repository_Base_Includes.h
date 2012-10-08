@@ -20,7 +20,7 @@
 
 #define CHILD(child_interface,child_base) Polaris_Component<typename ThisType::child_interface,typename ThisType::child_base,ThisType::This_Type>
 
-template<typename Return_Type, typename Param_Type=NULLTYPE, typename Param2_Type=NULLTYPE, typename Param3_Type=NULLTYPE, typename Param4_Type=NULLTYPE>
+template<typename Return_Type=NULLTYPE, typename Param_Type=NULLTYPE, typename Param2_Type=NULLTYPE, typename Param3_Type=NULLTYPE, typename Param4_Type=NULLTYPE, typename Param5_Type=NULLTYPE, typename Param6_Type=NULLTYPE, typename Param7_Type=NULLTYPE, typename Param8_Type=NULLTYPE>
 struct Target_Type
 {
 	typedef Return_Type ReturnType;
@@ -28,6 +28,10 @@ struct Target_Type
 	typedef Param2_Type Param2Type;
 	typedef Param3_Type Param3Type;
 	typedef Param4_Type Param4Type;
+	typedef Param5_Type Param5Type;
+	typedef Param6_Type Param6Type;
+	typedef Param7_Type Param7Type;
+	typedef Param8_Type Param8Type;
 };
 
 #define Basic_Data_Struct(DATA_STRUCT_NAME, DATA_VALUE_TYPE, TYPE_TRAIT_TAGS,...) \
