@@ -1,72 +1,14 @@
 #pragma once
-#include "Application_Includes.h"
 
-struct Master_Type
-{
-	typedef Master_Type T;
+#include "Models.h"
 
-	//==============================================================================================
-	// Signalization Types
-	typedef Signal_Components::Components::HCM_Signal_Full<T>::type				SIGNAL_TYPE;
-	typedef Signal_Components::Components::HCM_Phase_Full<T>::type				PHASE_TYPE;
-	typedef Signal_Components::Components::HCM_LaneGroup_Full<T>::type			LANE_GROUP_TYPE;
-	typedef Signal_Components::Components::HCM_Approach_Full<T>::type			APPROACH_TYPE;
-	typedef Signal_Components::Components::Signal_Indicator_Display<T>::type	INDICATOR_TYPE;
-	typedef Signal_Components::Components::Signal_Detector<T>::type				DETECTOR_TYPE;
-
-	typedef Signal_Components::Components::HCM_Signal_Full<T>::type			FULL_SIGNAL_TYPE;
-	typedef Signal_Components::Components::HCM_Signal_Simple<T>::type		SIMPLE_SIGNAL_TYPE;	
-	typedef Signal_Components::Components::HCM_Phase_Full<T>::type			FULL_PHASE_TYPE;
-	typedef Signal_Components::Components::HCM_Phase_Simple<T>::type		SIMPLE_PHASE_TYPE;
-	typedef Signal_Components::Components::HCM_LaneGroup_Full<T>::type		FULL_LANE_GROUP_TYPE;
-	typedef Signal_Components::Components::HCM_LaneGroup_Simple<T>::type	SIMPLE_LANE_GROUP_TYPE;
-
-	//==============================================================================================
-	// Network Types
-	typedef Scenario_Components::Components::Polaris_Scenario_Component<T>::type scenario_type;
-
-	typedef Network_Components::Components::Polaris_Network_Component<T>::type network_type;
-
-	typedef Intersection_Components::Components::Polaris_Intersection_Component<T>::type intersection_type;
-	typedef Intersection_Components::Components::Polaris_Movement_Component<T>::type movement_type;
-
-	typedef Link_Components::Components::Polaris_Link_Component<T>::type link_type;
-	typedef Intersection_Components::Components::Polaris_Movement_Component<T>::type turn_movement_type;
-
-	typedef Vehicle_Components::Components::Polaris_Vehicle_Component<T>::type vehicle_type;
-
-	typedef Routing_Components::Components::Routable_Network_Component<T>::type routable_network_type;
-
-	typedef Routing_Components::Components::Polaris_Routing_Component<T>::type routing_type;
-
-	typedef Intersection_Components::Components::Routable_Intersection_Component<T>::type routable_intersection_type;
-
-	typedef Link_Components::Components::Routable_Link_Component<T>::type routable_link_type;
-
-	typedef Intersection_Components::Components::Polaris_Movement_Component<T>::type movement_type;
-
-	typedef Demand_Components::Components::Polaris_Demand_Component<T>::type demand_type;
-
-	typedef Activity_Location_Components::Components::Polaris_Activity_Location_Component<T>::type activity_location_type;
-
-	typedef Traveler_Components::Components::Polaris_Traveler_Component<T>::type traveler_type;
-
-	typedef Intersection_Components::Components::Polaris_Inbound_Outbound_Movements_Component<T>::type inbound_outbound_movements_type;
-	typedef Intersection_Components::Components::Polaris_Outbound_Inbound_Movements_Component<T>::type outbound_inbound_movements_type;
-
-	typedef Intersection_Components::Components::Routable_Inbound_Outbound_Movements_Component<T>::type routable_inbound_outbound_movements_type;
-	typedef Intersection_Components::Components::Routable_Outbound_Inbound_Movements_Component<T>::type routable_outbound_inbound_movements_type;
-
-	typedef Intersection_Components::Components::Routable_Movement_Component<T>::type routable_movement_type;
-
-};
 
 ostream* stream_ptr;
 
+
+
 void main()
 {
-	generator.seed(1);
-
 	//===============
 	// OUTPUT OPTIONS
 	//----------------
@@ -76,6 +18,73 @@ void main()
 	//----------------
 	//stream_ptr = &cout;
 
+	generator.seed(1);
+
+	typedef Auto_Data<Master_Type>::type auto_data_type;
+	typedef Bus_Data<Master_Type>::type bus_data_type;
+	typedef Train_Data<Master_Type>::type train_data_type;
+	typedef Master_Type::UTILITY_CHOICE_MODEL_TYPE choice_model_type;
+	typedef Mode_Choice_Option<Master_Type>::type choice_option_type;
+	typedef Mode_Choice_Data_Interface<auto_data_type,NULLTYPE> auto_data_interface;
+	typedef Mode_Choice_Data_Interface<bus_data_type,NULLTYPE> bus_data_interface;
+	typedef Mode_Choice_Data_Interface<train_data_type,NULLTYPE> train_data_interface;
+	typedef Choice_Model_Components::Interfaces::Choice_Model_Interface<choice_model_type,NULLTYPE> choice_model_interface;	
+	typedef choice_option_type::Interface_Type<>::type choice_option_interface;	
+
+	//=====================================================
+	// create general choice model
+	choice_model_interface* mode_choice_model=(choice_model_interface*)Allocate<choice_model_type>();
+	mode_choice_model->Initialize<NULLTYPE>();
+	mode_choice_model->generator<std::tr1::mt19937_64*>(&generator);
+
+
+	//=====================================================
+	// Add three choice options to the mode choce model
+	for (int i=0; i<3; i++)
+	{
+		choice_option_interface* choice_option = (choice_option_interface*)Allocate<choice_option_type>();
+		mode_choice_model->choice_options<vector<choice_option_interface*>*>()->push_back((choice_option_interface*)choice_option);
+	}
+
+	//=====================================================
+	// Create model input data for user 1 and 2
+	auto_data_interface* auto_data = (auto_data_interface*)Allocate<auto_data_type>();
+	bus_data_interface* bus_data = (bus_data_interface*)Allocate<bus_data_type>();
+	train_data_interface* train_data = (train_data_interface*)Allocate<train_data_type>();
+	auto_data->cost<float>(1.0f);
+	auto_data->time<float>(1.0f);
+	bus_data->cost<float>(1.0f);
+	bus_data->time<float>(1.0f);
+	bus_data->wait<float>(1.0f);
+	train_data->cost<float>(1.0f);
+	train_data->time<float>(1.0f);
+	train_data->wait<float>(1.0f);
+	auto_data_interface* auto_data2 = (auto_data_interface*)Allocate<auto_data_type>();
+	bus_data_interface* bus_data2 = (bus_data_interface*)Allocate<bus_data_type>();
+	train_data_interface* train_data2 = (train_data_interface*)Allocate<train_data_type>();
+	auto_data2->cost<float>(3.0f);
+	auto_data2->time<float>(3.0f);
+	bus_data2->cost<float>(4.0f);
+	bus_data2->time<float>(4.0f);
+	bus_data2->wait<float>(4.0f);
+	train_data2->cost<float>(5.0f);
+	train_data2->time<float>(5.0f);
+	train_data2->wait<float>(5.0f);
+
+	//============================================
+	// SOLVE CHOICE MODEL FOR EACH USER
+	// user 1
+	vector<choice_option_interface*>* choices = mode_choice_model->choice_options<vector<choice_option_interface*>*>();
+	(*choices)[0]->choice_data_interface<auto_data_type>(auto_data);
+	(*choices)[1]->choice_data_interface<bus_data_type>(bus_data);
+	(*choices)[2]->choice_data_interface<train_data_type>(train_data);
+	mode_choice_model->Evaluate_Choices<choice_option_type>();
+	// user 2
+	choices = mode_choice_model->choice_options<vector<choice_option_interface*>*>();
+	(*choices)[0]->choice_data_interface<auto_data_type>(auto_data2);
+	(*choices)[1]->choice_data_interface<bus_data_type>(bus_data2);
+	(*choices)[2]->choice_data_interface<train_data_type>(train_data2);
+	mode_choice_model->Evaluate_Choices<choice_option_type>();
 
 	//data
 	cout << "allocating data structures..." <<endl;	

@@ -118,6 +118,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application_Includes.h" />
+    <ClInclude Include="Master_Types.h" />
+    <ClInclude Include="Models.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
