@@ -4,7 +4,6 @@
 ///============================================================================
 /// Polaris_Trivial_Iterator_Interface - stl Trivial Iterator interface
 ///============================================================================
-
 template<typename ThisType,typename CallerType=NULLTYPE>
 struct Polaris_Trivial_Iterator_Interface
 {
@@ -16,7 +15,6 @@ struct Polaris_Trivial_Iterator_Interface
 ///============================================================================
 /// Polaris_Trivial_Iterator - stl Trivial Iterator base
 ///============================================================================
-
 template<typename TrivialIteratorType>
 struct Polaris_Trivial_Iterator:public TrivialIteratorType
 {
@@ -49,7 +47,6 @@ struct Polaris_Input_Iterator_Interface
 ///============================================================================
 /// Polaris_Input_Iterator - stl Input Iterator base
 ///============================================================================
-
 template<typename InputIteratorType>
 struct Polaris_Input_Iterator:public InputIteratorType
 {
@@ -66,7 +63,6 @@ struct Polaris_Input_Iterator:public InputIteratorType
 ///============================================================================
 /// Polaris_Container_Interface - stl Container interface
 ///============================================================================
-
 template<typename ThisType,typename CallerType=NULLTYPE>
 struct Polaris_Container_Interface
 {
@@ -84,7 +80,6 @@ struct Polaris_Container_Interface
 ///============================================================================
 /// Polaris_Forward_Container_Interface - stl Forward Container interface
 ///============================================================================
-
 template<typename ThisType,typename CallerType=NULLTYPE>
 struct Polaris_Forward_Container_Interface
 {
@@ -102,7 +97,6 @@ struct Polaris_Forward_Container_Interface
 ///============================================================================
 /// Polaris_Sequence_Interface - stl Sequence interface
 ///============================================================================
-
 template<typename ThisType,typename CallerType=NULLTYPE>
 struct Polaris_Sequence_Interface
 {
@@ -138,7 +132,6 @@ struct Polaris_Sequence_Interface
 ///============================================================================
 /// Polaris_Back_Insertion_Sequence_Interface - stl Back Insertion Sequence interface
 ///============================================================================
-
 template<typename ThisType,typename CallerType=NULLTYPE>
 struct Polaris_Back_Insertion_Sequence_Interface
 {
@@ -180,7 +173,6 @@ struct Polaris_Back_Insertion_Sequence_Interface
 ///============================================================================
 /// Polaris_Container - stl Container base
 ///============================================================================
-
 template<typename ContainerType>
 struct Polaris_Container:public ContainerType
 {
@@ -199,7 +191,6 @@ struct Polaris_Container:public ContainerType
 ///============================================================================
 /// Polaris_Forward_Container - stl Forward Container base
 ///============================================================================
-
 template<typename ForwardContainerType>
 struct Polaris_Forward_Container:public ForwardContainerType
 {
@@ -218,7 +209,6 @@ struct Polaris_Forward_Container:public ForwardContainerType
 ///============================================================================
 /// Polaris_Sequence - stl Sequence base
 ///============================================================================
-
 template<typename SequenceType>
 struct Polaris_Sequence:public SequenceType
 {
@@ -237,7 +227,6 @@ struct Polaris_Sequence:public SequenceType
 ///============================================================================
 /// Polaris_Back_Insertion_Sequence - stl Back Insertion Sequence base
 ///============================================================================
-
 template<typename BackInsertionSequenceType>
 struct Polaris_Back_Insertion_Sequence:public BackInsertionSequenceType
 {
@@ -252,3 +241,4 @@ struct Polaris_Back_Insertion_Sequence:public BackInsertionSequenceType
 	template<typename ThisType=Polaris_Back_Insertion_Sequence,typename CallerType=NULLTYPE>
 	struct Interface_Type{typedef Polaris_Back_Insertion_Sequence_Interface<ThisType,CallerType> type;};
 };
+
