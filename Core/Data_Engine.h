@@ -17,7 +17,7 @@ public:
 
 	//void Activate_Type(Typed_Data_Pages<>* ptr)
 	//{
-	//	while(_InterlockedExchange(&de_lock,1)) Sleep(0); // lock the data engine
+	//	while(AtomicExchange(&de_lock,1)) SLEEP(0); // lock the data engine
 
 	//	active_types.push_back(Data_Type(ptr));
 

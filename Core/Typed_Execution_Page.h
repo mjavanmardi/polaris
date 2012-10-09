@@ -17,8 +17,10 @@ struct Typed_Execution_Page
 		const int num_cells=(Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType);
 		
 		ptex_current_revision=-1;
-		ptex_next_revision=LLONG_MAX;
-		ptex_next_next_revision=LLONG_MAX;
+		ptex_next_revision.iteration=LONG_MAX;
+		ptex_next_revision.sub_iteration=0;
+		ptex_next_next_revision.iteration=LONG_MAX;
+		ptex_next_next_revision.sub_iteration=0;
 		ptex_lock=0;
 		ptex_threads_counter=0;
 
@@ -52,6 +54,8 @@ struct Typed_Execution_Page
 	Execution_Object* first_free_cell;
 };
 
+
+
 ///============================================================================
 /// Typed_Execution_Pages
 /// Singleton object by type, holds information about pages currently assigned
@@ -59,21 +63,21 @@ struct Typed_Execution_Page
 /// Performs execution for the associate type
 ///============================================================================
 
-typedef void (*Execution_Condition)(void*,Revision&);
-
 template<typename DataType>
 class Typed_Execution_Pages
 {
 public:
-	Typed_Execution_Pages():stride(sizeof(DataType)),num_cells((Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType)),
-		process_directive((Execution_Condition)&Execution_Loop<(Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType),sizeof(DataType)>),
-		type_activated(false)
+	Typed_Execution_Pages(Execution_Directive execution_function):stride(sizeof(DataType)),type_activated(false),
+	num_cells((Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType)),
+	process_directive(execution_function)
 	{
 		tex_lock=0;
-
+		
 		tex_current_revision=-1;
-		tex_next_revision=LLONG_MAX;
-		tex_next_next_revision=LLONG_MAX;
+		tex_next_revision.iteration=LONG_MAX;
+		tex_next_revision.sub_iteration=0;
+		tex_next_next_revision.iteration=LONG_MAX;
+		tex_next_next_revision.sub_iteration=0;
 		
 		//event_register=nullptr;
 		//conditional_register=nullptr;
@@ -91,37 +95,37 @@ public:
 		return Revision(tex_next_revision);
 	}
 
-	template<typename ThisType>
-	void Load_Register(Conditional conditional,Event p_event,int start)
-	{
-		conditional_register=conditional;
-		event_register=p_event;
-	}
+	//template<typename ComponentType>
+	//void Load_Register(Conditional conditional,Event p_event,int start);
+	//{
+	//	conditional_register=conditional;
+	//	event_register=p_event;
+	//}
 
 	//__forceinline int next_iteration()
 	//{
 	//	return tex_next_next_revision.iteration;
 	//}
-
+	
 	void Process(Revision& tex_response)
 	{
 		Revision this_revision;
 		this_revision.sub_iteration = sub_iteration;
 		this_revision.iteration = iteration;
 
-		list<Typed_Execution_Page<DataType>*>::iterator itr;
+		typename list<Typed_Execution_Page<DataType>*>::iterator itr;
 
 		Byte* current_page;
 
 		const int header_size=sizeof(Typed_Execution_Page<DataType>);
 		
 		Typed_Execution_Page<>* execution_page;
-
+		
 		for(itr=active_pages.begin();itr!=active_pages.end();++itr)
 		{
 			execution_page = (*itr);
-
-			long process = _InterlockedIncrement(&execution_page->ptex_threads_counter);
+			
+			long process = AtomicIncrement(&execution_page->ptex_threads_counter);
 
 			if(process == 1)
 			{
@@ -132,31 +136,32 @@ public:
 				if(ptex_response == this_revision)
 				{
 					ptex_response=execution_page->ptex_next_next_revision;
-
+					
 					current_page=((Byte*)execution_page)+header_size;
-
+					
 					(*process_directive)(current_page,ptex_response);
 					
 					// extend shorthand iteration to include sub_iteration
 					if(ptex_response.iteration == this_revision.iteration) ptex_response.sub_iteration=this_revision.sub_iteration+1;
 					else ptex_response.sub_iteration=0;
 					
-					while(_InterlockedExchange(&execution_page->ptex_lock,1)) Sleep(0); // lock the page
-
+					while(AtomicExchange(&execution_page->ptex_lock,1)) SLEEP(0); // lock the page
+					
 					if(ptex_response < execution_page->ptex_next_next_revision)
 					{
 						// PTEX wishes to return sooner in the future than already assumed
 						// should be assumed that these are strictly ordered: execution_page->ptex_next_revision < execution_page->ptex_next_next_revision
 						execution_page->ptex_next_next_revision=ptex_response;
 					}
-
+					
 					execution_page->ptex_current_revision=this_revision;
 					execution_page->ptex_next_revision=execution_page->ptex_next_next_revision;
-					execution_page->ptex_next_next_revision=LLONG_MAX;
-
+					execution_page->ptex_next_next_revision.iteration=LONG_MAX;
+					execution_page->ptex_next_next_revision.sub_iteration=0;
+					
 					execution_page->ptex_lock=0; // unlock the page
 				}
-
+				
 				if(ptex_response < tex_response)
 				{
 					tex_response=ptex_response;
@@ -170,42 +175,8 @@ public:
 		}
 	}
 	
-	DataType* Allocate()
-	{
-		if(world_ptr->run) while(_InterlockedExchange(&mem_lock,1)) Sleep(0); // lock the mem
-		
-		if(pages_with_free_cells.size()==0)
-		{
-			if(!type_activated && !world_ptr->run)
-			{
-				execution_root_ptr->Activate_Type((Typed_Execution_Pages<>*)this);
-				type_activated=true;
-			}
-			else if(!type_activated) return nullptr;
-
-			Typed_Execution_Page<DataType>* new_page=(Typed_Execution_Page<DataType>*)memory_root_ptr->Allocate();
-
-			new_page->Initialize();
-			
-			pages_with_free_cells.push_back(new_page);
-			
-			active_pages.push_back(new_page);
-		}
-		
-		Byte* return_value=(Byte*)(pages_with_free_cells.front()->Allocate());
-
-		if((Byte*)pages_with_free_cells.front()->first_free_cell==((Byte*)pages_with_free_cells.front()+sizeof(Typed_Execution_Page<DataType>))+num_cells*stride)
-		{
-			pages_with_free_cells.pop_front();
-		}
-
-		new (return_value) DataType();
-
-		if(world_ptr->run) mem_lock=0; // unlock the mem
-
-		return (DataType*)return_value;
-	}
-
+	DataType* Allocate();
+	
 	list<Typed_Execution_Page<DataType>*> active_pages;
 	
 	list<Typed_Execution_Page<DataType>*> pages_with_free_cells;
@@ -225,9 +196,8 @@ public:
 	const unsigned int stride;
 	
 	const unsigned int num_cells;
-
-	const Execution_Condition process_directive;
-
-	//Event event_register;
-	//Conditional conditional_register;
+	
+	const Execution_Directive process_directive;
 };
+
+

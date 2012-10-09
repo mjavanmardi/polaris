@@ -73,41 +73,8 @@ public:
 		mem_lock=0;
 	}
 	
-	DataType* Allocate()
-	{
-		while(_InterlockedExchange(&mem_lock,1)) Sleep(0); // lock the page
+	DataType* Allocate();
 
-		if(pages_with_free_cells.size()==0)
-		{
-			//if(!type_activated && !world_ptr->run)
-			//{
-			//	data_root_ptr->Activate_Type((Typed_Data_Pages<>*)this);
-			//	type_activated=true;
-			//}
-			//else assert(false);
-
-			Typed_Data_Page<DataType>* new_page=(Typed_Data_Page<DataType>*)memory_root_ptr->Allocate();
-
-			new_page->Initialize();
-			
-			pages_with_free_cells.push_back(new_page);
-			
-			active_pages.push_back(new_page);
-		}
-
-		Byte* return_value=(Byte*)(pages_with_free_cells.front()->Allocate());
-		
-		new (return_value) DataType();
-
-		if((Byte*)pages_with_free_cells.front()->first_free_cell==((Byte*)pages_with_free_cells.front()+sizeof(Typed_Data_Page<DataType>))+num_cells*stride)
-		{
-			pages_with_free_cells.pop_front();
-		}
-		
-		mem_lock=0; // unlock the page
-
-		return (DataType*)return_value;
-	}
 
 	//	void Free(Data_Object<DataType>* cell)
 	//	{

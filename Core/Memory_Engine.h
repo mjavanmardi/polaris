@@ -18,7 +18,11 @@ public:
 
 	Memory_Root()
 	{
+#ifdef WINDOWS
 		pages=(Memory_Page*)VirtualAlloc(nullptr,Page_Size*Max_Pages,MEM_COMMIT,PAGE_READWRITE);
+#else
+		pages=(Memory_Page*)malloc(Page_Size*Max_Pages);
+#endif
 		end_page=pages+Max_Pages;
 		first_free_page=pages;
 		
@@ -71,16 +75,7 @@ public:
 
 static Memory_Root* memory_root_ptr;
 
-///============================================================================
-/// Allocate
-/// Multiple allocation calls to allocate and construct memory
-///============================================================================
 
-template<typename DataType>
-void* Allocate(void)
-{
-	return (void*)DataType::allocator_template<DataType>::allocator_reference.Allocate();
-}
 
 //template<typename DataType>
 //void Free(DataType*& value)

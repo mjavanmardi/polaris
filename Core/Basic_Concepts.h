@@ -30,24 +30,23 @@ struct False_Concept
 
 concept Is_Polaris_Component
 {
-	begin_requirements_list;
+	begin_requirements_list(none);
 
 	requires_typename_defined(none,This_Type,"Type is not self-aware");
 	requires_typename_defined(This_Type,Parent_Type,"Type is not aware of parent type");
-	requires_typename_defined(Parent_Type,Object_Type,"Type is not aware of object type");
-	requires_typename_defined(Object_Type,Base_Type,"Type is not aware of base type");
-	requires_typename_defined(Base_Type,Interface_Type,"Type is not aware of interface type");
-	requires_typename_defined(Interface_Type,Dispatched,"Type is not aware of dispatch capability");
-	requires_typename_defined(Dispatched,Master_Type,"Type is not aware of entity");
+	requires_typename_defined(Parent_Type,Group_List,"Type is not aware of group list");
+	requires_typename_defined(Group_List,Object_Type,"Type is not aware of object type");
+	requires_typename_defined(Object_Type,Master_Type,"Type is not aware of master type");
 
 	end_requirements_list(Master_Type);
 };
 
 concept Is_Data_Object
 {
-	begin_requirements_list;
+	begin_requirements_list(none);
 
 	requires_concept(none,Is_Polaris_Component);
+	
 	requires_typename_state(Is_Polaris_Component,Object_Type,Data_Object,"Type is not a Data_Object");
 
 	end_requirements_list(Object_Type);
@@ -55,7 +54,7 @@ concept Is_Data_Object
 
 concept Is_Execution_Object
 {
-	begin_requirements_list;
+	begin_requirements_list(none);
 
 	requires_concept(none,Is_Polaris_Component);
 	requires_typename_state(Is_Polaris_Component,Object_Type,Execution_Object,"Type is not an Execution_Object");
@@ -69,10 +68,9 @@ concept Is_Execution_Object
 
 concept Is_Dispatchable
 {
-	begin_requirements_list;
+	begin_requirements_list(none);
 
-	requires_concept(none,Is_Polaris_Component);
-	requires_typename_state(Is_Polaris_Component,Dispatched,false_type,"Type has already been Dispatched or Dispatched has not been defined");
+	requires_typename_state(none,Dispatched,false_type,"Type has already been Dispatched or Dispatched has not been defined");
 
 	end_requirements_list(Dispatched);
 };
@@ -83,10 +81,9 @@ concept Is_Dispatchable
 
 concept Is_Dispatched
 {
-	begin_requirements_list;
+	begin_requirements_list(none);
 
-	requires_concept(none,Is_Polaris_Component);
-	requires_typename_state(Is_Polaris_Component,Dispatched,true_type,"Type has not been Dispatched or Dispatched has not been defined");
+	requires_typename_state(none,Dispatched,true_type,"Type has not been Dispatched or Dispatched has not been defined");
 	
 	end_requirements_list(Dispatched);
 };
@@ -107,12 +104,12 @@ struct Dispatch:public T
 
 concept Is_Same_Entity
 {
-	begin_requirements_list;
+	begin_requirements_list(none);
 
 	requires_concept(none,Is_Polaris_Component);
-	requires_typename_match(Is_Polaris_Component,Master_Type,"Entity tags do not match!");
+	requires_typename_match(Is_Polaris_Component,Entity_Type,"Entity tags do not match!");
 	
-	end_requirements_list(Master_Type);
+	end_requirements_list(Entity_Type);
 };
 
 ///============================================================================
@@ -121,13 +118,14 @@ concept Is_Same_Entity
 
 concept Is_Same_Component
 {
-	begin_requirements_list;
+	begin_requirements_list(none);
 
 	requires_concept(none,Is_Polaris_Component);
 	requires_typename_match(Is_Polaris_Component,This_Type,"Type tags do not match!");
 	
 	end_requirements_list(This_Type);
 };
+
 
 /////============================================================================
 ///// Is_Property - check whether component may be owned

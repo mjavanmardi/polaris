@@ -18,9 +18,7 @@ class Data_Root;
 struct Data_Object
 {
 	permit_state_checking;
-
-	template<typename T> struct allocator_template{static Typed_Data_Pages<T> allocator_reference;};
-
+	
 	union
 	{
 		Event event_register;
@@ -31,10 +29,6 @@ struct Data_Object
 		};
 	};
 };
-
-template<typename T>
-Typed_Data_Pages<T> Data_Object::allocator_template<T>::allocator_reference=Typed_Data_Pages<T>();
-
 
 
 

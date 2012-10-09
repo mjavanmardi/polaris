@@ -117,7 +117,7 @@ public:
 				return true;
 			}
 
-			Sleep(10);
+			SLEEP(10);
 		}
 
 		return true;

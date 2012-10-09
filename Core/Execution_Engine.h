@@ -13,8 +13,10 @@ public:
 	Execution_Root()
 	{
 		ex_current_revision=-1;
-		ex_next_revision=LLONG_MAX;
-		ex_next_next_revision=LLONG_MAX;
+		ex_next_revision.iteration=LONG_MAX;
+		ex_next_revision.sub_iteration=0;
+		ex_next_next_revision.iteration=LONG_MAX;
+		ex_next_next_revision.sub_iteration=0;
 
 		ex_lock=0;
 
@@ -62,11 +64,11 @@ public:
 					tex_response=execution_type->tex_next_next_revision;
 
 					// process one slice of the TEX
-
+					
 					itr->typed_execution_pages->Process(tex_response);
-
-					while(_InterlockedExchange(&execution_type->tex_lock,1)) Sleep(0); // lock the type
-
+					
+					while(AtomicExchange(&execution_type->tex_lock,1)) SLEEP(0); // lock the type
+			
 					// TEX slice has revealed that it wishes to return some time in the future
 
 					if(tex_response < execution_type->tex_next_next_revision)
@@ -80,16 +82,9 @@ public:
 						// final thread, in charge of getting ready for the next revision, but only if something actually happened this revision
 						execution_type->tex_current_revision=this_revision;
 						execution_type->tex_next_revision=execution_type->tex_next_next_revision;
-						execution_type->tex_next_next_revision=LLONG_MAX;
+						execution_type->tex_next_next_revision.iteration=LONG_MAX;
+						execution_type->tex_next_next_revision.sub_iteration=0;
 						execution_type->tex_threads_counter=0;
-
-						// fire the post-event
-						//if(execution_type->conditional_register!=nullptr)
-						//{
-						//	((Execution_Object*)page)->conditional_register(page,optex_response);
-						//	((Execution_Object*)page)->next_iteration=optex_response.next;
-						//	if(optex_response.result) ((Execution_Object*)page)->event_register(page);
-						//}
 					}
 
 					execution_type->tex_lock=0; // unlock the type
@@ -101,8 +96,10 @@ public:
 				}
 			}
 
-			while(_InterlockedExchange(&ex_lock,1)) Sleep(0); // lock the execution engine
 
+					
+			while(AtomicExchange(&ex_lock,1)) SLEEP(0); // lock the execution engine
+			
 			// EX slice has revealed that it wishes to return some time in the future
 			
 			if(ex_response < ex_next_next_revision)
@@ -110,19 +107,17 @@ public:
 				// EX slice wishes to return sooner in the future than already assumed
 				ex_next_next_revision=ex_response;
 			}
-
+			
 			ex_lock=0; // unlock the execution engine
-
-
-
 			
 			// collect all threads and advance the sub_iteration
-
-			if(_InterlockedIncrement(&ex_threads_counter_begin) == num_threads)
+			
+			if(AtomicIncrement(&ex_threads_counter_begin) == num_threads)
 			{
 				ex_current_revision=this_revision;
 				ex_next_revision=ex_next_next_revision;
-				ex_next_next_revision=LLONG_MAX;
+				ex_next_next_revision.iteration=LONG_MAX;
+				ex_next_next_revision.sub_iteration=0;
 
 				sub_tick_tock=!sub_tick_tock;
 				sub_iteration++;
@@ -131,26 +126,24 @@ public:
 			}
 			else
 			{
-				while(_InterlockedCompareExchange(&ex_threads_counter_begin,0,0)) Sleep(0);
+				while(AtomicCompareExchange(&ex_threads_counter_begin,0,0)) SLEEP(0);
 			}
-
+			
 			this_revision.sub_iteration = sub_iteration;
 			this_revision.iteration = iteration;
-
-			
 			
 			if(ex_next_revision == this_revision)
 			{
 				// if the iteration will be repeated, make sure all threads are collected before starting the new loop
-				// this prevents threads from getting stuck in the previous _InterlockedCompareExchange
+				// this prevents threads from getting stuck in the previous AtomicCompareExchange
 
-				if(_InterlockedIncrement(&ex_threads_counter_end) == num_threads)
+				if(AtomicIncrement(&ex_threads_counter_end) == num_threads)
 				{
 					ex_threads_counter_end=0;
 				}
 				else
 				{
-					while(_InterlockedCompareExchange(&ex_threads_counter_end,0,0)) Sleep(0);
+					while(AtomicCompareExchange(&ex_threads_counter_end,0,0)) SLEEP(0);
 				}
 			}
 		}

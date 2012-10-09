@@ -1,25 +1,56 @@
 #pragma once
 
+#define WINDOWS
+
 #include <list>
 #include <vector>
 #include <set>
 #include <deque>
 #include <queue>
 #include <string>
+
+#ifdef WINDOWS
 #include <Windows.h>
 #include <WinBase.h>
-#include <intrin.h>
+#include <type_traits>
+#include <random>
+#else
+#include <limits.h>
+#include <pthread.h>
+#define __forceinline inline
+#endif
+
 #include <sstream>
 #include <iostream>
-#include <type_traits>
+
 #include <assert.h>
 #include <cstdarg>
 #include <set>
-#include <random>
+
 #include <fstream>
 #include "Run_Parameters.h"
 using namespace std;
 
+
+#ifdef WINDOWS
+#include <intrin.h>
+#define AtomicExchange(TARGET,VALUE) _InterlockedExchange(TARGET,VALUE)
+#define AtomicIncrement(TARGET) _InterlockedIncrement(TARGET)
+#define AtomicDecrement(TARGET) _InterlockedIncrement(TARGET)
+#define AtomicCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE) _InterlockedCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE)
+#else
+static const int inc_val=1;
+#define AtomicExchange(TARGET,VALUE) __sync_val_compare_and_swap(TARGET,VALUE,true)
+#define AtomicIncrement(TARGET) (__sync_fetch_and_add(TARGET,inc_val)+inc_val)
+#define AtomicDecrement(TARGET) (__sync_fetch_and_sub(TARGET,inc_val)-inc_val)
+#define AtomicCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE) __sync_val_compare_and_swap(TARGET,EXCHANGE_VALUE,COMPARE_VALUE)
+#endif
+
+#ifdef WINDOWS
+#define SLEEP(Seconds) Sleep(Seconds*1000)
+#else
+#define SLEEP(Seconds) sleep(Seconds)
+#endif
 class NULLCLASS{};
 
 #define nullptr NULL
@@ -38,11 +69,13 @@ typedef char Page[Page_Size];
 static volatile long long* request_sum=new volatile long long();
 static volatile long long* exec_sum=new volatile long long();
 
+#ifdef WINDOWS
 __declspec(thread) int thread_id;
+#else
+int thread_id;
+#endif
 
 typedef char Byte;
-
-//unsigned int thread_stats[num_threads];
 
 template<int Size>
 struct Bytes{char bytes[Size];};
@@ -61,6 +94,7 @@ struct Conditional_Response
 	bool result;
 };
 
+
 union Revision
 {
 	Revision():revision(0){};
@@ -69,13 +103,19 @@ union Revision
 
 	inline void operator = (const long long val){revision=val;}
 	inline operator long long&(){return revision;}
-
+#ifdef WINDOWS
 	struct
 	{
 		long sub_iteration;
 		long iteration;
 	};
-
+#else
+	struct
+	{
+		long iteration;
+		long sub_iteration;
+	};
+#endif
 	long long revision;
 };
 
@@ -84,12 +124,6 @@ static long& sub_iteration=revision.sub_iteration;
 static long& iteration=revision.iteration;
 
 typedef void (*Conditional)(void*,Conditional_Response&);
-
-
-//static void False(void*,Conditional_Response& rsp){rsp.result=false;rsp.next=INT_MAX;}
-//
-//template<int Delay>
-//static void True(void*,Conditional_Response& rsp){rsp.result=true;rsp.next=iteration+Delay;}
 
 #define typedef_template(TYPEDEF_NAME,TEMPLATE_NAME) template<typename T> struct TYPEDEF_NAME{typedef TEMPLATE_NAME<T> Type;}
 

@@ -15,6 +15,7 @@ struct member_function_ptr_types
 	typedef void (Type::* type)(void);
 };
 
+/*
 ///============================================================================
 /// Type_Info Wrapper Class
 ///============================================================================
@@ -33,6 +34,7 @@ public:
 };
 
 static bool operator==(const Type_Info& A,const Type_Info& B){return (*A.pInfo_)==(*B.pInfo_);}
+*/
 
 ///============================================================================
 /// Basic Type Traits
@@ -46,13 +48,13 @@ template<> struct test_condition<true>{typedef true_type type;};
 ///============================================================================
 
 template<class T,class U>
-struct Typelist
+struct TypeList
 {
 	typedef T Head;
 	typedef U Tail;
 };
 
-#define TYPELIST_1(T1) Typelist<T1,NULLTYPE>
+#define TYPELIST_1(T1) TypeList<T1,NULLTYPE>
 
 ///============================================================================
 /// IndexOf Implementation
@@ -62,9 +64,25 @@ template<class TList, class T> struct IndexOf;
 
 template<class T> struct IndexOf<NULLTYPE,T>{enum{value = -1 };};
 
-template<class T, class Tail> struct IndexOf<Typelist<T, Tail>,T>{enum{value = 0 };};
+template<class T, class Tail> struct IndexOf<TypeList<T, Tail>,T>{enum{value = 0 };};
 
-template<class Head, class Tail, class T> struct IndexOf<Typelist<Head, Tail>, T>{private:enum { temp = IndexOf<Tail, T>::value };public:enum { value = temp == -1 ? -1 : 1 + temp };};
+template<class Head, class Tail, class T> struct IndexOf<TypeList<Head, Tail>, T>{private:enum { temp = IndexOf<Tail, T>::value };public:enum { value = temp == -1 ? -1 : 1 + temp };};
+
+///============================================================================
+/// ValidIndex Implementation
+///============================================================================
+
+template<int Index>
+struct ValidIndex
+{
+	typedef true_type type;
+};
+
+template<>
+struct ValidIndex<-1>
+{
+	typedef false_type type;
+};
 
 ///============================================================================
 /// Length Implementation
@@ -72,7 +90,7 @@ template<class Head, class Tail, class T> struct IndexOf<Typelist<Head, Tail>, T
 
 template<class TList> struct Length;template <> struct Length<NULLTYPE>{enum { value = 0 };};
 
-template<class T, class U> struct Length<Typelist<T, U>>{enum { value = 1 + Length<U>::value };};
+template<class T, class U> struct Length<TypeList<T, U>>{enum { value = 1 + Length<U>::value };};
 
 ///============================================================================
 /// Append Implementation
@@ -82,11 +100,56 @@ template<class TList, class T> struct Append;
 
 template<> struct Append<NULLTYPE, NULLTYPE>{typedef NULLTYPE Result;};
 
-template<class T> struct Append<NULLTYPE, T>{typedef TYPELIST_1(T) Result;};
+template<class T> struct Append<NULLTYPE, T>{typedef TypeList<T,NULLTYPE> Result;};
 
-template<class Head, class Tail> struct Append<NULLTYPE, Typelist<Head, Tail> >{typedef Typelist<Head, Tail> Result;};
+template<class Head, class Tail> struct Append<NULLTYPE, TypeList<Head, Tail> >{typedef TypeList<Head, Tail> Result;};
 
-template<class Head, class Tail, class T> struct Append<Typelist<Head, Tail>, T>{typedef Typelist<Head,typename Append<Tail, T>::Result> Result;};
+template<class Head, class Tail, class T> struct Append<TypeList<Head, Tail>, T>{typedef TypeList<Head,typename Append<Tail, T>::Result> Result;};
+
+///============================================================================
+/// Erase Implementation
+///============================================================================
+
+template <class TList, class T> struct Erase;
+
+template <class T>
+struct Erase<NULLTYPE, T>
+{
+	typedef NULLTYPE Result;
+};
+
+template <class T, class Tail>
+struct Erase<TypeList<T, Tail>, T>
+{
+	typedef Tail Result;
+};
+
+template <class Head, class Tail, class T>
+struct Erase<TypeList<Head, Tail>, T>
+{
+	typedef TypeList<Head,typename Erase<Tail, T>::Result> Result;
+};
+
+///============================================================================
+/// Remove Duplicates Implementation
+///============================================================================
+
+template <class TList> struct RemoveDuplicates;
+
+template <> struct RemoveDuplicates<NULLTYPE>
+{
+	typedef NULLTYPE Result;
+};
+
+template <class Head, class Tail>
+struct RemoveDuplicates< TypeList<Head, Tail> >
+{
+private:
+	typedef typename RemoveDuplicates<Tail>::Result L1;
+	typedef typename Erase<L1, Head>::Result L2;
+public:
+	typedef TypeList<Head, L2> Result;
+};
 
 ///============================================================================
 /// IsTrue Implementation
@@ -95,7 +158,7 @@ template<class Head, class Tail, class T> struct Append<Typelist<Head, Tail>, T>
 template<class TList,unsigned int index=Length<TList>::value-1> struct IsTrue;
 
 template<class Head,class Tail>
-struct IsTrue<Typelist<Head,Tail>,0>{static const bool value=Head::value;};
+struct IsTrue<TypeList<Head,Tail>,0>{static const bool value=Head::value;};
 
 template<class Head,class Tail,unsigned int i>
-struct IsTrue<Typelist<Head,Tail>,i>{static const bool value=Head::value && IsTrue<Tail,i-1>::value;};
+struct IsTrue<TypeList<Head,Tail>,i>{static const bool value=Head::value && IsTrue<Tail,i-1>::value;};

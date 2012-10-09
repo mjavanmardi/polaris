@@ -11,7 +11,7 @@
 /// facet_base - standard declarator for all base facets
 ///============================================================================
 
-#define facet_base public: template<typename ThisType,typename CallerType,typename TargetType>
+#define facet_base public: template<typename ComponentType,typename CallerType,typename TargetType>
 
 ///============================================================================
 /// declare_facet_event - header for a basic event facet
@@ -21,7 +21,7 @@ struct event_type{};
 
 #define declare_facet_event(FACET_NAME)\
 	typedef event_type FACET_NAME##_event_tag;\
-	template<typename TargetType> static void FACET_NAME(ThisType* pthis)
+	template<typename TargetType> static void FACET_NAME(void* _this)
 
 template<typename Type>
 struct member_function_ptr_types<Type,event_type>
@@ -37,7 +37,7 @@ struct conditional_type{};
 
 #define declare_facet_conditional(FACET_NAME)\
 	typedef conditional_type FACET_NAME##_conditional_tag;\
-	template<typename TargetType> static void FACET_NAME(ThisType* pthis,Conditional_Response& response)
+	template<typename TargetType> static void FACET_NAME(void* _this,Conditional_Response& response)
 
 template<typename Type>
 struct member_function_ptr_types<Type,conditional_type>
@@ -60,57 +60,14 @@ struct member_function_ptr_types<Type,conditional_type>
 		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
 	};\
 	template<typename TargetType>\
-	TargetType FACET_NAME(call_requirements((requires(ThisType,Is_Dispatchable) && requires(ThisType,FACET_NAME##_get_check))))\
+	TargetType FACET_NAME(call_requirements((requires(ComponentType,FACET_NAME##_get_check))))\
 	{\
-		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>();\
+		return component_cast_self().template FACET_NAME<ComponentType,CallerType,TargetType>();\
 	}\
 	template<typename TargetType>\
-	TargetType FACET_NAME(call_requirements(!(requires(ThisType,Is_Dispatchable) && requires(ThisType,FACET_NAME##_get_check))))\
+	TargetType FACET_NAME(call_requirements(!requires(ComponentType,FACET_NAME##_get_check)))\
 	{\
-		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
-	}\
-	template<typename T>\
-	struct FACET_NAME##_set_check\
-	{\
-		template<typename U> static small_type has_matching_typename(typename U::FACET_NAME##_setter_tag*);\
-		template<typename U> static large_type has_matching_typename(...);\
-		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
-	};\
-	template<typename TargetType>\
-	void FACET_NAME(TargetType set_value,call_requirements((requires(ThisType,Is_Dispatchable) && requires(ThisType,FACET_NAME##_set_check))))\
-	{\
-		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>(set_value);\
-	}\
-	template<typename TargetType>\
-	void FACET_NAME(TargetType set_value,call_requirements(!(requires(ThisType,Is_Dispatchable) && requires(ThisType,FACET_NAME##_set_check))))\
-	{\
-		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
-	}\
-
-///============================================================================
-/// facet_accessor_interface - implements the standard get and set dispatch facets
-///		takes the TargetType as the component so checks can be performed
-///		returns the interface implied by TargetType
-///============================================================================
-
-#define facet_accessor_interface(FACET_NAME)\
-	public:\
-	template<typename T>\
-	struct FACET_NAME##_get_check\
-	{\
-		template<typename U> static small_type has_matching_typename(typename U::FACET_NAME##_getter_tag*);\
-		template<typename U> static large_type has_matching_typename(...);\
-		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
-	};\
-	template<typename TargetType>\
-	typename TargetType::Interface_Type<TargetType,CallerType>::type* FACET_NAME(call_requirements((requires(ThisType,Is_Dispatchable) && requires(ThisType,FACET_NAME##_get_check))))\
-	{\
-		return PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>();\
-	}\
-	template<typename TargetType>\
-	typename TargetType::Interface_Type<TargetType,CallerType>::type* FACET_NAME(call_requirements(!(requires(ThisType,Is_Dispatchable) && requires(ThisType,FACET_NAME##_get_check))))\
-	{\
-		static_assert(FACET_NAME##_get_check<ThisType>::value,"\n\n\n[--------- No Getter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
+		static_assert(FACET_NAME##_get_check<ComponentType>::value,"\n\n\n[--------- No Getter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
 	}\
 	template<typename T>\
 	struct FACET_NAME##_set_check\
@@ -120,15 +77,15 @@ struct member_function_ptr_types<Type,conditional_type>
 		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
 	};\
 	template<typename TargetType>\
-	void FACET_NAME(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value,call_requirements((requires(ThisType,Is_Dispatchable) && requires(ThisType,FACET_NAME##_set_check))))\
+	void FACET_NAME(TargetType set_value,call_requirements((requires(ComponentType,FACET_NAME##_set_check))))\
 	{\
-		PTHIS(ThisType)->FACET_NAME<Dispatch<ThisType>,CallerType,TargetType>(set_value);\
+		component_cast_self().template FACET_NAME<ComponentType,CallerType,TargetType>(set_value);\
 	}\
 	template<typename TargetType>\
-	void FACET_NAME(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value,call_requirements(!(requires(ThisType,Is_Dispatchable) && requires(ThisType,FACET_NAME##_set_check))))\
+	void FACET_NAME(TargetType set_value,call_requirements(!requires(ComponentType,FACET_NAME##_set_check)))\
 	{\
-		static_assert(FACET_NAME##_set_check<ThisType>::value,"\n\n\n[--------- No Setter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
-	}
+		static_assert(FACET_NAME##_set_check<ComponentType>::value,"\n\n\n[--------- No Setter Target for " #FACET_NAME " to Dispatch To! ---------]\n\n");\
+	}\
 
 
 ///============================================================================
@@ -144,7 +101,7 @@ struct member_function_ptr_types<Type,getter_type>
 };
 
 #define declare_facet_getter(FACET_NAME,ADDITIONAL_REQUIREMENTS)\
-	template<typename ThisType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS)))
+	template<typename ComponentType,typename CallerType,typename TargetType> TargetType FACET_NAME(call_requirements(requires(ComponentType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS)))
 
 #define tag_getter(FACET_NAME) typedef getter_type FACET_NAME##_getter_tag;
 
@@ -163,7 +120,7 @@ struct member_function_ptr_types<Type,setter_type>
 #define tag_setter(FACET_NAME) typedef setter_type FACET_NAME##_setter_tag;
 
 #define declare_facet_setter(FACET_NAME,ADDITIONAL_REQUIREMENTS)\
-	template<typename ThisType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS)))
+	template<typename ComponentType,typename CallerType,typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ComponentType,Is_Dispatched) && (ADDITIONAL_REQUIREMENTS)))
 
 ///============================================================================
 /// declare_facet_getter_setter - catches the standard get and set dispatches meeting concepts
@@ -175,53 +132,107 @@ struct member_function_ptr_types<Type,setter_type>
 #define tag_getter_setter(FACET_NAME) tag_getter(FACET_NAME);tag_setter(FACET_NAME)
 
 ///============================================================================
-/// member_data – data member creator, type-definition and basic accessors
+/// member_data and member_pointer – member creator, type-definition and basic accessors
 ///============================================================================
+
+#define member_pointer_basic(DATA_TYPE,FACET_NAME)\
+	protected:\
+		DATA_TYPE* _##FACET_NAME;\
+	public:\
+		typedef DATA_TYPE FACET_NAME##_type;\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!requires(TargetType,is_pointer)))\
+		{return (TargetType)(*_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(requires(TargetType,is_pointer)))\
+		{return (TargetType)(_##FACET_NAME);}\
+		tag_getter(FACET_NAME);\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer)))\
+		{(*_##FACET_NAME)=((DATA_TYPE)value);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer)))\
+		{_##FACET_NAME=(DATA_TYPE*)value;}\
+		tag_setter(FACET_NAME);
 
 #define member_data_basic(DATA_TYPE,FACET_NAME)\
 	protected:\
-	DATA_TYPE _##FACET_NAME;\
+		DATA_TYPE _##FACET_NAME;\
 	public:\
-	typedef DATA_TYPE FACET_NAME##_type;\
-	typedef strip_modifiers_nontemplate(DATA_TYPE) FACET_NAME##_type_raw;\
-	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched))){_##FACET_NAME=(DATA_TYPE)set_value;}\
-	tag_setter(FACET_NAME);\
-	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_##FACET_NAME;}\
-	tag_getter(FACET_NAME);\
+		typedef DATA_TYPE FACET_NAME##_type;\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!requires(TargetType,is_pointer)))\
+		{return (TargetType)(_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(requires(TargetType,is_pointer)))\
+		{return (TargetType)(&_##FACET_NAME);}\
+		tag_getter(FACET_NAME);\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer)))\
+		{_##FACET_NAME=((DATA_TYPE)value);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer)))\
+		{_##FACET_NAME=(DATA_TYPE)(*value);}\
+		tag_setter(FACET_NAME);
 
-#define member_data(DATA_TYPE,FACET_NAME,ADDITIONAL_REQUIREMENTS_GETTER,ADDITIONAL_REQUIREMENTS_SETTER)\
-	protected:\
-	DATA_TYPE _##FACET_NAME;\
-	public:\
-	typedef DATA_TYPE FACET_NAME##_type;\
-	typedef strip_modifiers_nontemplate(DATA_TYPE) FACET_NAME##_type_raw;\
-	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && ( ADDITIONAL_REQUIREMENTS_SETTER ))){_##FACET_NAME=(DATA_TYPE)set_value;}\
-	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(TargetType set_value,call_requirements(requires(ThisType,Is_Dispatched) && !( ADDITIONAL_REQUIREMENTS_SETTER ))){static_assert(false,"\n\n\n[--------- one or more unmatched setter requirements: " #ADDITIONAL_REQUIREMENTS_SETTER " ---------]\n\n");}\
-	tag_setter(FACET_NAME);\
-	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && ( ADDITIONAL_REQUIREMENTS_GETTER ))){return (TargetType)_##FACET_NAME;}\
-	template<typename ThisType, typename CallerType, typename TargetType> TargetType FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && !( ADDITIONAL_REQUIREMENTS_GETTER ))){static_assert(false,"\n\n\n[--------- one or more unmatched getter requirements: " #ADDITIONAL_REQUIREMENTS_GETTER " ---------]\n\n");}\
-	tag_getter(FACET_NAME);\
+///============================================================================
+/// member_component – member creator, type-definition and basic accessors
+///============================================================================
 
 #define member_component_basic(COMPONENT_TYPE,FACET_NAME)\
 	protected:\
-	COMPONENT_TYPE::Interface_Type<COMPONENT_TYPE,NULLTYPE>::type* _##FACET_NAME;\
+		COMPONENT_TYPE* _##FACET_NAME;\
 	public:\
-	typedef COMPONENT_TYPE FACET_NAME##_type;\
-	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value,call_requirements(requires(ThisType,Is_Dispatched))){_##FACET_NAME=(COMPONENT_TYPE::Interface_Type<COMPONENT_TYPE,NULLTYPE>::type*)set_value;}\
-	tag_setter(FACET_NAME);\
-	template<typename ThisType, typename CallerType, typename TargetType> typename TargetType::Interface_Type<TargetType,CallerType>::type* FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched))){return (typename TargetType::Interface_Type<TargetType,CallerType>::type*)_##FACET_NAME;}\
-	tag_getter(FACET_NAME);\
+		typedef COMPONENT_TYPE FACET_NAME##_type;\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!requires(TargetType,is_pointer)))\
+		{return (TargetType)(*_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(requires(TargetType,is_pointer)))\
+		{return (TargetType)(_##FACET_NAME);}\
+		tag_getter(FACET_NAME);\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer)))\
+		{(*_##FACET_NAME)=(COMPONENT_TYPE&)value;}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer)))\
+		{(_##FACET_NAME)=(COMPONENT_TYPE*)value;}\
+		tag_setter(FACET_NAME);
 
-#define member_component(COMPONENT_TYPE,FACET_NAME,ADDITIONAL_REQUIREMENTS_GETTER,ADDITIONAL_REQUIREMENTS_SETTER)\
+///============================================================================
+/// member_container – member creator, type-definition and basic accessors
+///============================================================================
+
+#define member_container_basic(CONTAINER_TYPE,FACET_NAME)\
 	protected:\
-	COMPONENT_TYPE::Interface_Type<COMPONENT_TYPE,NULLTYPE>::type* _##FACET_NAME;\
+		Polaris_Container<CONTAINER_TYPE> _##FACET_NAME;\
 	public:\
-	typedef COMPONENT_TYPE FACET_NAME##_type;\
-	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value,call_requirements(requires(ThisType,Is_Dispatched) && ( ADDITIONAL_REQUIREMENTS_SETTER ))){_##FACET_NAME=(COMPONENT_TYPE::Interface_Type<TargetType,CallerType>::type*)set_value;}\
-	template<typename ThisType, typename CallerType, typename TargetType> void FACET_NAME(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value,call_requirements(requires(ThisType,Is_Dispatched) && !( ADDITIONAL_REQUIREMENTS_SETTER ))){static_assert(false,"\n\n\n[--------- one or more unmatched setter requirements: " #ADDITIONAL_REQUIREMENTS_SETTER " ---------]\n\n");}\
-	tag_setter(FACET_NAME);\
-	template<typename ThisType, typename CallerType, typename TargetType> typename TargetType::Interface_Type<TargetType,CallerType>::type* FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && ( ADDITIONAL_REQUIREMENTS_GETTER ))){return (typename TargetType::Interface_Type<TargetType,CallerType>::type*)_##FACET_NAME;}\
-	template<typename ThisType, typename CallerType, typename TargetType> typename TargetType::Interface_Type<TargetType,CallerType>::type* FACET_NAME(call_requirements(requires(ThisType,Is_Dispatched) && !( ADDITIONAL_REQUIREMENTS_GETTER ))){static_assert(false,"\n\n\n[--------- one or more unmatched getter requirements: " #ADDITIONAL_REQUIREMENTS_GETTER " ---------]\n\n");}\
-	tag_getter(FACET_NAME);	
+		typedef Polaris_Container<CONTAINER_TYPE> FACET_NAME##_type;\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!requires(TargetType,is_pointer)))\
+		{return (TargetType)(_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(requires(TargetType,is_pointer)))\
+		{return (TargetType)(&_##FACET_NAME);}\
+		tag_getter(FACET_NAME);\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer)))\
+		{_##FACET_NAME=(Polaris_Container<CONTAINER_TYPE>&)value;}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer)))\
+		{_##FACET_NAME=(Polaris_Container<CONTAINER_TYPE>&)(*value);}\
+		tag_setter(FACET_NAME);
 
 
+///============================================================================
+/// local definition macros
+///============================================================================
+
+#define define_component_interface(COMPONENT_ALIAS,INTERFACE_TEMPLATE,FACET_LINKED_TO_TYPE,CALLER_TYPE) typedef INTERFACE_TEMPLATE<typename ComponentType::FACET_LINKED_TO_TYPE##_type,CALLER_TYPE> COMPONENT_ALIAS
+
+#define define_container_and_value_interface(INTERFACE_TEMPLATE,FACET_LINKED_TO_TYPE,CONTAINER_ALIAS,VALUE_INTERFACE_TEMPLATE,VALUE_ALIAS,CALLER_TYPE)\
+	typedef VALUE_INTERFACE_TEMPLATE<typename ComponentType::FACET_LINKED_TO_TYPE##_type::unqualified_value_type,CALLER_TYPE> VALUE_ALIAS;\
+	typedef INTERFACE_TEMPLATE<typename ComponentType::FACET_LINKED_TO_TYPE##_type,CALLER_TYPE,VALUE_ALIAS*> CONTAINER_ALIAS
+
+#define define_container_interface(INTERFACE_TEMPLATE,FACET_LINKED_TO_TYPE,CONTAINER_ALIAS,TARGET_VALUE_INTERFACE,CALLER_TYPE)\
+	typedef INTERFACE_TEMPLATE<typename ComponentType::FACET_LINKED_TO_TYPE##_type,CALLER_TYPE,TARGET_VALUE_INTERFACE> CONTAINER_ALIAS
