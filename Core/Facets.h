@@ -46,6 +46,31 @@ struct member_function_ptr_types<Type,conditional_type>
 };
 
 ///============================================================================
+/// define_get_set_checks - implements a mini-concept to check for base existence
+///============================================================================
+
+#define define_get_exists_check(FACET_NAME)\
+	public:\
+	template<typename T>\
+	struct FACET_NAME##_get_exists\
+	{\
+		template<typename U> static small_type has_matching_typename(typename U::FACET_NAME##_getter_tag*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	};
+
+#define define_set_exists_check(FACET_NAME)\
+	template<typename T>\
+	struct FACET_NAME##_set_exists\
+	{\
+		template<typename U> static small_type has_matching_typename(typename U::FACET_NAME##_setter_tag*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	};
+
+#define define_get_set_exist_check(FACET_NAME) define_get_exists_check(FACET_NAME) define_set_exists_check(FACET_NAME)
+
+///============================================================================
 /// facet_accessor - implements the standard get and set dispatch facets
 ///		includes a check on whether the base has corresponding dispatch
 ///============================================================================
