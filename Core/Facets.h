@@ -180,6 +180,33 @@ struct member_function_ptr_types<Type,setter_type>
 		{_##FACET_NAME=(DATA_TYPE*)value;}\
 		tag_setter(FACET_NAME);
 
+#define member_pointer(DATA_TYPE,FACET_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	protected:\
+		DATA_TYPE* _##FACET_NAME;\
+	public:\
+		typedef DATA_TYPE FACET_NAME##_type;\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		{return (TargetType)(*_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		{return (TargetType)(_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!(GETTER_REQUIREMENTS)))\
+		{static_assert(false,"\n\n\n[--------- Some of " #FACET_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
+		tag_getter(FACET_NAME);\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		{_##FACET_NAME=(DATA_TYPE*)(&value);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		{_##FACET_NAME=(DATA_TYPE*)(value);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(TargetType value, call_requirements(!(SETTER_REQUIREMENTS)))\
+		{static_assert(false,"\n\n\n[--------- Some of " #FACET_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
+		tag_setter(FACET_NAME);
+
+
 #define member_data_basic(DATA_TYPE,FACET_NAME)\
 	protected:\
 		DATA_TYPE _##FACET_NAME;\
@@ -199,6 +226,33 @@ struct member_function_ptr_types<Type,setter_type>
 		void FACET_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer)))\
 		{_##FACET_NAME=(DATA_TYPE)(*value);}\
 		tag_setter(FACET_NAME);
+
+#define member_data(DATA_TYPE,FACET_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	protected:\
+		DATA_TYPE _##FACET_NAME;\
+	public:\
+		typedef DATA_TYPE FACET_NAME##_type;\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		{return (TargetType)(_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		{return (TargetType)(&_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!(GETTER_REQUIREMENTS)))\
+		{static_assert(false,"\n\n\n[--------- Some of " #FACET_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
+		tag_getter(FACET_NAME);\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		{_##FACET_NAME=((DATA_TYPE)value);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		{_##FACET_NAME=(DATA_TYPE)(*value);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(TargetType value, call_requirements(!(SETTER_REQUIREMENTS)))\
+		{static_assert(false,"\n\n\n[--------- Some of " #FACET_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
+		tag_setter(FACET_NAME);
+
 
 ///============================================================================
 /// member_component – member creator, type-definition and basic accessors
@@ -224,6 +278,32 @@ struct member_function_ptr_types<Type,setter_type>
 		{(_##FACET_NAME)=(COMPONENT_TYPE*)value;}\
 		tag_setter(FACET_NAME);
 
+#define member_component(COMPONENT_TYPE,FACET_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	protected:\
+		COMPONENT_TYPE* _##FACET_NAME;\
+	public:\
+		typedef COMPONENT_TYPE FACET_NAME##_type;\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		{return (TargetType)(*_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		{return (TargetType)(_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!(GETTER_REQUIREMENTS)))\
+		{static_assert(false,"\n\n\n[--------- Some of " #FACET_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
+		tag_getter(FACET_NAME);\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		{_##FACET_NAME=((COMPONENT_TYPE*)(&value);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		{_##FACET_NAME=(COMPONENT_TYPE)(*value);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(TargetType value, call_requirements(!(SETTER_REQUIREMENTS)))\
+		{static_assert(false,"\n\n\n[--------- Some of " #FACET_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
+		tag_setter(FACET_NAME);
+
 ///============================================================================
 /// member_container – member creator, type-definition and basic accessors
 ///============================================================================
@@ -246,6 +326,33 @@ struct member_function_ptr_types<Type,setter_type>
 		template<typename ComponentType, typename CallerType, typename TargetType>\
 		void FACET_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer)))\
 		{_##FACET_NAME=(Polaris_Container<CONTAINER_TYPE>&)(*value);}\
+		tag_setter(FACET_NAME);
+
+
+#define member_container(CONTAINER_TYPE,FACET_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	protected:\
+		Polaris_Container<CONTAINER_TYPE> _##FACET_NAME;\
+	public:\
+		typedef Polaris_Container<CONTAINER_TYPE> FACET_NAME##_type;\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		{return (TargetType)(_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		{return (TargetType)(&_##FACET_NAME);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(call_requirements(!(GETTER_REQUIREMENTS)))\
+		{static_assert(false,"\n\n\n[--------- Some of " #FACET_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
+		tag_getter(FACET_NAME);\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		{_##FACET_NAME=(Polaris_Container<CONTAINER_TYPE>&)value;}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		void FACET_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		{_##FACET_NAME=(Polaris_Container<CONTAINER_TYPE>&)(*value);}\
+		template<typename ComponentType, typename CallerType, typename TargetType>\
+		TargetType FACET_NAME(TargetType value, call_requirements(!(SETTER_REQUIREMENTS)))\
+		{static_assert(false,"\n\n\n[--------- Some of " #FACET_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
 		tag_setter(FACET_NAME);
 
 
