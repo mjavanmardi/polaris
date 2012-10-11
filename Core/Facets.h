@@ -68,7 +68,7 @@ struct member_function_ptr_types<Type,conditional_type>
 		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
 	};
 
-#define define_get_set_exist_check(FACET_NAME) define_get_exists_check(FACET_NAME) define_set_exists_check(FACET_NAME)
+#define define_get_set_exists_check(FACET_NAME) define_get_exists_check(FACET_NAME) define_set_exists_check(FACET_NAME)
 
 ///============================================================================
 /// facet_accessor - implements the standard get and set dispatch facets
