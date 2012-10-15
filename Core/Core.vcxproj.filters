@@ -29,9 +29,6 @@
     <ClInclude Include="Execution_Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Facets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Generic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -69,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Grouping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Features.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

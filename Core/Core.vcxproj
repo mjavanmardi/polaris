@@ -120,7 +120,7 @@
     <ClInclude Include="Data_Object.h" />
     <ClInclude Include="Execution_Engine.h" />
     <ClInclude Include="Execution_Object.h" />
-    <ClInclude Include="Facets.h" />
+    <ClInclude Include="Features.h" />
     <ClInclude Include="Generic.h" />
     <ClInclude Include="Grouping.h" />
     <ClInclude Include="Interprocess.h" />

@@ -8,23 +8,23 @@
 /// Polaris_Component - adds base, with parent
 ///============================================================================
 
-template<template<class> class BaseTemplate=NULLTEMPLATE,typename MasterType=NULLTYPE,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE,typename ObjectType=Data_Object>
+template<template<class> class ImplementationTemplate=NULLTEMPLATE,typename MasterType=NULLTYPE,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE,typename ObjectType=Data_Object>
 class Polaris_Component:
 	public Polaris_Component<NULLTEMPLATE,NULLTYPE,ParentType,NULLTYPE,ObjectType>,
-	public BaseTemplate<MasterType>
+	public ImplementationTemplate<MasterType>
 {
 public:
 #if STATE_CHECKS
 	virtual void State_Check(){};
 #endif
 #ifdef WINDOWS
-	friend BaseTemplate<MasterType>;
+	friend ImplementationTemplate<MasterType>;
 #else
-	friend class BaseTemplate<MasterType>;
+	friend class ImplementationTemplate<MasterType>;
 #endif
 	
 	typedef Polaris_Component This_Type;
-	typedef Polaris_Component Base_Type;
+	typedef Polaris_Component Implementation_Type;
 	typedef ObjectType Object_Type;
 	typedef MasterType Master_Type;
 
@@ -39,23 +39,23 @@ public:
 /// Polaris_Component - adds base, no parent
 ///============================================================================
 
-template<template<class> class BaseTemplate,typename MasterType,typename GroupList,typename ObjectType>
-class Polaris_Component<BaseTemplate,MasterType,NULLTYPE,GroupList,ObjectType>:
+template<template<class> class ImplementationTemplate,typename MasterType,typename GroupList,typename ObjectType>
+class Polaris_Component<ImplementationTemplate,MasterType,NULLTYPE,GroupList,ObjectType>:
 	public ObjectType,
-	public BaseTemplate<MasterType>
+	public ImplementationTemplate<MasterType>
 {
 public:
 #if STATE_CHECKS
 	virtual void State_Check(){};
 #endif
 #ifdef WINDOWS
-	friend BaseTemplate<MasterType>;
+	friend ImplementationTemplate<MasterType>;
 #else
-	friend class BaseTemplate<MasterType>;
+	friend class ImplementationTemplate<MasterType>;
 #endif
 
 	typedef Polaris_Component This_Type;
-	typedef Polaris_Component Base_Type;
+	typedef Polaris_Component Implementation_Type;
 	typedef ObjectType Object_Type;
 	typedef MasterType Master_Type;
 	
@@ -99,22 +99,22 @@ public:
 /// Polaris_Component_Execution - adds base, with parent
 ///============================================================================
 
-template<template<class> class BaseTemplate=NULLTEMPLATE,typename MasterType=NULLTYPE,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE>
+template<template<class> class ImplementationTemplate=NULLTEMPLATE,typename MasterType=NULLTYPE,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE>
 class Polaris_Component_Execution:
 	public Polaris_Component_Execution<NULLTEMPLATE,NULLTYPE,ParentType,NULLTYPE>,
-	public BaseTemplate<MasterType>
+	public ImplementationTemplate<MasterType>
 {
 public:
 #if STATE_CHECKS
 	virtual void State_Check(){};
 #endif
 #ifdef WINDOWS
-	friend BaseTemplate<MasterType>;
+	friend ImplementationTemplate<MasterType>;
 #else
-	friend class BaseTemplate<MasterType>;
+	friend class ImplementationTemplate<MasterType>;
 #endif
 
-	typedef Polaris_Component_Execution Base_Type;
+	typedef Polaris_Component_Execution Implementation_Type;
 	typedef Polaris_Component_Execution This_Type;
 	typedef Execution_Object Object_Type;
 	typedef MasterType Master_Type;
@@ -130,21 +130,21 @@ public:
 /// Polaris_Component_Execution - adds base, no parent
 ///============================================================================
 
-template<template<class> class BaseTemplate,typename MasterType,typename GroupList>
-class Polaris_Component_Execution<BaseTemplate,MasterType,NULLTYPE,GroupList>:
+template<template<class> class ImplementationTemplate,typename MasterType,typename GroupList>
+class Polaris_Component_Execution<ImplementationTemplate,MasterType,NULLTYPE,GroupList>:
 	public Execution_Object,
-	public BaseTemplate<MasterType>
+	public ImplementationTemplate<MasterType>
 {
 public:
 #if STATE_CHECKS
 	virtual void State_Check(){};
 #endif
 #ifdef WINDOWS
-	friend BaseTemplate<MasterType>;
+	friend ImplementationTemplate<MasterType>;
 #else
-	friend class BaseTemplate<MasterType>;
+	friend class ImplementationTemplate<MasterType>;
 #endif
-	typedef Polaris_Component_Execution Base_Type;
+	typedef Polaris_Component_Execution Implementation_Type;
 	typedef Polaris_Component_Execution This_Type;
 	typedef Execution_Object Object_Type;
 	typedef MasterType Master_Type;
@@ -194,14 +194,14 @@ public:
 /// component and interface cast macros
 ///============================================================================
 
-#define component_cast_self() ((ComponentType&)*this)
-#define component_cast_target(TARGET_COMPONENT_TYPE,POINTER_TO_TARGET) ((TARGET_COMPONENT_TYPE&)*POINTER_TO_TARGET)
+#define cast_self_to_component() ((ComponentType&)*this)
+#define cast_target_to_component(TARGET_COMPONENT_TYPE,POINTER_TO_TARGET) ((TARGET_COMPONENT_TYPE&)*POINTER_TO_TARGET)
 #define pthis ((ComponentType*)this)
 
-#define interface_cast_self(INTERFACE_ALIAS) ((INTERFACE_ALIAS&)*this)
-#define interface_cast_target(INTERFACE_ALIAS,POINTER_TO_TARGET) ((INTERFACE_ALIAS&)(*POINTER_TO_TARGET))
-#define interface_cast_iterator(INTERFACE_ALIAS,ITERATOR_VARIABLE) ( (INTERFACE_ALIAS&) (*(*ITERATOR_VARIABLE)) )
-#define interface_cast_getter(INTERFACE_ALIAS,FACET_FUNCTION) ( (INTERFACE_ALIAS&) FACET_FUNCTION<INTERFACE_ALIAS&>() )
+#define cast_self_to_interface(INTERFACE_ALIAS) ((INTERFACE_ALIAS&)*this)
+#define cast_target_to_interface(INTERFACE_ALIAS,POINTER_TO_TARGET) ((INTERFACE_ALIAS&)(*POINTER_TO_TARGET))
+#define cast_iterator_to_interface(INTERFACE_ALIAS,ITERATOR_VARIABLE) ( (INTERFACE_ALIAS&) (*(*ITERATOR_VARIABLE)) )
+#define cast_getter_to_interface(INTERFACE_ALIAS,FEATURE_FUNCTION) ( (INTERFACE_ALIAS&) FEATURE_FUNCTION<INTERFACE_ALIAS&>() )
 
 ///============================================================================
 /// type singleton information

@@ -22,11 +22,11 @@ struct Polaris_Input_Iterator:public IteratorType
 };
 
 ///============================================================================
-/// Polaris_Back_Insertion_Sequence_Interface - stl Back Insertion Sequence interface
+/// Polaris_Back_Insertion_Sequence_Prototype - stl Back Insertion Sequence prototype
 ///============================================================================
 
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
-struct Polaris_Back_Insertion_Sequence_Interface
+struct Polaris_Back_Insertion_Sequence_Prototype
 {
 	typedef Polaris_Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
 	typedef typename ComponentType::size_type size_type;
@@ -94,11 +94,11 @@ struct Polaris_Container:public ContainerType
 
 
 ///============================================================================
-/// Polaris_Trivial_Iterator_Interface - stl Trivial Iterator interface
+/// Polaris_Trivial_Iterator_Prototype - stl Trivial Iterator prototype
 ///============================================================================
 
 //template<typename ComponentType,typename CallerType=NULLTYPE>
-//struct Polaris_Trivial_Iterator_Interface
+//struct Polaris_Trivial_Iterator_Prototype
 //{
 //	typename ComponentType::value_type& operator*(){return *((ComponentType*)this);}
 //
@@ -112,14 +112,14 @@ struct Polaris_Container:public ContainerType
 //template<typename TrivialIteratorType>
 //struct Polaris_Trivial_Iterator:public TrivialIteratorType
 //{
-//	typedef TrivialIteratorType Base_Type;
+//	typedef TrivialIteratorType Implementation_Type;
 //	typedef Polaris_Trivial_Iterator This_Type;
 //
 //	typedef typename TrivialIteratorType::value_type stored_type;	
 //	typedef strip_modifiers(stored_type) type;
 //
 //	template<typename ComponentType=Polaris_Trivial_Iterator,typename CallerType=NULLTYPE>
-//	struct Interface_Type{typedef Polaris_Trivial_Iterator_Interface<ComponentType,CallerType> type;};
+//	struct Prototype_Type{typedef Polaris_Trivial_Iterator_Prototype<ComponentType,CallerType> type;};
 //};
 
 
@@ -131,22 +131,22 @@ struct Polaris_Container:public ContainerType
 //template<typename InputIteratorType>
 //struct Polaris_Input_Iterator:public InputIteratorType
 //{
-//	typedef InputIteratorType Base_Type;
+//	typedef InputIteratorType Implementation_Type;
 //	typedef Polaris_Input_Iterator This_Type;
 //
 //	typedef typename InputIteratorType::value_type stored_type;	
 //	typedef strip_modifiers(stored_type) type;
 //
 //	template<typename ComponentType=Polaris_Input_Iterator,typename CallerType=NULLTYPE>
-//	struct Interface_Type{typedef Polaris_Input_Iterator_Interface<ComponentType,CallerType> type;};
+//	struct Prototype_Type{typedef Polaris_Input_Iterator_Prototype<ComponentType,CallerType> type;};
 //};
 
 ///============================================================================
-/// Polaris_Container_Interface - stl Container interface
+/// Polaris_Container_Prototype - stl Container prototype
 ///============================================================================
 
 //template<typename ComponentType,typename CallerType=NULLTYPE>
-//struct Polaris_Container_Interface
+//struct Polaris_Container_Prototype
 //{
 //	typename ComponentType::iterator begin(){return ((ComponentType*)this)->begin();}
 //
@@ -160,11 +160,11 @@ struct Polaris_Container:public ContainerType
 //};
 
 ///============================================================================
-/// Polaris_Forward_Container_Interface - stl Forward Container interface
+/// Polaris_Forward_Container_Prototype - stl Forward Container prototype
 ///============================================================================
 
 //template<typename ComponentType,typename CallerType=NULLTYPE>
-//struct Polaris_Forward_Container_Interface
+//struct Polaris_Forward_Container_Prototype
 //{
 //	typename ComponentType::iterator begin(){return ((ComponentType*)this)->begin();}
 //
@@ -178,11 +178,11 @@ struct Polaris_Container:public ContainerType
 //};
 
 ///============================================================================
-/// Polaris_Sequence_Interface - stl Sequence interface
+/// Polaris_Sequence_Prototype - stl Sequence prototype
 ///============================================================================
 
 //template<typename ComponentType,typename CallerType=NULLTYPE>
-//struct Polaris_Sequence_Interface
+//struct Polaris_Sequence_Prototype
 //{
 //	typename ComponentType::iterator begin(){return ((ComponentType*)this)->begin();}
 //
@@ -230,14 +230,14 @@ struct Polaris_Container:public ContainerType
 //{
 //	typedef Polaris_Input_Iterator<typename ForwardContainerType::iterator> Iterator_Type;
 //
-//	typedef ForwardContainerType Base_Type;
+//	typedef ForwardContainerType Implementation_Type;
 //	typedef Polaris_Forward_Container This_Type;
 //
-//	typedef typename Base_Type::value_type element_stored_type;	
+//	typedef typename Implementation_Type::value_type element_stored_type;	
 //	typedef strip_modifiers(element_stored_type) element_type;
 //
 //	template<typename ComponentType=Polaris_Forward_Container,typename CallerType=NULLTYPE>
-//	struct Interface_Type{typedef Polaris_Forward_Container_Interface<ComponentType,CallerType> type;};
+//	struct Prototype_Type{typedef Polaris_Forward_Container_Prototype<ComponentType,CallerType> type;};
 //};
 //
 /////============================================================================
@@ -249,14 +249,14 @@ struct Polaris_Container:public ContainerType
 //{
 //	typedef Polaris_Input_Iterator<typename SequenceType::iterator> Iterator_Type;
 //
-//	typedef SequenceType Base_Type;
+//	typedef SequenceType Implementation_Type;
 //	typedef Polaris_Sequence This_Type;
 //	
-//	typedef typename Base_Type::value_type element_stored_type;	
+//	typedef typename Implementation_Type::value_type element_stored_type;	
 //	typedef strip_modifiers(element_stored_type) element_type;
 //
 //	template<typename ComponentType=Polaris_Sequence,typename CallerType=NULLTYPE>
-//	struct Interface_Type{typedef Polaris_Sequence_Interface<ComponentType,CallerType> type;};
+//	struct Prototype_Type{typedef Polaris_Sequence_Prototype<ComponentType,CallerType> type;};
 //};
 //
 /////============================================================================
@@ -268,12 +268,12 @@ struct Polaris_Container:public ContainerType
 //{
 //	typedef Polaris_Input_Iterator<typename BackInsertionSequenceType::iterator> Iterator_Type;
 //
-//	typedef BackInsertionSequenceType Base_Type;
+//	typedef BackInsertionSequenceType Implementation_Type;
 //	typedef Polaris_Back_Insertion_Sequence This_Type;
 //
-//	typedef typename Base_Type::value_type element_stored_type;	
+//	typedef typename Implementation_Type::value_type element_stored_type;	
 //	typedef strip_modifiers(element_stored_type) element_type;
 //
 //	template<typename ComponentType=Polaris_Back_Insertion_Sequence,typename CallerType=NULLTYPE>
-//	struct Interface_Type{typedef Polaris_Back_Insertion_Sequence_Interface<ComponentType,CallerType> type;};
+//	struct Prototype_Type{typedef Polaris_Back_Insertion_Sequence_Prototype<ComponentType,CallerType> type;};
 //};

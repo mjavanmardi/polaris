@@ -31,15 +31,15 @@ static const int success=sizeof(small_type);
 	};\
 	typedef typename Append<auto_check_list_##LINKED_CONCEPT,REQUIREMENT_NAME>::Result auto_check_list_##REQUIREMENT_NAME;
 
-#define requires_facet(LINKED_CONCEPT,FACET_NAME,FACET_TYPE,ERROR_MESSAGE)\
-	struct FACET_NAME\
+#define requires_feature(LINKED_CONCEPT,FEATURE_NAME,FEATURE_TYPE,ERROR_MESSAGE)\
+	struct FEATURE_NAME\
 	{\
-	template<typename U> static small_type has_matching_typename(typename U::FACET_NAME##_FACET_TYPE*);\
+	template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_FEATURE_TYPE*);\
 		template<typename U> static large_type has_matching_typename(...);\
 		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
 		static_assert(value || !assert_requirements,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n");\
 	};\
-	typedef typename Append<auto_check_list_##LINKED_CONCEPT,FACET_NAME>::Result auto_check_list_##FACET_NAME;
+	typedef typename Append<auto_check_list_##LINKED_CONCEPT,FEATURE_NAME>::Result auto_check_list_##FEATURE_NAME;
 
 #define requires_named_member(LINKED_CONCEPT,REQUIREMENT_NAME,ERROR_MESSAGE)\
 	struct REQUIREMENT_NAME\
