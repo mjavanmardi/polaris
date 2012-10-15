@@ -6,13 +6,13 @@
 /// prototype - standard declarator for all prototypes
 ///============================================================================
 
-#define prototype template<typename ComponentType,typename CallerType> struct
+#define prototype template<typename ComponentType,typename CallerType>
 
 ///============================================================================
 /// implementation - standard declarator for all implementations
 ///============================================================================
 
-#define implementation template<typename MasterType> struct
+#define implementation template<typename MasterType>
 
 ///============================================================================
 /// feature - standard declarator for all prototype features
