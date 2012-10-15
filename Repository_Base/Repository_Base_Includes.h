@@ -48,7 +48,7 @@ struct DATA_STRUCT_NAME \
 
 concept Is_Target_Type_Struct
 {
-	begin_requirements_list;
+	begin_requirements_list (none);
 	requires_typename_defined(none, ReturnType,"Type does not model an HCM simple solution type.");
 	requires_typename_defined(ReturnType, ParamType,"Type does not model an HCM simple solution type.");
 	requires_typename_defined(ParamType, Param2Type,"Type does not model an HCM simple solution type.");

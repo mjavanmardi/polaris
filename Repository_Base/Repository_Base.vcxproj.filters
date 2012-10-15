@@ -71,6 +71,9 @@
     <ClInclude Include="Choice_Model_Bases.h">
       <Filter>Bases</Filter>
     </ClInclude>
+    <ClInclude Include="Basic_Units.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository_Base.cpp">
