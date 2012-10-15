@@ -124,7 +124,7 @@ namespace Intersection_Components
 
 			facet_accessor(signal);
 
-			//facet_accessor(rng_stream);
+			facet_accessor(rng_stream);
 
 			facet_accessor(inbound_links);
 			facet_accessor(outbound_links);
@@ -232,7 +232,6 @@ namespace Intersection_Components
 							std::string s1 = s;
 							scenario_reference<Scenario_Interface*>()->output<NULLTYPE>(s1);
 							sprintf_s(s, "advanced:%i:%i:%i\n", outbound_link->uuid<int>(), outbound_link->downstream_intersection<Intersection_Interface*>()->uuid<int>(), scenario_reference<Scenario_Interface*>()->current_time<int>());
-							//sprintf_s(s, "advanced:%i:%i:%i\n", outbound_link->uuid<int>(), this->uuid<int>(), scenario_reference<Scenario_Interface*>()->current_time<int>());
 							std::string s2 = s;
 							scenario_reference<Scenario_Interface*>()->output<NULLTYPE>(s2);
 						}
@@ -550,6 +549,8 @@ namespace Intersection_Components
 				typedef typename ThisType::inbound_movement_type InboundMovementType;
 				typedef typename Movement_Interface<InboundMovementType,ThisType> Movement_Interface;
 
+				typedef typename ThisType::rng_stream_type RngStreamType;
+
 				// apply transfers of y(a,a''t) for each turn;
 				//int arrived_vehicles = this->network_cumulative_arrived_vehicles;
 				//int in_network_vehicles = this->network_in_network_vehicles;
@@ -595,9 +596,7 @@ namespace Intersection_Components
 						
 						if(transfer_flow_turn_movement > 0.0)
 						{
-							std::uniform_real_distribution<double> distribution(0,1);
-							double rng=distribution(generator);
-
+							double rng = (this->rng_stream<RngStreamType&>()).RandU01();
 							if(rng<=transfer_flow_turn_movement)
 							{//partial vehicle, incomplete implementation
 								++num_transfer_vehicles_of_turn_movement;
@@ -626,6 +625,8 @@ namespace Intersection_Components
 								inbound_link->link_downstream_cumulative_vehicles<int&>()++;
 								inbound_link->link_downstream_departed_vehicles<int&>()++;
 
+								outbound_link->link_upstream_arrived_vehicles<int&>()++;
+								outbound_link->link_upstream_cumulative_arrived_vehicles<int&>()++;
 								//update turn movement state: N(a',a,t)
 								inbound_movement->turn_movement_cumulative_vehicles<int&>()++;
 

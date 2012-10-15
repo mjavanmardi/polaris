@@ -142,7 +142,7 @@ namespace Demand_Components
 				for(int simulation_interval_index=0;simulation_interval_index<scenario->num_simulation_intervals<int>();simulation_interval_index++)
 				{// generate vehicles for each simulation interval
 
-					if(simulation_interval_index<=5000)
+					if(simulation_interval_index<=300)
 					{
 						freeway_demand_rate += 5.0;
 						ramp_demand_rate +=5.0;
@@ -289,10 +289,10 @@ namespace Demand_Components
 
 								
 
-								departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
+								departed_time = simulation_interval_index * scenario->template simulation_interval_length<int>();
 								traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
-								vehicle->departed_simulation_interval_index<int>(departed_time);
-								vehicle->departed_assignment_interval_index<int>(departed_time);
+								vehicle->template departed_simulation_interval_index<int>(departed_time);
+								vehicle->template departed_assignment_interval_index<int>(departed_time);
 
 								cur_vehicle_rate_per_simulation_interval = (float) (cur_vehicle_rate_per_simulation_interval - 1.0);
 								//cout << endl<<"RAMP\t"<<traveler->uuid<int>() <<"\t"<<departed_time;

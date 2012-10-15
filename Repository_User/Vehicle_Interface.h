@@ -67,6 +67,7 @@ namespace Vehicle_Components
 			facet_accessor(destination_activity_location);
 			facet_accessor(current_link_enter_time);
 			facet_accessor(current_link_enter_interval_index);
+			facet_accessor(uuid);
 
 			facet void set_route_links(TargetType& path_container/*,requires(TargetType,IsReversed)*/)
 			{

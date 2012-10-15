@@ -193,8 +193,8 @@ namespace Link_Components
 				vehicle->transfer_to_next_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length,current_time);
 
 				//update outbound link state: A(a,0,t)
-				link_upstream_cumulative_arrived_vehicles<int&>()++;
-				link_upstream_arrived_vehicles<int&>()++;
+				//link_upstream_cumulative_arrived_vehicles<int&>()++;
+				//link_upstream_arrived_vehicles<int&>()++;
 
 				if(this==vehicle->destination_link<Link_Interface*>())
 				{
@@ -204,6 +204,8 @@ namespace Link_Components
 					link_destination_cumulative_arrived_vehicles<int&>()++;
 					link_destination_arrived_vehicles<int&>()++;
 					
+					scenario->network_cumulative_arrived_vehicles<int&>()++;
+					scenario->network_in_network_vehicles<int&>()--;
 					//update network state:
 					//arrived_vehicles++;
 					//in_network_vehicles--;
@@ -253,7 +255,7 @@ namespace Link_Components
 					if (current_simulation_interval_index >= (link_bwtt_cached_simulation_interval_size<int>()) )
 					{
 						t_minus_bwtt = (current_simulation_interval_index + 1 - link_bwtt_cached_simulation_interval_size<int>())%(link_bwtt_cached_simulation_interval_size<int>());
-						link_downstream_cumulative_vehicles_by_t_minus_bwtt = cached_link_upstream_cumulative_vehicles_array<int*>()[t_minus_bwtt];
+						link_downstream_cumulative_vehicles_by_t_minus_bwtt = cached_link_downstream_cumulative_vehicles_array<int*>()[t_minus_bwtt];
 					}
 					
 					//supply(a,t) = Kj(a,t)*L(a)*nlanes(a,t) + N(a,L(a),t-bwtt) -N(a,0,t-1) = backward wave propogation in link
@@ -279,6 +281,8 @@ namespace Link_Components
 				typedef typename ThisType::intersection_type IntersectionType;
 				typedef typename Intersection_Interface<IntersectionType,ThisType> Intersection_Interface;
 
+				typedef IntersectionType::rng_stream_type RngStreamType;
+
 				Intersection_Interface* intersection=downstream_intersection<Intersection_Interface*>();
 
 				typename VehicleQueueType::iterator vehicle_itr;
@@ -297,6 +301,11 @@ namespace Link_Components
 			{
 				typedef typename ThisType::scenario_type ScenarioType;
 				typedef typename Scenario_Interface<ScenarioType,ThisType> Scenario_Interface;
+
+				typedef typename ThisType::intersection_type IntersectionType;
+				typedef typename Intersection_Interface<IntersectionType,ThisType> Intersection_Interface; 
+
+				typedef RngStream RngStreamType;
 
 				Scenario_Interface* scenario=scenario_reference<Scenario_Interface*>();
 
@@ -345,6 +354,7 @@ namespace Link_Components
 							link_origin_arrived_vehicles<int&>()++;
 							link_origin_cumulative_arrived_vehicles<int&>()++;
 							//loaded_vehicles++;
+							scenario->network_cumulative_loaded_vehicles<int&>()++;
 						//}
 						//else
 						//{
@@ -363,8 +373,8 @@ namespace Link_Components
 					
 					if (link_origin_departed_flow_allowed>0.0)
 					{//partial vehicle
-						std::uniform_real_distribution<double> distribution(0,1);
-						double rng=distribution(generator);
+						Intersection_Interface* intersection = upstream_intersection<Intersection_Interface*>();
+						double rng = intersection->rng_stream<RngStreamType&>().RandU01();
 						if(rng<=link_origin_departed_flow_allowed)
 						{//partial vehicle, incomplete implementation
 							++num_link_origin_departed_vehicles_allowed;
@@ -383,28 +393,34 @@ namespace Link_Components
 							vehicle->load_to_origin_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
 							
 							//update link state
-							//link_origin_cumulative_departed_vehicles<int&>()++;
+							link_origin_cumulative_departed_vehicles<int&>()++;
 							link_origin_departed_vehicles<int&>()++;
 							link_origin_arrived_vehicles<int&>()--;
 
 							push_vehicle<Vehicle_Interface*>(vehicle);
-							
+
 							//update network state
 							//departed_vehicles++;
 							//in_network_vehicles++;
+							scenario->network_cumulative_departed_vehicles<int&>()++;
+							scenario->network_in_network_vehicles<int&>()++;
+							
+							// Bo added: the following logic already implemented in push_vehicle. Don't need to do here
 
-							if(this==vehicle->destination_link<Link_Interface*>())
-							{
-								vehicle->arrive_to_destination_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
-								
-								//update link state: N_destination(a,t)
-								link_destination_cumulative_arrived_vehicles<int&>()++;
-								link_destination_arrived_vehicles<int&>()++;
-								
-								//update network state:
-								//arrived_vehicles++;
-								//in_network_vehicles--;
-							}
+							//if(this==vehicle->destination_link<Link_Interface*>())
+							//{
+							//	vehicle->arrive_to_destination_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
+							//	
+							//	//update link state: N_destination(a,t)
+							//	link_destination_cumulative_arrived_vehicles<int&>()++;
+							//	link_destination_arrived_vehicles<int&>()++;
+							//	
+							//	//update network state:
+							//	//arrived_vehicles++;
+							//	//in_network_vehicles--;
+							//	scenario->network_cumulative_arrived_vehicles<int&>()++;
+							//	scenario->network_in_network_vehicles<int&>()--;
+							//}
 						}
 					}
 				}
@@ -532,7 +548,6 @@ namespace Link_Components
 				{
 					link_shifted_cumulative_arrived_vehicles = 0;
 				}
-				
 				//network_data.link_upstream_cumulative_arrived_curve_array[outbound_link_index] = this->link_upstream_cumulative_arrived_vehicles_array[outbound_link_index];
 				//network_data.link_upstream_cumulative_depature_curve_array[outbound_link_index] = this->link_upstream_cumulative_vehicles_array[outbound_link_index];
 				//network_data.link_downstream_cumulative_arrived_curve_array[outbound_link_index] = link_shifted_cumulative_arrive_vehicles;

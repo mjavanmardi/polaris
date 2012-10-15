@@ -41,11 +41,16 @@ namespace Scenario_Components
 
 			facet_accessor(output_writer);
 
+			facet_accessor(network_cumulative_loaded_vehicles);
+			facet_accessor(network_cumulative_departed_vehicles);
+			facet_accessor(network_in_network_vehicles);
+			facet_accessor(network_cumulative_arrived_vehicles);
+
 			facet void read_scenario_data()
 			{
 				simulation_interval_length<int>(6); //6 seconds
 				assignment_interval_length<int>(50*simulation_interval_length<int>()); // 5 minutes
-				planning_horizon<int>(14400*simulation_interval_length<int>()); // 1 hour
+				planning_horizon<int>(600*simulation_interval_length<int>()); // 1 hour
 				
 				simulation_start_time<int>(0);
 				simulation_end_time<int>(planning_horizon<int>()+simulation_start_time<int>());
@@ -60,6 +65,11 @@ namespace Scenario_Components
 
 				typedef typename ThisType::output_writer_type OutputWriterType;
 				output_writer<OutputWriterType&>().open("Polaris_Output.log");
+
+				network_cumulative_loaded_vehicles<int>(0);
+				network_cumulative_departed_vehicles<int>(0);
+				network_in_network_vehicles<int>(0);
+				network_cumulative_arrived_vehicles<int>(0);
 			}
 
 			facet void output(std::string s)

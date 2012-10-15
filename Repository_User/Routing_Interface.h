@@ -499,6 +499,7 @@ namespace Routing_Components
 				schedule_event_local(ThisType,Compute_Route_Condition,Compute_Route,departed_time,NULLTYPE);
 			}
 
+			//first event
 			declare_facet_event(Compute_Route)
 			{
 				Routing_Interface* _this=(Routing_Interface*)pthis;

@@ -372,7 +372,7 @@ namespace Network_Components
 				link_5->speed_limit<float>(speed_limit_ramp);
 				link_5->maximum_flow_rate<float>(maximum_flow_rate_arterial);
 				link_5->backward_wave_speed<float>(backward_wave_speed);
-				link_5->free_flow_speed<float>(speed_limit + 10.0);
+				link_5->free_flow_speed<float>(link_5->speed_limit<float>() + 10.0);
 				link_5->jam_density<float>(jam_density);
 				link_5->left_turn_bay_length<float>(0.0);
 				link_5->right_turn_bay_length<float>(0.0);
@@ -411,7 +411,7 @@ namespace Network_Components
 
 				turn_movement_0->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
 				turn_movement_0->movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-				turn_movement_0->id<int>(7);
+				turn_movement_0->id<int>(0);
 				// assign the detector
 				turn_movement_0->detector<Detector_Interface*>(NULL);
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_0);
@@ -421,7 +421,7 @@ namespace Network_Components
 				turn_movement_1->outbound_link<Link_Interface*>((Link_Interface*)links_container<LinksContainerType&>()[2]);
 				turn_movement_1->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
 				turn_movement_1->movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-				turn_movement_1->id<int>(8);
+				turn_movement_1->id<int>(1);
 				// assign the detector
 				turn_movement_1->detector<Detector_Interface*>(lane->Detector_Thru<typename Master_Type::DETECTOR_TYPE>());
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_1);
@@ -431,7 +431,7 @@ namespace Network_Components
 				turn_movement_2->outbound_link<Link_Interface*>((Link_Interface*)links_container<LinksContainerType&>()[3]);
 				turn_movement_2->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
 				turn_movement_2->movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-				turn_movement_2->id<int>(9);
+				turn_movement_2->id<int>(2);
 				turn_movement_2->detector<Detector_Interface*>(NULL);
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_2);
 
@@ -440,7 +440,7 @@ namespace Network_Components
 				turn_movement_3->outbound_link<Link_Interface*>((Link_Interface*)links_container<LinksContainerType&>()[2]);
 				turn_movement_3->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::RIGHT_TURN);
 				turn_movement_3->movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-				turn_movement_3->id<int>(10);
+				turn_movement_3->id<int>(3);
 				// assign the detector
 				turn_movement_3->detector<Detector_Interface*>(lane2->Detector_Left<typename Master_Type::DETECTOR_TYPE>());
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_3);
@@ -451,7 +451,7 @@ namespace Network_Components
 				turn_movement_4->outbound_link<Link_Interface*>((Link_Interface*)links_container<LinksContainerType&>()[4]);
 				turn_movement_4->movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
 				turn_movement_4->movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-				turn_movement_4->id<int>(11);
+				turn_movement_4->id<int>(4);
 				turn_movement_4->detector<Detector_Interface*>(NULL);
 				turn_movements_container<TurnMovementsContainerType&>().push_back(turn_movement_4);
 
@@ -591,6 +591,8 @@ namespace Network_Components
 				typedef typename ThisType::scenario_data_type ScenarioDataType;
 				typedef typename Scenario_Interface<ScenarioDataType, ThisType> ScenarioInterface;
 
+				typedef class RngStream RngStreamType;
+
 			
 
 				//initialized outside
@@ -680,7 +682,7 @@ namespace Network_Components
 				{
 					Intersection_Interface* intersection = (Intersection_Interface*)intersections_container<IntersectionsContainerType>()[i];
 
-					//intersection->rng_stream<RngStream&>().SetSeed(((ScenarioInterface*)scenario_data)->iseed<unsigned int>()+i+1);
+					(intersection->rng_stream<RngStreamType&>()).SetSeed(((ScenarioInterface*)scenario_data)->iseed<unsigned int>()+intersection->uuid<int>()+1);
 
 					intersection->scenario_reference<ScenarioInterface*>((ScenarioInterface*)scenario_data);
 

@@ -44,6 +44,11 @@ namespace Scenario_Components
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType output_writer(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_output_writer;} tag_getter(output_writer);
 			output_writer_type _output_writer;
+
+			member_data_basic(int, network_cumulative_loaded_vehicles);
+			member_data_basic(int, network_cumulative_departed_vehicles);
+			member_data_basic(int, network_in_network_vehicles);
+			member_data_basic(int, network_cumulative_arrived_vehicles);
 		};
 	}
 

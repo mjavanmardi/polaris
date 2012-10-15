@@ -1,14 +1,14 @@
 #pragma once
 
+ 
 #include <string>
-#include <random>
 
 class RngStream
 {
 public:
 
 RngStream (const char *name = "");
-std::mt19937_64 generator;
+
 
 static bool SetPackageSeed (const unsigned long seed[6]);
 
@@ -88,7 +88,6 @@ double U01d ();
 
 #include <cstdlib>
 #include <iostream>
-#include "RngStream.h"
 using namespace std;
 
 namespace
@@ -440,19 +439,25 @@ bool RngStream::SetPackageSeed (const unsigned long seed[6])
 
 
 //-------------------------------------------------------------------------
-//bool RngStream::SetSeed (const unsigned long seed[6])
-//{
-//   if (CheckSeed (seed))
-//      return false;                   // FAILURE     
-//   for (int i = 0; i < 6; ++i)
-//      Cg[i] = Bg[i] = Ig[i] = seed[i];
-//   return true;                       // SUCCESS
-//}
+bool RngStream::SetSeed (const unsigned long seed[6])
+{
+   if (CheckSeed (seed))
+      return false;                   // FAILURE     
+   for (int i = 0; i < 6; ++i)
+      Cg[i] = Bg[i] = Ig[i] = seed[i];
+   return true;                       // SUCCESS
+}
 
 bool RngStream::SetSeed(const unsigned long iseed)
 {
+   unsigned long seed[6];
+   for (int i=0;i<6;++i)
+	   seed[i] = iseed+i;
 
-	generator.seed(iseed);
+   if (CheckSeed (seed))
+      return false;                   // FAILURE     
+   for (int i = 0; i < 6; ++i)
+      Cg[i] = Bg[i] = Ig[i] = seed[i];
    return true;                       // SUCCESS
 
 }
@@ -566,8 +571,10 @@ void RngStream::SetAntithetic (bool a)
 //
 double RngStream::RandU01 ()
 {
-	std::uniform_real_distribution<double> distribution(0,1);
-	return distribution(generator);
+   if (incPrec)
+      return U01d();
+   else
+      return U01();
 }
 
 
@@ -576,7 +583,6 @@ double RngStream::RandU01 ()
 //
 int RngStream::RandInt (int low, int high)
 {
-    std::uniform_real_distribution<double> distribution(0,1);
-	double randu01 = distribution(generator);
-	return low + static_cast<int> ((high - low + 1.0) * randu01);
+    return low + static_cast<int> ((high - low + 1.0) * RandU01 ());
 };
+

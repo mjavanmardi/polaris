@@ -292,6 +292,15 @@ namespace Intersection_Components
 
 			typedef typename MasterType::scenario_type scenario_type;
 			void* _scenario_reference;
+
+			
+			template<typename ThisType, typename CallerType, typename TargetType>
+			TargetType rng_stream(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)_rng_stream;}
+			tag_getter(rng_stream);
+
+			RngStream _rng_stream;
+
+			typedef RngStream rng_stream_type;
 		};
 	}
 

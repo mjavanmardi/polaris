@@ -59,6 +59,7 @@ namespace Vehicle_Components
 			member_data_basic(int, arrived_simulation_interval_index);
 			member_data_basic(int, current_link_enter_time);
 			member_data_basic(int, current_link_enter_interval_index);
+			member_data_basic(int, uuid);
 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType trajectory_container(call_requirements(requires(ThisType,Is_Dispatched))){return (TargetType)(_trajectory_container);} tag_getter(trajectory_container);
