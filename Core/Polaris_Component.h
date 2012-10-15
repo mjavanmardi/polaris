@@ -5,7 +5,7 @@
 #include "State_Checking.h"
 
 ///============================================================================
-/// Polaris_Component - adds base, with parent
+/// Polaris_Component - adds implementation, with parent
 ///============================================================================
 
 template<template<class> class ImplementationTemplate=NULLTEMPLATE,typename MasterType=NULLTYPE,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE,typename ObjectType=Data_Object>
@@ -36,7 +36,7 @@ public:
 };
 
 ///============================================================================
-/// Polaris_Component - adds base, no parent
+/// Polaris_Component - adds implementation, no parent
 ///============================================================================
 
 template<template<class> class ImplementationTemplate,typename MasterType,typename GroupList,typename ObjectType>
@@ -96,7 +96,7 @@ public:
 
 
 ///============================================================================
-/// Polaris_Component_Execution - adds base, with parent
+/// Polaris_Component_Execution - adds implementation, with parent
 ///============================================================================
 
 template<template<class> class ImplementationTemplate=NULLTEMPLATE,typename MasterType=NULLTYPE,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE>
@@ -127,7 +127,7 @@ public:
 };
 
 ///============================================================================
-/// Polaris_Component_Execution - adds base, no parent
+/// Polaris_Component_Execution - adds implementation, no parent
 ///============================================================================
 
 template<template<class> class ImplementationTemplate,typename MasterType,typename GroupList>

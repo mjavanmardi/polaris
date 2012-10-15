@@ -20,10 +20,10 @@
 #define feature public: template<typename TargetType>
 
 ///============================================================================
-/// feature_base - standard declarator for all base features
+/// feature_implementation - standard declarator for all implementation features
 ///============================================================================
 
-#define feature_base public: template<typename ComponentType,typename CallerType,typename TargetType>
+#define feature_implementation public: template<typename ComponentType,typename CallerType,typename TargetType>
 
 ///============================================================================
 /// declare_feature_event - header for a basic event feature
@@ -58,7 +58,7 @@ struct member_function_ptr_types<Type,conditional_type>
 };
 
 ///============================================================================
-/// define_get_set_checks - implements a mini-concept to check for base existence
+/// define_get_set_checks - implements a mini-concept to check for implementation existence
 ///============================================================================
 
 #define define_get_exists_check(FEATURE_NAME)\
@@ -84,7 +84,7 @@ struct member_function_ptr_types<Type,conditional_type>
 
 ///============================================================================
 /// feature_accessor - implements the standard get and set dispatch features
-///		includes a check on whether the base has corresponding dispatch
+///		includes a check on whether the implementation has corresponding dispatch
 ///============================================================================
 
 #define feature_accessor(FEATURE_NAME)\

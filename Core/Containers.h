@@ -67,7 +67,7 @@ struct Polaris_Back_Insertion_Sequence_Prototype
 };
 
 ///============================================================================
-/// Polaris_Container - stl Container base
+/// Polaris_Container - stl Container implementation
 ///============================================================================
 
 template<typename ContainerType>
@@ -106,7 +106,7 @@ struct Polaris_Container:public ContainerType
 //};
 
 ///============================================================================
-/// Polaris_Trivial_Iterator - stl Trivial Iterator base
+/// Polaris_Trivial_Iterator - stl Trivial Iterator implementation
 ///============================================================================
 
 //template<typename TrivialIteratorType>
@@ -125,7 +125,7 @@ struct Polaris_Container:public ContainerType
 
 
 ///============================================================================
-/// Polaris_Input_Iterator - stl Input Iterator base
+/// Polaris_Input_Iterator - stl Input Iterator implementation
 ///============================================================================
 
 //template<typename InputIteratorType>
@@ -222,7 +222,7 @@ struct Polaris_Container:public ContainerType
 
 
 ///============================================================================
-/// Polaris_Forward_Container - stl Forward Container base
+/// Polaris_Forward_Container - stl Forward Container implementation
 ///============================================================================
 //
 //template<typename ForwardContainerType>
@@ -241,7 +241,7 @@ struct Polaris_Container:public ContainerType
 //};
 //
 /////============================================================================
-///// Polaris_Sequence - stl Sequence base
+///// Polaris_Sequence - stl Sequence implementation
 /////============================================================================
 //
 //template<typename SequenceType>
@@ -260,7 +260,7 @@ struct Polaris_Container:public ContainerType
 //};
 //
 /////============================================================================
-///// Polaris_Back_Insertion_Sequence - stl Back Insertion Sequence base
+///// Polaris_Back_Insertion_Sequence - stl Back Insertion Sequence implementation
 /////============================================================================
 //
 //template<typename BackInsertionSequenceType>
