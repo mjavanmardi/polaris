@@ -1,17 +1,18 @@
 #pragma once
 #include "Containers.h"
 
+
 ///============================================================================
 /// prototype - standard declarator for all prototypes
 ///============================================================================
 
-#define prototype template<typename ComponentType,typename CallerType>
+#define prototype template<typename ComponentType,typename CallerType> struct
 
 ///============================================================================
 /// implementation - standard declarator for all implementations
 ///============================================================================
 
-#define implementation template<typename MasterType>
+#define implementation template<typename MasterType> struct
 
 ///============================================================================
 /// feature - standard declarator for all prototype features
