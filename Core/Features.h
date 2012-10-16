@@ -308,7 +308,7 @@ struct member_function_ptr_types<Type,setter_type>
 		tag_getter(FEATURE_NAME);\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
 		void FEATURE_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
-		{_##FEATURE_NAME=((COMPONENT_TYPE*)(&value);}\
+		{_##FEATURE_NAME=(COMPONENT_TYPE*)(&value);}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
 		void FEATURE_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
 		{_##FEATURE_NAME=(COMPONENT_TYPE)(*value);}\
