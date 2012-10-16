@@ -109,69 +109,65 @@ namespace Choice_Model_Components
 	//==================================================================================================================
 	/// Namespace which includes the interface(or interfaces if necessary) which links to the various Bases regarding the transportation object
 	//------------------------------------------------------------------------------------------------------------------
-	namespace Interfaces
+	namespace Prototypes
 	{
 		//------------------------------------------------------------------------------------------------------------------
 		/// RENAME THE Inteface struct below.  This is the inteface to a POLARIS component
 		//------------------------------------------------------------------------------------------------------------------
-		template <typename ComponentType, typename CallerType=NULLTYPE>
-		struct Choice_Option_Interface
+		prototype struct Choice_Option_Prototype
 		{
 			/// INTERFACE FUNCTION EXAMPLE - this example dispatched the Initialize function call to the component base
-			facet void Initialize()
+			feature void Initialize()
 			{
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
+				cast_self_to_component().Initialize<ComponentType,CallerType,TargetType>();
 			}
 
-			facet void Evaluate_Probability(call_requirements(requires(ComponentType, Concepts::Choice_Is_Rule_Based)))
+			feature void Evaluate_Probability(call_requirements(requires(ComponentType, Concepts::Choice_Is_Rule_Based)))
 			{
 				// Dispatch to probability rules written in base
-				TargetType prob = PTHIS(ThisType)->Evaluate_Probability<Dispatch<ThisType>,CallerType,TargetType>();
+				TargetType prob = cast_self_to_component().Evaluate_Probability<ComponentType,CallerType,TargetType>();
 				this->probability<TargetType>(prob);
 			}
 
-			facet void Evaluate_Utility(call_requirements(requires(ComponentType, Concepts::Choice_Is_Utility_Based)))
+			feature void Evaluate_Utility(call_requirements(requires(ComponentType, Concepts::Choice_Is_Utility_Based)))
 			{
-				TargetType util = component_cast_self().Evaluate_Utility<ComponentType,CallerType,TargetType>();
+				TargetType util = cast_self_to_component().Evaluate_Utility<ComponentType,CallerType,TargetType>();
 				this->utility<TargetType>(util);
 			}
 			 
-			facet_accessor(choice_data_interface);
+			feature_accessor(choice_data_interface);
 
-			facet_accessor(utility);
-			facet_accessor(probability);
+			feature_accessor(utility);
+			feature_accessor(probability);
 		};
 
 
 		//------------------------------------------------------------------------------------------------------------------
 		/// RENAME THE Inteface struct below.  This is the inteface to a POLARIS component
 		//------------------------------------------------------------------------------------------------------------------
-		template <typename ComponentType, typename CallerType=NULLTYPE>
-		struct Choice_Model_Interface
+		prototype struct Choice_Model_Prototype
 		{
 			/// BASIC INITIALIZER
-			facet void Initialize()
+			feature void Initialize()
 			{
-				return component_cast_self().Initialize<ComponentType,CallerType,TargetType>();
+				return cast_self_to_component().Initialize<ComponentType,CallerType,TargetType>();
 			}
 
-			facet void Add_Choice_Option(TargetType new_choice_option_data, call_requires(TargetType, Is_Polaris_Component))
+			feature void Add_Choice_Option(TargetType new_choice_option_data, call_requires(strip_modifiers(TargetType), Is_Polaris_Component))
 			{
-				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Interface,choice_options,_choices_interface,Choice_Option_Interface,_choice_interface,ComponentType);
+				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Prototype,choice_options,_choices_interface,Choice_Option_Prototype,_choice_interface,ComponentType);
 				_choices_interface* choices = this->choice_options<_choices_interface*>();
 				_choice_interface* choice = (_choice_interface*)Allocate<ComponentType::choice_options_type::unqualified_value_type>();
 				choice->choice_data_interface<TargetType>(new_choice_option_data);
 				choices->push_back(choice);
-
-				//choice_interface* choice=(choice_interface*)Allocate<ComponentType::choice_model_type::choice_options_type::unqualified_value_type>();	
-				//_Road_Interface* road = (*roads_itr);
-				//choice->choice_data_interface<_Road_Interface*>(road);
-				//cout << choice->choice_data_interface<_Road_Interface*>()->road_id<int>();
-				//options->push_back(choice);
+			}
+			feature void Add_Choice_Option(TargetType new_choice_option_data, call_requires(strip_modifiers(TargetType), !Is_Polaris_Component))
+			{
+				assert_requirements(TargetType,Is_Polaris_Component, "TargetType is not a polaris component.");
 			}
 
 			/// SELECT FROM THE AVAILABLE CHOICES FOR SIMULATION
-			facet Choice_Option_Interface<TargetType>* Make_Choice(call_requirements(requires(ComponentType, Concepts::Choice_Is_Deterministic)))
+			feature Choice_Option_Prototype<TargetType>* Make_Choice(call_requirements(requires(ComponentType, Concepts::Choice_Is_Deterministic)))
 			{	
 				// Local type definition option
 				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Interface,choice_options,_choices_interface,Choice_Option_Interface,_choice_interface,ComponentType);
@@ -190,7 +186,7 @@ namespace Choice_Model_Components
 				}
 
 			}
-			facet Choice_Option_Interface<TargetType>* Make_Choice(call_requirements(requires(ComponentType, Concepts::Choice_Is_Probabilistic)))
+			feature Choice_Option_Prototype<TargetType>* Make_Choice(call_requirements(requires(ComponentType, Concepts::Choice_Is_Probabilistic)))
 			{
 
 				// Local type definition option
@@ -209,20 +205,20 @@ namespace Choice_Model_Components
 					if (rand < cumulative_probability) return choice;
 				}
 			}
-			facet Choice_Option_Interface<TargetType>* Make_Choice(call_requirements(!(requires(ComponentType, Concepts::Choice_Is_Deterministic) || requires(ComponentType, Concepts::Choice_Is_Probabilistic))))
+			feature Choice_Option_Prototype<TargetType>* Make_Choice(call_requirements(!(requires(ComponentType, Concepts::Choice_Is_Deterministic) || requires(ComponentType, Concepts::Choice_Is_Probabilistic))))
 			{
-
+				assert_requirements(ComponentType, Concepts::Choice_Is_Deterministic, "ComponentType does not specify if Choice is Deterministic or Probabilistic");
 			}
 			
 				
 			/// EVALUATE THE AVAILABLE CHOICES (i.e. CALCULATE UTILITY, SET PROBABILITIES, ETC.)
-			facet void Evaluate_Choices(call_requirements(
+			feature void Evaluate_Choices(call_requirements(
 				requires(ComponentType, Concepts::Is_MNL_Model) &&
 				requires(typename ComponentType::choice_options_type::unqualified_value_type, Concepts::Choice_Is_Utility_Based) &&
 				requires(TargetType, is_arithmetic)))
 			{	
 				// Local type definition option
-				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Interface,choice_options,_choices_interface,Choice_Option_Interface,_choice_interface,ComponentType);
+				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Prototype,choice_options,_choices_interface,Choice_Option_Prototype,_choice_interface,ComponentType);
 				_choices_interface* choices = this->choice_options<_choices_interface*>();
 				_choice_interface* choice;
 				_choices_interface::iterator itr = choices->begin();
@@ -244,7 +240,7 @@ namespace Choice_Model_Components
 				}
 
 			}
-			facet void Evaluate_Choices(call_requirements(
+			feature void Evaluate_Choices(call_requirements(
 				requires(ComponentType, Concepts::Choice_Is_Rule_Based) &&
 				requires(TargetType, is_arithmetic)))
 			{
@@ -269,7 +265,7 @@ namespace Choice_Model_Components
 				//	choice->probability<typename TargetType::ReturnType>(util/utility_sum);
 				//}
 			}
-			facet void Evaluate_Choices(call_requirements(!(
+			feature void Evaluate_Choices(call_requirements(!(
 				(requires(ComponentType, Concepts::Is_MNL_Model) || requires(ComponentType, Concepts::Choice_Is_Rule_Based)) &&
 				requires(TargetType, is_arithmetic))))
 			{
@@ -281,10 +277,10 @@ namespace Choice_Model_Components
 
 			 
 			/// ACCESSORS
-			facet_accessor(chooser);
-			facet_accessor(generator);
-			facet_accessor(choice_options);
-			facet_accessor(random_probability_value);
+			feature_accessor(chooser);
+			feature_accessor(generator);
+			feature_accessor(choice_options);
+			feature_accessor(random_probability_value);
 		};
 
 	}

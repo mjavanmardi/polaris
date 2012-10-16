@@ -62,13 +62,13 @@ namespace Signal_Components
 		#pragma region Signal Concepts
 		concept CONCEPT_NAME
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_typename_state(none, CHECK, true_type,"ERROR_MESSAGE");
 			end_requirements_list(CHECK);
 		};
 		concept Has_Child_Phase
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_named_member(none, Phases, "ThisType does not have a Phase child type: no Phase_Base type is defined.");
 			end_requirements_list(Phases);
 		};
@@ -77,7 +77,7 @@ namespace Signal_Components
 		#pragma region Phase Concepts
 		concept Has_Child_Lane_Group
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_named_member(none, Lane_Groups, "ThisType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
 			end_requirements_list(Lane_Groups);
 		};
@@ -86,7 +86,7 @@ namespace Signal_Components
 		#pragma region Units Concepts
 		concept Is_Percentage
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_typename_state(none, Percent, true_type,"Type does not model a percentage concept.");
 			end_requirements_list(Percent);
 		};
@@ -94,21 +94,21 @@ namespace Signal_Components
 
 		concept Is_Measure
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_typename_defined(none, Length, "Type does not model a measurement concept.");
 			requires_typename_defined(Length,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
 			end_requirements_list(ValueType);
 		};
 		concept Is_Foot_Measure
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_concept(none, Is_Measure);
 			requires_typename_defined(Is_Measure, Feet, "Type does not model a foot measurement concept.");
 			end_requirements_list(Feet);
 		};
 		concept Is_Meter_Measure
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_concept(none, Is_Measure);
 			requires_typename_defined(Is_Measure, Meters, "Type does not model a meter measure concept.");
 			end_requirements_list(Meters);
@@ -117,21 +117,21 @@ namespace Signal_Components
 
 		concept Is_Time
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_typename_defined(none, Time, "Type does not model a Time concept.");
 			requires_typename_defined(Time,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
 			end_requirements_list(ValueType);
 		};
 		concept Is_Time_Seconds
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_concept(none, Is_Time);
 			requires_typename_defined(Is_Time, Seconds, "Type does not model a Time in Seconds concept.");
 			end_requirements_list(Seconds);
 		};
 		concept Is_Time_Minutes
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_concept(none, Is_Time);
 			requires_typename_defined(Is_Time, Minutes, "Type does not model a Time in Seconds concept.");
 			end_requirements_list(Minutes);
@@ -140,21 +140,21 @@ namespace Signal_Components
 
 		concept Is_Flow
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_typename_defined(none, Flow, "Type does not model a Flow concept.");
 			requires_typename_defined(Flow,ValueType,"Your measure type does not have an arithmetic ValueType defined.");
 			end_requirements_list(ValueType);
 		};
 		concept Is_Flow_Per_Hour
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_concept(none, Is_Flow);
 			requires_typename_defined(Is_Flow, Unit_Per_Hour, "Type does not model a Flow per hour concept.");
 			end_requirements_list(Unit_Per_Hour);
 		};
 		concept Is_Flow_Per_15_Minutes
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_concept(none, Is_Flow);
 			requires_typename_defined(Is_Flow, Unit_Per_15_Minute, "Type does not model a Flow per 15 minute time period concept.");
 			end_requirements_list(Unit_Per_15_Minute);
@@ -167,13 +167,13 @@ namespace Signal_Components
 		#pragma region Solution Type Concepts
 		concept Is_HCM_Simple_Solution
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_typename_state(none, HCM_Simple, true_type,"Type does not model an HCM simple solution type.");
 			end_requirements_list(HCM_Simple);
 		};
 		concept Is_HCM_Full_Solution
 		{
-			begin_requirements_list;
+			begin_requirements_list(none);
 			requires_typename_state(none, HCM_Full, true_type,"Type does not model an HCM full solution type.");
 			end_requirements_list(HCM_Full);
 		};
@@ -237,27 +237,26 @@ namespace Signal_Components
 	//==================================================================================================================
 	/// Namespace which includes the interface(or interfaces if necessary) which links to the various Bases regarding the transportation object
 	//------------------------------------------------------------------------------------------------------------------
-	namespace Interfaces
+	namespace Prototypes
 	{
 		//------------------------------------------------------------------------------------------------------------------
 		/// Inteface to the basic POLARIS Lane Group component as defined in HCM
 		//------------------------------------------------------------------------------------------------------------------
-		template<typename ThisType=NULLTYPE, typename CallerType=NULLTYPE>
-		struct Lane_Group_Interface
+		prototype struct Lane_Group_Prototype
 		{
-			facet void Initialize()
+			feature void Initialize()
 			{
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
+				return cast_self_as_component().Initialize<ComponentType,CallerType,TargetType>();
 			}
 
 			//=======================================================
 			// General Lane Group Calculation Facets
 			//-------------------------------------------------------
-			facet void Update_Demand(TargetType time, call_requires(TargetType, Concepts::Is_Time))
+			feature void Update_Demand(TargetType time, call_requires(TargetType, Concepts::Is_Time))
 			{
-				Interfaces::Detector_Interface<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* left = this->Detector_Left<typename ThisType::Master_Type::DETECTOR_TYPE>();
-				Interfaces::Detector_Interface<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* right = this->Detector_Right<typename ThisType::Master_Type::DETECTOR_TYPE>();
-				Interfaces::Detector_Interface<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* thru = this->Detector_Thru<typename ThisType::Master_Type::DETECTOR_TYPE>();
+				Prototypes::Detector_Prototype<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* left = this->Detector_Left<typename ThisType::Master_Type::DETECTOR_TYPE>();
+				Prototypes::Detector_Prototype<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* right = this->Detector_Right<typename ThisType::Master_Type::DETECTOR_TYPE>();
+				Prototypes::Detector_Prototype<typename ThisType::Master_Type::DETECTOR_TYPE,NULLTYPE>* thru = this->Detector_Thru<typename ThisType::Master_Type::DETECTOR_TYPE>();
 				Data_Structures::Flow_Per_Hour flow;
 				flow = left->count<Target_Type<Data_Structures::Flow_Per_Hour,Data_Structures::Time_Second>>(time);
 				this->demand_left<Data_Structures::Flow_Per_Hour>(flow);
@@ -267,25 +266,25 @@ namespace Signal_Components
 				this->demand_thru<Data_Structures::Flow_Per_Hour>(flow);
 			}
 			// Get the volumeto capacity ratio for lane group
-			facet TargetType Calculate_VC_ratio(call_requires(TargetType,is_arithmetic))
+			feature TargetType Calculate_VC_ratio(call_requires(TargetType,is_arithmetic))
 			{
-				return this->cycle_length<TargetType>() * this->demand_lane_group<TargetType>() / this->_Calculate_Saturation_Flow_Rate<TargetType>() / this->green_time<TargetType>();
+				return this->cycle_length<TargetType>() * this->demand_lane_group<TargetType>() / this->Calculate_Saturation_Flow_Rate<TargetType>() / this->green_time<TargetType>();
 			}
-			facet TargetType Calculate_VC_ratio(call_requires(TargetType,!is_arithmetic))
+			feature TargetType Calculate_VC_ratio(call_requires(TargetType,!is_arithmetic))
 			{
 				assert_requirements(TargetType,is_arithmetic,"Error - your TargetType is not arithmetic.");
 			}
 			// Get the flow ratio for the lane group - used in Full analysis
-			facet TargetType Calculate_VS_ratio(call_requires(TargetType,is_arithmetic))
+			feature TargetType Calculate_VS_ratio(call_requires(TargetType,is_arithmetic))
 			{
 				return this->demand_lane_group<Data_Structures::Flow_Per_Hour>() / this->Calculate_Saturation_Flow_Rate<TargetType>();
 			}
-			facet TargetType Calculate_VS_ratio(call_requires(TargetType,!is_arithmetic))
+			feature TargetType Calculate_VS_ratio(call_requires(TargetType,!is_arithmetic))
 			{
 				assert_requirements(TargetType,is_arithmetic,"Error - your TargetType is not arithmetic.");
 			}
 			// Get the critical volume for the lane group - used in simple analysis
-			facet TargetType Calculate_Lane_Volume(call_requires(TargetType,Concepts::Is_Flow_Per_Hour))
+			feature TargetType Calculate_Lane_Volume(call_requires(TargetType,Concepts::Is_Flow_Per_Hour))
 			{
 				TargetType vol_tot, vol_right, vol_left, vol_thru, vol_right_shared, vol_left_unopposed, vol_opposing, left_proportion;
 				vol_right = this->demand_right<TargetType>();
@@ -376,7 +375,7 @@ namespace Signal_Components
 
 					// through car equivalence
 					float thru_car_equivalent=1.0;
-					Interfaces::Lane_Group_Interface<ThisType,NULLTYPE>* opposing = this->opposing_lane<ThisType>();
+					Prototypes::Lane_Group_Prototype<ThisType,NULLTYPE>* opposing = this->opposing_lane<ThisType>();
 					if (opposing == NULL) vol_opposing = 0;
 					else vol_opposing = opposing->demand_thru<TargetType>();
 					if (vol_opposing < 200) thru_car_equivalent = 1.4;
@@ -410,12 +409,12 @@ namespace Signal_Components
 				}
 
 			}
-			facet TargetType Calculate_Lane_Volume(call_requires(TargetType,!Concepts::Is_Flow_Per_Hour))
+			feature TargetType Calculate_Lane_Volume(call_requires(TargetType,!Concepts::Is_Flow_Per_Hour))
 			{
 				assert_requirements(TargetType,Concepts::Is_Flow_Per_Hour,"Error - your TargetType is not a flow per hour measure.");
 			}
 			// Get the saturation flow rate for the lane group
-			facet TargetType Calculate_Saturation_Flow_Rate(call_requirements(requires(ThisType,Concepts::Is_HCM_Full_Solution)))
+			feature TargetType Calculate_Saturation_Flow_Rate(call_requirements(requires(ThisType,Concepts::Is_HCM_Full_Solution)))
 			{
 				 /*s = saturation flow rate for subject lane group, expressed as a total for all lanes in lane group (veh/h)
 				 s o = base saturation flow rate per lane (pc/h/ln)
@@ -434,7 +433,8 @@ namespace Signal_Components
 
 				TargetType  s_o = this->base_saturation_flow<Data_Structures::Flow_Per_Hour>();
 				TargetType  N = this->number_of_lanes<TargetType>();
-				TargetType  fw = SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fw<TargetType>();
+				this->
+				TargetType  fw = ((Lane_Group_Prototype::HCM_Lane_Group_Prototype*)this)->HCM_adjustment_fw<TargetType>();
 				TargetType  fHV = SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fHV<TargetType>();
 				TargetType  fg = SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fg<TargetType>() ;
 				TargetType  fp = SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fp<TargetType>() ;
@@ -450,7 +450,7 @@ namespace Signal_Components
 
 				return s;
 			}
-			facet TargetType Calculate_Saturation_Flow_Rate(call_requirements(requires(ThisType,Concepts::Is_HCM_Simple_Solution)))
+			feature TargetType Calculate_Saturation_Flow_Rate(call_requirements(requires(ThisType,Concepts::Is_HCM_Simple_Solution)))
 			{
 				TargetType s = this->base_saturation_flow<Data_Structures::Flow_Per_Hour>() *
 					this->number_of_lanes<TargetType>() *
@@ -458,7 +458,7 @@ namespace Signal_Components
 					SUB_THIS(HCM_Lane_Group)->HCM_adjustment_fa<TargetType>();
 				return s;
 			}
-			facet TargetType Calculate_Saturation_Flow_Rate(call_requirements(!(requires(ThisType,Concepts::Is_HCM_Simple_Solution) || requires(ThisType,Concepts::Is_HCM_Full_Solution))))
+			feature TargetType Calculate_Saturation_Flow_Rate(call_requirements(!(requires(ThisType,Concepts::Is_HCM_Simple_Solution) || requires(ThisType,Concepts::Is_HCM_Full_Solution))))
 			{
 				static_assert(false,"ThisType does not state whether it is a HCM_Full_Solution or an HCM_Simple_Solution.");
 			}
@@ -466,29 +466,29 @@ namespace Signal_Components
 			//=======================================================
 			// Lane_Group Interface Members Specific to HCM Analysis
 			//-------------------------------------------------------
-			NAMESPACE(HCM_Lane_Group, Lane_Group_Interface)
+			prototype struct HCM_Lane_Group_Prototype
 			{
 				// adjustment factor for lane width
-				facet float HCM_adjustment_fw()
+				feature float HCM_adjustment_fw()
 				{				
 					float width = THIS->avg_lane_width<Data_Structures::Length_Foot>();
 					State_Checks::valid_lane_width<ThisType, CallerType, TargetType>(this, width);
 					return (1.0f + (width - 12.0f)/30.0f);
 				}
 				// adjustment factor for heavy vehicles in traffic stream
-				facet float HCM_adjustment_fHV()
+				feature float HCM_adjustment_fHV()
 				{
 					return 100.0f/(100.0f + THIS->percent_heavy_vehicles<Data_Structures::Percentage>());
 				}
 				// adjustment factor for approach grade
-				facet float HCM_adjustment_fg()
+				feature float HCM_adjustment_fg()
 				{
 					float grade = THIS->grade<Data_Structures::Percentage>();
 					State_Checks::valid_grade<ThisType,CallerType,TargetType>(this, grade);
 					return 1.0f - grade / 200.0f;
 				}
 				// adjustment factor for existence of a parking lane and parking activity adjacent to lane group
-				facet float HCM_adjustment_fp()
+				feature float HCM_adjustment_fp()
 				{
 					float parking = THIS->parking_activity<float>();
 					State_Checks::valid_parking_manuevers<ThisType,CallerType,TargetType>(this, parking);
@@ -497,7 +497,7 @@ namespace Signal_Components
 					return (lanes - 0.1f - 18.0f * parking /3600.0f)/lanes;
 				}
 				// adjustment factor for blocking effect of local buses that stop within intersection area
-				facet float HCM_adjustment_fbb()
+				feature float HCM_adjustment_fbb()
 				{
 					float buses = THIS->buses_per_hour<float>();
 					State_Checks::valid_num_bus_stops<ThisType,CallerType,TargetType>(this, buses);
@@ -505,20 +505,20 @@ namespace Signal_Components
 					return (lanes - 14.4f * buses /3600.0f)/lanes;
 				}
 				// adjustment factor for area type
-				facet float HCM_adjustment_fa()
+				feature float HCM_adjustment_fa()
 				{
 					bool in_cbd = THIS->in_CBD<bool>();
 					if (in_cbd) return 0.9f;
 					else return 1.0f;
 				}
 				//  adjustment factor for lane utilization
-				facet float HCM_adjustment_fLU()
+				feature float HCM_adjustment_fLU()
 				{
 					return 1.0f;
 					//return THIS->demand_lane_group<Data_Structures::Flow_Per_Hour>() / (THIS->demand_lane_max<Data_Structures::Flow_Per_Hour>() * THIS->number_of_lanes<float>());
 				}
 				// adjustment factor for left turns in lane group
-				facet float HCM_adjustment_fLT()
+				feature float HCM_adjustment_fLT()
 				{
 					bool has_left, has_right, has_thru;
 					Data_Structures::Left_Turn_Types turn_type = THIS->left_turn_type<Data_Structures::Left_Turn_Types>();
@@ -544,7 +544,7 @@ namespace Signal_Components
 					return 1.0f;
 				}
 				// adjustment factor for right turns in lane group
-				facet float HCM_adjustment_fRT()
+				feature float HCM_adjustment_fRT()
 				{
 					bool has_left, has_right, has_thru;
 					has_left = THIS->has_left_turn<bool>();
@@ -574,12 +574,12 @@ namespace Signal_Components
 
 				}
 				// pedestrian adjustment factor for left-turn movements
-				facet float HCM_adjustment_fLpb()
+				feature float HCM_adjustment_fLpb()
 				{
 					return 1.0f;
 				}
 				// pedestrian-bicycle adjustment factor for right-turn movements
-				facet float HCM_adjustment_fRpb()
+				feature float HCM_adjustment_fRpb()
 				{
 					return 1.0f;
 				}
@@ -588,87 +588,86 @@ namespace Signal_Components
 			//=======================================================
 			// Demand data source Facets
 			//-------------------------------------------------------
-			facet_accessor_interface(Detector_Left);
-			facet_accessor_interface(Detector_Right);
-			facet_accessor_interface(Detector_Thru);
-			facet_accessor(Lane_Group_LOS);
+			feature_accessor(Detector_Left);
+			feature_accessor(Detector_Right);
+			feature_accessor(Detector_Thru);
+			feature_accessor(Lane_Group_LOS);
 
 			//=======================================================
 			// DATA Access Facets
 			//-------------------------------------
 			//Geometric conditions 
-			facet_accessor(number_of_lanes);		///< N
-			facet_accessor(number_of_right_lanes);	///< Nr
-			facet_accessor(number_of_left_lanes);	///< Nl
-			facet_accessor(avg_lane_width);			///< W (ft)
-			facet_accessor(grade);					///< G(%)
-			facet_accessor(has_left_turn);			///<
-			facet_accessor(left_turn_type);			///< Protected, Permitted, Unopposed, None
-			facet_accessor(left_turn_lane_type);	///< Exclusive, Shared, None
-			facet_accessor(right_turn_lane_type);	///< Exclusive, Shared, None
-			facet_accessor(has_right_turn);			///<
-			facet_accessor(has_thru_move);			///<
-			facet_accessor(in_CBD);					///<
-			facet_accessor(length_left_turn);		///< Ls s (ft)
-			facet_accessor(length_right_turn);		///< Lr (ft)
-			facet_accessor(has_parking);			///<
+			feature_accessor(number_of_lanes);		///< N
+			feature_accessor(number_of_right_lanes);	///< Nr
+			feature_accessor(number_of_left_lanes);	///< Nl
+			feature_accessor(avg_lane_width);			///< W (ft)
+			feature_accessor(grade);					///< G(%)
+			feature_accessor(has_left_turn);			///<
+			feature_accessor(left_turn_type);			///< Protected, Permitted, Unopposed, None
+			feature_accessor(left_turn_lane_type);	///< Exclusive, Shared, None
+			feature_accessor(right_turn_lane_type);	///< Exclusive, Shared, None
+			feature_accessor(has_right_turn);			///<
+			feature_accessor(has_thru_move);			///<
+			feature_accessor(in_CBD);					///<
+			feature_accessor(length_left_turn);		///< Ls s (ft)
+			feature_accessor(length_right_turn);		///< Lr (ft)
+			feature_accessor(has_parking);			///<
 
-			facet_accessor_interface(opposing_lane);
+			feature_accessor(opposing_lane);
 
 			//-------------------------------------
 			//Traffic conditions 
-			facet_accessor(demand_left);			///< V_l (veh/h)
-			facet_accessor(demand_right);			///< V_r (veh/h)
-			facet_accessor(demand_thru);			///< V (veh/h)
-			facet TargetType demand_lane_group()
+			feature_accessor(demand_left);			///< V_l (veh/h)
+			feature_accessor(demand_right);			///< V_r (veh/h)
+			feature_accessor(demand_thru);			///< V (veh/h)
+			feature TargetType demand_lane_group()
 			{
 				return (this->demand_left<TargetType>() + this->demand_right<TargetType>() + this->demand_thru<TargetType>());
 			}
-			facet TargetType demand_lane_max()
+			feature TargetType demand_lane_max()
 			{
 				return max(this->demand_left<TargetType>() , max(this->demand_right<TargetType>() , this->demand_thru<TargetType>()));
 			}
-			facet_accessor(base_saturation_flow);	///< s_o (pc/h/ln)
-			facet_accessor(peak_hour_factor);		///< PHF
-			facet_accessor(peak_hour_left);			///< PHF
-			facet_accessor(peak_hour_right);		///< PHF
-			facet_accessor(peak_hour_thru);			///< PHF
-			facet_accessor(percent_heavy_vehicles); ///< HV for the entire lane group (%)
-			facet_accessor(percent_heavy_veh_left); ///< HV for left turn lanes in the group(%)
-			facet_accessor(percent_heavy_veh_right);///< HV for right turn lanes in the group(%)
-			facet_accessor(percent_heavy_veh_thru);	///< HV for through lanes in teh group(%)
-			facet_accessor(pedestrian_flow_rate);	///< v_ped (p/h)
-			facet_accessor(buses_per_hour);			///< N_b (buses/h)
-			facet_accessor(parking_activity);		///< Nm (maneuvers/h)
-			facet_accessor(arrival_type);			///< AT
-			facet_accessor(percent_arrive_on_green);///< P
-			facet_accessor(approach_speed);			///< S_a	(mi/h)
+			feature_accessor(base_saturation_flow);	///< s_o (pc/h/ln)
+			feature_accessor(peak_hour_factor);		///< PHF
+			feature_accessor(peak_hour_left);			///< PHF
+			feature_accessor(peak_hour_right);		///< PHF
+			feature_accessor(peak_hour_thru);			///< PHF
+			feature_accessor(percent_heavy_vehicles); ///< HV for the entire lane group (%)
+			feature_accessor(percent_heavy_veh_left); ///< HV for left turn lanes in the group(%)
+			feature_accessor(percent_heavy_veh_right);///< HV for right turn lanes in the group(%)
+			feature_accessor(percent_heavy_veh_thru);	///< HV for through lanes in teh group(%)
+			feature_accessor(pedestrian_flow_rate);	///< v_ped (p/h)
+			feature_accessor(buses_per_hour);			///< N_b (buses/h)
+			feature_accessor(parking_activity);		///< Nm (maneuvers/h)
+			feature_accessor(arrival_type);			///< AT
+			feature_accessor(percent_arrive_on_green);///< P
+			feature_accessor(approach_speed);			///< S_a	(mi/h)
 
 			//-------------------------------------
 			//Signalization conditions 
-			facet_accessor(cycle_length);			///< C (s)
-			facet_accessor(max_cycle_length);			///< C (s)
-			facet_accessor(min_cycle_length);			///< C (s)
-			facet_accessor(green_time);				///< G (s)
-			facet_accessor(yellow_and_all_red_time);///< Y (s)
-			facet_accessor(is_actuated);			///< true if actuated, false if pre-timed
-			facet_accessor(has_pedestrian_button);	///< true if has pedestrian push button
-			facet_accessor(min_pedestrian_green);	///< G_p (s)
-			facet_accessor(phase_plan);				///< 
-			facet_accessor(analysis_period);		///< T (h)
+			feature_accessor(cycle_length);			///< C (s)
+			feature_accessor(max_cycle_length);			///< C (s)
+			feature_accessor(min_cycle_length);			///< C (s)
+			feature_accessor(green_time);				///< G (s)
+			feature_accessor(yellow_and_all_red_time);///< Y (s)
+			feature_accessor(is_actuated);			///< true if actuated, false if pre-timed
+			feature_accessor(has_pedestrian_button);	///< true if has pedestrian push button
+			feature_accessor(min_pedestrian_green);	///< G_p (s)
+			feature_accessor(phase_plan);				///< 
+			feature_accessor(analysis_period);		///< T (h)
 		};
 
 
 		//------------------------------------------------------------------------------------------------------------------
 		/// Inteface to the basic POLARIS Signal Phase Component
 		//------------------------------------------------------------------------------------------------------------------
-		template<typename ThisType=NULLTYPE, typename CallerType=NULLTYPE>
-		struct Phase_Interface
+		prototype struct Phase_Prototype
 		{
 			//============================================================
 			//  Intialize dispatched
 			//------------------------------------------------------------
-			facet void Initialize(TargetType number_of_lane_groups)
+			feature void Initialize(TargetType number_of_lane_groups)
 			{
 				this->signal_state<Data_Structures::Signal_State>(Data_Structures::Signal_State::RED);
 				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(number_of_lane_groups);
@@ -679,7 +678,7 @@ namespace Signal_Components
 			//  Phase Calculation Members
 			//------------------------------------------------------------
 			/// Get the maximum saturation ratio from amonst the individual lane_group in the phase
-			facet TargetType Find_Critical_VS_Ratio(call_requirements(
+			feature TargetType Find_Critical_VS_Ratio(call_requirements(
 				requires(ThisType, Concepts::Is_HCM_Full_Solution) && 
 				requires(TargetType, is_arithmetic)))
 			{
@@ -702,7 +701,7 @@ namespace Signal_Components
 				return vs_crit;
 			}
 
-			facet TargetType Find_Critical_VS_Ratio(call_requirements(!(
+			feature TargetType Find_Critical_VS_Ratio(call_requirements(!(
 				requires(ThisType, Concepts::Is_HCM_Full_Solution) && 
 				requires(TargetType, is_arithmetic))))
 			{
@@ -712,7 +711,7 @@ namespace Signal_Components
 			}
 
 			/// Get the maximum critical phase volume from amonst the individual lane_group in the phase
-			facet TargetType Find_Critical_Phase_Volume(call_requirements(
+			feature TargetType Find_Critical_Phase_Volume(call_requirements(
 				requires(ThisType, Concepts::Is_HCM_Simple_Solution) && 
 				requires(TargetType, Concepts::Is_Flow_Per_Hour)))
 			{
@@ -736,7 +735,7 @@ namespace Signal_Components
 				return v_crit;
 			}
 			
-			facet TargetType Find_Critical_Phase_Volume(call_requirements(!(
+			feature TargetType Find_Critical_Phase_Volume(call_requirements(!(
 				requires(ThisType, Concepts::Is_HCM_Simple_Solution) && 
 				requires(TargetType, Concepts::Is_Flow_Per_Hour))))
 			{
@@ -746,7 +745,7 @@ namespace Signal_Components
 				//assert_requirements_2(ThisType::LaneGroupType::Interface_Type&,Lange_Group_Interface,is_convertible,"Error - your lane group type is not convertible to the base lane group interface.");
 			}
 
-			facet void Update_Demand(TargetType time, call_requirements(
+			feature void Update_Demand(TargetType time, call_requirements(
 				requires(TargetType, Concepts::Is_Time)))
 			{
 				// Get reference to the Lane Groups in the current phase
@@ -761,7 +760,7 @@ namespace Signal_Components
 				}
 			}
 	
-			facet void Update_Demand(TargetType time, call_requirements(!(
+			feature void Update_Demand(TargetType time, call_requirements(!(
 				requires(TargetType, Concepts::Is_Time))))
 			{
 				assert_requirements(ThisType, Concepts::Has_Child_Lane_Group, "ThisType does not have an associated LaneGroupType as a child element.");
@@ -772,49 +771,48 @@ namespace Signal_Components
 			//============================================================
 			//  SIGNAL STATUS ACCESSORS
 			//------------------------------------------------------------
-			facet_accessor(signal_state);
+			feature_accessor(signal_state);
 
 
 			//============================================================
 			//  BASIC ACCESSORS
 			//------------------------------------------------------------
 			/// Phase green time
-			facet_accessor(green_time);					///< G (s)
+			feature_accessor(green_time);					///< G (s)
 			/// Phase lost time
-			facet_accessor(yellow_and_all_red_time);	///< Y (s)
+			feature_accessor(yellow_and_all_red_time);	///< Y (s)
 			/// Weight factor used when setting the phase green times (multiplier for the phase volume)
-			facet_accessor(weight);
+			feature_accessor(weight);
 			/// Local facet to return the list of lane groups associated with phase
-			facet_accessor(Lane_Groups);
-			facet_accessor(name);
-			facet_accessor(phase_id);
+			feature_accessor(Lane_Groups);
+			feature_accessor(name);
+			feature_accessor(phase_id);
 
 
 			//============================================================
 			//  PARENT CLASS ACCESSORS
 			//------------------------------------------------------------
-			facet_accessor(cycle_length);			///< C (s)
-			facet_accessor(max_cycle_length);			///< C (s)
-			facet_accessor(min_cycle_length);			///< C (s)
-			facet_accessor(in_CBD);				/// 0.9 for CBD else 1.0
-			facet_accessor(analysis_period);		///< T (h)
+			feature_accessor(cycle_length);			///< C (s)
+			feature_accessor(max_cycle_length);			///< C (s)
+			feature_accessor(min_cycle_length);			///< C (s)
+			feature_accessor(in_CBD);				/// 0.9 for CBD else 1.0
+			feature_accessor(analysis_period);		///< T (h)
 		};
 
 
 		//------------------------------------------------------------------------------------------------------------------
 		/// Inteface to the basic POLARIS Signal Phase Component
 		//------------------------------------------------------------------------------------------------------------------
-		template<typename ThisType=NULLTYPE, typename CallerType=NULLTYPE>
-		struct Approach_Interface
+		prototype struct Approach_Prototype
 		{
 			//============================================================
 			//  Intialize dispatched
 			//------------------------------------------------------------
-			facet void Initialize()
+			feature void Initialize()
 			{
 				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
 			}
-			facet void Add_Lane_Group(typename TargetType::Interface_Type<TargetType,NULLTYPE>::type* lane_group)
+			feature void Add_Lane_Group(typename TargetType::Interface_Type<TargetType,NULLTYPE>::type* lane_group)
 			{
 				PTHIS(ThisType)->Add_Lane_Group<Dispatch<ThisType>,CallerType,TargetType>(lane_group);
 			}
@@ -823,7 +821,7 @@ namespace Signal_Components
 			//  Approach LOS and Delay Members
 			//------------------------------------------------------------
 			/// Get the maximum saturation ratio from amonst the individual lane_group in the phase
-			facet void Calculate_Approach_LOS(call_requirements(
+			feature void Calculate_Approach_LOS(call_requirements(
 				requires(TargetType, is_arithmetic)))
 			{
 				// Get reference to the Lane Groups in the current phase
@@ -874,7 +872,7 @@ namespace Signal_Components
 				this->approach_flow_rate<Data_Structures::Flow_Per_Hour>(sum_flow);
 			}
 
-			facet void Calculate_Approach_LOS(call_requirements(!(
+			feature void Calculate_Approach_LOS(call_requirements(!(
 				requires(TargetType, is_arithmetic))))
 			{
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not arithmetic.");
@@ -885,38 +883,37 @@ namespace Signal_Components
 			//  BASIC ACCESSORS
 			//------------------------------------------------------------
 			/// Phase green time
-			facet_accessor(delay);					///< d (s)
+			feature_accessor(delay);					///< d (s)
 			/// Flow rate for combined lane groups in the approach
-			facet_accessor(approach_flow_rate);
+			feature_accessor(approach_flow_rate);
 			/// Phase lost time
-			facet_accessor(LOS);					
+			feature_accessor(LOS);					
 			/// Local facet to return the list of lane groups associated with phase
-			facet_accessor(Lane_Groups);
+			feature_accessor(Lane_Groups);
 			/// Local facet to return the approach name (if applicable)
-			facet_accessor(name);
+			feature_accessor(name);
 
 			//============================================================
 			//  PARENT CLASS ACCESSORS
 			//------------------------------------------------------------
-			facet_accessor(cycle_length);				///< C (s)
-			facet_accessor(max_cycle_length);			///< C (s)
-			facet_accessor(min_cycle_length);			///< C (s)
-			facet_accessor(in_CBD);						///< 0.9 for CBD else 1.0
-			facet_accessor(analysis_period);			///< T (h)
+			feature_accessor(cycle_length);				///< C (s)
+			feature_accessor(max_cycle_length);			///< C (s)
+			feature_accessor(min_cycle_length);			///< C (s)
+			feature_accessor(in_CBD);						///< 0.9 for CBD else 1.0
+			feature_accessor(analysis_period);			///< T (h)
 		};
 
 
 		//------------------------------------------------------------------------------------------------------------------
 		/// Inteface to the basic POLARIS Signal component
 		//------------------------------------------------------------------------------------------------------------------
-		template<typename ThisType=NULLTYPE, typename CallerType=NULLTYPE>
-		struct Signal_Interface
+		prototype struct Signal_Prototype
 		{
 			//=======================================================
 			// Initialization
 			//-------------------------------------------------------
 			/// Dispatch the Initialize function call to the component base
-			facet void Initialize(TargetType num_phases, TargetType number_of_approaches)
+			feature void Initialize(TargetType num_phases, TargetType number_of_approaches)
 			{		
 				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(num_phases, number_of_approaches);
 				this->Next_Event_Iteration<int>(0);
@@ -934,7 +931,7 @@ namespace Signal_Components
 			// HCM Retiming calculations
 			//-------------------------------------------------------
 			/// HCM Retiming calculations for complex signals, with full information
-			facet void Update_Timing(call_requirements(
+			feature void Update_Timing(call_requirements(
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
 				requires(typename ThisType, Concepts::Is_HCM_Full_Solution)))
 			{
@@ -1001,7 +998,7 @@ namespace Signal_Components
 				//this->Display_Signal_LOS<NULLTYPE>();
 			}
 			/// HCM Retiming calculations for simple signals
-			facet void Update_Timing(call_requirements(
+			feature void Update_Timing(call_requirements(
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
 				requires(typename ThisType, Concepts::Is_HCM_Simple_Solution)))
 			{
@@ -1061,7 +1058,7 @@ namespace Signal_Components
 				Calculate_Signal_LOS<char>();
 			}
 			/// HCM Retiming calculation error handler
-			facet void Update_Timing(call_requirements(!(
+			feature void Update_Timing(call_requirements(!(
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
 				(requires(ThisType, Concepts::Is_HCM_Full_Solution) || requires(ThisType, Concepts::Is_HCM_Simple_Solution)))))
 			{
@@ -1071,7 +1068,7 @@ namespace Signal_Components
 				assert_requirements_2(ThisType::Phase_Interface&, Interfaces::Phase_Interface&, is_convertible, "Your ThisType::Phase_Interface specifies can not be cast to a Interface::Phase_Interface.");
 			}
 			/// HCM LOS Calculation
-			facet void Calculate_Signal_LOS(call_requirements(requires(TargetType,is_integral)))
+			feature void Calculate_Signal_LOS(call_requirements(requires(TargetType,is_integral)))
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
@@ -1107,7 +1104,7 @@ namespace Signal_Components
 			// Display functionality
 			//-------------------------------------------------------
 			/// Output the cycle length and phasing plan information for signal	
-			facet void Display_Timing()
+			feature void Display_Timing()
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
@@ -1136,7 +1133,7 @@ namespace Signal_Components
 				
 			}	
 			/// Display the signal LOS to the output stream
-			facet void Display_Signal_LOS()
+			feature void Display_Signal_LOS()
 			{
 				// Simplify ThisType name
 				typedef ThisType T;
@@ -1159,7 +1156,7 @@ namespace Signal_Components
 			//=======================================================
 			// Signal Events
 			//-------------------------------------------------------
-			declare_facet_conditional(Signal_Check_Conditional)
+			declare_feature_conditional(Signal_Check_Conditional)
 			{
 				// Get Current Interface
 				typedef ThisType T;
@@ -1251,7 +1248,7 @@ namespace Signal_Components
 				//	assert("Error, should not get here");
 				//}
 			}
-			declare_facet_event(Change_Signal_State)
+			declare_feature_event(Change_Signal_State)
 			{
 				// Get Current Interface
 				typedef ThisType T;
@@ -1312,7 +1309,7 @@ namespace Signal_Components
 				// Set has fired to true, indicates signal events done for current iteration
 				_this->Event_Has_Fired<bool>(true);
 			}
-			declare_facet_event(Change_Signal_Timing)
+			declare_feature_event(Change_Signal_Timing)
 			{
 				// Get Current Interface
 				typedef ThisType T;
@@ -1340,104 +1337,103 @@ namespace Signal_Components
 			//--------------------------------------------
 			// Signal Event timing and iteration accessors
 			//--------------------------------------------
-			facet_accessor(Next_Event_Iteration);
-			facet_accessor(Next_Timing_Event_Iteration);
-			facet_accessor(Event_Has_Fired);
-			facet_accessor(Event_Conditional_Hit);
-			facet_accessor(Timing_Event_Has_Fired);
-			facet_accessor(Timing_Event_Conditional_Hit);
+			feature_accessor(Next_Event_Iteration);
+			feature_accessor(Next_Timing_Event_Iteration);
+			feature_accessor(Event_Has_Fired);
+			feature_accessor(Event_Conditional_Hit);
+			feature_accessor(Timing_Event_Has_Fired);
+			feature_accessor(Timing_Event_Conditional_Hit);
 
 
 			//=======================================================
 			// Accessor facets
 			//-------------------------------------------------------
 			/// Stream to write messages to
-			facet_accessor(output_stream);
+			feature_accessor(output_stream);
 			/// Number of cycles until signal update is called
-			facet_accessor(num_cycles_between_updates);  
+			feature_accessor(num_cycles_between_updates);  
 			/// Analysis Period
-			facet_accessor(analysis_period);		///< T (h)
+			feature_accessor(analysis_period);		///< T (h)
 			/// Total cycle length
-			facet_accessor(cycle_length);			///< C (s)
+			feature_accessor(cycle_length);			///< C (s)
 			/// Total cycle length
-			facet_accessor(max_cycle_length);			///< C (s)
+			feature_accessor(max_cycle_length);			///< C (s)
 			/// Total cycle length
-			facet_accessor(min_cycle_length);			///< C (s)
+			feature_accessor(min_cycle_length);			///< C (s)
 			/// Total cycle length
-			facet_accessor(degree_of_saturation);	///< X (s)
+			feature_accessor(degree_of_saturation);	///< X (s)
 			/// Area type
-			facet_accessor(in_CBD);
+			feature_accessor(in_CBD);
 			/// Signal ID accessor
-			facet_accessor(Signal_ID);
+			feature_accessor(Signal_ID);
 			/// Signal name accessor
-			facet_accessor(name);
+			feature_accessor(name);
 			// phf for the signal as a whole
-			facet_accessor(peak_hour_factor);
+			feature_accessor(peak_hour_factor);
 			// Currently active (green) signal phase
-			facet_accessor(active_phase);
+			feature_accessor(active_phase);
 			// Current signal delay per vehicle
-			facet_accessor(delay);
+			feature_accessor(delay);
 			// Current signal LOS
-			facet_accessor(LOS);
+			feature_accessor(LOS);
 
 			//========================================================================
 			// COLLECTIONS
 			//------------------------------------------------------------------------
 			/// Local facet to return the list of phases associated with signal
-			facet_accessor(Phases);
+			feature_accessor(Phases);
 			/// Local facet to return the list of phases associated with signal
-			facet_accessor(Approaches);
+			feature_accessor(Approaches);
 		};
 
 
 		//------------------------------------------------------------------------------------------------------------------
 		/// Signal Indicator Component
 		//------------------------------------------------------------------------------------------------------------------
-		template <typename ThisType, typename CallerType>
-		struct Signal_Indicator_Interface
+		prototype struct Signal_Indicator_Prototype
 		{
 			// Initialize the signal indicator
-			facet void Initialize(call_requirements(requires(ThisType,Is_Execution_Object)))
+			feature void Initialize(call_requirements(requires(ThisType,Is_Execution_Object)))
 			{
 				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
 				schedule_event_local(ThisType,Signal_Indicator_Conditional,Signal_Indicator_Event,0,NULLTYPE);
 				this->Conditional_Has_Fired<bool>(false);
 			}
-			facet void Initialize(call_requirements(requires(ThisType,Is_Data_Object)))
+			feature void Initialize(call_requirements(requires(ThisType,Is_Data_Object)))
 			{
 				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
 			}
-			facet void Initialize(call_requirements(requires(ThisType,!Is_Data_Object) && requires(ThisType,!Is_Execution_Object)))
+			feature void Initialize(call_requirements(requires(ThisType,!Is_Data_Object) && requires(ThisType,!Is_Execution_Object)))
 			{
 				assert_requirements(ThisType,Is_Data_Object,"ThisType is not a data object or an execution object.");
 			}
 
 			// Initialize the signal indicator and provide its linked signal
-			facet void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements(requires(ThisType,Is_Execution_Object) && requires(TargetType, Is_Polaris_Component)))
+			feature void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements(requires(ThisType,Is_Execution_Object) && requires(TargetType, Is_Polaris_Component)))
 			{
 				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
 				schedule_event_local(ThisType,Signal_Indicator_Conditional,Signal_Indicator_Event,0,NULLTYPE);
 				this->Conditional_Has_Fired<bool>(false);
 				this->Signal<TargetType>(signal_interface);
 			}
-			facet void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements(requires(ThisType,Is_Data_Object) && requires(TargetType, Is_Polaris_Component)))
+			feature void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements(requires(ThisType,Is_Data_Object) && requires(TargetType, Is_Polaris_Component)))
 			{
 				PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
 				this->Signal<TargetType>(signal_interface);
 			}
-			facet void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements((requires(ThisType,!Is_Data_Object) && requires(ThisType,!Is_Execution_Object)) || requires(TargetType, !Is_Polaris_Component)))
+			feature void Initialize(typename TargetType::Interface_Type<TargetType,CallerType>::type* signal_interface, call_requirements((requires(ThisType,!Is_Data_Object) && requires(ThisType,!Is_Execution_Object)) || requires(TargetType, !Is_Polaris_Component)))
 			{
 				assert_requirements(ThisType,Is_Data_Object,"ThisType is not a data object or an execution object.");
 				assert_requirements(TargetType,Is_Polaris_Component,"TargetType is not a polaris component.");
 			}
 
 			// Signal Interface accessor
-			facet_accessor_interface(Signal);
-			facet_accessor(Conditional_Has_Fired);
-			facet_accessor(output_stream);
+			feature_accessor_interface(Signal);
+			feature_accessor(Conditional_Has_Fired);
+			feature_accessor(output_stream);
 
 			// Event definition
-			declare_facet_conditional(Signal_Indicator_Conditional)
+			declare_feature_conditional(Signal_Indicator_Conditional)
 			{
 				// Get Current Interface
 				Signal_Indicator_Interface<ThisType,NULLTYPE>* _this=(Signal_Indicator_Interface<ThisType,NULLTYPE>*)pthis;
@@ -1456,7 +1452,7 @@ namespace Signal_Components
 					response.next = iteration + 1;
 				}
 			}
-			declare_facet_event(Signal_Indicator_Event)
+			declare_feature_event(Signal_Indicator_Event)
 			{
 				// Sleep Now
 				Sleep(100);
@@ -1499,11 +1495,10 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		/// Detector Interface
 		//------------------------------------------------------------------------------------------------------------------
-		template <typename ThisType, typename CallerType>
-		struct Detector_Interface
+		prototype struct Detector_Prototype
 		{
 			// Getter for the detector count data
-			facet typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
+			feature typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
 				requires(ThisType, Is_Dispatchable) &&
 				requires(TargetType, Is_Target_Type_Struct) &&
 				requires(typename TargetType::ParamType, Concepts::Is_Time)))
@@ -1511,7 +1506,7 @@ namespace Signal_Components
 				return PTHIS(ThisType)->count<Dispatch<ThisType>, CallerType, TargetType>(time);
 			}
 			// Getter for the detector count data
-			facet typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(!(
+			feature typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(!(
 				requires(ThisType, Is_Dispatchable) &&
 				requires(TargetType,Is_Target_Type_Struct) &&
 				requires(typename TargetType::ParamType, Concepts::Is_Time))))
@@ -1521,15 +1516,15 @@ namespace Signal_Components
 			}
 
 			// Updater for the detector count data - call whenever a vehicle crosses detector (or use for aggregate updates by passing a vehicle count value in)
-			facet void detect_vehicles(TargetType vehicle_detection_count)
+			feature void detect_vehicles(TargetType vehicle_detection_count)
 			{
 				PTHIS(ThisType)->detect_vehicle<Dispatch<ThisType>,CallerType,TargetType>(vehicle_detection_count);
 			}
-			facet void detect_vehicle()
+			feature void detect_vehicle()
 			{
 				PTHIS(ThisType)->detect_vehicle<Dispatch<ThisType>,CallerType,TargetType>(1);
 			}
-			facet TargetType Get_Count()
+			feature TargetType Get_Count()
 			{
 				return PTHIS(ThisType)->Get_Count<Dispatch<ThisType>,CallerType,TargetType>();
 			}
