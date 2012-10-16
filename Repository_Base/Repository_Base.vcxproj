@@ -120,14 +120,12 @@
     <ClInclude Include="Basic_Units.h" />
     <ClInclude Include="Choice_Model_Bases.h" />
     <ClInclude Include="Choice_Model_Interface.h" />
-    <ClInclude Include="Signal_Base.h" />
     <ClInclude Include="TEMPLATE_Bases.h" />
     <ClInclude Include="TEMPLATE_interface.h" />
     <ClInclude Include="Location_Interfaces.h" />
     <ClInclude Include="Location_Base.h" />
     <ClInclude Include="Repository_Base.h" />
     <ClInclude Include="Repository_Base_Includes.h" />
-    <ClInclude Include="Signal_Interfaces.h" />
     <ClInclude Include="Spatial_Interfaces.h" />
     <ClInclude Include="Spatial_Base.h" />
     <ClInclude Include="Time_Interfaces.h" />

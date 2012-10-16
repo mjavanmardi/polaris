@@ -9,10 +9,10 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Interfaces">
+    <Filter Include="Prototypes">
       <UniqueIdentifier>{98719f82-5714-4a33-82cc-592c4eb105bb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Bases">
+    <Filter Include="Implementations">
       <UniqueIdentifier>{4d0cd0e1-2c81-45b9-8890-1f5d97aa702c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -24,28 +24,28 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Location_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Spatial_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Time_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Trip_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Time_Interfaces.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Trip_Interfaces.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Location_Interfaces.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Spatial_Interfaces.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="TEMPLATE_interface.h">
       <Filter>Header Files</Filter>
@@ -53,26 +53,20 @@
     <ClInclude Include="TEMPLATE_Bases.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Signal_Interfaces.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Signal_Base.h">
-      <Filter>Bases</Filter>
-    </ClInclude>
     <ClInclude Include="..\Repository_User\Demand_Bases.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Traffic_Management_Interfaces.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Choice_Model_Interface.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Choice_Model_Bases.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Basic_Units.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
