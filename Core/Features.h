@@ -6,7 +6,7 @@
 /// prototype - standard declarator for all prototypes
 ///============================================================================
 
-#define prototype template<typename ComponentType,typename CallerType>
+#define prototype template<typename ComponentType,typename CallerType=NULLTYPE>
 
 ///============================================================================
 /// implementation - standard declarator for all implementations
