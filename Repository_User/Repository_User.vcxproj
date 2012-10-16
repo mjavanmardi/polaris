@@ -145,6 +145,8 @@
     <ClInclude Include="Routable_Link_Base.h" />
     <ClInclude Include="Routing_Interface.h" />
     <ClInclude Include="Scenario_Interface.h" />
+    <ClInclude Include="Signal_Implementations.h" />
+    <ClInclude Include="Signal_Prototypes.h" />
     <ClInclude Include="Transims_Demand_API.h" />
     <ClInclude Include="Traveler_Interface.h" />
     <ClInclude Include="Vehicle_Interface.h" />

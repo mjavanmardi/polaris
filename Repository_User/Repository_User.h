@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Signal_Implementations.h"
 #include "Repository_User_Includes.h"
 #include "Polaris_Intersection_Base.h"
 #include "Polaris_Link_Base.h"

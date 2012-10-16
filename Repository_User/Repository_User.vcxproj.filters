@@ -9,11 +9,11 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Interfaces">
-      <UniqueIdentifier>{9da4cbf3-1852-4bb9-a898-879a9b1dca5f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Bases">
+    <Filter Include="Implementations">
       <UniqueIdentifier>{4ec1dd34-e5cc-487f-9d45-124080eb5821}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Prototypes">
+      <UniqueIdentifier>{9da4cbf3-1852-4bb9-a898-879a9b1dca5f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -27,67 +27,73 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Intersection_Interface.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Link_Interface.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Scenario_Interface.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Vehicle_Interface.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Network_Interface.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Routing_Interface.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Traveler_Interface.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Activity_Location_Interface.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Demand_Interface.h">
-      <Filter>Interfaces</Filter>
+      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Polaris_Intersection_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Polaris_Link_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Polaris_Network_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Polaris_Scenario_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Polaris_Vehicle_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Routable_Link_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Routable_Intersection_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Polaris_Routing_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Polaris_Traveler_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Polaris_Activity_Location_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Polaris_Demand_Base.h">
-      <Filter>Bases</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="RngStream.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Signal_Prototypes.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Signal_Implementations.h">
+      <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
