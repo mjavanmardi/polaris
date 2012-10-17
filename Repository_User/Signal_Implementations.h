@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Signal_Interfaces.h"
+#include "Signal_Prototypes.h"
 
 
 namespace Signal_Components
@@ -8,15 +8,15 @@ namespace Signal_Components
 	//==================================================================================================================
 	/// DETECTOR BASE Namespace of Base classes and Components related to the Interface(s) from the component namespace.
 	//------------------------------------------------------------------------------------------------------------------
-	namespace Bases
+	namespace Implementations
 	{
 		//==================================================================================================================
 		/// Signal Detector Base
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename MasterType>
-		struct Signal_Detector_Base
+		struct Signal_Detector_Implementation
 		{
-			Signal_Detector_Base() : _last_access(Data_Structures::Time_Second(0)), _count(0){}
+			Signal_Detector_Implementation() : _count(0){_last_access = Data_Structures::Time_Second(0);}
 			Data_Structures::Time_Second _last_access;
 			int _count;
 
@@ -61,7 +61,7 @@ namespace Signal_Components
 		template<typename MasterType>
 		struct Signal_Detector
 		{
-			typedef Polaris_Component<Interfaces::Detector_Interface, Bases::Signal_Detector_Base<MasterType>,NULLTYPE,MasterType> type;
+			typedef Polaris_Component<Implementations::Signal_Detector_Implementation,MasterType> type;
 		};
 	}
 
@@ -70,7 +70,7 @@ namespace Signal_Components
 	//==================================================================================================================
 	/// SIGNAL ELEMENTS BASES Namespace of Base classes and Components related to the Interface(s) from the component namespace.
 	//------------------------------------------------------------------------------------------------------------------
-	namespace Bases
+	namespace Implementations
 	{
 		//==================================================================================================================
 		/// Lane Group Bases
@@ -78,8 +78,10 @@ namespace Signal_Components
 		/// Holds common data for all HCM Lanegroup Bases
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename MasterType>
-		struct Lane_Group_HCM_Base
+		struct Lane_Group_HCM_Implementation
 		{
+			typedef true_type IsLaneGroup;
+
 			//============================================================
 			//  Lane Group Initializer
 			//------------------------------------------------------------
@@ -112,7 +114,7 @@ namespace Signal_Components
 			tag_getter(in_CBD);
 			feature_implementation TargetType in_CBD(call_requirements(requires(TargetType,is_integral)))			
 			{
-				Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				return parent->in_CBD<TargetType>();
 			}
 			feature_implementation TargetType in_CBD(call_requirements(requires(TargetType,!is_integral)))			
@@ -122,7 +124,8 @@ namespace Signal_Components
 			tag_getter(cycle_length);
 			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
-				Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				return parent->cycle_length<TargetType>();
 			}
 			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
@@ -132,7 +135,8 @@ namespace Signal_Components
 			tag_getter(max_cycle_length);
 			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
-				Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
+				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->max_cycle_length<TargetType>();
 			}
 			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
@@ -142,7 +146,8 @@ namespace Signal_Components
 			tag_getter(min_cycle_length);
 			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
-				Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
+				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->min_cycle_length<TargetType>();
 			}
 			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
@@ -152,7 +157,8 @@ namespace Signal_Components
 			tag_getter(green_time);
 			feature_implementation TargetType green_time(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
-				Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
+				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->green_time<TargetType>();
 			}
 			feature_implementation TargetType green_time(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
@@ -162,7 +168,8 @@ namespace Signal_Components
 			tag_getter(yellow_and_all_red_time);
 			feature_implementation TargetType yellow_and_all_red_time(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
-				Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
+				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->yellow_and_all_red_time<TargetType>();
 			}
 			feature_implementation TargetType yellow_and_all_red_time(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
@@ -172,7 +179,8 @@ namespace Signal_Components
 			tag_getter(analysis_period);
 			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,Concepts::Is_Time_Minutes)))			
 			{
-				Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
+				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->analysis_period<TargetType>();
 			}
 			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,!Concepts::Is_Time_Minutes)))			
@@ -185,17 +193,7 @@ namespace Signal_Components
 			//============================================================
 			// Opposing lane_group interface 
 			//------------------------------------------------------------
-			void* _opposing_lane;
-			tag_getter_setter(opposing_lane);
-			feature_implementation typename TargetType::Interface_Type<TargetType,CallerType>::type* opposing_lane(call_requirements(requires(ComponentType,Is_Dispatched) && requires_2(ComponentType,TargetType,Is_Same_Component)))			
-			{
-				return  (typename TargetType::Interface_Type<TargetType,CallerType>::type*) _opposing_lane;
-			}
-			feature_implementation void opposing_lane(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value, call_requirements(requires(ComponentType,Is_Dispatched) && requires_2(ComponentType,TargetType,Is_Same_Component)))			
-			{
-				_opposing_lane = (void*) set_value;
-			}
-			//member_component_basic(Components::HCM_LaneGroup_Simple,opposing_lane);
+			member_component_basic(typename MasterType::LANE_GROUP_TYPE,opposing_lane);
 
 
 			//============================================================
@@ -218,30 +216,30 @@ namespace Signal_Components
 			//------------------------------------------------------------
 			float _avg_lane_width;
 			tag_getter_setter(avg_lane_width);
-			feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(requires(ComponentType,Is_Dispatched) && requires(TargetType,Concepts::Is_Foot_Measure)))
+			feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(requires(TargetType,Concepts::Is_Foot_Measure)))
 			{
 				State_Checks::valid_lane_width<ComponentType,CallerType,TargetType>(this,set_value);
 				_avg_lane_width=(float)set_value;
 			}
-			feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(requires(ComponentType,Is_Dispatched) && requires(TargetType,Concepts::Is_Meter_Measure)))
+			feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(requires(TargetType,Concepts::Is_Meter_Measure)))
 			{
-				State_Checks::valid_lane_width<TargetType>(set_value.value * 3.28084);
+				State_Checks::valid_lane_width<ComponentType,CallerType,TargetType>(set_value.value * 3.28084);
 				_avg_lane_width=(float)set_value.value * 3.28084;
 			}
-			feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(!(requires(ComponentType,Is_Dispatched) && (requires(TargetType, Concepts::Is_Foot_Measure) || requires(TargetType, Concepts::Is_Meter_Measure)))))
+			feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(!((requires(TargetType, Concepts::Is_Foot_Measure) || requires(TargetType, Concepts::Is_Meter_Measure)))))
 			{
 				assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
 				assert_requirements(TargetType,Concepts::Is_Foot_Measure,"TargetType is not a foot or meter measure");
 			}
-			feature_implementation  TargetType avg_lane_width(call_requirements(requires(ComponentType,Is_Dispatched) && requires(TargetType,Concepts::Is_Foot_Measure)))
+			feature_implementation  TargetType avg_lane_width(call_requirements(requires(TargetType,Concepts::Is_Foot_Measure)))
 			{
 				return (typename TargetType::ValueType)_avg_lane_width;
 			}
-			feature_implementation  TargetType avg_lane_width(call_requirements(requires(ComponentType,Is_Dispatched) && requires(TargetType,Concepts::Is_Meter_Measure)))
+			feature_implementation  TargetType avg_lane_width(call_requirements(requires(TargetType,Concepts::Is_Meter_Measure)))
 			{
 				return (typename TargetType::ValueType)(_avg_lane_width * 0.3048);
 			}
-			feature_implementation  TargetType avg_lane_width(call_requirements(!(requires(ComponentType,Is_Dispatched) && (requires(TargetType, Concepts::Is_Foot_Measure) || requires(TargetType, Concepts::Is_Meter_Measure)))))
+			feature_implementation  TargetType avg_lane_width(call_requirements(!(requires(TargetType, Concepts::Is_Foot_Measure) || requires(TargetType, Concepts::Is_Meter_Measure))))
 			{
 				assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
 				assert_requirements(TargetType,Concepts::Is_Foot_Measure,"TargetType is not a foot or meter measure");
@@ -283,11 +281,11 @@ namespace Signal_Components
 		/// according to HCM 2000 CH16
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename MasterType>
-		struct Lane_Group_HCM_Full_Base : public Lane_Group_HCM_Base<MasterType>
+		struct Lane_Group_HCM_Full_Implementation : public Lane_Group_HCM_Implementation<MasterType>
 		{
 			feature_implementation  void Initialize()
 			{
-				Lane_Group_HCM_Base::Initialize<ComponentType,CallerType,TargetType>();
+				Lane_Group_HCM_Implementation::Initialize<ComponentType,CallerType,TargetType>();
 
 			}
 			/// Type definitions to define the context of the base class
@@ -310,8 +308,8 @@ namespace Signal_Components
 				 fLpb = pedestrian adjustment factor for left-turn movements
 				 fRpb = pedestrian-bicycle adjustment factor for right-turn movements.*/
 
-				TargetType  s_o = this->base_saturation_flow<ComponentType,CallerType,Data_Structures::Flow_Per_Hour>();
-				TargetType  N = this->number_of_lanes<ComponentType,CallerType,TargetType>();
+				TargetType  s_o = ((Lane_Group_HCM_Implementation<MasterType>*)this)->base_saturation_flow<ComponentType,CallerType,Data_Structures::Flow_Per_Hour>();
+				TargetType  N = ((Lane_Group_HCM_Implementation<MasterType>*)this)->number_of_lanes<ComponentType,CallerType,TargetType>();
 				TargetType  fw = this->HCM_adjustment_fw<ComponentType,CallerType,TargetType>();
 				TargetType  fHV = this->HCM_adjustment_fHV<ComponentType,CallerType,TargetType>();
 				TargetType  fg = this->HCM_adjustment_fg<ComponentType,CallerType,TargetType>() ;
@@ -387,15 +385,15 @@ namespace Signal_Components
 			// adjustment factor for blocking effect of local buses that stop within intersection area
 			feature_implementation float HCM_adjustment_fbb()
 			{
-				float buses = THIS->buses_per_hour<float>();
+				float buses = this->buses_per_hour<float>();
 				State_Checks::valid_num_bus_stops<ComponentType,CallerType,TargetType>(this, buses);
-				float lanes = THIS->number_of_lanes<float>();
+				float lanes = ((Lane_Group_HCM_Implementation<MasterType>*)this)->number_of_lanes<float>();
 				return (lanes - 14.4f * buses /3600.0f)/lanes;
 			}
 			// adjustment factor for area type
 			feature_implementation float HCM_adjustment_fa()
 			{
-				bool in_cbd = THIS->in_CBD<bool>();
+				bool in_cbd = ((Lane_Group_HCM_Implementation<MasterType>*)this)->in_CBD<bool>();
 				if (in_cbd) return 0.9f;
 				else return 1.0f;
 			}
@@ -409,10 +407,10 @@ namespace Signal_Components
 			feature_implementation float HCM_adjustment_fLT()
 			{
 				bool has_left, has_right, has_thru;
-				Data_Structures::Left_Turn_Types turn_type = THIS->left_turn_type<Data_Structures::Left_Turn_Types>();
-				has_left = THIS->has_left_turn<bool>();
-				has_right = THIS->has_right_turn<bool>();
-				has_thru = THIS->has_thru_move<bool>();
+				Data_Structures::Left_Turn_Types turn_type = ((Lane_Group_HCM_Implementation<MasterType>*)this)->left_turn_type<ComponentType,CallerType,Data_Structures::Left_Turn_Types>();
+				has_left = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_left_turn<bool>();
+				has_right = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_right_turn<bool>();
+				has_thru = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_thru_move<bool>();
 
 				if (turn_type == Data_Structures::Left_Turn_Types::Protected)
 				{
@@ -422,7 +420,7 @@ namespace Signal_Components
 					}
 					else if (has_left && has_thru)
 					{
-						return 1.0f / (1.0f + 0.05f * THIS->demand_left<Data_Structures::Flow_Per_Hour>() / THIS->demand_lane_group<Data_Structures::Flow_Per_Hour>());
+						return 1.0f / (1.0f + 0.05f * ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_left<Data_Structures::Flow_Per_Hour>() / ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_lane_group<Data_Structures::Flow_Per_Hour>());
 					}
 					else
 					{
@@ -435,9 +433,9 @@ namespace Signal_Components
 			feature_implementation float HCM_adjustment_fRT()
 			{
 				bool has_left, has_right, has_thru;
-				has_left = THIS->has_left_turn<bool>();
-				has_right = THIS->has_right_turn<bool>();
-				has_thru = THIS->has_thru_move<bool>();
+				has_left = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_left_turn<bool>();
+				has_right = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_right_turn<bool>();
+				has_thru = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_thru_move<bool>();
 
 				if (has_right && !has_thru)
 				{
@@ -445,14 +443,14 @@ namespace Signal_Components
 				}
 				else if (has_right && has_thru)
 				{
-					int nlane = THIS->number_of_lanes<int>();
+					int nlane = ((Lane_Group_HCM_Implementation<MasterType>*)this)->number_of_lanes<int>();
 					if (nlane > 1)
 					{
-						return 1.0f - 0.15f * THIS->demand_right<Data_Structures::Flow_Per_Hour>() / THIS->demand_lane_group<Data_Structures::Flow_Per_Hour>();
+						return 1.0f - 0.15f * ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_right<Data_Structures::Flow_Per_Hour>() / ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_lane_group<Data_Structures::Flow_Per_Hour>();
 					}
 					else
 					{
-						return 1.0f - 0.135f * THIS->demand_right<Data_Structures::Flow_Per_Hour>() / THIS->demand_lane_group<Data_Structures::Flow_Per_Hour>();
+						return 1.0f - 0.135f * ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_right<Data_Structures::Flow_Per_Hour>() / ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_lane_group<Data_Structures::Flow_Per_Hour>();
 					}
 				}
 				else
@@ -479,7 +477,7 @@ namespace Signal_Components
 		/// according to HCM 2000 CH10 - simplified method
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename MasterType>
-		struct Lane_Group_HCM_Simple_Base : public Lane_Group_HCM_Base<MasterType>
+		struct Lane_Group_HCM_Simple_Implementation : public Lane_Group_HCM_Implementation<MasterType>
 		{
 			/// Type definitions to define the context of the base class
 			typedef Types::Solution_Types::HCM_Simple HCM_Simple;	///< The solution type applied to this base
@@ -494,8 +492,11 @@ namespace Signal_Components
 		/// Used to store common functionality for HCM Phase bases
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename MasterType>
-		struct Phase_HCM_Base
+		struct Phase_HCM_Implementation
 		{
+			// replace this eventually with a concept which checks for existence of important implementation members
+			typedef true_type IsPhase;
+
 			feature_implementation void Initialize(TargetType number_of_lane_groups)
 			{
 				this->_green_time = 0.0;
@@ -503,8 +504,18 @@ namespace Signal_Components
 				this->_name = "";
 				this->_phase_id = 0;
 				this->_weight = 1.0f;
-			}
+								
+				Phase_HCM_Implementation::Initialize<ComponentType,CallerType,TargetType>(number_of_lane_groups);
+				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,lane_groups_itf,Prototypes::Lane_Group_Prototype,lane_group_itf,CallerType);
+				lane_groups_itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,lane_groups_itf*>();
 
+				for (int i=0; i<(int)number_of_lane_groups; i++)
+				{
+					 lane_group_itf* lane = (lane_group_itf*)Allocate<lane_group_itf_type>();
+					 cast_target_to_component(lane_group_itf_type,lane).Parent(&cast_self_to_component());
+					 lane_groups->push_back(lane);
+				}
+			}
 
 			//============================================================
 			//  BASIC LOCAL DATA AND ACCESSOR
@@ -523,20 +534,21 @@ namespace Signal_Components
 			// CHILD CLASS ACCESS HANDLERS
 			//-------------------------------------------------------------
 			// Phase lane groups container
-			vector<void*> _Lane_Groups; 
-			// create a tag that says the getter and setter have been defined - the existence of this tag is checked if the interface accessors are invoked
-			tag_getter_setter(Lane_Groups);
-			// create a handler for the GET version of the lane groups accessor created in the interface
-			feature_implementation TargetType Lane_Groups(call_requirements(requires(ComponentType,Is_Dispatched)))
-			{
-				return (TargetType) &_Lane_Groups; // return the local data member cast to the TargetType
-			}
-			// Make sure to create an error handler for the accessors by negating the requirements
-			feature_implementation TargetType Lane_Groups(call_requirements(!(requires(ComponentType,Is_Dispatched))))
-			{
-				assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
-				assert_requirements(TargetType, Is_Polaris_Component,"TargetType is not a polaris component");
-			}
+			member_container_basic(vector<typename MasterType::LANE_GROUP_TYPE*>,Lane_Groups);
+			//vector<void*> _Lane_Groups; 
+			//// create a tag that says the getter and setter have been defined - the existence of this tag is checked if the interface accessors are invoked
+			//tag_getter_setter(Lane_Groups);
+			//// create a handler for the GET version of the lane groups accessor created in the interface
+			//feature_implementation TargetType Lane_Groups(call_requirements(requires(ComponentType,Is_Dispatched)))
+			//{
+			//	return (TargetType) &_Lane_Groups; // return the local data member cast to the TargetType
+			//}
+			//// Make sure to create an error handler for the accessors by negating the requirements
+			//feature_implementation TargetType Lane_Groups(call_requirements(!(requires(ComponentType,Is_Dispatched))))
+			//{
+			//	assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
+			//	assert_requirements(TargetType, Is_Polaris_Component,"TargetType is not a polaris component");
+			//}
 			
 
 			//============================================================
@@ -545,7 +557,7 @@ namespace Signal_Components
 			tag_getter(in_CBD);
 			feature_implementation TargetType in_CBD(call_requirements(requires(TargetType,is_integral)))			
 			{
-				Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				return parent->in_CBD<TargetType>();
 			}
 			feature_implementation TargetType in_CBD(call_requirements(requires(TargetType,!is_integral)))			
@@ -555,7 +567,8 @@ namespace Signal_Components
 			tag_getter(cycle_length);
 			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
-				Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
+				//Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->cycle_length<TargetType>();
 			}
 			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
@@ -565,7 +578,8 @@ namespace Signal_Components
 			tag_getter(max_cycle_length);
 			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
-				Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
+				//Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->max_cycle_length<TargetType>();
 			}
 			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
@@ -575,7 +589,8 @@ namespace Signal_Components
 			tag_getter(min_cycle_length);
 			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
 			{
-				Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
+				//Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->min_cycle_length<TargetType>();
 			}
 			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
@@ -585,7 +600,8 @@ namespace Signal_Components
 			tag_getter(analysis_period);
 			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,Concepts::Is_Time_Minutes)))			
 			{
-				Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
+				//Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->analysis_period<TargetType>();
 			}
 			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,!Concepts::Is_Time_Minutes)))			
@@ -595,7 +611,8 @@ namespace Signal_Components
 			tag_getter(degree_of_saturation);
 			feature_implementation TargetType degree_of_saturation(call_requirements(requires(TargetType,is_arithmetic)))			
 			{
-				Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
+				Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
+				//Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->degree_of_saturation<TargetType>();
 			}
 			feature_implementation TargetType degree_of_saturation(call_requirements(requires(TargetType,!is_arithmetic)))			
@@ -610,21 +627,25 @@ namespace Signal_Components
 		/// phasing according to HCM 2000 CH16
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename MasterType>
-		struct Phase_HCM_Full_Base : public Phase_HCM_Base<MasterType>
+		struct Phase_HCM_Full_Implementation : public Phase_HCM_Implementation<MasterType>
 		{
-			feature_implementation  void Initialize(TargetType number_of_lane_groups)
-			{
-				Phase_HCM_Base::Initialize<ComponentType,CallerType,TargetType>(number_of_lane_groups);
+			//feature_implementation  void Initialize(TargetType number_of_lane_groups)
+			//{
+			//	Phase_HCM_Implementation::Initialize<ComponentType,CallerType,TargetType>(number_of_lane_groups);
+			//	define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,lane_groups_itf,Prototypes::Lane_Group_Prototype,lane_group_itf,CallerType);
+			//	lane_groups_itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,lane_groups_itf*>();
 
-				for (int i=0; i<(int)number_of_lane_groups; i++)
-				{
-					typedef Interfaces::Lane_Group_Interface<typename MasterType::LANE_GROUP_TYPE,NULLTYPE>* ITF_TYPE;
-					 ITF_TYPE itf = (ITF_TYPE)Allocate<typename MasterType::LANE_GROUP_TYPE>();
-					((typename MasterType::LANE_GROUP_TYPE*)itf)->_parent = PTHIS(ComponentType);
-					this->_Lane_Groups.push_back((double*)itf);
-				}
+			//	for (int i=0; i<(int)number_of_lane_groups; i++)
+			//	{
+			//		 lane_group_itf* lane = (lane_group_itf*)Allocate<lane_group_itf_type>();
+			//		 cast_target_to_component(lane_group_itf_type,lane).Parent(&cast_self_to_component());
+			//		 lane_groups->push_back(lane);
 
-			}
+			//		//((typename MasterType::LANE_GROUP_TYPE*)itf)->_parent = PTHIS(ComponentType);
+			//		//this->_Lane_Groups.push_back((double*)itf);
+			//	}
+
+			//}
 
 			// TYPEDEFS to define the context of the base class
 			typedef Types::Solution_Types::HCM_Full HCM_Full;		///< The solution type applied to this base
@@ -635,20 +656,20 @@ namespace Signal_Components
 		/// phasing according to HCM 2000 CH10 - simplified method
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename MasterType>
-		struct Phase_HCM_Simple_Base : public Phase_HCM_Base<MasterType>
+		struct Phase_HCM_Simple_Implementation : public Phase_HCM_Implementation<MasterType>
 		{
-			feature_implementation void Initialize(TargetType number_of_lane_groups)
-			{
-				Phase_HCM_Base::Initialize<ComponentType,CallerType,TargetType>(number_of_lane_groups);
+			//feature_implementation void Initialize(TargetType number_of_lane_groups)
+			//{
+			//	Phase_HCM_Base::Initialize<ComponentType,CallerType,TargetType>(number_of_lane_groups);
 
-				for (int i=0; i<(int)number_of_lane_groups; i++)
-				{
-					ComponentType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ComponentType::This_Type>::type,NULLTYPE>::type* itf = (ComponentType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ComponentType::This_Type>::type,NULLTYPE>::type*)Allocate<Lane_Group_Type<Execution_Object, typename ComponentType::This_Type>::type>();
-					((Lane_Group_Type<Execution_Object,typename ComponentType::This_Type>::type*)itf)->_parent = PTHIS(typename ComponentType::This_Type);
-					this->_Lane_Groups.push_back((double*)itf);
-				}
+			//	for (int i=0; i<(int)number_of_lane_groups; i++)
+			//	{
+			//		ComponentType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ComponentType::This_Type>::type,NULLTYPE>::type* itf = (ComponentType::Lane_Group_Interface<Lane_Group_Type<Execution_Object,typename ComponentType::This_Type>::type,NULLTYPE>::type*)Allocate<Lane_Group_Type<Execution_Object, typename ComponentType::This_Type>::type>();
+			//		((Lane_Group_Type<Execution_Object,typename ComponentType::This_Type>::type*)itf)->_parent = PTHIS(typename ComponentType::This_Type);
+			//		this->_Lane_Groups.push_back((double*)itf);
+			//	}
 
-			}
+			//}
 
 			/// Type definitions to define the context of the base class
 			typedef Types::Solution_Types::HCM_Simple HCM_Simple;	///< The solution type applied to this base
@@ -663,7 +684,7 @@ namespace Signal_Components
 		/// Used to store common functionality for HCM Approach base
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename MasterType>
-		struct Approach_HCM_Base
+		struct Approach_HCM_Implementation
 		{
 			feature_implementation void Initialize(TargetType number_of_lane_groups)
 			{
@@ -672,9 +693,29 @@ namespace Signal_Components
 				this->_LOS = 'A';
 				this->_name = "";
 			}
-			feature_implementation void Add_Lane_Group(typename TargetType::Interface_Type<TargetType,NULLTYPE>::type* lane_group)
+			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType), Concepts::Is_Lane_Group) && requires(TargetType,is_pointer)))
 			{
-				this->_Lane_Groups.push_back(lane_group);
+				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,Lane_Groups_Itf,Prototypes::Lane_Group_Prototype,Lane_Group_Itf,CallerType);
+				Lane_Groups_Itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,Lane_Groups_Itf*>();
+				lane_groups->push_back(lane_group);
+			}
+			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Lane_Group) && requires(TargetType,is_pointer)))
+			{
+				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,Lane_Groups_Itf,Prototypes::Lane_Group_Prototype,Lane_Group_Itf,CallerType);
+				Lane_Groups_Itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,Lane_Groups_Itf*>();
+				lane_groups->push_back(lane_group);
+			}
+			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType), Concepts::Is_Lane_Group) && requires(TargetType,is_reference)))
+			{
+				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,Lane_Groups_Itf,Prototypes::Lane_Group_Prototype,Lane_Group_Itf,CallerType);
+				Lane_Groups_Itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,Lane_Groups_Itf*>();
+				lane_groups->push_back(&lane_group);
+			}
+			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Lane_Group) && requires(TargetType,is_reference)))
+			{
+				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,Lane_Groups_Itf,Prototypes::Lane_Group_Prototype,Lane_Group_Itf,CallerType);
+				Lane_Groups_Itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,Lane_Groups_Itf*>();
+				lane_groups->push_back(&lane_group);
 			}
 
 
@@ -693,20 +734,7 @@ namespace Signal_Components
 			// CHILD CLASS ACCESS HANDLERS
 			//-------------------------------------------------------------
 			// Phase lane groups container
-			vector<void*> _Lane_Groups; 
-			// create a tag that says the getter and setter have been defined - the existence of this tag is checked if the interface accessors are invoked
-			tag_getter_setter(Lane_Groups);
-			// create a handler for the GET version of the lane groups accessor created in the interface
-			feature_implementation TargetType Lane_Groups(call_requirements(requires(ComponentType,Is_Dispatched)))
-			{
-				return (TargetType) &_Lane_Groups; // return the local data member cast to the TargetType
-			}
-			// Make sure to create an error handler for the accessors by negating the requirements
-			feature_implementation TargetType Lane_Groups(call_requirements(!(requires(ComponentType,Is_Dispatched))))
-			{
-				assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
-				assert_requirements(TargetType, Is_Polaris_Component,"TargetType is not a polaris component");
-			}
+			member_container_basic(vector<typename MasterType::LANE_GROUP_TYPE*>,Lane_Groups);
 			
 
 			//============================================================
@@ -784,8 +812,43 @@ namespace Signal_Components
 		/// Used to store common base functionality amonst all HCM signal bases
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename MasterType>
-		struct Signal_HCM_Base
+		struct Signal_HCM_Implementation
 		{
+			typedef true_type IsSignal;
+
+			/// Handler for a general Initializer dispatched from an Interface
+			feature_implementation void Initialize(TargetType number_of_phases, TargetType number_of_approaches, call_requirements(requires(TargetType,is_arithmetic)))
+			{			
+				// Set member variables to defaults
+				this->_Signal_ID = 0;
+				this->_name = "";
+				this->_output_stream = &cout;
+				this->_in_CBD = false;
+				this->_cycle_length = 0.0;
+				this->_degree_of_saturation = 0.9;
+
+
+				// Create new phases according to specified number of phases
+				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Phases,phases_itf,Prototypes::Phase_Prototype,phase_itf,CallerType);
+				phases_itf* phases = this->Phases<ComponentType,CallerType,phases_itf*>();
+				for (int i=0; i<(int)number_of_phases; i++)
+				{
+					phase_itf* phase = (phase_itf*)Allocate<phases_itf_type>();
+					cast_target_to_component(phase_itf_type,phase).Parent(&cast_self_to_component());
+					phases->push_back(phase);
+				}
+				// Create new approaches according to specified number of approaches
+				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Approaches,approaches_itf,Prototypes::Approach_Prototype,approach_itf,CallerType);
+				approaches_itf* approaches = this->Approaches<ComponentType,CallerType,approaches_itf*>();
+				for (int i=0; i<(int)number_of_approaches; i++)
+				{
+					approach_itf* approach = (approach_itf*)Allocate<approach_itf_type>();
+					cast_target_to_component(approach_itf_type,approach).Parent(&cast_self_to_component());
+					approaches->push_back(approach);
+				}
+
+			}
+
 			//===========================================================
 			// SIGNAL event info
 			//-----------------------------------------------------------
@@ -795,45 +858,16 @@ namespace Signal_Components
 			member_data_basic(bool, Timing_Event_Has_Fired);
 			member_data_basic(bool, Event_Conditional_Hit);
 			member_data_basic(bool, Timing_Event_Conditional_Hit);
-			member_data_basic(std::ostream*, output_stream);
+			member_pointer_basic(std::ostream, output_stream);
 			
 
 			//============================================================
 			// CHILD CLASS ACCESS HANDLERS
 			//-------------------------------------------------------------
 			// Create Phases data member
-			vector<void*> _Phases; 
-			// create a tag that says the getter and setter have been defined - the existence of this tag is checked if the interface accessors are invoked
-			tag_getter(Phases);
-			// create a handler for the GET version of the ACCESSOR_NAME accessor created in the interface
-			feature_implementation TargetType Phases(call_requirements(requires(ComponentType,Is_Dispatched)))
-			{
-				//(vector<typename TargetType::Interface_Type<TargetType,CallerType>*>&)
-				return (TargetType) &_Phases; // return the local data member cast to the TargetType
-			}
-			// Make sure to create an error handler for the accessors by negating the requirements
-			feature_implementation TargetType Phases(call_requirements(!(requires(ComponentType,Is_Dispatched))))
-			{
-				assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
-				assert_requirements(TargetType,Is_Dispatched,"TargetType is not polaris component");
-			}
-			
+			member_container_basic(vector<typename MasterType::LANE_GROUP_TYPE*>, Phases);		
 			// Create Approaches data member
-			vector<void*> _Approaches; 
-			// create a tag that says the getter and setter have been defined - the existence of this tag is checked if the interface accessors are invoked
-			tag_getter(Approaches);
-			// create a handler for the GET version of the ACCESSOR_NAME accessor created in the interface
-			feature_implementation TargetType Approaches(call_requirements(requires(ComponentType,Is_Dispatched)))
-			{
-				return (TargetType) &_Approaches; // return the local data member cast to the TargetType
-			}
-			// Make sure to create an error handler for the accessors by negating the requirements
-			feature_implementation TargetType Approaches(call_requirements(!(requires(ComponentType,Is_Dispatched))))
-			{
-				assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
-				assert_requirements(TargetType,Is_Dispatched,"TargetType is not polaris component");
-			}
-
+			member_container_basic(vector<typename MasterType::LANE_GROUP_TYPE*>, Approaches);
 
 			//==========================================================================================
 			// Signal local data members
@@ -870,38 +904,17 @@ namespace Signal_Components
 		/// A signalized intersection base class which links to phase child classes and recalculates signal timing accoriding to HCM 2000 ch16
 		//------------------------------------------------------------------------------------------------------------------
 		template<typename MasterType>
-		struct Signal_HCM_Full_Base : public Signal_HCM_Base<MasterType>
+		struct Signal_HCM_Full_Implementation : public Signal_HCM_Implementation<MasterType>
 		{
 			/// Type definitions to define the context of the base class
 			typedef Types::Solution_Types::HCM_Full HCM_Full;	///< The solution type applied to this base
 
 			/// Handler for a general Initializer dispatched from an Interface
-			feature_implementation void Initialize(TargetType number_of_phases, TargetType number_of_approaches, call_requirements(requires(ComponentType,Is_Dispatched)))
+			feature_implementation void Initialize(TargetType number_of_phases, TargetType number_of_approaches, call_requirements(requires(TargetType,is_arithmetic)))
 			{
-				Signal_HCM_Base<MasterType>* _this = ((Signal_HCM_Base<MasterType>*)this);
-				this->_Signal_ID = 0;
-				this->_name = "";
-				this->_output_stream = &cout;
-				this->_in_CBD = false;
-				this->_cycle_length = 0.0;
-				this->_degree_of_saturation = 0.9;
-				
-				for (int i=0; i<(int)number_of_phases; i++)
-				{
-					typedef Interfaces::Phase_Interface<typename MasterType::PHASE_TYPE, NULLTYPE>* ITF_TYPE;
-					ITF_TYPE itf= (ITF_TYPE)Allocate<typename MasterType::PHASE_TYPE>();
-					((typename MasterType::PHASE_TYPE*)itf)->_parent = PTHIS(ComponentType);
+				((Signal_HCM_Implementation<MasterType>*)this)->Initialize<ComponentType,CallerType,TargetType>(number_of_phases,number_of_approaches);
 
-					_Phases.push_back((void*)itf);
-				}
-				for (int i=0; i<(int)number_of_approaches; i++)
-				{
-					typedef Interfaces::Approach_Interface<typename MasterType::APPROACH_TYPE,NULLTYPE>* ITF_TYPE;
-					ITF_TYPE itf= (ITF_TYPE)Allocate<typename MasterType::APPROACH_TYPE>();
-					((typename MasterType::APPROACH_TYPE*)itf)->_parent = PTHIS(ComponentType);
-
-					_Approaches.push_back((void*)itf);
-				}
+				//Other initialization details here
 			}
 		};
 		//------------------------------------------------------------------------------------------------------------------
@@ -909,43 +922,19 @@ namespace Signal_Components
 		/// A Simple signalized intersection base class which links to phase child classes and recalculates signal timing accoriding to HCM 2000 ch 10
 		//------------------------------------------------------------------------------------------------------------------	
 		template<typename MasterType>
-		struct Signal_HCM_Simple_Base : public Signal_HCM_Base<MasterType>
+		struct Signal_HCM_Simple_Implementation : public Signal_HCM_Implementation<MasterType>
 		{
 			/// Type definitions to define the context of the base class
 			typedef Types::Solution_Types::HCM_Simple HCM_Simple;	///< The solution type applied to this base
 
 
-			/// Handler for a general Initializer dispatched from an Interface
-			feature_implementation void Initialize(TargetType number_of_phases, TargetType number_of_approaches, call_requirements(requires(ComponentType,Is_Dispatched)))
+			/// Handler for a specific Initializer dispatched from an Interface
+			feature_implementation void Initialize(TargetType number_of_phases, TargetType number_of_approaches, call_requirements(requires(TargetType,is_arithmetic)))
 			{
-				Signal_HCM_Base<MasterType>* _this = ((Signal_HCM_Base<MasterType>*)this);
-				
-				// Set member variables to defaults
-				this->_Signal_ID = 0;
-				this->_name = "";
-				this->_output_stream = &cout;
-				this->_in_CBD = false;
-				this->_cycle_length = 0.0;
-				this->_degree_of_saturation = 0.9;
+				// call general initializer
+				((Signal_HCM_Implementation<MasterType>*)this)->Initialize<ComponentType,CallerType,TargetType>(number_of_phases,number_of_approaches);
 
-				// Create new phases according to specified number of phases
-				for (int i=0; i<(int)number_of_phases; i++)
-				{
-					
-					ComponentType::Phase_Interface<Phase_Type<Execution_Object, typename ComponentType::This_Type>::type,NULLTYPE>::type* itf= (ComponentType::Phase_Interface<Phase_Type<Execution_Object, typename ComponentType::This_Type>::type,NULLTYPE>::type*)Allocate<Phase_Type<Execution_Object, typename ComponentType::This_Type>::type>();
-					((Phase_Type<Execution_Object, typename ComponentType::This_Type>::type*)itf)->_parent = PTHIS(ComponentType::This_Type);
-
-					_Phases.push_back((void*)itf);
-				}
-				for (int i=0; i<(int)number_of_approaches; i++)
-				{
-					typedef ComponentType::Approach_Interface<Approach_Type<Execution_Object, typename ComponentType::This_Type>::type,NULLTYPE>::type* ITF_TYPE;
-					ITF_TYPE itf= (ITF_TYPE)Allocate<Approach_Type<Execution_Object, typename ComponentType::This_Type>::type>();
-					((Approach_Type<Execution_Object, typename ComponentType::This_Type>::type*)itf)->_parent = PTHIS(ComponentType::This_Type);
-
-					_Approaches.push_back((void*)itf);
-				}
-
+				//Other initialization details here
 			}
 		};
 
@@ -960,12 +949,12 @@ namespace Signal_Components
 		template<typename MasterType>
 		struct HCM_Signal_Full
 		{
-			typedef Polaris_Component_Execution<Interfaces::Signal_Interface, Bases::Signal_HCM_Full_Base<MasterType>,NULLTYPE,MasterType> type;
+			typedef Polaris_Component_Execution<Implementations::Signal_HCM_Full_Implementation,MasterType> type;
 		};
 		template<typename MasterType>
 		struct HCM_Signal_Simple
 		{
-			typedef Polaris_Component_Execution<Interfaces::Signal_Interface, Bases::Signal_HCM_Simple_Base<MasterType>,NULLTYPE,MasterType> type;
+			typedef Polaris_Component_Execution<Implementations::Signal_HCM_Simple_Implementation,MasterType> type;
 		};
 
 		//------------------
@@ -973,12 +962,12 @@ namespace Signal_Components
 		template<typename MasterType>
 		struct HCM_Approach_Full
 		{
-			typedef Polaris_Component_Execution<Interfaces::Approach_Interface, Bases::Approach_HCM_Base<MasterType>,typename HCM_Signal_Full<MasterType>::type,MasterType> type;
+			typedef Polaris_Component_Execution<Implementations::Approach_HCM_Implementation,MasterType,typename HCM_Signal_Full<MasterType>::type> type;
 		};
 		template<typename MasterType>
 		struct HCM_Approach_Simple
 		{
-			typedef Polaris_Component_Execution<Interfaces::Approach_Interface, Bases::Approach_HCM_Base<MasterType>,typename HCM_Signal_Simple<MasterType>::type,MasterType> type;
+			typedef Polaris_Component_Execution<Implementations::Approach_HCM_Implementation,MasterType,typename HCM_Signal_Simple<MasterType>::type> type;
 		};
 
 		//------------------
@@ -986,12 +975,12 @@ namespace Signal_Components
 		template<typename MasterType>
 		struct HCM_Phase_Full
 		{
-			typedef Polaris_Component_Execution<Interfaces::Phase_Interface, Bases::Phase_HCM_Full_Base<MasterType>,typename HCM_Signal_Full<MasterType>::type,MasterType> type;
+			typedef Polaris_Component_Execution<Implementations::Phase_HCM_Full_Implementation,MasterType,typename HCM_Signal_Full<MasterType>::type> type;
 		};
 		template<typename MasterType>
 		struct HCM_Phase_Simple
 		{
-			typedef Polaris_Component_Execution<Interfaces::Phase_Interface, Bases::Phase_HCM_Simple_Base<MasterType>,typename HCM_Signal_Simple<MasterType>::type,MasterType> type;
+			typedef Polaris_Component_Execution<Implementations::Phase_HCM_Simple_Implementation,MasterType,typename HCM_Signal_Simple<MasterType>::type> type;
 		};
 
 		//------------------
@@ -999,12 +988,12 @@ namespace Signal_Components
 		template<typename MasterType>
 		struct HCM_LaneGroup_Full
 		{
-			typedef Polaris_Component_Execution<Interfaces::Lane_Group_Interface, Bases::Lane_Group_HCM_Full_Base<MasterType>,typename HCM_Phase_Full<MasterType>::type,MasterType> type;
+			typedef Polaris_Component_Execution<Implementations::Lane_Group_HCM_Full_Implementation,MasterType,typename HCM_Phase_Full<MasterType>::type> type;
 		};
 		template<typename MasterType>
 		struct HCM_LaneGroup_Simple
 		{
-			typedef Polaris_Component_Execution<Interfaces::Lane_Group_Interface, Bases::Lane_Group_HCM_Simple_Base<MasterType>,typename HCM_Phase_Simple<MasterType>::type,MasterType> type;
+			typedef Polaris_Component_Execution<Implementations::Lane_Group_HCM_Simple_Implementation,MasterType,typename HCM_Phase_Simple<MasterType>::type> type;
 		};
 	}	
 
@@ -1013,59 +1002,46 @@ namespace Signal_Components
 	//==================================================================================================================
 	/// INDICATOR BASE Namespace of Base classes and Components related to the Interface(s) from the component namespace.
 	//------------------------------------------------------------------------------------------------------------------
-	namespace Bases
+	namespace Implementations
 	{
 		//==================================================================================================================
 		/// Signal Indicator Base
 		//------------------------------------------------------------------------------------------------------------------
 		template <typename MasterType>
-		struct Signal_Indicator_Display_Base
+		struct Signal_Indicator_Display_Implementation
 		{
-			feature_implementation void Initialize(call_requirements(requires(ComponentType,Is_Dispatched)))
+			feature_implementation void Initialize()
 			{
 				this->_output_stream = (ofstream*)&cout;
-				this->_signal = NULL;
+				this->_Signal = NULL;
 			}
 
 			member_data_basic(bool,Conditional_Has_Fired);
 			member_data_basic(ostream*, output_stream);
 
-			// Local data member for signal interface
-			void* _signal;
-			tag_getter_setter(Signal);
-			feature_implementation void Signal(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value, call_requires(TargetType,Is_Polaris_Component))
-			{
-				_signal = (void*)set_value;
-			}
-			feature_implementation typename TargetType::Interface_Type<TargetType,NULLTYPE>::type* Signal(call_requires(TargetType,Is_Polaris_Component))
-			{
-				return (typename TargetType::Interface_Type<TargetType,NULLTYPE>::type*)_signal;
-			}
+			member_component_basic(typename MasterType::SIGNAL_TYPE,Signal);
+			//// Local data member for signal interface
+			//member_component(typename MasterType::SIGNAL_TYPE,Signal,
+			//	(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Signal)) || (requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType),Concepts::Is_Signal)),
+			//	(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Signal)) || (requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType),Concepts::Is_Signal)))
 		};
 
 		template <typename MasterType>
-		struct Signal_Indicator_Base
+		struct Signal_Indicator_Implementation
 		{
-			feature_implementation void Initialize(call_requirements(requires(ComponentType,Is_Dispatched)))
+			feature_implementation void Initialize()
 			{
 				this->_output_stream = (ostream*)&cout;
 				this->_signal = NULL;
 			}
 
 			member_data_basic(ostream*, output_stream);
-			member_component_basic(typename MasterType::SIGNAL_TYPE,Signal);
 
 			// Local data member for signal interface
-			void* _signal;
-			tag_getter_setter(Signal);
-			feature_implementation void Signal(typename TargetType::Interface_Type<TargetType,CallerType>::type* set_value, call_requires(TargetType,Is_Polaris_Component))
-			{
-				_signal = (void*)set_value;
-			}
-			feature_implementation typename TargetType::Interface_Type<TargetType,NULLTYPE>::type* Signal(call_requires(TargetType,Is_Polaris_Component))
-			{
-				return (typename TargetType::Interface_Type<TargetType,NULLTYPE>::type*)_signal;
-			}
+			member_component(typename MasterType::SIGNAL_TYPE,Signal,
+				(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Signal)) || (requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType),Concepts::Is_Signal)),
+				(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Signal)) || (requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType),Concepts::Is_Signal)))
+		
 
 		};
 
@@ -1078,12 +1054,12 @@ namespace Signal_Components
 		template<typename MasterType>
 		struct Signal_Indicator_Display
 		{
-			typedef Polaris_Component_Execution<Interfaces::Signal_Indicator_Interface, Bases::Signal_Indicator_Display_Base<MasterType>,NULLTYPE,MasterType> type;
+			typedef Polaris_Component_Execution<Implementations::Signal_Indicator_Display_Implementation,MasterType> type;
 		};
 		template<typename MasterType>
 		struct Signal_Indicator
 		{
-			typedef Polaris_Component<Interfaces::Signal_Indicator_Interface, Bases::Signal_Indicator_Base<MasterType>,NULLTYPE,MasterType> type;
+			typedef Polaris_Component<Implementations::Signal_Indicator_Implementation,MasterType> type;
 		};
 	}	
 }

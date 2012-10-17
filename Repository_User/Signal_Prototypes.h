@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Repository_Base_Includes.h"
+#include "Repository_User_Includes.h"
 
 
 namespace Signal_Components
@@ -80,6 +80,24 @@ namespace Signal_Components
 			begin_requirements_list(none);
 			requires_named_member(none, Lane_Groups, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
 			end_requirements_list(Lane_Groups);
+		};
+		concept Is_Lane_Group
+		{
+			begin_requirements_list(none);
+			requires_typename_state(none, IsLaneGroup, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
+			end_requirements_list(IsLaneGroup);
+		};
+		concept Is_Phase
+		{
+			begin_requirements_list(none);
+			requires_typename_state(none, IsPhase, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
+			end_requirements_list(IsPhase);
+		};
+		concept Is_Signal
+		{
+			begin_requirements_list(none);
+			requires_typename_state(none, IsSignal, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
+			end_requirements_list(IsSignal);
 		};
 		#pragma endregion
 
@@ -244,9 +262,11 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		prototype struct Lane_Group_Prototype
 		{
+			tag_polaris_prototype;
+
 			feature void Initialize()
 			{
-				return cast_self_as_component().Initialize<ComponentType,CallerType,TargetType>();
+				return cast_self_to_component().Initialize<ComponentType,CallerType,TargetType>();
 			}
 
 			//=======================================================
@@ -511,6 +531,8 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		prototype struct Phase_Prototype
 		{
+			tag_polaris_prototype;
+
 			//============================================================
 			//  Intialize dispatched
 			//------------------------------------------------------------
@@ -652,6 +674,8 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		prototype struct Approach_Prototype
 		{
+			tag_polaris_prototype;
+
 			//============================================================
 			//  Intialize dispatched
 			//------------------------------------------------------------
@@ -659,7 +683,7 @@ namespace Signal_Components
 			{
 				return cast_self_to_component().Initialize<ComponentType,CallerType,TargetType>();
 			}
-			feature void Add_Lane_Group(typename TargetType::Interface_Type<TargetType,NULLTYPE>::type* lane_group)
+			feature void Add_Lane_Group(TargetType lane_group)
 			{
 				cast_self_to_component().Add_Lane_Group<ComponentType,CallerType,TargetType>(lane_group);
 			}
@@ -756,6 +780,8 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		prototype struct Signal_Prototype
 		{
+			tag_polaris_prototype;
+
 			//=======================================================
 			// Initialization
 			//-------------------------------------------------------
@@ -1010,13 +1036,11 @@ namespace Signal_Components
 				Signal_Prototype<ComponentType,NULLTYPE>* _pthis=(Signal_Prototype<ComponentType,NULLTYPE>*)_this;
 			
 				// Get interface to phases in signal
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = _pthis->Phases<vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
-				Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>* phase;
+				define_container_and_value_interface_local(Random_Access_Sequence_Prototype,Phases,phases_itf,Prototypes::Phase_Prototype,phase_itf,CallerType);
 
-				// Get the currently active phase
+				phases_itf* phases = _pthis->Phases<phases_itf*>();
 				int active_phase = _pthis->active_phase<int>();
-				phase = (*phases)[active_phase];
-
+				phase_itf* phase = (*phases)[active_phase];
 
 				//=======================================================================================================================
 				// If timing updating is turned off (num_cycles = 0) then set the time of the next timing update to infinity so it is never called
@@ -1030,7 +1054,7 @@ namespace Signal_Components
 				if (iteration == _pthis->Next_Timing_Event_Iteration<int>() && _pthis->Timing_Event_Conditional_Hit<bool>()==false)
 				{
 
-					((Execution_Object*)_this)->Swap_Event((Event)&Signal_Interface<ComponentType,NULLTYPE>::Change_Signal_Timing<NULLTYPE>);
+					((Execution_Object*)_this)->Swap_Event((Event)&Signal_Prototype<ComponentType,NULLTYPE>::Change_Signal_Timing<NULLTYPE>);
 					response.result = false;
 					response.next = iteration;
 					_pthis->Timing_Event_Conditional_Hit<bool>(true);
@@ -1046,7 +1070,7 @@ namespace Signal_Components
 
 				else if (iteration == _pthis->Next_Timing_Event_Iteration<int>() && _pthis->Timing_Event_Has_Fired<bool>()==true)
 				{
-					((Execution_Object*)_this)->Swap_Event((Event)&Signal_Interface<ComponentType,NULLTYPE>::Change_Signal_State<NULLTYPE>);
+					((Execution_Object*)_this)->Swap_Event((Event)&Signal_Prototype<ComponentType,NULLTYPE>::Change_Signal_State<NULLTYPE>);
 					response.result = false;
 					response.next = iteration;
 					int next = iteration + (int)_pthis->cycle_length<Data_Structures::Time_Second>() * _pthis->num_cycles_between_updates<int>();
@@ -1081,20 +1105,26 @@ namespace Signal_Components
 			{
 				// Get Current Interface
 				typedef ComponentType T;
-				Signal_Interface<ComponentType,CallerType>* _pthis = (Signal_Interface<ComponentType,CallerType>*)_this;
+				Signal_Prototype<ComponentType,CallerType>* _pthis = (Signal_Prototype<ComponentType,CallerType>*)_this;
 
 				// Display the signal information if the output stream is not null
 				ostream* out = _pthis->output_stream<ostream*>();
 
-				// Get interface to phases in signal
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = _pthis->Phases<vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator phase_itr = phases->begin();
-				Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>* phase;
-
-				// Get the currently active phase
+				// Get interface to phases in sign
+				define_container_and_value_interface_local(Random_Access_Sequence_Prototype,Phases,phases_itf,Prototypes::Phase_Prototype,phase_itf,CallerType);
+				phases_itf* phases = _pthis->Phases<phases_itf*>();
 				int active_phase = _pthis->active_phase<int>();
+				phase_itf* phase = (*phases)[active_phase];
 
-				phase = (*phases)[active_phase];
+				// Get interface to phases in signal
+				//vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = _pthis->Phases<vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
+				//vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator phase_itr = phases->begin();
+				//Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>* phase;
+
+				//// Get the currently active phase
+				//int active_phase = _pthis->active_phase<int>();
+
+				//phase = (*phases)[active_phase];
 
 				// If state of active phase is RED (i.e. All Red) Change current phase to Green (Each phases starts in all red)
 				if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::RED)
@@ -1128,6 +1158,7 @@ namespace Signal_Components
 					int start_time = iteration - _pthis->cycle_length<Data_Structures::Time_Second>();
 					int cur_time = start_time;
 					
+					typename phases_itf::iterator phase_itr=phases->begin();
 					for (phase_itr; phase_itr != phases->end(); phase_itr++)
 					{
 						cout << "cycle_end:"<<(*phase_itr)->phase_id<int>()<<":"<<_pthis->Signal_ID<int>()<<":"<<start_time<<":"<<cur_time<<":"<<cur_time+(*phase_itr)->green_time<Data_Structures::Time_Second>()<<":"<<iteration<<endl;
@@ -1142,7 +1173,7 @@ namespace Signal_Components
 			{
 				// Get Current Interface
 				typedef ComponentType T;
-				Signal_Interface<ComponentType,NULLTYPE>* _pthis = (Signal_Interface<ComponentType,NULLTYPE>*)_this;
+				Signal_Prototype<ComponentType,CallerType>* _pthis = (Signal_Prototype<ComponentType,CallerType>*)_this;
 
 				// Call the routine to update the signal timing
 				_pthis->Update_Timing<Data_Structures::Time_Second>();
@@ -1221,10 +1252,12 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		prototype struct Signal_Indicator_Prototype
 		{
+			tag_polaris_prototype;
+
 			// Initialize the signal indicator
 			feature void Initialize(call_requirements(requires(ComponentType,Is_Execution_Object)))
 			{
-				cast_self_as_component().Initialize<ComponentType,CallerType,TargetType>();
+				cast_self_to_component().Initialize<ComponentType,CallerType,TargetType>();
 				schedule_event_local(ComponentType,Signal_Indicator_Conditional,Signal_Indicator_Event,0,NULLTYPE);
 				this->Conditional_Has_Fired<bool>(false);
 			}
@@ -1257,7 +1290,7 @@ namespace Signal_Components
 			}
 
 			// Signal Interface accessor
-			feature_accessor_interface(Signal);
+			feature_accessor(Signal);
 			feature_accessor(Conditional_Has_Fired);
 			feature_accessor(output_stream);
 
@@ -1265,11 +1298,11 @@ namespace Signal_Components
 			declare_feature_conditional(Signal_Indicator_Conditional)
 			{
 				// Get Current Interface
-				Signal_Indicator_Interface<ComponentType,NULLTYPE>* _pthis=(Signal_Indicator_Interface<ComponentType,NULLTYPE>*)_this;
+				Signal_Indicator_Prototype<ComponentType,NULLTYPE>* _pthis=(Signal_Indicator_Prototype<ComponentType,NULLTYPE>*)_this;
 
-				// Get Signal Interface from this
-				Signal_Components::Interfaces::Signal_Interface<typename ComponentType::Master_Type::SIGNAL_TYPE,NULLTYPE>* signal = _pthis->Signal<typename ComponentType::Master_Type::SIGNAL_TYPE>();
-
+				define_component_interface_local(Signal_Itf,Prototypes::Signal_Prototype,Signal,CallerType);
+				Signal_Itf* signal = _pthis->Signal<Signal_Itf*>();
+				
 				if (iteration == signal->Next_Event_Iteration<int>())
 				{
 					response.result = false;
@@ -1287,15 +1320,21 @@ namespace Signal_Components
 				Sleep(100);
 
 				// Get Current Interface
-				Signal_Indicator_Interface<ComponentType,NULLTYPE>* _pthis=(Signal_Indicator_Interface<ComponentType,NULLTYPE>*)_this;
+				Signal_Indicator_Prototype<ComponentType,NULLTYPE>* _pthis=(Signal_Indicator_Prototype<ComponentType,NULLTYPE>*)_this;
 				ostream* out = _pthis->output_stream<ostream*>();
 
 				// Get Signal Interface from this
-				Signal_Components::Interfaces::Signal_Interface<typename ComponentType::Master_Type::SIGNAL_TYPE,NULLTYPE>* signal = _pthis->Signal<typename ComponentType::Master_Type::SIGNAL_TYPE>();
+				define_component_interface_local(Signal_Itf,Prototypes::Signal_Prototype,Signal,CallerType);
+				Signal_Itf* signal = _pthis->Signal<Signal_Itf*>();
+				//Signal_Components::Prototypes::Signal_Prototype<typename ComponentType::Master_Type::SIGNAL_TYPE,NULLTYPE>* signal = _pthis->Signal<typename ComponentType::Master_Type::SIGNAL_TYPE>();
 
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = signal->Phases<vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
+				define_container_and_value_interface(Random_Access_Sequence_Prototype, Signal_Itf_type::Phases,Phases_Itf,Prototypes::Phase_Prototype,Phase_Itf,CallerType);
+				Phases_Itf* phases = signal->Phases<Phases_Itf*>();
+				Phases_Itf::iterator itr=phases->begin();
+
+				//vector<Prototypes::Phase_Prototype<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = signal->Phases<vector<Prototypes::Phase_Prototype<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
+				//vector<Prototypes::Phase_Prototype<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
 
 				// Display the signal state info if the output stream is not null
 				if (out != NULL)
@@ -1320,6 +1359,8 @@ namespace Signal_Components
 		//------------------------------------------------------------------------------------------------------------------
 		prototype struct Detector_Prototype
 		{
+			tag_polaris_prototype;
+
 			// Getter for the detector count data
 			feature typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
 				requires(ComponentType, Is_Dispatchable) &&
