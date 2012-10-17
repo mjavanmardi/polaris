@@ -9,11 +9,11 @@
 
 static const int success=sizeof(small_type);
 
-#define strip_modifiers(TYPE) typename remove_cv<typename remove_pointer<typename remove_extent<typename remove_reference<typename TYPE>::type>::type>::type>::type
-#define strip_modifiers_nontemplate(TYPE) remove_cv<typename remove_pointer<typename remove_extent<typename remove_reference<typename TYPE>::type>::type>::type>::type
+#define strip_modifiers(TYPE) typename remove_cv<typename remove_pointer<typename remove_extent<typename remove_reference<TYPE>::type>::type>::type>::type
+#define strip_modifiers_nontemplate(TYPE) remove_cv<typename remove_pointer<typename remove_extent<typename remove_reference<TYPE>::type>::type>::type>::type
 
-//#define begin_requirements_list(NULL_CONCEPT_NAME) typedef strip_modifiers(TYPE_A) T; typedef strip_modifiers(TYPE_B) V; typedef true_type NULL_CONCEPT_NAME; typedef TYPELIST_1(NULL_CONCEPT_NAME) auto_check_list_##NULL_CONCEPT_NAME
-#define begin_requirements_list(NULL_CONCEPT_NAME) typedef TYPE_A T; typedef TYPE_B V; typedef true_type NULL_CONCEPT_NAME; typedef TYPELIST_1(NULL_CONCEPT_NAME) auto_check_list_##NULL_CONCEPT_NAME
+#define begin_requirements_list(NULL_CONCEPT_NAME) typedef strip_modifiers(TYPE_A) T; typedef strip_modifiers(TYPE_B) V; typedef true_type NULL_CONCEPT_NAME; typedef TYPELIST_1(NULL_CONCEPT_NAME) auto_check_list_##NULL_CONCEPT_NAME
+//#define begin_requirements_list(NULL_CONCEPT_NAME) typedef TYPE_A T; typedef TYPE_B V; typedef true_type NULL_CONCEPT_NAME; typedef TYPELIST_1(NULL_CONCEPT_NAME) auto_check_list_##NULL_CONCEPT_NAME
 #define end_requirements_list(LAST_CONCEPT) static const bool value=IsTrue<auto_check_list_##LAST_CONCEPT>::value;typedef typename test_condition<value>::type type;
 
 ///============================================================================
@@ -137,5 +137,6 @@ static const int success=sizeof(small_type);
 #define call_requires_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) char(*)[CONCEPT_NAME<CALL_REQUIREMENTS_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::value]=NULL
 
 #define call_requirements(...) char(*)[__VA_ARGS__ && True_Concept<TargetType>::value]=NULL
-#define requires(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<TYPE_TO_TEST>::value
+#define requires(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<strip_modifiers(TYPE_TO_TEST)>::value
+#define requires_basic(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<TYPE_TO_TEST>::value
 #define requires_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<CALL_REQUIREMENTS_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::value
