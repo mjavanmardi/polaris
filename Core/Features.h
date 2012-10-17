@@ -296,20 +296,21 @@ struct member_function_ptr_types<Type,setter_type>
 	public:\
 		typedef COMPONENT_TYPE FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		TargetType FEATURE_NAME(call_requirements(!requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		TargetType FEATURE_NAME(call_requirements(!requires(TargetType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (TargetType)(*_##FEATURE_NAME);}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		TargetType FEATURE_NAME(call_requirements(requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		TargetType FEATURE_NAME(call_requirements(requires(TargetType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (TargetType)(_##FEATURE_NAME);}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
 		TargetType FEATURE_NAME(call_requirements(!(GETTER_REQUIREMENTS)))\
 		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
 		tag_getter(FEATURE_NAME);\
+		\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		void FEATURE_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		void FEATURE_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(COMPONENT_TYPE*)(&value);}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		void FEATURE_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		void FEATURE_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(COMPONENT_TYPE)(*value);}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
 		TargetType FEATURE_NAME(TargetType value, call_requirements(!(SETTER_REQUIREMENTS)))\
