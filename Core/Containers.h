@@ -67,6 +67,57 @@ struct Polaris_Back_Insertion_Sequence_Prototype
 };
 
 ///============================================================================
+/// Polaris_Back_Insertion_Sequence_Prototype - stl Random Access Sequence prototype
+///============================================================================
+
+template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
+struct Polaris_Random_Access_Sequence_Prototype
+{
+	typedef Polaris_Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
+	typedef typename ComponentType::size_type size_type;
+
+	iterator begin(){return (iterator)((ComponentType*)this)->begin();}
+
+	iterator end(){return (iterator)((ComponentType*)this)->end();}
+	
+	size_type size(){return ((ComponentType*)this)->size();}
+
+	size_type max_size(){return ((ComponentType*)this)->size();}
+
+	bool empty(){return ((ComponentType*)this)->empty();}
+
+	TargetValueType front(){return (TargetValueType)(((ComponentType*)this)->front());}
+
+	iterator insert(iterator p, TargetValueType t){return ((ComponentType*)this)->insert(p,t);}
+	
+	void insert(iterator p, size_type n, TargetValueType t){return ((ComponentType*)this)->insert(p,n);}
+
+	void insert(iterator p, iterator i, iterator j){return ((ComponentType*)this)->insert(p,i,j);}
+
+	iterator erase(iterator p){return ((ComponentType*)this)->erase(p);}
+	
+	iterator erase(iterator p, iterator q){return ((ComponentType*)this)->erase(p,q);}
+
+	void clear(){return ((ComponentType*)this)->clear();}
+
+	void resize(size_type n){return ((ComponentType*)this)->resize(n);}
+	
+	void resize(size_type n, TargetValueType t){return ((ComponentType*)this)->resize(n,t);}
+
+	TargetValueType back(){return (TargetValueType)(((ComponentType*)this)->back());}
+	
+	void push_back(TargetValueType& t){return ((ComponentType*)this)->push_back((typename ComponentType::value_type&)t);}
+
+	void pop_back(){((ComponentType*)this)->pop_back();}
+
+	TargetValueType& operator [](int i){return (TargetValueType&)((*((ComponentType*)this))[i]);}
+	
+	const TargetValueType& operator [](int i) const {return (TargetValueType&)((*((ComponentType*)this))[i]);}
+
+	TargetValueType& at(int i){return (TargetValueType&)(((ComponentType*)this)->at(i));}
+};
+
+///============================================================================
 /// Polaris_Container - stl Container implementation
 ///============================================================================
 
