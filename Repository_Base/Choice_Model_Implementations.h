@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Choice_Model_Interface.h"
+#include "Choice_Model_Prototypes.h"
 #include <random>
 
 

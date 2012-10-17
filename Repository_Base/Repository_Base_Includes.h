@@ -34,8 +34,8 @@ struct DATA_STRUCT_NAME \
 {													\
 	typedef true_type TYPE_TRAIT_TAGS, __VA_ARGS__; \
 	typedef DATA_VALUE_TYPE ValueType; \
-	DATA_STRUCT_NAME(DATA_VALUE_TYPE val,call_requires(DATA_VALUE_TYPE,is_arithmetic)): Value(val){} \
-	DATA_STRUCT_NAME(call_requires(DATA_VALUE_TYPE,is_arithmetic)): Value(0){} \
+	DATA_STRUCT_NAME(DATA_VALUE_TYPE val): Value(val){} \
+	DATA_STRUCT_NAME(): Value(0){} \
 	DATA_VALUE_TYPE Value; \
 	operator DATA_VALUE_TYPE(){return Value;}; \
 	DATA_STRUCT_NAME& operator=(DATA_VALUE_TYPE& obj){Value = obj; return *this;}  \
@@ -53,7 +53,10 @@ concept Is_Target_Type_Struct
 	end_requirements_list(Param2Type);
 };
 
-
+#define tag_polaris_prototype\
+	typedef ComponentType Component_Type;\
+	typedef CallerType Caller_Type;\
+	typedef true_type Is_Prototype;
 
 ///======================================================================================
 /// RTTI STUFF - in production
