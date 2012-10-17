@@ -13,11 +13,11 @@ namespace Location_Components
 			typedef true_type LocationType;
 
 
-			facet_base void Initialize(TargetType location_struct, call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,Concepts::Is_Transims_Location)))
+			feature_implementation void Initialize(TargetType location_struct, call_requirements(requires(ComponentType,Is_Dispatched) && requires(TargetType,Concepts::Is_Transims_Location)))
 			{
 				_location = location_struct;
 			}
-			facet_base void Initialize(TargetType location_struct, call_requirements(requires(ThisType,!Is_Dispatched) || requires(TargetType,!Concepts::Is_Transims_Location)))
+			feature_implementation void Initialize(TargetType location_struct, call_requirements(requires(ComponentType,!Is_Dispatched) || requires(TargetType,!Concepts::Is_Transims_Location)))
 			{
 				assert_requirements(TargetType,Is_Transims_Location,"TargetType is not a transims location - required to use this version of initialize");
 				assert_requirements(TargetType,Is_Dispatched,"TargetType is not dispatched");

@@ -93,29 +93,29 @@ namespace Time_Components
 		//=============================================================
 		/// Basic Time Interface
 		/// This is the core time object in polaris.  It implements, initialization, addition, display and conversion routines
-		template<typename ThisType, typename CallerType>
+		template<typename ComponentType, typename CallerType>
 		struct Time_Interface
 		{
 			/// Communicates that this time interface is a time type
-			typedef ThisType This_Type;
+			typedef ComponentType This_Type;
 			typedef true_type TimeType;
 
 			/// Initializer
-			facet void Initialize(TargetType t, call_requires(ThisType,Is_Dispatchable))
+			facet void Initialize(TargetType t, call_requires(ComponentType,Is_Dispatchable))
 			{
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(t);
+				return PTHIS(ComponentType)->Initialize<Dispatch<ComponentType>,CallerType,TargetType>(t);
 			}
 
 			/// Adding time
-			facet void Add_Time(TargetType t, call_requires(ThisType,Is_Dispatchable))
+			facet void Add_Time(TargetType t, call_requires(ComponentType,Is_Dispatchable))
 			{
-				return PTHIS(ThisType)->Add_Time<Dispatch<ThisType>,CallerType,TargetType>(t);
+				return PTHIS(ComponentType)->Add_Time<Dispatch<ComponentType>,CallerType,TargetType>(t);
 			}
 
 			/// Display the time
 			facet void Write()
 			{
-				//cout <<"Total Seconds: "<<pthis->Total_Seconds<ThisType, CallerType, TargetType>()<<endl;
+				//cout <<"Total Seconds: "<<pthis->Total_Seconds<ComponentType, CallerType, TargetType>()<<endl;
 				cout << "Day "<< this->Time_Component<Data_Structures::Time_Days>()<<":  ";
 				cout << this->Time_Component<Data_Structures::Time_Hours>()<<":"<<this->Time_Component<Data_Structures::Time_Minutes>()<<":"<<this->Time_Component<Data_Structures::Time_Seconds>()<<"."<< this->Time_Component<Data_Structures::Time_DRSeconds>();
 			}

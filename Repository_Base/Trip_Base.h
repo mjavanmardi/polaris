@@ -14,21 +14,21 @@ namespace Trip_Components
 
 			///====================================================================
 			/// Trip Initializers requires valid Time and Location Types
-			facet_base void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
-				requires(ThisType,Is_Dispatched) &&
+			feature_implementation void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
+				requires(ComponentType,Is_Dispatched) &&
 				requires(typename TargetType::ParamType, is_arithmetic) &&
 				requires(strip_modifiers(typename TargetType::Param2Type),Time_Components::Concepts::Is_Time) &&
 				requires(strip_modifiers(typename TargetType::Param3Type),Location_Components::Concepts::Is_Location)))
 			{
 				this->_ID = ID;
-				this->Start_Time<ThisType, NULLTYPE, strip_modifiers(TargetType::Param2Type)::This_Type>(start_time_val);
-				this->End_Time<ThisType, NULLTYPE, strip_modifiers(TargetType::Param2Type)::This_Type>(end_time_val);
-				this->Origin<ThisType, NULLTYPE, strip_modifiers(TargetType::Param3Type)::This_Type>(origin);
-				this->Destination<ThisType, NULLTYPE, strip_modifiers(TargetType::Param3Type)::This_Type>(destination);
+				this->Start_Time<ComponentType, NULLTYPE, strip_modifiers(TargetType::Param2Type)::This_Type>(start_time_val);
+				this->End_Time<ComponentType, NULLTYPE, strip_modifiers(TargetType::Param2Type)::This_Type>(end_time_val);
+				this->Origin<ComponentType, NULLTYPE, strip_modifiers(TargetType::Param3Type)::This_Type>(origin);
+				this->Destination<ComponentType, NULLTYPE, strip_modifiers(TargetType::Param3Type)::This_Type>(destination);
 			}
 
-			facet_base void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
-				requires(ThisType,Is_Dispatched) &&
+			feature_implementation void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
+				requires(ComponentType,Is_Dispatched) &&
 				requires(typename TargetType::ParamType, is_arithmetic) &&
 				requires(strip_modifiers(typename TargetType::Param2Type),Time_Components::Concepts::Has_Time) &&
 				requires(strip_modifiers(typename TargetType::Param3Type),Location_Components::Concepts::Is_Transims_Location)))
@@ -48,13 +48,13 @@ namespace Trip_Components
 				this->_End_Time->Initialize<typename TargetType::Param2Type>(end_time_val);
 			}
 
-			facet_base void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
-				requires(ThisType,!Is_Dispatched) ||
+			feature_implementation void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
+				requires(ComponentType,!Is_Dispatched) ||
 				requires(typename TargetType::ParamType, !is_arithmetic) ||
 				(requires(strip_modifiers(typename TargetType::Param2Type),!Time_Components::Concepts::Has_Time) && requires(strip_modifiers(typename TargetType::Param2Type), !Time_Components::Concepts::Is_Time)) ||
 				(requires(strip_modifiers(typename TargetType::Param3Type),!Location_Components::Concepts::Is_Transims_Location) && requires(strip_modifiers(typename TargetType::Param3Type),!Location_Components::Concepts::Is_Location))))
 			{
-				assert_requirements(ThisType, Is_Dispatched, " - ThisType is not dispatched - ");
+				assert_requirements(ComponentType, Is_Dispatched, " - ComponentType is not dispatched - ");
 				assert_requirements_std(typename TargetType::ParamType, is_arithmetic, " - TargetType::ParamType is not arithmetic - ");
 				assert_requirements(strip_modifiers(typename TargetType::Param2Type), Time_Components::Concepts::Has_Time, " - TimeType is not a Time Type - ");
 				assert_requirements(strip_modifiers(typename TargetType::Param3Type), Location_Components::Concepts::Is_Location, " - LocationType is not a Location Type - ");
@@ -76,7 +76,7 @@ namespace Trip_Components
 			member_component(Location_Components::Components::Location,Destination, requires(TargetType,Location_Components::Concepts::Is_Location), requires(TargetType,Location_Components::Concepts::Is_Location));
 
 
-			facet_base void Write()
+			feature_implementation void Write()
 			{
 				cout<<endl<<"TRIP:"<<endl;
 				cout <<"ID: "<<_ID<<endl;

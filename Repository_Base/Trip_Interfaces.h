@@ -27,31 +27,31 @@ namespace Trip_Components
 	}
 	namespace Interfaces
 	{
-		template<typename ThisType, typename CallerType>
+		template<typename ComponentType, typename CallerType>
 		struct Trip_Interface
 		{
 			/// Tells everyone that this interface is a trip type
 			typedef Types::TripType TripType ;
-			typedef ThisType This_Type;
+			typedef ComponentType This_Type;
 
 			/// Trip Initializers requires valid Time and Location Types
 			facet void Initialize(typename TargetType::ParamType ID, typename TargetType::Param2Type start_time_val, typename TargetType::Param2Type end_time_val, typename TargetType::Param3Type origin, typename TargetType::Param3Type destination, call_requirements(
-				(requires(ThisType, Is_Dispatchable) && requires(TargetType, Is_Target_Type_Struct))))
+				(requires(ComponentType, Is_Dispatchable) && requires(TargetType, Is_Target_Type_Struct))))
 			{
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(ID,start_time_val, end_time_val, origin, destination);
+				return PTHIS(ComponentType)->Initialize<Dispatch<ComponentType>,CallerType,TargetType>(ID,start_time_val, end_time_val, origin, destination);
 			}
 		
 
 			facet void Write()
 			{
-				PTHIS(ThisType)->Write<Dispatch<ThisType>,CallerType,TargetType>();
+				PTHIS(ComponentType)->Write<Dispatch<ComponentType>,CallerType,TargetType>();
 			}
 
-			facet_accessor(ID);
-			facet_accessor_interface(Start_Time);
-			facet_accessor_interface(End_Time);
-			facet_accessor_interface(Origin);
-			facet_accessor_interface(Destination);
+			feature_accessor(ID);
+			feature_accessor(Start_Time);
+			feature_accessor(End_Time);
+			feature_accessor(Origin);
+			feature_accessor(Destination);
 		};
 	}
 	namespace Data_Structures

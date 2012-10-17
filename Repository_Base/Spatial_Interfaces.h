@@ -49,26 +49,26 @@ namespace Spatial_Components
 		/// Location Interface class
 		struct Coordinate_System_Interface
 		{
-			facet void Initialize(float* var, TargetType& origin_coord_struct, call_requires(ThisType,Is_Dispatchable))
+			facet void Initialize(float* var, TargetType& origin_coord_struct, call_requires(ComponentType,Is_Dispatchable))
 			{
-				this->ptr_test<ThisType,CallerType,float*>(var);
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(var, origin_coord_struct);
+				this->ptr_test<ComponentType,CallerType,float*>(var);
+				return PTHIS(ComponentType)->Initialize<Dispatch<ComponentType>,CallerType,TargetType>(var, origin_coord_struct);
 			}
-			template<typename ThisType, typename CallerType, typename CoordinateStructType, typename ZoneStructType>
-			void Initialize(CoordinateStructType& origin_coord_struct, ZoneStructType& zone_struct, call_requires(ThisType,Is_Dispatchable))
+			template<typename ComponentType, typename CallerType, typename CoordinateStructType, typename ZoneStructType>
+			void Initialize(CoordinateStructType& origin_coord_struct, ZoneStructType& zone_struct, call_requires(ComponentType,Is_Dispatchable))
 			{
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,CoordinateStructType,ZoneStructType>(origin_coord_struct,zone_struct);
+				return PTHIS(ComponentType)->Initialize<Dispatch<ComponentType>,CallerType,CoordinateStructType,ZoneStructType>(origin_coord_struct,zone_struct);
 			}
 
 			facet void Write(call_requirements(requires(TargetType, is_arithmetic) || requires_2(TargetType,string,is_same)))
 			{
-				TargetType l = location<ThisType,CallerType,TargetType>();
+				TargetType l = location<ComponentType,CallerType,TargetType>();
 				cout << l;
 			}
 
 			facet void Convert()
 			{
-				int* test = this->ptr_test<ThisType,CallerType,int*>();
+				int* test = this->ptr_test<ComponentType,CallerType,int*>();
 				cout <<*test;
 			}
 			facet void Distance(){}

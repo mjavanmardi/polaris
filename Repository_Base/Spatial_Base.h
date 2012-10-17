@@ -11,13 +11,13 @@ namespace Spatial_Components
 		/// Base for the XY coordinate system class
 		class XY_Coordinate_System_Base
 		{
-			facet void Initialize(float* var, TargetType& orig, call_requirements(requires(ThisType,Is_Dispatched) && requires(TargetType,Concepts::Is_XY)))
+			facet void Initialize(float* var, TargetType& orig, call_requirements(requires(ComponentType,Is_Dispatched) && requires(TargetType,Concepts::Is_XY)))
 			{
 				this->_ptr_test = var;
 				this->_Origin_X=orig.x;
 				this->_Origin_Y=orig.y;
 			}
-			facet void Initialize(call_requirements(requires(ThisType,!Is_Dispatched) || requires(TargetType,!Concepts::Is_XY)))
+			facet void Initialize(call_requirements(requires(ComponentType,!Is_Dispatched) || requires(TargetType,!Concepts::Is_XY)))
 			{
 				assert_requirements(TargetType,Is_Transims_Location,"TargetType is not a transims location - required to use this version of initialize");
 				assert_requirements(TargetType,Is_Dispatched,"TargetType is not dispatched");
@@ -44,22 +44,22 @@ namespace Spatial_Components
 		{
 			facet
 			void Initialize(TargetType& zone_struct, call_requirements(
-				requires(ThisType,Is_Dispatched) &&
+				requires(ComponentType,Is_Dispatched) &&
 				requires(TargetType,Concepts::Is_UTM)))
 			{
 
 			}
-			template<typename ThisType, typename CallerType, typename CoordinateStructType, typename ZoneStructType>
+			template<typename ComponentType, typename CallerType, typename CoordinateStructType, typename ZoneStructType>
 			void Initialize(CoordinateStructType& origin_coord_struct, ZoneStructType& zone_struct, call_requirements(
-				requires(ThisType,Is_Dispatched) &&
+				requires(ComponentType,Is_Dispatched) &&
 				requires(CoordinateStructType,Concepts::Is_UTM) &&
 				requires(ZoneStructType,Concepts::Is_UTM)))
 			{
 
 			}
-			template<typename ThisType, typename CallerType, typename CoordinateStructType, typename ZoneStructType>
+			template<typename ComponentType, typename CallerType, typename CoordinateStructType, typename ZoneStructType>
 			void Initialize(CoordinateStructType& origin_coord_struct, ZoneStructType& zone_struct, call_requirements(
-				requires(ThisType,!Is_Dispatched) || 
+				requires(ComponentType,!Is_Dispatched) || 
 				requires(CoordinateStructType,!Concepts::Is_UTM)))
 			{
 				assert_requirements(TargetType,Is_Transims_Location,"TargetType is not a transims location - required to use this version of initialize");

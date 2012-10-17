@@ -31,15 +31,15 @@ namespace Location_Components
 	namespace Interfaces
 	{
 		/// Location Interface class
-		template<typename ThisType, typename CallerType>
+		template<typename ComponentType, typename CallerType>
 		struct Location_Interface
 		{
-			typedef ThisType This_Type;
+			typedef ComponentType This_Type;
 			typedef true_type LocationType;
 
-			facet void Initialize(TargetType location_struct, call_requires(ThisType,Is_Dispatchable))
+			facet void Initialize(TargetType location_struct, call_requires(ComponentType,Is_Dispatchable))
 			{
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>(location_struct);
+				return PTHIS(ComponentType)->Initialize<Dispatch<ComponentType>,CallerType,TargetType>(location_struct);
 			}
 			facet void Write(call_requirements(requires(TargetType, is_arithmetic)))
 			{

@@ -48,22 +48,21 @@ namespace EXAMPLE_COMPONENTS
 	//==================================================================================================================
 	/// Namespace which includes the interface(or interfaces if necessary) which links to the various Bases regarding the transportation object
 	//------------------------------------------------------------------------------------------------------------------
-	namespace Interfaces
+	namespace Prototypes
 	{
 		//------------------------------------------------------------------------------------------------------------------
 		/// RENAME THE Inteface struct below.  This is the inteface to a POLARIS component
 		//------------------------------------------------------------------------------------------------------------------
-		template <typename ThisType, typename CallerType>
-		struct INTERFACE_NAME
+		prototype struct PROTOTYPE_NAME
 		{
 			/// INTERFACE FUNCTION EXAMPLE - this example dispatched the Initialize function call to the component base
-			facet void Initialize()
+			feature void Initialize()
 			{
-				return PTHIS(ThisType)->Initialize<Dispatch<ThisType>,CallerType,TargetType>();
+				return cast_self_to_component().Initialize<ComponentType,CallerType,TargetType>();
 			}
 			 
 			// ACCESSOR EXAMPLE - this creates an accessor called ACCESSOR_NAME
-			facet_accessor(ACCESSOR_NAME);
+			feature_accessor(ACCESSOR_NAME);
 		};
 	}
 
