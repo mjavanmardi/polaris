@@ -244,3 +244,9 @@ DataType* Allocate(void)
 {
 	return (DataType*)((type_singleton<DataType>::ref)->Allocate());
 }
+
+
+#define tag_polaris_prototype\
+	typedef ComponentType Component_Type;\
+	typedef CallerType Caller_Type;\
+	typedef true_type Is_Prototype;
