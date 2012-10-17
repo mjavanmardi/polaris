@@ -41,6 +41,15 @@ concept Is_Polaris_Component
 	end_requirements_list(Master_Type);
 };
 
+concept Is_Polaris_Prototype
+{
+	begin_requirements_list (none);
+	requires_typename_defined(none, Component_Type,"Type does not have Component_Type defined.");
+	requires_typename_defined(Component_Type, Caller_Type,"Type does not have Caller_Type defined.");
+	requires_typename_state(Caller_Type, Is_Prototype, true_type,"Type is not a Polaris_Prototype.");
+	end_requirements_list(Is_Prototype);
+};
+
 concept Is_Data_Object
 {
 	begin_requirements_list(none);
