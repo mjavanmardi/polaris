@@ -611,7 +611,6 @@ namespace Signal_Components
 				// Get reference to the Lane Groups in the current phase
 				lane_groups_itf* lane_groups = this->Lane_Groups<lane_groups_itf*>();
 				lane_groups_itf::iterator itr = lane_groups->begin();
-				lane_group_itf* lane_group;
 
 				// initialize critical vs ratio
 				TargetType vs_crit = 0;
@@ -619,7 +618,7 @@ namespace Signal_Components
 				// search each lane group in the phase, return the one with highest vs
 				for (itr; itr != lane_groups->end(); itr++)
 				{
-					lane_group = (*itr);
+					lane_group_itf* lane_group = (*itr);
 					TargetType vs_i = lane_group->Calculate_VS_ratio<TargetType>();
 					if (vs_i > vs_crit) vs_crit = vs_i;
 				}
@@ -641,8 +640,6 @@ namespace Signal_Components
 				// Get reference to the Lane Groups in the current phase
 				lane_groups_itf* lane_groups = this->Lane_Groups<lane_groups_itf*>();
 				lane_groups_itf::iterator itr = lane_groups->begin();
-				lane_group_itf* lane_group;
-
 				
 				// initialize critical vs ratio
 				TargetType v_crit = 0;
@@ -650,7 +647,7 @@ namespace Signal_Components
 				// search each lane group in the phase, return the one with highest volume
 				for (itr; itr != lane_groups->end(); itr++)
 				{
-					lane_group = (*itr);
+					lane_group_itf* lane_group = (*itr);
 					TargetType v_i = lane_group->Calculate_Lane_Volume<TargetType>();
 					if (v_i > v_crit) v_crit = v_i;
 				}
@@ -668,11 +665,10 @@ namespace Signal_Components
 				// Get reference to the Lane Groups in the current phase
 				lane_groups_itf* lane_groups = this->Lane_Groups<lane_groups_itf*>();
 				lane_groups_itf::iterator itr = lane_groups->begin();
-				lane_group_itf* lane_group;
 
 				for (itr; itr!=lane_groups->end(); itr++)
 				{
-					lane_group = (*itr);
+					lane_group_itf* lane_group = (*itr);
 					lane_group->Update_Demand<TargetType>(time);
 				}
 			}
@@ -722,8 +718,6 @@ namespace Signal_Components
 		prototype struct Approach_Prototype
 		{
 			tag_polaris_prototype;
-
-			// create interfaces to signal collections (phases/phase and approaches/approach
 			define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype,Lane_Groups,lane_groups_itf,Lane_Group_Prototype,lane_group_itf,NULLTYPE);
 
 			//============================================================
@@ -748,7 +742,6 @@ namespace Signal_Components
 				// Get reference to the Lane Groups in the current approach
 				lane_groups_itf* lane_groups = this->Lane_Groups<lane_groups_itf*>();
 				lane_groups_itf::iterator itr = lane_groups->begin();
-				lane_group_itf* lg;
 
 				// initialize critical vs ratio
 				float sum_delay = 0;
@@ -757,7 +750,7 @@ namespace Signal_Components
 				// search each lane group in the approach and set the LOS and delay
 				for (itr; itr != lane_groups->end(); itr++)
 				{
-					lg = *itr;
+					lane_group_itf* lg = *itr;
 					float g = lg->green_time<Data_Structures::Time_Second>();
 					float cycle = lg->cycle_length<Data_Structures::Time_Second>();
 					float v = lg->demand_lane_group<Data_Structures::Flow_Per_Hour>();
@@ -830,8 +823,6 @@ namespace Signal_Components
 		prototype struct Signal_Prototype
 		{
 			tag_polaris_prototype;
-
-			// create interfaces to signal collections (phases/phase and approaches/approach
 			define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype,Phases,phases_itf,Phase_Prototype,phase_itf,NULLTYPE);
 			define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype,Approaches,approaches_itf,Approach_Prototype,approach_itf,NULLTYPE);
 
@@ -915,9 +906,6 @@ namespace Signal_Components
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
 				requires(typename ComponentType, Concepts::Is_HCM_Simple_Solution)))
 			{
-				// Simplify ComponentType name
-				typedef ComponentType T;
-
 				// Get reference to the phases in the signal phase diagram
 				phases_itf* phases = this->Phases<phases_itf*>();
 				typename phases_itf::iterator itr = phases->begin();
@@ -983,20 +971,16 @@ namespace Signal_Components
 			/// HCM LOS Calculation
 			feature void Calculate_Signal_LOS(call_requirements(requires(TargetType,is_integral)))
 			{
-				// Simplify ComponentType name
-				typedef ComponentType T;
-
 				// Get reference to the phases in the signal phase diagram
 				approaches_itf* approaches = this->Approaches<approaches_itf*>();
 				typename approaches_itf::iterator itr = approaches->begin();
-				approach_itf* approach_ptr;
 
 				// Sum total lost time and critical vs for all approaches
 				float sum_delay = 0;
 				float sum_flow = 0;
 				for (itr; itr != approaches->end(); itr++)
 				{
-					approach_ptr = (*itr);
+					approach_itf* approach_ptr = (*itr);
 					approach_ptr->Calculate_Approach_LOS<char>();
 					sum_delay += approach_ptr->delay<Data_Structures::Time_Second>() * approach_ptr->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
 					sum_flow += approach_ptr->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
@@ -1020,15 +1004,10 @@ namespace Signal_Components
 			/// Output the cycle length and phasing plan information for signal	
 			feature void Display_Timing()
 			{
-				// Simplify ComponentType name
-				typedef ComponentType T;
-				
-
 				// Get reference to the phases in the signal phase diagram
 				phases_itf* phases = this->Phases<phases_itf*>();
 				typename phases_itf::iterator itr = phases->begin();
 
-				
 				ostream* out = this->output_stream<ostream*>();	
 
 				if (out == NULL) return;
@@ -1042,26 +1021,20 @@ namespace Signal_Components
 					(*out) <<"Green:\t"<<(*phases)[i]->green_time<Data_Structures::Time_Second>()<<"\t";
 					(*out) <<"Yellow/red:\t"<<(*phases)[i]->yellow_and_all_red_time<Data_Structures::Time_Second>()<<"\t";
 				}
-				(*out)<<endl;
-				//(*out).flush();
-				
+				(*out)<<endl;				
 			}	
 			/// Display the signal LOS to the output stream
 			feature void Display_Signal_LOS()
 			{
-				// Simplify ComponentType name
-				typedef ComponentType T;
-
 				// Get reference to the phases in the signal phase diagram
 				approaches_itf* approaches = this->Approaches<approaches_itf*>();
 				typename approaches_itf::iterator itr = approaches->begin();
-				approach_itf* approach_ptr;
 
 				// Sum total lost time and critical vs for all approaches
 				cout<<endl<<this->name<char*>()<<" LOS = "<<this->LOS<char>();
 				for (itr; itr != approaches->end(); itr++)
 				{
-					approach_ptr = (*itr);
+					approach_itf* approach_ptr = (*itr);
 					cout<<endl<<approach_ptr->name<char*>()<<" Approach LOS = "<<approach_ptr->LOS<char>();
 				}
 			}
@@ -1073,12 +1046,8 @@ namespace Signal_Components
 			declare_feature_conditional(Signal_Check_Conditional)
 			{
 				// Get Current Interface
-				typedef ComponentType T;
 				Signal_Prototype<ComponentType,NULLTYPE>* _pthis=(Signal_Prototype<ComponentType,NULLTYPE>*)_this;
-			
-				// Get interface to phases in signal
-				define_container_and_value_interface_local(Random_Access_Sequence_Prototype,Phases,phases_itf,Prototypes::Phase_Prototype,phase_itf,CallerType);
-
+	
 				phases_itf* phases = _pthis->Phases<phases_itf*>();
 				int active_phase = _pthis->active_phase<int>();
 				phase_itf* phase = (*phases)[active_phase];
@@ -1087,7 +1056,6 @@ namespace Signal_Components
 				// If timing updating is turned off (num_cycles = 0) then set the time of the next timing update to infinity so it is never called
 				//-----------------------------------------------------------------------------------------------------------------------
 				if (_pthis->num_cycles_between_updates<int>() == 0) _pthis->Next_Timing_Event_Iteration<int>(INT_MAX);
-
 
 				//=======================================================================================================================
 				// Handle the timing update sequence - occurs once every analysis period (calculated as a multiple of the current cycle length
@@ -1145,7 +1113,6 @@ namespace Signal_Components
 			declare_feature_event(Change_Signal_State)
 			{
 				// Get Current Interface
-				typedef ComponentType T;
 				Signal_Prototype<ComponentType,CallerType>* _pthis = (Signal_Prototype<ComponentType,CallerType>*)_this;
 
 				// Display the signal information if the output stream is not null
@@ -1202,7 +1169,6 @@ namespace Signal_Components
 			declare_feature_event(Change_Signal_Timing)
 			{
 				// Get Current Interface
-				typedef ComponentType T;
 				Signal_Prototype<ComponentType,CallerType>* _pthis = (Signal_Prototype<ComponentType,CallerType>*)_this;
 
 				// Call the routine to update the signal timing
@@ -1366,7 +1332,6 @@ namespace Signal_Components
 
 			}
 		};
-
 	}
 
 
