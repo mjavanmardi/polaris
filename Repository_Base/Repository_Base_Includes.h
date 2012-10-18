@@ -53,11 +53,6 @@ concept Is_Target_Type_Struct
 	end_requirements_list(Param2Type);
 };
 
-#define tag_polaris_prototype\
-	typedef ComponentType Component_Type;\
-	typedef CallerType Caller_Type;\
-	typedef true_type Is_Prototype;
-
 ///======================================================================================
 /// RTTI STUFF - in production
 
@@ -127,6 +122,74 @@ concept Is_Target_Type_Struct
 #define error_handler_RTTI_6(FEATURE_NAME,CONCEPT,NAME2,CONCEPT2,NAME3,CONCEPT3,NAME4,CONCEPT4,NAME5,CONCEPT5,NAME6,CONCEPT6) _error_handler_RTTI(FEATURE_NAME, (CONCEPT) || (CONCEPT2)|| (CONCEPT3)|| (CONCEPT4)|| (CONCEPT5)|| (CONCEPT6))
 
 
+
+#define requires_typename_state_interface(LINKED_CONCEPT,REQUIREMENT_NAME,TYPENAME_STATE,ERROR_MESSAGE)\
+	struct REQUIREMENT_NAME\
+	{\
+		template<typename U> static small_type has_matching_typename(typename U::Component_Type::REQUIREMENT_NAME*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool member_exists=sizeof(has_matching_typename<T>(0))==success;\
+		template<class U,bool B> struct p_conditional{typedef false_type type;};\
+		template<class U> struct p_conditional<U,true>{typedef typename is_same<typename U::Component_Type::REQUIREMENT_NAME,TYPENAME_STATE>::type type;};\
+		static const bool value=(member_exists && p_conditional<T,member_exists>::type::value);\
+		static_assert(value || !assert_requirements,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n");\
+	};\
+	typedef typename Append<auto_check_list_##LINKED_CONCEPT,REQUIREMENT_NAME>::Result auto_check_list_##REQUIREMENT_NAME;
+
+#define requires_typed_member_interface(LINKED_CONCEPT,REQUIREMENT_NAME,DESIRED_TYPE,ERROR_MESSAGE)\
+	struct REQUIREMENT_NAME\
+	{\
+		template<typename U> static small_type has_matching_named_member(decltype(&U::Component_Type::REQUIREMENT_NAME));\
+		template<typename U> static large_type has_matching_named_member(...);\
+		static const bool member_exists=sizeof(has_matching_named_member<T>(0))==success;\
+		template<class U,bool B> struct p_conditional{typedef false_type type;};\
+		template<class U> struct p_conditional<U,true>{typedef typename is_same<decltype(&U::REQUIREMENT_NAME),DESIRED_TYPE U::*>::type type;};\
+		static const bool value=(member_exists && p_conditional<T,member_exists>::type::value);\
+	};\
+	typedef typename Append<auto_check_list_##LINKED_CONCEPT,REQUIREMENT_NAME>::Result auto_check_list_##REQUIREMENT_NAME;
+
+
+#define requires_typename_defined_interface(LINKED_CONCEPT,REQUIREMENT_NAME,ERROR_MESSAGE)\
+	struct REQUIREMENT_NAME\
+	{\
+		template<typename U> static small_type has_matching_typename(typename U::Component_Type::REQUIREMENT_NAME*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+		static_assert(value || !assert_requirements,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n");\
+	};\
+	typedef typename Append<auto_check_list_##LINKED_CONCEPT,REQUIREMENT_NAME>::Result auto_check_list_##REQUIREMENT_NAME;
+
+
+#define requires_named_member_interface(LINKED_CONCEPT,REQUIREMENT_NAME,ERROR_MESSAGE)\
+	struct REQUIREMENT_NAME\
+	{\
+		template<typename U> static small_type has_matching_named_member(decltype(&U::Component_Type::REQUIREMENT_NAME));\
+		template<typename U> static large_type has_matching_named_member(...);\
+		static const bool value=sizeof(has_matching_named_member<T>(0))==success;\
+		static_assert(value || !assert_requirements,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n");\
+	};\
+	typedef typename Append<auto_check_list_##LINKED_CONCEPT,REQUIREMENT_NAME>::Result auto_check_list_##REQUIREMENT_NAME;
+
+#define requires_feature_interface(LINKED_CONCEPT,FEATURE_NAME,FEATURE_TYPE,ERROR_MESSAGE)\
+	struct FEATURE_NAME\
+	{\
+	template<typename U> static small_type has_matching_typename(typename U::Component_Type::FEATURE_NAME##_FEATURE_TYPE*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+		static_assert(value || !assert_requirements,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n");\
+	};\
+	typedef typename Append<auto_check_list_##LINKED_CONCEPT,FEATURE_NAME>::Result auto_check_list_##FEATURE_NAME;
+
+#define requires_method_interface(LINKED_CONCEPT,REQUIREMENT_NAME,METHOD_FORM,ERROR_MESSAGE)\
+	struct REQUIREMENT_NAME\
+	{\
+		template<METHOD_FORM> struct tester{};\
+		template<typename U> static small_type has_matching_function_member(tester<&U::Component_Type::REQUIREMENT_NAME>*);\
+		template<typename U> static large_type has_matching_function_member(...);\
+		static const bool value=sizeof(has_matching_function_member<T>(0))==success;\
+		static_assert(value || !assert_requirements,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n");\
+	};\
+	typedef typename Append<auto_check_list_##LINKED_CONCEPT,REQUIREMENT_NAME>::Result auto_check_list_##REQUIREMENT_NAME;
 
 //================================================================================================================================================================
 //================================================================================================================================================================
