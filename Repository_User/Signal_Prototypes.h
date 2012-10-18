@@ -84,19 +84,43 @@ namespace Signal_Components
 		concept Is_Lane_Group
 		{
 			begin_requirements_list(none);
-			requires_typename_state(none, IsLaneGroup, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
+			requires_concept(none,Is_Polaris_Component);
+			requires_typename_state(Is_Polaris_Component, IsLaneGroup, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
+			end_requirements_list(IsLaneGroup);
+		};
+		concept Is_Lane_Group_Prototype
+		{
+			begin_requirements_list(none);
+			requires_concept(none,Is_Polaris_Prototype);
+			requires_typename_state_interface(Is_Polaris_Prototype, IsLaneGroup, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
 			end_requirements_list(IsLaneGroup);
 		};
 		concept Is_Phase
 		{
 			begin_requirements_list(none);
-			requires_typename_state(none, IsPhase, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
+			requires_concept(none,Is_Polaris_Component);
+			requires_typename_state(Is_Polaris_Component, IsPhase, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
+			end_requirements_list(IsPhase);
+		};
+		concept Is_Phase_Prototype
+		{
+			begin_requirements_list(none);
+			requires_concept(none,Is_Polaris_Prototype);
+			requires_typename_state_interface(Is_Polaris_Prototype, IsPhase, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
 			end_requirements_list(IsPhase);
 		};
 		concept Is_Signal
 		{
 			begin_requirements_list(none);
-			requires_typename_state(none, IsSignal, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
+			requires_concept(none,Is_Polaris_Component);
+			requires_typename_state(Is_Polaris_Component, IsSignal, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
+			end_requirements_list(IsSignal);
+		};
+		concept Is_Signal_Prototype
+		{
+			begin_requirements_list(none);
+			requires_concept(none,Is_Polaris_Prototype);
+			requires_typename_state_interface(Is_Polaris_Prototype, IsSignal, true_type, "ComponentType does not have a Lane_Group child type: no Lane_Group_Base type is defined.");
 			end_requirements_list(IsSignal);
 		};
 		#pragma endregion
@@ -258,11 +282,47 @@ namespace Signal_Components
 	namespace Prototypes
 	{
 		//------------------------------------------------------------------------------------------------------------------
+		/// Detector Interface
+		//------------------------------------------------------------------------------------------------------------------
+		prototype struct Detector_Prototype
+		{
+			tag_polaris_prototype;
+
+			// Getter for the detector count data
+			feature typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(requires(TargetType, Is_Target_Type_Struct) && requires_basic(typename TargetType::ParamType, Concepts::Is_Time)))
+			{
+				return cast_self_to_component().count<ComponentType, CallerType, TargetType>(time);
+			}
+			// Getter for the detector count data
+			feature typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(!(requires(TargetType,Is_Target_Type_Struct) && requires_basic(typename TargetType::ParamType, Concepts::Is_Time))))
+			{
+				assert_requirements(TargetType, Concepts::Is_Target_Type_Struct, "TargetType is not a Target_Type struct");
+				assert_requirements(typename TargetType::ParamType, Concepts::Is_Time, "TargetType::ParamType is not a time data structure");
+			}
+
+			// Updater for the detector count data - call whenever a vehicle crosses detector (or use for aggregate updates by passing a vehicle count value in)
+			feature void detect_vehicles(TargetType vehicle_detection_count)
+			{
+				cast_self_to_component().detect_vehicle<ComponentType,CallerType,TargetType>(vehicle_detection_count);
+			}
+			feature void detect_vehicle()
+			{
+				cast_self_as_component().detect_vehicle<ComponentType,CallerType,TargetType>(1);
+			}
+			feature TargetType Get_Count()
+			{
+				cast_self_as_component().Get_Count<ComponentType,CallerType,TargetType>();
+			}
+		};
+
+
+		//------------------------------------------------------------------------------------------------------------------
 		/// Inteface to the basic POLARIS Lane Group component as defined in HCM
 		//------------------------------------------------------------------------------------------------------------------
 		prototype struct Lane_Group_Prototype
 		{
 			tag_polaris_prototype;
+			define_component_interface_local(Detector_Interface,Signal_Components::Prototypes::Detector_Prototype,Detector_Left,CallerType);
 
 			feature void Initialize()
 			{
@@ -274,9 +334,9 @@ namespace Signal_Components
 			//-------------------------------------------------------
 			feature void Update_Demand(TargetType time, call_requires(TargetType, Concepts::Is_Time))
 			{
-				Prototypes::Detector_Prototype<typename ComponentType::Master_Type::DETECTOR_TYPE,NULLTYPE>* left = this->Detector_Left<typename ComponentType::Master_Type::DETECTOR_TYPE>();
-				Prototypes::Detector_Prototype<typename ComponentType::Master_Type::DETECTOR_TYPE,NULLTYPE>* right = this->Detector_Right<typename ComponentType::Master_Type::DETECTOR_TYPE>();
-				Prototypes::Detector_Prototype<typename ComponentType::Master_Type::DETECTOR_TYPE,NULLTYPE>* thru = this->Detector_Thru<typename ComponentType::Master_Type::DETECTOR_TYPE>();
+				Detector_Interface* left = this->Detector_Left<Detector_Interface*>();
+				Detector_Interface* right = this->Detector_Right<Detector_Interface*>();
+				Detector_Interface* thru = this->Detector_Thru<Detector_Interface*>();
 				Data_Structures::Flow_Per_Hour flow;
 				flow = left->count<Target_Type<Data_Structures::Flow_Per_Hour,Data_Structures::Time_Second>>(time);
 				this->demand_left<Data_Structures::Flow_Per_Hour>(flow);
@@ -436,7 +496,7 @@ namespace Signal_Components
 			// Get the saturation flow rate for the lane group
 			feature TargetType Calculate_Saturation_Flow_Rate(call_requirements(requires(ComponentType,Concepts::Is_HCM_Full_Solution)))
 			{
-				 cast_self_to_component().Calculate_Saturation_Flow_Rate<ComponentType,CallerType,TargetType>();
+				 return cast_self_to_component().Calculate_Saturation_Flow_Rate<ComponentType,CallerType,TargetType>();
 			}
 			feature TargetType Calculate_Saturation_Flow_Rate(call_requirements(requires(ComponentType,Concepts::Is_HCM_Simple_Solution)))
 			{
@@ -533,6 +593,9 @@ namespace Signal_Components
 		{
 			tag_polaris_prototype;
 
+			// create interfaces to signal collections (phases/phase and approaches/approach
+			define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype,Lane_Groups,lane_groups_itf,Lane_Group_Prototype,lane_group_itf,NULLTYPE);
+
 			//============================================================
 			//  Intialize dispatched
 			//------------------------------------------------------------
@@ -552,19 +615,18 @@ namespace Signal_Components
 				requires(TargetType, is_arithmetic)))
 			{
 				// Get reference to the Lane Groups in the current phase
-				typedef ComponentType T;
-				typedef Interfaces::Lane_Group_Interface<typename ComponentType::Master_Type::LANE_GROUP_TYPE, CallerType>* LaneGroupItf;
-				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
-				vector<LaneGroupItf>::iterator itr = lane_group->begin();
-
+				lane_groups_itf* lane_groups = this->Lane_Groups<lane_groups_itf*>();
+				lane_groups_itf::iterator itr = lane_groups->begin();
+				lane_group_itf* lane_group;
 
 				// initialize critical vs ratio
 				TargetType vs_crit = 0;
 
 				// search each lane group in the phase, return the one with highest vs
-				for (itr; itr != lane_group->end(); itr++)
+				for (itr; itr != lane_groups->end(); itr++)
 				{
-					TargetType vs_i = (*itr)->Calculate_VS_ratio<TargetType>();
+					lane_group = (*itr);
+					TargetType vs_i = lane_group->Calculate_VS_ratio<TargetType>();
 					if (vs_i > vs_crit) vs_crit = vs_i;
 				}
 				return vs_crit;
@@ -585,20 +647,19 @@ namespace Signal_Components
 				requires(TargetType, Concepts::Is_Flow_Per_Hour)))
 			{
 				// Get reference to the Lane Groups in the current phase
-				typedef ComponentType T;
-				typedef Interfaces::Lane_Group_Interface<typename ComponentType::Master_Type::LANE_GROUP_TYPE, CallerType>* LaneGroupItf;
-				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
-				vector<LaneGroupItf>::iterator itr = lane_group->begin();
+				lane_groups_itf* lane_groups = this->Lane_Groups<lane_groups_itf*>();
+				lane_groups_itf::iterator itr = lane_groups->begin();
+				lane_group_itf* lane_group;
 
 				
 				// initialize critical vs ratio
 				TargetType v_crit = 0;
 
 				// search each lane group in the phase, return the one with highest volume
-				for (itr; itr != lane_group->end(); itr++)
+				for (itr; itr != lane_groups->end(); itr++)
 				{
-					//TargetType v_i = (*itr)->demand_lane_max<TargetType>();
-					TargetType v_i = (*itr)->Calculate_Lane_Volume<TargetType>();
+					lane_group = (*itr);
+					TargetType v_i = lane_group->Calculate_Lane_Volume<TargetType>();
 					if (v_i > v_crit) v_crit = v_i;
 				}
 				return v_crit;
@@ -618,14 +679,14 @@ namespace Signal_Components
 				requires(TargetType, Concepts::Is_Time)))
 			{
 				// Get reference to the Lane Groups in the current phase
-				typedef ComponentType T;
-				typedef Interfaces::Lane_Group_Interface<typename ComponentType::Master_Type::LANE_GROUP_TYPE, CallerType>* LaneGroupItf;
-				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
-				vector<LaneGroupItf>::iterator itr = lane_group->begin();
+				lane_groups_itf* lane_groups = this->Lane_Groups<lane_groups_itf*>();
+				lane_groups_itf::iterator itr = lane_groups->begin();
+				lane_group_itf* lane_group;
 
-				for (itr; itr!=lane_group->end(); itr++)
+				for (itr; itr!=lane_groups->end(); itr++)
 				{
-					(*itr)->Update_Demand<TargetType>(time);
+					lane_group = (*itr);
+					lane_group->Update_Demand<TargetType>(time);
 				}
 			}
 	
@@ -676,6 +737,9 @@ namespace Signal_Components
 		{
 			tag_polaris_prototype;
 
+			// create interfaces to signal collections (phases/phase and approaches/approach
+			define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype,Lane_Groups,lane_groups_itf,Lane_Group_Prototype,lane_group_itf,NULLTYPE);
+
 			//============================================================
 			//  Intialize dispatched
 			//------------------------------------------------------------
@@ -695,20 +759,19 @@ namespace Signal_Components
 			feature void Calculate_Approach_LOS(call_requirements(
 				requires(TargetType, is_arithmetic)))
 			{
-				// Get reference to the Lane Groups in the current phase
-				typedef ComponentType T;
-				typedef Interfaces::Lane_Group_Interface<typename ComponentType::Master_Type::LANE_GROUP_TYPE, CallerType>* LaneGroupItf;
-				vector<LaneGroupItf>* lane_group = this->Lane_Groups<vector<LaneGroupItf>*>();
-				vector<LaneGroupItf>::iterator itr = lane_group->begin();
+				// Get reference to the Lane Groups in the current approach
+				lane_groups_itf* lane_groups = this->Lane_Groups<lane_groups_itf*>();
+				lane_groups_itf::iterator itr = lane_groups->begin();
+				lane_group_itf* lg;
 
 				// initialize critical vs ratio
 				float sum_delay = 0;
 				float sum_flow = 0;
 
 				// search each lane group in the approach and set the LOS and delay
-				for (itr; itr != lane_group->end(); itr++)
+				for (itr; itr != lane_groups->end(); itr++)
 				{
-					LaneGroupItf lg = *itr;
+					lg = *itr;
 					float g = lg->green_time<Data_Structures::Time_Second>();
 					float cycle = lg->cycle_length<Data_Structures::Time_Second>();
 					float v = lg->demand_lane_group<Data_Structures::Flow_Per_Hour>();
@@ -782,6 +845,10 @@ namespace Signal_Components
 		{
 			tag_polaris_prototype;
 
+			// create interfaces to signal collections (phases/phase and approaches/approach
+			define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype,Phases,phases_itf,Phase_Prototype,phase_itf,NULLTYPE);
+			define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype,Approaches,approaches_itf,Approach_Prototype,approach_itf,NULLTYPE);
+
 			//=======================================================
 			// Initialization
 			//-------------------------------------------------------
@@ -816,14 +883,14 @@ namespace Signal_Components
 				// Simplify ComponentType name
 				typedef ComponentType T;
 
-				Interfaces::Signal_Interface<typename ComponentType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>* simple_signal = (Interfaces::Signal_Interface<typename ComponentType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>*)this;
-				simple_signal->Update_Timing<Data_Structures::Time_Second>();
+				//Prototypes::Signal_Prototype<typename ComponentType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>* simple_signal = (Prototypes::Signal_Prototype<typename ComponentType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>*)this;
+				//simple_signal->Update_Timing<Data_Structures::Time_Second>();
 
 				ostream* out = this->output_stream<ostream*>();
 
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::FULL_PHASE_TYPE,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::FULL_PHASE_TYPE,NULLTYPE>*>*>();
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::FULL_PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
+				phases_itf* phases = this->Phases<phases_itf*>();
+				typename phases_itf::iterator itr = phases->begin();
 
 				// Sum total lost time and critical vs for all phases
 				float lost_time = 0;
@@ -831,7 +898,7 @@ namespace Signal_Components
 				float vs_i=0;
 				for (itr; itr != phases->end(); itr++)
 				{
-					//(*itr)->Update_Demand<Data_Structures::Time_Second>(iteration);
+					(*itr)->Update_Demand<Data_Structures::Time_Second>(iteration);
 					lost_time += (*itr)->yellow_and_all_red_time<TargetType>();
 					vs_i= (*itr)->Find_Critical_VS_Ratio<float>()*(*itr)->weight<float>();
 					vs_sum += vs_i;
@@ -879,8 +946,8 @@ namespace Signal_Components
 				typedef ComponentType T;
 
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>*>();
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::SIMPLE_PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
+				phases_itf* phases = this->Phases<phases_itf*>();
+				typename phases_itf::iterator itr = phases->begin();
 
 				ostream* out = this->output_stream<ostream*>();
 
@@ -947,18 +1014,19 @@ namespace Signal_Components
 				typedef ComponentType T;
 
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Approach_Interface<typename ComponentType::Master_Type::APPROACH_TYPE,NULLTYPE>*>* approaches = this->Approaches<vector<Interfaces::Approach_Interface<typename ComponentType::Master_Type::APPROACH_TYPE,NULLTYPE>*>*>();
-				vector<Interfaces::Approach_Interface<typename ComponentType::Master_Type::APPROACH_TYPE,NULLTYPE>*>::iterator itr = approaches->begin();
+				approaches_itf* approaches = this->Approaches<approaches_itf*>();
+				typename approaches_itf::iterator itr = approaches->begin();
+				approach_itf* approach_ptr;
 
 				// Sum total lost time and critical vs for all approaches
 				float sum_delay = 0;
 				float sum_flow = 0;
 				for (itr; itr != approaches->end(); itr++)
 				{
-					(*itr)->Calculate_Approach_LOS<char>();
-
-					sum_delay += (*itr)->delay<Data_Structures::Time_Second>() * (*itr)->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
-					sum_flow += (*itr)->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
+					approach_ptr = (*itr);
+					approach_ptr->Calculate_Approach_LOS<char>();
+					sum_delay += approach_ptr->delay<Data_Structures::Time_Second>() * approach_ptr->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
+					sum_flow += approach_ptr->approach_flow_rate<Data_Structures::Flow_Per_Hour>();
 				}
 
 				// convert delay to LOS
@@ -984,8 +1052,8 @@ namespace Signal_Components
 				
 
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = this->Phases<vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
-				vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
+				phases_itf* phases = this->Phases<phases_itf*>();
+				typename phases_itf::iterator itr = phases->begin();
 
 				
 				ostream* out = this->output_stream<ostream*>();	
@@ -1012,9 +1080,9 @@ namespace Signal_Components
 				typedef ComponentType T;
 
 				// Get reference to the phases in the signal phase diagram
-				vector<Interfaces::Approach_Interface<typename ComponentType::Master_Type::APPROACH_TYPE,NULLTYPE>*>* approaches = this->Approaches<vector<Interfaces::Approach_Interface<typename ComponentType::Master_Type::APPROACH_TYPE,NULLTYPE>*>*>();
-				vector<Interfaces::Approach_Interface<typename ComponentType::Master_Type::APPROACH_TYPE,NULLTYPE>*>::iterator itr = approaches->begin();
-				Interfaces::Approach_Interface<typename ComponentType::Master_Type::APPROACH_TYPE,NULLTYPE>* approach_ptr;
+				approaches_itf* approaches = this->Approaches<approaches_itf*>();
+				typename approaches_itf::iterator itr = approaches->begin();
+				approach_itf* approach_ptr;
 
 				// Sum total lost time and critical vs for all approaches
 				cout<<endl<<this->name<char*>()<<" LOS = "<<this->LOS<char>();
@@ -1253,6 +1321,8 @@ namespace Signal_Components
 		prototype struct Signal_Indicator_Prototype
 		{
 			tag_polaris_prototype;
+			define_component_interface_local(Signal_Itf,Prototypes::Signal_Prototype,Signal,CallerType);
+			define_container_and_value_interface(Random_Access_Sequence_Prototype, typename Signal_Itf_type::Phases,Phases_Itf,Prototypes::Phase_Prototype,Phase_Itf,CallerType);
 
 			// Initialize the signal indicator
 			feature void Initialize(call_requirements(requires(ComponentType,Is_Execution_Object)))
@@ -1289,6 +1359,12 @@ namespace Signal_Components
 				assert_requirements(TargetType,Is_Polaris_Component,"TargetType is not a polaris component.");
 			}
 
+			// Link to the phase display functionality
+			feature void Display(TargetType phase_interface_ptr)
+			{
+				cast_self_to_component().Display<ComponentType,CallerType,TargetType>(phase_interface_ptr);
+			}
+		
 			// Signal Interface accessor
 			feature_accessor(Signal);
 			feature_accessor(Conditional_Has_Fired);
@@ -1324,17 +1400,11 @@ namespace Signal_Components
 				ostream* out = _pthis->output_stream<ostream*>();
 
 				// Get Signal Interface from this
-				define_component_interface_local(Signal_Itf,Prototypes::Signal_Prototype,Signal,CallerType);
 				Signal_Itf* signal = _pthis->Signal<Signal_Itf*>();
-				//Signal_Components::Prototypes::Signal_Prototype<typename ComponentType::Master_Type::SIGNAL_TYPE,NULLTYPE>* signal = _pthis->Signal<typename ComponentType::Master_Type::SIGNAL_TYPE>();
 
 				// Get reference to the phases in the signal phase diagram
-				define_container_and_value_interface(Random_Access_Sequence_Prototype, Signal_Itf_type::Phases,Phases_Itf,Prototypes::Phase_Prototype,Phase_Itf,CallerType);
 				Phases_Itf* phases = signal->Phases<Phases_Itf*>();
 				Phases_Itf::iterator itr=phases->begin();
-
-				//vector<Prototypes::Phase_Prototype<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = signal->Phases<vector<Prototypes::Phase_Prototype<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
-				//vector<Prototypes::Phase_Prototype<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator itr = phases->begin();
 
 				// Display the signal state info if the output stream is not null
 				if (out != NULL)
@@ -1342,57 +1412,12 @@ namespace Signal_Components
 					int i;
 					for (itr, i=0; itr != phases->end(); itr++, i++)
 					{
-						(*out) << "signal_state:"<<(*itr)->phase_id<int>()<<":"<<signal->Signal_ID<int>()<<":";
-						int signal_status = 1;
-						if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = 3;
-						else if ((*itr)->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = 2;
-						(*out) <<signal_status<<":"<<iteration<<endl;
-						(*out).flush();
+						_pthis->Display<Phase_Itf*>(*itr);
 					}
 				}
 			}
 		};
 
-
-		//------------------------------------------------------------------------------------------------------------------
-		/// Detector Interface
-		//------------------------------------------------------------------------------------------------------------------
-		prototype struct Detector_Prototype
-		{
-			tag_polaris_prototype;
-
-			// Getter for the detector count data
-			feature typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
-				requires(ComponentType, Is_Dispatchable) &&
-				requires(TargetType, Is_Target_Type_Struct) &&
-				requires(typename TargetType::ParamType, Concepts::Is_Time)))
-			{
-				return cast_self_as_component().count<ComponentType, CallerType, TargetType>(time);
-			}
-			// Getter for the detector count data
-			feature typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(!(
-				requires(ComponentType, Is_Dispatchable) &&
-				requires(TargetType,Is_Target_Type_Struct) &&
-				requires(typename TargetType::ParamType, Concepts::Is_Time))))
-			{
-				assert_requirements(TargetType, Concepts::Is_Target_Type_Struct, "TargetType is not an Target_Type struct");
-				assert_requirements(typename TargetType::ParamType, Concepts::Is_Time, "TargetType::ParamType is not a time data structure");
-			}
-
-			// Updater for the detector count data - call whenever a vehicle crosses detector (or use for aggregate updates by passing a vehicle count value in)
-			feature void detect_vehicles(TargetType vehicle_detection_count)
-			{
-				cast_self_as_component().detect_vehicle<ComponentType,CallerType,TargetType>(vehicle_detection_count);
-			}
-			feature void detect_vehicle()
-			{
-				cast_self_as_component().detect_vehicle<ComponentType,CallerType,TargetType>(1);
-			}
-			feature TargetType Get_Count()
-			{
-				cast_self_as_component().Get_Count<ComponentType,CallerType,TargetType>();
-			}
-		};
 	}
 
 

@@ -357,7 +357,7 @@ namespace Signal_Components
 			// adjustment factor for lane width
 			feature_implementation float HCM_adjustment_fw()
 			{				
-				float width = ((Lane_Group_HCM_Base<MasterType>*)this)->avg_lane_width<ComponentType,CallerType,Data_Structures::Length_Foot>();
+				float width = ((Lane_Group_HCM_Implementation<MasterType>*)this)->avg_lane_width<ComponentType,CallerType,Data_Structures::Length_Foot>();
 				State_Checks::valid_lane_width<ComponentType,CallerType, TargetType>(this, width);
 				return (1.0f + (width - 12.0f)/30.0f);
 			}
@@ -379,21 +379,21 @@ namespace Signal_Components
 				float parking = this->parking_activity<ComponentType,CallerType,float>();
 				State_Checks::valid_parking_manuevers<ComponentType,CallerType,TargetType>(this, parking);
 				if (parking == 0.0f) return 1.0f;
-				float lanes = THIS->number_of_lanes<float>();
+				float lanes = ((Lane_Group_HCM_Implementation<MasterType>*)this)->number_of_lanes<ComponentType,CallerType,float>();
 				return (lanes - 0.1f - 18.0f * parking /3600.0f)/lanes;
 			}
 			// adjustment factor for blocking effect of local buses that stop within intersection area
 			feature_implementation float HCM_adjustment_fbb()
 			{
-				float buses = this->buses_per_hour<float>();
+				float buses = this->buses_per_hour<ComponentType,CallerType,float>();
 				State_Checks::valid_num_bus_stops<ComponentType,CallerType,TargetType>(this, buses);
-				float lanes = ((Lane_Group_HCM_Implementation<MasterType>*)this)->number_of_lanes<float>();
+				float lanes = ((Lane_Group_HCM_Implementation<MasterType>*)this)->number_of_lanes<ComponentType,CallerType,float>();
 				return (lanes - 14.4f * buses /3600.0f)/lanes;
 			}
 			// adjustment factor for area type
 			feature_implementation float HCM_adjustment_fa()
 			{
-				bool in_cbd = ((Lane_Group_HCM_Implementation<MasterType>*)this)->in_CBD<bool>();
+				bool in_cbd = ((Lane_Group_HCM_Implementation<MasterType>*)this)->in_CBD<ComponentType,CallerType,bool>();
 				if (in_cbd) return 0.9f;
 				else return 1.0f;
 			}
@@ -408,9 +408,9 @@ namespace Signal_Components
 			{
 				bool has_left, has_right, has_thru;
 				Data_Structures::Left_Turn_Types turn_type = ((Lane_Group_HCM_Implementation<MasterType>*)this)->left_turn_type<ComponentType,CallerType,Data_Structures::Left_Turn_Types>();
-				has_left = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_left_turn<bool>();
-				has_right = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_right_turn<bool>();
-				has_thru = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_thru_move<bool>();
+				has_left = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_left_turn<ComponentType,CallerType,bool>();
+				has_right = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_right_turn<ComponentType,CallerType,bool>();
+				has_thru = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_thru_move<ComponentType,CallerType,bool>();
 
 				if (turn_type == Data_Structures::Left_Turn_Types::Protected)
 				{
@@ -420,7 +420,7 @@ namespace Signal_Components
 					}
 					else if (has_left && has_thru)
 					{
-						return 1.0f / (1.0f + 0.05f * ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_left<Data_Structures::Flow_Per_Hour>() / ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_lane_group<Data_Structures::Flow_Per_Hour>());
+						return 1.0f / (1.0f + 0.05f * ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_left<ComponentType,CallerType,Data_Structures::Flow_Per_Hour>() / ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_lane_group<ComponentType,CallerType,Data_Structures::Flow_Per_Hour>());
 					}
 					else
 					{
@@ -433,9 +433,9 @@ namespace Signal_Components
 			feature_implementation float HCM_adjustment_fRT()
 			{
 				bool has_left, has_right, has_thru;
-				has_left = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_left_turn<bool>();
-				has_right = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_right_turn<bool>();
-				has_thru = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_thru_move<bool>();
+				has_left = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_left_turn<ComponentType,CallerType,bool>();
+				has_right = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_right_turn<ComponentType,CallerType,bool>();
+				has_thru = ((Lane_Group_HCM_Implementation<MasterType>*)this)->has_thru_move<ComponentType,CallerType,bool>();
 
 				if (has_right && !has_thru)
 				{
@@ -443,14 +443,14 @@ namespace Signal_Components
 				}
 				else if (has_right && has_thru)
 				{
-					int nlane = ((Lane_Group_HCM_Implementation<MasterType>*)this)->number_of_lanes<int>();
+					int nlane = ((Lane_Group_HCM_Implementation<MasterType>*)this)->number_of_lanes<ComponentType,CallerType,int>();
 					if (nlane > 1)
 					{
-						return 1.0f - 0.15f * ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_right<Data_Structures::Flow_Per_Hour>() / ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_lane_group<Data_Structures::Flow_Per_Hour>();
+						return 1.0f - 0.15f * ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_right<ComponentType,CallerType,Data_Structures::Flow_Per_Hour>() / ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_lane_group<ComponentType,CallerType,Data_Structures::Flow_Per_Hour>();
 					}
 					else
 					{
-						return 1.0f - 0.135f * ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_right<Data_Structures::Flow_Per_Hour>() / ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_lane_group<Data_Structures::Flow_Per_Hour>();
+						return 1.0f - 0.135f * ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_right<ComponentType,CallerType,Data_Structures::Flow_Per_Hour>() / ((Lane_Group_HCM_Implementation<MasterType>*)this)->demand_lane_group<ComponentType,CallerType,Data_Structures::Flow_Per_Hour>();
 					}
 				}
 				else
@@ -505,7 +505,6 @@ namespace Signal_Components
 				this->_phase_id = 0;
 				this->_weight = 1.0f;
 								
-				Phase_HCM_Implementation::Initialize<ComponentType,CallerType,TargetType>(number_of_lane_groups);
 				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,lane_groups_itf,Prototypes::Lane_Group_Prototype,lane_group_itf,CallerType);
 				lane_groups_itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,lane_groups_itf*>();
 
@@ -693,32 +692,37 @@ namespace Signal_Components
 				this->_LOS = 'A';
 				this->_name = "";
 			}
-			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType), Concepts::Is_Lane_Group) && requires(TargetType,is_pointer)))
+			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(TargetType, Concepts::Is_Lane_Group) && requires(TargetType,is_pointer)))
 			{
 				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,Lane_Groups_Itf,Prototypes::Lane_Group_Prototype,Lane_Group_Itf,CallerType);
 				Lane_Groups_Itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,Lane_Groups_Itf*>();
 				lane_groups->push_back(lane_group);
 			}
-			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Lane_Group) && requires(TargetType,is_pointer)))
+			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(TargetType, Concepts::Is_Lane_Group_Prototype) && requires(TargetType,is_pointer)))
 			{
 				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,Lane_Groups_Itf,Prototypes::Lane_Group_Prototype,Lane_Group_Itf,CallerType);
 				Lane_Groups_Itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,Lane_Groups_Itf*>();
 				lane_groups->push_back(lane_group);
 			}
-			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType), Concepts::Is_Lane_Group) && requires(TargetType,is_reference)))
+			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(TargetType, Concepts::Is_Lane_Group) && requires(TargetType,is_reference)))
 			{
 				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,Lane_Groups_Itf,Prototypes::Lane_Group_Prototype,Lane_Group_Itf,CallerType);
 				Lane_Groups_Itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,Lane_Groups_Itf*>();
 				lane_groups->push_back(&lane_group);
 			}
-			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Lane_Group) && requires(TargetType,is_reference)))
+			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(requires(TargetType, Concepts::Is_Lane_Group_Prototype) && requires(TargetType,is_reference)))
 			{
 				define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,Lane_Groups,Lane_Groups_Itf,Prototypes::Lane_Group_Prototype,Lane_Group_Itf,CallerType);
 				Lane_Groups_Itf* lane_groups = this->Lane_Groups<ComponentType,CallerType,Lane_Groups_Itf*>();
 				lane_groups->push_back(&lane_group);
 			}
-
-
+			feature_implementation void Add_Lane_Group(TargetType lane_group, call_requirements(!( (requires(TargetType, Concepts::Is_Lane_Group) || requires(TargetType, Concepts::Is_Lane_Group_Prototype)) && (requires(TargetType,is_pointer) || requires(TargetType,is_reference)))))
+			{
+				//assert_requirements_std(TargetType,is_reference, "TargetType is not reference");
+				assert_requirements_std(TargetType,is_pointer, "TargetType is not pointer");
+				//assert_requirements(TargetType, Concepts::Is_Lane_Group, "TargetType is not lane groupe");
+				assert_requirements(TargetType, Concepts::Is_Lane_Group_Prototype, "TargetType is not lane Group Prototype");
+			}
 			//============================================================
 			//  BASIC LOCAL DATA AND ACCESSOR
 			//------------------------------------------------------------
@@ -833,7 +837,7 @@ namespace Signal_Components
 				phases_itf* phases = this->Phases<ComponentType,CallerType,phases_itf*>();
 				for (int i=0; i<(int)number_of_phases; i++)
 				{
-					phase_itf* phase = (phase_itf*)Allocate<phases_itf_type>();
+					phase_itf* phase = (phase_itf*)Allocate<phase_itf_type>();
 					cast_target_to_component(phase_itf_type,phase).Parent(&cast_self_to_component());
 					phases->push_back(phase);
 				}
@@ -865,9 +869,9 @@ namespace Signal_Components
 			// CHILD CLASS ACCESS HANDLERS
 			//-------------------------------------------------------------
 			// Create Phases data member
-			member_container_basic(vector<typename MasterType::LANE_GROUP_TYPE*>, Phases);		
+			member_container_basic(vector<typename MasterType::PHASE_TYPE*>, Phases);		
 			// Create Approaches data member
-			member_container_basic(vector<typename MasterType::LANE_GROUP_TYPE*>, Approaches);
+			member_container_basic(vector<typename MasterType::APPROACH_TYPE*>, Approaches);
 
 			//==========================================================================================
 			// Signal local data members
@@ -1008,22 +1012,69 @@ namespace Signal_Components
 		/// Signal Indicator Base
 		//------------------------------------------------------------------------------------------------------------------
 		template <typename MasterType>
-		struct Signal_Indicator_Display_Implementation
+		struct Signal_Indicator_Basic_Display_Implementation
 		{
 			feature_implementation void Initialize()
 			{
-				this->_output_stream = (ofstream*)&cout;
+				this->_output_stream = (ostream*)&cout;
 				this->_Signal = NULL;
 			}
 
 			member_data_basic(bool,Conditional_Has_Fired);
-			member_data_basic(ostream*, output_stream);
+			member_pointer_basic(ostream, output_stream);
 
-			member_component_basic(typename MasterType::SIGNAL_TYPE,Signal);
-			//// Local data member for signal interface
-			//member_component(typename MasterType::SIGNAL_TYPE,Signal,
-			//	(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Signal)) || (requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType),Concepts::Is_Signal)),
-			//	(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Signal)) || (requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType),Concepts::Is_Signal)))
+			//member_component_basic(typename MasterType::SIGNAL_TYPE,Signal);
+			// Local data member for signal interface
+			member_component(typename MasterType::SIGNAL_TYPE,Signal, (requires(TargetType,Concepts::Is_Signal_Prototype) || requires(TargetType,Concepts::Is_Signal)),(requires(TargetType,Concepts::Is_Signal_Prototype) || requires(TargetType,Concepts::Is_Signal)));
+				
+			feature_implementation void Display(TargetType phase_interface_ptr, call_requirements(requires(TargetType,Concepts::Is_Phase_Prototype)))
+			{
+				Prototypes::Phase_Prototype<typename strip_modifiers(TargetType)::Component_Type,NULLTYPE>* phase = phase_interface_ptr;
+				(*_output_stream)<< "At time = "<< iteration << ", Signal_ID: "<<_Signal->Signal_ID<typename MasterType::SIGNAL_TYPE, NULLTYPE,int>()<<", Phase_ID: "<<phase->phase_id<int>()<<" is ";
+				char* signal_status;
+				if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = "GREEN.";
+				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = "YELLOW.";
+				else signal_status = "RED.";
+				(*_output_stream) << signal_status<<endl;
+				(*_output_stream).flush();
+			}
+			feature_implementation void Display(TargetType phase_interface_ptr, call_requirements(requires(TargetType,!Concepts::Is_Phase_Prototype)))
+			{
+				assert_requirements(TargetType,Concepts::Is_Phase_Prototype,"The TargetType specified is not a Phase Interface");
+			}
+		};
+
+		//==================================================================================================================
+		/// Signal Indicator Base
+		//------------------------------------------------------------------------------------------------------------------
+		template <typename MasterType>
+		struct Signal_Indicator_Vadim_Display_Implementation
+		{
+			feature_implementation void Initialize()
+			{
+				this->_output_stream = (ostream*)&cout;
+				this->_Signal = NULL;
+			}
+
+			member_data_basic(bool,Conditional_Has_Fired);
+			member_pointer_basic(ostream, output_stream);
+
+			member_component(typename MasterType::SIGNAL_TYPE,Signal, (requires(TargetType,Concepts::Is_Signal_Prototype) || requires(TargetType,Concepts::Is_Signal)),(requires(TargetType,Concepts::Is_Signal_Prototype) || requires(TargetType,Concepts::Is_Signal)));
+				
+			feature_implementation void Display(TargetType phase_interface_ptr, call_requirements(requires(TargetType,Concepts::Is_Phase_Prototype)))
+			{
+				Prototypes::Phase_Prototype<typename strip_modifiers(TargetType)::Component_Type,NULLTYPE>* phase = phase_interface_ptr;
+				(*_output_stream) << "signal_state:"<<phase->phase_id<int>()<<":"<<_Signal->Signal_ID<typename MasterType::SIGNAL_TYPE, NULLTYPE,int>()<<":";
+				int signal_status = 1;
+				if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::GREEN) signal_status = 3;
+				else if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::YELLOW) signal_status = 2;
+				(*_output_stream) <<signal_status<<":"<<iteration<<endl;
+				(*_output_stream).flush();
+			}
+			feature_implementation void Display(TargetType phase_interface_ptr, call_requirements(requires(TargetType,!Concepts::Is_Phase_Prototype)))
+			{
+				assert_requirements(TargetType,Concepts::Is_Phase_Prototype,"The TargetType specified is not a Phase Interface");
+			}
 		};
 
 		template <typename MasterType>
@@ -1035,14 +1086,15 @@ namespace Signal_Components
 				this->_signal = NULL;
 			}
 
-			member_data_basic(ostream*, output_stream);
+			member_pointer_basic(ostream, output_stream);
 
 			// Local data member for signal interface
-			member_component(typename MasterType::SIGNAL_TYPE,Signal,
-				(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Signal)) || (requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType),Concepts::Is_Signal)),
-				(requires(strip_modifiers(TargetType),Is_Polaris_Prototype) && requires(strip_modifiers(TargetType)::Component_Type, Concepts::Is_Signal)) || (requires(strip_modifiers(TargetType),Is_Polaris_Component) && requires(strip_modifiers(TargetType),Concepts::Is_Signal)))
-		
+			member_component(typename MasterType::SIGNAL_TYPE,Signal, (requires(TargetType,Concepts::Is_Signal_Prototype) || requires(TargetType,Concepts::Is_Signal)),(requires(TargetType,Concepts::Is_Signal_Prototype) || requires(TargetType,Concepts::Is_Signal)));
 
+			feature_implementation void Display(TargetType phase_interface_ptr)
+			{
+
+			}
 		};
 
 	}
@@ -1052,9 +1104,14 @@ namespace Signal_Components
 	namespace Components
 	{
 		template<typename MasterType>
-		struct Signal_Indicator_Display
+		struct Signal_Indicator_Basic_Display
 		{
-			typedef Polaris_Component_Execution<Implementations::Signal_Indicator_Display_Implementation,MasterType> type;
+			typedef Polaris_Component_Execution<Implementations::Signal_Indicator_Basic_Display_Implementation,MasterType> type;
+		};
+		template<typename MasterType>
+		struct Signal_Indicator_Vadim_Display
+		{
+			typedef Polaris_Component_Execution<Implementations::Signal_Indicator_Vadim_Display_Implementation,MasterType> type;
 		};
 		template<typename MasterType>
 		struct Signal_Indicator
