@@ -327,17 +327,17 @@ struct member_function_ptr_types<Type,setter_type>
 	public:\
 		typedef Polaris_Container<CONTAINER_TYPE> FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		TargetType FEATURE_NAME(call_requirements(!requires(TargetType,is_pointer)))\
+		TargetType FEATURE_NAME(call_requirements(!requires_basic(TargetType,is_pointer)))\
 		{return (TargetType)(_##FEATURE_NAME);}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		TargetType FEATURE_NAME(call_requirements(requires(TargetType,is_pointer)))\
+		TargetType FEATURE_NAME(call_requirements(requires_basic(TargetType,is_pointer)))\
 		{return (TargetType)(&_##FEATURE_NAME);}\
 		tag_getter(FEATURE_NAME);\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		void FEATURE_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer)))\
+		void FEATURE_NAME(TargetType value,call_requirements(!requires_basic(TargetType,is_pointer)))\
 		{_##FEATURE_NAME=(Polaris_Container<CONTAINER_TYPE>&)value;}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		void FEATURE_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer)))\
+		void FEATURE_NAME(TargetType value,call_requirements(requires_basic(TargetType,is_pointer)))\
 		{_##FEATURE_NAME=(Polaris_Container<CONTAINER_TYPE>&)(*value);}\
 		tag_setter(FEATURE_NAME);
 
@@ -348,20 +348,20 @@ struct member_function_ptr_types<Type,setter_type>
 	public:\
 		typedef Polaris_Container<CONTAINER_TYPE> FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		TargetType FEATURE_NAME(call_requirements(!requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		TargetType FEATURE_NAME(call_requirements(!requires_basic(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
 		{return (TargetType)(_##FEATURE_NAME);}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		TargetType FEATURE_NAME(call_requirements(requires(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
+		TargetType FEATURE_NAME(call_requirements(requires_basic(TargetType,is_pointer) && GETTER_REQUIREMENTS))\
 		{return (TargetType)(&_##FEATURE_NAME);}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
 		TargetType FEATURE_NAME(call_requirements(!(GETTER_REQUIREMENTS)))\
 		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
 		tag_getter(FEATURE_NAME);\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		void FEATURE_NAME(TargetType value,call_requirements(!requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		void FEATURE_NAME(TargetType value,call_requirements(!requires_basic(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
 		{_##FEATURE_NAME=(Polaris_Container<CONTAINER_TYPE>&)value;}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
-		void FEATURE_NAME(TargetType value,call_requirements(requires(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
+		void FEATURE_NAME(TargetType value,call_requirements(requires_basic(TargetType,is_pointer) && SETTER_REQUIREMENTS))\
 		{_##FEATURE_NAME=(Polaris_Container<CONTAINER_TYPE>&)(*value);}\
 		template<typename ComponentType, typename CallerType, typename TargetType>\
 		TargetType FEATURE_NAME(TargetType value, call_requirements(!(SETTER_REQUIREMENTS)))\
