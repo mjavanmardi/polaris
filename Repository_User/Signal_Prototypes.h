@@ -307,11 +307,7 @@ namespace Signal_Components
 			}
 			feature void detect_vehicle()
 			{
-				cast_self_as_component().detect_vehicle<ComponentType,CallerType,TargetType>(1);
-			}
-			feature TargetType Get_Count()
-			{
-				cast_self_as_component().Get_Count<ComponentType,CallerType,TargetType>();
+				cast_self_to_component().detect_vehicle<ComponentType,CallerType,TargetType>(1);
 			}
 		};
 
@@ -383,8 +379,6 @@ namespace Signal_Components
 				float rt_adj, lt_adj, park_adj;
 				park_adj = 1.0;
 				if (this->has_parking<bool>()) park_adj = 0.9;
-
-
 
 				//=====================================================================================================
 				// get the adjusted right turn volume - for exclusive RT lanes
@@ -642,9 +636,7 @@ namespace Signal_Components
 			}
 
 			/// Get the maximum critical phase volume from amonst the individual lane_group in the phase
-			feature TargetType Find_Critical_Phase_Volume(call_requirements(
-				requires(ComponentType, Concepts::Is_HCM_Simple_Solution) && 
-				requires(TargetType, Concepts::Is_Flow_Per_Hour)))
+			feature TargetType Find_Critical_Phase_Volume(call_requirements(requires(ComponentType, Concepts::Is_HCM_Simple_Solution) && requires(TargetType, Concepts::Is_Flow_Per_Hour)))
 			{
 				// Get reference to the Lane Groups in the current phase
 				lane_groups_itf* lane_groups = this->Lane_Groups<lane_groups_itf*>();
@@ -665,18 +657,13 @@ namespace Signal_Components
 				return v_crit;
 			}
 			
-			feature TargetType Find_Critical_Phase_Volume(call_requirements(!(
-				requires(ComponentType, Concepts::Is_HCM_Simple_Solution) && 
-				requires(TargetType, Concepts::Is_Flow_Per_Hour))))
+			feature TargetType Find_Critical_Phase_Volume(call_requirements(!(requires(ComponentType, Concepts::Is_HCM_Simple_Solution) && requires(TargetType, Concepts::Is_Flow_Per_Hour))))
 			{
 				assert_requirements(ComponentType,Concepts::Is_HCM_Simple_Solution,"Your Phase component does not have a solution type defined.  Please add 'HCM_Simple' or HCM_Full' type tag.");
 				assert_requirements(TargetType,Concepts::Is_Flow_Per_Hour,"Your TargetType is not a flow per hour measure.");
-				//assert_requirements(ComponentType::Lane_Group_Type::type,Is_Polaris_Component,"Your lane group is not a valid polaris component");
-				//assert_requirements_2(ComponentType::LaneGroupType::Interface_Type&,Lange_Group_Interface,is_convertible,"Error - your lane group type is not convertible to the base lane group interface.");
 			}
 
-			feature void Update_Demand(TargetType time, call_requirements(
-				requires(TargetType, Concepts::Is_Time)))
+			feature void Update_Demand(TargetType time, call_requirements(requires(TargetType, Concepts::Is_Time)))
 			{
 				// Get reference to the Lane Groups in the current phase
 				lane_groups_itf* lane_groups = this->Lane_Groups<lane_groups_itf*>();
@@ -690,8 +677,7 @@ namespace Signal_Components
 				}
 			}
 	
-			feature void Update_Demand(TargetType time, call_requirements(!(
-				requires(TargetType, Concepts::Is_Time))))
+			feature void Update_Demand(TargetType time, call_requirements(!(requires(TargetType, Concepts::Is_Time))))
 			{
 				assert_requirements(ComponentType, Concepts::Has_Child_Lane_Group, "ComponentType does not have an associated LaneGroupType as a child element.");
 				assert_requirements(TargetType, Concepts::Is_Time, "The TargetType specified is not  a Time object.");
@@ -875,17 +861,6 @@ namespace Signal_Components
 				requires(TargetType, Concepts::Is_Time_Seconds) && 
 				requires(typename ComponentType, Concepts::Is_HCM_Full_Solution)))
 			{
-
-				//float weight;
-				//cout <<endl<< "Enter a weight: ";
-				//cin >> weight;
-
-				// Simplify ComponentType name
-				typedef ComponentType T;
-
-				//Prototypes::Signal_Prototype<typename ComponentType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>* simple_signal = (Prototypes::Signal_Prototype<typename ComponentType::Master_Type::SIMPLE_SIGNAL_TYPE,NULLTYPE>*)this;
-				//simple_signal->Update_Timing<Data_Structures::Time_Second>();
-
 				ostream* out = this->output_stream<ostream*>();
 
 				// Get reference to the phases in the signal phase diagram
@@ -934,8 +909,6 @@ namespace Signal_Components
 
 				// Finally, output the LOS information
 				this->Calculate_Signal_LOS<char>();
-				//this->Display_Timing<NULLTYPE>();
-				//this->Display_Signal_LOS<NULLTYPE>();
 			}
 			/// HCM Retiming calculations for simple signals
 			feature void Update_Timing(call_requirements(
@@ -1179,20 +1152,9 @@ namespace Signal_Components
 				ostream* out = _pthis->output_stream<ostream*>();
 
 				// Get interface to phases in sign
-				define_container_and_value_interface_local(Random_Access_Sequence_Prototype,Phases,phases_itf,Prototypes::Phase_Prototype,phase_itf,CallerType);
 				phases_itf* phases = _pthis->Phases<phases_itf*>();
 				int active_phase = _pthis->active_phase<int>();
 				phase_itf* phase = (*phases)[active_phase];
-
-				// Get interface to phases in signal
-				//vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>* phases = _pthis->Phases<vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>*>();
-				//vector<Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>*>::iterator phase_itr = phases->begin();
-				//Interfaces::Phase_Interface<typename ComponentType::Master_Type::PHASE_TYPE,NULLTYPE>* phase;
-
-				//// Get the currently active phase
-				//int active_phase = _pthis->active_phase<int>();
-
-				//phase = (*phases)[active_phase];
 
 				// If state of active phase is RED (i.e. All Red) Change current phase to Green (Each phases starts in all red)
 				if (phase->signal_state<Data_Structures::Signal_State>() == Data_Structures::RED)
@@ -1252,15 +1214,7 @@ namespace Signal_Components
 
 				// Display the signal information if the output stream is not null
 				ostream* out = _pthis->output_stream<ostream*>();
-				if (out != NULL)
-				{
-					//(*out) <<endl<<endl<<"===================================================================";
-					//(*out) <<endl<<" CHANGE SIGNAL TIMING CALLED ";
-					//(*out) <<endl<<"==================================================================="<<endl<<endl;
-					//(*out) <<"\t"<< iteration<<"\t";
-					_pthis->Display_Timing<NULLTYPE>();
-					//(*out) <<endl<<"==================================================================="<<endl<<endl;
-				}
+				if (out != NULL)_pthis->Display_Timing<NULLTYPE>();
 			}
 			//--------------------------------------------
 			// Signal Event timing and iteration accessors
@@ -1375,8 +1329,6 @@ namespace Signal_Components
 			{
 				// Get Current Interface
 				Signal_Indicator_Prototype<ComponentType,NULLTYPE>* _pthis=(Signal_Indicator_Prototype<ComponentType,NULLTYPE>*)_this;
-
-				define_component_interface_local(Signal_Itf,Prototypes::Signal_Prototype,Signal,CallerType);
 				Signal_Itf* signal = _pthis->Signal<Signal_Itf*>();
 				
 				if (iteration == signal->Next_Event_Iteration<int>())
@@ -1393,7 +1345,7 @@ namespace Signal_Components
 			declare_feature_event(Signal_Indicator_Event)
 			{
 				// Sleep Now
-				Sleep(100);
+				Sleep(50);
 
 				// Get Current Interface
 				Signal_Indicator_Prototype<ComponentType,NULLTYPE>* _pthis=(Signal_Indicator_Prototype<ComponentType,NULLTYPE>*)_this;
@@ -1406,15 +1358,12 @@ namespace Signal_Components
 				Phases_Itf* phases = signal->Phases<Phases_Itf*>();
 				Phases_Itf::iterator itr=phases->begin();
 
-				// Display the signal state info if the output stream is not null
-				if (out != NULL)
-				{
-					int i;
-					for (itr, i=0; itr != phases->end(); itr++, i++)
-					{
-						_pthis->Display<Phase_Itf*>(*itr);
-					}
-				}
+				// if the output stream is null, exit
+				if (out == NULL) return;
+
+				// Otherwise, display the signal state info 
+				for (itr; itr != phases->end(); itr++) _pthis->Display<Phase_Itf*>(*itr);
+
 			}
 		};
 

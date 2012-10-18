@@ -47,10 +47,6 @@ namespace Signal_Components
 			{
 				_count += (int)vehicle_detection_count;
 			}
-			feature_implementation TargetType Get_Count()
-			{
-				return (TargetType)_count;
-			}
 		};
 	}
 	//==================================================================================================================
@@ -1055,12 +1051,6 @@ namespace Signal_Components
 				this->_output_stream = (ostream*)&cout;
 				this->_Signal = NULL;
 			}
-
-			member_data_basic(bool,Conditional_Has_Fired);
-			member_pointer_basic(ostream, output_stream);
-
-			member_component(typename MasterType::SIGNAL_TYPE,Signal, (requires(TargetType,Concepts::Is_Signal_Prototype) || requires(TargetType,Concepts::Is_Signal)),(requires(TargetType,Concepts::Is_Signal_Prototype) || requires(TargetType,Concepts::Is_Signal)));
-				
 			feature_implementation void Display(TargetType phase_interface_ptr, call_requirements(requires(TargetType,Concepts::Is_Phase_Prototype)))
 			{
 				Prototypes::Phase_Prototype<typename strip_modifiers(TargetType)::Component_Type,NULLTYPE>* phase = phase_interface_ptr;
@@ -1075,6 +1065,10 @@ namespace Signal_Components
 			{
 				assert_requirements(TargetType,Concepts::Is_Phase_Prototype,"The TargetType specified is not a Phase Interface");
 			}
+
+			member_data_basic(bool,Conditional_Has_Fired);
+			member_pointer_basic(ostream, output_stream);
+			member_component(typename MasterType::SIGNAL_TYPE,Signal, (requires(TargetType,Concepts::Is_Signal_Prototype) || requires(TargetType,Concepts::Is_Signal)),(requires(TargetType,Concepts::Is_Signal_Prototype) || requires(TargetType,Concepts::Is_Signal)));
 		};
 
 		template <typename MasterType>
