@@ -88,6 +88,30 @@ struct member_function_ptr_types<Type,conditional_type>
 ///		includes a check on whether the implementation has corresponding dispatch
 ///============================================================================
 
+#define define_get_check(FEATURE_NAME)\
+	template<typename T>\
+	struct FEATURE_NAME##_get_check\
+	{\
+		template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_getter_tag*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	};
+
+#define define_set_check(FEATURE_NAME)\
+	template<typename T>\
+	struct FEATURE_NAME##_set_check\
+	{\
+		template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_setter_tag*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	};\
+
+#define define_get_set_check(FEATURE_NAME) define_get_check(FEATURE_NAME) define_set_check(FEATURE_NAME)
+
+#define get_check(FEATURE_NAME) FEATURE_NAME##_get_check
+
+#define set_check(FEATURE_NAME) FEATURE_NAME##_set_check
+
 #define feature_accessor(FEATURE_NAME)\
 	public:\
 	template<typename T>\
