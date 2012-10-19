@@ -586,8 +586,6 @@ namespace Signal_Components
 		prototype struct Phase_Prototype
 		{
 			tag_polaris_prototype;
-
-			// create interfaces to signal collections (phases/phase and approaches/approach
 			define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype,Lane_Groups,lane_groups_itf,Lane_Group_Prototype,lane_group_itf,NULLTYPE);
 
 			//============================================================
@@ -1329,7 +1327,6 @@ namespace Signal_Components
 
 				// Otherwise, display the signal state info 
 				for (itr; itr != phases->end(); itr++) _pthis->Display<Phase_Itf*>(*itr);
-
 			}
 		};
 	}
