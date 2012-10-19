@@ -59,14 +59,17 @@
     <ClInclude Include="Traffic_Management_Interfaces.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
-    <ClInclude Include="Basic_Units.h">
-      <Filter>Prototypes</Filter>
-    </ClInclude>
     <ClInclude Include="Choice_Model_Implementations.h">
       <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Choice_Model_Prototypes.h">
       <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Basic_Units_Prototypes.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Basic_Unit_Implementations.h">
+      <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

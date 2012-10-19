@@ -111,11 +111,10 @@ namespace Choice_Model_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Prototypes
 	{
-		//------------------------------------------------------------------------------------------------------------------
-		/// RENAME THE Inteface struct below.  This is the inteface to a POLARIS component
-		//------------------------------------------------------------------------------------------------------------------
 		prototype struct Choice_Option_Prototype
 		{
+			tag_polaris_prototype;
+
 			/// INTERFACE FUNCTION EXAMPLE - this example dispatched the Initialize function call to the component base
 			feature void Initialize()
 			{
@@ -147,6 +146,9 @@ namespace Choice_Model_Components
 		//------------------------------------------------------------------------------------------------------------------
 		prototype struct Choice_Model_Prototype
 		{
+			tag_polaris_prototype;
+			define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,choice_options,_choices_interface,Choice_Option_Prototype,_choice_interface,ComponentType);
+
 			/// BASIC INITIALIZER
 			feature void Initialize()
 			{
@@ -155,9 +157,8 @@ namespace Choice_Model_Components
 
 			feature void Add_Choice_Option(TargetType new_choice_option_data, call_requires(strip_modifiers(TargetType), Is_Polaris_Component))
 			{
-				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Prototype,choice_options,_choices_interface,Choice_Option_Prototype,_choice_interface,ComponentType);
 				_choices_interface* choices = this->choice_options<_choices_interface*>();
-				_choice_interface* choice = (_choice_interface*)Allocate<ComponentType::choice_options_type::unqualified_value_type>();
+				_choice_interface* choice = (_choice_interface*)Allocate<_choice_interface_type>();
 				choice->choice_data_interface<TargetType>(new_choice_option_data);
 				choices->push_back(choice);
 			}
@@ -170,7 +171,6 @@ namespace Choice_Model_Components
 			feature Choice_Option_Prototype<TargetType>* Make_Choice(call_requirements(requires(ComponentType, Concepts::Choice_Is_Deterministic)))
 			{	
 				// Local type definition option
-				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Interface,choice_options,_choices_interface,Choice_Option_Interface,_choice_interface,ComponentType);
 				_choices_interface* choices = this->choice_options<_choices_interface*>();
 				_choice_interface* choice;
 				_choices_interface::iterator itr = choices->begin();
@@ -188,9 +188,7 @@ namespace Choice_Model_Components
 			}
 			feature Choice_Option_Prototype<TargetType>* Make_Choice(call_requirements(requires(ComponentType, Concepts::Choice_Is_Probabilistic)))
 			{
-
 				// Local type definition option
-				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Interface,choice_options,_choices_interface,Choice_Option_Interface,_choice_interface,ComponentType);
 				_choices_interface* choices = this->choice_options<_choices_interface*>();
 				_choice_interface* choice;
 				_choices_interface::iterator itr = choices->begin();
@@ -218,7 +216,6 @@ namespace Choice_Model_Components
 				requires(TargetType, is_arithmetic)))
 			{	
 				// Local type definition option
-				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Prototype,choice_options,_choices_interface,Choice_Option_Prototype,_choice_interface,ComponentType);
 				_choices_interface* choices = this->choice_options<_choices_interface*>();
 				_choice_interface* choice;
 				_choices_interface::iterator itr = choices->begin();
@@ -245,7 +242,6 @@ namespace Choice_Model_Components
 				requires(TargetType, is_arithmetic)))
 			{
 				// Local type definition option
-				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Interface,choice_options,_choices_interface,Choice_Option_Interface,_choice_interface,ComponentType);
 				_choices_interface* choices = this->choice_options<_choices_interface*>();
 				_choice_interface* choice;
 				_choices_interface::iterator itr = choices->begin();

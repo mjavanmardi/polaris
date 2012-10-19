@@ -11,10 +11,10 @@ namespace Time_Components
 	/// Useful types related to Time.
 	/// These types are used to tag the Data_Structures to communicate information and in concept checking
 	namespace Types
-	{
-		typedef true_type TimeType;
+	{	
 		namespace Time_Types
 		{
+			typedef true_type TimeType;
 			typedef true_type Days;
 			typedef true_type Hours;
 			typedef true_type Minutes;
@@ -93,8 +93,7 @@ namespace Time_Components
 		//=============================================================
 		/// Basic Time Interface
 		/// This is the core time object in polaris.  It implements, initialization, addition, display and conversion routines
-		template<typename ComponentType, typename CallerType>
-		struct Time_Interface
+		prototype struct Time_Interface
 		{
 			/// Communicates that this time interface is a time type
 			typedef ComponentType This_Type;

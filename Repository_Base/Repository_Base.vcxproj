@@ -117,7 +117,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Repository_User\Demand_Bases.h" />
-    <ClInclude Include="Basic_Units.h" />
+    <ClInclude Include="Basic_Units_Prototypes.h" />
+    <ClInclude Include="Basic_Unit_Implementations.h" />
     <ClInclude Include="Choice_Model_Implementations.h" />
     <ClInclude Include="Choice_Model_Prototypes.h" />
     <ClInclude Include="TEMPLATE_Bases.h" />
