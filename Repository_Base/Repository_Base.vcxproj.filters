@@ -29,14 +29,8 @@
     <ClInclude Include="Spatial_Base.h">
       <Filter>Implementations</Filter>
     </ClInclude>
-    <ClInclude Include="Time_Base.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
     <ClInclude Include="Trip_Base.h">
       <Filter>Implementations</Filter>
-    </ClInclude>
-    <ClInclude Include="Time_Interfaces.h">
-      <Filter>Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="Trip_Interfaces.h">
       <Filter>Prototypes</Filter>

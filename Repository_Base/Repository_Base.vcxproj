@@ -129,8 +129,6 @@
     <ClInclude Include="Repository_Base_Includes.h" />
     <ClInclude Include="Spatial_Interfaces.h" />
     <ClInclude Include="Spatial_Base.h" />
-    <ClInclude Include="Time_Interfaces.h" />
-    <ClInclude Include="Time_Base.h" />
     <ClInclude Include="Traffic_Management_Interfaces.h" />
     <ClInclude Include="Trip_Interfaces.h" />
     <ClInclude Include="Trip_Base.h" />
