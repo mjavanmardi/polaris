@@ -69,23 +69,23 @@ public:
 					
 					while(AtomicExchange(&execution_type->tex_lock,1)) SLEEP(0); // lock the type
 			
-					// TEX slice has revealed that it wishes to return some time in the future
+						// TEX slice has revealed that it wishes to return some time in the future
 
-					if(tex_response < execution_type->tex_next_next_revision)
-					{
-						// TEX slice wishes to return sooner in the future than already assumed
-						execution_type->tex_next_next_revision=tex_response;
-					}
+						if(tex_response < execution_type->tex_next_next_revision)
+						{
+							// TEX slice wishes to return sooner in the future than already assumed
+							execution_type->tex_next_next_revision=tex_response;
+						}
 
-					if(++execution_type->tex_threads_counter == num_threads)
-					{
-						// final thread, in charge of getting ready for the next revision, but only if something actually happened this revision
-						execution_type->tex_current_revision=this_revision;
-						execution_type->tex_next_revision=execution_type->tex_next_next_revision;
-						execution_type->tex_next_next_revision.iteration=LONG_MAX;
-						execution_type->tex_next_next_revision.sub_iteration=0;
-						execution_type->tex_threads_counter=0;
-					}
+						if(++execution_type->tex_threads_counter == num_threads)
+						{
+							// final thread, in charge of getting ready for the next revision, but only if something actually happened this revision
+							execution_type->tex_current_revision=this_revision;
+							execution_type->tex_next_revision=execution_type->tex_next_next_revision;
+							execution_type->tex_next_next_revision.iteration=LONG_MAX;
+							execution_type->tex_next_next_revision.sub_iteration=0;
+							execution_type->tex_threads_counter=0;
+						}
 
 					execution_type->tex_lock=0; // unlock the type
 				}
@@ -100,13 +100,13 @@ public:
 					
 			while(AtomicExchange(&ex_lock,1)) SLEEP(0); // lock the execution engine
 			
-			// EX slice has revealed that it wishes to return some time in the future
+				// EX slice has revealed that it wishes to return some time in the future
 			
-			if(ex_response < ex_next_next_revision)
-			{
-				// EX slice wishes to return sooner in the future than already assumed
-				ex_next_next_revision=ex_response;
-			}
+				if(ex_response < ex_next_next_revision)
+				{
+					// EX slice wishes to return sooner in the future than already assumed
+					ex_next_next_revision=ex_response;
+				}
 			
 			ex_lock=0; // unlock the execution engine
 			

@@ -83,6 +83,7 @@ World::World()
 	memory_root_ptr=new Memory_Root();
 	execution_root_ptr=new Execution_Root();
 	data_root_ptr=new Data_Root();
+	interprocess_root_ptr=new Interprocess_Engine();
 	world_ptr=this;
 	run=false;
 
@@ -119,6 +120,7 @@ void* Thread_Loop(void* package_ptr)
 	thread_id=id;
 
 	Execution_Root* const exe=execution_root_ptr;
+	Interprocess_Engine* const iexe=interprocess_root_ptr;
 
 	// thread enters in the finished queue
 	while(world->threads_finished_counter!=0) SLEEP(0);
@@ -132,7 +134,11 @@ void* Thread_Loop(void* package_ptr)
 	while(world->run)
 	{
 		exe->Process();
-	
+		
+#ifndef WINDOWS
+		interprocess_root_ptr->Exchange();
+#endif
+
 		// let the world know that this thread is finished
 		AtomicIncrement(&world->threads_finished_counter);
 		
@@ -182,7 +188,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 
 		// Following makes TEX aware, can catch TEX in 3 states: A) Pre-update, B) Mid-update, C) Post-update
 		
-		Typed_Execution_Pages<ComponentType>* execution_type=(Typed_Execution_Pages<ComponentType>*)type_singleton<ComponentType>::ref;
+		Typed_Execution_Pages<ComponentType>* execution_type=(Typed_Execution_Pages<ComponentType>*)ComponentType::singleton_reference;
 
 		while(AtomicExchange(&execution_type->tex_lock,1)) SLEEP(0); // lock the TEX
 
@@ -316,7 +322,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 
 
 		
-		Typed_Execution_Pages<ComponentType>* execution_type=(Typed_Execution_Pages<ComponentType>*)type_singleton<ComponentType>::ref;
+		Typed_Execution_Pages<ComponentType>* execution_type=(Typed_Execution_Pages<ComponentType>*)ComponentType::singleton_reference;
 
 		if(starting_iteration <= execution_type->tex_next_revision)
 		{

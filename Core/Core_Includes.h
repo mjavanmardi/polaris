@@ -15,9 +15,18 @@
 #include <type_traits>
 #include <random>
 #else
+#include <tr1/unordered_map>
+#include <string.h>
+#include <unistd.h>
 #include <limits.h>
 #include <pthread.h>
 #define __forceinline inline
+#define unordered_map tr1::unordered_map
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #endif
 
 #include <sstream>
@@ -74,6 +83,9 @@ __declspec(thread) int thread_id;
 #else
 int thread_id;
 #endif
+
+static int num_partitions=0;
+static int host_rank=0;
 
 typedef char Byte;
 
@@ -132,3 +144,19 @@ typedef void (*Conditional)(void*,Conditional_Response&);
 //static ofstream logger=ofstream("log.txt");
 
 #define PRINT(X) cout << X << endl;
+
+
+///============================================================================
+/// all_components - type singletons for all compiled components
+///============================================================================
+
+static vector<void*> all_components;
+
+static int component_counter;
+
+template<typename SingletonType>
+static SingletonType* Add_Component_Singleton(SingletonType* val)
+{
+	all_components.push_back(val);
+	return val;
+}

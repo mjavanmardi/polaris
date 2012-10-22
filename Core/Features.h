@@ -55,16 +55,29 @@ struct conditional_type{};
 template<typename Type>
 struct member_function_ptr_types<Type,conditional_type>
 {
-	typedef void (Type::* type)(NULLTYPE*,Conditional_Response& response);
+	typedef void (Type::* type)(NULLTYPE*,Conditional_Response&);
+};
+
+
+///============================================================================
+/// declare_feature_handler - header for a basic condition feature
+///============================================================================
+
+struct handler_type{};
+
+#define declare_feature_handler(FEATURE_NAME)\
+	typedef handler_type FEATURE_NAME##_handler_tag;\
+	template<typename TargetType> static void FEATURE_NAME(void* _this,char* message)
+
+template<typename Type>
+struct member_function_ptr_types<Type,handler_type>
+{
+	typedef void (Type::* type)(NULLTYPE*,char*);
 };
 
 ///============================================================================
 /// define_get_set_checks - implements a mini-concept to check for implementation existence
 ///============================================================================
-
-#define get_check(FEATURE_NAME) FEATURE_NAME##_get_check
-
-#define set_check(FEATURE_NAME) FEATURE_NAME##_set_check
 
 #define define_get_exists_check(FEATURE_NAME)\
 	public:\
@@ -91,7 +104,6 @@ struct member_function_ptr_types<Type,conditional_type>
 /// feature_accessor - implements the standard get and set dispatch features
 ///		includes a check on whether the implementation has corresponding dispatch
 ///============================================================================
-
 
 #define feature_accessor(FEATURE_NAME)\
 	public:\
