@@ -1240,7 +1240,7 @@ namespace Signal_Components
 		{
 			tag_polaris_prototype;
 			define_component_interface_local(Signal_Itf,Prototypes::Signal_Prototype,Signal,CallerType);
-			define_container_and_value_interface(Random_Access_Sequence_Prototype, typename Signal_Itf_type::Phases,Phases_Itf,Prototypes::Phase_Prototype,Phase_Itf,CallerType);
+			define_container_and_value_interface(Polaris_Random_Access_Sequence_Prototype, typename Signal_Itf_type::Phases,Phases_Itf,Prototypes::Phase_Prototype,Phase_Itf,CallerType);
 
 			// Initialize the signal indicator
 			feature void Initialize(call_requirements(requires(ComponentType,Is_Execution_Object)))
