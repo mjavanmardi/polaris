@@ -124,32 +124,32 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Activity_Location_Interface.h" />
-    <ClInclude Include="Demand_Interface.h" />
-    <ClInclude Include="Intersection_Interface.h" />
-    <ClInclude Include="Link_Interface.h" />
-    <ClInclude Include="Network_Interface.h" />
-    <ClInclude Include="Polaris_Activity_Location_Base.h" />
-    <ClInclude Include="Polaris_Demand_Base.h" />
-    <ClInclude Include="Polaris_Intersection_Base.h" />
-    <ClInclude Include="Polaris_Link_Base.h" />
-    <ClInclude Include="Polaris_Network_Base.h" />
-    <ClInclude Include="Polaris_Routing_Base.h" />
-    <ClInclude Include="Polaris_Scenario_Base.h" />
-    <ClInclude Include="Polaris_Traveler_Base.h" />
-    <ClInclude Include="Polaris_Vehicle_Base.h" />
+    <ClInclude Include="Activity_Location_Prototype.h" />
+    <ClInclude Include="Demand_Prototype.h" />
+    <ClInclude Include="Intersection_Prototype.h" />
+    <ClInclude Include="Link_Prototype.h" />
+    <ClInclude Include="Network_Prototype.h" />
+    <ClInclude Include="Polaris_Activity_Location_Implementation.h" />
+    <ClInclude Include="Polaris_Demand_Implementation.h" />
+    <ClInclude Include="Polaris_Intersection_Implementation.h" />
+    <ClInclude Include="Polaris_Link_Implementation.h" />
+    <ClInclude Include="Polaris_Network_Implementation.h" />
+    <ClInclude Include="Polaris_Routing_Implementation.h" />
+    <ClInclude Include="Polaris_Scenario_Implementation.h" />
+    <ClInclude Include="Polaris_Traveler_Implementation.h" />
+    <ClInclude Include="Polaris_Vehicle_Implementation.h" />
     <ClInclude Include="Repository_User.h" />
     <ClInclude Include="Repository_User_Includes.h" />
     <ClInclude Include="RngStream.h" />
-    <ClInclude Include="Routable_Intersection_Base.h" />
-    <ClInclude Include="Routable_Link_Base.h" />
-    <ClInclude Include="Routing_Interface.h" />
-    <ClInclude Include="Scenario_Interface.h" />
+    <ClInclude Include="Routable_Intersection_Implementation.h" />
+    <ClInclude Include="Routable_Link_Implementation.h" />
+    <ClInclude Include="Routing_Prototype.h" />
+    <ClInclude Include="Scenario_Prototype.h" />
     <ClInclude Include="Signal_Implementations.h" />
     <ClInclude Include="Signal_Prototypes.h" />
     <ClInclude Include="Transims_Demand_API.h" />
-    <ClInclude Include="Traveler_Interface.h" />
-    <ClInclude Include="Vehicle_Interface.h" />
+    <ClInclude Include="Traveler_Prototype.h" />
+    <ClInclude Include="Vehicle_Prototype.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository_User.cpp" />
