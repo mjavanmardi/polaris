@@ -191,13 +191,10 @@ namespace Routing_Components
 
 					_Routable_Link_Interface* routable_link = (_Routable_Link_Interface*)(*routable_link_itr);
 					_Regular_Link_Interface* regular_link = routable_link->network_link_reference<_Regular_Link_Interface*>();
-if (routable_link->uuid<int>() == 3) {
-cout << "stop here" << endl;
-}					
+		
 					_Regular_Intersection_Interface* regular_upstream_intersection = regular_link->upstream_intersection<_Regular_Intersection_Interface*>();
 					_Routable_Intersection_Interface* routable_upstream_intersection = intersectionsMap.find(regular_upstream_intersection)->second;
 					routable_link->upstream_intersection<_Routable_Intersection_Interface*>(routable_upstream_intersection);
-int intersectionId = routable_upstream_intersection->uuid<int>();
 					_Regular_Intersection_Interface* regular_downstream_intersection = regular_link->downstream_intersection<_Regular_Intersection_Interface*>();
 					_Routable_Intersection_Interface* routable_downstream_intersection = intersectionsMap.find(regular_downstream_intersection)->second;
 					routable_link->downstream_intersection<_Routable_Intersection_Interface*>(routable_downstream_intersection);
@@ -439,7 +436,6 @@ int intersectionId = routable_upstream_intersection->uuid<int>();
 				_Reversed_Path_Container_Interface& reversed_path_container=routable_network<_Routable_Network_Interface*>()->reversed_path_container<_Reversed_Path_Container_Interface&>();
 
 				current_link=destination_link<_Routable_Link_Interface*>();
-				//_Regular_Link_Interface* a = current_link->network_link_reference<_Regular_Link_Interface*>();
 				reversed_path_container.push_back(current_link->network_link_reference<_Regular_Link_Interface*>());
 				current_link=current_link->label_pointer<_Routable_Link_Interface*>();
 					

@@ -120,7 +120,7 @@ namespace Vehicle_Components
 			{
 
 				define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype, trajectory_container, _Trajectory_Container_Interface, Trajectory_Unit_Prototype, _Trajectory_Unit_Interface, ComponentType);
-				if(current_trajectory_unit_index<int>() < trajectory_container<_Trajectory_Container_Interface&>().size())
+				if((size_t)current_trajectory_unit_index<int>() < trajectory_container<_Trajectory_Container_Interface&>().size())
 				{
 					int index = current_trajectory_unit_index<int>() + 1;
 					size_t size = trajectory_container<_Trajectory_Container_Interface&>().size();
