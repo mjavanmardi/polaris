@@ -191,6 +191,22 @@ concept Is_Target_Type_Struct
 	};\
 	typedef typename Append<auto_check_list_##LINKED_CONCEPT,REQUIREMENT_NAME>::Result auto_check_list_##REQUIREMENT_NAME;
 
+
+#define feature_accessor_to_member_component_feature(FEATURE_NAME, COMPONENT_FEATURE_NAME, COMPONENT_PROTOTYPE)\
+	define_get_set_exists_check(FEATURE_NAME);\
+	feature TargetType FEATURE_NAME(call_requires(ComponentType,get_exists_check(FEATURE_NAME)))\
+	{\
+		define_component_interface_local(FEATURE_NAME##_itf,COMPONENT_PROTOTYPE,FEATURE_NAME,ComponentType);\
+		FEATURE_NAME##_itf* FEATURE_NAME_val = cast_self_to_component().FEATURE_NAME<ComponentType,CallerType,FEATURE_NAME##_itf*>();\
+		return FEATURE_NAME_val->COMPONENT_FEATURE_NAME<TargetType>();\
+	}\
+	feature void FEATURE_NAME(TargetType value, call_requires(ComponentType,set_exists_check(FEATURE_NAME)))\
+	{\
+		define_component_interface_local(FEATURE_NAME##_itf,COMPONENT_PROTOTYPE,FEATURE_NAME,ComponentType);\
+		FEATURE_NAME##_itf* FEATURE_NAME_val = cast_self_to_component().FEATURE_NAME<ComponentType,CallerType,FEATURE_NAME##_itf*>();\
+		FEATURE_NAME_val->COMPONENT_FEATURE_NAME<TargetType>(value);\
+	}
+
 //================================================================================================================================================================
 //================================================================================================================================================================
 //================================================================================================================================================================
