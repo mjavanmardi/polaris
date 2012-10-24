@@ -538,7 +538,13 @@ namespace Link_Components
 				{
 					link_shifted_cumulative_arrived_vehicles = 0;
 				}
+				if (this->uuid<int>() == 5 && scenario->current_simulation_interval_index<int>()%1 == 0) // the last link visited for current iteration
+				{
+					printf("time=%d", scenario->current_simulation_interval_index<int>());
+					printf("loaded=%d, departed=%d, in_network=%d, arrived=%d",scenario->network_cumulative_loaded_vehicles<int>(),scenario->network_cumulative_departed_vehicles<int>(),scenario->network_in_network_vehicles<int>(),scenario->network_cumulative_arrived_vehicles<int>());
+					printf("\n"); 
 
+				}
 				//network_data.link_upstream_cumulative_arrived_curve_array[outbound_link_index] = this->link_upstream_cumulative_arrived_vehicles_array[outbound_link_index];
 				//network_data.link_upstream_cumulative_depature_curve_array[outbound_link_index] = this->link_upstream_cumulative_vehicles_array[outbound_link_index];
 				//network_data.link_downstream_cumulative_arrived_curve_array[outbound_link_index] = link_shifted_cumulative_arrive_vehicles;
