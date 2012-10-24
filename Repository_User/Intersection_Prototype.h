@@ -166,7 +166,7 @@ namespace Intersection_Components
 				define_container_and_value_interface(Polaris_Random_Access_Sequence_Prototype, _Outbound_Inbound_Movements_Interface_type::inbound_movements, _Movements_Container_Interface, Movement_Prototype, _Movement_Interface, ComponentType);
 				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Prototype, _Movement_Interface_type::vehicles_container, _Vehicles_Container_Interface, Vehicle_Prototype, _Vehicle_Interface, ComponentType);
 				define_component_interface(_Intersection_Interface, Intersection_Prototype, _Link_Interface_type::upstream_intersection, ComponentType);
-				define_component_interface(_Detector_Interface, Signal_Components::Prototypes::Detector_Prototype, _Outbound_Inbound_Movements_Interface_type::detector, ComponentType);
+				define_component_interface(_Detector_Interface, Signal_Components::Prototypes::Detector_Prototype, _Movement_Interface_type::detector, ComponentType);
 
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 				int current_simulation_interval_index = scenario->current_simulation_interval_index<int>();

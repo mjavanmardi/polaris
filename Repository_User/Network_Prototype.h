@@ -60,6 +60,7 @@ namespace Network_Components
 				define_container_and_value_interface(Polaris_Random_Access_Sequence_Prototype,Signal_Type::Approaches,approaches_itf,Signal_Components::Prototypes::Approach_Prototype,Approach_Interface,ComponentType);
 				define_container_and_value_interface(Polaris_Random_Access_Sequence_Prototype,Phase_Interface_type::Lane_Groups,lane_groups_itf,Signal_Components::Prototypes::Lane_Group_Prototype,Lane_Group_Interface,ComponentType);
 				define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype, intersections_container, _Intersections_Container_Interface, Intersection_Prototype, _Intersection_Interface, ComponentType);
+				define_component_interface(Detector_Interface,Signal_Components::Prototypes::Detector_Prototype,Lane_Group_Interface_type::Detector_Left,ComponentType);
 				intersections_container<_Intersections_Container_Interface&>().clear();
 
 				i = 0;
@@ -140,17 +141,17 @@ namespace Network_Components
 				lane->left_turn_type<Left_Turn_Types>(Left_Turn_Types::None);
 				lane->number_of_left_lanes(0);
 				lane->number_of_lanes<int>(2);
-				lane->opposing_lane<Lane_Group_Type>((Lane_Group_Interface*)NULL);
-				lane->Detector_Left<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
-				lane->Detector_Right<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
-				lane->Detector_Thru<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+				lane->opposing_lane<Lane_Group_Interface*>((Lane_Group_Interface*)NULL);
+				lane->Detector_Left<Detector_Interface*>((Detector_Interface*)Allocate<Detector_Interface_type>());
+				lane->Detector_Right<Detector_Interface*>((Detector_Interface*)Allocate<Detector_Interface_type>());
+				lane->Detector_Thru<Detector_Interface*>((Detector_Interface*)Allocate<Detector_Interface_type>());
 				// Initialize phase 2
 				phase = (*phases)[1];
 				phase->Initialize<int>(1);
 				phase->yellow_and_all_red_time<Time_Seconds>(4.0);
 				phase->phase_id<int>(4);
 				phase->name<char*>("SB-Left");
-				lanes = phase->Lane_Groups<vector<Lane_Group_Interface*>*>();
+				lanes = phase->Lane_Groups<lane_groups_itf*>();
 				lane2 = (*lanes)[0];
 				(*approaches)[1]->Add_Lane_Group<Lane_Group_Interface*>(lane);
 				(*approaches)[1]->name<char*>("SB");
@@ -169,10 +170,10 @@ namespace Network_Components
 				lane2->left_turn_type<Left_Turn_Types>(Left_Turn_Types::Unopposed);
 				lane2->number_of_left_lanes(1);
 				lane2->number_of_lanes<int>(1);
-				lane2->opposing_lane<Lane_Group_Type>((Lane_Group_Interface*)NULL);
-				lane2->Detector_Left<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
-				lane2->Detector_Right<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
-				lane2->Detector_Thru<Detector_Type>((Detector_Interface*)Allocate<Detector_Type>());
+				lane2->opposing_lane<Lane_Group_Interface*>((Lane_Group_Interface*)NULL);
+				lane2->Detector_Left<Detector_Interface*>((Detector_Interface*)Allocate<Detector_Interface_type>());
+				lane2->Detector_Right<Detector_Interface*>((Detector_Interface*)Allocate<Detector_Interface_type>());
+				lane2->Detector_Thru<Detector_Interface*>((Detector_Interface*)Allocate<Detector_Interface_type>());
 
 				intersection_2->signal<Signal_Interface*>(signal);
 
