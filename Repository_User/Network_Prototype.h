@@ -5,6 +5,9 @@
 #include "Traveler_Prototype.h"
 #include <hash_map>
 
+using namespace Basic_Units::Data_Structures;
+using namespace Signal_Components::Data_Structures;
+
 namespace Network_Components
 {
 	namespace Types
@@ -51,12 +54,11 @@ namespace Network_Components
 				typedef typename ComponentType::Master_Type::SIGNAL_TYPE Signal_Type;
 				typedef typename Signal_Components::Prototypes::Signal_Prototype<Signal_Type,NULLTYPE> Signal_Interface;
 				typedef typename ComponentType::Master_Type::INDICATOR_TYPE Indicator_Type;
-				typedef typename Signal_Components:Prototypes::Signal_Indicator_Prototype<Indicator_Type,NULLTYPE> Indicator_Interface;
+				typedef typename Signal_Components::Prototypes::Signal_Indicator_Prototype<Indicator_Type,NULLTYPE> Indicator_Interface;
 
-				define_container_and_value_interface(Random_Access_Sequence_Prototype,Signal_Type::Phases,phases_itf,Signal_Components::Prototypes::Phase_Prototype,Phase_Interface,ComponentType);
-				define_container_and_value_interface(Random_Access_Sequence_Prototype,Signal_Type::Approaches,approaches_itf,Signal_Components::Prototypes::Approach_Prototype,Approach_Interface,ComponentType);
-				define_container_and_value_interface(Random_Access_Sequence_Prototype,Signal_Type::phase_itf_type::Lane_Groups,lane_groups_itf,Signal_Components::Prototypes::Lane_Group_Prototype,Lane_Group_Interface,ComponentType);
-		
+				define_container_and_value_interface(Polaris_Random_Access_Sequence_Prototype,Signal_Type::Phases,phases_itf,Signal_Components::Prototypes::Phase_Prototype,Phase_Interface,ComponentType);
+				define_container_and_value_interface(Polaris_Random_Access_Sequence_Prototype,Signal_Type::Approaches,approaches_itf,Signal_Components::Prototypes::Approach_Prototype,Approach_Interface,ComponentType);
+				define_container_and_value_interface(Polaris_Random_Access_Sequence_Prototype,Phase_Interface_type::Lane_Groups,lane_groups_itf,Signal_Components::Prototypes::Lane_Group_Prototype,Lane_Group_Interface,ComponentType);
 				define_container_and_value_interface_local(Polaris_Random_Access_Sequence_Prototype, intersections_container, _Intersections_Container_Interface, Intersection_Prototype, _Intersection_Interface, ComponentType);
 				intersections_container<_Intersections_Container_Interface&>().clear();
 
@@ -95,17 +97,17 @@ namespace Network_Components
 				signal->name<char*>("Signal_1");
 				signal->output_stream<ostream*>(stream_ptr);
 				signal->in_CBD<bool>(false);
-				signal->analysis_period<Time_Minute>(15.0);
+				signal->analysis_period<Time_Minutes>(15.0);
 				signal->degree_of_saturation<float>(0.9);
 				signal->peak_hour_factor<float>(0.95);
-				signal->max_cycle_length<Time_Second>(100.0);
-				signal->min_cycle_length<Time_Second>(20.0);
+				signal->max_cycle_length<Time_Seconds>(100.0);
+				signal->min_cycle_length<Time_Seconds>(20.0);
 				signal->num_cycles_between_updates<int>(5);
 
 				// signal indicator
 				Indicator_Interface* indicator = (Indicator_Interface*)Allocate<Indicator_Type>();
 				indicator->Initialize<NULLTYPE>();
-				indicator->Signal<Signal_Type>(signal);
+				indicator->Signal<Signal_Interface*>(signal);
 
 				
 				phases_itf* phases = signal->Phases<phases_itf*>();
@@ -118,10 +120,10 @@ namespace Network_Components
 				phase->Initialize<int>(1);
 				phase->phase_id<int>(1);
 				phase->name<char*>("EB-Thru");
-				phase->yellow_and_all_red_time<Time_Second>(4.0);
-				lane_group_itf* lanes = phase->Lane_Groups<vector<lane_group_itf*>();
+				phase->yellow_and_all_red_time<Time_Seconds>(4.0);
+				lane_groups_itf* lanes = phase->Lane_Groups<lane_groups_itf*>();
 				lane = (*lanes)[0];
-				(*approaches)[0]->Add_Lane_Group<Lane_Group_Type>(lane);
+				(*approaches)[0]->Add_Lane_Group<Lane_Group_Interface*>(lane);
 				(*approaches)[0]->name<char*>("EB");
 				lane->Initialize<float>();
 				lane->avg_lane_width<Length_Foot>(11.0);
@@ -145,17 +147,17 @@ namespace Network_Components
 				// Initialize phase 2
 				phase = (*phases)[1];
 				phase->Initialize<int>(1);
-				phase->yellow_and_all_red_time<Time_Second>(4.0);
+				phase->yellow_and_all_red_time<Time_Seconds>(4.0);
 				phase->phase_id<int>(4);
 				phase->name<char*>("SB-Left");
 				lanes = phase->Lane_Groups<vector<Lane_Group_Interface*>*>();
 				lane2 = (*lanes)[0];
-				(*approaches)[1]->Add_Lane_Group<Lane_Group_Type>(lane);
+				(*approaches)[1]->Add_Lane_Group<Lane_Group_Interface*>(lane);
 				(*approaches)[1]->name<char*>("SB");
 				lane2->Initialize<float>();
 				lane2->avg_lane_width<Length_Foot>(11.0);
 				lane2->demand_left<Flow_Per_Hour>(0);
-				lane2->demand_right<Flow_Per_Hour>(0);
+				lane2->demand_right<Signal_Components::Data_Structures::Flow_Per_Hour>(0);
 				lane2->demand_thru<Flow_Per_Hour>(0);
 				lane2->has_left_turn<bool>(true);
 				lane2->has_parking<bool>(false);
