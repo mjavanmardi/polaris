@@ -47,6 +47,8 @@ namespace Intersection_Components
 
 			member_container_basic(vector<typename MasterType::routable_movement_type*>, replicas_container);
 
+			member_component_basic(typename MasterType::DETECTOR_TYPE,detector);
+
 
 		//==================================================================================================================
 		/// forward_link_turn_travel_time
@@ -108,14 +110,7 @@ namespace Intersection_Components
 		
 		implementation struct Polaris_Intersection_Implementation
 		{
-
-			
-			//typedef Signal_Components::Interfaces::Signal_Interface<typename MasterType::SIGNAL_TYPE,NULLTYPE> signal_interface;
-
-
-			//signal_interface* _signal;
-			feature_implementation TargetType signal(){return (TargetType)_signal;} tag_getter(signal);
-			feature_implementation void signal(TargetType set_value){_signal = (signal_interface*)set_value;} tag_setter(signal);
+			member_component_basic(typename MasterType::SIGNAL_TYPE,signal);
 
 			member_data_basic(int, uuid);
 			member_data_basic(float, x_position);

@@ -1,5 +1,6 @@
 #pragma once
 #include "Repository_User_Includes.h"
+#include "Signal_Prototypes.h"
 #include "Link_Prototype.h"
 #include "Vehicle_Prototype.h"
 
@@ -81,6 +82,8 @@ namespace Intersection_Components
 			feature_accessor(replicas_container);
 
 			feature_accessor(vehicles_container);
+
+			feature_accessor(detector);
 
 			feature TargetType pull_vehicle()
 			{
@@ -164,7 +167,7 @@ namespace Intersection_Components
 				define_container_and_value_interface(Polaris_Random_Access_Sequence_Prototype, _Outbound_Inbound_Movements_Interface_type::inbound_movements, _Movements_Container_Interface, Movement_Prototype, _Movement_Interface, ComponentType);
 				define_container_and_value_interface(Polaris_Back_Insertion_Sequence_Prototype, _Movement_Interface_type::vehicles_container, _Vehicles_Container_Interface, Vehicle_Prototype, _Vehicle_Interface, ComponentType);
 				define_component_interface(_Intersection_Interface, Intersection_Prototype, _Link_Interface_type::upstream_intersection, ComponentType);
-
+				define_component_interface(_Detector_Interface, Signal_Components::Prototypes::Detector_Prototype, _Outbound_Inbound_Movements_Interface_type::detector, ComponentType);
 
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 				int current_simulation_interval_index = scenario->current_simulation_interval_index<int>();
@@ -201,17 +204,16 @@ namespace Intersection_Components
 						if(((_Vehicle_Interface*)vehicle)->next_link<_Link_Interface*>()==outbound_link && ((_Vehicle_Interface*)vehicle)->current_link<_Link_Interface*>()==inbound_link)
 						{
 							
-							//Signal_Components::Interfaces::Detector_Interface<typename ComponentType::Master_Type::DETECTOR_TYPE,NULLTYPE>* detector;
-							//detector = inbound_movement->detector<Signal_Components::Interfaces::Detector_Interface<typename ComponentType::Master_Type::DETECTOR_TYPE,NULLTYPE>*>();
-							//if (detector != NULL) detector->detect_vehicle<int>();
+							_Detector_Interface* detector;
+							detector = inbound_movement->detector<_Detector_Interface*>();
+							if (detector != NULL) detector->detect_vehicle<int>();
+
 							_Vehicle_Interface* veh = (_Vehicle_Interface*)vehicle;
 							inbound_movement->vehicles_container<_Vehicles_Container_Interface&>().push_back(veh);
 							inbound_movement->turn_movement_cumulative_arrived_vehicles<int&>()++;
 
 							if (outbound_link->uuid<int>() == 2 && inbound_link->uuid<int>() == 1)
 							{
-								//int count;
-								//count = detector->Get_Count<int>();
 								bool test = false;
 							}
 
