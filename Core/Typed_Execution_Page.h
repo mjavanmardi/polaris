@@ -67,7 +67,7 @@ template<typename DataType>
 class Typed_Execution_Pages
 {
 public:
-	Typed_Execution_Pages(Execution_Directive execution_function):stride(sizeof(DataType)),type_activated(false),
+	Typed_Execution_Pages(Execution_Directive execution_function=(Execution_Directive)Execution_Loop<(Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType),sizeof(DataType)>):stride(sizeof(DataType)),type_activated(false),
 	num_cells((Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType)),
 	process_directive(execution_function)
 	{
