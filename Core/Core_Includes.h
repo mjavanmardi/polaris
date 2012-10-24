@@ -58,7 +58,7 @@ static const int inc_val=1;
 #ifdef WINDOWS
 #define SLEEP(Seconds) Sleep(Seconds*1000)
 #else
-#define SLEEP(Seconds) sleep(Seconds)
+#define SLEEP(Seconds) usleep(Seconds*1000000)
 #endif
 class NULLCLASS{};
 

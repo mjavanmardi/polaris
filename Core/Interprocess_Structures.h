@@ -116,3 +116,50 @@ void Send_Message(void* msg,int msg_length,int destination,int next_exchange)
 
 	memcpy(thread_exchange_data->send_buffer.buffer()+sizeof(Message_Base),msg,msg_length);
 }
+
+template<typename ComponentType>
+void Broadcast_Message(void* msg,int msg_length,int next_exchange)
+{
+	for(int i=0;i<num_partitions;i++)
+	{
+		if(i==host_rank) continue;
+		
+		Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[thread_id][i];
+
+		// cannot affect current_exchange, but will help determine next_exchange
+		
+		if(next_exchange < thread_exchange_data->next_exchange)
+		{
+			thread_exchange_data->next_exchange=next_exchange;
+		}
+		
+		/*
+		if(next_exchange < thread_exchange_data->next_exchange)
+		{
+			thread_exchange_data->next_next_exchange=thread_exchange_data->next_exchange;
+			thread_exchange_data->next_exchange=next_exchange;
+		}
+		else if(next_exchange == thread_exchange_data->next_exchange)
+		{
+			// do nothing
+		}
+		else if(next_exchange < thread_exchange_data->next_next_exchange)
+		{
+			thread_exchange_data->next_next_exchange=next_exchange;
+		}
+		*/
+		
+		//cout << "Thread status " << destination << ": " << thread_exchange_data->next_exchange << "," << thread_exchange_data->next_next_exchange << endl;
+		
+		// number of messages for this thread / destination combination
+		
+		thread_exchange_data->num_messages++;
+		
+		char* mbuf=thread_exchange_data->send_buffer.allocate(msg_length+sizeof(Message_Base));
+		
+		((Message_Base*)mbuf)->length=msg_length+sizeof(Message_Base);
+		((Message_Base*)mbuf)->type_index=ComponentType::component_index;
+
+		memcpy(thread_exchange_data->send_buffer.buffer()+sizeof(Message_Base),msg,msg_length);
+	}
+}

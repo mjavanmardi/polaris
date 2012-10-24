@@ -206,7 +206,7 @@ public:
 	typedef typename ObjectToSingleton<Execution_Object,Polaris_Component_Execution>::type Singleton_Type;
 	static Singleton_Type* const singleton_reference;
 	static vector<void*>* const all_components_reference;
-
+	
 	typedef Polaris_Component_Execution Implementation_Type;
 	typedef Polaris_Component_Execution This_Type;
 	typedef Execution_Object Object_Type;
@@ -451,6 +451,9 @@ typename Polaris_Component_Communication<ImplementationTemplate,MasterType,NULLT
 #define cast_target_to_component(TARGET_COMPONENT_TYPE,POINTER_TO_TARGET) ((TARGET_COMPONENT_TYPE&)*POINTER_TO_TARGET)
 #define pthis ((ComponentType*)this)
 
+#define access_communication_singleton(COMPONENT_TYPE,PROTOTYPE,CALLER_TYPE,TARGET_TYPE) ((PROTOTYPE<COMPONENT_TYPE,CALLER_TYPE>*)COMPONENT_TYPE::singleton_reference)
+
+ 
 #define cast_self_to_interface(INTERFACE_ALIAS) ((INTERFACE_ALIAS&)*this)
 #define cast_target_to_interface(INTERFACE_ALIAS,POINTER_TO_TARGET) ((INTERFACE_ALIAS&)(*POINTER_TO_TARGET))
 #define cast_iterator_to_interface(INTERFACE_ALIAS,ITERATOR_VARIABLE) ( (INTERFACE_ALIAS&) (*(*ITERATOR_VARIABLE)) )

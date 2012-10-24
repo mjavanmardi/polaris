@@ -83,7 +83,7 @@ public:
 		
 		//for(mitr=rank_to_ip.begin();mitr!=rank_to_ip.end();mitr++)
 		//{
-			//cout << "one (rank,ip) combo is: (" << mitr->first << "," << mitr->second << ")" << endl;
+		//	cout << "one (rank,ip) combo is: (" << mitr->first << "," << mitr->second << ")" << endl;
 		//}
 		
 		
@@ -133,6 +133,8 @@ public:
 		}
 		
 		//cout << "Done initializing exchange data" << endl;
+		
+		//SLEEP(1);
 	}
 	
 	void identify_job(string& jobname)
@@ -314,15 +316,15 @@ public:
 		
 		//cout << "bound: " << bound << endl;
 		
-		int listening=listen(listening_socket,10);
+		int listening=listen(listening_socket,100);
 		
 		SLEEP(1);
 		
 		//cout << "listening: " << listening << endl;	
 
-		for(int i=0;i<(rank_to_ip.size()-1);i++)
+		for(int i=0;i<rank_to_ip.size();i++)
 		{
-			if(i>=host_rank)
+			if(i>host_rank)
 			{
 				int connecting_socket=socket(AF_INET,SOCK_STREAM,0);
 				
@@ -331,37 +333,47 @@ public:
 				sockaddr_in server_socket_address;
 				
 				server_socket_address.sin_family = AF_INET;
-				inet_aton(rank_to_ip[i+1].c_str(),(in_addr*)&server_socket_address.sin_addr.s_addr);
+				inet_aton(rank_to_ip[i].c_str(),(in_addr*)&server_socket_address.sin_addr.s_addr);
 				server_socket_address.sin_port = htons(40111);
 				
 				//cout << "connecting from: " << rank_to_ip[host_rank].c_str() << " to " << rank_to_ip[i+1].c_str() << endl;
 				
 				int connected=connect(connecting_socket,(struct sockaddr*) &server_socket_address, sizeof(server_socket_address) );
 				
-				//cout << "connected: " << connected << endl;
+				while(!connected)
+				{
+					SLEEP(.1);
+					connected=connect(connecting_socket,(struct sockaddr*) &server_socket_address, sizeof(server_socket_address) );
+				}
 				
-				rank_to_socket[i+1]=connecting_socket;
+				//cout << "connected: " << i << endl;
+				
+				rank_to_socket[i]=connecting_socket;
 			}
 			if(i<host_rank)
 			{
-				SLEEP(1);
+				//SLEEP(.1);
 				
-				int accepting_socket;
+				int accepting_socket=accept(listening_socket,NULL,NULL);
 				
-				accepting_socket=accept(listening_socket,NULL,NULL);
+				while(!accepting_socket)
+				{
+					SLEEP(.1);
+					accepting_socket=accept(listening_socket,NULL,NULL);
+				}
 				
-				//cout << "accepting: " << accepting_socket << endl;
+				//cout << "accepting: " << i << endl;
 				
 				rank_to_socket[i]=accepting_socket;
 			}
 		}
 		
-		//unordered_map<int,int>::iterator mitr;
+		unordered_map<int,int>::iterator mitr;
 		
-		//for(mitr=rank_to_socket.begin();mitr!=rank_to_socket.end();mitr++)
-		//{
-		//	cout << "one (rank,socket) combo is: (" << mitr->first << "," << mitr->second << ")" << endl;
-		//}
+		for(mitr=rank_to_socket.begin();mitr!=rank_to_socket.end();mitr++)
+		{
+			cout << "one (rank,socket) combo is: (" << mitr->first << "," << mitr->second << ")" << endl;
+		}
 	}
 	
 	void msg_all_to_all()
@@ -370,33 +382,34 @@ public:
 		for(int i=0;i<255;i++) msg[i]='\0';
 		stringstream s;
 		
-		for(int sender=0;sender<(rank_to_ip.size());sender++)
+		for(int sender=0;sender<rank_to_ip.size();sender++)
 		{
-			if(sender==host_rank)
+			for(int receiver=0;receiver<rank_to_ip.size();receiver++)
 			{
-				for(int receiver=0;receiver<(rank_to_ip.size());receiver++)
+				if(receiver!=host_rank)
 				{
-					if(receiver!=host_rank)
-					{
-						//cout << "sending to " << receiver << endl;
-						
-						s << "Hello from " << host_rank << "\0";
-						
-						send(rank_to_socket[receiver],s.str().c_str(),s.str().size(),0);
-						
-						//cout << "sent" << endl;
-						
-						s.str("");
-					}
+					cout << "sending to " << receiver << endl;
+					
+					s << "Hello from " << host_rank << "\0";
+					
+					send(rank_to_socket[receiver],s.str().c_str(),s.str().size(),0);
+					
+					cout << "sent" << endl;
+					
+					s.str("");
 				}
+			}
+			
+			if(true)
+			{
 			}
 			else
 			{
-				//cout << "receiving from " << sender << endl;
+				cout << "receiving from " << sender << endl;
 				
 				recv(rank_to_socket[sender],msg,255,0);
 				
-				//cout << msg << endl;			
+				cout << msg << endl;			
 			}
 		}
 	}
