@@ -79,9 +79,9 @@ namespace Basic_Units
 		concept Has_Time
 		{
 			begin_requirements_list(none);
-			requires_typename_state(none,TimeType,true_type,"Type is not a Time data structure");
+			requires_typename_state(none,Time,true_type,"Type is not a Time data structure");
 			//requires_concept_checked_member(TimeType, value, is_arithmetic,"An arithmetic 'Time' data member has not been defined.");
-			end_requirements_list(TimeType);
+			end_requirements_list(Time);
 		};
 		/// Check if initializing struct is tagged as DRSeconds (i.e. 1/10th of a second)
 		concept Time_In_DRSeconds
@@ -535,11 +535,11 @@ namespace Basic_Units
 		Basic_Data_Struct(Meters, length_data_type, Length_Type, Meters_Type);
 		Basic_Data_Struct(Kilometers, length_data_type, Length_Type, Kilometers_Type);
 
-		Basic_Data_Struct(Time_DRSeconds,time_data_type,Time_Type,DRSeconds);
-		Basic_Data_Struct(Time_Seconds,time_data_type,Time_Type,Seconds);
-		Basic_Data_Struct(Time_Minutes,time_data_type,Time_Type,Minutes);
-		Basic_Data_Struct(Time_Hours,time_data_type,Time_Type,Hours);
-		Basic_Data_Struct(Time_Days,time_data_type,Time_Type,Days);
+		Basic_Data_Struct(Time_DRSeconds,time_data_type,Time,DRSeconds);
+		Basic_Data_Struct(Time_Seconds,time_data_type,Time,Seconds);
+		Basic_Data_Struct(Time_Minutes,time_data_type,Time,Minutes);
+		Basic_Data_Struct(Time_Hours,time_data_type,Time,Hours);
+		Basic_Data_Struct(Time_Days,time_data_type,Time,Days);
 	}
 
 }
