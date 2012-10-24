@@ -83,7 +83,6 @@ namespace Intersection_Components
 
 			feature_accessor(vehicles_container);
 
-			feature_accessor(detector);
 
 			feature TargetType pull_vehicle()
 			{
@@ -785,7 +784,7 @@ namespace Intersection_Components
 
 				if(_this_ptr->intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::NONE_COMPLETE)
 				{
-					Revision links_current_revision=type_singleton<_Link_Interface::Component_Type,Execution_Object>::ref->type_current_revision();
+					Revision links_current_revision=_Link_Interface::Component_Type::singleton_reference->type_current_revision();
 					//Revision links_current_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_current_revision();
 
 					if(links_current_revision.iteration==iteration)
@@ -852,7 +851,7 @@ namespace Intersection_Components
 				else if(_this_ptr->intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE)
 				{
 					//although not ideal, simply check whether links are completely done this iteration
-					Revision link_next_revision=type_singleton<typename _Link_Interface::Component_Type,Execution_Object>::ref->type_next_check();
+					Revision link_next_revision=Component_Type::singleton_reference->type_next_check();
 					//Revision link_next_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_next_check();
 
 					if(link_next_revision.iteration>iteration)

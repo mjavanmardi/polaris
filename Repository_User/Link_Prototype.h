@@ -604,7 +604,7 @@ namespace Link_Components
 
 					typedef Intersection_Components::Types::Intersection_Simulation_Status intersection_simulation_status_type;
 
-					Revision intersection_current_revision=type_singleton<_Intersection_Interface::Component_Type,Execution_Object>::ref->type_current_revision();
+					Revision intersection_current_revision=_Intersection_Interface::Component_Type::singleton_reference->type_current_revision();
 					//Revision intersection_current_revision=Execution_Object::allocator_template<_Intersection_Interface_type>::allocator_reference.type_current_revision();
 
 					_Intersection_Interface* upstream=_this_ptr->upstream_intersection<_Intersection_Interface*>();
