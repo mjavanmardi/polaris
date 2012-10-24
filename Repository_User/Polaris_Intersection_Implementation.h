@@ -86,8 +86,6 @@ namespace Intersection_Components
 
 			member_data_basic(int, id);
 		};
-		
-
 
 		implementation struct Polaris_Outbound_Inbound_Movements_Implementation
 		{
