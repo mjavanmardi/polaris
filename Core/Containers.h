@@ -62,7 +62,9 @@ struct Polaris_Back_Insertion_Sequence_Prototype
 	TargetValueType back(){return (TargetValueType)(((ComponentType*)this)->back());}
 	
 	void push_back(TargetValueType& t){return ((ComponentType*)this)->push_back((typename ComponentType::value_type&)t);}
-
+	
+	void push_back(TargetValueType&& t){return ((ComponentType*)this)->push_back((typename ComponentType::value_type&&)t);}
+	
 	void pop_back(){((ComponentType*)this)->pop_back();}
 
 	void pop_front(){((ComponentType*)this)->pop_front();}
@@ -109,6 +111,8 @@ struct Polaris_Random_Access_Sequence_Prototype
 	TargetValueType back(){return (TargetValueType)(((ComponentType*)this)->back());}
 	
 	void push_back(TargetValueType& t){return ((ComponentType*)this)->push_back((typename ComponentType::value_type&)t);}
+
+	void push_back(TargetValueType&& t){return ((ComponentType*)this)->push_back((typename ComponentType::value_type&&)t);}
 
 	void pop_back(){((ComponentType*)this)->pop_back();}
 
