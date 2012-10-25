@@ -9,7 +9,7 @@ namespace Basic_Units
 		{
 			// LENGTH - stored in feet
 			typedef true_type Length_Type;
-			member_data_basic(float,length);
+			member_data_basic(float,Length);
 		};
 		implementation struct Inches_Implementation : Measure_1D_Implementation<MasterType>
 		{
@@ -43,7 +43,33 @@ namespace Basic_Units
 		/// local member.  The functions below handle requests from the Time_Interface
 		implementation struct Time_Implementation
 		{
-			typedef true_type TimeType;
+			typedef true_type Time_Type;
+			member_data_basic(float,Time);
+		};
+		implementation struct DRSeconds_Implementation : Time_Implementation<MasterType>
+		{
+			typedef true_type DRSeconds_Type;
+		};
+		implementation struct Seconds_Implementation : Time_Implementation<MasterType>
+		{
+			typedef true_type Seconds_Type;
+		};
+		implementation struct Minutes_Implementation : Time_Implementation<MasterType>
+		{
+			typedef true_type Minutes_Type;
+		};
+		implementation struct Hours_Implementation : Time_Implementation<MasterType>
+		{
+			typedef true_type Hours_Type;
+		};
+		implementation struct Days_Implementation : Time_Implementation<MasterType>
+		{
+			typedef true_type Days_Type;
+		};
+
+		implementation struct Time_Implementation_old
+		{
+			typedef true_type Time;
 
 			//================================================================================================
 			// Initializers for different time types:
@@ -216,9 +242,75 @@ namespace Basic_Units
 			typedef Polaris_Component<Implementations::Kilometers_Implementation,MasterType> type;
 		};
 
-		implementation struct Time
+		implementation struct Square_Inches
 		{
-			typedef Polaris_Component<Implementations::Time_Implementation,MasterType> type;
+			typedef Polaris_Component<Implementations::Inches_Implementation, MasterType> type;
+		};
+		implementation struct Square_Feet
+		{
+			typedef Polaris_Component<Implementations::Feet_Implementation,MasterType> type;
+		};
+		implementation struct Square_Miles
+		{
+			typedef Polaris_Component<Implementations::Miles_Implementation,MasterType> type;
+		};
+		implementation struct Square_Centimeters
+		{
+			typedef Polaris_Component<Implementations::Centimeters_Implementation,MasterType> type;
+		};
+		implementation struct Square_Meters
+		{
+			typedef Polaris_Component<Implementations::Meters_Implementation,MasterType> type;
+		};
+		implementation struct Square_Kilometers
+		{
+			typedef Polaris_Component<Implementations::Kilometers_Implementation,MasterType> type;
+		};
+
+		implementation struct Cubic_Inches
+		{
+			typedef Polaris_Component<Implementations::Inches_Implementation, MasterType> type;
+		};
+		implementation struct Cubic_Feet
+		{
+			typedef Polaris_Component<Implementations::Feet_Implementation,MasterType> type;
+		};
+		implementation struct Cubic_Miles
+		{
+			typedef Polaris_Component<Implementations::Miles_Implementation,MasterType> type;
+		};
+		implementation struct Cubic_Centimeters
+		{
+			typedef Polaris_Component<Implementations::Centimeters_Implementation,MasterType> type;
+		};
+		implementation struct Cubic_Meters
+		{
+			typedef Polaris_Component<Implementations::Meters_Implementation,MasterType> type;
+		};
+		implementation struct Cubic_Kilometers
+		{
+			typedef Polaris_Component<Implementations::Kilometers_Implementation,MasterType> type;
+		};
+
+		implementation struct DRSeconds
+		{
+			typedef Polaris_Component<Implementations::DRSeconds_Implementation,MasterType> type;
+		};
+		implementation struct Seconds
+		{
+			typedef Polaris_Component<Implementations::Seconds_Implementation,MasterType> type;
+		};
+		implementation struct Minutes
+		{
+			typedef Polaris_Component<Implementations::Minutes_Implementation,MasterType> type;
+		};
+		implementation struct Hours
+		{
+			typedef Polaris_Component<Implementations::Hours_Implementation,MasterType> type;
+		};
+		implementation struct Days
+		{
+			typedef Polaris_Component<Implementations::Days_Implementation,MasterType> type;
 		};
 	}
 }
