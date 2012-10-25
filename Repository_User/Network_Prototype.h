@@ -127,7 +127,7 @@ namespace Network_Components
 				(*approaches)[0]->Add_Lane_Group<Lane_Group_Interface*>(lane);
 				(*approaches)[0]->name<char*>("EB");
 				lane->Initialize<float>();
-				lane->avg_lane_width<Length_Foot>(11.0);
+				lane->avg_lane_width<Feet>(11.0);
 				lane->demand_left<Flow_Per_Hour>(0);
 				lane->demand_right<Flow_Per_Hour>(0);
 				lane->demand_thru<Flow_Per_Hour>(0);
@@ -156,7 +156,7 @@ namespace Network_Components
 				(*approaches)[1]->Add_Lane_Group<Lane_Group_Interface*>(lane);
 				(*approaches)[1]->name<char*>("SB");
 				lane2->Initialize<float>();
-				lane2->avg_lane_width<Length_Foot>(11.0);
+				lane2->avg_lane_width<Feet>(11.0);
 				lane2->demand_left<Flow_Per_Hour>(0);
 				lane2->demand_right<Signal_Components::Data_Structures::Flow_Per_Hour>(0);
 				lane2->demand_thru<Flow_Per_Hour>(0);

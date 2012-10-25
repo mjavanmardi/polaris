@@ -16,16 +16,16 @@ namespace Signal_Components
 		template<typename MasterType>
 		struct Signal_Detector_Implementation
 		{
-			Signal_Detector_Implementation() : _count(0){_last_access = Data_Structures::Time_Second(0);}
-			Data_Structures::Time_Second _last_access;
+			Signal_Detector_Implementation() : _count(0){_last_access = Basic_Units::Data_Structures::Time_Seconds(0);}
+			Basic_Units::Data_Structures::Time_Seconds _last_access;
 			int _count;
 
 			feature_implementation typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
 				requires(typename TargetType::ReturnType,Concepts::Is_Flow_Per_Hour) &&
-				requires(typename TargetType::ParamType,Concepts::Is_Time_Seconds)))
+				requires(typename TargetType::ParamType,Basic_Units::Concepts::Time_In_Seconds)))
 			{
 				typename TargetType::ReturnType value = 0;
-				Data_Structures::Time_Second time_since = (float)time.Value - (float)_last_access.Value;
+				Basic_Units::Data_Structures::Time_Seconds time_since = (float)time.Value - (float)_last_access.Value;
 				if (time_since <=0) return value;
 				_last_access.Value = time.Value;
 				value = (_count / time_since * 3600.f);
@@ -35,9 +35,9 @@ namespace Signal_Components
 			}
 			feature_implementation typename TargetType::ReturnType count(typename TargetType::ParamType time, call_requirements(
 				requires(typename TargetType::ReturnType,Concepts::Is_Flow_Per_15_Minutes) &&
-				requires(typename TargetType::ParamType,Concepts::Is_Time_Seconds)))
+				requires(typename TargetType::ParamType,Basic_Units::Concepts::Time_In_Seconds)))
 			{
-				Data_Structures::Time_Second time_since = time - _last_access;
+				Basic_Units::Data_Structures::Time_Seconds time_since = time - _last_access;
 				_last_access = time;
 				_count = 0;
 				return (_count / time_since / 900.f);
@@ -83,7 +83,9 @@ namespace Signal_Components
 			//------------------------------------------------------------
 			feature_implementation void Initialize()
 			{
-				this->_avg_lane_width = 10.0;
+				//this->_avg_lane_width = 10.0;
+				this->_avg_lane_width = Allocate<MasterType::WIDTH_TYPE>();
+				this->avg_lane_width<MasterType::WIDTH_TYPE,ComponentType,Feet>(10.0);
 				this->_base_saturation_flow = 1900.0;
 				this->_demand_lane_group = 0;
 				this->_demand_lane_max = 0;
@@ -118,68 +120,68 @@ namespace Signal_Components
 				assert_requirements_std(TargetType,is_integral,"Your TargetType is not an integral type.");
 			}
 			tag_getter(cycle_length);
-			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Seconds)))			
 			{
 				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				return parent->cycle_length<TargetType>();
 			}
-			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Seconds)))			
 			{
-				assert_requirements_std(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+				assert_requirements_std(TargetType,Basic_Units::Concepts::Time_In_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(max_cycle_length);
-			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Seconds)))			
 			{
 				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->max_cycle_length<TargetType>();
 			}
-			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Seconds)))			
 			{
-				assert_requirements_std(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+				assert_requirements_std(TargetType,Basic_Units::Concepts::Time_In_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(min_cycle_length);
-			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Seconds)))			
 			{
 				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->min_cycle_length<TargetType>();
 			}
-			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Seconds)))			
 			{
-				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Basic_Units::Concepts::Time_In_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(green_time);
-			feature_implementation TargetType green_time(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType green_time(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Seconds)))			
 			{
 				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->green_time<TargetType>();
 			}
-			feature_implementation TargetType green_time(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType green_time(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Seconds)))			
 			{
-				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Basic_Units::Concepts::Time_In_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(yellow_and_all_red_time);
-			feature_implementation TargetType yellow_and_all_red_time(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType yellow_and_all_red_time(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Seconds)))			
 			{
 				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->yellow_and_all_red_time<TargetType>();
 			}
-			feature_implementation TargetType yellow_and_all_red_time(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType yellow_and_all_red_time(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Seconds)))			
 			{
-				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Basic_Units::Concepts::Time_In_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(analysis_period);
-			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,Concepts::Is_Time_Minutes)))			
+			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Minutes)))			
 			{
 				Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Phase_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				//Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Phase_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->analysis_period<TargetType>();
 			}
-			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,!Concepts::Is_Time_Minutes)))			
+			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Minutes)))			
 			{
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
 			}
@@ -210,36 +212,38 @@ namespace Signal_Components
 			//============================================================
 			/// Lane width data member
 			//------------------------------------------------------------
-			float _avg_lane_width;
-			tag_getter_setter(avg_lane_width);
-			feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(requires(TargetType,Concepts::Is_Foot_Measure)))
-			{
-				State_Checks::valid_lane_width<ComponentType,CallerType,TargetType>(this,set_value);
-				_avg_lane_width=(float)set_value;
-			}
-			feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(requires(TargetType,Concepts::Is_Meter_Measure)))
-			{
-				State_Checks::valid_lane_width<ComponentType,CallerType,TargetType>(set_value.value * 3.28084);
-				_avg_lane_width=(float)set_value.value * 3.28084;
-			}
-			feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(!((requires(TargetType, Concepts::Is_Foot_Measure) || requires(TargetType, Concepts::Is_Meter_Measure)))))
-			{
-				assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
-				assert_requirements(TargetType,Concepts::Is_Foot_Measure,"TargetType is not a foot or meter measure");
-			}
-			feature_implementation  TargetType avg_lane_width(call_requirements(requires(TargetType,Concepts::Is_Foot_Measure)))
-			{
-				return (typename TargetType::ValueType)_avg_lane_width;
-			}
-			feature_implementation  TargetType avg_lane_width(call_requirements(requires(TargetType,Concepts::Is_Meter_Measure)))
-			{
-				return (typename TargetType::ValueType)(_avg_lane_width * 0.3048);
-			}
-			feature_implementation  TargetType avg_lane_width(call_requirements(!(requires(TargetType, Concepts::Is_Foot_Measure) || requires(TargetType, Concepts::Is_Meter_Measure))))
-			{
-				assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
-				assert_requirements(TargetType,Concepts::Is_Foot_Measure,"TargetType is not a foot or meter measure");
-			}
+			
+			member_component_basic(typename MasterType::WIDTH_TYPE,avg_lane_width)
+			//float _avg_lane_width;
+			//tag_getter_setter(avg_lane_width);
+			//feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(requires(TargetType,Basic_Units::Concepts::Measure_in_Feet)))
+			//{
+			//	State_Checks::valid_lane_width<ComponentType,CallerType,TargetType>(this,set_value);
+			//	_avg_lane_width=(float)set_value;
+			//}
+			//feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(requires(TargetType,Basic_Units::Concepts::Measure_in_Meters)))
+			//{
+			//	State_Checks::valid_lane_width<ComponentType,CallerType,TargetType>(set_value.value * 3.28084);
+			//	_avg_lane_width=(float)set_value.value * 3.28084;
+			//}
+			//feature_implementation  void avg_lane_width(TargetType set_value,call_requirements(!((requires(TargetType, Basic_Units::Concepts::Measure_in_Feet) || requires(TargetType, Basic_Units::Concepts::Measure_in_Meters)))))
+			//{
+			//	assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
+			//	assert_requirements(TargetType,Concepts::Is_Foot_Measure,"TargetType is not a foot or meter measure");
+			//}
+			//feature_implementation  TargetType avg_lane_width(call_requirements(requires(TargetType,Concepts::Is_Foot_Measure)))
+			//{
+			//	return (typename TargetType::ValueType)_avg_lane_width;
+			//}
+			//feature_implementation  TargetType avg_lane_width(call_requirements(requires(TargetType,Concepts::Is_Meter_Measure)))
+			//{
+			//	return (typename TargetType::ValueType)(_avg_lane_width * 0.3048);
+			//}
+			//feature_implementation  TargetType avg_lane_width(call_requirements(!(requires(TargetType, Concepts::Is_Foot_Measure) || requires(TargetType, Concepts::Is_Meter_Measure))))
+			//{
+			//	assert_requirements(ComponentType,Is_Dispatched,"ComponentType is not dispatched");
+			//	assert_requirements(TargetType,Concepts::Is_Foot_Measure,"TargetType is not a foot or meter measure");
+			//}
 
 			//============================================================
 			// Other geometry data members
@@ -327,8 +331,8 @@ namespace Signal_Components
 			//-------------------------------------
 			// Common Geometry conditions specific to Full analysis
 			member_data(float,grade,requires(TargetType,Concepts::Is_Percentage),requires(TargetType,Concepts::Is_Percentage));					///< G(%)
-			member_data(float,length_left_turn,requires(TargetType,Concepts::Is_Foot_Measure),requires(TargetType,Concepts::Is_Foot_Measure));		///< Ls s (ft)
-			member_data(float,length_right_turn,requires(TargetType,Concepts::Is_Foot_Measure),requires(TargetType,Concepts::Is_Foot_Measure));		///< Lr (ft)
+			member_data(float,length_left_turn,requires(TargetType,Basic_Units::Concepts::Measure_in_Feet),requires(TargetType,Basic_Units::Concepts::Measure_in_Feet));		///< Ls s (ft)
+			member_data(float,length_right_turn,requires(TargetType,Basic_Units::Concepts::Measure_in_Feet),requires(TargetType,Basic_Units::Concepts::Measure_in_Feet));		///< Lr (ft)
 
 			//-------------------------------------
 			// Traffic conditions specific to the Full analysis
@@ -352,10 +356,12 @@ namespace Signal_Components
 
 			// adjustment factor for lane width
 			feature_implementation float HCM_adjustment_fw()
-			{				
-				float width = ((Lane_Group_HCM_Implementation<MasterType>*)this)->avg_lane_width<ComponentType,CallerType,Data_Structures::Length_Foot>();
-				State_Checks::valid_lane_width<ComponentType,CallerType, TargetType>(this, width);
-				return (1.0f + (width - 12.0f)/30.0f);
+			{		
+				typedef Basic_Units::Prototypes::Width_Prototype<typename MasterType::WIDTH_TYPE,NULLTYPE> width_itf;
+				width_itf* width = ((Lane_Group_HCM_Implementation<MasterType>*)this)->avg_lane_width<ComponentType,CallerType,width_itf*>();
+				float w = width->Width<Feet>();
+				State_Checks::valid_lane_width<ComponentType,CallerType, TargetType>(this, w);
+				return (1.0f + (w - 12.0f)/30.0f);
 			}
 			// adjustment factor for heavy vehicles in traffic stream
 			feature_implementation float HCM_adjustment_fHV()
@@ -517,9 +523,9 @@ namespace Signal_Components
 			//------------------------------------------------------------
 			member_data_basic(Data_Structures::Signal_State, signal_state);
 			/// Phase green time
-			member_data(float, green_time, requires(TargetType, Concepts::Is_Time_Seconds), requires(TargetType, Concepts::Is_Time_Seconds));	///< G (s)
+			member_data(float, green_time, requires(TargetType, Basic_Units::Concepts::Time_In_Seconds), requires(TargetType, Basic_Units::Concepts::Time_In_Seconds));	///< G (s)
 			/// Phase lost time
-			member_data(float, yellow_and_all_red_time, requires(TargetType, Concepts::Is_Time_Seconds), requires(TargetType, Concepts::Is_Time_Seconds));	///< Y (s)
+			member_data(float, yellow_and_all_red_time, requires(TargetType, Basic_Units::Concepts::Time_In_Seconds), requires(TargetType,Basic_Units::Concepts::Time_In_Seconds));	///< Y (s)
 			member_data_basic(int, phase_id);
 			member_data_basic(char*,name);
 			member_data(float, weight, requires(TargetType, is_arithmetic), requires(TargetType, is_arithmetic));
@@ -560,48 +566,48 @@ namespace Signal_Components
 				assert_requirements_std(TargetType,is_integral,"Your TargetType is not an integral type.");
 			}
 			tag_getter(cycle_length);
-			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Seconds)))			
 			{
 				Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				//Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->cycle_length<TargetType>();
 			}
-			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType cycle_length(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Seconds)))			
 			{
-				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Basic_Units::Concepts::Time_In_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(max_cycle_length);
-			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Seconds)))			
 			{
 				Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				//Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->max_cycle_length<TargetType>();
 			}
-			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Seconds)))			
 			{
-				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Basic_Units::Concepts::Time_In_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(min_cycle_length);
-			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Seconds)))			
 			{
 				Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				//Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->min_cycle_length<TargetType>();
 			}
-			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Seconds)))			
 			{
-				assert_requirements(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Basic_Units::Concepts::Time_In_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(analysis_period);
-			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,Concepts::Is_Time_Minutes)))			
+			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Minutes)))			
 			{
 				Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>* parent = (Prototypes::Signal_Prototype<typename ComponentType::Parent_Type,NULLTYPE>*)(cast_self_to_component().Parent());
 				//Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->analysis_period<TargetType>();
 			}
-			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,!Concepts::Is_Time_Minutes)))			
+			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Minutes)))			
 			{
-				assert_requirements(TargetType,Concepts::Is_Time_Minutes,"Your TargetType is not an arithmetic type.");
+				assert_requirements(TargetType,Basic_Units::Concepts::Time_In_Minutes,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(degree_of_saturation);
 			feature_implementation TargetType degree_of_saturation(call_requirements(requires(TargetType,is_arithmetic)))			
@@ -724,7 +730,7 @@ namespace Signal_Components
 			//------------------------------------------------------------
 			member_data(Data_Structures::Flow_Per_Hour, approach_flow_rate, requires(TargetType, Concepts::Is_Flow_Per_Hour), requires(TargetType, Concepts::Is_Flow_Per_Hour));
 			/// Phase green time
-			member_data(Data_Structures::Time_Second, delay, requires(TargetType, Concepts::Is_Time_Seconds), requires(TargetType, Concepts::Is_Time_Seconds));	///< G (s)
+			member_data(Basic_Units::Data_Structures::Time_Seconds, delay, requires(TargetType, Basic_Units::Concepts::Time_In_Seconds), requires(TargetType, Basic_Units::Concepts::Time_In_Seconds));	///< G (s)
 			/// Phase lost time
 			member_data(char, LOS, requires(TargetType, is_integral), requires(TargetType, is_integral));	///< Y (s)
 			/// Phase lost time
@@ -761,34 +767,34 @@ namespace Signal_Components
 				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(max_cycle_length);
-			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Seconds)))			
 			{
 				Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->max_cycle_length<TargetType>();
 			}
-			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,!Concepts::Is_Time_Seconds)))			
+			feature_implementation TargetType max_cycle_length(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Seconds)))			
 			{
-				assert_requirements_std(TargetType,Concepts::Is_Time_Seconds,"Your TargetType is not an arithmetic type.");
+				assert_requirements_std(TargetType,Basic_Units::Concepts::Time_In_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(min_cycle_length);
-			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,is_arithmetic)))			
+			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Seconds)))			
 			{
 				Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->min_cycle_length<TargetType>();
 			}
-			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,!is_arithmetic)))			
+			feature_implementation TargetType min_cycle_length(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Seconds)))			
 			{
-				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+				assert_requirements_std(TargetType,Basic_Units::Concepts::Time_In_Seconds,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(analysis_period);
-			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,Concepts::Is_Time_Minutes)))			
+			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,Basic_Units::Concepts::Time_In_Minutes)))			
 			{
 				Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>* parent = (Interfaces::Signal_Interface<ComponentType::Parent_Type,NULLTYPE>*)(((ComponentType*)this)->_parent);
 				return parent->analysis_period<TargetType>();
 			}
-			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,!Concepts::Is_Time_Minutes)))			
+			feature_implementation TargetType analysis_period(call_requirements(requires(TargetType,!Basic_Units::Concepts::Time_In_Minutes)))			
 			{
-				assert_requirements_std(TargetType,is_arithmetic,"Your TargetType is not an arithmetic type.");
+				assert_requirements_std(TargetType,Basic_Units::Concepts::Time_In_Minutes,"Your TargetType is not an arithmetic type.");
 			}
 			tag_getter(degree_of_saturation);
 			feature_implementation TargetType degree_of_saturation(call_requirements(requires(TargetType,is_arithmetic)))			
@@ -877,11 +883,11 @@ namespace Signal_Components
 			/// Currently active phase
 			member_data(int, active_phase,requires(TargetType, is_integral),requires(TargetType,is_integral));
 			/// Total cycle length
-			member_data(float,cycle_length,requires(TargetType,Concepts::Is_Time_Seconds),requires(TargetType,Concepts::Is_Time_Seconds));			///< C (s)
+			member_data(float,cycle_length,requires(TargetType,Basic_Units::Concepts::Time_In_Seconds),requires(TargetType,Basic_Units::Concepts::Time_In_Seconds));			///< C (s)
 			/// maximum cycle length
-			member_data(float,max_cycle_length,requires(TargetType,Concepts::Is_Time_Seconds),requires(TargetType,Concepts::Is_Time_Seconds));	
+			member_data(float,max_cycle_length,requires(TargetType,Basic_Units::Concepts::Time_In_Seconds),requires(TargetType,Basic_Units::Concepts::Time_In_Seconds));	
 			/// minimum cycle length
-			member_data(float,min_cycle_length,requires(TargetType,Concepts::Is_Time_Seconds),requires(TargetType,Concepts::Is_Time_Seconds));	
+			member_data(float,min_cycle_length,requires(TargetType,Basic_Units::Concepts::Time_In_Seconds),requires(TargetType,Basic_Units::Concepts::Time_In_Seconds));	
 			/// target degree of saturation (default of 0.9)
 			member_data(float,degree_of_saturation,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));	///< X (s)
 			/// Area type
@@ -891,13 +897,13 @@ namespace Signal_Components
 			/// Signal name accessor
 			member_data(char*,name,true,true);
 			/// Analyisis Period accessor
-			member_data(float,analysis_period,requires(TargetType,Concepts::Is_Time_Minutes),requires(TargetType,Concepts::Is_Time_Minutes));
+			member_data(float,analysis_period,requires(TargetType,Basic_Units::Concepts::Time_In_Minutes),requires(TargetType,Basic_Units::Concepts::Time_In_Minutes));
 			/// Peak hour factor used to convert hourly to 15 minute maximum volume
 			member_data(float,peak_hour_factor,requires(TargetType,is_arithmetic),requires(TargetType,is_arithmetic));
 			/// Overall Signal Level of service
 			member_data(char,LOS,requires(TargetType,is_integral), requires(TargetType, is_integral));
 			/// Average intersection delay in seconds / vehicle
-			member_data(char,delay,requires(TargetType,Concepts::Is_Time_Seconds), requires(TargetType, Concepts::Is_Time_Seconds));
+			member_data(char,delay,requires(TargetType,Basic_Units::Concepts::Time_In_Seconds), requires(TargetType, Basic_Units::Concepts::Time_In_Seconds));
 		};
 		//------------------------------------------------------------------------------------------------------------------
 		/// HCM_Signal class.
