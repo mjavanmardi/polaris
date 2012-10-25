@@ -42,6 +42,7 @@ struct DATA_STRUCT_NAME \
 	DATA_STRUCT_NAME& operator+(DATA_VALUE_TYPE& obj){Value = Value + obj; return *this;}  \
 	DATA_STRUCT_NAME& operator-(DATA_VALUE_TYPE& obj){Value = Value - obj; return *this;}  \
 	DATA_STRUCT_NAME& operator*(DATA_VALUE_TYPE& obj){Value = Value * obj; return *this;}  \
+	DATA_STRUCT_NAME& operator/(DATA_VALUE_TYPE& obj){Value = Value / obj; return *this;}  \
 };
 
 concept Is_Target_Type_Struct

@@ -9,7 +9,7 @@ namespace Basic_Units
 		{
 			// LENGTH - stored in feet
 			typedef true_type Length_Type;
-			member_data_basic(float,Length);
+			member_data_basic(Value_Type,Value);
 		};
 		implementation struct Inches_Implementation : Measure_1D_Implementation<MasterType>
 		{
@@ -38,13 +38,13 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic time_component base clase.
-		/// The basic time component base clase has a float _local_time member which stores the total seconds
+		/// The basic time component base clase has a Value_Type _local_time member which stores the total seconds
 		/// represented by the time_class.  The initializers, addition operation, and accessors all use this 
 		/// local member.  The functions below handle requests from the Time_Interface
 		implementation struct Time_Implementation
 		{
 			typedef true_type Time_Type;
-			member_data_basic(float,Time);
+			member_data_basic(Value_Type,Value);
 		};
 		implementation struct DRSeconds_Implementation : Time_Implementation<MasterType>
 		{
@@ -77,27 +77,27 @@ namespace Basic_Units
 			/// Initialize Time using a DRSeconds struct
 			feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,Concepts::Time_In_DRSeconds)))
 			{
-				this->_local_time=((float)t/ (float)10.0);
+				this->_local_time=((Value_Type)t/ (Value_Type)10.0);
 			}
 			/// Initialize Time using a Seconds struct
 			feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,Concepts::Time_In_Seconds)))
 			{
-				this->_local_time=((float)t);
+				this->_local_time=((Value_Type)t);
 			}
 			/// Initialize Time using a Minutes struct
 			feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,Concepts::Time_In_Minutes)))
 			{
-				this->_local_time=((float)t * (float)60.0);
+				this->_local_time=((Value_Type)t * (Value_Type)60.0);
 			}
 			/// Initialize Time using an Hours struct
 			feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,Concepts::Time_In_Hours)))
 			{
-				this->_local_time=((float)t * (float)3600.0);
+				this->_local_time=((Value_Type)t * (Value_Type)3600.0);
 			}
 			/// Initialize Time using a Days struct
 			feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,Concepts::Time_In_Days)))
 			{
-				this->_local_time=((float)t * (float)86400.0);
+				this->_local_time=((Value_Type)t * (Value_Type)86400.0);
 			}
 			/// Initialization Error Handler - initializing without a valid time_struct, i.e. either has not 'Time' value member or is not tagged with an appropriate time_type
 			feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,!Concepts::Time_In_DRSeconds) && requires(TargetType,!Concepts::Time_In_Seconds) && 
@@ -114,27 +114,27 @@ namespace Basic_Units
 			/// Add a DRSeconds time value to the current time
 			feature_implementation void Add_Time(TargetType t, call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_DRSeconds)))
 			{
-				this->_local_time = this->_local_time + (float)t/ (float)10.0;
+				this->_local_time = this->_local_time + (Value_Type)t/ (Value_Type)10.0;
 			}
 			/// Add a Seconds time value to the current time
 			feature_implementation void Add_Time(TargetType& t, call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Seconds)))
 			{
-				this->_local_time = this->_local_time + (float)t;
+				this->_local_time = this->_local_time + (Value_Type)t;
 			}
 			/// Add a Minutes time value to the current time
 			feature_implementation void Add_Time(TargetType& t, call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Minutes)))
 			{
-				this->local_time=this->_local_time + (float)t * (float)60.0;
+				this->local_time=this->_local_time + (Value_Type)t * (Value_Type)60.0;
 			}
 			/// Add a Hours time value to the current time
 			feature_implementation void Add_Time(TargetType& t, call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Hours)))
 			{
-				this->_local_time=this->_local_time + (float)t.Time * (float)3600.0;
+				this->_local_time=this->_local_time + (Value_Type)t.Time * (Value_Type)3600.0;
 			}
 			/// Add a Days time value to the current time
 			feature_implementation void Add_Time(TargetType& t, call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Days)))
 			{
-				this->local_time=this->_local_time + (float)t  / (float)86400.0;
+				this->local_time=this->_local_time + (Value_Type)t  / (Value_Type)86400.0;
 			}
 			/// Adding time Error Handler
 			feature_implementation void Add_Time(TargetType& t, call_requirements(
@@ -211,7 +211,7 @@ namespace Basic_Units
 			//================================================================================================
 			/// Storage for local_time value
 			//------------------------------------------------------------------------------------------------
-			member_data(float, local_time, requires(TargetType,is_arithmetic),requires(TargetType, is_arithmetic));		
+			member_data(Value_Type, local_time, requires(TargetType,is_arithmetic),requires(TargetType, is_arithmetic));		
 		};
 	}
 
