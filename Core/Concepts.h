@@ -140,3 +140,5 @@ static const int success=sizeof(small_type);
 #define requires(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<strip_modifiers(TYPE_TO_TEST)>::value
 #define requires_basic(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<TYPE_TO_TEST>::value
 #define requires_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<CALL_REQUIREMENTS_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::value
+
+#define requires_member(CONCEPT_NAME) CONCEPT_NAME<strip_modifiers(TargetType)>::value
