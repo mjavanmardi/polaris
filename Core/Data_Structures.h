@@ -9,7 +9,7 @@
 struct Byte_Balloon
 {
 public:
-	Byte_Balloon():bytes(nullptr),current_size(0),max_size(0){};
+	Byte_Balloon():bytez(nullptr),current_size(0),max_size(0){};
 
 	void clear()
 	{
@@ -20,15 +20,10 @@ public:
 	{
 		return current_size;
 	}
-
-	int max()
-	{
-		return max_size;
-	}
 	
 	char* buffer()
 	{
-		return bytes;
+		return bytez;
 	}
 
 	char* allocate(int byte_array_size)
@@ -39,14 +34,14 @@ public:
 
 			char* new_bytes=new char[max_size];
 
-			memcpy(new_bytes,bytes,current_size);
+			memcpy(new_bytes,bytez,current_size);
 
-			delete bytes;
+			delete bytez;
 
-			bytes=new_bytes;
+			bytez=new_bytes;
 		}
 		
-		char* retval=&bytes[current_size];
+		char* retval=&bytez[current_size];
 
 		current_size+=byte_array_size;
 		
@@ -54,7 +49,7 @@ public:
 	}
 
 private:
-	char* bytes;
+	char* bytez;
 	int current_size;
 	int max_size;
 };
