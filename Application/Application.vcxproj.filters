@@ -14,12 +14,6 @@
     <ClInclude Include="Application_Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Master_Types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Models.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">

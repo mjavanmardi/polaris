@@ -112,14 +112,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Repository_User\Repository_User.vcxproj">
-      <Project>{03356212-5dd0-4d56-a243-5dabb710dd31}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Application_Includes.h" />
-    <ClInclude Include="Master_Types.h" />
-    <ClInclude Include="Models.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />

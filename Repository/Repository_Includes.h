@@ -45,13 +45,22 @@ struct DATA_STRUCT_NAME \
 	DATA_STRUCT_NAME& operator/(DATA_VALUE_TYPE& obj){Value = Value / obj; return *this;}  \
 };
 
+//concept Is_Target_Type_Struct
+//{
+//	begin_requirements_list (none);
+//	requires_typename_defined(none, ReturnType,"Type does not model an HCM simple solution type.");
+//	requires_typename_defined(ReturnType, ParamType,"Type does not model an HCM simple solution type.");
+//	requires_typename_defined(ParamType, Param2Type,"Type does not model an HCM simple solution type.");
+//	end_requirements_list(Param2Type);
+//};
+
 concept Is_Target_Type_Struct
 {
-	begin_requirements_list (none);
-	requires_typename_defined(none, ReturnType,"Type does not model an HCM simple solution type.");
-	requires_typename_defined(ReturnType, ParamType,"Type does not model an HCM simple solution type.");
-	requires_typename_defined(ParamType, Param2Type,"Type does not model an HCM simple solution type.");
-	end_requirements_list(Param2Type);
+	requires_typename_defined(check1,ReturnType);
+	requires_typename_defined(check2,ParamType);
+	requires_typename_defined(check3,Param2Type);
+
+	define_default_check(check1 && check2 && check3);
 };
 
 ///======================================================================================
