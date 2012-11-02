@@ -31,18 +31,18 @@ public:
 		{
 			// wait until all threads have entered the finished queue
 
-			while(threads_finished_counter!=num_threads) SLEEP(0);
+			while(threads_finished_counter!=_num_threads) SLEEP(0);
 		
 			// can safely say no threads are running at this point
 			threads_running_counter=0;
 
 			tick_tock=!tick_tock;
 
-			iteration++;
+			_iteration++;
 
-			sub_iteration=0;
+			_sub_iteration=0;
 
-			if(iteration>=num_iterations)
+			if(_iteration>=_num_iterations)
 			{
 				AtomicDecrement(&run);
 
@@ -68,11 +68,11 @@ public:
 	//LARGE_INTEGER start;
 	//LARGE_INTEGER end;
 
-	Thread_Package packages[num_threads];
+	Thread_Package packages[_num_threads];
 #ifdef WINDOWS
-	void* threads[num_threads];
+	void* threads[_num_threads];
 #else
-	pthread_t threads[num_threads];
+	pthread_t threads[_num_threads];
 #endif
 };
 
@@ -88,12 +88,12 @@ World::World()
 	run=false;
 
 	// no threads have work yet
-	threads_finished_counter=num_threads;
+	threads_finished_counter=_num_threads;
 	
 	// no threads running
 	threads_running_counter=0;
 
-	for(int i=0;i<num_threads;i++)
+	for(int i=0;i<_num_threads;i++)
 	{
 		packages[i].id=i;
 		packages[i].world_ptr=this;
@@ -117,7 +117,7 @@ void* Thread_Loop(void* package_ptr)
 	World* world=((Thread_Package*)package_ptr)->world_ptr;
 	int id=((Thread_Package*)package_ptr)->id;
 
-	thread_id=id;
+	_thread_id=id;
 
 	Execution_Root* const exe=execution_root_ptr;
 	Interprocess_Engine* const iexe=interprocess_root_ptr;
@@ -129,7 +129,7 @@ void* Thread_Loop(void* package_ptr)
 	AtomicIncrement(&world->threads_running_counter);
 
 	// thread waits until all threads have left the finished queue to begin actual operation
-	while(world->threads_running_counter!=num_threads) SLEEP(0);
+	while(world->threads_running_counter!=_num_threads) SLEEP(0);
 	
 	while(world->run)
 	{
@@ -149,7 +149,7 @@ void* Thread_Loop(void* package_ptr)
 		AtomicIncrement(&world->threads_running_counter);
 
 		// thread waits until all threads have left the finished queue to begin actual operation
-		while(world->threads_running_counter!=num_threads) SLEEP(0);
+		while(world->threads_running_counter!=_num_threads) SLEEP(0);
 	}
 
 	return 0;
@@ -160,16 +160,16 @@ template<typename ComponentType>
 void Execution_Object::Load_Register(Conditional conditional,Event p_event,int start)	
 {
 	Revision starting_iteration;
-	starting_iteration.iteration=start;
-	starting_iteration.sub_iteration=0;
+	starting_iteration._iteration=start;
+	starting_iteration._sub_iteration=0;
 	
 	if(world_ptr->run)
 	{
-		if(starting_iteration.iteration <= iteration) starting_iteration.iteration=iteration+1;
+		if(starting_iteration._iteration <= _iteration) starting_iteration._iteration=_iteration+1;
 
 		Revision this_revision;
-		this_revision.iteration=iteration;
-		this_revision.sub_iteration=sub_iteration;
+		this_revision._iteration=_iteration;
+		this_revision._sub_iteration=_sub_iteration;
 
 		// Following makes EX aware, can catch EX in 2 states which are handled identically: A) Pre-Update B) Mid-Update
 		
@@ -214,7 +214,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 
 			if(execution_type->tex_next_revision == this_revision)
 			{
-				// we are slated to visit this iteration, cannot be post-update as this would be invalid
+				// we are slated to visit this _iteration, cannot be post-update as this would be invalid
 			
 				if(starting_iteration < execution_type->tex_next_next_revision)
 				{
@@ -229,11 +229,11 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 
 				if(starting_iteration < execution_type->tex_next_revision)
 				{
-					// we will not otherwise be updated this revision
+					// we will not otherwise be updated this _revision
 
 					execution_type->tex_next_revision=starting_iteration;
-					execution_type->tex_next_next_revision.iteration=LONG_MAX;
-					execution_type->tex_next_next_revision.sub_iteration=0;
+					execution_type->tex_next_next_revision._iteration=LONG_MAX;
+					execution_type->tex_next_next_revision._sub_iteration=0;
 					}
 			}
 		}
@@ -252,7 +252,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		
 		int dist=(int)(_this-(Byte*)memory_root_ptr->pages);
 
-		_this=((dist/Page_Size)*Page_Size+(Byte*)memory_root_ptr->pages);
+		_this=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
 		
 		// finally, cast to PTEX
 		Typed_Execution_Page<ComponentType>* execution_page=(Typed_Execution_Page<ComponentType>*)_this;
@@ -273,7 +273,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		
 		if(execution_page->ptex_next_revision == this_revision)
 		{
-			// we are slated to visit this iteration, cannot be post-update as this would be invalid
+			// we are slated to visit this _iteration, cannot be post-update as this would be invalid
 			
 			if(starting_iteration < execution_page->ptex_next_next_revision)
 			{
@@ -283,22 +283,22 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		}
 		else
 		{
-			// we will not be otherwise updated this revision
+			// we will not be otherwise updated this _revision
 
 			if(starting_iteration < execution_page->ptex_next_revision)
 			{
 				execution_page->ptex_next_revision=starting_iteration;
-				execution_page->ptex_next_next_revision.iteration=LONG_MAX;
-				execution_page->ptex_next_next_revision.sub_iteration=0;
+				execution_page->ptex_next_next_revision._iteration=LONG_MAX;
+				execution_page->ptex_next_next_revision._sub_iteration=0;
 			}
 		}
 
 		execution_page->ptex_lock=0; // unlock the page
 
 		// Following makes OPTEX aware
-		// there should be no problem making this assignment as it doesn't matter whether it is acknowledged or not this revision
+		// there should be no problem making this assignment as it doesn't matter whether it is acknowledged or not this _revision
 		
-		next_iteration=starting_iteration.iteration;
+		next_iteration=starting_iteration._iteration;
 		
 
 		//============================END==========================
@@ -312,8 +312,8 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		if(starting_iteration <= execution_root_ptr->ex_next_revision)
 		{
 			execution_root_ptr->ex_next_revision=starting_iteration;
-			execution_root_ptr->ex_next_next_revision.iteration=LONG_MAX;
-			execution_root_ptr->ex_next_next_revision.sub_iteration=0;
+			execution_root_ptr->ex_next_next_revision._iteration=LONG_MAX;
+			execution_root_ptr->ex_next_next_revision._sub_iteration=0;
 		}
 		else if(starting_iteration < execution_root_ptr->ex_next_next_revision)
 		{
@@ -327,8 +327,8 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		if(starting_iteration <= execution_type->tex_next_revision)
 		{
 			execution_type->tex_next_revision=starting_iteration;
-			execution_type->tex_next_next_revision.iteration=LONG_MAX;
-			execution_type->tex_next_next_revision.sub_iteration=0;
+			execution_type->tex_next_next_revision._iteration=LONG_MAX;
+			execution_type->tex_next_next_revision._sub_iteration=0;
 		}
 		else if(starting_iteration < execution_type->tex_next_next_revision)
 		{
@@ -339,14 +339,14 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		// Must first locate PTEX corresponding to self
 		Byte* _this=(Byte*)this;
 		int dist=(int)(_this-(Byte*)memory_root_ptr->pages);
-		_this=((dist/Page_Size)*Page_Size+(Byte*)memory_root_ptr->pages);
+		_this=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
 		Typed_Execution_Page<ComponentType>* execution_page=(Typed_Execution_Page<ComponentType>*)_this;
 
 		if(starting_iteration <= execution_page->ptex_next_revision)
 		{
 			execution_page->ptex_next_revision=starting_iteration;
-			execution_page->ptex_next_next_revision.iteration=LONG_MAX;
-			execution_page->ptex_next_next_revision.sub_iteration=0;
+			execution_page->ptex_next_next_revision._iteration=LONG_MAX;
+			execution_page->ptex_next_next_revision._sub_iteration=0;
 		}
 		else if(starting_iteration < execution_page->ptex_next_next_revision)
 		{
@@ -354,7 +354,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		}
 
 
-		next_iteration=starting_iteration.iteration;
+		next_iteration=starting_iteration._iteration;
 	}
 	
 

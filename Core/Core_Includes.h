@@ -64,6 +64,8 @@ class NULLCLASS{};
 
 #define nullptr NULL
 
+#define none true
+
 struct NULLTYPE{};
 
 template<typename A> struct NULLTEMPLATE{};
@@ -73,19 +75,19 @@ struct UNKNOWN{};
 
 class NC{};
 
-typedef char Page[Page_Size];
+typedef char Page[_Page_Size];
 
 static volatile long long* request_sum=new volatile long long();
 static volatile long long* exec_sum=new volatile long long();
 
 #ifdef WINDOWS
-__declspec(thread) int thread_id;
+__declspec(thread) int _thread_id;
 #else
-int thread_id;
+int _thread_id;
 #endif
 
-static int num_partitions=0;
-static int host_rank=0;
+static int _num_partitions=0;
+static int _host_rank=0;
 
 typedef char Byte;
 
@@ -109,31 +111,31 @@ struct Conditional_Response
 
 union Revision
 {
-	Revision():revision(0){};
-	Revision(long sub_revision,long revision):sub_iteration(sub_revision),iteration(revision){};
-	Revision(Revision& copy):revision(copy.revision){};
+	Revision():_revision(0){};
+	Revision(long sub_revision,long revision):_sub_iteration(sub_revision),_iteration(revision){};
+	Revision(Revision& copy):_revision(copy._revision){};
 
-	inline void operator = (const long long val){revision=val;}
-	inline operator long long&(){return revision;}
+	inline void operator = (const long long val){_revision=val;}
+	inline operator long long&(){return _revision;}
 #ifdef WINDOWS
 	struct
 	{
-		long sub_iteration;
-		long iteration;
+		long _sub_iteration;
+		long _iteration;
 	};
 #else
 	struct
 	{
-		long iteration;
-		long sub_iteration;
+		long _iteration;
+		long _sub_iteration;
 	};
 #endif
-	long long revision;
+	long long _revision;
 };
 
-static Revision revision;
-static long& sub_iteration=revision.sub_iteration;
-static long& iteration=revision.iteration;
+static Revision _revision;
+static long& _sub_iteration=_revision._sub_iteration;
+static long& _iteration=_revision._iteration;
 
 typedef void (*Conditional)(void*,Conditional_Response&);
 
@@ -145,18 +147,46 @@ typedef void (*Conditional)(void*,Conditional_Response&);
 
 #define PRINT(X) cout << X << endl;
 
+#define START() world->Start_Turning()
 
 ///============================================================================
-/// all_components - type singletons for all compiled components
+/// _all_components - type singletons for all compiled components
 ///============================================================================
 
-static vector<void*> all_components;
+static vector<void*> _all_components;
 
-static int component_counter;
+static int _component_counter;
 
 template<typename SingletonType>
 static SingletonType* Add_Component_Singleton(SingletonType* val)
 {
-	all_components.push_back(val);
+	_all_components.push_back(val);
 	return val;
 }
+
+
+
+
+#ifdef DEBUG_1
+#define debug_1(MESSAGE) cout << MESSAGE
+#else
+#define debug_1(MESSAGE) 
+#endif
+
+#ifdef DEBUG_2
+#undef debug_1
+#define debug_1(MESSAGE) cout << MESSAGE
+#define debug_2(MESSAGE) cout << MESSAGE
+#else
+#define debug_2(MESSAGE) 
+#endif
+
+#ifdef DEBUG_3
+#undef debug_1
+#undef debug_2
+#define debug_1(MESSAGE) cout << MESSAGE
+#define debug_2(MESSAGE) cout << MESSAGE
+#define debug_3(MESSAGE) cout << MESSAGE
+#else
+#define debug_3(MESSAGE) 
+#endif

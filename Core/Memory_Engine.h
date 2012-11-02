@@ -19,16 +19,16 @@ public:
 	Memory_Root()
 	{
 #ifdef WINDOWS
-		pages=(Memory_Page*)VirtualAlloc(nullptr,Page_Size*Max_Pages,MEM_COMMIT,PAGE_READWRITE);
+		pages=(Memory_Page*)VirtualAlloc(nullptr,_Page_Size*_Max_Pages,MEM_COMMIT,PAGE_READWRITE);
 #else
-		pages=(Memory_Page*)malloc(Page_Size*Max_Pages);
+		pages=(Memory_Page*)malloc(_Page_Size*_Max_Pages);
 #endif
-		end_page=pages+Max_Pages;
+		end_page=pages+_Max_Pages;
 		first_free_page=pages;
 		
 		Memory_Page* current_page=first_free_page;
 
-		for(int i=0;i<Max_Pages;i++)
+		for(int i=0;i<_Max_Pages;i++)
 		{
 			current_page->next_free_page=current_page+1;
 			current_page++;

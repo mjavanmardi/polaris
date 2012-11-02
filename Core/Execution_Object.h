@@ -38,9 +38,9 @@ struct Execution_Object
 
 	inline Revision&& object_next_check()
 	{
-		if(next_iteration==iteration)
+		if(next_iteration==_iteration)
 		{
-			return Revision(sub_iteration+1,next_iteration);
+			return Revision(_sub_iteration+1,next_iteration);
 		}
 		else
 		{
@@ -77,13 +77,13 @@ struct Execution_Object
 	//template<typename ComponentType>
 	//inline long type_current_revision()
 	//{
-	//	return allocator_template<ComponentType>::allocator_reference.current_revision.iteration;
+	//	return allocator_template<ComponentType>::allocator_reference.current_revision._iteration;
 	//}
 
 	//template<typename ComponentType>
 	//inline long type_next_revision()
 	//{
-	//	return allocator_template<ComponentType>::allocator_reference.next_revision.iteration;
+	//	return allocator_template<ComponentType>::allocator_reference.next_revision._iteration;
 	//}	
 	
 	__forceinline void Swap_Event(Event new_event)
@@ -130,7 +130,7 @@ void Execution_Loop(void* page_in, Revision& ptex_response)
 	
 	const Bytes<stride>* const __restrict end_page=page+iterations;
 	
-	const int this_iteration=iteration;
+	const int this_iteration=_iteration;
 	
 	Conditional_Response optex_response;
 	
@@ -151,9 +151,9 @@ void Execution_Loop(void* page_in, Revision& ptex_response)
 			((Execution_Object*)page)->current_revision=this_iteration;
 		}
 
-		if(((Execution_Object*)page)->next_iteration < ptex_response.iteration)
+		if(((Execution_Object*)page)->next_iteration < ptex_response._iteration)
 		{
-			ptex_response.iteration=((Execution_Object*)page)->next_iteration;
+			ptex_response._iteration=((Execution_Object*)page)->next_iteration;
 		}
 	}
 	while(++page<end_page);

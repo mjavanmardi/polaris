@@ -14,13 +14,13 @@ struct Typed_Execution_Page
 	{
 		first_free_cell=(Execution_Object*)((Byte*)this+sizeof(Typed_Execution_Page<DataType>));
 		const int stride=sizeof(DataType);
-		const int num_cells=(Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType);
+		const int num_cells=(_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType);
 		
 		ptex_current_revision=-1;
-		ptex_next_revision.iteration=LONG_MAX;
-		ptex_next_revision.sub_iteration=0;
-		ptex_next_next_revision.iteration=LONG_MAX;
-		ptex_next_next_revision.sub_iteration=0;
+		ptex_next_revision._iteration=LONG_MAX;
+		ptex_next_revision._sub_iteration=0;
+		ptex_next_next_revision._iteration=LONG_MAX;
+		ptex_next_next_revision._sub_iteration=0;
 		ptex_lock=0;
 		ptex_threads_counter=0;
 
@@ -67,17 +67,17 @@ template<typename DataType>
 class Typed_Execution_Pages
 {
 public:
-	Typed_Execution_Pages(Execution_Directive execution_function=(Execution_Directive)Execution_Loop<(Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType),sizeof(DataType)>):stride(sizeof(DataType)),type_activated(false),
-	num_cells((Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType)),
+	Typed_Execution_Pages(Execution_Directive execution_function=(Execution_Directive)Execution_Loop<(_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType),sizeof(DataType)>):stride(sizeof(DataType)),type_activated(false),
+	num_cells((_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType)),
 	process_directive(execution_function)
 	{
 		tex_lock=0;
 		
 		tex_current_revision=-1;
-		tex_next_revision.iteration=LONG_MAX;
-		tex_next_revision.sub_iteration=0;
-		tex_next_next_revision.iteration=LONG_MAX;
-		tex_next_next_revision.sub_iteration=0;
+		tex_next_revision._iteration=LONG_MAX;
+		tex_next_revision._sub_iteration=0;
+		tex_next_next_revision._iteration=LONG_MAX;
+		tex_next_next_revision._sub_iteration=0;
 		
 		//event_register=nullptr;
 		//conditional_register=nullptr;
@@ -104,14 +104,14 @@ public:
 
 	//__forceinline int next_iteration()
 	//{
-	//	return tex_next_next_revision.iteration;
+	//	return tex_next_next_revision._iteration;
 	//}
 	
 	void Process(Revision& tex_response)
 	{
 		Revision this_revision;
-		this_revision.sub_iteration = sub_iteration;
-		this_revision.iteration = iteration;
+		this_revision._sub_iteration = _sub_iteration;
+		this_revision._iteration = _iteration;
 
 		typename list<Typed_Execution_Page<DataType>*>::iterator itr;
 
@@ -129,7 +129,7 @@ public:
 
 			if(process == 1)
 			{
-				// allow one thread into this page per iteration / sub_iteration				
+				// allow one thread into this page per _iteration / _sub_iteration				
 				
 				Revision ptex_response=execution_page->ptex_next_revision;
 
@@ -141,9 +141,9 @@ public:
 					
 					(*process_directive)(current_page,ptex_response);
 					
-					// extend shorthand iteration to include sub_iteration
-					if(ptex_response.iteration == this_revision.iteration) ptex_response.sub_iteration=this_revision.sub_iteration+1;
-					else ptex_response.sub_iteration=0;
+					// extend shorthand _iteration to include _sub_iteration
+					if(ptex_response._iteration == this_revision._iteration) ptex_response._sub_iteration=this_revision._sub_iteration+1;
+					else ptex_response._sub_iteration=0;
 					
 					while(AtomicExchange(&execution_page->ptex_lock,1)) SLEEP(0); // lock the page
 					
@@ -156,8 +156,8 @@ public:
 					
 					execution_page->ptex_current_revision=this_revision;
 					execution_page->ptex_next_revision=execution_page->ptex_next_next_revision;
-					execution_page->ptex_next_next_revision.iteration=LONG_MAX;
-					execution_page->ptex_next_next_revision.sub_iteration=0;
+					execution_page->ptex_next_next_revision._iteration=LONG_MAX;
+					execution_page->ptex_next_next_revision._sub_iteration=0;
 					
 					execution_page->ptex_lock=0; // unlock the page
 				}
@@ -168,7 +168,7 @@ public:
 				}
 			}
 			
-			if(process == num_threads)
+			if(process == _num_threads)
 			{
 				execution_page->ptex_threads_counter=0;
 			}

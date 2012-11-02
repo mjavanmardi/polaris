@@ -1,13 +1,15 @@
 #pragma once
 
 
-static const unsigned int Megabytes_To_Allocate=100;
-static const unsigned int num_iterations=1;
-static const int num_threads=1;
+static const unsigned int _Megabytes_To_Allocate=100;
+static const unsigned int _num_iterations=1;
+static const int _num_threads=1;
 
-static const int Max_Message_Size=5*1048576;
+static const int _Max_Message_Size=5*1048576;
 
-static const int Page_Size=4096;
-static const unsigned int Max_Pages=(Megabytes_To_Allocate*1048576)/Page_Size;
+static const int _Page_Size=4096;
+static const unsigned int _Max_Pages=(_Megabytes_To_Allocate*1048576)/_Page_Size;
 
 #define STATE_CHECKS 0
+
+#define DEBUG_3

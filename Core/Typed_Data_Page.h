@@ -13,7 +13,7 @@ struct Typed_Data_Page
 	{
 		first_free_cell=(Data_Object*)((Byte*)this+sizeof(Typed_Data_Page<DataType>));
 		const int stride=sizeof(DataType);
-		const int num_cells=(Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType);
+		const int num_cells=(_Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType);
 
 		Data_Object* current_cell=first_free_cell;
 
@@ -68,7 +68,7 @@ template<typename DataType>
 class Typed_Data_Pages
 {
 public:
-	Typed_Data_Pages():stride(sizeof(DataType)),num_cells((Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType))
+	Typed_Data_Pages():stride(sizeof(DataType)),num_cells((_Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType))
 	{
 		mem_lock=0;
 	}
@@ -137,7 +137,7 @@ public:
 //	{
 //		first_free_cell=(Data_Object<DataType>*)((Byte*)this+sizeof(Typed_Data_Page<DataType>));
 //		const int stride=sizeof(DataType);
-//		const int num_cells=(Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType);
+//		const int num_cells=(_Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType);
 //
 //		Data_Object<DataType>* current_cell=first_free_cell;
 //
@@ -192,7 +192,7 @@ public:
 //class Typed_Data_Pages
 //{
 //public:
-//	Typed_Data_Pages():stride(sizeof(DataType)),num_cells((Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType)){};
+//	Typed_Data_Pages():stride(sizeof(DataType)),num_cells((_Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType)){};
 //
 //	DataType* Allocate(void* argument)
 //	{
@@ -246,7 +246,7 @@ public:
 //
 //	void Free(void* value)
 //	{
-//		Typed_Data_Page<DataType>* typed_data_page=(Typed_Data_Page<DataType>*)(memory_root_ptr->pages+((Byte*)value-(Byte*)memory_root_ptr->pages)/Page_Size);
+//		Typed_Data_Page<DataType>* typed_data_page=(Typed_Data_Page<DataType>*)(memory_root_ptr->pages+((Byte*)value-(Byte*)memory_root_ptr->pages)/_Page_Size);
 //
 //		if(typed_data_page->first_free_cell==(Data_Object<DataType>*)(((Byte*)typed_data_page+sizeof(Typed_Data_Page<DataType>))+num_cells*stride))
 //		{

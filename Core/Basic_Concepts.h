@@ -30,23 +30,22 @@ struct False_Concept
 
 concept Is_Polaris_Component
 {
-	begin_requirements_list(none);
+	requires_typename_defined(has_this_type,This_Type);
+	requires_typename_defined(has_parent_type,Parent_Type);
+	requires_typename_defined(has_group_list,Group_List);
+	requires_typename_defined(has_object_type,Object_Type);
+	requires_typename_defined(has_master_type,Master_Type);
 
-	requires_typename_defined(none,This_Type,"Type is not self-aware");
-	requires_typename_defined(This_Type,Parent_Type,"Type is not aware of parent type");
-	requires_typename_defined(Parent_Type,Group_List,"Type is not aware of group list");
-	requires_typename_defined(Group_List,Object_Type,"Type is not aware of object type");
-	requires_typename_defined(Object_Type,Master_Type,"Type is not aware of master type");
-
-	end_requirements_list(Master_Type);
+	define_default_check(has_this_type && has_parent_type && has_group_list && has_object_type && has_master_type);
 };
 
+/*
 concept Is_Polaris_Prototype
 {
 	begin_requirements_list (none);
-	requires_typename_defined(none, Component_Type,"Type does not have Component_Type defined.");
-	requires_typename_defined(Component_Type, Caller_Type,"Type does not have Caller_Type defined.");
-	requires_typename_state(Caller_Type, Is_Prototype, true_type,"Type is not a Polaris_Prototype.");
+	requires_typename_defined(none, Component_Type,"Type does not have Component_Type defined");
+	requires_typename_defined(Component_Type, Caller_Type,"Type does not have Caller_Type defined");
+	requires_typename_state(Caller_Type, Is_Prototype, true_type,"Type is not a Polaris_Prototype, did you remember to add the macro \"tag_as_prototype()\" in the body of this class's definition");
 	end_requirements_list(Is_Prototype);
 };
 
@@ -135,7 +134,7 @@ concept Is_Same_Component
 	end_requirements_list(This_Type);
 };
 
-
+*/
 /////============================================================================
 ///// Is_Property - check whether component may be owned
 /////============================================================================

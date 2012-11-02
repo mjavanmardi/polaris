@@ -1,22 +1,22 @@
 #pragma once
 #include "Interprocess_Structures.h"
 
-typedef void (*Handler)(void*,char*);
+typedef void (*Communication_Handler)(void*,char*);
 
 struct Communication_Object
 {
-	__forceinline void Swap_Handler(Handler new_handler)
+	__forceinline void Swap_Communication_Handler(Communication_Handler new_communication_handler)
 	{
-		handler_register=new_handler;
+		communication_handler_register=new_communication_handler;
 	}
 	
 	template<typename ComponentType>
-	void Load_Register(Handler handler)
+	void Load_Register(Communication_Handler communication_handler)
 	{
-		handler_register=handler;
+		communication_handler_register=communication_handler;
 	}
 
-	Handler handler_register;
+	Communication_Handler communication_handler_register;
 };
 
 #ifdef WINDOWS
@@ -76,8 +76,8 @@ public:
 		//for(itr=all_ips.begin();itr!=all_ips.end();itr++) cout << "one other ip is: " << (*itr) << endl;
 		
 		
-		determine_ranks(all_ips,rank_to_ip,host_ip,host_rank);
-		//cout << "host_rank is: " << host_rank << endl;
+		determine_ranks(all_ips,rank_to_ip,host_ip,_host_rank);
+		//cout << "_host_rank is: " << _host_rank << endl;
 		
 		//unordered_map<int,string>::iterator mitr;
 		
@@ -95,7 +95,7 @@ public:
 			
 			for(mitr=rank_to_ip.begin();mitr!=rank_to_ip.end();mitr++)
 			{
-				if(mitr->first!=host_rank)
+				if(mitr->first!=_host_rank)
 				{
 					s << "ssh " << mitr->second << " 'cd POLARIS && export PBS_JOBID=" << job_name.c_str() << " && module load compiler/gcc471 && ./Core > Out_" << mitr->first << ".txt &' ";
 					
@@ -112,24 +112,24 @@ public:
 		
 		//msg_all_to_all();
 		
-		num_partitions=rank_to_ip.size();
+		_num_partitions=rank_to_ip.size();
 		
-		//cout << "Number of partitions: " << num_partitions << endl;
+		//cout << "Number of partitions: " << _num_partitions << endl;
 		
 		//cout << "Initializing exchange data" << endl;
 		
-		for(int i=0;i<num_threads;i++)
+		for(int i=0;i<_num_threads;i++)
 		{
-			exchange_information.thread_local_exchange_data[i]=new Exchange_Data[num_partitions];
+			exchange_information.thread_local_exchange_data[i]=new Exchange_Data[_num_partitions];
 		}
 		
-		exchange_information.partition_exchange_data=new Exchange_Data[num_partitions];
+		exchange_information.partition_exchange_data=new Exchange_Data[_num_partitions];
 		
 		// set an initial max message size for the exchange
 		
-		for(int i=0;i<num_partitions;i++)
+		for(int i=0;i<_num_partitions;i++)
 		{
-			exchange_information.partition_exchange_data[i].recv_buffer.allocate(Max_Message_Size);
+			exchange_information.partition_exchange_data[i].recv_buffer.allocate(_Max_Message_Size);
 		}
 		
 		//cout << "Done initializing exchange data" << endl;
@@ -324,7 +324,7 @@ public:
 
 		for(int i=0;i<rank_to_ip.size();i++)
 		{
-			if(i>host_rank)
+			if(i>_host_rank)
 			{
 				int connecting_socket=socket(AF_INET,SOCK_STREAM,0);
 				
@@ -336,7 +336,7 @@ public:
 				inet_aton(rank_to_ip[i].c_str(),(in_addr*)&server_socket_address.sin_addr.s_addr);
 				server_socket_address.sin_port = htons(40111);
 				
-				//cout << "connecting from: " << rank_to_ip[host_rank].c_str() << " to " << rank_to_ip[i+1].c_str() << endl;
+				//cout << "connecting from: " << rank_to_ip[_host_rank].c_str() << " to " << rank_to_ip[i+1].c_str() << endl;
 				
 				int connected=connect(connecting_socket,(struct sockaddr*) &server_socket_address, sizeof(server_socket_address) );
 				
@@ -350,7 +350,7 @@ public:
 				
 				rank_to_socket[i]=connecting_socket;
 			}
-			if(i<host_rank)
+			if(i<_host_rank)
 			{
 				//SLEEP(.1);
 				
@@ -386,11 +386,11 @@ public:
 		{
 			for(int receiver=0;receiver<rank_to_ip.size();receiver++)
 			{
-				if(receiver!=host_rank)
+				if(receiver!=_host_rank)
 				{
 					cout << "sending to " << receiver << endl;
 					
-					s << "Hello from " << host_rank << "\0";
+					s << "Hello from " << _host_rank << "\0";
 					
 					send(rank_to_socket[receiver],s.str().c_str(),s.str().size(),0);
 					
@@ -418,13 +418,13 @@ public:
 	{
 		// first, merge all of the messages by partition, use one thread for now in order to not confuse the FSB
 		
-		for(int i=0;i<num_partitions;i++)
+		for(int i=0;i<_num_partitions;i++)
 		{
 			Exchange_Data* partition_exchange_data=&exchange_information.partition_exchange_data[i];
 			
-			// consolidate message buffers should the exchange be happening this iteration
+			// consolidate message buffers should the exchange be happening this _iteration
 			
-			if(partition_exchange_data->current_exchange==iteration)
+			if(partition_exchange_data->current_exchange==_iteration)
 			{
 				//the head of the partition message buffer is reserved to contain the msg header
 				
@@ -432,7 +432,7 @@ public:
 				
 				((Head_Message_Base*)hbuf)->num_messages=0;
 				
-				for(int j=0;j<num_threads;j++)
+				for(int j=0;j<_num_threads;j++)
 				{
 					Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[j][i];
 					
@@ -480,7 +480,7 @@ public:
 	
 	void Send_Receive()
 	{
-		for(int i=0;i<num_partitions;i++)
+		for(int i=0;i<_num_partitions;i++)
 		{
 			Exchange_Data* partition_exchange_data=&exchange_information.partition_exchange_data[i];
 			
@@ -488,13 +488,13 @@ public:
 			
 			long process = AtomicIncrement(&partition_exchange_data->comm_lock);
 			
-			//cout << "\t\tstatus of exchange with " << i << ": " << (bool)(partition_exchange_data->current_exchange==iteration) << endl;
+			//cout << "\t\tstatus of exchange with " << i << ": " << (bool)(partition_exchange_data->current_exchange==_iteration) << endl;
 			
 			if(process == 1)
 			{
-				if(partition_exchange_data->current_exchange==iteration)
+				if(partition_exchange_data->current_exchange==_iteration)
 				{
-					//cout << "\t\tmid-check " << i << ":" << host_rank << endl;
+					//cout << "\t\tmid-check " << i << ":" << _host_rank << endl;
 					
 					// only process exchanges which are happening
 					
@@ -502,23 +502,23 @@ public:
 					
 					// initiate sends in rank order for those ranks which are smaller than you and receives for those ranks larger than you, self send is just a memcpy
 					
-					if(i < host_rank)
+					if(i < _host_rank)
 					{
-						//cout << "\t\t\t" << host_rank << " sending first to " << i << ": " << partition_exchange_data->send_buffer.size() << endl;
+						//cout << "\t\t\t" << _host_rank << " sending first to " << i << ": " << partition_exchange_data->send_buffer.size() << endl;
 						
 						send(rank_to_socket[i],partition_exchange_data->send_buffer.buffer(),partition_exchange_data->send_buffer.size(),0);
 						
-						recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer(),Max_Message_Size,0);
+						recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer(),_Max_Message_Size,0);
 					}
-					else if(i == host_rank)
+					else if(i == _host_rank)
 					{
 						memcpy(partition_exchange_data->recv_buffer.buffer(),partition_exchange_data->send_buffer.buffer(),partition_exchange_data->send_buffer.size());
 					}
 					else
 					{
-						//cout << "\t\t\t" << host_rank << " receiving first from " << i << ": " << partition_exchange_data->send_buffer.size() << endl;
+						//cout << "\t\t\t" << _host_rank << " receiving first from " << i << ": " << partition_exchange_data->send_buffer.size() << endl;
 						
-						recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer(),Max_Message_Size,0);
+						recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer(),_Max_Message_Size,0);
 						
 						send(rank_to_socket[i],partition_exchange_data->send_buffer.buffer(),partition_exchange_data->send_buffer.size(),0);
 					}
@@ -553,7 +553,7 @@ public:
 					partition_exchange_data->next_exchange = partition_exchange_data->next_next_exchange;
 					partition_exchange_data->next_next_exchange = INT_MAX;
 					
-					for(int j=0;j<num_threads;j++)
+					for(int j=0;j<_num_threads;j++)
 					{
 						// threads become as critical as the partition_exchange
 						
@@ -590,7 +590,7 @@ public:
 				}
 			}
 			
-			if(process == num_threads)
+			if(process == _num_threads)
 			{
 				partition_exchange_data->comm_lock=0;
 			}
@@ -599,11 +599,11 @@ public:
 
 	void Update_Global_Exchange_Schedule()
 	{
-		// quickly sync the partition exchange iteration before processing
+		// quickly sync the partition exchange _iteration before processing
 		
 		Exchange_Data* partition_exchange_data;
 		
-		for(int i=0;i<num_partitions;i++)
+		for(int i=0;i<_num_partitions;i++)
 		{
 			partition_exchange_data=&exchange_information.partition_exchange_data[i];
 			
@@ -630,7 +630,7 @@ public:
 		
 		// first determine roughly how many threads per message
 		
-		int msg_ratio=process_data->num_messages_total/num_threads;
+		int msg_ratio=process_data->num_messages_total/_num_threads;
 		
 		//cout << "\t\t" << "msg ratio: " << msg_ratio << endl;
 		
@@ -648,7 +648,7 @@ public:
 
 			// target is to have 5 parcels per thread, first see if the number of messages will fit evenly into this number of parcels
 			
-			min_parcels=5*num_threads;
+			min_parcels=5*_num_threads;
 		}
 		else
 		{
@@ -656,7 +656,7 @@ public:
 			
 			// target is to have msg_ratio parcels per thread, first see if the number of messages will fit evenly into this number of parcels
 			
-			min_parcels = msg_ratio*num_threads;			
+			min_parcels = msg_ratio*_num_threads;			
 		}
 		
 		
@@ -741,13 +741,13 @@ public:
 				{
 					// locate the type singleton and submit the message
 
-					(*((Communication_Object*)all_components[((Message_Base*)current_position)->type_index])->handler_register)(all_components[((Message_Base*)current_position)->type_index],current_position+sizeof(Message_Base));
+					(*((Communication_Object*)_all_components[((Message_Base*)current_position)->type_index])->communication_handler_register)(_all_components[((Message_Base*)current_position)->type_index],current_position+sizeof(Message_Base));
 					current_position+=((Message_Base*)current_position)->length;
 				}
 				
 			}
 			
-			if(process == num_threads)
+			if(process == _num_threads)
 			{
 				process_data->process_data_lock=0;
 			}
@@ -756,7 +756,7 @@ public:
 
 	void Exchange()
 	{
-		bool exchange_this_iteration = (exchange_information.current_exchange == iteration);
+		bool exchange_this_iteration = (exchange_information.current_exchange == _iteration);
 		
 		//cout << "entering exchange: " << exchange_this_iteration << endl;
 		
@@ -773,7 +773,7 @@ public:
 					//cout << "\tmessages merged" << endl;
 				}
 				
-				if(ipc_threads_counter_A==num_threads)
+				if(ipc_threads_counter_A==_num_threads)
 				{
 					ipc_threads_counter_A=0;
 				}
@@ -790,7 +790,7 @@ public:
 
 			//cout << "\tdone sending and receiving" << endl;
 			
-			if(ipc_threads_counter_B==num_threads)
+			if(ipc_threads_counter_B==_num_threads)
 			{
 				ipc_threads_counter_B=0;
 			}
@@ -816,7 +816,7 @@ public:
 					//cout << "\tdone building parcels" << endl;
 				}
 				
-				if(ipc_threads_counter_A==num_threads)
+				if(ipc_threads_counter_A==_num_threads)
 				{
 					ipc_threads_counter_A=0;
 				}
@@ -837,7 +837,7 @@ public:
 			
 			//cout << "\tdone processing" << endl;
 			
-			if(ipc_threads_counter_B==num_threads)
+			if(ipc_threads_counter_B==_num_threads)
 			{
 				ipc_threads_counter_B=0;
 				
@@ -851,7 +851,7 @@ public:
 			exchange_information.current_exchange=exchange_information.next_exchange;
 			exchange_information.next_exchange=INT_MAX;
 			
-			exchange_this_iteration = (exchange_information.current_exchange == iteration);
+			exchange_this_iteration = (exchange_information.current_exchange == _iteration);
 			
 			//cout << "\t" << "exchange again? " << exchange_this_iteration << endl << endl << endl;
 			

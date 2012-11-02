@@ -8,7 +8,7 @@
 template<typename ComponentType,typename Added_Group>
 struct Add_Group:public ComponentType
 {
-	assert_requirements(ComponentType,Is_Polaris_Component,"Cannot add group to non-POLARIS component!");
+	assert_default_check(ComponentType,Is_Polaris_Component,"Cannot add group to non-POLARIS component!");
 	typedef typename RemoveDuplicates<typename Append<typename ComponentType::Group_List,Added_Group>::Result>::Result Group_List;
 	typedef Add_Group This_Type;
 };
@@ -20,7 +20,7 @@ struct Add_Group:public ComponentType
 template<typename ComponentType,typename Removed_Group>
 struct Remove_Group:public ComponentType
 {
-	assert_requirements(ComponentType,Is_Polaris_Component,"Cannot remove group from non-POLARIS component!");
+	assert_default_check(ComponentType,Is_Polaris_Component,"Cannot remove group from non-POLARIS component!");
 	typedef typename Erase<typename ComponentType::Group_List,Removed_Group>::Result Group_List;
 	typedef Remove_Group This_Type;
 };
@@ -32,6 +32,6 @@ struct Remove_Group:public ComponentType
 template<typename ComponentType,typename Checked_Group>
 struct Check_Group
 {
-	assert_requirements(ComponentType,Is_Polaris_Component,"Cannot check group in non-POLARIS component!");
+	assert_default_check(ComponentType,Is_Polaris_Component,"Cannot check group in non-POLARIS component!");
 	typedef typename ValidIndex<IndexOf<typename ComponentType::Group_List,Checked_Group>::value>::type type;
 };

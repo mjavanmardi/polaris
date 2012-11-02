@@ -52,7 +52,7 @@ struct Exchange_Information
 	Exchange_Information():partition_exchange_data(nullptr),current_exchange(0),next_exchange(INT_MAX){};
 	
 	Exchange_Data* partition_exchange_data;
-	Exchange_Data* thread_local_exchange_data[num_threads];
+	Exchange_Data* thread_local_exchange_data[_num_threads];
 	
 	int current_exchange;
 	int next_exchange;
@@ -78,7 +78,7 @@ struct Message_Base
 template<typename ComponentType>
 void Send_Message(void* msg,int msg_length,int destination,int next_exchange)
 {
-	Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[thread_id][destination];
+	Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[_thread_id][destination];
 
 	// cannot affect current_exchange, but will help determine next_exchange
 	
@@ -120,11 +120,11 @@ void Send_Message(void* msg,int msg_length,int destination,int next_exchange)
 template<typename ComponentType>
 void Broadcast_Message(void* msg,int msg_length,int next_exchange)
 {
-	for(int i=0;i<num_partitions;i++)
+	for(int i=0;i<_num_partitions;i++)
 	{
-		if(i==host_rank) continue;
+		if(i==_host_rank) continue;
 		
-		Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[thread_id][i];
+		Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[_thread_id][i];
 
 		// cannot affect current_exchange, but will help determine next_exchange
 		

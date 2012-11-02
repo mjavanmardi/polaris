@@ -13,10 +13,10 @@ public:
 	Execution_Root()
 	{
 		ex_current_revision=-1;
-		ex_next_revision.iteration=LONG_MAX;
-		ex_next_revision.sub_iteration=0;
-		ex_next_next_revision.iteration=LONG_MAX;
-		ex_next_next_revision.sub_iteration=0;
+		ex_next_revision._iteration=LONG_MAX;
+		ex_next_revision._sub_iteration=0;
+		ex_next_next_revision._iteration=LONG_MAX;
+		ex_next_next_revision._sub_iteration=0;
 
 		ex_lock=0;
 
@@ -37,11 +37,11 @@ public:
 
 	void Process()
 	{
-		// log the current revision
+		// log the current _revision
 
 		Revision this_revision;
-		this_revision.sub_iteration = sub_iteration;
-		this_revision.iteration = iteration;
+		this_revision._sub_iteration = _sub_iteration;
+		this_revision._iteration = _iteration;
 
 		// you are guaranteed that EX::next_revision will not change until the final thread has finished this EX
 
@@ -77,13 +77,13 @@ public:
 							execution_type->tex_next_next_revision=tex_response;
 						}
 
-						if(++execution_type->tex_threads_counter == num_threads)
+						if(++execution_type->tex_threads_counter == _num_threads)
 						{
-							// final thread, in charge of getting ready for the next revision, but only if something actually happened this revision
+							// final thread, in charge of getting ready for the next _revision, but only if something actually happened this _revision
 							execution_type->tex_current_revision=this_revision;
 							execution_type->tex_next_revision=execution_type->tex_next_next_revision;
-							execution_type->tex_next_next_revision.iteration=LONG_MAX;
-							execution_type->tex_next_next_revision.sub_iteration=0;
+							execution_type->tex_next_next_revision._iteration=LONG_MAX;
+							execution_type->tex_next_next_revision._sub_iteration=0;
 							execution_type->tex_threads_counter=0;
 						}
 
@@ -110,17 +110,17 @@ public:
 			
 			ex_lock=0; // unlock the execution engine
 			
-			// collect all threads and advance the sub_iteration
+			// collect all threads and advance the _sub_iteration
 			
-			if(AtomicIncrement(&ex_threads_counter_begin) == num_threads)
+			if(AtomicIncrement(&ex_threads_counter_begin) == _num_threads)
 			{
 				ex_current_revision=this_revision;
 				ex_next_revision=ex_next_next_revision;
-				ex_next_next_revision.iteration=LONG_MAX;
-				ex_next_next_revision.sub_iteration=0;
+				ex_next_next_revision._iteration=LONG_MAX;
+				ex_next_next_revision._sub_iteration=0;
 
 				sub_tick_tock=!sub_tick_tock;
-				sub_iteration++;
+				_sub_iteration++;
 
 				ex_threads_counter_begin=0;
 			}
@@ -129,15 +129,15 @@ public:
 				while(AtomicCompareExchange(&ex_threads_counter_begin,0,0)) SLEEP(0);
 			}
 			
-			this_revision.sub_iteration = sub_iteration;
-			this_revision.iteration = iteration;
+			this_revision._sub_iteration = _sub_iteration;
+			this_revision._iteration = _iteration;
 			
 			if(ex_next_revision == this_revision)
 			{
-				// if the iteration will be repeated, make sure all threads are collected before starting the new loop
+				// if the _iteration will be repeated, make sure all threads are collected before starting the new loop
 				// this prevents threads from getting stuck in the previous AtomicCompareExchange
 
-				if(AtomicIncrement(&ex_threads_counter_end) == num_threads)
+				if(AtomicIncrement(&ex_threads_counter_end) == _num_threads)
 				{
 					ex_threads_counter_end=0;
 				}
