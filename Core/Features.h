@@ -307,49 +307,9 @@ struct member_function_ptr_types<Type,setter_type>
 		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
 
-
-
 ///============================================================================
-/// local definition macros TODO: change from FEATURE to FEATURE type in all macros, etc.
+/// polaris_variable / member_component_feature – PoDs with type tags
 ///============================================================================
-
-#define define_component_interface(COMPONENT_INTERFACE_ALIAS, FEATURE_TYPE, PROTOTYPE_TEMPLATE, CALLER_TYPE)\
-	typedef PROTOTYPE_TEMPLATE<FEATURE_TYPE,CALLER_TYPE> COMPONENT_INTERFACE_ALIAS
-
-#define define_container_and_value_interface(CONTAINER_ALIAS, VALUE_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_PROTOTYPE,CALLER_TYPE)\
-	typedef VALUE_PROTOTYPE<CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> VALUE_ALIAS;\
-	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,VALUE_ALIAS*> CONTAINER_ALIAS
-
-#define define_simple_container_interface(CONTAINER_PROTOTYPE, NON_LOCAL_FEATURE_LINKED_TO_CONTAINER_TYPE, CONTAINER_ALIAS, VALUE_TYPE, CALLER_TYPE)\
-	typedef CONTAINER_PROTOTYPE<CONTAINER_ALIAS##_type,CALLER_TYPE,VALUE_TYPE> CONTAINER_ALIAS
-
-#define type_of(FEATURE_NAME) FEATURE##_type // - use this
-
-
-
-
-template<class>
-struct prototype_yo
-{
-	feature_accessor(my_vec,none,none);
-
-	template<class>
-	void Test()
-	{
-		define_simple_container_interface(Polaris_Random_Access_Sequence_Prototype,type_of(my_vec),vec,int,NULLTYPE);
-
-		vec* hey;
-
-		hey->
-	}
-};
-
-template<class>
-struct implementation_yo
-{
-	member_container(vector<int>,my_vec,none,none);
-};
-
 
 #define polaris_variable(VARIABLE_NAME, VARIABLE_VALUE_TYPE, TYPE_TRAIT_TAGS,...) \
 struct VARIABLE_NAME \
@@ -376,11 +336,6 @@ struct VARIABLE_NAME \
 	VARIABLE_NAME& operator--(){Value = Value - 1; return *this;}  \
 };
 
-
-
-
-/// ADD RESTRICTIONS SO CAN ONLY BE USED WITHIN SAME ENTITY ///
-
 #define member_component_feature(FEATURE_NAME, MEMBER_COMPONENT_NAME, MEMBER_COMPONENT_FEATURE, MEMBER_COMPONENT_PROTOTYPE)\
 	define_get_set_exists_check(MEMBER_COMPONENT_NAME,get_##MEMBER_COMPONENT_NAME, set_##MEMBER_COMPONENT_NAME);\
 	template<typename ComponentType, typename CallerType, typename ReturnValueType>\
@@ -399,3 +354,22 @@ struct VARIABLE_NAME \
 	}\
 	tag_getter_as_available(FEATURE_NAME);\
 	tag_setter_as_available(FEATURE_NAME);
+	
+///============================================================================
+/// local definition macros
+///============================================================================
+
+#define define_component_interface(COMPONENT_INTERFACE_ALIAS, FEATURE_TYPE, PROTOTYPE_TEMPLATE, CALLER_TYPE)\
+	typedef PROTOTYPE_TEMPLATE<FEATURE_TYPE,CALLER_TYPE> COMPONENT_INTERFACE_ALIAS
+
+#define define_container_and_value_interface(CONTAINER_ALIAS, VALUE_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_PROTOTYPE,CALLER_TYPE)\
+	typedef VALUE_PROTOTYPE<CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> VALUE_ALIAS;\
+	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,VALUE_ALIAS*> CONTAINER_ALIAS
+
+#define define_simple_container_interface(CONTAINER_PROTOTYPE, NON_LOCAL_FEATURE_LINKED_TO_CONTAINER_TYPE, CONTAINER_ALIAS, VALUE_TYPE, CALLER_TYPE)\
+	typedef CONTAINER_PROTOTYPE<CONTAINER_ALIAS##_type,CALLER_TYPE,VALUE_TYPE> CONTAINER_ALIAS
+
+#define type_of(FEATURE_NAME) FEATURE##_type // - use this
+
+
+
