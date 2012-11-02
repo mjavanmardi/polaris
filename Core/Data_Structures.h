@@ -20,6 +20,11 @@ public:
 	{
 		return current_size;
 	}
+
+	int max()
+	{
+		return max_size;
+	}
 	
 	char* buffer()
 	{
@@ -28,37 +33,22 @@ public:
 
 	char* allocate(int byte_array_size)
 	{
-		//cout << "entering allocate" << endl;
-		
-		//cout << "\tcurrent_size: " << current_size << endl;
-		//cout << "\tmax_size: " << max_size << endl;
-		//cout << "\tbyte_array_size: " << byte_array_size << endl;
-
-		
 		if(current_size + byte_array_size > max_size)
 		{
-			//cout << "\t\texpanding bytes" << endl;
-		
 			max_size=(max_size+byte_array_size)*2;
-			
-			//cout << "\t\tmax_size: " << max_size << endl;
-			
+
 			char* new_bytes=new char[max_size];
 
 			memcpy(new_bytes,bytes,current_size);
-			
-			delete[] bytes;
-			
+
+			delete bytes;
+
 			bytes=new_bytes;
 		}
 		
 		char* retval=&bytes[current_size];
 
 		current_size+=byte_array_size;
-
-		//cout << "\tending current_size: " << current_size << endl;
-		
-		//cout << "leaving allocate" << endl;
 		
 		return retval;
 	}

@@ -1,8 +1,8 @@
 #pragma once
 
 
-static const unsigned int _Megabytes_To_Allocate=100;
-static const unsigned int _num_iterations=1;
+static const unsigned int _Megabytes_To_Allocate=500;
+static const unsigned int _num_iterations=10;
 static const int _num_threads=1;
 
 static const int _Max_Message_Size=5*1048576;

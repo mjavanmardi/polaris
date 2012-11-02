@@ -65,15 +65,15 @@ public:
 		
 		identify_others(job_name,all_names);
 		
-		//vector<string>::iterator itr;
-		//for(itr=all_names.begin();itr!=all_names.end();itr++) cout << "one other name is: " << (*itr) << endl;
+		vector<string>::iterator itr;
+		//for(itr=all_names.begin();itr!=all_names.end();itr++) cout << "one hostname is: " << (*itr) << endl;
 		
 		
 		
 		node_names_to_ip_addresses(all_names,all_ips,hostname,host_ip);
 		
 		//cout << "host_ip is: " << host_ip << endl;
-		//for(itr=all_ips.begin();itr!=all_ips.end();itr++) cout << "one other ip is: " << (*itr) << endl;
+		//for(itr=all_ips.begin();itr!=all_ips.end();itr++) cout << "one ip is: " << (*itr) << endl;
 		
 		
 		determine_ranks(all_ips,rank_to_ip,host_ip,_host_rank);
@@ -86,27 +86,40 @@ public:
 		//	cout << "one (rank,ip) combo is: (" << mitr->first << "," << mitr->second << ")" << endl;
 		//}
 		
-		
 		if(is_head_node)
 		{
 			stringstream s;
 			
 			unordered_map<int,string>::iterator mitr;
-			
-			for(mitr=rank_to_ip.begin();mitr!=rank_to_ip.end();mitr++)
+			int k=0;
+			for(mitr=rank_to_ip.begin();mitr!=rank_to_ip.end();mitr++,k++)
 			{
 				if(mitr->first!=_host_rank)
 				{
-					s << "ssh " << mitr->second << " 'cd POLARIS && export PBS_JOBID=" << job_name.c_str() << " && module load compiler/gcc471 && ./Core > Out_" << mitr->first << ".txt &' ";
+					SLEEP(.01);
+					//mitr->second
+					s << "ssh " << all_names[mitr->first] << " 'cd POLARIS && export PBS_JOBID=" << job_name.c_str() << " && export NOT_HEAD_NODE=1 && module load compiler/gcc471 && ./Core > Out_" << mitr->first << ".txt &' ";
 					
 					//cout << "opening child process: " << s.str() << endl;
-
+					
+					//FILE* from_cluster;
+					
 					popen(s.str().c_str(),"r");
 					
 					s.str("");
+					
+					//char buffer[255];for(int i=0;i<255;i++) buffer[i]=0;
+					
+					//fgets(buffer,255,from_cluster);
+					
+					//cout << "cluster response: " << buffer << endl;
 				}
 			}
 		}
+		
+		//cout << "done!" << endl;
+		
+		//SLEEP(1000);
 		
 		connect_all_to_all();
 		
@@ -133,8 +146,6 @@ public:
 		}
 		
 		//cout << "Done initializing exchange data" << endl;
-		
-		//SLEEP(1);
 	}
 	
 	void identify_job(string& jobname)
@@ -172,13 +183,13 @@ public:
 		
 		for(int i=0;i<255;i++) buffer[i]=0;
 		
-		from_cluster=popen("echo $PBS_JOBNAME", "r");
+		from_cluster=popen("echo $NOT_HEAD_NODE", "r");
 		
-		fgets(buffer,255,from_cluster);	
+		fgets(buffer,255,from_cluster);
 		
 		pclose(from_cluster);
 		
-		is_headnode=(buffer[0]!='\n');
+		is_headnode=(buffer[0]=='\n');
 	}
 	
 	void identify_others(string& jobname,vector<string>& allnames)
@@ -316,12 +327,12 @@ public:
 		
 		//cout << "bound: " << bound << endl;
 		
-		int listening=listen(listening_socket,100);
+		int listening=listen(listening_socket,120);
 		
-		SLEEP(1);
+		//SLEEP(1);
 		
 		//cout << "listening: " << listening << endl;	
-
+		
 		for(int i=0;i<rank_to_ip.size();i++)
 		{
 			if(i>_host_rank)
@@ -336,33 +347,32 @@ public:
 				inet_aton(rank_to_ip[i].c_str(),(in_addr*)&server_socket_address.sin_addr.s_addr);
 				server_socket_address.sin_port = htons(40111);
 				
-				//cout << "connecting from: " << rank_to_ip[_host_rank].c_str() << " to " << rank_to_ip[i+1].c_str() << endl;
+				//cout << "connecting from: " << rank_to_ip[_host_rank].c_str() << " to " << rank_to_ip[i].c_str() << endl;
+				
+				//SLEEP(1);
 				
 				int connected=connect(connecting_socket,(struct sockaddr*) &server_socket_address, sizeof(server_socket_address) );
 				
-				while(!connected)
+				while(connected != 0)
 				{
-					SLEEP(.1);
+					SLEEP(.5);
 					connected=connect(connecting_socket,(struct sockaddr*) &server_socket_address, sizeof(server_socket_address) );
+					//cout << rank_to_ip[_host_rank].c_str() << " to " << rank_to_ip[i].c_str() << " connection failed, retrying: " << strerror(errno) << endl;
 				}
 				
-				//cout << "connected: " << i << endl;
+				//cout << "connected: " << connecting_socket << endl;
 				
 				rank_to_socket[i]=connecting_socket;
 			}
 			if(i<_host_rank)
 			{
-				//SLEEP(.1);
+				//int listening=listen(listening_socket,128);
 				
+				//cout << rank_to_ip[_host_rank].c_str() << " waiting for connection from: " << rank_to_ip[i].c_str() << endl;	
+
 				int accepting_socket=accept(listening_socket,NULL,NULL);
 				
-				while(!accepting_socket)
-				{
-					SLEEP(.1);
-					accepting_socket=accept(listening_socket,NULL,NULL);
-				}
-				
-				//cout << "accepting: " << i << endl;
+				//cout << "accepting: " << accepting_socket << endl;
 				
 				rank_to_socket[i]=accepting_socket;
 			}
@@ -370,10 +380,10 @@ public:
 		
 		unordered_map<int,int>::iterator mitr;
 		
-		for(mitr=rank_to_socket.begin();mitr!=rank_to_socket.end();mitr++)
-		{
-			cout << "one (rank,socket) combo is: (" << mitr->first << "," << mitr->second << ")" << endl;
-		}
+		//for(mitr=rank_to_socket.begin();mitr!=rank_to_socket.end();mitr++)
+		//{
+		//	cout << "one (rank,socket) combo is: (" << mitr->first << "," << mitr->second << ")" << endl;
+		//}
 	}
 	
 	void msg_all_to_all()
@@ -436,6 +446,8 @@ public:
 				{
 					Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[j][i];
 					
+					//cout << "\t\t\tThread stats " << j << ": " << thread_exchange_data->num_messages << endl;
+					
 					//cout << "\t\t\tThread status " << i << ": " << thread_exchange_data->next_exchange << "," << thread_exchange_data->next_next_exchange << endl;
 					
 					// reconcile partition need to exchange with local need to exchange, current has been "set in stone" already
@@ -464,6 +476,7 @@ public:
 					
 					// done with thread local send buffer
 					
+					//cout << thread_exchange_data->send_buffer.size()  << "," << thread_exchange_data->send_buffer.max() << endl;
 					thread_exchange_data->send_buffer.clear();
 					thread_exchange_data->num_messages=0;
 				}
@@ -508,7 +521,28 @@ public:
 						
 						send(rank_to_socket[i],partition_exchange_data->send_buffer.buffer(),partition_exchange_data->send_buffer.size(),0);
 						
-						recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer(),_Max_Message_Size,0);
+						int recvd=recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer(),_Max_Message_Size,0);
+						
+						Head_Message_Base* head_msg=(Head_Message_Base*)partition_exchange_data->recv_buffer.buffer();
+						
+						int len_so_far=recvd;
+						int msg_len=head_msg->length;
+						
+						//cout << "\t\t\t" << "received initial message: " << head_msg->length << ", len_so_far " << recvd << endl;
+						
+						while(len_so_far<msg_len)
+						{
+							recvd=recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer()+len_so_far,_Max_Message_Size,0);
+							
+							if(recvd!=-1)
+							{
+								len_so_far+=recvd;
+								
+								//cout << "\t\t\t" << "received sub message: " << recvd << ", new len_so_far: " << len_so_far << endl;
+							}
+							
+							//SLEEP(.001);
+						}
 					}
 					else if(i == _host_rank)
 					{
@@ -518,8 +552,29 @@ public:
 					{
 						//cout << "\t\t\t" << _host_rank << " receiving first from " << i << ": " << partition_exchange_data->send_buffer.size() << endl;
 						
-						recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer(),_Max_Message_Size,0);
+						int recvd=recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer(),_Max_Message_Size,0);
 						
+						Head_Message_Base* head_msg=(Head_Message_Base*)partition_exchange_data->recv_buffer.buffer();
+						
+						int len_so_far=recvd;
+						int msg_len=head_msg->length;
+						
+						//cout << "\t\t\t" << "received initial message: " << head_msg->length << ", len_so_far " << recvd << endl;
+
+						while(len_so_far<msg_len)
+						{
+							recvd=recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer()+len_so_far,_Max_Message_Size,0);
+							
+							if(recvd!=-1)
+							{
+								len_so_far+=recvd;
+								
+								//cout << "\t\t\t" << "received sub message: " << recvd << ", new len_so_far: " << len_so_far << endl;
+							}
+							
+							//SLEEP(.001);
+						}
+												
 						send(rank_to_socket[i],partition_exchange_data->send_buffer.buffer(),partition_exchange_data->send_buffer.size(),0);
 					}
 					
@@ -528,7 +583,7 @@ public:
 					partition_exchange_data->send_buffer.clear();
 					
 					// process the header to update the exchange info with this partition, the two will agree on the minimum of their respective suggestions
-										
+					
 					Head_Message_Base* head_msg=(Head_Message_Base*)partition_exchange_data->recv_buffer.buffer();
 					
 					//cout << "\t\t\t" << "received message: " << head_msg->length << "," << head_msg->num_messages << "," << head_msg->suggested_next_exchange << endl;
@@ -579,7 +634,7 @@ public:
 							char* mbuf=process_buffer->allocate(head_msg->length - sizeof(Head_Message_Base));
 							memcpy( mbuf, (partition_exchange_data->recv_buffer.buffer()+sizeof(Head_Message_Base)), (head_msg->length-sizeof(Head_Message_Base)) );
 							
-							//cout << "test-: " << *(int*)(process_buffer->buffer()+sizeof(Message_Base)) << endl;
+							//cout << "test: " << *(int*)(mbuf+sizeof(Message_Base)) << "," << *(int*)(mbuf+2*sizeof(Message_Base)+16) << endl;
 						
 						process_data->process_data_lock=0; // unlock the process buffer
 					}
@@ -634,13 +689,11 @@ public:
 		
 		//cout << "\t\t" << "msg ratio: " << msg_ratio << endl;
 		
-		int min_parcels;
-		
 		if(msg_ratio==0)
 		{
 			// small case, more threads than messages; need num_messages parcels with 1 message each
 			
-			min_parcels=0;
+			process_data->num_parcels=1;
 		}
 		else if(msg_ratio > 5)
 		{
@@ -648,7 +701,7 @@ public:
 
 			// target is to have 5 parcels per thread, first see if the number of messages will fit evenly into this number of parcels
 			
-			min_parcels=5*_num_threads;
+			process_data->num_parcels=5*_num_threads;
 		}
 		else
 		{
@@ -656,30 +709,27 @@ public:
 			
 			// target is to have msg_ratio parcels per thread, first see if the number of messages will fit evenly into this number of parcels
 			
-			min_parcels = msg_ratio*_num_threads;			
+			process_data->num_parcels = msg_ratio*_num_threads;			
 		}
 		
-		
-		if( (process_data->num_messages_total%min_parcels) == 0 )
+		int num_full_parcels;
+		if( (process_data->num_messages_total%process_data->num_parcels) == 0 )
 		{
-			// no extra parcel required, divides evenly
+			// no extra messages per parcel required, divides evenly
 			
-			process_data->num_parcels=min_parcels;
+			process_data->num_messages_per_parcel = process_data->num_messages_total/process_data->num_parcels;
+			num_full_parcels=process_data->num_parcels;
 		}
 		else
 		{
-			// one extra parcel required
-		
-			process_data->num_parcels=min_parcels + 1;
+			// will have to take a partial load in some of the parcels
+			
+			process_data->num_messages_per_parcel = process_data->num_messages_total/process_data->num_parcels + 1;
+			num_full_parcels=process_data->num_messages_total%process_data->num_parcels;
 		}
 		
-		// rough messages per parcel
 		
-		process_data->num_messages_per_parcel = process_data->num_messages_total/min_parcels;
-		
-		
-		
-		//cout << "\t\t" << "num parcels: " << process_data->num_parcels << ", num_messages_per_parcel: " << process_data->num_messages_per_parcel << endl;
+		//cout << "\t\t" << "num messages: " << process_data->num_messages_total << ", num parcels: " << process_data->num_parcels << ", num_messages_per_parcel: " << process_data->num_messages_per_parcel << ", num_full_parcels: " << num_full_parcels << endl;
 		
 		int message_counter=0;
 		
@@ -688,9 +738,20 @@ public:
 			Processing_Parcel* parcel=(Processing_Parcel*)process_data->processing_parcels.allocate(sizeof(Processing_Parcel));
 			
 			parcel->parcel_lock=0;
+			
+			if(num_full_parcels>0)
+			{
+				parcel->num_messages=process_data->num_messages_per_parcel;
+				--num_full_parcels;
+			}
+			else
+			{
+				parcel->num_messages=process_data->num_messages_per_parcel - 1;
+			}
+			
 			parcel->message_offset=message_counter;
 
-			message_counter+=process_data->num_messages_per_parcel;
+			message_counter+=parcel->num_messages;
 		}
 	}
 	
@@ -731,17 +792,19 @@ public:
 				
 				// may process either a full or partial parcel
 				
-				int num_messages_to_process=min(process_data->num_messages_per_parcel,process_data->num_messages_total-my_message_offset);
+				//int num_messages_to_process=min(process_data->num_messages_per_parcel,process_data->num_messages_total-my_message_offset);
+				//int num_messages_to_process=parcel->num_messages;
 				
 				//cout << "\t\t\t" << "num_messages_to_process: " << num_messages_to_process << "; " <<  process_data->num_messages_total << "," << my_message_offset << endl;
 				
 				// next, begin deciphering and processing messages
 				
-				for(int i=0;i<num_messages_to_process;i++)
+				for(int i=0;i<parcel->num_messages;i++)
 				{
 					// locate the type singleton and submit the message
 
-					(*((Communication_Object*)_all_components[((Message_Base*)current_position)->type_index])->communication_handler_register)(_all_components[((Message_Base*)current_position)->type_index],current_position+sizeof(Message_Base));
+					(*((Communication_Object*)_all_components[((Message_Base*)current_position)->type_index])->handler_register)(_all_components[((Message_Base*)current_position)->type_index],current_position+sizeof(Message_Base));
+					//cout << "\t\t\t" << "incrementing: " << ((Message_Base*)current_position)->length << "," << ((Message_Base*)current_position)->type_index << endl;
 					current_position+=((Message_Base*)current_position)->length;
 				}
 				
@@ -756,11 +819,11 @@ public:
 
 	void Exchange()
 	{
-		bool exchange_this_iteration = (exchange_information.current_exchange == _iteration);
+		bool exchange_this__iteration = (exchange_information.current_exchange == _iteration);
 		
-		//cout << "entering exchange: " << exchange_this_iteration << endl;
+		//cout << "entering exchange: " << _iteration << " : " << exchange_information.current_exchange << endl;
 		
-		while(exchange_this_iteration)
+		while(exchange_this__iteration)
 		{
 			while(AtomicExchange(&ipc_lock,1)) SLEEP(0); // lock the ipc engine
 				
@@ -770,28 +833,30 @@ public:
 				{
 					//cout << "\tmerging messages" << endl;
 					Merge_Messages();
-					//cout << "\tmessages merged" << endl;
 				}
 				
 				if(ipc_threads_counter_A==_num_threads)
 				{
 					ipc_threads_counter_A=0;
+					//cout << "\tmessages merged" << endl;
 				}
 			
 			ipc_lock=0; // unlock the ipc engine
 			
 			while(AtomicCompareExchange(&ipc_threads_counter_A,0,0)) SLEEP(0); // everyone spins until the counter is reset
 
-			AtomicIncrement(&ipc_threads_counter_B); // have everyone go through the next turnstile
-			
 			//cout << "\tsending and receiving" << endl;
 			
 			Send_Receive();
-
-			//cout << "\tdone sending and receiving" << endl;
+			
+			
+			
+			AtomicIncrement(&ipc_threads_counter_B); // have everyone go through the next turnstile
 			
 			if(ipc_threads_counter_B==_num_threads)
 			{
+				//cout << "\tdone sending and receiving" << endl;
+			
 				ipc_threads_counter_B=0;
 			}
 			
@@ -825,35 +890,37 @@ public:
 			
 			while(AtomicCompareExchange(&ipc_threads_counter_A,0,0)) SLEEP(0); // everyone spins until the counter is reset
 			
-			
-			
-			AtomicIncrement(&ipc_threads_counter_B); // have everyone go through the next turnstile
-
 			// finally handle all of the messages
 			
 			//cout << "\tprocessing" << endl;
 			
 			Process();
 			
+			//while(AtomicExchange(&stdout_lock,1)) SLEEP(0);
+			//cout << _thread_id << " done processing" << endl;
+			//stdout_lock=0;
+		
 			//cout << "\tdone processing" << endl;
+			
+			AtomicIncrement(&ipc_threads_counter_B); // have everyone go through the next turnstile
 			
 			if(ipc_threads_counter_B==_num_threads)
 			{
+				// clean up processing
+				
+				exchange_information.process_data.Reset();
+				
+				exchange_information.current_exchange=exchange_information.next_exchange;
+				exchange_information.next_exchange=INT_MAX;
+				
 				ipc_threads_counter_B=0;
 				
-				// clean up processing
-
-				exchange_information.process_data.Reset();
+				//cout << "\t" << "done, next exchange: " << exchange_information.current_exchange << endl;
 			}
 			
 			while(AtomicCompareExchange(&ipc_threads_counter_B,0,0)) SLEEP(0); // everyone spins until the counter is reset
 			
-			exchange_information.current_exchange=exchange_information.next_exchange;
-			exchange_information.next_exchange=INT_MAX;
-			
-			exchange_this_iteration = (exchange_information.current_exchange == _iteration);
-			
-			//cout << "\t" << "exchange again? " << exchange_this_iteration << endl << endl << endl;
+			exchange_this__iteration = (exchange_information.current_exchange == _iteration);
 			
 			break;
 		}

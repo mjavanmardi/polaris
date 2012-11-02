@@ -1,6 +1,6 @@
 #pragma once
 
-#define WINDOWS
+//#define WINDOWS
 
 #include <list>
 #include <vector>
@@ -49,7 +49,7 @@ using namespace std;
 #define AtomicCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE) _InterlockedCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE)
 #else
 static const int inc_val=1;
-#define AtomicExchange(TARGET,VALUE) __sync_val_compare_and_swap(TARGET,VALUE,true)
+#define AtomicExchange(TARGET,VALUE) __sync_lock_test_and_set(TARGET,VALUE)
 #define AtomicIncrement(TARGET) (__sync_fetch_and_add(TARGET,inc_val)+inc_val)
 #define AtomicDecrement(TARGET) (__sync_fetch_and_sub(TARGET,inc_val)-inc_val)
 #define AtomicCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE) __sync_val_compare_and_swap(TARGET,EXCHANGE_VALUE,COMPARE_VALUE)
@@ -79,6 +79,7 @@ typedef char Page[_Page_Size];
 
 static volatile long long* request_sum=new volatile long long();
 static volatile long long* exec_sum=new volatile long long();
+static volatile long stdout_lock=0;
 
 #ifdef WINDOWS
 __declspec(thread) int _thread_id;

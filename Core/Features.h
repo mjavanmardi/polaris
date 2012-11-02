@@ -207,7 +207,7 @@ struct member_function_ptr_types<Type,setter_type>
 		{return (ReturnValueType)(_##FEATURE_NAME);}\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
-		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
+		{static_assert(!(GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- Some of " #FEATURE_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
@@ -217,7 +217,7 @@ struct member_function_ptr_types<Type,setter_type>
 		{_##FEATURE_NAME=(DATA_TYPE*)(value);}\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
-		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
+		{static_assert(!(SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- Some of " #FEATURE_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
 
 #define member_data(DATA_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
@@ -233,7 +233,7 @@ struct member_function_ptr_types<Type,setter_type>
 		{return (ReturnValueType)(&_##FEATURE_NAME);}\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
-		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
+		{static_assert(!(GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- Some of " #FEATURE_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
@@ -243,7 +243,7 @@ struct member_function_ptr_types<Type,setter_type>
 		{_##FEATURE_NAME=(DATA_TYPE)(*value);}\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
-		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
+		{static_assert(!(SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- Some of " #FEATURE_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
 
 ///============================================================================
@@ -263,7 +263,7 @@ struct member_function_ptr_types<Type,setter_type>
 		{return (ReturnValueType)(_##FEATURE_NAME);}\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
-		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
+		{static_assert(!(GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- Some of " #FEATURE_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
 		\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
@@ -274,7 +274,7 @@ struct member_function_ptr_types<Type,setter_type>
 		{_##FEATURE_NAME=(COMPONENT_TYPE*)(value);}\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
-		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
+		{static_assert(!(SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- Some of " #FEATURE_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
 
 ///============================================================================
@@ -294,7 +294,7 @@ struct member_function_ptr_types<Type,setter_type>
 		{return (ReturnValueType)(&_##FEATURE_NAME);}\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
-		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
+		{static_assert(!(GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- Some of " #FEATURE_NAME" getter requirements from {"#GETTER_REQUIREMENTS"} were not matched---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && SETTER_REQUIREMENTS))\
@@ -304,7 +304,7 @@ struct member_function_ptr_types<Type,setter_type>
 		{_##FEATURE_NAME=(Polaris_Container<CONTAINER_TYPE>&)(*value);}\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
-		{static_assert(false,"\n\n\n[--------- Some of " #FEATURE_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
+		{static_assert(!(SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- Some of " #FEATURE_NAME" setter requirements from: {"#SETTER_REQUIREMENTS"}, were not matched---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
 
 ///============================================================================
@@ -369,7 +369,7 @@ struct VARIABLE_NAME \
 #define define_simple_container_interface(CONTAINER_PROTOTYPE, NON_LOCAL_FEATURE_LINKED_TO_CONTAINER_TYPE, CONTAINER_ALIAS, VALUE_TYPE, CALLER_TYPE)\
 	typedef CONTAINER_PROTOTYPE<CONTAINER_ALIAS##_type,CALLER_TYPE,VALUE_TYPE> CONTAINER_ALIAS
 
-#define type_of(FEATURE_NAME) FEATURE##_type // - use this
+#define type_of(FEATURE_NAME) FEATURE_NAME##_type // - use this
 
 
 
