@@ -82,9 +82,9 @@ static volatile long long* exec_sum=new volatile long long();
 static volatile long stdout_lock=0;
 
 #ifdef WINDOWS
-__declspec(thread) int _thread_id;
+static __declspec(thread) int _thread_id;
 #else
-int _thread_id;
+static int _thread_id;
 #endif
 
 static int _num_partitions=0;

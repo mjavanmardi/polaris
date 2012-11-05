@@ -88,9 +88,9 @@ struct ValidIndex<-1>
 /// Length Implementation
 ///============================================================================
 
-template<class TList> struct Length;template <> struct Length<NULLTYPE>{enum { value = 0 };};
+template<class TList> struct _Length;template <> struct _Length<NULLTYPE>{enum { value = 0 };};
 
-template<class T, class U> struct Length<TypeList<T, U>>{enum { value = 1 + Length<U>::value };};
+template<class T, class U> struct _Length<TypeList<T, U>>{enum { value = 1 + _Length<U>::value };};
 
 ///============================================================================
 /// Append Implementation

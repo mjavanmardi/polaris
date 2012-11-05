@@ -18,7 +18,32 @@ struct Thread_Package
 class World
 {
 public:
-	World();
+	World(World* world_pt)
+	{
+		memory_root_ptr=new Memory_Root();
+		execution_root_ptr=new Execution_Root();
+		data_root_ptr=new Data_Root();
+		interprocess_root_ptr=new Interprocess_Engine();
+		world_pt=this;
+		run=false;
+
+		// no threads have work yet
+		threads_finished_counter=_num_threads;
+	
+		// no threads running
+		threads_running_counter=0;
+
+		for(int i=0;i<_num_threads;i++)
+		{
+			packages[i].id=i;
+			packages[i].world_ptr=this;
+	#ifdef WINDOWS
+			threads[i]=CreateThread(NULL,0,Thread_Loop,&packages[i],0,NULL);
+	#else
+			pthread_create(&threads[i],NULL,Thread_Loop,&packages[i]);
+	#endif
+		}
+	}
 	
 	void Start_Turning()
 	{
@@ -76,42 +101,17 @@ public:
 #endif
 };
 
-World* world_ptr=nullptr;
-
-World::World()
-{
-	memory_root_ptr=new Memory_Root();
-	execution_root_ptr=new Execution_Root();
-	data_root_ptr=new Data_Root();
-	interprocess_root_ptr=new Interprocess_Engine();
-	world_ptr=this;
-	run=false;
-
-	// no threads have work yet
-	threads_finished_counter=_num_threads;
-	
-	// no threads running
-	threads_running_counter=0;
-
-	for(int i=0;i<_num_threads;i++)
-	{
-		packages[i].id=i;
-		packages[i].world_ptr=this;
-#ifdef WINDOWS
-		threads[i]=CreateThread(NULL,0,Thread_Loop,&packages[i],0,NULL);
-#else
-		pthread_create(&threads[i],NULL,Thread_Loop,&packages[i]);
-#endif
-	}
-}
+static World* world_ptr=nullptr;
 
 
-static World* world=new World();
+
+
+static World* world=new World(world_ptr);
 
 #ifdef WINDOWS
-DWORD WINAPI Thread_Loop(LPVOID package_ptr)
+static DWORD WINAPI Thread_Loop(LPVOID package_ptr)
 #else
-void* Thread_Loop(void* package_ptr)
+static void* Thread_Loop(void* package_ptr)
 #endif
 {
 	World* world=((Thread_Package*)package_ptr)->world_ptr;

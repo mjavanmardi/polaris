@@ -30,11 +30,11 @@ struct False_Concept
 
 concept Is_Polaris_Component
 {
-	requires_typename_defined(has_this_type,This_Type);
-	requires_typename_defined(has_parent_type,Parent_Type);
-	requires_typename_defined(has_group_list,Group_List);
-	requires_typename_defined(has_object_type,Object_Type);
-	requires_typename_defined(has_master_type,Master_Type);
+	check_typename_defined(has_this_type,This_Type);
+	check_typename_defined(has_parent_type,Parent_Type);
+	check_typename_defined(has_group_list,Group_List);
+	check_typename_defined(has_object_type,Object_Type);
+	check_typename_defined(has_master_type,Master_Type);
 
 	define_default_check(has_this_type && has_parent_type && has_group_list && has_object_type && has_master_type);
 };

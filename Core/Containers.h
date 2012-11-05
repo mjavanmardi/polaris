@@ -2,33 +2,33 @@
 #include "Grouping.h"
 
 ///============================================================================
-/// Polaris_Input_Iterator - stl Input_Iterator
+/// Input_Iterator - stl Input_Iterator
 ///============================================================================
 
 template<typename IteratorType,typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
-struct Polaris_Input_Iterator:public IteratorType
+struct Input_Iterator:public IteratorType
 {
-	Polaris_Input_Iterator():IteratorType(){};
+	Input_Iterator():IteratorType(){};
 
-	Polaris_Input_Iterator(IteratorType val):IteratorType(val){}
+	Input_Iterator(IteratorType val):IteratorType(val){}
 
 	TargetValueType& operator*(){return (TargetValueType&)(((IteratorType*)this)->operator*());}
 
 	TargetValueType* operator->(){return (TargetValueType*)(((IteratorType*)this)->operator->());}
 
-	Polaris_Input_Iterator& operator++(){return (Polaris_Input_Iterator&)++(*((IteratorType*)this));}
+	Input_Iterator& operator++(){return (Input_Iterator&)++(*((IteratorType*)this));}
 
 	void operator++(int){(*((IteratorType*)this))++;}
 };
 
 ///============================================================================
-/// Polaris_Back_Insertion_Sequence_Prototype - stl Back Insertion Sequence prototype
+/// Back_Insertion_Sequence_Prototype - stl Back Insertion Sequence prototype
 ///============================================================================
 
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
-struct Polaris_Back_Insertion_Sequence_Prototype
+struct Back_Insertion_Sequence_Prototype
 {
-	typedef Polaris_Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
+	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
 	typedef typename ComponentType::size_type size_type;
 
 	iterator begin(){return (iterator)((ComponentType*)this)->begin();}
@@ -71,13 +71,13 @@ struct Polaris_Back_Insertion_Sequence_Prototype
 };
 
 ///============================================================================
-/// Polaris_Back_Insertion_Sequence_Prototype - stl Random Access Sequence prototype
+/// Random_Access_Sequence_Prototype - stl Random Access Sequence prototype
 ///============================================================================
 
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
-struct Polaris_Random_Access_Sequence_Prototype
+struct Random_Access_Sequence_Prototype
 {
-	typedef Polaris_Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
+	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
 	typedef typename ComponentType::size_type size_type;
 
 	iterator begin(){return (iterator)((ComponentType*)this)->begin();}

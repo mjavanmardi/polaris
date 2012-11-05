@@ -23,7 +23,7 @@ static const int success=sizeof(small_type);
 /// Concept Checks
 ///============================================================================
 
-#define requires_method(CHECK_ALIAS,METHOD_NAME,METHOD_FORM)\
+#define check_method(CHECK_ALIAS,METHOD_NAME,METHOD_FORM)\
 	struct CHECK_ALIAS##_procedure\
 	{\
 		template<METHOD_FORM> struct tester{};\
@@ -33,7 +33,7 @@ static const int success=sizeof(small_type);
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
-#define requires_feature(CHECK_ALIAS,FEATURE_NAME,FEATURE_TYPE)\
+#define check_feature(CHECK_ALIAS,FEATURE_NAME,FEATURE_TYPE)\
 	struct CHECK_ALIAS##_procedure\
 	{\
 		template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_FEATURE_TYPE*);\
@@ -42,7 +42,7 @@ static const int success=sizeof(small_type);
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
-#define requires_named_member(CHECK_ALIAS,MEMBER_NAME)\
+#define check_named_member(CHECK_ALIAS,MEMBER_NAME)\
 	struct CHECK_ALIAS##_procedure\
 	{\
 		template<typename U> static small_type has_matching_named_member(decltype(&U::MEMBER_NAME));\
@@ -51,7 +51,7 @@ static const int success=sizeof(small_type);
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
-#define requires_typename_defined(CHECK_ALIAS,TYPENAME_NAME)\
+#define check_typename_defined(CHECK_ALIAS,TYPENAME_NAME)\
 	struct CHECK_ALIAS##_procedure\
 	{\
 		template<typename U> static small_type has_matching_typename(typename U::TYPENAME_NAME*);\
@@ -60,7 +60,7 @@ static const int success=sizeof(small_type);
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
-#define requires_typed_member(CHECK_ALIAS,MEMBER_NAME,DESIRED_TYPE)\
+#define check_typed_member(CHECK_ALIAS,MEMBER_NAME,DESIRED_TYPE)\
 	struct CHECK_ALIAS##_procedure\
 	{\
 		template<typename U> static small_type has_matching_named_member(decltype(&U::MEMBER_NAME));\
@@ -72,7 +72,7 @@ static const int success=sizeof(small_type);
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
-#define requires_typename_state(CHECK_ALIAS,TYPENAME_NAME,TYPENAME_STATE)\
+#define check_typename_state(CHECK_ALIAS,TYPENAME_NAME,TYPENAME_STATE)\
 	struct CHECK_ALIAS##_procedure\
 	{\
 		template<typename U> static small_type has_matching_typename(typename U::TYPENAME_NAME*);\
@@ -84,7 +84,7 @@ static const int success=sizeof(small_type);
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
-#define requires_typename_match(CHECK_ALIAS,TYPENAME_NAME)\
+#define check_typename_match(CHECK_ALIAS,TYPENAME_NAME)\
 	struct CHECK_ALIAS##_procedure\
 	{\
 		template<typename U> static small_type has_matching_typename_T(typename U::TYPENAME_NAME*);\
@@ -100,7 +100,7 @@ static const int success=sizeof(small_type);
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
 #define REQUIRES_CONCEPT_PARAMS(TYPE_TO_TEST_1,TYPE_TO_TEST_2) TYPE_TO_TEST_1,TYPE_TO_TEST_2
-#define requires_concept(CHECK_ALIAS,CONCEPT_NAME) static const bool CHECK_ALIAS=CONCEPT_NAME<REQUIRES_CONCEPT_PARAMS(T,V)>::value;
+#define check_concept(CHECK_ALIAS,CONCEPT_NAME) static const bool CHECK_ALIAS=CONCEPT_NAME<REQUIRES_CONCEPT_PARAMS(T,V)>::value;
 
 ///============================================================================
 /// Call requirement macros and assertion macros

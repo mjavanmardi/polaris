@@ -17,16 +17,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TEMPLATE_Implementations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TEMPLATE_prototypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Repository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Repository_Includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TEMPLATE_Implementations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TEMPLATE_prototypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

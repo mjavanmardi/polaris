@@ -168,7 +168,8 @@ typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE
 #define target_to_component(TARGET_COMPONENT_TYPE,POINTER_TO_TARGET) ((TARGET_COMPONENT_TYPE&)*POINTER_TO_TARGET)
 #define target_to_interface(INTERFACE_ALIAS,POINTER_TO_TARGET) ((INTERFACE_ALIAS&)(*POINTER_TO_TARGET))
 #define iterator_to_interface(INTERFACE_ALIAS,ITERATOR_VARIABLE) ( (INTERFACE_ALIAS&) (*(*ITERATOR_VARIABLE)) )
-#define getter_to_interface(INTERFACE_ALIAS,FEATURE_FUNCTION) ( (INTERFACE_ALIAS&) FEATURE_FUNCTION<INTERFACE_ALIAS&>() )
+#define get(INTERFACE_ALIAS,FEATURE_FUNCTION) ( (INTERFACE_ALIAS&) FEATURE_FUNCTION<INTERFACE_ALIAS&>() )
+#define set(INTERFACE_ALIAS,FEATURE_FUNCTION,SET_VALUE) FEATURE_FUNCTION<INTERFACE_ALIAS&>(INTERFACE_ALIAS& SET_VALUE)
 
 #define access_communication_singleton(COMPONENT_TYPE,PROTOTYPE,CALLER_TYPE,TARGET_TYPE) ((PROTOTYPE<COMPONENT_TYPE,CALLER_TYPE>*)COMPONENT_TYPE::singleton_reference)
 
@@ -176,11 +177,11 @@ typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE
 /// basic load macro
 ///============================================================================
 
-#define load_event(SELF_AWARE_TYPE,CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,TARGET_TYPE) \
-       ((typename SELF_AWARE_TYPE::This_Type*)this)->template Load_Register<typename SELF_AWARE_TYPE::This_Type>((&CONDITIONAL_FUNCTION<NULLTYPE>),(&LOCAL_EVENT_FUNCTION<TARGET_TYPE>),FIRST_ITERATION)
+#define load_event(COMPONENT_TYPE,LOCAL_CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,TARGET_TYPE) \
+       ((COMPONENT_TYPE*)this)->template Load_Register<COMPONENT_TYPE>((&LOCAL_CONDITIONAL_FUNCTION<NULLTYPE>),(&LOCAL_EVENT_FUNCTION<TARGET_TYPE>),FIRST_ITERATION)
 
-#define load_communication_handler(SELF_AWARE_TYPE,HANDLER_FUNCTION,TARGET_TYPE) \
-       ((typename SELF_AWARE_TYPE::This_Type*)this)->template Load_Register<typename SELF_AWARE_TYPE::This_Type>((&HANDLER_FUNCTION<TARGET_TYPE>))
+#define load_communication_handler(COMPONENT_TYPE,HANDLER_FUNCTION,TARGET_TYPE) \
+       ((COMPONENT_TYPE*)this)->template Load_Register<COMPONENT_TYPE>((&HANDLER_FUNCTION<TARGET_TYPE>))
 
 
 ///============================================================================
@@ -202,8 +203,8 @@ DataType* Allocate(void)
 
 
 #define tag_as_prototype\
-	typedef ComponentType Component_Type;\
-	typedef CallerType Caller_Type;\
+	typedef ComponentType ComponentType;\
+	typedef CallerType CallerType;\
 	typedef true_type Is_Prototype;
 	
 	

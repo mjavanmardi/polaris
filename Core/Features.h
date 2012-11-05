@@ -1,9 +1,6 @@
 #pragma once
 #include "Containers.h"
 
-
-
-
 ///============================================================================
 /// prototype - standard declarator for all prototypes
 ///============================================================================
@@ -106,15 +103,15 @@ struct member_function_ptr_types<Type,communication_handler_type>
 ///		includes a check on whether the implementation has corresponding dispatch
 ///============================================================================
 
-#define feature_accessor_with_interface(FEATURE_NAME, INTERFACE_PROTOTYPE, INTERFACE_ALIAS,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	template<typename CallerType>\
-	struct INTERFACE_ALIAS\
-	{\
-		typedef INTERFACE_PROTOTYPE<typename ComponentType::FEATURE_NAME##_type,CallerType> _interface;\
-	};\
-	feature_accessor(FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)
-
-#define interface_of(INTERFACE_ALIAS,CALLER_TYPE) INTERFACE_ALIAS<CALLER_TYPE>::_interface
+//#define feature_accessor_with_interface(FEATURE_NAME, INTERFACE_PROTOTYPE, INTERFACE_ALIAS,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+//	template<typename CallerType>\
+//	struct INTERFACE_ALIAS\
+//	{\
+//		typedef INTERFACE_PROTOTYPE<typename ComponentType::FEATURE_NAME##_type,CallerType> _interface;\
+//	};\
+//	feature_accessor(FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)
+//
+//#define interface_of(INTERFACE_ALIAS,CALLER_TYPE) INTERFACE_ALIAS<CALLER_TYPE>::_interface
 
 
 #define feature_accessor(FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
@@ -321,7 +318,7 @@ struct VARIABLE_NAME \
 	VARIABLE_NAME(): Value(){} \
 	VARIABLE_VALUE_TYPE Value; \
 	operator VARIABLE_VALUE_TYPE(){return Value;}; \
-	VARIABLE_NAME& operator=(DATA_VALUE_TYPE& obj){Value = obj; return *this;}  \
+	VARIABLE_NAME& operator=(VARIABLE_VALUE_TYPE& obj){Value = obj; return *this;}  \
 	bool operator==(VARIABLE_VALUE_TYPE& obj){return Value == obj; }  \
 	bool operator!=(VARIABLE_VALUE_TYPE& obj){return Value != obj; }  \
 	bool operator>(VARIABLE_VALUE_TYPE& obj){return Value > obj; }  \
@@ -360,16 +357,17 @@ struct VARIABLE_NAME \
 ///============================================================================
 
 #define define_component_interface(COMPONENT_INTERFACE_ALIAS, FEATURE_TYPE, PROTOTYPE_TEMPLATE, CALLER_TYPE)\
-	typedef PROTOTYPE_TEMPLATE<FEATURE_TYPE,CALLER_TYPE> COMPONENT_INTERFACE_ALIAS
+	typedef PROTOTYPE_TEMPLATE<typename FEATURE_TYPE,CALLER_TYPE> COMPONENT_INTERFACE_ALIAS
 
 #define define_container_and_value_interface(CONTAINER_ALIAS, VALUE_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_PROTOTYPE,CALLER_TYPE)\
-	typedef VALUE_PROTOTYPE<CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> VALUE_ALIAS;\
-	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,VALUE_ALIAS*> CONTAINER_ALIAS
+	typedef VALUE_PROTOTYPE<typename CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> VALUE_ALIAS;\
+	typedef CONTAINER_PROTOTYPE<typename CONTAINER_TYPE,CALLER_TYPE,VALUE_ALIAS*> CONTAINER_ALIAS
 
 #define define_simple_container_interface(CONTAINER_PROTOTYPE, NON_LOCAL_FEATURE_LINKED_TO_CONTAINER_TYPE, CONTAINER_ALIAS, VALUE_TYPE, CALLER_TYPE)\
-	typedef CONTAINER_PROTOTYPE<CONTAINER_ALIAS##_type,CALLER_TYPE,VALUE_TYPE> CONTAINER_ALIAS
+	typedef CONTAINER_PROTOTYPE<typename CONTAINER_ALIAS##_type,CALLER_TYPE,VALUE_TYPE> CONTAINER_ALIAS
 
 #define type_of(FEATURE_NAME) FEATURE_NAME##_type // - use this
+#define get_type_of(FEATURE_NAME) ComponentType::FEATURE_NAME##_type // - use this
 
 
 
