@@ -18,18 +18,18 @@ concept Is_In_Units
 };
 
 
-prototype struct Node_Proto
+prototype struct Node_Prototype
 {	tag_as_prototype; // tags are required in all prototype defintions
 
 	feature_accessor(id,check(ReturnValueType,is_arithmetic),none); // available slots for adding getter/setter checks, use none if not checking anything
 };
 
-implementation struct Node_Impl
+implementation struct Node_Implementation
 {
 	member_data(int,id,none,none); // available slots for adding getter/setter checks, use none if not checking anything
 };
 
-prototype struct Link_Proto
+prototype struct Link_Prototype
 {	tag_as_prototype;
 
 
@@ -39,7 +39,7 @@ prototype struct Link_Proto
 	feature_accessor(length,none,none);
 };
 
-implementation struct Link_Impl
+implementation struct Link_Implementation
 {
 	polaris_variable(Length_In_Feet,float,In_Feet);
 
@@ -49,21 +49,21 @@ implementation struct Link_Impl
 	member_component(typename MasterType::Node,b_node,none,none);
 };
 
-prototype struct Network_Proto
+prototype struct Network_Prototype
 {	tag_as_prototype;
 	
 	
 	feature_accessor(links,none,none);
 };
 
-implementation struct Network_Impl
+implementation struct Network_Implementation
 {
 	member_container(vector<typename MasterType::Link*>,links,none,none); // for member containers
 };
 
 
 
-prototype struct Agent_Proto
+prototype struct Agent_Prototype
 {	tag_as_prototype;
 
 
@@ -81,18 +81,23 @@ prototype struct Agent_Proto
 		cout << "current iteration is: " << _iteration << endl;
 	}
 
-	feature_prototype void Initialize_Agent()
+	feature_prototype void Initialize_Agent(requires(!check(TargetType,is_arithmetic)))
+	{
+		assert_default_check(TargetType,is_arithmetic,"Did not pass an arithmetic type!");
+	}
+
+	feature_prototype void Initialize_Agent(requires(check(TargetType,is_arithmetic)))
 	{
 		// load event function
 		load_event(ComponentType,Do_Stuff_Condition,Do_Stuff,0,NULLTYPE);
 		
 		// define your interface to network
-		define_component_interface(Network,get_type_of(network),Network_Proto,ComponentType);
+		define_component_interface(Network,get_type_of(network),Network_Prototype,ComponentType);
 
 		Network& net=network<Network&>();
 
 		// define your interface to the links container and to the links value inside
-		define_container_and_value_interface(Links,Link,Network::get_type_of(links),Random_Access_Sequence_Prototype,Link_Proto,ComponentType);
+		define_container_and_value_interface(Links,Link,Network::get_type_of(links),Random_Access_Sequence_Prototype,Link_Prototype,ComponentType);
 
 		Links& links=net.links<Links&>();
 
@@ -123,7 +128,7 @@ prototype struct Agent_Proto
 			float len=link->length<float>();
 
 			// nested access here, notice how the type is now extracted through the Link prototype
-			define_component_interface(Node,Link::get_type_of(a_node),Node_Proto,ComponentType);
+			define_component_interface(Node,Link::get_type_of(a_node),Node_Prototype,ComponentType);
 
 			Node& a_node=link->a_node<Node&>();
 
@@ -132,7 +137,7 @@ prototype struct Agent_Proto
 	}
 };
 
-implementation struct Agent_Impl
+implementation struct Agent_Implementation
 {
 	member_component(typename MasterType::Network,network,none,none);
 };
@@ -141,10 +146,10 @@ implementation struct Agent_Impl
 // notice how components are no longer doubly defined, they are defined once in MasterType now
 struct MasterType
 {
-	typedef Polaris_Component<Link_Impl,MasterType,Data_Object> Link;
-	typedef Polaris_Component<Node_Impl,MasterType,Data_Object> Node;
-	typedef Polaris_Component<Agent_Impl,MasterType,Execution_Object> Agent;
-	typedef Polaris_Component<Network_Impl,MasterType,Data_Object> Network;
+	typedef Polaris_Component<Link_Implementation,MasterType,Data_Object> Link;
+	typedef Polaris_Component<Node_Implementation,MasterType,Data_Object> Node;
+	typedef Polaris_Component<Agent_Implementation,MasterType,Execution_Object> Agent;
+	typedef Polaris_Component<Network_Implementation,MasterType,Data_Object> Network;
 };
 
 
@@ -153,7 +158,7 @@ struct MasterType
 int main()
 {
 	// Initialize Node
-	define_component_interface(Node_Interface,MasterType::Node,Node_Proto,NULLTYPE);
+	define_component_interface(Node_Interface,MasterType::Node,Node_Prototype,NULLTYPE);
 
 	// Allocate version with casting dictated by 2nd template parameter
 	Node_Interface* node_itf=(Node_Interface*)Allocate<MasterType::Node>();
@@ -162,7 +167,7 @@ int main()
 
 
 	// Initialize Link
-	define_component_interface(Link_Interface,MasterType::Link,Link_Proto,NULLTYPE);
+	define_component_interface(Link_Interface,MasterType::Link,Link_Prototype,NULLTYPE);
 	Link_Interface* link_itf=(Link_Interface*)Allocate<MasterType::Link>();
 	
 	// Notice how polaris variables can be accessed like regular variables
@@ -179,27 +184,27 @@ int main()
 	
 	
 	// Initialize Network
-	define_component_interface(Network_Interface,MasterType::Network,Network_Proto,NULLTYPE);
+	define_component_interface(Network_Interface,MasterType::Network,Network_Prototype,NULLTYPE);
 	Network_Interface* net_itf=(Network_Interface*)Allocate<MasterType::Network>();
 	
 
 	// Add reference to link, notice 2 ways of accessing container
-	define_container_and_value_interface(Links,Link,Network_Interface::get_type_of(links),Random_Access_Sequence_Prototype,Link_Proto,NULLTYPE);
+	define_container_and_value_interface(Links,Link,Network_Interface::get_type_of(links),Random_Access_Sequence_Prototype,Link_Prototype,NULLTYPE);
 	get(Links,net_itf->links).push_back(link_itf); // supports IDE
 	net_itf->links<Links*>()->push_back(link_itf);
 
 
 
 	// Initialize Agent
-	define_component_interface(Agent_Interface,MasterType::Agent,Agent_Proto,NULLTYPE);
+	define_component_interface(Agent_Interface,MasterType::Agent,Agent_Prototype,NULLTYPE);
 	Agent_Interface* agent_itf=(Agent_Interface*)Allocate<MasterType::Agent>();
 	// Add reference to network
 	agent_itf->network<Network_Interface*>(net_itf);
 
 	
 	
-	
-	agent_itf->Initialize_Agent<NULLTYPE>();
+	//agent_itf->Initialize_Agent<NULLTYPE>(); this will give a compile time error
+	agent_itf->Initialize_Agent<int>();
 
 
 
