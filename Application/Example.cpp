@@ -1,6 +1,9 @@
-#include "Application_Includes.h"
+#define EXAMPLE
 
 #ifdef EXAMPLE
+
+#include "Application_Includes.h"
+
 
 concept Is_In_Units
 {
@@ -153,7 +156,7 @@ int main()
 	define_component_interface(Node_Interface,MasterType::Node,Node_Proto,NULLTYPE);
 
 	// Allocate version with casting dictated by 2nd template parameter
-	Node_Interface* node_itf=Allocate<MasterType::Node,Node_Interface*>();
+	Node_Interface* node_itf=(Node_Interface*)Allocate<MasterType::Node>();
 	node_itf->id<int>(3);
 	
 

@@ -1,6 +1,8 @@
-#include "Application_Includes.h"
+#define EXAMPLE
 
 #ifndef EXAMPLE
+#include "Application_Includes.h"
+
 int main()
 {
 

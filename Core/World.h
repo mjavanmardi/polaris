@@ -18,13 +18,13 @@ struct Thread_Package
 class World
 {
 public:
-	World(World* world_pt)
+	World(World** world_pt)
 	{
 		memory_root_ptr=new Memory_Root();
 		execution_root_ptr=new Execution_Root();
 		data_root_ptr=new Data_Root();
 		interprocess_root_ptr=new Interprocess_Engine();
-		world_pt=this;
+		*world_pt=this;
 		run=false;
 
 		// no threads have work yet
@@ -102,11 +102,7 @@ public:
 };
 
 static World* world_ptr=nullptr;
-
-
-
-
-static World* world=new World(world_ptr);
+static World* world=new World(&world_ptr);
 
 #ifdef WINDOWS
 static DWORD WINAPI Thread_Loop(LPVOID package_ptr)

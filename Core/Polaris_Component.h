@@ -161,15 +161,8 @@ typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE
 	(new Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::Singleton_Type());
 
 ///============================================================================
-/// component and interface cast macros
+/// singleton access macros
 ///============================================================================
-
-#define this_component() ((ComponentType&)*this)
-#define target_to_component(TARGET_COMPONENT_TYPE,POINTER_TO_TARGET) ((TARGET_COMPONENT_TYPE&)*POINTER_TO_TARGET)
-#define target_to_interface(INTERFACE_ALIAS,POINTER_TO_TARGET) ((INTERFACE_ALIAS&)(*POINTER_TO_TARGET))
-#define iterator_to_interface(INTERFACE_ALIAS,ITERATOR_VARIABLE) ( (INTERFACE_ALIAS&) (*(*ITERATOR_VARIABLE)) )
-#define get(INTERFACE_ALIAS,FEATURE_FUNCTION) ( (INTERFACE_ALIAS&) FEATURE_FUNCTION<INTERFACE_ALIAS&>() )
-#define set(INTERFACE_ALIAS,FEATURE_FUNCTION,SET_VALUE) FEATURE_FUNCTION<INTERFACE_ALIAS&>(INTERFACE_ALIAS& SET_VALUE)
 
 #define access_communication_singleton(COMPONENT_TYPE,PROTOTYPE,CALLER_TYPE,TARGET_TYPE) ((PROTOTYPE<COMPONENT_TYPE,CALLER_TYPE>*)COMPONENT_TYPE::singleton_reference)
 
@@ -200,11 +193,5 @@ DataType* Allocate(void)
 {
 	return (DataType*)((DataType::singleton_reference)->Allocate());
 }
-
-
-#define tag_as_prototype\
-	typedef ComponentType ComponentType;\
-	typedef CallerType CallerType;\
-	typedef true_type Is_Prototype;
 	
 	

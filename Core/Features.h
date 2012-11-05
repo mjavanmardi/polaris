@@ -7,6 +7,11 @@
 
 #define prototype template<typename ComponentType,typename CallerType=NULLTYPE>
 
+#define tag_as_prototype\
+	typedef ComponentType ComponentType;\
+	typedef CallerType CallerType;\
+	typedef true_type Is_Prototype;
+
 ///============================================================================
 /// implementation - standard declarator for all implementations
 ///============================================================================
@@ -369,5 +374,14 @@ struct VARIABLE_NAME \
 #define type_of(FEATURE_NAME) FEATURE_NAME##_type // - use this
 #define get_type_of(FEATURE_NAME) ComponentType::FEATURE_NAME##_type // - use this
 
+///============================================================================
+/// component and interface cast macros
+///============================================================================
 
+#define this_component() ((ComponentType&)*this)
+#define target_to_component(TARGET_COMPONENT_TYPE,POINTER_TO_TARGET) ((TARGET_COMPONENT_TYPE&)*POINTER_TO_TARGET)
+#define target_to_interface(INTERFACE_ALIAS,POINTER_TO_TARGET) ((INTERFACE_ALIAS&)(*POINTER_TO_TARGET))
+#define iterator_to_interface(INTERFACE_ALIAS,ITERATOR_VARIABLE) ( (INTERFACE_ALIAS&) (*(*ITERATOR_VARIABLE)) )
+#define get(INTERFACE_ALIAS,FEATURE_FUNCTION) ( (INTERFACE_ALIAS&) FEATURE_FUNCTION<INTERFACE_ALIAS&>() )
+#define set(INTERFACE_ALIAS,FEATURE_FUNCTION,SET_VALUE) FEATURE_FUNCTION<INTERFACE_ALIAS&>(INTERFACE_ALIAS& SET_VALUE)
 
