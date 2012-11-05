@@ -28,7 +28,7 @@ struct False_Concept
 /// Is_Polaris_Component - detects whether type models a Polaris Component
 ///============================================================================
 
-concept Is_Polaris_Component
+concept struct Is_Polaris_Component
 {
 	check_typename_defined(has_this_type,This_Type);
 	check_typename_defined(has_parent_type,Parent_Type);

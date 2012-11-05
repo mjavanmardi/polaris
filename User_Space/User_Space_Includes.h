@@ -53,7 +53,7 @@ struct DATA_STRUCT_NAME \
 //	end_requirements_list(Param2Type);
 //};
 
-concept Is_Target_Type_Struct
+concept struct Is_Target_Type_Struct
 {
 	check_typename_defined(check1,ReturnType);
 	check_typename_defined(check2,ParamType);

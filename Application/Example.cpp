@@ -5,7 +5,7 @@
 #include "Application_Includes.h"
 
 
-concept Is_In_Units
+concept struct Is_In_Units
 {
 	// checks are now laid out like this
 	check_typename_state(in_meters,In_Meters,true_type);
@@ -83,7 +83,7 @@ prototype struct Agent_Prototype
 
 	feature_prototype void Initialize_Agent(requires(!check(TargetType,is_arithmetic)))
 	{
-		assert_default_check(TargetType,is_arithmetic,"Did not pass an arithmetic type!");
+		assert_default_check(TargetType,is_arithmetic,"TargetType is not an arithmetic type!");
 	}
 
 	feature_prototype void Initialize_Agent(requires(check(TargetType,is_arithmetic)))

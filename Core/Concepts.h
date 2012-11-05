@@ -5,7 +5,7 @@
 /// General Definitions
 ///============================================================================
 
-#define concept template<typename T=NULLTYPE,typename V=NULLTYPE> struct
+#define concept template<typename T=NULLTYPE,typename V=NULLTYPE>
 
 static const int success=sizeof(small_type);
 
