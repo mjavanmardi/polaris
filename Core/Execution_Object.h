@@ -31,35 +31,35 @@ struct Execution_Object
 
 
 	
-	//inline Revision&& object_current_revision()
-	//{
-	//	return Revision(0,current_revision);
-	//}
+	inline Revision&& object_current_revision()
+	{
+		return Revision(0,current_revision);
+	}
 
-	//inline Revision&& object_next_check()
-	//{
-	//	if(next_iteration==_iteration)
-	//	{
-	//		return Revision(_sub_iteration+1,next_iteration);
-	//	}
-	//	else
-	//	{
-	//		return Revision(0,next_iteration);
-	//	}
-	//}
+	inline Revision&& object_next_check()
+	{
+		if(next_iteration==_iteration)
+		{
+			return Revision(_sub_iteration+1,next_iteration);
+		}
+		else
+		{
+			return Revision(0,next_iteration);
+		}
+	}
 	
 
-	//template<typename ComponentType>
-	//inline Revision&& type_current_revision()
-	//{
-	//	return Revision(allocator_template<ComponentType>::allocator_reference.tex_current_revision);
-	//}
+	template<typename ComponentType>
+	inline Revision&& type_current_revision()
+	{
+		return Revision(allocator_template<ComponentType>::allocator_reference.tex_current_revision);
+	}
 
-	//template<typename ComponentType>
-	//inline Revision&& type_next_check()
-	//{
-	//	return Revision(allocator_template<ComponentType>::allocator_reference.tex_next_revision);
-	//}
+	template<typename ComponentType>
+	inline Revision&& type_next_check()
+	{
+		return Revision(allocator_template<ComponentType>::allocator_reference.tex_next_revision);
+	}
 	
 	
 	
