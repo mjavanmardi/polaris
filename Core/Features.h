@@ -8,7 +8,7 @@
 #define prototype template<typename ComponentType,typename CallerType=NULLTYPE>
 
 #define tag_as_prototype\
-	typedef ComponentType ComponentType;\
+	typedef ComponentType Component_Type;\
 	typedef CallerType CallerType;\
 	typedef true_type Is_Prototype;
 
@@ -367,11 +367,15 @@ struct VARIABLE_NAME \
 	typedef VALUE_PROTOTYPE<typename CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> VALUE_ALIAS;\
 	typedef CONTAINER_PROTOTYPE<typename CONTAINER_TYPE,CALLER_TYPE,VALUE_ALIAS*> CONTAINER_ALIAS
 
-#define define_simple_container_interface(CONTAINER_PROTOTYPE, NON_LOCAL_FEATURE_LINKED_TO_CONTAINER_TYPE, CONTAINER_ALIAS, VALUE_TYPE, CALLER_TYPE)\
-	typedef CONTAINER_PROTOTYPE<typename CONTAINER_ALIAS##_type,CALLER_TYPE,VALUE_TYPE> CONTAINER_ALIAS
+#define define_container_interface(CONTAINER_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_PROTOTYPE,CALLER_TYPE)\
+	typedef VALUE_PROTOTYPE<typename CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> value_alias;\
+	typedef CONTAINER_PROTOTYPE<typename CONTAINER_TYPE,CALLER_TYPE,value_alias*> CONTAINER_ALIAS
+
+#define define_simple_container_interface(CONTAINER_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_TYPE, CALLER_TYPE)\
+	typedef CONTAINER_PROTOTYPE<typename CONTAINER_TYPE,CALLER_TYPE,VALUE_TYPE> CONTAINER_ALIAS
 
 #define type_of(FEATURE_NAME) FEATURE_NAME##_type
-#define get_type_of(FEATURE_NAME) ComponentType::FEATURE_NAME##_type
+#define get_type_of(FEATURE_NAME) Component_Type::FEATURE_NAME##_type
 
 ///============================================================================
 /// component and interface cast macros
