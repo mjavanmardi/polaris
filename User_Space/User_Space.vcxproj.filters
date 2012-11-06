@@ -28,5 +28,65 @@
     <ClInclude Include="User_Space_Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Polaris_Activity_Location_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Demand_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Intersection_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Link_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Network_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Routing_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Scenario_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Traveler_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Vehicle_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Routable_Intersection_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Routable_Link_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Activity_Location_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Demand_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Intersection_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Link_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Network_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Routing_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenario_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Traveler_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Vehicle_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
