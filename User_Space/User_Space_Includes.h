@@ -1,5 +1,8 @@
 #pragma once
 #include "Repository\Repository.h"
+#include "RngStream.h"
+
+std::mt19937_64 generator;
 
 #include <iostream>
 #include <fstream>
