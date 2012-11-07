@@ -4,7 +4,7 @@
 #ifdef WINDOWS
 DWORD WINAPI Thread_Loop(LPVOID package_ptr);
 #else
-void* Thread_Loop(void* package_ptr);
+static void* Thread_Loop(void* package_ptr);
 #endif
 
 class World;

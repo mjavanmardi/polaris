@@ -49,17 +49,17 @@ struct Execution_Object
 	}
 	
 
-	template<typename ComponentType>
-	inline Revision&& type_current_revision()
-	{
-		return Revision(allocator_template<ComponentType>::allocator_reference.tex_current_revision);
-	}
+	//template<typename ComponentType>
+	//inline Revision&& type_current_revision()
+	//{
+	//	return Revision(allocator_template<ComponentType>::allocator_reference.tex_current_revision);
+	//}
 
-	template<typename ComponentType>
-	inline Revision&& type_next_check()
-	{
-		return Revision(allocator_template<ComponentType>::allocator_reference.tex_next_revision);
-	}
+	//template<typename ComponentType>
+	//inline Revision&& type_next_check()
+	//{
+	//	return Revision(allocator_template<ComponentType>::allocator_reference.tex_next_revision);
+	//}
 	
 	
 	
