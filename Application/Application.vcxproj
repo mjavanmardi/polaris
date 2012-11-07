@@ -119,6 +119,9 @@
     <ClCompile Include="Example.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Scenario_Manager\Scenario_Manager.vcxproj">
+      <Project>{fe16ca2c-e4c8-4c9c-9a8f-f63dc734205f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\User_Space\User_Space.vcxproj">
       <Project>{03356212-5dd0-4d56-a243-5dabb710dd31}</Project>
     </ProjectReference>
