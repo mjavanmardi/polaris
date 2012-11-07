@@ -91,8 +91,8 @@ public:
 			stringstream s;
 			
 			unordered_map<int,string>::iterator mitr;
-			int k=0;
-			for(mitr=rank_to_ip.begin();mitr!=rank_to_ip.end();mitr++,k++)
+			//int k=0;
+			for(mitr=rank_to_ip.begin();mitr!=rank_to_ip.end();mitr++)
 			{
 				if(mitr->first!=_host_rank)
 				{
@@ -318,6 +318,11 @@ public:
 		
 		//cout << "listener: " << listening_socket << endl;
 		
+		if(listening_socket==-1)
+		{
+			cout << "listener creation error: " << strerror(errno) << endl;
+		}
+		
 		sockaddr_in server_socket_address;
 		server_socket_address.sin_family = AF_INET;
 		server_socket_address.sin_addr.s_addr=INADDR_ANY;
@@ -326,12 +331,23 @@ public:
 		int bound=bind(listening_socket,(struct sockaddr*)&server_socket_address,sizeof(server_socket_address));
 		
 		//cout << "bound: " << bound << endl;
+
+		if(bound==-1)
+		{
+			cout << "binding error: " << strerror(errno) << endl;
+		}
 		
 		int listening=listen(listening_socket,120);
 		
 		//SLEEP(1);
 		
 		//cout << "listening: " << listening << endl;	
+		
+		
+		if(listening==-1)
+		{
+			cout << "listening error: " << strerror(errno) << endl;
+		}
 		
 		for(int i=0;i<rank_to_ip.size();i++)
 		{
@@ -341,6 +357,11 @@ public:
 				
 				//cout << "connecter socket: " << connecting_socket << endl;
 				
+				if(connecting_socket==-1)
+				{
+					cout << "connecter creation error: " << strerror(errno) << endl;
+				}
+		
 				sockaddr_in server_socket_address;
 				
 				server_socket_address.sin_family = AF_INET;
@@ -366,8 +387,6 @@ public:
 			}
 			if(i<_host_rank)
 			{
-				//int listening=listen(listening_socket,128);
-				
 				//cout << rank_to_ip[_host_rank].c_str() << " waiting for connection from: " << rank_to_ip[i].c_str() << endl;	
 
 				int accepting_socket=accept(listening_socket,NULL,NULL);
@@ -803,7 +822,7 @@ public:
 				{
 					// locate the type singleton and submit the message
 
-					(*((Communication_Object*)_all_components[((Message_Base*)current_position)->type_index])->handler_register)(_all_components[((Message_Base*)current_position)->type_index],current_position+sizeof(Message_Base));
+					(*((Communication_Object*)_all_components[((Message_Base*)current_position)->type_index])->communication_handler_register)(_all_components[((Message_Base*)current_position)->type_index],current_position+sizeof(Message_Base));
 					//cout << "\t\t\t" << "incrementing: " << ((Message_Base*)current_position)->length << "," << ((Message_Base*)current_position)->type_index << endl;
 					current_position+=((Message_Base*)current_position)->length;
 				}

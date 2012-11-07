@@ -72,16 +72,12 @@ public:
 	process_directive(execution_function)
 	{
 		tex_lock=0;
-		
+		type_process_directive=&Typed_Execution_Pages::Process;
 		tex_current_revision=-1;
 		tex_next_revision._iteration=LONG_MAX;
 		tex_next_revision._sub_iteration=0;
 		tex_next_next_revision._iteration=LONG_MAX;
 		tex_next_next_revision._sub_iteration=0;
-		
-		//event_register=nullptr;
-		//conditional_register=nullptr;
-
 		tex_threads_counter=0;
 	}
 	
@@ -95,18 +91,6 @@ public:
 		return Revision(tex_next_revision);
 	}
 
-	//template<typename ComponentType>
-	//void Load_Register(Conditional conditional,Event p_event,int start);
-	//{
-	//	conditional_register=conditional;
-	//	event_register=p_event;
-	//}
-
-	//__forceinline int next_iteration()
-	//{
-	//	return tex_next_next_revision._iteration;
-	//}
-	
 	void Process(Revision& tex_response)
 	{
 		Revision this_revision;
@@ -119,7 +103,7 @@ public:
 
 		const int header_size=sizeof(Typed_Execution_Page<DataType>);
 		
-		Typed_Execution_Page<>* execution_page;
+		Typed_Execution_Page<DataType>* execution_page;
 		
 		for(itr=active_pages.begin();itr!=active_pages.end();++itr)
 		{
@@ -198,6 +182,7 @@ public:
 	const unsigned int num_cells;
 	
 	const Execution_Directive process_directive;
+	void (Typed_Execution_Pages::* type_process_directive)(Revision&);
 };
 
 

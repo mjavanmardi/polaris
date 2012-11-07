@@ -24,15 +24,9 @@ public:
 		ex_threads_counter_end=0;
 	}
 
-	struct Execution_Type
-	{
-		Execution_Type(Typed_Execution_Pages<>* ptr):typed_execution_pages(ptr){};
-		Typed_Execution_Pages<>* typed_execution_pages;
-	};
-
 	void Activate_Type(Typed_Execution_Pages<>* ptr)
 	{
-		active_types.push_back(Execution_Type(ptr));
+		active_types.push_back(ptr);
 	}
 
 	void Process()
@@ -49,11 +43,11 @@ public:
 		{
 			Revision ex_response=ex_next_next_revision;
 
-			list<Execution_Type>::iterator itr;
+			list<Typed_Execution_Pages<>*>::iterator itr;
 
 			for(itr=active_types.begin();itr!=active_types.end();itr++)
 			{
-				Typed_Execution_Pages<>* execution_type=itr->typed_execution_pages;
+				Typed_Execution_Pages<>* execution_type=(*itr);
 				
 				Revision tex_response=execution_type->tex_next_revision;
 
@@ -65,12 +59,13 @@ public:
 
 					// process one slice of the TEX
 					
-					itr->typed_execution_pages->Process(tex_response);
+					(execution_type->*(execution_type->type_process_directive))(tex_response);
+					//itr->Process(tex_response);
 					
 					while(AtomicExchange(&execution_type->tex_lock,1)) SLEEP(0); // lock the type
 			
 						// TEX slice has revealed that it wishes to return some time in the future
-
+						
 						if(tex_response < execution_type->tex_next_next_revision)
 						{
 							// TEX slice wishes to return sooner in the future than already assumed
@@ -96,8 +91,7 @@ public:
 				}
 			}
 
-
-					
+			
 			while(AtomicExchange(&ex_lock,1)) SLEEP(0); // lock the execution engine
 			
 				// EX slice has revealed that it wishes to return some time in the future
@@ -149,7 +143,7 @@ public:
 		}
 	}
 
-	list<Execution_Type> active_types;
+	list<Typed_Execution_Pages<>*> active_types;
 
 	Revision ex_next_next_revision;
 	Revision ex_next_revision;

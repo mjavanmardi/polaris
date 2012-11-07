@@ -74,11 +74,3 @@ public:
 };
 
 static Memory_Root* memory_root_ptr;
-
-
-
-//template<typename DataType>
-//void Free(DataType*& value)
-//{
-//	return DataType::allocator_template<DataType>::allocator_reference.Free(value);
-//}

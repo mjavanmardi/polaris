@@ -155,7 +155,7 @@ public:
 /// IsTrue Implementation
 ///============================================================================
 
-template<class TList,unsigned int index=Length<TList>::value-1> struct IsTrue;
+template<class TList,unsigned int index=_Length<TList>::value-1> struct IsTrue;
 
 template<class Head,class Tail>
 struct IsTrue<TypeList<Head,Tail>,0>{static const bool value=Head::value;};

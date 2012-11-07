@@ -84,7 +84,7 @@ static volatile long stdout_lock=0;
 #ifdef WINDOWS
 static __declspec(thread) int _thread_id;
 #else
-static int _thread_id;
+static __thread int _thread_id;
 #endif
 
 static int _num_partitions=0;
