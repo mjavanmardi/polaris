@@ -1,5 +1,7 @@
 #pragma once
+#include "Scenario_Manager\cfg_reader.h"
 #include "User_Space_Includes.h"
+
 
 namespace Scenario_Components
 {
@@ -49,9 +51,20 @@ namespace Scenario_Components
 
 			feature_prototype void read_scenario_data()
 			{
-				simulation_interval_length<int>(6); //6 seconds
-				assignment_interval_length<int>(50*simulation_interval_length<int>()); // 5 minutes
-				planning_horizon<int>(6000*simulation_interval_length<int>()); // 1 hour
+				CfgReader cfgReader;
+				cfgReader.initialize("scenario.json");
+				cfgReader.getParameter("simulation_interval_length", simulation_interval_length<int*>());
+				//simulation_interval_length<int>(6); //6 seconds
+				
+				
+				int assignment_intervals;
+				cfgReader.getParameter("intervals_per_assignment", &assignment_intervals);
+				assignment_interval_length<int>(assignment_intervals*simulation_interval_length<int>());
+				//assignment_interval_length<int>(50*simulation_interval_length<int>()); // 5 minutes
+				int planning_intervals;
+				cfgReader.getParameter("planning_intervals", &planning_intervals);
+				planning_horizon<int>(planning_intervals*simulation_interval_length<int>());
+				//planning_horizon<int>(6000*simulation_interval_length<int>()); // 1 hour
 				
 				simulation_start_time<int>(0);
 				simulation_end_time<int>(planning_horizon<int>()+simulation_start_time<int>());
