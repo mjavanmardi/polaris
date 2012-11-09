@@ -6,10 +6,11 @@
 ///============================================================================
 
 #define prototype template<typename ComponentType,typename CallerType=NULLTYPE>
+#define forward_declare_prototype template<typename ComponentType,typename CallerType>
 
 #define tag_as_prototype\
 	typedef ComponentType Component_Type;\
-	typedef CallerType CallerType;\
+	typedef CallerType Caller_Type;\
 	typedef true_type Is_Prototype;
 
 ///============================================================================

@@ -31,21 +31,14 @@ struct Execution_Object
 
 
 	
-	inline Revision&& object_current_revision()
+	inline long object_current_revision()
 	{
-		return Revision(0,current_revision);
+		return current_revision;
 	}
 
-	inline Revision&& object_next_check()
+	inline long object_next_check()
 	{
-		if(next_iteration==_iteration)
-		{
-			return Revision(_sub_iteration+1,next_iteration);
-		}
-		else
-		{
-			return Revision(0,next_iteration);
-		}
+		return next_iteration;
 	}
 	
 

@@ -81,14 +81,14 @@ public:
 		tex_threads_counter=0;
 	}
 	
-	inline Revision&& type_current_revision()
+	inline long type_current_revision()
 	{
-		return Revision(tex_current_revision);
+		return tex_current_revision._iteration;
 	}
 
-	inline Revision&& type_next_check()
+	inline long type_next_check()
 	{
-		return Revision(tex_next_revision);
+		return tex_next_revision._iteration;
 	}
 
 	void Process(Revision& tex_response)
