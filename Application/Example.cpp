@@ -92,24 +92,24 @@ prototype struct Agent_Prototype
 		load_event(ComponentType,Do_Stuff_Condition,Do_Stuff,0,NULLTYPE);
 		
 		// define your interface to network
-		define_component_interface(Network,get_type_of(network),Network_Prototype,ComponentType);
+		define_component_interface(Network,get_type_of(network),::Network_Prototype,ComponentType);
 
 		Network& net=network<Network&>();
 
 		// define your interface to the links container and to the links value inside
-		define_container_and_value_interface(Links,Link,Network::get_type_of(links),Random_Access_Sequence_Prototype,Link_Prototype,ComponentType);
+		define_container_and_value_interface(Links,Link,Network::get_type_of(links),Random_Access_Sequence_Prototype,::Link_Prototype,ComponentType);
 
 		Links& links=net.links<Links&>();
 
 		// access with IDE support
-		size_t siz=get(Links,net.links).size();
+		size_t siz=access(Links,net.links).size();
 
 		if(siz>0)
 		{
 			Link* link=links[0];
 			
 			// link monitor variable for debugging
-			Link::ComponentType* link_monitor=(Link::ComponentType*)link;
+			Link::Component_Type* link_monitor=(Link::Component_Type*)link;
 
 			// Notice how polaris variables have type
 
@@ -167,7 +167,7 @@ int main()
 
 
 	// Initialize Link
-	define_component_interface(Link_Interface,MasterType::Link,Link_Prototype,NULLTYPE);
+	define_component_interface(Link_Interface,MasterType::Link,::Link_Prototype,NULLTYPE);
 	Link_Interface* link_itf=(Link_Interface*)Allocate<MasterType::Link>();
 	
 	// Notice how polaris variables can be accessed like regular variables
@@ -184,13 +184,13 @@ int main()
 	
 	
 	// Initialize Network
-	define_component_interface(Network_Interface,MasterType::Network,Network_Prototype,NULLTYPE);
+	define_component_interface(Network_Interface,MasterType::Network,::Network_Prototype,NULLTYPE);
 	Network_Interface* net_itf=(Network_Interface*)Allocate<MasterType::Network>();
 	
 
 	// Add reference to link, notice 2 ways of accessing container
-	define_container_and_value_interface(Links,Link,Network_Interface::get_type_of(links),Random_Access_Sequence_Prototype,Link_Prototype,NULLTYPE);
-	get(Links,net_itf->links).push_back(link_itf); // supports IDE
+	define_container_and_value_interface(Links,Link,Network_Interface::get_type_of(links),Random_Access_Sequence_Prototype,::Link_Prototype,NULLTYPE);
+	access(Links,net_itf->links).push_back(link_itf); // supports IDE
 	net_itf->links<Links*>()->push_back(link_itf);
 
 
