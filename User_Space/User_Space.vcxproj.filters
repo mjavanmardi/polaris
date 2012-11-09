@@ -88,5 +88,8 @@
     <ClInclude Include="Vehicle_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
+    <ClInclude Include="RngStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

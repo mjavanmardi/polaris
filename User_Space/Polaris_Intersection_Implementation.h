@@ -51,7 +51,9 @@ namespace Intersection_Components
 		//==================================================================================================================
 		/// forward_link_turn_travel_time
 		//------------------------------------------------------------------------------------------------------------------
-			define_container_and_value_interface(_Replicas_Container_Interface, _Replica_Interface, replicas_container_type, Random_Access_Sequence_Prototype, Movement_Prototype, NULLTYPE);
+			//define_container_and_value_interface(_Replicas_Container_Interface, _Replica_Interface, replicas_container_type, Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, NULLTYPE);
+            typedef Intersection_Components::Prototypes::Movement_Prototype<typename replicas_container_type::unqualified_value_type,NULLTYPE> _Replica_Interface;
+            typedef Random_Access_Sequence_Prototype<replicas_container_type,NULLTYPE,_Replica_Interface*> _Replicas_Container_Interface;
 			
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType forward_link_turn_travel_time(){return (TargetType)(_forward_link_turn_travel_time);} tag_getter_as_available(forward_link_turn_travel_time);
@@ -60,11 +62,11 @@ namespace Intersection_Components
 			{
 				_forward_link_turn_travel_time = (float)set_value;
 				// update replicas
-				_Replicas_Container_Interface::iterator replica_itr;
+				typename _Replicas_Container_Interface::iterator replica_itr;
 				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
 				{
 					_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-					//replica->forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
+					//replica->template forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
 				}
 			}
 			tag_setter_as_available(forward_link_turn_travel_time);

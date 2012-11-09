@@ -1,6 +1,17 @@
 #pragma once
 #include "User_Space_Includes.h"
 
+/*
+ * Needed for Linux compatability. Do not hurt Windows compilation.
+ */
+namespace Routing_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Routing_Prototype;
+	}
+};
+/*------------------------------------------------*/
+
 namespace Traveler_Components
 {
 	namespace Types
@@ -23,10 +34,10 @@ namespace Traveler_Components
 
 			feature_prototype void Schedule_New_Departure(int departed_time)
 			{
-				define_component_interface(_Routing_Interface, get_type_of(router), Routing_Prototype, ComponentType);
+				define_component_interface(_Routing_Interface, get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 				_Routing_Interface* itf=router<_Routing_Interface*>();
 				
-				itf->Schedule_Route_Computation<NULLTYPE>(departed_time);
+				itf->template Schedule_Route_Computation<NULLTYPE>(departed_time);
 			}
 		};
 	}

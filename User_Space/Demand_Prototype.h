@@ -2,6 +2,47 @@
 
 #include "User_Space_Includes.h"
 
+/*
+ * Needed for Linux compatability. Do not hurt Windows compilation.
+ */
+namespace Scenario_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Scenario_Prototype;
+	}
+};
+namespace Network_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Network_Prototype;
+	}
+};
+namespace Activity_Location_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Activity_Location_Prototype;
+	}
+};
+namespace Link_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Link_Prototype;
+	}
+};
+namespace Vehicle_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Vehicle_Prototype;
+	}
+};
+namespace Routing_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Routing_Prototype;
+	}
+};
+/*------------------------------------------------*/
+
 #ifdef Advanced
 #include "Transims_Demand_API.h"
 #endif
@@ -108,15 +149,15 @@ namespace Demand_Components
 				//sort demand by departed time
 				//demand_data.time_dependent_vehicle_index_array.resize(scenario_data.num_simulation_intervals*scenario_data.simulation_interval_length);
 
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Prototype, ComponentType);
-				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				
-				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Prototype, ComponentType);
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
-				define_component_interface(_Vehicle_Interface, ComponentType::traveler_type::vehicle_type, Vehicle_Prototype, ComponentType);
-				define_component_interface(_Routing_Interface, ComponentType::traveler_type::router_type, Routing_Prototype, ComponentType);
-				typedef Traveler_Prototype<ComponentType::traveler_type, ComponentType> _Traveler_Interface;
+				define_component_interface(_Vehicle_Interface, ComponentType::traveler_type::vehicle_type, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(_Routing_Interface, ComponentType::traveler_type::router_type, Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+				typedef Traveler_Components::Prototypes::Traveler_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
 
 				_Network_Interface* network=network_reference<_Network_Interface*>();
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
@@ -124,9 +165,9 @@ namespace Demand_Components
 
 				int traveler_id_counter=-1;
 
-				int num_intervals = scenario->num_simulation_intervals<int>();
+				int num_intervals = scenario->template num_simulation_intervals<int>();
 
-				for(int simulation_interval_index=0;simulation_interval_index<scenario->num_simulation_intervals<int>();simulation_interval_index++)
+				for(int simulation_interval_index=0;simulation_interval_index<scenario->template num_simulation_intervals<int>();simulation_interval_index++)
 				{// generate vehicles for each simulation interval
 
 					if(simulation_interval_index<=300)
@@ -141,21 +182,21 @@ namespace Demand_Components
 					}
 
 					int freeway_origin_activity_location_index = 0;
-					_Activity_Location_Interface* freeway_origin_activity_location = (_Activity_Location_Interface*)(network->activity_locations_container<_Activity_Locations_Container_Interface&>()[freeway_origin_activity_location_index]);
-					_Link_Interface* freeway_origin_link = (_Link_Interface*)freeway_origin_activity_location->origin_links<_Links_Container_Interface&>()[0];
-					int num_lanes_freeway = freeway_origin_link->num_lanes<int>();
+					_Activity_Location_Interface* freeway_origin_activity_location = (_Activity_Location_Interface*)(network->template activity_locations_container<_Activity_Locations_Container_Interface&>()[freeway_origin_activity_location_index]);
+					_Link_Interface* freeway_origin_link = (_Link_Interface*)freeway_origin_activity_location->template origin_links<_Links_Container_Interface&>()[0];
+					int num_lanes_freeway = freeway_origin_link->template num_lanes<int>();
 
 					int ramp_origin_activity_location_index = 2;
-					_Activity_Location_Interface* ramp_origin_activity_location = (_Activity_Location_Interface*)(network->activity_locations_container<_Activity_Locations_Container_Interface&>()[ramp_origin_activity_location_index]);
-					_Link_Interface* ramp_origin_link = (_Link_Interface*)ramp_origin_activity_location->origin_links<_Links_Container_Interface&>()[0];
-					int num_lanes_ramp = ramp_origin_link->num_lanes<int>();
+					_Activity_Location_Interface* ramp_origin_activity_location = (_Activity_Location_Interface*)(network->template activity_locations_container<_Activity_Locations_Container_Interface&>()[ramp_origin_activity_location_index]);
+					_Link_Interface* ramp_origin_link = (_Link_Interface*)ramp_origin_activity_location->template origin_links<_Links_Container_Interface&>()[0];
+					int num_lanes_ramp = ramp_origin_link->template num_lanes<int>();
 					
-					float num_generated_vehicles_freeway = (float) ((1.0+num_lanes_freeway*scenario->simulation_interval_length<int>() * freeway_demand_rate)/3600.0);
-					float num_generated_vehicles_ramp = (float) ((1.0+num_lanes_ramp*scenario->simulation_interval_length<int>() * ramp_demand_rate)/3600.0);
+					float num_generated_vehicles_freeway = (float) ((1.0+num_lanes_freeway*scenario->template simulation_interval_length<int>() * freeway_demand_rate)/3600.0);
+					float num_generated_vehicles_ramp = (float) ((1.0+num_lanes_ramp*scenario->template simulation_interval_length<int>() * ramp_demand_rate)/3600.0);
 
 					int destination_activity_location_index = 1;
-					_Activity_Location_Interface* destination_activity_location = (_Activity_Location_Interface*)(network->activity_locations_container<_Activity_Locations_Container_Interface&>()[destination_activity_location_index]);
-					_Link_Interface* destination_link = (_Link_Interface*)(destination_activity_location->destination_links<_Links_Container_Interface&>()[0]);
+					_Activity_Location_Interface* destination_activity_location = (_Activity_Location_Interface*)(network->template activity_locations_container<_Activity_Locations_Container_Interface&>()[destination_activity_location_index]);
+					_Link_Interface* destination_link = (_Link_Interface*)(destination_activity_location->template destination_links<_Links_Container_Interface&>()[0]);
 					
 					_Traveler_Interface* traveler;
 					_Vehicle_Interface* vehicle;
@@ -166,14 +207,14 @@ namespace Demand_Components
 					_Link_Interface* origin_link;
 					_Activity_Location_Interface* origin_activity_location;
 					int assignment_interval_index;
-					assignment_interval_index = (int)((simulation_interval_index+1) * scenario->simulation_interval_length<int>()) / scenario->assignment_interval_length<int>();					
+					assignment_interval_index = (int)((simulation_interval_index+1) * scenario->template simulation_interval_length<int>()) / scenario->template assignment_interval_length<int>();					
 					
-					vehicle_rate_per_simulation_interval = (float)(num_generated_vehicles_freeway / scenario->simulation_interval_length<float>());
+					vehicle_rate_per_simulation_interval = (float)(num_generated_vehicles_freeway / scenario->template simulation_interval_length<float>());
 					origin_link = freeway_origin_link;
-					origin_activity_location = (_Activity_Location_Interface*)network->activity_locations_container<_Activity_Locations_Container_Interface&>()[freeway_origin_activity_location_index];
+					origin_activity_location = (_Activity_Location_Interface*)network->template activity_locations_container<_Activity_Locations_Container_Interface&>()[freeway_origin_activity_location_index];
 
 
-					for (int i=0;i<scenario_reference<_Scenario_Interface*>()->simulation_interval_length<int>();i++)
+					for (int i=0;i<scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();i++)
 					{
 						float cur_vehicle_rate_per_simulation_interval = vehicle_rate_per_simulation_interval;
 						while(cur_vehicle_rate_per_simulation_interval>0)
@@ -181,30 +222,30 @@ namespace Demand_Components
 							if (cur_vehicle_rate_per_simulation_interval>=1.0)
 							{
 								
-								traveler=(_Traveler_Interface*)Allocate<ComponentType::traveler_type>();
-								vehicle=(_Vehicle_Interface*)Allocate<_Vehicle_Interface::Component_Type>();
-								router=(_Routing_Interface*)Allocate<_Routing_Interface::Component_Type>();
+								traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
+								vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
+								router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 								
-								traveler->uuid<int>(++traveler_id_counter);
-								traveler->router<_Routing_Interface*>(router);
-								traveler->vehicle<_Vehicle_Interface*>(vehicle);
-								router->traveler<_Traveler_Interface*>(traveler);
-								router->network<_Network_Interface*>(network);
+								traveler->template uuid<int>(++traveler_id_counter);
+								traveler->template router<_Routing_Interface*>(router);
+								traveler->template vehicle<_Vehicle_Interface*>(vehicle);
+								router->template traveler<_Traveler_Interface*>(traveler);
+								router->template network<_Network_Interface*>(network);
 
-								vehicle->uuid<int>(traveler_id_counter);
-								vehicle->origin_link<_Link_Interface*>(origin_link);
-								vehicle->destination_link<_Link_Interface*>(destination_link);
-								vehicle->origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
-								vehicle->destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
+								vehicle->template uuid<int>(traveler_id_counter);
+								vehicle->template origin_link<_Link_Interface*>(origin_link);
+								vehicle->template destination_link<_Link_Interface*>(destination_link);
+								vehicle->template origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
+								vehicle->template destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
 								//vehicle_data.set_seed(scenario_data.iseed);simulation_interval_index
 
 								
 
-								departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
-								traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
-								vehicle->departed_simulation_interval_index<int>(departed_time);
-								vehicle->departed_assignment_interval_index<int>(departed_time);
-								//cout << endl<<traveler->uuid<int>() <<"\t"<<departed_time;
+								departed_time = simulation_interval_index * scenario->template simulation_interval_length<int>();
+								traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
+								vehicle->template departed_simulation_interval_index<int>(departed_time);
+								vehicle->template departed_assignment_interval_index<int>(departed_time);
+								//cout << endl<<traveler->template uuid<int>() <<"\t"<<departed_time;
 
 								cur_vehicle_rate_per_simulation_interval = (float) (cur_vehicle_rate_per_simulation_interval - 1.0);
 							}
@@ -214,29 +255,29 @@ namespace Demand_Components
 								if (r1<=cur_vehicle_rate_per_simulation_interval)
 								{
 
-									traveler=(_Traveler_Interface*)Allocate<ComponentType::traveler_type>();
-									vehicle=(_Vehicle_Interface*)Allocate<_Vehicle_Interface::Component_Type>();
-									router=(_Routing_Interface*)Allocate<_Routing_Interface::Component_Type>();
+									traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
+									vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
+									router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 									
-									traveler->uuid<int>(++traveler_id_counter);
-									traveler->router<_Routing_Interface*>(router);
-									traveler->vehicle<_Vehicle_Interface*>(vehicle);
-									router->traveler<_Traveler_Interface*>(traveler);
-									router->network<_Network_Interface*>(network);
+									traveler->template uuid<int>(++traveler_id_counter);
+									traveler->template router<_Routing_Interface*>(router);
+									traveler->template vehicle<_Vehicle_Interface*>(vehicle);
+									router->template traveler<_Traveler_Interface*>(traveler);
+									router->template network<_Network_Interface*>(network);
 
-									vehicle->origin_link<_Link_Interface*>(origin_link);
-									vehicle->destination_link<_Link_Interface*>(destination_link);
-									vehicle->origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
-									vehicle->destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
+									vehicle->template origin_link<_Link_Interface*>(origin_link);
+									vehicle->template destination_link<_Link_Interface*>(destination_link);
+									vehicle->template origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
+									vehicle->template destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
 									//vehicle_data.set_seed(scenario_data.iseed);
 									
 
 
-									departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
-									traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
-									vehicle->departed_assignment_interval_index<int>(departed_time);
-									vehicle->departed_simulation_interval_index<int>(departed_time);
-									//cout << endl<<traveler->uuid<int>() <<"\t"<<departed_time;
+									departed_time = simulation_interval_index * scenario->template simulation_interval_length<int>();
+									traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
+									vehicle->template departed_assignment_interval_index<int>(departed_time);
+									vehicle->template departed_simulation_interval_index<int>(departed_time);
+									//cout << endl<<traveler->template uuid<int>() <<"\t"<<departed_time;
 								}
 
 								cur_vehicle_rate_per_simulation_interval = (float)(cur_vehicle_rate_per_simulation_interval - 1.0);
@@ -247,72 +288,72 @@ namespace Demand_Components
 
 
 
-					vehicle_rate_per_simulation_interval = (float)(num_generated_vehicles_ramp / scenario->simulation_interval_length<float>());
+					vehicle_rate_per_simulation_interval = (float)(num_generated_vehicles_ramp / scenario->template simulation_interval_length<float>());
 					origin_link = ramp_origin_link;
-					origin_activity_location = (_Activity_Location_Interface*)network->activity_locations_container<_Activity_Locations_Container_Interface&>()[ramp_origin_activity_location_index];
+					origin_activity_location = (_Activity_Location_Interface*)network->template activity_locations_container<_Activity_Locations_Container_Interface&>()[ramp_origin_activity_location_index];
 
 
-					for (int i=0;i<scenario_reference<_Scenario_Interface*>()->simulation_interval_length<int>();i++)
+					for (int i=0;i<scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();i++)
 					{
 						float cur_vehicle_rate_per_simulation_interval = vehicle_rate_per_simulation_interval;
 						while(cur_vehicle_rate_per_simulation_interval>0)
 						{
 							if (cur_vehicle_rate_per_simulation_interval>=1.0)
 							{
-								traveler=(_Traveler_Interface*)Allocate<ComponentType::traveler_type>();
-								vehicle=(_Vehicle_Interface*)Allocate<_Vehicle_Interface::Component_Type>();
-								router=(_Routing_Interface*)Allocate<_Vehicle_Interface::Component_Type>();
+								traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
+								vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
+								router=(_Routing_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
 								
-								traveler->uuid<int>(++traveler_id_counter);
-								traveler->router<_Routing_Interface*>(router);
-								traveler->vehicle<_Vehicle_Interface*>(vehicle);
-								router->traveler<_Traveler_Interface*>(traveler);
-								router->network<_Network_Interface*>(network);
+								traveler->template uuid<int>(++traveler_id_counter);
+								traveler->template router<_Routing_Interface*>(router);
+								traveler->template vehicle<_Vehicle_Interface*>(vehicle);
+								router->template traveler<_Traveler_Interface*>(traveler);
+								router->template network<_Network_Interface*>(network);
 
-								vehicle->origin_link<_Link_Interface*>(origin_link);
-								vehicle->destination_link<_Link_Interface*>(destination_link);
-								vehicle->origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
-								vehicle->destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
+								vehicle->template origin_link<_Link_Interface*>(origin_link);
+								vehicle->template destination_link<_Link_Interface*>(destination_link);
+								vehicle->template origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
+								vehicle->template destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
 								//vehicle_data.set_seed(scenario_data.iseed);
 
 								
 
 								departed_time = simulation_interval_index * scenario->template simulation_interval_length<int>();
-								traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
+								traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
 								vehicle->template departed_simulation_interval_index<int>(departed_time);
 								vehicle->template departed_assignment_interval_index<int>(departed_time);
 
 								cur_vehicle_rate_per_simulation_interval = (float) (cur_vehicle_rate_per_simulation_interval - 1.0);
-								//cout << endl<<"RAMP\t"<<traveler->uuid<int>() <<"\t"<<departed_time;
+								//cout << endl<<"RAMP\t"<<traveler->template uuid<int>() <<"\t"<<departed_time;
 							}
 							else
 							{//monte carlo
 								double r1 = (double) g1.RandU01();
 								if (r1<=cur_vehicle_rate_per_simulation_interval)
 								{
-									traveler=(_Traveler_Interface*)Allocate<ComponentType::traveler_type>();
-									vehicle=(_Vehicle_Interface*)Allocate<_Vehicle_Interface::Component_Type>();
-									router=(_Routing_Interface*)Allocate<_Routing_Interface::Component_Type>();
+									traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
+									vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
+									router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 									
-									traveler->uuid<int>(++traveler_id_counter);
-									traveler->router<_Routing_Interface*>(router);
-									traveler->vehicle<_Vehicle_Interface*>(vehicle);
-									router->traveler<_Traveler_Interface*>(traveler);
-									router->network<_Network_Interface*>(network);
+									traveler->template uuid<int>(++traveler_id_counter);
+									traveler->template router<_Routing_Interface*>(router);
+									traveler->template vehicle<_Vehicle_Interface*>(vehicle);
+									router->template traveler<_Traveler_Interface*>(traveler);
+									router->template network<_Network_Interface*>(network);
 
-									vehicle->origin_link<_Link_Interface*>(origin_link);
-									vehicle->destination_link<_Link_Interface*>(destination_link);
-									vehicle->origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
-									vehicle->destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
+									vehicle->template origin_link<_Link_Interface*>(origin_link);
+									vehicle->template destination_link<_Link_Interface*>(destination_link);
+									vehicle->template origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
+									vehicle->template destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
 									//vehicle_data.set_seed(scenario_data.iseed);
 
 									
 
-									departed_time = simulation_interval_index * scenario->simulation_interval_length<int>();
-									traveler->Schedule_New_Departure<NULLTYPE>(departed_time);
-									vehicle->departed_simulation_interval_index<int>(departed_time);
-									vehicle->departed_assignment_interval_index<int>(departed_time);
-									//cout << endl<<"RAMP\t"<<traveler->uuid<int>() <<"\t"<<departed_time;
+									departed_time = simulation_interval_index * scenario->template simulation_interval_length<int>();
+									traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
+									vehicle->template departed_simulation_interval_index<int>(departed_time);
+									vehicle->template departed_assignment_interval_index<int>(departed_time);
+									//cout << endl<<"RAMP\t"<<traveler->template uuid<int>() <<"\t"<<departed_time;
 								}
 
 								cur_vehicle_rate_per_simulation_interval = (float)(cur_vehicle_rate_per_simulation_interval - 1.0);
@@ -343,7 +384,7 @@ namespace Demand_Components
 			void Initialize(InputFileType& input_file_struct, TimeStructType& iteration_step_struct, call_requires(ComponentType, Is_Dispatchable))
 			{
 				cout <<endl<<"GETTING DEMAND FROM TRANSIMS..."<<endl;
-				PTHIS(ComponentType)->Initialize<Dispatch<ComponentType>,CallerType,TripType,InputFileType,TimeStructType>(input_file_struct,iteration_step_struct);
+				PTHIS(ComponentType)->template Initialize<Dispatch<ComponentType>,CallerType,TripType,InputFileType,TimeStructType>(input_file_struct,iteration_step_struct);
 				cout <<endl<<"DONE."<<endl<<endl;
 				schedule_event_local(ComponentType,Get_Trips_Conditional,Get_Trips_Event,0,TripType);
 			}
@@ -359,16 +400,16 @@ namespace Demand_Components
 				char print;
 				cout <<endl<<"Getting Trips"<<endl;
 				Demand_Interface* demand = pthis;
-				demand->Get_Current_Trips_From_External<ComponentType,CallerType,TargetType>();
-				demand->Display_Timestep<ComponentType,CallerType,TargetType>();
-				demand->Increment_Time<ComponentType,CallerType,TargetType>();
+				demand->template Get_Current_Trips_From_External<ComponentType,CallerType,TargetType>();
+				demand->template Display_Timestep<ComponentType,CallerType,TargetType>();
+				demand->template Increment_Time<ComponentType,CallerType,TargetType>();
 
 				cout <<endl<<"Print trips to screen ('y' or 'n'): ";
 				cin >> print;
 
-				if (print == 'y' || print == 'Y') demand->Print_Trips<ComponentType,CallerType,TargetType>();
+				if (print == 'y' || print == 'Y') demand->template Print_Trips<ComponentType,CallerType,TargetType>();
 
-				demand->Clear_Trips<ComponentType,CallerType,TargetType>();
+				demand->template Clear_Trips<ComponentType,CallerType,TargetType>();
 
 			}
 			/// Conditional function used to trigger the event feature - currently check every iteration
@@ -391,9 +432,9 @@ namespace Demand_Components
 				Time_Components::Interfaces::Time_Interface* tstart = timestep_start<ComponentType,CallerType,Time_Components::Components::Time>();
 				Time_Components::Interfaces::Time_Interface* tend = timestep_end<ComponentType,CallerType,Time_Components::Components::Time>();
 				
-				tstart->Write<Time_Components::Components::Time,CallerType,int>();
-				auto s = tstart->Convert_Time<Time_Components::Components::Time, CallerType, Time_Components::Data_Structures::Time_DRSeconds>();
-				auto e = tend->Convert_Time<Time_Components::Components::Time, CallerType, Time_Components::Data_Structures::Time_DRSeconds>();
+				tstart->template Write<Time_Components::Components::Time,CallerType,int>();
+				auto s = tstart->template Convert_Time<Time_Components::Components::Time, CallerType, Time_Components::Data_Structures::Time_DRSeconds>();
+				auto e = tend->template Convert_Time<Time_Components::Components::Time, CallerType, Time_Components::Data_Structures::Time_DRSeconds>();
 
 				Time start = Time((int)s.Time);
 				Time end = Time((int)e.Time);
@@ -407,28 +448,28 @@ namespace Demand_Components
 				
 				for (itr=v.begin(); itr != v.end(); itr++)
 				{
-					this->push_trip<ComponentType,ComponentType,Trip_Components::Components::Trip>(*itr);
+					this->template push_trip<ComponentType,ComponentType,Trip_Components::Components::Trip>(*itr);
 					trip_count++;
 				}
-				cout <<endl<<endl<<"TIMESTEP "<<iteration<<endl<<"Trip count = "<<this->Trip_Count<ComponentType,CallerType,int>()<<endl;
+				cout <<endl<<endl<<"TIMESTEP "<<iteration<<endl<<"Trip count = "<<this->template Trip_Count<ComponentType,CallerType,int>()<<endl;
 			}
 			/// Time incrementing feature
 			feature void Increment_Time()
 			{
 				auto start = timestep_start<ComponentType,CallerType,Time_Components::Components::Time>();
 				auto end = timestep_end<ComponentType,CallerType,Time_Components::Components::Time>();
-				auto tstep = this->t_step<ComponentType,CallerType,Time_Components::Data_Structures::Time_Seconds&>();
+				auto tstep = this->template t_step<ComponentType,CallerType,Time_Components::Data_Structures::Time_Seconds&>();
 
-				start->Add_Time<Time_Components::Components::Time,CallerType>(tstep);
-				end->Add_Time<Time_Components::Components::Time,CallerType>(tstep);
+				start->template Add_Time<Time_Components::Components::Time,CallerType>(tstep);
+				end->template Add_Time<Time_Components::Components::Time,CallerType>(tstep);
 			}
 			/// Display the current timestep information
 			feature void Display_Timestep()
 			{
 				cout<<"Timestep Start:  ";
-				timestep_start<ComponentType,ComponentType,Time_Components::Components::Time>()->Write<Time_Components::Components::Time,CallerType,int>();
+				timestep_start<ComponentType,ComponentType,Time_Components::Components::Time>()->template Write<Time_Components::Components::Time,CallerType,int>();
 				cout<<endl<<"Timestep End:  ";
-				timestep_end<ComponentType,ComponentType,Time_Components::Components::Time>()->Write<Time_Components::Components::Time,CallerType,int>();			
+				timestep_end<ComponentType,ComponentType,Time_Components::Components::Time>()->template Write<Time_Components::Components::Time,CallerType,int>();			
 			}
 			//------------------------------------------------------------------------------------------------------------------
 			//  Implementation function dispatchers
@@ -436,22 +477,22 @@ namespace Demand_Components
 			/// Push a trip returned from external source into the local trip list through a base function call
 			feature void push_trip(Trip_Info* trip, call_requirements(requires(ComponentType,Is_Dispatchable) && requires(TargetType, Trip_Components::Concepts::Is_Trip)))
 			{
-				PTHIS(ComponentType)->push_trip<Dispatch<ComponentType>,CallerType,TargetType>(trip);
+				PTHIS(ComponentType)->template push_trip<Dispatch<ComponentType>,CallerType,TargetType>(trip);
 			}
 			/// Print the current trip list usign base function call
 			feature void Print_Trips(call_requires(ComponentType, Is_Dispatchable))
 			{
-				PTHIS(ComponentType)->Print_Trips<Dispatch<ComponentType>,CallerType,TargetType>();
+				PTHIS(ComponentType)->template Print_Trips<Dispatch<ComponentType>,CallerType,TargetType>();
 			}
 			/// Get a count of the number of trips returned in current timestep using base function call
 			feature TargetType Trip_Count(call_requires(ComponentType,Is_Dispatchable))
 			{
-				return PTHIS(ComponentType)->Trip_Count<Dispatch<ComponentType>,CallerType,TargetType>();
+				return PTHIS(ComponentType)->template Trip_Count<Dispatch<ComponentType>,CallerType,TargetType>();
 			}
 			/// Clear the current trip list using base function call
 			feature void Clear_Trips(call_requires(ComponentType, Is_Dispatchable))
 			{
-				PTHIS(ComponentType)->Clear_Trips<Dispatch<ComponentType>,CallerType,TargetType>();
+				PTHIS(ComponentType)->template Clear_Trips<Dispatch<ComponentType>,CallerType,TargetType>();
 			}
 
 

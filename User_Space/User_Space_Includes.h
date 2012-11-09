@@ -1,8 +1,6 @@
 #pragma once
-#include "Repository\Repository.h"
+#include "../Repository/Repository.h"
 #include "RngStream.h"
-
-std::mt19937_64 generator;
 
 #include <iostream>
 #include <fstream>
@@ -210,13 +208,13 @@ concept struct Is_Target_Type_Struct
 	{\
 		define_component_interface_local(MEMBER_COMPONENT_NAME##_itf,MEMBER_COMPONENT_PROTOTYPE,MEMBER_COMPONENT_NAME,ComponentType);\
 		MEMBER_COMPONENT_NAME##_itf* itf = cast_self_to_component().MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
-		return itf->MEMBER_COMPONENT_FEATURE<TargetType>();\
+		return itf->template MEMBER_COMPONENT_FEATURE<TargetType>();\
 	}\
 	feature void FEATURE_ALIAS(TargetType value, call_requires(ComponentType,set_exists_check(MEMBER_COMPONENT_NAME)))\
 	{\
 		define_component_interface_local(MEMBER_COMPONENT_NAME##_itf,MEMBER_COMPONENT_PROTOTYPE,MEMBER_COMPONENT_NAME,ComponentType);\
 		MEMBER_COMPONENT_NAME##_itf* itf = cast_self_to_component().MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
-		itf->MEMBER_COMPONENT_FEATURE<TargetType>(value);\
+		itf->template MEMBER_COMPONENT_FEATURE<TargetType>(value);\
 	}
 
 #define get_exists_check(FEATURE_NAME) FEATURE_NAME##_get_exists
@@ -226,3 +224,7 @@ concept struct Is_Target_Type_Struct
 //================================================================================================================================================================
 //================================================================================================================================================================
 #pragma endregion
+
+#ifndef WINDOWS
+#define FLT_MAX	3.402823466e+38F	/* max value */
+#endif

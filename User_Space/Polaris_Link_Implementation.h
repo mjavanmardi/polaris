@@ -181,11 +181,11 @@ namespace Link_Components
 			{
 				_travel_time = (int)set_value;
 				// update replicas
-				replicas_container_type::iterator replica_itr;
+				typename replicas_container_type::iterator replica_itr;
 				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
 				{
 					replica_interface* replica = (replica_interface*)(*replica_itr);
-					replica->travel_time<float>(_travel_time);
+					replica->template travel_time<float>(_travel_time);
 				}
 			}
 			tag_setter_as_available(travel_time);

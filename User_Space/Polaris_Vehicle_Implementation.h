@@ -28,8 +28,6 @@ namespace Vehicle_Components
 			
 			member_component(typename MasterType::link_type, link, none, none);
 
-			typedef typename MasterType::link_type link_type;
-
 			//end
 			//--------------------------------------------------------------------------------------------------------
 

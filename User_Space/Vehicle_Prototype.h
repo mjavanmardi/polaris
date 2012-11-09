@@ -1,6 +1,23 @@
 #pragma once
 #include "User_Space_Includes.h"
 
+/*
+ * Needed for Linux compatability. Do not hurt Windows compilation.
+ */
+namespace Scenario_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Scenario_Prototype;
+	}
+};
+namespace Intersection_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Intersection_Prototype;
+	}
+};
+/*------------------------------------------------*/
+
 namespace Vehicle_Components
 {
 	namespace Types
@@ -75,17 +92,17 @@ namespace Vehicle_Components
 			{
 				int route_link_size=(int)path_container.size();
 				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Trajectory_Unit_Interface::get_type_of(link), Link_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
 
 				for(int i=route_link_size-1;i>=0;i--)
 				{
-					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<_Trajectory_Unit_Interface::Component_Type>();
-					vehicle_trajectory_data->link<_Link_Interface*>((_Link_Interface*)(path_container[i]));
-					vehicle_trajectory_data->enter_time<int>(0);
-					vehicle_trajectory_data->delayed_time<int>(0);
+					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
+					vehicle_trajectory_data->template link<_Link_Interface*>((_Link_Interface*)(path_container[i]));
+					vehicle_trajectory_data->template enter_time<int>(0);
+					vehicle_trajectory_data->template delayed_time<int>(0);
 
-					//PRINT("\t\tPath Link: " << vehicle_trajectory_data->link<Link_Interface*>()->uuid<int>());
+					//PRINT("\t\tPath Link: " << vehicle_trajectory_data->template link<Link_Interface*>()->template uuid<int>());
 					trajectory.push_back(vehicle_trajectory_data);
 				}
 			};
@@ -126,10 +143,10 @@ namespace Vehicle_Components
 				{
 					int index = current_trajectory_unit_index<int>() + 1;
 					size_t size = trajectory_container<_Trajectory_Container_Interface&>().size();
-					int vid = this->uuid<int>();
+					int vid = this->template uuid<int>();
 					_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)trajectory_container<_Trajectory_Container_Interface&>()[index];
 
-					return trajectory_unit->link<TargetType>();
+					return trajectory_unit->template link<TargetType>();
 				}
 				else 
 				{
@@ -143,7 +160,7 @@ namespace Vehicle_Components
 
 				if(current_trajectory_unit_index<int>() != -1)
 				{
-					return trajectory_position<_Trajectory_Unit_Interface*>()->link<TargetType>();
+					return trajectory_position<_Trajectory_Unit_Interface*>()->template link<TargetType>();
 				}
 				else
 				{
@@ -161,7 +178,7 @@ namespace Vehicle_Components
 
 				_Trajectory_Unit_Interface* current=trajectory_position<_Trajectory_Unit_Interface*>();
 				
-				current->delayed_time<int>(0);
+				current->template delayed_time<int>(0);
 
 				arrived_time<int>(current_time_in_seconds);
 				arrived_simulation_interval_index<int>(simulation_interval_index);
@@ -181,10 +198,10 @@ namespace Vehicle_Components
 
 				//typedef Link_Interface<typename Trajectory_Unit_Type::link_type,ComponentType> Link_Interface;
 
-				//PRINT("origin link " << current->link<Link_Interface*>()->uuid<int>());
+				//PRINT("origin link " << current->template link<Link_Interface*>()->template uuid<int>());
 
-				//current->enter_time<int>(current_time_in_seconds);
-				//current->enter_interval_index<int>(simulation_interval_index);
+				//current->template enter_time<int>(current_time_in_seconds);
+				//current->template enter_interval_index<int>(simulation_interval_index);
 			}
 			
 			feature_prototype void transfer_to_next_link(int simulation_interval_index,int simulation_interval_length,int delayed_time)
@@ -193,30 +210,30 @@ namespace Vehicle_Components
 
 				//add exit time to trajectory data
 				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Trajectory_Unit_Interface::get_type_of(link), Link_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				_Trajectory_Unit_Interface* current=trajectory_position<_Trajectory_Unit_Interface*>();
 
-				if(current) current->delayed_time<int>(delayed_time);
+				if(current) current->template delayed_time<int>(delayed_time);
 				
 				current = advance_trajectory<_Trajectory_Unit_Interface*>();
 				
-				//PRINT("transferring to next link " << current->link<Link_Interface*>()->uuid<int>());
+				//PRINT("transferring to next link " << current->template link<Link_Interface*>()->template uuid<int>());
 
 				//add enter time to the trajectory data
-				current->enter_time<int>(current_time_in_seconds);
-				current->enter_interval_index<int>(simulation_interval_index);
+				current->template enter_time<int>(current_time_in_seconds);
+				current->template enter_interval_index<int>(simulation_interval_index);
 			}
 
 			feature_prototype int get_current_link_enter_time()
 			{
-				define_container_and_value_interface_local(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
-				return trajectory_position<_Trajectory_Unit_Interface*>()->enter_time<int>();
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				return trajectory_position<_Trajectory_Unit_Interface*>()->template enter_time<int>();
 			}
 			
 			feature_prototype int get_current_link_enter_interval_index()
 			{
-				define_container_and_value_interface_local(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
-				return trajectory_position<_Trajectory_Unit_Interface*>()->enter_interval_index<int>();
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				return trajectory_position<_Trajectory_Unit_Interface*>()->template enter_interval_index<int>();
 			}
 		};
 	}

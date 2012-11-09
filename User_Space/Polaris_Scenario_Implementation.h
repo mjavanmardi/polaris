@@ -21,15 +21,15 @@ namespace Scenario_Components
 			member_data(int, simulation_interval_length, none, none);
 			member_data(int, assignment_interval_length, none, none);
 
-			feature_implementation TargetType current_simulation_interval_index(requires(check(TargetType,is_arithmetic))){return (TargetType)_iteration/_simulation_interval_length;}
+			feature_implementation TargetType current_simulation_interval_index(){return (TargetType)_iteration/_simulation_interval_length;}
 			tag_getter_as_available(current_simulation_interval_index);
 
-			feature_implementation TargetType current_simulation_interval_index(requires(!check(TargetType,is_arithmetic))) {static_assert(false,"Your TargetType is not an arithmetic type.");}
+			//feature_implementation TargetType current_simulation_interval_index(requires(!check(TargetType,is_arithmetic))) {static_assert(false,"Your TargetType is not an arithmetic type.");}
 
-			feature_implementation TargetType current_time(requires(check(TargetType,is_arithmetic))){return (TargetType)_iteration;}
+			feature_implementation TargetType current_time(){return (TargetType)_iteration;}
 			tag_getter_as_available(current_time);
 
-			feature_implementation TargetType current_time(requires(!check(TargetType,is_arithmetic))) {static_assert(false,"Your TargetType is not an arithmetic type.");}
+			//feature_implementation TargetType current_time(requires(!check(TargetType,is_arithmetic))) {static_assert(false,"Your TargetType is not an arithmetic type.");}
 
 			member_data(int, planning_horizon, none, none);
 			member_data(int, simulation_start_time, none, none);
