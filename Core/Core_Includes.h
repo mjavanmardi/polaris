@@ -1,6 +1,6 @@
 #pragma once
 
-//#define WINDOWS
+#define WINDOWS
 
 #include <list>
 #include <vector>
