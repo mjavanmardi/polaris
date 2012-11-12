@@ -243,6 +243,7 @@ public:
 			s << "nslookup ";
 			s << itr->c_str();
 			s << "-ipinfin | grep Address | tail -1 | awk '{ print $2 }'";
+			//s << "-ib | grep Address | tail -1 | awk '{ print $2 }'";
 			
 			from_cluster=popen(s.str().c_str(),"r");
 			
@@ -499,13 +500,15 @@ public:
 					thread_exchange_data->send_buffer.clear();
 					thread_exchange_data->num_messages=0;
 				}
-
+				
 				//the head of the partition message buffer gets length and suggested next exchange information
 				
+				((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->current_iteration=_iteration;
 				((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->length=partition_exchange_data->send_buffer.size();
 				((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->suggested_next_exchange=partition_exchange_data->next_exchange;
-								
-				//cout << "\t\tTo Partition " << i << ": " << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->length << "," << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->suggested_next_exchange << endl;
+				((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->suggested_exchange_interval=partition_exchange_data->exchange_interval;
+				
+				//cout << "\t\tTo Partition " << i << ": " << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->length << "," << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->suggested_next_exchange << "," << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->suggested_exchange_interval << endl;
 			}
 		}
 	}
@@ -530,7 +533,7 @@ public:
 					
 					// only process exchanges which are happening
 					
-					//cout << "\t\t\t" << "send stats: " << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->length << "," << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->num_messages << "," << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->suggested_next_exchange << endl;
+					//cout << "\t\t\t" << "send stats to " << i << ": " << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->length << "," << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->num_messages << "," << ((Head_Message_Base*)partition_exchange_data->send_buffer.buffer())->suggested_next_exchange << endl;
 					
 					// initiate sends in rank order for those ranks which are smaller than you and receives for those ranks larger than you, self send is just a memcpy
 					
@@ -538,14 +541,32 @@ public:
 					{
 						//cout << "\t\t\t" << _host_rank << " sending first to " << i << ": " << partition_exchange_data->send_buffer.size() << endl;
 						
-						send(rank_to_socket[i],partition_exchange_data->send_buffer.buffer(),partition_exchange_data->send_buffer.size(),0);
+						int err=send(rank_to_socket[i],partition_exchange_data->send_buffer.buffer(),partition_exchange_data->send_buffer.size(),0);
+						
+						if(err==-1)
+						{
+							cout << "Send Error: " << strerror(errno) << endl;
+							exit(0);
+						}
 						
 						int recvd=recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer(),_Max_Message_Size,0);
+						
+						if(recvd==-1)
+						{
+							cout << "Receive Error: " << strerror(errno) << endl;
+							exit(0);
+						}
 						
 						Head_Message_Base* head_msg=(Head_Message_Base*)partition_exchange_data->recv_buffer.buffer();
 						
 						int len_so_far=recvd;
 						int msg_len=head_msg->length;
+						
+						if(head_msg->current_iteration!=_iteration)
+						{
+							cout << "Receive Failure: " << len_so_far << "," << msg_len << "," << head_msg->current_iteration << "," << _iteration << "," << i << "," << head_msg->suggested_next_exchange << endl;
+							exit(0);
+						}
 						
 						//cout << "\t\t\t" << "received initial message: " << head_msg->length << ", len_so_far " << recvd << endl;
 						
@@ -556,11 +577,11 @@ public:
 							if(recvd!=-1)
 							{
 								len_so_far+=recvd;
-								
-								//cout << "\t\t\t" << "received sub message: " << recvd << ", new len_so_far: " << len_so_far << endl;
 							}
-							
-							//SLEEP(.001);
+							else
+							{
+								cout << "Receive Error: " << strerror(errno) << endl;
+							}
 						}
 					}
 					else if(i == _host_rank)
@@ -573,10 +594,22 @@ public:
 						
 						int recvd=recv(rank_to_socket[i],partition_exchange_data->recv_buffer.buffer(),_Max_Message_Size,0);
 						
+						if(recvd==-1)
+						{
+							cout << "Receive Error: " << strerror(errno) << endl;
+							exit(0);
+						}
+						
 						Head_Message_Base* head_msg=(Head_Message_Base*)partition_exchange_data->recv_buffer.buffer();
 						
 						int len_so_far=recvd;
 						int msg_len=head_msg->length;
+						
+						if(head_msg->current_iteration!=_iteration)
+						{
+							cout << "Receive Failure: " << len_so_far << "," << msg_len << "," << head_msg->current_iteration << "," << _iteration << "," << i << "," << head_msg->suggested_next_exchange << endl;
+							exit(0);
+						}
 						
 						//cout << "\t\t\t" << "received initial message: " << head_msg->length << ", len_so_far " << recvd << endl;
 
@@ -587,14 +620,22 @@ public:
 							if(recvd!=-1)
 							{
 								len_so_far+=recvd;
-								
-								//cout << "\t\t\t" << "received sub message: " << recvd << ", new len_so_far: " << len_so_far << endl;
 							}
-							
-							//SLEEP(.001);
+							else
+							{
+								cout << "Receive Error: " << strerror(errno) << endl;
+								exit(0);
+							}							
 						}
+						
+						int err=send(rank_to_socket[i],partition_exchange_data->send_buffer.buffer(),partition_exchange_data->send_buffer.size(),0);
 												
-						send(rank_to_socket[i],partition_exchange_data->send_buffer.buffer(),partition_exchange_data->send_buffer.size(),0);
+						if(err==-1)
+						{
+							cout << "Send Error: " << strerror(errno) << endl;
+							exit(0);
+						}
+						
 					}
 					
 					// done with partition send buffer
@@ -605,7 +646,54 @@ public:
 					
 					Head_Message_Base* head_msg=(Head_Message_Base*)partition_exchange_data->recv_buffer.buffer();
 					
-					//cout << "\t\t\t" << "received message: " << head_msg->length << "," << head_msg->num_messages << "," << head_msg->suggested_next_exchange << endl;
+					//cout << "\t\t\t" << "received message from " << i << ": " << head_msg->length << "," << head_msg->num_messages << "," << head_msg->suggested_next_exchange << endl;
+					
+					if(head_msg->suggested_exchange_interval < partition_exchange_data->exchange_interval)
+					{
+						partition_exchange_data->exchange_interval=head_msg->suggested_exchange_interval;
+					}
+					
+					// decide when the interval would imply the next exchange, assume constancy from 0
+					
+					int interval_exchange = _iteration + (partition_exchange_data->exchange_interval - _iteration%partition_exchange_data->exchange_interval);
+					
+					// run the update check for this exchange interval
+
+					if(interval_exchange < partition_exchange_data->next_exchange)
+					{
+						partition_exchange_data->next_next_exchange = partition_exchange_data->next_exchange;
+						partition_exchange_data->next_exchange = interval_exchange;
+					}
+					else if(interval_exchange == partition_exchange_data->next_exchange)
+					{
+						// do nothing
+					}
+					else if(interval_exchange < partition_exchange_data->next_next_exchange)
+					{
+						partition_exchange_data->next_next_exchange = interval_exchange;
+					}
+					
+					
+					int interval_next_exchange = partition_exchange_data->exchange_interval + _iteration + (partition_exchange_data->exchange_interval - _iteration%partition_exchange_data->exchange_interval);
+					
+					// run the update check for this next exchange interval
+					
+					if(interval_next_exchange < partition_exchange_data->next_exchange)
+					{
+						partition_exchange_data->next_next_exchange = partition_exchange_data->next_exchange;
+						partition_exchange_data->next_exchange = interval_next_exchange;
+					}
+					else if(interval_next_exchange == partition_exchange_data->next_exchange)
+					{
+						// do nothing
+					}
+					else if(interval_next_exchange < partition_exchange_data->next_next_exchange)
+					{
+						partition_exchange_data->next_next_exchange = interval_next_exchange;
+					}
+					
+					
+					// run the update check for the suggested exchange
 					
 					if(head_msg->suggested_next_exchange < partition_exchange_data->next_exchange)
 					{
@@ -631,7 +719,8 @@ public:
 					{
 						// threads become as critical as the partition_exchange
 						
-						exchange_information.thread_local_exchange_data[j][i].next_exchange = partition_exchange_data->next_exchange;
+						exchange_information.thread_local_exchange_data[j][i].current_exchange = partition_exchange_data->current_exchange;
+						exchange_information.thread_local_exchange_data[j][i].next_exchange = partition_exchange_data->next_exchange;						
 					}
 					
 					//cout << "\t\t\t" << "status of exchange with " << i << ": " << partition_exchange_data->current_exchange << "," << partition_exchange_data->next_exchange << "," << partition_exchange_data->next_next_exchange << endl;
@@ -652,9 +741,7 @@ public:
 							
 							char* mbuf=process_buffer->allocate(head_msg->length - sizeof(Head_Message_Base));
 							memcpy( mbuf, (partition_exchange_data->recv_buffer.buffer()+sizeof(Head_Message_Base)), (head_msg->length-sizeof(Head_Message_Base)) );
-							
-							//cout << "test: " << *(int*)(mbuf+sizeof(Message_Base)) << "," << *(int*)(mbuf+2*sizeof(Message_Base)+16) << endl;
-						
+
 						process_data->process_data_lock=0; // unlock the process buffer
 					}
 					
@@ -681,13 +768,15 @@ public:
 		{
 			partition_exchange_data=&exchange_information.partition_exchange_data[i];
 			
+			//cout << partition_exchange_data->current_exchange << "," << exchange_information.next_exchange << endl;
+			
 			if(partition_exchange_data->current_exchange < exchange_information.next_exchange)
 			{
 				exchange_information.next_exchange=partition_exchange_data->current_exchange;
 			}
 		}
 
-		//cout << "\t\t\t" << "status of partition exchange: " << exchange_information.current_exchange << endl;
+		//cout << "\t\t\t" << "status of partition exchange: " << exchange_information.current_exchange << "," << exchange_information.next_exchange  << endl;
 	}
 	
 	void Build_Parcels()
@@ -818,6 +907,8 @@ public:
 				
 				// next, begin deciphering and processing messages
 				
+				//start_timer(sub_process_timer_b[_thread_id]);
+				
 				for(int i=0;i<parcel->num_messages;i++)
 				{
 					// locate the type singleton and submit the message
@@ -827,6 +918,7 @@ public:
 					current_position+=((Message_Base*)current_position)->length;
 				}
 				
+				//end_timer(sub_process_timer_b[_thread_id],sub_process_time_b[_thread_id]);
 			}
 			
 			if(process == _num_threads)
@@ -838,12 +930,14 @@ public:
 
 	void Exchange()
 	{
-		bool exchange_this__iteration = (exchange_information.current_exchange == _iteration);
+		bool exchange_this_iteration = (exchange_information.current_exchange == _iteration);
 		
 		//cout << "entering exchange: " << _iteration << " : " << exchange_information.current_exchange << endl;
 		
-		while(exchange_this__iteration)
+		while(exchange_this_iteration)
 		{
+			//long process=AtomicIncrement(&ipc_threads_counter_A);
+			
 			while(AtomicExchange(&ipc_lock,1)) SLEEP(0); // lock the ipc engine
 				
 				// only the first thread gets in
@@ -863,16 +957,15 @@ public:
 			ipc_lock=0; // unlock the ipc engine
 			
 			while(AtomicCompareExchange(&ipc_threads_counter_A,0,0)) SLEEP(0); // everyone spins until the counter is reset
-
+			
 			//cout << "\tsending and receiving" << endl;
 			
 			Send_Receive();
 			
 			
 			
-			AtomicIncrement(&ipc_threads_counter_B); // have everyone go through the next turnstile
 			
-			if(ipc_threads_counter_B==_num_threads)
+			if(AtomicIncrement(&ipc_threads_counter_B)==_num_threads) // have everyone go through the next turnstile
 			{
 				//cout << "\tdone sending and receiving" << endl;
 			
@@ -921,10 +1014,10 @@ public:
 		
 			//cout << "\tdone processing" << endl;
 			
-			AtomicIncrement(&ipc_threads_counter_B); // have everyone go through the next turnstile
-			
-			if(ipc_threads_counter_B==_num_threads)
+			if(AtomicIncrement(&ipc_threads_counter_B)==_num_threads) // have everyone go through the next turnstile
 			{
+				//cout << "\t\t\t" << "status of partition exchange B: " << exchange_information.current_exchange << "," << exchange_information.next_exchange  << endl;
+			
 				// clean up processing
 				
 				exchange_information.process_data.Reset();
@@ -939,7 +1032,7 @@ public:
 			
 			while(AtomicCompareExchange(&ipc_threads_counter_B,0,0)) SLEEP(0); // everyone spins until the counter is reset
 			
-			exchange_this__iteration = (exchange_information.current_exchange == _iteration);
+			exchange_this_iteration = (exchange_information.current_exchange == _iteration);
 			
 			break;
 		}

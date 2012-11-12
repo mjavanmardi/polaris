@@ -36,7 +36,7 @@ public:
 
 			memcpy(new_bytes,bytez,current_size);
 
-			delete bytez;
+			delete[] bytez;
 
 			bytez=new_bytes;
 		}

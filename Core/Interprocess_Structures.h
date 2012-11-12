@@ -3,7 +3,7 @@
 
 struct Exchange_Data
 {
-	Exchange_Data():num_messages(0),comm_lock(0),current_exchange(0),next_exchange(INT_MAX),next_next_exchange(INT_MAX){};
+	Exchange_Data():exchange_interval(0),num_messages(0),comm_lock(0),current_exchange(0),next_exchange(INT_MAX),next_next_exchange(INT_MAX){};
 	
 	Byte_Balloon send_buffer;
 	Byte_Balloon recv_buffer;
@@ -12,6 +12,7 @@ struct Exchange_Data
 	int current_exchange;
 	int next_exchange;
 	int next_next_exchange;
+	int exchange_interval;
 	
 	volatile long comm_lock;
 };
@@ -65,8 +66,10 @@ static Exchange_Information exchange_information;
 
 struct Head_Message_Base
 {
-	int suggested_next_exchange;
 	int length;
+	int current_iteration;
+	int suggested_next_exchange;
+	int suggested_exchange_interval;
 	int num_messages;
 };
 
@@ -124,10 +127,50 @@ void Broadcast_Message(void* msg,int msg_length,int next_exchange)
 }
 
 
+void Initialize_Exchange_Interval(unsigned int partition,unsigned int exchange_interval)
+{
+	Exchange_Data* partition_exchange_data=&exchange_information.partition_exchange_data[partition];
+	
+	partition_exchange_data->exchange_interval=exchange_interval;
+	
+	int interval_exchange = _iteration + (partition_exchange_data->exchange_interval - _iteration%partition_exchange_data->exchange_interval);
+	
+	for(int i=0;i<_num_threads;i++)
+	{
+		Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[i][partition];
+		
+		thread_exchange_data->exchange_interval=exchange_interval;
+		
+		if(interval_exchange < thread_exchange_data->next_exchange)
+		{
+			thread_exchange_data->next_exchange=interval_exchange;
+		}
+	}
+	
+	if(interval_exchange < partition_exchange_data->next_exchange)
+	{
+		partition_exchange_data->next_next_exchange = partition_exchange_data->next_exchange;
+		partition_exchange_data->next_exchange = interval_exchange;
+	}
+	else if(interval_exchange == partition_exchange_data->next_exchange)
+	{
+		// do nothing
+	}
+	else if(interval_exchange < partition_exchange_data->next_next_exchange)
+	{
+		partition_exchange_data->next_next_exchange = interval_exchange;
+	}
+
+	if(partition_exchange_data->next_exchange < exchange_information.next_exchange)
+	{
+		exchange_information.next_exchange=partition_exchange_data->next_exchange;
+	}	
+}
+
 template<typename ComponentType>
-void Send_Message(void* msg,int msg_length,int destination,int next_exchange)
-{	
-	if(destination >= _num_partitions) return;
+void Send_Message(void* msg,unsigned int msg_length,unsigned int destination,unsigned int next_exchange=INT_MAX)
+{
+	if(destination >= _num_partitions || next_exchange < _iteration) return;
 	
 	Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[_thread_id][destination];
 	
@@ -137,22 +180,6 @@ void Send_Message(void* msg,int msg_length,int destination,int next_exchange)
 	{
 		thread_exchange_data->next_exchange=next_exchange;
 	}
-	
-	/*
-	if(next_exchange < thread_exchange_data->next_exchange)
-	{
-		thread_exchange_data->next_next_exchange=thread_exchange_data->next_exchange;
-		thread_exchange_data->next_exchange=next_exchange;
-	}
-	else if(next_exchange == thread_exchange_data->next_exchange)
-	{
-		// do nothing
-	}
-	else if(next_exchange < thread_exchange_data->next_next_exchange)
-	{
-		thread_exchange_data->next_next_exchange=next_exchange;
-	}
-	*/
 	
 	// number of messages for this thread / destination combination
 	

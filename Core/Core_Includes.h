@@ -1,6 +1,6 @@
 #pragma once
 
-#define WINDOWS
+//#define WINDOWS
 
 #include <list>
 #include <vector>
@@ -15,6 +15,7 @@
 #include <type_traits>
 #include <random>
 #else
+#include <time.h>
 #include <tr1/unordered_map>
 #include <string.h>
 #include <unistd.h>
@@ -166,6 +167,45 @@ static SingletonType* Add_Component_Singleton(SingletonType* val)
 }
 
 
+#ifdef WINDOWS
+#else
+static timespec process_timer[_num_threads];
+static long long process_time[_num_threads];
+static timespec sub_process_timer_a[_num_threads];
+static long long sub_process_time_a[_num_threads];
+static timespec sub_process_timer_b[_num_threads];
+static long long sub_process_time_b[_num_threads];
+static timespec sub_process_timer_c[_num_threads];
+static long long sub_process_time_c[_num_threads];
+static timespec exchange_timer[_num_threads];
+static long long exchange_time[_num_threads];
+
+void start_timer(timespec& start)
+{
+	clock_gettime(CLOCK_REALTIME, &start);
+}
+
+void end_timer(timespec& start,long long& total)
+{
+	timespec end;
+	clock_gettime(CLOCK_REALTIME, &end);
+	
+	timespec temp;
+	if ((end.tv_nsec-start.tv_nsec)<0)
+	{
+		temp.tv_sec = end.tv_sec-start.tv_sec-1;
+		temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+	}
+	else
+	{
+		temp.tv_sec = end.tv_sec-start.tv_sec;
+		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
+	}
+	
+	total=total+temp.tv_nsec+1000000000*temp.tv_sec;
+}
+
+#endif
 
 
 #ifdef DEBUG_1
