@@ -16,7 +16,7 @@ namespace Activity_Location_Components
 		implementation struct Polaris_Activity_Location_Implementation
 		{
 
-			member_data(int, zone, none, none);
+			member_data(int, zone, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_container(vector<typename MasterType::link_type*>, origin_links, none, none);
 
@@ -24,9 +24,5 @@ namespace Activity_Location_Components
 
 		};
 	}
-
-	namespace Components
-	{
-	}	
 
 }

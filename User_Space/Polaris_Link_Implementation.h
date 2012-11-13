@@ -63,61 +63,61 @@ namespace Link_Components
 		//==================================================================================================================
 		/// Simple Link Members
 		//------------------------------------------------------------------------------------------------------------------
-			member_data(int, uuid, none, none);
+			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
-			member_data(int, num_lanes, none, none);
-			member_data(float, length, none, none);
-			member_data(float, speed_limit, none, none);
+			member_data(int, num_lanes, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, speed_limit, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
 			member_data(Link_Components::Types::Link_Type_Keys, link_type, none, none);
 			
-			member_data(int, num_left_turn_bays, none, none);
-			member_data(int, num_right_turn_bays, none, none);
+			member_data(int, num_left_turn_bays, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, num_right_turn_bays, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
-			member_data(float, left_turn_bay_length, none, none);
-			member_data(float, right_turn_bay_length, none, none);
+			member_data(float, left_turn_bay_length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, right_turn_bay_length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
-			member_data(int, inbound_turn_movement_size, none, none);
-			member_data(int, outbound_turn_movement_size, none, none);
+			member_data(int, inbound_turn_movement_size, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, outbound_turn_movement_size, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
 			//link state			
-			member_data(float, link_fftt, none, none);
-			member_data(float, link_bwtt, none, none);
-			member_data(int, link_fftt_cached_simulation_interval_size, none, none);
-			member_data(int, link_bwtt_cached_simulation_interval_size, none, none);
+			member_data(float, link_fftt, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, link_bwtt, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, link_fftt_cached_simulation_interval_size, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, link_bwtt_cached_simulation_interval_size, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
 			//current interval
-			member_data(float, link_capacity, none, none);
-			member_data(float, link_supply, none, none);
+			member_data(float, link_capacity, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, link_supply, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
-			member_data(int, link_upstream_arrived_vehicles, none, none);
-			member_data(int, link_downstream_departed_vehicles, none, none);
+			member_data(int, link_upstream_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, link_downstream_departed_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
-			member_data(int, link_origin_arrived_vehicles, none, none);
-			member_data(int, link_origin_departed_vehicles, none, none);
+			member_data(int, link_origin_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, link_origin_departed_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
-			member_data(int, link_destination_arrived_vehicles, none, none);
+			member_data(int, link_destination_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			//cumulative - Mid-Trip
-			member_data(int, link_upstream_cumulative_arrived_vehicles, none, none);
-			member_data(int, link_shifted_cumulative_arrived_vehicles, none, none);
-			member_data(int, link_upstream_cumulative_vehicles, none, none);
-			member_data(int, link_downstream_cumulative_vehicles, none, none);
+			member_data(int, link_upstream_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, link_shifted_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, link_upstream_cumulative_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, link_downstream_cumulative_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
 			//cumulative - Begin/End-Trip
-			member_data(int, link_origin_cumulative_arrived_vehicles, none, none);
-			member_data(int, link_origin_cumulative_departed_vehicles, none, none);
-			member_data(int, link_destination_cumulative_arrived_vehicles, none, none);
+			member_data(int, link_origin_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, link_origin_cumulative_departed_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, link_destination_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			//cached cumulative state - Mid-Trip
-			member_data(int, cached_link_shifted_cumulative_arrived_vehicles, none, none);
+			member_data(int, cached_link_shifted_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			//other attributes
-			member_data(float, maximum_flow_rate, none, none);
-			member_data(float, free_flow_speed, none, none);
-			member_data(float, backward_wave_speed, none, none);
-			member_data(float, jam_density, none, none);
-			member_data(float, critical_density, none, none);
+			member_data(float, maximum_flow_rate, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, backward_wave_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, jam_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, critical_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_data(Types::Link_Simulation_Status, link_simulation_status, none, none);
 
@@ -194,9 +194,5 @@ namespace Link_Components
 		};
 			
 	}
-
-	namespace Components
-	{
-	}	
 
 }

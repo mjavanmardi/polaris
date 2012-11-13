@@ -19,7 +19,7 @@ namespace Intersection_Components
 
 		implementation struct Routable_Movement_Implementation
 		{
-			member_data(float, forward_link_turn_travel_time, none, none);
+			member_data(float, forward_link_turn_travel_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
 			member_component(typename MasterType::routable_link_type, inbound_link, none, none);
 			member_component(typename MasterType::routable_link_type, outbound_link, none, none);
@@ -46,10 +46,10 @@ namespace Intersection_Components
 		template<typename MasterType>
 		struct Routable_Intersection_Implementation
 		{
-			member_data(int, uuid, none, none);
-			member_data(float, x_position, none, none);
-			member_data(float, y_position, none, none);
-			member_data(float, z_position, none, none);
+			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, x_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, y_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, z_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			typedef Polaris_Component<Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation, MasterType> outbound_inbound_movements_container_element_type;
 			member_container(vector<outbound_inbound_movements_container_element_type*>, outbound_inbound_movements, none, none);
@@ -58,9 +58,5 @@ namespace Intersection_Components
 
 		};
 	}
-
-	namespace Components
-	{
-	}	
 
 }

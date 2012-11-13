@@ -19,7 +19,7 @@ namespace Network_Components
 		template<typename MasterType>
 		struct Polaris_Network_Implementation
 		{
-			member_data(float, max_free_flow_speed, none, none);
+			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_container(vector<typename MasterType::intersection_type*>, intersections_container, none, none);
 
@@ -43,8 +43,5 @@ namespace Network_Components
 
 
 	}
-	
-	namespace Components
-	{
-	}	
+
 }

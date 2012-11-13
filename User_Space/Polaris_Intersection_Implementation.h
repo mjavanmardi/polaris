@@ -24,26 +24,26 @@ namespace Intersection_Components
 		public:
 
 
-			member_data(float, turn_travel_penalty, none, none);
+			member_data(float, turn_travel_penalty, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
-			member_data(float, movement_capacity, none, none);
-			member_data(float, movement_supply, none, none);
-			member_data(float, movement_demand, none, none);
-			member_data(float, movement_flow, none, none);
-			member_data(int, movement_transferred, none, none);
+			member_data(float, movement_capacity, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, movement_supply, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, movement_demand, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, movement_flow, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, movement_transferred, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_data(Intersection_Components::Types::Turn_Movement_Type_Keys, movement_type, none, none);
 			member_data(Intersection_Components::Types::Turn_Movement_Rule_Keys, movement_rule, none, none);
 
-			member_data(float, inbound_link_departed_time_based_experienced_link_turn_travel_delay, none, none);
-			member_data(float, outbound_link_arrived_time_based_experienced_link_turn_travel_delay, none, none);
+			member_data(float, inbound_link_departed_time_based_experienced_link_turn_travel_delay, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, outbound_link_arrived_time_based_experienced_link_turn_travel_delay, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
-			member_data(int, turn_movement_cumulative_arrived_vehicles, none, none);
-			member_data(int, turn_movement_cumulative_vehicles, none, none);
+			member_data(int, turn_movement_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, turn_movement_cumulative_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
-			member_data(int, turn_movement_cumulative_shifted_arrived_vehicles, none, none);
+			member_data(int, turn_movement_cumulative_shifted_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
-			member_data(float, minimum_merge_rate, none, none);
+			member_data(float, minimum_merge_rate, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_container(vector<typename MasterType::routable_movement_type*>, replicas_container, none, none);
 
@@ -87,7 +87,7 @@ namespace Intersection_Components
 
 			//member_component_basic(typename MasterType::DETECTOR_TYPE,detector);
 
-			member_data(int, id, none, none);
+			member_data(int, id, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 		};
 		
 
@@ -118,10 +118,10 @@ namespace Intersection_Components
 
 //			member_component(typename MasterType::SIGNAL_TYPE,signal, none, none);
 
-			member_data(int, uuid, none, none);
-			member_data(float, x_position, none, none);
-			member_data(float, y_position, none, none);
-			member_data(float, z_position, none, none);
+			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, x_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, y_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, z_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_data(Intersection_Components::Types::Intersection_Type_Keys, intersection_type, none, none);
 
@@ -145,9 +145,5 @@ namespace Intersection_Components
 
 		};
 	}
-
-	namespace Components
-	{
-	}	
 
 }

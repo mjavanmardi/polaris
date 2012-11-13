@@ -27,8 +27,5 @@ namespace Demand_Components
 
 
 	}
-	
-	namespace Components
-	{
-	}	
+
 }

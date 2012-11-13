@@ -21,12 +21,12 @@ namespace Link_Components
 
 			typedef typename MasterType::link_type network_link_type;
 
-			member_data(int, uuid, none, none);
-			member_data(float, travel_time, none, none);
-			member_data(float, f_cost, none, none);
-			member_data(float, h_cost, none, none);
+			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, travel_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, f_cost, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, h_cost, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_component(typename MasterType::routable_link_type, label_pointer, none, none);
-			member_data(float, label_cost, none, none);
+			member_data(float, label_cost, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(Scan_List_Status_Keys, scan_list_status, none, none);
 
 			member_component(typename MasterType::link_type, network_link_reference, none, none);
@@ -37,9 +37,5 @@ namespace Link_Components
 		};
 		
 	}
-
-	namespace Components
-	{
-	}	
 
 }

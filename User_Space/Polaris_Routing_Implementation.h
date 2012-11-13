@@ -22,7 +22,7 @@ namespace Routing_Components
 		{
 			typedef set<pair<float, void*>> scan_list_typedef;
 			member_data(scan_list_typedef, scan_list, none, none);
-			member_data(float, max_free_flow_speed, none, none);
+			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_container(vector<typename MasterType::routable_intersection_type*>, intersections, none, none);
 
@@ -104,9 +104,5 @@ namespace Routing_Components
 			typedef typename MasterType::routable_network_type routable_network_type;
 		};
 	}
-
-	namespace Components
-	{
-	}	
 
 }
