@@ -53,7 +53,7 @@ public:
 	typedef typename ObjectToSingleton<ObjectType,Polaris_Component>::type Singleton_Type;
 	static Singleton_Type* const singleton_reference;
 	static vector<void*>* const all_components_reference;
-
+	
 	typedef Polaris_Component This_Type;
 	typedef Polaris_Component Implementation_Type;
 	typedef ObjectType Object_Type;

@@ -134,7 +134,8 @@ template<typename ContainerType>
 struct Polaris_Container:public ContainerType
 {
 	typedef Polaris_Container This_Type;
-
+	typedef ContainerType Container_Type;
+	
 	typedef typename remove_pointer<typename ContainerType::value_type>::type unqualified_value_type;
 };
 
