@@ -28,6 +28,10 @@ struct Input_Iterator:public IteratorType
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
 struct Back_Insertion_Sequence_Prototype
 {
+	typedef ComponentType Component_Type;\
+	typedef CallerType Caller_Type;\
+	typedef true_type Is_Prototype;
+
 	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
 	typedef typename ComponentType::size_type size_type;
 
@@ -77,6 +81,10 @@ struct Back_Insertion_Sequence_Prototype
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
 struct Random_Access_Sequence_Prototype
 {
+	typedef ComponentType Component_Type;\
+	typedef CallerType Caller_Type;\
+	typedef true_type Is_Prototype;
+
 	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
 	typedef typename ComponentType::size_type size_type;
 
