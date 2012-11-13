@@ -51,7 +51,7 @@ struct Process_Data
 
 struct Exchange_Information
 {
-	Exchange_Information():partition_exchange_data(nullptr),current_exchange(0),next_exchange(INT_MAX){};
+	Exchange_Information():partition_exchange_data(nullptr),current_exchange(-1),next_exchange(INT_MAX){};
 	
 	Exchange_Data* partition_exchange_data;
 	Exchange_Data* thread_local_exchange_data[_num_threads];
