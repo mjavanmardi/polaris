@@ -643,7 +643,7 @@ namespace Network_Components
 				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				define_simple_container_interface(_Float_Container_Interface, _Inbound_Movement_Interface::get_type_of(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array), Random_Access_Sequence_Prototype, float, ComponentType);
-				define_container_and_value_interface(_Vehicles_Queue_Interface, _Vehicle_Interface, _Inbound_Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_container_and_value_interface(_Vehicles_Queue_Interface, _Vehicle_Interface_2, _Inbound_Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 
 
 				for (i = 0; i < (int)intersections_container<_Intersections_Container_Interface&>().size(); i++)
