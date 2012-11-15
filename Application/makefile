@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -g -std=c++0x -pthread 
-LDFLAGS = -g -pthread -lstdc++
+LDFLAGS = -g -pthread -lstdc++ -lrt
 HEADERS = ../Core/*.h ../User_Space/*.h ../Repository/*.h
 all: Application
 clean: 
