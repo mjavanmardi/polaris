@@ -106,7 +106,7 @@ namespace Network_Components
 				intersections_container<_Intersections_Container_Interface&>().clear();
 
 				i = 0;
-	
+				
 				_Intersection_Interface* intersection_0=(_Intersection_Interface*)Allocate<typename _Intersection_Interface::Component_Type>();
 				intersection_0->template uuid<int>(0);
 				intersection_0->template x_position<float>(0.0);
