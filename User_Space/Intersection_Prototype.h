@@ -169,7 +169,6 @@ namespace Intersection_Components
 			feature_accessor(scenario_reference, none, none);
 
 			feature_accessor(network, none, none);
-			
 
 			feature_accessor(intersection_simulation_status, none, none);
 
@@ -595,8 +594,6 @@ namespace Intersection_Components
 						
 						if (num_transfer_vehicles_of_turn_movement>0)
 						{
-
-							
 							//move vehicles for this turn movement
 							for (int iv=0;iv<num_transfer_vehicles_of_turn_movement;iv++)
 							{

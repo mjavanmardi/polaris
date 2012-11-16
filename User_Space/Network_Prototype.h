@@ -572,8 +572,6 @@ namespace Network_Components
 
 			feature_prototype void simulation_initialize(void* scenario_data)
 			{
-
-
 				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
 
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);

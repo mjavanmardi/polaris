@@ -78,6 +78,10 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -146,14 +150,6 @@
     <ClInclude Include="User_Space.h" />
     <ClInclude Include="User_Space_Includes.h" />
     <ClInclude Include="Vehicle_Prototype.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Repository\Repository.vcxproj">
-      <Project>{b1069bed-cdda-4039-811c-459007051917}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Scenario_Manager\Scenario_Manager.vcxproj">
-      <Project>{fe16ca2c-e4c8-4c9c-9a8f-f63dc734205f}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

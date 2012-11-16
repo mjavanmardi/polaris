@@ -1,4 +1,4 @@
-#define EXAMPLE
+//#define EXAMPLE
 
 #ifdef EXAMPLE
 
@@ -62,10 +62,14 @@ implementation struct Network_Implementation
 };
 
 
+class YoYo
+{
+};
 
 prototype struct Agent_Prototype
 {	tag_as_prototype;
 
+	feature_accessor(id,none,none);
 
 	feature_accessor(network,none,none);
 
@@ -88,6 +92,8 @@ prototype struct Agent_Prototype
 
 	feature_prototype void Initialize_Agent(requires(check(TargetType,is_arithmetic)))
 	{
+		id<int>();
+
 		// load event function
 		load_event(ComponentType,Do_Stuff_Condition,Do_Stuff,0,NULLTYPE);
 		
@@ -140,6 +146,7 @@ prototype struct Agent_Prototype
 implementation struct Agent_Implementation
 {
 	member_component(typename MasterType::Network,network,none,none);
+	member_data(int,id,check(ReturnValueType,is_arithmetic),none);
 };
 
 

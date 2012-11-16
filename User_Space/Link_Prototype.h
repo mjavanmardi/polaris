@@ -509,10 +509,8 @@ namespace Link_Components
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
 				int current_time = scenario->template current_time<int>();
 
-				//Vehicle_Interface* vehicle;
-
 				//calculate upstream cumulative vehicles using the three detector method
-				int t_minus_bwtt=-1;			
+				int t_minus_bwtt=-1;
 				
 				int bwtt_cached_simulation_interval_size=link_bwtt_cached_simulation_interval_size<int>();
 				int fftt_cached_simulation_interval_size=link_fftt_cached_simulation_interval_size<int>();
@@ -522,24 +520,23 @@ namespace Link_Components
 					t_minus_bwtt = (current_simulation_interval_index + 1- bwtt_cached_simulation_interval_size)%bwtt_cached_simulation_interval_size;
 				}
 
-				int upstream_cumulative_departed_vehicles = 0;
-				upstream_cumulative_departed_vehicles = 
+				int upstream_cumulative_vehicles = 
 					link_upstream_cumulative_arrived_vehicles<int>() + 
 					link_origin_cumulative_departed_vehicles<int>() - 
 					link_destination_cumulative_arrived_vehicles<int>();
 
-				upstream_cumulative_departed_vehicles = max(0,upstream_cumulative_departed_vehicles);
+				upstream_cumulative_vehicles = max(0,upstream_cumulative_vehicles);
 
 				if (t_minus_bwtt>-1)
 				{
 					int jam_vehicles = (int) (num_lanes<int>() * length<float>() * jam_density<float>());
 
 					int cached=cached_link_downstream_cumulative_vehicles_array<_Int_Container_Interface&>()[t_minus_bwtt]+jam_vehicles;
-					link_upstream_cumulative_vehicles<int>(min(upstream_cumulative_departed_vehicles,cached));
+					link_upstream_cumulative_vehicles<int>(min(upstream_cumulative_vehicles,cached));
 				}
 				else
 				{
-					link_upstream_cumulative_vehicles<int>(upstream_cumulative_departed_vehicles);
+					link_upstream_cumulative_vehicles<int>(upstream_cumulative_vehicles);
 				}
 
 				int t_fftt = -1;
@@ -563,27 +560,21 @@ namespace Link_Components
 				cached_link_downstream_cumulative_vehicles_array<_Int_Container_Interface&>()[t_bwtt] = link_downstream_cumulative_vehicles<int>();
 
 				//network data
-				int t_minus_fftt = -1;
-				int link_shifted_cumulative_arrived_vehicles = 0;
+				//int t_minus_fftt = -1;
+				//int link_shifted_cumulative_arrived_vehicles = 0;
 
-				int cached_fftt=link_fftt_cached_simulation_interval_size<int>();
+				//int cached_fftt=link_fftt_cached_simulation_interval_size<int>();
 
-				if((current_simulation_interval_index+1) >= cached_fftt)
-				{
-					t_minus_fftt = (current_simulation_interval_index + 1 - cached_fftt) % cached_fftt;
-					link_shifted_cumulative_arrived_vehicles = cached_link_upstream_cumulative_vehicles_array<_Int_Container_Interface&>()[t_minus_fftt];
-				}
-				else
-				{
-					link_shifted_cumulative_arrived_vehicles = 0;
-				}
-				if (this->template uuid<int>() == 5 && scenario->template current_simulation_interval_index<int>()%1 == 0) // the last link visited for current iteration
-				{
-					printf("time=%d", scenario->template current_simulation_interval_index<int>());
-					printf("loaded=%d, departed=%d, in_network=%d, arrived=%d",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_in_network_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>());
-					printf("\n"); 
+				//if((current_simulation_interval_index+1) >= cached_fftt)
+				//{
+				//	t_minus_fftt = (current_simulation_interval_index + 1 - cached_fftt) % cached_fftt;
+				//	link_shifted_cumulative_arrived_vehicles = cached_link_upstream_cumulative_vehicles_array<_Int_Container_Interface&>()[t_minus_fftt];
+				//}
+				//else
+				//{
+				//	link_shifted_cumulative_arrived_vehicles = 0;
+				//}
 
-				}
 			}
 
 			feature_accessor(link_simulation_status, none, none);
@@ -592,16 +583,6 @@ namespace Link_Components
 			{
 				load_event(ComponentType,Newells_Conditional,Compute_Step_Flow_Supply_Update,0,NULLTYPE);
 			}
-
-			/*
-
-
-
-			ADD EVENT REGISTER TO TYPE!!!
-
-
-
-			*/
 
 			declare_feature_conditional(Newells_Conditional)
 			{
