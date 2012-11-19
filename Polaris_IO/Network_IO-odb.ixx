@@ -496,7 +496,7 @@ namespace odb
   access::object_traits< ::pio::Sign >::
   id (const object_type& o)
   {
-    return o.sign;
+    return o.auto_id;
   }
 
   inline
@@ -584,7 +584,7 @@ namespace odb
   access::object_traits< ::pio::Timing >::
   id (const object_type& o)
   {
-    return o.timing;
+    return o.auto_id;
   }
 
   inline
@@ -628,7 +628,7 @@ namespace odb
   access::object_traits< ::pio::Phasing >::
   id (const object_type& o)
   {
-    return o.phasing;
+    return o.auto_id;
   }
 
   inline

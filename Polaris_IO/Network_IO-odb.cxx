@@ -2189,7 +2189,11 @@ namespace odb
 
     // type
     //
-    t[9UL] = false;
+    if (t[9UL])
+    {
+      i.type_value.capacity (i.type_size);
+      grew = true;
+    }
 
     // divided
     //
@@ -2341,8 +2345,12 @@ namespace odb
 
     // type
     //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.type_value;
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.type_value.data ();
+    b[n].size = &i.type_size;
+    b[n].capacity = i.type_value.capacity ();
     b[n].is_null = &i.type_null;
     n++;
 
@@ -2652,17 +2660,20 @@ namespace odb
     // type
     //
     {
-      int const& v =
+      ::std::string const& v =
         o.type;
 
       bool is_null (false);
+      std::size_t cap (i.type_value.capacity ());
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
+          ::std::string,
+          sqlite::id_text >::set_image (
         i.type_value,
+        i.type_size,
         is_null,
         v);
       i.type_null = is_null;
+      grew = grew || (cap != i.type_value.capacity ());
     }
 
     // divided
@@ -3093,14 +3104,15 @@ namespace odb
     // type
     //
     {
-      int& v =
+      ::std::string& v =
         o.type;
 
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
+          ::std::string,
+          sqlite::id_text >::set_value (
         v,
         i.type_value,
+        i.type_size,
         i.type_null);
     }
 
@@ -3865,7 +3877,7 @@ namespace odb
                       "  \"setback_b\" REAL,\n"
                       "  \"bearing_a\" INTEGER NOT NULL,\n"
                       "  \"bearing_b\" INTEGER NOT NULL,\n"
-                      "  \"type\" INTEGER NOT NULL,\n"
+                      "  \"type\" TEXT NOT NULL,\n"
                       "  \"divided\" INTEGER NOT NULL,\n"
                       "  \"area_type\" INTEGER NOT NULL,\n"
                       "  \"use\" INTEGER NOT NULL,\n"
@@ -4833,29 +4845,37 @@ namespace odb
     //
     t[9UL] = false;
 
-    // offset
+    // start
     //
     t[10UL] = false;
 
-    // length
+    // end
     //
     t[11UL] = false;
 
-    // toll
+    // offset
     //
     t[12UL] = false;
 
-    // rate
+    // length
     //
     t[13UL] = false;
 
-    // min_delay
+    // toll
     //
     t[14UL] = false;
 
-    // max_delay
+    // rate
     //
     t[15UL] = false;
+
+    // min_delay
+    //
+    t[16UL] = false;
+
+    // max_delay
+    //
+    t[17UL] = false;
 
     return grew;
   }
@@ -4942,6 +4962,20 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.max_trav_value;
     b[n].is_null = &i.max_trav_null;
+    n++;
+
+    // start
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.start_value;
+    b[n].is_null = &i.start_null;
+    n++;
+
+    // end
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.end_value;
+    b[n].is_null = &i.end_null;
     n++;
 
     // offset
@@ -5177,6 +5211,38 @@ namespace odb
         is_null,
         v);
       i.max_trav_null = is_null;
+    }
+
+    // start
+    //
+    {
+      double const& v =
+        o.start;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.start_value,
+        is_null,
+        v);
+      i.start_null = is_null;
+    }
+
+    // end
+    //
+    {
+      double const& v =
+        o.end;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.end_value,
+        is_null,
+        v);
+      i.end_null = is_null;
     }
 
     // offset
@@ -5441,6 +5507,34 @@ namespace odb
         i.max_trav_null);
     }
 
+    // start
+    //
+    {
+      double& v =
+        o.start;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.start_value,
+        i.start_null);
+    }
+
+    // end
+    //
+    {
+      double& v =
+        o.end;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.end_value,
+        i.end_null);
+    }
+
     // offset
     //
     {
@@ -5560,13 +5654,15 @@ namespace odb
   "\"max_type\","
   "\"min_trav\","
   "\"max_trav\","
+  "\"start\","
+  "\"end\","
   "\"offset\","
   "\"length\","
   "\"toll\","
   "\"rate\","
   "\"min_delay\","
   "\"max_delay\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Lane_Use >::find_statement[] =
   "SELECT "
@@ -5580,6 +5676,8 @@ namespace odb
   "\"Lane_Use\".\"max_type\","
   "\"Lane_Use\".\"min_trav\","
   "\"Lane_Use\".\"max_trav\","
+  "\"Lane_Use\".\"start\","
+  "\"Lane_Use\".\"end\","
   "\"Lane_Use\".\"offset\","
   "\"Lane_Use\".\"length\","
   "\"Lane_Use\".\"toll\","
@@ -5600,6 +5698,8 @@ namespace odb
   "\"max_type\"=?,"
   "\"min_trav\"=?,"
   "\"max_trav\"=?,"
+  "\"start\"=?,"
+  "\"end\"=?,"
   "\"offset\"=?,"
   "\"length\"=?,"
   "\"toll\"=?,"
@@ -5624,6 +5724,8 @@ namespace odb
   "\"Lane_Use\".\"max_type\","
   "\"Lane_Use\".\"min_trav\","
   "\"Lane_Use\".\"max_trav\","
+  "\"Lane_Use\".\"start\","
+  "\"Lane_Use\".\"end\","
   "\"Lane_Use\".\"offset\","
   "\"Lane_Use\".\"length\","
   "\"Lane_Use\".\"toll\","
@@ -6012,6 +6114,8 @@ namespace odb
                       "  \"max_type\" INTEGER NOT NULL,\n"
                       "  \"min_trav\" INTEGER NOT NULL,\n"
                       "  \"max_trav\" INTEGER NOT NULL,\n"
+                      "  \"start\" REAL,\n"
+                      "  \"end\" REAL,\n"
                       "  \"offset\" REAL,\n"
                       "  \"length\" REAL,\n"
                       "  \"toll\" INTEGER NOT NULL,\n"
@@ -6084,15 +6188,27 @@ namespace odb
 
     // lanes
     //
-    t[4UL] = false;
+    if (t[4UL])
+    {
+      i.lanes_value.capacity (i.lanes_size);
+      grew = true;
+    }
 
     // to_lanes
     //
-    t[5UL] = false;
+    if (t[5UL])
+    {
+      i.to_lanes_value.capacity (i.to_lanes_size);
+      grew = true;
+    }
 
     // type
     //
-    t[6UL] = false;
+    if (t[6UL])
+    {
+      i.type_value.capacity (i.type_size);
+      grew = true;
+    }
 
     // penalty
     //
@@ -6161,22 +6277,34 @@ namespace odb
 
     // lanes
     //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.lanes_value;
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.lanes_value.data ();
+    b[n].size = &i.lanes_size;
+    b[n].capacity = i.lanes_value.capacity ();
     b[n].is_null = &i.lanes_null;
     n++;
 
     // to_lanes
     //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.to_lanes_value;
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.to_lanes_value.data ();
+    b[n].size = &i.to_lanes_size;
+    b[n].capacity = i.to_lanes_value.capacity ();
     b[n].is_null = &i.to_lanes_null;
     n++;
 
     // type
     //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.type_value;
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.type_value.data ();
+    b[n].size = &i.type_size;
+    b[n].capacity = i.type_value.capacity ();
     b[n].is_null = &i.type_null;
     n++;
 
@@ -6326,49 +6454,58 @@ namespace odb
     // lanes
     //
     {
-      int const& v =
+      ::std::string const& v =
         o.lanes;
 
       bool is_null (false);
+      std::size_t cap (i.lanes_value.capacity ());
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
+          ::std::string,
+          sqlite::id_text >::set_image (
         i.lanes_value,
+        i.lanes_size,
         is_null,
         v);
       i.lanes_null = is_null;
+      grew = grew || (cap != i.lanes_value.capacity ());
     }
 
     // to_lanes
     //
     {
-      int const& v =
+      ::std::string const& v =
         o.to_lanes;
 
       bool is_null (false);
+      std::size_t cap (i.to_lanes_value.capacity ());
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
+          ::std::string,
+          sqlite::id_text >::set_image (
         i.to_lanes_value,
+        i.to_lanes_size,
         is_null,
         v);
       i.to_lanes_null = is_null;
+      grew = grew || (cap != i.to_lanes_value.capacity ());
     }
 
     // type
     //
     {
-      int const& v =
+      ::std::string const& v =
         o.type;
 
       bool is_null (false);
+      std::size_t cap (i.type_value.capacity ());
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
+          ::std::string,
+          sqlite::id_text >::set_image (
         i.type_value,
+        i.type_size,
         is_null,
         v);
       i.type_null = is_null;
+      grew = grew || (cap != i.type_value.capacity ());
     }
 
     // penalty
@@ -6552,42 +6689,45 @@ namespace odb
     // lanes
     //
     {
-      int& v =
+      ::std::string& v =
         o.lanes;
 
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
+          ::std::string,
+          sqlite::id_text >::set_value (
         v,
         i.lanes_value,
+        i.lanes_size,
         i.lanes_null);
     }
 
     // to_lanes
     //
     {
-      int& v =
+      ::std::string& v =
         o.to_lanes;
 
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
+          ::std::string,
+          sqlite::id_text >::set_value (
         v,
         i.to_lanes_value,
+        i.to_lanes_size,
         i.to_lanes_null);
     }
 
     // type
     //
     {
-      int& v =
+      ::std::string& v =
         o.type;
 
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
+          ::std::string,
+          sqlite::id_text >::set_value (
         v,
         i.type_value,
+        i.type_size,
         i.type_null);
     }
 
@@ -7038,6 +7178,20 @@ namespace odb
     auto_result ar (st);
     select_statement::result r (st.fetch ());
 
+    if (r == select_statement::truncated)
+    {
+      if (grow (im, sts.select_image_truncated ()))
+        im.version++;
+
+      if (im.version != sts.select_image_version ())
+      {
+        bind (imb.bind, im, statement_select);
+        sts.select_image_version (im.version);
+        imb.version++;
+        st.refetch ();
+      }
+    }
+
     return r != select_statement::no_data;
   }
 
@@ -7127,9 +7281,9 @@ namespace odb
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"to_link\" INTEGER,\n"
-                      "  \"lanes\" INTEGER NOT NULL,\n"
-                      "  \"to_lanes\" INTEGER NOT NULL,\n"
-                      "  \"type\" INTEGER NOT NULL,\n"
+                      "  \"lanes\" TEXT NOT NULL,\n"
+                      "  \"to_lanes\" TEXT NOT NULL,\n"
+                      "  \"type\" TEXT NOT NULL,\n"
                       "  \"penalty\" INTEGER NOT NULL,\n"
                       "  \"speed\" REAL,\n"
                       "  \"capacity\" INTEGER NOT NULL,\n"
@@ -7203,29 +7357,37 @@ namespace odb
     //
     t[3UL] = false;
 
-    // use
+    // start
     //
     t[4UL] = false;
 
-    // min_type
+    // end
     //
     t[5UL] = false;
 
-    // max_type
+    // use
     //
     t[6UL] = false;
 
-    // penalty
+    // min_type
     //
     t[7UL] = false;
 
-    // in_node
+    // max_type
     //
     t[8UL] = false;
 
-    // out_node
+    // penalty
     //
     t[9UL] = false;
+
+    // in_node
+    //
+    t[10UL] = false;
+
+    // out_node
+    //
+    t[11UL] = false;
 
     return grew;
   }
@@ -7270,6 +7432,20 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.to_link_value;
     b[n].is_null = &i.to_link_null;
+    n++;
+
+    // start
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.start_value;
+    b[n].is_null = &i.start_null;
+    n++;
+
+    // end
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.end_value;
+    b[n].is_null = &i.end_null;
     n++;
 
     // use
@@ -7420,6 +7596,38 @@ namespace odb
       }
       else
         i.to_link_null = true;
+    }
+
+    // start
+    //
+    {
+      double const& v =
+        o.start;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.start_value,
+        is_null,
+        v);
+      i.start_null = is_null;
+    }
+
+    // end
+    //
+    {
+      double const& v =
+        o.end;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.end_value,
+        is_null,
+        v);
+      i.end_null = is_null;
     }
 
     // use
@@ -7638,6 +7846,34 @@ namespace odb
       }
     }
 
+    // start
+    //
+    {
+      double& v =
+        o.start;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.start_value,
+        i.start_null);
+    }
+
+    // end
+    //
+    {
+      double& v =
+        o.end;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.end_value,
+        i.end_null);
+    }
+
     // use
     //
     {
@@ -7783,13 +8019,15 @@ namespace odb
   "\"link\","
   "\"dir\","
   "\"to_link\","
+  "\"start\","
+  "\"end\","
   "\"use\","
   "\"min_type\","
   "\"max_type\","
   "\"penalty\","
   "\"in_node\","
   "\"out_node\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Turn_Pen >::find_statement[] =
   "SELECT "
@@ -7797,6 +8035,8 @@ namespace odb
   "\"Turn_Pen\".\"link\","
   "\"Turn_Pen\".\"dir\","
   "\"Turn_Pen\".\"to_link\","
+  "\"Turn_Pen\".\"start\","
+  "\"Turn_Pen\".\"end\","
   "\"Turn_Pen\".\"use\","
   "\"Turn_Pen\".\"min_type\","
   "\"Turn_Pen\".\"max_type\","
@@ -7811,6 +8051,8 @@ namespace odb
   "\"link\"=?,"
   "\"dir\"=?,"
   "\"to_link\"=?,"
+  "\"start\"=?,"
+  "\"end\"=?,"
   "\"use\"=?,"
   "\"min_type\"=?,"
   "\"max_type\"=?,"
@@ -7829,6 +8071,8 @@ namespace odb
   "\"Turn_Pen\".\"link\","
   "\"Turn_Pen\".\"dir\","
   "\"Turn_Pen\".\"to_link\","
+  "\"Turn_Pen\".\"start\","
+  "\"Turn_Pen\".\"end\","
   "\"Turn_Pen\".\"use\","
   "\"Turn_Pen\".\"min_type\","
   "\"Turn_Pen\".\"max_type\","
@@ -8214,6 +8458,8 @@ namespace odb
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"to_link\" INTEGER,\n"
+                      "  \"start\" REAL,\n"
+                      "  \"end\" REAL,\n"
                       "  \"use\" INTEGER NOT NULL,\n"
                       "  \"min_type\" INTEGER NOT NULL,\n"
                       "  \"max_type\" INTEGER NOT NULL,\n"
@@ -8304,17 +8550,33 @@ namespace odb
     //
     t[5UL] = false;
 
-    // space
+    // start
     //
     t[6UL] = false;
 
-    // hourly
+    // end
     //
     t[7UL] = false;
 
-    // daily
+    // space
     //
     t[8UL] = false;
+
+    // time_in
+    //
+    t[9UL] = false;
+
+    // time_out
+    //
+    t[10UL] = false;
+
+    // hourly
+    //
+    t[11UL] = false;
+
+    // daily
+    //
+    t[12UL] = false;
 
     return grew;
   }
@@ -8375,11 +8637,39 @@ namespace odb
     b[n].is_null = &i.use_null;
     n++;
 
+    // start
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.start_value;
+    b[n].is_null = &i.start_null;
+    n++;
+
+    // end
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.end_value;
+    b[n].is_null = &i.end_null;
+    n++;
+
     // space
     //
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.space_value;
     b[n].is_null = &i.space_null;
+    n++;
+
+    // time_in
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.time_in_value;
+    b[n].is_null = &i.time_in_null;
+    n++;
+
+    // time_out
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.time_out_value;
+    b[n].is_null = &i.time_out_null;
     n++;
 
     // hourly
@@ -8525,6 +8815,38 @@ namespace odb
       i.use_null = is_null;
     }
 
+    // start
+    //
+    {
+      double const& v =
+        o.start;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.start_value,
+        is_null,
+        v);
+      i.start_null = is_null;
+    }
+
+    // end
+    //
+    {
+      double const& v =
+        o.end;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.end_value,
+        is_null,
+        v);
+      i.end_null = is_null;
+    }
+
     // space
     //
     {
@@ -8539,6 +8861,38 @@ namespace odb
         is_null,
         v);
       i.space_null = is_null;
+    }
+
+    // time_in
+    //
+    {
+      double const& v =
+        o.time_in;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.time_in_value,
+        is_null,
+        v);
+      i.time_in_null = is_null;
+    }
+
+    // time_out
+    //
+    {
+      double const& v =
+        o.time_out;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.time_out_value,
+        is_null,
+        v);
+      i.time_out_null = is_null;
     }
 
     // hourly
@@ -8683,6 +9037,34 @@ namespace odb
         i.use_null);
     }
 
+    // start
+    //
+    {
+      double& v =
+        o.start;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.start_value,
+        i.start_null);
+    }
+
+    // end
+    //
+    {
+      double& v =
+        o.end;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.end_value,
+        i.end_null);
+    }
+
     // space
     //
     {
@@ -8695,6 +9077,34 @@ namespace odb
         v,
         i.space_value,
         i.space_null);
+    }
+
+    // time_in
+    //
+    {
+      double& v =
+        o.time_in;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.time_in_value,
+        i.time_in_null);
+    }
+
+    // time_out
+    //
+    {
+      double& v =
+        o.time_out;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.time_out_value,
+        i.time_out_null);
     }
 
     // hourly
@@ -8756,10 +9166,14 @@ namespace odb
   "\"offset\","
   "\"type\","
   "\"use\","
+  "\"start\","
+  "\"end\","
   "\"space\","
+  "\"time_in\","
+  "\"time_out\","
   "\"hourly\","
   "\"daily\")"
-  " VALUES (?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Parking >::find_statement[] =
   "SELECT "
@@ -8769,7 +9183,11 @@ namespace odb
   "\"Parking\".\"offset\","
   "\"Parking\".\"type\","
   "\"Parking\".\"use\","
+  "\"Parking\".\"start\","
+  "\"Parking\".\"end\","
   "\"Parking\".\"space\","
+  "\"Parking\".\"time_in\","
+  "\"Parking\".\"time_out\","
   "\"Parking\".\"hourly\","
   "\"Parking\".\"daily\""
   " FROM \"Parking\""
@@ -8782,7 +9200,11 @@ namespace odb
   "\"offset\"=?,"
   "\"type\"=?,"
   "\"use\"=?,"
+  "\"start\"=?,"
+  "\"end\"=?,"
   "\"space\"=?,"
+  "\"time_in\"=?,"
+  "\"time_out\"=?,"
   "\"hourly\"=?,"
   "\"daily\"=?"
   " WHERE \"parking\"=?";
@@ -8799,7 +9221,11 @@ namespace odb
   "\"Parking\".\"offset\","
   "\"Parking\".\"type\","
   "\"Parking\".\"use\","
+  "\"Parking\".\"start\","
+  "\"Parking\".\"end\","
   "\"Parking\".\"space\","
+  "\"Parking\".\"time_in\","
+  "\"Parking\".\"time_out\","
   "\"Parking\".\"hourly\","
   "\"Parking\".\"daily\""
   " FROM \"Parking\""
@@ -9176,7 +9602,11 @@ namespace odb
                       "  \"offset\" REAL,\n"
                       "  \"type\" INTEGER NOT NULL,\n"
                       "  \"use\" INTEGER NOT NULL,\n"
+                      "  \"start\" REAL,\n"
+                      "  \"end\" REAL,\n"
                       "  \"space\" INTEGER NOT NULL,\n"
+                      "  \"time_in\" REAL,\n"
+                      "  \"time_out\" REAL,\n"
                       "  \"hourly\" INTEGER NOT NULL,\n"
                       "  \"daily\" INTEGER NOT NULL,\n"
                       "  CONSTRAINT \"link_fk\"\n"
@@ -10096,9 +10526,13 @@ namespace odb
     //
     t[6UL] = false;
 
-    // cost
+    // time
     //
     t[7UL] = false;
+
+    // cost
+    //
+    t[8UL] = false;
 
     return grew;
   }
@@ -10164,6 +10598,13 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.dir_value;
     b[n].is_null = &i.dir_null;
+    n++;
+
+    // time
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.time_value;
+    b[n].is_null = &i.time_null;
     n++;
 
     // cost
@@ -10318,6 +10759,22 @@ namespace odb
       i.dir_null = is_null;
     }
 
+    // time
+    //
+    {
+      double const& v =
+        o.time;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.time_value,
+        is_null,
+        v);
+      i.time_null = is_null;
+    }
+
     // cost
     //
     {
@@ -10458,6 +10915,20 @@ namespace odb
         i.dir_null);
     }
 
+    // time
+    //
+    {
+      double& v =
+        o.time;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.time_value,
+        i.time_null);
+    }
+
     // cost
     //
     {
@@ -10504,8 +10975,9 @@ namespace odb
   "\"to_id\","
   "\"to_type\","
   "\"dir\","
+  "\"time\","
   "\"cost\")"
-  " VALUES (?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Access >::find_statement[] =
   "SELECT "
@@ -10516,6 +10988,7 @@ namespace odb
   "\"Access\".\"to_id\","
   "\"Access\".\"to_type\","
   "\"Access\".\"dir\","
+  "\"Access\".\"time\","
   "\"Access\".\"cost\""
   " FROM \"Access\""
   " WHERE \"Access\".\"auto_id\"=?";
@@ -10528,6 +11001,7 @@ namespace odb
   "\"to_id\"=?,"
   "\"to_type\"=?,"
   "\"dir\"=?,"
+  "\"time\"=?,"
   "\"cost\"=?"
   " WHERE \"auto_id\"=?";
 
@@ -10544,6 +11018,7 @@ namespace odb
   "\"Access\".\"to_id\","
   "\"Access\".\"to_type\","
   "\"Access\".\"dir\","
+  "\"Access\".\"time\","
   "\"Access\".\"cost\""
   " FROM \"Access\""
   " LEFT JOIN \"Link\" AS \"link\" ON \"link\".\"link\"=\"Access\".\"link\""
@@ -10924,6 +11399,7 @@ namespace odb
                       "  \"to_id\" INTEGER NOT NULL,\n"
                       "  \"to_type\" INTEGER NOT NULL,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
+                      "  \"time\" REAL,\n"
                       "  \"cost\" INTEGER NOT NULL,\n"
                       "  CONSTRAINT \"link_fk\"\n"
                       "    FOREIGN KEY (\"link\")\n"
@@ -10955,11 +11431,11 @@ namespace odb
     id_type id;
     {
       sqlite::value_traits<
-          int,
+          long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.sign_value,
-        i.sign_null);
+        i.auto_id_value,
+        i.auto_id_null);
     }
 
     return id;
@@ -10973,17 +11449,25 @@ namespace odb
 
     bool grew (false);
 
-    // link
+    // auto_id
     //
     t[0UL] = false;
 
-    // dir
+    // link
     //
     t[1UL] = false;
 
-    // sign
+    // dir
     //
     t[2UL] = false;
+
+    // sign
+    //
+    if (t[3UL])
+    {
+      i.sign_value.capacity (i.sign_size);
+      grew = true;
+    }
 
     return grew;
   }
@@ -10998,6 +11482,16 @@ namespace odb
     using namespace sqlite;
 
     std::size_t n (0);
+
+    // auto_id
+    //
+    if (sk != statement_update)
+    {
+      b[n].type = sqlite::bind::integer;
+      b[n].buffer = &i.auto_id_value;
+      b[n].is_null = &i.auto_id_null;
+      n++;
+    }
 
     // link
     //
@@ -11015,13 +11509,14 @@ namespace odb
 
     // sign
     //
-    if (sk != statement_update)
-    {
-      b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.sign_value;
-      b[n].is_null = &i.sign_null;
-      n++;
-    }
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.sign_value.data ();
+    b[n].size = &i.sign_size;
+    b[n].capacity = i.sign_value.capacity ();
+    b[n].is_null = &i.sign_null;
+    n++;
   }
 
   void access::object_traits< ::pio::Sign >::
@@ -11043,6 +11538,23 @@ namespace odb
     using namespace sqlite;
 
     bool grew (false);
+
+    // auto_id
+    //
+    if (sk == statement_insert)
+    {
+      long unsigned int const& v =
+        o.auto_id;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          long unsigned int,
+          sqlite::id_integer >::set_image (
+        i.auto_id_value,
+        is_null,
+        v);
+      i.auto_id_null = is_null;
+    }
 
     // link
     //
@@ -11089,19 +11601,21 @@ namespace odb
 
     // sign
     //
-    if (sk == statement_insert)
     {
-      int const& v =
+      ::std::string const& v =
         o.sign;
 
       bool is_null (false);
+      std::size_t cap (i.sign_value.capacity ());
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
+          ::std::string,
+          sqlite::id_text >::set_image (
         i.sign_value,
+        i.sign_size,
         is_null,
         v);
       i.sign_null = is_null;
+      grew = grew || (cap != i.sign_value.capacity ());
     }
 
     return grew;
@@ -11113,6 +11627,20 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (o);
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
+
+    // auto_id
+    //
+    {
+      long unsigned int& v =
+        o.auto_id;
+
+      sqlite::value_traits<
+          long unsigned int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.auto_id_value,
+        i.auto_id_null);
+    }
 
     // link
     //
@@ -11161,14 +11689,15 @@ namespace odb
     // sign
     //
     {
-      int& v =
+      ::std::string& v =
         o.sign;
 
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
+          ::std::string,
+          sqlite::id_text >::set_value (
         v,
         i.sign_value,
+        i.sign_size,
         i.sign_null);
     }
   }
@@ -11179,7 +11708,7 @@ namespace odb
     {
       bool is_null (false);
       sqlite::value_traits<
-          int,
+          long unsigned int,
           sqlite::id_integer >::set_image (
         i.id_value,
         is_null,
@@ -11197,31 +11726,35 @@ namespace odb
 
   const char access::object_traits< ::pio::Sign >::persist_statement[] =
   "INSERT INTO \"Sign\" ("
+  "\"auto_id\","
   "\"link\","
   "\"dir\","
   "\"sign\")"
-  " VALUES (?,?,?)";
+  " VALUES (?,?,?,?)";
 
   const char access::object_traits< ::pio::Sign >::find_statement[] =
   "SELECT "
+  "\"Sign\".\"auto_id\","
   "\"Sign\".\"link\","
   "\"Sign\".\"dir\","
   "\"Sign\".\"sign\""
   " FROM \"Sign\""
-  " WHERE \"Sign\".\"sign\"=?";
+  " WHERE \"Sign\".\"auto_id\"=?";
 
   const char access::object_traits< ::pio::Sign >::update_statement[] =
   "UPDATE \"Sign\" SET "
   "\"link\"=?,"
-  "\"dir\"=?"
-  " WHERE \"sign\"=?";
+  "\"dir\"=?,"
+  "\"sign\"=?"
+  " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Sign >::erase_statement[] =
   "DELETE FROM \"Sign\""
-  " WHERE \"sign\"=?";
+  " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Sign >::query_statement[] =
   "SELECT "
+  "\"Sign\".\"auto_id\","
   "\"Sign\".\"link\","
   "\"Sign\".\"dir\","
   "\"Sign\".\"sign\""
@@ -11237,7 +11770,7 @@ namespace odb
   "\"Sign\"";
 
   void access::object_traits< ::pio::Sign >::
-  persist (database& db, const object_type& obj)
+  persist (database& db, object_type& obj)
   {
     ODB_POTENTIALLY_UNUSED (db);
 
@@ -11249,7 +11782,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     callback (db,
-              obj,
+              static_cast<const object_type&> (obj),
               callback_event::pre_persist);
 
     image_type& im (sts.image ());
@@ -11257,6 +11790,8 @@ namespace odb
 
     if (init (im, obj, statement_insert))
       im.version++;
+
+    im.auto_id_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -11270,8 +11805,10 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
+    obj.auto_id = static_cast< id_type > (st.id ());
+
     callback (db,
-              obj,
+              static_cast<const object_type&> (obj),
               callback_event::post_persist);
   }
 
@@ -11290,7 +11827,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.sign);
+    init (i, obj.auto_id);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -11459,7 +11996,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.sign);
+      obj.auto_id);
 
     if (!find_ (sts, &id))
       return false;
@@ -11507,6 +12044,20 @@ namespace odb
     st.execute ();
     auto_result ar (st);
     select_statement::result r (st.fetch ());
+
+    if (r == select_statement::truncated)
+    {
+      if (grow (im, sts.select_image_truncated ()))
+        im.version++;
+
+      if (im.version != sts.select_image_version ())
+      {
+        bind (imb.bind, im, statement_select);
+        sts.select_image_version (im.version);
+        imb.version++;
+        st.refetch ();
+      }
+    }
 
     return r != select_statement::no_data;
   }
@@ -11593,9 +12144,10 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Sign\" (\n"
+                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
-                      "  \"sign\" INTEGER NOT NULL PRIMARY KEY,\n"
+                      "  \"sign\" TEXT NOT NULL,\n"
                       "  CONSTRAINT \"link_fk\"\n"
                       "    FOREIGN KEY (\"link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
@@ -11656,21 +12208,33 @@ namespace odb
     //
     t[2UL] = false;
 
-    // timing
+    // start
     //
     t[3UL] = false;
 
-    // phasing
+    // end
     //
     t[4UL] = false;
 
-    // type
+    // timing
     //
     t[5UL] = false;
 
-    // offset
+    // phasing
     //
     t[6UL] = false;
+
+    // type
+    //
+    if (t[7UL])
+    {
+      i.type_value.capacity (i.type_size);
+      grew = true;
+    }
+
+    // offset
+    //
+    t[8UL] = false;
 
     return grew;
   }
@@ -11710,6 +12274,20 @@ namespace odb
     b[n].is_null = &i.times_null;
     n++;
 
+    // start
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.start_value;
+    b[n].is_null = &i.start_null;
+    n++;
+
+    // end
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.end_value;
+    b[n].is_null = &i.end_null;
+    n++;
+
     // timing
     //
     b[n].type = sqlite::bind::integer;
@@ -11726,8 +12304,12 @@ namespace odb
 
     // type
     //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.type_value;
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.type_value.data ();
+    b[n].size = &i.type_size;
+    b[n].capacity = i.type_value.capacity ();
     b[n].is_null = &i.type_null;
     n++;
 
@@ -11808,74 +12390,87 @@ namespace odb
       i.times_null = is_null;
     }
 
+    // start
+    //
+    {
+      double const& v =
+        o.start;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.start_value,
+        is_null,
+        v);
+      i.start_null = is_null;
+    }
+
+    // end
+    //
+    {
+      double const& v =
+        o.end;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.end_value,
+        is_null,
+        v);
+      i.end_null = is_null;
+    }
+
     // timing
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Timing > const& v =
-        o.timing;
-
-      typedef object_traits< ::pio::Timing > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Timing > > ptr_traits;
-
-      bool is_null (ptr_traits::null_ptr (v));
-      if (!is_null)
-      {
-        const obj_traits::id_type& id (
-          obj_traits::id (ptr_traits::get_ref (v)));
-
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_image (
-          i.timing_value,
-          is_null,
-          id);
-        i.timing_null = is_null;
-      }
-      else
-        i.timing_null = true;
-    }
-
-    // phasing
-    //
-    {
-      ::std::tr1::shared_ptr< ::pio::Phasing > const& v =
-        o.phasing;
-
-      typedef object_traits< ::pio::Phasing > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Phasing > > ptr_traits;
-
-      bool is_null (ptr_traits::null_ptr (v));
-      if (!is_null)
-      {
-        const obj_traits::id_type& id (
-          obj_traits::id (ptr_traits::get_ref (v)));
-
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_image (
-          i.phasing_value,
-          is_null,
-          id);
-        i.phasing_null = is_null;
-      }
-      else
-        i.phasing_null = true;
-    }
-
-    // type
-    //
-    {
       int const& v =
-        o.type;
+        o.timing;
 
       bool is_null (false);
       sqlite::value_traits<
           int,
           sqlite::id_integer >::set_image (
+        i.timing_value,
+        is_null,
+        v);
+      i.timing_null = is_null;
+    }
+
+    // phasing
+    //
+    {
+      int const& v =
+        o.phasing;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.phasing_value,
+        is_null,
+        v);
+      i.phasing_null = is_null;
+    }
+
+    // type
+    //
+    {
+      ::std::string const& v =
+        o.type;
+
+      bool is_null (false);
+      std::size_t cap (i.type_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
         i.type_value,
+        i.type_size,
         is_null,
         v);
       i.type_null = is_null;
+      grew = grew || (cap != i.type_value.capacity ());
     }
 
     // offset
@@ -11946,77 +12541,74 @@ namespace odb
         i.times_null);
     }
 
+    // start
+    //
+    {
+      double& v =
+        o.start;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.start_value,
+        i.start_null);
+    }
+
+    // end
+    //
+    {
+      double& v =
+        o.end;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.end_value,
+        i.end_null);
+    }
+
     // timing
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Timing >& v =
-        o.timing;
-
-      typedef object_traits< ::pio::Timing > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Timing > > ptr_traits;
-
-      if (i.timing_null)
-        v = ptr_traits::pointer_type ();
-      else
-      {
-        obj_traits::id_type id;
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_value (
-          id,
-          i.timing_value,
-          i.timing_null);
-
-        // If a compiler error points to the line below, then
-        // it most likely means that a pointer used in a member
-        // cannot be initialized from an object pointer.
-        //
-        v = ptr_traits::pointer_type (
-          db->load< obj_traits::object_type > (id));
-      }
-    }
-
-    // phasing
-    //
-    {
-      ::std::tr1::shared_ptr< ::pio::Phasing >& v =
-        o.phasing;
-
-      typedef object_traits< ::pio::Phasing > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Phasing > > ptr_traits;
-
-      if (i.phasing_null)
-        v = ptr_traits::pointer_type ();
-      else
-      {
-        obj_traits::id_type id;
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_value (
-          id,
-          i.phasing_value,
-          i.phasing_null);
-
-        // If a compiler error points to the line below, then
-        // it most likely means that a pointer used in a member
-        // cannot be initialized from an object pointer.
-        //
-        v = ptr_traits::pointer_type (
-          db->load< obj_traits::object_type > (id));
-      }
-    }
-
-    // type
-    //
-    {
       int& v =
-        o.type;
+        o.timing;
 
       sqlite::value_traits<
           int,
           sqlite::id_integer >::set_value (
         v,
+        i.timing_value,
+        i.timing_null);
+    }
+
+    // phasing
+    //
+    {
+      int& v =
+        o.phasing;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.phasing_value,
+        i.phasing_null);
+    }
+
+    // type
+    //
+    {
+      ::std::string& v =
+        o.type;
+
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        v,
         i.type_value,
+        i.type_size,
         i.type_null);
     }
 
@@ -12062,17 +12654,21 @@ namespace odb
   "\"signal\","
   "\"group\","
   "\"times\","
+  "\"start\","
+  "\"end\","
   "\"timing\","
   "\"phasing\","
   "\"type\","
   "\"offset\")"
-  " VALUES (?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Signal >::find_statement[] =
   "SELECT "
   "\"Signal\".\"signal\","
   "\"Signal\".\"group\","
   "\"Signal\".\"times\","
+  "\"Signal\".\"start\","
+  "\"Signal\".\"end\","
   "\"Signal\".\"timing\","
   "\"Signal\".\"phasing\","
   "\"Signal\".\"type\","
@@ -12084,6 +12680,8 @@ namespace odb
   "UPDATE \"Signal\" SET "
   "\"group\"=?,"
   "\"times\"=?,"
+  "\"start\"=?,"
+  "\"end\"=?,"
   "\"timing\"=?,"
   "\"phasing\"=?,"
   "\"type\"=?,"
@@ -12099,13 +12697,13 @@ namespace odb
   "\"Signal\".\"signal\","
   "\"Signal\".\"group\","
   "\"Signal\".\"times\","
+  "\"Signal\".\"start\","
+  "\"Signal\".\"end\","
   "\"Signal\".\"timing\","
   "\"Signal\".\"phasing\","
   "\"Signal\".\"type\","
   "\"Signal\".\"offset\""
   " FROM \"Signal\""
-  " LEFT JOIN \"Timing\" AS \"timing\" ON \"timing\".\"timing\"=\"Signal\".\"timing\""
-  " LEFT JOIN \"Phasing\" AS \"phasing\" ON \"phasing\".\"phasing\"=\"Signal\".\"phasing\""
   " ";
 
   const char access::object_traits< ::pio::Signal >::erase_query_statement[] =
@@ -12387,6 +12985,20 @@ namespace odb
     auto_result ar (st);
     select_statement::result r (st.fetch ());
 
+    if (r == select_statement::truncated)
+    {
+      if (grow (im, sts.select_image_truncated ()))
+        im.version++;
+
+      if (im.version != sts.select_image_version ())
+      {
+        bind (imb.bind, im, statement_select);
+        sts.select_image_version (im.version);
+        imb.version++;
+        st.refetch ();
+      }
+    }
+
     return r != select_statement::no_data;
   }
 
@@ -12475,18 +13087,12 @@ namespace odb
                       "  \"signal\" INTEGER NOT NULL PRIMARY KEY,\n"
                       "  \"group\" INTEGER NOT NULL,\n"
                       "  \"times\" INTEGER NOT NULL,\n"
-                      "  \"timing\" INTEGER,\n"
-                      "  \"phasing\" INTEGER,\n"
-                      "  \"type\" INTEGER NOT NULL,\n"
-                      "  \"offset\" INTEGER NOT NULL,\n"
-                      "  CONSTRAINT \"timing_fk\"\n"
-                      "    FOREIGN KEY (\"timing\")\n"
-                      "    REFERENCES \"Timing\" (\"timing\")\n"
-                      "    DEFERRABLE INITIALLY DEFERRED,\n"
-                      "  CONSTRAINT \"phasing_fk\"\n"
-                      "    FOREIGN KEY (\"phasing\")\n"
-                      "    REFERENCES \"Phasing\" (\"phasing\")\n"
-                      "    DEFERRABLE INITIALLY DEFERRED)");
+                      "  \"start\" REAL,\n"
+                      "  \"end\" REAL,\n"
+                      "  \"timing\" INTEGER NOT NULL,\n"
+                      "  \"phasing\" INTEGER NOT NULL,\n"
+                      "  \"type\" TEXT NOT NULL,\n"
+                      "  \"offset\" INTEGER NOT NULL)");
           return false;
         }
       }
@@ -12513,11 +13119,11 @@ namespace odb
     id_type id;
     {
       sqlite::value_traits<
-          int,
+          long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.timing_value,
-        i.timing_null);
+        i.auto_id_value,
+        i.auto_id_null);
     }
 
     return id;
@@ -12531,65 +13137,69 @@ namespace odb
 
     bool grew (false);
 
-    // signal
+    // auto_id
     //
     t[0UL] = false;
 
-    // timing
+    // signal
     //
     t[1UL] = false;
 
-    // type
+    // timing
     //
     t[2UL] = false;
 
-    // cycle
+    // type
     //
     t[3UL] = false;
 
-    // offset
+    // cycle
     //
     t[4UL] = false;
 
-    // phases
+    // offset
     //
     t[5UL] = false;
 
-    // phase
+    // phases
     //
     t[6UL] = false;
 
-    // barrier
+    // phase
     //
     t[7UL] = false;
 
-    // ring
+    // barrier
     //
     t[8UL] = false;
 
-    // position
+    // ring
     //
     t[9UL] = false;
 
-    // minimum
+    // position
     //
     t[10UL] = false;
 
-    // maximum
+    // minimum
     //
     t[11UL] = false;
 
-    // extend
+    // maximum
     //
     t[12UL] = false;
 
-    // yellow
+    // extend
     //
     t[13UL] = false;
 
-    // red
+    // yellow
     //
     t[14UL] = false;
+
+    // red
+    //
+    t[15UL] = false;
 
     return grew;
   }
@@ -12605,6 +13215,16 @@ namespace odb
 
     std::size_t n (0);
 
+    // auto_id
+    //
+    if (sk != statement_update)
+    {
+      b[n].type = sqlite::bind::integer;
+      b[n].buffer = &i.auto_id_value;
+      b[n].is_null = &i.auto_id_null;
+      n++;
+    }
+
     // signal
     //
     b[n].type = sqlite::bind::integer;
@@ -12614,13 +13234,10 @@ namespace odb
 
     // timing
     //
-    if (sk != statement_update)
-    {
-      b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.timing_value;
-      b[n].is_null = &i.timing_null;
-      n++;
-    }
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.timing_value;
+    b[n].is_null = &i.timing_null;
+    n++;
 
     // type
     //
@@ -12734,6 +13351,23 @@ namespace odb
 
     bool grew (false);
 
+    // auto_id
+    //
+    if (sk == statement_insert)
+    {
+      long unsigned int const& v =
+        o.auto_id;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          long unsigned int,
+          sqlite::id_integer >::set_image (
+        i.auto_id_value,
+        is_null,
+        v);
+      i.auto_id_null = is_null;
+    }
+
     // signal
     //
     {
@@ -12763,7 +13397,6 @@ namespace odb
 
     // timing
     //
-    if (sk == statement_insert)
     {
       int const& v =
         o.timing;
@@ -12995,6 +13628,20 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (o);
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
+
+    // auto_id
+    //
+    {
+      long unsigned int& v =
+        o.auto_id;
+
+      sqlite::value_traits<
+          long unsigned int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.auto_id_value,
+        i.auto_id_null);
+    }
 
     // signal
     //
@@ -13229,7 +13876,7 @@ namespace odb
     {
       bool is_null (false);
       sqlite::value_traits<
-          int,
+          long unsigned int,
           sqlite::id_integer >::set_image (
         i.id_value,
         is_null,
@@ -13247,6 +13894,7 @@ namespace odb
 
   const char access::object_traits< ::pio::Timing >::persist_statement[] =
   "INSERT INTO \"Timing\" ("
+  "\"auto_id\","
   "\"signal\","
   "\"timing\","
   "\"type\","
@@ -13262,10 +13910,11 @@ namespace odb
   "\"extend\","
   "\"yellow\","
   "\"red\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Timing >::find_statement[] =
   "SELECT "
+  "\"Timing\".\"auto_id\","
   "\"Timing\".\"signal\","
   "\"Timing\".\"timing\","
   "\"Timing\".\"type\","
@@ -13282,11 +13931,12 @@ namespace odb
   "\"Timing\".\"yellow\","
   "\"Timing\".\"red\""
   " FROM \"Timing\""
-  " WHERE \"Timing\".\"timing\"=?";
+  " WHERE \"Timing\".\"auto_id\"=?";
 
   const char access::object_traits< ::pio::Timing >::update_statement[] =
   "UPDATE \"Timing\" SET "
   "\"signal\"=?,"
+  "\"timing\"=?,"
   "\"type\"=?,"
   "\"cycle\"=?,"
   "\"offset\"=?,"
@@ -13300,14 +13950,15 @@ namespace odb
   "\"extend\"=?,"
   "\"yellow\"=?,"
   "\"red\"=?"
-  " WHERE \"timing\"=?";
+  " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Timing >::erase_statement[] =
   "DELETE FROM \"Timing\""
-  " WHERE \"timing\"=?";
+  " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Timing >::query_statement[] =
   "SELECT "
+  "\"Timing\".\"auto_id\","
   "\"Timing\".\"signal\","
   "\"Timing\".\"timing\","
   "\"Timing\".\"type\","
@@ -13335,7 +13986,7 @@ namespace odb
   "\"Timing\"";
 
   void access::object_traits< ::pio::Timing >::
-  persist (database& db, const object_type& obj)
+  persist (database& db, object_type& obj)
   {
     ODB_POTENTIALLY_UNUSED (db);
 
@@ -13347,7 +13998,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     callback (db,
-              obj,
+              static_cast<const object_type&> (obj),
               callback_event::pre_persist);
 
     image_type& im (sts.image ());
@@ -13355,6 +14006,8 @@ namespace odb
 
     if (init (im, obj, statement_insert))
       im.version++;
+
+    im.auto_id_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -13368,8 +14021,10 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
+    obj.auto_id = static_cast< id_type > (st.id ());
+
     callback (db,
-              obj,
+              static_cast<const object_type&> (obj),
               callback_event::post_persist);
   }
 
@@ -13388,7 +14043,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.timing);
+    init (i, obj.auto_id);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -13557,7 +14212,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.timing);
+      obj.auto_id);
 
     if (!find_ (sts, &id))
       return false;
@@ -13691,8 +14346,9 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Timing\" (\n"
+                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"signal\" INTEGER,\n"
-                      "  \"timing\" INTEGER NOT NULL PRIMARY KEY,\n"
+                      "  \"timing\" INTEGER NOT NULL,\n"
                       "  \"type\" INTEGER NOT NULL,\n"
                       "  \"cycle\" INTEGER NOT NULL,\n"
                       "  \"offset\" INTEGER NOT NULL,\n"
@@ -13736,11 +14392,11 @@ namespace odb
     id_type id;
     {
       sqlite::value_traits<
-          int,
+          long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.phasing_value,
-        i.phasing_null);
+        i.auto_id_value,
+        i.auto_id_null);
     }
 
     return id;
@@ -13754,45 +14410,61 @@ namespace odb
 
     bool grew (false);
 
-    // signal
+    // auto_id
     //
     t[0UL] = false;
 
-    // phasing
+    // signal
     //
     t[1UL] = false;
 
-    // phase
+    // phasing
     //
     t[2UL] = false;
 
-    // detectors
+    // phase
     //
     t[3UL] = false;
 
-    // movements
+    // detectors
     //
-    t[4UL] = false;
+    if (t[4UL])
+    {
+      i.detectors_value.capacity (i.detectors_size);
+      grew = true;
+    }
 
-    // movement
+    // movements
     //
     t[5UL] = false;
 
-    // link
+    // movement
     //
-    t[6UL] = false;
+    if (t[6UL])
+    {
+      i.movement_value.capacity (i.movement_size);
+      grew = true;
+    }
 
-    // dir
+    // link
     //
     t[7UL] = false;
 
-    // to_link
+    // dir
     //
     t[8UL] = false;
 
-    // protect
+    // to_link
     //
     t[9UL] = false;
+
+    // protect
+    //
+    if (t[10UL])
+    {
+      i.protect_value.capacity (i.protect_size);
+      grew = true;
+    }
 
     return grew;
   }
@@ -13808,6 +14480,16 @@ namespace odb
 
     std::size_t n (0);
 
+    // auto_id
+    //
+    if (sk != statement_update)
+    {
+      b[n].type = sqlite::bind::integer;
+      b[n].buffer = &i.auto_id_value;
+      b[n].is_null = &i.auto_id_null;
+      n++;
+    }
+
     // signal
     //
     b[n].type = sqlite::bind::integer;
@@ -13817,13 +14499,10 @@ namespace odb
 
     // phasing
     //
-    if (sk != statement_update)
-    {
-      b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.phasing_value;
-      b[n].is_null = &i.phasing_null;
-      n++;
-    }
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.phasing_value;
+    b[n].is_null = &i.phasing_null;
+    n++;
 
     // phase
     //
@@ -13834,8 +14513,12 @@ namespace odb
 
     // detectors
     //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.detectors_value;
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.detectors_value.data ();
+    b[n].size = &i.detectors_size;
+    b[n].capacity = i.detectors_value.capacity ();
     b[n].is_null = &i.detectors_null;
     n++;
 
@@ -13848,8 +14531,12 @@ namespace odb
 
     // movement
     //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.movement_value;
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.movement_value.data ();
+    b[n].size = &i.movement_size;
+    b[n].capacity = i.movement_value.capacity ();
     b[n].is_null = &i.movement_null;
     n++;
 
@@ -13876,8 +14563,12 @@ namespace odb
 
     // protect
     //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.protect_value;
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.protect_value.data ();
+    b[n].size = &i.protect_size;
+    b[n].capacity = i.protect_value.capacity ();
     b[n].is_null = &i.protect_null;
     n++;
   }
@@ -13901,6 +14592,23 @@ namespace odb
     using namespace sqlite;
 
     bool grew (false);
+
+    // auto_id
+    //
+    if (sk == statement_insert)
+    {
+      long unsigned int const& v =
+        o.auto_id;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          long unsigned int,
+          sqlite::id_integer >::set_image (
+        i.auto_id_value,
+        is_null,
+        v);
+      i.auto_id_null = is_null;
+    }
 
     // signal
     //
@@ -13931,7 +14639,6 @@ namespace odb
 
     // phasing
     //
-    if (sk == statement_insert)
     {
       int const& v =
         o.phasing;
@@ -13965,28 +14672,20 @@ namespace odb
     // detectors
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Detector > const& v =
+      ::std::string const& v =
         o.detectors;
 
-      typedef object_traits< ::pio::Detector > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Detector > > ptr_traits;
-
-      bool is_null (ptr_traits::null_ptr (v));
-      if (!is_null)
-      {
-        const obj_traits::id_type& id (
-          obj_traits::id (ptr_traits::get_ref (v)));
-
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_image (
-          i.detectors_value,
-          is_null,
-          id);
-        i.detectors_null = is_null;
-      }
-      else
-        i.detectors_null = true;
+      bool is_null (false);
+      std::size_t cap (i.detectors_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
+        i.detectors_value,
+        i.detectors_size,
+        is_null,
+        v);
+      i.detectors_null = is_null;
+      grew = grew || (cap != i.detectors_value.capacity ());
     }
 
     // movements
@@ -14008,17 +14707,20 @@ namespace odb
     // movement
     //
     {
-      int const& v =
+      ::std::string const& v =
         o.movement;
 
       bool is_null (false);
+      std::size_t cap (i.movement_value.capacity ());
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
+          ::std::string,
+          sqlite::id_text >::set_image (
         i.movement_value,
+        i.movement_size,
         is_null,
         v);
       i.movement_null = is_null;
+      grew = grew || (cap != i.movement_value.capacity ());
     }
 
     // link
@@ -14094,17 +14796,20 @@ namespace odb
     // protect
     //
     {
-      int const& v =
+      ::std::string const& v =
         o.protect;
 
       bool is_null (false);
+      std::size_t cap (i.protect_value.capacity ());
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
+          ::std::string,
+          sqlite::id_text >::set_image (
         i.protect_value,
+        i.protect_size,
         is_null,
         v);
       i.protect_null = is_null;
+      grew = grew || (cap != i.protect_value.capacity ());
     }
 
     return grew;
@@ -14116,6 +14821,20 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (o);
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
+
+    // auto_id
+    //
+    {
+      long unsigned int& v =
+        o.auto_id;
+
+      sqlite::value_traits<
+          long unsigned int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.auto_id_value,
+        i.auto_id_null);
+    }
 
     // signal
     //
@@ -14178,31 +14897,16 @@ namespace odb
     // detectors
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Detector >& v =
+      ::std::string& v =
         o.detectors;
 
-      typedef object_traits< ::pio::Detector > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Detector > > ptr_traits;
-
-      if (i.detectors_null)
-        v = ptr_traits::pointer_type ();
-      else
-      {
-        obj_traits::id_type id;
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_value (
-          id,
-          i.detectors_value,
-          i.detectors_null);
-
-        // If a compiler error points to the line below, then
-        // it most likely means that a pointer used in a member
-        // cannot be initialized from an object pointer.
-        //
-        v = ptr_traits::pointer_type (
-          db->load< obj_traits::object_type > (id));
-      }
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        v,
+        i.detectors_value,
+        i.detectors_size,
+        i.detectors_null);
     }
 
     // movements
@@ -14222,14 +14926,15 @@ namespace odb
     // movement
     //
     {
-      int& v =
+      ::std::string& v =
         o.movement;
 
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
+          ::std::string,
+          sqlite::id_text >::set_value (
         v,
         i.movement_value,
+        i.movement_size,
         i.movement_null);
     }
 
@@ -14310,14 +15015,15 @@ namespace odb
     // protect
     //
     {
-      int& v =
+      ::std::string& v =
         o.protect;
 
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
+          ::std::string,
+          sqlite::id_text >::set_value (
         v,
         i.protect_value,
+        i.protect_size,
         i.protect_null);
     }
   }
@@ -14328,7 +15034,7 @@ namespace odb
     {
       bool is_null (false);
       sqlite::value_traits<
-          int,
+          long unsigned int,
           sqlite::id_integer >::set_image (
         i.id_value,
         is_null,
@@ -14346,6 +15052,7 @@ namespace odb
 
   const char access::object_traits< ::pio::Phasing >::persist_statement[] =
   "INSERT INTO \"Phasing\" ("
+  "\"auto_id\","
   "\"signal\","
   "\"phasing\","
   "\"phase\","
@@ -14356,10 +15063,11 @@ namespace odb
   "\"dir\","
   "\"to_link\","
   "\"protect\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Phasing >::find_statement[] =
   "SELECT "
+  "\"Phasing\".\"auto_id\","
   "\"Phasing\".\"signal\","
   "\"Phasing\".\"phasing\","
   "\"Phasing\".\"phase\","
@@ -14371,11 +15079,12 @@ namespace odb
   "\"Phasing\".\"to_link\","
   "\"Phasing\".\"protect\""
   " FROM \"Phasing\""
-  " WHERE \"Phasing\".\"phasing\"=?";
+  " WHERE \"Phasing\".\"auto_id\"=?";
 
   const char access::object_traits< ::pio::Phasing >::update_statement[] =
   "UPDATE \"Phasing\" SET "
   "\"signal\"=?,"
+  "\"phasing\"=?,"
   "\"phase\"=?,"
   "\"detectors\"=?,"
   "\"movements\"=?,"
@@ -14384,14 +15093,15 @@ namespace odb
   "\"dir\"=?,"
   "\"to_link\"=?,"
   "\"protect\"=?"
-  " WHERE \"phasing\"=?";
+  " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Phasing >::erase_statement[] =
   "DELETE FROM \"Phasing\""
-  " WHERE \"phasing\"=?";
+  " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Phasing >::query_statement[] =
   "SELECT "
+  "\"Phasing\".\"auto_id\","
   "\"Phasing\".\"signal\","
   "\"Phasing\".\"phasing\","
   "\"Phasing\".\"phase\","
@@ -14404,7 +15114,6 @@ namespace odb
   "\"Phasing\".\"protect\""
   " FROM \"Phasing\""
   " LEFT JOIN \"Signal\" AS \"signal\" ON \"signal\".\"signal\"=\"Phasing\".\"signal\""
-  " LEFT JOIN \"Detector\" AS \"detectors\" ON \"detectors\".\"detector\"=\"Phasing\".\"detectors\""
   " LEFT JOIN \"Link\" AS \"link\" ON \"link\".\"link\"=\"Phasing\".\"link\""
   " LEFT JOIN \"Link\" AS \"to_link\" ON \"to_link\".\"link\"=\"Phasing\".\"to_link\""
   " ";
@@ -14417,7 +15126,7 @@ namespace odb
   "\"Phasing\"";
 
   void access::object_traits< ::pio::Phasing >::
-  persist (database& db, const object_type& obj)
+  persist (database& db, object_type& obj)
   {
     ODB_POTENTIALLY_UNUSED (db);
 
@@ -14429,7 +15138,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     callback (db,
-              obj,
+              static_cast<const object_type&> (obj),
               callback_event::pre_persist);
 
     image_type& im (sts.image ());
@@ -14437,6 +15146,8 @@ namespace odb
 
     if (init (im, obj, statement_insert))
       im.version++;
+
+    im.auto_id_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -14450,8 +15161,10 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
+    obj.auto_id = static_cast< id_type > (st.id ());
+
     callback (db,
-              obj,
+              static_cast<const object_type&> (obj),
               callback_event::post_persist);
   }
 
@@ -14470,7 +15183,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.phasing);
+    init (i, obj.auto_id);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -14639,7 +15352,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.phasing);
+      obj.auto_id);
 
     if (!find_ (sts, &id))
       return false;
@@ -14687,6 +15400,20 @@ namespace odb
     st.execute ();
     auto_result ar (st);
     select_statement::result r (st.fetch ());
+
+    if (r == select_statement::truncated)
+    {
+      if (grow (im, sts.select_image_truncated ()))
+        im.version++;
+
+      if (im.version != sts.select_image_version ())
+      {
+        bind (imb.bind, im, statement_select);
+        sts.select_image_version (im.version);
+        imb.version++;
+        st.refetch ();
+      }
+    }
 
     return r != select_statement::no_data;
   }
@@ -14773,23 +15500,20 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Phasing\" (\n"
+                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"signal\" INTEGER,\n"
-                      "  \"phasing\" INTEGER NOT NULL PRIMARY KEY,\n"
+                      "  \"phasing\" INTEGER NOT NULL,\n"
                       "  \"phase\" INTEGER NOT NULL,\n"
-                      "  \"detectors\" INTEGER,\n"
+                      "  \"detectors\" TEXT NOT NULL,\n"
                       "  \"movements\" INTEGER NOT NULL,\n"
-                      "  \"movement\" INTEGER NOT NULL,\n"
+                      "  \"movement\" TEXT NOT NULL,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"to_link\" INTEGER,\n"
-                      "  \"protect\" INTEGER NOT NULL,\n"
+                      "  \"protect\" TEXT NOT NULL,\n"
                       "  CONSTRAINT \"signal_fk\"\n"
                       "    FOREIGN KEY (\"signal\")\n"
                       "    REFERENCES \"Signal\" (\"signal\")\n"
-                      "    DEFERRABLE INITIALLY DEFERRED,\n"
-                      "  CONSTRAINT \"detectors_fk\"\n"
-                      "    FOREIGN KEY (\"detectors\")\n"
-                      "    REFERENCES \"Detector\" (\"detector\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED,\n"
                       "  CONSTRAINT \"link_fk\"\n"
                       "    FOREIGN KEY (\"link\")\n"
@@ -20371,9 +21095,17 @@ namespace odb
     //
     t[7UL] = false;
 
-    // speed
+    // dwell
     //
     t[8UL] = false;
+
+    // time
+    //
+    t[9UL] = false;
+
+    // speed
+    //
+    t[10UL] = false;
 
     return grew;
   }
@@ -20450,6 +21182,20 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.type_value;
     b[n].is_null = &i.type_null;
+    n++;
+
+    // dwell
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.dwell_value;
+    b[n].is_null = &i.dwell_null;
+    n++;
+
+    // time
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.time_value;
+    b[n].is_null = &i.time_null;
     n++;
 
     // speed
@@ -20645,6 +21391,38 @@ namespace odb
       i.type_null = is_null;
     }
 
+    // dwell
+    //
+    {
+      double const& v =
+        o.dwell;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.dwell_value,
+        is_null,
+        v);
+      i.dwell_null = is_null;
+    }
+
+    // time
+    //
+    {
+      double const& v =
+        o.time;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.time_value,
+        is_null,
+        v);
+      i.time_null = is_null;
+    }
+
     // speed
     //
     {
@@ -20832,6 +21610,34 @@ namespace odb
         i.type_null);
     }
 
+    // dwell
+    //
+    {
+      double& v =
+        o.dwell;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.dwell_value,
+        i.dwell_null);
+    }
+
+    // time
+    //
+    {
+      double& v =
+        o.time;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.time_value,
+        i.time_null);
+    }
+
     // speed
     //
     {
@@ -20879,8 +21685,10 @@ namespace odb
   "\"name\","
   "\"node\","
   "\"type\","
+  "\"dwell\","
+  "\"time\","
   "\"speed\")"
-  " VALUES (?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Route_Nodes >::find_statement[] =
   "SELECT "
@@ -20892,6 +21700,8 @@ namespace odb
   "\"Route_Nodes\".\"name\","
   "\"Route_Nodes\".\"node\","
   "\"Route_Nodes\".\"type\","
+  "\"Route_Nodes\".\"dwell\","
+  "\"Route_Nodes\".\"time\","
   "\"Route_Nodes\".\"speed\""
   " FROM \"Route_Nodes\""
   " WHERE \"Route_Nodes\".\"auto_id\"=?";
@@ -20905,6 +21715,8 @@ namespace odb
   "\"name\"=?,"
   "\"node\"=?,"
   "\"type\"=?,"
+  "\"dwell\"=?,"
+  "\"time\"=?,"
   "\"speed\"=?"
   " WHERE \"auto_id\"=?";
 
@@ -20922,6 +21734,8 @@ namespace odb
   "\"Route_Nodes\".\"name\","
   "\"Route_Nodes\".\"node\","
   "\"Route_Nodes\".\"type\","
+  "\"Route_Nodes\".\"dwell\","
+  "\"Route_Nodes\".\"time\","
   "\"Route_Nodes\".\"speed\""
   " FROM \"Route_Nodes\""
   " LEFT JOIN \"Veh_Type\" AS \"veh_type\" ON \"veh_type\".\"type\"=\"Route_Nodes\".\"veh_type\""
@@ -21319,6 +22133,8 @@ namespace odb
                       "  \"name\" TEXT NOT NULL,\n"
                       "  \"node\" INTEGER,\n"
                       "  \"type\" INTEGER NOT NULL,\n"
+                      "  \"dwell\" REAL,\n"
+                      "  \"time\" REAL,\n"
                       "  \"speed\" REAL,\n"
                       "  CONSTRAINT \"veh_type_fk\"\n"
                       "    FOREIGN KEY (\"veh_type\")\n"
@@ -21559,28 +22375,17 @@ namespace odb
     // trip
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Trip > const& v =
+      int const& v =
         o.trip;
 
-      typedef object_traits< ::pio::Trip > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Trip > > ptr_traits;
-
-      bool is_null (ptr_traits::null_ptr (v));
-      if (!is_null)
-      {
-        const obj_traits::id_type& id (
-          obj_traits::id (ptr_traits::get_ref (v)));
-
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_image (
-          i.trip_value,
-          is_null,
-          id);
-        i.trip_null = is_null;
-      }
-      else
-        i.trip_null = true;
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.trip_value,
+        is_null,
+        v);
+      i.trip_null = is_null;
     }
 
     // type
@@ -21684,31 +22489,15 @@ namespace odb
     // trip
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Trip >& v =
+      int& v =
         o.trip;
 
-      typedef object_traits< ::pio::Trip > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Trip > > ptr_traits;
-
-      if (i.trip_null)
-        v = ptr_traits::pointer_type ();
-      else
-      {
-        obj_traits::id_type id;
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_value (
-          id,
-          i.trip_value,
-          i.trip_null);
-
-        // If a compiler error points to the line below, then
-        // it most likely means that a pointer used in a member
-        // cannot be initialized from an object pointer.
-        //
-        v = ptr_traits::pointer_type (
-          db->load< obj_traits::object_type > (id));
-      }
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.trip_value,
+        i.trip_null);
     }
 
     // type
@@ -21809,7 +22598,6 @@ namespace odb
   "\"Selection\".\"type\","
   "\"Selection\".\"partition\""
   " FROM \"Selection\""
-  " LEFT JOIN \"Trip\" AS \"trip\" ON \"trip\".\"auto_id\"=\"Selection\".\"trip\""
   " ";
 
   const char access::object_traits< ::pio::Selection >::erase_query_statement[] =
@@ -22184,13 +22972,9 @@ namespace odb
                       "  \"hhold\" INTEGER NOT NULL,\n"
                       "  \"person\" INTEGER NOT NULL,\n"
                       "  \"tour\" INTEGER NOT NULL,\n"
-                      "  \"trip\" INTEGER,\n"
+                      "  \"trip\" INTEGER NOT NULL,\n"
                       "  \"type\" INTEGER NOT NULL,\n"
-                      "  \"partition\" INTEGER NOT NULL,\n"
-                      "  CONSTRAINT \"trip_fk\"\n"
-                      "    FOREIGN KEY (\"trip\")\n"
-                      "    REFERENCES \"Trip\" (\"auto_id\")\n"
-                      "    DEFERRABLE INITIALLY DEFERRED)");
+                      "  \"partition\" INTEGER NOT NULL)");
           return false;
         }
       }
@@ -22522,28 +23306,17 @@ namespace odb
     // vehicles
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Vehicle > const& v =
+      int const& v =
         o.vehicles;
 
-      typedef object_traits< ::pio::Vehicle > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Vehicle > > ptr_traits;
-
-      bool is_null (ptr_traits::null_ptr (v));
-      if (!is_null)
-      {
-        const obj_traits::id_type& id (
-          obj_traits::id (ptr_traits::get_ref (v)));
-
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_image (
-          i.vehicles_value,
-          is_null,
-          id);
-        i.vehicles_null = is_null;
-      }
-      else
-        i.vehicles_null = true;
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.vehicles_value,
+        is_null,
+        v);
+      i.vehicles_null = is_null;
     }
 
     // type
@@ -22773,31 +23546,15 @@ namespace odb
     // vehicles
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Vehicle >& v =
+      int& v =
         o.vehicles;
 
-      typedef object_traits< ::pio::Vehicle > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Vehicle > > ptr_traits;
-
-      if (i.vehicles_null)
-        v = ptr_traits::pointer_type ();
-      else
-      {
-        obj_traits::id_type id;
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_value (
-          id,
-          i.vehicles_value,
-          i.vehicles_null);
-
-        // If a compiler error points to the line below, then
-        // it most likely means that a pointer used in a member
-        // cannot be initialized from an object pointer.
-        //
-        v = ptr_traits::pointer_type (
-          db->load< obj_traits::object_type > (id));
-      }
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.vehicles_value,
+        i.vehicles_null);
     }
 
     // type
@@ -23011,7 +23768,6 @@ namespace odb
   "\"Household\".\"drive\""
   " FROM \"Household\""
   " LEFT JOIN \"Location\" AS \"location\" ON \"location\".\"location\"=\"Household\".\"location\""
-  " LEFT JOIN \"Vehicle\" AS \"vehicles\" ON \"vehicles\".\"auto_id\"=\"Household\".\"vehicles\""
   " ";
 
   const char access::object_traits< ::pio::Household >::erase_query_statement[] =
@@ -23387,7 +24143,7 @@ namespace odb
                       "  \"location\" INTEGER,\n"
                       "  \"persons\" INTEGER NOT NULL,\n"
                       "  \"workers\" INTEGER NOT NULL,\n"
-                      "  \"vehicles\" INTEGER,\n"
+                      "  \"vehicles\" INTEGER NOT NULL,\n"
                       "  \"type\" INTEGER NOT NULL,\n"
                       "  \"partition\" INTEGER NOT NULL,\n"
                       "  \"person\" INTEGER NOT NULL,\n"
@@ -23399,10 +24155,6 @@ namespace odb
                       "  CONSTRAINT \"location_fk\"\n"
                       "    FOREIGN KEY (\"location\")\n"
                       "    REFERENCES \"Location\" (\"location\")\n"
-                      "    DEFERRABLE INITIALLY DEFERRED,\n"
-                      "  CONSTRAINT \"vehicles_fk\"\n"
-                      "    FOREIGN KEY (\"vehicles\")\n"
-                      "    REFERENCES \"Vehicle\" (\"auto_id\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
           return false;
         }
@@ -23464,17 +24216,33 @@ namespace odb
     //
     t[3UL] = false;
 
-    // flow
+    // start
     //
     t[4UL] = false;
 
-    // out_link
+    // end
     //
     t[5UL] = false;
 
-    // out_flow
+    // flow
     //
     t[6UL] = false;
+
+    // time
+    //
+    t[7UL] = false;
+
+    // out_link
+    //
+    t[8UL] = false;
+
+    // out_flow
+    //
+    t[9UL] = false;
+
+    // out_time
+    //
+    t[10UL] = false;
 
     return grew;
   }
@@ -23521,11 +24289,32 @@ namespace odb
     b[n].is_null = &i.type_null;
     n++;
 
+    // start
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.start_value;
+    b[n].is_null = &i.start_null;
+    n++;
+
+    // end
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.end_value;
+    b[n].is_null = &i.end_null;
+    n++;
+
     // flow
     //
     b[n].type = sqlite::bind::real;
     b[n].buffer = &i.flow_value;
     b[n].is_null = &i.flow_null;
+    n++;
+
+    // time
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.time_value;
+    b[n].is_null = &i.time_null;
     n++;
 
     // out_link
@@ -23540,6 +24329,13 @@ namespace odb
     b[n].type = sqlite::bind::real;
     b[n].buffer = &i.out_flow_value;
     b[n].is_null = &i.out_flow_null;
+    n++;
+
+    // out_time
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.out_time_value;
+    b[n].is_null = &i.out_time_null;
     n++;
   }
 
@@ -23639,6 +24435,38 @@ namespace odb
       i.type_null = is_null;
     }
 
+    // start
+    //
+    {
+      double const& v =
+        o.start;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.start_value,
+        is_null,
+        v);
+      i.start_null = is_null;
+    }
+
+    // end
+    //
+    {
+      double const& v =
+        o.end;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.end_value,
+        is_null,
+        v);
+      i.end_null = is_null;
+    }
+
     // flow
     //
     {
@@ -23653,6 +24481,22 @@ namespace odb
         is_null,
         v);
       i.flow_null = is_null;
+    }
+
+    // time
+    //
+    {
+      double const& v =
+        o.time;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.time_value,
+        is_null,
+        v);
+      i.time_null = is_null;
     }
 
     // out_link
@@ -23696,6 +24540,22 @@ namespace odb
         is_null,
         v);
       i.out_flow_null = is_null;
+    }
+
+    // out_time
+    //
+    {
+      double const& v =
+        o.out_time;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.out_time_value,
+        is_null,
+        v);
+      i.out_time_null = is_null;
     }
 
     return grew;
@@ -23780,6 +24640,34 @@ namespace odb
         i.type_null);
     }
 
+    // start
+    //
+    {
+      double& v =
+        o.start;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.start_value,
+        i.start_null);
+    }
+
+    // end
+    //
+    {
+      double& v =
+        o.end;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.end_value,
+        i.end_null);
+    }
+
     // flow
     //
     {
@@ -23792,6 +24680,20 @@ namespace odb
         v,
         i.flow_value,
         i.flow_null);
+    }
+
+    // time
+    //
+    {
+      double& v =
+        o.time;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.time_value,
+        i.time_null);
     }
 
     // out_link
@@ -23837,6 +24739,20 @@ namespace odb
         i.out_flow_value,
         i.out_flow_null);
     }
+
+    // out_time
+    //
+    {
+      double& v =
+        o.out_time;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.out_time_value,
+        i.out_time_null);
+    }
   }
 
   void access::object_traits< ::pio::Link_Delay >::
@@ -23867,10 +24783,14 @@ namespace odb
   "\"link\","
   "\"dir\","
   "\"type\","
+  "\"start\","
+  "\"end\","
   "\"flow\","
+  "\"time\","
   "\"out_link\","
-  "\"out_flow\")"
-  " VALUES (?,?,?,?,?,?,?)";
+  "\"out_flow\","
+  "\"out_time\")"
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Link_Delay >::find_statement[] =
   "SELECT "
@@ -23878,9 +24798,13 @@ namespace odb
   "\"Link_Delay\".\"link\","
   "\"Link_Delay\".\"dir\","
   "\"Link_Delay\".\"type\","
+  "\"Link_Delay\".\"start\","
+  "\"Link_Delay\".\"end\","
   "\"Link_Delay\".\"flow\","
+  "\"Link_Delay\".\"time\","
   "\"Link_Delay\".\"out_link\","
-  "\"Link_Delay\".\"out_flow\""
+  "\"Link_Delay\".\"out_flow\","
+  "\"Link_Delay\".\"out_time\""
   " FROM \"Link_Delay\""
   " WHERE \"Link_Delay\".\"auto_id\"=?";
 
@@ -23889,9 +24813,13 @@ namespace odb
   "\"link\"=?,"
   "\"dir\"=?,"
   "\"type\"=?,"
+  "\"start\"=?,"
+  "\"end\"=?,"
   "\"flow\"=?,"
+  "\"time\"=?,"
   "\"out_link\"=?,"
-  "\"out_flow\"=?"
+  "\"out_flow\"=?,"
+  "\"out_time\"=?"
   " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Link_Delay >::erase_statement[] =
@@ -23904,9 +24832,13 @@ namespace odb
   "\"Link_Delay\".\"link\","
   "\"Link_Delay\".\"dir\","
   "\"Link_Delay\".\"type\","
+  "\"Link_Delay\".\"start\","
+  "\"Link_Delay\".\"end\","
   "\"Link_Delay\".\"flow\","
+  "\"Link_Delay\".\"time\","
   "\"Link_Delay\".\"out_link\","
-  "\"Link_Delay\".\"out_flow\""
+  "\"Link_Delay\".\"out_flow\","
+  "\"Link_Delay\".\"out_time\""
   " FROM \"Link_Delay\""
   " LEFT JOIN \"Link\" AS \"link\" ON \"link\".\"link\"=\"Link_Delay\".\"link\""
   " LEFT JOIN \"Link\" AS \"out_link\" ON \"out_link\".\"link\"=\"Link_Delay\".\"out_link\""
@@ -24284,9 +25216,13 @@ namespace odb
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"type\" INTEGER NOT NULL,\n"
+                      "  \"start\" REAL,\n"
+                      "  \"end\" REAL,\n"
                       "  \"flow\" REAL,\n"
+                      "  \"time\" REAL,\n"
                       "  \"out_link\" INTEGER,\n"
                       "  \"out_flow\" REAL,\n"
+                      "  \"out_time\" REAL,\n"
                       "  CONSTRAINT \"link_fk\"\n"
                       "    FOREIGN KEY (\"link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
@@ -24347,29 +25283,33 @@ namespace odb
     //
     t[1UL] = false;
 
-    // density
+    // delay
     //
     t[2UL] = false;
 
-    // max_den
+    // density
     //
     t[3UL] = false;
 
-    // ratio
+    // max_den
     //
     t[4UL] = false;
 
-    // queue
+    // ratio
     //
     t[5UL] = false;
 
-    // max_que
+    // queue
     //
     t[6UL] = false;
 
-    // fail
+    // max_que
     //
     t[7UL] = false;
+
+    // fail
+    //
+    t[8UL] = false;
 
     return grew;
   }
@@ -24400,6 +25340,13 @@ namespace odb
     b[n].type = sqlite::bind::real;
     b[n].buffer = &i.speed_value;
     b[n].is_null = &i.speed_null;
+    n++;
+
+    // delay
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.delay_value;
+    b[n].is_null = &i.delay_null;
     n++;
 
     // density
@@ -24496,6 +25443,22 @@ namespace odb
         is_null,
         v);
       i.speed_null = is_null;
+    }
+
+    // delay
+    //
+    {
+      double const& v =
+        o.delay;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.delay_value,
+        is_null,
+        v);
+      i.delay_null = is_null;
     }
 
     // density
@@ -24632,6 +25595,20 @@ namespace odb
         i.speed_null);
     }
 
+    // delay
+    //
+    {
+      double& v =
+        o.delay;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.delay_value,
+        i.delay_null);
+    }
+
     // density
     //
     {
@@ -24743,18 +25720,20 @@ namespace odb
   "INSERT INTO \"Performance\" ("
   "\"auto_id\","
   "\"speed\","
+  "\"delay\","
   "\"density\","
   "\"max_den\","
   "\"ratio\","
   "\"queue\","
   "\"max_que\","
   "\"fail\")"
-  " VALUES (?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Performance >::find_statement[] =
   "SELECT "
   "\"Performance\".\"auto_id\","
   "\"Performance\".\"speed\","
+  "\"Performance\".\"delay\","
   "\"Performance\".\"density\","
   "\"Performance\".\"max_den\","
   "\"Performance\".\"ratio\","
@@ -24767,6 +25746,7 @@ namespace odb
   const char access::object_traits< ::pio::Performance >::update_statement[] =
   "UPDATE \"Performance\" SET "
   "\"speed\"=?,"
+  "\"delay\"=?,"
   "\"density\"=?,"
   "\"max_den\"=?,"
   "\"ratio\"=?,"
@@ -24783,6 +25763,7 @@ namespace odb
   "SELECT "
   "\"Performance\".\"auto_id\","
   "\"Performance\".\"speed\","
+  "\"Performance\".\"delay\","
   "\"Performance\".\"density\","
   "\"Performance\".\"max_den\","
   "\"Performance\".\"ratio\","
@@ -25162,6 +26143,7 @@ namespace odb
           db.execute ("CREATE TABLE \"Performance\" (\n"
                       "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"speed\" REAL,\n"
+                      "  \"delay\" REAL,\n"
                       "  \"density\" REAL,\n"
                       "  \"max_den\" REAL,\n"
                       "  \"ratio\" REAL,\n"
@@ -25232,21 +26214,29 @@ namespace odb
     //
     t[4UL] = false;
 
-    // board
+    // schedule
     //
     t[5UL] = false;
 
-    // alight
+    // time
     //
     t[6UL] = false;
 
-    // load
+    // board
     //
     t[7UL] = false;
 
-    // factor
+    // alight
     //
     t[8UL] = false;
+
+    // load
+    //
+    t[9UL] = false;
+
+    // factor
+    //
+    t[10UL] = false;
 
     return grew;
   }
@@ -25298,6 +26288,20 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.stop_value;
     b[n].is_null = &i.stop_null;
+    n++;
+
+    // schedule
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.schedule_value;
+    b[n].is_null = &i.schedule_null;
+    n++;
+
+    // time
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.time_value;
+    b[n].is_null = &i.time_null;
     n++;
 
     // board
@@ -25439,6 +26443,38 @@ namespace odb
       }
       else
         i.stop_null = true;
+    }
+
+    // schedule
+    //
+    {
+      double const& v =
+        o.schedule;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.schedule_value,
+        is_null,
+        v);
+      i.schedule_null = is_null;
+    }
+
+    // time
+    //
+    {
+      double const& v =
+        o.time;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.time_value,
+        is_null,
+        v);
+      i.time_null = is_null;
     }
 
     // board
@@ -25601,6 +26637,34 @@ namespace odb
       }
     }
 
+    // schedule
+    //
+    {
+      double& v =
+        o.schedule;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.schedule_value,
+        i.schedule_null);
+    }
+
+    // time
+    //
+    {
+      double& v =
+        o.time;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.time_value,
+        i.time_null);
+    }
+
     // board
     //
     {
@@ -25687,11 +26751,13 @@ namespace odb
   "\"route\","
   "\"run\","
   "\"stop\","
+  "\"schedule\","
+  "\"time\","
   "\"board\","
   "\"alight\","
   "\"load\","
   "\"factor\")"
-  " VALUES (?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Ridership >::find_statement[] =
   "SELECT "
@@ -25700,6 +26766,8 @@ namespace odb
   "\"Ridership\".\"route\","
   "\"Ridership\".\"run\","
   "\"Ridership\".\"stop\","
+  "\"Ridership\".\"schedule\","
+  "\"Ridership\".\"time\","
   "\"Ridership\".\"board\","
   "\"Ridership\".\"alight\","
   "\"Ridership\".\"load\","
@@ -25713,6 +26781,8 @@ namespace odb
   "\"route\"=?,"
   "\"run\"=?,"
   "\"stop\"=?,"
+  "\"schedule\"=?,"
+  "\"time\"=?,"
   "\"board\"=?,"
   "\"alight\"=?,"
   "\"load\"=?,"
@@ -25730,6 +26800,8 @@ namespace odb
   "\"Ridership\".\"route\","
   "\"Ridership\".\"run\","
   "\"Ridership\".\"stop\","
+  "\"Ridership\".\"schedule\","
+  "\"Ridership\".\"time\","
   "\"Ridership\".\"board\","
   "\"Ridership\".\"alight\","
   "\"Ridership\".\"load\","
@@ -26111,6 +27183,8 @@ namespace odb
                       "  \"route\" INTEGER NOT NULL,\n"
                       "  \"run\" INTEGER NOT NULL,\n"
                       "  \"stop\" INTEGER,\n"
+                      "  \"schedule\" REAL,\n"
+                      "  \"time\" REAL,\n"
                       "  \"board\" INTEGER NOT NULL,\n"
                       "  \"alight\" INTEGER NOT NULL,\n"
                       "  \"load\" INTEGER NOT NULL,\n"
@@ -26207,9 +27281,17 @@ namespace odb
     //
     t[10UL] = false;
 
-    // subtype
+    // min_dwell
     //
     t[11UL] = false;
+
+    // max_dwell
+    //
+    t[12UL] = false;
+
+    // subtype
+    //
+    t[13UL] = false;
 
     return grew;
   }
@@ -26303,6 +27385,20 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.method_value;
     b[n].is_null = &i.method_null;
+    n++;
+
+    // min_dwell
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.min_dwell_value;
+    b[n].is_null = &i.min_dwell_null;
+    n++;
+
+    // max_dwell
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.max_dwell_value;
+    b[n].is_null = &i.max_dwell_null;
     n++;
 
     // subtype
@@ -26510,6 +27606,38 @@ namespace odb
       i.method_null = is_null;
     }
 
+    // min_dwell
+    //
+    {
+      double const& v =
+        o.min_dwell;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.min_dwell_value,
+        is_null,
+        v);
+      i.min_dwell_null = is_null;
+    }
+
+    // max_dwell
+    //
+    {
+      double const& v =
+        o.max_dwell;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.max_dwell_value,
+        is_null,
+        v);
+      i.max_dwell_null = is_null;
+    }
+
     // subtype
     //
     {
@@ -26690,6 +27818,34 @@ namespace odb
         i.method_null);
     }
 
+    // min_dwell
+    //
+    {
+      double& v =
+        o.min_dwell;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.min_dwell_value,
+        i.min_dwell_null);
+    }
+
+    // max_dwell
+    //
+    {
+      double& v =
+        o.max_dwell;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.max_dwell_value,
+        i.max_dwell_null);
+    }
+
     // subtype
     //
     {
@@ -26740,8 +27896,10 @@ namespace odb
   "\"load\","
   "\"unload\","
   "\"method\","
+  "\"min_dwell\","
+  "\"max_dwell\","
   "\"subtype\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Veh_Type >::find_statement[] =
   "SELECT "
@@ -26756,6 +27914,8 @@ namespace odb
   "\"Veh_Type\".\"load\","
   "\"Veh_Type\".\"unload\","
   "\"Veh_Type\".\"method\","
+  "\"Veh_Type\".\"min_dwell\","
+  "\"Veh_Type\".\"max_dwell\","
   "\"Veh_Type\".\"subtype\""
   " FROM \"Veh_Type\""
   " WHERE \"Veh_Type\".\"type\"=?";
@@ -26772,6 +27932,8 @@ namespace odb
   "\"load\"=?,"
   "\"unload\"=?,"
   "\"method\"=?,"
+  "\"min_dwell\"=?,"
+  "\"max_dwell\"=?,"
   "\"subtype\"=?"
   " WHERE \"type\"=?";
 
@@ -26792,6 +27954,8 @@ namespace odb
   "\"Veh_Type\".\"load\","
   "\"Veh_Type\".\"unload\","
   "\"Veh_Type\".\"method\","
+  "\"Veh_Type\".\"min_dwell\","
+  "\"Veh_Type\".\"max_dwell\","
   "\"Veh_Type\".\"subtype\""
   " FROM \"Veh_Type\""
   " ";
@@ -27171,6 +28335,8 @@ namespace odb
                       "  \"load\" REAL,\n"
                       "  \"unload\" REAL,\n"
                       "  \"method\" INTEGER NOT NULL,\n"
+                      "  \"min_dwell\" REAL,\n"
+                      "  \"max_dwell\" REAL,\n"
                       "  \"subtype\" INTEGER NOT NULL)");
           return false;
         }
@@ -28127,45 +29293,57 @@ namespace odb
     //
     t[4UL] = false;
 
-    // origin
+    // start
     //
     t[5UL] = false;
 
-    // destination
+    // end
     //
     t[6UL] = false;
 
-    // purpose
+    // duration
     //
     t[7UL] = false;
 
-    // mode
+    // origin
     //
     t[8UL] = false;
 
-    // constraint
+    // destination
     //
     t[9UL] = false;
 
-    // priority
+    // purpose
     //
     t[10UL] = false;
 
-    // vehicle
+    // mode
     //
     t[11UL] = false;
 
-    // passengers
+    // constraint
     //
     t[12UL] = false;
 
-    // type
+    // priority
     //
     t[13UL] = false;
 
-    // partition
+    // vehicle
     //
     t[14UL] = false;
+
+    // passengers
+    //
+    t[15UL] = false;
+
+    // type
+    //
+    t[16UL] = false;
+
+    // partition
+    //
+    t[17UL] = false;
 
     return grew;
   }
@@ -28217,6 +29395,27 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.trip_value;
     b[n].is_null = &i.trip_null;
+    n++;
+
+    // start
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.start_value;
+    b[n].is_null = &i.start_null;
+    n++;
+
+    // end
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.end_value;
+    b[n].is_null = &i.end_null;
+    n++;
+
+    // duration
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.duration_value;
+    b[n].is_null = &i.duration_null;
     n++;
 
     // origin
@@ -28391,6 +29590,54 @@ namespace odb
       i.trip_null = is_null;
     }
 
+    // start
+    //
+    {
+      double const& v =
+        o.start;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.start_value,
+        is_null,
+        v);
+      i.start_null = is_null;
+    }
+
+    // end
+    //
+    {
+      double const& v =
+        o.end;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.end_value,
+        is_null,
+        v);
+      i.end_null = is_null;
+    }
+
+    // duration
+    //
+    {
+      double const& v =
+        o.duration;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.duration_value,
+        is_null,
+        v);
+      i.duration_null = is_null;
+    }
+
     // origin
     //
     {
@@ -28512,28 +29759,17 @@ namespace odb
     // vehicle
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Vehicle > const& v =
+      int const& v =
         o.vehicle;
 
-      typedef object_traits< ::pio::Vehicle > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Vehicle > > ptr_traits;
-
-      bool is_null (ptr_traits::null_ptr (v));
-      if (!is_null)
-      {
-        const obj_traits::id_type& id (
-          obj_traits::id (ptr_traits::get_ref (v)));
-
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_image (
-          i.vehicle_value,
-          is_null,
-          id);
-        i.vehicle_null = is_null;
-      }
-      else
-        i.vehicle_null = true;
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.vehicle_value,
+        is_null,
+        v);
+      i.vehicle_null = is_null;
     }
 
     // passengers
@@ -28664,6 +29900,48 @@ namespace odb
         i.trip_null);
     }
 
+    // start
+    //
+    {
+      double& v =
+        o.start;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.start_value,
+        i.start_null);
+    }
+
+    // end
+    //
+    {
+      double& v =
+        o.end;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.end_value,
+        i.end_null);
+    }
+
+    // duration
+    //
+    {
+      double& v =
+        o.duration;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.duration_value,
+        i.duration_null);
+    }
+
     // origin
     //
     {
@@ -28783,31 +30061,15 @@ namespace odb
     // vehicle
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Vehicle >& v =
+      int& v =
         o.vehicle;
 
-      typedef object_traits< ::pio::Vehicle > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Vehicle > > ptr_traits;
-
-      if (i.vehicle_null)
-        v = ptr_traits::pointer_type ();
-      else
-      {
-        obj_traits::id_type id;
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_value (
-          id,
-          i.vehicle_value,
-          i.vehicle_null);
-
-        // If a compiler error points to the line below, then
-        // it most likely means that a pointer used in a member
-        // cannot be initialized from an object pointer.
-        //
-        v = ptr_traits::pointer_type (
-          db->load< obj_traits::object_type > (id));
-      }
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.vehicle_value,
+        i.vehicle_null);
     }
 
     // passengers
@@ -28882,6 +30144,9 @@ namespace odb
   "\"person\","
   "\"tour\","
   "\"trip\","
+  "\"start\","
+  "\"end\","
+  "\"duration\","
   "\"origin\","
   "\"destination\","
   "\"purpose\","
@@ -28892,7 +30157,7 @@ namespace odb
   "\"passengers\","
   "\"type\","
   "\"partition\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Trip >::find_statement[] =
   "SELECT "
@@ -28901,6 +30166,9 @@ namespace odb
   "\"Trip\".\"person\","
   "\"Trip\".\"tour\","
   "\"Trip\".\"trip\","
+  "\"Trip\".\"start\","
+  "\"Trip\".\"end\","
+  "\"Trip\".\"duration\","
   "\"Trip\".\"origin\","
   "\"Trip\".\"destination\","
   "\"Trip\".\"purpose\","
@@ -28920,6 +30188,9 @@ namespace odb
   "\"person\"=?,"
   "\"tour\"=?,"
   "\"trip\"=?,"
+  "\"start\"=?,"
+  "\"end\"=?,"
+  "\"duration\"=?,"
   "\"origin\"=?,"
   "\"destination\"=?,"
   "\"purpose\"=?,"
@@ -28943,6 +30214,9 @@ namespace odb
   "\"Trip\".\"person\","
   "\"Trip\".\"tour\","
   "\"Trip\".\"trip\","
+  "\"Trip\".\"start\","
+  "\"Trip\".\"end\","
+  "\"Trip\".\"duration\","
   "\"Trip\".\"origin\","
   "\"Trip\".\"destination\","
   "\"Trip\".\"purpose\","
@@ -28956,7 +30230,6 @@ namespace odb
   " FROM \"Trip\""
   " LEFT JOIN \"Location\" AS \"origin\" ON \"origin\".\"location\"=\"Trip\".\"origin\""
   " LEFT JOIN \"Location\" AS \"destination\" ON \"destination\".\"location\"=\"Trip\".\"destination\""
-  " LEFT JOIN \"Vehicle\" AS \"vehicle\" ON \"vehicle\".\"auto_id\"=\"Trip\".\"vehicle\""
   " ";
 
   const char access::object_traits< ::pio::Trip >::erase_query_statement[] =
@@ -29332,13 +30605,16 @@ namespace odb
                       "  \"person\" INTEGER NOT NULL,\n"
                       "  \"tour\" INTEGER NOT NULL,\n"
                       "  \"trip\" INTEGER NOT NULL,\n"
+                      "  \"start\" REAL,\n"
+                      "  \"end\" REAL,\n"
+                      "  \"duration\" REAL,\n"
                       "  \"origin\" INTEGER,\n"
                       "  \"destination\" INTEGER,\n"
                       "  \"purpose\" INTEGER NOT NULL,\n"
                       "  \"mode\" INTEGER NOT NULL,\n"
                       "  \"constraint\" INTEGER NOT NULL,\n"
                       "  \"priority\" INTEGER NOT NULL,\n"
-                      "  \"vehicle\" INTEGER,\n"
+                      "  \"vehicle\" INTEGER NOT NULL,\n"
                       "  \"passengers\" INTEGER NOT NULL,\n"
                       "  \"type\" INTEGER NOT NULL,\n"
                       "  \"partition\" INTEGER NOT NULL,\n"
@@ -29349,10 +30625,6 @@ namespace odb
                       "  CONSTRAINT \"destination_fk\"\n"
                       "    FOREIGN KEY (\"destination\")\n"
                       "    REFERENCES \"Location\" (\"location\")\n"
-                      "    DEFERRABLE INITIALLY DEFERRED,\n"
-                      "  CONSTRAINT \"vehicle_fk\"\n"
-                      "    FOREIGN KEY (\"vehicle\")\n"
-                      "    REFERENCES \"Vehicle\" (\"auto_id\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
           return false;
         }
@@ -29402,29 +30674,33 @@ namespace odb
     //
     t[0UL] = false;
 
-    // link
+    // time
     //
     t[1UL] = false;
 
-    // dir
+    // link
     //
     t[2UL] = false;
 
-    // lane
+    // dir
     //
     t[3UL] = false;
 
-    // offset
+    // lane
     //
     t[4UL] = false;
 
-    // route
+    // offset
     //
     t[5UL] = false;
 
-    // survey
+    // route
     //
     t[6UL] = false;
+
+    // survey
+    //
+    t[7UL] = false;
 
     return grew;
   }
@@ -29449,6 +30725,13 @@ namespace odb
       b[n].is_null = &i.problem_null;
       n++;
     }
+
+    // time
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.time_value;
+    b[n].is_null = &i.time_null;
+    n++;
 
     // link
     //
@@ -29528,6 +30811,22 @@ namespace odb
         is_null,
         v);
       i.problem_null = is_null;
+    }
+
+    // time
+    //
+    {
+      double const& v =
+        o.time;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.time_value,
+        is_null,
+        v);
+      i.time_null = is_null;
     }
 
     // link
@@ -29661,6 +30960,20 @@ namespace odb
         i.problem_null);
     }
 
+    // time
+    //
+    {
+      double& v =
+        o.time;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.time_value,
+        i.time_null);
+    }
+
     // link
     //
     {
@@ -29787,17 +31100,19 @@ namespace odb
   const char access::object_traits< ::pio::Problem >::persist_statement[] =
   "INSERT INTO \"Problem\" ("
   "\"problem\","
+  "\"time\","
   "\"link\","
   "\"dir\","
   "\"lane\","
   "\"offset\","
   "\"route\","
   "\"survey\")"
-  " VALUES (?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Problem >::find_statement[] =
   "SELECT "
   "\"Problem\".\"problem\","
+  "\"Problem\".\"time\","
   "\"Problem\".\"link\","
   "\"Problem\".\"dir\","
   "\"Problem\".\"lane\","
@@ -29809,6 +31124,7 @@ namespace odb
 
   const char access::object_traits< ::pio::Problem >::update_statement[] =
   "UPDATE \"Problem\" SET "
+  "\"time\"=?,"
   "\"link\"=?,"
   "\"dir\"=?,"
   "\"lane\"=?,"
@@ -29824,6 +31140,7 @@ namespace odb
   const char access::object_traits< ::pio::Problem >::query_statement[] =
   "SELECT "
   "\"Problem\".\"problem\","
+  "\"Problem\".\"time\","
   "\"Problem\".\"link\","
   "\"Problem\".\"dir\","
   "\"Problem\".\"lane\","
@@ -30199,6 +31516,7 @@ namespace odb
         {
           db.execute ("CREATE TABLE \"Problem\" (\n"
                       "  \"problem\" INTEGER NOT NULL PRIMARY KEY,\n"
+                      "  \"time\" REAL,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"lane\" INTEGER NOT NULL,\n"
@@ -30257,41 +31575,77 @@ namespace odb
     //
     t[0UL] = false;
 
-    // length
+    // depart
     //
     t[1UL] = false;
 
-    // cost
+    // arrive
     //
     t[2UL] = false;
 
-    // impedance
+    // activity
     //
     t[3UL] = false;
 
-    // leg_mode
+    // walk
     //
     t[4UL] = false;
 
-    // leg_type
+    // drive
     //
     t[5UL] = false;
 
-    // leg_id
+    // transit
     //
     t[6UL] = false;
 
-    // leg_length
+    // wait
     //
     t[7UL] = false;
 
-    // leg_cost
+    // other
     //
     t[8UL] = false;
 
-    // leg_imp
+    // length
     //
     t[9UL] = false;
+
+    // cost
+    //
+    t[10UL] = false;
+
+    // impedance
+    //
+    t[11UL] = false;
+
+    // leg_mode
+    //
+    t[12UL] = false;
+
+    // leg_type
+    //
+    t[13UL] = false;
+
+    // leg_id
+    //
+    t[14UL] = false;
+
+    // leg_time
+    //
+    t[15UL] = false;
+
+    // leg_length
+    //
+    t[16UL] = false;
+
+    // leg_cost
+    //
+    t[17UL] = false;
+
+    // leg_imp
+    //
+    t[18UL] = false;
 
     return grew;
   }
@@ -30316,6 +31670,62 @@ namespace odb
       b[n].is_null = &i.auto_id_null;
       n++;
     }
+
+    // depart
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.depart_value;
+    b[n].is_null = &i.depart_null;
+    n++;
+
+    // arrive
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.arrive_value;
+    b[n].is_null = &i.arrive_null;
+    n++;
+
+    // activity
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.activity_value;
+    b[n].is_null = &i.activity_null;
+    n++;
+
+    // walk
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.walk_value;
+    b[n].is_null = &i.walk_null;
+    n++;
+
+    // drive
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.drive_value;
+    b[n].is_null = &i.drive_null;
+    n++;
+
+    // transit
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.transit_value;
+    b[n].is_null = &i.transit_null;
+    n++;
+
+    // wait
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.wait_value;
+    b[n].is_null = &i.wait_null;
+    n++;
+
+    // other
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.other_value;
+    b[n].is_null = &i.other_null;
+    n++;
 
     // length
     //
@@ -30357,6 +31767,13 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.leg_id_value;
     b[n].is_null = &i.leg_id_null;
+    n++;
+
+    // leg_time
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.leg_time_value;
+    b[n].is_null = &i.leg_time_null;
     n++;
 
     // leg_length
@@ -30416,6 +31833,134 @@ namespace odb
         is_null,
         v);
       i.auto_id_null = is_null;
+    }
+
+    // depart
+    //
+    {
+      double const& v =
+        o.depart;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.depart_value,
+        is_null,
+        v);
+      i.depart_null = is_null;
+    }
+
+    // arrive
+    //
+    {
+      double const& v =
+        o.arrive;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.arrive_value,
+        is_null,
+        v);
+      i.arrive_null = is_null;
+    }
+
+    // activity
+    //
+    {
+      double const& v =
+        o.activity;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.activity_value,
+        is_null,
+        v);
+      i.activity_null = is_null;
+    }
+
+    // walk
+    //
+    {
+      double const& v =
+        o.walk;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.walk_value,
+        is_null,
+        v);
+      i.walk_null = is_null;
+    }
+
+    // drive
+    //
+    {
+      double const& v =
+        o.drive;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.drive_value,
+        is_null,
+        v);
+      i.drive_null = is_null;
+    }
+
+    // transit
+    //
+    {
+      double const& v =
+        o.transit;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.transit_value,
+        is_null,
+        v);
+      i.transit_null = is_null;
+    }
+
+    // wait
+    //
+    {
+      double const& v =
+        o.wait;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.wait_value,
+        is_null,
+        v);
+      i.wait_null = is_null;
+    }
+
+    // other
+    //
+    {
+      double const& v =
+        o.other;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.other_value,
+        is_null,
+        v);
+      i.other_null = is_null;
     }
 
     // length
@@ -30514,6 +32059,22 @@ namespace odb
       i.leg_id_null = is_null;
     }
 
+    // leg_time
+    //
+    {
+      double const& v =
+        o.leg_time;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.leg_time_value,
+        is_null,
+        v);
+      i.leg_time_null = is_null;
+    }
+
     // leg_length
     //
     {
@@ -30584,6 +32145,118 @@ namespace odb
         v,
         i.auto_id_value,
         i.auto_id_null);
+    }
+
+    // depart
+    //
+    {
+      double& v =
+        o.depart;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.depart_value,
+        i.depart_null);
+    }
+
+    // arrive
+    //
+    {
+      double& v =
+        o.arrive;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.arrive_value,
+        i.arrive_null);
+    }
+
+    // activity
+    //
+    {
+      double& v =
+        o.activity;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.activity_value,
+        i.activity_null);
+    }
+
+    // walk
+    //
+    {
+      double& v =
+        o.walk;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.walk_value,
+        i.walk_null);
+    }
+
+    // drive
+    //
+    {
+      double& v =
+        o.drive;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.drive_value,
+        i.drive_null);
+    }
+
+    // transit
+    //
+    {
+      double& v =
+        o.transit;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.transit_value,
+        i.transit_null);
+    }
+
+    // wait
+    //
+    {
+      double& v =
+        o.wait;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.wait_value,
+        i.wait_null);
+    }
+
+    // other
+    //
+    {
+      double& v =
+        o.other;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.other_value,
+        i.other_null);
     }
 
     // length
@@ -30670,6 +32343,20 @@ namespace odb
         i.leg_id_null);
     }
 
+    // leg_time
+    //
+    {
+      double& v =
+        o.leg_time;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.leg_time_value,
+        i.leg_time_null);
+    }
+
     // leg_length
     //
     {
@@ -30738,26 +32425,44 @@ namespace odb
   const char access::object_traits< ::pio::Plan >::persist_statement[] =
   "INSERT INTO \"Plan\" ("
   "\"auto_id\","
+  "\"depart\","
+  "\"arrive\","
+  "\"activity\","
+  "\"walk\","
+  "\"drive\","
+  "\"transit\","
+  "\"wait\","
+  "\"other\","
   "\"length\","
   "\"cost\","
   "\"impedance\","
   "\"leg_mode\","
   "\"leg_type\","
   "\"leg_id\","
+  "\"leg_time\","
   "\"leg_length\","
   "\"leg_cost\","
   "\"leg_imp\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Plan >::find_statement[] =
   "SELECT "
   "\"Plan\".\"auto_id\","
+  "\"Plan\".\"depart\","
+  "\"Plan\".\"arrive\","
+  "\"Plan\".\"activity\","
+  "\"Plan\".\"walk\","
+  "\"Plan\".\"drive\","
+  "\"Plan\".\"transit\","
+  "\"Plan\".\"wait\","
+  "\"Plan\".\"other\","
   "\"Plan\".\"length\","
   "\"Plan\".\"cost\","
   "\"Plan\".\"impedance\","
   "\"Plan\".\"leg_mode\","
   "\"Plan\".\"leg_type\","
   "\"Plan\".\"leg_id\","
+  "\"Plan\".\"leg_time\","
   "\"Plan\".\"leg_length\","
   "\"Plan\".\"leg_cost\","
   "\"Plan\".\"leg_imp\""
@@ -30766,12 +32471,21 @@ namespace odb
 
   const char access::object_traits< ::pio::Plan >::update_statement[] =
   "UPDATE \"Plan\" SET "
+  "\"depart\"=?,"
+  "\"arrive\"=?,"
+  "\"activity\"=?,"
+  "\"walk\"=?,"
+  "\"drive\"=?,"
+  "\"transit\"=?,"
+  "\"wait\"=?,"
+  "\"other\"=?,"
   "\"length\"=?,"
   "\"cost\"=?,"
   "\"impedance\"=?,"
   "\"leg_mode\"=?,"
   "\"leg_type\"=?,"
   "\"leg_id\"=?,"
+  "\"leg_time\"=?,"
   "\"leg_length\"=?,"
   "\"leg_cost\"=?,"
   "\"leg_imp\"=?"
@@ -30784,12 +32498,21 @@ namespace odb
   const char access::object_traits< ::pio::Plan >::query_statement[] =
   "SELECT "
   "\"Plan\".\"auto_id\","
+  "\"Plan\".\"depart\","
+  "\"Plan\".\"arrive\","
+  "\"Plan\".\"activity\","
+  "\"Plan\".\"walk\","
+  "\"Plan\".\"drive\","
+  "\"Plan\".\"transit\","
+  "\"Plan\".\"wait\","
+  "\"Plan\".\"other\","
   "\"Plan\".\"length\","
   "\"Plan\".\"cost\","
   "\"Plan\".\"impedance\","
   "\"Plan\".\"leg_mode\","
   "\"Plan\".\"leg_type\","
   "\"Plan\".\"leg_id\","
+  "\"Plan\".\"leg_time\","
   "\"Plan\".\"leg_length\","
   "\"Plan\".\"leg_cost\","
   "\"Plan\".\"leg_imp\""
@@ -31165,12 +32888,21 @@ namespace odb
         {
           db.execute ("CREATE TABLE \"Plan\" (\n"
                       "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"depart\" REAL,\n"
+                      "  \"arrive\" REAL,\n"
+                      "  \"activity\" REAL,\n"
+                      "  \"walk\" REAL,\n"
+                      "  \"drive\" REAL,\n"
+                      "  \"transit\" REAL,\n"
+                      "  \"wait\" REAL,\n"
+                      "  \"other\" REAL,\n"
                       "  \"length\" REAL,\n"
                       "  \"cost\" REAL,\n"
                       "  \"impedance\" INTEGER NOT NULL,\n"
                       "  \"leg_mode\" INTEGER NOT NULL,\n"
                       "  \"leg_type\" INTEGER NOT NULL,\n"
                       "  \"leg_id\" INTEGER NOT NULL,\n"
+                      "  \"leg_time\" REAL,\n"
                       "  \"leg_length\" REAL,\n"
                       "  \"leg_cost\" REAL,\n"
                       "  \"leg_imp\" INTEGER NOT NULL)");
@@ -31222,17 +32954,41 @@ namespace odb
     //
     t[0UL] = false;
 
-    // length
+    // time
     //
     t[1UL] = false;
 
-    // cost
+    // walk
     //
     t[2UL] = false;
 
-    // impedance
+    // drive
     //
     t[3UL] = false;
+
+    // transit
+    //
+    t[4UL] = false;
+
+    // wait
+    //
+    t[5UL] = false;
+
+    // other
+    //
+    t[6UL] = false;
+
+    // length
+    //
+    t[7UL] = false;
+
+    // cost
+    //
+    t[8UL] = false;
+
+    // impedance
+    //
+    t[9UL] = false;
 
     return grew;
   }
@@ -31257,6 +33013,48 @@ namespace odb
       b[n].is_null = &i.auto_id_null;
       n++;
     }
+
+    // time
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.time_value;
+    b[n].is_null = &i.time_null;
+    n++;
+
+    // walk
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.walk_value;
+    b[n].is_null = &i.walk_null;
+    n++;
+
+    // drive
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.drive_value;
+    b[n].is_null = &i.drive_null;
+    n++;
+
+    // transit
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.transit_value;
+    b[n].is_null = &i.transit_null;
+    n++;
+
+    // wait
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.wait_value;
+    b[n].is_null = &i.wait_null;
+    n++;
+
+    // other
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.other_value;
+    b[n].is_null = &i.other_null;
+    n++;
 
     // length
     //
@@ -31315,6 +33113,102 @@ namespace odb
         is_null,
         v);
       i.auto_id_null = is_null;
+    }
+
+    // time
+    //
+    {
+      double const& v =
+        o.time;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.time_value,
+        is_null,
+        v);
+      i.time_null = is_null;
+    }
+
+    // walk
+    //
+    {
+      double const& v =
+        o.walk;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.walk_value,
+        is_null,
+        v);
+      i.walk_null = is_null;
+    }
+
+    // drive
+    //
+    {
+      double const& v =
+        o.drive;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.drive_value,
+        is_null,
+        v);
+      i.drive_null = is_null;
+    }
+
+    // transit
+    //
+    {
+      double const& v =
+        o.transit;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.transit_value,
+        is_null,
+        v);
+      i.transit_null = is_null;
+    }
+
+    // wait
+    //
+    {
+      double const& v =
+        o.wait;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.wait_value,
+        is_null,
+        v);
+      i.wait_null = is_null;
+    }
+
+    // other
+    //
+    {
+      double const& v =
+        o.other;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.other_value,
+        is_null,
+        v);
+      i.other_null = is_null;
     }
 
     // length
@@ -31389,6 +33283,90 @@ namespace odb
         i.auto_id_null);
     }
 
+    // time
+    //
+    {
+      double& v =
+        o.time;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.time_value,
+        i.time_null);
+    }
+
+    // walk
+    //
+    {
+      double& v =
+        o.walk;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.walk_value,
+        i.walk_null);
+    }
+
+    // drive
+    //
+    {
+      double& v =
+        o.drive;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.drive_value,
+        i.drive_null);
+    }
+
+    // transit
+    //
+    {
+      double& v =
+        o.transit;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.transit_value,
+        i.transit_null);
+    }
+
+    // wait
+    //
+    {
+      double& v =
+        o.wait;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.wait_value,
+        i.wait_null);
+    }
+
+    // other
+    //
+    {
+      double& v =
+        o.other;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.other_value,
+        i.other_null);
+    }
+
     // length
     //
     {
@@ -31457,14 +33435,26 @@ namespace odb
   const char access::object_traits< ::pio::Skim >::persist_statement[] =
   "INSERT INTO \"Skim\" ("
   "\"auto_id\","
+  "\"time\","
+  "\"walk\","
+  "\"drive\","
+  "\"transit\","
+  "\"wait\","
+  "\"other\","
   "\"length\","
   "\"cost\","
   "\"impedance\")"
-  " VALUES (?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Skim >::find_statement[] =
   "SELECT "
   "\"Skim\".\"auto_id\","
+  "\"Skim\".\"time\","
+  "\"Skim\".\"walk\","
+  "\"Skim\".\"drive\","
+  "\"Skim\".\"transit\","
+  "\"Skim\".\"wait\","
+  "\"Skim\".\"other\","
   "\"Skim\".\"length\","
   "\"Skim\".\"cost\","
   "\"Skim\".\"impedance\""
@@ -31473,6 +33463,12 @@ namespace odb
 
   const char access::object_traits< ::pio::Skim >::update_statement[] =
   "UPDATE \"Skim\" SET "
+  "\"time\"=?,"
+  "\"walk\"=?,"
+  "\"drive\"=?,"
+  "\"transit\"=?,"
+  "\"wait\"=?,"
+  "\"other\"=?,"
   "\"length\"=?,"
   "\"cost\"=?,"
   "\"impedance\"=?"
@@ -31485,6 +33481,12 @@ namespace odb
   const char access::object_traits< ::pio::Skim >::query_statement[] =
   "SELECT "
   "\"Skim\".\"auto_id\","
+  "\"Skim\".\"time\","
+  "\"Skim\".\"walk\","
+  "\"Skim\".\"drive\","
+  "\"Skim\".\"transit\","
+  "\"Skim\".\"wait\","
+  "\"Skim\".\"other\","
   "\"Skim\".\"length\","
   "\"Skim\".\"cost\","
   "\"Skim\".\"impedance\""
@@ -31860,6 +33862,12 @@ namespace odb
         {
           db.execute ("CREATE TABLE \"Skim\" (\n"
                       "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"time\" REAL,\n"
+                      "  \"walk\" REAL,\n"
+                      "  \"drive\" REAL,\n"
+                      "  \"transit\" REAL,\n"
+                      "  \"wait\" REAL,\n"
+                      "  \"other\" REAL,\n"
                       "  \"length\" REAL,\n"
                       "  \"cost\" REAL,\n"
                       "  \"impedance\" INTEGER NOT NULL)");
@@ -31935,25 +33943,33 @@ namespace odb
     //
     t[6UL] = false;
 
-    // link
+    // schedule
     //
     t[7UL] = false;
 
-    // dir
+    // actual
     //
     t[8UL] = false;
 
-    // lane
+    // link
     //
     t[9UL] = false;
 
-    // offset
+    // dir
     //
     t[10UL] = false;
 
-    // route
+    // lane
     //
     t[11UL] = false;
+
+    // offset
+    //
+    t[12UL] = false;
+
+    // route
+    //
+    t[13UL] = false;
 
     return grew;
   }
@@ -32019,6 +34035,20 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.type_value;
     b[n].is_null = &i.type_null;
+    n++;
+
+    // schedule
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.schedule_value;
+    b[n].is_null = &i.schedule_null;
+    n++;
+
+    // actual
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.actual_value;
+    b[n].is_null = &i.actual_null;
     n++;
 
     // link
@@ -32145,28 +34175,17 @@ namespace odb
     // trip
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Trip > const& v =
+      int const& v =
         o.trip;
 
-      typedef object_traits< ::pio::Trip > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Trip > > ptr_traits;
-
-      bool is_null (ptr_traits::null_ptr (v));
-      if (!is_null)
-      {
-        const obj_traits::id_type& id (
-          obj_traits::id (ptr_traits::get_ref (v)));
-
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_image (
-          i.trip_value,
-          is_null,
-          id);
-        i.trip_null = is_null;
-      }
-      else
-        i.trip_null = true;
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.trip_value,
+        is_null,
+        v);
+      i.trip_null = is_null;
     }
 
     // mode
@@ -32199,6 +34218,38 @@ namespace odb
         is_null,
         v);
       i.type_null = is_null;
+    }
+
+    // schedule
+    //
+    {
+      double const& v =
+        o.schedule;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.schedule_value,
+        is_null,
+        v);
+      i.schedule_null = is_null;
+    }
+
+    // actual
+    //
+    {
+      double const& v =
+        o.actual;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.actual_value,
+        is_null,
+        v);
+      i.actual_null = is_null;
     }
 
     // link
@@ -32361,31 +34412,15 @@ namespace odb
     // trip
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Trip >& v =
+      int& v =
         o.trip;
 
-      typedef object_traits< ::pio::Trip > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Trip > > ptr_traits;
-
-      if (i.trip_null)
-        v = ptr_traits::pointer_type ();
-      else
-      {
-        obj_traits::id_type id;
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_value (
-          id,
-          i.trip_value,
-          i.trip_null);
-
-        // If a compiler error points to the line below, then
-        // it most likely means that a pointer used in a member
-        // cannot be initialized from an object pointer.
-        //
-        v = ptr_traits::pointer_type (
-          db->load< obj_traits::object_type > (id));
-      }
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.trip_value,
+        i.trip_null);
     }
 
     // mode
@@ -32414,6 +34449,34 @@ namespace odb
         v,
         i.type_value,
         i.type_null);
+    }
+
+    // schedule
+    //
+    {
+      double& v =
+        o.schedule;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.schedule_value,
+        i.schedule_null);
+    }
+
+    // actual
+    //
+    {
+      double& v =
+        o.actual;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.actual_value,
+        i.actual_null);
     }
 
     // link
@@ -32534,12 +34597,14 @@ namespace odb
   "\"trip\","
   "\"mode\","
   "\"type\","
+  "\"schedule\","
+  "\"actual\","
   "\"link\","
   "\"dir\","
   "\"lane\","
   "\"offset\","
   "\"route\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Event >::find_statement[] =
   "SELECT "
@@ -32550,6 +34615,8 @@ namespace odb
   "\"Event\".\"trip\","
   "\"Event\".\"mode\","
   "\"Event\".\"type\","
+  "\"Event\".\"schedule\","
+  "\"Event\".\"actual\","
   "\"Event\".\"link\","
   "\"Event\".\"dir\","
   "\"Event\".\"lane\","
@@ -32566,6 +34633,8 @@ namespace odb
   "\"trip\"=?,"
   "\"mode\"=?,"
   "\"type\"=?,"
+  "\"schedule\"=?,"
+  "\"actual\"=?,"
   "\"link\"=?,"
   "\"dir\"=?,"
   "\"lane\"=?,"
@@ -32586,13 +34655,14 @@ namespace odb
   "\"Event\".\"trip\","
   "\"Event\".\"mode\","
   "\"Event\".\"type\","
+  "\"Event\".\"schedule\","
+  "\"Event\".\"actual\","
   "\"Event\".\"link\","
   "\"Event\".\"dir\","
   "\"Event\".\"lane\","
   "\"Event\".\"offset\","
   "\"Event\".\"route\""
   " FROM \"Event\""
-  " LEFT JOIN \"Trip\" AS \"trip\" ON \"trip\".\"auto_id\"=\"Event\".\"trip\""
   " LEFT JOIN \"Link\" AS \"link\" ON \"link\".\"link\"=\"Event\".\"link\""
   " ";
 
@@ -32968,18 +35038,16 @@ namespace odb
                       "  \"hhold\" INTEGER NOT NULL,\n"
                       "  \"person\" INTEGER NOT NULL,\n"
                       "  \"tour\" INTEGER NOT NULL,\n"
-                      "  \"trip\" INTEGER,\n"
+                      "  \"trip\" INTEGER NOT NULL,\n"
                       "  \"mode\" INTEGER NOT NULL,\n"
                       "  \"type\" INTEGER NOT NULL,\n"
+                      "  \"schedule\" REAL,\n"
+                      "  \"actual\" REAL,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"lane\" INTEGER NOT NULL,\n"
                       "  \"offset\" REAL,\n"
                       "  \"route\" INTEGER NOT NULL,\n"
-                      "  CONSTRAINT \"trip_fk\"\n"
-                      "    FOREIGN KEY (\"trip\")\n"
-                      "    REFERENCES \"Trip\" (\"auto_id\")\n"
-                      "    DEFERRABLE INITIALLY DEFERRED,\n"
                       "  CONSTRAINT \"link_fk\"\n"
                       "    FOREIGN KEY (\"link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
@@ -33052,33 +35120,37 @@ namespace odb
     //
     t[5UL] = false;
 
-    // distance
+    // time
     //
     t[6UL] = false;
 
-    // speed
+    // distance
     //
     t[7UL] = false;
 
-    // link
+    // speed
     //
     t[8UL] = false;
 
-    // dir
+    // link
     //
     t[9UL] = false;
 
-    // lane
+    // dir
     //
     t[10UL] = false;
 
-    // offset
+    // lane
     //
     t[11UL] = false;
 
-    // route
+    // offset
     //
     t[12UL] = false;
+
+    // route
+    //
+    t[13UL] = false;
 
     return grew;
   }
@@ -33137,6 +35209,13 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.mode_value;
     b[n].is_null = &i.mode_null;
+    n++;
+
+    // time
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.time_value;
+    b[n].is_null = &i.time_null;
     n++;
 
     // distance
@@ -33277,28 +35356,17 @@ namespace odb
     // trip
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Trip > const& v =
+      int const& v =
         o.trip;
 
-      typedef object_traits< ::pio::Trip > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Trip > > ptr_traits;
-
-      bool is_null (ptr_traits::null_ptr (v));
-      if (!is_null)
-      {
-        const obj_traits::id_type& id (
-          obj_traits::id (ptr_traits::get_ref (v)));
-
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_image (
-          i.trip_value,
-          is_null,
-          id);
-        i.trip_null = is_null;
-      }
-      else
-        i.trip_null = true;
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.trip_value,
+        is_null,
+        v);
+      i.trip_null = is_null;
     }
 
     // mode
@@ -33315,6 +35383,22 @@ namespace odb
         is_null,
         v);
       i.mode_null = is_null;
+    }
+
+    // time
+    //
+    {
+      double const& v =
+        o.time;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.time_value,
+        is_null,
+        v);
+      i.time_null = is_null;
     }
 
     // distance
@@ -33509,31 +35593,15 @@ namespace odb
     // trip
     //
     {
-      ::std::tr1::shared_ptr< ::pio::Trip >& v =
+      int& v =
         o.trip;
 
-      typedef object_traits< ::pio::Trip > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Trip > > ptr_traits;
-
-      if (i.trip_null)
-        v = ptr_traits::pointer_type ();
-      else
-      {
-        obj_traits::id_type id;
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_value (
-          id,
-          i.trip_value,
-          i.trip_null);
-
-        // If a compiler error points to the line below, then
-        // it most likely means that a pointer used in a member
-        // cannot be initialized from an object pointer.
-        //
-        v = ptr_traits::pointer_type (
-          db->load< obj_traits::object_type > (id));
-      }
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.trip_value,
+        i.trip_null);
     }
 
     // mode
@@ -33548,6 +35616,20 @@ namespace odb
         v,
         i.mode_value,
         i.mode_null);
+    }
+
+    // time
+    //
+    {
+      double& v =
+        o.time;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.time_value,
+        i.time_null);
     }
 
     // distance
@@ -33695,6 +35777,7 @@ namespace odb
   "\"tour\","
   "\"trip\","
   "\"mode\","
+  "\"time\","
   "\"distance\","
   "\"speed\","
   "\"link\","
@@ -33702,7 +35785,7 @@ namespace odb
   "\"lane\","
   "\"offset\","
   "\"route\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Traveler >::find_statement[] =
   "SELECT "
@@ -33712,6 +35795,7 @@ namespace odb
   "\"Traveler\".\"tour\","
   "\"Traveler\".\"trip\","
   "\"Traveler\".\"mode\","
+  "\"Traveler\".\"time\","
   "\"Traveler\".\"distance\","
   "\"Traveler\".\"speed\","
   "\"Traveler\".\"link\","
@@ -33729,6 +35813,7 @@ namespace odb
   "\"tour\"=?,"
   "\"trip\"=?,"
   "\"mode\"=?,"
+  "\"time\"=?,"
   "\"distance\"=?,"
   "\"speed\"=?,"
   "\"link\"=?,"
@@ -33750,6 +35835,7 @@ namespace odb
   "\"Traveler\".\"tour\","
   "\"Traveler\".\"trip\","
   "\"Traveler\".\"mode\","
+  "\"Traveler\".\"time\","
   "\"Traveler\".\"distance\","
   "\"Traveler\".\"speed\","
   "\"Traveler\".\"link\","
@@ -33758,7 +35844,6 @@ namespace odb
   "\"Traveler\".\"offset\","
   "\"Traveler\".\"route\""
   " FROM \"Traveler\""
-  " LEFT JOIN \"Trip\" AS \"trip\" ON \"trip\".\"auto_id\"=\"Traveler\".\"trip\""
   " LEFT JOIN \"Link\" AS \"link\" ON \"link\".\"link\"=\"Traveler\".\"link\""
   " ";
 
@@ -34134,8 +36219,9 @@ namespace odb
                       "  \"hhold\" INTEGER NOT NULL,\n"
                       "  \"person\" INTEGER NOT NULL,\n"
                       "  \"tour\" INTEGER NOT NULL,\n"
-                      "  \"trip\" INTEGER,\n"
+                      "  \"trip\" INTEGER NOT NULL,\n"
                       "  \"mode\" INTEGER NOT NULL,\n"
+                      "  \"time\" REAL,\n"
                       "  \"distance\" REAL,\n"
                       "  \"speed\" REAL,\n"
                       "  \"link\" INTEGER,\n"
@@ -34143,10 +36229,6 @@ namespace odb
                       "  \"lane\" INTEGER NOT NULL,\n"
                       "  \"offset\" REAL,\n"
                       "  \"route\" INTEGER NOT NULL,\n"
-                      "  CONSTRAINT \"trip_fk\"\n"
-                      "    FOREIGN KEY (\"trip\")\n"
-                      "    REFERENCES \"Trip\" (\"auto_id\")\n"
-                      "    DEFERRABLE INITIALLY DEFERRED,\n"
                       "  CONSTRAINT \"link_fk\"\n"
                       "    FOREIGN KEY (\"link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"

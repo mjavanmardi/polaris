@@ -855,9 +855,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     type_type_;
 
     static const type_type_ type;
@@ -1258,7 +1258,8 @@ namespace odb
 
       // type
       //
-      long long type_value;
+      details::buffer type_value;
+      std::size_t type_size;
       bool type_null;
 
       // divided
@@ -1865,6 +1866,30 @@ namespace odb
 
     static const max_trav_type_ max_trav;
 
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
     // offset
     //
     typedef
@@ -1989,6 +2014,16 @@ namespace odb
   max_trav (A::table_name, "\"max_trav\"", 0);
 
   template <typename A>
+  const typename pointer_query_columns< ::pio::Lane_Use, A >::start_type_
+  pointer_query_columns< ::pio::Lane_Use, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Lane_Use, A >::end_type_
+  pointer_query_columns< ::pio::Lane_Use, A >::
+  end (A::table_name, "\"end\"", 0);
+
+  template <typename A>
   const typename pointer_query_columns< ::pio::Lane_Use, A >::offset_type_
   pointer_query_columns< ::pio::Lane_Use, A >::
   offset (A::table_name, "\"offset\"", 0);
@@ -2093,6 +2128,16 @@ namespace odb
       long long max_trav_value;
       bool max_trav_null;
 
+      // start
+      //
+      double start_value;
+      bool start_null;
+
+      // end
+      //
+      double end_value;
+      bool end_null;
+
       // offset
       //
       double offset_value;
@@ -2165,7 +2210,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 16UL;
+    static const std::size_t column_count = 18UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -2288,9 +2333,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     lanes_type_;
 
     static const lanes_type_ lanes;
@@ -2300,9 +2345,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     to_lanes_type_;
 
     static const to_lanes_type_ to_lanes;
@@ -2312,9 +2357,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     type_type_;
 
     static const type_type_ type;
@@ -2487,17 +2532,20 @@ namespace odb
 
       // lanes
       //
-      long long lanes_value;
+      details::buffer lanes_value;
+      std::size_t lanes_size;
       bool lanes_null;
 
       // to_lanes
       //
-      long long to_lanes_value;
+      details::buffer to_lanes_value;
+      std::size_t to_lanes_size;
       bool to_lanes_null;
 
       // type
       //
-      long long type_value;
+      details::buffer type_value;
+      std::size_t type_size;
       bool type_null;
 
       // penalty
@@ -2685,6 +2733,30 @@ namespace odb
 
     static const to_link_type_ to_link;
 
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
     // use
     //
     typedef
@@ -2779,6 +2851,16 @@ namespace odb
   to_link (A::table_name, "\"to_link\"", 0);
 
   template <typename A>
+  const typename pointer_query_columns< ::pio::Turn_Pen, A >::start_type_
+  pointer_query_columns< ::pio::Turn_Pen, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Turn_Pen, A >::end_type_
+  pointer_query_columns< ::pio::Turn_Pen, A >::
+  end (A::table_name, "\"end\"", 0);
+
+  template <typename A>
   const typename pointer_query_columns< ::pio::Turn_Pen, A >::use_type_
   pointer_query_columns< ::pio::Turn_Pen, A >::
   use (A::table_name, "\"use\"", 0);
@@ -2853,6 +2935,16 @@ namespace odb
       long long to_link_value;
       bool to_link_null;
 
+      // start
+      //
+      double start_value;
+      bool start_null;
+
+      // end
+      //
+      double end_value;
+      bool end_null;
+
       // use
       //
       long long use_value;
@@ -2925,7 +3017,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 10UL;
+    static const std::size_t column_count = 12UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -3067,6 +3159,30 @@ namespace odb
 
     static const use_type_ use;
 
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
     // space
     //
     typedef
@@ -3078,6 +3194,30 @@ namespace odb
     space_type_;
 
     static const space_type_ space;
+
+    // time_in
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_in_type_;
+
+    static const time_in_type_ time_in;
+
+    // time_out
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_out_type_;
+
+    static const time_out_type_ time_out;
 
     // hourly
     //
@@ -3135,9 +3275,29 @@ namespace odb
   use (A::table_name, "\"use\"", 0);
 
   template <typename A>
+  const typename pointer_query_columns< ::pio::Parking, A >::start_type_
+  pointer_query_columns< ::pio::Parking, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Parking, A >::end_type_
+  pointer_query_columns< ::pio::Parking, A >::
+  end (A::table_name, "\"end\"", 0);
+
+  template <typename A>
   const typename pointer_query_columns< ::pio::Parking, A >::space_type_
   pointer_query_columns< ::pio::Parking, A >::
   space (A::table_name, "\"space\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Parking, A >::time_in_type_
+  pointer_query_columns< ::pio::Parking, A >::
+  time_in (A::table_name, "\"time_in\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Parking, A >::time_out_type_
+  pointer_query_columns< ::pio::Parking, A >::
+  time_out (A::table_name, "\"time_out\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::pio::Parking, A >::hourly_type_
@@ -3204,10 +3364,30 @@ namespace odb
       long long use_value;
       bool use_null;
 
+      // start
+      //
+      double start_value;
+      bool start_null;
+
+      // end
+      //
+      double end_value;
+      bool end_null;
+
       // space
       //
       long long space_value;
       bool space_null;
+
+      // time_in
+      //
+      double time_in_value;
+      bool time_in_null;
+
+      // time_out
+      //
+      double time_out_value;
+      bool time_out_null;
 
       // hourly
       //
@@ -3261,7 +3441,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 9UL;
+    static const std::size_t column_count = 13UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -3685,6 +3865,18 @@ namespace odb
 
     static const dir_type_ dir;
 
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
+
     // cost
     //
     typedef
@@ -3732,6 +3924,11 @@ namespace odb
   const typename pointer_query_columns< ::pio::Access, A >::dir_type_
   pointer_query_columns< ::pio::Access, A >::
   dir (A::table_name, "\"dir\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Access, A >::time_type_
+  pointer_query_columns< ::pio::Access, A >::
+  time (A::table_name, "\"time\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::pio::Access, A >::cost_type_
@@ -3798,6 +3995,11 @@ namespace odb
       long long dir_value;
       bool dir_null;
 
+      // time
+      //
+      double time_value;
+      bool time_null;
+
       // cost
       //
       long long cost_value;
@@ -3845,7 +4047,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 8UL;
+    static const std::size_t column_count = 9UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -3915,6 +4117,18 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::pio::Sign, A >
   {
+    // auto_id
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        long unsigned int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    auto_id_type_;
+
+    static const auto_id_type_ auto_id;
+
     // link
     //
     typedef
@@ -3944,13 +4158,18 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     sign_type_;
 
     static const sign_type_ sign;
   };
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Sign, A >::auto_id_type_
+  pointer_query_columns< ::pio::Sign, A >::
+  auto_id (A::table_name, "\"auto_id\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::pio::Sign, A >::link_type_
@@ -3977,8 +4196,8 @@ namespace odb
 
     static const bool polymorphic = false;
 
-    typedef int id_type;
-    static const bool auto_id = false;
+    typedef long unsigned int id_type;
+    static const bool auto_id = true;
 
     struct id_image_type
     {
@@ -3992,6 +4211,11 @@ namespace odb
 
     struct image_type
     {
+      // auto_id
+      //
+      long long auto_id_value;
+      bool auto_id_null;
+
       // link
       //
       long long link_value;
@@ -4004,7 +4228,8 @@ namespace odb
 
       // sign
       //
-      long long sign_value;
+      details::buffer sign_value;
+      std::size_t sign_size;
       bool sign_null;
 
       std::size_t version;
@@ -4049,7 +4274,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 3UL;
+    static const std::size_t column_count = 4UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -4071,7 +4296,7 @@ namespace odb
     callback (database&, const object_type&, callback_event);
 
     static void
-    persist (database&, const object_type&);
+    persist (database&, object_type&);
 
     static pointer_type
     find (database&, const id_type&);
@@ -4117,7 +4342,7 @@ namespace odb
   };
 
   template <typename A>
-  struct pointer_query_columns< ::pio::Signal, A >
+  struct query_columns< ::pio::Signal, A >
   {
     // signal
     //
@@ -4155,6 +4380,30 @@ namespace odb
 
     static const times_type_ times;
 
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
     // timing
     //
     typedef
@@ -4184,9 +4433,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     type_type_;
 
     static const type_type_ type;
@@ -4205,39 +4454,55 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Signal, A >::signal_type_
-  pointer_query_columns< ::pio::Signal, A >::
+  const typename query_columns< ::pio::Signal, A >::signal_type_
+  query_columns< ::pio::Signal, A >::
   signal (A::table_name, "\"signal\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Signal, A >::group_type_
-  pointer_query_columns< ::pio::Signal, A >::
+  const typename query_columns< ::pio::Signal, A >::group_type_
+  query_columns< ::pio::Signal, A >::
   group (A::table_name, "\"group\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Signal, A >::times_type_
-  pointer_query_columns< ::pio::Signal, A >::
+  const typename query_columns< ::pio::Signal, A >::times_type_
+  query_columns< ::pio::Signal, A >::
   times (A::table_name, "\"times\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Signal, A >::timing_type_
-  pointer_query_columns< ::pio::Signal, A >::
+  const typename query_columns< ::pio::Signal, A >::start_type_
+  query_columns< ::pio::Signal, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Signal, A >::end_type_
+  query_columns< ::pio::Signal, A >::
+  end (A::table_name, "\"end\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Signal, A >::timing_type_
+  query_columns< ::pio::Signal, A >::
   timing (A::table_name, "\"timing\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Signal, A >::phasing_type_
-  pointer_query_columns< ::pio::Signal, A >::
+  const typename query_columns< ::pio::Signal, A >::phasing_type_
+  query_columns< ::pio::Signal, A >::
   phasing (A::table_name, "\"phasing\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Signal, A >::type_type_
-  pointer_query_columns< ::pio::Signal, A >::
+  const typename query_columns< ::pio::Signal, A >::type_type_
+  query_columns< ::pio::Signal, A >::
   type (A::table_name, "\"type\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Signal, A >::offset_type_
-  pointer_query_columns< ::pio::Signal, A >::
+  const typename query_columns< ::pio::Signal, A >::offset_type_
+  query_columns< ::pio::Signal, A >::
   offset (A::table_name, "\"offset\"", 0);
+
+  template <typename A>
+  struct pointer_query_columns< ::pio::Signal, A >:
+    query_columns< ::pio::Signal, A >
+  {
+  };
 
   template <>
   class access::object_traits< ::pio::Signal >
@@ -4279,6 +4544,16 @@ namespace odb
       long long times_value;
       bool times_null;
 
+      // start
+      //
+      double start_value;
+      bool start_null;
+
+      // end
+      //
+      double end_value;
+      bool end_null;
+
       // timing
       //
       long long timing_value;
@@ -4291,7 +4566,8 @@ namespace odb
 
       // type
       //
-      long long type_value;
+      details::buffer type_value;
+      std::size_t type_size;
       bool type_null;
 
       // offset
@@ -4341,7 +4617,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 7UL;
+    static const std::size_t column_count = 9UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -4411,6 +4687,18 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::pio::Timing, A >
   {
+    // auto_id
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        long unsigned int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    auto_id_type_;
+
+    static const auto_id_type_ auto_id;
+
     // signal
     //
     typedef
@@ -4593,6 +4881,11 @@ namespace odb
   };
 
   template <typename A>
+  const typename pointer_query_columns< ::pio::Timing, A >::auto_id_type_
+  pointer_query_columns< ::pio::Timing, A >::
+  auto_id (A::table_name, "\"auto_id\"", 0);
+
+  template <typename A>
   const typename pointer_query_columns< ::pio::Timing, A >::signal_type_
   pointer_query_columns< ::pio::Timing, A >::
   signal (A::table_name, "\"signal\"", 0);
@@ -4677,8 +4970,8 @@ namespace odb
 
     static const bool polymorphic = false;
 
-    typedef int id_type;
-    static const bool auto_id = false;
+    typedef long unsigned int id_type;
+    static const bool auto_id = true;
 
     struct id_image_type
     {
@@ -4692,6 +4985,11 @@ namespace odb
 
     struct image_type
     {
+      // auto_id
+      //
+      long long auto_id_value;
+      bool auto_id_null;
+
       // signal
       //
       long long signal_value;
@@ -4809,7 +5107,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 15UL;
+    static const std::size_t column_count = 16UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -4831,7 +5129,7 @@ namespace odb
     callback (database&, const object_type&, callback_event);
 
     static void
-    persist (database&, const object_type&);
+    persist (database&, object_type&);
 
     static pointer_type
     find (database&, const id_type&);
@@ -4879,6 +5177,18 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::pio::Phasing, A >
   {
+    // auto_id
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        long unsigned int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    auto_id_type_;
+
+    static const auto_id_type_ auto_id;
+
     // signal
     //
     typedef
@@ -4920,9 +5230,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     detectors_type_;
 
     static const detectors_type_ detectors;
@@ -4944,9 +5254,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     movement_type_;
 
     static const movement_type_ movement;
@@ -4992,13 +5302,18 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     protect_type_;
 
     static const protect_type_ protect;
   };
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Phasing, A >::auto_id_type_
+  pointer_query_columns< ::pio::Phasing, A >::
+  auto_id (A::table_name, "\"auto_id\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::pio::Phasing, A >::signal_type_
@@ -5060,8 +5375,8 @@ namespace odb
 
     static const bool polymorphic = false;
 
-    typedef int id_type;
-    static const bool auto_id = false;
+    typedef long unsigned int id_type;
+    static const bool auto_id = true;
 
     struct id_image_type
     {
@@ -5075,6 +5390,11 @@ namespace odb
 
     struct image_type
     {
+      // auto_id
+      //
+      long long auto_id_value;
+      bool auto_id_null;
+
       // signal
       //
       long long signal_value;
@@ -5092,7 +5412,8 @@ namespace odb
 
       // detectors
       //
-      long long detectors_value;
+      details::buffer detectors_value;
+      std::size_t detectors_size;
       bool detectors_null;
 
       // movements
@@ -5102,7 +5423,8 @@ namespace odb
 
       // movement
       //
-      long long movement_value;
+      details::buffer movement_value;
+      std::size_t movement_size;
       bool movement_null;
 
       // link
@@ -5122,7 +5444,8 @@ namespace odb
 
       // protect
       //
-      long long protect_value;
+      details::buffer protect_value;
+      std::size_t protect_size;
       bool protect_null;
 
       std::size_t version;
@@ -5167,7 +5490,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 10UL;
+    static const std::size_t column_count = 11UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -5189,7 +5512,7 @@ namespace odb
     callback (database&, const object_type&, callback_event);
 
     static void
-    persist (database&, const object_type&);
+    persist (database&, object_type&);
 
     static pointer_type
     find (database&, const id_type&);
@@ -7153,6 +7476,30 @@ namespace odb
 
     static const type_type_ type;
 
+    // dwell
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    dwell_type_;
+
+    static const dwell_type_ dwell;
+
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
+
     // speed
     //
     typedef
@@ -7205,6 +7552,16 @@ namespace odb
   const typename pointer_query_columns< ::pio::Route_Nodes, A >::type_type_
   pointer_query_columns< ::pio::Route_Nodes, A >::
   type (A::table_name, "\"type\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Route_Nodes, A >::dwell_type_
+  pointer_query_columns< ::pio::Route_Nodes, A >::
+  dwell (A::table_name, "\"dwell\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Route_Nodes, A >::time_type_
+  pointer_query_columns< ::pio::Route_Nodes, A >::
+  time (A::table_name, "\"time\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::pio::Route_Nodes, A >::speed_type_
@@ -7277,6 +7634,16 @@ namespace odb
       long long type_value;
       bool type_null;
 
+      // dwell
+      //
+      double dwell_value;
+      bool dwell_null;
+
+      // time
+      //
+      double time_value;
+      bool time_null;
+
       // speed
       //
       double speed_value;
@@ -7324,7 +7691,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 9UL;
+    static const std::size_t column_count = 11UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -7392,7 +7759,7 @@ namespace odb
   };
 
   template <typename A>
-  struct pointer_query_columns< ::pio::Selection, A >
+  struct query_columns< ::pio::Selection, A >
   {
     // auto_id
     //
@@ -7447,7 +7814,7 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        long unsigned int,
+        int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
     trip_type_;
@@ -7480,39 +7847,45 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Selection, A >::auto_id_type_
-  pointer_query_columns< ::pio::Selection, A >::
+  const typename query_columns< ::pio::Selection, A >::auto_id_type_
+  query_columns< ::pio::Selection, A >::
   auto_id (A::table_name, "\"auto_id\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Selection, A >::hhold_type_
-  pointer_query_columns< ::pio::Selection, A >::
+  const typename query_columns< ::pio::Selection, A >::hhold_type_
+  query_columns< ::pio::Selection, A >::
   hhold (A::table_name, "\"hhold\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Selection, A >::person_type_
-  pointer_query_columns< ::pio::Selection, A >::
+  const typename query_columns< ::pio::Selection, A >::person_type_
+  query_columns< ::pio::Selection, A >::
   person (A::table_name, "\"person\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Selection, A >::tour_type_
-  pointer_query_columns< ::pio::Selection, A >::
+  const typename query_columns< ::pio::Selection, A >::tour_type_
+  query_columns< ::pio::Selection, A >::
   tour (A::table_name, "\"tour\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Selection, A >::trip_type_
-  pointer_query_columns< ::pio::Selection, A >::
+  const typename query_columns< ::pio::Selection, A >::trip_type_
+  query_columns< ::pio::Selection, A >::
   trip (A::table_name, "\"trip\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Selection, A >::type_type_
-  pointer_query_columns< ::pio::Selection, A >::
+  const typename query_columns< ::pio::Selection, A >::type_type_
+  query_columns< ::pio::Selection, A >::
   type (A::table_name, "\"type\"", 0);
 
   template <typename A>
-  const typename pointer_query_columns< ::pio::Selection, A >::partition_type_
-  pointer_query_columns< ::pio::Selection, A >::
+  const typename query_columns< ::pio::Selection, A >::partition_type_
+  query_columns< ::pio::Selection, A >::
   partition (A::table_name, "\"partition\"", 0);
+
+  template <typename A>
+  struct pointer_query_columns< ::pio::Selection, A >:
+    query_columns< ::pio::Selection, A >
+  {
+  };
 
   template <>
   class access::object_traits< ::pio::Selection >
@@ -7751,7 +8124,7 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        long unsigned int,
+        int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
     vehicles_type_;
@@ -8180,6 +8553,30 @@ namespace odb
 
     static const type_type_ type;
 
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
     // flow
     //
     typedef
@@ -8191,6 +8588,18 @@ namespace odb
     flow_type_;
 
     static const flow_type_ flow;
+
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
 
     // out_link
     //
@@ -8215,6 +8624,18 @@ namespace odb
     out_flow_type_;
 
     static const out_flow_type_ out_flow;
+
+    // out_time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    out_time_type_;
+
+    static const out_time_type_ out_time;
   };
 
   template <typename A>
@@ -8238,9 +8659,24 @@ namespace odb
   type (A::table_name, "\"type\"", 0);
 
   template <typename A>
+  const typename pointer_query_columns< ::pio::Link_Delay, A >::start_type_
+  pointer_query_columns< ::pio::Link_Delay, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Link_Delay, A >::end_type_
+  pointer_query_columns< ::pio::Link_Delay, A >::
+  end (A::table_name, "\"end\"", 0);
+
+  template <typename A>
   const typename pointer_query_columns< ::pio::Link_Delay, A >::flow_type_
   pointer_query_columns< ::pio::Link_Delay, A >::
   flow (A::table_name, "\"flow\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Link_Delay, A >::time_type_
+  pointer_query_columns< ::pio::Link_Delay, A >::
+  time (A::table_name, "\"time\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::pio::Link_Delay, A >::out_link_type_
@@ -8251,6 +8687,11 @@ namespace odb
   const typename pointer_query_columns< ::pio::Link_Delay, A >::out_flow_type_
   pointer_query_columns< ::pio::Link_Delay, A >::
   out_flow (A::table_name, "\"out_flow\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Link_Delay, A >::out_time_type_
+  pointer_query_columns< ::pio::Link_Delay, A >::
+  out_time (A::table_name, "\"out_time\"", 0);
 
   template <>
   class access::object_traits< ::pio::Link_Delay >
@@ -8297,10 +8738,25 @@ namespace odb
       long long type_value;
       bool type_null;
 
+      // start
+      //
+      double start_value;
+      bool start_null;
+
+      // end
+      //
+      double end_value;
+      bool end_null;
+
       // flow
       //
       double flow_value;
       bool flow_null;
+
+      // time
+      //
+      double time_value;
+      bool time_null;
 
       // out_link
       //
@@ -8311,6 +8767,11 @@ namespace odb
       //
       double out_flow_value;
       bool out_flow_null;
+
+      // out_time
+      //
+      double out_time_value;
+      bool out_time_null;
 
       std::size_t version;
     };
@@ -8354,7 +8815,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 7UL;
+    static const std::size_t column_count = 11UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -8448,6 +8909,18 @@ namespace odb
 
     static const speed_type_ speed;
 
+    // delay
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    delay_type_;
+
+    static const delay_type_ delay;
+
     // density
     //
     typedef
@@ -8532,6 +9005,11 @@ namespace odb
   speed (A::table_name, "\"speed\"", 0);
 
   template <typename A>
+  const typename query_columns< ::pio::Performance, A >::delay_type_
+  query_columns< ::pio::Performance, A >::
+  delay (A::table_name, "\"delay\"", 0);
+
+  template <typename A>
   const typename query_columns< ::pio::Performance, A >::density_type_
   query_columns< ::pio::Performance, A >::
   density (A::table_name, "\"density\"", 0);
@@ -8601,6 +9079,11 @@ namespace odb
       //
       double speed_value;
       bool speed_null;
+
+      // delay
+      //
+      double delay_value;
+      bool delay_null;
 
       // density
       //
@@ -8674,7 +9157,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 8UL;
+    static const std::size_t column_count = 9UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -8804,6 +9287,30 @@ namespace odb
 
     static const stop_type_ stop;
 
+    // schedule
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    schedule_type_;
+
+    static const schedule_type_ schedule;
+
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
+
     // board
     //
     typedef
@@ -8879,6 +9386,16 @@ namespace odb
   stop (A::table_name, "\"stop\"", 0);
 
   template <typename A>
+  const typename pointer_query_columns< ::pio::Ridership, A >::schedule_type_
+  pointer_query_columns< ::pio::Ridership, A >::
+  schedule (A::table_name, "\"schedule\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Ridership, A >::time_type_
+  pointer_query_columns< ::pio::Ridership, A >::
+  time (A::table_name, "\"time\"", 0);
+
+  template <typename A>
   const typename pointer_query_columns< ::pio::Ridership, A >::board_type_
   pointer_query_columns< ::pio::Ridership, A >::
   board (A::table_name, "\"board\"", 0);
@@ -8948,6 +9465,16 @@ namespace odb
       long long stop_value;
       bool stop_null;
 
+      // schedule
+      //
+      double schedule_value;
+      bool schedule_null;
+
+      // time
+      //
+      double time_value;
+      bool time_null;
+
       // board
       //
       long long board_value;
@@ -9010,7 +9537,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 9UL;
+    static const std::size_t column_count = 11UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -9212,6 +9739,30 @@ namespace odb
 
     static const method_type_ method;
 
+    // min_dwell
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    min_dwell_type_;
+
+    static const min_dwell_type_ min_dwell;
+
+    // max_dwell
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    max_dwell_type_;
+
+    static const max_dwell_type_ max_dwell;
+
     // subtype
     //
     typedef
@@ -9279,6 +9830,16 @@ namespace odb
   const typename query_columns< ::pio::Veh_Type, A >::method_type_
   query_columns< ::pio::Veh_Type, A >::
   method (A::table_name, "\"method\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Veh_Type, A >::min_dwell_type_
+  query_columns< ::pio::Veh_Type, A >::
+  min_dwell (A::table_name, "\"min_dwell\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Veh_Type, A >::max_dwell_type_
+  query_columns< ::pio::Veh_Type, A >::
+  max_dwell (A::table_name, "\"max_dwell\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Veh_Type, A >::subtype_type_
@@ -9371,6 +9932,16 @@ namespace odb
       long long method_value;
       bool method_null;
 
+      // min_dwell
+      //
+      double min_dwell_value;
+      bool min_dwell_null;
+
+      // max_dwell
+      //
+      double max_dwell_value;
+      bool max_dwell_null;
+
       // subtype
       //
       long long subtype_value;
@@ -9418,7 +9989,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 12UL;
+    static const std::size_t column_count = 14UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -9840,6 +10411,42 @@ namespace odb
 
     static const trip_type_ trip;
 
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
+    // duration
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    duration_type_;
+
+    static const duration_type_ duration;
+
     // origin
     //
     typedef
@@ -9917,7 +10524,7 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        long unsigned int,
+        int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
     vehicle_type_;
@@ -9985,6 +10592,21 @@ namespace odb
   const typename pointer_query_columns< ::pio::Trip, A >::trip_type_
   pointer_query_columns< ::pio::Trip, A >::
   trip (A::table_name, "\"trip\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Trip, A >::start_type_
+  pointer_query_columns< ::pio::Trip, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Trip, A >::end_type_
+  pointer_query_columns< ::pio::Trip, A >::
+  end (A::table_name, "\"end\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Trip, A >::duration_type_
+  pointer_query_columns< ::pio::Trip, A >::
+  duration (A::table_name, "\"duration\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::pio::Trip, A >::origin_type_
@@ -10086,6 +10708,21 @@ namespace odb
       long long trip_value;
       bool trip_null;
 
+      // start
+      //
+      double start_value;
+      bool start_null;
+
+      // end
+      //
+      double end_value;
+      bool end_null;
+
+      // duration
+      //
+      double duration_value;
+      bool duration_null;
+
       // origin
       //
       long long origin_value;
@@ -10178,7 +10815,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 15UL;
+    static const std::size_t column_count = 18UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -10260,6 +10897,18 @@ namespace odb
 
     static const problem_type_ problem;
 
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
+
     // link
     //
     typedef
@@ -10339,6 +10988,11 @@ namespace odb
   problem (A::table_name, "\"problem\"", 0);
 
   template <typename A>
+  const typename pointer_query_columns< ::pio::Problem, A >::time_type_
+  pointer_query_columns< ::pio::Problem, A >::
+  time (A::table_name, "\"time\"", 0);
+
+  template <typename A>
   const typename pointer_query_columns< ::pio::Problem, A >::link_type_
   pointer_query_columns< ::pio::Problem, A >::
   link (A::table_name, "\"link\"", 0);
@@ -10397,6 +11051,11 @@ namespace odb
       //
       long long problem_value;
       bool problem_null;
+
+      // time
+      //
+      double time_value;
+      bool time_null;
 
       // link
       //
@@ -10470,7 +11129,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 7UL;
+    static const std::size_t column_count = 8UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -10552,6 +11211,102 @@ namespace odb
 
     static const auto_id_type_ auto_id;
 
+    // depart
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    depart_type_;
+
+    static const depart_type_ depart;
+
+    // arrive
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    arrive_type_;
+
+    static const arrive_type_ arrive;
+
+    // activity
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    activity_type_;
+
+    static const activity_type_ activity;
+
+    // walk
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    walk_type_;
+
+    static const walk_type_ walk;
+
+    // drive
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    drive_type_;
+
+    static const drive_type_ drive;
+
+    // transit
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    transit_type_;
+
+    static const transit_type_ transit;
+
+    // wait
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    wait_type_;
+
+    static const wait_type_ wait;
+
+    // other
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    other_type_;
+
+    static const other_type_ other;
+
     // length
     //
     typedef
@@ -10624,6 +11379,18 @@ namespace odb
 
     static const leg_id_type_ leg_id;
 
+    // leg_time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    leg_time_type_;
+
+    static const leg_time_type_ leg_time;
+
     // leg_length
     //
     typedef
@@ -10667,6 +11434,46 @@ namespace odb
   auto_id (A::table_name, "\"auto_id\"", 0);
 
   template <typename A>
+  const typename query_columns< ::pio::Plan, A >::depart_type_
+  query_columns< ::pio::Plan, A >::
+  depart (A::table_name, "\"depart\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Plan, A >::arrive_type_
+  query_columns< ::pio::Plan, A >::
+  arrive (A::table_name, "\"arrive\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Plan, A >::activity_type_
+  query_columns< ::pio::Plan, A >::
+  activity (A::table_name, "\"activity\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Plan, A >::walk_type_
+  query_columns< ::pio::Plan, A >::
+  walk (A::table_name, "\"walk\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Plan, A >::drive_type_
+  query_columns< ::pio::Plan, A >::
+  drive (A::table_name, "\"drive\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Plan, A >::transit_type_
+  query_columns< ::pio::Plan, A >::
+  transit (A::table_name, "\"transit\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Plan, A >::wait_type_
+  query_columns< ::pio::Plan, A >::
+  wait (A::table_name, "\"wait\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Plan, A >::other_type_
+  query_columns< ::pio::Plan, A >::
+  other (A::table_name, "\"other\"", 0);
+
+  template <typename A>
   const typename query_columns< ::pio::Plan, A >::length_type_
   query_columns< ::pio::Plan, A >::
   length (A::table_name, "\"length\"", 0);
@@ -10695,6 +11502,11 @@ namespace odb
   const typename query_columns< ::pio::Plan, A >::leg_id_type_
   query_columns< ::pio::Plan, A >::
   leg_id (A::table_name, "\"leg_id\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Plan, A >::leg_time_type_
+  query_columns< ::pio::Plan, A >::
+  leg_time (A::table_name, "\"leg_time\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Plan, A >::leg_length_type_
@@ -10747,6 +11559,46 @@ namespace odb
       long long auto_id_value;
       bool auto_id_null;
 
+      // depart
+      //
+      double depart_value;
+      bool depart_null;
+
+      // arrive
+      //
+      double arrive_value;
+      bool arrive_null;
+
+      // activity
+      //
+      double activity_value;
+      bool activity_null;
+
+      // walk
+      //
+      double walk_value;
+      bool walk_null;
+
+      // drive
+      //
+      double drive_value;
+      bool drive_null;
+
+      // transit
+      //
+      double transit_value;
+      bool transit_null;
+
+      // wait
+      //
+      double wait_value;
+      bool wait_null;
+
+      // other
+      //
+      double other_value;
+      bool other_null;
+
       // length
       //
       double length_value;
@@ -10776,6 +11628,11 @@ namespace odb
       //
       long long leg_id_value;
       bool leg_id_null;
+
+      // leg_time
+      //
+      double leg_time_value;
+      bool leg_time_null;
 
       // leg_length
       //
@@ -10834,7 +11691,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 10UL;
+    static const std::size_t column_count = 19UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -10916,6 +11773,78 @@ namespace odb
 
     static const auto_id_type_ auto_id;
 
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
+
+    // walk
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    walk_type_;
+
+    static const walk_type_ walk;
+
+    // drive
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    drive_type_;
+
+    static const drive_type_ drive;
+
+    // transit
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    transit_type_;
+
+    static const transit_type_ transit;
+
+    // wait
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    wait_type_;
+
+    static const wait_type_ wait;
+
+    // other
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    other_type_;
+
+    static const other_type_ other;
+
     // length
     //
     typedef
@@ -10957,6 +11886,36 @@ namespace odb
   const typename query_columns< ::pio::Skim, A >::auto_id_type_
   query_columns< ::pio::Skim, A >::
   auto_id (A::table_name, "\"auto_id\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Skim, A >::time_type_
+  query_columns< ::pio::Skim, A >::
+  time (A::table_name, "\"time\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Skim, A >::walk_type_
+  query_columns< ::pio::Skim, A >::
+  walk (A::table_name, "\"walk\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Skim, A >::drive_type_
+  query_columns< ::pio::Skim, A >::
+  drive (A::table_name, "\"drive\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Skim, A >::transit_type_
+  query_columns< ::pio::Skim, A >::
+  transit (A::table_name, "\"transit\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Skim, A >::wait_type_
+  query_columns< ::pio::Skim, A >::
+  wait (A::table_name, "\"wait\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Skim, A >::other_type_
+  query_columns< ::pio::Skim, A >::
+  other (A::table_name, "\"other\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Skim, A >::length_type_
@@ -11008,6 +11967,36 @@ namespace odb
       //
       long long auto_id_value;
       bool auto_id_null;
+
+      // time
+      //
+      double time_value;
+      bool time_null;
+
+      // walk
+      //
+      double walk_value;
+      bool walk_null;
+
+      // drive
+      //
+      double drive_value;
+      bool drive_null;
+
+      // transit
+      //
+      double transit_value;
+      bool transit_null;
+
+      // wait
+      //
+      double wait_value;
+      bool wait_null;
+
+      // other
+      //
+      double other_value;
+      bool other_null;
 
       // length
       //
@@ -11066,7 +12055,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 4UL;
+    static const std::size_t column_count = 10UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -11189,7 +12178,7 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        long unsigned int,
+        int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
     trip_type_;
@@ -11219,6 +12208,30 @@ namespace odb
     type_type_;
 
     static const type_type_ type;
+
+    // schedule
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    schedule_type_;
+
+    static const schedule_type_ schedule;
+
+    // actual
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    actual_type_;
+
+    static const actual_type_ actual;
 
     // link
     //
@@ -11317,6 +12330,16 @@ namespace odb
   type (A::table_name, "\"type\"", 0);
 
   template <typename A>
+  const typename pointer_query_columns< ::pio::Event, A >::schedule_type_
+  pointer_query_columns< ::pio::Event, A >::
+  schedule (A::table_name, "\"schedule\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::pio::Event, A >::actual_type_
+  pointer_query_columns< ::pio::Event, A >::
+  actual (A::table_name, "\"actual\"", 0);
+
+  template <typename A>
   const typename pointer_query_columns< ::pio::Event, A >::link_type_
   pointer_query_columns< ::pio::Event, A >::
   link (A::table_name, "\"link\"", 0);
@@ -11401,6 +12424,16 @@ namespace odb
       long long type_value;
       bool type_null;
 
+      // schedule
+      //
+      double schedule_value;
+      bool schedule_null;
+
+      // actual
+      //
+      double actual_value;
+      bool actual_null;
+
       // link
       //
       long long link_value;
@@ -11468,7 +12501,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 12UL;
+    static const std::size_t column_count = 14UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -11591,7 +12624,7 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        long unsigned int,
+        int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
     trip_type_;
@@ -11609,6 +12642,18 @@ namespace odb
     mode_type_;
 
     static const mode_type_ mode;
+
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
 
     // distance
     //
@@ -11726,6 +12771,11 @@ namespace odb
   mode (A::table_name, "\"mode\"", 0);
 
   template <typename A>
+  const typename pointer_query_columns< ::pio::Traveler, A >::time_type_
+  pointer_query_columns< ::pio::Traveler, A >::
+  time (A::table_name, "\"time\"", 0);
+
+  template <typename A>
   const typename pointer_query_columns< ::pio::Traveler, A >::distance_type_
   pointer_query_columns< ::pio::Traveler, A >::
   distance (A::table_name, "\"distance\"", 0);
@@ -11815,6 +12865,11 @@ namespace odb
       long long mode_value;
       bool mode_null;
 
+      // time
+      //
+      double time_value;
+      bool time_null;
+
       // distance
       //
       double distance_value;
@@ -11892,7 +12947,7 @@ namespace odb
 
     struct container_statement_cache_type;
 
-    static const std::size_t column_count = 13UL;
+    static const std::size_t column_count = 14UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -12256,9 +13311,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     type_type_;
 
     static const type_type_ type;
@@ -12896,6 +13951,30 @@ namespace odb
 
     static const max_trav_type_ max_trav;
 
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
     // offset
     //
     typedef
@@ -13018,6 +14097,16 @@ namespace odb
   const typename query_columns< ::pio::Lane_Use, A >::max_trav_type_
   query_columns< ::pio::Lane_Use, A >::
   max_trav (A::table_name, "\"max_trav\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Lane_Use, A >::start_type_
+  query_columns< ::pio::Lane_Use, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Lane_Use, A >::end_type_
+  query_columns< ::pio::Lane_Use, A >::
+  end (A::table_name, "\"end\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Lane_Use, A >::offset_type_
@@ -13177,9 +14266,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     lanes_type_;
 
     static const lanes_type_ lanes;
@@ -13189,9 +14278,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     to_lanes_type_;
 
     static const to_lanes_type_ to_lanes;
@@ -13201,9 +14290,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     type_type_;
 
     static const type_type_ type;
@@ -13479,6 +14568,30 @@ namespace odb
 
     static const to_link_type_ to_link;
 
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
     // use
     //
     typedef
@@ -13609,6 +14722,16 @@ namespace odb
   const typename query_columns< ::pio::Turn_Pen, A >::to_link_type_
   query_columns< ::pio::Turn_Pen, A >::
   to_link (A::table_name, "\"to_link\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Turn_Pen, A >::start_type_
+  query_columns< ::pio::Turn_Pen, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Turn_Pen, A >::end_type_
+  query_columns< ::pio::Turn_Pen, A >::
+  end (A::table_name, "\"end\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Turn_Pen, A >::use_type_
@@ -13747,6 +14870,30 @@ namespace odb
 
     static const use_type_ use;
 
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
     // space
     //
     typedef
@@ -13758,6 +14905,30 @@ namespace odb
     space_type_;
 
     static const space_type_ space;
+
+    // time_in
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_in_type_;
+
+    static const time_in_type_ time_in;
+
+    // time_out
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_out_type_;
+
+    static const time_out_type_ time_out;
 
     // hourly
     //
@@ -13815,9 +14986,29 @@ namespace odb
   use (A::table_name, "\"use\"", 0);
 
   template <typename A>
+  const typename query_columns< ::pio::Parking, A >::start_type_
+  query_columns< ::pio::Parking, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Parking, A >::end_type_
+  query_columns< ::pio::Parking, A >::
+  end (A::table_name, "\"end\"", 0);
+
+  template <typename A>
   const typename query_columns< ::pio::Parking, A >::space_type_
   query_columns< ::pio::Parking, A >::
   space (A::table_name, "\"space\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Parking, A >::time_in_type_
+  query_columns< ::pio::Parking, A >::
+  time_in (A::table_name, "\"time_in\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Parking, A >::time_out_type_
+  query_columns< ::pio::Parking, A >::
+  time_out (A::table_name, "\"time_out\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Parking, A >::hourly_type_
@@ -14126,6 +15317,18 @@ namespace odb
 
     static const dir_type_ dir;
 
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
+
     // cost
     //
     typedef
@@ -14175,6 +15378,11 @@ namespace odb
   dir (A::table_name, "\"dir\"", 0);
 
   template <typename A>
+  const typename query_columns< ::pio::Access, A >::time_type_
+  query_columns< ::pio::Access, A >::
+  time (A::table_name, "\"time\"", 0);
+
+  template <typename A>
   const typename query_columns< ::pio::Access, A >::cost_type_
   query_columns< ::pio::Access, A >::
   cost (A::table_name, "\"cost\"", 0);
@@ -14195,6 +15403,18 @@ namespace odb
   struct query_columns< ::pio::Sign, A >:
     query_columns_base< ::pio::Sign >
   {
+    // auto_id
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        long unsigned int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    auto_id_type_;
+
+    static const auto_id_type_ auto_id;
+
     // link
     //
     typedef
@@ -14243,13 +15463,18 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     sign_type_;
 
     static const sign_type_ sign;
   };
+
+  template <typename A>
+  const typename query_columns< ::pio::Sign, A >::auto_id_type_
+  query_columns< ::pio::Sign, A >::
+  auto_id (A::table_name, "\"auto_id\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Sign, A >::link_type_
@@ -14265,216 +15490,6 @@ namespace odb
   const typename query_columns< ::pio::Sign, A >::sign_type_
   query_columns< ::pio::Sign, A >::
   sign (A::table_name, "\"sign\"", 0);
-
-  // Signal
-  //
-  class timing_alias_tag;
-
-#ifndef ODB_ALIAS_TRAITS_TIMING_FOR_PIO_TIMING
-#define ODB_ALIAS_TRAITS_TIMING_FOR_PIO_TIMING
-  template <bool d>
-  struct alias_traits< ::pio::Timing, timing_alias_tag, d >
-  {
-    static const char table_name[];
-  };
-
-  template <bool d>
-  const char alias_traits< ::pio::Timing, timing_alias_tag, d >::
-  table_name[] = "\"timing\"";
-#endif // ODB_ALIAS_TRAITS_TIMING_FOR_PIO_TIMING
-
-  class phasing_alias_tag;
-
-#ifndef ODB_ALIAS_TRAITS_PHASING_FOR_PIO_PHASING
-#define ODB_ALIAS_TRAITS_PHASING_FOR_PIO_PHASING
-  template <bool d>
-  struct alias_traits< ::pio::Phasing, phasing_alias_tag, d >
-  {
-    static const char table_name[];
-  };
-
-  template <bool d>
-  const char alias_traits< ::pio::Phasing, phasing_alias_tag, d >::
-  table_name[] = "\"phasing\"";
-#endif // ODB_ALIAS_TRAITS_PHASING_FOR_PIO_PHASING
-
-  template <>
-  struct query_columns_base< ::pio::Signal >
-  {
-    // timing
-    //
-    typedef
-    odb::alias_traits< ::pio::Timing, timing_alias_tag >
-    timing_alias_;
-
-    // phasing
-    //
-    typedef
-    odb::alias_traits< ::pio::Phasing, phasing_alias_tag >
-    phasing_alias_;
-  };
-
-  template <typename A>
-  struct query_columns< ::pio::Signal, A >:
-    query_columns_base< ::pio::Signal >
-  {
-    // signal
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    signal_type_;
-
-    static const signal_type_ signal;
-
-    // group
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    group_type_;
-
-    static const group_type_ group;
-
-    // times
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    times_type_;
-
-    static const times_type_ times;
-
-    // timing
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    timing_column_type_;
-
-    typedef
-    odb::query_pointer<
-      odb::pointer_query_columns<
-        ::pio::Timing,
-        timing_alias_ > >
-    timing_pointer_type_;
-
-    struct timing_type_: timing_pointer_type_, timing_column_type_
-    {
-      timing_type_ ()
-      {
-      }
-
-      timing_type_ (const char* t, const char* c, const char* conv)
-        : timing_column_type_ (t, c, conv)
-      {
-      }
-    };
-
-    static const timing_type_ timing;
-
-    // phasing
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    phasing_column_type_;
-
-    typedef
-    odb::query_pointer<
-      odb::pointer_query_columns<
-        ::pio::Phasing,
-        phasing_alias_ > >
-    phasing_pointer_type_;
-
-    struct phasing_type_: phasing_pointer_type_, phasing_column_type_
-    {
-      phasing_type_ ()
-      {
-      }
-
-      phasing_type_ (const char* t, const char* c, const char* conv)
-        : phasing_column_type_ (t, c, conv)
-      {
-      }
-    };
-
-    static const phasing_type_ phasing;
-
-    // type
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    type_type_;
-
-    static const type_type_ type;
-
-    // offset
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    offset_type_;
-
-    static const offset_type_ offset;
-  };
-
-  template <typename A>
-  const typename query_columns< ::pio::Signal, A >::signal_type_
-  query_columns< ::pio::Signal, A >::
-  signal (A::table_name, "\"signal\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Signal, A >::group_type_
-  query_columns< ::pio::Signal, A >::
-  group (A::table_name, "\"group\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Signal, A >::times_type_
-  query_columns< ::pio::Signal, A >::
-  times (A::table_name, "\"times\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Signal, A >::timing_type_
-  query_columns< ::pio::Signal, A >::
-  timing (A::table_name, "\"timing\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Signal, A >::phasing_type_
-  query_columns< ::pio::Signal, A >::
-  phasing (A::table_name, "\"phasing\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Signal, A >::type_type_
-  query_columns< ::pio::Signal, A >::
-  type (A::table_name, "\"type\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Signal, A >::offset_type_
-  query_columns< ::pio::Signal, A >::
-  offset (A::table_name, "\"offset\"", 0);
 
   // Timing
   //
@@ -14507,6 +15522,18 @@ namespace odb
   struct query_columns< ::pio::Timing, A >:
     query_columns_base< ::pio::Timing >
   {
+    // auto_id
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        long unsigned int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    auto_id_type_;
+
+    static const auto_id_type_ auto_id;
+
     // signal
     //
     typedef
@@ -14708,6 +15735,11 @@ namespace odb
   };
 
   template <typename A>
+  const typename query_columns< ::pio::Timing, A >::auto_id_type_
+  query_columns< ::pio::Timing, A >::
+  auto_id (A::table_name, "\"auto_id\"", 0);
+
+  template <typename A>
   const typename query_columns< ::pio::Timing, A >::signal_type_
   query_columns< ::pio::Timing, A >::
   signal (A::table_name, "\"signal\"", 0);
@@ -14784,21 +15816,6 @@ namespace odb
 
   // Phasing
   //
-  class detectors_alias_tag;
-
-#ifndef ODB_ALIAS_TRAITS_DETECTORS_FOR_PIO_DETECTOR
-#define ODB_ALIAS_TRAITS_DETECTORS_FOR_PIO_DETECTOR
-  template <bool d>
-  struct alias_traits< ::pio::Detector, detectors_alias_tag, d >
-  {
-    static const char table_name[];
-  };
-
-  template <bool d>
-  const char alias_traits< ::pio::Detector, detectors_alias_tag, d >::
-  table_name[] = "\"detectors\"";
-#endif // ODB_ALIAS_TRAITS_DETECTORS_FOR_PIO_DETECTOR
-
   template <>
   struct query_columns_base< ::pio::Phasing >
   {
@@ -14807,12 +15824,6 @@ namespace odb
     typedef
     odb::alias_traits< ::pio::Signal, signal_alias_tag >
     signal_alias_;
-
-    // detectors
-    //
-    typedef
-    odb::alias_traits< ::pio::Detector, detectors_alias_tag >
-    detectors_alias_;
 
     // link
     //
@@ -14831,6 +15842,18 @@ namespace odb
   struct query_columns< ::pio::Phasing, A >:
     query_columns_base< ::pio::Phasing >
   {
+    // auto_id
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        long unsigned int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    auto_id_type_;
+
+    static const auto_id_type_ auto_id;
+
     // signal
     //
     typedef
@@ -14891,29 +15914,10 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    detectors_column_type_;
-
-    typedef
-    odb::query_pointer<
-      odb::pointer_query_columns<
-        ::pio::Detector,
-        detectors_alias_ > >
-    detectors_pointer_type_;
-
-    struct detectors_type_: detectors_pointer_type_, detectors_column_type_
-    {
-      detectors_type_ ()
-      {
-      }
-
-      detectors_type_ (const char* t, const char* c, const char* conv)
-        : detectors_column_type_ (t, c, conv)
-      {
-      }
-    };
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
+    detectors_type_;
 
     static const detectors_type_ detectors;
 
@@ -14934,9 +15938,9 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     movement_type_;
 
     static const movement_type_ movement;
@@ -15020,13 +16024,18 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
     protect_type_;
 
     static const protect_type_ protect;
   };
+
+  template <typename A>
+  const typename query_columns< ::pio::Phasing, A >::auto_id_type_
+  query_columns< ::pio::Phasing, A >::
+  auto_id (A::table_name, "\"auto_id\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Phasing, A >::signal_type_
@@ -16485,6 +17494,30 @@ namespace odb
 
     static const type_type_ type;
 
+    // dwell
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    dwell_type_;
+
+    static const dwell_type_ dwell;
+
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
+
     // speed
     //
     typedef
@@ -16539,179 +17572,19 @@ namespace odb
   type (A::table_name, "\"type\"", 0);
 
   template <typename A>
+  const typename query_columns< ::pio::Route_Nodes, A >::dwell_type_
+  query_columns< ::pio::Route_Nodes, A >::
+  dwell (A::table_name, "\"dwell\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Route_Nodes, A >::time_type_
+  query_columns< ::pio::Route_Nodes, A >::
+  time (A::table_name, "\"time\"", 0);
+
+  template <typename A>
   const typename query_columns< ::pio::Route_Nodes, A >::speed_type_
   query_columns< ::pio::Route_Nodes, A >::
   speed (A::table_name, "\"speed\"", 0);
-
-  // Selection
-  //
-  class trip_alias_tag;
-
-#ifndef ODB_ALIAS_TRAITS_TRIP_FOR_PIO_TRIP
-#define ODB_ALIAS_TRAITS_TRIP_FOR_PIO_TRIP
-  template <bool d>
-  struct alias_traits< ::pio::Trip, trip_alias_tag, d >
-  {
-    static const char table_name[];
-  };
-
-  template <bool d>
-  const char alias_traits< ::pio::Trip, trip_alias_tag, d >::
-  table_name[] = "\"trip\"";
-#endif // ODB_ALIAS_TRAITS_TRIP_FOR_PIO_TRIP
-
-  template <>
-  struct query_columns_base< ::pio::Selection >
-  {
-    // trip
-    //
-    typedef
-    odb::alias_traits< ::pio::Trip, trip_alias_tag >
-    trip_alias_;
-  };
-
-  template <typename A>
-  struct query_columns< ::pio::Selection, A >:
-    query_columns_base< ::pio::Selection >
-  {
-    // auto_id
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    auto_id_type_;
-
-    static const auto_id_type_ auto_id;
-
-    // hhold
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    hhold_type_;
-
-    static const hhold_type_ hhold;
-
-    // person
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    person_type_;
-
-    static const person_type_ person;
-
-    // tour
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    tour_type_;
-
-    static const tour_type_ tour;
-
-    // trip
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    trip_column_type_;
-
-    typedef
-    odb::query_pointer<
-      odb::pointer_query_columns<
-        ::pio::Trip,
-        trip_alias_ > >
-    trip_pointer_type_;
-
-    struct trip_type_: trip_pointer_type_, trip_column_type_
-    {
-      trip_type_ ()
-      {
-      }
-
-      trip_type_ (const char* t, const char* c, const char* conv)
-        : trip_column_type_ (t, c, conv)
-      {
-      }
-    };
-
-    static const trip_type_ trip;
-
-    // type
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    type_type_;
-
-    static const type_type_ type;
-
-    // partition
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    partition_type_;
-
-    static const partition_type_ partition;
-  };
-
-  template <typename A>
-  const typename query_columns< ::pio::Selection, A >::auto_id_type_
-  query_columns< ::pio::Selection, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Selection, A >::hhold_type_
-  query_columns< ::pio::Selection, A >::
-  hhold (A::table_name, "\"hhold\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Selection, A >::person_type_
-  query_columns< ::pio::Selection, A >::
-  person (A::table_name, "\"person\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Selection, A >::tour_type_
-  query_columns< ::pio::Selection, A >::
-  tour (A::table_name, "\"tour\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Selection, A >::trip_type_
-  query_columns< ::pio::Selection, A >::
-  trip (A::table_name, "\"trip\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Selection, A >::type_type_
-  query_columns< ::pio::Selection, A >::
-  type (A::table_name, "\"type\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::pio::Selection, A >::partition_type_
-  query_columns< ::pio::Selection, A >::
-  partition (A::table_name, "\"partition\"", 0);
 
   // Household
   //
@@ -16730,21 +17603,6 @@ namespace odb
   table_name[] = "\"location\"";
 #endif // ODB_ALIAS_TRAITS_LOCATION_FOR_PIO_LOCATION
 
-  class vehicles_alias_tag;
-
-#ifndef ODB_ALIAS_TRAITS_VEHICLES_FOR_PIO_VEHICLE
-#define ODB_ALIAS_TRAITS_VEHICLES_FOR_PIO_VEHICLE
-  template <bool d>
-  struct alias_traits< ::pio::Vehicle, vehicles_alias_tag, d >
-  {
-    static const char table_name[];
-  };
-
-  template <bool d>
-  const char alias_traits< ::pio::Vehicle, vehicles_alias_tag, d >::
-  table_name[] = "\"vehicles\"";
-#endif // ODB_ALIAS_TRAITS_VEHICLES_FOR_PIO_VEHICLE
-
   template <>
   struct query_columns_base< ::pio::Household >
   {
@@ -16753,12 +17611,6 @@ namespace odb
     typedef
     odb::alias_traits< ::pio::Location, location_alias_tag >
     location_alias_;
-
-    // vehicles
-    //
-    typedef
-    odb::alias_traits< ::pio::Vehicle, vehicles_alias_tag >
-    vehicles_alias_;
   };
 
   template <typename A>
@@ -16849,29 +17701,10 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        long unsigned int,
+        int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    vehicles_column_type_;
-
-    typedef
-    odb::query_pointer<
-      odb::pointer_query_columns<
-        ::pio::Vehicle,
-        vehicles_alias_ > >
-    vehicles_pointer_type_;
-
-    struct vehicles_type_: vehicles_pointer_type_, vehicles_column_type_
-    {
-      vehicles_type_ ()
-      {
-      }
-
-      vehicles_type_ (const char* t, const char* c, const char* conv)
-        : vehicles_column_type_ (t, c, conv)
-      {
-      }
-    };
+    vehicles_type_;
 
     static const vehicles_type_ vehicles;
 
@@ -17146,6 +17979,30 @@ namespace odb
 
     static const type_type_ type;
 
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
     // flow
     //
     typedef
@@ -17157,6 +18014,18 @@ namespace odb
     flow_type_;
 
     static const flow_type_ flow;
+
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
 
     // out_link
     //
@@ -17200,6 +18069,18 @@ namespace odb
     out_flow_type_;
 
     static const out_flow_type_ out_flow;
+
+    // out_time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    out_time_type_;
+
+    static const out_time_type_ out_time;
   };
 
   template <typename A>
@@ -17223,9 +18104,24 @@ namespace odb
   type (A::table_name, "\"type\"", 0);
 
   template <typename A>
+  const typename query_columns< ::pio::Link_Delay, A >::start_type_
+  query_columns< ::pio::Link_Delay, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Link_Delay, A >::end_type_
+  query_columns< ::pio::Link_Delay, A >::
+  end (A::table_name, "\"end\"", 0);
+
+  template <typename A>
   const typename query_columns< ::pio::Link_Delay, A >::flow_type_
   query_columns< ::pio::Link_Delay, A >::
   flow (A::table_name, "\"flow\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Link_Delay, A >::time_type_
+  query_columns< ::pio::Link_Delay, A >::
+  time (A::table_name, "\"time\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Link_Delay, A >::out_link_type_
@@ -17236,6 +18132,11 @@ namespace odb
   const typename query_columns< ::pio::Link_Delay, A >::out_flow_type_
   query_columns< ::pio::Link_Delay, A >::
   out_flow (A::table_name, "\"out_flow\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Link_Delay, A >::out_time_type_
+  query_columns< ::pio::Link_Delay, A >::
+  out_time (A::table_name, "\"out_time\"", 0);
 
   // Ridership
   //
@@ -17332,6 +18233,30 @@ namespace odb
 
     static const stop_type_ stop;
 
+    // schedule
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    schedule_type_;
+
+    static const schedule_type_ schedule;
+
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
+
     // board
     //
     typedef
@@ -17405,6 +18330,16 @@ namespace odb
   const typename query_columns< ::pio::Ridership, A >::stop_type_
   query_columns< ::pio::Ridership, A >::
   stop (A::table_name, "\"stop\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Ridership, A >::schedule_type_
+  query_columns< ::pio::Ridership, A >::
+  schedule (A::table_name, "\"schedule\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Ridership, A >::time_type_
+  query_columns< ::pio::Ridership, A >::
+  time (A::table_name, "\"time\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Ridership, A >::board_type_
@@ -17668,21 +18603,6 @@ namespace odb
   table_name[] = "\"destination\"";
 #endif // ODB_ALIAS_TRAITS_DESTINATION_FOR_PIO_LOCATION
 
-  class vehicle_alias_tag;
-
-#ifndef ODB_ALIAS_TRAITS_VEHICLE_FOR_PIO_VEHICLE
-#define ODB_ALIAS_TRAITS_VEHICLE_FOR_PIO_VEHICLE
-  template <bool d>
-  struct alias_traits< ::pio::Vehicle, vehicle_alias_tag, d >
-  {
-    static const char table_name[];
-  };
-
-  template <bool d>
-  const char alias_traits< ::pio::Vehicle, vehicle_alias_tag, d >::
-  table_name[] = "\"vehicle\"";
-#endif // ODB_ALIAS_TRAITS_VEHICLE_FOR_PIO_VEHICLE
-
   template <>
   struct query_columns_base< ::pio::Trip >
   {
@@ -17697,12 +18617,6 @@ namespace odb
     typedef
     odb::alias_traits< ::pio::Location, destination_alias_tag >
     destination_alias_;
-
-    // vehicle
-    //
-    typedef
-    odb::alias_traits< ::pio::Vehicle, vehicle_alias_tag >
-    vehicle_alias_;
   };
 
   template <typename A>
@@ -17768,6 +18682,42 @@ namespace odb
     trip_type_;
 
     static const trip_type_ trip;
+
+    // start
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    start_type_;
+
+    static const start_type_ start;
+
+    // end
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    end_type_;
+
+    static const end_type_ end;
+
+    // duration
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    duration_type_;
+
+    static const duration_type_ duration;
 
     // origin
     //
@@ -17884,29 +18834,10 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        long unsigned int,
+        int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    vehicle_column_type_;
-
-    typedef
-    odb::query_pointer<
-      odb::pointer_query_columns<
-        ::pio::Vehicle,
-        vehicle_alias_ > >
-    vehicle_pointer_type_;
-
-    struct vehicle_type_: vehicle_pointer_type_, vehicle_column_type_
-    {
-      vehicle_type_ ()
-      {
-      }
-
-      vehicle_type_ (const char* t, const char* c, const char* conv)
-        : vehicle_column_type_ (t, c, conv)
-      {
-      }
-    };
+    vehicle_type_;
 
     static const vehicle_type_ vehicle;
 
@@ -17971,6 +18902,21 @@ namespace odb
   const typename query_columns< ::pio::Trip, A >::trip_type_
   query_columns< ::pio::Trip, A >::
   trip (A::table_name, "\"trip\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Trip, A >::start_type_
+  query_columns< ::pio::Trip, A >::
+  start (A::table_name, "\"start\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Trip, A >::end_type_
+  query_columns< ::pio::Trip, A >::
+  end (A::table_name, "\"end\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Trip, A >::duration_type_
+  query_columns< ::pio::Trip, A >::
+  duration (A::table_name, "\"duration\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Trip, A >::origin_type_
@@ -18049,6 +18995,18 @@ namespace odb
     problem_type_;
 
     static const problem_type_ problem;
+
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
 
     // link
     //
@@ -18148,6 +19106,11 @@ namespace odb
   problem (A::table_name, "\"problem\"", 0);
 
   template <typename A>
+  const typename query_columns< ::pio::Problem, A >::time_type_
+  query_columns< ::pio::Problem, A >::
+  time (A::table_name, "\"time\"", 0);
+
+  template <typename A>
   const typename query_columns< ::pio::Problem, A >::link_type_
   query_columns< ::pio::Problem, A >::
   link (A::table_name, "\"link\"", 0);
@@ -18182,12 +19145,6 @@ namespace odb
   template <>
   struct query_columns_base< ::pio::Event >
   {
-    // trip
-    //
-    typedef
-    odb::alias_traits< ::pio::Trip, trip_alias_tag >
-    trip_alias_;
-
     // link
     //
     typedef
@@ -18252,29 +19209,10 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        long unsigned int,
+        int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    trip_column_type_;
-
-    typedef
-    odb::query_pointer<
-      odb::pointer_query_columns<
-        ::pio::Trip,
-        trip_alias_ > >
-    trip_pointer_type_;
-
-    struct trip_type_: trip_pointer_type_, trip_column_type_
-    {
-      trip_type_ ()
-      {
-      }
-
-      trip_type_ (const char* t, const char* c, const char* conv)
-        : trip_column_type_ (t, c, conv)
-      {
-      }
-    };
+    trip_type_;
 
     static const trip_type_ trip;
 
@@ -18301,6 +19239,30 @@ namespace odb
     type_type_;
 
     static const type_type_ type;
+
+    // schedule
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    schedule_type_;
+
+    static const schedule_type_ schedule;
+
+    // actual
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    actual_type_;
+
+    static const actual_type_ actual;
 
     // link
     //
@@ -18418,6 +19380,16 @@ namespace odb
   type (A::table_name, "\"type\"", 0);
 
   template <typename A>
+  const typename query_columns< ::pio::Event, A >::schedule_type_
+  query_columns< ::pio::Event, A >::
+  schedule (A::table_name, "\"schedule\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Event, A >::actual_type_
+  query_columns< ::pio::Event, A >::
+  actual (A::table_name, "\"actual\"", 0);
+
+  template <typename A>
   const typename query_columns< ::pio::Event, A >::link_type_
   query_columns< ::pio::Event, A >::
   link (A::table_name, "\"link\"", 0);
@@ -18447,12 +19419,6 @@ namespace odb
   template <>
   struct query_columns_base< ::pio::Traveler >
   {
-    // trip
-    //
-    typedef
-    odb::alias_traits< ::pio::Trip, trip_alias_tag >
-    trip_alias_;
-
     // link
     //
     typedef
@@ -18517,29 +19483,10 @@ namespace odb
     typedef
     sqlite::query_column<
       sqlite::value_traits<
-        long unsigned int,
+        int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    trip_column_type_;
-
-    typedef
-    odb::query_pointer<
-      odb::pointer_query_columns<
-        ::pio::Trip,
-        trip_alias_ > >
-    trip_pointer_type_;
-
-    struct trip_type_: trip_pointer_type_, trip_column_type_
-    {
-      trip_type_ ()
-      {
-      }
-
-      trip_type_ (const char* t, const char* c, const char* conv)
-        : trip_column_type_ (t, c, conv)
-      {
-      }
-    };
+    trip_type_;
 
     static const trip_type_ trip;
 
@@ -18554,6 +19501,18 @@ namespace odb
     mode_type_;
 
     static const mode_type_ mode;
+
+    // time
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    time_type_;
+
+    static const time_type_ time;
 
     // distance
     //
@@ -18688,6 +19647,11 @@ namespace odb
   const typename query_columns< ::pio::Traveler, A >::mode_type_
   query_columns< ::pio::Traveler, A >::
   mode (A::table_name, "\"mode\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::pio::Traveler, A >::time_type_
+  query_columns< ::pio::Traveler, A >::
+  time (A::table_name, "\"time\"", 0);
 
   template <typename A>
   const typename query_columns< ::pio::Traveler, A >::distance_type_
