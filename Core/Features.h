@@ -132,7 +132,7 @@ struct member_function_ptr_types<Type,communication_handler_type>
 	template<typename ReturnValueType>\
 	ReturnValueType FEATURE_NAME(requires_getter(check(ComponentType,FEATURE_NAME##_get_check) && (GETTER_REQUIREMENTS)))\
 	{\
-		return this_component().template FEATURE_NAME<ComponentType,CallerType,ReturnValueType>();\
+		return this_component()->template FEATURE_NAME<ComponentType,CallerType,ReturnValueType>();\
 	}\
 	template<typename ReturnValueType>\
 	ReturnValueType FEATURE_NAME(requires_getter(!check(ComponentType,FEATURE_NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
@@ -150,7 +150,7 @@ struct member_function_ptr_types<Type,communication_handler_type>
 	template<typename SetValueType>\
 	void FEATURE_NAME(SetValueType set_value,requires_setter(check(ComponentType,FEATURE_NAME##_set_check) && (SETTER_REQUIREMENTS)))\
 	{\
-		this_component().template FEATURE_NAME<ComponentType,CallerType,SetValueType>(set_value);\
+		this_component()->template FEATURE_NAME<ComponentType,CallerType,SetValueType>(set_value);\
 	}\
 	template<typename SetValueType>\
 	void FEATURE_NAME(SetValueType set_value,requires_setter(!check(ComponentType,FEATURE_NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
@@ -344,14 +344,14 @@ struct VARIABLE_NAME \
 	ReturnValueType FEATURE_NAME(requires_getter(check(ComponentType,get_##MEMBER_COMPONENT_NAME) && check_2(ComponentType,type_of_feature(MEMBER_COMPONENT_NAME),Is_Same_Entity)))\
 	{\
 		define_component_interface(MEMBER_COMPONENT_NAME##_itf,typename ComponentType::MEMBER_COMPONENT_NAME,MEMBER_COMPONENT_PROTOTYPE,ComponentType);\
-		MEMBER_COMPONENT_NAME##_itf* itf = this_component().MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
+		MEMBER_COMPONENT_NAME##_itf* itf = this_component()->MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
 		return itf->MEMBER_COMPONENT_FEATURE<ReturnValueType>();\
 	}\
 	template<typename ComponentType, typename CallerType, typename SetValueType>\
 	void FEATURE_NAME(SetValueType value, requires_setter(check(ComponentType,set_##MEMBER_COMPONENT_NAME)))\
 	{\
 		define_component_interface(MEMBER_COMPONENT_NAME##_itf,typename ComponentType::MEMBER_COMPONENT_NAME,MEMBER_COMPONENT_PROTOTYPE,ComponentType);\
-		MEMBER_COMPONENT_NAME##_itf* itf = this_component().MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
+		MEMBER_COMPONENT_NAME##_itf* itf = this_component()->MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
 		itf->MEMBER_COMPONENT_FEATURE<SetValueType>(value);\
 	}\
 	tag_getter_as_available(FEATURE_NAME);\
@@ -382,7 +382,7 @@ struct VARIABLE_NAME \
 /// component and interface cast macros
 ///============================================================================
 
-#define this_component() ((ComponentType&)*this)
+#define this_component() ((ComponentType*)this)
 #define target_to_component(TARGET_COMPONENT_TYPE,POINTER_TO_TARGET) ((TARGET_COMPONENT_TYPE&)*POINTER_TO_TARGET)
 #define target_to_interface(INTERFACE_ALIAS,POINTER_TO_TARGET) ((INTERFACE_ALIAS&)(*POINTER_TO_TARGET))
 #define iterator_to_interface(INTERFACE_ALIAS,ITERATOR_VARIABLE) ( (INTERFACE_ALIAS&) (*(*ITERATOR_VARIABLE)) )
