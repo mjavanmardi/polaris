@@ -60,13 +60,25 @@ namespace odb
     //
     t[0UL] = false;
 
-    // subarea
+    // x
     //
     t[1UL] = false;
 
-    // part
+    // y
     //
     t[2UL] = false;
+
+    // z
+    //
+    t[3UL] = false;
+
+    // subarea
+    //
+    t[4UL] = false;
+
+    // part
+    //
+    t[5UL] = false;
 
     return grew;
   }
@@ -91,6 +103,27 @@ namespace odb
       b[n].is_null = &i.node_null;
       n++;
     }
+
+    // x
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.x_value;
+    b[n].is_null = &i.x_null;
+    n++;
+
+    // y
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.y_value;
+    b[n].is_null = &i.y_null;
+    n++;
+
+    // z
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.z_value;
+    b[n].is_null = &i.z_null;
+    n++;
 
     // subarea
     //
@@ -142,6 +175,54 @@ namespace odb
         is_null,
         v);
       i.node_null = is_null;
+    }
+
+    // x
+    //
+    {
+      double const& v =
+        o.x;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.x_value,
+        is_null,
+        v);
+      i.x_null = is_null;
+    }
+
+    // y
+    //
+    {
+      double const& v =
+        o.y;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.y_value,
+        is_null,
+        v);
+      i.y_null = is_null;
+    }
+
+    // z
+    //
+    {
+      double const& v =
+        o.z;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.z_value,
+        is_null,
+        v);
+      i.z_null = is_null;
     }
 
     // subarea
@@ -200,6 +281,48 @@ namespace odb
         i.node_null);
     }
 
+    // x
+    //
+    {
+      double& v =
+        o.x;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.x_value,
+        i.x_null);
+    }
+
+    // y
+    //
+    {
+      double& v =
+        o.y;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.y_value,
+        i.y_null);
+    }
+
+    // z
+    //
+    {
+      double& v =
+        o.z;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.z_value,
+        i.z_null);
+    }
+
     // subarea
     //
     {
@@ -254,13 +377,19 @@ namespace odb
   const char access::object_traits< ::pio::Node >::persist_statement[] =
   "INSERT INTO \"Node\" ("
   "\"node\","
+  "\"x\","
+  "\"y\","
+  "\"z\","
   "\"subarea\","
   "\"part\")"
-  " VALUES (?,?,?)";
+  " VALUES (?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Node >::find_statement[] =
   "SELECT "
   "\"Node\".\"node\","
+  "\"Node\".\"x\","
+  "\"Node\".\"y\","
+  "\"Node\".\"z\","
   "\"Node\".\"subarea\","
   "\"Node\".\"part\""
   " FROM \"Node\""
@@ -268,6 +397,9 @@ namespace odb
 
   const char access::object_traits< ::pio::Node >::update_statement[] =
   "UPDATE \"Node\" SET "
+  "\"x\"=?,"
+  "\"y\"=?,"
+  "\"z\"=?,"
   "\"subarea\"=?,"
   "\"part\"=?"
   " WHERE \"node\"=?";
@@ -279,6 +411,9 @@ namespace odb
   const char access::object_traits< ::pio::Node >::query_statement[] =
   "SELECT "
   "\"Node\".\"node\","
+  "\"Node\".\"x\","
+  "\"Node\".\"y\","
+  "\"Node\".\"z\","
   "\"Node\".\"subarea\","
   "\"Node\".\"part\""
   " FROM \"Node\""
@@ -649,6 +784,9 @@ namespace odb
         {
           db.execute ("CREATE TABLE \"Node\" (\n"
                       "  \"node\" INTEGER NOT NULL PRIMARY KEY,\n"
+                      "  \"x\" REAL,\n"
+                      "  \"y\" REAL,\n"
+                      "  \"z\" REAL,\n"
                       "  \"subarea\" INTEGER NOT NULL,\n"
                       "  \"part\" INTEGER NOT NULL)");
           return false;
@@ -699,25 +837,37 @@ namespace odb
     //
     t[0UL] = false;
 
-    // area
+    // x
     //
     t[1UL] = false;
 
-    // min_x
+    // y
     //
     t[2UL] = false;
 
-    // min_y
+    // z
     //
     t[3UL] = false;
 
-    // max_x
+    // area
     //
     t[4UL] = false;
 
-    // max_y
+    // min_x
     //
     t[5UL] = false;
+
+    // min_y
+    //
+    t[6UL] = false;
+
+    // max_x
+    //
+    t[7UL] = false;
+
+    // max_y
+    //
+    t[8UL] = false;
 
     return grew;
   }
@@ -742,6 +892,27 @@ namespace odb
       b[n].is_null = &i.zone_null;
       n++;
     }
+
+    // x
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.x_value;
+    b[n].is_null = &i.x_null;
+    n++;
+
+    // y
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.y_value;
+    b[n].is_null = &i.y_null;
+    n++;
+
+    // z
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.z_value;
+    b[n].is_null = &i.z_null;
+    n++;
 
     // area
     //
@@ -814,6 +985,54 @@ namespace odb
         is_null,
         v);
       i.zone_null = is_null;
+    }
+
+    // x
+    //
+    {
+      double const& v =
+        o.x;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.x_value,
+        is_null,
+        v);
+      i.x_null = is_null;
+    }
+
+    // y
+    //
+    {
+      double const& v =
+        o.y;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.y_value,
+        is_null,
+        v);
+      i.y_null = is_null;
+    }
+
+    // z
+    //
+    {
+      double const& v =
+        o.z;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.z_value,
+        is_null,
+        v);
+      i.z_null = is_null;
     }
 
     // area
@@ -920,6 +1139,48 @@ namespace odb
         i.zone_null);
     }
 
+    // x
+    //
+    {
+      double& v =
+        o.x;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.x_value,
+        i.x_null);
+    }
+
+    // y
+    //
+    {
+      double& v =
+        o.y;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.y_value,
+        i.y_null);
+    }
+
+    // z
+    //
+    {
+      double& v =
+        o.z;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.z_value,
+        i.z_null);
+    }
+
     // area
     //
     {
@@ -1016,16 +1277,22 @@ namespace odb
   const char access::object_traits< ::pio::Zone >::persist_statement[] =
   "INSERT INTO \"Zone\" ("
   "\"zone\","
+  "\"x\","
+  "\"y\","
+  "\"z\","
   "\"area\","
   "\"min_x\","
   "\"min_y\","
   "\"max_x\","
   "\"max_y\")"
-  " VALUES (?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Zone >::find_statement[] =
   "SELECT "
   "\"Zone\".\"zone\","
+  "\"Zone\".\"x\","
+  "\"Zone\".\"y\","
+  "\"Zone\".\"z\","
   "\"Zone\".\"area\","
   "\"Zone\".\"min_x\","
   "\"Zone\".\"min_y\","
@@ -1036,6 +1303,9 @@ namespace odb
 
   const char access::object_traits< ::pio::Zone >::update_statement[] =
   "UPDATE \"Zone\" SET "
+  "\"x\"=?,"
+  "\"y\"=?,"
+  "\"z\"=?,"
   "\"area\"=?,"
   "\"min_x\"=?,"
   "\"min_y\"=?,"
@@ -1050,6 +1320,9 @@ namespace odb
   const char access::object_traits< ::pio::Zone >::query_statement[] =
   "SELECT "
   "\"Zone\".\"zone\","
+  "\"Zone\".\"x\","
+  "\"Zone\".\"y\","
+  "\"Zone\".\"z\","
   "\"Zone\".\"area\","
   "\"Zone\".\"min_x\","
   "\"Zone\".\"min_y\","
@@ -1423,6 +1696,9 @@ namespace odb
         {
           db.execute ("CREATE TABLE \"Zone\" (\n"
                       "  \"zone\" INTEGER NOT NULL PRIMARY KEY,\n"
+                      "  \"x\" REAL,\n"
+                      "  \"y\" REAL,\n"
+                      "  \"z\" REAL,\n"
                       "  \"area\" INTEGER NOT NULL,\n"
                       "  \"min_x\" REAL,\n"
                       "  \"min_y\" REAL,\n"
@@ -1484,6 +1760,18 @@ namespace odb
     //
     t[2UL] = false;
 
+    // x
+    //
+    t[3UL] = false;
+
+    // y
+    //
+    t[4UL] = false;
+
+    // z
+    //
+    t[5UL] = false;
+
     return grew;
   }
 
@@ -1520,6 +1808,27 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.points_value;
     b[n].is_null = &i.points_null;
+    n++;
+
+    // x
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.x_value;
+    b[n].is_null = &i.x_null;
+    n++;
+
+    // y
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.y_value;
+    b[n].is_null = &i.y_null;
+    n++;
+
+    // z
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.z_value;
+    b[n].is_null = &i.z_null;
     n++;
   }
 
@@ -1603,6 +1912,54 @@ namespace odb
       i.points_null = is_null;
     }
 
+    // x
+    //
+    {
+      double const& v =
+        o.x;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.x_value,
+        is_null,
+        v);
+      i.x_null = is_null;
+    }
+
+    // y
+    //
+    {
+      double const& v =
+        o.y;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.y_value,
+        is_null,
+        v);
+      i.y_null = is_null;
+    }
+
+    // z
+    //
+    {
+      double const& v =
+        o.z;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.z_value,
+        is_null,
+        v);
+      i.z_null = is_null;
+    }
+
     return grew;
   }
 
@@ -1670,6 +2027,48 @@ namespace odb
         i.points_value,
         i.points_null);
     }
+
+    // x
+    //
+    {
+      double& v =
+        o.x;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.x_value,
+        i.x_null);
+    }
+
+    // y
+    //
+    {
+      double& v =
+        o.y;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.y_value,
+        i.y_null);
+    }
+
+    // z
+    //
+    {
+      double& v =
+        o.z;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.z_value,
+        i.z_null);
+    }
   }
 
   void access::object_traits< ::pio::Shape >::
@@ -1698,21 +2097,30 @@ namespace odb
   "INSERT INTO \"Shape\" ("
   "\"auto_id\","
   "\"link\","
-  "\"points\")"
-  " VALUES (?,?,?)";
+  "\"points\","
+  "\"x\","
+  "\"y\","
+  "\"z\")"
+  " VALUES (?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Shape >::find_statement[] =
   "SELECT "
   "\"Shape\".\"auto_id\","
   "\"Shape\".\"link\","
-  "\"Shape\".\"points\""
+  "\"Shape\".\"points\","
+  "\"Shape\".\"x\","
+  "\"Shape\".\"y\","
+  "\"Shape\".\"z\""
   " FROM \"Shape\""
   " WHERE \"Shape\".\"auto_id\"=?";
 
   const char access::object_traits< ::pio::Shape >::update_statement[] =
   "UPDATE \"Shape\" SET "
   "\"link\"=?,"
-  "\"points\"=?"
+  "\"points\"=?,"
+  "\"x\"=?,"
+  "\"y\"=?,"
+  "\"z\"=?"
   " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Shape >::erase_statement[] =
@@ -1723,7 +2131,10 @@ namespace odb
   "SELECT "
   "\"Shape\".\"auto_id\","
   "\"Shape\".\"link\","
-  "\"Shape\".\"points\""
+  "\"Shape\".\"points\","
+  "\"Shape\".\"x\","
+  "\"Shape\".\"y\","
+  "\"Shape\".\"z\""
   " FROM \"Shape\""
   " LEFT JOIN \"Link\" AS \"link\" ON \"link\".\"link\"=\"Shape\".\"link\""
   " ";
@@ -2099,6 +2510,9 @@ namespace odb
                       "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"points\" INTEGER NOT NULL,\n"
+                      "  \"x\" REAL,\n"
+                      "  \"y\" REAL,\n"
+                      "  \"z\" REAL,\n"
                       "  CONSTRAINT \"link_fk\"\n"
                       "    FOREIGN KEY (\"link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
@@ -3960,7 +4374,11 @@ namespace odb
 
     // type
     //
-    t[3UL] = false;
+    if (t[3UL])
+    {
+      i.type_value.capacity (i.type_size);
+      grew = true;
+    }
 
     // lanes
     //
@@ -4014,8 +4432,12 @@ namespace odb
 
     // type
     //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.type_value;
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.type_value.data ();
+    b[n].size = &i.type_size;
+    b[n].capacity = i.type_value.capacity ();
     b[n].is_null = &i.type_null;
     n++;
 
@@ -4124,17 +4546,20 @@ namespace odb
     // type
     //
     {
-      int const& v =
+      ::std::string const& v =
         o.type;
 
       bool is_null (false);
+      std::size_t cap (i.type_value.capacity ());
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
+          ::std::string,
+          sqlite::id_text >::set_image (
         i.type_value,
+        i.type_size,
         is_null,
         v);
       i.type_null = is_null;
+      grew = grew || (cap != i.type_value.capacity ());
     }
 
     // lanes
@@ -4256,14 +4681,15 @@ namespace odb
     // type
     //
     {
-      int& v =
+      ::std::string& v =
         o.type;
 
       sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
+          ::std::string,
+          sqlite::id_text >::set_value (
         v,
         i.type_value,
+        i.type_size,
         i.type_null);
     }
 
@@ -4665,6 +5091,20 @@ namespace odb
     auto_result ar (st);
     select_statement::result r (st.fetch ());
 
+    if (r == select_statement::truncated)
+    {
+      if (grow (im, sts.select_image_truncated ()))
+        im.version++;
+
+      if (im.version != sts.select_image_version ())
+      {
+        bind (imb.bind, im, statement_select);
+        sts.select_image_version (im.version);
+        imb.version++;
+        st.refetch ();
+      }
+    }
+
     return r != select_statement::no_data;
   }
 
@@ -4753,7 +5193,7 @@ namespace odb
                       "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
-                      "  \"type\" INTEGER NOT NULL,\n"
+                      "  \"type\" TEXT NOT NULL,\n"
                       "  \"lanes\" INTEGER NOT NULL,\n"
                       "  \"length\" REAL,\n"
                       "  \"offset\" REAL,\n"
@@ -14460,11 +14900,7 @@ namespace odb
 
     // protect
     //
-    if (t[10UL])
-    {
-      i.protect_value.capacity (i.protect_size);
-      grew = true;
-    }
+    t[10UL] = false;
 
     return grew;
   }
@@ -14563,12 +14999,8 @@ namespace odb
 
     // protect
     //
-    b[n].type = sqlite::image_traits<
-      ::std::string,
-      sqlite::id_text>::bind_value;
-    b[n].buffer = i.protect_value.data ();
-    b[n].size = &i.protect_size;
-    b[n].capacity = i.protect_value.capacity ();
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.protect_value;
     b[n].is_null = &i.protect_null;
     n++;
   }
@@ -14796,20 +15228,17 @@ namespace odb
     // protect
     //
     {
-      ::std::string const& v =
+      int const& v =
         o.protect;
 
       bool is_null (false);
-      std::size_t cap (i.protect_value.capacity ());
       sqlite::value_traits<
-          ::std::string,
-          sqlite::id_text >::set_image (
+          int,
+          sqlite::id_integer >::set_image (
         i.protect_value,
-        i.protect_size,
         is_null,
         v);
       i.protect_null = is_null;
-      grew = grew || (cap != i.protect_value.capacity ());
     }
 
     return grew;
@@ -15015,15 +15444,14 @@ namespace odb
     // protect
     //
     {
-      ::std::string& v =
+      int& v =
         o.protect;
 
       sqlite::value_traits<
-          ::std::string,
-          sqlite::id_text >::set_value (
+          int,
+          sqlite::id_integer >::set_value (
         v,
         i.protect_value,
-        i.protect_size,
         i.protect_null);
     }
   }
@@ -15510,7 +15938,7 @@ namespace odb
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"to_link\" INTEGER,\n"
-                      "  \"protect\" TEXT NOT NULL,\n"
+                      "  \"protect\" INTEGER NOT NULL,\n"
                       "  CONSTRAINT \"signal_fk\"\n"
                       "    FOREIGN KEY (\"signal\")\n"
                       "    REFERENCES \"Signal\" (\"signal\")\n"

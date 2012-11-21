@@ -1,6 +1,6 @@
 
-#ifndef OutNetwork
-#define OutNetwork
+#ifndef InputContext
+#define InputContext
 #pragma warning(disable:4068)
 
 #include <map>
@@ -76,13 +76,19 @@ public:
 	// Default Constructor
 	Node () {}	
 	//Contructor
-	Node ( int node_, int subarea_, int part_ )  
-	: node (node_), subarea (subarea_), part (part_)
+	Node ( int node_, double x_, double y_, double z_, int subarea_, int part_ )  
+	: node (node_), x (x_), y (y_), z (z_), subarea (subarea_), part (part_)
 	{
 	}
 	//Accessors
 	const int& getNode () const {return node;}
 	void setNode (const int& node_){node = node_;}
+	const double& getX () const {return x;}
+	void setX (const double& x_){x = x_;}
+	const double& getY () const {return y;}
+	void setY (const double& y_){y = y_;}
+	const double& getZ () const {return z;}
+	void setZ (const double& z_){z = z_;}
 	const int& getSubarea () const {return subarea;}
 	void setSubarea (const int& subarea_){subarea = subarea_;}
 	const int& getPart () const {return part;}
@@ -94,6 +100,9 @@ private:
 	friend class odb::access;
 	#pragma db id
 	int node;
+	double x;
+	double y;
+	double z;
 	int subarea;
 	int part;
 
@@ -106,13 +115,19 @@ public:
 	// Default Constructor
 	Zone () {}	
 	//Contructor
-	Zone ( int zone_, int area_, double min_x_, double min_y_, double max_x_, double max_y_ )  
-	: zone (zone_), area (area_), min_x (min_x_), min_y (min_y_), max_x (max_x_), max_y (max_y_)
+	Zone ( int zone_, double x_, double y_, double z_, int area_, double min_x_, double min_y_, double max_x_, double max_y_ )  
+	: zone (zone_), x (x_), y (y_), z (z_), area (area_), min_x (min_x_), min_y (min_y_), max_x (max_x_), max_y (max_y_)
 	{
 	}
 	//Accessors
 	const int& getZone () const {return zone;}
 	void setZone (const int& zone_){zone = zone_;}
+	const double& getX () const {return x;}
+	void setX (const double& x_){x = x_;}
+	const double& getY () const {return y;}
+	void setY (const double& y_){y = y_;}
+	const double& getZ () const {return z;}
+	void setZ (const double& z_){z = z_;}
 	const int& getArea () const {return area;}
 	void setArea (const int& area_){area = area_;}
 	const double& getMin_X () const {return min_x;}
@@ -130,6 +145,9 @@ private:
 	friend class odb::access;
 	#pragma db id
 	int zone;
+	double x;
+	double y;
+	double z;
 	int area;
 	double min_x;
 	double min_y;
@@ -145,8 +163,8 @@ public:
 	// Default Constructor
 	Shape () {}	
 	//Contructor
-	Shape ( shared_ptr<Link> link_, int points_ )  
-	: link (link_), points (points_)
+	Shape ( shared_ptr<Link> link_, int points_, double x_, double y_, double z_ )  
+	: link (link_), points (points_), x (x_), y (y_), z (z_)
 	{
 	}
 	//Accessors
@@ -155,6 +173,12 @@ public:
 	void setLink (const int& link_, InputContainer& container){link = container.Links[link_];}
 	const int& getPoints () const {return points;}
 	void setPoints (const int& points_){points = points_;}
+	const double& getX () const {return x;}
+	void setX (const double& x_){x = x_;}
+	const double& getY () const {return y;}
+	void setY (const double& y_){y = y_;}
+	const double& getZ () const {return z;}
+	void setZ (const double& z_){z = z_;}
 	const unsigned long& getPrimaryKey () const {return auto_id;}
 	const unsigned long& getAuto_id () const {return auto_id;}
 
@@ -165,6 +189,9 @@ private:
 	unsigned long auto_id;
 	shared_ptr<Link> link;
 	int points;
+	double x;
+	double y;
+	double z;
 
 };
 
@@ -276,7 +303,7 @@ public:
 	// Default Constructor
 	Pocket () {}	
 	//Contructor
-	Pocket ( shared_ptr<Link> link_, int dir_, int type_, int lanes_, double length_, double offset_ )  
+	Pocket ( shared_ptr<Link> link_, int dir_, std::string type_, int lanes_, double length_, double offset_ )  
 	: link (link_), dir (dir_), type (type_), lanes (lanes_), length (length_), offset (offset_)
 	{
 	}
@@ -286,8 +313,8 @@ public:
 	void setLink (const int& link_, InputContainer& container){link = container.Links[link_];}
 	const int& getDir () const {return dir;}
 	void setDir (const int& dir_){dir = dir_;}
-	const int& getType () const {return type;}
-	void setType (const int& type_){type = type_;}
+	const std::string& getType () const {return type;}
+	void setType (const std::string& type_){type = type_;}
 	const int& getLanes () const {return lanes;}
 	void setLanes (const int& lanes_){lanes = lanes_;}
 	const double& getLength () const {return length;}
@@ -304,7 +331,7 @@ private:
 	unsigned long auto_id;
 	shared_ptr<Link> link;
 	int dir;
-	int type;
+	std::string type;
 	int lanes;
 	double length;
 	double offset;
@@ -811,7 +838,7 @@ public:
 	// Default Constructor
 	Phasing () {}	
 	//Contructor
-	Phasing ( shared_ptr<Signal> signal_, int phasing_, int phase_, std::string detectors_, int movements_, std::string movement_, shared_ptr<Link> link_, int dir_, shared_ptr<Link> to_link_, std::string protect_ )  
+	Phasing ( shared_ptr<Signal> signal_, int phasing_, int phase_, std::string detectors_, int movements_, std::string movement_, shared_ptr<Link> link_, int dir_, shared_ptr<Link> to_link_, int protect_ )  
 	: signal (signal_), phasing (phasing_), phase (phase_), detectors (detectors_), movements (movements_), movement (movement_), link (link_), dir (dir_), to_link (to_link_), protect (protect_)
 	{
 	}
@@ -837,8 +864,8 @@ public:
 	const shared_ptr<Link>& getTo_Link () const {return to_link;}
 	void setTo_Link (const shared_ptr<Link>& to_link_){to_link = to_link_;}
 	void setTo_Link (const int& to_link_, InputContainer& container){to_link = container.Links[to_link_];}
-	const std::string& getProtect () const {return protect;}
-	void setProtect (const std::string& protect_){protect = protect_;}
+	const int& getProtect () const {return protect;}
+	void setProtect (const int& protect_){protect = protect_;}
 	const unsigned long& getPrimaryKey () const {return auto_id;}
 	const unsigned long& getAuto_id () const {return auto_id;}
 
@@ -856,7 +883,7 @@ private:
 	shared_ptr<Link> link;
 	int dir;
 	shared_ptr<Link> to_link;
-	std::string protect;
+	int protect;
 
 };
 
@@ -1927,4 +1954,4 @@ private:
 };
 
 }//end of namespace
-#endif // OutNetwork
+#endif // InputContext

@@ -12,6 +12,7 @@
 #ifdef WINDOWS
 #include <Windows.h>
 #include <WinBase.h>
+#include <unordered_map>
 #include <type_traits>
 #include <random>
 #else

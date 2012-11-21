@@ -9,6 +9,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Data_Structures">
+      <UniqueIdentifier>{f6479c2c-a5e9-4e84-929f-92577ef096eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Basic_Concepts.h">
@@ -71,14 +74,50 @@
     <ClInclude Include="Features.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Data_Structures.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Interprocess_Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Interprocess_Structures.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Data_Structures.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\dense_hash_map.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\dense_hash_set.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\densehashtable.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\hashtable-common.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\libc_allocator_with_realloc.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\sparse_hash_map.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\sparse_hash_set.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\sparseconfig.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\sparsehashtable.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\sparsetable.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\template_util.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="sparsehash\type_traits.h">
+      <Filter>Data_Structures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
