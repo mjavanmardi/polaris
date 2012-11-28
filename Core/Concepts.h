@@ -7,6 +7,8 @@
 
 #define concept template<typename T=NULLTYPE,typename V=NULLTYPE>
 
+static true_type true_val;
+
 static const int success=sizeof(small_type);
 
 #define strip_modifiers(TYPE) typename remove_cv<typename remove_pointer<typename remove_extent<typename remove_reference<TYPE>::type>::type>::type>::type
@@ -45,9 +47,9 @@ static const int success=sizeof(small_type);
 #define check_named_member(CHECK_ALIAS,MEMBER_NAME)\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U> static small_type has_matching_named_member(decltype(&U::MEMBER_NAME));\
+		template<typename U> static small_type has_matching_named_member(is_member_object_pointer<decltype(&U::MEMBER_NAME)>::type);\
 		template<typename U> static large_type has_matching_named_member(...);\
-		static const bool value=sizeof(has_matching_named_member<T>(0))==success;\
+		static const bool value=sizeof(has_matching_named_member<T>(true_val))==success;\
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
@@ -63,9 +65,9 @@ static const int success=sizeof(small_type);
 #define check_typed_member(CHECK_ALIAS,MEMBER_NAME,DESIRED_TYPE)\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U> static small_type has_matching_named_member(decltype(&U::MEMBER_NAME));\
+		template<typename U> static small_type has_matching_named_member(is_member_object_pointer<decltype(&U::MEMBER_NAME)>::type);\
 		template<typename U> static large_type has_matching_named_member(...);\
-		static const bool member_exists=sizeof(has_matching_named_member<T>(0))==success;\
+		static const bool member_exists=sizeof(has_matching_named_member<T>(true_val))==success;\
 		template<class U,bool B> struct p_conditional{typedef false_type type;};\
 		template<class U> struct p_conditional<U,true>{typedef typename is_same<decltype(&U::MEMBER_NAME),DESIRED_TYPE U::*>::type type;};\
 		static const bool value=(member_exists && p_conditional<T,member_exists>::type::value);\
@@ -98,6 +100,13 @@ static const int success=sizeof(small_type);
 		static const bool value=(member_exists && p_conditional<T,V,member_exists>::type::value);\
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
+
+
+#define check_type_match(CHECK_ALIAS,TYPE_TO_MATCH)\
+	static const bool CHECK_ALIAS=is_same<T,TYPE_TO_MATCH>::value;
+
+#define check_type_same(CHECK_ALIAS)\
+	static const bool CHECK_ALIAS=is_same<T,V>::value;
 
 #define REQUIRES_CONCEPT_PARAMS(TYPE_TO_TEST_1,TYPE_TO_TEST_2) TYPE_TO_TEST_1,TYPE_TO_TEST_2
 #define check_concept(CHECK_ALIAS,CONCEPT_NAME) static const bool CHECK_ALIAS=CONCEPT_NAME<REQUIRES_CONCEPT_PARAMS(T,V)>::value;
