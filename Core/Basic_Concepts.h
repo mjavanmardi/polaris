@@ -30,111 +30,54 @@ struct False_Concept
 
 concept struct Is_Polaris_Component
 {
+	// Basic check to satisfy polaris component requirements
 	check_typename_defined(has_this_type,This_Type);
 	check_typename_defined(has_parent_type,Parent_Type);
 	check_typename_defined(has_group_list,Group_List);
 	check_typename_defined(has_object_type,Object_Type);
 	check_typename_defined(has_master_type,Master_Type);
 
-	define_default_check(has_this_type && has_parent_type && has_group_list && has_object_type && has_master_type);
+	// subchecks which can be used to identify object type
+	check_typename_state(is_data_object,Object_Type, Data_Object);
+	check_typename_state(is_execution_object,Object_Type, Execution_Object);
+
+	// default check when concept is used
+	define_default_check(has_this_type && has_parent_type && has_group_list && has_object_type && has_master_type && (is_data_object || is_execution_object));
 };
 
-/*
-concept Is_Polaris_Prototype
+
+concept struct Is_Polaris_Prototype
 {
-	begin_requirements_list (none);
-	requires_typename_defined(none, Component_Type,"Type does not have Component_Type defined");
-	requires_typename_defined(Component_Type, Caller_Type,"Type does not have Caller_Type defined");
-	requires_typename_state(Caller_Type, Is_Prototype, true_type,"Type is not a Polaris_Prototype, did you remember to add the macro \"tag_as_prototype()\" in the body of this class's definition");
-	end_requirements_list(Is_Prototype);
+	check_typename_defined(has_component_type,Component_Type);
+	check_typename_defined(has_caller_type,Caller_Type);
+	check_typename_state(has_prototype_tag,Is_Prototype, true_type);
+	define_default_check(has_component_type && has_caller_type && has_prototype_tag);
 };
 
-concept Is_Data_Object
-{
-	begin_requirements_list(none);
-
-	requires_concept(none,Is_Polaris_Component);
-	
-	requires_typename_state(Is_Polaris_Component,Object_Type,Data_Object,"Type is not a Data_Object");
-
-	end_requirements_list(Object_Type);
-};
-
-concept Is_Execution_Object
-{
-	begin_requirements_list(none);
-
-	requires_concept(none,Is_Polaris_Component);
-	requires_typename_state(Is_Polaris_Component,Object_Type,Execution_Object,"Type is not an Execution_Object");
-
-	end_requirements_list(Object_Type);
-};
-
-///============================================================================
-/// Is_Dispatchable - detects whether type can be dispatched
-///============================================================================
-
-concept Is_Dispatchable
-{
-	begin_requirements_list(none);
-
-	requires_typename_state(none,Dispatched,false_type,"Type has already been Dispatched or Dispatched has not been defined");
-
-	end_requirements_list(Dispatched);
-};
-
-///============================================================================
-/// Is_Dispatched - detects whether type has been dispatched
-///============================================================================
-
-concept Is_Dispatched
-{
-	begin_requirements_list(none);
-
-	requires_typename_state(none,Dispatched,true_type,"Type has not been Dispatched or Dispatched has not been defined");
-	
-	end_requirements_list(Dispatched);
-};
-
-///============================================================================
-/// Dispatch - wrapper class which acknowledges a dispatch
-///============================================================================
-
-template<typename T>
-struct Dispatch:public T
-{
-	typedef true_type Dispatched;
-};
 
 ///============================================================================
 /// Is_Same_Entity - check whether component is part of the same entity
 ///============================================================================
 
-concept Is_Same_Entity
+concept struct Is_Same_Entity
 {
-	begin_requirements_list(none);
-
-	requires_concept(none,Is_Polaris_Component);
-	requires_typename_match(Is_Polaris_Component,Entity_Type,"Entity tags do not match!");
-	
-	end_requirements_list(Entity_Type);
+	check_concept(is_polaris_component_check,Is_Polaris_Component);
+	check_typename_match(has_matching_entity_type,Entity_Type);
+	define_default_check(is_polaris_component_check && has_matching_entity_type);
 };
 
 ///============================================================================
 /// Is_Same_Component - check whether component is itself
 ///============================================================================
 
-concept Is_Same_Component
+concept struct Is_Same_Component
 {
-	begin_requirements_list(none);
-
-	requires_concept(none,Is_Polaris_Component);
-	requires_typename_match(Is_Polaris_Component,This_Type,"Type tags do not match!");
-	
-	end_requirements_list(This_Type);
+	check_concept(is_polaris_component_check,Is_Polaris_Component);
+	check_typename_match(has_matching_this_type,This_Type);
+	define_default_check(is_polaris_component_check && has_matching_this_type);
 };
 
-*/
+
 /////============================================================================
 ///// Is_Property - check whether component may be owned
 /////============================================================================
@@ -197,4 +140,40 @@ concept Is_Same_Component
 //{
 //	assert_requirements_2(Property,Prior_Owner,Is_Retained_By,"Type is not retained by given type!");
 //	typedef NULLTYPE Property_Tag;
+//};
+
+///============================================================================
+/// Is_Dispatchable - detects whether type can be dispatched
+///============================================================================
+
+//concept Is_Dispatchable
+//{
+//	begin_requirements_list(none);
+//
+//	requires_typename_state(none,Dispatched,false_type,"Type has already been Dispatched or Dispatched has not been defined");
+//
+//	end_requirements_list(Dispatched);
+//};
+
+///============================================================================
+/// Is_Dispatched - detects whether type has been dispatched
+///============================================================================
+
+//concept Is_Dispatched
+//{
+//	begin_requirements_list(none);
+//
+//	requires_typename_state(none,Dispatched,true_type,"Type has not been Dispatched or Dispatched has not been defined");
+//	
+//	end_requirements_list(Dispatched);
+//};
+
+///============================================================================
+/// Dispatch - wrapper class which acknowledges a dispatch
+///============================================================================
+
+//template<typename T>
+//struct Dispatch:public T
+//{
+//	typedef true_type Dispatched;
 //};
