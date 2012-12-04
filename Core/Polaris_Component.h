@@ -164,7 +164,7 @@ typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE
 /// singleton access macros
 ///============================================================================
 
-#define access_communication_singleton(COMPONENT_TYPE,PROTOTYPE,CALLER_TYPE,TARGET_TYPE) ((PROTOTYPE<COMPONENT_TYPE,CALLER_TYPE>*)COMPONENT_TYPE::singleton_reference)
+#define access_communication_singleton(COMPONENT_TYPE,PROTOTYPE,CALLER_TYPE) ((PROTOTYPE<COMPONENT_TYPE,CALLER_TYPE>*)COMPONENT_TYPE::singleton_reference)
 
 ///============================================================================
 /// basic load macro
@@ -193,5 +193,14 @@ DataType* Allocate(void)
 {
 	return (DataType*)((DataType::singleton_reference)->Allocate());
 }
-	
-	
+
+///============================================================================
+/// Free
+/// Call to free and destruct memory
+///============================================================================
+
+template<typename DataType>
+void Free(DataType* object)
+{
+	(DataType::singleton_reference)->Queue_Free(object);
+}

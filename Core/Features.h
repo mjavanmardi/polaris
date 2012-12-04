@@ -123,6 +123,24 @@ struct member_function_ptr_types<Type,communication_handler_type>
 #define feature_accessor(FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 	public:\
 	template<typename T>\
+	struct FEATURE_NAME##_set_check\
+	{\
+		template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_setter_tag*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	};\
+	template<typename SetValueType>\
+	void FEATURE_NAME(SetValueType set_value,requires_setter(check(ComponentType,FEATURE_NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+	{\
+		this_component()->template FEATURE_NAME<ComponentType,CallerType,SetValueType>(set_value);\
+	}\
+	template<typename SetValueType>\
+	void FEATURE_NAME(SetValueType set_value,requires_setter(!check(ComponentType,FEATURE_NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+	{\
+		static_assert(FEATURE_NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_setter_as_available\"? ---------]\n\n");\
+		static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
+	}\
+	template<typename T>\
 	struct FEATURE_NAME##_get_check\
 	{\
 		template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_getter_tag*);\
@@ -140,24 +158,7 @@ struct member_function_ptr_types<Type,communication_handler_type>
 		static_assert(FEATURE_NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_getter_as_available\"? ---------]\n\n");\
 		static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
 	}\
-	template<typename T>\
-	struct FEATURE_NAME##_set_check\
-	{\
-		template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_setter_tag*);\
-		template<typename U> static large_type has_matching_typename(...);\
-		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
-	};\
-	template<typename SetValueType>\
-	void FEATURE_NAME(SetValueType set_value,requires_setter(check(ComponentType,FEATURE_NAME##_set_check) && (SETTER_REQUIREMENTS)))\
-	{\
-		this_component()->template FEATURE_NAME<ComponentType,CallerType,SetValueType>(set_value);\
-	}\
-	template<typename SetValueType>\
-	void FEATURE_NAME(SetValueType set_value,requires_setter(!check(ComponentType,FEATURE_NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
-	{\
-		static_assert(FEATURE_NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_setter_as_available\"? ---------]\n\n");\
-		static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
-	}
+
 
 ///============================================================================
 /// feature_getter - catches the standard get dispatches meeting concepts

@@ -13,8 +13,7 @@ struct Typed_Execution_Page
 	void Initialize()
 	{
 		first_free_cell=(Execution_Object*)((Byte*)this+sizeof(Typed_Execution_Page<DataType>));
-		const int stride=sizeof(DataType);
-		const int num_cells=(_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType);
+
 		
 		ptex_current_revision=-1;
 		ptex_next_revision._iteration=LONG_MAX;
@@ -43,6 +42,41 @@ struct Typed_Execution_Page
 		
 		return return_val;
 	}
+	
+	void Free(Execution_Object* cell)
+	{
+		Execution_Object* current_cell=first_free_cell;
+
+		if(cell<first_free_cell)
+		{
+			current_cell=first_free_cell;
+
+			first_free_cell=cell;
+			first_free_cell->next_free_cell=current_cell;
+		}
+		else
+		{
+			while(cell>current_cell->next_free_cell)
+			{
+				current_cell=current_cell->next_free_cell;
+			}
+
+			cell->next_free_cell=current_cell->next_free_cell;
+			current_cell->next_free_cell=cell;
+		}
+
+		cell->next_iteration.set_free();
+	}
+	
+	bool Empty()
+	{
+		return ((Byte*)first_free_cell)==(((Byte*)this)+sizeof(Typed_Execution_Page<DataType>));
+	}
+
+	bool Full()
+	{
+		return ((Byte*)first_free_cell)==(((Byte*)this)+sizeof(Typed_Execution_Page<DataType>))+num_cells*stride;
+	}
 
 	Revision ptex_current_revision;
 	Revision ptex_next_revision;
@@ -52,9 +86,16 @@ struct Typed_Execution_Page
 	volatile long ptex_lock;
 
 	Execution_Object* first_free_cell;
+
+	static const int stride;
+	static const int num_cells;
 };
 
+template<typename DataType>
+const int Typed_Execution_Page<DataType>::num_cells=(_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType);
 
+template<typename DataType>
+const int Typed_Execution_Page<DataType>::stride=sizeof(DataType);
 
 ///============================================================================
 /// Typed_Execution_Pages
@@ -67,11 +108,12 @@ template<typename DataType>
 class Typed_Execution_Pages
 {
 public:
-	Typed_Execution_Pages(Execution_Directive execution_function=(Execution_Directive)Execution_Loop<(_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType),sizeof(DataType)>):stride(sizeof(DataType)),type_activated(false),
+	Typed_Execution_Pages(Execution_Directive execution_function=(Execution_Directive)Execution_Loop<DataType,(_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType),sizeof(DataType)>):stride(sizeof(DataType)),type_activated(false),
 	num_cells((_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType)),
 	process_directive(execution_function)
 	{
 		tex_lock=0;
+		mem_lock=0;
 		type_process_directive=&Typed_Execution_Pages::Process;
 		tex_current_revision=-1;
 		tex_next_revision._iteration=LONG_MAX;
@@ -108,7 +150,7 @@ public:
 		for(itr=active_pages.begin();itr!=active_pages.end();++itr)
 		{
 			execution_page = (*itr);
-			
+
 			long process = AtomicIncrement(&execution_page->ptex_threads_counter);
 
 			if(process == 1)
@@ -154,13 +196,36 @@ public:
 			
 			if(process == _num_threads)
 			{
+				// inform type that this page is no longer relevant for the execution
+				if(execution_page->Empty())
+				{
+					list<Typed_Execution_Page<DataType>*>::iterator itr;
+
+					for(itr=active_pages.begin();itr!=active_pages.end();itr++)
+					{
+						if((*itr)==execution_page)
+						{
+							active_pages.erase(itr);
+							break;
+						}
+					}
+				}
+
 				execution_page->ptex_threads_counter=0;
 			}
 		}
 	}
 	
 	DataType* Allocate();
+
+	void Queue_Free(DataType* object)
+	{
+		//execution pages only mark memory to be freed
+		((Execution_Object*)object)->next_iteration.queue_free();
+	}
 	
+	void Free(DataType* object);
+
 	list<Typed_Execution_Page<DataType>*> active_pages;
 	
 	list<Typed_Execution_Page<DataType>*> pages_with_free_cells;
@@ -184,5 +249,3 @@ public:
 	const Execution_Directive process_directive;
 	void (Typed_Execution_Pages::* type_process_directive)(Revision&);
 };
-
-

@@ -119,6 +119,9 @@
     <ClInclude Include="sparsehash\type_traits.h">
       <Filter>Data_Structures</Filter>
     </ClInclude>
+    <ClInclude Include="Byte_Balloon.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">

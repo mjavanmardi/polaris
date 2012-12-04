@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Basic_Concepts.h" />
+    <ClInclude Include="Byte_Balloon.h" />
     <ClInclude Include="Concepts.h" />
     <ClInclude Include="Containers.h" />
     <ClInclude Include="Core_Includes.h" />

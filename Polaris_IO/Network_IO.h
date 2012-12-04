@@ -597,7 +597,7 @@ class Location
 {
 public:
 	// Default Constructor
-	Location () {}	
+	Location () {}
 	//Contructor
 	Location ( int location_, shared_ptr<Link> link_, int dir_, double offset_, double setback_, shared_ptr<Zone> zone_ )  
 	: location (location_), link (link_), dir (dir_), offset (offset_), setback (setback_), zone (zone_)
@@ -630,7 +630,6 @@ private:
 	double offset;
 	double setback;
 	shared_ptr<Zone> zone;
-
 };
 
 #pragma db object

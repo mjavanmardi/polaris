@@ -63,7 +63,7 @@ public:
 					//itr->Process(tex_response);
 					
 					while(AtomicExchange(&execution_type->tex_lock,1)) SLEEP(0); // lock the type
-			
+						
 						// TEX slice has revealed that it wishes to return some time in the future
 						
 						if(tex_response < execution_type->tex_next_next_revision)

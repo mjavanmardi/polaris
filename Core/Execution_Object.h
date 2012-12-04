@@ -24,11 +24,7 @@ struct Typed_Execution_Page;
 
 struct Execution_Object
 {
-	Execution_Object():next_iteration(INT_MAX){};
-
 	permit_state_checking;
-	
-
 
 	
 	inline long object_current_revision()
@@ -53,9 +49,7 @@ struct Execution_Object
 	//{
 	//	return Revision(allocator_template<ComponentType>::allocator_reference.tex_next_revision);
 	//}
-	
-	
-	
+
 	
 	//inline long object_current_revision()
 	//{
@@ -79,6 +73,13 @@ struct Execution_Object
 	//	return allocator_template<ComponentType>::allocator_reference.next_revision._iteration;
 	//}	
 	
+	//void Unload_Register()
+	//{
+	//	//conditional_register=&False;
+	//	event_register=nullptr;
+	//}
+
+
 	__forceinline void Swap_Event(Event new_event)
 	{
 		event_register=new_event;
@@ -87,26 +88,66 @@ struct Execution_Object
 	template<typename ComponentType>
 	void Load_Register(Conditional conditional,Event p_event,int start);
 	
-	//void Unload_Register()
-	//{
-	//	//conditional_register=&False;
-	//	event_register=nullptr;
-	//}
-	
-
 	Conditional conditional_register;
 
-	int next_iteration;
-	int current_revision;
+	struct packed_iteration
+	{
+		inline int operator= (int value)
+		{
+			_value=value;
+			return _value&0x7fffffff;
+		}
 
+		inline bool operator==(int value)
+		{
+			return (_value&0x7fffffff)==value;
+		}
+
+		inline bool operator<(int value)
+		{
+			return (_value&0x7fffffff)<value;
+		}
+
+		inline bool operator<=(int value)
+		{
+			return (_value&0x7fffffff)<=value;
+		}
+
+		inline bool operator>=(int value)
+		{
+			return (_value&0x7fffffff)>=value;
+		}
+
+		inline bool operator>(int value)
+		{
+			return (_value&0x7fffffff)>value;
+		}
+
+		inline operator int()
+		{
+			return (_value&0x7fffffff);
+		}
+
+		inline void queue_free()
+		{
+			_value=0x80000000;
+		}
+		
+		inline void set_free()
+		{
+			_value=0x7fffffff;
+		}
+
+		int _value;
+	} next_iteration;
+
+	int current_revision;
+	
 	union
 	{
 		Event event_register;
 
-		struct
-		{
-			Execution_Object* next_free_cell;
-		};
+		Execution_Object* next_free_cell;
 	};
 };
 
@@ -116,7 +157,7 @@ typedef void (*Execution_Directive)(void*,Revision&);
 /// Tight loop function to process a given execution page
 ///============================================================================
 
-template<const int iterations,const int stride>
+template<typename DataType,const int iterations,const int stride>
 void Execution_Loop(void* page_in, Revision& ptex_response)
 {
 	Bytes<stride>* page=(Bytes<stride>*)page_in;
@@ -133,20 +174,28 @@ void Execution_Loop(void* page_in, Revision& ptex_response)
 		//response.next=INT_MAX;
 		//response.result=false;
 
-		if(((Execution_Object*)page)->next_iteration==this_iteration)
+		if( ((Execution_Object*)page)->next_iteration == this_iteration )
 		{
 			((Execution_Object*)page)->conditional_register(page,optex_response);
 			
 			((Execution_Object*)page)->next_iteration=optex_response.next;
 
 			if(optex_response.result) ((Execution_Object*)page)->event_register(page);
-					
+			
 			((Execution_Object*)page)->current_revision=this_iteration;
 		}
 
-		if(((Execution_Object*)page)->next_iteration < ptex_response._iteration)
+
+		if(((Execution_Object*)page)->next_iteration._value < ptex_response._iteration)
 		{
-			ptex_response._iteration=((Execution_Object*)page)->next_iteration;
+			if(((Execution_Object*)page)->next_iteration._value >= 0)
+			{
+				ptex_response._iteration=((Execution_Object*)page)->next_iteration;
+			}
+			else
+			{
+				(DataType::singleton_reference)->Free((DataType*)page);
+			}
 		}
 	}
 	while(++page<end_page);
