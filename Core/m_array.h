@@ -38,6 +38,7 @@ public:
        {      // default constructor
 		   _fixed_dim = -1;
 		   _fixed_dim_val = -1;
+		   m_Ptr = NULL;
        }
 
       m_array_iterator(vector<_Ty>* data, vector<int>* dim_sizes, vector<int>* cursor)
@@ -80,21 +81,31 @@ public:
        }
 
        m_array_iterator& operator++()
-       {      // preincrement
-              //++m_Ptr;
-              //return (*this);
+       {    // preincrement
+			//++m_Ptr;
+			//return (*this);
 
-			  for (int d = _dimensions->size()-1; d >= 0; d--)
-			  {
-				  if (d != _fixed_dim)
-				  {
-					  ++(_cursor)[d];
-					  if ((_cursor)[d] >= (*_dimensions)[d]) (_cursor)[d] = 0;
-					  else break;
-				  }
-			  }
-			  m_Ptr = &(*_data)[get_index(_cursor)];
-			  return (*this);
+			for (int d = _dimensions->size()-1; d >= 0; d--)
+			{
+				if (d != _fixed_dim)
+				{
+					++(_cursor)[d];
+
+					if ((_cursor)[d] >= (*_dimensions)[d])
+					{
+						(_cursor)[d] = 0;
+
+						if (d == 0 || (d == 1 && _fixed_dim == 0))
+						{
+							return m_array_iterator();
+						}
+					}
+					else break;
+				}
+			}
+			m_Ptr = &(*_data)[get_index(_cursor)];
+
+			return (*this);
        }
 
       m_array_iterator& operator--()
@@ -179,8 +190,7 @@ public:
     }
 	iterator end()
     {
-		for (int i = 0; i< _dim_sizes.size(); i++) _cursor[i] = _dim_sizes[i]-1;
-		return iterator(this, &_dim_sizes, &_cursor);
+		return iterator();
     }
 	iterator end(int fixed_dimension_index, int fixed_dimension_value)
     {
