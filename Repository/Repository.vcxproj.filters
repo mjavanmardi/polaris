@@ -29,6 +29,12 @@
     <ClInclude Include="TEMPLATE_prototypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RNG_Implementations.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="RNG_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository.cpp">
