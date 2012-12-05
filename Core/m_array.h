@@ -22,7 +22,7 @@ class m_array_iterator
 	_Ty *m_Ptr;                                            // pointer to container value type
 	vector<int>* _dimensions;								// dimensional sizes 
 	vector<int> _cursor;
-	vector<_Ty>* _data;
+	_Ty * _data;
 	int _fixed_dim;
 	int _fixed_dim_val;
 
@@ -41,25 +41,25 @@ public:
 		   m_Ptr = NULL;
        }
 
-      m_array_iterator(vector<_Ty>* data, vector<int>* dim_sizes, vector<int>* cursor)
+      m_array_iterator(_Ty* data, vector<int>* dim_sizes, vector<int>* cursor)
        {	// copy constructor
 			_fixed_dim = -1;
 			_fixed_dim_val = -1;
 			_dimensions = dim_sizes;
 			for (int i = 0; i< cursor->size(); i++) _cursor.push_back((*cursor)[i]);
+			m_Ptr = &data[get_index(_cursor)];
 			_data = data;
-			m_Ptr = &(*data)[get_index(_cursor)];
        }
 
-	  m_array_iterator(vector<_Ty>* data, vector<int>* dim_sizes, vector<int>* cursor, int fixed_dimension_index, int fixed_dimension_value)
+	  m_array_iterator(_Ty* data, vector<int>* dim_sizes, vector<int>* cursor, int fixed_dimension_index, int fixed_dimension_value)
        {	// copy constructor
 			_fixed_dim = fixed_dimension_index;
 			_fixed_dim_val = fixed_dimension_value;
 			_dimensions = dim_sizes;
 			for (int i = 0; i< cursor->size(); i++) _cursor.push_back((*cursor)[i]);
 			_cursor[_fixed_dim] = _fixed_dim_val;
+			m_Ptr = &data[get_index(_cursor)];
 			_data = data;
-			m_Ptr = &(*data)[get_index(_cursor)];
        }
 
       reference operator*() const
@@ -72,7 +72,6 @@ public:
        {      // predecrement
               m_Ptr = obj.m_Ptr;
 			  _dimensions = obj._dimensions;
-			  _data = obj._data;
 			  _cursor = obj._cursor;
 			  _fixed_dim = obj._fixed_dim;
 			  _fixed_dim_val = obj._fixed_dim_val;
@@ -97,13 +96,14 @@ public:
 
 						if (d == 0 || (d == 1 && _fixed_dim == 0))
 						{
-							return m_array_iterator();
+							m_Ptr = NULL;
+							return (*this);
 						}
 					}
 					else break;
 				}
 			}
-			m_Ptr = &(*_data)[get_index(_cursor)];
+			m_Ptr = &_data[get_index(_cursor)];
 
 			return (*this);
        }
@@ -163,10 +163,8 @@ public:
 
  };
 
-
-
-template <class T>
-class m_array : public vector<T>
+ template <class T>
+class m_array
 {
 public:
 
@@ -181,12 +179,12 @@ public:
 	iterator begin()
     {
 		for (int i = 0; i< _dim_sizes.size(); i++) _cursor[i] = 0;
-		return iterator(this, &_dim_sizes, &_cursor);
+		return iterator(this->_data, &_dim_sizes, &_cursor);
     }
 	iterator begin(int fixed_dimension_index, int fixed_dimension_value)
     {
 		for (int i = 0; i< _dim_sizes.size(); i++) _cursor[i] = 0;
-		return iterator(this, &_dim_sizes, &_cursor, fixed_dimension_index, fixed_dimension_value);
+		return iterator(this->_data, &_dim_sizes, &_cursor, fixed_dimension_index, fixed_dimension_value);
     }
 	iterator end()
     {
@@ -199,28 +197,29 @@ public:
     }
 
 	// MArray constructors/destructor
-	m_array (void) : vector<T>(){_allocated=false;};
+	m_array (void){_allocated=false;};
 	m_array (vector<int> &dim_sizes);
 	m_array (vector<int> &dim_sizes, T init_val);
 	m_array (const m_array& obj);
 	void Init(vector<int> &dim_sizes);
 	void Copy(const m_array& obj);
 	m_array& operator=(const m_array& obj);
+	~m_array (void);
 
 	// Array Looping functions
-	bool iterate(void);	// loop over all cells
-	bool iterate(int fix_dim, int at_index); // loop over all cells not in dimension=fix_dim.  
+	//bool iterate(void);	// loop over all cells
+	//bool iterate(int fix_dim, int at_index); // loop over all cells not in dimension=fix_dim.  
 
 	// MArray operators overloads for data acces
 	T& operator[](vector<int> index) // get data at given index
 	{
 		uint i = get_index(index);
-		return vector<T>::operator[](i);
+		return _data[i];
 	} 
 	T& operator()(void) // Get data at current cursor position
 	{
 		uint i = get_index(_cursor);
-		return vector<T>::operator[](i);
+		return _data[i];
 	}
 	vector<int> operator()(bool returnIndex) // get index of current cursor position in the form of a vector of ints for each dimension
 	{
@@ -228,50 +227,37 @@ public:
 		for (int j=0; j<_ndim; j++) i.push_back(_cursor[j]);
 		return i;
 	}
-
-	uint get_index(vector<int> &index);
 	
 	// Property access members
-	const int& dimensions() {return _dim_sizes.size();}
-
-	const int& dimension_size(int dimension) { return _dim_sizes[dimension];}
-
-	friend class m_array_iterator<T>;
+	const int& dimensions() {return _ndim;}
+	const int& dimension_size(int dimension) {return this->_dim_sizes[dimension];}
 
 protected:
 	vector<int> _dim_sizes;
 	vector<int> _cursor;
+	int _ndim;
+	uint _size;
 	bool _iterating;
-
+	T * _data;
 	bool _allocated;
 	void _init(vector<int> &dim_sizes);
 	void _copy(const m_array& obj);
+	void _cleanup(){delete _data;}
 
-	
-	bool _advance(void); // advance to next cell by shifting cursor
-	bool _advance(int fixed_dim); // advance to next cell (not in the fixed dimension) by shifting cursor
-	void _goToStart(void);
-	T& getCurrentCell(void)
-	{
-		uint i = get_index(_cursor);
-		return ((vector<T>*)this)->operator[][i];
-	}
-
+	uint get_index(vector<int> &index);
 };
 
 // Multi-dim Array Constructors, copiers, assignment, etc.
 template <class T>
-m_array<T>::m_array(vector<int> &dim_sizes) : vector<T>()
+m_array<T>::m_array(vector<int> &dim_sizes)
 {
 	_init(dim_sizes);
 }
 template <class T>
-m_array<T>::m_array(vector<int> &dim_sizes, T init_val) : vector<T>()
+m_array<T>::m_array(vector<int> &dim_sizes, T init_val)
 {
 	_init(dim_sizes);
-	vector<T>::iterator itr = ((vector<T>*)this)->begin();
-	for (;itr!= ((vector<T>*)this)->end(); itr++) *itr = init_val;
-	//for (int i=0; i<_size; i++) _data[i]=init_val;
+	for (int i=0; i<_size; i++) _data[i]=init_val;
 }
 template <class T>
 m_array<T>::m_array(const m_array<T>& obj)
@@ -314,20 +300,18 @@ void m_array<T>::Init(vector<int> &dim_sizes)
 template <class T>
 void m_array<T>::_init(vector<int> &dim_sizes)
 {
+	_ndim = dim_sizes.size();
+	_size = 1;
 	_iterating = false;
-	int size = 1;
 
-	for (int i=0; i<dim_sizes.size(); i++)
+	for (int i=0; i<_ndim; i++)
 	{
 		_dim_sizes.push_back(dim_sizes[i]);
 		_cursor.push_back(0);
-		size = size * dim_sizes[i];
+		_size = _size*dim_sizes[i];
 	}
-	
-	for (int i = 0; i<size; i++)	
-	{
-		vector<T>::push_back((T)0);
-	}
+
+	_data = new T[_size];
 	_allocated=true;
 }
 template <class T>
@@ -342,26 +326,34 @@ m_array<T>& m_array<T>::operator=(const m_array<T>& obj)
 }
 
 
+// M_array destructor
+template <class T>
+m_array<T>::~m_array(void)
+{
+	if (_allocated) 
+	{
+		delete [] _data;
+		_allocated=false;
+	}
+}
 
 template <class T>
 uint m_array<T>::get_index(vector<int> &index)
 {
 	uint ind=0;
 
-	if (index.size() != _dim_sizes.size()) throw new std::exception("Error, incorrect number of dimensions in index.");
-	//{
-	//	//const char* mess = "Error, incorrect number of dimensions in index.";
-	//	//throw new exception(mess);
-	//	////THROW_EXCEPTION(mess);
-	//}
+	if (index.size() != _ndim)
+	{
+		const char* mess = "Error, incorrect number of dimensions in index.";
+		throw new std::exception(mess);
+	}
 	for (int i = 0; i< index.size(); i++)
 	{
-		if (index[i] >= _dim_sizes[i]) throw new std::exception( string("Error, index outside of array bounds for dimension: %i", i).c_str());
-		//{
-		//	//const char* mess = string("Error, index outside of array bounds for dimension: %i", i).c_str();
-		//	//throw new exception(mess);
-		//	////THROW_EXCEPTION(mess);
-		//}
+		if (index[i] >= _dim_sizes[i]) 
+		{
+			const char* mess = string("Error, index outside of array bounds for dimension: %i", i).c_str();
+			throw new std::exception(mess);
+		}
 		int multiplier = 1;
 		for (int j=i+1; j< index.size(); j++)
 		{
@@ -371,102 +363,4 @@ uint m_array<T>::get_index(vector<int> &index)
 		ind += index[i] * multiplier;
 	}
 	return ind;
-}
-
-
-// array functions used during iteration
-template <class T>
-bool m_array<T>::iterate(void)
-{
-	if (_iterating) 
-	{
-		return _advance();
-	}
-	else
-	{
-		_goToStart();
-		_iterating = true;
-		return true;
-	}
-}
-template <class T>
-bool m_array<T>::iterate(int fix_dim, int at_index)
-{
-	if (_iterating) 
-	{
-		return _advance(fix_dim);
-	}
-	else
-	{
-		_goToStart();
-		_cursor[fix_dim] = at_index;
-		_iterating = true;
-		return true;
-	}
-}
-template <class T>
-bool m_array<T>::_advance(void)
-{
-	_cursor[_ndim-1]++;
-	for (int d= _ndim-1; d>=0; d--)
-	{
-		if(_cursor[d]==_dim_sizes[d])
-		{
-			if (d>0)
-			{
-				_cursor[d]=0;
-				_cursor[d-1]++;
-			}
-			else
-			{
-				_iterating=false;
-				return false;
-			}
-		}
-	}
-	return true;
-}
-template <class T>
-bool m_array<T>::_advance(int fixed_dim)
-{
-	if (fixed_dim == _ndim-1) _cursor[_ndim-2]++;
-	else _cursor[_ndim-1]++;
-
-	for (int d = _ndim-1; d>=0; d--)
-	{
-		if (d== fixed_dim) d--;
-		if (d<0) break;
-
-		if(_cursor[d]==_dim_sizes[d])
-		{
-			if (d>0)
-			{
-				_cursor[d]=0;
-				if (d-1 == fixed_dim) 
-				{
-					if (d-2 < 0)
-					{
-						_iterating = false;
-						return false;
-					}
-					else
-					{
-						_cursor[d-2]++;
-					}
-				}
-				else _cursor[d-1]++;
-			}
-			else
-			{
-				_iterating=false;
-				return false;
-			}
-		}
-	}
-	return true;
-}
-template <class T>
-void m_array<T>::_goToStart(void)
-{
-	for (int d=0; d<_ndim; d++) _cursor[d]=0;
 }
