@@ -90,6 +90,10 @@ struct Execution_Object
 	
 	Conditional conditional_register;
 
+	///============================================================================
+	/// packed_iteration - strips out 4th bit for internal purposes
+	///============================================================================
+
 	struct packed_iteration
 	{
 		inline int operator= (int value)

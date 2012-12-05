@@ -122,6 +122,12 @@
     <ClInclude Include="Byte_Balloon.h">
       <Filter>Data_Structures</Filter>
     </ClInclude>
+    <ClInclude Include="Memory_Detail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Execution_Detail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">

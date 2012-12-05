@@ -1,6 +1,10 @@
 #pragma once
 #include "Memory_Engine.h"
 
+///============================================================================
+/// Exchange_Data - key information about scheduling by partition by thread
+///============================================================================
+
 struct Exchange_Data
 {
 	Exchange_Data():exchange_interval(0),num_messages(0),comm_lock(0),current_exchange(0),next_exchange(INT_MAX),next_next_exchange(INT_MAX){};
@@ -17,12 +21,20 @@ struct Exchange_Data
 	volatile long comm_lock;
 };
 
+///============================================================================
+/// Processing_Parcel - controls thread execution over parcel
+///============================================================================
+
 struct Processing_Parcel
 {
 	int message_offset;
 	int num_messages;
 	volatile long parcel_lock;
 };
+
+///============================================================================
+/// Process_Data - root execution structure for message parsing
+///============================================================================
 
 struct Process_Data
 {
@@ -49,6 +61,10 @@ struct Process_Data
 	int num_parcels;
 };
 
+///============================================================================
+/// Exchange_Information - root structure for message exchange
+///============================================================================
+
 struct Exchange_Information
 {
 	Exchange_Information():partition_exchange_data(nullptr),current_exchange(-1),next_exchange(INT_MAX){};
@@ -64,6 +80,10 @@ struct Exchange_Information
 
 static Exchange_Information exchange_information;
 
+///============================================================================
+/// Head_Message_Base - header for every exchange with another partition
+///============================================================================
+
 struct Head_Message_Base
 {
 	int length;
@@ -73,59 +93,70 @@ struct Head_Message_Base
 	int num_messages;
 };
 
+///============================================================================
+/// Message_Base - header for every individual message sent
+///============================================================================
+
 struct Message_Base
 {
 	int type_index;
 	int length;
 };
 
-template<typename ComponentType>
-void Broadcast_Message(void* msg,int msg_length,int next_exchange)
-{
-	for(int i=0;i<_num_partitions;i++)
-	{
-		if(i==_host_rank) continue;
-		
-		Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[_thread_id][i];
+///============================================================================
+/// Broadcast_Message - send to all partitions
+///============================================================================
 
-		// cannot affect current_exchange, but will help determine next_exchange
-		
-		if(next_exchange < thread_exchange_data->next_exchange)
-		{
-			thread_exchange_data->next_exchange=next_exchange;
-		}
-		
-		/*
-		if(next_exchange < thread_exchange_data->next_exchange)
-		{
-			thread_exchange_data->next_next_exchange=thread_exchange_data->next_exchange;
-			thread_exchange_data->next_exchange=next_exchange;
-		}
-		else if(next_exchange == thread_exchange_data->next_exchange)
-		{
-			// do nothing
-		}
-		else if(next_exchange < thread_exchange_data->next_next_exchange)
-		{
-			thread_exchange_data->next_next_exchange=next_exchange;
-		}
-		*/
-		
-		//cout << "Thread status " << destination << ": " << thread_exchange_data->next_exchange << "," << thread_exchange_data->next_next_exchange << endl;
-		
-		// number of messages for this thread / destination combination
-		
-		thread_exchange_data->num_messages++;
-		
-		char* mbuf=thread_exchange_data->send_buffer.allocate(msg_length+sizeof(Message_Base));
-		
-		((Message_Base*)mbuf)->length=msg_length+sizeof(Message_Base);
-		((Message_Base*)mbuf)->type_index=ComponentType::component_index;
+//template<typename ComponentType>
+//void Broadcast_Message(void* msg,int msg_length,int next_exchange)
+//{
+//	for(int i=0;i<_num_partitions;i++)
+//	{
+//		if(i==_host_rank) continue;
+//		
+//		Exchange_Data* thread_exchange_data=&exchange_information.thread_local_exchange_data[_thread_id][i];
+//
+//		// cannot affect current_exchange, but will help determine next_exchange
+//		
+//		if(next_exchange < thread_exchange_data->next_exchange)
+//		{
+//			thread_exchange_data->next_exchange=next_exchange;
+//		}
+//		
+//		/*
+//		if(next_exchange < thread_exchange_data->next_exchange)
+//		{
+//			thread_exchange_data->next_next_exchange=thread_exchange_data->next_exchange;
+//			thread_exchange_data->next_exchange=next_exchange;
+//		}
+//		else if(next_exchange == thread_exchange_data->next_exchange)
+//		{
+//			// do nothing
+//		}
+//		else if(next_exchange < thread_exchange_data->next_next_exchange)
+//		{
+//			thread_exchange_data->next_next_exchange=next_exchange;
+//		}
+//		*/
+//		
+//		//cout << "Thread status " << destination << ": " << thread_exchange_data->next_exchange << "," << thread_exchange_data->next_next_exchange << endl;
+//		
+//		// number of messages for this thread / destination combination
+//		
+//		thread_exchange_data->num_messages++;
+//		
+//		char* mbuf=thread_exchange_data->send_buffer.allocate(msg_length+sizeof(Message_Base));
+//		
+//		((Message_Base*)mbuf)->length=msg_length+sizeof(Message_Base);
+//		((Message_Base*)mbuf)->type_index=ComponentType::component_index;
+//
+//		memcpy(mbuf+sizeof(Message_Base),msg,msg_length);
+//	}
+//}
 
-		memcpy(mbuf+sizeof(Message_Base),msg,msg_length);
-	}
-}
-
+///============================================================================
+/// Initialize_Exchange_Interval - set minimum exchange interval by partition
+///============================================================================
 
 void Initialize_Exchange_Interval(unsigned int partition,unsigned int exchange_interval)
 {
@@ -166,6 +197,10 @@ void Initialize_Exchange_Interval(unsigned int partition,unsigned int exchange_i
 		exchange_information.next_exchange=partition_exchange_data->next_exchange;
 	}	
 }
+
+///============================================================================
+/// Broadcast_Message - send individual message to target partition
+///============================================================================
 
 template<typename ComponentType>
 void Send_Message(void* msg,unsigned int msg_length,unsigned int destination,unsigned int next_exchange=INT_MAX)

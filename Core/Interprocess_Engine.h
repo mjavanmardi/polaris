@@ -3,6 +3,11 @@
 
 typedef void (*Communication_Handler)(void*,char*);
 
+///============================================================================
+/// Communication_Object - foundational object for communication
+/// contains one register which controls which function is used for parsing
+///============================================================================
+
 struct Communication_Object
 {
 	__forceinline void Swap_Communication_Handler(Communication_Handler new_communication_handler)
@@ -46,6 +51,10 @@ public:
 		END_PARSE
 	};
 	
+	///============================================================================
+	/// Initialize - establish socket connections among all partitions
+	///============================================================================
+
 	void Initialize()
 	{
 		//cout << "hello world!" << endl;
@@ -148,6 +157,10 @@ public:
 		//cout << "Done initializing exchange data" << endl;
 	}
 	
+	///============================================================================
+	/// identify_job - query cluster to identify personal job information
+	///============================================================================
+
 	void identify_job(string& jobname)
 	{
 		char buffer[255];for(int i=0;i<255;i++) buffer[i]=0;
@@ -165,6 +178,10 @@ public:
 		jobname.resize(jobname.size()-1);
 	}
 	
+	///============================================================================
+	/// identify_self - query cluster for personal hostname
+	///============================================================================
+
 	void identify_self(string& host_name,bool& is_headnode)
 	{
 		char buffer[255];for(int i=0;i<255;i++) buffer[i]=0;
@@ -192,6 +209,10 @@ public:
 		is_headnode=(buffer[0]=='\n');
 	}
 	
+	///============================================================================
+	/// identify_others - query cluster for other nodes involved in this job
+	///============================================================================
+
 	void identify_others(string& jobname,vector<string>& allnames)
 	{
 		char buffer[255];for(int i=0;i<255;i++) buffer[i]=0;
@@ -223,6 +244,10 @@ public:
 			if(buf==nullptr) break;
 		}
 	}
+	
+	///============================================================================
+	/// identify_others - query cluster to convert names to ip addresses
+	///============================================================================
 
 	void node_names_to_ip_addresses(vector<string>& allnames,vector<string>& allips,string& host_name,string& hostip)
 	{
@@ -260,6 +285,10 @@ public:
 		}
 	}
 	
+	///============================================================================
+	/// identify_others - compute ranks for self and all others
+	///============================================================================
+
 	void determine_ranks(vector<string>& allips, unordered_map<int,string>& ranktoip,string& hostip,int& rank)
 	{
 		vector<string>::iterator itr;
@@ -273,6 +302,10 @@ public:
 			++rank_counter;
 		}
 	}
+	
+	///============================================================================
+	/// identify_others - take char buffer with node list, convert to string
+	///============================================================================
 
 	char* parse_node_name(string& node_name,char* buffer)
 	{
@@ -313,6 +346,10 @@ public:
 		return buffer;
 	}
 	
+	///============================================================================
+	/// connect_all_to_all - establish connection with all identified nodes
+	///============================================================================
+
 	void connect_all_to_all()
 	{
 		int listening_socket=socket(AF_INET,SOCK_STREAM,0);
@@ -406,44 +443,48 @@ public:
 		//}
 	}
 	
-	void msg_all_to_all()
-	{
-		char msg[255];
-		for(int i=0;i<255;i++) msg[i]='\0';
-		stringstream s;
-		
-		for(int sender=0;sender<rank_to_ip.size();sender++)
-		{
-			for(int receiver=0;receiver<rank_to_ip.size();receiver++)
-			{
-				if(receiver!=_host_rank)
-				{
-					cout << "sending to " << receiver << endl;
-					
-					s << "Hello from " << _host_rank << "\0";
-					
-					send(rank_to_socket[receiver],s.str().c_str(),s.str().size(),0);
-					
-					cout << "sent" << endl;
-					
-					s.str("");
-				}
-			}
-			
-			if(true)
-			{
-			}
-			else
-			{
-				cout << "receiving from " << sender << endl;
-				
-				recv(rank_to_socket[sender],msg,255,0);
-				
-				cout << msg << endl;			
-			}
-		}
-	}
+	//void msg_all_to_all()
+	//{
+	//	char msg[255];
+	//	for(int i=0;i<255;i++) msg[i]='\0';
+	//	stringstream s;
+	//	
+	//	for(int sender=0;sender<rank_to_ip.size();sender++)
+	//	{
+	//		for(int receiver=0;receiver<rank_to_ip.size();receiver++)
+	//		{
+	//			if(receiver!=_host_rank)
+	//			{
+	//				cout << "sending to " << receiver << endl;
+	//				
+	//				s << "Hello from " << _host_rank << "\0";
+	//				
+	//				send(rank_to_socket[receiver],s.str().c_str(),s.str().size(),0);
+	//				
+	//				cout << "sent" << endl;
+	//				
+	//				s.str("");
+	//			}
+	//		}
+	//		
+	//		if(true)
+	//		{
+	//		}
+	//		else
+	//		{
+	//			cout << "receiving from " << sender << endl;
+	//			
+	//			recv(rank_to_socket[sender],msg,255,0);
+	//			
+	//			cout << msg << endl;			
+	//		}
+	//	}
+	//}
 	
+	///============================================================================
+	/// Merge_Messages - merge messages from all threads into one per partition
+	///============================================================================
+
 	void Merge_Messages()
 	{
 		// first, merge all of the messages by partition, use one thread for now in order to not confuse the FSB
@@ -513,6 +554,10 @@ public:
 		}
 	}
 	
+	///============================================================================
+	/// Send_Receive - actually exchange messages
+	///============================================================================
+
 	void Send_Receive()
 	{
 		for(int i=0;i<_num_partitions;i++)
@@ -757,6 +802,10 @@ public:
 			}
 		}
 	}
+	
+	///============================================================================
+	/// Update_Global_Exchange_Schedule - collate scheduling data from all parts.
+	///============================================================================
 
 	void Update_Global_Exchange_Schedule()
 	{
@@ -779,6 +828,10 @@ public:
 		//cout << "\t\t\t" << "status of partition exchange: " << exchange_information.current_exchange << "," << exchange_information.next_exchange  << endl;
 	}
 	
+	///============================================================================
+	/// Build_Parcels - create parcels appropriate to num messages / threads
+	///============================================================================
+
 	void Build_Parcels()
 	{
 		Process_Data* process_data=&exchange_information.process_data;
@@ -863,6 +916,10 @@ public:
 		}
 	}
 	
+	///============================================================================
+	/// Process - submit messages to specified user parse functions
+	///============================================================================
+
 	void Process()
 	{
 		Process_Data* process_data=&exchange_information.process_data;
@@ -927,6 +984,10 @@ public:
 			}
 		}
 	}
+	
+	///============================================================================
+	/// Exchange - overall interprocess exchange function
+	///============================================================================
 
 	void Exchange()
 	{
