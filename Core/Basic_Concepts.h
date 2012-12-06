@@ -28,6 +28,7 @@ struct False_Concept
 /// Is_Polaris_Component - detects whether type models a Polaris Component
 ///============================================================================
 
+
 concept struct Is_Polaris_Component
 {
 	// Basic check to satisfy polaris component requirements

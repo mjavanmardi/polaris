@@ -1,6 +1,8 @@
 #pragma once
 #include "Core_Includes.h"
 
+#include "m_array.h"
+
 #include "Sparsehash\dense_hash_map.h"
 using google::dense_hash_map;
 #include "Sparsehash\dense_hash_set.h"

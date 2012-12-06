@@ -1,5 +1,6 @@
 #pragma once
 #include "Basic_Concepts.h"
+#include "Basic_State_Checks.h"
 
 ///============================================================================
 /// add a group to the group_list
