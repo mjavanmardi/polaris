@@ -13,4 +13,8 @@
 
 
 
+#include "User_Space\Population_Synthesis\Population_Unit_Implementations.h"
+
+#include "User_Space\Population_Synthesis\Synthesis_Zone_Implementations.h"
+
 
