@@ -67,6 +67,7 @@ class NULLCLASS{};
 #define nullptr NULL
 
 #define none true
+#define not_available false
 
 struct NULLTYPE{};
 
