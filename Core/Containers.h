@@ -160,7 +160,7 @@ struct Multidimensional_Random_Access_Array_Prototype
 
 	size_type size(size_type dimension){return ((ComponentType*)this)->size();}
 
-	index_type dimensions(){return ((ComponentType*)this)->size();}
+	index_type dimensions(){return ((ComponentType*)this)->dimensions();}
 
 	size_type max_size(){return ((ComponentType*)this)->size();}
 
