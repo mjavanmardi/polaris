@@ -162,21 +162,23 @@ struct Multidimensional_Random_Access_Array_Prototype
 
 	size_type num_dimensions(){return ((ComponentType*)this)->num_dimensions();}
 
-	index_type dimensions(){return ((ComponentType*)this)->dimensions();}
+	const_index_type dimensions(){return ((ComponentType*)this)->dimensions();}
 
 	size_type max_size(){return ((ComponentType*)this)->size();}
 
 	bool empty(){return ((ComponentType*)this)->empty();}
 
-	TargetValueType front(){return (TargetValueType)(((ComponentType*)this)->front());}
+	TargetValueType& front(){return (TargetValueType&)(((ComponentType*)this)->front());}
 
 	void clear(){return ((ComponentType*)this)->clear();}
+
+	void write(ostream& s){return ((ComponentType*)this)->print(s);}
 
 	void resize(const_index_type n){return ((ComponentType*)this)->resize(n);}
 	
 	void resize(const_index_type n, TargetValueType t){return ((ComponentType*)this)->resize(n,t);}
 
-	TargetValueType back(){return (TargetValueType)(((ComponentType*)this)->back());}
+	TargetValueType& back(){return (TargetValueType&)(((ComponentType*)this)->back());}
 
 	TargetValueType& operator [](const_index_type i){return (TargetValueType&)((*((ComponentType*)this))[i]);}
 	
