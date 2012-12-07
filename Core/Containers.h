@@ -158,7 +158,9 @@ struct Multidimensional_Random_Access_Array_Prototype
 	
 	size_type size(){return ((ComponentType*)this)->size();}
 
-	size_type size(size_type dimension){return ((ComponentType*)this)->size();}
+	size_type size(size_type dimension){return ((ComponentType*)this)->size(dimension);}
+
+	size_type num_dimensions(){return ((ComponentType*)this)->num_dimensions();}
 
 	index_type dimensions(){return ((ComponentType*)this)->dimensions();}
 
