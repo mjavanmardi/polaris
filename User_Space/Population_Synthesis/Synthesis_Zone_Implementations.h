@@ -10,11 +10,20 @@ namespace PopSyn
 		implementation struct Synthesis_Zone_Implementation
 		{
 			typedef true_type Has_Marginals_In_Distribution;
-			typedef typename MasterType::matrix_double::unqualified_value_type Value_Type;
+			typedef double Value_Type;
 
 			member_data(long,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
-			member_container(typename MasterType::matrix_double,Target_Joint_Distribution,none,not_available);
+			member_container(m_array<double>,Target_Joint_Distribution,none,not_available);
+			member_container(s_array<double>,Target_Marginal_Distribution, none, not_available);
 			member_container(vector<typename MasterType::pop_unit*>, Sample_Data,none,none);
+
+			member_component(typename MasterType::IPF_Solver_Settings,Solver_Settings,none,none);
+		};
+
+		implementation struct IPF_Solver_Settings_Implementation
+		{
+			member_data(double, Tolerance, check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			member_data(int, Iterations, check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 		};
 	}
 }

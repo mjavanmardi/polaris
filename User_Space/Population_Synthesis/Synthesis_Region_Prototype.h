@@ -2,6 +2,7 @@
 
 #include "User_Space\User_Space_includes.h"
 #include "User_Space\Population_Synthesis\Population_Unit_Implementations.h"
+#include "User_Space\Population_Synthesis\Synthesis_Zone_Prototypes.h"
 
 using namespace std;
 
@@ -12,52 +13,11 @@ namespace PopSyn
 {
 	namespace Concepts
 	{
-		concept struct Is_IPF_Capable
-		{
-			check_typename_defined(Has_Value_Type, Value_Type);
-			check_typename_state(Has_Marginals, Has_Marginals_In_Distribution, true_type);
-			define_default_check(Has_Marginals && Has_Value_Type);
-		};
-
-		concept struct Is_Probabilistic_Selection
-		{
-			check_typename_defined(Has_Value_Type, Value_Type);
-			check_typename_state(Has_Probabilistic_Selection_Defined, Probabilstic_Selection_Type, true_type);
-			define_default_check(Has_Probabilistic_Selection_Defined && Has_Value_Type);
-		};
-
-		concept struct Is_Loss_Function_Selection
-		{
-			check_typename_defined(Has_Value_Type, Value_Type);
-			check_typename_state(Has_Loss_Function_Selection_Defined, Loss_Function_Selection_Type, true_type);
-			define_default_check(Has_Probabilistic_Selection_Defined && Has_Value_Type);
-		};
-
-
-		concept struct Is_IPF_Solver_Setting
-		{
-			check_typed_member(Has_IPF_Tolerance_d, IPF_Tolerance, double);
-			check_typed_member(Has_IPF_Tolerance_f, IPF_Tolerance, float);
-			check_typed_member(Has_Max_Iterations_int, Max_Iterations, int);
-			check_typed_member(Has_Max_Iterations_uint, Max_Iterations, unsigned int);
-			check_typed_member(Has_Max_Iterations_long, Max_Iterations, long);
-			check_typed_member(Has_Max_Iterations_ulong, Max_Iterations, long);
-
-			define_default_check((Has_IPF_Tolerance_d || Has_IPF_Tolerance_f) && (Has_Max_Iterations_int || Has_Max_Iterations_uint || Has_Max_Iterations_long || Has_Max_Iterations_ulong));
-		};
 	}
 
 	namespace Prototypes
 	{
-		prototype struct Solver_Settings_Prototype
-		{
-			tag_as_prototype;
-
-			feature_accessor(Tolerance,check(ReturnValueType, is_arithmetic),check(SetValueType, is_arithmetic));
-			feature_accessor(Iterations,check(ReturnValueType, is_arithmetic),check(SetValueType, is_arithmetic));
-		};
-
-		prototype struct Synthesis_Zone_Prototype
+		prototype struct Synthesis_Region_Prototype : public Synthesis_Zone_Prototype<ComponentType,CallerType>
 		{
 			tag_as_prototype;
 
@@ -66,11 +26,16 @@ namespace PopSyn
 				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}
 
-			feature_prototype void Fit_Joint_Distribution_To_Marginal_Data(requires(check(ComponentType,Concepts::Is_IPF_Capable)))
+			feature_prototype void Synthesize_Population(requires(check(ComponentType,Concepts::Is_IPF_Capable)))
 			{
 				// Get the solution settings
 				define_component_interface(solution_settings_itf,get_type_of(Solver_Settings),Prototypes::Solver_Settings_Prototype,NULLTYPE);
 				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
+
+				// Get the list of synthesis zones in the region
+				define_container_and_value_interface(synthesis_zones_itf,zone_itf,get_type_of(Synthesis_Zone_Collection),Containers::Random_Access_Sequence_Prototype, Prototypes::Synthesis_Zone_Prototype,NULLTYPE);
+				synthesis_zones_itf& zones_collection = this->Synthesis_Zone_Collection<synthesis_zones_itf&>();
+				synthesis_zones_itf::iterator zone_itf = zones_collection.begin();
 
 				// IPF version of fitting the joint distribution to marginal distribution
 				typedef get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
@@ -123,7 +88,7 @@ namespace PopSyn
 						
 			}
 
-			feature_prototype void Fit_Joint_Distribution_To_Marginal_Data(requires(check(ComponentType,!Concepts::Is_IPF_Capable)))
+			feature_prototype void Synthesize_Population(requires(check(ComponentType,!Concepts::Is_IPF_Capable)))
 			{
 				assert_check(ComponentType,Concepts::Is_IPF_Capable,"Not IPF Capable");
 				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Joint_Distribution_Double,"doesn't have a double joint distribution");
@@ -133,60 +98,9 @@ namespace PopSyn
 				
 			}
 
-			feature_prototype void Select_Synthetic_Population_Units(requires(check(ComponentType, Concepts::Is_Probabilistic_Selection)))
-			{
+			feature_accessor(Synthesis_Zone_Collection,none,none);
 
-			}
-
-			feature_accessor(Target_Joint_Distribution,none,none);
-
-			feature_accessor(Target_Marginal_Distribution,none,none);
-
-			feature_accessor(Sample_Data,none,none);
-
-			feature_accessor(ID,none,none);
-
-			feature_accessor(Solver_Settings,none,none);
-
-			feature_accessor(Selection_Settings,none,none);
 		};
 
 	}
 }
-
-//class Zone : public m_array<double>
-//{
-//public:
-//	// constructors
-//	Zone (){}
-//	Zone (double ID, vector<int> &dim_sizes);
-//	Zone (const Zone& obj);
-//
-//	// Processing methods
-//	void initialize(m_array Data);
-//	bool IPF(double TOL, int MAX_ITER);
-//	bool Select_HH(int MAX_ITER, const hash_map<uint,vector<Pop_Unit>> &sample, Prob_Generator& Rand);
-//	void Add_Sample(const Pop_Unit& P);
-//
-//	// Property access methods
-//	double& marginal(int dim, int index) {return _marginals[dim][index];} //marginals get/set
-//	const double& Id(void){return _id;} // ID get
-//
-//	// I/O methods
-//	bool write(void);
-//	bool write(File_Writer &fw);
-//	bool write_sample(File_Writer &fw);
-//
-//protected:
-//	// Marginal totals across categories
-//	vector<vector<double>> _marginals;
-//	// List of households in zone
-//	hash_map<uint, vector<Pop_Unit>> _sample;
-//	// Unique zone ID
-//	double _id;
-//	
-//
-//private:
-//
-//};
-//
