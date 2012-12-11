@@ -7,6 +7,21 @@
 
 namespace Containers
 {
+	namespace Concepts
+	{
+		concept struct Is_Associative
+		{
+			check_typename_state(Has_Associative_Type_Defined,Is_Associative_Type,true_type);
+			define_default_check(Has_Associative_Type_Defined);
+		};
+		concept struct Is_Sequence
+		{
+			check_typename_state(Has_Sequence_Type_Defined,Is_Sequence_Type,true_type);
+			define_default_check(Has_Sequence_Type_Defined);
+		};
+
+	}
+
 template<typename IteratorType,typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
 struct Input_Iterator:public IteratorType
 {
@@ -86,6 +101,7 @@ struct Random_Access_Sequence_Prototype
 	typedef ComponentType Component_Type;
 	typedef CallerType Caller_Type;
 	typedef true_type Is_Prototype;
+	typedef true_type Is_Sequence_Type;
 
 	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
 	typedef typename ComponentType::size_type size_type;
@@ -142,6 +158,7 @@ struct Associative_Container_Prototype
 	typedef ComponentType Component_Type;
 	typedef CallerType Caller_Type;
 	typedef true_type Is_Prototype;
+	typedef true_type Is_Associative_Type;
 
 	typedef typename ComponentType::size_type size_type;
 	typedef typename ComponentType::key_type key_type;
@@ -178,7 +195,7 @@ struct Associative_Container_Prototype
 
 	iterator find ( const key_type& x ) { return ((CompoentType*)this)->find(x);}
 
-	pair<iterator,iterator>  equal_range ( const key_type& x ) { return ((CompoentType*)this)->equal_range(x);}
+	pair<iterator,iterator>  equal_range ( const key_type& x ) { return ((ComponentType*)this)->equal_range(x);}
 
 };
 
@@ -192,6 +209,7 @@ struct Multidimensional_Random_Access_Array_Prototype
 	typedef ComponentType Component_Type;
 	typedef CallerType Caller_Type;
 	typedef true_type Is_Prototype;
+	typedef true_type Is_Sequence_Type;
 
 	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
 	typedef typename ComponentType::size_type size_type;
@@ -250,6 +268,14 @@ struct Multidimensional_Random_Access_Array_Prototype
 ///============================================================================
 /// Polaris_Container - stl Container implementation
 ///============================================================================
+
+//template<typename ContainerType, typename QualifiedValueType = typename ContainerType::value_type>
+//struct Polaris_Container:public ContainerType
+//{
+//	typedef Polaris_Container This_Type;
+//	typedef ContainerType Container_Type;
+//	typedef typename remove_pointer<QualifiedValueType>::type unqualified_value_type;
+//};
 
 template<typename ContainerType>
 struct Polaris_Container:public ContainerType

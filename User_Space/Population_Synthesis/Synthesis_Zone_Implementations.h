@@ -20,7 +20,7 @@ namespace PopSyn
 			member_component(typename MasterType::IPF_Solver_Settings,Solver_Settings,none,none);
 	
 			typedef hash_multimap<uint, typename MasterType::pop_unit*> __sample_map_type;		
-			member_associative_container(__sample_map_type, typename MasterType::pop_unit*, Sample_Data, none, none); 
+			member_associative_container(__sample_map_type, Sample_Data, none, none); 
 		};
 
 		implementation struct IPF_Solver_Settings_Implementation

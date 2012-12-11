@@ -17,4 +17,6 @@
 
 #include "User_Space\Population_Synthesis\Synthesis_Zone_Implementations.h"
 
+#include "User_Space\Population_Synthesis\Synthesis_Region_Implementation.h"
+
 

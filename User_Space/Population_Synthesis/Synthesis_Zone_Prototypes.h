@@ -66,6 +66,41 @@ namespace PopSyn
 				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}
 
+			feature_prototype void Normalize_Sample()
+			{
+				define_container_and_value_interface(sample_itf,unit_itf,get_type_of(Sample_Data),Containers::Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,NULLTYPE);
+				sample_itf& sample = this->Sample_Data<sample_itf&>();
+				
+				
+				for (sample_itf::iterator itr = sample.begin(); itr != sample.end(); ++itr)
+				{
+					double sum = 0;
+					sample_itf::key_type stored_key = itr->first;
+					pair<sample_itf::iterator,sample_itf::iterator> range = sample.equal_range(stored_key);
+					while (range.first != range.second)
+					{
+						sum += range.first->second->Weight<double>();
+						++range.first;
+					}
+
+					range = sample.equal_range(stored_key);
+					while (range.first != range.second)
+					{
+						range.first->second->Weight<double>(range.first->second->Weight<double>()/sum);
+						++range.first;
+					}
+					itr = range.second;
+
+				}
+				//pair<hash_multimap<int,int>::iterator,hash_multimap<int,int>::iterator> pairIter;
+				//pairIter.equal_range(value_Iterator->first);
+				//while( pairIter.first != pairIter.second ){
+				//	// sum the values associated with keys
+				//	// Increment pairIter->first
+				//}
+				//value_iterator = pairIter.second;
+			}
+
 			feature_prototype void Fit_Joint_Distribution_To_Marginal_Data(requires(check(ComponentType,Concepts::Is_IPF_Capable)))
 			{
 				// Get the solution settings
@@ -133,7 +168,7 @@ namespace PopSyn
 				
 			}
 
-			feature_prototype void Select_Synthetic_Population_Units(requires(check(ComponentType, Concepts::Is_Probabilistic_Selection)))
+			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check_as_given(TargetType,is_pointer) && check(TargetType,Containers::Concepts::Is_Associative))
 			{
 
 			}
