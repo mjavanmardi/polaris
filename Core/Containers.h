@@ -5,6 +5,8 @@
 /// Input_Iterator - stl Input_Iterator
 ///============================================================================
 
+namespace Containers
+{
 template<typename IteratorType,typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
 struct Input_Iterator:public IteratorType
 {
@@ -102,7 +104,7 @@ struct Random_Access_Sequence_Prototype
 
 	iterator insert(iterator p, TargetValueType t){return ((ComponentType*)this)->insert(p,t);}
 	
-	void insert(iterator p, size_type n, TargetValueType t){return ((ComponentType*)this)->insert(p,n);}
+	void insert(iterator p, size_type n, TargetValueType t){return ((ComponentType*)this)->insert(p,n,t);}
 
 	void insert(iterator p, iterator i, iterator j){return ((ComponentType*)this)->insert(p,i,j);}
 
@@ -134,6 +136,52 @@ struct Random_Access_Sequence_Prototype
 
 };
 
+template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::mapped_type>
+struct Associative_Container_Prototype
+{
+	typedef ComponentType Component_Type;
+	typedef CallerType Caller_Type;
+	typedef true_type Is_Prototype;
+
+	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
+	typedef typename ComponentType::size_type size_type;
+	typedef typename ComponentType::key_type key_type;
+	typedef typename ComponentType::key_compare key_compare;
+	typedef typename ComponentType::value_compare value_compare;
+	typedef TargetValueType Test_Type;
+
+	iterator begin(){return (iterator)((ComponentType*)this)->begin();}
+
+	iterator end(){return (iterator)((ComponentType*)this)->end();}
+	
+	size_type size(){return ((ComponentType*)this)->size();}
+
+	size_type max_size(){return ((ComponentType*)this)->size();}
+
+	bool empty(){return ((ComponentType*)this)->empty();}
+
+	iterator insert(pair<key_type,TargetValueType> t){return ((ComponentType*)this)->insert(t);}
+
+	iterator insert(iterator p, TargetValueType t){return ((ComponentType*)this)->insert(p,t);}
+	
+	void insert(iterator p, iterator i, TargetValueType t){return ((ComponentType*)this)->insert(p,i,t);}
+
+	iterator erase(iterator p){return ((ComponentType*)this)->erase(p);}
+	
+	iterator erase(iterator p, iterator q){return ((ComponentType*)this)->erase(p,q);}
+
+	void clear(){return ((ComponentType*)this)->clear();}
+
+	key_compare key_comp() const { return ((ComponentType*)this)->key_comp();}
+
+	value_compare value_comp() const { return ((ComponentType*)this)->value_comp();}
+
+	iterator find ( const key_type& x ) { return ((CompoentType*)this)->find(x);}
+
+	pair<iterator,iterator>  equal_range ( const key_type& x ) { return ((CompoentType*)this)->equal_range(x);}
+
+};
+
 ///============================================================================
 /// Multidimensional_Random_Access_Sequence_Prototype - custom (note, not a sequence as insertion does not work with multiple dimensions
 ///============================================================================
@@ -149,9 +197,10 @@ struct Multidimensional_Random_Access_Array_Prototype
 	typedef typename ComponentType::size_type size_type;
 	typedef typename ComponentType::index_type index_type;
 	typedef typename ComponentType::const_index_type const_index_type;
+	typedef typename ComponentType::const_dimensional_type const_dimensional_type;
 
 	iterator begin(){return (iterator)((ComponentType*)this)->begin();}
-
+	iterator begin(size_type dim){return (iterator)((ComponentType*)this)->begin(dim);}
 	iterator begin(size_type dim, size_type index){return (iterator)((ComponentType*)this)->begin(dim,index);}
 
 	iterator end(){return (iterator)((ComponentType*)this)->end();}
@@ -162,27 +211,37 @@ struct Multidimensional_Random_Access_Array_Prototype
 
 	size_type num_dimensions(){return ((ComponentType*)this)->num_dimensions();}
 
-	const_index_type dimensions(){return ((ComponentType*)this)->dimensions();}
+	const_dimensional_type dimensions(){return ((ComponentType*)this)->dimensions();}
 
 	size_type max_size(){return ((ComponentType*)this)->size();}
 
 	bool empty(){return ((ComponentType*)this)->empty();}
 
 	TargetValueType& front(){return (TargetValueType&)(((ComponentType*)this)->front());}
+	TargetValueType& front(size_type dimension){return (TargetValueType&)(((ComponentType*)this)->front(dimension));}
+	TargetValueType& front(size_type dimension, size_type index){return (TargetValueType&)(((ComponentType*)this)->front(dimension, index));}
 
 	void clear(){return ((ComponentType*)this)->clear();}
 
+	void Copy(const Multidimensional_Random_Access_Array_Prototype<ComponentType,CallerType,TargetValueType>& obj)
+	{
+		((ComponentType*)this)->Copy(*((Multidimensional_Random_Access_Array_Prototype<ComponentType,CallerType,TargetValueType>::Component_Type::Container_Type*)&obj));
+	}
+
 	void write(ostream& s){return ((ComponentType*)this)->print(s);}
 
-	void resize(const_index_type n){return ((ComponentType*)this)->resize(n);}
-	
-	void resize(const_index_type n, TargetValueType t){return ((ComponentType*)this)->resize(n,t);}
+	void resize(const_dimensional_type n){return ((ComponentType*)this)->resize(n);}
+
+	void resize(const_dimensional_type n, TargetValueType t){return ((ComponentType*)this)->resize(n,t);}
 
 	TargetValueType& back(){return (TargetValueType&)(((ComponentType*)this)->back());}
+	TargetValueType& back(size_type dimension){return (TargetValueType&)(((ComponentType*)this)->back(dimension));}
+	TargetValueType& back(size_type dimension, size_type index){return (TargetValueType&)(((ComponentType*)this)->back(dimension, index));}
 
 	TargetValueType& operator [](const_index_type i){return (TargetValueType&)((*((ComponentType*)this))[i]);}
-	
 	const TargetValueType& operator [](const_index_type i) const {return (TargetValueType&)((*((ComponentType*)this))[i]);}
+	TargetValueType& operator [](size_type i) {return (TargetValueType&)((*((ComponentType*)this))[i]);}
+	const TargetValueType& operator [](size_type i) const {return (TargetValueType&)((*((ComponentType*)this))[i]);}
 
 	TargetValueType& at(const_index_type i){return (TargetValueType&)(((ComponentType*)this)->at(i));}
 
@@ -192,13 +251,20 @@ struct Multidimensional_Random_Access_Array_Prototype
 /// Polaris_Container - stl Container implementation
 ///============================================================================
 
-template<typename ContainerType>
+//template<typename ContainerType>
+//struct Polaris_Container:public ContainerType
+//{
+//	typedef Polaris_Container This_Type;
+//	typedef ContainerType Container_Type;
+//	typedef typename remove_pointer<typename ContainerType::value_type>::type unqualified_value_type;
+//};
+
+template<typename ContainerType, typename ContainerValueType = typename ContainerType::value_type>
 struct Polaris_Container:public ContainerType
 {
 	typedef Polaris_Container This_Type;
 	typedef ContainerType Container_Type;
-	
-	typedef typename remove_pointer<typename ContainerType::value_type>::type unqualified_value_type;
+	typedef typename remove_pointer<ContainerValueType>::type unqualified_value_type;
 };
 
 
@@ -400,3 +466,7 @@ struct Polaris_Container:public ContainerType
 //	template<typename ComponentType=Polaris_Back_Insertion_Sequence,typename CallerType=NULLTYPE>
 //	struct Prototype_Type{typedef Polaris_Back_Insertion_Sequence_Prototype<ComponentType,CallerType> type;};
 //};
+
+}
+
+using namespace Containers;
