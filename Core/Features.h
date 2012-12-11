@@ -283,7 +283,6 @@ struct member_function_ptr_types<Type,setter_type>
 ///============================================================================
 /// member_container – member creator, type-definition and basic accessors
 ///============================================================================
-
 #define member_container(CONTAINER_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 	protected:\
 		Polaris_Container<CONTAINER_TYPE> _##FEATURE_NAME;\
@@ -305,6 +304,32 @@ struct member_function_ptr_types<Type,setter_type>
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(check_as_given(SetValueType,is_pointer) && SETTER_REQUIREMENTS))\
 		{_##FEATURE_NAME=(Polaris_Container<CONTAINER_TYPE>&)(*value);}\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
+		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
+		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+		tag_setter_as_available(FEATURE_NAME);
+
+#define member_associative_container(CONTAINER_TYPE,VALUE_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	protected:\
+		Polaris_Container<CONTAINER_TYPE,VALUE_TYPE> _##FEATURE_NAME;\
+	public:\
+		typedef Polaris_Container<CONTAINER_TYPE,VALUE_TYPE> FEATURE_NAME##_type;\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
+		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && GETTER_REQUIREMENTS))\
+		{return (ReturnValueType)(_##FEATURE_NAME);}\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
+		ReturnValueType FEATURE_NAME(requires_getter(check_as_given(ReturnValueType,is_pointer) && GETTER_REQUIREMENTS))\
+		{return (ReturnValueType)(&_##FEATURE_NAME);}\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
+		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
+		{static_assert((GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
+		tag_getter_as_available(FEATURE_NAME);\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
+		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && SETTER_REQUIREMENTS))\
+		{_##FEATURE_NAME=(Polaris_Container<CONTAINER_TYPE,VALUE_TYPE>&)value;}\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
+		void FEATURE_NAME(SetValueType value,requires_setter(check_as_given(SetValueType,is_pointer) && SETTER_REQUIREMENTS))\
+		{_##FEATURE_NAME=(Polaris_Container<CONTAINER_TYPE,VALUE_TYPE>&)(*value);}\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
 		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
