@@ -10,7 +10,7 @@ namespace PopSyn
 		{
 			member_data(double,ID,none,none);
 			member_data(double,Weight,none,none);
-			member_data(uint,index,none,none);				 //index into the joint-distribution matrix of the region (convert using region.get_index())
+			member_data(uint,Index,none,none);				 //index into the joint-distribution matrix of the region (convert using region.get_index())
 			member_container(vector<double>, Characteristics,none,none);
 		};
 	}

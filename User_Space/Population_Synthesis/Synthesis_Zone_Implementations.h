@@ -15,9 +15,12 @@ namespace PopSyn
 			member_data(long,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 			member_container(m_array<double>,Target_Joint_Distribution,none,not_available);
 			member_container(s_array<double>,Target_Marginal_Distribution, none, not_available);
-			member_container(vector<typename MasterType::pop_unit*>, Sample_Data,none,none);
+			//member_container(vector<typename MasterType::pop_unit*>, Sample_Data,none,none);
 
 			member_component(typename MasterType::IPF_Solver_Settings,Solver_Settings,none,none);
+	
+			typedef hash_multimap<uint, typename MasterType::pop_unit*> __sample_map_type;		
+			member_associative_container(__sample_map_type, typename MasterType::pop_unit*, Sample_Data, none, none); 
 		};
 
 		implementation struct IPF_Solver_Settings_Implementation

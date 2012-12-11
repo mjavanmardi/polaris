@@ -2,7 +2,7 @@
 
 #include "User_Space\User_Space_includes.h"
 #include "User_Space\Population_Synthesis\Population_Unit_Implementations.h"
-#include "User_Space\Population_Synthesis\Synthesis_Zone_Prototypes.h"
+#include "User_Space\Population_Synthesis\Synthesis_Zone_Implementations.h"
 
 using namespace std;
 
@@ -28,62 +28,48 @@ namespace PopSyn
 
 			feature_prototype void Synthesize_Population(requires(check(ComponentType,Concepts::Is_IPF_Capable)))
 			{
+				//==========================================================
 				// Get the solution settings
 				define_component_interface(solution_settings_itf,get_type_of(Solver_Settings),Prototypes::Solver_Settings_Prototype,NULLTYPE);
 				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
 
+				//==========================================================
 				// Get the list of synthesis zones in the region
 				define_container_and_value_interface(synthesis_zones_itf,zone_itf,get_type_of(Synthesis_Zone_Collection),Containers::Random_Access_Sequence_Prototype, Prototypes::Synthesis_Zone_Prototype,NULLTYPE);
 				synthesis_zones_itf& zones_collection = this->Synthesis_Zone_Collection<synthesis_zones_itf&>();
-				synthesis_zones_itf::iterator zone_itf = zones_collection.begin();
+				synthesis_zones_itf::iterator zone_itr = zones_collection.begin();
 
-				// IPF version of fitting the joint distribution to marginal distribution
+				//==========================================================
+				// Get the region target distribution, use to fill zone distributions
 				typedef get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
 				define_simple_container_interface(mway_itf, get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
-				define_simple_container_interface(marg_itf, get_type_of(Target_Marginal_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
-
-				mway_itf::iterator itr;
-				marg_itf::iterator marg_itr;
-				typedef marg_itf::index_type index;
+				mway_itf& mway = Synthesis_Zone_Prototype<ComponentType,CallerType>::Target_Joint_Distribution<mway_itf&>();
 
 
-				// get the distribution
-				mway_itf& mway = this->Target_Joint_Distribution<mway_itf&>();
-				mway_itf::const_index_type dimensions = mway.dimensions();
-				mway_itf::size_type num_dim = (mway_itf::size_type)(dimensions.size());
+				//======================================================================
+				// MAIN SYNTHESIS ROUTINE. 
 
-				// get the marginals
-				marg_itf& marg = this->Target_Marginal_Distribution<marg_itf&>();
-				
-				// Main Execution loop - loop over each dimension, and each index within each dimensions and fit to the marginal
-				value_type max_error = (value_type)INT_MAX;
-				int iterations = 0;
-				while (iterations < settings.Iterations<uint>() && max_error > settings.Tolerance<value_type>())
+				//----------------------------------------------------------
+				// A. Fit the region distribution to region marginal
+				Synthesis_Zone_Prototype<ComponentType,CallerType>::Fit_Joint_Distribution_To_Marginal_Data<NULLTYPE>();
+
+				//----------------------------------------------------------
+				// B. Cycle through zones and solve for each
+				for (zone_itr; zone_itr != zones_collection.end(); ++zone_itr)
 				{
-					// 0. reset max error to 0, then store the highest value for current iteration
-					max_error = 0;
+					//----------------------------------------------------------
+					// 1. Push region distribution to each zone
+					(*zone_itr)->Target_Joint_Distribution<mway_itf&>().Copy(mway);
 
-					// 1.  Loop over each dimension
-					for (int d = 0; d < num_dim; ++d)
-					{
-						// 2. loop over each index in the marginal for each dimension
-						for (int i = 0; i < dimensions[d]; ++i)
-						{
-							// 3. get the current sum in the distribution for the current marginal
-							value_type sum = 0;
-							for (itr = mway.begin(d,i); itr != mway.end(); ++itr) sum += *itr;
+					//----------------------------------------------------------
+					// 2. Fit the zone distribution to the zone marginals
+					(*zone_itr)->Fit_Joint_Distribution_To_Marginal_Data<NULLTYPE>();
 
-							// 4. calculate the error against the known marginal value
-							value_type marg_val = marg[index(d,i)];
-							value_type temp_err = (marg_val != 0 ) ? (sum / marg_val) : 1;
-							if (abs((value_type)(temp_err - 1.0)) > max_error) max_error = abs((value_type)(temp_err - 1.0));
+					//----------------------------------------------------------
+					// 3. Select households from regional sample into the zone synthesized sample
 
-							// 5. update the values in the distribution by the error factor
-							for (itr = mway.begin(d,i); itr != mway.end(); ++itr) *itr = *itr / temp_err;
-						}
-					}
-
-					iterations++;
+					//----------------------------------------------------------
+					// 4. Done. output results
 				}
 						
 			}

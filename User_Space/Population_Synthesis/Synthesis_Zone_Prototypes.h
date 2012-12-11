@@ -92,17 +92,17 @@ namespace PopSyn
 				
 				// Main Execution loop - loop over each dimension, and each index within each dimensions and fit to the marginal
 				value_type max_error = (value_type)INT_MAX;
-				int iterations = 0;
+				uint iterations = 0;
 				while (iterations < settings.Iterations<uint>() && max_error > settings.Tolerance<value_type>())
 				{
 					// 0. reset max error to 0, then store the highest value for current iteration
 					max_error = 0;
 
 					// 1.  Loop over each dimension
-					for (int d = 0; d < num_dim; ++d)
+					for (uint d = 0; d < num_dim; ++d)
 					{
 						// 2. loop over each index in the marginal for each dimension
-						for (int i = 0; i < dimensions[d]; ++i)
+						for (uint i = 0; i < dimensions[d]; ++i)
 						{
 							// 3. get the current sum in the distribution for the current marginal
 							value_type sum = 0;
