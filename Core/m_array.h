@@ -181,16 +181,42 @@ public:
 	typedef const m_array_iterator<T>	const_iterator;
 	typedef int							difference_type;
 	typedef uint						size_type;
+	typedef const uint					const_size_type;
 	typedef vector<size_type>			index_type;
 	typedef const vector<size_type>&	const_index_type;
+	typedef const vector<size_type>&	const_dimensional_type;
 
 	// Members added for STL compliance
 	reference		at(const_index_type i){return _data[get_index(i)];}
 	const_reference	at(const_index_type i) const {return _data[get_index(i)];}
 	reference		front(){return _data[0];}
 	const_reference	front() const {return _data[0];}
+	reference		front(size_type fixed_dimension_index, size_type fixed_dimension_value)
+	{
+		_cursor_start();
+		_cursor[fixed_dimension_index] = fixed_dimension_value;
+		return this->operator[](_cursor);
+	}
+	const_reference	front(size_type fixed_dimension_index, size_type fixed_dimension_value) const 
+	{
+		_cursor_start();
+		_cursor[fixed_dimension_index] = fixed_dimension_value;
+		return this->operator[](_cursor);
+	}
 	reference		back(){return _data[_size-1];}
 	const_reference	back() const {return _data[_size-1];}
+	reference		back(size_type fixed_dimension_index, size_type fixed_dimension_value)
+	{
+		_cursor_end();
+		_cursor[fixed_dimension_index] = fixed_dimension_value;
+		return this->operator[](_cursor);
+	}
+	const_reference	back(size_type fixed_dimension_index, size_type fixed_dimension_value) const 
+	{
+		_cursor_end();
+		_cursor[fixed_dimension_index] = fixed_dimension_value;
+		return this->operator[](_cursor);
+	}
 	iterator		begin()
     {
 		for (size_type i = 0; i< _dim_sizes.size(); i++) _cursor[i] = 0;
@@ -274,6 +300,14 @@ public:
 		size_type i = get_index(index);
 		return _data[i];
 	} 
+	reference operator[](size_type index) // get data at given index
+	{
+		return _data[index];
+	} 
+	const_reference operator[](const_size_type index) const // get data at given index
+	{
+		return _data[index];
+	} 
 	
 	// Property access members
 	const size_type& size() {return _size;}
@@ -281,6 +315,8 @@ public:
 	const_index_type dimensions(){return _dim_sizes;}
 	const size_type& num_dimensions() {return _ndim;}
 
+	// display member
+	void print(ostream& stream);
 
 protected:
 	index_type _dim_sizes;
@@ -338,6 +374,17 @@ protected:
 		}
 		return true;
 	}
+	void _cursor_start()
+	{
+		for (int i=0; i<_cursor.size(); i++) _cursor[i] = 0;
+	}
+	void _cursor_end()
+	{
+		for (int i=0; i<_cursor.size(); i++) _cursor[i] = _dim_sizes[i]-1;
+	}
+
+	void print(ostream& stream, int n);
+
 };
 
 // Multi-dim Array Constructors, copiers, assignment, etc.
@@ -420,5 +467,61 @@ template <class T>
 m_array<T>::~m_array(void)
 {
 	_cleanup();
+}
+
+// display member functions
+template <class T>
+void m_array<T>::print(ostream& stream)
+{
+	this->begin();
+	print(stream, 0);
+}
+template <class T>
+void m_array<T>::print(ostream& stream, int n)
+{
+	if (n == _ndim-2)
+	{	
+		// print header for higher dimensions
+		if(_ndim>2)
+		{
+			stream<<"Higher Dimensions: ";
+			for (uint k=0; k<_ndim-2; k++) stream<<"D"<<k<<"="<<_cursor[k]<<",";
+			stream<<endl;
+		}
+
+		// print header for columns (last dimension in matrix)
+		stream<<"\t";
+		for (uint k=0; k<_dim_sizes[n+1]; k++) 
+		{
+			stream<</*setw(6)<<*/"D"<<n+1;
+			//cout<<n+1;
+			stream<<"=";
+			stream<<k;
+			stream<<"\t";
+		}
+		stream<<endl;
+
+		// print 2d matrix of last 2 dimensions
+		for (uint i=0; i<_dim_sizes[n]; i++)
+		{
+			_cursor[n] = i;
+			stream<<"D"<<n<<"="<<i<<"\t";
+			for (uint j=0; j<_dim_sizes[n+1]; j++)
+			{
+				_cursor[n+1]=j;
+
+				stream<</*setw(10)<<*/this->operator[](this->_cursor)<<"\t";
+			}
+			stream<<endl;
+		}
+		stream<<endl<<endl;
+		return;
+	}
+
+	for (uint i=0; i<_dim_sizes[n]; i++)
+	{
+		_cursor[n] = i;
+		print(stream, n+1);
+	}
 }
 
