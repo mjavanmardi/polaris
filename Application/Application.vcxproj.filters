@@ -16,10 +16,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Example.cpp">
+    <ClCompile Include="Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Application.cpp">
+    <ClCompile Include="PopSyn_Example.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

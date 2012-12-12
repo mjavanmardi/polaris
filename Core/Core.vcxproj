@@ -143,6 +143,7 @@
     <ClInclude Include="Interprocess_Structures.h" />
     <ClInclude Include="Memory_Detail.h" />
     <ClInclude Include="Memory_Engine.h" />
+    <ClInclude Include="m_array.h" />
     <ClInclude Include="Polaris_Component.h" />
     <ClInclude Include="Run_Parameters.h" />
     <ClInclude Include="sparsehash\densehashtable.h" />

@@ -165,6 +165,8 @@ struct Associative_Container_Prototype
 	typedef typename ComponentType::key_compare key_compare;
 	typedef typename ComponentType::value_compare value_compare;
 	typedef TargetValueType Test_Type;
+	typedef typename ComponentType::mapped_type Val_Type;
+
 	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,pair<key_type,TargetValueType>> iterator;
 
 	iterator begin(){return (iterator)((ComponentType*)this)->begin();}
@@ -177,7 +179,14 @@ struct Associative_Container_Prototype
 
 	bool empty(){return ((ComponentType*)this)->empty();}
 
-	iterator insert(key_type key, TargetValueType value){return ((ComponentType*)this)->insert(pair<key_type,ComponentType::mapped_type>(key,(ComponentType::mapped_type)value));}
+	iterator insert(key_type key, TargetValueType& value)
+	{
+		return ((ComponentType*)this)->insert(pair<key_type,Component_Type::mapped_type>(key,(Component_Type::mapped_type)value));
+	}
+	iterator insert(key_type key, TargetValueType&& value)
+	{
+		return ((ComponentType*)this)->insert(pair<key_type,Component_Type::mapped_type&&>(key,(Component_Type::mapped_type&&)value));
+	}
 
 	//iterator insert(iterator p, TargetValueType t){return ((ComponentType*)this)->insert(p,t);}
 	//
@@ -292,19 +301,6 @@ struct Polaris_Associative_Container:public ContainerType
 	typedef ContainerType Container_Type;
 	typedef typename remove_pointer<typename ContainerType::mapped_type>::type unqualified_value_type;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -66,19 +66,19 @@ int main()
 	//-----------------------------------------------------------------------------------------
 	// Initialize the distribution and marginals
 	joint_itf::index_type index;
-	index.push_back(3); index.push_back(4); index.push_back(4);
+	index.push_back(4); index.push_back(4); index.push_back(4);
 	dist.resize(index,1.0);
 	marg.resize(index,0);
 
 	//-----------------------------------------------------------------------------------------
 	// fill the distribution with randomly generated samples
-	for (uint i=0; i<200; ++i)
+	for (uint i=0; i<2000; ++i)
 	{
 		//pop = Allocate<MasterType::pop_unit>();
 		pop_unit_itf* p = (pop_unit_itf*)Allocate<MasterType::pop_unit>();
-		p->Index<uint>((uint)(rand->Next_Rand<double>()*47.0));
+		p->Index<uint>((uint)(rand->Next_Rand<double>()*63.9999));
 		p->Weight<double>(rand->Next_Rand<double>());
-		p->ID<uint>(p->Index<uint>());
+		p->ID<uint>(i);
 		data_itf* data = p->Characteristics<data_itf*>();
 		data->push_back(p->Index<double>() + p->Weight<double>());
 		dist[p->Index<uint>()] += p->Weight<double>();
@@ -88,11 +88,11 @@ int main()
 
 
 	out <<endl<<"UNNORMALIZED SAMPLE:"<<endl;
-	for (sample_itr = sample.begin(); sample_itr != sample.end(); ++sample_itr) out << endl << "ID: " << sample_itr->second->ID<uint>() << ",  weight: "<<sample_itr->second->Weight<float>();
+	for (sample_itr = sample.begin(); sample_itr != sample.end(); ++sample_itr) out << endl << "ID: " << sample_itr->second->ID<uint>() << ",  weight: "<<sample_itr->second->Weight<float>()<<", index: "<<sample_itr->second->Index<uint>() ;
 	// normalize
 	my_region->Normalize_Sample<NULLTYPE>();
 	out <<endl<<endl<<"NORMALIZED SAMPLE:"<<endl;
-	for (sample_itr = sample.begin(); sample_itr != sample.end(); ++sample_itr) out << endl << "ID: " << sample_itr->second->ID<uint>() << ",  weight: "<<sample_itr->second->Weight<float>();
+	for (sample_itr = sample.begin(); sample_itr != sample.end(); ++sample_itr) out << endl << "ID: " << sample_itr->second->ID<uint>() << ",  weight: "<<sample_itr->second->Weight<float>()<<", index: "<<sample_itr->second->Index<uint>() ;
 	
 	out <<endl<<"Normalized Joint Distribution: " << endl;
 	dist.write(out);
@@ -105,13 +105,13 @@ int main()
 		// set the last value for each dimension/index pair, i.e. the marginal value, to a random number
 		for (uint i=0; i< dist.dimensions()[d]-1; ++i)
 		{
-			double value = (int)(rand->Next_Rand<double>()*90+10);
+			double value = (int)(rand->Next_Rand<double>()*70+2);
 			sum += value;
 			//dist->back(d,i) = value;
 			marg[index_type(d,i)] = value;
 		}
 		//dist->back(d, dist->dimensions()[d]-2) = 250.0 - sum;
-		marg.back(d) = 250.0 - sum;
+		marg.back(d) = 300.0 - sum;
 	}
 
 
@@ -125,17 +125,16 @@ int main()
 		// set the last value for each dimension/index pair, i.e. the marginal value, to a random number
 		for (uint i=0; i< dist.dimensions()[d]-1; ++i)
 		{
-			double value = (int)(rand->Next_Rand<double>()*20+2);
+			double value = (int)(rand->Next_Rand<double>()*12000+2);
 			sum += value;
 			//dist->back(d,i) = value;
 			zmarg[index_type(d,i)] = value;
 		}
 		//dist->back(d, dist->dimensions()[d]-2) = 250.0 - sum;
-		zmarg.back(d) = 83.0 - sum;
+		zmarg.back(d) = 40000.0 - sum;
 	}
-
+	
 	// Print
-	marg.write(out);
 	zmarg.write(out);
 
 
@@ -145,13 +144,15 @@ int main()
 	
 	// Print
 	out << endl << endl;
-	dist.write(out);
-
 	joint_itf& zdist = my_zone->Target_Joint_Distribution<joint_itf&>();
 	zdist.write(out);
-
 	
 
+	// Print synthesized sample
+	cout << "Printing output...";
+	out <<endl<<endl<<"SYNTHESISED SAMPLE:"<<endl;
+	sample_itf* zsample = my_zone->Sample_Data<sample_itf*>();
+	for (sample_itr = zsample->begin(); sample_itr != zsample->end(); ++sample_itr) out << endl << "ID: " << sample_itr->second->ID<uint>() << ",  weight: "<<sample_itr->second->Weight<float>() <<", index: "<<sample_itr->second->Index<uint>();
 
 	START();
 
@@ -159,5 +160,3 @@ int main()
 	bool pause=true;
 	cin >> pause;
 }
-
-

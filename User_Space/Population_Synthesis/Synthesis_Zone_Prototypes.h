@@ -179,7 +179,7 @@ namespace PopSyn
 				define_container_and_value_interface(sample_itf, pop_unit_itf, get_type_of(Sample_Data), Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
 				sample_itf* sample = Region_Sample_Ptr;
 				sample_itf* zone_sample = this->Sample_Data<sample_itf*>();
-
+				
 				// Get interface to the zone random number generator
 				define_component_interface(rand_itf,get_type_of(Rand),RNG_Components::Prototypes::RNG_Prototype,NULLTYPE);		
 				rand_itf& rand = this->Rand<rand_itf&>();
@@ -189,35 +189,69 @@ namespace PopSyn
 				// note that this routine does not work when a loss function can be used (i.e. households are not uniquely assigned to one mway index)
 				for (sample_itf::iterator itr = sample->begin(); itr != sample->end(); ++itr)
 				{
+					//----------------------------------------------------------------------------------
+					// get a pointer to the value of the iterator for IDE support
+					pop_unit_itf* stored_pop_unit;
+
 					// get the current key (i.e. index into mway)
 					sample_itf::key_type index = itr->first;
 					double num_required = mway[index];
-
+				
 					// grab all sample units which link to this cell
 					pair<sample_itf::iterator,sample_itf::iterator> range = sample->equal_range(index);
 
-					// make num_required attempts to add each
+					stored_pop_unit = range.first->second;
+					double cumulative_weight = 1;
+
+					//----------------------------------------------------------------------------------
+					// make num_required attempts to add each unit in the range
 					while (range.first != range.second)
 					{
 						int num_generated=0;
+						double w = range.first->second->Weight<double>();
+						
 						for (int i = 0; i<num_required; ++i)
 						{
-							//range.first->second;
-							if (rand.Next_Rand<double>() < range.first->second->Weight<double>())
-							{
+							if (rand.Next_Rand<double>() < w/cumulative_weight)
+							{					
 								pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>();
 								pop_unit_itf* obj = range.first->second;
 								p->Initialize<pop_unit_itf&>(*obj);
 								zone_sample->insert(p->Index<uint>(),p);
+								int size = sizeof(typename sample_itf::Component_Type);
 								num_generated++;
 							}
 						}
-						// reduce the number required by the number generated
+						// reduce the number required by the number generated and the cumulative weight
 						num_required -= num_generated;
+						cumulative_weight -= w;
 
 						//move to the next unit for the current index
 						++range.first;
 					}
+
+					//----------------------------------------------------------------------------------
+					// add a copy of the last unit until num_required < 1
+					while (num_required > 1.0)
+					{
+						pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>();
+						pop_unit_itf* obj = stored_pop_unit;
+						p->Initialize<pop_unit_itf&>(*obj);
+						zone_sample->insert(p->Index<uint>(),p);
+						num_required--;
+					}
+
+					//----------------------------------------------------------------------------------
+					// if a fractional num_required is left, add another unit with probability of num_required
+					if (num_required > 0.0 && rand.Next_Rand<double>() < num_required)
+					{
+						pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>();
+						pop_unit_itf* obj = stored_pop_unit;
+						p->Initialize<pop_unit_itf&>(*obj);
+						zone_sample->insert(p->Index<uint>(),p);
+						num_required--;
+					}
+
 
 					// if at the end of the map, break so that increment does not go past end of data_structure
 					itr = range.second;
