@@ -152,12 +152,14 @@
     <ClInclude Include="Population_Synthesis\Linker_Implementations.h" />
     <ClInclude Include="Population_Synthesis\PopSyn_Implementations.h" />
     <ClInclude Include="Population_Synthesis\PopSyn_Prototype.h" />
+    <ClInclude Include="Population_Synthesis\Population_Unit_Implementations.h" />
     <ClInclude Include="Population_Synthesis\Population_Unit_Prototype.h" />
     <ClInclude Include="Population_Synthesis\Region_Implementations.h" />
     <ClInclude Include="Population_Synthesis\Region_Prototype.h" />
+    <ClInclude Include="Population_Synthesis\Synthesis_Region_Implementation.h" />
+    <ClInclude Include="Population_Synthesis\Synthesis_Region_Prototype.h" />
     <ClInclude Include="Population_Synthesis\Synthesis_Zone_Implementations.h" />
     <ClInclude Include="Population_Synthesis\Synthesis_Zone_Prototypes.h" />
-    <ClInclude Include="Population_Unit_Implementations.h" />
     <ClInclude Include="RngStream.h" />
     <ClInclude Include="Routable_Intersection_Implementation.h" />
     <ClInclude Include="Routable_Link_Implementation.h" />

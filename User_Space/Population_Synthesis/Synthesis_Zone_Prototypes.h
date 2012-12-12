@@ -22,7 +22,7 @@ namespace PopSyn
 		concept struct Is_Probabilistic_Selection
 		{
 			check_typename_defined(Has_Value_Type, Value_Type);
-			check_typename_state(Has_Probabilistic_Selection_Defined, Probabilstic_Selection_Type, true_type);
+			check_typename_state(Has_Probabilistic_Selection_Defined, Probabilistic_Selection_Type, true_type);
 			define_default_check(Has_Probabilistic_Selection_Defined && Has_Value_Type);
 		};
 
@@ -90,7 +90,7 @@ namespace PopSyn
 						++range.first;
 					}
 					itr = range.second;
-
+					if (itr == sample.end()) break;
 				}
 				//pair<hash_multimap<int,int>::iterator,hash_multimap<int,int>::iterator> pairIter;
 				//pairIter.equal_range(value_Iterator->first);
@@ -168,9 +168,68 @@ namespace PopSyn
 				
 			}
 
-			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check_as_given(TargetType,is_pointer) && check(TargetType,Containers::Concepts::Is_Associative))
+			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check_as_given(TargetType,is_pointer) && check(TargetType,Containers::Concepts::Is_Associative)))
 			{
+				// Get the fitted distribution
+				typedef get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
+				define_simple_container_interface(mway_itf, get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
+				mway_itf& mway = this->Target_Joint_Distribution<mway_itf&>();
 
+				// Get pointers to the regional and zonal household samples
+				define_container_and_value_interface(sample_itf, pop_unit_itf, get_type_of(Sample_Data), Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
+				sample_itf* sample = Region_Sample_Ptr;
+				sample_itf* zone_sample = this->Sample_Data<sample_itf*>();
+
+				// Get interface to the zone random number generator
+				define_component_interface(rand_itf,get_type_of(Rand),RNG_Components::Prototypes::RNG_Prototype,NULLTYPE);		
+				rand_itf& rand = this->Rand<rand_itf&>();
+
+				// loop through all cells in the regional mway matrix, and make N = Mway(i,j,...) attempts to add each pop_unit corresponding to that index
+				// The code below grabs a range for each index in the MWAY matrix which has corresponding samples which can be chosen.
+				// note that this routine does not work when a loss function can be used (i.e. households are not uniquely assigned to one mway index)
+				for (sample_itf::iterator itr = sample->begin(); itr != sample->end(); ++itr)
+				{
+					// get the current key (i.e. index into mway)
+					sample_itf::key_type index = itr->first;
+					double num_required = mway[index];
+
+					// grab all sample units which link to this cell
+					pair<sample_itf::iterator,sample_itf::iterator> range = sample->equal_range(index);
+
+					// make num_required attempts to add each
+					while (range.first != range.second)
+					{
+						int num_generated=0;
+						for (int i = 0; i<num_required; ++i)
+						{
+							//range.first->second;
+							if (rand.Next_Rand<double>() < range.first->second->Weight<double>())
+							{
+								pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>();
+								pop_unit_itf* obj = range.first->second;
+								p->Initialize<pop_unit_itf&>(*obj);
+								zone_sample->insert(p->Index<uint>(),p);
+								num_generated++;
+							}
+						}
+						// reduce the number required by the number generated
+						num_required -= num_generated;
+
+						//move to the next unit for the current index
+						++range.first;
+					}
+
+					// if at the end of the map, break so that increment does not go past end of data_structure
+					itr = range.second;
+					if (itr == sample->end()) break;
+				}		
+			}
+
+			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(!(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check_as_given(TargetType,is_pointer) && check(TargetType,Containers::Concepts::Is_Associative))))
+			{
+				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
+				assert_check(TargetType, is_pointer,"Is not a pointer");
+				assert_check_strip(TargetType, Containers::Concepts::Is_Associative, "Container is not associative.");
 			}
 
 			feature_accessor(Target_Joint_Distribution,none,none);
@@ -180,6 +239,8 @@ namespace PopSyn
 			feature_accessor(Sample_Data,none,none);
 
 			feature_accessor(ID,none,none);
+
+			feature_accessor(Rand,none,none);
 
 			feature_accessor(Solver_Settings,none,none);
 

@@ -97,9 +97,6 @@
     <ClInclude Include="RngStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Population_Unit_Implementations.h">
-      <Filter>Implementations\PopSyn</Filter>
-    </ClInclude>
     <ClInclude Include="Population_Synthesis\Synthesis_Zone_Implementations.h">
       <Filter>Implementations\PopSyn</Filter>
     </ClInclude>
@@ -137,6 +134,15 @@
       <Filter>Implementations\PopSyn</Filter>
     </ClInclude>
     <ClInclude Include="Population_Synthesis\Region_Implementations.h">
+      <Filter>Implementations\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="Population_Synthesis\Synthesis_Region_Implementation.h">
+      <Filter>Implementations\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="Population_Synthesis\Synthesis_Region_Prototype.h">
+      <Filter>Prototypes\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="Population_Synthesis\Population_Unit_Implementations.h">
       <Filter>Implementations\PopSyn</Filter>
     </ClInclude>
   </ItemGroup>

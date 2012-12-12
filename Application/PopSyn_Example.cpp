@@ -47,15 +47,15 @@ int main()
 	// Create analysis zone
 	zone_itf* my_zone = (zone_itf*)Allocate<MasterType::zone>();
 	my_zone->Solver_Settings(solver);
+	my_zone->Rand<Rand_Interface*>(rand);
 	zones_collection.push_back(my_zone);
 	
 	//-----------------------------------------------------------------------------------------
 	// Get reference to the region distribution, marginals and sample, and their iterators
 	define_simple_container_interface(joint_itf,MasterType::region::Target_Joint_Distribution_type,Multidimensional_Random_Access_Array_Prototype, MasterType::zone::Target_Joint_Distribution_type::unqualified_value_type ,NULLTYPE);
 	define_simple_container_interface(marginal_itf,MasterType::region::Target_Marginal_Distribution_type,Multidimensional_Random_Access_Array_Prototype, MasterType::zone::Target_Marginal_Distribution_type::unqualified_value_type ,NULLTYPE);
-	define_container_and_value_interface(sample_itf, _pop_unit_itf, MasterType::region::Sample_Data_type, Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
-	define_component_interface(pop_unit_itf,MasterType::pop_unit,PopSyn::Prototypes::Population_Unit_Prototype,NULLTYPE);
-	
+	define_container_and_value_interface(sample_itf, pop_unit_itf, MasterType::region::Sample_Data_type, Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
+	define_simple_container_interface(data_itf, MasterType::pop_unit::Characteristics_type,Random_Access_Sequence_Prototype,MasterType::pop_unit::Characteristics_type::unqualified_value_type, NULLTYPE);
 	joint_itf& dist = my_region->Target_Joint_Distribution<joint_itf&>();
 	joint_itf::iterator itr = dist.begin();
 	marginal_itf& marg = my_region->Target_Marginal_Distribution<marginal_itf&>();
@@ -74,24 +74,26 @@ int main()
 	// fill the distribution with randomly generated samples
 	for (uint i=0; i<200; ++i)
 	{
+		//pop = Allocate<MasterType::pop_unit>();
 		pop_unit_itf* p = (pop_unit_itf*)Allocate<MasterType::pop_unit>();
-		p->Index<uint>((uint)rand->Next_Rand<double>()*47.0);
+		p->Index<uint>((uint)(rand->Next_Rand<double>()*47.0));
 		p->Weight<double>(rand->Next_Rand<double>());
 		p->ID<uint>(p->Index<uint>());
+		data_itf* data = p->Characteristics<data_itf*>();
+		data->push_back(p->Index<double>() + p->Weight<double>());
 		dist[p->Index<uint>()] += p->Weight<double>();
 		
-		//pair<uint, pop_unit_itf*>(1,p);
-		sample.insert(pair<uint,MasterType::pop_unit*>(p->Index<uint>(),(MasterType::pop_unit*)p));
-		sample_itf::Test_Type t;
-		int x=1;
-	}
-	for (sample_itr = sample.begin(); sample_itr != sample.end(); ++sample_itr)
-	{
-		double sum = 0;
-		/*for (sample_vector_itr = sample_itr->second.begin(); sample_vector_itr != sample_itr->second.end(); ++ sample_vector_itr) sum += ((pop_unit_itf*)*sample_vector_itr)->Weight<double>();
-		for (sample_vector_itr = sample_itr->second.begin(); sample_vector_itr != sample_itr->second.end(); ++ sample_vector_itr) ((pop_unit_itf*)*sample_vector_itr)->Normalize_Weight<double>(sum);*/
+		sample.insert(p->Index<uint>(),p);
 	}
 
+
+	out <<endl<<"UNNORMALIZED SAMPLE:"<<endl;
+	for (sample_itr = sample.begin(); sample_itr != sample.end(); ++sample_itr) out << endl << "ID: " << sample_itr->second->ID<uint>() << ",  weight: "<<sample_itr->second->Weight<float>();
+	// normalize
+	my_region->Normalize_Sample<NULLTYPE>();
+	out <<endl<<endl<<"NORMALIZED SAMPLE:"<<endl;
+	for (sample_itr = sample.begin(); sample_itr != sample.end(); ++sample_itr) out << endl << "ID: " << sample_itr->second->ID<uint>() << ",  weight: "<<sample_itr->second->Weight<float>();
+	
 	out <<endl<<"Normalized Joint Distribution: " << endl;
 	dist.write(out);
 

@@ -45,6 +45,9 @@ namespace PopSyn
 				define_simple_container_interface(mway_itf, get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
 				mway_itf& mway = Synthesis_Zone_Prototype<ComponentType,CallerType>::Target_Joint_Distribution<mway_itf&>();
 
+				define_container_and_value_interface(sample_itf, pop_unit_itf, get_type_of(Sample_Data), Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
+				sample_itf* sample = Synthesis_Zone_Prototype<ComponentType,CallerType>::Sample_Data<sample_itf*>();
+
 
 				//======================================================================
 				// MAIN SYNTHESIS ROUTINE. 
@@ -67,6 +70,7 @@ namespace PopSyn
 
 					//----------------------------------------------------------
 					// 3. Select households from regional sample into the zone synthesized sample
+					(*zone_itr)->Select_Synthetic_Population_Units<sample_itf*>(sample);
 
 					//----------------------------------------------------------
 					// 4. Done. output results

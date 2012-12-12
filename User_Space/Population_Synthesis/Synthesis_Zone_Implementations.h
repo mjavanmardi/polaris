@@ -10,6 +10,7 @@ namespace PopSyn
 		implementation struct Synthesis_Zone_Implementation
 		{
 			typedef true_type Has_Marginals_In_Distribution;
+			typedef true_type Probabilistic_Selection_Type;
 			typedef double Value_Type;
 
 			member_data(long,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
@@ -18,6 +19,7 @@ namespace PopSyn
 			//member_container(vector<typename MasterType::pop_unit*>, Sample_Data,none,none);
 
 			member_component(typename MasterType::IPF_Solver_Settings,Solver_Settings,none,none);
+			member_component(typename MasterType::RNG, Rand,none,none);
 	
 			typedef hash_multimap<uint, typename MasterType::pop_unit*> __sample_map_type;		
 			member_associative_container(__sample_map_type, Sample_Data, none, none); 
