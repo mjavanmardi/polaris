@@ -318,24 +318,6 @@ public:
 	// display member
 	void print(ostream& stream);
 
-protected:
-	index_type _dim_sizes;
-	index_type _cursor;
-	size_type _ndim;
-	size_type _size;
-	pointer _data;
-
-	void _init(const_index_type dim_sizes);
-	void _copy(const m_array& obj);
-	void _cleanup()
-	{
-		if (_size > 0) delete _data;
-		_size=0;
-		_ndim=0;
-		_dim_sizes.clear();
-		_cursor.clear();
-	}
-
 	size_type get_index(const_index_type index)
 	{
 		size_type ind=0;
@@ -362,6 +344,25 @@ protected:
 		}
 		return ind;
 	}
+protected:
+	index_type _dim_sizes;
+	index_type _cursor;
+	size_type _ndim;
+	size_type _size;
+	pointer _data;
+
+	void _init(const_index_type dim_sizes);
+	void _copy(const m_array& obj);
+	void _cleanup()
+	{
+		if (_size > 0) delete _data;
+		_size=0;
+		_ndim=0;
+		_dim_sizes.clear();
+		_cursor.clear();
+	}
+
+
 	bool valid_index(const_index_type index)
 	{
 		if (index.size() != _ndim)

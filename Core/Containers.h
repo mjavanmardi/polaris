@@ -152,8 +152,8 @@ struct Random_Access_Sequence_Prototype
 
 };
 
-template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::mapped_type>
-struct Associative_Container_Prototype
+template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::mapped_type> 
+struct Associative_Container_Prototype : public ComponentType
 {
 	typedef ComponentType Component_Type;
 	typedef CallerType Caller_Type;
@@ -216,8 +216,8 @@ struct Associative_Container_Prototype
 /// Multidimensional_Random_Access_Sequence_Array_Prototype - custom (note, not a sequence as insertion does not work with multiple dimensions
 ///============================================================================
 
-template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
-struct Multidimensional_Random_Access_Array_Prototype
+template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type> 
+struct Multidimensional_Random_Access_Array_Prototype : public ComponentType
 {
 	typedef ComponentType Component_Type;
 	typedef CallerType Caller_Type;
