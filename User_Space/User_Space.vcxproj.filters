@@ -115,9 +115,6 @@
     <ClInclude Include="Population_Synthesis\Population_Unit_Prototype.h">
       <Filter>Prototypes\PopSyn</Filter>
     </ClInclude>
-    <ClInclude Include="Population_Synthesis\Region_Prototype.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
     <ClInclude Include="Population_Synthesis\Synthesis_Zone_Prototypes.h">
       <Filter>Prototypes\PopSyn</Filter>
     </ClInclude>

@@ -18,7 +18,7 @@ namespace PopSyn
 
 	namespace Prototypes
 	{
-		prototype struct Population_Synthesizer_Prototype
+		prototype struct Population_Synthesizer_Prototype : public ComponentType
 		{
 			feature_prototype bool Start_Popsyn(requires(check(ComponentType,Concepts::Uses_Linker_File)))
 			{
