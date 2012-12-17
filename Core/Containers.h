@@ -164,7 +164,6 @@ struct Associative_Container_Prototype
 	typedef typename ComponentType::key_type key_type;
 	typedef typename ComponentType::key_compare key_compare;
 	typedef typename ComponentType::value_compare value_compare;
-	typedef TargetValueType Test_Type;
 	typedef typename ComponentType::mapped_type Val_Type;
 
 	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,pair<key_type,TargetValueType>> iterator;
@@ -178,6 +177,11 @@ struct Associative_Container_Prototype
 	size_type max_size(){return ((ComponentType*)this)->size();}
 
 	bool empty(){return ((ComponentType*)this)->empty();}
+
+	pair<iterator,bool> insert(pair<key_type,TargetValueType>& p)
+	{
+		return ((ComponentType*)this)->insert(pair<key_type,Component_Type::mapped_type>(p.first,(Component_Type::mapped_type)(p.second)));
+	}
 
 	iterator insert(key_type key, TargetValueType& value)
 	{
@@ -202,14 +206,14 @@ struct Associative_Container_Prototype
 
 	value_compare value_comp() const { return ((ComponentType*)this)->value_comp();}
 
-	iterator find ( const key_type& x ) { return ((CompoentType*)this)->find(x);}
+	iterator find ( const key_type& x ) { return ((ComponentType*)this)->find(x);}
 
 	pair<iterator,iterator>  equal_range ( const key_type& x ) { return ((ComponentType*)this)->equal_range(x);}
 
 };
 
 ///============================================================================
-/// Multidimensional_Random_Access_Sequence_Prototype - custom (note, not a sequence as insertion does not work with multiple dimensions
+/// Multidimensional_Random_Access_Sequence_Array_Prototype - custom (note, not a sequence as insertion does not work with multiple dimensions
 ///============================================================================
 
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>

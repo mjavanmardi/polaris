@@ -35,9 +35,10 @@ namespace PopSyn
 
 				//==========================================================
 				// Get the list of synthesis zones in the region
-				define_container_and_value_interface(synthesis_zones_itf,zone_itf,get_type_of(Synthesis_Zone_Collection),Containers::Random_Access_Sequence_Prototype, Prototypes::Synthesis_Zone_Prototype,NULLTYPE);
+				define_container_and_value_interface(synthesis_zones_itf,zone_itf,get_type_of(Synthesis_Zone_Collection),Containers::Associative_Container_Prototype, Prototypes::Synthesis_Zone_Prototype,NULLTYPE);
 				synthesis_zones_itf& zones_collection = this->Synthesis_Zone_Collection<synthesis_zones_itf&>();
 				synthesis_zones_itf::iterator zone_itr = zones_collection.begin();
+				zone_itf* zone;
 
 				//==========================================================
 				// Get the region target distribution, use to fill zone distributions
@@ -60,17 +61,19 @@ namespace PopSyn
 				// B. Cycle through zones and solve for each
 				for (zone_itr; zone_itr != zones_collection.end(); ++zone_itr)
 				{
+					zone = zone_itr->second;
+
 					//----------------------------------------------------------
 					// 1. Push region distribution to each zone
-					(*zone_itr)->Target_Joint_Distribution<mway_itf&>().Copy(mway);
+					zone->Target_Joint_Distribution<mway_itf&>().Copy(mway);
 
 					//----------------------------------------------------------
 					// 2. Fit the zone distribution to the zone marginals
-					(*zone_itr)->Fit_Joint_Distribution_To_Marginal_Data<NULLTYPE>();
+					zone->Fit_Joint_Distribution_To_Marginal_Data<NULLTYPE>();
 
 					//----------------------------------------------------------
 					// 3. Select households from regional sample into the zone synthesized sample
-					(*zone_itr)->Select_Synthetic_Population_Units<sample_itf*>(sample);
+					zone->Select_Synthetic_Population_Units<sample_itf*>(sample);
 
 					//----------------------------------------------------------
 					// 4. Done. output results

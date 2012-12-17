@@ -121,12 +121,6 @@
     <ClInclude Include="Population_Synthesis\Synthesis_Zone_Prototypes.h">
       <Filter>Prototypes\PopSyn</Filter>
     </ClInclude>
-    <ClInclude Include="Population_Synthesis\File_Reader_Implementations.h">
-      <Filter>Implementations\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\File_Writer_Implementations.h">
-      <Filter>Implementations\PopSyn</Filter>
-    </ClInclude>
     <ClInclude Include="Population_Synthesis\Linker_Implementations.h">
       <Filter>Implementations\PopSyn</Filter>
     </ClInclude>

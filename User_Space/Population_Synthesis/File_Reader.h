@@ -21,7 +21,7 @@ namespace File_IO
 		template<class T>
 		bool Get_Data(vector<T> &data, vector<int> columns);
 		const string& Get_String(int column);
-		int Line_Length(){return _string_data.size();}
+		int Line_Length(){return (int)_string_data.size();}
 
 	protected:
 		ifstream _file;

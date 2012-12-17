@@ -52,9 +52,12 @@ namespace PopSyn
 		prototype struct Solver_Settings_Prototype
 		{
 			tag_as_prototype;
-
-			feature_accessor(Tolerance,check(ReturnValueType, is_arithmetic),check(SetValueType, is_arithmetic));
-			feature_accessor(Iterations,check(ReturnValueType, is_arithmetic),check(SetValueType, is_arithmetic));
+			feature_prototype void Initialize(typename TargetType::Param1Type tolerance, typename TargetType::Param2Type iterations)
+			{
+				this_component()->initialize<ComponentType,CallerType,TargetType>(tolerance,iterations);
+			}
+			feature_accessor(Tolerance,check(ReturnValueType, is_arithmetic),not_available);
+			feature_accessor(Iterations,check(ReturnValueType, is_arithmetic),not_available);
 		};
 
 		prototype struct Synthesis_Zone_Prototype

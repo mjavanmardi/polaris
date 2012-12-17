@@ -13,7 +13,7 @@ namespace PopSyn
 			typedef true_type Probabilistic_Selection_Type;
 			typedef double Value_Type;
 
-			member_data(long,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			member_data(ulong,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 			member_container(m_array<double>,Target_Joint_Distribution,none,not_available);
 			member_container(s_array<double>,Target_Marginal_Distribution, none, not_available);
 			//member_container(vector<typename MasterType::pop_unit*>, Sample_Data,none,none);
@@ -27,8 +27,13 @@ namespace PopSyn
 
 		implementation struct IPF_Solver_Settings_Implementation
 		{
-			member_data(double, Tolerance, check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
-			member_data(int, Iterations, check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			feature_implementation void initialize(typename TargetType::Param1Type tolerance, typename TargetType::Param2Type iterations)
+			{
+				this->Tolerance<ComponentType, CallerType, TargetType::Param1Type>(tolerance);
+				this->Iterations<ComponentType, CallerType, TargetType::Param2Type>(iterations);
+			}
+			member_data(double, Tolerance, check(ReturnValueType,is_arithmetic),check(SetValueType, is_arithmetic));
+			member_data(int, Iterations, check(ReturnValueType,is_arithmetic),check(SetValueType, is_arithmetic));
 		};
 	}
 }

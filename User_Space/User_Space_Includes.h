@@ -11,13 +11,13 @@
 //================================================================================================================================================================
 #pragma region TEMP_CORE
 
+typedef unsigned long long int ulong;
 
-
-template<typename Return_Type=NULLTYPE, typename Param_Type=NULLTYPE, typename Param2_Type=NULLTYPE, typename Param3_Type=NULLTYPE, typename Param4_Type=NULLTYPE, typename Param5_Type=NULLTYPE, typename Param6_Type=NULLTYPE, typename Param7_Type=NULLTYPE, typename Param8_Type=NULLTYPE>
+template<typename Return_Type=NULLTYPE, typename Param1_Type=NULLTYPE, typename Param2_Type=NULLTYPE, typename Param3_Type=NULLTYPE, typename Param4_Type=NULLTYPE, typename Param5_Type=NULLTYPE, typename Param6_Type=NULLTYPE, typename Param7_Type=NULLTYPE, typename Param8_Type=NULLTYPE>
 struct Target_Type
 {
 	typedef Return_Type ReturnType;
-	typedef Param_Type ParamType;
+	typedef Param1_Type Param1Type;
 	typedef Param2_Type Param2Type;
 	typedef Param3_Type Param3Type;
 	typedef Param4_Type Param4Type;

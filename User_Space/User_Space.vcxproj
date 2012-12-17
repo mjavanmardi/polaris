@@ -145,9 +145,7 @@
     <ClInclude Include="Polaris_Traveler_Implementation.h" />
     <ClInclude Include="Polaris_Vehicle_Implementation.h" />
     <ClInclude Include="Population_Synthesis\File_Reader.h" />
-    <ClInclude Include="Population_Synthesis\File_Reader_Implementations.h" />
     <ClInclude Include="Population_Synthesis\File_Writer.h" />
-    <ClInclude Include="Population_Synthesis\File_Writer_Implementations.h" />
     <ClInclude Include="Population_Synthesis\linker.h" />
     <ClInclude Include="Population_Synthesis\Linker_Implementations.h" />
     <ClInclude Include="Population_Synthesis\PopSyn_Implementations.h" />

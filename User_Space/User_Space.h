@@ -19,4 +19,6 @@
 
 #include "User_Space\Population_Synthesis\Synthesis_Region_Implementation.h"
 
+#include "Population_Synthesis\PopSyn_Implementations.h"
+
 

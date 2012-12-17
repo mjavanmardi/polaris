@@ -159,6 +159,7 @@
     <ClInclude Include="sparsehash\template_util.h" />
     <ClInclude Include="sparsehash\type_traits.h" />
     <ClInclude Include="State_Checking.h" />
+    <ClInclude Include="s_array.h" />
     <ClInclude Include="Typed_Data_Page.h" />
     <ClInclude Include="Typed_Execution_Page.h" />
     <ClInclude Include="World.h" />

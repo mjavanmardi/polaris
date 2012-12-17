@@ -13,6 +13,7 @@ struct MasterType
 	typedef Polaris_Component<PopSyn::Implementations::Synthesis_Region_Implementation, MasterType, Data_Object> region;
 	typedef Polaris_Component<PopSyn::Implementations::IPF_Solver_Settings_Implementation, MasterType, Data_Object> IPF_Solver_Settings;
 	typedef Polaris_Component<PopSyn::Implementations::ADAPTS_Population_Unit_Implementation, MasterType, Data_Object> pop_unit;
+	typedef Polaris_Component<PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation, MasterType, Data_Object> popsyn_solver;
 };
 
 
@@ -25,21 +26,27 @@ int main()
 	//ostream& out = cout;
 	out << "test";
 
+	// IPF Solver Settings
+	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
+	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
+	solver->Initialize<Target_Type<void,double,int>>(0.05,100);
+
+	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
+	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
+	popsyn->linker_file_path<string>(string("C:\\Users\\Josh\\Desktop\\IL_HSR\\Pop Syn\\Data\\LINK_test.txt"));
+	popsyn->Solution_Settings<solver_itf*>(solver);
+	popsyn->Start_Popsyn<NULLTYPE>();
 
 	// CREATE RNG for later use
 	define_component_interface(Rand_Interface,MasterType::RNG,RNG_Prototype,NULLTYPE);
 	Rand_Interface* rand = (Rand_Interface*)Allocate<MasterType::RNG>();
 	rand->Initialize<double>(50.0,0.0,100.0);
 
-	// IPF Solver Settings
-	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
-	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
-	solver->Iterations<int>(100);
-	solver->Tolerance<double>(0.05);
+	
 
 	// Create analysis region
 	define_component_interface(region_itf,MasterType::region, PopSyn::Prototypes::Synthesis_Region_Prototype,NULLTYPE);
-	define_container_and_value_interface(synthesis_zones_itf,zone_itf,region_itf::get_type_of(Synthesis_Zone_Collection),Containers::Random_Access_Sequence_Prototype, PopSyn::Prototypes::Synthesis_Zone_Prototype,NULLTYPE);
+	define_container_and_value_interface(synthesis_zones_itf,zone_itf,region_itf::get_type_of(Synthesis_Zone_Collection),Containers::Associative_Container_Prototype, PopSyn::Prototypes::Synthesis_Zone_Prototype,NULLTYPE);
 	region_itf* my_region = (region_itf*)Allocate<MasterType::region>();
 	my_region->Solver_Settings(solver);
 	synthesis_zones_itf& zones_collection = my_region->Synthesis_Zone_Collection<synthesis_zones_itf&>();
@@ -48,7 +55,7 @@ int main()
 	zone_itf* my_zone = (zone_itf*)Allocate<MasterType::zone>();
 	my_zone->Solver_Settings(solver);
 	my_zone->Rand<Rand_Interface*>(rand);
-	zones_collection.push_back(my_zone);
+	zones_collection.insert(pair<synthesis_zones_itf::key_type,zone_itf*>(1,my_zone));
 	
 	//-----------------------------------------------------------------------------------------
 	// Get reference to the region distribution, marginals and sample, and their iterators

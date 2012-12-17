@@ -9,7 +9,8 @@ namespace PopSyn
 	{
 		implementation struct Synthesis_Region_Implementation : public Synthesis_Zone_Implementation<MasterType>
 		{
-			member_container(vector<typename MasterType::zone*>, Synthesis_Zone_Collection,none,none);
+			typedef hash_map<ulong, typename MasterType::zone*> zone_map_type;
+			member_associative_container(zone_map_type, Synthesis_Zone_Collection,none,none);
 		};
 	}
 }
@@ -45,38 +46,38 @@ namespace PopSyn
 //
 //void Region::add_sample_data(Linker &link, File_Reader &fr)
 //	{
-//		double x;
-//
-//		vector<int> index = operator()(true);
-//		for (int i=0; i<_ndim; i++)
-//		{
-//			fr.Get_Data<double>(x,link.get_pums_column(i));
-//			index[i] = link.find_index_in_dimension(i,x);
-//		}
-//
-//		uint ind = Region::get_index(index);
-//		double sample_id;
-//		double weight;
-//		fr.Get_Data<double>(sample_id,link.sample_id_col);
-//		fr.Get_Data<double>(weight, link.sample_weight_col);
-//		vector<double> data;
-//		fr.Get_Data<double>(data,link.get_pums_data_cols());
-//
-//		Pop_Unit P = Pop_Unit(sample_id,ind,weight,data);
-//
-//		hash_map<uint, vector<Pop_Unit>>::iterator i;
-//		if ((i = _sample.find(ind)) != _sample.end())
-//		{
-//			i->second.push_back(P);
-//		}
-//		else
-//		{
-//			vector<Pop_Unit> v;
-//			v.push_back(P);
-//			_sample.insert(pair<uint,vector<Pop_Unit>>(ind,v));
-//		}
-//
-//		operator[](index) += weight;
+		//double x;
+
+		//vector<int> index = operator()(true);
+		//for (int i=0; i<_ndim; i++)
+		//{
+		//	fr.Get_Data<double>(x,link.get_pums_column(i));
+		//	index[i] = link.find_index_in_dimension(i,x);
+		//}
+
+		//uint ind = Region::get_index(index);
+		//double sample_id;
+		//double weight;
+		//fr.Get_Data<double>(sample_id,link.sample_id_col);
+		//fr.Get_Data<double>(weight, link.sample_weight_col);
+		//vector<double> data;
+		//fr.Get_Data<double>(data,link.get_pums_data_cols());
+
+		//Pop_Unit P = Pop_Unit(sample_id,ind,weight,data);
+
+		//hash_map<uint, vector<Pop_Unit>>::iterator i;
+		//if ((i = _sample.find(ind)) != _sample.end())
+		//{
+		//	i->second.push_back(P);
+		//}
+		//else
+		//{
+		//	vector<Pop_Unit> v;
+		//	v.push_back(P);
+		//	_sample.insert(pair<uint,vector<Pop_Unit>>(ind,v));
+		//}
+
+		//operator[](index) += weight;
 //	}
 //
 //void Region::reweight_sample()
