@@ -220,6 +220,33 @@ concept struct Is_Target_Type_Struct
 #define get_exists_check(FEATURE_NAME) FEATURE_NAME##_get_exists
 #define set_exists_check(FEATURE_NAME) FEATURE_NAME##_set_exists
 
+struct Counter
+{
+private:
+	double _freq;
+	__int64 _start;
+	LARGE_INTEGER _l;
+
+public:
+	Counter()
+	{
+		_freq = 0.0;
+		_start = 0;
+	}
+	void Start()
+	{
+		QueryPerformanceFrequency(&_l);
+		_freq = double(_l.QuadPart)/1000.0;
+		QueryPerformanceCounter(&_l);
+		_start = _l.QuadPart;
+	}
+	double Stop()
+	{
+		QueryPerformanceCounter(&_l);
+		return (double)(_l.QuadPart - _start)/_freq;
+	}
+};
+
 //================================================================================================================================================================
 //================================================================================================================================================================
 //================================================================================================================================================================

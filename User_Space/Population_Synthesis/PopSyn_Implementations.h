@@ -12,6 +12,8 @@ namespace PopSyn
 			member_associative_container(region_map_type,Synthesis_Regions_Collection, none,none);
 			member_component(typename MasterType::IPF_Solver_Settings,Solution_Settings,none,none);
 			member_data(string, linker_file_path, none,none);
+			member_pointer(ostream,Output_Stream,none,none);
+			member_pointer(ostream,Marginal_Output_Stream,none,none);
 		};
 	}
 }

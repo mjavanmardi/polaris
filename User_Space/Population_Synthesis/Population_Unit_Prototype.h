@@ -12,7 +12,7 @@ namespace PopSyn
 {
 	namespace Prototypes
 	{
-		prototype struct Population_Unit_Prototype
+		prototype struct Population_Unit_Prototype : public ComponentType
 		{
 			tag_as_prototype;
 			typedef Population_Unit_Prototype<ComponentType, CallerType> This_Type;

@@ -87,11 +87,21 @@ namespace File_IO
 
 	bool File_Reader::Read(void)
 	{
-		if (!_open || _file.eof()) return false;
+		bool ret_val = true;
+		if (!_open || _file.eof()) 
+		{
+			ret_val = false;
+			return ret_val;
+		}
 		string line;
 		getline(_file,line);
 		_string_data.clear();
 		tokenize(line, _string_data, _delims);
+		if (_string_data.size() < _header.size())
+		{
+			return Read();
+		}
+		return ret_val;
 	}
 
 	const string& File_Reader::Get_String(int column)

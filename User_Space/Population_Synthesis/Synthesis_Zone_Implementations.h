@@ -12,8 +12,13 @@ namespace PopSyn
 			typedef true_type Has_Marginals_In_Distribution;
 			typedef true_type Probabilistic_Selection_Type;
 			typedef double Value_Type;
+			
+			feature_implementation typename TargetType::ReturnType Get_1D_Index(typename TargetType::Param1Type& multi_dimensional_index_vector)
+			{
+				return this->_Target_Joint_Distribution.get_index(multi_dimensional_index_vector);
+			}
 
-			member_data(ulong,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			member_data(double,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 			member_container(m_array<double>,Target_Joint_Distribution,none,not_available);
 			member_container(s_array<double>,Target_Marginal_Distribution, none, not_available);
 			//member_container(vector<typename MasterType::pop_unit*>, Sample_Data,none,none);

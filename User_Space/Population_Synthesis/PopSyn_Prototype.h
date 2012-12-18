@@ -20,13 +20,46 @@ namespace PopSyn
 	{
 		prototype struct Population_Synthesizer_Prototype : public ComponentType
 		{
+			tag_as_prototype;
+			Counter timer;
+
+			feature_prototype void Initialize()
+			{
+				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,1,NULLTYPE);
+				//load_event(ComponentType,Output_Popsyn_Conditional,Output_Popsyn_Event,4,NULLTYPE);
+			}
+
+			// 1.) Startup Event - Reads inputs and allocates analysis objects (at timestep 1)
+			declare_feature_conditional(Start_Popsyn_Conditional)
+			{
+				if (_iteration == 1)
+				{
+					response.result = true;
+					response.next = UINT_MAX;
+				}
+				else
+				{
+					response.result = false;
+					response.next = _iteration + 1;
+				}
+			}
+			declare_feature_event(Start_Popsyn_Event)
+			{
+				((Population_Synthesizer_Prototype<ComponentType,CallerType>*) _this)->Start_Popsyn<NULLTYPE>();
+			}
 			feature_prototype bool Start_Popsyn(requires(check(ComponentType,Concepts::Uses_Linker_File)))
 			{
-				tag_as_prototype;
+				//------------------------
+				// TIMER
+				Counter timer;
+				timer.Start();
+				//------------------------
 
 				int ndim, ans;
 				Linker linker;
 				File_IO::File_Writer fw, fw_sample;
+
+				ostream& out = this->Output_Stream<ostream&>();
 
 
 				//===============================================================================================================
@@ -40,8 +73,7 @@ namespace PopSyn
 				// IPF Solver Settings
 				define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,ComponentType);
 				solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
-				solver->Initialize<Target_Type<void,double,int>>(0.05,100);
-	
+					
 
 				//===============================================================================================================
 				// Initialize file linker
@@ -106,8 +138,13 @@ namespace PopSyn
 					{
 						// create new region
 						new_region = (region_itf*)Allocate<region_type>();
+						new_region->Initialize<NULLTYPE>();
 						dist = new_region->Target_Joint_Distribution<joint_itf*>();
 						marg = new_region->Target_Marginal_Distribution<marginal_itf*>();
+						Rand_Interface* my_rand = (Rand_Interface*)Allocate<MasterType::RNG>();
+						my_rand->Initialize<double>(rand->Next_Rand<double>()*(double)SHRT_MAX);
+						new_region->Output_Stream<ostream&>(out);
+						((zone_itf*)new_region)->Rand<Rand_Interface*>(my_rand);
 
 						//-----------------------------------------------------------------------------------------
 						// Initialize the distribution and marginals
@@ -116,6 +153,9 @@ namespace PopSyn
 						marg->resize(dimensions,0.0);
 
 						new_region->ID<int>(ID);
+						solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
+						solver->Initialize<Target_Type<void,double,int>>(0.05,100);
+						new_region->Solver_Settings<solver_itf*>(solver);
 
 						// add new region to the list
 						regions->insert(pair<regions_itf::key_type, region_itf*>(ID, new_region));
@@ -145,11 +185,12 @@ namespace PopSyn
 
 					pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>();
 					p->ID(sample_id);
+					p->Index(new_region->Get_1D_Index<Target_Type<joint_itf::size_type,joint_itf::index_type>>(index));
 					p->Weight(weight);
 					p->Characteristics(data);
 
 					// Update the sample and joint distribution with the current population unit
-					sample->insert(p->ID<sample_collection_type::key_type>(), p);
+					sample->insert(p->Index<sample_collection_type::key_type>(), p);
 					(*dist)[index] += weight;
 				}
 				fr.Close();
@@ -197,13 +238,22 @@ namespace PopSyn
 					// Read marginal data from file and add to ZONE
 					zone_itf* zone = (zone_itf*)Allocate<zone_type>();
 					zone->ID(ID);
+					solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
+					solver->Initialize<Target_Type<void,double,int>>(0.05,100);
+					zone->Solver_Settings<solver_itf*>(solver);
 					joint_itf* mway = zone->Target_Joint_Distribution<joint_itf*>();
 					marginal_itf* marg = zone->Target_Marginal_Distribution<marginal_itf*>();
-					mway->resize(index,0);
+					mway->resize(dimensions,0);
+					marg->resize(dimensions,0);
+					Rand_Interface* my_rand = (Rand_Interface*)Allocate<MasterType::RNG>();
+					my_rand->Initialize<double>(rand->Next_Rand<double>()*(double)SHRT_MAX);
+					
 
-					for (marginal_itf::size_type i=0; i<index.size(); i++)
+					zone->Rand<Rand_Interface*>(my_rand);
+
+					for (marginal_itf::size_type i=0; i<dimensions.size(); i++)
 					{
-						for (marginal_itf::size_type j=0; j<index[i]; j++)
+						for (marginal_itf::size_type j=0; j<dimensions[i]; j++)
 						{
 							if (!zone_fr.Get_Data<double>(x,linker.get_sf3_column(i,j))) break;
 							(*marg)[pair<marginal_itf::size_type,marginal_itf::size_type>(i,j)] = x;
@@ -215,39 +265,150 @@ namespace PopSyn
 				zone_fr.Close();
 
 
-				//===============================================================================================================
-				// RUN SYNTHESIS PROCESS
-				//---------------------------------------------------------------------------------------------------------------
-				for (region_itr = regions->begin(); region_itr != regions->end(); region_itr++)
-				{
-					region_itf* region = region_itr->second;
-					region->Synthesize_Population<NULLTYPE>();
-				}
 
-				//===============================================================================================================
-				// OUTPUT RESULTS
-				//---------------------------------------------------------------------------------------------------------------
-				//fw.Open("..\\output.txt");
-				//fw_sample.Open("..\\population.txt");
-				//for (region_itr = regions.begin(); region_itr != regions.end(); region_itr++) region_itr->second.write(fw, fw_sample);
-				//fw.Close();
-				//fw_sample.Close();
 
-				cout <<endl<<"END?";
-				cin >> ans;
-				return 0;
+				//------------------------
+				// TIMER
+				cout <<"Setup Runtime (ms): "<<timer.Stop();
+				//------------------------
+
+				load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,3,NULLTYPE);
+
 			}
-
 			feature_prototype bool Start_Popsyn(requires(check(ComponentType,!Concepts::Uses_Linker_File)))
 			{
 				assert_check(ComponentType,Concepts::Uses_Linker_File,"This popsyn type does not use linker file setup.");
 			}
+
+			// 2.) Start timing event - called before individual objects begin processing (at timestep 3)
+			declare_feature_conditional(Start_Main_Timer_Conditional)
+			{
+				if (_iteration == 3)
+				{
+					response.result = true;
+					response.next = UINT_MAX;
+				}
+				else
+				{
+					response.result = false;
+					response.next = _iteration + 1;
+				}
+			}
+			declare_feature_event(Start_Main_Timer)
+			{
+				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
+				pthis->Start_Timer<NULLTYPE>();
+			}
+			feature_prototype void Start_Timer()
+			{
+				this->timer.Start();
+				load_event(ComponentType,Stop_Main_Timer_Conditional,Stop_Main_Timer,5,NULLTYPE);
+
+			}
+
+			// 3.) Stop timing event - called after individual objects end processing (at timestep 5)
+			declare_feature_conditional(Stop_Main_Timer_Conditional)
+			{
+				if (_iteration == 5)
+				{
+					response.result = true;
+					response.next = UINT_MAX;
+				}
+				else
+				{
+					response.result = false;
+					response.next = _iteration + 1;
+				}
+			}
+			declare_feature_event(Stop_Main_Timer)
+			{
+				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
+				pthis->Stop_Timer<NULLTYPE>();
+			}
+			feature_prototype void Stop_Timer()
+			{
+				cout << endl<<"Main Algorithm run-time: " << this->timer.Stop();
+				load_event(ComponentType,Output_Popsyn_Conditional,Output_Popsyn_Event,6,NULLTYPE);
+			}
+
+			// 4.) Output results event - called after timing is stopped (at timestep 7)
+			declare_feature_conditional(Output_Popsyn_Conditional)
+			{
+				if (_iteration == 7)
+				{
+					response.result = true;
+					response.next = UINT_MAX;
+				}
+				else
+				{
+					response.result = false;
+					response.next = _iteration + 1;
+				}
+			}
+			declare_feature_event(Output_Popsyn_Event)
+			{
+				Counter timer;
+				timer.Start();
+
+				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
+				
+				ostream& sample_out = pthis->Output_Stream<ostream&>();
+				ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
+				
+				// Define iterators and get pointer to the region collection
+				typedef get_type_of(Synthesis_Regions_Collection)			region_collection_type;
+				typedef region_collection_type::unqualified_value_type		region_type;
+				typedef region_type::Sample_Data_type						sample_collection_type;
+				typedef sample_collection_type::unqualified_value_type		sample_type;
+				typedef region_type::Synthesis_Zone_Collection_type			zone_collection_type;
+				typedef zone_collection_type::unqualified_value_type		zone_type;
+
+				define_container_and_value_interface(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
+				define_container_and_value_interface(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
+				define_container_and_value_interface(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,ComponentType);
+				define_simple_container_interface(joint_itf,MasterType::region::Target_Joint_Distribution_type,Multidimensional_Random_Access_Array_Prototype, MasterType::region::Target_Joint_Distribution_type::unqualified_value_type ,NULLTYPE);
+				define_simple_container_interface(marginal_itf,MasterType::region::Target_Marginal_Distribution_type,Multidimensional_Random_Access_Array_Prototype, MasterType::region::Target_Marginal_Distribution_type::unqualified_value_type ,NULLTYPE);
+	
+				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
+				regions_itf::iterator r_itr;
+				zones_itf::iterator z_itr;
+
+				for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
+				{
+					region_itf* region = r_itr->second;
+					zones_itf* zones = region->Synthesis_Zone_Collection<zones_itf*>();
+					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+					{
+						zone_itf* zone = z_itr->second;
+						marg_out <<endl<<endl<<"ZONE_ID: "<<zone->ID<long long int>();
+						zone->Target_Joint_Distribution<joint_itf*>()->write(marg_out);
+						marg_out <<endl;
+						zone->Target_Marginal_Distribution<marginal_itf*>()->write(marg_out);
+						marg_out <<endl;
+
+						sample_data_itf* sample = zone->Sample_Data<sample_data_itf*>();
+						
+						sample_out << endl<<endl<<"ZONE_ID: "<<zone->ID<long long int>();
+						for (sample_data_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
+						{
+							sample_out << endl << "ID: " << s_itr->second->ID<uint>() << ",  weight: "<<s_itr->second->Weight<float>() <<", index: "<<s_itr->second->Index<uint>();
+						}
+
+					}
+				}
+
+				cout <<endl<<"File I/O Runtime: "<<timer.Stop();
+			}
+
 			
 			feature_accessor(linker_file_path, none,none);
 
 			feature_accessor(Synthesis_Regions_Collection,none,none);
 
 			feature_accessor(Solution_Settings,none,none);
+
+			feature_accessor(Output_Stream,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
+			feature_accessor(Marginal_Output_Stream,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
 		};
 	}
 }

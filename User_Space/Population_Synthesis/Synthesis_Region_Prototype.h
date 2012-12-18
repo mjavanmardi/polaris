@@ -21,13 +21,35 @@ namespace PopSyn
 		{
 			tag_as_prototype;
 
+			declare_feature_event(Call_Synthesize_Population)
+			{
+				((Synthesis_Region_Prototype<ComponentType,CallerType>*) _this)->Synthesize_Population<NULLTYPE>();
+			}
+			declare_feature_conditional(Call_Synthesize_Population_Conditional)
+			{
+				if (_iteration == 4)
+				{
+					response.result = true;
+					response.next = UINT_MAX;
+				}
+				else
+				{
+					response.result = false;
+					response.next = _iteration + 1;
+				}
+			}
+
 			feature_prototype void Initialize()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				//this_component()->Initialize<ComponentType,CallerType,TargetType>();
+
+				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population,4,NULLTYPE);
 			}
 
 			feature_prototype void Synthesize_Population(requires(check(ComponentType,Concepts::Is_IPF_Capable)))
 			{
+				ostream& out = this->Output_Stream<ostream&>();
+
 				//==========================================================
 				// Get the solution settings
 				define_component_interface(solution_settings_itf,get_type_of(Solver_Settings),Prototypes::Solver_Settings_Prototype,NULLTYPE);
@@ -77,6 +99,7 @@ namespace PopSyn
 
 					//----------------------------------------------------------
 					// 4. Done. output results
+					
 				}
 						
 			}
@@ -92,6 +115,8 @@ namespace PopSyn
 			}
 
 			feature_accessor(Synthesis_Zone_Collection,none,none);
+
+			feature_accessor(Output_Stream,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
 
 		};
 

@@ -49,7 +49,7 @@ namespace PopSyn
 
 	namespace Prototypes
 	{
-		prototype struct Solver_Settings_Prototype
+		prototype struct Solver_Settings_Prototype : public ComponentType
 		{
 			tag_as_prototype;
 			feature_prototype void Initialize(typename TargetType::Param1Type tolerance, typename TargetType::Param2Type iterations)
@@ -60,7 +60,7 @@ namespace PopSyn
 			feature_accessor(Iterations,check(ReturnValueType, is_arithmetic),not_available);
 		};
 
-		prototype struct Synthesis_Zone_Prototype
+		prototype struct Synthesis_Zone_Prototype : public ComponentType
 		{
 			tag_as_prototype;
 
@@ -277,6 +277,11 @@ namespace PopSyn
 
 			feature_accessor(ID,none,none);
 
+			feature_prototype typename TargetType::ReturnType Get_1D_Index(typename TargetType::Param1Type& multi_dimensional_index_vector)
+			{
+				return this_component()->Get_1D_Index<ComponentType,CallerType,TargetType>(multi_dimensional_index_vector);
+			}
+
 			feature_accessor(Rand,none,none);
 
 			feature_accessor(Solver_Settings,none,none);
@@ -287,39 +292,3 @@ namespace PopSyn
 	}
 }
 
-//class Zone : public m_array<double>
-//{
-//public:
-//	// constructors
-//	Zone (){}
-//	Zone (double ID, vector<int> &dim_sizes);
-//	Zone (const Zone& obj);
-//
-//	// Processing methods
-//	void initialize(m_array Data);
-//	bool IPF(double TOL, int MAX_ITER);
-//	bool Select_HH(int MAX_ITER, const hash_map<uint,vector<Pop_Unit>> &sample, Prob_Generator& Rand);
-//	void Add_Sample(const Pop_Unit& P);
-//
-//	// Property access methods
-//	double& marginal(int dim, int index) {return _marginals[dim][index];} //marginals get/set
-//	const double& Id(void){return _id;} // ID get
-//
-//	// I/O methods
-//	bool write(void);
-//	bool write(File_Writer &fw);
-//	bool write_sample(File_Writer &fw);
-//
-//protected:
-//	// Marginal totals across categories
-//	vector<vector<double>> _marginals;
-//	// List of households in zone
-//	hash_map<uint, vector<Pop_Unit>> _sample;
-//	// Unique zone ID
-//	double _id;
-//	
-//
-//private:
-//
-//};
-//
