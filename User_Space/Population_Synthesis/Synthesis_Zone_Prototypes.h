@@ -63,47 +63,13 @@ namespace PopSyn
 		prototype struct Synthesis_Zone_Prototype : public ComponentType
 		{
 			tag_as_prototype;
-
 			feature_prototype void Initialize()
 			{
 				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}
 
-			feature_prototype void Normalize_Sample()
-			{
-				define_container_and_value_interface(sample_itf,unit_itf,get_type_of(Sample_Data),Containers::Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,NULLTYPE);
-				sample_itf& sample = this->Sample_Data<sample_itf&>();
-				
-				
-				for (sample_itf::iterator itr = sample.begin(); itr != sample.end(); ++itr)
-				{
-					double sum = 0;
-					sample_itf::key_type stored_key = itr->first;
-					pair<sample_itf::iterator,sample_itf::iterator> range = sample.equal_range(stored_key);
-					while (range.first != range.second)
-					{
-						sum += range.first->second->Weight<double>();
-						++range.first;
-					}
-
-					range = sample.equal_range(stored_key);
-					while (range.first != range.second)
-					{
-						range.first->second->Weight<double>(range.first->second->Weight<double>()/sum);
-						++range.first;
-					}
-					itr = range.second;
-					if (itr == sample.end()) break;
-				}
-				//pair<hash_multimap<int,int>::iterator,hash_multimap<int,int>::iterator> pairIter;
-				//pairIter.equal_range(value_Iterator->first);
-				//while( pairIter.first != pairIter.second ){
-				//	// sum the values associated with keys
-				//	// Increment pairIter->first
-				//}
-				//value_iterator = pairIter.second;
-			}
-
+			//===================================================================================================================================
+			// Defintion of the IPF procedure which can only be called for and IPF capable implementation
 			feature_prototype void Fit_Joint_Distribution_To_Marginal_Data(requires(check(ComponentType,Concepts::Is_IPF_Capable)))
 			{
 				// Get the solution settings
@@ -160,7 +126,6 @@ namespace PopSyn
 				}
 						
 			}
-
 			feature_prototype void Fit_Joint_Distribution_To_Marginal_Data(requires(check(ComponentType,!Concepts::Is_IPF_Capable)))
 			{
 				assert_check(ComponentType,Concepts::Is_IPF_Capable,"Not IPF Capable");
@@ -170,8 +135,45 @@ namespace PopSyn
 				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Marginals,"doesn't have marginals");
 				
 			}
+			feature_prototype void Normalize_Sample()
+			{
+				define_container_and_value_interface(sample_itf,unit_itf,get_type_of(Sample_Data),Containers::Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,NULLTYPE);
+				sample_itf& sample = this->Sample_Data<sample_itf&>();
+				
+				
+				for (sample_itf::iterator itr = sample.begin(); itr != sample.end(); ++itr)
+				{
+					double sum = 0;
+					sample_itf::key_type stored_key = itr->first;
+					pair<sample_itf::iterator,sample_itf::iterator> range = sample.equal_range(stored_key);
+					while (range.first != range.second)
+					{
+						sum += range.first->second->Weight<double>();
+						++range.first;
+					}
 
-			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check_as_given(TargetType,is_pointer) && check(TargetType,Containers::Concepts::Is_Associative)))
+					range = sample.equal_range(stored_key);
+					while (range.first != range.second)
+					{
+						range.first->second->Weight<double>(range.first->second->Weight<double>()/sum);
+						++range.first;
+					}
+					itr = range.second;
+					if (itr == sample.end()) break;
+				}
+				//pair<hash_multimap<int,int>::iterator,hash_multimap<int,int>::iterator> pairIter;
+				//pairIter.equal_range(value_Iterator->first);
+				//while( pairIter.first != pairIter.second ){
+				//	// sum the values associated with keys
+				//	// Increment pairIter->first
+				//}
+				//value_iterator = pairIter.second;
+			}
+
+			//===================================================================================================================================
+			// Defintion of the Household/Person selection procedure - can be used for IPF, Combinatorial Optimization, etc. methods
+			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, 
+				requires(check(ComponentType, Concepts::Is_Probabilistic_Selection)   && check_as_given(TargetType,is_pointer)                        && check(TargetType,Containers::Concepts::Is_Associative)))
 			{
 				// Get the fitted distribution
 				typedef get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
@@ -261,32 +263,34 @@ namespace PopSyn
 					if (itr == sample->end()) break;
 				}		
 			}
-
-			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, requires(!(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check_as_given(TargetType,is_pointer) && check(TargetType,Containers::Concepts::Is_Associative))))
+			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, 
+				requires(!(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check_as_given(TargetType,is_pointer)                        && check(TargetType,Containers::Concepts::Is_Associative))))
 			{
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
 				assert_check(TargetType, is_pointer,"Is not a pointer");
 				assert_check_strip(TargetType, Containers::Concepts::Is_Associative, "Container is not associative.");
 			}
 
+			//===================================================================================================================================
+			// Accessor for the Joint Distribution (IPF and CO only) and marginal distributions used in synthesis
 			feature_accessor(Target_Joint_Distribution,none,none);
-
 			feature_accessor(Target_Marginal_Distribution,none,none);
 
+			//===================================================================================================================================
+			// REQUIRED: Accessor for the Synthesized Population (if the component is a zone) or the sample population (if it is a region)
 			feature_accessor(Sample_Data,none,none);
-
+			
+			//===================================================================================================================================
+			// OPTIONAL: Other accessors that may be of use
 			feature_accessor(ID,none,none);
+			feature_accessor(Rand,none,none);
+			feature_accessor(Solver_Settings,none,none);
+			feature_accessor(Selection_Settings,none,none);
 
 			feature_prototype typename TargetType::ReturnType Get_1D_Index(typename TargetType::Param1Type& multi_dimensional_index_vector)
 			{
 				return this_component()->Get_1D_Index<ComponentType,CallerType,TargetType>(multi_dimensional_index_vector);
 			}
-
-			feature_accessor(Rand,none,none);
-
-			feature_accessor(Solver_Settings,none,none);
-
-			feature_accessor(Selection_Settings,none,none);
 		};
 
 	}

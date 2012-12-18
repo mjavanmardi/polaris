@@ -20,15 +20,13 @@ namespace PopSyn
 	{
 		prototype struct Population_Synthesizer_Prototype : public ComponentType
 		{
-			tag_as_prototype;
+			tag_as_prototype; // Declare class as a polaris prototype
 			Counter timer;
 
-			feature_prototype void Initialize()
-			{
-				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,1,NULLTYPE);
-				//load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,4,NULLTYPE);
-			}
-
+			//----------------------------------------------------------------
+			// Main analysis loop events, used to separate initialization, timing, 
+			// processing, and output into different timesteps
+			//----------------------------------------------------------------
 			// 1.) Startup Event - Reads inputs and allocates analysis objects (at timestep 1)
 			declare_feature_conditional(Start_Popsyn_Conditional)
 			{
@@ -281,7 +279,6 @@ namespace PopSyn
 			{
 				assert_check(ComponentType,Concepts::Uses_Linker_File,"This popsyn type does not use linker file setup.");
 			}
-
 			// 2.) Start timing event - called before individual objects begin processing (at timestep 3)
 			declare_feature_conditional(Start_Main_Timer_Conditional)
 			{
@@ -307,7 +304,6 @@ namespace PopSyn
 				load_event(ComponentType,Stop_Main_Timer_Conditional,Stop_Main_Timer,5,NULLTYPE);
 
 			}
-
 			// 3.) Stop timing event - called after individual objects end processing (at timestep 5)
 			declare_feature_conditional(Stop_Main_Timer_Conditional)
 			{
@@ -333,7 +329,6 @@ namespace PopSyn
 				//cout << endl<<"freq: " << this->timer.get_freq_value() << ", start: "<<this->timer.get_start_value() <<", l: "<<this->timer.get_l_value();
 				load_event(ComponentType,Output_Popsyn_Conditional,Output_Popsyn_Event,6,NULLTYPE);
 			}
-
 			// 4.) Output results event - called after timing is stopped (at timestep 7)
 			declare_feature_conditional(Output_Popsyn_Conditional)
 			{
@@ -402,14 +397,25 @@ namespace PopSyn
 
 				cout <<endl<<"File I/O Runtime: "<<timer.Stop();
 			}
+			//----------------------------------------------------------------
+			// Schedules the first event from above
+			feature_prototype void Initialize()
+			{
+				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,1,NULLTYPE);
+				//load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,4,NULLTYPE);
+			}
 
-			
-			feature_accessor(linker_file_path, none,none);
-
+			//----------------------------------------------------------------
+			// Required Features - necessary for any synthesis routing
 			feature_accessor(Synthesis_Regions_Collection,none,none);
-
 			feature_accessor(Solution_Settings,none,none);
 
+			//----------------------------------------------------------------
+			// Optional Features - used for specific solution types
+			feature_accessor(linker_file_path, none,none);
+			
+			//----------------------------------------------------------------
+			// Output features - optional, used to write intermediate and final results
 			feature_accessor(Output_Stream,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
 			feature_accessor(Marginal_Output_Stream,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
 		};
