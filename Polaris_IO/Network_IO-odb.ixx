@@ -4,6 +4,132 @@
 
 namespace odb
 {
+  // timing_phase
+  //
+
+  inline
+  bool access::composite_value_traits< ::pio::timing_phase >::
+  get_null (const image_type& i)
+  {
+    bool r (true);
+    r = r && i.phase_null;
+    r = r && i.barrier_null;
+    r = r && i.ring_null;
+    r = r && i.position_null;
+    r = r && i.minimum_null;
+    r = r && i.maximum_null;
+    r = r && i.extend_null;
+    r = r && i.yellow_null;
+    r = r && i.red_null;
+    return r;
+  }
+
+  inline
+  void access::composite_value_traits< ::pio::timing_phase >::
+  set_null (image_type& i, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    i.phase_null = true;
+    i.barrier_null = true;
+    i.ring_null = true;
+    i.position_null = true;
+    i.minimum_null = true;
+    i.maximum_null = true;
+    i.extend_null = true;
+    i.yellow_null = true;
+    i.red_null = true;
+  }
+
+  // shape_geometry
+  //
+
+  inline
+  bool access::composite_value_traits< ::pio::shape_geometry >::
+  get_null (const image_type& i)
+  {
+    bool r (true);
+    r = r && i.x_null;
+    r = r && i.y_null;
+    r = r && i.z_null;
+    return r;
+  }
+
+  inline
+  void access::composite_value_traits< ::pio::shape_geometry >::
+  set_null (image_type& i, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    i.x_null = true;
+    i.y_null = true;
+    i.z_null = true;
+  }
+
+  // signal_time
+  //
+
+  inline
+  bool access::composite_value_traits< ::pio::signal_time >::
+  get_null (const image_type& i)
+  {
+    bool r (true);
+    r = r && i.start_null;
+    r = r && i.end_null;
+    r = r && i.timing_null;
+    r = r && i.phasing_null;
+    return r;
+  }
+
+  inline
+  void access::composite_value_traits< ::pio::signal_time >::
+  set_null (image_type& i, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    i.start_null = true;
+    i.end_null = true;
+    i.timing_null = true;
+    i.phasing_null = true;
+  }
+
+  // phase_movement
+  //
+
+  inline
+  bool access::composite_value_traits< ::pio::phase_movement >::
+  get_null (const image_type& i)
+  {
+    bool r (true);
+    r = r && i.movement_null;
+    r = r && i.link_null;
+    r = r && i.dir_null;
+    r = r && i.to_link_null;
+    r = r && i.protect_null;
+    return r;
+  }
+
+  inline
+  void access::composite_value_traits< ::pio::phase_movement >::
+  set_null (image_type& i, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    i.movement_null = true;
+    i.link_null = true;
+    i.dir_null = true;
+    i.to_link_null = true;
+    i.protect_null = true;
+  }
+
   // Node
   //
 
@@ -128,12 +254,6 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (db);
     ODB_POTENTIALLY_UNUSED (x);
     ODB_POTENTIALLY_UNUSED (e);
-  }
-
-  inline
-  void access::object_traits< ::pio::Shape >::
-  load_ (statements_type&, object_type&)
-  {
   }
 
   // Link
@@ -570,12 +690,6 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (e);
   }
 
-  inline
-  void access::object_traits< ::pio::Signal >::
-  load_ (statements_type&, object_type&)
-  {
-  }
-
   // Timing
   //
 
@@ -614,12 +728,6 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (e);
   }
 
-  inline
-  void access::object_traits< ::pio::Timing >::
-  load_ (statements_type&, object_type&)
-  {
-  }
-
   // Phasing
   //
 
@@ -656,12 +764,6 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (db);
     ODB_POTENTIALLY_UNUSED (x);
     ODB_POTENTIALLY_UNUSED (e);
-  }
-
-  inline
-  void access::object_traits< ::pio::Phasing >::
-  load_ (statements_type&, object_type&)
-  {
   }
 
   // Detector
@@ -1540,6 +1642,50 @@ namespace odb
 
   inline
   void access::object_traits< ::pio::Traveler >::
+  load_ (statements_type&, object_type&)
+  {
+  }
+
+  // TripNoRef
+  //
+
+  inline
+  access::object_traits< ::pio::TripNoRef >::id_type
+  access::object_traits< ::pio::TripNoRef >::
+  id (const object_type& o)
+  {
+    return o.auto_id;
+  }
+
+  inline
+  void access::object_traits< ::pio::TripNoRef >::
+  erase (database& db, const object_type& obj)
+  {
+    callback (db, obj, callback_event::pre_erase);
+    erase (db, id (obj));
+    callback (db, obj, callback_event::post_erase);
+  }
+
+  inline
+  void access::object_traits< ::pio::TripNoRef >::
+  callback (database& db, object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::pio::TripNoRef >::
+  callback (database& db, const object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::pio::TripNoRef >::
   load_ (statements_type&, object_type&)
   {
   }

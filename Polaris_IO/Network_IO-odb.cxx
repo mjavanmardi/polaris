@@ -25,6 +25,1141 @@
 
 namespace odb
 {
+  // timing_phase
+  //
+
+  bool access::composite_value_traits< ::pio::timing_phase >::
+  grow (image_type& i, bool* t)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (t);
+
+    bool grew (false);
+
+    // phase
+    //
+    t[0UL] = false;
+
+    // barrier
+    //
+    t[1UL] = false;
+
+    // ring
+    //
+    t[2UL] = false;
+
+    // position
+    //
+    t[3UL] = false;
+
+    // minimum
+    //
+    t[4UL] = false;
+
+    // maximum
+    //
+    t[5UL] = false;
+
+    // extend
+    //
+    t[6UL] = false;
+
+    // yellow
+    //
+    t[7UL] = false;
+
+    // red
+    //
+    t[8UL] = false;
+
+    return grew;
+  }
+
+  void access::composite_value_traits< ::pio::timing_phase >::
+  bind (sqlite::bind* b, image_type& i, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (b);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    std::size_t n (0);
+    ODB_POTENTIALLY_UNUSED (n);
+
+    // phase
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.phase_value;
+    b[n].is_null = &i.phase_null;
+    n++;
+
+    // barrier
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.barrier_value;
+    b[n].is_null = &i.barrier_null;
+    n++;
+
+    // ring
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.ring_value;
+    b[n].is_null = &i.ring_null;
+    n++;
+
+    // position
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.position_value;
+    b[n].is_null = &i.position_null;
+    n++;
+
+    // minimum
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.minimum_value;
+    b[n].is_null = &i.minimum_null;
+    n++;
+
+    // maximum
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.maximum_value;
+    b[n].is_null = &i.maximum_null;
+    n++;
+
+    // extend
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.extend_value;
+    b[n].is_null = &i.extend_null;
+    n++;
+
+    // yellow
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.yellow_value;
+    b[n].is_null = &i.yellow_null;
+    n++;
+
+    // red
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.red_value;
+    b[n].is_null = &i.red_null;
+    n++;
+  }
+
+  bool access::composite_value_traits< ::pio::timing_phase >::
+  init (image_type& i, const value_type& o, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    bool grew (false);
+
+    // phase
+    //
+    {
+      int const& v =
+        o.phase;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.phase_value,
+        is_null,
+        v);
+      i.phase_null = is_null;
+    }
+
+    // barrier
+    //
+    {
+      int const& v =
+        o.barrier;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.barrier_value,
+        is_null,
+        v);
+      i.barrier_null = is_null;
+    }
+
+    // ring
+    //
+    {
+      int const& v =
+        o.ring;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.ring_value,
+        is_null,
+        v);
+      i.ring_null = is_null;
+    }
+
+    // position
+    //
+    {
+      int const& v =
+        o.position;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.position_value,
+        is_null,
+        v);
+      i.position_null = is_null;
+    }
+
+    // minimum
+    //
+    {
+      int const& v =
+        o.minimum;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.minimum_value,
+        is_null,
+        v);
+      i.minimum_null = is_null;
+    }
+
+    // maximum
+    //
+    {
+      int const& v =
+        o.maximum;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.maximum_value,
+        is_null,
+        v);
+      i.maximum_null = is_null;
+    }
+
+    // extend
+    //
+    {
+      int const& v =
+        o.extend;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.extend_value,
+        is_null,
+        v);
+      i.extend_null = is_null;
+    }
+
+    // yellow
+    //
+    {
+      int const& v =
+        o.yellow;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.yellow_value,
+        is_null,
+        v);
+      i.yellow_null = is_null;
+    }
+
+    // red
+    //
+    {
+      int const& v =
+        o.red;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.red_value,
+        is_null,
+        v);
+      i.red_null = is_null;
+    }
+
+    return grew;
+  }
+
+  void access::composite_value_traits< ::pio::timing_phase >::
+  init (value_type& o, const image_type&  i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // phase
+    //
+    {
+      int& v =
+        o.phase;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.phase_value,
+        i.phase_null);
+    }
+
+    // barrier
+    //
+    {
+      int& v =
+        o.barrier;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.barrier_value,
+        i.barrier_null);
+    }
+
+    // ring
+    //
+    {
+      int& v =
+        o.ring;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.ring_value,
+        i.ring_null);
+    }
+
+    // position
+    //
+    {
+      int& v =
+        o.position;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.position_value,
+        i.position_null);
+    }
+
+    // minimum
+    //
+    {
+      int& v =
+        o.minimum;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.minimum_value,
+        i.minimum_null);
+    }
+
+    // maximum
+    //
+    {
+      int& v =
+        o.maximum;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.maximum_value,
+        i.maximum_null);
+    }
+
+    // extend
+    //
+    {
+      int& v =
+        o.extend;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.extend_value,
+        i.extend_null);
+    }
+
+    // yellow
+    //
+    {
+      int& v =
+        o.yellow;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.yellow_value,
+        i.yellow_null);
+    }
+
+    // red
+    //
+    {
+      int& v =
+        o.red;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.red_value,
+        i.red_null);
+    }
+  }
+
+  // shape_geometry
+  //
+
+  bool access::composite_value_traits< ::pio::shape_geometry >::
+  grow (image_type& i, bool* t)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (t);
+
+    bool grew (false);
+
+    // x
+    //
+    t[0UL] = false;
+
+    // y
+    //
+    t[1UL] = false;
+
+    // z
+    //
+    t[2UL] = false;
+
+    return grew;
+  }
+
+  void access::composite_value_traits< ::pio::shape_geometry >::
+  bind (sqlite::bind* b, image_type& i, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (b);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    std::size_t n (0);
+    ODB_POTENTIALLY_UNUSED (n);
+
+    // x
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.x_value;
+    b[n].is_null = &i.x_null;
+    n++;
+
+    // y
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.y_value;
+    b[n].is_null = &i.y_null;
+    n++;
+
+    // z
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.z_value;
+    b[n].is_null = &i.z_null;
+    n++;
+  }
+
+  bool access::composite_value_traits< ::pio::shape_geometry >::
+  init (image_type& i, const value_type& o, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    bool grew (false);
+
+    // x
+    //
+    {
+      double const& v =
+        o.x;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.x_value,
+        is_null,
+        v);
+      i.x_null = is_null;
+    }
+
+    // y
+    //
+    {
+      double const& v =
+        o.y;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.y_value,
+        is_null,
+        v);
+      i.y_null = is_null;
+    }
+
+    // z
+    //
+    {
+      double const& v =
+        o.z;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.z_value,
+        is_null,
+        v);
+      i.z_null = is_null;
+    }
+
+    return grew;
+  }
+
+  void access::composite_value_traits< ::pio::shape_geometry >::
+  init (value_type& o, const image_type&  i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // x
+    //
+    {
+      double& v =
+        o.x;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.x_value,
+        i.x_null);
+    }
+
+    // y
+    //
+    {
+      double& v =
+        o.y;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.y_value,
+        i.y_null);
+    }
+
+    // z
+    //
+    {
+      double& v =
+        o.z;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.z_value,
+        i.z_null);
+    }
+  }
+
+  // signal_time
+  //
+
+  bool access::composite_value_traits< ::pio::signal_time >::
+  grow (image_type& i, bool* t)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (t);
+
+    bool grew (false);
+
+    // start
+    //
+    t[0UL] = false;
+
+    // end
+    //
+    t[1UL] = false;
+
+    // timing
+    //
+    t[2UL] = false;
+
+    // phasing
+    //
+    t[3UL] = false;
+
+    return grew;
+  }
+
+  void access::composite_value_traits< ::pio::signal_time >::
+  bind (sqlite::bind* b, image_type& i, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (b);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    std::size_t n (0);
+    ODB_POTENTIALLY_UNUSED (n);
+
+    // start
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.start_value;
+    b[n].is_null = &i.start_null;
+    n++;
+
+    // end
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.end_value;
+    b[n].is_null = &i.end_null;
+    n++;
+
+    // timing
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.timing_value;
+    b[n].is_null = &i.timing_null;
+    n++;
+
+    // phasing
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.phasing_value;
+    b[n].is_null = &i.phasing_null;
+    n++;
+  }
+
+  bool access::composite_value_traits< ::pio::signal_time >::
+  init (image_type& i, const value_type& o, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    bool grew (false);
+
+    // start
+    //
+    {
+      double const& v =
+        o.start;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.start_value,
+        is_null,
+        v);
+      i.start_null = is_null;
+    }
+
+    // end
+    //
+    {
+      double const& v =
+        o.end;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.end_value,
+        is_null,
+        v);
+      i.end_null = is_null;
+    }
+
+    // timing
+    //
+    {
+      int const& v =
+        o.timing;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.timing_value,
+        is_null,
+        v);
+      i.timing_null = is_null;
+    }
+
+    // phasing
+    //
+    {
+      int const& v =
+        o.phasing;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.phasing_value,
+        is_null,
+        v);
+      i.phasing_null = is_null;
+    }
+
+    return grew;
+  }
+
+  void access::composite_value_traits< ::pio::signal_time >::
+  init (value_type& o, const image_type&  i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // start
+    //
+    {
+      double& v =
+        o.start;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.start_value,
+        i.start_null);
+    }
+
+    // end
+    //
+    {
+      double& v =
+        o.end;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.end_value,
+        i.end_null);
+    }
+
+    // timing
+    //
+    {
+      int& v =
+        o.timing;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.timing_value,
+        i.timing_null);
+    }
+
+    // phasing
+    //
+    {
+      int& v =
+        o.phasing;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.phasing_value,
+        i.phasing_null);
+    }
+  }
+
+  // phase_movement
+  //
+
+  bool access::composite_value_traits< ::pio::phase_movement >::
+  grow (image_type& i, bool* t)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (t);
+
+    bool grew (false);
+
+    // movement
+    //
+    if (t[0UL])
+    {
+      i.movement_value.capacity (i.movement_size);
+      grew = true;
+    }
+
+    // link
+    //
+    t[1UL] = false;
+
+    // dir
+    //
+    t[2UL] = false;
+
+    // to_link
+    //
+    t[3UL] = false;
+
+    // protect
+    //
+    if (t[4UL])
+    {
+      i.protect_value.capacity (i.protect_size);
+      grew = true;
+    }
+
+    return grew;
+  }
+
+  void access::composite_value_traits< ::pio::phase_movement >::
+  bind (sqlite::bind* b, image_type& i, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (b);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    std::size_t n (0);
+    ODB_POTENTIALLY_UNUSED (n);
+
+    // movement
+    //
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.movement_value.data ();
+    b[n].size = &i.movement_size;
+    b[n].capacity = i.movement_value.capacity ();
+    b[n].is_null = &i.movement_null;
+    n++;
+
+    // link
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.link_value;
+    b[n].is_null = &i.link_null;
+    n++;
+
+    // dir
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.dir_value;
+    b[n].is_null = &i.dir_null;
+    n++;
+
+    // to_link
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.to_link_value;
+    b[n].is_null = &i.to_link_null;
+    n++;
+
+    // protect
+    //
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.protect_value.data ();
+    b[n].size = &i.protect_size;
+    b[n].capacity = i.protect_value.capacity ();
+    b[n].is_null = &i.protect_null;
+    n++;
+  }
+
+  bool access::composite_value_traits< ::pio::phase_movement >::
+  init (image_type& i, const value_type& o, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    bool grew (false);
+
+    // movement
+    //
+    {
+      ::std::string const& v =
+        o.movement;
+
+      bool is_null (false);
+      std::size_t cap (i.movement_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
+        i.movement_value,
+        i.movement_size,
+        is_null,
+        v);
+      i.movement_null = is_null;
+      grew = grew || (cap != i.movement_value.capacity ());
+    }
+
+    // link
+    //
+    {
+      ::std::tr1::shared_ptr< ::pio::Link > const& v =
+        o.link;
+
+      typedef object_traits< ::pio::Link > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Link > > ptr_traits;
+
+      bool is_null (ptr_traits::null_ptr (v));
+      if (!is_null)
+      {
+        const obj_traits::id_type& id (
+          obj_traits::id (ptr_traits::get_ref (v)));
+
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_image (
+          i.link_value,
+          is_null,
+          id);
+        i.link_null = is_null;
+      }
+      else
+        i.link_null = true;
+    }
+
+    // dir
+    //
+    {
+      int const& v =
+        o.dir;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.dir_value,
+        is_null,
+        v);
+      i.dir_null = is_null;
+    }
+
+    // to_link
+    //
+    {
+      ::std::tr1::shared_ptr< ::pio::Link > const& v =
+        o.to_link;
+
+      typedef object_traits< ::pio::Link > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Link > > ptr_traits;
+
+      bool is_null (ptr_traits::null_ptr (v));
+      if (!is_null)
+      {
+        const obj_traits::id_type& id (
+          obj_traits::id (ptr_traits::get_ref (v)));
+
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_image (
+          i.to_link_value,
+          is_null,
+          id);
+        i.to_link_null = is_null;
+      }
+      else
+        i.to_link_null = true;
+    }
+
+    // protect
+    //
+    {
+      ::std::string const& v =
+        o.protect;
+
+      bool is_null (false);
+      std::size_t cap (i.protect_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
+        i.protect_value,
+        i.protect_size,
+        is_null,
+        v);
+      i.protect_null = is_null;
+      grew = grew || (cap != i.protect_value.capacity ());
+    }
+
+    return grew;
+  }
+
+  void access::composite_value_traits< ::pio::phase_movement >::
+  init (value_type& o, const image_type&  i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // movement
+    //
+    {
+      ::std::string& v =
+        o.movement;
+
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        v,
+        i.movement_value,
+        i.movement_size,
+        i.movement_null);
+    }
+
+    // link
+    //
+    {
+      ::std::tr1::shared_ptr< ::pio::Link >& v =
+        o.link;
+
+      typedef object_traits< ::pio::Link > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Link > > ptr_traits;
+
+      if (i.link_null)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_value (
+          id,
+          i.link_value,
+          i.link_null);
+
+        // If a compiler error points to the line below, then
+        // it most likely means that a pointer used in a member
+        // cannot be initialized from an object pointer.
+        //
+        v = ptr_traits::pointer_type (
+          db->load< obj_traits::object_type > (id));
+      }
+    }
+
+    // dir
+    //
+    {
+      int& v =
+        o.dir;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.dir_value,
+        i.dir_null);
+    }
+
+    // to_link
+    //
+    {
+      ::std::tr1::shared_ptr< ::pio::Link >& v =
+        o.to_link;
+
+      typedef object_traits< ::pio::Link > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Link > > ptr_traits;
+
+      if (i.to_link_null)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_value (
+          id,
+          i.to_link_value,
+          i.to_link_null);
+
+        // If a compiler error points to the line below, then
+        // it most likely means that a pointer used in a member
+        // cannot be initialized from an object pointer.
+        //
+        v = ptr_traits::pointer_type (
+          db->load< obj_traits::object_type > (id));
+      }
+    }
+
+    // protect
+    //
+    {
+      ::std::string& v =
+        o.protect;
+
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        v,
+        i.protect_value,
+        i.protect_size,
+        i.protect_null);
+    }
+  }
+
   // Node
   //
 
@@ -789,6 +1924,8 @@ namespace odb
                       "  \"z\" REAL,\n"
                       "  \"subarea\" INTEGER NOT NULL,\n"
                       "  \"part\" INTEGER NOT NULL)");
+          db.execute ("CREATE INDEX \"Node_node_i\"\n"
+                      "  ON \"Node\" (\"node\")");
           return false;
         }
       }
@@ -1704,6 +2841,8 @@ namespace odb
                       "  \"min_y\" REAL,\n"
                       "  \"max_x\" REAL,\n"
                       "  \"max_y\" REAL)");
+          db.execute ("CREATE INDEX \"Zone_zone_i\"\n"
+                      "  ON \"Zone\" (\"zone\")");
           return false;
         }
       }
@@ -1719,6 +2858,319 @@ namespace odb
 
   // Shape
   //
+
+  // nested_records
+  //
+
+  const char access::object_traits< ::pio::Shape >::nested_records_traits::
+  select_all_statement[] =
+  "SELECT "
+  "\"Shape_nested_records\".\"index\","
+  "\"Shape_nested_records\".\"value_x\","
+  "\"Shape_nested_records\".\"value_y\","
+  "\"Shape_nested_records\".\"value_z\""
+  " FROM \"Shape_nested_records\""
+  " WHERE \"Shape_nested_records\".\"object_id\"=?"
+  " ORDER BY \"Shape_nested_records\".\"index\"";
+
+  const char access::object_traits< ::pio::Shape >::nested_records_traits::
+  insert_one_statement[] =
+  "INSERT INTO \"Shape_nested_records\" ("
+  "\"object_id\","
+  "\"index\","
+  "\"value_x\","
+  "\"value_y\","
+  "\"value_z\")"
+  " VALUES (?,?,?,?,?)";
+
+  const char access::object_traits< ::pio::Shape >::nested_records_traits::
+  delete_all_statement[] =
+  "DELETE FROM \"Shape_nested_records\""
+  " WHERE \"object_id\"=?";
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  bind (sqlite::bind* b,
+        const sqlite::bind* id,
+        std::size_t id_size,
+        cond_image_type& c)
+  {
+    ODB_POTENTIALLY_UNUSED (c);
+
+    std::size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+  }
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  bind (sqlite::bind* b,
+        const sqlite::bind* id,
+        std::size_t id_size,
+        data_image_type& d)
+  {
+    using namespace sqlite;
+
+    statement_kind sk (statement_select);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+
+    // index
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &d.index_value;
+    b[n].is_null = &d.index_null;
+    n++;
+
+    // value
+    //
+    composite_value_traits< value_type >::bind (b + n, d.value_value, sk);
+  }
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  grow (data_image_type& i, bool* t)
+  {
+    bool grew (false);
+
+    // index
+    //
+    t[0UL] = false;
+
+    // value
+    //
+    if (composite_value_traits< value_type >::grow (
+          i.value_value, t + 1UL))
+    {
+      grew = true;
+    }
+
+    if (grew)
+      i.version++;
+  }
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  init (data_image_type& i, index_type j, const value_type& v)
+  {
+    using namespace sqlite;
+
+    statement_kind sk (statement_insert);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    bool grew (false);
+
+    // index
+    //
+    {
+      bool is_null (false);
+      sqlite::value_traits<
+          index_type,
+          sqlite::id_integer >::set_image (
+        i.index_value,
+        is_null,
+        j);
+      i.index_null = is_null;
+    }
+
+    // value
+    //
+    {
+      composite_value_traits< value_type >::init (
+        i.value_value,
+        v,
+        sk);
+    }
+
+    if (grew)
+      i.version++;
+  }
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  init (index_type& j, value_type& v, const data_image_type& i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // index
+    //
+    {
+      sqlite::value_traits<
+          index_type,
+          sqlite::id_integer >::set_value (
+        j,
+        i.index_value,
+        i.index_null);
+    }
+
+    // value
+    //
+    {
+      composite_value_traits< value_type >::init (
+        v,
+        i.value_value,
+        db);
+    }
+  }
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  insert_one (index_type i, const value_type& v, void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    binding& b (sts.data_image_binding ());
+    data_image_type& di (sts.data_image ());
+
+    init (di, i, v);
+
+    if (di.version != sts.data_image_version ())
+    {
+      bind (b.bind, 0, sts.id_binding ().count, di);
+      sts.data_image_version (di.version);
+      b.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    if (!sts.insert_one_statement ().execute ())
+      throw object_already_persistent ();
+  }
+
+  bool access::object_traits< ::pio::Shape >::nested_records_traits::
+  load_all (index_type& i, value_type& v, void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    data_image_type& di (sts.data_image ());
+    init (i, v, di, &sts.connection ().database ());
+
+    select_statement& st (sts.select_all_statement ());
+    select_statement::result r (st.fetch ());
+    return r != select_statement::no_data;
+  }
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  delete_all (void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    sts.delete_all_statement ().execute ();
+  }
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  persist (const container_type& c,
+           const sqlite::binding& id,
+           statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& b (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || b.version == 0)
+    {
+      bind (b.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      b.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::persist (c, fs);
+  }
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  load (container_type& c,
+        const sqlite::binding& id,
+        statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& db (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || db.version == 0)
+    {
+      bind (db.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      db.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    binding& cb (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || cb.version == 0)
+    {
+      bind (cb.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      cb.version++;
+    }
+
+    select_statement& st (sts.select_all_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+    bool more (r != select_statement::no_data);
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::load (c, more, fs);
+  }
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  update (const container_type& c,
+          const sqlite::binding& id,
+          statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& db (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || db.version == 0)
+    {
+      bind (db.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      db.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    binding& cb (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || cb.version == 0)
+    {
+      bind (cb.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      cb.version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::update (c, fs);
+  }
+
+  void access::object_traits< ::pio::Shape >::nested_records_traits::
+  erase (const sqlite::binding& id, statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& b (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || b.version == 0)
+    {
+      bind (b.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      b.version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::erase (fs);
+  }
 
   access::object_traits< ::pio::Shape >::id_type
   access::object_traits< ::pio::Shape >::
@@ -1760,18 +3212,6 @@ namespace odb
     //
     t[2UL] = false;
 
-    // x
-    //
-    t[3UL] = false;
-
-    // y
-    //
-    t[4UL] = false;
-
-    // z
-    //
-    t[5UL] = false;
-
     return grew;
   }
 
@@ -1808,27 +3248,6 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.points_value;
     b[n].is_null = &i.points_null;
-    n++;
-
-    // x
-    //
-    b[n].type = sqlite::bind::real;
-    b[n].buffer = &i.x_value;
-    b[n].is_null = &i.x_null;
-    n++;
-
-    // y
-    //
-    b[n].type = sqlite::bind::real;
-    b[n].buffer = &i.y_value;
-    b[n].is_null = &i.y_null;
-    n++;
-
-    // z
-    //
-    b[n].type = sqlite::bind::real;
-    b[n].buffer = &i.z_value;
-    b[n].is_null = &i.z_null;
     n++;
   }
 
@@ -1912,54 +3331,6 @@ namespace odb
       i.points_null = is_null;
     }
 
-    // x
-    //
-    {
-      double const& v =
-        o.x;
-
-      bool is_null (true);
-      sqlite::value_traits<
-          double,
-          sqlite::id_real >::set_image (
-        i.x_value,
-        is_null,
-        v);
-      i.x_null = is_null;
-    }
-
-    // y
-    //
-    {
-      double const& v =
-        o.y;
-
-      bool is_null (true);
-      sqlite::value_traits<
-          double,
-          sqlite::id_real >::set_image (
-        i.y_value,
-        is_null,
-        v);
-      i.y_null = is_null;
-    }
-
-    // z
-    //
-    {
-      double const& v =
-        o.z;
-
-      bool is_null (true);
-      sqlite::value_traits<
-          double,
-          sqlite::id_real >::set_image (
-        i.z_value,
-        is_null,
-        v);
-      i.z_null = is_null;
-    }
-
     return grew;
   }
 
@@ -2027,48 +3398,6 @@ namespace odb
         i.points_value,
         i.points_null);
     }
-
-    // x
-    //
-    {
-      double& v =
-        o.x;
-
-      sqlite::value_traits<
-          double,
-          sqlite::id_real >::set_value (
-        v,
-        i.x_value,
-        i.x_null);
-    }
-
-    // y
-    //
-    {
-      double& v =
-        o.y;
-
-      sqlite::value_traits<
-          double,
-          sqlite::id_real >::set_value (
-        v,
-        i.y_value,
-        i.y_null);
-    }
-
-    // z
-    //
-    {
-      double& v =
-        o.z;
-
-      sqlite::value_traits<
-          double,
-          sqlite::id_real >::set_value (
-        v,
-        i.z_value,
-        i.z_null);
-    }
   }
 
   void access::object_traits< ::pio::Shape >::
@@ -2088,7 +3417,10 @@ namespace odb
 
   struct access::object_traits< ::pio::Shape >::container_statement_cache_type
   {
-    container_statement_cache_type (sqlite::connection&)
+    sqlite::container_statements_impl< nested_records_traits > nested_records;
+
+    container_statement_cache_type (sqlite::connection& c)
+    : nested_records (c)
     {
     }
   };
@@ -2097,30 +3429,21 @@ namespace odb
   "INSERT INTO \"Shape\" ("
   "\"auto_id\","
   "\"link\","
-  "\"points\","
-  "\"x\","
-  "\"y\","
-  "\"z\")"
-  " VALUES (?,?,?,?,?,?)";
+  "\"points\")"
+  " VALUES (?,?,?)";
 
   const char access::object_traits< ::pio::Shape >::find_statement[] =
   "SELECT "
   "\"Shape\".\"auto_id\","
   "\"Shape\".\"link\","
-  "\"Shape\".\"points\","
-  "\"Shape\".\"x\","
-  "\"Shape\".\"y\","
-  "\"Shape\".\"z\""
+  "\"Shape\".\"points\""
   " FROM \"Shape\""
   " WHERE \"Shape\".\"auto_id\"=?";
 
   const char access::object_traits< ::pio::Shape >::update_statement[] =
   "UPDATE \"Shape\" SET "
   "\"link\"=?,"
-  "\"points\"=?,"
-  "\"x\"=?,"
-  "\"y\"=?,"
-  "\"z\"=?"
+  "\"points\"=?"
   " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Shape >::erase_statement[] =
@@ -2131,10 +3454,7 @@ namespace odb
   "SELECT "
   "\"Shape\".\"auto_id\","
   "\"Shape\".\"link\","
-  "\"Shape\".\"points\","
-  "\"Shape\".\"x\","
-  "\"Shape\".\"y\","
-  "\"Shape\".\"z\""
+  "\"Shape\".\"points\""
   " FROM \"Shape\""
   " LEFT JOIN \"Link\" AS \"link\" ON \"link\".\"link\"=\"Shape\".\"link\""
   " ";
@@ -2183,6 +3503,29 @@ namespace odb
       throw object_already_persistent ();
 
     obj.auto_id = static_cast< id_type > (st.id ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, obj.auto_id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::shape_geometry > const& v =
+        obj.nested_records;
+
+      nested_records_traits::persist (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -2242,6 +3585,18 @@ namespace odb
     if (sts.update_statement ().execute () == 0)
       throw object_not_persistent ();
 
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::shape_geometry > const& v =
+        obj.nested_records;
+
+      nested_records_traits::update (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
+
     callback (db, obj, callback_event::post_update);
   }
 
@@ -2267,6 +3622,12 @@ namespace odb
       sts.id_image_version (i.version);
       idb.version++;
     }
+
+    // nested_records
+    //
+    nested_records_traits::erase (
+      idb,
+      sts.container_statment_cache ().nested_records);
 
     if (sts.erase_statement ().execute () != 1)
       throw object_not_persistent ();
@@ -2425,6 +3786,24 @@ namespace odb
     return r != select_statement::no_data;
   }
 
+  void access::object_traits< ::pio::Shape >::
+  load_ (statements_type& sts, object_type& obj)
+  {
+    sqlite::binding& idb (sts.id_image_binding ());
+
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::shape_geometry >& v =
+        obj.nested_records;
+
+      nested_records_traits::load (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
+  }
+
   result< access::object_traits< ::pio::Shape >::object_type >
   access::object_traits< ::pio::Shape >::
   query (database&, const query_base_type& q)
@@ -2495,6 +3874,7 @@ namespace odb
       {
         case 1:
         {
+          db.execute ("DROP TABLE IF EXISTS \"Shape_nested_records\"");
           db.execute ("DROP TABLE IF EXISTS \"Shape\"");
           return false;
         }
@@ -2510,13 +3890,24 @@ namespace odb
                       "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"points\" INTEGER NOT NULL,\n"
-                      "  \"x\" REAL,\n"
-                      "  \"y\" REAL,\n"
-                      "  \"z\" REAL,\n"
                       "  CONSTRAINT \"link_fk\"\n"
                       "    FOREIGN KEY (\"link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE TABLE \"Shape_nested_records\" (\n"
+                      "  \"object_id\" INTEGER NOT NULL,\n"
+                      "  \"index\" INTEGER NOT NULL,\n"
+                      "  \"value_x\" REAL,\n"
+                      "  \"value_y\" REAL,\n"
+                      "  \"value_z\" REAL,\n"
+                      "  CONSTRAINT \"object_id_fk\"\n"
+                      "    FOREIGN KEY (\"object_id\")\n"
+                      "    REFERENCES \"Shape\" (\"auto_id\")\n"
+                      "    ON DELETE CASCADE)");
+          db.execute ("CREATE INDEX \"Shape_nested_records_object_id_i\"\n"
+                      "  ON \"Shape_nested_records\" (\"object_id\")");
+          db.execute ("CREATE INDEX \"Shape_nested_records_index_i\"\n"
+                      "  ON \"Shape_nested_records\" (\"index\")");
           return false;
         }
       }
@@ -4316,6 +5707,8 @@ namespace odb
                       "    FOREIGN KEY (\"node_b\")\n"
                       "    REFERENCES \"Node\" (\"node\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE INDEX \"Link_link_i\"\n"
+                      "  ON \"Link\" (\"link\")");
           return false;
         }
       }
@@ -10053,6 +11446,8 @@ namespace odb
                       "    FOREIGN KEY (\"link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE INDEX \"Parking_parking_i\"\n"
+                      "  ON \"Parking\" (\"parking\")");
           return false;
         }
       }
@@ -10894,6 +12289,8 @@ namespace odb
                       "    FOREIGN KEY (\"zone\")\n"
                       "    REFERENCES \"Zone\" (\"zone\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE INDEX \"Location_location_i\"\n"
+                      "  ON \"Location\" (\"location\")");
           return false;
         }
       }
@@ -12608,6 +14005,321 @@ namespace odb
   // Signal
   //
 
+  // nested_records
+  //
+
+  const char access::object_traits< ::pio::Signal >::nested_records_traits::
+  select_all_statement[] =
+  "SELECT "
+  "\"Signal_nested_records\".\"index\","
+  "\"Signal_nested_records\".\"value_start\","
+  "\"Signal_nested_records\".\"value_end\","
+  "\"Signal_nested_records\".\"value_timing\","
+  "\"Signal_nested_records\".\"value_phasing\""
+  " FROM \"Signal_nested_records\""
+  " WHERE \"Signal_nested_records\".\"object_id\"=?"
+  " ORDER BY \"Signal_nested_records\".\"index\"";
+
+  const char access::object_traits< ::pio::Signal >::nested_records_traits::
+  insert_one_statement[] =
+  "INSERT INTO \"Signal_nested_records\" ("
+  "\"object_id\","
+  "\"index\","
+  "\"value_start\","
+  "\"value_end\","
+  "\"value_timing\","
+  "\"value_phasing\")"
+  " VALUES (?,?,?,?,?,?)";
+
+  const char access::object_traits< ::pio::Signal >::nested_records_traits::
+  delete_all_statement[] =
+  "DELETE FROM \"Signal_nested_records\""
+  " WHERE \"object_id\"=?";
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  bind (sqlite::bind* b,
+        const sqlite::bind* id,
+        std::size_t id_size,
+        cond_image_type& c)
+  {
+    ODB_POTENTIALLY_UNUSED (c);
+
+    std::size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+  }
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  bind (sqlite::bind* b,
+        const sqlite::bind* id,
+        std::size_t id_size,
+        data_image_type& d)
+  {
+    using namespace sqlite;
+
+    statement_kind sk (statement_select);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+
+    // index
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &d.index_value;
+    b[n].is_null = &d.index_null;
+    n++;
+
+    // value
+    //
+    composite_value_traits< value_type >::bind (b + n, d.value_value, sk);
+  }
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  grow (data_image_type& i, bool* t)
+  {
+    bool grew (false);
+
+    // index
+    //
+    t[0UL] = false;
+
+    // value
+    //
+    if (composite_value_traits< value_type >::grow (
+          i.value_value, t + 1UL))
+    {
+      grew = true;
+    }
+
+    if (grew)
+      i.version++;
+  }
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  init (data_image_type& i, index_type j, const value_type& v)
+  {
+    using namespace sqlite;
+
+    statement_kind sk (statement_insert);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    bool grew (false);
+
+    // index
+    //
+    {
+      bool is_null (false);
+      sqlite::value_traits<
+          index_type,
+          sqlite::id_integer >::set_image (
+        i.index_value,
+        is_null,
+        j);
+      i.index_null = is_null;
+    }
+
+    // value
+    //
+    {
+      composite_value_traits< value_type >::init (
+        i.value_value,
+        v,
+        sk);
+    }
+
+    if (grew)
+      i.version++;
+  }
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  init (index_type& j, value_type& v, const data_image_type& i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // index
+    //
+    {
+      sqlite::value_traits<
+          index_type,
+          sqlite::id_integer >::set_value (
+        j,
+        i.index_value,
+        i.index_null);
+    }
+
+    // value
+    //
+    {
+      composite_value_traits< value_type >::init (
+        v,
+        i.value_value,
+        db);
+    }
+  }
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  insert_one (index_type i, const value_type& v, void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    binding& b (sts.data_image_binding ());
+    data_image_type& di (sts.data_image ());
+
+    init (di, i, v);
+
+    if (di.version != sts.data_image_version ())
+    {
+      bind (b.bind, 0, sts.id_binding ().count, di);
+      sts.data_image_version (di.version);
+      b.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    if (!sts.insert_one_statement ().execute ())
+      throw object_already_persistent ();
+  }
+
+  bool access::object_traits< ::pio::Signal >::nested_records_traits::
+  load_all (index_type& i, value_type& v, void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    data_image_type& di (sts.data_image ());
+    init (i, v, di, &sts.connection ().database ());
+
+    select_statement& st (sts.select_all_statement ());
+    select_statement::result r (st.fetch ());
+    return r != select_statement::no_data;
+  }
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  delete_all (void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    sts.delete_all_statement ().execute ();
+  }
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  persist (const container_type& c,
+           const sqlite::binding& id,
+           statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& b (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || b.version == 0)
+    {
+      bind (b.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      b.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::persist (c, fs);
+  }
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  load (container_type& c,
+        const sqlite::binding& id,
+        statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& db (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || db.version == 0)
+    {
+      bind (db.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      db.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    binding& cb (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || cb.version == 0)
+    {
+      bind (cb.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      cb.version++;
+    }
+
+    select_statement& st (sts.select_all_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+    bool more (r != select_statement::no_data);
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::load (c, more, fs);
+  }
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  update (const container_type& c,
+          const sqlite::binding& id,
+          statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& db (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || db.version == 0)
+    {
+      bind (db.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      db.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    binding& cb (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || cb.version == 0)
+    {
+      bind (cb.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      cb.version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::update (c, fs);
+  }
+
+  void access::object_traits< ::pio::Signal >::nested_records_traits::
+  erase (const sqlite::binding& id, statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& b (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || b.version == 0)
+    {
+      bind (b.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      b.version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::erase (fs);
+  }
+
   access::object_traits< ::pio::Signal >::id_type
   access::object_traits< ::pio::Signal >::
   id (const image_type& i)
@@ -12648,25 +14360,13 @@ namespace odb
     //
     t[2UL] = false;
 
-    // start
+    // nodes
     //
     t[3UL] = false;
 
-    // end
-    //
-    t[4UL] = false;
-
-    // timing
-    //
-    t[5UL] = false;
-
-    // phasing
-    //
-    t[6UL] = false;
-
     // type
     //
-    if (t[7UL])
+    if (t[4UL])
     {
       i.type_value.capacity (i.type_size);
       grew = true;
@@ -12674,7 +14374,7 @@ namespace odb
 
     // offset
     //
-    t[8UL] = false;
+    t[5UL] = false;
 
     return grew;
   }
@@ -12714,32 +14414,11 @@ namespace odb
     b[n].is_null = &i.times_null;
     n++;
 
-    // start
-    //
-    b[n].type = sqlite::bind::real;
-    b[n].buffer = &i.start_value;
-    b[n].is_null = &i.start_null;
-    n++;
-
-    // end
-    //
-    b[n].type = sqlite::bind::real;
-    b[n].buffer = &i.end_value;
-    b[n].is_null = &i.end_null;
-    n++;
-
-    // timing
+    // nodes
     //
     b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.timing_value;
-    b[n].is_null = &i.timing_null;
-    n++;
-
-    // phasing
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.phasing_value;
-    b[n].is_null = &i.phasing_null;
+    b[n].buffer = &i.nodes_value;
+    b[n].is_null = &i.nodes_null;
     n++;
 
     // type
@@ -12830,68 +14509,31 @@ namespace odb
       i.times_null = is_null;
     }
 
-    // start
+    // nodes
     //
     {
-      double const& v =
-        o.start;
+      ::std::tr1::shared_ptr< ::pio::Node > const& v =
+        o.nodes;
 
-      bool is_null (true);
-      sqlite::value_traits<
-          double,
-          sqlite::id_real >::set_image (
-        i.start_value,
-        is_null,
-        v);
-      i.start_null = is_null;
-    }
+      typedef object_traits< ::pio::Node > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Node > > ptr_traits;
 
-    // end
-    //
-    {
-      double const& v =
-        o.end;
+      bool is_null (ptr_traits::null_ptr (v));
+      if (!is_null)
+      {
+        const obj_traits::id_type& id (
+          obj_traits::id (ptr_traits::get_ref (v)));
 
-      bool is_null (true);
-      sqlite::value_traits<
-          double,
-          sqlite::id_real >::set_image (
-        i.end_value,
-        is_null,
-        v);
-      i.end_null = is_null;
-    }
-
-    // timing
-    //
-    {
-      int const& v =
-        o.timing;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.timing_value,
-        is_null,
-        v);
-      i.timing_null = is_null;
-    }
-
-    // phasing
-    //
-    {
-      int const& v =
-        o.phasing;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.phasing_value,
-        is_null,
-        v);
-      i.phasing_null = is_null;
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_image (
+          i.nodes_value,
+          is_null,
+          id);
+        i.nodes_null = is_null;
+      }
+      else
+        i.nodes_null = true;
     }
 
     // type
@@ -12981,60 +14623,34 @@ namespace odb
         i.times_null);
     }
 
-    // start
+    // nodes
     //
     {
-      double& v =
-        o.start;
+      ::std::tr1::shared_ptr< ::pio::Node >& v =
+        o.nodes;
 
-      sqlite::value_traits<
-          double,
-          sqlite::id_real >::set_value (
-        v,
-        i.start_value,
-        i.start_null);
-    }
+      typedef object_traits< ::pio::Node > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Node > > ptr_traits;
 
-    // end
-    //
-    {
-      double& v =
-        o.end;
+      if (i.nodes_null)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_value (
+          id,
+          i.nodes_value,
+          i.nodes_null);
 
-      sqlite::value_traits<
-          double,
-          sqlite::id_real >::set_value (
-        v,
-        i.end_value,
-        i.end_null);
-    }
-
-    // timing
-    //
-    {
-      int& v =
-        o.timing;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.timing_value,
-        i.timing_null);
-    }
-
-    // phasing
-    //
-    {
-      int& v =
-        o.phasing;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.phasing_value,
-        i.phasing_null);
+        // If a compiler error points to the line below, then
+        // it most likely means that a pointer used in a member
+        // cannot be initialized from an object pointer.
+        //
+        v = ptr_traits::pointer_type (
+          db->load< obj_traits::object_type > (id));
+      }
     }
 
     // type
@@ -13084,7 +14700,10 @@ namespace odb
 
   struct access::object_traits< ::pio::Signal >::container_statement_cache_type
   {
-    container_statement_cache_type (sqlite::connection&)
+    sqlite::container_statements_impl< nested_records_traits > nested_records;
+
+    container_statement_cache_type (sqlite::connection& c)
+    : nested_records (c)
     {
     }
   };
@@ -13094,23 +14713,17 @@ namespace odb
   "\"signal\","
   "\"group\","
   "\"times\","
-  "\"start\","
-  "\"end\","
-  "\"timing\","
-  "\"phasing\","
+  "\"nodes\","
   "\"type\","
   "\"offset\")"
-  " VALUES (?,?,?,?,?,?,?,?,?)";
+  " VALUES (?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Signal >::find_statement[] =
   "SELECT "
   "\"Signal\".\"signal\","
   "\"Signal\".\"group\","
   "\"Signal\".\"times\","
-  "\"Signal\".\"start\","
-  "\"Signal\".\"end\","
-  "\"Signal\".\"timing\","
-  "\"Signal\".\"phasing\","
+  "\"Signal\".\"nodes\","
   "\"Signal\".\"type\","
   "\"Signal\".\"offset\""
   " FROM \"Signal\""
@@ -13120,10 +14733,7 @@ namespace odb
   "UPDATE \"Signal\" SET "
   "\"group\"=?,"
   "\"times\"=?,"
-  "\"start\"=?,"
-  "\"end\"=?,"
-  "\"timing\"=?,"
-  "\"phasing\"=?,"
+  "\"nodes\"=?,"
   "\"type\"=?,"
   "\"offset\"=?"
   " WHERE \"signal\"=?";
@@ -13137,13 +14747,11 @@ namespace odb
   "\"Signal\".\"signal\","
   "\"Signal\".\"group\","
   "\"Signal\".\"times\","
-  "\"Signal\".\"start\","
-  "\"Signal\".\"end\","
-  "\"Signal\".\"timing\","
-  "\"Signal\".\"phasing\","
+  "\"Signal\".\"nodes\","
   "\"Signal\".\"type\","
   "\"Signal\".\"offset\""
   " FROM \"Signal\""
+  " LEFT JOIN \"Node\" AS \"nodes\" ON \"nodes\".\"node\"=\"Signal\".\"nodes\""
   " ";
 
   const char access::object_traits< ::pio::Signal >::erase_query_statement[] =
@@ -13186,6 +14794,29 @@ namespace odb
     insert_statement& st (sts.persist_statement ());
     if (!st.execute ())
       throw object_already_persistent ();
+
+    id_image_type& i (sts.id_image ());
+    init (i, obj.signal);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::signal_time > const& v =
+        obj.nested_records;
+
+      nested_records_traits::persist (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
 
     callback (db,
               obj,
@@ -13245,6 +14876,18 @@ namespace odb
     if (sts.update_statement ().execute () == 0)
       throw object_not_persistent ();
 
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::signal_time > const& v =
+        obj.nested_records;
+
+      nested_records_traits::update (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
+
     callback (db, obj, callback_event::post_update);
   }
 
@@ -13270,6 +14913,12 @@ namespace odb
       sts.id_image_version (i.version);
       idb.version++;
     }
+
+    // nested_records
+    //
+    nested_records_traits::erase (
+      idb,
+      sts.container_statment_cache ().nested_records);
 
     if (sts.erase_statement ().execute () != 1)
       throw object_not_persistent ();
@@ -13442,6 +15091,24 @@ namespace odb
     return r != select_statement::no_data;
   }
 
+  void access::object_traits< ::pio::Signal >::
+  load_ (statements_type& sts, object_type& obj)
+  {
+    sqlite::binding& idb (sts.id_image_binding ());
+
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::signal_time >& v =
+        obj.nested_records;
+
+      nested_records_traits::load (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
+  }
+
   result< access::object_traits< ::pio::Signal >::object_type >
   access::object_traits< ::pio::Signal >::
   query (database&, const query_base_type& q)
@@ -13512,6 +15179,7 @@ namespace odb
       {
         case 1:
         {
+          db.execute ("DROP TABLE IF EXISTS \"Signal_nested_records\"");
           db.execute ("DROP TABLE IF EXISTS \"Signal\"");
           return false;
         }
@@ -13527,12 +15195,30 @@ namespace odb
                       "  \"signal\" INTEGER NOT NULL PRIMARY KEY,\n"
                       "  \"group\" INTEGER NOT NULL,\n"
                       "  \"times\" INTEGER NOT NULL,\n"
-                      "  \"start\" REAL,\n"
-                      "  \"end\" REAL,\n"
-                      "  \"timing\" INTEGER NOT NULL,\n"
-                      "  \"phasing\" INTEGER NOT NULL,\n"
+                      "  \"nodes\" INTEGER,\n"
                       "  \"type\" TEXT NOT NULL,\n"
-                      "  \"offset\" INTEGER NOT NULL)");
+                      "  \"offset\" INTEGER NOT NULL,\n"
+                      "  CONSTRAINT \"nodes_fk\"\n"
+                      "    FOREIGN KEY (\"nodes\")\n"
+                      "    REFERENCES \"Node\" (\"node\")\n"
+                      "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE INDEX \"Signal_signal_i\"\n"
+                      "  ON \"Signal\" (\"signal\")");
+          db.execute ("CREATE TABLE \"Signal_nested_records\" (\n"
+                      "  \"object_id\" INTEGER NOT NULL,\n"
+                      "  \"index\" INTEGER NOT NULL,\n"
+                      "  \"value_start\" REAL,\n"
+                      "  \"value_end\" REAL,\n"
+                      "  \"value_timing\" INTEGER NOT NULL,\n"
+                      "  \"value_phasing\" INTEGER NOT NULL,\n"
+                      "  CONSTRAINT \"object_id_fk\"\n"
+                      "    FOREIGN KEY (\"object_id\")\n"
+                      "    REFERENCES \"Signal\" (\"signal\")\n"
+                      "    ON DELETE CASCADE)");
+          db.execute ("CREATE INDEX \"Signal_nested_records_object_id_i\"\n"
+                      "  ON \"Signal_nested_records\" (\"object_id\")");
+          db.execute ("CREATE INDEX \"Signal_nested_records_index_i\"\n"
+                      "  ON \"Signal_nested_records\" (\"index\")");
           return false;
         }
       }
@@ -13548,6 +15234,331 @@ namespace odb
 
   // Timing
   //
+
+  // nested_records
+  //
+
+  const char access::object_traits< ::pio::Timing >::nested_records_traits::
+  select_all_statement[] =
+  "SELECT "
+  "\"Timing_nested_records\".\"index\","
+  "\"Timing_nested_records\".\"value_phase\","
+  "\"Timing_nested_records\".\"value_barrier\","
+  "\"Timing_nested_records\".\"value_ring\","
+  "\"Timing_nested_records\".\"value_position\","
+  "\"Timing_nested_records\".\"value_minimum\","
+  "\"Timing_nested_records\".\"value_maximum\","
+  "\"Timing_nested_records\".\"value_extend\","
+  "\"Timing_nested_records\".\"value_yellow\","
+  "\"Timing_nested_records\".\"value_red\""
+  " FROM \"Timing_nested_records\""
+  " WHERE \"Timing_nested_records\".\"object_id\"=?"
+  " ORDER BY \"Timing_nested_records\".\"index\"";
+
+  const char access::object_traits< ::pio::Timing >::nested_records_traits::
+  insert_one_statement[] =
+  "INSERT INTO \"Timing_nested_records\" ("
+  "\"object_id\","
+  "\"index\","
+  "\"value_phase\","
+  "\"value_barrier\","
+  "\"value_ring\","
+  "\"value_position\","
+  "\"value_minimum\","
+  "\"value_maximum\","
+  "\"value_extend\","
+  "\"value_yellow\","
+  "\"value_red\")"
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+
+  const char access::object_traits< ::pio::Timing >::nested_records_traits::
+  delete_all_statement[] =
+  "DELETE FROM \"Timing_nested_records\""
+  " WHERE \"object_id\"=?";
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  bind (sqlite::bind* b,
+        const sqlite::bind* id,
+        std::size_t id_size,
+        cond_image_type& c)
+  {
+    ODB_POTENTIALLY_UNUSED (c);
+
+    std::size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+  }
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  bind (sqlite::bind* b,
+        const sqlite::bind* id,
+        std::size_t id_size,
+        data_image_type& d)
+  {
+    using namespace sqlite;
+
+    statement_kind sk (statement_select);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+
+    // index
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &d.index_value;
+    b[n].is_null = &d.index_null;
+    n++;
+
+    // value
+    //
+    composite_value_traits< value_type >::bind (b + n, d.value_value, sk);
+  }
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  grow (data_image_type& i, bool* t)
+  {
+    bool grew (false);
+
+    // index
+    //
+    t[0UL] = false;
+
+    // value
+    //
+    if (composite_value_traits< value_type >::grow (
+          i.value_value, t + 1UL))
+    {
+      grew = true;
+    }
+
+    if (grew)
+      i.version++;
+  }
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  init (data_image_type& i, index_type j, const value_type& v)
+  {
+    using namespace sqlite;
+
+    statement_kind sk (statement_insert);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    bool grew (false);
+
+    // index
+    //
+    {
+      bool is_null (false);
+      sqlite::value_traits<
+          index_type,
+          sqlite::id_integer >::set_image (
+        i.index_value,
+        is_null,
+        j);
+      i.index_null = is_null;
+    }
+
+    // value
+    //
+    {
+      composite_value_traits< value_type >::init (
+        i.value_value,
+        v,
+        sk);
+    }
+
+    if (grew)
+      i.version++;
+  }
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  init (index_type& j, value_type& v, const data_image_type& i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // index
+    //
+    {
+      sqlite::value_traits<
+          index_type,
+          sqlite::id_integer >::set_value (
+        j,
+        i.index_value,
+        i.index_null);
+    }
+
+    // value
+    //
+    {
+      composite_value_traits< value_type >::init (
+        v,
+        i.value_value,
+        db);
+    }
+  }
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  insert_one (index_type i, const value_type& v, void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    binding& b (sts.data_image_binding ());
+    data_image_type& di (sts.data_image ());
+
+    init (di, i, v);
+
+    if (di.version != sts.data_image_version ())
+    {
+      bind (b.bind, 0, sts.id_binding ().count, di);
+      sts.data_image_version (di.version);
+      b.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    if (!sts.insert_one_statement ().execute ())
+      throw object_already_persistent ();
+  }
+
+  bool access::object_traits< ::pio::Timing >::nested_records_traits::
+  load_all (index_type& i, value_type& v, void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    data_image_type& di (sts.data_image ());
+    init (i, v, di, &sts.connection ().database ());
+
+    select_statement& st (sts.select_all_statement ());
+    select_statement::result r (st.fetch ());
+    return r != select_statement::no_data;
+  }
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  delete_all (void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    sts.delete_all_statement ().execute ();
+  }
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  persist (const container_type& c,
+           const sqlite::binding& id,
+           statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& b (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || b.version == 0)
+    {
+      bind (b.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      b.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::persist (c, fs);
+  }
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  load (container_type& c,
+        const sqlite::binding& id,
+        statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& db (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || db.version == 0)
+    {
+      bind (db.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      db.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    binding& cb (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || cb.version == 0)
+    {
+      bind (cb.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      cb.version++;
+    }
+
+    select_statement& st (sts.select_all_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+    bool more (r != select_statement::no_data);
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::load (c, more, fs);
+  }
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  update (const container_type& c,
+          const sqlite::binding& id,
+          statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& db (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || db.version == 0)
+    {
+      bind (db.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      db.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    binding& cb (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || cb.version == 0)
+    {
+      bind (cb.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      cb.version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::update (c, fs);
+  }
+
+  void access::object_traits< ::pio::Timing >::nested_records_traits::
+  erase (const sqlite::binding& id, statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& b (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || b.version == 0)
+    {
+      bind (b.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      b.version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::erase (fs);
+  }
 
   access::object_traits< ::pio::Timing >::id_type
   access::object_traits< ::pio::Timing >::
@@ -13604,42 +15615,6 @@ namespace odb
     // phases
     //
     t[6UL] = false;
-
-    // phase
-    //
-    t[7UL] = false;
-
-    // barrier
-    //
-    t[8UL] = false;
-
-    // ring
-    //
-    t[9UL] = false;
-
-    // position
-    //
-    t[10UL] = false;
-
-    // minimum
-    //
-    t[11UL] = false;
-
-    // maximum
-    //
-    t[12UL] = false;
-
-    // extend
-    //
-    t[13UL] = false;
-
-    // yellow
-    //
-    t[14UL] = false;
-
-    // red
-    //
-    t[15UL] = false;
 
     return grew;
   }
@@ -13705,69 +15680,6 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.phases_value;
     b[n].is_null = &i.phases_null;
-    n++;
-
-    // phase
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.phase_value;
-    b[n].is_null = &i.phase_null;
-    n++;
-
-    // barrier
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.barrier_value;
-    b[n].is_null = &i.barrier_null;
-    n++;
-
-    // ring
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.ring_value;
-    b[n].is_null = &i.ring_null;
-    n++;
-
-    // position
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.position_value;
-    b[n].is_null = &i.position_null;
-    n++;
-
-    // minimum
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.minimum_value;
-    b[n].is_null = &i.minimum_null;
-    n++;
-
-    // maximum
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.maximum_value;
-    b[n].is_null = &i.maximum_null;
-    n++;
-
-    // extend
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.extend_value;
-    b[n].is_null = &i.extend_null;
-    n++;
-
-    // yellow
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.yellow_value;
-    b[n].is_null = &i.yellow_null;
-    n++;
-
-    // red
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.red_value;
-    b[n].is_null = &i.red_null;
     n++;
   }
 
@@ -13915,150 +15827,6 @@ namespace odb
       i.phases_null = is_null;
     }
 
-    // phase
-    //
-    {
-      int const& v =
-        o.phase;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.phase_value,
-        is_null,
-        v);
-      i.phase_null = is_null;
-    }
-
-    // barrier
-    //
-    {
-      int const& v =
-        o.barrier;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.barrier_value,
-        is_null,
-        v);
-      i.barrier_null = is_null;
-    }
-
-    // ring
-    //
-    {
-      int const& v =
-        o.ring;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.ring_value,
-        is_null,
-        v);
-      i.ring_null = is_null;
-    }
-
-    // position
-    //
-    {
-      int const& v =
-        o.position;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.position_value,
-        is_null,
-        v);
-      i.position_null = is_null;
-    }
-
-    // minimum
-    //
-    {
-      int const& v =
-        o.minimum;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.minimum_value,
-        is_null,
-        v);
-      i.minimum_null = is_null;
-    }
-
-    // maximum
-    //
-    {
-      int const& v =
-        o.maximum;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.maximum_value,
-        is_null,
-        v);
-      i.maximum_null = is_null;
-    }
-
-    // extend
-    //
-    {
-      int const& v =
-        o.extend;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.extend_value,
-        is_null,
-        v);
-      i.extend_null = is_null;
-    }
-
-    // yellow
-    //
-    {
-      int const& v =
-        o.yellow;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.yellow_value,
-        is_null,
-        v);
-      i.yellow_null = is_null;
-    }
-
-    // red
-    //
-    {
-      int const& v =
-        o.red;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.red_value,
-        is_null,
-        v);
-      i.red_null = is_null;
-    }
-
     return grew;
   }
 
@@ -14182,132 +15950,6 @@ namespace odb
         i.phases_value,
         i.phases_null);
     }
-
-    // phase
-    //
-    {
-      int& v =
-        o.phase;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.phase_value,
-        i.phase_null);
-    }
-
-    // barrier
-    //
-    {
-      int& v =
-        o.barrier;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.barrier_value,
-        i.barrier_null);
-    }
-
-    // ring
-    //
-    {
-      int& v =
-        o.ring;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.ring_value,
-        i.ring_null);
-    }
-
-    // position
-    //
-    {
-      int& v =
-        o.position;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.position_value,
-        i.position_null);
-    }
-
-    // minimum
-    //
-    {
-      int& v =
-        o.minimum;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.minimum_value,
-        i.minimum_null);
-    }
-
-    // maximum
-    //
-    {
-      int& v =
-        o.maximum;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.maximum_value,
-        i.maximum_null);
-    }
-
-    // extend
-    //
-    {
-      int& v =
-        o.extend;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.extend_value,
-        i.extend_null);
-    }
-
-    // yellow
-    //
-    {
-      int& v =
-        o.yellow;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.yellow_value,
-        i.yellow_null);
-    }
-
-    // red
-    //
-    {
-      int& v =
-        o.red;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.red_value,
-        i.red_null);
-    }
   }
 
   void access::object_traits< ::pio::Timing >::
@@ -14327,7 +15969,10 @@ namespace odb
 
   struct access::object_traits< ::pio::Timing >::container_statement_cache_type
   {
-    container_statement_cache_type (sqlite::connection&)
+    sqlite::container_statements_impl< nested_records_traits > nested_records;
+
+    container_statement_cache_type (sqlite::connection& c)
+    : nested_records (c)
     {
     }
   };
@@ -14340,17 +15985,8 @@ namespace odb
   "\"type\","
   "\"cycle\","
   "\"offset\","
-  "\"phases\","
-  "\"phase\","
-  "\"barrier\","
-  "\"ring\","
-  "\"position\","
-  "\"minimum\","
-  "\"maximum\","
-  "\"extend\","
-  "\"yellow\","
-  "\"red\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  "\"phases\")"
+  " VALUES (?,?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Timing >::find_statement[] =
   "SELECT "
@@ -14360,16 +15996,7 @@ namespace odb
   "\"Timing\".\"type\","
   "\"Timing\".\"cycle\","
   "\"Timing\".\"offset\","
-  "\"Timing\".\"phases\","
-  "\"Timing\".\"phase\","
-  "\"Timing\".\"barrier\","
-  "\"Timing\".\"ring\","
-  "\"Timing\".\"position\","
-  "\"Timing\".\"minimum\","
-  "\"Timing\".\"maximum\","
-  "\"Timing\".\"extend\","
-  "\"Timing\".\"yellow\","
-  "\"Timing\".\"red\""
+  "\"Timing\".\"phases\""
   " FROM \"Timing\""
   " WHERE \"Timing\".\"auto_id\"=?";
 
@@ -14380,16 +16007,7 @@ namespace odb
   "\"type\"=?,"
   "\"cycle\"=?,"
   "\"offset\"=?,"
-  "\"phases\"=?,"
-  "\"phase\"=?,"
-  "\"barrier\"=?,"
-  "\"ring\"=?,"
-  "\"position\"=?,"
-  "\"minimum\"=?,"
-  "\"maximum\"=?,"
-  "\"extend\"=?,"
-  "\"yellow\"=?,"
-  "\"red\"=?"
+  "\"phases\"=?"
   " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Timing >::erase_statement[] =
@@ -14404,16 +16022,7 @@ namespace odb
   "\"Timing\".\"type\","
   "\"Timing\".\"cycle\","
   "\"Timing\".\"offset\","
-  "\"Timing\".\"phases\","
-  "\"Timing\".\"phase\","
-  "\"Timing\".\"barrier\","
-  "\"Timing\".\"ring\","
-  "\"Timing\".\"position\","
-  "\"Timing\".\"minimum\","
-  "\"Timing\".\"maximum\","
-  "\"Timing\".\"extend\","
-  "\"Timing\".\"yellow\","
-  "\"Timing\".\"red\""
+  "\"Timing\".\"phases\""
   " FROM \"Timing\""
   " LEFT JOIN \"Signal\" AS \"signal\" ON \"signal\".\"signal\"=\"Timing\".\"signal\""
   " ";
@@ -14462,6 +16071,29 @@ namespace odb
       throw object_already_persistent ();
 
     obj.auto_id = static_cast< id_type > (st.id ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, obj.auto_id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::timing_phase > const& v =
+        obj.nested_records;
+
+      nested_records_traits::persist (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -14521,6 +16153,18 @@ namespace odb
     if (sts.update_statement ().execute () == 0)
       throw object_not_persistent ();
 
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::timing_phase > const& v =
+        obj.nested_records;
+
+      nested_records_traits::update (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
+
     callback (db, obj, callback_event::post_update);
   }
 
@@ -14546,6 +16190,12 @@ namespace odb
       sts.id_image_version (i.version);
       idb.version++;
     }
+
+    // nested_records
+    //
+    nested_records_traits::erase (
+      idb,
+      sts.container_statment_cache ().nested_records);
 
     if (sts.erase_statement ().execute () != 1)
       throw object_not_persistent ();
@@ -14704,6 +16354,24 @@ namespace odb
     return r != select_statement::no_data;
   }
 
+  void access::object_traits< ::pio::Timing >::
+  load_ (statements_type& sts, object_type& obj)
+  {
+    sqlite::binding& idb (sts.id_image_binding ());
+
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::timing_phase >& v =
+        obj.nested_records;
+
+      nested_records_traits::load (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
+  }
+
   result< access::object_traits< ::pio::Timing >::object_type >
   access::object_traits< ::pio::Timing >::
   query (database&, const query_base_type& q)
@@ -14774,6 +16442,7 @@ namespace odb
       {
         case 1:
         {
+          db.execute ("DROP TABLE IF EXISTS \"Timing_nested_records\"");
           db.execute ("DROP TABLE IF EXISTS \"Timing\"");
           return false;
         }
@@ -14793,19 +16462,30 @@ namespace odb
                       "  \"cycle\" INTEGER NOT NULL,\n"
                       "  \"offset\" INTEGER NOT NULL,\n"
                       "  \"phases\" INTEGER NOT NULL,\n"
-                      "  \"phase\" INTEGER NOT NULL,\n"
-                      "  \"barrier\" INTEGER NOT NULL,\n"
-                      "  \"ring\" INTEGER NOT NULL,\n"
-                      "  \"position\" INTEGER NOT NULL,\n"
-                      "  \"minimum\" INTEGER NOT NULL,\n"
-                      "  \"maximum\" INTEGER NOT NULL,\n"
-                      "  \"extend\" INTEGER NOT NULL,\n"
-                      "  \"yellow\" INTEGER NOT NULL,\n"
-                      "  \"red\" INTEGER NOT NULL,\n"
                       "  CONSTRAINT \"signal_fk\"\n"
                       "    FOREIGN KEY (\"signal\")\n"
                       "    REFERENCES \"Signal\" (\"signal\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE TABLE \"Timing_nested_records\" (\n"
+                      "  \"object_id\" INTEGER NOT NULL,\n"
+                      "  \"index\" INTEGER NOT NULL,\n"
+                      "  \"value_phase\" INTEGER NOT NULL,\n"
+                      "  \"value_barrier\" INTEGER NOT NULL,\n"
+                      "  \"value_ring\" INTEGER NOT NULL,\n"
+                      "  \"value_position\" INTEGER NOT NULL,\n"
+                      "  \"value_minimum\" INTEGER NOT NULL,\n"
+                      "  \"value_maximum\" INTEGER NOT NULL,\n"
+                      "  \"value_extend\" INTEGER NOT NULL,\n"
+                      "  \"value_yellow\" INTEGER NOT NULL,\n"
+                      "  \"value_red\" INTEGER NOT NULL,\n"
+                      "  CONSTRAINT \"object_id_fk\"\n"
+                      "    FOREIGN KEY (\"object_id\")\n"
+                      "    REFERENCES \"Timing\" (\"auto_id\")\n"
+                      "    ON DELETE CASCADE)");
+          db.execute ("CREATE INDEX \"Timing_nested_records_object_id_i\"\n"
+                      "  ON \"Timing_nested_records\" (\"object_id\")");
+          db.execute ("CREATE INDEX \"Timing_nested_records_index_i\"\n"
+                      "  ON \"Timing_nested_records\" (\"index\")");
           return false;
         }
       }
@@ -14821,6 +16501,369 @@ namespace odb
 
   // Phasing
   //
+
+  // nested_records
+  //
+
+  const char access::object_traits< ::pio::Phasing >::nested_records_traits::
+  select_all_statement[] =
+  "SELECT "
+  "\"Phasing_nested_records\".\"index\","
+  "\"Phasing_nested_records\".\"value_movement\","
+  "\"Phasing_nested_records\".\"value_link\","
+  "\"Phasing_nested_records\".\"value_dir\","
+  "\"Phasing_nested_records\".\"value_to_link\","
+  "\"Phasing_nested_records\".\"value_protect\""
+  " FROM \"Phasing_nested_records\""
+  " WHERE \"Phasing_nested_records\".\"object_id\"=?"
+  " ORDER BY \"Phasing_nested_records\".\"index\"";
+
+  const char access::object_traits< ::pio::Phasing >::nested_records_traits::
+  insert_one_statement[] =
+  "INSERT INTO \"Phasing_nested_records\" ("
+  "\"object_id\","
+  "\"index\","
+  "\"value_movement\","
+  "\"value_link\","
+  "\"value_dir\","
+  "\"value_to_link\","
+  "\"value_protect\")"
+  " VALUES (?,?,?,?,?,?,?)";
+
+  const char access::object_traits< ::pio::Phasing >::nested_records_traits::
+  delete_all_statement[] =
+  "DELETE FROM \"Phasing_nested_records\""
+  " WHERE \"object_id\"=?";
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  bind (sqlite::bind* b,
+        const sqlite::bind* id,
+        std::size_t id_size,
+        cond_image_type& c)
+  {
+    ODB_POTENTIALLY_UNUSED (c);
+
+    std::size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+  }
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  bind (sqlite::bind* b,
+        const sqlite::bind* id,
+        std::size_t id_size,
+        data_image_type& d)
+  {
+    using namespace sqlite;
+
+    statement_kind sk (statement_select);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+
+    // index
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &d.index_value;
+    b[n].is_null = &d.index_null;
+    n++;
+
+    // value
+    //
+    composite_value_traits< value_type >::bind (b + n, d.value_value, sk);
+  }
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  grow (data_image_type& i, bool* t)
+  {
+    bool grew (false);
+
+    // index
+    //
+    t[0UL] = false;
+
+    // value
+    //
+    if (composite_value_traits< value_type >::grow (
+          i.value_value, t + 1UL))
+    {
+      grew = true;
+    }
+
+    if (grew)
+      i.version++;
+  }
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  init (data_image_type& i, index_type j, const value_type& v)
+  {
+    using namespace sqlite;
+
+    statement_kind sk (statement_insert);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    bool grew (false);
+
+    // index
+    //
+    {
+      bool is_null (false);
+      sqlite::value_traits<
+          index_type,
+          sqlite::id_integer >::set_image (
+        i.index_value,
+        is_null,
+        j);
+      i.index_null = is_null;
+    }
+
+    // value
+    //
+    {
+      if (composite_value_traits< value_type >::init (
+            i.value_value,
+            v,
+            sk))
+        grew = true;
+    }
+
+    if (grew)
+      i.version++;
+  }
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  init (index_type& j, value_type& v, const data_image_type& i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // index
+    //
+    {
+      sqlite::value_traits<
+          index_type,
+          sqlite::id_integer >::set_value (
+        j,
+        i.index_value,
+        i.index_null);
+    }
+
+    // value
+    //
+    {
+      composite_value_traits< value_type >::init (
+        v,
+        i.value_value,
+        db);
+    }
+  }
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  insert_one (index_type i, const value_type& v, void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    binding& b (sts.data_image_binding ());
+    data_image_type& di (sts.data_image ());
+
+    init (di, i, v);
+
+    if (di.version != sts.data_image_version ())
+    {
+      bind (b.bind, 0, sts.id_binding ().count, di);
+      sts.data_image_version (di.version);
+      b.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    if (!sts.insert_one_statement ().execute ())
+      throw object_already_persistent ();
+  }
+
+  bool access::object_traits< ::pio::Phasing >::nested_records_traits::
+  load_all (index_type& i, value_type& v, void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    data_image_type& di (sts.data_image ());
+    init (i, v, di, &sts.connection ().database ());
+
+    const binding& idb (sts.id_binding ());
+
+    if (di.version != sts.data_image_version () ||
+        idb.version != sts.data_id_binding_version ())
+    {
+      binding& b (sts.data_image_binding ());
+      bind (b.bind, idb.bind, idb.count, di);
+      sts.data_image_version (di.version);
+      sts.data_id_binding_version (idb.version);
+      b.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    select_statement& st (sts.select_all_statement ());
+    select_statement::result r (st.fetch ());
+
+    if (r == select_statement::truncated)
+    {
+      grow (di, sts.select_image_truncated ());
+
+      if (di.version != sts.data_image_version ())
+      {
+        binding& b (sts.data_image_binding ());
+        bind (b.bind, 0, sts.id_binding ().count, di);
+        sts.data_image_version (di.version);
+        b.version++;
+        sts.select_image_binding ().version++;
+        st.refetch ();
+      }
+    }
+
+    return r != select_statement::no_data;
+  }
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  delete_all (void* d)
+  {
+    using namespace sqlite;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    sts.delete_all_statement ().execute ();
+  }
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  persist (const container_type& c,
+           const sqlite::binding& id,
+           statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& b (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || b.version == 0)
+    {
+      bind (b.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      b.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::persist (c, fs);
+  }
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  load (container_type& c,
+        const sqlite::binding& id,
+        statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& db (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || db.version == 0)
+    {
+      bind (db.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      db.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    binding& cb (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || cb.version == 0)
+    {
+      bind (cb.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      cb.version++;
+    }
+
+    select_statement& st (sts.select_all_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+
+    if (r == select_statement::truncated)
+    {
+      data_image_type& di (sts.data_image ());
+      grow (di, sts.select_image_truncated ());
+
+      if (di.version != sts.data_image_version ())
+      {
+        bind (db.bind, 0, id.count, sts.data_image ());
+        sts.data_image_version (di.version);
+        db.version++;
+        sts.select_image_binding ().version++;
+        st.refetch ();
+      }
+    }
+
+    bool more (r != select_statement::no_data);
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::load (c, more, fs);
+  }
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  update (const container_type& c,
+          const sqlite::binding& id,
+          statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& db (sts.data_image_binding ());
+    if (id.version != sts.data_id_binding_version () || db.version == 0)
+    {
+      bind (db.bind, id.bind, id.count, sts.data_image ());
+      sts.data_id_binding_version (id.version);
+      db.version++;
+      sts.select_image_binding ().version++;
+    }
+
+    binding& cb (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || cb.version == 0)
+    {
+      bind (cb.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      cb.version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::update (c, fs);
+  }
+
+  void access::object_traits< ::pio::Phasing >::nested_records_traits::
+  erase (const sqlite::binding& id, statements_type& sts)
+  {
+    using namespace sqlite;
+
+    binding& b (sts.cond_image_binding ());
+    if (id.version != sts.cond_id_binding_version () || b.version == 0)
+    {
+      bind (b.bind, id.bind, id.count, sts.cond_image ());
+      sts.cond_id_binding_version (id.version);
+      b.version++;
+    }
+
+    sts.id_binding (id);
+    functions_type& fs (sts.functions ());
+    fs.ordered (true);
+    container_traits_type::erase (fs);
+  }
 
   access::object_traits< ::pio::Phasing >::id_type
   access::object_traits< ::pio::Phasing >::
@@ -14877,30 +16920,6 @@ namespace odb
     // movements
     //
     t[5UL] = false;
-
-    // movement
-    //
-    if (t[6UL])
-    {
-      i.movement_value.capacity (i.movement_size);
-      grew = true;
-    }
-
-    // link
-    //
-    t[7UL] = false;
-
-    // dir
-    //
-    t[8UL] = false;
-
-    // to_link
-    //
-    t[9UL] = false;
-
-    // protect
-    //
-    t[10UL] = false;
 
     return grew;
   }
@@ -14963,45 +16982,6 @@ namespace odb
     b[n].type = sqlite::bind::integer;
     b[n].buffer = &i.movements_value;
     b[n].is_null = &i.movements_null;
-    n++;
-
-    // movement
-    //
-    b[n].type = sqlite::image_traits<
-      ::std::string,
-      sqlite::id_text>::bind_value;
-    b[n].buffer = i.movement_value.data ();
-    b[n].size = &i.movement_size;
-    b[n].capacity = i.movement_value.capacity ();
-    b[n].is_null = &i.movement_null;
-    n++;
-
-    // link
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.link_value;
-    b[n].is_null = &i.link_null;
-    n++;
-
-    // dir
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.dir_value;
-    b[n].is_null = &i.dir_null;
-    n++;
-
-    // to_link
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.to_link_value;
-    b[n].is_null = &i.to_link_null;
-    n++;
-
-    // protect
-    //
-    b[n].type = sqlite::bind::integer;
-    b[n].buffer = &i.protect_value;
-    b[n].is_null = &i.protect_null;
     n++;
   }
 
@@ -15136,111 +17116,6 @@ namespace odb
       i.movements_null = is_null;
     }
 
-    // movement
-    //
-    {
-      ::std::string const& v =
-        o.movement;
-
-      bool is_null (false);
-      std::size_t cap (i.movement_value.capacity ());
-      sqlite::value_traits<
-          ::std::string,
-          sqlite::id_text >::set_image (
-        i.movement_value,
-        i.movement_size,
-        is_null,
-        v);
-      i.movement_null = is_null;
-      grew = grew || (cap != i.movement_value.capacity ());
-    }
-
-    // link
-    //
-    {
-      ::std::tr1::shared_ptr< ::pio::Link > const& v =
-        o.link;
-
-      typedef object_traits< ::pio::Link > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Link > > ptr_traits;
-
-      bool is_null (ptr_traits::null_ptr (v));
-      if (!is_null)
-      {
-        const obj_traits::id_type& id (
-          obj_traits::id (ptr_traits::get_ref (v)));
-
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_image (
-          i.link_value,
-          is_null,
-          id);
-        i.link_null = is_null;
-      }
-      else
-        i.link_null = true;
-    }
-
-    // dir
-    //
-    {
-      int const& v =
-        o.dir;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.dir_value,
-        is_null,
-        v);
-      i.dir_null = is_null;
-    }
-
-    // to_link
-    //
-    {
-      ::std::tr1::shared_ptr< ::pio::Link > const& v =
-        o.to_link;
-
-      typedef object_traits< ::pio::Link > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Link > > ptr_traits;
-
-      bool is_null (ptr_traits::null_ptr (v));
-      if (!is_null)
-      {
-        const obj_traits::id_type& id (
-          obj_traits::id (ptr_traits::get_ref (v)));
-
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_image (
-          i.to_link_value,
-          is_null,
-          id);
-        i.to_link_null = is_null;
-      }
-      else
-        i.to_link_null = true;
-    }
-
-    // protect
-    //
-    {
-      int const& v =
-        o.protect;
-
-      bool is_null (false);
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_image (
-        i.protect_value,
-        is_null,
-        v);
-      i.protect_null = is_null;
-    }
-
     return grew;
   }
 
@@ -15351,109 +17226,6 @@ namespace odb
         i.movements_value,
         i.movements_null);
     }
-
-    // movement
-    //
-    {
-      ::std::string& v =
-        o.movement;
-
-      sqlite::value_traits<
-          ::std::string,
-          sqlite::id_text >::set_value (
-        v,
-        i.movement_value,
-        i.movement_size,
-        i.movement_null);
-    }
-
-    // link
-    //
-    {
-      ::std::tr1::shared_ptr< ::pio::Link >& v =
-        o.link;
-
-      typedef object_traits< ::pio::Link > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Link > > ptr_traits;
-
-      if (i.link_null)
-        v = ptr_traits::pointer_type ();
-      else
-      {
-        obj_traits::id_type id;
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_value (
-          id,
-          i.link_value,
-          i.link_null);
-
-        // If a compiler error points to the line below, then
-        // it most likely means that a pointer used in a member
-        // cannot be initialized from an object pointer.
-        //
-        v = ptr_traits::pointer_type (
-          db->load< obj_traits::object_type > (id));
-      }
-    }
-
-    // dir
-    //
-    {
-      int& v =
-        o.dir;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.dir_value,
-        i.dir_null);
-    }
-
-    // to_link
-    //
-    {
-      ::std::tr1::shared_ptr< ::pio::Link >& v =
-        o.to_link;
-
-      typedef object_traits< ::pio::Link > obj_traits;
-      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::pio::Link > > ptr_traits;
-
-      if (i.to_link_null)
-        v = ptr_traits::pointer_type ();
-      else
-      {
-        obj_traits::id_type id;
-        sqlite::value_traits<
-            obj_traits::id_type,
-            sqlite::id_integer >::set_value (
-          id,
-          i.to_link_value,
-          i.to_link_null);
-
-        // If a compiler error points to the line below, then
-        // it most likely means that a pointer used in a member
-        // cannot be initialized from an object pointer.
-        //
-        v = ptr_traits::pointer_type (
-          db->load< obj_traits::object_type > (id));
-      }
-    }
-
-    // protect
-    //
-    {
-      int& v =
-        o.protect;
-
-      sqlite::value_traits<
-          int,
-          sqlite::id_integer >::set_value (
-        v,
-        i.protect_value,
-        i.protect_null);
-    }
   }
 
   void access::object_traits< ::pio::Phasing >::
@@ -15473,7 +17245,10 @@ namespace odb
 
   struct access::object_traits< ::pio::Phasing >::container_statement_cache_type
   {
-    container_statement_cache_type (sqlite::connection&)
+    sqlite::container_statements_impl< nested_records_traits > nested_records;
+
+    container_statement_cache_type (sqlite::connection& c)
+    : nested_records (c)
     {
     }
   };
@@ -15485,13 +17260,8 @@ namespace odb
   "\"phasing\","
   "\"phase\","
   "\"detectors\","
-  "\"movements\","
-  "\"movement\","
-  "\"link\","
-  "\"dir\","
-  "\"to_link\","
-  "\"protect\")"
-  " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+  "\"movements\")"
+  " VALUES (?,?,?,?,?,?)";
 
   const char access::object_traits< ::pio::Phasing >::find_statement[] =
   "SELECT "
@@ -15500,12 +17270,7 @@ namespace odb
   "\"Phasing\".\"phasing\","
   "\"Phasing\".\"phase\","
   "\"Phasing\".\"detectors\","
-  "\"Phasing\".\"movements\","
-  "\"Phasing\".\"movement\","
-  "\"Phasing\".\"link\","
-  "\"Phasing\".\"dir\","
-  "\"Phasing\".\"to_link\","
-  "\"Phasing\".\"protect\""
+  "\"Phasing\".\"movements\""
   " FROM \"Phasing\""
   " WHERE \"Phasing\".\"auto_id\"=?";
 
@@ -15515,12 +17280,7 @@ namespace odb
   "\"phasing\"=?,"
   "\"phase\"=?,"
   "\"detectors\"=?,"
-  "\"movements\"=?,"
-  "\"movement\"=?,"
-  "\"link\"=?,"
-  "\"dir\"=?,"
-  "\"to_link\"=?,"
-  "\"protect\"=?"
+  "\"movements\"=?"
   " WHERE \"auto_id\"=?";
 
   const char access::object_traits< ::pio::Phasing >::erase_statement[] =
@@ -15534,16 +17294,9 @@ namespace odb
   "\"Phasing\".\"phasing\","
   "\"Phasing\".\"phase\","
   "\"Phasing\".\"detectors\","
-  "\"Phasing\".\"movements\","
-  "\"Phasing\".\"movement\","
-  "\"Phasing\".\"link\","
-  "\"Phasing\".\"dir\","
-  "\"Phasing\".\"to_link\","
-  "\"Phasing\".\"protect\""
+  "\"Phasing\".\"movements\""
   " FROM \"Phasing\""
   " LEFT JOIN \"Signal\" AS \"signal\" ON \"signal\".\"signal\"=\"Phasing\".\"signal\""
-  " LEFT JOIN \"Link\" AS \"link\" ON \"link\".\"link\"=\"Phasing\".\"link\""
-  " LEFT JOIN \"Link\" AS \"to_link\" ON \"to_link\".\"link\"=\"Phasing\".\"to_link\""
   " ";
 
   const char access::object_traits< ::pio::Phasing >::erase_query_statement[] =
@@ -15590,6 +17343,29 @@ namespace odb
       throw object_already_persistent ();
 
     obj.auto_id = static_cast< id_type > (st.id ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, obj.auto_id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::phase_movement > const& v =
+        obj.nested_records;
+
+      nested_records_traits::persist (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -15649,6 +17425,18 @@ namespace odb
     if (sts.update_statement ().execute () == 0)
       throw object_not_persistent ();
 
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::phase_movement > const& v =
+        obj.nested_records;
+
+      nested_records_traits::update (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
+
     callback (db, obj, callback_event::post_update);
   }
 
@@ -15674,6 +17462,12 @@ namespace odb
       sts.id_image_version (i.version);
       idb.version++;
     }
+
+    // nested_records
+    //
+    nested_records_traits::erase (
+      idb,
+      sts.container_statment_cache ().nested_records);
 
     if (sts.erase_statement ().execute () != 1)
       throw object_not_persistent ();
@@ -15846,6 +17640,24 @@ namespace odb
     return r != select_statement::no_data;
   }
 
+  void access::object_traits< ::pio::Phasing >::
+  load_ (statements_type& sts, object_type& obj)
+  {
+    sqlite::binding& idb (sts.id_image_binding ());
+
+    // nested_records
+    //
+    {
+      ::std::vector< ::pio::phase_movement >& v =
+        obj.nested_records;
+
+      nested_records_traits::load (
+        v,
+        idb,
+        sts.container_statment_cache ().nested_records);
+    }
+  }
+
   result< access::object_traits< ::pio::Phasing >::object_type >
   access::object_traits< ::pio::Phasing >::
   query (database&, const query_base_type& q)
@@ -15916,6 +17728,7 @@ namespace odb
       {
         case 1:
         {
+          db.execute ("DROP TABLE IF EXISTS \"Phasing_nested_records\"");
           db.execute ("DROP TABLE IF EXISTS \"Phasing\"");
           return false;
         }
@@ -15934,23 +17747,34 @@ namespace odb
                       "  \"phase\" INTEGER NOT NULL,\n"
                       "  \"detectors\" TEXT NOT NULL,\n"
                       "  \"movements\" INTEGER NOT NULL,\n"
-                      "  \"movement\" TEXT NOT NULL,\n"
-                      "  \"link\" INTEGER,\n"
-                      "  \"dir\" INTEGER NOT NULL,\n"
-                      "  \"to_link\" INTEGER,\n"
-                      "  \"protect\" INTEGER NOT NULL,\n"
                       "  CONSTRAINT \"signal_fk\"\n"
                       "    FOREIGN KEY (\"signal\")\n"
                       "    REFERENCES \"Signal\" (\"signal\")\n"
-                      "    DEFERRABLE INITIALLY DEFERRED,\n"
-                      "  CONSTRAINT \"link_fk\"\n"
-                      "    FOREIGN KEY (\"link\")\n"
+                      "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE TABLE \"Phasing_nested_records\" (\n"
+                      "  \"object_id\" INTEGER NOT NULL,\n"
+                      "  \"index\" INTEGER NOT NULL,\n"
+                      "  \"value_movement\" TEXT NOT NULL,\n"
+                      "  \"value_link\" INTEGER,\n"
+                      "  \"value_dir\" INTEGER NOT NULL,\n"
+                      "  \"value_to_link\" INTEGER,\n"
+                      "  \"value_protect\" TEXT NOT NULL,\n"
+                      "  CONSTRAINT \"object_id_fk\"\n"
+                      "    FOREIGN KEY (\"object_id\")\n"
+                      "    REFERENCES \"Phasing\" (\"auto_id\")\n"
+                      "    ON DELETE CASCADE,\n"
+                      "  CONSTRAINT \"value_link_fk\"\n"
+                      "    FOREIGN KEY (\"value_link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED,\n"
-                      "  CONSTRAINT \"to_link_fk\"\n"
-                      "    FOREIGN KEY (\"to_link\")\n"
+                      "  CONSTRAINT \"value_to_link_fk\"\n"
+                      "    FOREIGN KEY (\"value_to_link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE INDEX \"Phasing_nested_records_object_id_i\"\n"
+                      "  ON \"Phasing_nested_records\" (\"object_id\")");
+          db.execute ("CREATE INDEX \"Phasing_nested_records_index_i\"\n"
+                      "  ON \"Phasing_nested_records\" (\"index\")");
           return false;
         }
       }
@@ -16944,6 +18768,8 @@ namespace odb
                       "    FOREIGN KEY (\"link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE INDEX \"Detector_detector_i\"\n"
+                      "  ON \"Detector\" (\"detector\")");
           return false;
         }
       }
@@ -17871,6 +19697,8 @@ namespace odb
                       "    FOREIGN KEY (\"link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE INDEX \"Stop_stop_i\"\n"
+                      "  ON \"Stop\" (\"stop\")");
           return false;
         }
       }
@@ -18758,6 +20586,8 @@ namespace odb
                       "    FOREIGN KEY (\"to_zone\")\n"
                       "    REFERENCES \"Zone\" (\"zone\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE INDEX \"Fare_fare_i\"\n"
+                      "  ON \"Fare\" (\"fare\")");
           return false;
         }
       }
@@ -28766,6 +30596,8 @@ namespace odb
                       "  \"min_dwell\" REAL,\n"
                       "  \"max_dwell\" REAL,\n"
                       "  \"subtype\" INTEGER NOT NULL)");
+          db.execute ("CREATE INDEX \"Veh_Type_type_i\"\n"
+                      "  ON \"Veh_Type\" (\"type\")");
           return false;
         }
       }
@@ -31955,6 +33787,8 @@ namespace odb
                       "    FOREIGN KEY (\"link\")\n"
                       "    REFERENCES \"Link\" (\"link\")\n"
                       "    DEFERRABLE INITIALLY DEFERRED)");
+          db.execute ("CREATE INDEX \"Problem_problem_i\"\n"
+                      "  ON \"Problem\" (\"problem\")");
           return false;
         }
       }
@@ -36673,6 +38507,1339 @@ namespace odb
   schema_catalog_entry_pio_Traveler_ (
     "",
     &access::object_traits< ::pio::Traveler >::create_schema);
+
+  // TripNoRef
+  //
+
+  access::object_traits< ::pio::TripNoRef >::id_type
+  access::object_traits< ::pio::TripNoRef >::
+  id (const image_type& i)
+  {
+    sqlite::database* db (0);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    id_type id;
+    {
+      sqlite::value_traits<
+          long unsigned int,
+          sqlite::id_integer >::set_value (
+        id,
+        i.auto_id_value,
+        i.auto_id_null);
+    }
+
+    return id;
+  }
+
+  bool access::object_traits< ::pio::TripNoRef >::
+  grow (image_type& i, bool* t)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (t);
+
+    bool grew (false);
+
+    // auto_id
+    //
+    t[0UL] = false;
+
+    // hhold
+    //
+    t[1UL] = false;
+
+    // person
+    //
+    t[2UL] = false;
+
+    // tour
+    //
+    t[3UL] = false;
+
+    // trip
+    //
+    t[4UL] = false;
+
+    // start
+    //
+    t[5UL] = false;
+
+    // end
+    //
+    t[6UL] = false;
+
+    // duration
+    //
+    t[7UL] = false;
+
+    // origin
+    //
+    t[8UL] = false;
+
+    // destination
+    //
+    t[9UL] = false;
+
+    // purpose
+    //
+    t[10UL] = false;
+
+    // mode
+    //
+    t[11UL] = false;
+
+    // constraint
+    //
+    t[12UL] = false;
+
+    // priority
+    //
+    t[13UL] = false;
+
+    // vehicle
+    //
+    t[14UL] = false;
+
+    // passengers
+    //
+    t[15UL] = false;
+
+    // type
+    //
+    t[16UL] = false;
+
+    // partition
+    //
+    t[17UL] = false;
+
+    return grew;
+  }
+
+  void access::object_traits< ::pio::TripNoRef >::
+  bind (sqlite::bind* b,
+        image_type& i,
+        sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    std::size_t n (0);
+
+    // auto_id
+    //
+    if (sk != statement_update)
+    {
+      b[n].type = sqlite::bind::integer;
+      b[n].buffer = &i.auto_id_value;
+      b[n].is_null = &i.auto_id_null;
+      n++;
+    }
+
+    // hhold
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.hhold_value;
+    b[n].is_null = &i.hhold_null;
+    n++;
+
+    // person
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.person_value;
+    b[n].is_null = &i.person_null;
+    n++;
+
+    // tour
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.tour_value;
+    b[n].is_null = &i.tour_null;
+    n++;
+
+    // trip
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.trip_value;
+    b[n].is_null = &i.trip_null;
+    n++;
+
+    // start
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.start_value;
+    b[n].is_null = &i.start_null;
+    n++;
+
+    // end
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.end_value;
+    b[n].is_null = &i.end_null;
+    n++;
+
+    // duration
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.duration_value;
+    b[n].is_null = &i.duration_null;
+    n++;
+
+    // origin
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.origin_value;
+    b[n].is_null = &i.origin_null;
+    n++;
+
+    // destination
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.destination_value;
+    b[n].is_null = &i.destination_null;
+    n++;
+
+    // purpose
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.purpose_value;
+    b[n].is_null = &i.purpose_null;
+    n++;
+
+    // mode
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.mode_value;
+    b[n].is_null = &i.mode_null;
+    n++;
+
+    // constraint
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.constraint_value;
+    b[n].is_null = &i.constraint_null;
+    n++;
+
+    // priority
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.priority_value;
+    b[n].is_null = &i.priority_null;
+    n++;
+
+    // vehicle
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.vehicle_value;
+    b[n].is_null = &i.vehicle_null;
+    n++;
+
+    // passengers
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.passengers_value;
+    b[n].is_null = &i.passengers_null;
+    n++;
+
+    // type
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.type_value;
+    b[n].is_null = &i.type_null;
+    n++;
+
+    // partition
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.partition_value;
+    b[n].is_null = &i.partition_null;
+    n++;
+  }
+
+  void access::object_traits< ::pio::TripNoRef >::
+  bind (sqlite::bind* b, id_image_type& i)
+  {
+    std::size_t n (0);
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.id_value;
+    b[n].is_null = &i.id_null;
+  }
+
+  bool access::object_traits< ::pio::TripNoRef >::
+  init (image_type& i, const object_type& o, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    bool grew (false);
+
+    // auto_id
+    //
+    if (sk == statement_insert)
+    {
+      long unsigned int const& v =
+        o.auto_id;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          long unsigned int,
+          sqlite::id_integer >::set_image (
+        i.auto_id_value,
+        is_null,
+        v);
+      i.auto_id_null = is_null;
+    }
+
+    // hhold
+    //
+    {
+      int const& v =
+        o.hhold;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.hhold_value,
+        is_null,
+        v);
+      i.hhold_null = is_null;
+    }
+
+    // person
+    //
+    {
+      int const& v =
+        o.person;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.person_value,
+        is_null,
+        v);
+      i.person_null = is_null;
+    }
+
+    // tour
+    //
+    {
+      int const& v =
+        o.tour;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.tour_value,
+        is_null,
+        v);
+      i.tour_null = is_null;
+    }
+
+    // trip
+    //
+    {
+      int const& v =
+        o.trip;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.trip_value,
+        is_null,
+        v);
+      i.trip_null = is_null;
+    }
+
+    // start
+    //
+    {
+      double const& v =
+        o.start;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.start_value,
+        is_null,
+        v);
+      i.start_null = is_null;
+    }
+
+    // end
+    //
+    {
+      double const& v =
+        o.end;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.end_value,
+        is_null,
+        v);
+      i.end_null = is_null;
+    }
+
+    // duration
+    //
+    {
+      double const& v =
+        o.duration;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.duration_value,
+        is_null,
+        v);
+      i.duration_null = is_null;
+    }
+
+    // origin
+    //
+    {
+      int const& v =
+        o.origin;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.origin_value,
+        is_null,
+        v);
+      i.origin_null = is_null;
+    }
+
+    // destination
+    //
+    {
+      int const& v =
+        o.destination;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.destination_value,
+        is_null,
+        v);
+      i.destination_null = is_null;
+    }
+
+    // purpose
+    //
+    {
+      int const& v =
+        o.purpose;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.purpose_value,
+        is_null,
+        v);
+      i.purpose_null = is_null;
+    }
+
+    // mode
+    //
+    {
+      int const& v =
+        o.mode;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.mode_value,
+        is_null,
+        v);
+      i.mode_null = is_null;
+    }
+
+    // constraint
+    //
+    {
+      int const& v =
+        o.constraint;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.constraint_value,
+        is_null,
+        v);
+      i.constraint_null = is_null;
+    }
+
+    // priority
+    //
+    {
+      int const& v =
+        o.priority;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.priority_value,
+        is_null,
+        v);
+      i.priority_null = is_null;
+    }
+
+    // vehicle
+    //
+    {
+      int const& v =
+        o.vehicle;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.vehicle_value,
+        is_null,
+        v);
+      i.vehicle_null = is_null;
+    }
+
+    // passengers
+    //
+    {
+      int const& v =
+        o.passengers;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.passengers_value,
+        is_null,
+        v);
+      i.passengers_null = is_null;
+    }
+
+    // type
+    //
+    {
+      int const& v =
+        o.type;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.type_value,
+        is_null,
+        v);
+      i.type_null = is_null;
+    }
+
+    // partition
+    //
+    {
+      int const& v =
+        o.partition;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.partition_value,
+        is_null,
+        v);
+      i.partition_null = is_null;
+    }
+
+    return grew;
+  }
+
+  void access::object_traits< ::pio::TripNoRef >::
+  init (object_type& o, const image_type& i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // auto_id
+    //
+    {
+      long unsigned int& v =
+        o.auto_id;
+
+      sqlite::value_traits<
+          long unsigned int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.auto_id_value,
+        i.auto_id_null);
+    }
+
+    // hhold
+    //
+    {
+      int& v =
+        o.hhold;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.hhold_value,
+        i.hhold_null);
+    }
+
+    // person
+    //
+    {
+      int& v =
+        o.person;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.person_value,
+        i.person_null);
+    }
+
+    // tour
+    //
+    {
+      int& v =
+        o.tour;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.tour_value,
+        i.tour_null);
+    }
+
+    // trip
+    //
+    {
+      int& v =
+        o.trip;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.trip_value,
+        i.trip_null);
+    }
+
+    // start
+    //
+    {
+      double& v =
+        o.start;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.start_value,
+        i.start_null);
+    }
+
+    // end
+    //
+    {
+      double& v =
+        o.end;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.end_value,
+        i.end_null);
+    }
+
+    // duration
+    //
+    {
+      double& v =
+        o.duration;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.duration_value,
+        i.duration_null);
+    }
+
+    // origin
+    //
+    {
+      int& v =
+        o.origin;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.origin_value,
+        i.origin_null);
+    }
+
+    // destination
+    //
+    {
+      int& v =
+        o.destination;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.destination_value,
+        i.destination_null);
+    }
+
+    // purpose
+    //
+    {
+      int& v =
+        o.purpose;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.purpose_value,
+        i.purpose_null);
+    }
+
+    // mode
+    //
+    {
+      int& v =
+        o.mode;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.mode_value,
+        i.mode_null);
+    }
+
+    // constraint
+    //
+    {
+      int& v =
+        o.constraint;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.constraint_value,
+        i.constraint_null);
+    }
+
+    // priority
+    //
+    {
+      int& v =
+        o.priority;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.priority_value,
+        i.priority_null);
+    }
+
+    // vehicle
+    //
+    {
+      int& v =
+        o.vehicle;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.vehicle_value,
+        i.vehicle_null);
+    }
+
+    // passengers
+    //
+    {
+      int& v =
+        o.passengers;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.passengers_value,
+        i.passengers_null);
+    }
+
+    // type
+    //
+    {
+      int& v =
+        o.type;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.type_value,
+        i.type_null);
+    }
+
+    // partition
+    //
+    {
+      int& v =
+        o.partition;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.partition_value,
+        i.partition_null);
+    }
+  }
+
+  void access::object_traits< ::pio::TripNoRef >::
+  init (id_image_type& i, const id_type& id)
+  {
+    {
+      bool is_null (false);
+      sqlite::value_traits<
+          long unsigned int,
+          sqlite::id_integer >::set_image (
+        i.id_value,
+        is_null,
+        id);
+      i.id_null = is_null;
+    }
+  }
+
+  struct access::object_traits< ::pio::TripNoRef >::container_statement_cache_type
+  {
+    container_statement_cache_type (sqlite::connection&)
+    {
+    }
+  };
+
+  const char access::object_traits< ::pio::TripNoRef >::persist_statement[] =
+  "INSERT INTO \"TripNoRef\" ("
+  "\"auto_id\","
+  "\"hhold\","
+  "\"person\","
+  "\"tour\","
+  "\"trip\","
+  "\"start\","
+  "\"end\","
+  "\"duration\","
+  "\"origin\","
+  "\"destination\","
+  "\"purpose\","
+  "\"mode\","
+  "\"constraint\","
+  "\"priority\","
+  "\"vehicle\","
+  "\"passengers\","
+  "\"type\","
+  "\"partition\")"
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+  const char access::object_traits< ::pio::TripNoRef >::find_statement[] =
+  "SELECT "
+  "\"TripNoRef\".\"auto_id\","
+  "\"TripNoRef\".\"hhold\","
+  "\"TripNoRef\".\"person\","
+  "\"TripNoRef\".\"tour\","
+  "\"TripNoRef\".\"trip\","
+  "\"TripNoRef\".\"start\","
+  "\"TripNoRef\".\"end\","
+  "\"TripNoRef\".\"duration\","
+  "\"TripNoRef\".\"origin\","
+  "\"TripNoRef\".\"destination\","
+  "\"TripNoRef\".\"purpose\","
+  "\"TripNoRef\".\"mode\","
+  "\"TripNoRef\".\"constraint\","
+  "\"TripNoRef\".\"priority\","
+  "\"TripNoRef\".\"vehicle\","
+  "\"TripNoRef\".\"passengers\","
+  "\"TripNoRef\".\"type\","
+  "\"TripNoRef\".\"partition\""
+  " FROM \"TripNoRef\""
+  " WHERE \"TripNoRef\".\"auto_id\"=?";
+
+  const char access::object_traits< ::pio::TripNoRef >::update_statement[] =
+  "UPDATE \"TripNoRef\" SET "
+  "\"hhold\"=?,"
+  "\"person\"=?,"
+  "\"tour\"=?,"
+  "\"trip\"=?,"
+  "\"start\"=?,"
+  "\"end\"=?,"
+  "\"duration\"=?,"
+  "\"origin\"=?,"
+  "\"destination\"=?,"
+  "\"purpose\"=?,"
+  "\"mode\"=?,"
+  "\"constraint\"=?,"
+  "\"priority\"=?,"
+  "\"vehicle\"=?,"
+  "\"passengers\"=?,"
+  "\"type\"=?,"
+  "\"partition\"=?"
+  " WHERE \"auto_id\"=?";
+
+  const char access::object_traits< ::pio::TripNoRef >::erase_statement[] =
+  "DELETE FROM \"TripNoRef\""
+  " WHERE \"auto_id\"=?";
+
+  const char access::object_traits< ::pio::TripNoRef >::query_statement[] =
+  "SELECT "
+  "\"TripNoRef\".\"auto_id\","
+  "\"TripNoRef\".\"hhold\","
+  "\"TripNoRef\".\"person\","
+  "\"TripNoRef\".\"tour\","
+  "\"TripNoRef\".\"trip\","
+  "\"TripNoRef\".\"start\","
+  "\"TripNoRef\".\"end\","
+  "\"TripNoRef\".\"duration\","
+  "\"TripNoRef\".\"origin\","
+  "\"TripNoRef\".\"destination\","
+  "\"TripNoRef\".\"purpose\","
+  "\"TripNoRef\".\"mode\","
+  "\"TripNoRef\".\"constraint\","
+  "\"TripNoRef\".\"priority\","
+  "\"TripNoRef\".\"vehicle\","
+  "\"TripNoRef\".\"passengers\","
+  "\"TripNoRef\".\"type\","
+  "\"TripNoRef\".\"partition\""
+  " FROM \"TripNoRef\""
+  " ";
+
+  const char access::object_traits< ::pio::TripNoRef >::erase_query_statement[] =
+  "DELETE FROM \"TripNoRef\""
+  " ";
+
+  const char access::object_traits< ::pio::TripNoRef >::table_name[] =
+  "\"TripNoRef\"";
+
+  void access::object_traits< ::pio::TripNoRef >::
+  persist (database& db, object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    callback (db,
+              static_cast<const object_type&> (obj),
+              callback_event::pre_persist);
+
+    image_type& im (sts.image ());
+    binding& imb (sts.insert_image_binding ());
+
+    if (init (im, obj, statement_insert))
+      im.version++;
+
+    im.auto_id_null = true;
+
+    if (im.version != sts.insert_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_insert);
+      sts.insert_image_version (im.version);
+      imb.version++;
+    }
+
+    insert_statement& st (sts.persist_statement ());
+    if (!st.execute ())
+      throw object_already_persistent ();
+
+    obj.auto_id = static_cast< id_type > (st.id ());
+
+    callback (db,
+              static_cast<const object_type&> (obj),
+              callback_event::post_persist);
+  }
+
+  void access::object_traits< ::pio::TripNoRef >::
+  update (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace sqlite;
+
+    callback (db, obj, callback_event::pre_update);
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, obj.auto_id);
+
+    image_type& im (sts.image ());
+    if (init (im, obj, statement_update))
+      im.version++;
+
+    bool u (false);
+    binding& imb (sts.update_image_binding ());
+    if (im.version != sts.update_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_update);
+      sts.update_image_version (im.version);
+      imb.version++;
+      u = true;
+    }
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.update_id_image_version () ||
+        idb.version == 0)
+    {
+      if (i.version != sts.id_image_version () ||
+          idb.version == 0)
+      {
+        bind (idb.bind, i);
+        sts.id_image_version (i.version);
+        idb.version++;
+      }
+
+      sts.update_id_image_version (i.version);
+
+      if (!u)
+        imb.version++;
+    }
+
+    if (sts.update_statement ().execute () == 0)
+      throw object_not_persistent ();
+
+    callback (db, obj, callback_event::post_update);
+  }
+
+  void access::object_traits< ::pio::TripNoRef >::
+  erase (database& db, const id_type& id)
+  {
+    using namespace sqlite;
+
+    ODB_POTENTIALLY_UNUSED (db);
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    if (sts.erase_statement ().execute () != 1)
+      throw object_not_persistent ();
+
+    pointer_cache_traits::erase (db, id);
+  }
+
+  access::object_traits< ::pio::TripNoRef >::pointer_type
+  access::object_traits< ::pio::TripNoRef >::
+  find (database& db, const id_type& id)
+  {
+    using namespace sqlite;
+
+    {
+      pointer_type p (pointer_cache_traits::find (db, id));
+
+      if (!pointer_traits::null_ptr (p))
+        return p;
+    }
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    if (l.locked ())
+    {
+      if (!find_ (sts, &id))
+        return pointer_type ();
+    }
+
+    pointer_type p (
+      access::object_factory<object_type, pointer_type>::create ());
+    pointer_traits::guard pg (p);
+
+    pointer_cache_traits::insert_guard ig (
+      pointer_cache_traits::insert (db, id, p));
+
+    object_type& obj (pointer_traits::get_ref (p));
+
+    if (l.locked ())
+    {
+      select_statement& st (sts.find_statement ());
+      ODB_POTENTIALLY_UNUSED (st);
+
+      callback (db, obj, callback_event::pre_load);
+      init (obj, sts.image (), &db);
+      load_ (sts, obj);
+      sts.load_delayed ();
+      l.unlock ();
+      callback (db, obj, callback_event::post_load);
+    }
+    else
+      sts.delay_load (id, obj, ig.position ());
+
+    ig.release ();
+    pg.release ();
+    return p;
+  }
+
+  bool access::object_traits< ::pio::TripNoRef >::
+  find (database& db, const id_type& id, object_type& obj)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    reference_cache_traits::insert_guard ig (
+      reference_cache_traits::insert (db, id, obj));
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    load_ (sts, obj);
+    sts.load_delayed ();
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    ig.release ();
+    return true;
+  }
+
+  bool access::object_traits< ::pio::TripNoRef >::
+  reload (database& db, object_type& obj)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    const id_type& id  (
+      obj.auto_id);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    load_ (sts, obj);
+    sts.load_delayed ();
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    return true;
+  }
+
+  bool access::object_traits< ::pio::TripNoRef >::
+  find_ (statements_type& sts, const id_type* id)
+  {
+    using namespace sqlite;
+
+    id_image_type& i (sts.id_image ());
+    init (i, *id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    select_statement& st (sts.find_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+
+    return r != select_statement::no_data;
+  }
+
+  result< access::object_traits< ::pio::TripNoRef >::object_type >
+  access::object_traits< ::pio::TripNoRef >::
+  query (database&, const query_base_type& q)
+  {
+    using namespace sqlite;
+    using odb::details::shared;
+    using odb::details::shared_ptr;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    shared_ptr<select_statement> st (
+      new (shared) select_statement (
+        sts.connection (),
+        query_statement + q.clause (),
+        q.parameters_binding (),
+        imb));
+
+    st->execute ();
+
+    shared_ptr< odb::object_result_impl<object_type> > r (
+      new (shared) sqlite::object_result_impl<object_type> (
+        q, st, sts));
+
+    return result<object_type> (r);
+  }
+
+  unsigned long long access::object_traits< ::pio::TripNoRef >::
+  erase_query (database&, const query_base_type& q)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+
+    delete_statement st (
+      conn,
+      erase_query_statement + q.clause (),
+      q.parameters_binding ());
+
+    return st.execute ();
+  }
+
+  bool access::object_traits< ::pio::TripNoRef >::
+  create_schema (database& db, unsigned short pass, bool drop)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (pass);
+    ODB_POTENTIALLY_UNUSED (drop);
+
+    if (drop)
+    {
+      switch (pass)
+      {
+        case 1:
+        {
+          db.execute ("DROP TABLE IF EXISTS \"TripNoRef\"");
+          return false;
+        }
+      }
+    }
+    else
+    {
+      switch (pass)
+      {
+        case 1:
+        {
+          db.execute ("CREATE TABLE \"TripNoRef\" (\n"
+                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"hhold\" INTEGER NOT NULL,\n"
+                      "  \"person\" INTEGER NOT NULL,\n"
+                      "  \"tour\" INTEGER NOT NULL,\n"
+                      "  \"trip\" INTEGER NOT NULL,\n"
+                      "  \"start\" REAL,\n"
+                      "  \"end\" REAL,\n"
+                      "  \"duration\" REAL,\n"
+                      "  \"origin\" INTEGER NOT NULL,\n"
+                      "  \"destination\" INTEGER NOT NULL,\n"
+                      "  \"purpose\" INTEGER NOT NULL,\n"
+                      "  \"mode\" INTEGER NOT NULL,\n"
+                      "  \"constraint\" INTEGER NOT NULL,\n"
+                      "  \"priority\" INTEGER NOT NULL,\n"
+                      "  \"vehicle\" INTEGER NOT NULL,\n"
+                      "  \"passengers\" INTEGER NOT NULL,\n"
+                      "  \"type\" INTEGER NOT NULL,\n"
+                      "  \"partition\" INTEGER NOT NULL)");
+          return false;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  static const schema_catalog_entry
+  schema_catalog_entry_pio_TripNoRef_ (
+    "",
+    &access::object_traits< ::pio::TripNoRef >::create_schema);
 }
 
 #include <odb/post.hxx>

@@ -54,6 +54,47 @@ class Skim;
 class Event;
 class Traveler;
 class InputContainer;
+#pragma db value
+class timing_phase
+{
+public:
+	int phase;
+	int barrier;
+	int ring;
+	int position;
+	int minimum;
+	int maximum;
+	int extend;
+	int yellow;
+	int red;
+};
+#pragma db value
+class shape_geometry
+{
+public:
+	double x;
+	double y;
+	double z;
+};
+#pragma db value
+class signal_time
+{
+public:
+	double start;
+	double end;
+	int timing;
+	int phasing;
+};
+#pragma db value
+class phase_movement
+{
+public:
+	std::string movement;
+	shared_ptr<Link> link;
+	int dir;
+	shared_ptr<Link> to_link;
+	std::string protect;
+};
 //Input Container.
 //
 class InputContainer 
@@ -69,7 +110,7 @@ public:
 	std::map<int,shared_ptr<Veh_Type>> Veh_Types;
 };
 
-#pragma db object
+#pragma db object //table("NODE")
 class Node
 {
 public:
@@ -105,10 +146,11 @@ private:
 	double z;
 	int subarea;
 	int part;
+	#pragma db index member(node)
 
 };
 
-#pragma db object
+#pragma db object //table("ZONE")
 class Zone
 {
 public:
@@ -153,18 +195,19 @@ private:
 	double min_y;
 	double max_x;
 	double max_y;
+	#pragma db index member(zone)
 
 };
 
-#pragma db object
+#pragma db object //table("SHAPE")
 class Shape
 {
 public:
 	// Default Constructor
 	Shape () {}	
 	//Contructor
-	Shape ( shared_ptr<Link> link_, int points_, double x_, double y_, double z_ )  
-	: link (link_), points (points_), x (x_), y (y_), z (z_)
+	Shape ( shared_ptr<Link> link_, int points_ )  
+	: link (link_), points (points_)
 	{
 	}
 	//Accessors
@@ -173,14 +216,12 @@ public:
 	void setLink (const int& link_, InputContainer& container){link = container.Links[link_];}
 	const int& getPoints () const {return points;}
 	void setPoints (const int& points_){points = points_;}
-	const double& getX () const {return x;}
-	void setX (const double& x_){x = x_;}
-	const double& getY () const {return y;}
-	void setY (const double& y_){y = y_;}
-	const double& getZ () const {return z;}
-	void setZ (const double& z_){z = z_;}
 	const unsigned long& getPrimaryKey () const {return auto_id;}
 	const unsigned long& getAuto_id () const {return auto_id;}
+
+
+	//Vector that contains the associated nested records
+	 std::vector<shape_geometry> nested_records;
 
 //Data Fields
 private:
@@ -189,13 +230,10 @@ private:
 	unsigned long auto_id;
 	shared_ptr<Link> link;
 	int points;
-	double x;
-	double y;
-	double z;
 
 };
 
-#pragma db object
+#pragma db object //table("LINK")
 class Link
 {
 public:
@@ -293,10 +331,11 @@ private:
 	int right_ab;
 	int left_ba;
 	int right_ba;
+	#pragma db index member(link)
 
 };
 
-#pragma db object
+#pragma db object //table("POCKET")
 class Pocket
 {
 public:
@@ -338,7 +377,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("LANE_USE")
 class Lane_Use
 {
 public:
@@ -413,7 +452,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("CONNECT")
 class Connect
 {
 public:
@@ -471,7 +510,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("TURN_PEN")
 class Turn_Pen
 {
 public:
@@ -531,7 +570,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("PARKING")
 class Parking
 {
 public:
@@ -589,15 +628,16 @@ private:
 	double time_out;
 	int hourly;
 	int daily;
+	#pragma db index member(parking)
 
 };
 
-#pragma db object
+#pragma db object //table("LOCATION")
 class Location
 {
 public:
 	// Default Constructor
-	Location () {}
+	Location () {}	
 	//Contructor
 	Location ( int location_, shared_ptr<Link> link_, int dir_, double offset_, double setback_, shared_ptr<Zone> zone_ )  
 	: location (location_), link (link_), dir (dir_), offset (offset_), setback (setback_), zone (zone_)
@@ -630,9 +670,11 @@ private:
 	double offset;
 	double setback;
 	shared_ptr<Zone> zone;
+	#pragma db index member(location)
+
 };
 
-#pragma db object
+#pragma db object //table("ACCESS")
 class Access
 {
 public:
@@ -680,7 +722,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("SIGN")
 class Sign
 {
 public:
@@ -713,15 +755,15 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("SIGNAL")
 class Signal
 {
 public:
 	// Default Constructor
 	Signal () {}	
 	//Contructor
-	Signal ( int signal_, int group_, int times_, double start_, double end_, int timing_, int phasing_, std::string type_, int offset_ )  
-	: signal (signal_), group (group_), times (times_), start (start_), end (end_), timing (timing_), phasing (phasing_), type (type_), offset (offset_)
+	Signal ( int signal_, int group_, int times_, shared_ptr<Node> nodes_, std::string type_, int offset_ )  
+	: signal (signal_), group (group_), times (times_), nodes (nodes_), type (type_), offset (offset_)
 	{
 	}
 	//Accessors
@@ -731,19 +773,18 @@ public:
 	void setGroup (const int& group_){group = group_;}
 	const int& getTimes () const {return times;}
 	void setTimes (const int& times_){times = times_;}
-	const double& getStart () const {return start;}
-	void setStart (const double& start_){start = start_;}
-	const double& getEnd () const {return end;}
-	void setEnd (const double& end_){end = end_;}
-	const int& getTiming () const {return timing;}
-	void setTiming (const int& timing_){timing = timing_;}
-	const int& getPhasing () const {return phasing;}
-	void setPhasing (const int& phasing_){phasing = phasing_;}
+	const shared_ptr<Node>& getNodes () const {return nodes;}
+	void setNodes (const shared_ptr<Node>& nodes_){nodes = nodes_;}
+	void setNodes (const int& nodes_, InputContainer& container){nodes = container.Nodes[nodes_];}
 	const std::string& getType () const {return type;}
 	void setType (const std::string& type_){type = type_;}
 	const int& getOffset () const {return offset;}
 	void setOffset (const int& offset_){offset = offset_;}
 	const int& getPrimaryKey () const {return signal;}
+
+
+	//Vector that contains the associated nested records
+	std::vector<signal_time> nested_records;
 
 //Data Fields
 private:
@@ -752,24 +793,22 @@ private:
 	int signal;
 	int group;
 	int times;
-	double start;
-	double end;
-	int timing;
-	int phasing;
+	shared_ptr<Node> nodes;
 	std::string type;
 	int offset;
+	#pragma db index member(signal)
 
 };
 
-#pragma db object
+#pragma db object //table("TIMING")
 class Timing
 {
 public:
 	// Default Constructor
 	Timing () {}	
 	//Contructor
-	Timing ( shared_ptr<Signal> signal_, int timing_, int type_, int cycle_, int offset_, int phases_, int phase_, int barrier_, int ring_, int position_, int minimum_, int maximum_, int extend_, int yellow_, int red_ )  
-	: signal (signal_), timing (timing_), type (type_), cycle (cycle_), offset (offset_), phases (phases_), phase (phase_), barrier (barrier_), ring (ring_), position (position_), minimum (minimum_), maximum (maximum_), extend (extend_), yellow (yellow_), red (red_)
+	Timing ( shared_ptr<Signal> signal_, int timing_, int type_, int cycle_, int offset_, int phases_ )  
+	: signal (signal_), timing (timing_), type (type_), cycle (cycle_), offset (offset_), phases (phases_)
 	{
 	}
 	//Accessors
@@ -786,26 +825,12 @@ public:
 	void setOffset (const int& offset_){offset = offset_;}
 	const int& getPhases () const {return phases;}
 	void setPhases (const int& phases_){phases = phases_;}
-	const int& getPhase () const {return phase;}
-	void setPhase (const int& phase_){phase = phase_;}
-	const int& getBarrier () const {return barrier;}
-	void setBarrier (const int& barrier_){barrier = barrier_;}
-	const int& getRing () const {return ring;}
-	void setRing (const int& ring_){ring = ring_;}
-	const int& getPosition () const {return position;}
-	void setPosition (const int& position_){position = position_;}
-	const int& getMinimum () const {return minimum;}
-	void setMinimum (const int& minimum_){minimum = minimum_;}
-	const int& getMaximum () const {return maximum;}
-	void setMaximum (const int& maximum_){maximum = maximum_;}
-	const int& getExtend () const {return extend;}
-	void setExtend (const int& extend_){extend = extend_;}
-	const int& getYellow () const {return yellow;}
-	void setYellow (const int& yellow_){yellow = yellow_;}
-	const int& getRed () const {return red;}
-	void setRed (const int& red_){red = red_;}
 	const unsigned long& getPrimaryKey () const {return auto_id;}
 	const unsigned long& getAuto_id () const {return auto_id;}
+
+
+	//Vector that contains the associated nested records
+	 std::vector<timing_phase> nested_records;
 
 //Data Fields
 private:
@@ -818,27 +843,18 @@ private:
 	int cycle;
 	int offset;
 	int phases;
-	int phase;
-	int barrier;
-	int ring;
-	int position;
-	int minimum;
-	int maximum;
-	int extend;
-	int yellow;
-	int red;
 
 };
 
-#pragma db object
+#pragma db object //table("PHASING")
 class Phasing
 {
 public:
 	// Default Constructor
 	Phasing () {}	
 	//Contructor
-	Phasing ( shared_ptr<Signal> signal_, int phasing_, int phase_, std::string detectors_, int movements_, std::string movement_, shared_ptr<Link> link_, int dir_, shared_ptr<Link> to_link_, int protect_ )  
-	: signal (signal_), phasing (phasing_), phase (phase_), detectors (detectors_), movements (movements_), movement (movement_), link (link_), dir (dir_), to_link (to_link_), protect (protect_)
+	Phasing ( shared_ptr<Signal> signal_, int phasing_, int phase_, std::string detectors_, int movements_ )  
+	: signal (signal_), phasing (phasing_), phase (phase_), detectors (detectors_), movements (movements_)
 	{
 	}
 	//Accessors
@@ -853,20 +869,12 @@ public:
 	void setDetectors (const std::string& detectors_){detectors = detectors_;}
 	const int& getMovements () const {return movements;}
 	void setMovements (const int& movements_){movements = movements_;}
-	const std::string& getMovement () const {return movement;}
-	void setMovement (const std::string& movement_){movement = movement_;}
-	const shared_ptr<Link>& getLink () const {return link;}
-	void setLink (const shared_ptr<Link>& link_){link = link_;}
-	void setLink (const int& link_, InputContainer& container){link = container.Links[link_];}
-	const int& getDir () const {return dir;}
-	void setDir (const int& dir_){dir = dir_;}
-	const shared_ptr<Link>& getTo_Link () const {return to_link;}
-	void setTo_Link (const shared_ptr<Link>& to_link_){to_link = to_link_;}
-	void setTo_Link (const int& to_link_, InputContainer& container){to_link = container.Links[to_link_];}
-	const int& getProtect () const {return protect;}
-	void setProtect (const int& protect_){protect = protect_;}
 	const unsigned long& getPrimaryKey () const {return auto_id;}
 	const unsigned long& getAuto_id () const {return auto_id;}
+
+
+	//Vector that contains the associated nested records
+	 std::vector<phase_movement> nested_records;
 
 //Data Fields
 private:
@@ -878,15 +886,10 @@ private:
 	int phase;
 	std::string detectors;
 	int movements;
-	std::string movement;
-	shared_ptr<Link> link;
-	int dir;
-	shared_ptr<Link> to_link;
-	int protect;
 
 };
 
-#pragma db object
+#pragma db object //table("DETECTOR")
 class Detector
 {
 public:
@@ -935,10 +938,11 @@ private:
 	int use;
 	int low;
 	int high;
+	#pragma db index member(detector)
 
 };
 
-#pragma db object
+#pragma db object //table("STOP")
 class Stop
 {
 public:
@@ -981,10 +985,11 @@ private:
 	int use;
 	int type;
 	int space;
+	#pragma db index member(stop)
 
 };
 
-#pragma db object
+#pragma db object //table("FARE")
 class Fare
 {
 public:
@@ -1025,10 +1030,11 @@ private:
 	int type;
 	#pragma db id
 	int fare;
+	#pragma db index member(fare)
 
 };
 
-#pragma db object
+#pragma db object //table("LINE")
 class Line
 {
 public:
@@ -1078,7 +1084,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("SCHEDULE")
 class Schedule
 {
 public:
@@ -1112,7 +1118,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("DRIVER")
 class Driver
 {
 public:
@@ -1155,7 +1161,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("ROUTE_NODES")
 class Route_Nodes
 {
 public:
@@ -1211,7 +1217,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("SELECTION")
 class Selection
 {
 public:
@@ -1252,7 +1258,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("HOUSEHOLD")
 class Household
 {
 public:
@@ -1315,7 +1321,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("LINK_DELAY")
 class Link_Delay
 {
 public:
@@ -1370,7 +1376,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("PERFORMANCE")
 class Performance
 {
 public:
@@ -1417,7 +1423,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("RIDERSHIP")
 class Ridership
 {
 public:
@@ -1471,7 +1477,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("VEH_TYPE")
 class Veh_Type
 {
 public:
@@ -1531,10 +1537,11 @@ private:
 	double min_dwell;
 	double max_dwell;
 	int subtype;
+	#pragma db index member(type)
 
 };
 
-#pragma db object
+#pragma db object //table("VEHICLE")
 class Vehicle
 {
 public:
@@ -1577,7 +1584,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("TRIP")
 class Trip
 {
 public:
@@ -1653,7 +1660,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("PROBLEM")
 class Problem
 {
 public:
@@ -1696,10 +1703,11 @@ private:
 	double offset;
 	int route;
 	int survey;
+	#pragma db index member(problem)
 
 };
 
-#pragma db object
+#pragma db object //table("PLAN")
 class Plan
 {
 public:
@@ -1776,7 +1784,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("SKIM")
 class Skim
 {
 public:
@@ -1826,7 +1834,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("EVENT")
 class Event
 {
 public:
@@ -1889,7 +1897,7 @@ private:
 
 };
 
-#pragma db object
+#pragma db object //table("TRAVELER")
 class Traveler
 {
 public:
@@ -1949,6 +1957,80 @@ private:
 	int lane;
 	double offset;
 	int route;
+
+};
+
+#pragma db object //table("TRIPNOREF")
+class TripNoRef
+{
+public:
+	// Default Constructor
+	TripNoRef () {}	
+	//Contructor
+	TripNoRef ( int hhold_, int person_, int tour_, int trip_, double start_, double end_, double duration_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, int vehicle_, int passengers_, int type_, int partition_ )  
+	: hhold (hhold_), person (person_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
+	{
+	}
+	//Accessors
+	const int& getHhold () const {return hhold;}
+	void setHhold (const int& hhold_){hhold = hhold_;}
+	const int& getPerson () const {return person;}
+	void setPerson (const int& person_){person = person_;}
+	const int& getTour () const {return tour;}
+	void setTour (const int& tour_){tour = tour_;}
+	const int& getTrip () const {return trip;}
+	void setTrip (const int& trip_){trip = trip_;}
+	const double& getStart () const {return start;}
+	void setStart (const double& start_){start = start_;}
+	const double& getEnd () const {return end;}
+	void setEnd (const double& end_){end = end_;}
+	const double& getDuration () const {return duration;}
+	void setDuration (const double& duration_){duration = duration_;}
+	const int& getOrigin () const {return origin;}
+	void setOrigin (const int& origin_){origin = origin_;}
+	const int& getDestination () const {return destination;}
+	void setDestination (const int& destination_){destination = destination_;}
+	const int& getPurpose () const {return purpose;}
+	void setPurpose (const int& purpose_){purpose = purpose_;}
+	const int& getMode () const {return mode;}
+	void setMode (const int& mode_){mode = mode_;}
+	const int& getConstraint () const {return constraint;}
+	void setConstraint (const int& constraint_){constraint = constraint_;}
+	const int& getPriority () const {return priority;}
+	void setPriority (const int& priority_){priority = priority_;}
+	const int& getVehicle () const {return vehicle;}
+	void setVehicle (const int& vehicle_){vehicle = vehicle_;}
+	const int& getPassengers () const {return passengers;}
+	void setPassengers (const int& passengers_){passengers = passengers_;}
+	const int& getType () const {return type;}
+	void setType (const int& type_){type = type_;}
+	const int& getPartition () const {return partition;}
+	void setPartition (const int& partition_){partition = partition_;}
+	const unsigned long& getPrimaryKey () const {return auto_id;}
+	const unsigned long& getAuto_id () const {return auto_id;}
+
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id auto
+	unsigned long auto_id;
+	int hhold;
+	int person;
+	int tour;
+	int trip;
+	double start;
+	double end;
+	double duration;
+	int origin;
+	int destination;
+	int purpose;
+	int mode;
+	int constraint;
+	int priority;
+	int vehicle;
+	int passengers;
+	int type;
+	int partition;
 
 };
 
