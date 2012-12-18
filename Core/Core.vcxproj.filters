@@ -131,6 +131,9 @@
     <ClInclude Include="m_array.h">
       <Filter>Data_Structures</Filter>
     </ClInclude>
+    <ClInclude Include="s_array.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">

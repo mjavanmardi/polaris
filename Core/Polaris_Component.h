@@ -185,12 +185,16 @@ typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE
 template<typename DataType,typename ReturnValueType>
 ReturnValueType Allocate(void)
 {
+	static_assert(!(sizeof(DataType)>_Page_Size),"Allocation request too large, increase the _Page_Size value in Run_Parameters.h");
+
 	return (ReturnValueType)((DataType::singleton_reference)->Allocate());
 }
 
 template<typename DataType>
 DataType* Allocate(void)
 {
+	static_assert(!(sizeof(DataType)>_Page_Size),"Allocation request too large, increase the _Page_Size value in Run_Parameters.h");
+
 	return (DataType*)((DataType::singleton_reference)->Allocate());
 }
 

@@ -96,7 +96,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		
 		// next, re-adjust to the start of the page
 		
-		int dist=(int)(_this-(Byte*)memory_root_ptr->pages);
+		long long dist=(long long)(_this-(Byte*)memory_root_ptr->pages);
 
 		_this=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
 		
@@ -181,7 +181,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 
 		// Must first locate PTEX corresponding to self
 		Byte* _this=(Byte*)this;
-		int dist=(int)(_this-(Byte*)memory_root_ptr->pages);
+		long long dist=(long long)(_this-(Byte*)memory_root_ptr->pages);
 		_this=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
 		Typed_Execution_Page<ComponentType>* execution_page=(Typed_Execution_Page<ComponentType>*)_this;
 

@@ -15,8 +15,11 @@ DataType* Typed_Execution_Pages<DataType>::Allocate()
 		//}
 		//else if(!type_activated) return nullptr;
 
-		execution_root_ptr->Activate_Type((Typed_Execution_Pages<>*)this);
-		type_activated=true;
+		if(!type_activated)
+		{
+			execution_root_ptr->Activate_Type((Typed_Execution_Pages<>*)this);
+			type_activated=true;
+		}
 
 		Typed_Execution_Page<DataType>* new_page=(Typed_Execution_Page<DataType>*)memory_root_ptr->Allocate();
 
@@ -53,7 +56,7 @@ void Typed_Execution_Pages<DataType>::Free(DataType* _object)
 	
 	// find the page which this object resides in
 	Byte* object=(Byte*)_object;
-	int dist=(int)(object-(Byte*)memory_root_ptr->pages);
+	long long dist=(long long)(object-(Byte*)memory_root_ptr->pages);
 	object=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
 	Typed_Execution_Page<DataType>*exe_page=(Typed_Execution_Page<DataType>*)object;
 
@@ -112,7 +115,7 @@ void Typed_Data_Pages<DataType>::Free(DataType* _object)
 
 	// find the page which this object resides in
 	Byte* object=(Byte*)_object;
-	int dist=(int)(object-(Byte*)memory_root_ptr->pages);
+	long long dist=(long long)(object-(Byte*)memory_root_ptr->pages);
 	object=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
 	Typed_Data_Page<DataType>* data_page=(Typed_Data_Page<DataType>*)object;
 

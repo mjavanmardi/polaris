@@ -158,7 +158,7 @@ struct Message_Base
 /// Initialize_Exchange_Interval - set minimum exchange interval by partition
 ///============================================================================
 
-void Initialize_Exchange_Interval(unsigned int partition,unsigned int exchange_interval)
+static void Initialize_Exchange_Interval(unsigned int partition,unsigned int exchange_interval)
 {
 	Exchange_Data* partition_exchange_data=&exchange_information.partition_exchange_data[partition];
 	
