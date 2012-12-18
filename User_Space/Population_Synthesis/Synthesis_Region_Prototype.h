@@ -30,7 +30,7 @@ namespace PopSyn
 				if (_iteration == 4)
 				{
 					response.result = true;
-					response.next = UINT_MAX;
+					response.next = END;
 				}
 				else
 				{
@@ -46,6 +46,8 @@ namespace PopSyn
 				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population,4,NULLTYPE);
 			}
 
+			//==============================================================================================================
+			// This handles the main population synthesis loop on the region-level, calls IPF and Selection for each zone
 			feature_prototype void Synthesize_Population(requires(check(ComponentType,Concepts::Is_IPF_Capable)))
 			{
 				ostream& out = this->Output_Stream<ostream&>();
@@ -67,7 +69,8 @@ namespace PopSyn
 				typedef get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
 				define_simple_container_interface(mway_itf, get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
 				mway_itf& mway = Synthesis_Zone_Prototype<ComponentType,CallerType>::Target_Joint_Distribution<mway_itf&>();
-
+				define_simple_container_interface(marg_itf, get_type_of(Target_Marginal_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
+				marg_itf& marg = Synthesis_Zone_Prototype<ComponentType,CallerType>::Target_Marginal_Distribution<marg_itf&>();
 				define_container_and_value_interface(sample_itf, pop_unit_itf, get_type_of(Sample_Data), Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
 				sample_itf* sample = Synthesis_Zone_Prototype<ComponentType,CallerType>::Sample_Data<sample_itf*>();
 

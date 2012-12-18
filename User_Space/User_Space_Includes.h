@@ -226,7 +226,8 @@ private:
 	double _freq;
 	__int64 _start;
 	LARGE_INTEGER _l;
-
+	clock_t _t_start;
+	clock_t _t_end;
 public:
 	Counter()
 	{
@@ -235,16 +236,22 @@ public:
 	}
 	void Start()
 	{
-		QueryPerformanceFrequency(&_l);
+		if (!QueryPerformanceFrequency(&_l)) printf("QPF() failed with error %d\n", GetLastError());
 		_freq = double(_l.QuadPart)/1000.0;
-		QueryPerformanceCounter(&_l);
+		if (!QueryPerformanceCounter(&_l)) printf("QPC() failed with error %d\n", GetLastError());
 		_start = _l.QuadPart;
+		_t_start = clock();
 	}
 	double Stop()
 	{
-		QueryPerformanceCounter(&_l);
+		if (!QueryPerformanceCounter(&_l)) printf("QPC() failed with error %d\n", GetLastError());
+		_t_end = clock();
+		cout << endl << "approx clock time (s) = "<< (double)(_t_end - _t_start) / (double)CLOCKS_PER_SEC<<endl;
 		return (double)(_l.QuadPart - _start)/_freq;
 	}
+	const __int64& get_start_value(){return _start;}
+	const double& get_freq_value(){return _freq;}
+	const long long& get_l_value(){return _l.QuadPart;}
 };
 
 //================================================================================================================================================================

@@ -26,7 +26,7 @@ namespace PopSyn
 			feature_prototype void Initialize()
 			{
 				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,1,NULLTYPE);
-				//load_event(ComponentType,Output_Popsyn_Conditional,Output_Popsyn_Event,4,NULLTYPE);
+				//load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,4,NULLTYPE);
 			}
 
 			// 1.) Startup Event - Reads inputs and allocates analysis objects (at timestep 1)
@@ -35,7 +35,7 @@ namespace PopSyn
 				if (_iteration == 1)
 				{
 					response.result = true;
-					response.next = UINT_MAX;
+					response.next = END;
 				}
 				else
 				{
@@ -124,7 +124,7 @@ namespace PopSyn
 				// references to the various region components
 				region_itf* new_region;
 				joint_itf* dist;
-				marginal_itf* marg;
+				marginal_itf* marg,  *regional_marg;
 				sample_data_itf* sample;
 
 				while(fr.Read())
@@ -234,6 +234,7 @@ namespace PopSyn
 						return EXIT_FAILURE;
 					}
 					region_itf* region = region_itr->second;
+					regional_marg = region->Target_Marginal_Distribution<marginal_itf*>();
 
 					// Read marginal data from file and add to ZONE
 					zone_itf* zone = (zone_itf*)Allocate<zone_type>();
@@ -257,6 +258,7 @@ namespace PopSyn
 						{
 							if (!zone_fr.Get_Data<double>(x,linker.get_sf3_column(i,j))) break;
 							(*marg)[pair<marginal_itf::size_type,marginal_itf::size_type>(i,j)] = x;
+							(*regional_marg)[pair<marginal_itf::size_type,marginal_itf::size_type>(i,j)] += x;
 						}
 
 					}
@@ -286,7 +288,7 @@ namespace PopSyn
 				if (_iteration == 3)
 				{
 					response.result = true;
-					response.next = UINT_MAX;
+					response.next = END;
 				}
 				else
 				{
@@ -312,7 +314,7 @@ namespace PopSyn
 				if (_iteration == 5)
 				{
 					response.result = true;
-					response.next = UINT_MAX;
+					response.next = END;
 				}
 				else
 				{
@@ -328,6 +330,7 @@ namespace PopSyn
 			feature_prototype void Stop_Timer()
 			{
 				cout << endl<<"Main Algorithm run-time: " << this->timer.Stop();
+				//cout << endl<<"freq: " << this->timer.get_freq_value() << ", start: "<<this->timer.get_start_value() <<", l: "<<this->timer.get_l_value();
 				load_event(ComponentType,Output_Popsyn_Conditional,Output_Popsyn_Event,6,NULLTYPE);
 			}
 
@@ -336,8 +339,8 @@ namespace PopSyn
 			{
 				if (_iteration == 7)
 				{
-					response.result = true;
-					response.next = UINT_MAX;
+					response.result = false;
+					response.next = END;
 				}
 				else
 				{
