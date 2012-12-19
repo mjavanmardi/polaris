@@ -358,8 +358,8 @@ protected:
 		if (_size > 0) delete _data;
 		_size=0;
 		_ndim=0;
-		_dim_sizes.clear();
-		_cursor.clear();
+		if (_dim_sizes.size() > 0) _dim_sizes.clear();
+		if (_cursor.size() > 0) _cursor.clear();
 	}
 
 
@@ -415,8 +415,8 @@ void m_array<T>::Copy(const m_array<T>& obj)
 template <class T>
 void m_array<T>::_copy(const m_array<T>& obj)
 {
-	_dim_sizes.clear();
-	_cursor.clear();
+	if (_dim_sizes.size() > 0) _dim_sizes.clear();
+	if (_cursor.size() > 0) _cursor.clear();
 	_ndim = obj._ndim;
 	_size = obj._size;
 
