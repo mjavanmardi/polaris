@@ -118,7 +118,7 @@ namespace PopSyn
 							if (abs((value_type)(temp_err - 1.0)) > max_error) max_error = abs((value_type)(temp_err - 1.0));
 
 							// 5. update the values in the distribution by the error factor
-							for (itr = mway.begin(d,i); itr != mway.end(); ++itr) *itr = *itr / temp_err;
+							if (temp_err > 0) for (itr = mway.begin(d,i); itr != mway.end(); ++itr) *itr = *itr / temp_err;
 						}
 					}
 
@@ -161,13 +161,6 @@ namespace PopSyn
 					itr = range.second;
 					if (itr == sample.end()) break;
 				}
-				//pair<hash_multimap<int,int>::iterator,hash_multimap<int,int>::iterator> pairIter;
-				//pairIter.equal_range(value_Iterator->first);
-				//while( pairIter.first != pairIter.second ){
-				//	// sum the values associated with keys
-				//	// Increment pairIter->first
-				//}
-				//value_iterator = pairIter.second;
 			}
 
 			//===================================================================================================================================
@@ -219,7 +212,8 @@ namespace PopSyn
 						{
 							if (rand.Next_Rand<double>() < w/cumulative_weight)
 							{					
-								pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>();
+								//pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
+								pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
 								pop_unit_itf* obj = range.first->second;
 								p->Initialize<pop_unit_itf&>(*obj);
 								zone_sample->insert(p->Index<uint>(),p);
@@ -239,7 +233,8 @@ namespace PopSyn
 					// add a copy of the last unit until num_required < 1
 					while (num_required > 1.0)
 					{
-						pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>();
+						//pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
+						pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
 						pop_unit_itf* obj = stored_pop_unit;
 						p->Initialize<pop_unit_itf&>(*obj);
 						zone_sample->insert(p->Index<uint>(),p);
@@ -250,7 +245,8 @@ namespace PopSyn
 					// if a fractional num_required is left, add another unit with probability of num_required
 					if (num_required > 0.0 && rand.Next_Rand<double>() < num_required)
 					{
-						pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>();
+						//pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
+						pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
 						pop_unit_itf* obj = stored_pop_unit;
 						p->Initialize<pop_unit_itf&>(*obj);
 						zone_sample->insert(p->Index<uint>(),p);

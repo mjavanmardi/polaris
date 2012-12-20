@@ -30,16 +30,29 @@ namespace PopSyn
 			// 1.) Startup Event - Reads inputs and allocates analysis objects (at timestep 1)
 			declare_feature_conditional(Start_Popsyn_Conditional)
 			{
-				if (_iteration == 1)
+				ComponentType* pthis = (ComponentType*)_this;
+				switch (_iteration)
 				{
+				case 1:
 					response.result = true;
-					response.next = END;
-				}
-				else
-				{
+					break;
+				case 3:
+					response.result = true;
+					pthis->Swap_Event(&Start_Main_Timer<NULLTYPE>);
+					break;
+				case 5:
+					response.result = true;
+					pthis->Swap_Event(&Stop_Main_Timer<NULLTYPE>);
+					break;
+				case 7:
 					response.result = false;
-					response.next = _iteration + 1;
+					pthis->Swap_Event(&Output_Popsyn_Event<NULLTYPE>);
+					break;
+				default:
+					response.result = false;
 				}
+				
+				response.next = _iteration + 1;
 			}
 			declare_feature_event(Start_Popsyn_Event)
 			{
@@ -66,12 +79,13 @@ namespace PopSyn
 				// CREATE RNG for later use
 				define_component_interface(Rand_Interface,MasterType::RNG,RNG_Prototype,NULLTYPE);
 				Rand_Interface* rand = (Rand_Interface*)Allocate<MasterType::RNG>();
+				//Rand_Interface* rand = (Rand_Interface*)(new MasterType::RNG()); // ALLOCATION TEST
 				rand->Initialize<double>(0);
 
 				// IPF Solver Settings
 				define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,ComponentType);
 				solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
-					
+				//solver_itf* solver = (solver_itf*)(new MasterType::IPF_Solver_Settings()); // ALLOCATION TEST
 
 				//===============================================================================================================
 				// Initialize file linker
@@ -139,7 +153,8 @@ namespace PopSyn
 						new_region->Initialize<NULLTYPE>();
 						dist = new_region->Target_Joint_Distribution<joint_itf*>();
 						marg = new_region->Target_Marginal_Distribution<marginal_itf*>();
-						Rand_Interface* my_rand = (Rand_Interface*)Allocate<MasterType::RNG>();
+						Rand_Interface* my_rand = (Rand_Interface*)Allocate<MasterType::RNG>(); // ALLOCATION TEST
+						//Rand_Interface* my_rand = (Rand_Interface*)(new MasterType::RNG());
 						my_rand->Initialize<double>(rand->Next_Rand<double>()*(double)SHRT_MAX);
 						new_region->Output_Stream<ostream&>(out);
 						((zone_itf*)new_region)->Rand<Rand_Interface*>(my_rand);
@@ -151,7 +166,9 @@ namespace PopSyn
 						marg->resize(dimensions,0.0);
 
 						new_region->ID<int>(ID);
-						solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
+						solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>(); // ALLOCATION TEST
+						//solver = (solver_itf*)(new MasterType::IPF_Solver_Settings());
+
 						solver->Initialize<Target_Type<void,double,int>>(0.05,100);
 						new_region->Solver_Settings<solver_itf*>(solver);
 
@@ -181,7 +198,8 @@ namespace PopSyn
 					sample_type::Characteristics_type data;
 					fr.Get_Data<sample_type::Characteristics_type::unqualified_value_type>(data,linker.get_pums_data_cols());
 
-					pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>();
+					pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>(); //ALLOCATION_TEST
+					//pop_unit_itf* p = (pop_unit_itf*)(new sample_type());
 					p->ID(sample_id);
 					p->Index(new_region->Get_1D_Index<Target_Type<joint_itf::size_type,joint_itf::index_type>>(index));
 					p->Weight(weight);
@@ -193,10 +211,10 @@ namespace PopSyn
 				}
 				fr.Close();
 
-				for (region_itr = regions->begin(); region_itr != regions->end(); ++region_itr)
-				{
-					// print the distributions to output file
-				}
+				//for (region_itr = regions->begin(); region_itr != regions->end(); ++region_itr)
+				//{
+				//	// print the distributions to output file
+				//}
 
 
 
@@ -235,16 +253,21 @@ namespace PopSyn
 					regional_marg = region->Target_Marginal_Distribution<marginal_itf*>();
 
 					// Read marginal data from file and add to ZONE
-					zone_itf* zone = (zone_itf*)Allocate<zone_type>();
+					zone_itf* zone = (zone_itf*)Allocate<zone_type>(); // ALLOCATION_TEST
+					//zone_itf* zone = (zone_itf*)(new zone_type());
+
 					zone->ID(ID);
-					solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
+					solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>(); // ALLOCATION_TEST
+					//solver = (solver_itf*)(new MasterType::IPF_Solver_Settings());
+
 					solver->Initialize<Target_Type<void,double,int>>(0.05,100);
 					zone->Solver_Settings<solver_itf*>(solver);
 					joint_itf* mway = zone->Target_Joint_Distribution<joint_itf*>();
 					marginal_itf* marg = zone->Target_Marginal_Distribution<marginal_itf*>();
 					mway->resize(dimensions,0);
 					marg->resize(dimensions,0);
-					Rand_Interface* my_rand = (Rand_Interface*)Allocate<MasterType::RNG>();
+					Rand_Interface* my_rand = (Rand_Interface*)Allocate<MasterType::RNG>(); // ALLOCATION_TEST
+					//Rand_Interface* my_rand = (Rand_Interface*)(new MasterType::RNG());
 					my_rand->Initialize<double>(rand->Next_Rand<double>()*(double)SHRT_MAX);
 					
 
@@ -272,27 +295,15 @@ namespace PopSyn
 				cout <<"Setup Runtime (ms): "<<timer.Stop();
 				//------------------------
 
-				load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,3,NULLTYPE);
+				//this_component()->swap_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,3,NULLTYPE);
 
 			}
 			feature_prototype bool Start_Popsyn(requires(check(ComponentType,!Concepts::Uses_Linker_File)))
 			{
 				assert_check(ComponentType,Concepts::Uses_Linker_File,"This popsyn type does not use linker file setup.");
 			}
+			
 			// 2.) Start timing event - called before individual objects begin processing (at timestep 3)
-			declare_feature_conditional(Start_Main_Timer_Conditional)
-			{
-				if (_iteration == 3)
-				{
-					response.result = true;
-					response.next = END;
-				}
-				else
-				{
-					response.result = false;
-					response.next = _iteration + 1;
-				}
-			}
 			declare_feature_event(Start_Main_Timer)
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
@@ -301,23 +312,11 @@ namespace PopSyn
 			feature_prototype void Start_Timer()
 			{
 				this->timer.Start();
-				load_event(ComponentType,Stop_Main_Timer_Conditional,Stop_Main_Timer,5,NULLTYPE);
+				//load_event(ComponentType,Stop_Main_Timer_Conditional,Stop_Main_Timer,5,NULLTYPE);
 
 			}
+			
 			// 3.) Stop timing event - called after individual objects end processing (at timestep 5)
-			declare_feature_conditional(Stop_Main_Timer_Conditional)
-			{
-				if (_iteration == 5)
-				{
-					response.result = true;
-					response.next = END;
-				}
-				else
-				{
-					response.result = false;
-					response.next = _iteration + 1;
-				}
-			}
 			declare_feature_event(Stop_Main_Timer)
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
@@ -327,22 +326,10 @@ namespace PopSyn
 			{
 				cout << endl<<"Main Algorithm run-time: " << this->timer.Stop();
 				//cout << endl<<"freq: " << this->timer.get_freq_value() << ", start: "<<this->timer.get_start_value() <<", l: "<<this->timer.get_l_value();
-				load_event(ComponentType,Output_Popsyn_Conditional,Output_Popsyn_Event,6,NULLTYPE);
+				//load_event(ComponentType,Output_Popsyn_Conditional,Output_Popsyn_Event,6,NULLTYPE);
 			}
+			
 			// 4.) Output results event - called after timing is stopped (at timestep 7)
-			declare_feature_conditional(Output_Popsyn_Conditional)
-			{
-				if (_iteration == 7)
-				{
-					response.result = false;
-					response.next = END;
-				}
-				else
-				{
-					response.result = false;
-					response.next = _iteration + 1;
-				}
-			}
 			declare_feature_event(Output_Popsyn_Event)
 			{
 				Counter timer;
@@ -397,6 +384,7 @@ namespace PopSyn
 
 				cout <<endl<<"File I/O Runtime: "<<timer.Stop();
 			}
+			
 			//----------------------------------------------------------------
 			// Schedules the first event from above
 			feature_prototype void Initialize()
