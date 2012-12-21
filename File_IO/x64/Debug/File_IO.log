@@ -1,0 +1,38 @@
+﻿Build started 12/21/2012 3:40:38 PM.
+Project "C:\Users\bxu\Desktop\test\File_IO\File_IO.vcxproj" on node 2 (rebuild target(s)).
+_PrepareForClean:
+  Deleting file "x64\Debug\File_IO.lastbuildstate".
+InitializeBuildStatus:
+  Creating "x64\Debug\File_IO.unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /Od /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc100.pdb" /Gd /TP /errorReport:prompt network_data.cpp network_demand_data.cpp network_information.cpp network_operation_data.cpp network_scenario_data.cpp network_vehicle_data.cpp RngStream.cpp utilities.cpp
+  utilities.cpp
+  RngStream.cpp
+  network_vehicle_data.cpp
+  network_scenario_data.cpp
+  network_operation_data.cpp
+network_operation_data.cpp(921): warning C4101: 'yeild_two_way_stop_sign_end' : unreferenced local variable
+network_operation_data.cpp(920): warning C4101: 'yeild_two_way_stop_sign_start' : unreferenced local variable
+network_operation_data.cpp(919): warning C4101: 'iline_phase_end' : unreferenced local variable
+  network_information.cpp
+  network_demand_data.cpp
+  network_data.cpp
+  Generating Code...
+Lib:
+  c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\x86_amd64\Lib.exe /OUT:"C:\Users\bxu\Desktop\test\x64\Debug\File_IO.lib" /NOLOGO x64\Debug\network_data.obj
+  x64\Debug\network_demand_data.obj
+  x64\Debug\network_information.obj
+  x64\Debug\network_operation_data.obj
+  x64\Debug\network_scenario_data.obj
+  x64\Debug\network_vehicle_data.obj
+  x64\Debug\RngStream.obj
+  x64\Debug\utilities.obj
+  File_IO.vcxproj -> C:\Users\bxu\Desktop\test\x64\Debug\File_IO.lib
+FinalizeBuildStatus:
+  Deleting file "x64\Debug\File_IO.unsuccessfulbuild".
+  Touching "x64\Debug\File_IO.lastbuildstate".
+Done Building Project "C:\Users\bxu\Desktop\test\File_IO\File_IO.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:22.30

@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="network_activity_location_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_assignment_models.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_demand_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_information.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_link_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_link_management_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_models.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_node_control_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_node_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_operation_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_route_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_scenario_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_sensor_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_turn_movement_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_vehicle_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network_zone_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RngStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="network_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="network_demand_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="network_information.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="network_operation_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="network_scenario_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="network_vehicle_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RngStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
