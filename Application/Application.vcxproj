@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="NetworkModel.cpp" />
+    <ClCompile Include="PopSyn_Example.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\File_IO\File_IO.vcxproj">

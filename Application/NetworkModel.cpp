@@ -1,4 +1,4 @@
-#define NetworkModelApplication
+//#define NetworkModelApplication
 #ifdef NetworkModelApplication
 //#define DBIO
 #ifdef DBIO
