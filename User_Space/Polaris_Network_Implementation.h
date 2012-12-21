@@ -35,10 +35,11 @@ namespace Network_Components
 
 			member_container(vector<typename MasterType::activity_location_type*>, activity_locations_container, none, none);
 
+			member_container(vector<typename MasterType::zone_type*>, zones_container, none, none);
 			
 			member_container(vector<typename MasterType::movement_type*>, movements_container, none, none);
 
-			typedef typename MasterType::scenario_type scenario_type;
+			member_component(typename MasterType::scenario_type, scenario_reference, none, none);
 		};
 
 

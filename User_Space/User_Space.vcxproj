@@ -66,7 +66,8 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir); $(SolutionDir)\Polaris_IO\odb_include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LIBODB_STATIC_LIB;LIBODB_SQLITE_STATIC_LIB;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -132,18 +133,23 @@
   <ItemGroup>
     <ClInclude Include="Activity_Location_Prototype.h" />
     <ClInclude Include="Demand_Prototype.h" />
+    <ClInclude Include="Intersection_Control_Prototype.h" />
     <ClInclude Include="Intersection_Prototype.h" />
     <ClInclude Include="Link_Prototype.h" />
     <ClInclude Include="Network_Prototype.h" />
+    <ClInclude Include="Operation_Prototype.h" />
     <ClInclude Include="Polaris_Activity_Location_Implementation.h" />
     <ClInclude Include="Polaris_Demand_Implementation.h" />
+    <ClInclude Include="Polaris_Intersection_Control_Implementation.h" />
     <ClInclude Include="Polaris_Intersection_Implementation.h" />
     <ClInclude Include="Polaris_Link_Implementation.h" />
     <ClInclude Include="Polaris_Network_Implementation.h" />
+    <ClInclude Include="Polaris_Operation_Implementation.h" />
     <ClInclude Include="Polaris_Routing_Implementation.h" />
     <ClInclude Include="Polaris_Scenario_Implementation.h" />
     <ClInclude Include="Polaris_Traveler_Implementation.h" />
     <ClInclude Include="Polaris_Vehicle_Implementation.h" />
+    <ClInclude Include="Polaris_Zone_Implementation.h" />
     <ClInclude Include="Population_Synthesis\File_Reader.h" />
     <ClInclude Include="Population_Synthesis\File_Writer.h" />
     <ClInclude Include="Population_Synthesis\linker.h" />
@@ -166,6 +172,7 @@
     <ClInclude Include="User_Space.h" />
     <ClInclude Include="User_Space_Includes.h" />
     <ClInclude Include="Vehicle_Prototype.h" />
+    <ClInclude Include="Zone_Prototype.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

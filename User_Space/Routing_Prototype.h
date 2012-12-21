@@ -1,5 +1,6 @@
 #pragma once
 #include "Intersection_Prototype.h"
+#include "../File_IO/utilities.h"
 
 #ifndef WINDOWS
 // for hash_map
@@ -95,11 +96,11 @@ namespace Routing_Components
 				for(link_itr=links_container.begin();link_itr!=links_container.end();link_itr++)
 				{
 					_Routable_Link_Interface* link_ptr = (_Routable_Link_Interface*)(*link_itr);
-					link_ptr->template label_cost<float>(FLT_MAX);
-					link_ptr->template label_pointer<_Routable_Link_Interface*>(nullptr);
+					link_ptr->template label_cost<float>(INFINITY_FLOAT);
+					link_ptr->template label_pointer<_Routable_Link_Interface*>(link_ptr);
 					link_ptr->template scan_list_status<Scan_List_Status_Keys>(UNSCANNED);
-					link_ptr->template f_cost<float>(0);
-					link_ptr->template h_cost<float>(0);
+					link_ptr->template f_cost<float>(0.0);
+					link_ptr->template h_cost<float>(0.0);
 				}
 			}
 
@@ -125,35 +126,47 @@ namespace Routing_Components
 				_Regular_Links_Container_Interface& regular_links_container = ((_Regular_Network_Interface*)regular_network)->template links_container<_Regular_Links_Container_Interface&>();
 				
 				// copy all links
-				hash_map<int, _Routable_Link_Interface*> linksMap;
+cout << "copying links" << endl;
+				dense_hash_map<int, _Routable_Link_Interface*> linksMap;
+				linksMap.set_empty_key(-1);
+				linksMap.set_deleted_key(-2);
 				typename _Regular_Links_Container_Interface::iterator regular_link_itr;
 				for(regular_link_itr=regular_links_container.begin(); regular_link_itr!=regular_links_container.end(); regular_link_itr++)
 				{
 					_Regular_Link_Interface* regular_link = (_Regular_Link_Interface*)(*regular_link_itr);
 					_Routable_Link_Interface* routable_link =  (_Routable_Link_Interface*)Allocate<typename _Routable_Link_Interface::Component_Type>();
 					routable_link->template network_link_reference<_Regular_Link_Interface*>(regular_link);
-					routable_link->template f_cost<float>(0);
-					routable_link->template h_cost<float>(0);
-					routable_link->template label_pointer<void*>(nullptr);
-					routable_link->template label_cost<float>(0);
+					routable_link->template f_cost<float>(0.0);
+					routable_link->template h_cost<float>(0.0);
+					routable_link->template label_pointer<void*>(routable_link);
+					routable_link->template label_cost<float>(0.0);
 					routable_link->template uuid<int>(regular_link->template uuid<int>());
+					routable_link->template internal_id<int>(regular_link->template internal_id<int>());
 					routable_link->template travel_time<float>(regular_link->template travel_time<float>());
 					links<_Routable_Links_Container_Interface&>().push_back(routable_link);
-					linksMap.insert(pair<int, _Routable_Link_Interface*>(regular_link->template uuid<int>(), routable_link));
+					linksMap.insert(pair<int, _Routable_Link_Interface*>(regular_link->template internal_id<int>(), routable_link));
 					regular_link->template replicas_container<_Routable_Links_Container_Interface&>().push_back(routable_link);
 				}
-
+cout << "copying intersections" << endl;
 				// copy all intersections
+int counter = -1;
 				_Regular_Intersections_Container_Interface& regular_intersections_container = ((_Regular_Network_Interface*)regular_network)->template intersections_container<_Regular_Intersections_Container_Interface&>();
-				hash_map<int, _Routable_Intersection_Interface*> intersectionsMap;
+				dense_hash_map<int, _Routable_Intersection_Interface*> intersectionsMap;
+				intersectionsMap.set_empty_key(-1);
+				intersectionsMap.set_deleted_key(-2);
 				typename _Regular_Intersections_Container_Interface::iterator regular_intersection_itr;
 				for(regular_intersection_itr=regular_intersections_container.begin(); regular_intersection_itr!=regular_intersections_container.end(); regular_intersection_itr++)
 				{
+if (++counter % 10000 == 0)
+{
+	cout << counter << " intersections copied" << endl;
+}
 					_Regular_Intersection_Interface* regular_intersection = (_Regular_Intersection_Interface*)(*regular_intersection_itr);
 					_Routable_Intersection_Interface* routable_intersection =  (_Routable_Intersection_Interface*)Allocate<typename _Routable_Intersection_Interface::Component_Type>();
 					routable_intersection->template x_position<float>(regular_intersection->template x_position<float>());
 					routable_intersection->template y_position<float>(regular_intersection->template y_position<float>());
 					routable_intersection->template uuid<int>(regular_intersection->template uuid<int>());
+					routable_intersection->template internal_id<int>(regular_intersection->template internal_id<int>());
 
 					// now add movements for the intersection
 					//RegularOutboundInboundMovementsContainerType& regular_outbound_inbound_movements_container = regular_intersection->template inbound_outbound_movements<RegularOutboundInboundMovementsContainerType&>();
@@ -181,7 +194,7 @@ namespace Routing_Components
 						//float forward_link_turn_travel_time = regular_outbound_inbound_movements->template forward_link_turn_travel_time<float>();
 						//routable_outbound_inbound_movements->template forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
 						_Regular_Link_Interface* regular_link = regular_inbound_outbound_movements->template inbound_link_reference<_Regular_Link_Interface*>();
-						_Routable_Link_Interface* routable_link = linksMap.find(regular_link->template uuid<int>())->second;
+						_Routable_Link_Interface* routable_link = linksMap.find(regular_link->template internal_id<int>())->second;
 						routable_inbound_outbound_movements->template inbound_link_reference<_Routable_Link_Interface*>(routable_link);
 						//another level of loop
 						_Regular_Movements_Container_Interface& regular_outbound_movements_container = regular_inbound_outbound_movements->template outbound_movements<_Regular_Movements_Container_Interface&>();
@@ -192,7 +205,7 @@ namespace Routing_Components
 							_Routable_Movement_Interface* routable_outbound_movement = (_Routable_Movement_Interface*)Allocate<typename _Routable_Movement_Interface::Component_Type>();
 							routable_outbound_movement->template forward_link_turn_travel_time<float>(regular_outbound_movement->template forward_link_turn_travel_time<float>());
 							_Regular_Link_Interface* regular_outbound_link = regular_outbound_movement->template outbound_link<_Regular_Link_Interface*>();
-							_Routable_Link_Interface* routable_outbound_link = linksMap.find(regular_outbound_link->template uuid<int>())->second;
+							_Routable_Link_Interface* routable_outbound_link = linksMap.find(regular_outbound_link->template internal_id<int>())->second;
 							routable_outbound_movement->template outbound_link<_Routable_Link_Interface*>(routable_outbound_link);
 							regular_outbound_movement->template replicas_container<_Routable_Movements_Container_Interface&>().push_back(routable_outbound_movement);
 							routable_inbound_outbound_movements->template outbound_movements<_Routable_Movements_Container_Interface&>().push_back(routable_outbound_movement);
@@ -211,7 +224,7 @@ namespace Routing_Components
 						//float forward_link_turn_travel_time = regular_outbound_inbound_movements->template forward_link_turn_travel_time<float>();
 						//routable_outbound_inbound_movements->template forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
 						_Regular_Link_Interface* regular_link = regular_outbound_inbound_movements->template outbound_link_reference<_Regular_Link_Interface*>();
-						_Routable_Link_Interface* routable_link = linksMap.find(regular_link->template uuid<int>())->second;
+						_Routable_Link_Interface* routable_link = linksMap.find(regular_link->template internal_id<int>())->second;
 						routable_outbound_inbound_movements->template outbound_link_reference<_Routable_Link_Interface*>(routable_link);
 						//another level of loop
 						_Regular_Movements_Container_Interface& regular_inbound_movements_container = regular_outbound_inbound_movements->template inbound_movements<_Regular_Movements_Container_Interface&>();
@@ -222,7 +235,7 @@ namespace Routing_Components
 							_Routable_Movement_Interface* routable_inbound_movement = (_Routable_Movement_Interface*)Allocate<typename _Routable_Movement_Interface::Component_Type>();
 							routable_inbound_movement->template forward_link_turn_travel_time<float>(regular_inbound_movement->template forward_link_turn_travel_time<float>());
 							_Regular_Link_Interface* regular_inbound_link = regular_inbound_movement->template inbound_link<_Regular_Link_Interface*>();
-							_Routable_Link_Interface* routable_inbound_link = linksMap.find(regular_inbound_link->template uuid<int>())->second;
+							_Routable_Link_Interface* routable_inbound_link = linksMap.find(regular_inbound_link->template internal_id<int>())->second;
 							routable_inbound_movement->template inbound_link<_Routable_Link_Interface*>(routable_inbound_link);
 							regular_inbound_movement->template replicas_container<_Routable_Movements_Container_Interface&>().push_back(routable_inbound_movement);
 							routable_outbound_inbound_movements->template inbound_movements<_Routable_Movements_Container_Interface&>().push_back(routable_inbound_movement);
@@ -231,9 +244,9 @@ namespace Routing_Components
 					}
 
 					intersections<_Routable_Intersections_Container_Interface&>().push_back(routable_intersection);
-					intersectionsMap.insert(pair<int, _Routable_Intersection_Interface*>(regular_intersection->template uuid<int>(), routable_intersection));
+					intersectionsMap.insert(pair<int, _Routable_Intersection_Interface*>(regular_intersection->template internal_id<int>(), routable_intersection));
 				}
-
+cout << " adding up/down streams to each link" << endl;
 				// add upstream and downstream to each link
 				typename _Routable_Links_Container_Interface::iterator routable_link_itr;
 				for(routable_link_itr=links<_Routable_Links_Container_Interface&>().begin(); routable_link_itr!=links<_Routable_Links_Container_Interface&>().end(); routable_link_itr++)
@@ -243,12 +256,13 @@ namespace Routing_Components
 					_Regular_Link_Interface* regular_link = routable_link->template network_link_reference<_Regular_Link_Interface*>();
 		
 					_Regular_Intersection_Interface* regular_upstream_intersection = regular_link->template upstream_intersection<_Regular_Intersection_Interface*>();
-					_Routable_Intersection_Interface* routable_upstream_intersection = intersectionsMap.find(regular_upstream_intersection->template uuid<int>())->second;
+					_Routable_Intersection_Interface* routable_upstream_intersection = intersectionsMap.find(regular_upstream_intersection->template internal_id<int>())->second;
 					routable_link->template upstream_intersection<_Routable_Intersection_Interface*>(routable_upstream_intersection);
 					_Regular_Intersection_Interface* regular_downstream_intersection = regular_link->template downstream_intersection<_Regular_Intersection_Interface*>();
-					_Routable_Intersection_Interface* routable_downstream_intersection = intersectionsMap.find(regular_downstream_intersection->template uuid<int>())->second;
+					_Routable_Intersection_Interface* routable_downstream_intersection = intersectionsMap.find(regular_downstream_intersection->template internal_id<int>())->second;
 					routable_link->template downstream_intersection<_Routable_Intersection_Interface*>(routable_downstream_intersection);
 				}
+cout << " streams added" << endl;
 				
 				// for debug, we printout everything of the network
 				/*
@@ -341,11 +355,11 @@ namespace Routing_Components
 
 				//PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting traveler: " << uuid);
 
-				response.next=INT_MAX;
+				response.next=END;
 				response.result=true;
 			}
 
-			feature_prototype void one_to_one_link_based_least_time_path_a_star()
+			feature_prototype bool one_to_one_link_based_least_time_path_a_star()
 			{
 
 				define_component_interface(_Routable_Network_Interface, get_type_of(routable_network), Routing_Components::Prototypes::Routable_Network_Prototype, ComponentType);
@@ -358,7 +372,9 @@ namespace Routing_Components
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typedef typename _Routable_Network_Interface::get_type_of(scan_list) ScanListType;
-
+define_component_interface(_Vehicle_Interface, get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+//cout << "routing start for vehicle " << vehicle<_Vehicle_Interface*>()->uuid<int>() << " at time " << network<_Regular_Network_Interface*>()->template scenario_reference<_Scenario_Interface*>()->current_time<int>() << endl;
 				_Routable_Network_Interface* routable_net=routable_network<_Routable_Network_Interface*>();
 				routable_net->template Reset<NULLTYPE>();
 				
@@ -374,7 +390,11 @@ namespace Routing_Components
 				_Regular_Link_Interface* net_origin_link=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>();
 				_Movements_Container_Interface& turn_mvmt_container=net_origin_link->template outbound_turn_movements<_Movements_Container_Interface&>();
 				int outbound_turn_movement_size = (int)turn_mvmt_container.size();
-				if (outbound_turn_movement_size == 0){return;}
+				if (origin_link_ptr != destination_link_ptr && outbound_turn_movement_size == 0)
+				{
+					cerr << "Origin link must have outbount turn movement" << endl;
+					assert(false);
+				}
 			
 				//initialization
 				//RoutableLinkInterface* nextlink;
@@ -407,17 +427,56 @@ namespace Routing_Components
 				}
 				else
 				{
-					return;
+					return true;
 				}
 
-				current_link->template label_pointer<_Regular_Link_Interface*>(nullptr);
+				current_link->template label_pointer<_Routable_Link_Interface*>(current_link);
 
 				scan_list.insert(make_pair(current_link->template f_cost<float>(),current_link));
+//if (vehicle<_Vehicle_Interface*>()->uuid<int>() == 17918)
+//{
+//	cout << "<" << current_link->template f_cost<float>() << ", " << current_link->uuid<int>() << "> inserted " << endl;
+//}
 				current_link->template scan_list_status<Scan_List_Status_Keys>(INSELIST);
 				int cur_link_id;
+//define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, _Regular_Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				
+//for (int i = 0; i < (int)routable_net->links<_Routable_Links_Container_Interface&>().size(); i++)
+//{
+//	//_Intersection_Interface* current_intersection = routable_net->intersections_container<_Intersections_Container_Interface&>()[i];
+//
+//	_Routable_Intersection_Interface* current_intersection1=routable_net->links<_Routable_Links_Container_Interface&>()[i]->template downstream_intersection<_Routable_Intersection_Interface*>();
+//
+//		//for all outbound turn movements
+//	_Inbound_Outbound_Movements_Container_Interface& inbound_outbound_movements_container = current_intersection1->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>();
+//	typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_itr;
+//	for(inbound_itr=inbound_outbound_movements_container.begin(); inbound_itr!=inbound_outbound_movements_container.end(); inbound_itr++)
+//	{
+//		_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_itr);
+//
+//		_Movements_Container_Interface& outbound_movements_container = inbound_outbound_movements->template outbound_movements<_Movements_Container_Interface&>();
+//		typename _Movements_Container_Interface::iterator outbound_itr;
+//		for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
+//		{
+//			_Movement_Interface* outbound_movement = (_Movement_Interface*)(*outbound_itr);
+//
+//			//int inbound_link_id = outbound_movement->inbound_link<_Routable_Link_Interface*>()->uuid<int>();
+//			//int outbound_link_id = outbound_movement->outbound_link<_Routable_Link_Interface*>()->uuid<int>();
+//
+//			next_cost=outbound_movement->template forward_link_turn_travel_time<float>();
+//			cout << "next_cost = " << next_cost << endl;
+//		}
+//	}
+//
+//}
 
+//if (vehicle<_Vehicle_Interface*>()->uuid<int>() == 17918 && network<_Regular_Network_Interface*>()->template scenario_reference<_Scenario_Interface*>()->current_time<int>() == 22530)
+//{
+//	cout << "here" << endl;
+//}
+//cout << "routing 1" << endl;
 				while(!scan_list.empty())
-				{
+				{ 
 					//selection
 					//num_searches++;
 					current_link = (_Routable_Link_Interface*)(scan_list.begin()->second);
@@ -440,16 +499,26 @@ namespace Routing_Components
 					{
 						_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_itr);
 						_Routable_Link_Interface* inbound_link = inbound_outbound_movements->template inbound_link_reference<_Routable_Link_Interface*>();
+						int inbound_link_id=inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
+
 						if (inbound_link == current_link)
 						{
 							_Movements_Container_Interface& outbound_movements_container = inbound_outbound_movements->template outbound_movements<_Movements_Container_Interface&>();
 							typename _Movements_Container_Interface::iterator outbound_itr;
+//cout << "current_link = " << current_link->uuid<int>() << endl;
+//if (vehicle<_Vehicle_Interface*>()->uuid<int>() == 17918 && current_link->uuid<int>() == 8)
+//{
+//	cout << "here" << endl;
+//}
 							for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
 							{
 								_Movement_Interface* outbound_movement = (_Movement_Interface*)(*outbound_itr);
 								_Routable_Link_Interface* next_link=outbound_movement->template outbound_link<_Routable_Link_Interface*>();
+								int next_link_id=next_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
+
+
 								next_cost=outbound_movement->template forward_link_turn_travel_time<float>();
-								new_cost=current_link->template label_cost<float>();
+								new_cost=current_link->template label_cost<float>() + next_cost;
 
 								if(next_link->template label_cost<float>()>new_cost)
 								{
@@ -463,18 +532,23 @@ namespace Routing_Components
 
 									if(next_link->template network_link_reference<_Regular_Link_Interface*>()!=destination_reference)
 									{
-										dx=destination_x - next_link->template downstream_intersection<_Routable_Intersection_Interface*>()->template x_position<float>();
-										dy=destination_y - next_link->template downstream_intersection<_Routable_Intersection_Interface*>()->template y_position<float>();
+										dx=destination_x - next_link->template upstream_intersection<_Routable_Intersection_Interface*>()->template x_position<float>();
+										dy=destination_y - next_link->template upstream_intersection<_Routable_Intersection_Interface*>()->template y_position<float>();
 										next_link->template h_cost<float>(sqrt(dx*dx+dy*dy)/max_free_flow_speed);
 									}
 									else
 									{
-										next_link->template h_cost<float>(0);
+										next_link->template h_cost<float>(0.0);
 									}
 
 									next_link->template f_cost<float>(next_link->template label_cost<float>() + next_link->template h_cost<float>());
 
 									scan_list.insert(make_pair(next_link->template f_cost<float>(),next_link)); // update with the new cost
+//if (vehicle<_Vehicle_Interface*>()->uuid<int>() == 17918)
+//{
+//	cout << "<" << next_link->template f_cost<float>() << ", " << next_link->uuid<int>() << "> inserted " << endl;
+//}
+
 									next_link->template scan_list_status<Scan_List_Status_Keys>(INSELIST);
 								}
 							}
@@ -482,36 +556,96 @@ namespace Routing_Components
 						}
 					}
 				}
+//if (vehicle<_Vehicle_Interface*>()->uuid<int>() == 17918)
+//{
+//	cout << "here" << endl;
+//}
 
-
-				_Reversed_Path_Container_Interface& reversed_path_container=routable_network<_Routable_Network_Interface*>()->template reversed_path_container<_Reversed_Path_Container_Interface&>();
-
-				current_link=destination_link<_Routable_Link_Interface*>();
-				reversed_path_container.push_back(current_link->template network_link_reference<_Regular_Link_Interface*>());
-				current_link=current_link->template label_pointer<_Routable_Link_Interface*>();
-					
-				while(current_link != nullptr)
+				if (destination_link_ptr->template label_pointer<_Routable_Link_Interface*>() == destination_link_ptr)
 				{
-					reversed_path_container.push_back(current_link->template network_link_reference<_Regular_Link_Interface*>());
-					current_link=current_link->template label_pointer<_Routable_Link_Interface*>();
+					return false;
 				}
+				else
+				{
+
+					_Reversed_Path_Container_Interface& reversed_path_container=routable_network<_Routable_Network_Interface*>()->template reversed_path_container<_Reversed_Path_Container_Interface&>();
+
+					current_link=destination_link<_Routable_Link_Interface*>();
+				
+					while (true)
+					{
+						reversed_path_container.push_back(current_link->template network_link_reference<_Regular_Link_Interface*>());
+
+//if (vehicle<_Vehicle_Interface*>()->internal_id<int>() == 10225){
+//cout << "linke = " << current_link->template network_link_reference<_Regular_Link_Interface*>()->internal_id<int>() << endl;
+//}
+						if (current_link->label_pointer<_Routable_Link_Interface*>() != current_link)
+						{
+							current_link=current_link->template label_pointer<_Routable_Link_Interface*>();
+						}
+						else
+						{
+							break;
+						}
+						
+					}
+
+
+//	cout << "ok 2" << endl;
+					return true;
+				}
+				//_Reversed_Path_Container_Interface& reversed_path_container=routable_network<_Routable_Network_Interface*>()->template reversed_path_container<_Reversed_Path_Container_Interface&>();
+
+				//int cc_size = 0;
+				//current_link=destination_link<_Routable_Link_Interface*>();
+				//int ccc = current_link->template network_link_reference<_Regular_Link_Interface*>()->template uuid<int>();
+				//
+				//reversed_path_container.push_back(current_link->template network_link_reference<_Regular_Link_Interface*>());
+				//cc_size++;
+
+				//current_link=current_link->template label_pointer<_Routable_Link_Interface*>();
+				//ccc = current_link->template network_link_reference<_Regular_Link_Interface*>()->template uuid<int>();
+				//
+				//
+				//while(current_link != nullptr)
+				//{
+				//	reversed_path_container.push_back(current_link->template network_link_reference<_Regular_Link_Interface*>());
+				//	cc_size++;
+
+				//	current_link=current_link->template label_pointer<_Routable_Link_Interface*>();
+				//	if (current_link != nullptr)
+				//	{
+				//		ccc = current_link->template network_link_reference<_Regular_Link_Interface*>()->template uuid<int>();
+				//	}
+				//}
+//cout << "routing ended" << endl;
+
 			};
 
 			feature_prototype void Schedule_Route_Computation(int departed_time)
 			{
-				load_event(ComponentType,Compute_Route_Condition,Compute_Route,departed_time,NULLTYPE);
+				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				int simulation_start_time = network<_Regular_Network_Interface*>()->template scenario_reference<_Scenario_Interface*>()->template simulation_start_time<int>();
+				int relative_departed_time = departed_time - simulation_start_time; // departure time relative to the simulation start time
+				if (relative_departed_time >= 0) {
+					load_event(ComponentType,Compute_Route_Condition,Compute_Route,relative_departed_time,NULLTYPE);
+				}
 			}
 
 			//first event
 			declare_feature_event(Compute_Route)
 			{
+				double calculation_time_start = ::get_current_cpu_time_in_seconds();
 				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
 				typedef Link_Components::Prototypes::Link_Prototype<typename ComponentType::routable_link_type, ComponentType> _Routable_Link_Interface;
-
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
 				typedef Vehicle_Components::Prototypes::Vehicle_Prototype<typename ComponentType::vehicle_type, ComponentType> _Vehicle_Interface;
 				typedef Routing_Components::Prototypes::Routable_Network_Prototype<typename ComponentType::routable_network_type, ComponentType> _Routable_Network_Interface;
-				
+
+				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+
 				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, ComponentType::routable_network_type::type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				
 				_Vehicle_Interface* veh=_this_ptr->template vehicle<_Vehicle_Interface*>();
@@ -522,14 +656,24 @@ namespace Routing_Components
 				
 				_this_ptr->template origin_link<_Regular_Link_Interface*>(origin_link);
 				_this_ptr->template destination_link<_Regular_Link_Interface*>(destination_link);
-
-				_this_ptr->template one_to_one_link_based_least_time_path_a_star<NULLTYPE>();
-				
+//if (veh->uuid<int>() == 17979)
+//{
+//	int vid = veh->uuid<int>();
+//	cout << "here" << endl;
+//}
+				bool pathFound = _this_ptr->template one_to_one_link_based_least_time_path_a_star<NULLTYPE>();
+				if (pathFound)
+				{
 	
-				_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
+					_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
 				
-				veh->set_route_links(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
-				origin_link->p_vehicle(veh);
+					veh->set_route_links(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
+				
+
+					origin_link->p_vehicle(veh);
+				}
+				double calculation_time_end = ::get_current_cpu_time_in_seconds();
+				_this_ptr->template network<_Regular_Network_Interface*>()->template scenario_reference<_Scenario_Interface*>()->template assignment_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
 			}
 		};
 	}

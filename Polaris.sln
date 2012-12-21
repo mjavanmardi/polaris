@@ -4,14 +4,26 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Polaris_IO", "Polaris_IO\Polaris_IO.vcxproj", "{565DD22F-96FD-4930-85B4-50198D30B88E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "User_Space", "User_Space\User_Space.vcxproj", "{03356212-5DD0-4D56-A243-5DABB710DD31}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F} = {FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F}
+		{565DD22F-96FD-4930-85B4-50198D30B88E} = {565DD22F-96FD-4930-85B4-50198D30B88E}
+		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030} = {70F1765F-C7C3-4EE7-89C4-5274CFCC4030}
+		{B1069BED-CDDA-4039-811C-459007051917} = {B1069BED-CDDA-4039-811C-459007051917}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Core\Core.vcxproj", "{CC14D99C-6731-411A-8226-51D3EA948BFF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Repository", "Repository\Repository.vcxproj", "{B1069BED-CDDA-4039-811C-459007051917}"
+	ProjectSection(ProjectDependencies) = postProject
+		{565DD22F-96FD-4930-85B4-50198D30B88E} = {565DD22F-96FD-4930-85B4-50198D30B88E}
+		{CC14D99C-6731-411A-8226-51D3EA948BFF} = {CC14D99C-6731-411A-8226-51D3EA948BFF}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scenario_Manager", "Scenario_Manager\Scenario_Manager.vcxproj", "{FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Application\Application.vcxproj", "{098AE0AB-930F-43F6-93E6-19CF9E0C1809}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "File_IO", "File_IO\File_IO.vcxproj", "{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +81,14 @@ Global
 		{098AE0AB-930F-43F6-93E6-19CF9E0C1809}.Release|Win32.Build.0 = Release|Win32
 		{098AE0AB-930F-43F6-93E6-19CF9E0C1809}.Release|x64.ActiveCfg = Release|x64
 		{098AE0AB-930F-43F6-93E6-19CF9E0C1809}.Release|x64.Build.0 = Release|x64
+		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Debug|Win32.ActiveCfg = Debug|Win32
+		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Debug|Win32.Build.0 = Debug|Win32
+		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Debug|x64.ActiveCfg = Debug|x64
+		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Debug|x64.Build.0 = Debug|x64
+		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Release|Win32.ActiveCfg = Release|Win32
+		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Release|Win32.Build.0 = Release|Win32
+		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Release|x64.ActiveCfg = Release|x64
+		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

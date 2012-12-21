@@ -31,7 +31,8 @@ namespace Traveler_Components
 			feature_accessor(router, none, none);
 			feature_accessor(vehicle, none, none);
 			feature_accessor(uuid, none, none);
-
+			feature_accessor(internal_id, none, none);
+			
 			feature_prototype void Schedule_New_Departure(int departed_time)
 			{
 				define_component_interface(_Routing_Interface, get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);

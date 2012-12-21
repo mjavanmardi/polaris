@@ -1,6 +1,6 @@
 #pragma once
 #include "User_Space_Includes.h"
-
+#include "Activity_Location_Prototype.h"
 namespace Activity_Location_Components
 {
 	namespace Types
@@ -16,11 +16,19 @@ namespace Activity_Location_Components
 		implementation struct Polaris_Activity_Location_Implementation
 		{
 
-			member_data(int, zone, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_component(typename MasterType::zone_type, zone, none, none);
 
 			member_container(vector<typename MasterType::link_type*>, origin_links, none, none);
 
 			member_container(vector<typename MasterType::link_type*>, destination_links, none, none);
+
+			member_container(vector<float>, origin_link_choice_cdfs, none, none);
+
+			member_container(vector<float>, destination_link_choice_cdfs, none, none);
+
+			member_data(int, uuid, none, none);
+
+			member_data(int, internal_id, none, none);
 
 		};
 	}

@@ -17,6 +17,7 @@ namespace Traveler_Components
 		implementation struct Polaris_Traveler_Implementation
 		{
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, internal_id, none, none);
 
 			member_component(typename MasterType::routing_type, router, none, none);
 

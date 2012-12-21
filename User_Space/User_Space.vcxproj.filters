@@ -136,5 +136,23 @@
     <ClInclude Include="Population_Synthesis\Population_Unit_Implementations.h">
       <Filter>Implementations\PopSyn</Filter>
     </ClInclude>
+    <ClInclude Include="Intersection_Control_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Operation_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Zone_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Intersection_Control_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Operation_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Zone_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

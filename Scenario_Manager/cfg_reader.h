@@ -25,5 +25,6 @@ public:
 	int getParameter( const char *parameterName, DoubleArray *parameter);
 	int getParameter( const char *parameterName, StringArray *parameter);
 	int getParameter( const char *parameterName, BoolArray *parameter);
+	int getParameter( const char *parameterName, unsigned long *paramValue);
 };
 

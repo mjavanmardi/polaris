@@ -2,7 +2,7 @@
 
 
 static const long long _Megabytes_To_Allocate=1000;
-static const unsigned int _num_iterations=10;
+static const unsigned int _num_iterations=24*3600*2; // 2 days
 static const int _num_threads=1;
 
 static const int _Max_Message_Size=5*1048576;

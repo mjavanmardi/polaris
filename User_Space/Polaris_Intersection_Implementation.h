@@ -66,7 +66,7 @@ namespace Intersection_Components
 				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
 				{
 					_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-					//replica->template forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
+					replica->template forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
 				}
 			}
 			tag_setter_as_available(forward_link_turn_travel_time);
@@ -80,6 +80,7 @@ namespace Intersection_Components
 
 			//typedef deque<typename MasterType::vehicle_type*> vehicles_container_type;
 			member_container(deque<typename MasterType::vehicle_type*>, vehicles_container, none, none);
+			member_container(deque<typename MasterType::vehicle_type*>, upstream_vehicles_container, none, none);
 
 			member_component(typename MasterType::link_type, inbound_link, none, none);
 
@@ -87,7 +88,11 @@ namespace Intersection_Components
 
 			//member_component_basic(typename MasterType::DETECTOR_TYPE,detector);
 
-			member_data(int, id, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, internal_id, none, none);
+			member_data(int, merge_priority, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, green_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, inbound_link_green_cycle_ratio, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 		};
 		
 
@@ -119,6 +124,7 @@ namespace Intersection_Components
 //			member_component(typename MasterType::SIGNAL_TYPE,signal, none, none);
 
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, internal_id, none, none);
 			member_data(float, x_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, y_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, z_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -139,7 +145,10 @@ namespace Intersection_Components
 			member_component(typename MasterType::scenario_type, scenario_reference, none, none);
 
 
-			member_data(RngStream, rng_stream, none, none);
+			member_data(User_Space::RngStream, rng_stream, none, none);
+			member_component(typename MasterType::network_type, network_reference, none, none);
+
+			member_component(typename MasterType::intersection_control_type, intersection_control, none, none);
 
 			typedef typename MasterType::vehicle_type vehicle_type;
 

@@ -60,6 +60,25 @@ int CfgReader::getParameter( const char *paramName, int *paramValue )
 	return 0;
 }
 
+int CfgReader::getParameter( const char *paramName, unsigned long *paramValue )
+{
+	Json::Value value = getParameter(paramName);
+	
+	if (value.isNull())
+	{
+		return PARAMETER_NOT_SPECIFIED;
+	}
+	
+	if (!value.isNumeric())
+	{
+		return PARAMETER_TYPE_NOT_MATCH;
+	}
+	
+	*paramValue = value.asInt();
+	
+	return 0;
+}
+
 int CfgReader::getParameter( const char *paramName, double *paramValue )
 {
 	Json::Value value = getParameter(paramName);

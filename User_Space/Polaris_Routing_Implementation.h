@@ -4,7 +4,7 @@
 #include "Routable_Link_Implementation.h"
 #include "Polaris_Vehicle_Implementation.h"
 #include "Traveler_Prototype.h"
-
+#include <iostream>
 namespace Routing_Components
 {
 	namespace Types
@@ -63,7 +63,7 @@ namespace Routing_Components
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			void origin_link(TargetType set_value)
 			{
-				_origin_link = set_value->template uuid<int>();
+				_origin_link = set_value->template internal_id<int>();
 			}
 			tag_setter_as_available(origin_link);
 
@@ -85,7 +85,7 @@ namespace Routing_Components
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			void destination_link(TargetType set_value)
 			{
-				_destination_link = set_value->template uuid<int>();
+				_destination_link = set_value->template internal_id<int>();
 			}
 			tag_setter_as_available(destination_link);
 

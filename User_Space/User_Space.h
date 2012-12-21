@@ -10,7 +10,9 @@
 #include "Polaris_Demand_Implementation.h"
 #include "Polaris_Activity_Location_Implementation.h"
 #include "Polaris_Traveler_Implementation.h"
-
+#include "Polaris_Intersection_Control_Implementation.h"
+#include "Polaris_Operation_Implementation.h"
+#include "Polaris_Zone_Implementation.h"
 
 
 #include "User_Space\Population_Synthesis\Population_Unit_Implementations.h"

@@ -64,7 +64,7 @@ namespace Link_Components
 		/// Simple Link Members
 		//------------------------------------------------------------------------------------------------------------------
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-
+			member_data(int, internal_id, none, none);
 			member_data(int, num_lanes, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, speed_limit, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -95,6 +95,7 @@ namespace Link_Components
 			
 			member_data(int, link_origin_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, link_origin_departed_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, link_origin_loaded_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
 			member_data(int, link_destination_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
@@ -130,6 +131,7 @@ namespace Link_Components
 
 
 			member_component(typename MasterType::scenario_type, scenario_reference, none, none);
+			member_component(typename MasterType::network_type, network_reference, none, none);
 
 
 		//==================================================================================================================
@@ -179,7 +181,7 @@ namespace Link_Components
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			void travel_time(TargetType set_value)
 			{
-				_travel_time = (int)set_value;
+				_travel_time = (float)set_value;
 				// update replicas
 				typename replicas_container_type::iterator replica_itr;
 				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
@@ -190,7 +192,12 @@ namespace Link_Components
 			}
 			tag_setter_as_available(travel_time);
 
-			int _travel_time;
+			float _travel_time;
+
+			member_component(typename MasterType::approach_type, approach, none, none);
+			member_data(int, link_num_vehicles_in_queue, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+
+			member_container(deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, none, none);
 		};
 			
 	}

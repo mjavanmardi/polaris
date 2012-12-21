@@ -21,7 +21,13 @@ namespace Demand_Components
 			member_component(typename MasterType::scenario_type, scenario_reference, none, none);
 
 			member_component(typename MasterType::network_type, network_reference, none, none);
+			
+			member_container(vector<typename MasterType::vehicle_type*>, vehicles_container, none, none);
 
+			member_data(int, first_vehicle_departure_time, none, none);
+
+			member_data(int, last_vehicle_departure_time, none, none);
+			
 			typedef typename MasterType::traveler_type traveler_type;
 		};
 

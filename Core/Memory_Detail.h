@@ -39,10 +39,10 @@ DataType* Typed_Execution_Pages<DataType>::Allocate()
 	{
 		pages_with_free_cells.pop_front();
 	}
-	
-	if(world_ptr->run) mem_lock=0; // unlock the mem
 
 	new (return_value) DataType();
+
+	if(world_ptr->run) mem_lock=0; // unlock the mem
 
 	return (DataType*)return_value;
 }
@@ -76,64 +76,58 @@ void Typed_Execution_Pages<DataType>::Free(DataType* _object)
 	mem_lock=0; // unlock the page
 }
 
-//static LARGE_INTEGER start_mem_timer[_num_threads];
-//static LARGE_INTEGER end_mem_timer[_num_threads];
-//static float sum_mem_timer[_num_threads];
-
 template<typename DataType>
 DataType* Typed_Data_Pages<DataType>::Allocate()
 {
-	//while(AtomicExchange(&mem_lock,1)) SLEEP(0); // lock the page
+	while(AtomicExchange(&mem_lock,1)) SLEEP(0); // lock the page
 
-	//if(pages_with_free_cells.size()==0)
-	//{
-	//	Typed_Data_Page<DataType>* new_page=(Typed_Data_Page<DataType>*)memory_root_ptr->Allocate();
+	if(pages_with_free_cells.size()==0)
+	{
+		Typed_Data_Page<DataType>* new_page=(Typed_Data_Page<DataType>*)memory_root_ptr->Allocate();
 
-	//	new_page->Initialize();
-	//	
-	//	pages_with_free_cells.push_back(new_page);
+		new_page->Initialize();
+		
+		pages_with_free_cells.push_back(new_page);
+		
+		active_pages.push_back(new_page);
+	}
 
-	//	//active_pages.push_back(new_page);
-	//}
+	Byte* return_value=(Byte*)(pages_with_free_cells.front()->Allocate());
+	
+	new (return_value) DataType();
 
-	//Byte* return_value=(Byte*)(pages_with_free_cells.front()->Allocate());
-	//
-	//if((Byte*)pages_with_free_cells.front()->Full())
-	//{
-	//	pages_with_free_cells.pop_front();
-	//}
+	if((Byte*)pages_with_free_cells.front()->Full())
+	{
+		pages_with_free_cells.pop_front();
+	}
+	
+	mem_lock=0; // unlock the page
 
-	//mem_lock=0; // unlock the page
-
-	//new (return_value) DataType();
-
-	return new DataType();
+	return (DataType*)return_value;
 }
 
 template<typename DataType>
 void Typed_Data_Pages<DataType>::Free(DataType* _object)
 {
-	//while(AtomicExchange(&mem_lock,1)) SLEEP(0); // lock the page
+	while(AtomicExchange(&mem_lock,1)) SLEEP(0); // lock the page
 
-	//// data pages fully free the object whenever requested
+	// data pages fully free the object whenever requested
 
-	//// find the page which this object resides in
-	//Byte* object=(Byte*)_object;
-	//long long dist=(long long)(object-(Byte*)memory_root_ptr->pages);
-	//object=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
-	//Typed_Data_Page<DataType>* data_page=(Typed_Data_Page<DataType>*)object;
+	// find the page which this object resides in
+	Byte* object=(Byte*)_object;
+	long long dist=(long long)(object-(Byte*)memory_root_ptr->pages);
+	object=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
+	Typed_Data_Page<DataType>* data_page=(Typed_Data_Page<DataType>*)object;
 
-	//// check if need to inform type that this page has space now
-	//bool notify_type=false;
+	// check if need to inform type that this page has space now
+	bool notify_type=false;
 
-	//if(data_page->Full()){notify_type=true;}
-	//
-	//data_page->Free(_object);
+	if(data_page->Full()){notify_type=true;}
+	
+	data_page->Free(_object);
 
-	//// inform type that this page has space
-	//if(notify_type){pages_with_free_cells.push_back(data_page);}
+	// inform type that this page has space
+	if(notify_type){pages_with_free_cells.push_back(data_page);}
 
-	//mem_lock=0; // unlock the page
-
-	delete object;
+	mem_lock=0; // unlock the page
 }

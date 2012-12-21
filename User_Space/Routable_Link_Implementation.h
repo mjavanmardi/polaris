@@ -22,6 +22,7 @@ namespace Link_Components
 			typedef typename MasterType::link_type network_link_type;
 
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, internal_id, none, none);
 			member_data(float, travel_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, f_cost, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, h_cost, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));

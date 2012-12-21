@@ -1,5 +1,7 @@
 #pragma once
 #include "User_Space_Includes.h"
+#include "Intersection_Control_Prototype.h"
+#include "../File_IO/utilities.h"
 //#include "Signal_Prototypes.h"
 
 /*
@@ -21,6 +23,18 @@ namespace Vehicle_Components {
 	namespace Prototypes
 	{
 		forward_declare_prototype struct Vehicle_Prototype;
+	}
+};
+namespace Network_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Network_Prototype;
+	}
+};
+namespace Intersection_Control_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Intersection_Control_Prototype;
 	}
 };
 /*------------------------------------------------*/
@@ -53,11 +67,12 @@ namespace Intersection_Components
 			ACTUATED_SIGNAL_CONTROL, 
 			ADAPTIVE_SIGNAL_CONTROL,
 		};
-
 #ifdef WINDOWS
 		enum Intersection_Simulation_Status
 		{
 			NONE_COMPLETE,
+			PROCESS_SKIPPED,
+			COMPUTE_STEP_CONTROL_COMPLETE,
 			COMPUTE_STEP_FLOW_COMPLETE,
 			NETWORK_STATE_UPDATE_COMPLETE
 		};
@@ -75,7 +90,8 @@ namespace Intersection_Components
 			tag_as_prototype;
 
 			feature_accessor(detector, none, none);
-			feature_accessor(id, none, none);
+			feature_accessor(internal_id, none, none);
+			feature_accessor(uuid, none, none);
 			feature_accessor(inbound_link, none, none);
 			feature_accessor(outbound_link, none, none);
 
@@ -106,7 +122,11 @@ namespace Intersection_Components
 			feature_accessor(replicas_container, none, none);
 
 			feature_accessor(vehicles_container, none, none);
+			feature_accessor(upstream_vehicles_container, none, none);
 
+			feature_accessor(merge_priority, none, none);
+			feature_accessor(green_time, none, none);
+			feature_accessor(inbound_link_green_cycle_ratio, none,none);
 
 			feature_prototype TargetType pull_vehicle()
 			{
@@ -119,12 +139,16 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 
 				_Vehicle_Interface* veh=(_Vehicle_Interface*)vehicles_container<_Vehicles_Container_Interface&>().front();
+
+veh->printStatus<NULLTYPE>();
 				vehicles_container<_Vehicles_Container_Interface&>().pop_front();
 
 				return (TargetType)veh;
 			}
 
 			feature_accessor(minimum_merge_rate, none, none);
+
+			feature_accessor(movement_priority_type, none, none);
 		};
 
 		prototype struct Outbound_Inbound_Movements_Prototype
@@ -149,7 +173,7 @@ namespace Intersection_Components
 			tag_as_prototype;
 
 			feature_accessor(uuid, none, none);
-
+			feature_accessor(internal_id, none, none);
 			feature_accessor(signal, none, none);
 
 			feature_accessor(rng_stream, none, none);
@@ -166,18 +190,21 @@ namespace Intersection_Components
 
 			feature_accessor(intersection_type, none, none);
 
-			feature_accessor(scenario_reference, none, none);
-
-			feature_accessor(network, none, none);
-
 			feature_accessor(intersection_simulation_status, none, none);
 
-			feature_prototype void push_vehicle(void* vehicle)
+			feature_accessor(intersection_control, none, none);
+
+			
+			feature_accessor(network_reference, none, none);
+
+			feature_accessor(scenario_reference, none, none);
+
+			feature_prototype void push_vehicle(void* vehicle, int num_departed_vehicles, int num_link_origin_departed_vehicles_allowed)
 			{
-				accept_vehicle<TargetType>(vehicle);
+				accept_vehicle<TargetType>(vehicle, num_departed_vehicles, num_link_origin_departed_vehicles_allowed);
 			}
 			
-			feature_prototype void accept_vehicle(void* vehicle)
+			feature_prototype void accept_vehicle(void* vehicle, int num_departed_vehicles, int num_link_origin_departed_vehicles_allowed)
 			{
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
@@ -192,7 +219,7 @@ namespace Intersection_Components
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
 				int current_time = scenario->template current_time<int>();
-
+_Vehicle_Interface* veh = (_Vehicle_Interface*)vehicle;
 
 				_Link_Interface* outbound_link;
 
@@ -207,7 +234,8 @@ namespace Intersection_Components
 
 					_Movement_Interface* inbound_movement;
 					_Link_Interface* inbound_link;
-
+					
+					
 					_Movements_Container_Interface& inbound_movements = ((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
 					typename _Movements_Container_Interface::iterator inbound_itr;
 
@@ -216,6 +244,8 @@ namespace Intersection_Components
 						inbound_movement=(_Movement_Interface*)(*inbound_itr);
 
 						inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
+
+
 
 						//PRINT(((Vehicle_Interface*)vehicle)->template next_link<Link_Interface*>()->template uuid<int>() << "," << outbound_link->template uuid<int>());
 						//PRINT(((Vehicle_Interface*)vehicle)->template current_link<Link_Interface*>()->template uuid<int>() << "," << inbound_link->template uuid<int>());
@@ -227,14 +257,53 @@ namespace Intersection_Components
 							//detector = inbound_movement->template detector<_Detector_Interface*>();
 							//if (detector != NULL) detector->template detect_vehicle<int>();
 
-							_Vehicle_Interface* veh = (_Vehicle_Interface*)vehicle;
+							
+
+veh->printStatus<NULLTYPE>();
 							inbound_movement->template vehicles_container<_Vehicles_Container_Interface&>().push_back(veh);
 							inbound_movement->template turn_movement_cumulative_arrived_vehicles<int&>()++;
+define_container_and_value_interface(_Trajecotry_Container_Interface, _Trajectory_Unit_Interface, _Vehicle_Interface::get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Trajectory_Unit_Prototype, ComponentType);
 
-							if (outbound_link->template uuid<int>() == 2 && inbound_link->template uuid<int>() == 1)
-							{
-								bool test = false;
-							}
+scenario->vehicle_transfer_file<fstream&>()
+	<< convert_seconds_to_hhmmss(scenario->current_time<int>()) <<  ","
+	<< (scenario->current_time<int>()) <<  ","
+	<< this->uuid<int>() << ","
+	<< inbound_movement->uuid<int>() <<  ","
+	<< inbound_movement->inbound_link<_Link_Interface*>()->uuid<int>() <<  ","
+	<< inbound_movement->outbound_link<_Link_Interface*>()->uuid<int>() <<  ","
+	
+	<< inbound_movement->inbound_link<_Link_Interface*>()->link_supply<float>() << ","
+	<< inbound_movement->inbound_link<_Link_Interface*>()->link_upstream_arrived_vehicles<int>() << ","
+	<< num_departed_vehicles << ","
+	<< num_link_origin_departed_vehicles_allowed << ","
+	<< inbound_movement->inbound_link<_Link_Interface*>()->link_origin_arrived_vehicles<int>() << ","
+	<< inbound_movement->inbound_link<_Link_Interface*>()->link_origin_departed_vehicles<int>() << ","
+
+
+
+	<< inbound_movement->template turn_movement_cumulative_arrived_vehicles<int&>() << ","
+	<< veh->uuid<int>()<< ","
+	<< veh->internal_id<int>()<< ","
+	<< veh->trajectory_container<_Trajecotry_Container_Interface&>().size()<< ","
+	<< veh->current_link<_Link_Interface*>()->internal_id<int>()<< ",";
+for (int ilink=0;ilink<(int)veh->trajectory_container<_Trajecotry_Container_Interface&>().size();ilink++)
+{
+	if (ilink < (int)veh->trajectory_container<_Trajecotry_Container_Interface&>().size() - 1)
+	{
+		scenario->vehicle_transfer_file<fstream&>() << veh->trajectory_container<_Trajecotry_Container_Interface&>()[ilink]->link<_Link_Interface*>()->internal_id<int>() << ",";
+	}
+	else
+	{
+		scenario->vehicle_transfer_file<fstream&>() << veh->trajectory_container<_Trajecotry_Container_Interface&>()[ilink]->link<_Link_Interface*>()->internal_id<int>() << endl;
+	}
+}
+//if (inbound_movement->uuid<int>() == 121 && 
+//	inbound_movement->template turn_movement_cumulative_arrived_vehicles<int&>() == 508)
+//{
+//	cout << "Here" << endl;
+//	int vid = veh->uuid<int>();
+//
+//}
 
 							char s[100];
 #ifdef WINDOWS
@@ -243,14 +312,14 @@ namespace Intersection_Components
 							sprintf(s, "stop:%i:%i:%i\n", inbound_link->template uuid<int>(), this->template uuid<int>(), scenario_reference<_Scenario_Interface*>()->template current_time<int>());
 #endif
 							std::string s1 = s;
-							scenario_reference<_Scenario_Interface*>()->template output<NULLTYPE>(s1);
+							//scenario_reference<_Scenario_Interface*>()->template output<NULLTYPE>(s1);
 #ifdef WINDOWS							
 							sprintf_s(s, "advanced:%i:%i:%i\n", outbound_link->template uuid<int>(), outbound_link->template downstream_intersection<_Intersection_Interface*>()->template uuid<int>(), scenario_reference<_Scenario_Interface*>()->template current_time<int>());
 #else
 							sprintf(s, "advanced:%i:%i:%i\n", outbound_link->template uuid<int>(), outbound_link->template downstream_intersection<_Intersection_Interface*>()->template uuid<int>(), scenario_reference<_Scenario_Interface*>()->template current_time<int>());
 #endif
 							std::string s2 = s;
-							scenario_reference<_Scenario_Interface*>()->template output<NULLTYPE>(s2);
+							//scenario_reference<_Scenario_Interface*>()->template output<NULLTYPE>(s2);
 						}
 					}
 				}
@@ -264,7 +333,7 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
-
+int current_time = scenario->template current_time<int>();
 
 
 				// y_capacity(a,t) = q_max(a,t) * delta_t * nlanes(a);
@@ -296,16 +365,18 @@ namespace Intersection_Components
 					{
 						inbound_movement=(_Movement_Interface*)(*inbound_itr);
 
+
 						inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
 						float inbound_link_capacity = inbound_link->template link_capacity<float>(); 
-						
+						float green_time = inbound_movement->green_time<float>();
+						float green_time_ratio = inbound_movement->green_time<float>()*1.0f/((float)scenario->template simulation_interval_length<int>());
 						if(intersection_type<Types::Intersection_Type_Keys>() == Types::Intersection_Type_Keys::NO_CONTROL)
 						{
-							inbound_movement->template movement_capacity<float>(min(inbound_link_capacity,outbound_link_capacity));
+							inbound_movement->template movement_capacity<float>(min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio);
 						}
 						else
 						{
-							inbound_movement->template movement_capacity<float>(min(inbound_link_capacity,outbound_link_capacity));
+							inbound_movement->template movement_capacity<float>(min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio);
 						}
 
 						//PRINT("\t\t\t" << "for inbound link " << inbound_link->template uuid<int>() << " is: " << inbound_movement->template movement_capacity<float>());
@@ -315,136 +386,35 @@ namespace Intersection_Components
 
 			feature_prototype void turn_movement_supply_allocation()
 			{
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
-
-				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
-
-
-
-				// y_capacity(a,t) = q_max(a,t) * delta_t * nlanes(a);
-				// y_capacity(a,a',t)
-				//	= min{y_capacity(a,t),y_capacity(a',t)} no control
-				//	= delta_t * [green(a,a')/C] * min{y_capacity(a,t),y_capacity(a',t)} signal control method 1: no control simulation
-				//	= [green(a,a',t)/delta_t] * min{y_capacity(a,t),y_capacity(a',t)} signal control method 2: control simulation
-				
-				
-				vector<float> merge_ratios;
-				const int max_inbound_turn_movement_size=20;
-				merge_ratios.resize(max_inbound_turn_movement_size);
-
-				_Link_Interface* outbound_link;
-				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
-				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
-
-				//PRINT("\t" << "turn movement supplies of node " << uuid<int>());
-				size_t size = outbound_links_container.size();
-				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
+				define_component_interface(_Intersection_Control_Interface, get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
+				define_component_interface(_Control_Plan_Interface, _Intersection_Control_Interface::get_type_of(current_control_plan), Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
+_Intersection_Control_Interface* control = intersection_control<_Intersection_Control_Interface*>();
+_Control_Plan_Interface* plan = control->current_control_plan<_Control_Plan_Interface*>();
+int type = plan->template control_type<int>();
+				Node_Type_Keys control_type = this->intersection_control<_Intersection_Control_Interface*>()->template current_control_plan<_Control_Plan_Interface*>()->template control_type<Node_Type_Keys>();
+				switch(control_type)
 				{
-					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
-					
-					//PRINT("\t\t" << "for outbound link " << outbound_link->template uuid<int>());
-
-					_Movement_Interface* inbound_movement;
-					_Link_Interface* inbound_link;
-					_Movements_Container_Interface& inbound_links_container=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
-					typename _Movements_Container_Interface::iterator inbound_itr;
-
-					int inbound_turn_movement_size=(int)inbound_links_container.size();
-					
-					if(inbound_turn_movement_size==1)
-					{
-						((_Movement_Interface*)inbound_links_container[0])->template movement_supply<float>(outbound_link->template link_supply<float>());
-					}
-					else
-					{
-						///simple rule as Daganzo --- need to work on this later
-						int num_lanes_outbound_link = outbound_link->template num_lanes<int>();
-						int link_type_outbound_link = outbound_link->template link_type<int>();
-						int num_merge_lanes = 0;
-
-						int num_through_turns = 0;
-
-						for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
-						{
-							inbound_movement=(_Movement_Interface*)(*inbound_itr);
-
-							inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
-
-							int num_lanes_inbound_link = inbound_link->template num_lanes<int>();
-							int link_type_inbound_link = inbound_link->template link_type<int>();
-							
-							if (link_type_inbound_link != link_type_outbound_link)
-							{
-								if (num_merge_lanes<num_lanes_inbound_link)
-								{
-									num_merge_lanes = num_lanes_inbound_link;
-								}
-							}
-							if (inbound_movement->template movement_type<Types::Turn_Movement_Type_Keys>() == Types::Turn_Movement_Type_Keys::THROUGH_TURN)
-							{
-								num_through_turns++;
-							}
-						}
-						float major_approach_merge_ratio = 0.6;
-						float minor_approach_merge_ratio = 0.4;
-
-
-						if (num_through_turns>0)
-						{
-							float through_turn_ratio = 1.0/(float(num_through_turns));
-							if (num_merge_lanes<num_lanes_outbound_link)
-							{
-								float dedicated_lanes = float(num_lanes_outbound_link - num_merge_lanes);
-								major_approach_merge_ratio = through_turn_ratio* dedicated_lanes / (float(num_lanes_outbound_link)) + 0.6 * ((float (num_merge_lanes))/(float(num_lanes_outbound_link)));
-								minor_approach_merge_ratio = 0.4 * ((float (num_merge_lanes))/(float(num_lanes_outbound_link))) / (float(inbound_turn_movement_size-1));
-							}
-							else
-							{
-								major_approach_merge_ratio =through_turn_ratio* 0.6;
-								minor_approach_merge_ratio = 0.4 / (float(inbound_turn_movement_size-1));
-							}
-						}
-						else
-						{
-							if (num_merge_lanes<num_lanes_outbound_link)
-							{
-								float dedicated_lanes = float(num_lanes_outbound_link - num_merge_lanes);
-								major_approach_merge_ratio =  dedicated_lanes / (float(num_lanes_outbound_link)) + 0.5 * ((float (num_merge_lanes))/(float(num_lanes_outbound_link)));
-								minor_approach_merge_ratio = 0.5 * ((float (num_merge_lanes))/(float(num_lanes_outbound_link))) / (float(inbound_turn_movement_size-1));
-							}
-							else
-							{
-								major_approach_merge_ratio = 0.5;
-								minor_approach_merge_ratio = 0.5 / (float(inbound_turn_movement_size-1));
-							}
-						}
-
-						for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
-						{
-							inbound_movement=(_Movement_Interface*)(*inbound_itr);
-
-							inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
-
-							int link_type_inbound_link = inbound_link->template link_type<int>();
-							float merge_ratio = 0;
-
-							if(link_type_inbound_link == link_type_outbound_link && inbound_movement->template movement_type<Types::Turn_Movement_Type_Keys>() == Types::Turn_Movement_Type_Keys::THROUGH_TURN)
-							{
-								merge_ratio = major_approach_merge_ratio;
-							}
-							else
-							{
-								merge_ratio = minor_approach_merge_ratio;
-							}
-
-							inbound_movement->template movement_supply<float>(merge_ratio*outbound_link->template link_supply<float>());
-							//PRINT("\t\t\t" << "for inbound link " << inbound_link->template uuid<int>() << " is: " << inbound_movement->template movement_supply<float>());
-						}
-						///simple rule as Daganzo
-					}
+					case NO_CONTROL:
+						this->template supply_allocation_based_on_driving_rule<NULLTYPE>();
+						break;
+					case YIELD_SIGN:
+						this->template supply_allocation_based_on_driving_rule<NULLTYPE>();
+						break;
+					case ALL_WAY_STOP_SIGN:
+						this->template supply_allocation_proportion_to_demand<NULLTYPE>();
+						break;
+					case TWO_WAY_STOP_SIGN:
+						this->template supply_allocation_based_on_driving_rule<NULLTYPE>();
+						break;
+					case PRE_TIMED_SIGNAL_CONTROL:
+						this->template supply_allocation_based_on_driving_rule<NULLTYPE>();
+						break;
+					case ACTUATED_SIGNAL_CONTROL:
+						this->template supply_allocation_based_on_driving_rule<NULLTYPE>();
+						break;
+					case ADAPTIVE_SIGNAL_CONTROL:
+						this->template supply_allocation_based_on_driving_rule<NULLTYPE>();
+						break;
 				}
 			}
 
@@ -500,16 +470,31 @@ namespace Intersection_Components
 						}
 						else
 						{
-							inbound_movement->template turn_movement_cumulative_shifted_arrived_vehicles<int>(0);
+							inbound_movement->template turn_movement_cumulative_shifted_arrived_vehicles<int>(0.0);
 						}
-						
+					
+
+
 						int movement_demand = inbound_movement->template turn_movement_cumulative_shifted_arrived_vehicles<int>() - inbound_movement->template turn_movement_cumulative_vehicles<int>();
-						
+vector<int> v;
+for (int x = 0; x < (int)inbound_movement->template cached_turn_movement_cumulative_shifted_arrived_vehicles_array<_Int_Container_Interface&>().size(); x++)
+{
+	v.push_back(inbound_movement->template cached_turn_movement_cumulative_shifted_arrived_vehicles_array<_Int_Container_Interface&>()[x]);
+}
+
+	float shifted = inbound_movement->template turn_movement_cumulative_shifted_arrived_vehicles<int>();
+	float cumulative = inbound_movement->template turn_movement_cumulative_vehicles<int>();
+	float dd = inbound_movement->template movement_demand<float>();
+
+/*if (inbound_movement->uuid<int>() == 30 && current_time == 0)
+{
+	cout << "here" << endl;
+}	*/				
 						inbound_movement->template movement_demand<float>(movement_demand);
 
 						if(inbound_movement->template movement_demand<float>() < 0.0) 
 						{
-							inbound_movement->template movement_demand<float>(0);
+							inbound_movement->template movement_demand<float>(0.0);
 						}
 
 						float turn_movement_demand = inbound_movement->template movement_demand<float>();
@@ -528,7 +513,7 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_component_interface(_Link_Interface,  _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
-				define_simple_container_interface(_Float_Container_Interface, _Movement_Interface::get_type_of(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array), Random_Access_Sequence_Prototype, int, ComponentType);
+				define_simple_container_interface(_Float_Container_Interface, _Movement_Interface::get_type_of(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array), Random_Access_Sequence_Prototype, float, ComponentType);
 				typedef Vehicle_Components::Prototypes::Vehicle_Prototype<typename ComponentType::vehicle_type, ComponentType> _Vehicle_Interface;
 
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
@@ -557,22 +542,26 @@ namespace Intersection_Components
 					typename _Movements_Container_Interface::iterator inbound_itr;
 					
 					//initialization ->template  move to network state update
-					outbound_link->template link_upstream_arrived_vehicles<int>(0);
-					outbound_link->template link_destination_arrived_vehicles<int>(0);
+					outbound_link->template link_upstream_arrived_vehicles<int>(0.0);
+					outbound_link->template link_destination_arrived_vehicles<int>(0.0);
 
 					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 					{
 						inbound_movement=(_Movement_Interface*)(*inbound_itr);
 
 						inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
-
-						inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(0);
-						inbound_movement->template inbound_link_departed_time_based_experienced_link_turn_travel_delay<float>(0);
+//if (inbound_movement->uuid<int>() == 121 && current_time == 3042)
+//{
+//	cout << "here" << endl;
+//}
+						inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(0.0);
+float outbound_delay = inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>();
+						inbound_movement->template inbound_link_departed_time_based_experienced_link_turn_travel_delay<float>(0.0);
 
 						if(outbound_itr==outbound_links_container.begin())
 						{
 							//initialization
-							inbound_link->template link_downstream_departed_vehicles<int>(0);
+							inbound_link->template link_downstream_departed_vehicles<int>(0.0);
 						}
 
 						//determine number of transfered vehicles
@@ -583,7 +572,7 @@ namespace Intersection_Components
 						
 						if(transfer_flow_turn_movement > 0.0)
 						{
-							double rng = (this->template rng_stream<RngStream&>()).RandU01();
+							double rng = (this->template rng_stream<User_Space::RngStream&>()).RandU01();
 							if(rng<=transfer_flow_turn_movement)
 							{//partial vehicle, incomplete implementation
 								++num_transfer_vehicles_of_turn_movement;
@@ -594,14 +583,16 @@ namespace Intersection_Components
 						
 						if (num_transfer_vehicles_of_turn_movement>0)
 						{
+
+							
 							//move vehicles for this turn movement
 							for (int iv=0;iv<num_transfer_vehicles_of_turn_movement;iv++)
 							{
 								_Vehicle_Interface* vehicle=inbound_movement->template pull_vehicle<_Vehicle_Interface*>();
 
 								//update vehicle state: transfer to next link
-								int enter_time=vehicle->template current_link_enter_time<int>();
-								int delayed_time = (scenario->template current_time<int>() - enter_time) - inbound_link->template link_fftt<float>();
+								int enter_time=vehicle->template get_current_link_enter_time<NULLTYPE>();
+								int delayed_time = int((scenario->template current_time<int>() - enter_time) - inbound_link->template link_fftt<float>());
 								int enter_interval_index = vehicle->template current_link_enter_interval_index<int>();
 								int delayed_interval = current_simulation_interval_index - enter_interval_index;
 
@@ -633,7 +624,7 @@ namespace Intersection_Components
 
 								inbound_movement->template cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>()[departed_time_position]+=delayed_interval*simulation_interval_length;
 								
-								outbound_link->template push_vehicle<_Vehicle_Interface*>(vehicle);
+								outbound_link->template push_vehicle<_Vehicle_Interface*>(vehicle, delayed_time);
 							}
 						}
 
@@ -646,13 +637,13 @@ namespace Intersection_Components
 						{
 							if(inbound_movement->template movement_rule<Types::Turn_Movement_Rule_Keys>() == Types::Turn_Movement_Rule_Keys::PROHIBITED)
 							{
-								inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(FLT_MAX);
+								inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(INFINITY_FLOAT);
 							}
 							else
 							{
 								if(inbound_movement->template movement_demand<float>() == 0)
 								{//no demand
-									inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(0);
+									inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(0.0);
 								}
 								else
 								{//no supply for this turn -- need a prediction -- need to work it later
@@ -668,7 +659,7 @@ namespace Intersection_Components
 									}
 									else
 									{
-										inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(0);
+										inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>(0.0);
 									}
 								}
 							}
@@ -679,6 +670,16 @@ namespace Intersection_Components
 				//network_cumulative_arrived_vehicles=arrived_vehicles;
 				//network_in_network_vehicles=in_network_vehicles;
 			}
+			
+			feature_prototype void intersection_control_update()
+			{
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Intersection_Control_Interface, get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
+				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
+				intersection_control<_Intersection_Control_Interface*>()->template intersection_control_update<NULLTYPE>(scenario);
+			}
+
+			
 
 			feature_prototype void network_state_update()
 			{
@@ -686,8 +687,9 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
-				define_simple_container_interface(_Float_Container_Interface, _Movement_Interface::get_type_of(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array), Random_Access_Sequence_Prototype, int, ComponentType);
+				define_simple_container_interface(_Float_Container_Interface, _Movement_Interface::get_type_of(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array), Random_Access_Sequence_Prototype, float, ComponentType);
 				define_simple_container_interface(_Int_Container_Interface, _Movement_Interface::get_type_of(cached_turn_movement_cumulative_shifted_arrived_vehicles_array), Random_Access_Sequence_Prototype, int, ComponentType);
+				define_component_interface(_Intersection_Control_Interface, get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
 
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 				
@@ -695,7 +697,7 @@ namespace Intersection_Components
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
 				int current_time = scenario->template current_time<int>();
 
-
+				
 
 				//network_data.network_cumulative_arrived_vehicles = this->template network_cumulative_arrived_vehicles;
 				//network_data.network_cumulative_departed_vehicles = this->template network_cumulative_departed_vehicles;
@@ -739,7 +741,6 @@ namespace Intersection_Components
 					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 					{
 						inbound_movement=(_Movement_Interface*)(*inbound_itr);
-
 						inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
 
 						int t_plus_fftt = -1;
@@ -754,30 +755,215 @@ namespace Intersection_Components
 						}
 
 						//cached cumulative shifted arrived vehicles
+vector<int> v;
+for (int x = 0; x < (int)inbound_movement->template cached_turn_movement_cumulative_shifted_arrived_vehicles_array<_Int_Container_Interface&>().size(); x++)
+{
+	v.push_back(inbound_movement->template cached_turn_movement_cumulative_shifted_arrived_vehicles_array<_Int_Container_Interface&>()[x]);
+}
+//if (inbound_movement->uuid<int>() == 30 && current_time == 0)
+//{
+//	int cumulative = inbound_movement->template turn_movement_cumulative_arrived_vehicles<int>();
+//	cout << "here" << endl;
+//}
 						inbound_movement->template cached_turn_movement_cumulative_shifted_arrived_vehicles_array<_Int_Container_Interface&>()[t_plus_fftt] = inbound_movement->template turn_movement_cumulative_arrived_vehicles<int>();
-						
+//cout << "intersection id = " << this->uuid<int>() << endl;
+//cout << "ptr = " << inbound_movement << endl;
+//cout << " size = " << inbound_movement->template cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>().size() << endl;
+//cout << "t_cached_delay = " << t_cached_delay << endl;
+//cout << "value = " << inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>() << endl;
 						//turn movement delayed time update
-						inbound_movement->template cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>()[t_cached_delay] = inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<int>();
-						
-						inbound_movement->template turn_travel_penalty<float>(inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>());
-						
-						float turn_travel_penalty = 0.0;
 
+						inbound_movement->template cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>()[t_cached_delay] = inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>();
+float a= inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>();
+float b= inbound_movement->template cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>()[t_cached_delay];
+//if (	current_simulation_interval_index==36 && inbound_movement->uuid<int>() == 67)
+//{
+//	cout << "here" << endl;
+//}
+						//inbound_movement->template turn_travel_penalty<float>(inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>());
+//if (current_simulation_interval_index>=scenario->template num_simulation_intervals_per_assignment_interval<int>())
+	{
+		if (((current_simulation_interval_index+1)*simulation_interval_length)%scenario->template assignment_interval_length<int>() == 0)
+		{	
+
+						float turn_travel_penalty = 0.0;
+vector<float> v;
 						for (int t_cached_time=0;t_cached_time<scenario->template num_simulation_intervals_per_assignment_interval<int>();t_cached_time++)
 						{
 							turn_travel_penalty += inbound_movement->template cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>()[t_cached_time];
+							v.push_back(inbound_movement->template cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>()[t_cached_time]);
+//cout << "cached_delay[" << t_cached_time << "]=" << inbound_movement->template cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>()[t_cached_time] << endl;
 						}
 
+//if (inbound_movement->uuid<int>() == 67)
+//{
+//	cout << "here" << endl;
+//}
 						turn_travel_penalty = (float) ( turn_travel_penalty/((float)scenario->template num_simulation_intervals_per_assignment_interval<int>()) );
-						
+						inbound_movement->template turn_travel_penalty<float>(turn_travel_penalty);
+//cout << "turn_travel_penalty= " << inbound_movement->template turn_travel_penalty<float>()<< endl;
 						inbound_movement->template forward_link_turn_travel_time<float>(outbound_link->template travel_time<float>()+inbound_movement->template turn_travel_penalty<float>());
+//cout << "forward_link_turn_travel_time= " << inbound_movement->template forward_link_turn_travel_time<float>()<< endl;
+		}
+}
 					}
 				}
 			}
 			
+			feature_prototype void origin_link_loading()
+			{
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_simple_container_interface(_Float_Container_Interface, _Movement_Interface::get_type_of(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array), Random_Access_Sequence_Prototype, float, ComponentType);
+				define_simple_container_interface(_Int_Container_Interface, _Movement_Interface::get_type_of(cached_turn_movement_cumulative_shifted_arrived_vehicles_array), Random_Access_Sequence_Prototype, int, ComponentType);
+				define_component_interface(_Intersection_Control_Interface, get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
+				define_container_and_value_interface(_Vehicles_Origin_Container_Interface, _Vehicle_Interface,_Link_Interface::get_type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_container_interface(_Vehicle_Origin_Queue_Interface, _Link_Interface::get_type_of(link_origin_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+
+				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
+				
+				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
+				int simulation_interval_length = scenario->template simulation_interval_length<int>();
+				int current_time = scenario->template current_time<int>();
+
+				
+
+				//network_data.network_cumulative_arrived_vehicles = this->template network_cumulative_arrived_vehicles;
+				//network_data.network_cumulative_departed_vehicles = this->template network_cumulative_departed_vehicles;
+				//network_data.network_cumulative_loaded_vehicles = this->template network_cumulative_loaded_vehicles;
+				//network_data.network_in_network_vehicles = this->template network_in_network_vehicles;
+
+
+				_Link_Interface* outbound_link;
+				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
+				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
+
+				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
+				{
+					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
+
+					_Vehicle_Interface* vehicle;
+					outbound_link->template link_origin_departed_vehicles<int>(0.0);
+					outbound_link->template link_origin_loaded_vehicles<int>(0.0);
+					//arrived vehicles at current interval
+					int current_position = outbound_link->template link_origin_vehicle_current_position<int>();
+
+//int a = (int)outbound_link->template link_origin_vehicle_array<_Vehicles_Origin_Container_Interface&>().size();
+//if (outbound_link->uuid<int>() == 1 && current_time == 23796)
+//{
+//	cout << "here" << endl;
+//}
+					if(current_position<(int)outbound_link->template link_origin_vehicle_array<_Vehicles_Origin_Container_Interface&>().size())
+					{
+						for(int iv=current_position;iv<(int)outbound_link->template link_origin_vehicle_array<_Vehicles_Origin_Container_Interface&>().size();iv++)
+						{
+							//update current position
+							outbound_link->template link_origin_vehicle_current_position<int&>()++;
+
+							vehicle=(_Vehicle_Interface*)outbound_link->template link_origin_vehicle_array<_Vehicles_Origin_Container_Interface&>()[iv];
+						
+							int departure_interval=vehicle->template departed_simulation_interval_index<int>();
+							//if(vehicle->template departed_simulation_interval_index<int>() == current_time)
+							//{
+								//PRINT(iteration << ": loading traveler");
+								outbound_link->template link_origin_vehicle_queue<_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
+								outbound_link->template link_origin_arrived_vehicles<int&>()++;
+								outbound_link->template link_origin_loaded_vehicles<int&>()++;
+								outbound_link->template link_origin_cumulative_arrived_vehicles<int&>()++;
+								//loaded_vehicles++;
+								scenario->template network_cumulative_loaded_vehicles<int&>()++;
+							//}
+							//else
+							//{
+							//	break;
+							//}
+						}
+					}
+
+					//have demand
+					if(outbound_link->template link_origin_arrived_vehicles<int>()>0)
+					{
+						//check available spaces
+						float link_available_spaces = outbound_link->template link_supply<float>() - outbound_link->template link_upstream_arrived_vehicles<float>();
+						int num_link_origin_departed_vehicles_allowed = (int) link_available_spaces;
+						float link_origin_departed_flow_allowed = (float) (link_available_spaces - num_link_origin_departed_vehicles_allowed);
+					
+						if (link_origin_departed_flow_allowed>0.0)
+						{//partial vehicle
+							//_Intersection_Interface* intersection = upstream_intersection<_Intersection_Interface*>();
+							double rng = rng_stream<User_Space::RngStream&>().RandU01();
+							if(rng<=link_origin_departed_flow_allowed)
+							{//partial vehicle, incomplete implementation
+								++num_link_origin_departed_vehicles_allowed;
+							}
+						}
+
+						if(num_link_origin_departed_vehicles_allowed>0)
+						{//
+							int num_departed_vehicles = min(outbound_link->template link_origin_arrived_vehicles<int>(),num_link_origin_departed_vehicles_allowed);
+							for (int iv=0;iv<num_departed_vehicles;iv++)
+							{//
+								vehicle=(_Vehicle_Interface*)outbound_link->template link_origin_vehicle_queue<_Vehicle_Origin_Queue_Interface&>().front();
+								outbound_link->template link_origin_vehicle_queue<_Vehicle_Origin_Queue_Interface&>().pop_front();
+
+								//update vehicle state
+								vehicle->template load_to_origin_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
+							
+								//update link state
+								outbound_link->template link_origin_cumulative_departed_vehicles<int&>()++;
+								outbound_link->template link_origin_departed_vehicles<int&>()++;
+
+								outbound_link->template link_origin_arrived_vehicles<int&>()--;
+
+								outbound_link->template push_vehicle<_Vehicle_Interface*>(vehicle, 0.0);
+
+								//update network state
+								//departed_vehicles++;
+								//in_network_vehicles++;
+								scenario->template network_cumulative_departed_vehicles<int&>()++;
+								scenario->template network_in_network_vehicles<int&>()++;
+							
+								// Bo added: the following logic already implemented in push_vehicle. Don't need to do here
+
+								//if(this==vehicle->template destination_link<Link_Interface*>())
+								//{
+								//	vehicle->template arrive_to_destination_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
+								//	
+								//	//update link state: N_destination(a,t)
+								//	link_destination_cumulative_arrived_vehicles<int&>()++;
+								//	link_destination_arrived_vehicles<int&>()++;
+								//	
+								//	//update network state:
+								//	//arrived_vehicles++;
+								//	//in_network_vehicles--;
+								//	scenario->template network_cumulative_arrived_vehicles<int&>()++;
+								//	scenario->template network_in_network_vehicles<int&>()--;
+								//}
+							}
+						}
+					}
+				}
+			}
+
+
+
 			feature_prototype void Initialize()
 			{
-				load_event(ComponentType,Newells_Conditional,Compute_Step_Flow,0,NULLTYPE);
+				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				if (outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>().size() == 0 || inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>().size() == 0)
+				{
+					// no outbound or no inbound
+					this->template intersection_simulation_status<Intersection_Components::Types::Intersection_Simulation_Status>(Intersection_Components::Types::Intersection_Simulation_Status::PROCESS_SKIPPED);
+				}
+				else {
+					network_reference<_Network_Interface*>()->template increment_intersection_finish_target<NULLTYPE>();
+					load_event(ComponentType,Newells_Conditional,Compute_Step_Control,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,NULLTYPE);
+				}
 			}
 
 			declare_feature_conditional(Newells_Conditional)
@@ -788,13 +974,9 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				typedef Intersection_Prototype<ComponentType, ComponentType> _Intersection_Interface;
 
-				
-
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
-					
-				//PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting intersection: " << _this_ptr->template uuid<int>());
-				
+
 				long intersection_current_revision=_pthis->object_current_revision();
 
 				
@@ -805,61 +987,64 @@ namespace Intersection_Components
 				{
 					//first visit this iteration, update status
 					_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::NONE_COMPLETE);
-				}
 
+				}
+				if(_sub_iteration==0)
+				{
+					//PRINT("\t" << "Compute_Route Not Finished, Return This Iteration");
+
+					_pthis->Swap_Event((Event)&Intersection_Prototype::Compute_Step_Control<NULLTYPE>);
+					response.result=false;
+					response.next=_iteration;
+				}
+				else 
 				if(_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::NONE_COMPLETE)
 				{
+
+					_pthis->Swap_Event((Event)&Intersection_Prototype::Compute_Step_Control<NULLTYPE>);
+					response.result=true;
+					response.next=_iteration;
+				}
+				else if(_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::COMPUTE_STEP_CONTROL_COMPLETE)
+				{
+
 					long links_current_revision=_Link_Interface::Component_Type::singleton_reference->type_current_revision();
 					//Revision links_current_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_current_revision();
 
 					if(links_current_revision==_iteration)
 					{
 						//links visited at least once, link_simulation_status is accurate
-
 						//necessary condition is that all intersection's downstream/upstream links are done
-
 						_Link_Interface* outbound_link;
 						_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=_this_ptr->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
 						typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
-
 						bool done=true;
-
 						for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 						{
 							outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
-
 							_Link_Interface* inbound_link;
 							_Movement_Interface* inbound_movement;
 							_Movements_Container_Interface& inbound_links_container = ((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
-							
 							typename _Movements_Container_Interface::iterator inbound_itr;
-
 							for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 							{
 								inbound_movement=(_Movement_Interface*)(*inbound_itr);
 								inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
-
 								done=done &&
 									(inbound_link->template link_simulation_status<link_simulation_status_type>()
 									 == link_simulation_status_type::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE);
-
 								if(!done) break;
 							}
-							
 							if(!done) break;
 						}
-
 						if(done)
 						{
-							//PRINT("\t" << "Run Compute_Step_Flow, Return This Iteration");
-							
 							_pthis->Swap_Event((Event)&Intersection_Prototype::Compute_Step_Flow<NULLTYPE>);
 							response.result=true;
 							response.next=_iteration;
 						}
 						else
 						{
-							//PRINT("\t" << "Compute_Step_Flow_Supply_Update Not Finished, Return This Iteration");
 							response.result=false;
 							response.next=_iteration;
 						}
@@ -875,6 +1060,7 @@ namespace Intersection_Components
 				}
 				else if(_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE)
 				{
+
 					//although not ideal, simply check whether links are completely done this iteration
 					long link_next_revision=_Link_Interface::Component_Type::singleton_reference->type_next_check();
 					//Revision link_next_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_next_check();
@@ -895,11 +1081,33 @@ namespace Intersection_Components
 				}
 
 			}
+			
+			declare_feature_event(Compute_Step_Control)
+			{
+				typedef Intersection_Prototype<ComponentType, ComponentType> _Intersection_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				
+				double calculation_time_start = ::get_current_cpu_time_in_seconds();
+				
+				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+
+				//step 0: update control
+
+				_this_ptr->template intersection_control_update<NULLTYPE>();
+
+				_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::COMPUTE_STEP_CONTROL_COMPLETE);
+
+				double calculation_time_end = ::get_current_cpu_time_in_seconds();
+				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template operation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
+			}
 
 			declare_feature_event(Compute_Step_Flow)
 			{
 				typedef Intersection_Prototype<ComponentType, ComponentType> _Intersection_Interface;
-
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				
+				double calculation_time_start = ::get_current_cpu_time_in_seconds();
+				
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
 
 				//step 2: turn vehicles updating based on node control and link management, inbound link demand, and outbound link supply
@@ -914,23 +1122,250 @@ namespace Intersection_Components
 				//step 6: node transfer
 				_this_ptr->template node_transfer<NULLTYPE>();
 
+				_this_ptr->template origin_link_loading<NULLTYPE>();
+
 				_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE);
 
+				double calculation_time_end = ::get_current_cpu_time_in_seconds();
+				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
 				//PRINT("\t\t" << "COMPUTE_STEP_FLOW_COMPLETE");
 			}
 
 			declare_feature_event(Network_State_Update)
 			{
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				typedef Intersection_Prototype<ComponentType, ComponentType> _Intersection_Interface;
-
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				
+				double calculation_time_start = ::get_current_cpu_time_in_seconds();
+				
 				Intersection_Prototype* _this_ptr=(Intersection_Prototype*)_this;
 
 				//step 9: intersection network state update
 				_this_ptr->template network_state_update<NULLTYPE>();
 
 				_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::NETWORK_STATE_UPDATE_COMPLETE);
+				_this_ptr->template network_reference<_Network_Interface*>()->template increment_intersection_finish_counter<NULLTYPE>();
 
+				double calculation_time_end = ::get_current_cpu_time_in_seconds();
+				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
 				//PRINT("\t\t" << "NETWORK_STATE_UPDATE_COMPLETE");
+			}
+
+			feature_prototype void supply_allocation_based_on_driving_rule()
+			{
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+
+				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
+				_Link_Interface* outbound_link;
+				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
+				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
+
+				//PRINT("\t" << "turn movement supplies of node " << uuid<int>());
+				size_t size = outbound_links_container.size();
+				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
+				{
+					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
+float ms;
+float supp = outbound_link->link_supply<float>();	
+int ilink,olink,mmt,mmt_type,mmt_rule;
+olink = outbound_link->internal_id<int>();
+
+					//PRINT("\t\t" << "for outbound link " << outbound_link->template uuid<int>());
+
+					_Movement_Interface* inbound_movement;
+					_Link_Interface* inbound_link;
+					_Movements_Container_Interface& inbound_links_container=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
+					typename _Movements_Container_Interface::iterator inbound_itr;
+
+					int inbound_turn_movement_size=(int)inbound_links_container.size();
+					if(inbound_turn_movement_size >= 1)
+					{
+						if (inbound_turn_movement_size == 1)
+						{
+							inbound_links_container[0]->template movement_supply<float>(outbound_link->template link_supply<float>());
+						}
+						else
+						{//divide space based on merging policy
+							///driving rule with priority : protected movement v.s. permitted movements
+							///only one movement can be specified as protected movement for merging to a link, other movements should be yielded the protected movement
+							///there will be capacity lose for such driving rule for permitted movements
+							///if there is no protected movement, then all the movements are all permitted and thus share the capacity based on demand
+							int num_allowed_movements = 0;
+							float total_transfer_demand = 0.0f;
+							_Movement_Interface* protected_turn_movement = nullptr;
+
+							for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
+							{
+								inbound_movement=(_Movement_Interface*)(*inbound_itr);
+
+								inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
+ilink = inbound_link->internal_id<int>();
+mmt = inbound_movement->internal_id<int>();
+mmt_type = inbound_movement->movement_type<int>();
+mmt_rule = inbound_movement->movement_rule<int>();
+								total_transfer_demand += inbound_movement->template movement_demand<float>();
+					
+								if (inbound_movement->template merge_priority<int>() == 1)
+								{
+									protected_turn_movement = inbound_movement;
+								}
+								if (inbound_movement->template movement_rule<int>() == ALLOWED)
+								{
+									num_allowed_movements++;
+								}
+							}
+
+							if (total_transfer_demand>0)
+							{
+								if (total_transfer_demand<=outbound_link->template link_supply<float>())
+								{//case 1: total_transfer_demand<= link_supply_array
+									for (int inbound_turn_movement = 0; inbound_turn_movement < inbound_turn_movement_size; inbound_turn_movement++)
+									{
+										inbound_movement = inbound_links_container[inbound_turn_movement];
+										inbound_movement->template movement_supply<float>(inbound_movement->template movement_demand<float>());
+										ms = inbound_movement->movement_supply<float>();
+									}
+								}
+								else
+								{//case 2: total_transfer_demand<= link_supply_array
+									if (protected_turn_movement != nullptr)
+									{
+										if (protected_turn_movement->template movement_demand<float>() >= outbound_link->link_supply<float>())
+										{
+											protected_turn_movement->movement_supply<float>(outbound_link->link_supply<float>());
+											for (int inbound_turn_movement = 0; inbound_turn_movement < inbound_turn_movement_size; inbound_turn_movement++)
+											{
+												inbound_movement = inbound_links_container[inbound_turn_movement];
+												if (inbound_movement->template internal_id<int>() != protected_turn_movement->template internal_id<int>())
+												{
+													inbound_movement->template movement_supply<float>(0.0);
+												}
+												ms = inbound_movement->movement_supply<float>();
+											}
+											
+										}
+										else
+										{
+											protected_turn_movement->template movement_supply<float>(protected_turn_movement->template movement_demand<float>());
+								
+											total_transfer_demand -= protected_turn_movement->template movement_demand<float>();
+											float link_supply_leftover = outbound_link->template link_supply<float>() - protected_turn_movement->template movement_supply<float>();
+								
+											for (int inbound_turn_movement = 0; inbound_turn_movement < inbound_turn_movement_size; inbound_turn_movement++)
+											{
+												inbound_movement = inbound_links_container[inbound_turn_movement];
+												if (inbound_movement->template internal_id<int>() != protected_turn_movement->template internal_id<int>())
+												{
+													inbound_movement->template movement_supply<float>(link_supply_leftover * inbound_movement->template movement_demand<float>() *1.0f / (total_transfer_demand*1.0f));
+												}
+												ms = inbound_movement->movement_supply<float>();
+											}
+										}
+					
+									}
+									else
+									{
+										for (int inbound_turn_movement = 0; inbound_turn_movement < inbound_turn_movement_size; inbound_turn_movement++)
+										{
+											inbound_movement = inbound_links_container[inbound_turn_movement];
+											inbound_movement->template movement_supply<float>(outbound_link->template link_supply<float>() * inbound_movement->template movement_demand<float>() *1.0f / (total_transfer_demand*1.0f));
+										ms = inbound_movement->movement_supply<float>();
+										}
+										
+									}
+								}
+							}
+							else
+							{
+								for (int inbound_turn_movement = 0; inbound_turn_movement < inbound_turn_movement_size; inbound_turn_movement++)
+								{
+									inbound_movement = inbound_links_container[inbound_turn_movement];
+						
+									if (inbound_movement->template movement_rule<int>() == ALLOWED)
+									{
+										inbound_movement->movement_supply<float>(outbound_link->template link_supply<float>() / (num_allowed_movements*1.0f));
+									}
+									else
+									{
+										inbound_movement->movement_supply<float>(0.0f);
+									}
+ ms = inbound_movement->movement_supply<float>();
+								}
+							}
+
+						}
+					}
+				}
+			}
+
+			feature_prototype void supply_allocation_proportion_to_demand()
+			{
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+
+				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
+				_Link_Interface* outbound_link;
+				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
+				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
+
+				//PRINT("\t" << "turn movement supplies of node " << uuid<int>());
+				size_t size = outbound_links_container.size();
+				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
+				{
+					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
+					
+					//PRINT("\t\t" << "for outbound link " << outbound_link->template uuid<int>());
+
+					_Movement_Interface* inbound_movement;
+
+					_Movements_Container_Interface& inbound_links_container=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
+					typename _Movements_Container_Interface::iterator inbound_itr;
+
+					int inbound_turn_movement_size=(int)inbound_links_container.size();
+					if (inbound_turn_movement_size == 1)
+					{//only one inbound turn movement - allocate full space of outbound link to inbound turn movement
+						inbound_movement = inbound_links_container[0];
+						inbound_movement->movement_supply<float>(outbound_link->template link_supply<float>());
+					}
+					else
+					{//divide space based on merging policy
+						///propotional to demand
+						float total_transfer_demand = 0.0f;
+						for (int inbound_turn_movement = 0; inbound_turn_movement < inbound_turn_movement_size; inbound_turn_movement++)
+						{
+							inbound_movement = inbound_links_container[inbound_turn_movement];
+							total_transfer_demand += inbound_movement->template movement_demand<float>();
+							inbound_movement->template movement_supply<float>(outbound_link->link_supply<float>() / (inbound_turn_movement_size*1.0f));
+						}
+
+						if (total_transfer_demand>0)
+						{
+									
+							if (total_transfer_demand<=outbound_link->template link_supply<float>())
+							{//case 1: total_transfer_demand<= link_supply_array
+								for (int inbound_turn_movement = 0; inbound_turn_movement < inbound_turn_movement_size; inbound_turn_movement++)
+								{
+									inbound_movement = inbound_links_container[inbound_turn_movement];
+									inbound_movement->template movement_supply<float>(inbound_movement->template movement_demand<float>());
+								}
+							}
+							else
+							{//case 2: total_transfer_demand<= link_supply_array
+								for (int inbound_turn_movement = 0; inbound_turn_movement < inbound_turn_movement_size; inbound_turn_movement++)
+								{
+									inbound_movement = inbound_links_container[inbound_turn_movement];
+									inbound_movement->template movement_supply<float>(outbound_link->template link_supply<float>() * inbound_movement->template movement_demand<float>() *1.0f / (total_transfer_demand*1.0f));
+								}
+							}
+						}
+					}
+				}
 			}
 		};
 	}

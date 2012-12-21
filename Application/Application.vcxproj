@@ -66,7 +66,8 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\Polaris_IO\odb_include </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LIBODB_STATIC_LIB;LIBODB_SQLITE_STATIC_LIB;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -131,9 +132,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="PopSyn_Example.cpp" />
+    <ClCompile Include="NetworkModel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\File_IO\File_IO.vcxproj">
+      <Project>{70f1765f-c7c3-4ee7-89c4-5274cfcc4030}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Polaris_IO\Polaris_IO.vcxproj">
       <Project>{565dd22f-96fd-4930-85b4-50198d30b88e}</Project>
     </ProjectReference>
