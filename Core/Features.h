@@ -24,6 +24,7 @@
 ///============================================================================
 
 #define feature_prototype public: template<typename TargetType>
+#define feature public: template<typename TargetType>
 
 ///============================================================================
 /// feature_implementation - standard declarator for all implementation features
@@ -122,42 +123,42 @@ struct member_function_ptr_types<Type,communication_handler_type>
 
 #define feature_accessor(FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 	public:\
-	template<typename T>\
-	struct FEATURE_NAME##_set_check\
-	{\
-		template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_setter_tag*);\
-		template<typename U> static large_type has_matching_typename(...);\
-		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
-	};\
-	template<typename SetValueType>\
-	void FEATURE_NAME(SetValueType set_value,requires_setter(check(ComponentType,FEATURE_NAME##_set_check) && (SETTER_REQUIREMENTS)))\
-	{\
-		this_component()->template FEATURE_NAME<ComponentType,CallerType,SetValueType>(set_value);\
-	}\
-	template<typename SetValueType>\
-	void FEATURE_NAME(SetValueType set_value,requires_setter(!check(ComponentType,FEATURE_NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
-	{\
-		static_assert(FEATURE_NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_setter_as_available\"? ---------]\n\n");\
-		static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
-	}\
-	template<typename T>\
-	struct FEATURE_NAME##_get_check\
-	{\
-		template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_getter_tag*);\
-		template<typename U> static large_type has_matching_typename(...);\
-		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
-	};\
-	template<typename ReturnValueType>\
-	ReturnValueType FEATURE_NAME(requires_getter(check(ComponentType,FEATURE_NAME##_get_check) && (GETTER_REQUIREMENTS)))\
-	{\
-		return this_component()->template FEATURE_NAME<ComponentType,CallerType,ReturnValueType>();\
-	}\
-	template<typename ReturnValueType>\
-	ReturnValueType FEATURE_NAME(requires_getter(!check(ComponentType,FEATURE_NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
-	{\
-		static_assert(FEATURE_NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_getter_as_available\"? ---------]\n\n");\
-		static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
-	}\
+		template<typename T>\
+		struct FEATURE_NAME##_set_check\
+		{\
+			template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_setter_tag*);\
+			template<typename U> static large_type has_matching_typename(...);\
+			static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+		};\
+		template<typename SetValueType>\
+		void FEATURE_NAME(SetValueType set_value,requires_setter(check(ComponentType,FEATURE_NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+		{\
+			this_component()->template FEATURE_NAME<ComponentType,CallerType,SetValueType>(set_value);\
+		}\
+		template<typename SetValueType>\
+		void FEATURE_NAME(SetValueType set_value,requires_setter(!check(ComponentType,FEATURE_NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+		{\
+			static_assert(FEATURE_NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_setter_as_available\"? ---------]\n\n");\
+			static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
+		}\
+		template<typename T>\
+		struct FEATURE_NAME##_get_check\
+		{\
+			template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_getter_tag*);\
+			template<typename U> static large_type has_matching_typename(...);\
+			static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+		};\
+		template<typename ReturnValueType>\
+		ReturnValueType FEATURE_NAME(requires_getter(check(ComponentType,FEATURE_NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+		{\
+			return this_component()->template FEATURE_NAME<ComponentType,CallerType,ReturnValueType>();\
+		}\
+		template<typename ReturnValueType>\
+		ReturnValueType FEATURE_NAME(requires_getter(!check(ComponentType,FEATURE_NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+		{\
+			static_assert(FEATURE_NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_getter_as_available\"? ---------]\n\n");\
+			static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
+		}\
 
 
 ///============================================================================
@@ -199,9 +200,8 @@ struct member_function_ptr_types<Type,setter_type>
 ///============================================================================
 
 #define member_pointer(DATA_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	protected:\
-		DATA_TYPE* _##FEATURE_NAME;\
 	public:\
+	    DATA_TYPE* _##FEATURE_NAME;\
 		typedef DATA_TYPE FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
@@ -225,9 +225,8 @@ struct member_function_ptr_types<Type,setter_type>
 		tag_setter_as_available(FEATURE_NAME);
 
 #define member_data(DATA_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	protected:\
-		DATA_TYPE _##FEATURE_NAME;\
 	public:\
+		DATA_TYPE _##FEATURE_NAME;\
 		typedef DATA_TYPE FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
@@ -255,9 +254,8 @@ struct member_function_ptr_types<Type,setter_type>
 ///============================================================================
 
 #define member_component(COMPONENT_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	protected:\
-		COMPONENT_TYPE* _##FEATURE_NAME;\
 	public:\
+		COMPONENT_TYPE* _##FEATURE_NAME;\
 		typedef COMPONENT_TYPE FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
@@ -283,10 +281,10 @@ struct member_function_ptr_types<Type,setter_type>
 ///============================================================================
 /// member_container – member creator, type-definition and basic accessors
 ///============================================================================
+
 #define member_container(CONTAINER_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	protected:\
-		Polaris_Container<CONTAINER_TYPE> _##FEATURE_NAME;\
 	public:\
+		Polaris_Container<CONTAINER_TYPE> _##FEATURE_NAME;\
 		typedef Polaris_Container<CONTAINER_TYPE> FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && GETTER_REQUIREMENTS))\
@@ -310,9 +308,8 @@ struct member_function_ptr_types<Type,setter_type>
 		tag_setter_as_available(FEATURE_NAME);
 
 #define member_associative_container(CONTAINER_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	protected:\
-		Polaris_Associative_Container<CONTAINER_TYPE> _##FEATURE_NAME;\
 	public:\
+		Polaris_Associative_Container<CONTAINER_TYPE> _##FEATURE_NAME;\
 		typedef Polaris_Associative_Container<CONTAINER_TYPE> FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && GETTER_REQUIREMENTS))\
