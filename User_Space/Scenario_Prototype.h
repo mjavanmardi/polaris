@@ -503,6 +503,21 @@ int a = num_simulation_intervals_per_assignment_interval<int>();
 				cout << s;
 				cout.flush();
 			}
+
+			// convert from meter to foot
+			feature_prototype float meterToFoot(float meterValue)
+			{
+				// 1 meter = 3.28084 feet
+				return meterValue * 3.28084;
+			}
+
+			// convert from meters per second to miles per hour
+			feature_prototype float mepsToMiph(float mepsValue)
+			{
+				// 1 meter = 0.000621371 mile
+				return mepsValue * 0.000621371 * 3600;
+			}
+
 		};
 	}
 }
