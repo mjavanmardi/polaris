@@ -33,20 +33,17 @@ int main()
 
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
-	popsyn->linker_file_path<string>(string("C:\\Users\\Jauld\\Desktop\\Popsyn_data\\LINK.txt"));
+	popsyn->linker_file_path<string>(string("C:\\Users\\Jauld\\Desktop\\Popsyn_data\\LINK_chicago.txt"));
 	popsyn->Solution_Settings<solver_itf*>(solver);
 	popsyn->Output_Stream<ostream&>(out);
 	popsyn->Marginal_Output_Stream<ostream&>(marg_out);
 	popsyn->Initialize<NULLTYPE>();
 
-	//popsyn->Start_Popsyn<NULLTYPE>();
 
-
-	
 	START();
 	out.close();
 	// Break Here
 	bool pause=true;
 	cout <<endl<<endl<<"Done, press a key.";
-	cin >> pause;
+	//cin >> pause;
 }

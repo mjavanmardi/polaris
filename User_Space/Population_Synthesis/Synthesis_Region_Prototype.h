@@ -71,13 +71,13 @@ namespace PopSyn
 				// MAIN SYNTHESIS ROUTINE. 
 				//----------------------------------------------------------
 				// A. Fit the region distribution to region marginal
-				this->Output_Stream<ostream&>()<<endl<<"REGION DISTRIBUTION BEFORE IPF:"<<endl;
-				mway.write(this->Output_Stream<ostream&>());
-				this->Output_Stream<ostream&>()<<endl<<"MARGINAL DISTRIBUTION:"<<endl;
-				marg.write(this->Output_Stream<ostream&>());
+				//this->Output_Stream<ostream&>()<<endl<<"REGION DISTRIBUTION BEFORE IPF:"<<endl;
+				//mway.write(this->Output_Stream<ostream&>());
+				//this->Output_Stream<ostream&>()<<endl<<"MARGINAL DISTRIBUTION:"<<endl;
+				//marg.write(this->Output_Stream<ostream&>());
 				Synthesis_Zone_Prototype<ComponentType,CallerType>::Fit_Joint_Distribution_To_Marginal_Data<NULLTYPE>();
-				this->Output_Stream<ostream&>()<<endl<<"REGION DISTRIBUTION AFTER:"<<endl;
-				mway.write(this->Output_Stream<ostream&>());
+				//this->Output_Stream<ostream&>()<<endl<<"REGION DISTRIBUTION AFTER:"<<endl;
+				//mway.write(this->Output_Stream<ostream&>());
 				//----------------------------------------------------------
 				// B. Cycle through zones and solve for each
 				for (zones_itf::iterator zone_itr = zones_collection.begin(); zone_itr != zones_collection.end(); ++zone_itr)
@@ -86,7 +86,8 @@ namespace PopSyn
 					zone->Target_Joint_Distribution<mway_itf&>().Copy(mway);		/*1. push region dist to zone */
 					zone->Fit_Joint_Distribution_To_Marginal_Data<NULLTYPE>();		/*2. Fit the zone distribution to the zone marginals */
 					zone->Select_Synthetic_Population_Units<sample_itf*>(sample);	/*3. Select households from regional sample into the zone synthesized sample */
-				}				
+				}	
+				cout <<endl<<"Zone " << this->ID<uint>() <<" is complete.";
 			}
 			feature_prototype void Synthesize_Population(requires(check(ComponentType,!Concepts::Is_IPF_Capable)))
 			{

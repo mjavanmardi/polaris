@@ -45,7 +45,7 @@ namespace PopSyn
 					pthis->Swap_Event(&Stop_Main_Timer<NULLTYPE>);
 					break;
 				case 7:
-					response.result = false;
+					response.result = true;
 					pthis->Swap_Event(&Output_Popsyn_Event<NULLTYPE>);
 					break;
 				default:
@@ -60,6 +60,7 @@ namespace PopSyn
 			}
 			feature_prototype bool Start_Popsyn(requires(check(ComponentType,Concepts::Uses_Linker_File)))
 			{
+				cout<<endl<<"====================================================="<<endl<<"Starting synthetic population generation:"<<endl;
 				//------------------------
 				// TIMER
 				Counter timer;
@@ -155,7 +156,7 @@ namespace PopSyn
 						marg = new_region->Target_Marginal_Distribution<marginal_itf*>();
 						Rand_Interface* my_rand = (Rand_Interface*)Allocate<MasterType::RNG>(); // ALLOCATION TEST
 						//Rand_Interface* my_rand = (Rand_Interface*)(new MasterType::RNG());
-						my_rand->Initialize<double>(rand->Next_Rand<double>()*(double)SHRT_MAX);
+						my_rand->Initialize<double>(ID/*rand->Next_Rand<double>()*(double)SHRT_MAX*/);
 						new_region->Output_Stream<ostream&>(out);
 						((zone_itf*)new_region)->Rand<Rand_Interface*>(my_rand);
 
