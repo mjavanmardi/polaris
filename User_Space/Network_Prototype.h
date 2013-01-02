@@ -628,13 +628,13 @@ namespace Network_Components
 
 
 				int counter=0;
-				const float link_length = 5280.0;
-				const float speed_limit = 60.0;
-				const float speed_limit_ramp = 30.0;
-				const float maximum_flow_rate = 2200.0;
-				const float maximum_flow_rate_ramp = 600.0;
+				const float link_length = 5280.0; // in foot
+				const float speed_limit = 60.0; // in miles per hour
+				const float speed_limit_ramp = 30.0; 
+				const float maximum_flow_rate = 2200.0; // in vehicles per hour per lane
+				const float maximum_flow_rate_ramp = 600.0; // 
 				const float maximum_flow_rate_arterial = 900;
-				const float jam_density = 220.0;
+				const float jam_density = 220.0; // in vehiles per mile per lane
 				const float backward_wave_speed = 12.0;
 				const float distance_factor = 1.5;				
 
@@ -673,8 +673,8 @@ namespace Network_Components
 
 					intersection->template uuid<int>( db_itr->getNode() );
 					intersection->template internal_id<int>(counter);
-					intersection->template x_position<float>( db_itr->getX());
-					intersection->template y_position<float>( db_itr->getY());
+					intersection->template x_position<float>( scenario_reference<_Scenario_Interface*>()->meterToFoot<NULLTYPE>(db_itr->getX()));
+					intersection->template y_position<float>( scenario_reference<_Scenario_Interface*>()->meterToFoot<NULLTYPE>(db_itr->getY()));
 					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
 					
 					net_io_maps.intersection_id_to_ptr[db_itr->getNode()]=intersection;
@@ -756,14 +756,14 @@ namespace Network_Components
 
 						link->template num_lanes<int>(db_itr->getLanes_Ab());
 						
-						link->template length<float>(db_itr->getLength());
-						link->template speed_limit<float>(db_itr->getSpeed_Ab());
+						link->template length<float>(scenario_reference<_Scenario_Interface*>()->meterToFoot<NULLTYPE>(db_itr->getLength()));
+						link->template speed_limit<float>(scenario_reference<_Scenario_Interface*>()->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()));
 						
 						link->template num_left_turn_bays<int>(db_itr->getLeft_Ab());
 						link->template num_right_turn_bays<int>(db_itr->getRight_Ab());
 						
-						link->template left_turn_bay_length<float>(0.0);
-						link->template right_turn_bay_length<float>(0.0);
+						link->template left_turn_bay_length<float>(scenario_reference<_Scenario_Interface*>()->meterToFoot<NULLTYPE>(0.0));
+						link->template right_turn_bay_length<float>(scenario_reference<_Scenario_Interface*>()->meterToFoot<NULLTYPE>(0.0));
 
 						
 						const string& facility_type=db_itr->getType();
@@ -785,7 +785,7 @@ namespace Network_Components
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
 						}
 
-						link->template free_flow_speed<float>(db_itr->getSpeed_Ab() + 10.0);
+						link->template free_flow_speed<float>(scenario_reference<_Scenario_Interface*>()->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()) + 10.0);
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
@@ -818,14 +818,14 @@ namespace Network_Components
 
 						link->template num_lanes<int>(db_itr->getLanes_Ba());
 						
-						link->template length<float>(db_itr->getLength());
-						link->template speed_limit<float>(db_itr->getSpeed_Ba());
+						link->template length<float>(scenario_reference<_Scenario_Interface*>()->meterToFoot<NULLTYPE>(db_itr->getLength()));
+						link->template speed_limit<float>(scenario_reference<_Scenario_Interface*>()->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()));
 						
 						link->template num_left_turn_bays<int>(db_itr->getLeft_Ba());
 						link->template num_right_turn_bays<int>(db_itr->getRight_Ba());
 						
-						link->template left_turn_bay_length<float>(0.0);
-						link->template right_turn_bay_length<float>(0.0);
+						link->template left_turn_bay_length<float>(scenario_reference<_Scenario_Interface*>()->meterToFoot<NULLTYPE>(0.0));
+						link->template right_turn_bay_length<float>(scenario_reference<_Scenario_Interface*>()->meterToFoot<NULLTYPE>(0.0));
 
 						
 						const string& facility_type=db_itr->getType();
@@ -847,7 +847,7 @@ namespace Network_Components
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
 						}
 
-						link->template free_flow_speed<float>(db_itr->getSpeed_Ba() + 10.0);
+						link->template free_flow_speed<float>(scenario_reference<_Scenario_Interface*>()->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()) + 10.0);
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
@@ -1531,7 +1531,7 @@ int a = (int)inbound_movement->template cached_outbound_link_arrived_time_based_
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
 				//write_network_link_flow<NULLTYPE>();
-				write_network_link_turn_time<NULLTYPE>();
+				//write_network_link_turn_time<NULLTYPE>();
 				write_output_summary<NULLTYPE>();
 
 			}
