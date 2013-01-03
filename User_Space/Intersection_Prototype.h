@@ -982,104 +982,30 @@ vector<float> v;
 				
 				typedef Link_Components::Types::Link_Simulation_Status link_simulation_status_type;
 
-
-				if(intersection_current_revision!=_iteration)
+				if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::CONTROL_ITERATION)
 				{
-					//first visit this iteration, update status
-					_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::NONE_COMPLETE);
-
-				}
-				if(_sub_iteration==0)
-				{
-					//PRINT("\t" << "Compute_Route Not Finished, Return This Iteration");
-
-					_pthis->Swap_Event((Event)&Intersection_Prototype::Compute_Step_Control<NULLTYPE>);
-					response.result=false;
-					response.next=_iteration;
-				}
-				else 
-				if(_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::NONE_COMPLETE)
-				{
-
 					_pthis->Swap_Event((Event)&Intersection_Prototype::Compute_Step_Control<NULLTYPE>);
 					response.result=true;
 					response.next=_iteration;
 				}
-				else if(_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::COMPUTE_STEP_CONTROL_COMPLETE)
+				else if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_ITERATION)
+				{
+					_pthis->Swap_Event((Event)&Intersection_Prototype::Compute_Step_Flow<NULLTYPE>);
+					response.result=true;
+					response.next=_iteration;
+				}
+				else if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE)
 				{
 
-					long links_current_revision=_Link_Interface::Component_Type::singleton_reference->type_current_revision();
-					//Revision links_current_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_current_revision();
-
-					if(links_current_revision==_iteration)
-					{
-						//links visited at least once, link_simulation_status is accurate
-						//necessary condition is that all intersection's downstream/upstream links are done
-						_Link_Interface* outbound_link;
-						_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=_this_ptr->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
-						typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
-						bool done=true;
-						for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
-						{
-							outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
-							_Link_Interface* inbound_link;
-							_Movement_Interface* inbound_movement;
-							_Movements_Container_Interface& inbound_links_container = ((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
-							typename _Movements_Container_Interface::iterator inbound_itr;
-							for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
-							{
-								inbound_movement=(_Movement_Interface*)(*inbound_itr);
-								inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
-								done=done &&
-									(inbound_link->template link_simulation_status<link_simulation_status_type>()
-									 == link_simulation_status_type::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE);
-								if(!done) break;
-							}
-							if(!done) break;
-						}
-						if(done)
-						{
-							_pthis->Swap_Event((Event)&Intersection_Prototype::Compute_Step_Flow<NULLTYPE>);
-							response.result=true;
-							response.next=_iteration;
-						}
-						else
-						{
-							response.result=false;
-							response.next=_iteration;
-						}
-					}
-					else
-					{
-						//link not visited yet
-
-						//PRINT("\t" << "Link Not Visited, Return This Iteration");
-						response.result=false;
-						response.next=_iteration;
-					}
-				}
-				else if(_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>()==Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE)
+					_pthis->Swap_Event((Event)&Intersection_Prototype::Network_State_Update<NULLTYPE>);
+					response.result=true;
+					response.next=_iteration + _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
+				} 
+				else
 				{
-
-					//although not ideal, simply check whether links are completely done this iteration
-					long link_next_revision=_Link_Interface::Component_Type::singleton_reference->type_next_check();
-					//Revision link_next_revision=Execution_Object::allocator_template<link_type>::allocator_reference.type_next_check();
-
-					if(link_next_revision>_iteration)
-					{
-						//PRINT("\t" << "Run Network_State_Update, Return Next Iteration");
-						_pthis->Swap_Event((Event)&Intersection_Prototype::Network_State_Update<NULLTYPE>);
-						response.result=true;
-						response.next=_iteration + _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
-					}
-					else
-					{
-						//PRINT("\t" << "Compute_Step_Flow_Link_Moving Not Finished, Return This Iteration");
-						response.result=false;
-						response.next=_iteration;
-					}
+					response.result=false;
+					response.next=_iteration;
 				}
-
 			}
 			
 			declare_feature_event(Compute_Step_Control)
@@ -1150,6 +1076,23 @@ vector<float> v;
 				double calculation_time_end = ::get_current_cpu_time_in_seconds();
 				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
 				//PRINT("\t\t" << "NETWORK_STATE_UPDATE_COMPLETE");
+			}
+
+			feature_prototype string getStatus()
+			{
+				switch(intersection_simulation_status<Types::Intersection_Simulation_Status>())
+				{
+				case Types::Intersection_Simulation_Status::NONE_COMPLETE:
+					return "NONE_COMPLETE";
+				case Types::Intersection_Simulation_Status::PROCESS_SKIPPED:
+					return "PROCESS_SKIPPED";
+				case Types::Intersection_Simulation_Status::COMPUTE_STEP_CONTROL_COMPLETE:
+					return "COMPUTE_STEP_CONTROL_COMPLETE";
+				case Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE:
+					return "COMPUTE_STEP_FLOW_COMPLETE";
+				case Types::Intersection_Simulation_Status::NETWORK_STATE_UPDATE_COMPLETE:
+					return "NETWORK_STATE_UPDATE_COMPLETE";
+				}
 			}
 
 			feature_prototype void supply_allocation_based_on_driving_rule()

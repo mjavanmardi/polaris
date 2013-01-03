@@ -12,7 +12,7 @@ namespace Scenario_Components
 		struct ODB_Scenario{};
 		struct File_Scenario{};
 
-					enum Assignment_Simulation_Mode_Keys
+			enum Assignment_Simulation_Mode_Keys
 			{
 				ONE_SHOT_ASSIGNMENT_SIMULATION_MODE=0,
 				ITERATIVE_ASSIGNMENT_SIMULATION_MODE,
@@ -25,6 +25,15 @@ namespace Scenario_Components
 				FILE_IO_SOURCE,
 			};
 
+			enum Type_Iteration_keys
+			{
+				DEMAND_ITERATION = 0,
+				CONTROL_ITERATION = 1,
+				LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_ITERATION = 2,
+				INTERSECTION_COMPUTE_STEP_FLOW_ITERATION = 3,
+				LINK_COMPUTE_STEP_FLOW_LINK_MOVING = 4,
+				INTERSECTION_NETWORK_STATE_UPDATE = 5,
+			};
 	}
 
 	namespace Concepts

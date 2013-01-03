@@ -648,103 +648,35 @@ int current_simulation_time = scenario->template current_time<int>();
 				define_component_interface(_Intersection_Interface, get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				long link_current_revision=_pthis->object_current_revision();
 				
-				//PRINT("\n" << iteration << "." << sub_iteration << ":\t" << "visiting link: " << _this_ptr->template uuid<int>());
-
-				if(link_current_revision!=_iteration)
+				if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_ITERATION)
 				{
-					//first visit this iteration, update status
-
-					_this_ptr->template link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::NONE_COMPLETE);
+					_pthis->Swap_Event((Event)&Link_Prototype::Compute_Step_Flow_Supply_Update<NULLTYPE>);
+					response.result=true;
+					response.next=_iteration;
 				}
-
-				if(_this_ptr->template link_simulation_status<Types::Link_Simulation_Status>()==Types::Link_Simulation_Status::NONE_COMPLETE)
+				else if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING)
 				{
-					typedef Intersection_Components::Types::Intersection_Simulation_Status intersection_simulation_status_type;
-
-					long intersection_current_revision=_Intersection_Interface::Component_Type::singleton_reference->type_current_revision();
-					//Revision intersection_current_revision=Execution_Object::allocator_template<_Intersection_Interface_type>::allocator_reference.type_current_revision();
-
-					if(intersection_current_revision==_iteration)
-					{
-						_Intersection_Interface* upstream=_this_ptr->template upstream_intersection<_Intersection_Interface*>();
-						_Intersection_Interface* downstream=_this_ptr->template downstream_intersection<_Intersection_Interface*>();
-						if((upstream->template intersection_simulation_status<intersection_simulation_status_type>()
-							==intersection_simulation_status_type::COMPUTE_STEP_CONTROL_COMPLETE || 
-							upstream->template intersection_simulation_status<intersection_simulation_status_type>() == intersection_simulation_status_type::PROCESS_SKIPPED)
-							&&
-							(downstream->template intersection_simulation_status<intersection_simulation_status_type>()
-							==intersection_simulation_status_type::COMPUTE_STEP_CONTROL_COMPLETE 
-							|| downstream->template intersection_simulation_status<intersection_simulation_status_type>() == intersection_simulation_status_type::PROCESS_SKIPPED)) 
-						{
-							_pthis->Swap_Event((Event)&Link_Prototype::Compute_Step_Flow_Supply_Update<NULLTYPE>);
-							response.result=true;
-							response.next=_iteration;
-						}
-						else
-						{
-							response.result=false;
-							response.next=_iteration;
-						}
-					}
-					else
-					{
-						response.result=false;
-						response.next=_iteration;
-					}
+					_pthis->Swap_Event((Event)&Link_Prototype::Compute_Step_Flow_Link_Moving<NULLTYPE>);
+					response.result=true;
+					response.next=_iteration+_this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
 				}
-
-
-
-				//if(_sub_iteration==0)
-				//{
-				//	//PRINT("\t" << "Compute_Route Not Finished, Return This Iteration");
-
-				//	_pthis->Swap_Event((Event)&Link_Prototype::Compute_Step_Flow_Supply_Update<NULLTYPE>);
-				//	response.result=false;
-				//	response.next=_iteration;
-				//}
-				//else if(_this_ptr->template link_simulation_status<Types::Link_Simulation_Status>()==Types::Link_Simulation_Status::NONE_COMPLETE)
-				//{
-				//	//PRINT("\t" << "Run Compute_Step_Flow_Supply_Update, Return This Iteration");
-
-				//	_pthis->Swap_Event((Event)&Link_Prototype::Compute_Step_Flow_Supply_Update<NULLTYPE>);
-				//	response.result=true;
-				//	response.next=_iteration;
-				//}
-				else if(_this_ptr->template link_simulation_status<Types::Link_Simulation_Status>()==Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE)
+				else
 				{
-
-					typedef Intersection_Components::Types::Intersection_Simulation_Status intersection_simulation_status_type;
-
-					//long intersection_current_revision=_Intersection_Interface::Component_Type::singleton_reference->type_current_revision();
-					//Revision intersection_current_revision=Execution_Object::allocator_template<_Intersection_Interface_type>::allocator_reference.type_current_revision();
-
-					_Intersection_Interface* upstream=_this_ptr->template upstream_intersection<_Intersection_Interface*>();
-					_Intersection_Interface* downstream=_this_ptr->template downstream_intersection<_Intersection_Interface*>();
-
-					if((upstream->template intersection_simulation_status<intersection_simulation_status_type>()
-						==intersection_simulation_status_type::COMPUTE_STEP_FLOW_COMPLETE || upstream->template intersection_simulation_status<intersection_simulation_status_type>() == intersection_simulation_status_type::PROCESS_SKIPPED)
-						&&
-						(downstream->template intersection_simulation_status<intersection_simulation_status_type>()
-						==intersection_simulation_status_type::COMPUTE_STEP_FLOW_COMPLETE || downstream->template intersection_simulation_status<intersection_simulation_status_type>() == intersection_simulation_status_type::PROCESS_SKIPPED)) 
-					{
-						//upstream and downstream intersections check out, ready for "phase 2: Compute_Step_Flow_Link_Moving"
-						
-						//PRINT("\t" << "Run Compute_Step_Flow_Link_Moving, Return Next Iteration");
-
-						_pthis->Swap_Event((Event)&Link_Prototype::Compute_Step_Flow_Link_Moving<NULLTYPE>);
-						response.result=true;
-						response.next=_iteration+_this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
-					}
-					else
-					{
-						//either upstream and/or downstream intersection is not done, come back later
-
-						//PRINT("\t" << "Compute_Step_Flow Not Finished, Return This Iteration");
-
-						response.result=false;
-						response.next=_iteration;
-					}
+					response.result=false;
+					response.next=_iteration;
+				}
+			}
+			
+			feature_prototype string getStatus()
+			{
+				switch(link_simulation_status<Types::Link_Simulation_Status>())
+				{
+				case Types::Link_Simulation_Status::NONE_COMPLETE:
+					return "NONE_COMPLETE";
+				case Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE:
+					return "COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE";
+				case Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE:
+					return "COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE";
 				}
 			}
 
