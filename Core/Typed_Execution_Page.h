@@ -14,7 +14,6 @@ struct Typed_Execution_Page
 	{
 		first_free_cell=(Execution_Object*)((Byte*)this+sizeof(Typed_Execution_Page<DataType>));
 
-		
 		ptex_current_revision=-1;
 		ptex_next_revision._iteration=LONG_MAX;
 		ptex_next_revision._sub_iteration=0;
@@ -25,7 +24,10 @@ struct Typed_Execution_Page
 
 		Execution_Object* current_cell=first_free_cell;
 
-		for(int i=0;i<num_cells;i++)
+		const Execution_Object* end=(Execution_Object*)((Byte*)first_free_cell+num_cells*stride);
+
+		//for(int i=0;i<num_cells;i++)
+		while(current_cell!=end)
 		{
 			current_cell->next_free_cell=(Execution_Object*)((Byte*)current_cell+stride);
 			current_cell->next_iteration=INT_MAX;
@@ -226,7 +228,7 @@ public:
 
 	list<Typed_Execution_Page<DataType>*> active_pages;
 	
-	list<Typed_Execution_Page<DataType>*> pages_with_free_cells;
+	Quick_Stack<Typed_Execution_Page<DataType>*> pages_with_free_cells;
 	
 	volatile long tex_lock;
 
