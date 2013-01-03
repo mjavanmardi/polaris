@@ -66,6 +66,10 @@ class NULLCLASS{};
 
 #define nullptr NULL
 
+typedef volatile long _lock;
+#define LOCK(LOCK_VARIABLE) while(AtomicExchange(&LOCK_VARIABLE,1)) SLEEP(0)
+#define UNLOCK(LOCK_VARIABLE) mem_lock=0
+
 #define none true
 #define not_available false
 

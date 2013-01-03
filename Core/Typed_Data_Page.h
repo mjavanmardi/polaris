@@ -17,7 +17,10 @@ struct Typed_Data_Page
 
 		Data_Object* current_cell=first_free_cell;
 
-		for(int i=0;i<num_cells;i++)
+		const Data_Object* end=(Data_Object*)((Byte*)first_free_cell+num_cells*stride);
+
+		//for(int i=0;i<num_cells;i++)
+		while(current_cell!=end)
 		{
 			current_cell->next_free_cell=(Data_Object*)((Byte*)current_cell+stride);
 			current_cell=(Data_Object*)((Byte*)current_cell+stride);
@@ -97,12 +100,11 @@ public:
 
 	void Free(DataType* object);
 
-	list<Typed_Data_Page<DataType>*> active_pages;
-	
-	list<Typed_Data_Page<DataType>*> pages_with_free_cells;
-	
+	Quick_Stack<Typed_Data_Page<DataType>*> pages_with_free_cells;
+	//deque<Typed_Data_Page<DataType>*> pages_with_free_cells;
+
+	//vector<Typed_Data_Page<DataType>*> active_pages;
 	//bool type_activated;
-	
 	//volatile long tde_lock;
 	
 	volatile long mem_lock;

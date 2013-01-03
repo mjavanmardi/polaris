@@ -49,8 +49,6 @@ struct Typed_Execution_Page
 
 		if(cell<first_free_cell)
 		{
-			current_cell=first_free_cell;
-
 			first_free_cell=cell;
 			first_free_cell->next_free_cell=current_cell;
 		}

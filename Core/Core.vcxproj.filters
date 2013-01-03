@@ -134,6 +134,9 @@
     <ClInclude Include="s_array.h">
       <Filter>Data_Structures</Filter>
     </ClInclude>
+    <ClInclude Include="Quick_Stack.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">
