@@ -41,7 +41,7 @@ namespace File_IO
 			return false;
 		}
 		istringstream iss(_string_data[column]);
-		return iss>>t;
+		return (bool)(iss>>t);
 	}
 
 	template<class T>

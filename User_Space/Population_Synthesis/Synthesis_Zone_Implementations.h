@@ -13,7 +13,7 @@ namespace PopSyn
 			typedef true_type Probabilistic_Selection_Type;
 			typedef double Value_Type;
 			
-			feature_implementation typename TargetType::ReturnType Get_1D_Index(typename TargetType::Param1Type& multi_dimensional_index_vector)
+			feature_implementation typename TargetType::ReturnType Get_1D_Index(typename TargetType::ParamType& multi_dimensional_index_vector)
 			{
 				return this->_Target_Joint_Distribution.get_index(multi_dimensional_index_vector);
 			}
@@ -31,9 +31,9 @@ namespace PopSyn
 
 		implementation struct IPF_Solver_Settings_Implementation
 		{
-			feature_implementation void initialize(typename TargetType::Param1Type tolerance, typename TargetType::Param2Type iterations)
+			feature_implementation void initialize(typename TargetType::ParamType tolerance, typename TargetType::Param2Type iterations)
 			{
-				this->Tolerance<ComponentType, CallerType, TargetType::Param1Type>(tolerance);
+				this->Tolerance<ComponentType, CallerType, TargetType::ParamType>(tolerance);
 				this->Iterations<ComponentType, CallerType, TargetType::Param2Type>(iterations);
 			}
 			member_data(double, Tolerance, check(ReturnValueType,is_arithmetic),check(SetValueType, is_arithmetic));

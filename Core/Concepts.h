@@ -86,6 +86,18 @@ static const int success=sizeof(small_type);
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
+#define check_typename_state_interface(CHECK_ALIAS,TYPENAME_NAME,TYPENAME_STATE)\
+	struct REQUIREMENT_NAME\
+	{\
+		template<typename U> static small_type has_matching_typename(typename U::Component_Type::TYPENAME_NAME*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool member_exists=sizeof(has_matching_typename<T>(0))==success;\
+		template<class U,bool B> struct p_conditional{typedef false_type type;};\
+		template<class U> struct p_conditional<U,true>{typedef typename is_same<typename U::Component_Type::TYPENAME_NAME,TYPENAME_STATE>::type type;};\
+		static const bool value=(member_exists && p_conditional<T,member_exists>::type::value);\
+	};\
+	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
+
 #define check_typename_match(CHECK_ALIAS,TYPENAME_NAME)\
 	struct CHECK_ALIAS##_procedure\
 	{\

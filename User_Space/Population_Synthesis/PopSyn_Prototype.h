@@ -24,8 +24,15 @@ namespace PopSyn
 			Counter timer;
 
 			//----------------------------------------------------------------
-			// Main analysis loop events, used to separate initialization, timing, 
-			// processing, and output into different timesteps
+			// Schedules the first event from above
+			feature_prototype void Initialize()
+			{
+				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,1,NULLTYPE);
+				//load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,4,NULLTYPE);
+			}
+
+			//----------------------------------------------------------------
+			// Main analysis loop events, used to separate operations into different timesteps
 			//----------------------------------------------------------------
 			// 1.) Startup Event - Reads inputs and allocates analysis objects (at timestep 1)
 			declare_feature_conditional(Start_Popsyn_Conditional)
@@ -386,14 +393,6 @@ namespace PopSyn
 				cout <<endl<<"File I/O Runtime: "<<timer.Stop();
 			}
 			
-			//----------------------------------------------------------------
-			// Schedules the first event from above
-			feature_prototype void Initialize()
-			{
-				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,1,NULLTYPE);
-				//load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,4,NULLTYPE);
-			}
-
 			//----------------------------------------------------------------
 			// Required Features - necessary for any synthesis routing
 			feature_accessor(Synthesis_Regions_Collection,none,none);

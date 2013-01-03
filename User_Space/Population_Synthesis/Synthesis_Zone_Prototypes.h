@@ -52,7 +52,7 @@ namespace PopSyn
 		prototype struct Solver_Settings_Prototype : public ComponentType
 		{
 			tag_as_prototype;
-			feature_prototype void Initialize(typename TargetType::Param1Type tolerance, typename TargetType::Param2Type iterations)
+			feature_prototype void Initialize(typename TargetType::ParamType tolerance, typename TargetType::Param2Type iterations)
 			{
 				this_component()->initialize<ComponentType,CallerType,TargetType>(tolerance,iterations);
 			}
@@ -283,7 +283,7 @@ namespace PopSyn
 			feature_accessor(Solver_Settings,none,none);
 			feature_accessor(Selection_Settings,none,none);
 
-			feature_prototype typename TargetType::ReturnType Get_1D_Index(typename TargetType::Param1Type& multi_dimensional_index_vector)
+			feature_prototype typename TargetType::ReturnType Get_1D_Index(typename TargetType::ParamType& multi_dimensional_index_vector)
 			{
 				return this_component()->Get_1D_Index<ComponentType,CallerType,TargetType>(multi_dimensional_index_vector);
 			}

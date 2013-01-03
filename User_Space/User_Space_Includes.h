@@ -13,19 +13,7 @@
 
 typedef unsigned long long int ulong;
 
-template<typename Return_Type=NULLTYPE, typename Param1_Type=NULLTYPE, typename Param2_Type=NULLTYPE, typename Param3_Type=NULLTYPE, typename Param4_Type=NULLTYPE, typename Param5_Type=NULLTYPE, typename Param6_Type=NULLTYPE, typename Param7_Type=NULLTYPE, typename Param8_Type=NULLTYPE>
-struct Target_Type
-{
-	typedef Return_Type ReturnType;
-	typedef Param1_Type Param1Type;
-	typedef Param2_Type Param2Type;
-	typedef Param3_Type Param3Type;
-	typedef Param4_Type Param4Type;
-	typedef Param5_Type Param5Type;
-	typedef Param6_Type Param6Type;
-	typedef Param7_Type Param7Type;
-	typedef Param8_Type Param8Type;
-};
+
 
 
 
@@ -54,14 +42,7 @@ struct DATA_STRUCT_NAME \
 //	end_requirements_list(Param2Type);
 //};
 
-concept struct Is_Target_Type_Struct
-{
-	check_typename_defined(check1,ReturnType);
-	check_typename_defined(check2,ParamType);
-	check_typename_defined(check3,Param2Type);
 
-	define_default_check(check1 && check2 && check3);
-};
 
 ///======================================================================================
 /// RTTI STUFF - in production
@@ -202,20 +183,24 @@ concept struct Is_Target_Type_Struct
 	typedef typename Append<auto_check_list_##LINKED_CONCEPT,REQUIREMENT_NAME>::Result auto_check_list_##REQUIREMENT_NAME;
 
 
-#define feature_accessor_to_member_component_feature(FEATURE_ALIAS, MEMBER_COMPONENT_NAME, MEMBER_COMPONENT_FEATURE, MEMBER_COMPONENT_PROTOTYPE)\
-	define_get_set_exists_check(MEMBER_COMPONENT_NAME);\
-	feature TargetType FEATURE_ALIAS(call_requires(ComponentType,get_exists_check(MEMBER_COMPONENT_NAME)))\
-	{\
-		define_component_interface_local(MEMBER_COMPONENT_NAME##_itf,MEMBER_COMPONENT_PROTOTYPE,MEMBER_COMPONENT_NAME,ComponentType);\
-		MEMBER_COMPONENT_NAME##_itf* itf = cast_self_to_component().MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
-		return itf->template MEMBER_COMPONENT_FEATURE<TargetType>();\
-	}\
-	feature void FEATURE_ALIAS(TargetType value, call_requires(ComponentType,set_exists_check(MEMBER_COMPONENT_NAME)))\
-	{\
-		define_component_interface_local(MEMBER_COMPONENT_NAME##_itf,MEMBER_COMPONENT_PROTOTYPE,MEMBER_COMPONENT_NAME,ComponentType);\
-		MEMBER_COMPONENT_NAME##_itf* itf = cast_self_to_component().MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
-		itf->template MEMBER_COMPONENT_FEATURE<TargetType>(value);\
-	}
+//#define member_feature_accessor(FEATURE_ALIAS, MEMBER_COMPONENT_NAME, MEMBER_COMPONENT_FEATURE, MEMBER_COMPONENT_PROTOTYPE)\
+//	define_get_set_exists_check(MEMBER_COMPONENT_NAME, MEMBER_COMPONENT_NAME##_get_exists, MEMBER_COMPONENT_NAME##_set_exists);\
+//	feature_prototype TargetType FEATURE_ALIAS(requires(check(ComponentType,MEMBER_COMPONENT_NAME##_get_exists)))\
+//	{\
+//		define_component_interface_local(MEMBER_COMPONENT_NAME##_itf,MEMBER_COMPONENT_PROTOTYPE,MEMBER_COMPONENT_NAME,ComponentType);\
+//		MEMBER_COMPONENT_NAME##_itf* itf = cast_self_to_component().MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
+//		return itf->template MEMBER_COMPONENT_FEATURE<TargetType>();\
+//	}\
+//	feature_prototype TargetType FEATURE_ALIAS(requires(check(ComponentType,!MEMBER_COMPONENT_NAME##_get_exists)))\
+//	{\
+//		assert_check(ComponentType, MEMBER_COMPONENT_NAME##_get_exists, "The member component specified does not exists.  Did you tag with the tag_as_getter/setter macros?");\
+//	}\
+//	feature_prototype void FEATURE_ALIAS(TargetType value, requires(check(ComponentType,MEMBER_COMPONENT_NAME##_set_exists)))\
+//	{\
+//		define_component_interface_local(MEMBER_COMPONENT_NAME##_itf,MEMBER_COMPONENT_PROTOTYPE,MEMBER_COMPONENT_NAME,ComponentType);\
+//		MEMBER_COMPONENT_NAME##_itf* itf = cast_self_to_component().MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
+//		itf->template MEMBER_COMPONENT_FEATURE<TargetType>(value);\
+//	}
 
 #define get_exists_check(FEATURE_NAME) FEATURE_NAME##_get_exists
 #define set_exists_check(FEATURE_NAME) FEATURE_NAME##_set_exists
