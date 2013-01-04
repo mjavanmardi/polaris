@@ -146,9 +146,8 @@ void demand_data_information::read_demand_vehicle(string input_dir_name,Scenario
 			//	<<time_in_second_parse_vehicle_data << ","
 			//	<<endl;
 		}
-		demand_data.vehilce_data_array.shrink_to_fit();
-		//demand_data.demand_vehicle_size = (int)demand_data.vehilce_data_array.size();
-		demand_data.demand_vehicle_size = num_vehicles;
+		demand_data.vehilce_data_array.erase (demand_data.vehilce_data_array.begin() + num_vehicles,demand_data.vehilce_data_array.end());
+		demand_data.demand_vehicle_size = (int)demand_data.vehilce_data_array.size();
 	}
 	else
 	{
