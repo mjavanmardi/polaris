@@ -374,7 +374,6 @@ cout << " streams added" << endl;
 				typedef typename _Routable_Network_Interface::get_type_of(scan_list) ScanListType;
 define_component_interface(_Vehicle_Interface, get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-//cout << "routing start for vehicle " << vehicle<_Vehicle_Interface*>()->uuid<int>() << " at time " << network<_Regular_Network_Interface*>()->template scenario_reference<_Scenario_Interface*>()->current_time<int>() << endl;
 				_Routable_Network_Interface* routable_net=routable_network<_Routable_Network_Interface*>();
 				routable_net->template Reset<NULLTYPE>();
 				
@@ -470,10 +469,7 @@ define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_
 //
 //}
 
-//if (vehicle<_Vehicle_Interface*>()->uuid<int>() == 17918 && network<_Regular_Network_Interface*>()->template scenario_reference<_Scenario_Interface*>()->current_time<int>() == 22530)
-//{
-//	cout << "here" << endl;
-//}
+
 //cout << "routing 1" << endl;
 				while(!scan_list.empty())
 				{ 
@@ -626,11 +622,7 @@ define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_
 			{
 				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				int simulation_start_time = network<_Regular_Network_Interface*>()->template scenario_reference<_Scenario_Interface*>()->template simulation_start_time<int>();
-				int relative_departed_time = departed_time - simulation_start_time; // departure time relative to the simulation start time
-				if (relative_departed_time >= 0) {
-					load_event(ComponentType,Compute_Route_Condition,Compute_Route,relative_departed_time,NULLTYPE);
-				}
+				load_event(ComponentType,Compute_Route_Condition,Compute_Route,departed_time,NULLTYPE);
 			}
 
 			//first event

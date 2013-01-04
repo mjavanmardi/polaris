@@ -118,7 +118,7 @@ namespace Scenario_Components
 				cfgReader.getParameter("starting_time_hh_mm", &start_time_in_string);
 				start_time_in_string += ":00";
 				int start_time = convert_hhmmss_to_seconds(start_time_in_string);
-				assert(start_time == 0); // to be done for start time > 0
+				//assert(start_time == 0); // to be done for start time > 0
 				simulation_start_time<int>(start_time);
 				
 				string end_time_in_string;
@@ -221,8 +221,6 @@ int a = num_simulation_intervals_per_assignment_interval<int>();
 
 				current_simulation_interval_index<int>(scenario_data.current_simulation_interval_index);
 				current_assignment_interval_index<int>(scenario_data.current_assignment_interval_index);
-				current_time<int>(scenario_data.current_time);	//from 00::00:00
-				current_simulation_time<int>(scenario_data.current_simulation_time); // from simulation_start_time
 				current_day_index<int>(scenario_data.current_day_index);
 
 				assignment_mode<int>(scenario_data.assignment_mode);
@@ -370,9 +368,6 @@ int a = num_simulation_intervals_per_assignment_interval<int>();
 						<< "supply" << ","
 						<< "flow" << ","
 						<< "transfered_veicles" << ","
-						<< "cumulative_vehicles" << ","
-						<< "cumulative_arrival_vehicles" << ","
-						<< "cumulative_shifted_arrival_vehicles" << ","
 						<< "avg_turn_penalty"  << ","
 						<< "avg_link_turn_time"
 						<<endl;

@@ -134,7 +134,7 @@ namespace Intersection_Control_Components
 				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 
-				int current_time = ((_Scenario_Interface*)scenario)->template current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 
 				Component_Type* this_monitor=this_component();
 
@@ -191,7 +191,7 @@ namespace Intersection_Control_Components
 			{
 				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 	
 				int t_start = current_time;
 				int t_end = t_start + ((_Scenario_Interface*)scenario)->simulation_interval_length<int>();
@@ -219,7 +219,7 @@ namespace Intersection_Control_Components
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 				
 				//green times for each movement are assumed to be the length of the simulation interval
 				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
@@ -263,7 +263,7 @@ namespace Intersection_Control_Components
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 				define_component_interface(_Link_Interface,_Approach_Interface::get_type_of(inbound_link),Link_Components::Prototypes::Link_Prototype, ComponentType);
 
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				//green times for each movement are assumed to be the length of the simulation interval
 				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
@@ -330,7 +330,7 @@ namespace Intersection_Control_Components
 			{
 				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 
 				int t_start = current_time;
@@ -355,7 +355,7 @@ namespace Intersection_Control_Components
 			{
 				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
 				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
@@ -378,7 +378,7 @@ namespace Intersection_Control_Components
 			{
 				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
 				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
@@ -401,7 +401,7 @@ namespace Intersection_Control_Components
 			{
 				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
 				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
@@ -432,7 +432,7 @@ namespace Intersection_Control_Components
 			{
 				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
 				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
@@ -473,7 +473,7 @@ namespace Intersection_Control_Components
 				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 
-				int current_time = ((_Scenario_Interface*)scenario)->template current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 
 				int num_phases = (int)current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>().size();
 				int last_phase = num_phases - 1;
@@ -633,7 +633,7 @@ namespace Intersection_Control_Components
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 
-				int current_time = ((_Scenario_Interface*)scenario)->template current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 
 				int num_phases = (int)current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>().size();
 
@@ -804,7 +804,7 @@ int agt_max, agt_min, gt_max, gt_min;
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 
-				int current_time = ((_Scenario_Interface*)scenario)->template current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 				int num_phases = (int)current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>().size();
 				int offset = current_control_plan<_Control_Plan_Interface*>()->template offset<int>();
 				int last_phase = num_phases - 1;
@@ -967,7 +967,7 @@ int agt_max, agt_min, gt_max, gt_min;
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 
-				int current_time = ((_Scenario_Interface*)scenario)->template current_time<long>()%(24*60*60);
+				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 				int num_phases = (int)current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>().size();
 
 

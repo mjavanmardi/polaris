@@ -218,7 +218,6 @@ veh->printStatus<NULLTYPE>();
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-				int current_time = scenario->template current_time<int>();
 _Vehicle_Interface* veh = (_Vehicle_Interface*)vehicle;
 
 				_Link_Interface* outbound_link;
@@ -333,7 +332,7 @@ for (int ilink=0;ilink<(int)veh->trajectory_container<_Trajecotry_Container_Inte
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
-int current_time = scenario->template current_time<int>();
+
 
 
 				// y_capacity(a,t) = q_max(a,t) * delta_t * nlanes(a);
@@ -431,7 +430,7 @@ int type = plan->template control_type<int>();
 				
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-				int current_time = scenario->template current_time<int>();
+
 
 
 				_Link_Interface* outbound_link;
@@ -520,7 +519,7 @@ for (int x = 0; x < (int)inbound_movement->template cached_turn_movement_cumulat
 				
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-				int current_time = scenario->template current_time<int>();
+
 
 
 				// apply transfers of y(a,a''t) for each turn;
@@ -592,7 +591,7 @@ float outbound_delay = inbound_movement->template outbound_link_arrived_time_bas
 
 								//update vehicle state: transfer to next link
 								int enter_time=vehicle->template get_current_link_enter_time<NULLTYPE>();
-								int delayed_time = int((scenario->template current_time<int>() - enter_time) - inbound_link->template link_fftt<float>());
+								int delayed_time = int((scenario->template current_simulation_time<int>() - enter_time) - inbound_link->template link_fftt<float>());
 								int enter_interval_index = vehicle->template current_link_enter_interval_index<int>();
 								int delayed_interval = current_simulation_interval_index - enter_interval_index;
 
@@ -695,7 +694,7 @@ float outbound_delay = inbound_movement->template outbound_link_arrived_time_bas
 				
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-				int current_time = scenario->template current_time<int>();
+
 
 				
 
@@ -826,7 +825,7 @@ vector<float> v;
 				
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-				int current_time = scenario->template current_time<int>();
+
 
 				
 

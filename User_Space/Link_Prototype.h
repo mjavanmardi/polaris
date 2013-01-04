@@ -241,7 +241,7 @@ namespace Link_Components
 				
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-				int current_time = scenario->template current_time<int>();
+
 
 
 define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
@@ -290,7 +290,7 @@ define_component_interface(_Scenario_Interface, get_type_of(scenario_reference),
 
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-				int current_time = scenario->template current_time<int>();
+
 
 				//Newell's model
 				if(true)
@@ -342,7 +342,7 @@ define_component_interface(_Scenario_Interface, get_type_of(scenario_reference),
 				define_component_interface(_Intersection_Interface, get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 _Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
-int current_simulation_time = scenario->template current_time<int>();
+
 //if (this->template uuid<int>() == 7 && current_simulation_time == 23802)
 //{
 //	cout << "here" << endl;
@@ -375,7 +375,7 @@ int current_simulation_time = scenario->template current_time<int>();
 
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-				int current_time = scenario->template current_time<int>();
+
 
 				//int loaded_vehicles = this->template network_cumulative_loaded_vehicles;
 				//int departed_vehicles = this->template network_cumulative_departed_vehicles;
@@ -537,7 +537,7 @@ int current_simulation_time = scenario->template current_time<int>();
 
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-				int current_time = scenario->template current_time<int>();
+
 
 				//Vehicle_Interface* vehicle;
 

@@ -1507,7 +1507,6 @@ int a = (int)inbound_movement->template cached_outbound_link_arrived_time_based_
 					printResults<NULLTYPE>();
 					
 					if (scenario_reference<_Scenario_Interface*>()->template current_time<int>() > scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>() && scenario_reference<_Scenario_Interface*>()->template network_in_network_vehicles<int>() == 0)
-					//if (scenario_reference<_Scenario_Interface*>()->template current_time<int>() > 3*3600+30*60+00)
 					{
 						scenario_reference<_Scenario_Interface*>()->template close_output_files<NULLTYPE>();
 						exit(0);
@@ -1524,7 +1523,6 @@ int a = (int)inbound_movement->template cached_outbound_link_arrived_time_based_
 			{
 						
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				//printf("%s, ", convert_seconds_to_hhmmss(6*((int)scenario_reference<_Scenario_Interface*>()->template current_time<int>()/6)).c_str());
 				printf("%s, ", convert_seconds_to_hhmmss(scenario_reference<_Scenario_Interface*>()->template current_time<int>()).c_str());
 				printf("loaded=%7d, departed=%7d, arrived=%7d, in_network=%7d\n",scenario_reference<_Scenario_Interface*>()->template network_cumulative_loaded_vehicles<int>(),scenario_reference<_Scenario_Interface*>()->template network_cumulative_departed_vehicles<int>(),scenario_reference<_Scenario_Interface*>()->template network_cumulative_arrived_vehicles<int>(),scenario_reference<_Scenario_Interface*>()->template network_in_network_vehicles<int>());
 
@@ -1902,9 +1900,6 @@ int a = (int)inbound_movement->template cached_outbound_link_arrived_time_based_
 						<< movement->template movement_supply<float>() << ","
 						<< movement->template movement_flow<float>() << ","
 						<< movement->template movement_transferred<float>() << ","
-						<< movement->template turn_movement_cumulative_vehicles<float>() << ","
-						<< movement->template turn_movement_cumulative_arrived_vehicles<float>() << ","
-						<< movement->template turn_movement_cumulative_shifted_arrived_vehicles<float>() << ","
 						//<< movement->template vehicles_container<_Vehicles_Container_Interface&>().size() << ","
 						<< movement->template turn_travel_penalty<float>() << ","
 						<< movement->template forward_link_turn_travel_time<float>()

@@ -302,6 +302,8 @@ if (++counter % 10000 == 0)
 						this->template last_vehicle_departure_time<int>(departed_time);
 					}
 
+					departed_time = departed_time - scenario->simulation_start_time<int>();
+					
 					traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
 					vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
 					router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
