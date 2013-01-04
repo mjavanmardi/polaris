@@ -13,6 +13,7 @@ public:
 	struct List_Cell
 	{
 		List_Cell* next_allocated_cell;
+		unsigned int id;
 
 		union
 		{
@@ -21,17 +22,20 @@ public:
 		};
 	};
 
-	Quick_List(const int size = 4096000 / sizeof(List_Cell) )
+	Quick_List(const int size = 409600 / sizeof(List_Cell) )
 	{
 		stack_cells=new List_Cell[size];
+		
+		num_cells=0;
+
+		Initialize_Memory(stack_cells,size);
+
 		num_cells=size;
 
 		first_free_cell = stack_cells;
 		first_allocated_cell = nullptr;
 		last_allocated_cell = nullptr;
 		num_allocated = 0;
-
-		Initialize_Memory(stack_cells,num_cells);
 	}
 
 	DataType* Push(DataType& val)
@@ -81,7 +85,8 @@ public:
 		else
 		{
 			// link to middle
-			while( current_cell->next_free_cell != nullptr && first_allocated_cell > current_cell->next_free_cell )
+
+			while( first_allocated_cell->id > current_cell->next_free_cell->id )
 			{
 				current_cell = current_cell->next_free_cell;
 			}
@@ -108,39 +113,30 @@ public:
 		--num_allocated;
 	}
 	
-	size_t Size()
-	{
-		return num_allocated;
-	}
+	size_t Size() { return num_allocated; }
 	
-	bool Empty()
-	{
-		return num_allocated == 0;
-	}
+	bool Empty() { return num_allocated == 0; }
 
-	DataType& First()
-	{
-		return first_allocated_cell->data;
-	}
+	DataType& First() { return first_allocated_cell->data; }
 
-	List_Cell* Begin()
-	{
-		return first_allocated_cell;
-	}
+	List_Cell* Begin() { return first_allocated_cell; }
 
 	// Not yet implemented
-	void Erase(List_Cell*){assert(false);}
+	void Erase(List_Cell*) { assert(false); }
 
 private:
-	void Initialize_Memory(List_Cell* start_ptr,int numcells)
+	void Initialize_Memory(List_Cell* start_ptr,int alloc_cells)
 	{
 		List_Cell* init_ptr = start_ptr;
 		List_Cell* prev_ptr = init_ptr;
+		int counter = num_cells;
 
-		while( ++init_ptr < ( start_ptr + numcells ) )
+		while( ++init_ptr < ( start_ptr + alloc_cells ) )
 		{
 			prev_ptr->next_allocated_cell = nullptr;
 			prev_ptr->next_free_cell = init_ptr;
+			prev_ptr->id = counter;
+			counter++;
 
 			prev_ptr = init_ptr;
 		}
@@ -148,6 +144,7 @@ private:
 		// end of list
 		prev_ptr->next_free_cell = nullptr;
 		prev_ptr->next_allocated_cell = nullptr;
+		prev_ptr->id = counter;
 	}
 
 	void Expand_List()
@@ -169,12 +166,12 @@ private:
 		}
 
 		List_Cell* new_cells=new List_Cell[alloc_cells];
-		
-		num_cells+=alloc_cells;
 
 		first_free_cell = new_cells;
 
 		Initialize_Memory(new_cells,alloc_cells);
+
+		num_cells+=alloc_cells;
 	}
 
 	List_Cell* stack_cells;
