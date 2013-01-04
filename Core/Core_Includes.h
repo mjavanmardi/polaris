@@ -157,6 +157,7 @@ typedef void (*Conditional)(void*,Conditional_Response&);
 
 #define START() world->Start_Turning()
 
+
 ///============================================================================
 /// _all_components - type singletons for all compiled components
 ///============================================================================
@@ -237,3 +238,4 @@ void end_timer(timespec& start,long long& total)
 #else
 #define debug_3(MESSAGE) 
 #endif
+

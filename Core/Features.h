@@ -332,34 +332,7 @@ struct member_function_ptr_types<Type,setter_type>
 		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
 
-///============================================================================
-/// polaris_variable / member_component_feature – PoDs with type tags
-///============================================================================
 
-#define polaris_variable(VARIABLE_NAME, VARIABLE_VALUE_TYPE, TYPE_TRAIT_TAGS,...) \
-struct VARIABLE_NAME \
-{													\
-	typedef true_type TYPE_TRAIT_TAGS, __VA_ARGS__; \
-	typedef VARIABLE_VALUE_TYPE ValueType; \
-	typedef true_type polaris_variable_type;\
-	VARIABLE_NAME(VARIABLE_VALUE_TYPE val): Value(val){} \
-	VARIABLE_NAME(): Value(){} \
-	VARIABLE_VALUE_TYPE Value; \
-	operator VARIABLE_VALUE_TYPE(){return Value;}; \
-	VARIABLE_NAME& operator=(VARIABLE_VALUE_TYPE& obj){Value = obj; return *this;}  \
-	bool operator==(VARIABLE_VALUE_TYPE& obj){return Value == obj; }  \
-	bool operator!=(VARIABLE_VALUE_TYPE& obj){return Value != obj; }  \
-	bool operator>(VARIABLE_VALUE_TYPE& obj){return Value > obj; }  \
-	bool operator>=(VARIABLE_VALUE_TYPE& obj){return Value >= obj; }  \
-	bool operator<(VARIABLE_VALUE_TYPE& obj){return Value < obj; }  \
-	bool operator<=(VARIABLE_VALUE_TYPE& obj){return Value <= obj; }  \
-	VARIABLE_NAME& operator+(VARIABLE_VALUE_TYPE& obj){Value = Value + obj; return *this;}  \
-	VARIABLE_NAME& operator-(VARIABLE_VALUE_TYPE& obj){Value = Value - obj; return *this;}  \
-	VARIABLE_NAME& operator*(VARIABLE_VALUE_TYPE& obj){Value = Value * obj; return *this;}  \
-	VARIABLE_NAME& operator/(VARIABLE_VALUE_TYPE& obj){Value = Value / obj; return *this;}  \
-	VARIABLE_NAME& operator++(){Value = Value + 1; return *this;}  \
-	VARIABLE_NAME& operator--(){Value = Value - 1; return *this;}  \
-};
 
 
 #define member_component_feature(FEATURE_NAME, MEMBER_COMPONENT_NAME, MEMBER_COMPONENT_FEATURE, MEMBER_COMPONENT_PROTOTYPE)\
