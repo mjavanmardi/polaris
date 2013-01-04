@@ -604,14 +604,40 @@ namespace Basic_Units
 		{
 			tag_as_prototype;
 
-			feature_prototype TargetType Length()
+			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
+			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Time_Value)))
 			{
-				return TargetType(cast_self_to_component().length<ComponentType,CallerType,Value_Type>() * Conversion_Factor<TargetType>());
+				ReturnValueType val = Time_Prototype<ComponentType,CallerType>::Conversion_Factor<ReturnValueType>();
+				return ReturnValueType(this_component()->Value<ComponentType,CallerType,Value_Type>() / val);
 			}
-			feature_prototype void Length(TargetType value)
+			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Time_Value)))
 			{
-				cast_self_to_component().length<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<TargetType>());
+				assert_requirements(ComponentType,get_exists_check(Value), "Getter does not exists for this accessor.");
+				assert_requirements(TargetType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
 			}
+			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Time_Value)))
+			{
+				this_component()->Value<ComponentType,CallerType,Value_Type>(value * Conversion_Factor<SetValueType>());
+			}
+			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Time_Value)))
+			{
+				assert_requirements(ComponentType,set_exists_check(Value), "Setter does not exists for this accessor.");
+				assert_requirements(SetValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
+			}
+			
+			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
+			{
+				Value_Type convert_component_value_to_param = Time_Prototype::Conversion_Factor<TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = Time_Prototype::Conversion_Factor<TargetType::ReturnType>();
+				return TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+			}
+			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
+			{
+				assert_check(TargetType,Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
+				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
+				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
+			}
+
 
 		};
 	}
@@ -658,6 +684,16 @@ namespace Basic_Units
 		polaris_variable(Time_Minutes,time_data_type,Time_Type,Minutes_Type);
 		polaris_variable(Time_Hours,time_data_type,Time_Type,Hours_Type);
 		polaris_variable(Time_Days,time_data_type,Time_Type,Days_Type);
+	}
+
+	namespace Unit_Rate_Variables
+	{
+		typedef Value_Type rate_data_type;
+		polaris_variable(Unit_Per_DRSeconds,rate_data_type,Time_Type,DRSeconds_Type);
+		polaris_variable(Unit_Per_Seconds,rate_data_type,Time_Type,Seconds_Type);
+		polaris_variable(Unit_Per_Minutes,rate_data_type,Time_Type,Minutes_Type);
+		polaris_variable(Unit_Per_Hours,rate_data_type,Time_Type,Hours_Type);
+		polaris_variable(Unit_Per_Days,rate_data_type,Time_Type,Days_Type);
 	}
 
 	namespace Rate_Variables

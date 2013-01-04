@@ -10,6 +10,7 @@ prototype struct Agent_Prototype : ComponentType
 	feature_accessor(My_Length,none,none);
 	feature_accessor(My_Area,none,none);
 	feature_accessor(My_Time,none,none);
+	feature_accessor(My_Rate,none,none);
 };
 
 implementation struct Agent_Impl
@@ -27,6 +28,10 @@ implementation struct Agent_Impl
 		define_component_interface(agent_time_itf,MasterType::Agent_Time,Basic_Units::Prototypes::Time_Prototype,NULLTYPE);
 		agent_time_itf* time = (agent_time_itf*)Allocate<MasterType::Agent_Time>();
 		this->Time<ComponentType, CallerType, agent_time_itf*>(time);
+
+		define_component_interface(agent_rate_itf,MasterType::Agent_Rate,Basic_Units::Prototypes::Rate_Prototype,NULLTYPE);
+		agent_rate_itf* rate = (agent_rate_itf*)Allocate<MasterType::Agent_Rate>();
+		this->Rate<ComponentType, CallerType, agent_rate_itf*>(rate);
 	}
 	// Length member
 	member_component(typename MasterType::Agent_Length,Length,none,none);
@@ -37,6 +42,9 @@ implementation struct Agent_Impl
 	// Time member
 	member_component(typename MasterType::Agent_Time,Time,none,none);
 	member_component_feature(My_Time, Time, Value, Basic_Units::Prototypes::Time_Prototype);
+	// Rate member
+	member_component(typename MasterType::Agent_Rate,Rate,none,none);
+	member_component_feature(My_Rate, Rate, Value, Basic_Units::Prototypes::Rate_Prototype);
 };
 
 
@@ -51,6 +59,7 @@ struct MasterType
 	typedef Polaris_Component<Basic_Units::Implementations::Meters_Implementation, M, D, Agent> Agent_Length;
 	typedef Polaris_Component<Basic_Units::Implementations::Square_Meters_Implementation, M, D, Agent> Agent_Area;
 	typedef Polaris_Component<Basic_Units::Implementations::Hours_Implementation, M, D, Agent> Agent_Time;
+	typedef Polaris_Component<Basic_Units::Implementations::Unit_Per_Seconds_Implementation, M, D, Agent> Agent_Rate;
 
 	typedef Polaris_Component<RNG_Components::Implementations::RngStream_Implementation, M, D> RNG;
 	typedef m_array<int>	matrix_int;
@@ -79,7 +88,9 @@ int main()
 
 	agent->My_Time<Basic_Units::Time_Variables::Time_Minutes>(1440.0);
 	cout <<endl<<agent->My_Time<Basic_Units::Time_Variables::Time_Days>();
-	cout << endl << Basic_Units::Prototypes::Time_Prototype<MasterType::Agent_Time>::Convert_Value<Target_Type<Basic_Units::Time_Variables::Time_Days,Basic_Units::Time_Variables::Time_Hours>>(12.0);
+
+	agent->My_Rate<Basic_Units::Rate_Variables::Units_Per_Minute>(120.0);
+	cout <<endl<<agent->My_Rate<Basic_Units::Rate_Variables::Units_Per_Hour>();
 	
 	ofstream out;
 	out.open("full_population_chicag.xls",ios_base::out);

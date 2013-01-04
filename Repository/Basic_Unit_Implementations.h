@@ -85,6 +85,15 @@ namespace Basic_Units
 			typedef true_type Days_Type;
 		};
 
+		implementation struct Rate_Implementation : Time_Implementation<MasterType>{};
+		implementation struct Unit_Per_DRSeconds_Implementation : DRSeconds_Implementation<MasterType>{};
+		implementation struct Unit_Per_Seconds_Implementation : Seconds_Implementation<MasterType>{};
+		implementation struct Unit_Per_Minutes_Implementation : Minutes_Implementation<MasterType>{};
+		implementation struct Unit_Per_Hours_Implementation : Hours_Implementation<MasterType>{};
+		implementation struct Unit_Per_Days_Implementation : Days_Implementation<MasterType>{};
+
+
+
 		//implementation struct Time_Implementation_old
 		//{
 		//	typedef true_type Time;
