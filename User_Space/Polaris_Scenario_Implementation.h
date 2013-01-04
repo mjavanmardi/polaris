@@ -32,9 +32,7 @@ namespace Scenario_Components
 
 			feature_implementation TargetType current_simulation_interval_index()
 			{
-				int adjusted_iteration = _iteration == 0? 0 : _iteration - (_simulation_interval_length - 1);
-				int current_time = adjusted_iteration + _simulation_start_time;
-				return (TargetType)(current_time / _simulation_interval_length);
+				return (TargetType)(current_simulation_time<ComponentType,CallerType,TargetType>() / _simulation_interval_length);
 			}
 			tag_getter_as_available(current_simulation_interval_index);
 
@@ -45,22 +43,19 @@ namespace Scenario_Components
 
 			feature_implementation TargetType current_time()
 			{
-				int adjusted_iteration = _iteration == 0? 0 : _iteration - (_simulation_interval_length - 1);
-				return adjusted_iteration + _simulation_start_time;
+				return (TargetType)(current_simulation_time<ComponentType,CallerType,TargetType>() + _simulation_start_time);
 			}
 			tag_getter_as_available(current_time);
 
 			feature_implementation void current_time(TargetType setValue)
 			{
-				//assert(false);
-				//cerr << "current_time in Scenario should never be set!" << endl;
+				assert(false);
+				cerr << "current_time in Scenario should never be set!" << endl;
 			}
 			tag_setter_as_available(current_time);
 			//feature_implementation TargetType current_time(requires(!check(TargetType,is_arithmetic))) {static_assert(false,"Your TargetType is not an arithmetic type.");}
 
 			member_data(int, planning_horizon, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-
-
 			member_data(int, num_simulation_intervals, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, num_assignment_intervals, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, num_simulation_intervals_per_assignment_interval, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -69,7 +64,21 @@ namespace Scenario_Components
 
 			member_data(int, path_calculation_interval_length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, current_assignment_interval_index, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-			member_data(int, current_simulation_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+
+			feature_implementation TargetType current_simulation_time()
+			{
+				int adjusted_iteration = _iteration == 0? 0 : _iteration - (_simulation_interval_length - 1);
+				return (TargetType)adjusted_iteration;
+			}
+			tag_getter_as_available(current_simulation_time);
+
+			feature_implementation void current_simulation_time(TargetType setValue)
+			{
+				assert(false);
+				cerr << "current_simulation_time in Scenario should never be set!" << endl;
+			}
+			tag_setter_as_available(current_simulation_time);
+
 			member_data(int, current_day_index, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 
