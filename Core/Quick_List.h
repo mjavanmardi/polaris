@@ -3,7 +3,7 @@
 
 ///============================================================================
 /// Quick_List
-/// A high performance stack of non-decreasing size
+/// A high performance list of non-decreasing size
 ///============================================================================
 
 template<typename DataType>
@@ -12,16 +12,16 @@ class Quick_List
 public:
 	struct List_Cell
 	{
-		List_Cell* next_free_cell;
 		List_Cell* next_allocated_cell;
 
-		//List_Cell* next_cell;
-		//int id;
-
-		DataType data;
+		union
+		{
+			List_Cell* next_free_cell;
+			DataType data;
+		};
 	};
 
-	Quick_List(int size = 4096000 / sizeof(List_Cell) )
+	Quick_List(const int size = 4096000 / sizeof(List_Cell) )
 	{
 		stack_cells=new List_Cell[size];
 		num_cells=size;
@@ -29,18 +29,17 @@ public:
 		first_free_cell = stack_cells;
 		first_allocated_cell = nullptr;
 		last_allocated_cell = nullptr;
-		//last_cell = stack_cells+(num_cells-1);
-		//stack_cells->id=0;
+		num_allocated = 0;
 
 		Initialize_Memory(stack_cells,num_cells);
 	}
 
 	DataType* Push(DataType& val)
 	{
-		if( first_free_cell == nullptr )
+		if( num_allocated == num_cells )
 		{
 			//full, make more room
-			Expand_Stack();
+			Expand_List();
 		}
 
 		if( first_allocated_cell == nullptr )
@@ -58,16 +57,18 @@ public:
 		
 		first_free_cell = first_free_cell->next_free_cell;
 
-		last_allocated_cell->next_free_cell = nullptr; // previous first_free_cell->next_free_cell
+		//last_allocated_cell->next_free_cell = nullptr; // previous first_free_cell->next_free_cell
 
 		last_allocated_cell->data = val;
+
+		++num_allocated;
 
 		return &last_allocated_cell->data;
 	}
 
 	void Pop()
 	{
-		if( first_allocated_cell == nullptr ) return;
+		if( num_allocated == 0 ) return;
 
 		List_Cell* current_cell = first_free_cell;
 
@@ -103,16 +104,18 @@ public:
 			first_allocated_cell = first_allocated_cell->next_allocated_cell;
 			current_cell->next_allocated_cell = nullptr;
 		}
+
+		--num_allocated;
 	}
 	
 	size_t Size()
 	{
-		return num_cells;
+		return num_allocated;
 	}
 	
 	bool Empty()
 	{
-		return first_allocated_cell == nullptr;
+		return num_allocated == 0;
 	}
 
 	DataType& First()
@@ -120,119 +123,24 @@ public:
 		return first_allocated_cell->data;
 	}
 
-	void Erase(List_Cell*){assert(false);}
-
 	List_Cell* Begin()
 	{
 		return first_allocated_cell;
 	}
 
-	//void Print_Stack_Contents()
-	//{
-	//	cout << endl << "first_free_cell: ";
-	//	
-	//	if(first_free_cell==nullptr)
-	//	{
-	//		cout << "-1" << endl;
-	//	}
-	//	else
-	//	{
-	//		cout << first_free_cell->id << endl;
-	//	}
-
-	//	cout << "first_allocated_cell: ";
-	//	
-	//	if(first_allocated_cell==nullptr)
-	//	{
-	//		cout << "-1" << endl;
-	//	}
-	//	else
-	//	{
-	//		cout << first_allocated_cell->id << endl;
-	//	}
-
-	//	cout << "last_allocated_cell: ";
-	//	
-	//	if(last_allocated_cell==nullptr)
-	//	{
-	//		cout << "-1" << endl;
-	//	}
-	//	else
-	//	{
-	//		cout << last_allocated_cell->id << endl;
-	//	}
-
-	//	cout << "last_cell: ";
-	//	
-	//	if(last_cell==nullptr)
-	//	{
-	//		cout << "-1" << endl;
-	//	}
-	//	else
-	//	{
-	//		cout << last_cell->id << endl;
-	//	}
-
-	//	cout << endl;
-	//	
-	//	List_Cell* current_cell=stack_cells;
-
-	//	for(int i=0;i<num_cells;i++)
-	//	{
-	//		cout << "Cell " << i << ":" << endl;
-
-	//		cout << "\tnext_cell: ";
-	//		
-	//		if(current_cell->next_cell==nullptr)
-	//		{
-	//			cout << "-1" << endl;
-	//		}
-	//		else
-	//		{
-	//			cout << current_cell->next_cell->id << endl;
-	//		}
-
-	//		cout << "\tnext_free_cell: ";
-	//		
-	//		if(current_cell->next_free_cell==nullptr)
-	//		{
-	//			cout << "-1" << endl;
-	//		}
-	//		else
-	//		{
-	//			cout << current_cell->next_free_cell->id << endl;
-	//		}
-
-	//		cout << "\tnext_allocated_cell: ";
-	//		
-	//		if(current_cell->next_allocated_cell==nullptr)
-	//		{
-	//			cout << "-1" << endl;
-	//		}
-	//		else
-	//		{
-	//			cout << current_cell->next_allocated_cell->id << endl;
-	//		}
-
-	//		current_cell=current_cell->next_cell;
-	//	}
-	//}
-
+	// Not yet implemented
+	void Erase(List_Cell*){assert(false);}
 
 private:
 	void Initialize_Memory(List_Cell* start_ptr,int numcells)
 	{
 		List_Cell* init_ptr = start_ptr;
 		List_Cell* prev_ptr = init_ptr;
-		//int counter = start_ptr->id;
 
-		while( ++init_ptr < ( start_ptr+numcells ) )
+		while( ++init_ptr < ( start_ptr + numcells ) )
 		{
 			prev_ptr->next_allocated_cell = nullptr;
 			prev_ptr->next_free_cell = init_ptr;
-			//prev_ptr->next_cell = init_ptr;
-			//prev_ptr->id = counter;
-			//counter++;
 
 			prev_ptr = init_ptr;
 		}
@@ -240,35 +148,41 @@ private:
 		// end of list
 		prev_ptr->next_free_cell = nullptr;
 		prev_ptr->next_allocated_cell = nullptr;
-		
-		//prev_ptr->next_cell = nullptr;
-		//prev_ptr->id = counter;
 	}
 
-	void Expand_Stack()
+	void Expand_List()
 	{
-		List_Cell* new_cells=new List_Cell[num_cells];
+		unsigned int alloc_cells=0;
 
-		num_cells*=2;
+		const unsigned int megabyte=1048576;
+		const unsigned int num_megabytes=200;
+
+		if(sizeof(List_Cell)*num_cells < megabyte*num_megabytes)
+		{
+			//if allocation amount under 200 MB, double the container size
+			alloc_cells=num_cells;
+		}
+		else
+		{
+			//if allocation amount over 200 MB, just add another 200 MB
+			alloc_cells=(megabyte*num_megabytes)/sizeof(List_Cell);
+		}
+
+		List_Cell* new_cells=new List_Cell[alloc_cells];
+		
+		num_cells+=alloc_cells;
 
 		first_free_cell = new_cells;
 
-		//last_cell->next_cell = new_cells;
-
-		//last_cell = new_cells+(num_cells/2-1);
-		
-		//new_cells->id = num_cells/2;
-
-		Initialize_Memory(new_cells,num_cells/2);
+		Initialize_Memory(new_cells,alloc_cells);
 	}
 
 	List_Cell* stack_cells;
 	
-	int num_cells;
+	unsigned int num_cells;
+	unsigned int num_allocated;
 
 	List_Cell* first_free_cell;
 	List_Cell* first_allocated_cell;
 	List_Cell* last_allocated_cell;
-
-	//List_Cell* last_cell;
 };
