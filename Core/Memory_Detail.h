@@ -34,7 +34,8 @@ DataType* Typed_Execution_Pages<DataType>::Allocate()
 	//if(pages_with_free_cells.front()->Empty())
 	{
 		//active_pages.push_back(pages_with_free_cells.front());
-		active_pages.push_back(pages_with_free_cells.First());
+		//active_pages.push_back(pages_with_free_cells.First());
+		active_pages.Push(pages_with_free_cells.First());
 	}
 
 	Byte* return_value=(Byte*)(pages_with_free_cells.First()->Allocate());

@@ -2,17 +2,28 @@
 #include "Core_Includes.h"
 
 ///============================================================================
-/// Quick_Stack
+/// Quick_List
 /// A high performance stack of non-decreasing size
 ///============================================================================
 
 template<typename DataType>
-class Quick_Stack
+class Quick_List
 {
 public:
-	Quick_Stack(int size = 4096 / sizeof(Stack_Cell) )
+	struct List_Cell
 	{
-		stack_cells=new Stack_Cell[size];
+		List_Cell* next_free_cell;
+		List_Cell* next_allocated_cell;
+
+		//List_Cell* next_cell;
+		//int id;
+
+		DataType data;
+	};
+
+	Quick_List(int size = 4096000 / sizeof(List_Cell) )
+	{
+		stack_cells=new List_Cell[size];
 		num_cells=size;
 
 		first_free_cell = stack_cells;
@@ -58,7 +69,7 @@ public:
 	{
 		if( first_allocated_cell == nullptr ) return;
 
-		Stack_Cell* current_cell = first_free_cell;
+		List_Cell* current_cell = first_free_cell;
 
 		if( first_allocated_cell < first_free_cell || first_free_cell == nullptr )
 		{
@@ -109,6 +120,13 @@ public:
 		return first_allocated_cell->data;
 	}
 
+	void Erase(List_Cell*){assert(false);}
+
+	List_Cell* Begin()
+	{
+		return first_allocated_cell;
+	}
+
 	//void Print_Stack_Contents()
 	//{
 	//	cout << endl << "first_free_cell: ";
@@ -157,7 +175,7 @@ public:
 
 	//	cout << endl;
 	//	
-	//	Stack_Cell* current_cell=stack_cells;
+	//	List_Cell* current_cell=stack_cells;
 
 	//	for(int i=0;i<num_cells;i++)
 	//	{
@@ -200,22 +218,12 @@ public:
 	//	}
 	//}
 
+
 private:
-	struct Stack_Cell
+	void Initialize_Memory(List_Cell* start_ptr,int numcells)
 	{
-		Stack_Cell* next_free_cell;
-		Stack_Cell* next_allocated_cell;
-
-		//Stack_Cell* next_cell;
-		//int id;
-
-		DataType data;
-	};
-
-	void Initialize_Memory(Stack_Cell* start_ptr,int numcells)
-	{
-		Stack_Cell* init_ptr = start_ptr;
-		Stack_Cell* prev_ptr = init_ptr;
+		List_Cell* init_ptr = start_ptr;
+		List_Cell* prev_ptr = init_ptr;
 		//int counter = start_ptr->id;
 
 		while( ++init_ptr < ( start_ptr+numcells ) )
@@ -239,7 +247,7 @@ private:
 
 	void Expand_Stack()
 	{
-		Stack_Cell* new_cells=new Stack_Cell[num_cells];
+		List_Cell* new_cells=new List_Cell[num_cells];
 
 		num_cells*=2;
 
@@ -254,13 +262,13 @@ private:
 		Initialize_Memory(new_cells,num_cells/2);
 	}
 
-	Stack_Cell* stack_cells;
+	List_Cell* stack_cells;
 	
 	int num_cells;
 
-	Stack_Cell* first_free_cell;
-	Stack_Cell* first_allocated_cell;
-	Stack_Cell* last_allocated_cell;
+	List_Cell* first_free_cell;
+	List_Cell* first_allocated_cell;
+	List_Cell* last_allocated_cell;
 
-	//Stack_Cell* last_cell;
+	//List_Cell* last_cell;
 };

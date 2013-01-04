@@ -100,7 +100,7 @@ public:
 
 	void Free(DataType* object);
 
-	Quick_Stack<Typed_Data_Page<DataType>*> pages_with_free_cells;
+	Quick_List<Typed_Data_Page<DataType>*> pages_with_free_cells;
 	//deque<Typed_Data_Page<DataType>*> pages_with_free_cells;
 
 	//vector<Typed_Data_Page<DataType>*> active_pages;

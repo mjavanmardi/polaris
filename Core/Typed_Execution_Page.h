@@ -139,7 +139,8 @@ public:
 		this_revision._sub_iteration = _sub_iteration;
 		this_revision._iteration = _iteration;
 
-		typename list<Typed_Execution_Page<DataType>*>::iterator itr;
+		//typename list<Typed_Execution_Page<DataType>*>::iterator itr;
+		Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* itr=active_pages.Begin();
 
 		Byte* current_page;
 
@@ -147,9 +148,10 @@ public:
 		
 		Typed_Execution_Page<DataType>* execution_page;
 		
-		for(itr=active_pages.begin();itr!=active_pages.end();++itr)
+		//for(itr=active_pages.begin();itr!=active_pages.end();++itr)
+		while(itr!=nullptr)
 		{
-			execution_page = (*itr);
+			execution_page = itr->data;
 
 			long process = AtomicIncrement(&execution_page->ptex_threads_counter);
 
@@ -199,20 +201,26 @@ public:
 				// inform type that this page is no longer relevant for the execution
 				if(execution_page->Empty())
 				{
-					list<Typed_Execution_Page<DataType>*>::iterator itr;
+					//list<Typed_Execution_Page<DataType>*>::iterator itr;
+					Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* fitr=active_pages.Begin();
 
-					for(itr=active_pages.begin();itr!=active_pages.end();itr++)
+					//for(itr=active_pages.begin();itr!=active_pages.end();itr++)
+					while(fitr!=nullptr)
 					{
-						if((*itr)==execution_page)
+						if(fitr->data==execution_page)
 						{
-							active_pages.erase(itr);
+							active_pages.Erase(fitr);
 							break;
 						}
+
+						fitr=fitr->next_allocated_cell;
 					}
 				}
 
 				execution_page->ptex_threads_counter=0;
 			}
+
+			itr=itr->next_allocated_cell;
 		}
 	}
 	
@@ -226,9 +234,9 @@ public:
 	
 	void Free(DataType* object);
 
-	list<Typed_Execution_Page<DataType>*> active_pages;
+	Quick_List<Typed_Execution_Page<DataType>*> active_pages;
 	
-	Quick_Stack<Typed_Execution_Page<DataType>*> pages_with_free_cells;
+	Quick_List<Typed_Execution_Page<DataType>*> pages_with_free_cells;
 	
 	volatile long tex_lock;
 

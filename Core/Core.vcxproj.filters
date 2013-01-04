@@ -134,7 +134,10 @@
     <ClInclude Include="s_array.h">
       <Filter>Data_Structures</Filter>
     </ClInclude>
-    <ClInclude Include="Quick_Stack.h">
+    <ClInclude Include="Polaris_Variables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Quick_List.h">
       <Filter>Data_Structures</Filter>
     </ClInclude>
   </ItemGroup>

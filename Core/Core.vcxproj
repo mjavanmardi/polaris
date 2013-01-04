@@ -136,7 +136,7 @@
     <ClInclude Include="Execution_Engine.h" />
     <ClInclude Include="Execution_Object.h" />
     <ClInclude Include="Polaris_Variables.h" />
-    <ClInclude Include="Quick_Stack.h" />
+    <ClInclude Include="Quick_List.h" />
     <ClInclude Include="Features.h" />
     <ClInclude Include="Generic.h" />
     <ClInclude Include="Grouping.h" />
