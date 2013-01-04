@@ -112,4 +112,4 @@ using namespace Basic_Units::Time_Variables;
 using namespace Basic_Units::Length_Variables;
 using namespace Basic_Units::Area_Variables;
 using namespace Basic_Units::Volume_Variables;
-using namespace Basic_Units::Rate_Variables;
+using namespace Basic_Units::Unit_Rate_Variables;
