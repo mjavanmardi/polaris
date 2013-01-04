@@ -241,103 +241,22 @@ namespace Basic_Units
 		//	member_data(Value_Type, local_time, requires(TargetType,is_arithmetic),requires(TargetType, is_arithmetic));		
 		//};
 	}
-
-	//namespace Components
-	//{
-	//	implementation struct Inches
-	//	{
-	//		typedef Polaris_Component<Implementations::Inches_Implementation, MasterType> type;
-	//	};
-	//	implementation struct Feet
-	//	{
-	//		typedef Polaris_Component<Implementations::Feet_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Miles
-	//	{
-	//		typedef Polaris_Component<Implementations::Miles_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Centimeters
-	//	{
-	//		typedef Polaris_Component<Implementations::Centimeters_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Meters
-	//	{
-	//		typedef Polaris_Component<Implementations::Meters_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Kilometers
-	//	{
-	//		typedef Polaris_Component<Implementations::Kilometers_Implementation,MasterType> type;
-	//	};
-
-	//	implementation struct Square_Inches
-	//	{
-	//		typedef Polaris_Component<Implementations::Inches_Implementation, MasterType> type;
-	//	};
-	//	implementation struct Square_Feet
-	//	{
-	//		typedef Polaris_Component<Implementations::Feet_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Square_Miles
-	//	{
-	//		typedef Polaris_Component<Implementations::Miles_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Square_Centimeters
-	//	{
-	//		typedef Polaris_Component<Implementations::Centimeters_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Square_Meters
-	//	{
-	//		typedef Polaris_Component<Implementations::Meters_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Square_Kilometers
-	//	{
-	//		typedef Polaris_Component<Implementations::Kilometers_Implementation,MasterType> type;
-	//	};
-
-	//	implementation struct Cubic_Inches
-	//	{
-	//		typedef Polaris_Component<Implementations::Inches_Implementation, MasterType> type;
-	//	};
-	//	implementation struct Cubic_Feet
-	//	{
-	//		typedef Polaris_Component<Implementations::Feet_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Cubic_Miles
-	//	{
-	//		typedef Polaris_Component<Implementations::Miles_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Cubic_Centimeters
-	//	{
-	//		typedef Polaris_Component<Implementations::Centimeters_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Cubic_Meters
-	//	{
-	//		typedef Polaris_Component<Implementations::Meters_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Cubic_Kilometers
-	//	{
-	//		typedef Polaris_Component<Implementations::Kilometers_Implementation,MasterType> type;
-	//	};
-
-	//	implementation struct DRSeconds
-	//	{
-	//		typedef Polaris_Component<Implementations::DRSeconds_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Seconds
-	//	{
-	//		typedef Polaris_Component<Implementations::Seconds_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Minutes
-	//	{
-	//		typedef Polaris_Component<Implementations::Minutes_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Hours
-	//	{
-	//		typedef Polaris_Component<Implementations::Hours_Implementation,MasterType> type;
-	//	};
-	//	implementation struct Days
-	//	{
-	//		typedef Polaris_Component<Implementations::Days_Implementation,MasterType> type;
-	//	};
-	//}
 }
+
+typedef Polaris_Component<Basic_Units::Implementations::Seconds_Implementation, NULLTYPE, Data_Object> Basic_Time;
+template<typename Base_Time_Type>
+struct Simulation_Timer
+{
+	template<typename TargetType> TargetType Current_Time(requires(check(Base_Time_Type,Basic_Units::Concepts::Is_Time_Value) && check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
+	{
+		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Base_Time_Type>>((Base_Time_Type::ValueType)_iteration);
+	}
+	template<typename TargetType> Base_Time_Type Future_Time(TargetType Additional_Time_Increment, requires(check(Base_Time_Type,Basic_Units::Concepts::Is_Time_Value) && check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
+	{
+		Base_Time_Type current_time;
+		current_time = (Base_Time_Type::ValueType)_iteration;
+		TargetType additional_time = Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<Base_Time_Type,TargetType>>(Additional_Time_Increment);
+		return  current_time + additional_time;
+	}
+};
+Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;

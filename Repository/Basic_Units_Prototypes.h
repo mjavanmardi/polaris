@@ -2,7 +2,6 @@
 #include "Repository_Includes.h"
 
 
-
 namespace Basic_Units
 {
 	//==========================================================================
@@ -457,7 +456,7 @@ namespace Basic_Units
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Time_Value)))
 			{
 				assert_requirements(ComponentType,get_exists_check(Value), "Getter does not exists for this accessor.");
-				assert_requirements(TargetType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
+				assert_requirements(ReturnValueType,Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Time_Value)))
 			{
@@ -466,7 +465,7 @@ namespace Basic_Units
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Time_Value)))
 			{
 				assert_requirements(ComponentType,set_exists_check(Value), "Setter does not exists for this accessor.");
-				assert_requirements(SetValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
+				assert_requirements(SetValueType,Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
@@ -629,7 +628,7 @@ namespace Basic_Units
 			{
 				Value_Type convert_component_value_to_param = Time_Prototype::Conversion_Factor<TargetType::ParamType>();
 				Value_Type convert_component_value_to_return = Time_Prototype::Conversion_Factor<TargetType::ReturnType>();
-				return TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+				return TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
 			}
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
 			{
@@ -637,71 +636,50 @@ namespace Basic_Units
 				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
 			}
-
-
 		};
-	}
 
-	namespace Length_Variables
-	{
-		typedef Value_Type length_data_type;
+		prototype struct Speed_Prototype : protected Time_Prototype<ComponentType,CallerType>, protected Length_Prototype<ComponentType,CallerType>
+		{
+			tag_as_prototype;
+
+			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
+			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Time_Value) && check(ReturnValueType,Concepts::Is_Length_Value)))
+			{
+				ReturnValueType val = Time_Prototype<ComponentType,CallerType>::Conversion_Factor<ReturnValueType>();
+				return ReturnValueType(this_component()->Value<ComponentType,CallerType,Value_Type>() / val);
+			}
+			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Time_Value) || check(ReturnValueType,Concepts::Is_Length_Value)))
+			{
+				assert_requirements(ComponentType,get_exists_check(Value), "Getter does not exists for this accessor.");
+				assert_requirements(ReturnValueType,Concepts::Is_Time_Value, "The specified TargetType is not a valid Speed data structure, Time data structure information is missng.");
+				assert_requirements(ReturnValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Speed data structure, Length data structure is missing.");
+			}
+			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Time_Value) && check(SetValueType,Concepts::Is_Length_Value)))
+			{
+				this_component()->Value<ComponentType,CallerType,Value_Type>(value * Conversion_Factor<SetValueType>());
+			}
+			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Time_Value) || check(SetValueType,Concepts::Is_Length_Value)))
+			{
+				assert_requirements(ComponentType,set_exists_check(Value), "Setter does not exists for this accessor.");
+				assert_requirements(SetValueType,Concepts::Is_Time_Value, "The specified TargetType is not a valid Speed data structure, Time data structure information is missng.");
+				assert_requirements(SetValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Speed data structure, Length data structure is missing.");
+			}
+			
+			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
+			{
+				Value_Type convert_component_value_to_param = Time_Prototype::Conversion_Factor<TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = Time_Prototype::Conversion_Factor<TargetType::ReturnType>();
+				return TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+			}
+			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
+			{
+				assert_check(TargetType,Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
+				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
+				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
+			}
+		};
 		
-		polaris_variable(Inches, length_data_type, Length_Type, Inches_Type);
-		polaris_variable(Feet, length_data_type, Length_Type, Feet_Type);
-		polaris_variable(Miles, length_data_type, Length_Type, Miles_Type);
-		polaris_variable(Centimeters, length_data_type, Length_Type, Centimeters_Type);
-		polaris_variable(Meters, length_data_type, Length_Type, Meters_Type);
-		polaris_variable(Kilometers, length_data_type, Length_Type, Kilometers_Type);
 	}
 
-	namespace Area_Variables
-	{
-		typedef Value_Type length_data_type;
-		polaris_variable(Square_Inches, length_data_type, Length_Type, Area_Type, Inches_Type);
-		polaris_variable(Square_Feet, length_data_type, Length_Type, Area_Type, Feet_Type);
-		polaris_variable(Square_Miles, length_data_type, Length_Type, Area_Type, Miles_Type);
-		polaris_variable(Square_Centimeters, length_data_type, Length_Type, Area_Type, Centimeters_Type);
-		polaris_variable(Square_Meters, length_data_type, Length_Type, Area_Type,  Meters_Type);
-		polaris_variable(Square_Kilometers, length_data_type, Length_Type, Area_Type, Kilometers_Type);
-	}
-
-	namespace Volume_Variables
-	{
-		typedef Value_Type length_data_type;
-		polaris_variable(Cubic_Inches, length_data_type, Length_Type, Volume_Type, Inches_Type);
-		polaris_variable(Cubic_Feet, length_data_type, Length_Type, Volume_Type, Feet_Type);
-		polaris_variable(Cubic_Miles, length_data_type, Length_Type, Volume_Type, Miles_Type);
-		polaris_variable(Cubic_Centimeters, length_data_type, Length_Type, Volume_Type, Centimeters_Type);
-		polaris_variable(Cubic_Meters, length_data_type, Length_Type, Volume_Type, Meters_Type);
-		polaris_variable(Cubic_Kilometers, length_data_type, Length_Type, Volume_Type, Kilometers_Type);
-	}
-
-	namespace Time_Variables
-	{
-		typedef Value_Type time_data_type;
-		polaris_variable(Time_DRSeconds,time_data_type,Time_Type,DRSeconds_Type);
-		polaris_variable(Time_Seconds,time_data_type,Time_Type,Seconds_Type);
-		polaris_variable(Time_Minutes,time_data_type,Time_Type,Minutes_Type);
-		polaris_variable(Time_Hours,time_data_type,Time_Type,Hours_Type);
-		polaris_variable(Time_Days,time_data_type,Time_Type,Days_Type);
-	}
-
-	namespace Unit_Rate_Variables
-	{
-		typedef Value_Type rate_data_type;
-		polaris_variable(Unit_Per_DRSeconds,rate_data_type,Time_Type,DRSeconds_Type);
-		polaris_variable(Unit_Per_Seconds,rate_data_type,Time_Type,Seconds_Type);
-		polaris_variable(Unit_Per_Minutes,rate_data_type,Time_Type,Minutes_Type);
-		polaris_variable(Unit_Per_Hours,rate_data_type,Time_Type,Hours_Type);
-		polaris_variable(Unit_Per_Days,rate_data_type,Time_Type,Days_Type);
-	}
-
-	namespace Rate_Variables
-	{
-		typedef Value_Type rate_data_type;
-		polaris_variable(Units_Per_Second,rate_data_type,Time_Type,Seconds_Type);
-		polaris_variable(Units_Per_Minute,rate_data_type,Time_Type,Minutes_Type);
-		polaris_variable(Units_Per_Hour,rate_data_type,Time_Type,Hours_Type);
-		polaris_variable(Units_Per_Day,rate_data_type,Time_Type,Days_Type);
-	}
 }
+

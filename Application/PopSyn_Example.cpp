@@ -3,8 +3,18 @@
 
 prototype struct Agent_Prototype : ComponentType
 {
+	declare_feature_conditional(Agent_Conditional)
+	{
+		response.next = Simulation_Time.Future_Time<Time_Hours>(2);
+		response.result = true;
+	}
+	declare_feature_event(Agent_Event)
+	{
+		cout << endl << "Current time in minutes: "<<Simulation_Time.Current_Time<Time_Minutes>();
+	}
 	feature_prototype void Initialize()
 	{
+		load_event(ComponentType,Agent_Conditional,Agent_Event,0,NULLTYPE);
 		this_component()->Initialize<ComponentType, CallerType, TargetType>();
 	}
 	feature_accessor(My_Length,none,none);
@@ -51,11 +61,12 @@ implementation struct Agent_Impl
 // notice how components are no longer doubly defined, they are defined once in MasterType now
 struct MasterType
 {
+	
 	typedef MasterType M;
 	typedef Data_Object D;
 	typedef Execution_Object E;
 
-	typedef Polaris_Component<Agent_Impl, M, D> Agent;
+	typedef Polaris_Component<Agent_Impl, M, E> Agent;
 	typedef Polaris_Component<Basic_Units::Implementations::Meters_Implementation, M, D, Agent> Agent_Length;
 	typedef Polaris_Component<Basic_Units::Implementations::Square_Meters_Implementation, M, D, Agent> Agent_Area;
 	typedef Polaris_Component<Basic_Units::Implementations::Hours_Implementation, M, D, Agent> Agent_Time;
@@ -70,8 +81,6 @@ struct MasterType
 	typedef Polaris_Component<PopSyn::Implementations::ADAPTS_Population_Unit_Implementation, M, D> pop_unit;
 	typedef Polaris_Component<PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation, M, E> popsyn_solver;
 };
-
-
 
 
 int main()
@@ -89,33 +98,33 @@ int main()
 	agent->My_Time<Basic_Units::Time_Variables::Time_Minutes>(1440.0);
 	cout <<endl<<agent->My_Time<Basic_Units::Time_Variables::Time_Days>();
 
-	agent->My_Rate<Basic_Units::Rate_Variables::Units_Per_Minute>(120.0);
-	cout <<endl<<agent->My_Rate<Basic_Units::Rate_Variables::Units_Per_Hour>();
+	agent->My_Rate<Basic_Units::Unit_Rate_Variables::Units_Per_Minute>(120.0);
+	cout <<endl<<agent->My_Rate<Basic_Units::Unit_Rate_Variables::Units_Per_Hour>();
 	
-	ofstream out;
-	out.open("full_population_chicag.xls",ios_base::out);
-	ofstream marg_out;
-	marg_out.open("marginals_and_distributions_chicago.xls",ios_base::out);
-	//ostream& out = cout;
+	//ofstream out;
+	//out.open("full_population_chicag.xls",ios_base::out);
+	//ofstream marg_out;
+	//marg_out.open("marginals_and_distributions_chicago.xls",ios_base::out);
+	////ostream& out = cout;
 
-	// IPF Solver Settings
-	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
-	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
-	solver->Initialize<Target_Type<void,double,int>>(0.05,100);
+	//// IPF Solver Settings
+	//define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
+	//solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
+	//solver->Initialize<Target_Type<void,double,int>>(0.05,100);
 
-	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
-	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
-	popsyn->linker_file_path<string>(string("C:\\Users\\Jauld\\Desktop\\Popsyn_data\\LINK_chicago.txt"));
-	popsyn->Solution_Settings<solver_itf*>(solver);
-	popsyn->Output_Stream<ostream&>(out);
-	popsyn->Marginal_Output_Stream<ostream&>(marg_out);
-	popsyn->Initialize<NULLTYPE>();
+	//define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
+	//popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
+	//popsyn->linker_file_path<string>(string("C:\\Users\\Jauld\\Desktop\\Popsyn_data\\LINK_chicago.txt"));
+	//popsyn->Solution_Settings<solver_itf*>(solver);
+	//popsyn->Output_Stream<ostream&>(out);
+	//popsyn->Marginal_Output_Stream<ostream&>(marg_out);
+	//popsyn->Initialize<NULLTYPE>();
 
 
 	START();
-	out.close();
+	//out.close();
 	// Break Here
 	bool pause=true;
 	cout <<endl<<endl<<"Done, press a key.";
-	//cin >> pause;
+	cin >> pause;
 }

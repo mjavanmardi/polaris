@@ -79,11 +79,11 @@ namespace Volume_Variables
 namespace Unit_Rate_Variables
 {
 	typedef double rate_data_type;
-	polaris_variable(Unit_Per_DRSeconds,rate_data_type,Time_Type,DRSeconds_Type);
-	polaris_variable(Unit_Per_Seconds,rate_data_type,Time_Type,Seconds_Type);
-	polaris_variable(Unit_Per_Minutes,rate_data_type,Time_Type,Minutes_Type);
-	polaris_variable(Unit_Per_Hours,rate_data_type,Time_Type,Hours_Type);
-	polaris_variable(Unit_Per_Days,rate_data_type,Time_Type,Days_Type);
+	polaris_variable(Units_Per_DRSecond,rate_data_type,Time_Type,DRSeconds_Type);
+	polaris_variable(Units_Per_Second,rate_data_type,Time_Type,Seconds_Type);
+	polaris_variable(Units_Per_Minute,rate_data_type,Time_Type,Minutes_Type);
+	polaris_variable(Units_Per_Hour,rate_data_type,Time_Type,Hours_Type);
+	polaris_variable(Units_Per_Day,rate_data_type,Time_Type,Days_Type);
 }
 
 namespace Speed_Variables
