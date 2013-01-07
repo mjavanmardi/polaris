@@ -5,244 +5,102 @@ namespace Basic_Units
 {
 	namespace Implementations
 	{
-		implementation struct Measure_1D_Implementation
-		{
-			// LENGTH - stored in feet
-			typedef true_type Length_Type;
-			member_data(Value_Type,Value,none,none);
-		};
-		implementation struct Measure_2D_Implementation : Measure_1D_Implementation<MasterType>
-		{
-			typedef true_type Area_Type;
-		};
-		implementation struct Measure_3D_Implementation : Measure_2D_Implementation<MasterType>
-		{
-			typedef true_type Volume_Type;
-		};
+		//================================================================================================
+		/// Basic Length base clase.
+		#pragma region Lenth Implementations
+		implementation struct Measure_1D_Implementation {typedef true_type Length_tag; member_data(Value_Type,Value,none,none);};
+		implementation struct Inches_Implementation : Measure_1D_Implementation<MasterType>		{typedef true_type Inches_tag;};
+		implementation struct Feet_Implementation : Measure_1D_Implementation<MasterType>		{typedef true_type Feet_tag;};
+		implementation struct Miles_Implementation  : Measure_1D_Implementation<MasterType>		{typedef true_type Miles_tag;};
+		implementation struct Centimeters_Implementation : Measure_1D_Implementation<MasterType>{typedef true_type Centimeters_tag;};
+		implementation struct Meters_Implementation : Measure_1D_Implementation<MasterType>		{typedef true_type Meters_tag;};
+		implementation struct Kilometers_Implementation : Measure_1D_Implementation<MasterType>	{typedef true_type Kilometers_tag;};
+		#pragma endregion
 
-		implementation struct Inches_Implementation : Measure_1D_Implementation<MasterType>
-		{
-			typedef true_type Inches_Type;
-		};
-		implementation struct Feet_Implementation : Measure_1D_Implementation<MasterType>
-		{
-			typedef true_type Feet_Type;
-		};
-		implementation struct Miles_Implementation  : Measure_1D_Implementation<MasterType>
-		{
-			typedef true_type Miles_Type;
-		};
-		implementation struct Centimeters_Implementation  : Measure_1D_Implementation<MasterType>
-		{
-			typedef true_type Centimeters_Type;
-		};
-		implementation struct Meters_Implementation : Measure_1D_Implementation<MasterType>
-		{
-			typedef true_type Meters_Type;
-		};
-		implementation struct Kilometers_Implementation : Measure_1D_Implementation<MasterType>
-		{
-			typedef true_type Kilometers_Type;
-		};
-
+		//================================================================================================
+		/// Basic Area base clase.
+		#pragma region Area Implementations
+		implementation struct Measure_2D_Implementation : Measure_1D_Implementation<MasterType>{typedef true_type Area_tag;};
 		implementation struct Square_Inches_Implementation : Inches_Implementation<MasterType> {};
 		implementation struct Square_Feet_Implementation : Feet_Implementation<MasterType> {};
 		implementation struct Square_Miles_Implementation : Miles_Implementation<MasterType> {};
 		implementation struct Square_Centimeters_Implementation : Centimeters_Implementation<MasterType> {};
 		implementation struct Square_Meters_Implementation : Meters_Implementation<MasterType> {};
 		implementation struct Square_Kilometers_Implementation : Kilometers_Implementation<MasterType> {};
+		#pragma endregion
 
+		//================================================================================================
+		/// Basic Volume base clase.
+		#pragma region Volume Implementations
+		implementation struct Measure_3D_Implementation : Measure_1D_Implementation<MasterType>{typedef true_type Volume_tag;};
+		implementation struct Cubic_Inches_Implementation : Inches_Implementation<MasterType> {};
+		implementation struct Cubic_Feet_Implementation : Feet_Implementation<MasterType> {};
+		implementation struct Cubic_Miles_Implementation : Miles_Implementation<MasterType> {};
+		implementation struct Cubic_Centimeters_Implementation : Centimeters_Implementation<MasterType> {};
+		implementation struct Cubic_Meters_Implementation : Meters_Implementation<MasterType> {};
+		implementation struct Cubic_Kilometers_Implementation : Kilometers_Implementation<MasterType> {};
+		#pragma endregion
+
+		//================================================================================================
+		/// Basic Time base clase.
+		implementation struct Time_Implementation {typedef true_type Time_tag;member_data(Value_Type,Value,none,none);};
+		implementation struct DRSeconds_Implementation : Time_Implementation<MasterType>{typedef true_type DRSeconds_tag;};
+		implementation struct Seconds_Implementation : Time_Implementation<MasterType>	{typedef true_type Seconds_tag;};
+		implementation struct Minutes_Implementation : Time_Implementation<MasterType>	{typedef true_type Minutes_tag;};
+		implementation struct Hours_Implementation : Time_Implementation<MasterType>	{typedef true_type Hours_tag;};
+		implementation struct Days_Implementation : Time_Implementation<MasterType>		{typedef true_type Days_tag;};
+
+		//================================================================================================
+		/// Basic Rate base clase.
+		implementation struct Rate_Implementation : Time_Implementation<MasterType>{typedef true_type Rate_tag;};
+		implementation struct Units_Per_DRSecond_Implementation : DRSeconds_Implementation<MasterType>{};
+		implementation struct Units_Per_Second_Implementation : Seconds_Implementation<MasterType>{};
+		implementation struct Units_Per_Minute_Implementation : Minutes_Implementation<MasterType>{};
+		implementation struct Units_Per_Hour_Implementation : Hours_Implementation<MasterType>{};
+		implementation struct Units_Per_Day_Implementation : Days_Implementation<MasterType>{};
 
 
 		//================================================================================================
-		/// Basic time_component base clase.
-		/// The basic time component base clase has a Value_Type _local_time member which stores the total seconds
-		/// represented by the time_class.  The initializers, addition operation, and accessors all use this 
-		/// local member.  The functions below handle requests from the Time_Interface
-		implementation struct Time_Implementation
-		{
-			typedef true_type Time_Type;
-			member_data(Value_Type,Value,none,none);
-		};
-		implementation struct DRSeconds_Implementation : Time_Implementation<MasterType>
-		{
-			typedef true_type DRSeconds_Type;
-		};
-		implementation struct Seconds_Implementation : Time_Implementation<MasterType>
-		{
-			typedef true_type Seconds_Type;
-		};
-		implementation struct Minutes_Implementation : Time_Implementation<MasterType>
-		{
-			typedef true_type Minutes_Type;
-		};
-		implementation struct Hours_Implementation : Time_Implementation<MasterType>
-		{
-			typedef true_type Hours_Type;
-		};
-		implementation struct Days_Implementation : Time_Implementation<MasterType>
-		{
-			typedef true_type Days_Type;
-		};
+		/// Basic Speed_component base clase.
+		implementation struct Speed_Implementation : Time_Implementation<MasterType>{typedef true_type Speed_tag; typedef true_type Length_tag;};
+		implementation struct Feet_Per_Second_Implementation : Seconds_Implementation<MasterType>, Speed_Implementation<MasterType>			{typedef true_type Feet_tag;};
+		implementation struct Feet_Per_Minute_Implementation : Minutes_Implementation<MasterType>, Speed_Implementation<MasterType>			{typedef true_type Feet_tag;};
+		implementation struct Feet_Per_Hour_Implementation : Hours_Implementation<MasterType>, Speed_Implementation<MasterType>				{typedef true_type Feet_tag;};
+		implementation struct Meters_Per_Second_Implementation : Seconds_Implementation<MasterType>, Speed_Implementation<MasterType>		{typedef true_type Meters_tag;};
+		implementation struct Meters_Per_Minute_Implementation : Minutes_Implementation<MasterType>, Speed_Implementation<MasterType>		{typedef true_type Meters_tag;};
+		implementation struct Meters_Per_Hour_Implementation : Hours_Implementation<MasterType>, Speed_Implementation<MasterType>			{typedef true_type Meters_tag;};
+		implementation struct Miles_Per_Second_Implementation : Seconds_Implementation<MasterType>, Speed_Implementation<MasterType>		{typedef true_type Miles_tag;};
+		implementation struct Miles_Per_Minute_Implementation : Minutes_Implementation<MasterType>, Speed_Implementation<MasterType>		{typedef true_type Miles_tag;};
+		implementation struct Miles_Per_Hour_Implementation : Hours_Implementation<MasterType>, Speed_Implementation<MasterType>			{typedef true_type Miles_tag;};
+		implementation struct Kilometers_Per_Second_Implementation : Seconds_Implementation<MasterType>, Speed_Implementation<MasterType>	{typedef true_type Kilometers_tag;};
+		implementation struct Kilometers_Per_Minute_Implementation : Minutes_Implementation<MasterType>, Speed_Implementation<MasterType>	{typedef true_type Kilometers_tag;};
+		implementation struct Kilometers_Per_Hour_Implementation : Hours_Implementation<MasterType>, Speed_Implementation<MasterType>		{typedef true_type Kilometers_tag;};
 
-		implementation struct Rate_Implementation : Time_Implementation<MasterType>{};
-		implementation struct Unit_Per_DRSeconds_Implementation : DRSeconds_Implementation<MasterType>{};
-		implementation struct Unit_Per_Seconds_Implementation : Seconds_Implementation<MasterType>{};
-		implementation struct Unit_Per_Minutes_Implementation : Minutes_Implementation<MasterType>{};
-		implementation struct Unit_Per_Hours_Implementation : Hours_Implementation<MasterType>{};
-		implementation struct Unit_Per_Days_Implementation : Days_Implementation<MasterType>{};
+		//================================================================================================
+		/// Basic Currency base clase.
+		#pragma region Currency Implementations
+		implementation struct Currency_Implementation {typedef true_type Currency_tag; member_data(Value_Type,Value,none,none);};
+		implementation struct Cents_Implementation : Currency_Implementation<MasterType>			{typedef true_type Cents_tag;};
+		implementation struct Dollars_Implementation : Currency_Implementation<MasterType>			{typedef true_type Dollars_tag;};
+		implementation struct Thousand_Dollars_Implementation  : Currency_Implementation<MasterType>{typedef true_type Thousand_Dollars_tag;};
+		implementation struct Million_Dollars_Implementation : Currency_Implementation<MasterType>	{typedef true_type Million_Dollars_tag;};
 
-
-
-		//implementation struct Time_Implementation_old
-		//{
-		//	typedef true_type Time;
-
-		//	//================================================================================================
-		//	// Initializers for different time types:
-		//	//------------------------------------------------------------------------------------------------
-		//	/// Initialize Time using a DRSeconds struct
-		//	feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,Concepts::Time_In_DRSeconds)))
-		//	{
-		//		this->_local_time=((Value_Type)t/ (Value_Type)10.0);
-		//	}
-		//	/// Initialize Time using a Seconds struct
-		//	feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,Concepts::Time_In_Seconds)))
-		//	{
-		//		this->_local_time=((Value_Type)t);
-		//	}
-		//	/// Initialize Time using a Minutes struct
-		//	feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,Concepts::Time_In_Minutes)))
-		//	{
-		//		this->_local_time=((Value_Type)t * (Value_Type)60.0);
-		//	}
-		//	/// Initialize Time using an Hours struct
-		//	feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,Concepts::Time_In_Hours)))
-		//	{
-		//		this->_local_time=((Value_Type)t * (Value_Type)3600.0);
-		//	}
-		//	/// Initialize Time using a Days struct
-		//	feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,Concepts::Time_In_Days)))
-		//	{
-		//		this->_local_time=((Value_Type)t * (Value_Type)86400.0);
-		//	}
-		//	/// Initialization Error Handler - initializing without a valid time_struct, i.e. either has not 'Time' value member or is not tagged with an appropriate time_type
-		//	feature_implementation void Initialize(TargetType t, call_requirements(requires(TargetType,!Concepts::Time_In_DRSeconds) && requires(TargetType,!Concepts::Time_In_Seconds) && 
-		//		requires(TargetType,!Concepts::Time_In_Minutes) && requires(TargetType,!Concepts::Time_In_Hours) && requires(TargetType,!Concepts::Time_In_Days)))
-		//	{
-		//		assert_requirements(ComponentType, Is_Dispatched, "ComponentType is not dispatched.");
-		//		assert_requirements(TargetType, Concepts::Time_In_DRSeconds,"Your TargetType does not contain a valid Time_Type tag (i.e Days, Hours, Minutes, Seconds, DRSeconds).");
-		//	}
-
-
-		//	//================================================================================================
-		//	// Functions for adding time for different time types
-		//	//------------------------------------------------------------------------------------------------
-		//	/// Add a DRSeconds time value to the current time
-		//	feature_implementation void Add_Time(TargetType t, call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_DRSeconds)))
-		//	{
-		//		this->_local_time = this->_local_time + (Value_Type)t/ (Value_Type)10.0;
-		//	}
-		//	/// Add a Seconds time value to the current time
-		//	feature_implementation void Add_Time(TargetType& t, call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Seconds)))
-		//	{
-		//		this->_local_time = this->_local_time + (Value_Type)t;
-		//	}
-		//	/// Add a Minutes time value to the current time
-		//	feature_implementation void Add_Time(TargetType& t, call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Minutes)))
-		//	{
-		//		this->local_time=this->_local_time + (Value_Type)t * (Value_Type)60.0;
-		//	}
-		//	/// Add a Hours time value to the current time
-		//	feature_implementation void Add_Time(TargetType& t, call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Hours)))
-		//	{
-		//		this->_local_time=this->_local_time + (Value_Type)t.Time * (Value_Type)3600.0;
-		//	}
-		//	/// Add a Days time value to the current time
-		//	feature_implementation void Add_Time(TargetType& t, call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Days)))
-		//	{
-		//		this->local_time=this->_local_time + (Value_Type)t  / (Value_Type)86400.0;
-		//	}
-		//	/// Adding time Error Handler
-		//	feature_implementation void Add_Time(TargetType& t, call_requirements(
-		//		requires(ComponentType, !Is_Dispatched) || (requires(TargetType,!Concepts::Time_In_DRSeconds) &&	requires(TargetType,!Concepts::Time_In_Seconds) && 
-		//		requires(TargetType,!Concepts::Time_In_Minutes) && requires(TargetType,!Concepts::Time_In_Hours) && requires(TargetType,!Concepts::Time_In_Days))))
-		//	{
-		//		assert_requirements(ComponentType, Is_Dispatched, "ComponentType is not dispatched.");
-		//		assert_requirements(TargetType, Concepts::Time_In_DRSeconds,"Your TargetType does not contain a valid Time_Type tag (i.e Days, Hours, Minutes, Seconds, DRSeconds).");
-		//	}
-
-
-		//	//================================================================================================
-		//	/// Accessor Functions
-		//	//------------------------------------------------------------------------------------------------
-		//	// returns the requested component of the current time, i.e. 12:30:45 => 12 hours, 30 minutes, 45 seconds, etc.
-		//	tag_getter(Time_Component);
-		//	feature_implementation TargetType Time_Component(call_requirements(requires(TargetType,Concepts::Time_In_Days)))
-		//	{
-		//		return (TargetType)((int)(_local_time/86400.0));
-		//	}
-		//	feature_implementation TargetType Time_Component(call_requirements(requires(TargetType,Concepts::Time_In_DRSeconds)))
-		//	{
-		//		return (TargetType)((int)(_local_time*10)%10);
-		//	}
-		//	feature_implementation TargetType Time_Component(call_requirements(requires(TargetType,Concepts::Time_In_Hours)))
-		//	{
-		//		return (TargetType)((int)(_local_time/3600.0) % 24);
-		//	}
-		//	feature_implementation TargetType Time_Component(call_requirements(requires(TargetType,Concepts::Time_In_Minutes)))
-		//	{
-		//		return (TargetType)((int)(_local_time/60.0)%60);
-		//	}
-		//	feature_implementation TargetType Time_Component(call_requirements(requires(TargetType,Concepts::Time_In_Seconds)))
-		//	{
-		//		return (TargetType) ((int)(_local_time)%60);
-		//	}
-		//	feature_implementation void Time_Component(call_requirements(requires(TargetType,!Concepts::Time_In_DRSeconds) &&	requires(TargetType,!Concepts::Time_In_Seconds) && 
-		//		requires(TargetType,!Concepts::Time_In_Minutes) && requires(TargetType,!Concepts::Time_In_Hours) && requires(TargetType,!Concepts::Time_In_Days)))
-		//	{
-		//		assert_requirements(ComponentType, Is_Dispatched, "ComponentType is not dispatched.");
-		//		assert_requirements(TargetType, Concepts::Time_In_DRSeconds,"Your TargetType does not contain a valid Time_Type tag (i.e Days, Hours, Minutes, Seconds, DRSeconds).");
-		//	}
-
-		//	// returns the current time in the requested time unit
-		//	tag_getter(Total_Time);
-		//	feature_implementation TargetType Total_Time(call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Days)))
-		//	{
-		//		return (TargetType)_local_time/86400.0f;
-		//	}
-		//	feature_implementation TargetType Total_Time(call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_DRSeconds)))
-		//	{
-		//		return (TargetType)_local_time*10.0f;
-		//	}
-		//	feature_implementation TargetType Total_Time(call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Hours)))
-		//	{
-		//		return (TargetType)_local_time/3600.0f;
-		//	}
-		//	feature_implementation TargetType Total_Time(call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Minutes)))
-		//	{
-		//		return (TargetType)_local_time/60.0f;
-		//	}
-		//	feature_implementation TargetType Total_Time(call_requirements(requires(ComponentType, Is_Dispatched) && requires(TargetType,Concepts::Time_In_Seconds)))
-		//	{
-		//		return (TargetType)_local_time;
-		//	}
-		//	feature_implementation void Total_Time(call_requirements(requires(TargetType,!Concepts::Time_In_DRSeconds) && requires(TargetType,!Concepts::Time_In_Seconds) && 
-		//		requires(TargetType,!Concepts::Time_In_Minutes) && requires(TargetType,!Concepts::Time_In_Hours) && requires(TargetType,!Concepts::Time_In_Days)))
-		//	{
-		//		assert_requirements(ComponentType, Is_Dispatched, "ComponentType is not dispatched.");
-		//		assert_requirements(TargetType, Concepts::Time_In_DRSeconds,"Your TargetType does not contain a valid Time_Type tag (i.e Days, Hours, Minutes, Seconds, DRSeconds).");
-		//	}
-
-
-		//	//================================================================================================
-		//	/// Storage for local_time value
-		//	//------------------------------------------------------------------------------------------------
-		//	member_data(Value_Type, local_time, requires(TargetType,is_arithmetic),requires(TargetType, is_arithmetic));		
-		//};
+		#pragma endregion
 	}
+
+
+	template<typename ParentType> struct Length_In_Meters {typedef Polaris_Component<Basic_Units::Implementations::Meters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Length_In_Feet {typedef Polaris_Component<Basic_Units::Implementations::Feet_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Length_In_Inches {typedef Polaris_Component<Basic_Units::Implementations::Inches_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Length_In_Centimeters {typedef Polaris_Component<Basic_Units::Implementations::Centimeters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Length_In_Kilometers {typedef Polaris_Component<Basic_Units::Implementations::Kilometers_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Length_In_Miles {typedef Polaris_Component<Basic_Units::Implementations::Miles_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+
 }
 
+
+//=================================================================================================================
+// SIMULATION TIMER DEFINITION - Used by aents as a wrapper for the global _iteration variable
 typedef Polaris_Component<Basic_Units::Implementations::Seconds_Implementation, NULLTYPE, Data_Object> Basic_Time;
 template<typename Base_Time_Type>
 struct Simulation_Timer

@@ -348,7 +348,7 @@ struct member_function_ptr_types<Type,setter_type>
 	ReturnValueType FEATURE_NAME(requires_getter(!check(ComponentType,get_##MEMBER_COMPONENT_NAME) || !check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)))\
 	{\
 		assert_check(ComponentType,get_##MEMBER_COMPONENT_NAME,"Getter for \"" #MEMBER_COMPONENT_NAME"\" could not be found.");\
-		assert_check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity,"Component does not have permission to access \"" #MEMBER_COMPONENT_NAME"\" based on the entity type.");\
+		assert_check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity,"Component does not have permission to access " #MEMBER_COMPONENT_NAME "based on the entity type.");\
 	}\
 	template<typename ComponentType, typename CallerType, typename SetValueType>\
 	void FEATURE_NAME(SetValueType value, requires_setter(check(ComponentType,set_##MEMBER_COMPONENT_NAME) && check_2(ComponentType,typename type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)))\
@@ -361,7 +361,7 @@ struct member_function_ptr_types<Type,setter_type>
 	void FEATURE_NAME(SetValueType value, requires_setter(!check(ComponentType,set_##MEMBER_COMPONENT_NAME) || !check_2(ComponentType,typename type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)))\
 	{\
 		assert_check(ComponentType,set_##MEMBER_COMPONENT_NAME,"Setter for \"" #MEMBER_COMPONENT_NAME"\" could not be found.");\
-		assert_check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity,"Component does not have permission to access \"" #MEMBER_COMPONENT_NAME"\" based on the entity type.");\
+		assert_check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity,"Component does not have permission to access " #MEMBER_COMPONENT_NAME" based on the entity type.");\
 	}\
 	tag_getter_as_available(FEATURE_NAME);\
 	tag_setter_as_available(FEATURE_NAME);

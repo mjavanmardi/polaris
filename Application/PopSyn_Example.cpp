@@ -21,30 +21,25 @@ prototype struct Agent_Prototype : ComponentType
 	feature_accessor(My_Area,none,none);
 	feature_accessor(My_Time,none,none);
 	feature_accessor(My_Rate,none,none);
+	feature_accessor(My_Speed,none,none);
+	feature_accessor(HH_Income,none,none);
 };
 
 implementation struct Agent_Impl
 {
+
 	feature_implementation void Initialize()
-	{
-		define_component_interface(agent_length_itf,MasterType::Agent_Length,Basic_Units::Prototypes::Length_Prototype,NULLTYPE);
-		agent_length_itf* length = (agent_length_itf*)Allocate<MasterType::Agent_Length>();
-		this->Length<ComponentType, CallerType, agent_length_itf*>(length);
-
-		define_component_interface(agent_area_itf,MasterType::Agent_Area,Basic_Units::Prototypes::Area_Prototype,NULLTYPE);
-		agent_area_itf* area = (agent_area_itf*)Allocate<MasterType::Agent_Area>();
-		this->Area<ComponentType, CallerType, agent_area_itf*>(area);
-
-		define_component_interface(agent_time_itf,MasterType::Agent_Time,Basic_Units::Prototypes::Time_Prototype,NULLTYPE);
-		agent_time_itf* time = (agent_time_itf*)Allocate<MasterType::Agent_Time>();
-		this->Time<ComponentType, CallerType, agent_time_itf*>(time);
-
-		define_component_interface(agent_rate_itf,MasterType::Agent_Rate,Basic_Units::Prototypes::Rate_Prototype,NULLTYPE);
-		agent_rate_itf* rate = (agent_rate_itf*)Allocate<MasterType::Agent_Rate>();
-		this->Rate<ComponentType, CallerType, agent_rate_itf*>(rate);
+	{	
+		this->Length<ComponentType, CallerType, Agent_Impl::Length_type*>(Allocate<Agent_Impl::Length_type>());
+		this->Area<ComponentType, CallerType, MasterType::Agent_Area*>(Allocate<MasterType::Agent_Area>());
+		this->Time<ComponentType, CallerType, MasterType::Agent_Time*>(Allocate<MasterType::Agent_Time>());
+		this->Rate<ComponentType, CallerType, MasterType::Agent_Rate*>(Allocate<MasterType::Agent_Rate>());
+		this->Speed<ComponentType, CallerType, MasterType::Agent_Speed*>(Allocate<MasterType::Agent_Speed>());
+		this->Income<ComponentType, CallerType, MasterType::Agent_Income*>(Allocate<MasterType::Agent_Income>());
 	}
+
 	// Length member
-	member_component(typename MasterType::Agent_Length,Length,none,none);
+	member_component(typename Basic_Units::Length_In_Meters<typename MasterType::Agent>::type,Length,none,none);
 	member_component_feature(My_Length, Length, Value, Basic_Units::Prototypes::Length_Prototype);
 	// Volume member
 	member_component(typename MasterType::Agent_Area,Area,none,none);
@@ -55,6 +50,12 @@ implementation struct Agent_Impl
 	// Rate member
 	member_component(typename MasterType::Agent_Rate,Rate,none,none);
 	member_component_feature(My_Rate, Rate, Value, Basic_Units::Prototypes::Rate_Prototype);
+	// Speed member
+	member_component(typename MasterType::Agent_Speed,Speed,none,none);
+	member_component_feature(My_Speed, Speed, Value, Basic_Units::Prototypes::Speed_Prototype);
+	// Income member
+	member_component(typename MasterType::Agent_Income,Income,none,none);
+	member_component_feature(HH_Income, Income, Value, Basic_Units::Prototypes::Currency_Prototype);
 };
 
 
@@ -70,7 +71,9 @@ struct MasterType
 	typedef Polaris_Component<Basic_Units::Implementations::Meters_Implementation, M, D, Agent> Agent_Length;
 	typedef Polaris_Component<Basic_Units::Implementations::Square_Meters_Implementation, M, D, Agent> Agent_Area;
 	typedef Polaris_Component<Basic_Units::Implementations::Hours_Implementation, M, D, Agent> Agent_Time;
-	typedef Polaris_Component<Basic_Units::Implementations::Unit_Per_Seconds_Implementation, M, D, Agent> Agent_Rate;
+	typedef Polaris_Component<Basic_Units::Implementations::Units_Per_Second_Implementation, M, D, Agent> Agent_Rate;
+	typedef Polaris_Component<Basic_Units::Implementations::Feet_Per_Second_Implementation, M, D, Agent> Agent_Speed;
+	typedef Polaris_Component<Basic_Units::Implementations::Dollars_Implementation, M, D, Agent> Agent_Income;
 
 	typedef Polaris_Component<RNG_Components::Implementations::RngStream_Implementation, M, D> RNG;
 	typedef m_array<int>	matrix_int;
@@ -89,6 +92,7 @@ int main()
 	define_component_interface(agent_length_itf,MasterType::Agent_Length,Basic_Units::Prototypes::Length_Prototype,NULLTYPE);
 	agent_itf* agent = (agent_itf*)Allocate<MasterType::Agent>();
 	agent->Initialize<NULLTYPE>();
+
 	agent->My_Length<Basic_Units::Length_Variables::Feet>(20.0);
 	cout << agent->My_Length<Basic_Units::Length_Variables::Centimeters>();
 
@@ -100,6 +104,9 @@ int main()
 
 	agent->My_Rate<Basic_Units::Unit_Rate_Variables::Units_Per_Minute>(120.0);
 	cout <<endl<<agent->My_Rate<Basic_Units::Unit_Rate_Variables::Units_Per_Hour>();
+
+	agent->My_Speed<Basic_Units::Speed_Variables::Kilometers_Per_Hour>(100.0);
+	cout <<endl<<agent->My_Speed<Basic_Units::Speed_Variables::Feet_Per_Second>();
 	
 	//ofstream out;
 	//out.open("full_population_chicag.xls",ios_base::out);

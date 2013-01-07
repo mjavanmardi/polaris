@@ -35,75 +35,75 @@ namespace Basic_Units
 namespace Time_Variables
 {
 	typedef double time_data_type;
-	polaris_variable(Time_DRSeconds,time_data_type,Time_Type,DRSeconds_Type);
-	polaris_variable(Time_Seconds,time_data_type,Time_Type,Seconds_Type);
-	polaris_variable(Time_Minutes,time_data_type,Time_Type,Minutes_Type);
-	polaris_variable(Time_Hours,time_data_type,Time_Type,Hours_Type);
-	polaris_variable(Time_Days,time_data_type,Time_Type,Days_Type);
+	polaris_variable(Time_DRSeconds,time_data_type,Time_tag,DRSeconds_tag);
+	polaris_variable(Time_Seconds,time_data_type,Time_tag,Seconds_tag);
+	polaris_variable(Time_Minutes,time_data_type,Time_tag,Minutes_tag);
+	polaris_variable(Time_Hours,time_data_type,Time_tag,Hours_tag);
+	polaris_variable(Time_Days,time_data_type,Time_tag,Days_tag);
 }
 
 namespace Length_Variables
 {
 	typedef double length_data_type;
 		
-	polaris_variable(Inches, length_data_type, Length_Type, Inches_Type);
-	polaris_variable(Feet, length_data_type, Length_Type, Feet_Type);
-	polaris_variable(Miles, length_data_type, Length_Type, Miles_Type);
-	polaris_variable(Centimeters, length_data_type, Length_Type, Centimeters_Type);
-	polaris_variable(Meters, length_data_type, Length_Type, Meters_Type);
-	polaris_variable(Kilometers, length_data_type, Length_Type, Kilometers_Type);
+	polaris_variable(Inches, length_data_type, Length_tag, Inches_tag);
+	polaris_variable(Feet, length_data_type, Length_tag, Feet_tag);
+	polaris_variable(Miles, length_data_type, Length_tag, Miles_tag);
+	polaris_variable(Centimeters, length_data_type, Length_tag, Centimeters_tag);
+	polaris_variable(Meters, length_data_type, Length_tag, Meters_tag);
+	polaris_variable(Kilometers, length_data_type, Length_tag, Kilometers_tag);
 }
 
 namespace Area_Variables
 {
 	typedef double length_data_type;
-	polaris_variable(Square_Inches, length_data_type, Length_Type, Area_Type, Inches_Type);
-	polaris_variable(Square_Feet, length_data_type, Length_Type, Area_Type, Feet_Type);
-	polaris_variable(Square_Miles, length_data_type, Length_Type, Area_Type, Miles_Type);
-	polaris_variable(Square_Centimeters, length_data_type, Length_Type, Area_Type, Centimeters_Type);
-	polaris_variable(Square_Meters, length_data_type, Length_Type, Area_Type,  Meters_Type);
-	polaris_variable(Square_Kilometers, length_data_type, Length_Type, Area_Type, Kilometers_Type);
+	polaris_variable(Square_Inches, length_data_type, Length_tag, Area_tag, Inches_tag);
+	polaris_variable(Square_Feet, length_data_type, Length_tag, Area_tag, Feet_tag);
+	polaris_variable(Square_Miles, length_data_type, Length_tag, Area_tag, Miles_tag);
+	polaris_variable(Square_Centimeters, length_data_type, Length_tag, Area_tag, Centimeters_tag);
+	polaris_variable(Square_Meters, length_data_type, Length_tag, Area_tag,  Meters_tag);
+	polaris_variable(Square_Kilometers, length_data_type, Length_tag, Area_tag, Kilometers_tag);
 }
 
 namespace Volume_Variables
 {
 	typedef double length_data_type;
-	polaris_variable(Cubic_Inches, length_data_type, Length_Type, Volume_Type, Inches_Type);
-	polaris_variable(Cubic_Feet, length_data_type, Length_Type, Volume_Type, Feet_Type);
-	polaris_variable(Cubic_Miles, length_data_type, Length_Type, Volume_Type, Miles_Type);
-	polaris_variable(Cubic_Centimeters, length_data_type, Length_Type, Volume_Type, Centimeters_Type);
-	polaris_variable(Cubic_Meters, length_data_type, Length_Type, Volume_Type, Meters_Type);
-	polaris_variable(Cubic_Kilometers, length_data_type, Length_Type, Volume_Type, Kilometers_Type);
+	polaris_variable(Cubic_Inches, length_data_type, Length_tag, Volume_tag, Inches_tag);
+	polaris_variable(Cubic_Feet, length_data_type, Length_tag, Volume_tag, Feet_tag);
+	polaris_variable(Cubic_Miles, length_data_type, Length_tag, Volume_tag, Miles_tag);
+	polaris_variable(Cubic_Centimeters, length_data_type, Length_tag, Volume_tag, Centimeters_tag);
+	polaris_variable(Cubic_Meters, length_data_type, Length_tag, Volume_tag, Meters_tag);
+	polaris_variable(Cubic_Kilometers, length_data_type, Length_tag, Volume_tag, Kilometers_tag);
 }
 
 namespace Unit_Rate_Variables
 {
 	typedef double rate_data_type;
-	polaris_variable(Units_Per_DRSecond,rate_data_type,Time_Type,DRSeconds_Type);
-	polaris_variable(Units_Per_Second,rate_data_type,Time_Type,Seconds_Type);
-	polaris_variable(Units_Per_Minute,rate_data_type,Time_Type,Minutes_Type);
-	polaris_variable(Units_Per_Hour,rate_data_type,Time_Type,Hours_Type);
-	polaris_variable(Units_Per_Day,rate_data_type,Time_Type,Days_Type);
+	polaris_variable(Units_Per_DRSecond,rate_data_type,Time_tag,DRSeconds_tag);
+	polaris_variable(Units_Per_Second,rate_data_type,Time_tag,Seconds_tag);
+	polaris_variable(Units_Per_Minute,rate_data_type,Time_tag,Minutes_tag);
+	polaris_variable(Units_Per_Hour,rate_data_type,Time_tag,Hours_tag);
+	polaris_variable(Units_Per_Day,rate_data_type,Time_tag,Days_tag);
 }
 
 namespace Speed_Variables
 {
 	typedef double rate_data_type;
-	polaris_variable(Feet_Per_Second,rate_data_type,Time_Type, Length_Type, Seconds_Type, Feet_Type);
-	polaris_variable(Feet_Per_Minute,rate_data_type,Time_Type, Length_Type, Minutes_Type, Feet_Type);
-	polaris_variable(Feet_Per_Hour,rate_data_type,Time_Type, Length_Type, Hours_Type, Feet_Type);
+	polaris_variable(Feet_Per_Second,rate_data_type, Speed_tag, Time_tag, Length_tag, Seconds_tag, Feet_tag);
+	polaris_variable(Feet_Per_Minute,rate_data_type, Speed_tag, Time_tag, Length_tag, Minutes_tag, Feet_tag);
+	polaris_variable(Feet_Per_Hour,rate_data_type, Speed_tag, Time_tag, Length_tag, Hours_tag, Feet_tag);
 
-	polaris_variable(Meters_Per_Second,rate_data_type,Time_Type, Length_Type, Seconds_Type, Meters_Type);
-	polaris_variable(Meters_Per_Minute,rate_data_type,Time_Type, Length_Type, Minutes_Type, Meters_Type);
-	polaris_variable(Meters_Per_Hour,rate_data_type,Time_Type, Length_Type, Hours_Type, Meters_Type);
+	polaris_variable(Meters_Per_Second,rate_data_type, Speed_tag, Time_tag, Length_tag, Seconds_tag, Meters_tag);
+	polaris_variable(Meters_Per_Minute,rate_data_type, Speed_tag, Time_tag, Length_tag, Minutes_tag, Meters_tag);
+	polaris_variable(Meters_Per_Hour,rate_data_type, Speed_tag, Time_tag, Length_tag, Hours_tag, Meters_tag);
 
-	polaris_variable(Miles_Per_Second,rate_data_type,Time_Type, Length_Type, Seconds_Type, Miles_Type);
-	polaris_variable(Miles_Per_Minute,rate_data_type,Time_Type, Length_Type, Minutes_Type, Miles_Type);
-	polaris_variable(Miles_Per_Hour,rate_data_type,Time_Type, Length_Type, Hours_Type, Miles_Type);
+	polaris_variable(Miles_Per_Second,rate_data_type, Speed_tag, Time_tag, Length_tag, Seconds_tag, Miles_tag);
+	polaris_variable(Miles_Per_Minute,rate_data_type, Speed_tag, Time_tag, Length_tag, Minutes_tag, Miles_tag);
+	polaris_variable(Miles_Per_Hour,rate_data_type, Speed_tag, Time_tag, Length_tag, Hours_tag, Miles_tag);
 
-	polaris_variable(Kilometers_Per_Second,rate_data_type,Time_Type, Length_Type, Seconds_Type, Kilometers_Type);
-	polaris_variable(Kilometers_Per_Minute,rate_data_type,Time_Type, Length_Type, Minutes_Type, Kilometers_Type);
-	polaris_variable(Kilometers_Per_Hour,rate_data_type,Time_Type, Length_Type, Hours_Type, Kilometers_Type);
+	polaris_variable(Kilometers_Per_Second,rate_data_type, Speed_tag, Time_tag, Length_tag, Seconds_tag, Kilometers_tag);
+	polaris_variable(Kilometers_Per_Minute,rate_data_type, Speed_tag, Time_tag, Length_tag, Minutes_tag, Kilometers_tag);
+	polaris_variable(Kilometers_Per_Hour,rate_data_type, Speed_tag, Time_tag, Length_tag, Hours_tag, Kilometers_tag);
 }
 
 }
@@ -113,3 +113,4 @@ using namespace Basic_Units::Length_Variables;
 using namespace Basic_Units::Area_Variables;
 using namespace Basic_Units::Volume_Variables;
 using namespace Basic_Units::Unit_Rate_Variables;
+using namespace Basic_Units::Speed_Variables;
