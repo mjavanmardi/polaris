@@ -67,17 +67,14 @@ namespace Vehicle_Components
 		prototype struct Vehicle_Prototype
 		{
 			tag_as_prototype;
-
-			//typedef typename ComponentType::trajectory_unit_type TrajectoryUnitType;
-			//typedef typename ComponentType::trajectory_container_type TrajectoryContainerType;
 			
 			feature_accessor(trajectory_container, none, none);
-			//feature_accessor(trajectory_position);
+
 			feature_accessor(current_trajectory_unit_index, none, none);
 			feature_accessor(departed_simulation_interval_index, none, none);
 			feature_accessor(origin_link, none, none);
 			feature_accessor(destination_link, none, none);
-			//feature_accessor(next_link);
+
 			feature_accessor(simulation_status, none, none);
 			feature_accessor(departed_time, none, none);
 			feature_accessor(arrived_time, none, none);
@@ -106,8 +103,6 @@ namespace Vehicle_Components
 					vehicle_trajectory_data->template link<_Link_Interface*>((_Link_Interface*)(path_container[i]));
 					vehicle_trajectory_data->template enter_time<int>(0.0);
 					vehicle_trajectory_data->template delayed_time<int>(0.0);
-
-					//PRINT("\t\tPath Link: " << vehicle_trajectory_data->template link<Link_Interface*>()->template uuid<int>());
 					trajectory.push_back(vehicle_trajectory_data);
 				}
 			};
@@ -149,7 +144,6 @@ namespace Vehicle_Components
 			feature_prototype void initialize_trajectory()
 			{
 				current_trajectory_unit_index<int>(-1);
-				//return (TargetType)advance_trajectory<TargetType>();
 			}
 
 			feature_prototype void load_to_entry_queue()
@@ -208,22 +202,10 @@ namespace Vehicle_Components
 			
 			feature_prototype void load_to_origin_link(int simulation_interval_index, int simulation_interval_length)
 			{
-				//int current_time_in_seconds = simulation_interval_index*simulation_interval_length;
-
 				simulation_status<Types::Vehicle_Status_Keys>(Types::Vehicle_Status_Keys::IN_NETWORK);
 
-				//typedef typename ComponentType::trajectory_unit_type Trajectory_Unit_Type;
-
-				//Trajectory_Unit_Interface<Trajectory_Unit_Type,ComponentType>* current=initialize_trajectory<NULLTYPE>();
-				
 				initialize_trajectory<NULLTYPE>();
 
-				//typedef Link_Interface<typename Trajectory_Unit_Type::link_type,ComponentType> Link_Interface;
-
-				//PRINT("origin link " << current->template link<Link_Interface*>()->template uuid<int>());
-
-				//current->template enter_time<int>(current_time_in_seconds);
-				//current->template enter_interval_index<int>(simulation_interval_index);
 			}
 			
 			feature_prototype void transfer_to_next_link(int simulation_interval_index,int simulation_interval_length,int delayed_time)
@@ -238,8 +220,6 @@ namespace Vehicle_Components
 				if(current) current->template delayed_time<int>(delayed_time);
 				
 				current = advance_trajectory<_Trajectory_Unit_Interface*>();
-				
-				//PRINT("transferring to next link " << current->template link<Link_Interface*>()->template uuid<int>());
 
 				//add enter time to the trajectory data
 				current->template enter_time<int>(current_time_in_seconds);

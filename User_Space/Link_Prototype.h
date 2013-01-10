@@ -71,26 +71,6 @@ namespace Link_Components
 	
 	namespace Prototypes
 	{
-		//template<typename ComponentType, typename CallerType>
-		//struct Turn_Movement_Interface
-		//{
-		//	feature_accessor(inbound_link);
-		//	feature_accessor(outbound_link);
-		//	feature_accessor(turn_movement_type);
-		//	feature_accessor(turn_movement_rule);
-		//	feature_accessor(turn_travel_penalty);
-		//	feature_accessor(forward_link_turn_travel_time);
-		//	feature_accessor(id);
-		//	feature_accessor(replicas_container);
-		//};
-
-		
-		//prototype struct ::Vehicle_Components::Prototypes::Vehicle_Prototype;
-		//prototype struct ::Scenario_Components::Prototypes::Scenario_Prototype;
-
-		//prototype struct Scenario_Prototype;
-		//prototype struct ::Intersection_Components::Prototypes::Intersection_Prototype;
-
 		prototype struct Link_Prototype
 		{
 			tag_as_prototype;
@@ -210,11 +190,6 @@ namespace Link_Components
 
 			feature_accessor(link_destination_vehicle_queue, none, none);
 
-			//feature TargetType pull_vehicle(call_requirements(requires_2(ComponentType,CallerType,Is_Same_Entity)))
-			//{
-			//	PTHIS(ComponentType)->template offer_vehicle<Dispatch<ComponentType>,TargetType>();
-			//}
-
 			feature_prototype void push_vehicle(TargetType vehicle, float a_delayed_time)
 			{
 				accept_vehicle<TargetType>(vehicle, a_delayed_time);
@@ -241,24 +216,9 @@ namespace Link_Components
 				
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-
-
-
-define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-
-
-//if (this->template uuid<int>() == 1 && current_time == 23796)
-//{
-//	cout << "here" << endl;
-//}
-
 				_Vehicle_Interface* vehicle=(_Vehicle_Interface*)veh;
 
 				vehicle->template transfer_to_next_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length,a_delayed_time);
-
-				//update outbound link state: A(a,0,t)
-				//link_upstream_cumulative_arrived_vehicles<int&>()++;
-				//link_upstream_arrived_vehicles<int&>()++;
 
 				if(this->template internal_id<int>()==(vehicle->template destination_link<_Link_Interface*>())->template internal_id<int>())
 				{
@@ -295,8 +255,7 @@ define_component_interface(_Scenario_Interface, get_type_of(scenario_reference),
 				//Newell's model
 				if(true)
 				{
-					//int outbound_turn_movement_size = outbound_turn_movement_size<int>();
-					
+		
 					//jam density * length * num_lanes = Kj(a,t)*L(a)*nlanes(a,t)
 					
 					float num_vehicles_under_jam_density_on_inbound_link = num_lanes<float>() * jam_density<float>() * length<float>()/5280.0;
@@ -332,21 +291,12 @@ define_component_interface(_Scenario_Interface, get_type_of(scenario_reference),
 					link_capacity<float>(current_link_capacity);
 				}
 
-
-				//PRINT("\t" << "link " << uuid<int>() << " has supply " << link_supply<float>());
 			}
 
 			feature_prototype void link_moving()
 			{
 				define_container_and_value_interface(_Vehicle_Queue_Interface, _Vehicle_Interface, get_type_of(current_vehicle_queue), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface, get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
-
-//if (this->template uuid<int>() == 7 && current_simulation_time == 23802)
-//{
-//	cout << "here" << endl;
-//}
 
 				_Intersection_Interface* intersection=downstream_intersection<_Intersection_Interface*>();
 
@@ -406,19 +356,12 @@ _Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 						vehicle=(_Vehicle_Interface*)link_origin_vehicle_array<_Vehicles_Origin_Container_Interface&>()[iv];
 						
 						int departure_interval=vehicle->template departed_simulation_interval_index<int>();
-						//if(vehicle->template departed_simulation_interval_index<int>() == current_time)
-						//{
-							//PRINT(iteration << ": loading traveler");
-							link_origin_vehicle_queue<_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
-							link_origin_arrived_vehicles<int&>()++;
-							link_origin_cumulative_arrived_vehicles<int&>()++;
-							//loaded_vehicles++;
-							scenario->template network_cumulative_loaded_vehicles<int&>()++;
-						//}
-						//else
-						//{
-						//	break;
-						//}
+
+						link_origin_vehicle_queue<_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
+						link_origin_arrived_vehicles<int&>()++;
+						link_origin_cumulative_arrived_vehicles<int&>()++;
+						scenario->template network_cumulative_loaded_vehicles<int&>()++;
+
 					}
 				}
 
@@ -458,36 +401,13 @@ _Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 
 							push_vehicle<_Vehicle_Interface*>(vehicle);
 
-							//update network state
-							//departed_vehicles++;
-							//in_network_vehicles++;
 							scenario->template network_cumulative_departed_vehicles<int&>()++;
 							scenario->template network_in_network_vehicles<int&>()++;
-							
-							// Bo added: the following logic already implemented in push_vehicle. Don't need to do here
 
-							//if(this==vehicle->template destination_link<Link_Interface*>())
-							//{
-							//	vehicle->template arrive_to_destination_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
-							//	
-							//	//update link state: N_destination(a,t)
-							//	link_destination_cumulative_arrived_vehicles<int&>()++;
-							//	link_destination_arrived_vehicles<int&>()++;
-							//	
-							//	//update network state:
-							//	//arrived_vehicles++;
-							//	//in_network_vehicles--;
-							//	scenario->template network_cumulative_arrived_vehicles<int&>()++;
-							//	scenario->template network_in_network_vehicles<int&>()--;
-							//}
 						}
 					}
 				}
 
-				//this->template network_cumulative_loaded_vehicles=loaded_vehicles;
-				//this->template network_cumulative_departed_vehicles=departed_vehicles;
-				//this->template network_in_network_vehicles=in_network_vehicles;
-				//this->template network_cumulative_arrived_vehicles=arrived_vehicles;
 			}
 
 			feature_prototype void network_state_update()
@@ -537,9 +457,6 @@ _Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-
-
-				//Vehicle_Interface* vehicle;
 
 				//calculate upstream cumulative vehicles using the three detector method
 				int t_minus_bwtt=-1;			
@@ -609,16 +526,7 @@ _Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 				}
 				
 				this->template link_num_vehicles_in_queue<int>(link_shifted_cumulative_arrived_vehicles - this->template link_downstream_cumulative_vehicles<int>());
-				
-				//network_reference<_Network_Interface*>()->template increment_link_finish_counter<NULLTYPE>();
 
-				//if (this->template uuid<int>() == 16 && scenario->template current_simulation_interval_index<int>()%1 == 0) // the last link visited for current iteration
-				//{
-				//	printf("time=%d", scenario->template current_simulation_interval_index<int>());
-				//	printf("loaded=%d, departed=%d, in_network=%d, arrived=%d",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_in_network_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>());
-				//	printf("\n"); 
-
-				//}
 			}
 
 			feature_accessor(link_simulation_status, none, none);
@@ -697,7 +605,6 @@ _Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 
 				double calculation_time_end = ::get_current_cpu_time_in_seconds();
 				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template operation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
-				//PRINT("\t\t" << "COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE");
 			}
 
 			declare_feature_event(Compute_Step_Flow_Link_Moving)
@@ -724,7 +631,6 @@ _Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 				double calculation_time_end = ::get_current_cpu_time_in_seconds();
 				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template operation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
 
-				//PRINT("\t\t" << "COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE");
 			}
 		};
 

@@ -77,11 +77,6 @@ namespace Operation_Components
 							phase->template red_start_time<int>(phase_data.red_start_time);
 							phase->template maximum_green_time<int>(phase_data.maximum_green_time);
 							phase->template minimum_green_time<int>(phase_data.minimum_green_time);
-if (control_plan_data.control_type == ACTUATED_SIGNAL_CONTROL)
-{
-	int iiiii = 1;
-}
-int gt_min = phase->template minimum_green_time<int>();
 							phase->template offset<int>(phase_data.offset);
 							phase->template green_time<int>(phase_data.green_time);
 							phase->template yellow_time<int>(phase_data.yellow_time);
@@ -171,9 +166,6 @@ int gt_min = phase->template minimum_green_time<int>();
 				using namespace odb;
 				using namespace pio;
 
-				//string name("C:\\Users\\hope\\Desktop\\POLARIS_v03\\Polaris_IO\\chicago.sqlite");
-				//string name("C:\\Users\\hope\\Desktop\\POLARIS_v03\\Polaris_IO\\TestNet50.sqlite");
-				//string name("C:\\Users\\bxu\\Desktop\\Good_copy_new_network_io-database - chicago\\Polaris_IO\\chicago.sqlite");
 				string name("chicago_with_demand_no_ref.sqlite");
 				auto_ptr<database> db (open_sqlite_database (name));
 				transaction t(db->begin());
@@ -199,17 +191,6 @@ int gt_min = phase->template minimum_green_time<int>();
 
 				int counter=0;
 
-
-				//dense_hash_set<int> bad_signals;
-				//bad_signals.set_deleted_key(-1);
-				//bad_signals.set_empty_key(-2);
-				
-				//result<Phasing> phasing_result=db->query<Phasing>(query<Phasing>::true_expr);
-
-				//for(result<Phasing>::iterator db_itr = phasing_result.begin(); db_itr != phasing_result.end();++db_itr)
-				//{
-				//	if(db_itr->getMovements()==0) bad_signals.insert(db_itr->getSignal()->getSignal());
-				//}
 				cout << "Reading Signals" << endl;
 
 				result<Signal> signal_result=db->query<Signal>(query<Signal>::true_expr);
@@ -218,14 +199,7 @@ int gt_min = phase->template minimum_green_time<int>();
 				{
 					if(db_itr->getSignal() > 5640) continue;
 
-					//if(bad_signals.count(db_itr->getSignal()))
-					//{
-					//	cout << db_itr->getSignal() << endl;
-					//	continue;
-					//}
-
 					_Intersection_Interface* intersection = (_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNodes()->getNode()];
-					//if (db_itr->getSignal() == 13994) continue;
 
 					if(++counter%1000==0) cout << "\t" << counter << endl;
 
@@ -295,12 +269,6 @@ int gt_min = phase->template minimum_green_time<int>();
 				{
 					if(db_itr->getSignal()->getSignal() > 5640) continue;
 
-					//if(bad_signals.count(db_itr->getSignal()->getSignal()))
-					//{
-					//	cout << db_itr->getSignal()->getSignal() << endl;
-					//	continue;
-					//}
-					
 					shared_ptr<Signal> signal=timing_result.begin ()->getSignal();
 
 					assert(net_io_maps.intersection_id_to_ptr.count(signal->getNodes()->getNode()));
@@ -379,11 +347,6 @@ int gt_min = phase->template minimum_green_time<int>();
 				{
 					if(db_itr->getSignal()->getSignal() > 5640) continue;
 
-					//if(bad_signals.count(db_itr->getSignal()->getSignal()))
-					//{
-					//	cout << db_itr->getSignal()->getSignal() << endl;
-					//	continue;
-					//}
 					shared_ptr<Signal> signal=db_itr->getSignal();
 
 					assert(net_io_maps.intersection_id_to_ptr.count(signal->getNodes()->getNode()));
@@ -668,20 +631,6 @@ int gt_min = phase->template minimum_green_time<int>();
 						}
 					}
 				}
-
-				//for(int m = 0; m < control_plan_data.num_approaches; m++)
-				//{
-				//	approach->template approach_index<int>(approach_data.approach_index);
-				//	approach->template approach_type<int>(approach_data.approach_type);
-				//}
-				//for (int n = 0; n < control_plan_data.num_major_approaches; n++)
-				//{
-				//	control_plan->template major_approach_data_array<_Approaches_Container_Interface&>().push_back(approach);
-				//}
-				//for (int o = 0; o < control_plan_data.num_minor_approaches; o++)
-				//{
-				//	control_plan->template minor_approach_data_array<_Approaches_Container_Interface&>().push_back(approach);
-				//}
 			}
 
 			feature_prototype void write_operation_data(network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::operation_data_information::OperationData& operation_data)

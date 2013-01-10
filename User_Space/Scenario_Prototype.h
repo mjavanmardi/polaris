@@ -217,7 +217,6 @@ namespace Scenario_Components
 				num_simulation_intervals<int>(scenario_data.num_simulation_intervals);
 				num_assignment_intervals<int>(scenario_data.num_assignment_intervals);
 				num_simulation_intervals_per_assignment_interval<int>(scenario_data.num_simulation_intervals_per_assignment_interval);
-int a = num_simulation_intervals_per_assignment_interval<int>();
 
 				current_simulation_interval_index<int>(scenario_data.current_simulation_interval_index);
 				current_assignment_interval_index<int>(scenario_data.current_assignment_interval_index);

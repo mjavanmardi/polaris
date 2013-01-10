@@ -639,10 +639,6 @@ namespace Intersection_Control_Components
 
 				int last_phase = num_phases - 1;
 				
-int ayt;
-int agt;
-int yt, gt;
-int agt_max, agt_min, gt_max, gt_min;
 				//calculate adjusted green and yellow times
 				for (int iphase=0;iphase<num_phases;iphase++)
 				{
@@ -677,15 +673,6 @@ int agt_max, agt_min, gt_max, gt_min;
 							(current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template yellow_time<int>() - 
 							current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template adjusted_yellow_time<int>()));
 					}
-					ayt = current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template adjusted_yellow_time<int>();
-					agt = current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template adjusted_green_time<int>();
-					yt = current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template yellow_time<int>();
-					gt = current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template green_time<int>();
-					agt_max = current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template adjusted_maximum_green_time<int>();
-					agt_min = current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template adjusted_minimum_green_time<int>();
-					gt_max = current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template maximum_green_time<int>();
-					gt_min = current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template minimum_green_time<int>();
-
 				}
 
 

@@ -150,9 +150,6 @@ namespace Demand_Components
 				using namespace odb;
 				using namespace pio;
 
-				//string name("C:\\Users\\hope\\Desktop\\POLARIS_v03\\Polaris_IO\\chicago_with_demand.sqlite");
-				//string name("C:\\Users\\bxu\\Desktop\\Good_copy_new_network_io-database\\Polaris_IO\\TestNet50.sqlite");
-				//string name("C:\\Users\\bxu\\Desktop\\Good_copy_new_network_io-database - chicago\\Polaris_IO\\chicago_with_demand.sqlite");
 				string name("chicago_with_demand_no_ref.sqlite");
 				auto_ptr<database> db (open_sqlite_database (name));
 
@@ -178,7 +175,6 @@ namespace Demand_Components
 
 				transaction t(db->begin());
 
-				//result<Location> location_result=db->query<Location>(query<Location>::true_expr);
 				result<TripNoRef> trip_result=db->query<TripNoRef>(query<TripNoRef>::true_expr);
 				
 				
@@ -208,7 +204,7 @@ namespace Demand_Components
 				cout << "Reading Travelers" << endl;
 
 
-int counter = -1;
+				int counter = -1;
 				int departed_time;
 				int skipped_counter=0;
 
@@ -221,10 +217,10 @@ int counter = -1;
 
 				for(result<TripNoRef>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
-if (++counter % 10000 == 0)
-{
-	cout << counter << " trips processed" << endl;
-}
+					if (++counter % 10000 == 0)
+					{
+						cout << counter << " trips processed" << endl;
+					}
 
 					departed_time = db_itr->getStart();
 
@@ -232,10 +228,6 @@ if (++counter % 10000 == 0)
 						continue;
 					}
 
-					//shared_ptr<Location> org=db_itr->getOrigin();				
-					//shared_ptr<Location> dst=db_itr->getDestination();
-					//if(org.get() && dst.get())
-					//{
 					int org_key=db_itr->getOrigin();
 
 					if(!activity_id_to_ptr.count(org_key))
@@ -258,35 +250,10 @@ if (++counter % 10000 == 0)
 						continue;
 					}
 
-
-
-
-					//dense_hash_map<int,_Activity_Location_Interface*>::const_iterator itr;
-					//itr = activity_id_to_ptr.find(org_key);
-					//if (itr == activity_id_to_ptr.end())
-					//{
-						// not such activity location
-						//continue;
-					//}
 					_Activity_Location_Interface* origin_activity_location = activity_id_to_ptr[org_key];
-					//itr = activity_id_to_ptr.find(dst_key);
-					//if (itr == activity_id_to_ptr.end())
-					//{
-						// not such activity location
-						//continue;
-					//}						
 					_Activity_Location_Interface* destination_activity_location = activity_id_to_ptr[dst_key];
-//cout << "k = " << db_itr->getPrimaryKey() << " a = " << db_itr->getAuto_id() << " m = " << db_itr->getMode() << " v = " << db_itr->getVehicle() << endl;
-					//_Activity_Location_Interface* origin_activity_location=(_Activity_Location_Interface*)activity_id_to_ptr[org_key];
-						
-					//_Activity_Location_Interface* destination_activity_location=(_Activity_Location_Interface*)activity_id_to_ptr[dst_key];
-//cout << "origin_acitivity_location internal id = " << origin_activity_location->internal_id<int>() << ", uuid = " << origin_activity_location->uuid<int>() << endl;
 					_Link_Interface* origin_link = origin_activity_location->origin_links<_Links_Container_Interface&>()[0];
 					_Link_Interface* destination_link = destination_activity_location->destination_links<_Links_Container_Interface&>()[0];
-					//if (origin_link == nullptr || destination_link == nullptr)
-					//{
-					//	continue;
-					//}
 					if (origin_link->internal_id<int>() == destination_link->internal_id<int>()  || (origin_link->outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
 					{
 						// No path can be found. Discard the trip
@@ -337,13 +304,6 @@ if (++counter % 10000 == 0)
 					vehicle->template origin_zone<_Zone_Interface*>(network->template zones_container<_Zones_Container_Interface&>()[0]);
 					vehicle->template destination_zone<_Zone_Interface*>(network->template zones_container<_Zones_Container_Interface&>()[0]);
 					vehicle->template departed_time<int>(departed_time);
-if (vehicle->internal_id<int>() == 23379)
-{
-cout << "trip primary key " << db_itr->getPrimaryKey() << endl;
-
-cout << "hello" << endl;
-}
-
 					traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
 					vehicle->template departed_simulation_interval_index<int>(departed_time);
 					vehicle->template departed_assignment_interval_index<int>(departed_time);
@@ -355,241 +315,9 @@ cout << "hello" << endl;
 						cout << "\t" << traveler_id_counter << endl;
 					}
 				}
-
-				//}
-
 			}
 
-#ifdef HARD_CODED_IO
-			feature_prototype void read_demand_data()
-			{
-				float freeway_demand_rate = 1800.0;
-				float ramp_demand_rate = 900.0;
-				
-				Uesr_Space::RngStream g1("Demand");
-				g1.SetSeed(1);
-				
-				//int vehilce_index = -1;
 
-				//sort demand by departed time
-				//demand_data.time_dependent_vehicle_index_array.resize(scenario_data.num_simulation_intervals*scenario_data.simulation_interval_length);
-
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
-				
-				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-
-				define_component_interface(_Vehicle_Interface, ComponentType::traveler_type::vehicle_type, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_component_interface(_Routing_Interface, ComponentType::traveler_type::router_type, Routing_Components::Prototypes::Routing_Prototype, ComponentType);
-				typedef Traveler_Components::Prototypes::Traveler_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
-
-				_Network_Interface* network=network_reference<_Network_Interface*>();
-				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
-
-
-				int traveler_id_counter=-1;
-
-				int num_intervals = scenario->template num_simulation_intervals<int>();
-
-				for(int simulation_interval_index=0;simulation_interval_index<scenario->template num_simulation_intervals<int>();simulation_interval_index++)
-				{// generate vehicles for each simulation interval
-
-					if(simulation_interval_index<=300)
-					{
-						freeway_demand_rate += 5.0;
-						ramp_demand_rate +=5.0;
-					}
-					else
-					{
-						freeway_demand_rate -= 5.0;
-						ramp_demand_rate -=5.0;
-					}
-
-					int freeway_origin_activity_location_index = 0;
-					_Activity_Location_Interface* freeway_origin_activity_location = (_Activity_Location_Interface*)(network->template activity_locations_container<_Activity_Locations_Container_Interface&>()[freeway_origin_activity_location_index]);
-					_Link_Interface* freeway_origin_link = (_Link_Interface*)freeway_origin_activity_location->template origin_links<_Links_Container_Interface&>()[0];
-					int num_lanes_freeway = freeway_origin_link->template num_lanes<int>();
-
-					int ramp_origin_activity_location_index = 2;
-					_Activity_Location_Interface* ramp_origin_activity_location = (_Activity_Location_Interface*)(network->template activity_locations_container<_Activity_Locations_Container_Interface&>()[ramp_origin_activity_location_index]);
-					_Link_Interface* ramp_origin_link = (_Link_Interface*)ramp_origin_activity_location->template origin_links<_Links_Container_Interface&>()[0];
-					int num_lanes_ramp = ramp_origin_link->template num_lanes<int>();
-					
-					float num_generated_vehicles_freeway = (float) ((1.0+num_lanes_freeway*scenario->template simulation_interval_length<int>() * freeway_demand_rate)/3600.0);
-					float num_generated_vehicles_ramp = (float) ((1.0+num_lanes_ramp*scenario->template simulation_interval_length<int>() * ramp_demand_rate)/3600.0);
-
-					int destination_activity_location_index = 1;
-					_Activity_Location_Interface* destination_activity_location = (_Activity_Location_Interface*)(network->template activity_locations_container<_Activity_Locations_Container_Interface&>()[destination_activity_location_index]);
-					_Link_Interface* destination_link = (_Link_Interface*)(destination_activity_location->template destination_links<_Links_Container_Interface&>()[0]);
-					
-					_Traveler_Interface* traveler;
-					_Vehicle_Interface* vehicle;
-					_Routing_Interface* router;
-
-					float vehicle_rate_per_simulation_interval;
-					int departed_time = -1;
-					_Link_Interface* origin_link;
-					_Activity_Location_Interface* origin_activity_location;
-					int assignment_interval_index;
-					assignment_interval_index = (int)((simulation_interval_index+1) * scenario->template simulation_interval_length<int>()) / scenario->template assignment_interval_length<int>();					
-					
-					vehicle_rate_per_simulation_interval = (float)(num_generated_vehicles_freeway / scenario->template simulation_interval_length<float>());
-					origin_link = freeway_origin_link;
-					origin_activity_location = (_Activity_Location_Interface*)network->template activity_locations_container<_Activity_Locations_Container_Interface&>()[freeway_origin_activity_location_index];
-
-
-					for (int i=0;i<scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();i++)
-					{
-						float cur_vehicle_rate_per_simulation_interval = vehicle_rate_per_simulation_interval;
-						while(cur_vehicle_rate_per_simulation_interval>0)
-						{
-							if (cur_vehicle_rate_per_simulation_interval>=1.0)
-							{
-								
-								traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
-								vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
-								router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
-								
-								traveler->template uuid<int>(++traveler_id_counter);
-								traveler->template router<_Routing_Interface*>(router);
-								traveler->template vehicle<_Vehicle_Interface*>(vehicle);
-								router->template traveler<_Traveler_Interface*>(traveler);
-								router->template network<_Network_Interface*>(network);
-
-								vehicle->template uuid<int>(traveler_id_counter);
-								vehicle->template origin_link<_Link_Interface*>(origin_link);
-								vehicle->template destination_link<_Link_Interface*>(destination_link);
-								vehicle->template origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
-								vehicle->template destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
-								//vehicle_data.set_seed(scenario_data.iseed);simulation_interval_index
-
-								
-
-								departed_time = simulation_interval_index * scenario->template simulation_interval_length<int>();
-								traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
-								vehicle->template departed_simulation_interval_index<int>(departed_time);
-								vehicle->template departed_assignment_interval_index<int>(departed_time);
-								//cout << endl<<traveler->template uuid<int>() <<"\t"<<departed_time;
-
-								cur_vehicle_rate_per_simulation_interval = (float) (cur_vehicle_rate_per_simulation_interval - 1.0);
-							}
-							else
-							{//monte carlo
-								double r1 = (double) g1.RandU01();
-								if (r1<=cur_vehicle_rate_per_simulation_interval)
-								{
-
-									traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
-									vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
-									router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
-									
-									traveler->template uuid<int>(++traveler_id_counter);
-									traveler->template router<_Routing_Interface*>(router);
-									traveler->template vehicle<_Vehicle_Interface*>(vehicle);
-									router->template traveler<_Traveler_Interface*>(traveler);
-									router->template network<_Network_Interface*>(network);
-
-									vehicle->template origin_link<_Link_Interface*>(origin_link);
-									vehicle->template destination_link<_Link_Interface*>(destination_link);
-									vehicle->template origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
-									vehicle->template destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
-									//vehicle_data.set_seed(scenario_data.iseed);
-									
-
-
-									departed_time = simulation_interval_index * scenario->template simulation_interval_length<int>();
-									traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
-									vehicle->template departed_assignment_interval_index<int>(departed_time);
-									vehicle->template departed_simulation_interval_index<int>(departed_time);
-									//cout << endl<<traveler->template uuid<int>() <<"\t"<<departed_time;
-								}
-
-								cur_vehicle_rate_per_simulation_interval = (float)(cur_vehicle_rate_per_simulation_interval - 1.0);
-							}
-						}
-					}
-
-
-
-
-					vehicle_rate_per_simulation_interval = (float)(num_generated_vehicles_ramp / scenario->template simulation_interval_length<float>());
-					origin_link = ramp_origin_link;
-					origin_activity_location = (_Activity_Location_Interface*)network->template activity_locations_container<_Activity_Locations_Container_Interface&>()[ramp_origin_activity_location_index];
-
-
-					for (int i=0;i<scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();i++)
-					{
-						float cur_vehicle_rate_per_simulation_interval = vehicle_rate_per_simulation_interval;
-						while(cur_vehicle_rate_per_simulation_interval>0)
-						{
-							if (cur_vehicle_rate_per_simulation_interval>=1.0)
-							{
-								traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
-								vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
-								router=(_Routing_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
-								
-								traveler->template uuid<int>(++traveler_id_counter);
-								traveler->template router<_Routing_Interface*>(router);
-								traveler->template vehicle<_Vehicle_Interface*>(vehicle);
-								router->template traveler<_Traveler_Interface*>(traveler);
-								router->template network<_Network_Interface*>(network);
-
-								vehicle->template origin_link<_Link_Interface*>(origin_link);
-								vehicle->template destination_link<_Link_Interface*>(destination_link);
-								vehicle->template origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
-								vehicle->template destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
-								//vehicle_data.set_seed(scenario_data.iseed);
-
-								
-
-								departed_time = simulation_interval_index * scenario->template simulation_interval_length<int>();
-								traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
-								vehicle->template departed_simulation_interval_index<int>(departed_time);
-								vehicle->template departed_assignment_interval_index<int>(departed_time);
-
-								cur_vehicle_rate_per_simulation_interval = (float) (cur_vehicle_rate_per_simulation_interval - 1.0);
-								//cout << endl<<"RAMP\t"<<traveler->template uuid<int>() <<"\t"<<departed_time;
-							}
-							else
-							{//monte carlo
-								double r1 = (double) g1.RandU01();
-								if (r1<=cur_vehicle_rate_per_simulation_interval)
-								{
-									traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
-									vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
-									router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
-									
-									traveler->template uuid<int>(++traveler_id_counter);
-									traveler->template router<_Routing_Interface*>(router);
-									traveler->template vehicle<_Vehicle_Interface*>(vehicle);
-									router->template traveler<_Traveler_Interface*>(traveler);
-									router->template network<_Network_Interface*>(network);
-
-									vehicle->template origin_link<_Link_Interface*>(origin_link);
-									vehicle->template destination_link<_Link_Interface*>(destination_link);
-									vehicle->template origin_activity_location<_Activity_Location_Interface*>(origin_activity_location);
-									vehicle->template destination_activity_location<_Activity_Location_Interface*>(destination_activity_location);
-									//vehicle_data.set_seed(scenario_data.iseed);
-
-									
-
-									departed_time = simulation_interval_index * scenario->template simulation_interval_length<int>();
-									traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
-									vehicle->template departed_simulation_interval_index<int>(departed_time);
-									vehicle->template departed_assignment_interval_index<int>(departed_time);
-									//cout << endl<<"RAMP\t"<<traveler->template uuid<int>() <<"\t"<<departed_time;
-								}
-
-								cur_vehicle_rate_per_simulation_interval = (float)(cur_vehicle_rate_per_simulation_interval - 1.0);
-							}
-						}
-					}
-				}
-				
-				//done with function
-			}
-#endif
 			feature_prototype void read_demand_data(requires(!check_2(TargetType,Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,Network_Components::Types::Hard_Coded_Network,is_same)))
 			{
 				assert_check_2(TargetType,Types::ODB_Network,is_same,"TargetType is ill-defined");
@@ -611,15 +339,6 @@ cout << "hello" << endl;
 				typedef Traveler_Components::Prototypes::Traveler_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, get_type_of(vehicles_container), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				
-				//if (scenario_data.demand_od_flag == 1)
-				//{
-				//	network_models::network_information::demand_data_information::read_demand_od("", scenario_data, demand_data, network_data);
-				//}
-				//else
-				//{
-				//	network_models::network_information::demand_data_information::read_demand_vehicle("", scenario_data, demand_data, network_data);
-				//}
-
 				this->first_vehicle_departure_time<int>(demand_data.first_vehicle_departure_time);
 				this->last_vehicle_departure_time<int>(demand_data.last_vehicle_departure_time);
 				int i;
@@ -649,9 +368,6 @@ cout << "hello" << endl;
 					vehicle->template destination_zone<_Zone_Interface*>(network_reference<_Network_Interface*>()->template zones_container<_Zones_Container_Interface&>().at(raw_vehicle.get_destination_zone_index()));
 
 					int departed_time = raw_vehicle.get_departure_time();
-//if (departed_time < 0) {
-//	cout << "here" << endl;
-//}
 					traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
 					vehicle->template departed_simulation_interval_index<int>(raw_vehicle.get_departure_simulation_interval_index());
 					vehicle->template departed_assignment_interval_index<int>(raw_vehicle.get_departure_assignment_interval_index());
@@ -660,22 +376,7 @@ cout << "hello" << endl;
 					vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 
 				}
-
-				int* toload = new int[scenario_data.planning_horizon];
 				
-				//for (i = 0; i < scenario_data.planning_horizon; i++) {
-				//	toload[i] = 0;
-				//	for (int j = 0; j < demand_data.demand_vehicle_size; j++)
-				//	{
-				//		_Vehicle_Interface* vehicle = vehicles.at(j);
-				//		if (vehicle->template departed_time<int>() == i)
-				//		{
-				//			toload[i]++;
-				//			cout << "to load " << vehicle->uuid<int>() << " at link " << vehicle->origin_link<_Link_Interface*>()->uuid<int>() << " at time " << i << endl;
-				//		}
-				//	}
-				//	//cout << "to load at " << i << " = " << toload[i] << endl;
-				//}
 			}
 
 			feature_prototype void read_demand_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data, network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::demand_data_information::DemandData& demand_data, requires(!check_2(TargetType,Network_Components::Types::File_Network,is_same)))
@@ -697,14 +398,14 @@ cout << "hello" << endl;
 				demand_data.first_vehicle_departure_time = this->first_vehicle_departure_time<int>();
 				demand_data.last_vehicle_departure_time = this->last_vehicle_departure_time<int>();
 				demand_data.time_dependent_vehicle_index_array.resize(scenario_reference<_Scenario_Interface*>()->template planning_horizon<int>());
-int counter = -1;
+				int counter = -1;
 
 				for (int i = 0; i < (int)vehicles_container<_Vehicles_Container_Interface&>().size(); i++) 
 				{
-if (++counter % 10000 == 0)
-{
-	cout << counter << " vehicles converted " << endl;
-}
+					if (++counter % 10000 == 0)
+					{
+						cout << counter << " vehicles converted " << endl;
+					}
 					_Vehicle_Interface* vehicle = vehicles_container<_Vehicles_Container_Interface&>()[i];
 					network_models::network_information::demand_data_information::VehicleData vehicle_data;
 					
