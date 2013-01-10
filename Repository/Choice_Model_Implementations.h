@@ -79,8 +79,8 @@ namespace Choice_Model_Components
 		implementation struct Utility_Choice_Model_Implementation : public Choice_Model_Implementation<MasterType>
 		{
 			// Define the type of choice to make
-			typedef true_type Probabilistic_Choice;
-			typedef true_type Utility_Based_Choice;
+			typedef true_type Probabilistic_Choice_tag;
+			typedef true_type Utility_Based_Choice_tag;
 
 			//==========================================================================================
 			/// Handler for a general Initializer dispatched from an Interface
@@ -103,7 +103,7 @@ namespace Choice_Model_Components
 		implementation struct MNL_Choice_Model_Implementation : public Utility_Choice_Model_Implementation<MasterType>
 		{
 			// Define the type of choice to make
-			typedef true_type MNL_Model;
+			typedef true_type MNL_Model_tag;
 		};
 	}
 

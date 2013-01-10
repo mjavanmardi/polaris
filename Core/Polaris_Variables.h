@@ -106,6 +106,15 @@ namespace Speed_Variables
 	polaris_variable(Kilometers_Per_Hour,rate_data_type, Speed_tag, Time_tag, Length_tag, Hours_tag, Kilometers_tag);
 }
 
+namespace Currency_Variables
+{
+	typedef double data_type;
+	polaris_variable(Cents,data_type, Currency_tag, Cents_tag);
+	polaris_variable(Dollars,data_type, Currency_tag, Dollars_tag);
+	polaris_variable(Thousand_Dollars,data_type, Currency_tag, Thousand_Dollars_tag);
+	polaris_variable(Million_Dollars,data_type,Currency_tag, Million_Dollars_tag);
+}
+
 }
 
 using namespace Basic_Units::Time_Variables;

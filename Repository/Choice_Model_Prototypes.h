@@ -1,5 +1,5 @@
 #pragma once
-#include "Repository_Base_Includes.h"
+#include "Repository_Includes.h"
 
 //==================================================================================================================
 /// EXAMPLE Component namespace -	used to organize similar high level transportation objects, i.e. Traveler, Vehicle,
@@ -27,15 +27,15 @@ namespace Choice_Model_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Types
 	{
-		typedef true_type Deterministic_Choice;
-		typedef true_type Probabilistic_Choice;
-		typedef true_type Utility_Based_Choice;
-		typedef true_type Rule_Based_Choice;
-		typedef true_type MNL_Model;
-		typedef true_type Mixed_Logit_Model;
-		typedef true_type Probit_Model;
-		typedef true_type Nested_Logit_Model;
-		typedef true_type Ordered_Logit_Model;
+		typedef true_type Deterministic_Choice_tag;
+		typedef true_type Probabilistic_Choice_tag;
+		typedef true_type Utility_Based_Choice_tag;
+		typedef true_type Rule_Based_Choice_tag;
+		typedef true_type MNL_Model_tag;
+		typedef true_type Mixed_Logit_Model_tag;
+		typedef true_type Probit_Model_tag;
+		typedef true_type Nested_Logit_Model_tag;
+		typedef true_type Ordered_Logit_Model_tag;
 	}
 
 
@@ -46,62 +46,39 @@ namespace Choice_Model_Components
 	namespace Concepts
 	{
 		/// EXAMPLE Concept: replace CONCEPT_NAME and CHECK below, and add/remove requirements as necessary
-		concept Choice_Is_Deterministic
+		concept struct Is_Choice_Model
 		{
-			begin_requirements_list(none);
-			requires_typename_state(none, Deterministic_Choice, true_type,"Choice selection specified is non-deterministic.");
-			end_requirements_list(Deterministic_Choice);
+			check_typename_state(Is_Deterministic, Deterministic_Choice_tag, true_type);
+			check_typename_state(Is_Probabilistic, Probabilistic_Choice_tag, true_type);
+			check_typename_state(Is_Rule_Based, Rule_Based_Choice_tag, true_type);
+			check_typename_state(Is_Utility_Based, Utility_Based_Choice_tag, true_type);
+			define_sub_check(Is_Utility_Based_Model, Is_Utility_Based && Is_Probabilistic);
+			define_sub_check(Is_Rule_Based_Model, Is_Rule_Based && (Is_Deterministic || Is_Probabilistic));
+			define_default_check(Is_Utility_Based_Model || Is_Rule_Based_Model)
 		};
-		concept Choice_Is_Probabilistic
+		concept struct Is_MNL_Model
 		{
-			begin_requirements_list(none);
-			requires_typename_state(none, Probabilistic_Choice, true_type,"Choice selection specified is non-probabilistic");
-			end_requirements_list(Probabilistic_Choice);
+			check_concept(Valid_Choice_Model, Is_Choice_Model);
+			check_typename_state(Is_MNL, MNL_Model_tag, true_type);
+			define_default_check(Is_MNL && Valid_Choice_Model);
 		};
-		concept Choice_Is_Utility_Based
+		concept struct Is_Mixed_Logit_Model
 		{
-			begin_requirements_list(none);
-			requires_typename_state(none, Utility_Based_Choice, true_type,"Choice selection specified is not utility based.");
-			end_requirements_list(Utility_Based_Choice);
+			check_concept(Valid_Choice_Model, Is_Choice_Model);
+			check_typename_state(Is_Mixed_Logit, Mixed_Logit_Model_tag, true_type);
+			define_default_check(Is_Mixed_Logit && Valid_Choice_Model);
 		};
-		concept Choice_Is_Rule_Based
+		concept struct Is_Probit_Model
 		{
-			begin_requirements_list(none);
-			requires_typename_state(none, Rule_Based_Choice, true_type,"Choice selection specified is non-probabilistic");
-			end_requirements_list(Rule_Based_Choice);
+			check_concept(Valid_Choice_Model, Is_Choice_Model);
+			check_typename_state(Is_Probit, Probit_Model_tag, true_type);
+			define_default_check(Is_Probit && Valid_Choice_Model);
 		};
-		concept Is_MNL_Model
+		concept struct Is_Nested_Logit_Model
 		{
-			begin_requirements_list(none);
-			requires_typename_state(none, MNL_Model, true_type,"Choice selection specified is not MNL_Model");
-			end_requirements_list(MNL_Model);
-		};
-		concept Is_Mixed_Logit_Model
-		{
-			begin_requirements_list(none);
-			requires_typename_state(none, Mixed_Logit_Model, true_type,"Choice selection specified is not Mixed_Logit_Model");
-			end_requirements_list(Mixed_Logit_Model);
-		};
-		concept Is_Probit_Model
-		{
-			begin_requirements_list(none);
-			requires_typename_state(none, Probit_Model, true_type,"Choice selection specified is not Probit_Model");
-			end_requirements_list(Probit_Model);
-		};
-		concept Is_Nested_Logit_Model
-		{
-			begin_requirements_list(none);
-			requires_typename_state(none, Nested_Logit_Model, true_type,"Choice selection specified is not Nested_Logit_Model");
-			end_requirements_list(Nested_Logit_Model);
-		};
-		concept Is_Random_Generator
-		{
-			begin_requirements_list(none);
-			requires_named_member(none, seed,"Type does not have 'seed' member");
-			requires_typename_defined(seed, result_type,"Type does not have 'result_type' defined");
-			requires_named_member(result_type, max,"Type does not have 'max' member");
-			requires_named_member(max, min,"Type does not have 'min' member");
-			end_requirements_list(min);
+			check_concept(Valid_Choice_Model, Is_Choice_Model);
+			check_typename_state(Is_Nested_Logit, Nested_Logit_Model_tag, true_type);
+			define_default_check(Is_Nested_Logit && Valid_Choice_Model);
 		};
 	}
 
@@ -113,30 +90,31 @@ namespace Choice_Model_Components
 	{
 		prototype struct Choice_Option_Prototype
 		{
-			tag_polaris_prototype;
+			tag_as_prototype;
 
 			/// INTERFACE FUNCTION EXAMPLE - this example dispatched the Initialize function call to the component base
 			feature void Initialize()
 			{
-				cast_self_to_component().Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}
 
-			feature void Evaluate_Probability(call_requirements(requires(ComponentType, Concepts::Choice_Is_Rule_Based)))
+			feature void Evaluate_Probability(requires(check(ComponentType, Concepts::Choice_Is_Rule_Based)))
 			{
 				// Dispatch to probability rules written in base
-				TargetType prob = cast_self_to_component().Evaluate_Probability<ComponentType,CallerType,TargetType>();
+				TargetType prob = this_component()->Evaluate_Probability<ComponentType,CallerType,TargetType>();
 				this->probability<TargetType>(prob);
 			}
 
 			feature void Evaluate_Utility(call_requirements(requires(ComponentType, Concepts::Choice_Is_Utility_Based)))
 			{
-				TargetType util = cast_self_to_component().Evaluate_Utility<ComponentType,CallerType,TargetType>();
+				TargetType util = this_component()->Evaluate_Utility<ComponentType,CallerType,TargetType>();
 				this->utility<TargetType>(util);
 			}
 			 
 			feature_accessor(choice_data_interface);
 
 			feature_accessor(utility);
+
 			feature_accessor(probability);
 		};
 
@@ -146,13 +124,13 @@ namespace Choice_Model_Components
 		//------------------------------------------------------------------------------------------------------------------
 		prototype struct Choice_Model_Prototype
 		{
-			tag_polaris_prototype;
-			define_container_and_value_interface_local(Polaris_Back_Insertion_Sequence_Prototype,choice_options,_choices_interface,Choice_Option_Prototype,_choice_interface,ComponentType);
+			tag_as_prototype;
+			define_container_and_value_interface(_choices_interface,_choice_interface,type_of(choice_options),Polaris_Back_Insertion_Sequence_Prototype,Choice_Option_Prototype,ComponentType);
 
 			/// BASIC INITIALIZER
 			feature void Initialize()
 			{
-				return cast_self_to_component().Initialize<ComponentType,CallerType,TargetType>();
+				return this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}
 
 			feature void Add_Choice_Option(TargetType new_choice_option_data, call_requires(strip_modifiers(TargetType), Is_Polaris_Component))
@@ -288,7 +266,6 @@ namespace Choice_Model_Components
 	namespace Data_Structures
 	{
 		typedef float Data_Type;
-		Basic_Data_Struct(Name, Data_Type, Type_Trait_1, Type_Trait_2, Type_Trait_3);
-		Basic_Data_Struct(Length_Measurement, float, length, feet);
+		polaris_variable(Name, Data_Type, Type_Trait_1, Type_Trait_2, Type_Trait_3);
 	}
 }

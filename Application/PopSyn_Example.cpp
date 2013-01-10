@@ -1,21 +1,31 @@
 
 #include "Application_Includes.h"
 
+concept struct Is_Agent
+{
+	check_method(Has_Initialize,Initialize,void(*)(char*));
+	define_default_check(Has_Initialize);
+};
+
 prototype struct Agent_Prototype : ComponentType
 {
 	declare_feature_conditional(Agent_Conditional)
 	{
-		response.next = Simulation_Time.Future_Time<Time_Hours>(2);
+		response.next = Simulation_Time.Future_Time<Time_Minutes>(5);
 		response.result = true;
 	}
 	declare_feature_event(Agent_Event)
 	{
 		cout << endl << "Current time in minutes: "<<Simulation_Time.Current_Time<Time_Minutes>();
 	}
-	feature_prototype void Initialize()
+	feature_prototype void Initialize(requires(check(ComponentType,Is_Agent)))
 	{
 		load_event(ComponentType,Agent_Conditional,Agent_Event,0,NULLTYPE);
 		this_component()->Initialize<ComponentType, CallerType, TargetType>();
+	}
+	feature_prototype void Initialize(requires(!check(ComponentType,Is_Agent)))
+	{
+		assert_check(ComponentType,Is_Agent,"This ComponentType is not a valid Agent.");
 	}
 	feature_accessor(My_Length,none,none);
 	feature_accessor(My_Area,none,none);
@@ -27,7 +37,7 @@ prototype struct Agent_Prototype : ComponentType
 
 implementation struct Agent_Impl
 {
-
+	double X;
 	feature_implementation void Initialize()
 	{	
 		this->Length<ComponentType, CallerType, Agent_Impl::Length_type*>(Allocate<Agent_Impl::Length_type>());
@@ -57,6 +67,8 @@ implementation struct Agent_Impl
 	member_component(typename MasterType::Agent_Income,Income,none,none);
 	member_component_feature(HH_Income, Income, Value, Basic_Units::Prototypes::Currency_Prototype);
 };
+
+implementation struct Derived_Agent : public Agent_Impl<MasterType>{};
 
 
 // notice how components are no longer doubly defined, they are defined once in MasterType now

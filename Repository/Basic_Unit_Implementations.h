@@ -96,6 +96,39 @@ namespace Basic_Units
 	template<typename ParentType> struct Length_In_Kilometers {typedef Polaris_Component<Basic_Units::Implementations::Kilometers_Implementation, NULLTYPE, Data_Object, ParentType> type;};
 	template<typename ParentType> struct Length_In_Miles {typedef Polaris_Component<Basic_Units::Implementations::Miles_Implementation, NULLTYPE, Data_Object, ParentType> type;};
 
+	template<typename ParentType> struct Area_In_Square_Meters {typedef Polaris_Component<Basic_Units::Implementations::Square_Meters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Area_In_Square_Feet {typedef Polaris_Component<Basic_Units::Implementations::Square_Feet_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Area_In_Square_Inches {typedef Polaris_Component<Basic_Units::Implementations::Square_Inches_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Area_In_Square_Centimeters {typedef Polaris_Component<Basic_Units::Implementations::Square_Centimeters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Area_In_Square_Kilometers {typedef Polaris_Component<Basic_Units::Implementations::Square_Kilometers_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Area_In_Square_Miles {typedef Polaris_Component<Basic_Units::Implementations::Square_Miles_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+
+	template<typename ParentType> struct Volume_In_Cubic_Meters {typedef Polaris_Component<Basic_Units::Implementations::Cubic_Meters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Volume_In_Cubic_Feet {typedef Polaris_Component<Basic_Units::Implementations::Cubic_Feet_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Volume_In_Cubic_Inches {typedef Polaris_Component<Basic_Units::Implementations::Cubic_Inches_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Volume_In_Cubic_Centimeters {typedef Polaris_Component<Basic_Units::Implementations::Cubic_Centimeters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Volume_In_Cubic_Kilometers {typedef Polaris_Component<Basic_Units::Implementations::Cubic_Kilometers_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Volume_In_Cubic_Miles {typedef Polaris_Component<Basic_Units::Implementations::Cubic_Miles_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+
+	template<typename ParentType> struct Time_In_DRSeconds {typedef Polaris_Component<Basic_Units::Implementations::DRSeconds_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Time_In_Seconds {typedef Polaris_Component<Basic_Units::Implementations::Seconds_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Time_In_Minutes {typedef Polaris_Component<Basic_Units::Implementations::Minutes_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Time_In_Hours {typedef Polaris_Component<Basic_Units::Implementations::Hours_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Time_In_Days {typedef Polaris_Component<Basic_Units::Implementations::Days_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+
+	template<typename ParentType> struct Speed_In_Meters_Per_Second {typedef Polaris_Component<Basic_Units::Implementations::Meters_Per_Second_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Feet_Per_Second {typedef Polaris_Component<Basic_Units::Implementations::Feet_Per_Second_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Kilometers_Per_Second {typedef Polaris_Component<Basic_Units::Implementations::Kilometers_Per_Second_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Miles_Per_Second {typedef Polaris_Component<Basic_Units::Implementations::Miles_Per_Second_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Meters_Per_Minute {typedef Polaris_Component<Basic_Units::Implementations::Meters_Per_Minute_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Feet_Per_Minute {typedef Polaris_Component<Basic_Units::Implementations::Feet_Per_Minute_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Kilometers_Per_Minute {typedef Polaris_Component<Basic_Units::Implementations::Kilometers_Per_Minute_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Miles_Per_Minute {typedef Polaris_Component<Basic_Units::Implementations::Miles_Per_Minute_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Meters_Per_Hour {typedef Polaris_Component<Basic_Units::Implementations::Meters_Per_Hour_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Feet_Per_Hour {typedef Polaris_Component<Basic_Units::Implementations::Feet_Per_Hour_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Kilometers_Per_Hour {typedef Polaris_Component<Basic_Units::Implementations::Kilometers_Per_Hour_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Speed_In_Miles_Per_Hour {typedef Polaris_Component<Basic_Units::Implementations::Miles_Per_Hour_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+
 }
 
 
