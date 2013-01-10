@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <random>
 #else
+#define nullptr NULL
 #include <time.h>
 #include <tr1/unordered_map>
 #include <string.h>
@@ -51,6 +52,7 @@ using namespace std;
 #define AtomicCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE) _InterlockedCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE)
 #else
 static const int inc_val=1;
+
 #define AtomicExchange(TARGET,VALUE) __sync_lock_test_and_set(TARGET,VALUE)
 #define AtomicIncrement(TARGET) (__sync_fetch_and_add(TARGET,inc_val)+inc_val)
 #define AtomicDecrement(TARGET) (__sync_fetch_and_sub(TARGET,inc_val)-inc_val)
@@ -64,7 +66,7 @@ static const int inc_val=1;
 #endif
 class NULLCLASS{};
 
-#define nullptr NULL
+
 
 typedef volatile long _lock;
 #define LOCK(LOCK_VARIABLE) while(AtomicExchange(&LOCK_VARIABLE,1)) SLEEP(0)
@@ -74,13 +76,11 @@ typedef volatile long _lock;
 #define not_available false
 
 struct NULLTYPE{};
+struct UNKNOWN{};
+class NC{};
 
 template<typename A> struct NULLTEMPLATE{};
 template<typename A,typename B> struct NULLTEMPLATE_2{};
-
-struct UNKNOWN{};
-
-class NC{};
 
 typedef char Page[_Page_Size];
 
@@ -146,6 +146,12 @@ static long& _sub_iteration=_revision._sub_iteration;
 static long& _iteration=_revision._iteration;
 
 typedef void (*Conditional)(void*,Conditional_Response&);
+
+static void False_Condition(void*,Conditional_Response& resp)
+{
+	resp.result=false;
+	resp.next=END;
+}
 
 #define typedef_template(TYPEDEF_NAME,TEMPLATE_NAME) template<typename T> struct TYPEDEF_NAME{typedef TEMPLATE_NAME<T> Type;}
 

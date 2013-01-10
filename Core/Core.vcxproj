@@ -112,6 +112,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AssemblerOutput>NoListing</AssemblerOutput>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

@@ -1,13 +1,13 @@
 #pragma once
 #include "World.h"
 
+
 template<typename DataType>
 DataType* Typed_Execution_Pages<DataType>::Allocate()
 {
 	if((world_ptr)->run) while(AtomicExchange(&mem_lock,1)) SLEEP(0); // lock the mem
-	
+
 	if( pages_with_free_cells.Empty() )
-	//if(pages_with_free_cells.size()==0)
 	{
 		//if(!type_activated && !world_ptr->run)
 		//{
@@ -25,28 +25,19 @@ DataType* Typed_Execution_Pages<DataType>::Allocate()
 		Typed_Execution_Page<DataType>* new_page=(Typed_Execution_Page<DataType>*)memory_root_ptr->Allocate();
 
 		new_page->Initialize();
-		
 		pages_with_free_cells.Push(new_page);
-		//pages_with_free_cells.push_back(new_page);
 	}
-	
+
 	if(pages_with_free_cells.First()->Empty())
-	//if(pages_with_free_cells.front()->Empty())
 	{
-		//active_pages.push_back(pages_with_free_cells.front());
-		//active_pages.push_back(pages_with_free_cells.First());
 		active_pages.Push(pages_with_free_cells.First());
 	}
 
 	Byte* return_value=(Byte*)(pages_with_free_cells.First()->Allocate());
-	//Byte* return_value=(Byte*)(pages_with_free_cells.front()->Allocate());
-	
+
 	if(pages_with_free_cells.First()->Full())
-	//if(pages_with_free_cells.front()->Full())
-	//if((Byte*)pages_with_free_cells.front()->first_free_cell == ((Byte*)pages_with_free_cells.front()+sizeof(Typed_Execution_Page<DataType>))+num_cells*stride)
 	{
 		pages_with_free_cells.Pop();
-		//pages_with_free_cells.pop_front();
 	}
 
 	new (return_value) DataType();
@@ -80,7 +71,6 @@ void Typed_Execution_Pages<DataType>::Free(DataType* _object)
 	if(notify_type)
 	{
 		pages_with_free_cells.Push(exe_page);
-		//pages_with_free_cells.push_back(exe_page);
 	}
 
 	mem_lock=0; // unlock the page

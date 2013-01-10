@@ -49,7 +49,6 @@ struct Execution_Object
 	//{
 	//	return Revision(allocator_template<ComponentType>::allocator_reference.tex_next_revision);
 	//}
-
 	
 	//inline long object_current_revision()
 	//{
@@ -96,7 +95,7 @@ struct Execution_Object
 
 	struct packed_iteration
 	{
-		inline int operator= (int value)
+		inline int operator=(int value)
 		{
 			_value=value;
 			return _value&0x7fffffff;
@@ -181,16 +180,19 @@ void Execution_Loop(void* page_in, Revision& ptex_response)
 		if( ((Execution_Object*)page)->next_iteration == this_iteration )
 		{
 			((Execution_Object*)page)->conditional_register(page,optex_response);
-			
+
 			((Execution_Object*)page)->next_iteration=optex_response.next;
 
 			if(optex_response.result) ((Execution_Object*)page)->event_register(page);
-			
+
 			((Execution_Object*)page)->current_revision=this_iteration;
 		}
 
-
-		if(((Execution_Object*)page)->next_iteration._value < ptex_response._iteration)
+		if(((Execution_Object*)page)->next_iteration._value >= ptex_response._iteration)
+		{
+			continue;
+		}
+		else
 		{
 			if(((Execution_Object*)page)->next_iteration._value >= 0)
 			{
@@ -202,5 +204,5 @@ void Execution_Loop(void* page_in, Revision& ptex_response)
 			}
 		}
 	}
-	while(++page<end_page);
+	while(++page < end_page);
 }

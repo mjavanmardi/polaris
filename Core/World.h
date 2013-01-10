@@ -69,7 +69,7 @@ public:
 
 			_sub_iteration=0;
 
-			if(_iteration>=_num_iterations)
+			if(_iteration == (_num_iterations-1))
 			{
 				AtomicDecrement(&run);
 

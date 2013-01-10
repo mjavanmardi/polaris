@@ -32,6 +32,8 @@ struct Typed_Execution_Page
 			current_cell->next_free_cell=(Execution_Object*)((Byte*)current_cell+stride);
 			current_cell->next_iteration=INT_MAX;
 			current_cell->current_revision=-1;
+			current_cell->event_register=nullptr;
+			current_cell->conditional_register=&False_Condition;
 			current_cell=(Execution_Object*)((Byte*)current_cell+stride);
 		}
 	}
@@ -139,7 +141,6 @@ public:
 		this_revision._sub_iteration = _sub_iteration;
 		this_revision._iteration = _iteration;
 
-		//typename list<Typed_Execution_Page<DataType>*>::iterator itr;
 		Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* itr=active_pages.Begin();
 
 		Byte* current_page;
@@ -147,12 +148,10 @@ public:
 		const int header_size=sizeof(Typed_Execution_Page<DataType>);
 		
 		Typed_Execution_Page<DataType>* execution_page;
-		
-		//for(itr=active_pages.begin();itr!=active_pages.end();++itr)
+
 		while(itr!=nullptr)
 		{
 			execution_page = itr->data;
-
 			long process = AtomicIncrement(&execution_page->ptex_threads_counter);
 
 			if(process == 1)
@@ -166,9 +165,9 @@ public:
 					ptex_response=execution_page->ptex_next_next_revision;
 					
 					current_page=((Byte*)execution_page)+header_size;
-					
+
 					(*process_directive)(current_page,ptex_response);
-					
+
 					// extend shorthand _iteration to include _sub_iteration
 					if(ptex_response._iteration == this_revision._iteration) ptex_response._sub_iteration=this_revision._sub_iteration+1;
 					else ptex_response._sub_iteration=0;
@@ -201,10 +200,7 @@ public:
 				// inform type that this page is no longer relevant for the execution
 				if(execution_page->Empty())
 				{
-					//list<Typed_Execution_Page<DataType>*>::iterator itr;
 					Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* fitr=active_pages.Begin();
-
-					//for(itr=active_pages.begin();itr!=active_pages.end();itr++)
 					while(fitr!=nullptr)
 					{
 						if(fitr->data==execution_page)
@@ -212,14 +208,12 @@ public:
 							active_pages.Erase(fitr);
 							break;
 						}
-
 						fitr=fitr->next_allocated_cell;
 					}
 				}
 
 				execution_page->ptex_threads_counter=0;
 			}
-
 			itr=itr->next_allocated_cell;
 		}
 	}
@@ -235,9 +229,8 @@ public:
 	void Free(DataType* object);
 
 	Quick_List<Typed_Execution_Page<DataType>*> active_pages;
-	
 	Quick_List<Typed_Execution_Page<DataType>*> pages_with_free_cells;
-	
+
 	volatile long tex_lock;
 
 	volatile long mem_lock;
