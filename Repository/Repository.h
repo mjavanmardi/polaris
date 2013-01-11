@@ -4,6 +4,7 @@
 #pragma warning(disable : 4482)
 #pragma warning(disable : 4305)
 #pragma warning(disable : 4503)
+#pragma warning(disable : 4800)
 
 
 #include "Repository_Includes.h"

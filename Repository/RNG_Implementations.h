@@ -16,7 +16,7 @@ namespace RNG_Components
 	{
 		implementation struct MT_Probability_Double
 		{
-			MT_Probability_Double<MasterType>()
+			MT_Probability_Double<MasterType,ParentType>()
 			{
 				_seed = time(NULL);
 				_generator.seed(_seed);
@@ -45,9 +45,9 @@ namespace RNG_Components
 			member_data(uniform_real<double>, distribution, none, none);
 		};
 
-		implementation struct MT_Uniform_Double : public MT_Probability_Double<MasterType>
+		implementation struct MT_Uniform_Double : public MT_Probability_Double<MasterType,ParentType>
 		{
-			MT_Uniform_Double<MasterType>() : MT_Probability_Double<MasterType>()
+			MT_Uniform_Double<MasterType,ParentType>() : MT_Probability_Double<MasterType,ParentType>()
 			{
 				_minimum = 0.0;
 				_maximum = 1.0;
@@ -77,9 +77,9 @@ namespace RNG_Components
 			member_data(double, minimum, none, none);
 		};
 
-		implementation struct MT_Normal_Double : public MT_Uniform_Double<MasterType>
+		implementation struct MT_Normal_Double : public MT_Uniform_Double<MasterType,ParentType>
 		{
-			MT_Normal_Double<MasterType>() : MT_Uniform_Double<MasterType>()
+			MT_Normal_Double<MasterType,ParentType>() : MT_Uniform_Double<MasterType,ParentType>()
 			{
 				_location = 0.0;
 				_scale = 1.0;
@@ -120,7 +120,7 @@ namespace RNG_Components
 
 		implementation struct RngStream_Implementation
 		{
-			RngStream_Implementation<MasterType>()
+			RngStream_Implementation<MasterType,ParentType>()
 			{
 				_seed = time(NULL);
 				_distribution.SetSeed(_seed);

@@ -755,32 +755,32 @@ namespace Basic_Units
 			tag_as_prototype;
 
 			define_get_set_exists_check(Value, Get_Value_exists, Set_Value_exists);
-			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Length_Value)))
+			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Currency_Value)))
 			{
 				return ReturnValueType(this_component()->Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
 			}
-			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Length_Value)))
+			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Currency_Value)))
 			{
 				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
 				assert_check(ReturnValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
 			}
-			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Length_Value)))
+			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Currency_Value)))
 			{
 				this_component()->Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
 			}
-			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Length_Value)))
+			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Currency_Value)))
 			{
-				assert_requirements(ComponentType,set_exists_check(Value), "Setter does not exists for this accessor.");
-				assert_requirements(SetValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
+				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
+				assert_check(SetValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
 			}
 
-			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(typename TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Length_Value) && check(typename TargetType::ReturnType,Concepts::Is_Length_Value)))
+			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(typename TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Currency_Value) && check(typename TargetType::ReturnType,Concepts::Is_Currency_Value)))
 			{
 				Value_Type convert_component_value_to_param = Conversion_Factor<TargetType::ParamType>();
 				Value_Type convert_component_value_to_return = Conversion_Factor<TargetType::ReturnType>();
 				return TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
-			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(typename TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Length_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Length_Value)))
+			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(typename TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Currency_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Currency_Value)))
 			{
 				assert_check(TargetType,Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Length_Value, "TargetTyp::ReturnType is not a valid length value structure.");

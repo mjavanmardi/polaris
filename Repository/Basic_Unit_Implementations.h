@@ -9,12 +9,12 @@ namespace Basic_Units
 		/// Basic Length base clase.
 		#pragma region Lenth Implementations
 		implementation struct Measure_1D_Implementation {typedef true_type Length_tag; member_data(Value_Type,Value,none,none);};
-		implementation struct Inches_Implementation : Measure_1D_Implementation<MasterType>		{typedef true_type Inches_tag;};
-		implementation struct Feet_Implementation : Measure_1D_Implementation<MasterType>		{typedef true_type Feet_tag;};
-		implementation struct Miles_Implementation  : Measure_1D_Implementation<MasterType>		{typedef true_type Miles_tag;};
-		implementation struct Centimeters_Implementation : Measure_1D_Implementation<MasterType>{typedef true_type Centimeters_tag;};
-		implementation struct Meters_Implementation : Measure_1D_Implementation<MasterType>		{typedef true_type Meters_tag;};
-		implementation struct Kilometers_Implementation : Measure_1D_Implementation<MasterType>	{typedef true_type Kilometers_tag;};
+		implementation struct Inches_Implementation : Measure_1D_Implementation<MasterType>, public Polaris_Component_Class<Inches_Implementation,MasterType,Data_Object,ParentType>			{typedef true_type Inches_tag;};
+		implementation struct Feet_Implementation : Measure_1D_Implementation<MasterType>, public Polaris_Component_Class<Feet_Implementation,MasterType,Data_Object,ParentType>				{typedef true_type Feet_tag;};
+		implementation struct Miles_Implementation  : Measure_1D_Implementation<MasterType>, public Polaris_Component_Class<Miles_Implementation,MasterType,Data_Object,ParentType>				{typedef true_type Miles_tag;};
+		implementation struct Centimeters_Implementation : Measure_1D_Implementation<MasterType>, public Polaris_Component_Class<Centimeters_Implementation,MasterType,Data_Object,ParentType>	{typedef true_type Centimeters_tag;};
+		implementation struct Meters_Implementation : Measure_1D_Implementation<MasterType>, public Polaris_Component_Class<Meters_Implementation,MasterType,Data_Object,ParentType>			{typedef true_type Meters_tag;};
+		implementation struct Kilometers_Implementation : Measure_1D_Implementation<MasterType>, public Polaris_Component_Class<Kilometers_Implementation,MasterType,Data_Object,ParentType>	{typedef true_type Kilometers_tag;};
 		#pragma endregion
 
 		//================================================================================================
@@ -89,12 +89,12 @@ namespace Basic_Units
 	}
 
 
-	template<typename ParentType> struct Length_In_Meters {typedef Polaris_Component<Basic_Units::Implementations::Meters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
-	template<typename ParentType> struct Length_In_Feet {typedef Polaris_Component<Basic_Units::Implementations::Feet_Implementation, NULLTYPE, Data_Object, ParentType> type;};
-	template<typename ParentType> struct Length_In_Inches {typedef Polaris_Component<Basic_Units::Implementations::Inches_Implementation, NULLTYPE, Data_Object, ParentType> type;};
-	template<typename ParentType> struct Length_In_Centimeters {typedef Polaris_Component<Basic_Units::Implementations::Centimeters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
-	template<typename ParentType> struct Length_In_Kilometers {typedef Polaris_Component<Basic_Units::Implementations::Kilometers_Implementation, NULLTYPE, Data_Object, ParentType> type;};
-	template<typename ParentType> struct Length_In_Miles {typedef Polaris_Component<Basic_Units::Implementations::Miles_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	//template<typename ParentType> struct Length_In_Meters {typedef Polaris_Component<Basic_Units::Implementations::Meters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	//template<typename ParentType> struct Length_In_Feet {typedef Polaris_Component<Basic_Units::Implementations::Feet_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	//template<typename ParentType> struct Length_In_Inches {typedef Polaris_Component<Basic_Units::Implementations::Inches_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	//template<typename ParentType> struct Length_In_Centimeters {typedef Polaris_Component<Basic_Units::Implementations::Centimeters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	//template<typename ParentType> struct Length_In_Kilometers {typedef Polaris_Component<Basic_Units::Implementations::Kilometers_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	//template<typename ParentType> struct Length_In_Miles {typedef Polaris_Component<Basic_Units::Implementations::Miles_Implementation, NULLTYPE, Data_Object, ParentType> type;};
 
 	template<typename ParentType> struct Area_In_Square_Meters {typedef Polaris_Component<Basic_Units::Implementations::Square_Meters_Implementation, NULLTYPE, Data_Object, ParentType> type;};
 	template<typename ParentType> struct Area_In_Square_Feet {typedef Polaris_Component<Basic_Units::Implementations::Square_Feet_Implementation, NULLTYPE, Data_Object, ParentType> type;};
@@ -128,6 +128,11 @@ namespace Basic_Units
 	template<typename ParentType> struct Speed_In_Feet_Per_Hour {typedef Polaris_Component<Basic_Units::Implementations::Feet_Per_Hour_Implementation, NULLTYPE, Data_Object, ParentType> type;};
 	template<typename ParentType> struct Speed_In_Kilometers_Per_Hour {typedef Polaris_Component<Basic_Units::Implementations::Kilometers_Per_Hour_Implementation, NULLTYPE, Data_Object, ParentType> type;};
 	template<typename ParentType> struct Speed_In_Miles_Per_Hour {typedef Polaris_Component<Basic_Units::Implementations::Miles_Per_Hour_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+
+	template<typename ParentType> struct Currency_In_Cents {typedef Polaris_Component<Basic_Units::Implementations::Cents_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Currency_In_Dollars {typedef Polaris_Component<Basic_Units::Implementations::Dollars_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Currency_In_Thousand_Dollars {typedef Polaris_Component<Basic_Units::Implementations::Thousand_Dollars_Implementation, NULLTYPE, Data_Object, ParentType> type;};
+	template<typename ParentType> struct Currency_In_Million_Dollars {typedef Polaris_Component<Basic_Units::Implementations::Million_Dollars_Implementation, NULLTYPE, Data_Object, ParentType> type;};
 
 }
 
