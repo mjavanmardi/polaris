@@ -3,11 +3,11 @@
 
 
 template<typename ComponentType>
-void Execution_Object::Load_Register(Conditional conditional,Event p_event,int start)	
+void Execution_Object::Load_Register(Conditional conditional,Event p_event,int start_iteration,int start_sub_iteration)	
 {
 	Revision starting_iteration;
-	starting_iteration._iteration=start;
-	starting_iteration._sub_iteration=0;
+	starting_iteration._iteration=start_iteration;
+	starting_iteration._sub_iteration=start_sub_iteration;
 	
 	if(world_ptr->run)
 	{

@@ -66,7 +66,8 @@ struct Typed_Execution_Page
 			current_cell->next_free_cell=cell;
 		}
 
-		cell->next_iteration.set_free();
+		//TODO
+		//cell->next_iteration.set_free();
 	}
 	
 	bool Empty()

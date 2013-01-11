@@ -173,7 +173,7 @@ typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE
 ///============================================================================
 
 template<template<class> class ImplementationTemplate=NULLTEMPLATE,typename MasterType=NULLTYPE,typename ObjectType=Data_Object,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE>
-class Polaris_Component_Class:public ImplementationTemplate<MasterType>
+class Polaris_Component_Class
 {
 public:
 #if STATE_CHECKS
@@ -311,8 +311,8 @@ typename Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NU
 /// basic load macro
 ///============================================================================
 
-#define load_event(COMPONENT_TYPE,LOCAL_CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,TARGET_TYPE) \
-       ((COMPONENT_TYPE*)this)->template Load_Register<COMPONENT_TYPE>((&LOCAL_CONDITIONAL_FUNCTION<NULLTYPE>),(&LOCAL_EVENT_FUNCTION<TARGET_TYPE>),FIRST_ITERATION)
+#define load_event(COMPONENT_TYPE,LOCAL_CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,FIRST_SUB_ITERATION,TARGET_TYPE) \
+       ((COMPONENT_TYPE*)this)->template Load_Register<COMPONENT_TYPE>((&LOCAL_CONDITIONAL_FUNCTION<NULLTYPE>),(&LOCAL_EVENT_FUNCTION<TARGET_TYPE>),FIRST_ITERATION,FIRST_SUB_ITERATION)
 
 #define load_communication_handler(COMPONENT_TYPE,HANDLER_FUNCTION,TARGET_TYPE) \
        ((COMPONENT_TYPE*)this)->template Load_Register<COMPONENT_TYPE>((&HANDLER_FUNCTION<TARGET_TYPE>))
