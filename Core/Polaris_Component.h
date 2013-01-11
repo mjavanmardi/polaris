@@ -34,17 +34,17 @@ struct ObjectToSingleton<Communication_Object,ComponentType>
 /// Polaris_Component - adds implementation, with parent
 ///============================================================================
 
-template<template<class> class ImplementationTemplate=NULLTEMPLATE,typename MasterType=NULLTYPE,typename ObjectType=Data_Object,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE>
+template<template<class,class> class ImplementationTemplate=NULLTEMPLATE_2,typename MasterType=NULLTYPE,typename ObjectType=Data_Object,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE>
 class Polaris_Component:
-	public Polaris_Component<NULLTEMPLATE,NULLTYPE,ObjectType,ParentType,NULLTYPE>,
-	public ImplementationTemplate<MasterType>
+	public Polaris_Component<NULLTEMPLATE_2,NULLTYPE,ObjectType,ParentType,NULLTYPE>,
+	public ImplementationTemplate<MasterType,ParentType>
 {
 public:
 #if STATE_CHECKS
 	virtual void State_Check(){};
 #endif
 #ifdef WINDOWS
-	friend ImplementationTemplate<MasterType>;
+	friend ImplementationTemplate<MasterType,ParentType>;
 #else
 	friend class ImplementationTemplate<MasterType>;
 #endif
@@ -70,17 +70,17 @@ public:
 /// Polaris_Component - adds implementation, no parent
 ///============================================================================
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
 class Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>:
 	public ObjectType,
-	public ImplementationTemplate<MasterType>
+	public ImplementationTemplate<MasterType,NULLTYPE>
 {
 public:
 #if STATE_CHECKS
 	virtual void State_Check(){};
 #endif
 #ifdef WINDOWS
-	friend ImplementationTemplate<MasterType>;
+	friend ImplementationTemplate<MasterType,NULLTYPE>;
 #else
 	friend class ImplementationTemplate<MasterType>;
 #endif
@@ -112,7 +112,7 @@ public:
 ///============================================================================
 
 template<typename ParentType,typename ObjectType>
-class Polaris_Component<NULLTEMPLATE,NULLTYPE,ObjectType,ParentType,NULLTYPE>:
+class Polaris_Component<NULLTEMPLATE_2,NULLTYPE,ObjectType,ParentType,NULLTYPE>:
 	public ObjectType
 {
 public:
@@ -134,26 +134,26 @@ public:
 /// Polaris_Component type tracking information
 ///============================================================================
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
 const int Polaris_Component<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::component_index=_component_counter++;
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
 vector<void*>* const Polaris_Component<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::all_components_reference=&_all_components;
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
 typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::Singleton_Type* const 
 	Polaris_Component<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::singleton_reference
 	= Add_Component_Singleton<typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::Singleton_Type>
 	(new Polaris_Component<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::Singleton_Type());
 	
 	
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
 const int Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::component_index=_component_counter++;
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
 vector<void*>* const Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::all_components_reference=&_all_components;
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
 typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::Singleton_Type* const 
 	Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::singleton_reference
 	= Add_Component_Singleton<typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::Singleton_Type>
@@ -172,7 +172,7 @@ typename Polaris_Component<ImplementationTemplate,MasterType,ObjectType,NULLTYPE
 /// Polaris_Component_Class - adds implementation, with parent
 ///============================================================================
 
-template<template<class> class ImplementationTemplate=NULLTEMPLATE,typename MasterType=NULLTYPE,typename ObjectType=Data_Object,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE>
+template<template<class,class> class ImplementationTemplate=NULLTEMPLATE_2,typename MasterType=NULLTYPE,typename ObjectType=Data_Object,typename ParentType=NULLTYPE,typename GroupList=NULLTYPE>
 class Polaris_Component_Class
 {
 public:
@@ -181,15 +181,15 @@ public:
 #endif
 
 	static const int component_index;
-	typedef typename ObjectToSingleton<ObjectType,ImplementationTemplate<MasterType>>::type Singleton_Type;
+	typedef typename ObjectToSingleton<ObjectType,ImplementationTemplate<MasterType,ParentType>>::type Singleton_Type;
 	static Singleton_Type* const singleton_reference;
 	static vector<void*>* const all_components_reference;
 	
-	typedef ImplementationTemplate<MasterType> This_Type;
-	typedef ImplementationTemplate<MasterType> Component_Type;
-	typedef ImplementationTemplate<MasterType> ComponentType;
+	typedef ImplementationTemplate<MasterType,ParentType> This_Type;
+	typedef ImplementationTemplate<MasterType,ParentType> Component_Type;
+	typedef ImplementationTemplate<MasterType,ParentType> ComponentType;
 
-	typedef ImplementationTemplate<MasterType> Implementation_Type;
+	typedef ImplementationTemplate<MasterType,ParentType> Implementation_Type;
 	typedef ObjectType Object_Type;
 	typedef MasterType Master_Type;
 
@@ -204,7 +204,7 @@ public:
 /// Polaris_Component_Class - adds implementation, no parent
 ///============================================================================
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
 class Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>:public ObjectType
 {
 public:
@@ -213,15 +213,15 @@ public:
 #endif
 
 	static const int component_index;
-	typedef typename ObjectToSingleton<ObjectType,ImplementationTemplate<MasterType>>::type Singleton_Type;
+	typedef typename ObjectToSingleton<ObjectType,ImplementationTemplate<MasterType,NULLTYPE>>::type Singleton_Type;
 	static Singleton_Type* const singleton_reference;
 	static vector<void*>* const all_components_reference;
 
-	typedef ImplementationTemplate<MasterType> This_Type;
-	typedef ImplementationTemplate<MasterType> Component_Type;
-	typedef ImplementationTemplate<MasterType> ComponentType;
+	typedef ImplementationTemplate<MasterType,NULLTYPE> This_Type;
+	typedef ImplementationTemplate<MasterType,NULLTYPE> Component_Type;
+	typedef ImplementationTemplate<MasterType,NULLTYPE> ComponentType;
 
-	typedef ImplementationTemplate<MasterType> Implementation_Type;
+	typedef ImplementationTemplate<MasterType,NULLTYPE> Implementation_Type;
 	typedef ObjectType Object_Type;
 	typedef MasterType Master_Type;
 	
@@ -234,7 +234,7 @@ public:
 		return nullptr;
 	}
 
-	typedef ImplementationTemplate<MasterType> Entity_Type;
+	typedef ImplementationTemplate<MasterType,NULLTYPE> Entity_Type;
 };
 
 ///============================================================================
@@ -242,7 +242,7 @@ public:
 ///============================================================================
 
 template<typename ParentType,typename ObjectType>
-class Polaris_Component_Class<NULLTEMPLATE,NULLTYPE,ObjectType,ParentType,NULLTYPE>:public ObjectType
+class Polaris_Component_Class<NULLTEMPLATE_2,NULLTYPE,ObjectType,ParentType,NULLTYPE>:public ObjectType
 {
 public:
 	ParentType* Parent()
@@ -263,26 +263,26 @@ public:
 /// Polaris_Component_Class type tracking information
 ///============================================================================
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
 const int Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::component_index=_component_counter++;
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
 vector<void*>* const Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::all_components_reference=&_all_components;
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,typename GroupList>
 typename Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::Singleton_Type* const 
 	Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::singleton_reference
 	= Add_Component_Singleton<typename Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::Singleton_Type>
 	(new Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,ParentType,GroupList>::Singleton_Type());
 	
 	
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
 const int Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::component_index=_component_counter++;
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
 vector<void*>* const Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::all_components_reference=&_all_components;
 
-template<template<class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
+template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename GroupList>
 typename Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::Singleton_Type* const 
 	Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::singleton_reference
 	= Add_Component_Singleton<typename Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,GroupList>::Singleton_Type>
@@ -311,8 +311,8 @@ typename Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NU
 /// basic load macro
 ///============================================================================
 
-#define load_event(COMPONENT_TYPE,LOCAL_CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION,FIRST_SUB_ITERATION,TARGET_TYPE) \
-       ((COMPONENT_TYPE*)this)->template Load_Register<COMPONENT_TYPE>((&LOCAL_CONDITIONAL_FUNCTION<NULLTYPE>),(&LOCAL_EVENT_FUNCTION<TARGET_TYPE>),FIRST_ITERATION,FIRST_SUB_ITERATION)
+#define load_event(COMPONENT_TYPE,LOCAL_CONDITIONAL_FUNCTION,LOCAL_EVENT_FUNCTION,FIRST_ITERATION, FIRST_SUB_ITERATION,TARGET_TYPE) \
+       ((COMPONENT_TYPE*)this)->template Load_Register<COMPONENT_TYPE>((&LOCAL_CONDITIONAL_FUNCTION<NULLTYPE>),(&LOCAL_EVENT_FUNCTION<TARGET_TYPE>),FIRST_ITERATION, FIRST_SUB_ITERATION)
 
 #define load_communication_handler(COMPONENT_TYPE,HANDLER_FUNCTION,TARGET_TYPE) \
        ((COMPONENT_TYPE*)this)->template Load_Register<COMPONENT_TYPE>((&HANDLER_FUNCTION<TARGET_TYPE>))
