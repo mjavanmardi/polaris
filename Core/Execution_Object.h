@@ -27,15 +27,15 @@ struct Execution_Object
 	permit_state_checking;
 
 	
-	inline long object_current_revision()
-	{
-		return current_revision;
-	}
+	//inline long object_current_revision()
+	//{
+	//	return current_revision;
+	//}
 
-	inline long object_next_check()
-	{
-		return next_iteration;
-	}
+	//inline long object_next_check()
+	//{
+	//	return next_iteration;
+	//}
 	
 
 	//template<typename ComponentType>
@@ -93,58 +93,84 @@ struct Execution_Object
 	/// packed_iteration - strips out 4th bit for internal purposes
 	///============================================================================
 
-	struct packed_iteration
-	{
-		inline int operator=(int value)
-		{
-			_value=value;
-			return _value&0x7fffffff;
-		}
+	//struct packed_iteration
+	//{
+	//	inline int operator=(int value)
+	//	{
+	//		_value=value;
+	//		return _value&0x7fffffff;
+	//	}
 
-		inline bool operator==(int value)
-		{
-			return (_value&0x7fffffff)==value;
-		}
+	//	inline bool operator==(int value)
+	//	{
+	//		return (_value&0x7fffffff)==value;
+	//	}
 
-		inline bool operator<(int value)
-		{
-			return (_value&0x7fffffff)<value;
-		}
+	//	inline bool operator<(int value)
+	//	{
+	//		return (_value&0x7fffffff)<value;
+	//	}
 
-		inline bool operator<=(int value)
-		{
-			return (_value&0x7fffffff)<=value;
-		}
+	//	inline bool operator<=(int value)
+	//	{
+	//		return (_value&0x7fffffff)<=value;
+	//	}
 
-		inline bool operator>=(int value)
-		{
-			return (_value&0x7fffffff)>=value;
-		}
+	//	inline bool operator>=(int value)
+	//	{
+	//		return (_value&0x7fffffff)>=value;
+	//	}
 
-		inline bool operator>(int value)
-		{
-			return (_value&0x7fffffff)>value;
-		}
+	//	inline bool operator>(int value)
+	//	{
+	//		return (_value&0x7fffffff)>value;
+	//	}
 
-		inline operator int()
-		{
-			return (_value&0x7fffffff);
-		}
+	//	inline operator int()
+	//	{
+	//		return (_value&0x7fffffff);
+	//	}
 
-		inline void queue_free()
-		{
-			_value=0x80000000;
-		}
-		
-		inline void set_free()
-		{
-			_value=0x7fffffff;
-		}
+	//	inline void queue_free()
+	//	{
+	//		_value=0x80000000;
+	//	}
+	//	
+	//	inline void set_free()
+	//	{
+	//		_value=0x7fffffff;
+	//	}
 
-		int _value;
-	} next_iteration;
+	//	int _value;
+	//} next_iteration;
 
-	int current_revision;
+	//union Packed_Revision
+	//{
+	//	Packed_Revision():_revision(0){};
+	//	Packed_Revision(int sub_revision,int revision):_sub_iteration(sub_revision){_iteration=revision;};
+	//	Packed_Revision(Packed_Revision& copy):_revision(copy._revision){};
+
+	//	inline void operator = (const long long val){_revision=val;}
+	//	inline operator long long&(){return _revision;}
+	//#ifdef WINDOWS
+	//	struct
+	//	{
+	//		int _sub_iteration;
+	//		packed_iteration _iteration;
+	//	};
+	//#else
+	//	struct
+	//	{
+	//		packed_iteration _iteration;
+	//		int _sub_iteration;
+	//	};
+	//#endif
+	//	long long _revision;
+	//} next_iteration;
+
+	Revision next_revision;
+
+	//int current_revision;
 	
 	union
 	{
@@ -167,7 +193,7 @@ void Execution_Loop(void* page_in, Revision& ptex_response)
 	
 	const Bytes<stride>* const __restrict end_page=page+iterations;
 	
-	const int this_iteration=_iteration;
+	const Revision this_revision=_revision;
 	
 	Conditional_Response optex_response;
 	
@@ -177,26 +203,24 @@ void Execution_Loop(void* page_in, Revision& ptex_response)
 		//response.next=INT_MAX;
 		//response.result=false;
 
-		if( ((Execution_Object*)page)->next_iteration == this_iteration )
+		if( ((Execution_Object*)page)->next_revision._revision == this_revision._revision )
 		{
 			((Execution_Object*)page)->conditional_register(page,optex_response);
 
-			((Execution_Object*)page)->next_iteration=optex_response.next;
+			((Execution_Object*)page)->next_revision=optex_response.next;
 
 			if(optex_response.result) ((Execution_Object*)page)->event_register(page);
-
-			((Execution_Object*)page)->current_revision=this_iteration;
 		}
 
-		if(((Execution_Object*)page)->next_iteration._value >= ptex_response._iteration)
+		if(((Execution_Object*)page)->next_revision >= ptex_response)
 		{
 			continue;
 		}
 		else
 		{
-			if(((Execution_Object*)page)->next_iteration._value >= 0)
+			if(((Execution_Object*)page)->next_revision >= 0)
 			{
-				ptex_response._iteration=((Execution_Object*)page)->next_iteration;
+				ptex_response=((Execution_Object*)page)->next_revision;
 			}
 			else
 			{

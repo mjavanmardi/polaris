@@ -108,13 +108,6 @@ static unsigned int sub_tick_tock=false;
 
 typedef void (*Event)(void*);
 
-struct Conditional_Response
-{
-	Conditional_Response():next(INT_MAX),result(false){};
-
-	int next;
-	bool result;
-};
 
 
 union Revision
@@ -144,6 +137,15 @@ union Revision
 static Revision _revision;
 static long& _sub_iteration=_revision._sub_iteration;
 static long& _iteration=_revision._iteration;
+
+
+struct Conditional_Response
+{
+	Conditional_Response():result(false){next._iteration=LONG_MAX;next._sub_iteration=0;};
+
+	Revision next;
+	bool result;
+};
 
 typedef void (*Conditional)(void*,Conditional_Response&);
 

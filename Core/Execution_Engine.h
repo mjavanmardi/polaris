@@ -41,9 +41,14 @@ public:
 		this_revision._sub_iteration = _sub_iteration;
 		this_revision._iteration = _iteration;
 
-		// you are guaranteed that EX::next_revision will not change until the final thread has finished this EX
+		Revision next_iteration;
+		next_iteration._sub_iteration = 0;
+		next_iteration._iteration = _iteration+1;
 
-		while(ex_next_revision == this_revision)
+		// you are guaranteed that EX::next_revision will not change until the final thread has finished this EX
+		// condition for success is whether the next_revision occurs before the start of the next full iteration
+
+		while(ex_next_revision >= this_revision && ex_next_revision < next_iteration)
 		{
 			Revision ex_response=ex_next_next_revision;
 
@@ -130,7 +135,8 @@ public:
 			this_revision._sub_iteration = _sub_iteration;
 			this_revision._iteration = _iteration;
 			
-			if(ex_next_revision == this_revision)
+			// condition for success is whether the next_revision occurs before the start of the next full iteration
+			if(ex_next_revision >= this_revision && ex_next_revision < next_iteration)
 			{
 				// if the _iteration will be repeated, make sure all threads are collected before starting the new loop
 				// this prevents threads from getting stuck in the previous AtomicCompareExchange

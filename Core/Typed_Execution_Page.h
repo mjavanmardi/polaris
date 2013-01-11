@@ -26,12 +26,11 @@ struct Typed_Execution_Page
 
 		const Execution_Object* end=(Execution_Object*)((Byte*)first_free_cell+num_cells*stride);
 
-		//for(int i=0;i<num_cells;i++)
 		while(current_cell!=end)
 		{
 			current_cell->next_free_cell=(Execution_Object*)((Byte*)current_cell+stride);
-			current_cell->next_iteration=INT_MAX;
-			current_cell->current_revision=-1;
+			current_cell->next_revision._iteration=LONG_MAX;
+			current_cell->next_revision._sub_iteration=0;
 			//current_cell->event_register=nullptr;//shared with first free list pointer, cannot initialize
 			current_cell->conditional_register=&False_Condition;
 			current_cell=(Execution_Object*)((Byte*)current_cell+stride);
@@ -125,15 +124,15 @@ public:
 		tex_threads_counter=0;
 	}
 	
-	inline long type_current_revision()
-	{
-		return tex_current_revision._iteration;
-	}
+	//inline long type_current_revision()
+	//{
+	//	return tex_current_revision._iteration;
+	//}
 
-	inline long type_next_check()
-	{
-		return tex_next_revision._iteration;
-	}
+	//inline long type_next_check()
+	//{
+	//	return tex_next_revision._iteration;
+	//}
 
 	void Process(Revision& tex_response)
 	{
@@ -169,8 +168,8 @@ public:
 					(*process_directive)(current_page,ptex_response);
 
 					// extend shorthand _iteration to include _sub_iteration
-					if(ptex_response._iteration == this_revision._iteration) ptex_response._sub_iteration=this_revision._sub_iteration+1;
-					else ptex_response._sub_iteration=0;
+					//if(ptex_response._iteration == this_revision._iteration) ptex_response._sub_iteration=this_revision._sub_iteration+1;
+					//else ptex_response._sub_iteration=0;
 					
 					while(AtomicExchange(&execution_page->ptex_lock,1)) SLEEP(0); // lock the page
 					

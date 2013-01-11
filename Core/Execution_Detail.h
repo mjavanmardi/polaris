@@ -11,6 +11,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 	
 	if(world_ptr->run)
 	{
+		// Maybe should be an assert
 		if(starting_iteration._iteration <= _iteration) starting_iteration._iteration=_iteration+1;
 
 		Revision this_revision;
@@ -80,7 +81,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 					execution_type->tex_next_revision=starting_iteration;
 					execution_type->tex_next_next_revision._iteration=LONG_MAX;
 					execution_type->tex_next_next_revision._sub_iteration=0;
-					}
+				}
 			}
 		}
 		
@@ -144,7 +145,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		// Following makes OPTEX aware
 		// there should be no problem making this assignment as it doesn't matter whether it is acknowledged or not this _revision
 		
-		next_iteration=starting_iteration._iteration;
+		next_revision=starting_iteration;
 		
 
 		//============================END==========================
@@ -197,7 +198,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		}
 
 
-		next_iteration=starting_iteration._iteration;
+		next_revision=starting_iteration;
 	}
 	
 
