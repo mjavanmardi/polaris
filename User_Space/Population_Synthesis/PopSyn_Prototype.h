@@ -27,7 +27,7 @@ namespace PopSyn
 			// Schedules the first event from above
 			feature_prototype void Initialize()
 			{
-				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,1,NULLTYPE);
+				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,1,0,NULLTYPE);
 				//load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,4,NULLTYPE);
 			}
 

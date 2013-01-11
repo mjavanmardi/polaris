@@ -24,7 +24,7 @@ namespace PopSyn
 			// Load the execution event
 			feature_prototype void Initialize()
 			{
-				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population,4,NULLTYPE);
+				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population,4,0,NULLTYPE);
 			}
 
 			//==============================================================================================================
