@@ -35,6 +35,15 @@ static const int success=sizeof(small_type);
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
+//#define check_method(CHECK_ALIAS,METHOD_NAME)\
+//	struct CHECK_ALIAS##_procedure\
+//	{\
+//		template<typename U> static small_type has_matching_named_member(is_member_function_pointer<decltype(&U::METHOD_NAME)>::type);\
+//		template<typename U> static large_type has_matching_named_member(...);\
+//		static const bool value=sizeof(has_matching_named_member<T>(true_val))==success;\
+//	};\
+//	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
+
 #define check_feature(CHECK_ALIAS,FEATURE_NAME,FEATURE_TYPE)\
 	struct CHECK_ALIAS##_procedure\
 	{\
@@ -112,7 +121,6 @@ static const int success=sizeof(small_type);
 		static const bool value=(member_exists && p_conditional<T,V,member_exists>::type::value);\
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
-
 
 #define check_type_match(CHECK_ALIAS,TYPE_TO_MATCH)\
 	static const bool CHECK_ALIAS=is_same<T,TYPE_TO_MATCH>::value;

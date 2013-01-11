@@ -32,7 +32,7 @@ struct Typed_Execution_Page
 			current_cell->next_free_cell=(Execution_Object*)((Byte*)current_cell+stride);
 			current_cell->next_iteration=INT_MAX;
 			current_cell->current_revision=-1;
-			current_cell->event_register=nullptr;
+			//current_cell->event_register=nullptr;//shared with first free list pointer, cannot initialize
 			current_cell->conditional_register=&False_Condition;
 			current_cell=(Execution_Object*)((Byte*)current_cell+stride);
 		}

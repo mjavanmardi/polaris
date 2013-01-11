@@ -31,32 +31,6 @@ public:
 	int z;
 };
 
-implementation struct Test_Alt
-{
-public:
-	Test_Alt()
-	{
-		x=0;
-		y=0;
-		z=0;
-	}
-
-	virtual void When_Do_Stuff(Conditional_Response& response,int __iteration)
-	{
-		response.result = (__iteration%2==0);
-		response.next = __iteration + 1;
-	}
-
-	virtual void Do_Stuff()
-	{
-		visited=visited+2+x;
-	}
-
-	int x;
-	int y;
-	int z;
-};
-
 struct MasterType{};
 
 void main()
@@ -79,13 +53,6 @@ void main()
 		test->Initialize();
 	}
 	
-	//list<Test_Alt<MasterType>*> agents;
-
-	//for(int i=0;i<num_agents;i++)
-	//{
-	//	agents.push_back(new Test_Alt<MasterType>());
-	//}
-	
 	QueryPerformanceCounter(&stop_timer);
 
 	allocation_time=((double)stop_timer.QuadPart-(double)start_timer.QuadPart)/((double)frequency.QuadPart);
@@ -93,20 +60,6 @@ void main()
 	QueryPerformanceCounter(&start_timer);
 	
 	START();
-
-	//for(int i=0;i<_num_iterations;i++)
-	//{
-	//	list<Test_Alt<MasterType>*>::iterator itr;
-	//	Conditional_Response response;
-	//	for(itr=agents.begin();itr!=agents.end();itr++)
-	//	{
-	//		(*itr)->When_Do_Stuff(response,i);
-	//		if(response.result)
-	//		{
-	//			(*itr)->Do_Stuff();
-	//		}
-	//	}
-	//}
 
 	QueryPerformanceCounter(&stop_timer);
 
