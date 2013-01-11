@@ -806,6 +806,8 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Intersection_Control_Interface, get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
+
 				if (outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>().size() == 0 || inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>().size() == 0)
 				{
 					// no outbound or no inbound
@@ -813,7 +815,8 @@ namespace Intersection_Components
 				}
 				else {
 					network_reference<_Network_Interface*>()->template increment_intersection_finish_target<NULLTYPE>();
-					load_event(ComponentType,Newells_Conditional,Compute_Step_Control,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,NULLTYPE);
+					load_event(ComponentType,Newells_Conditional,Compute_Step_Flow,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,NULLTYPE);
+					intersection_control<_Intersection_Control_Interface*>()->template Initialize<NULLTYPE>();
 				}
 			}
 
@@ -833,13 +836,7 @@ namespace Intersection_Components
 				
 				typedef Link_Components::Types::Link_Simulation_Status link_simulation_status_type;
 
-				if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::CONTROL_ITERATION)
-				{
-					_pthis->Swap_Event((Event)&Intersection_Prototype::Compute_Step_Control<NULLTYPE>);
-					response.result=true;
-					response.next=_iteration;
-				}
-				else if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_ITERATION)
+				if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_ITERATION)
 				{
 					_pthis->Swap_Event((Event)&Intersection_Prototype::Compute_Step_Flow<NULLTYPE>);
 					response.result=true;
@@ -857,25 +854,6 @@ namespace Intersection_Components
 					response.result=false;
 					response.next=_iteration;
 				}
-			}
-			
-			declare_feature_event(Compute_Step_Control)
-			{
-				typedef Intersection_Prototype<ComponentType, ComponentType> _Intersection_Interface;
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				
-				double calculation_time_start = ::get_current_cpu_time_in_seconds();
-				
-				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
-
-				//step 0: update control
-
-				_this_ptr->template intersection_control_update<NULLTYPE>();
-
-				_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::COMPUTE_STEP_CONTROL_COMPLETE);
-
-				double calculation_time_end = ::get_current_cpu_time_in_seconds();
-				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template operation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
 			}
 
 			declare_feature_event(Compute_Step_Flow)

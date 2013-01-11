@@ -40,6 +40,8 @@ namespace Network_Components
 			member_container(vector<typename MasterType::movement_type*>, movements_container, none, none);
 
 			member_component(typename MasterType::scenario_type, scenario_reference, none, none);
+
+			member_container(vector<typename MasterType::intersection_control_type*>, intersection_controls_container, none, none);
 		};
 
 

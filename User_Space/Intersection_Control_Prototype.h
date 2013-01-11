@@ -128,11 +128,13 @@ namespace Intersection_Control_Components
 			feature_accessor(intersection, none, none);
 			feature_accessor(current_control_plan, none, none);
 			feature_accessor(control_plan_data_array, none, none);
+			feature_accessor(scenario_reference, none, none);
 			
-			feature_prototype void set_node_current_control_plan_index(void* scenario)
+			feature_prototype void set_node_current_control_plan_index()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 
@@ -154,43 +156,44 @@ namespace Intersection_Control_Components
 				}
 			}
 
-			feature_prototype void intersection_control_update(void* scenario)
+			feature_prototype void intersection_control_update()
 			{
 
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				int control_type = current_control_plan<_Control_Plan_Interface*>()->template control_type<int>();
 
 				switch(control_type)
 				{
 					case NO_CONTROL:
-						this->template no_control_state_update<NULLTYPE>(scenario);
+						this->template no_control_state_update<NULLTYPE>();
 						break;
 					case YIELD_SIGN:
-						this->template yield_sign_control_state_update<NULLTYPE>(scenario);
+						this->template yield_sign_control_state_update<NULLTYPE>();
 						break;
 					case ALL_WAY_STOP_SIGN:
-						this->template all_way_stop_control_state_update<NULLTYPE>(scenario);
+						this->template all_way_stop_control_state_update<NULLTYPE>();
 						break;
 					case TWO_WAY_STOP_SIGN:
-						this->template two_way_stop_control_state_update<NULLTYPE>(scenario);
+						this->template two_way_stop_control_state_update<NULLTYPE>();
 						break;
 					case PRE_TIMED_SIGNAL_CONTROL:
-						this->template pre_timed_signal_control_state_update<NULLTYPE>(scenario);
+						this->template pre_timed_signal_control_state_update<NULLTYPE>();
 						break;
 					case ACTUATED_SIGNAL_CONTROL:
-						this->template actuated_signal_control_state_update<NULLTYPE>(scenario);
+						this->template actuated_signal_control_state_update<NULLTYPE>();
 						break;
 					case ADAPTIVE_SIGNAL_CONTROL:
-						this->template adaptive_signal_control_state_update<NULLTYPE>(scenario);
+						this->template adaptive_signal_control_state_update<NULLTYPE>();
 						break;
 				}
 			}
 			
-			feature_prototype void no_control_state_update(void* scenario)
+			feature_prototype void no_control_state_update()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
+				
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 	
 				int t_start = current_time;
@@ -202,7 +205,7 @@ namespace Intersection_Control_Components
 
 
 				// calculate green time
-				this->template calculate_turn_movement_green_time_no_control<NULLTYPE>(scenario);
+				this->template calculate_turn_movement_green_time_no_control<NULLTYPE>();
 
 				//end of the control plan
 				if (t_end == ending_time || (t_start < ending_time && t_end > ending_time))
@@ -211,13 +214,14 @@ namespace Intersection_Control_Components
 					this->template advance_control_plan_period<NULLTYPE>();
 				}
 			};
-			feature_prototype void calculate_turn_movement_green_time_no_control(void* scenario)
+			feature_prototype void calculate_turn_movement_green_time_no_control()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 				
@@ -253,15 +257,16 @@ namespace Intersection_Control_Components
 				}
 			};
 
-			feature_prototype void calculate_turn_movement_green_time_yield_control(void* scenario)
+			feature_prototype void calculate_turn_movement_green_time_yield_control()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 				define_component_interface(_Link_Interface,_Approach_Interface::get_type_of(inbound_link),Link_Components::Prototypes::Link_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
@@ -326,10 +331,12 @@ namespace Intersection_Control_Components
 				}
 			};
 
-			feature_prototype void yield_sign_control_state_update(void* scenario)
+			feature_prototype void yield_sign_control_state_update()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
+
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 
@@ -341,7 +348,7 @@ namespace Intersection_Control_Components
 
 
 				//calculate green time
-				this->template calculate_turn_movement_green_time_yield_control<NULLTYPE>(scenario);
+				this->template calculate_turn_movement_green_time_yield_control<NULLTYPE>();
 
 				//end of the control plan
 				if (t_end == ending_time || (t_start < ending_time && t_end > ending_time))
@@ -351,10 +358,12 @@ namespace Intersection_Control_Components
 				}
 			};
 
-			feature_prototype void all_way_stop_control_state_update(void* scenario)
+			feature_prototype void all_way_stop_control_state_update()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
+
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
@@ -364,7 +373,7 @@ namespace Intersection_Control_Components
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
 
 				//calculate green time
-				this->template calculate_turn_movement_green_time_no_control<NULLTYPE>(scenario);
+				this->template calculate_turn_movement_green_time_no_control<NULLTYPE>();
 
 				//end of the control plan
 				if (t_end == ending_time || (t_start < ending_time && t_end > ending_time))
@@ -374,10 +383,12 @@ namespace Intersection_Control_Components
 				}
 			};
 
-			feature_prototype void two_way_stop_control_state_update(void* scenario)
+			feature_prototype void two_way_stop_control_state_update()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
+
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
@@ -387,7 +398,7 @@ namespace Intersection_Control_Components
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
 
 				// calculate green time
-				this->template calculate_turn_movement_green_time_yield_control<NULLTYPE>(scenario);
+				this->template calculate_turn_movement_green_time_yield_control<NULLTYPE>();
 
 				//end of the control plan
 				if (t_end == ending_time || (t_start < ending_time && t_end > ending_time))
@@ -397,10 +408,12 @@ namespace Intersection_Control_Components
 				}
 			};
 
-			feature_prototype void pre_timed_signal_control_state_update(void* scenario)
+			feature_prototype void pre_timed_signal_control_state_update()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
+
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
@@ -413,12 +426,12 @@ namespace Intersection_Control_Components
 				if (t_start == starting_time)
 				{
 					//calcualte starting times of green, yellow, and red of each phase; green_cycle_ratio
-					this->template calculate_green_yellow_red_starting_times_and_green_cycle_ratio<NULLTYPE>(scenario);
+					this->template calculate_green_yellow_red_starting_times_and_green_cycle_ratio<NULLTYPE>();
 				}
 
 				//calculate green time
 				this->template initialize_node_turn_movement_green_time<NULLTYPE>();
-				this->template calculate_turn_movement_green_time<NULLTYPE>(scenario);
+				this->template calculate_turn_movement_green_time<NULLTYPE>();
 
 				//end of the control plan
 				if (t_end == ending_time || (t_start < ending_time && t_end > ending_time))
@@ -428,10 +441,12 @@ namespace Intersection_Control_Components
 				}
 			};
 
-			feature_prototype void actuated_signal_control_state_update(void* scenario)
+			feature_prototype void actuated_signal_control_state_update()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
+
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
@@ -444,16 +459,16 @@ namespace Intersection_Control_Components
 				if (t_start == starting_time)
 				{
 					//calcualte starting times of green, yellow, and red of each phase; green_cycle_ratio
-					this->template calculate_green_yellow_red_starting_times_and_green_cycle_ratio<NULLTYPE>(scenario);
+					this->template calculate_green_yellow_red_starting_times_and_green_cycle_ratio<NULLTYPE>();
 				}
 
 				//change signal parameters in response to demand
-				this->template actuated_signal_control_response<NULLTYPE>(scenario);
+				this->template actuated_signal_control_response<NULLTYPE>();
 
 
 				//calculate green time
 				this->template initialize_node_turn_movement_green_time<NULLTYPE>();
-				this->template calculate_turn_movement_green_time<NULLTYPE>(scenario);
+				this->template calculate_turn_movement_green_time<NULLTYPE>();
 
 
 				//end of the control plan
@@ -464,14 +479,15 @@ namespace Intersection_Control_Components
 				}
 			};
 
-			feature_prototype void actuated_signal_control_response(void* scenario)
+			feature_prototype void actuated_signal_control_response()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
 				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 
@@ -616,22 +632,23 @@ namespace Intersection_Control_Components
 				}
 			};
 
-			feature_prototype void adaptive_signal_control_state_update(void* scenario)
+			feature_prototype void adaptive_signal_control_state_update()
 			{
 
-				this->template no_control_state_update<NULLTYPE>(scenario);
+				this->template no_control_state_update<NULLTYPE>();
 			};
 
-			feature_prototype void calculate_green_yellow_red_starting_times_and_green_cycle_ratio(void* scenario)
+			feature_prototype void calculate_green_yellow_red_starting_times_and_green_cycle_ratio()
 			{
 
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
 				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 
@@ -756,7 +773,7 @@ namespace Intersection_Control_Components
 
 			feature_prototype void initialize_node_turn_movement_green_time()
 			{
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
@@ -780,16 +797,17 @@ namespace Intersection_Control_Components
 				}
 			}
 
-			feature_prototype void calculate_turn_movement_green_time(void* scenario)
+			feature_prototype void calculate_turn_movement_green_time()
 			{
 
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
 				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 				int num_phases = (int)current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>().size();
@@ -876,7 +894,7 @@ namespace Intersection_Control_Components
 				{
 					if (next_cycle_leftover_time == 0)
 					{
-						this->template advance_signal_control_cycle<NULLTYPE>(scenario,next_cycle_leftover_time);
+						this->template advance_signal_control_cycle<NULLTYPE>(next_cycle_leftover_time);
 					}
 					else
 					{
@@ -939,20 +957,21 @@ namespace Intersection_Control_Components
 						}
 					}
 
-					this->template advance_signal_control_cycle<NULLTYPE>(scenario,next_cycle_leftover_time);
+					this->template advance_signal_control_cycle<NULLTYPE>(next_cycle_leftover_time);
 				}
 			};
 
-			feature_prototype void advance_signal_control_cycle(void* scenario, int cycle_leftover_time)
+			feature_prototype void advance_signal_control_cycle(int cycle_leftover_time)
 			{
 
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
 				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 				int num_phases = (int)current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>().size();
@@ -971,8 +990,6 @@ namespace Intersection_Control_Components
 			
 			feature_prototype void advance_control_plan_period()
 			{
-
-				typedef typename Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::scenario_type, ComponentType> _Scenario_Interface;
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
@@ -990,7 +1007,40 @@ namespace Intersection_Control_Components
 					current_control_plan_index = 0;
 				}
 				current_control_plan<_Control_Plan_Interface*>(control_plan_data_array<_Control_Plans_Container_Interface&>()[current_control_plan_index]);
-			};		
+			};
+
+			feature_prototype void Initialize()
+			{
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				load_event(ComponentType,Newells_Conditional,Compute_Step_Control,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,NULLTYPE);
+			}
+
+			declare_feature_conditional(Newells_Conditional)
+			{
+				typedef Intersection_Control_Prototype<ComponentType, ComponentType> _Intersection_Control_Interface;
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				ComponentType* _pthis = (ComponentType*)_this;
+				_Intersection_Control_Interface* _this_ptr=(_Intersection_Control_Interface*)_this;
+				if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::CONTROL_ITERATION)
+				{
+					_pthis->Swap_Event((Event)&Intersection_Control_Prototype::Compute_Step_Control<NULLTYPE>);
+					response.result=true;
+					response.next=_iteration + _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
+				}
+				else
+				{
+					response.result=false;
+					response.next=_iteration;
+				}
+			}
+
+			declare_feature_event(Compute_Step_Control)
+			{
+				typedef Intersection_Control_Prototype<ComponentType, ComponentType> _Intersection_Control_Interface;
+				_Intersection_Control_Interface* _this_ptr=(_Intersection_Control_Interface*)_this;
+				//step 0: update control
+				_this_ptr->template intersection_control_update<NULLTYPE>();
+			}
 		};
 	}
 }

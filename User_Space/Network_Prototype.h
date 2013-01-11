@@ -812,7 +812,8 @@ namespace Network_Components
 				for(int i=0;i< (int)intersections_container<_Intersections_Container_Interface&>().size();i++)
 				{
 					_Intersection_Interface* intersection = intersections_container<_Intersections_Container_Interface&>()[i];
-					intersection->template intersection_control<_Intersection_Control_Interface*>()->template set_node_current_control_plan_index<NULLTYPE>(scenario_reference<_Scenario_Interface*>());
+					intersection->template intersection_control<_Intersection_Control_Interface*>()->template scenario_reference<_Scenario_Interface*>(scenario_reference<_Scenario_Interface*>());
+					intersection->template intersection_control<_Intersection_Control_Interface*>()->template set_node_current_control_plan_index<NULLTYPE>();
 				}
 			}
 
