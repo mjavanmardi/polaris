@@ -17,7 +17,7 @@
 /// implementation - standard declarator for all implementations
 ///============================================================================
 
-#define implementation template<typename MasterType>
+#define implementation template<typename MasterType, typename ParentType=NULLTYPE>
 
 ///============================================================================
 /// feature - standard declarator for all prototype features
@@ -83,6 +83,19 @@ struct member_function_ptr_types<Type,communication_handler_type>
 ///============================================================================
 /// define_get_set_checks - implements a mini-concept to check for implementation existence
 ///============================================================================
+
+#define define_feature_exists_check(FEATURE_NAME, CHECK_ALIAS)\
+	public:\
+	template<typename T>\
+	struct CHECK_ALIAS\
+	{\
+	template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_feature_tag*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool member_exists=sizeof(has_matching_typename<T>(0))==success;\
+		template<class U,bool B> struct p_conditional{typedef false_type type;};\
+		template<class U> struct p_conditional<U,true>{typedef typename is_same<typename U::FEATURE_NAME##_feature_tag,true_type>::type type;};\
+		static const bool value=(member_exists && p_conditional<T,member_exists>::type::value);\
+	};
 
 #define define_get_exists_check(FEATURE_NAME, GET_ALIAS)\
 	public:\
@@ -161,6 +174,12 @@ struct member_function_ptr_types<Type,communication_handler_type>
 		}\
 
 
+
+
+#define tag_feature_as_available(FEATURE_NAME) typedef true_type FEATURE_NAME##_feature_tag;
+
+
+
 ///============================================================================
 /// feature_getter - catches the standard get dispatches meeting concepts
 ///============================================================================
@@ -172,6 +191,8 @@ struct member_function_ptr_types<Type,getter_type>
 {
 	typedef NULLTYPE (Type::* type)(void);
 };
+
+
 
 #define tag_getter_as_available(FEATURE_NAME) typedef getter_type FEATURE_NAME##_getter_tag;
 
@@ -193,7 +214,7 @@ struct member_function_ptr_types<Type,setter_type>
 /// declare_feature_getter_setter - catches the standard get and set dispatches meeting concepts
 ///============================================================================
 
-#define tag_getter_setter_as_available(FEATURE_NAME) tag_getter(FEATURE_NAME);tag_setter(FEATURE_NAME)
+#define tag_getter_setter_as_available(FEATURE_NAME) tag_getter_as_available(FEATURE_NAME);tag_setter_as_available(FEATURE_NAME)
 
 ///============================================================================
 /// member_data and member_pointer – member creator, type-definition and basic accessors
