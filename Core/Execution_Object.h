@@ -87,6 +87,7 @@ struct Execution_Object
 	template<typename ComponentType>
 	void Load_Register(Conditional conditional,Event p_event,int start_iteration,int start_sub_iteration);
 	
+	//static Conditional conditional_register;
 	Conditional conditional_register;
 
 	///============================================================================
@@ -179,6 +180,8 @@ struct Execution_Object
 		Execution_Object* next_free_cell;
 	};
 };
+
+//Conditional Execution_Object::conditional_register;
 
 typedef void (*Execution_Directive)(void*,Revision&);
 

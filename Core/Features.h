@@ -42,6 +42,10 @@ struct event_type{};
 	typedef event_type FEATURE_NAME##_event_tag;\
 	template<typename TargetType> static void FEATURE_NAME(void* _this)
 
+#define declare_feature_event_implementation(FEATURE_NAME)\
+	typedef event_type FEATURE_NAME##_event_tag;\
+	template<typename ComponentType,typename CallerType,typename TargetType> static void FEATURE_NAME(void* _this)
+
 template<typename Type>
 struct member_function_ptr_types<Type,event_type>
 {
@@ -57,6 +61,10 @@ struct conditional_type{};
 #define declare_feature_conditional(FEATURE_NAME)\
 	typedef conditional_type FEATURE_NAME##_conditional_tag;\
 	template<typename TargetType> static void FEATURE_NAME(void* _this,Conditional_Response& response)
+
+#define declare_feature_conditional_implementation(FEATURE_NAME)\
+	typedef conditional_type FEATURE_NAME##_conditional_tag;\
+	template<typename ComponentType,typename CallerType,typename TargetType> static void FEATURE_NAME(void* _this,Conditional_Response& response)
 
 template<typename Type>
 struct member_function_ptr_types<Type,conditional_type>
@@ -418,3 +426,29 @@ struct member_function_ptr_types<Type,setter_type>
 #define iterator_to_interface(INTERFACE_ALIAS,ITERATOR_VARIABLE) ( (INTERFACE_ALIAS&) (*(*ITERATOR_VARIABLE)) )
 #define access(INTERFACE_ALIAS,FEATURE_FUNCTION) ( (INTERFACE_ALIAS&) FEATURE_FUNCTION<INTERFACE_ALIAS&>() )
 
+///============================================================================
+/// Target_Type structure for large function signatures
+///============================================================================
+
+template<typename Return_Type=NULLTYPE, typename Param_Type=NULLTYPE, typename Param2_Type=NULLTYPE, typename Param3_Type=NULLTYPE, typename Param4_Type=NULLTYPE, typename Param5_Type=NULLTYPE, typename Param6_Type=NULLTYPE, typename Param7_Type=NULLTYPE, typename Param8_Type=NULLTYPE>
+struct Target_Type
+{
+	typedef Return_Type ReturnType;
+	typedef Param_Type ParamType;
+	typedef Param2_Type Param2Type;
+	typedef Param3_Type Param3Type;
+	typedef Param4_Type Param4Type;
+	typedef Param5_Type Param5Type;
+	typedef Param6_Type Param6Type;
+	typedef Param7_Type Param7Type;
+	typedef Param8_Type Param8Type;
+};
+
+concept struct Is_Target_Type_Struct
+{
+	check_typename_defined(check1,ReturnType);
+	check_typename_defined(check2,ParamType);
+	check_typename_defined(check3,Param2Type);
+
+	define_default_check(check1 && check2 && check3);
+};
