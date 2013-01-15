@@ -67,7 +67,7 @@ struct MasterType
 	
 	typedef Polaris_Component<Operation_Components::Implementations::Polaris_Operation_Implementation, MasterType, Data_Object> operation_type;
 	
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation, MasterType, Data_Object> intersection_control_type;
+	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation, MasterType, Execution_Object> intersection_control_type;
 
 	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Control_Plan_Implementation, MasterType, Data_Object> control_plan_type;
 
@@ -282,7 +282,7 @@ struct MasterType
 
 	typedef Polaris_Component<Operation_Components::Implementations::Polaris_Operation_Implementation, MasterType, Data_Object> operation_type;
 	
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation, MasterType, Data_Object> intersection_control_type;
+	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation, MasterType, Execution_Object> intersection_control_type;
 
 	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Control_Plan_Implementation, MasterType, Data_Object> control_plan_type;
 
