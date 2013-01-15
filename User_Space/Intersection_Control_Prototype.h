@@ -5,26 +5,26 @@ namespace Intersection_Control_Components
 {
 	namespace Types
 	{
-			enum Movement_Priority_Type_Keys
-			{
-				PROTECTED=1,  //high priority
-				PERMITTED,    //yield the right-of-way to conflicting movements
-			};
-			enum Approach_Type_Keys
-			{
-				MAJOR_APPROACH=1,
-				MINOR_APPROACH,
-			};
-			enum Intersection_Type_Keys
-			{
-				NO_CONTROL=0,
-				YIELD_SIGN,
-				ALL_WAY_STOP_SIGN,
-				TWO_WAY_STOP_SIGN,
-				PRE_TIMED_SIGNAL_CONTROL, 
-				ACTUATED_SIGNAL_CONTROL, 
-				ADAPTIVE_SIGNAL_CONTROL,
-			};
+		enum Movement_Priority_Type_Keys
+		{
+			PROTECTED=1,  //high priority
+			PERMITTED,    //yield the right-of-way to conflicting movements
+		};
+		enum Approach_Type_Keys
+		{
+			MAJOR_APPROACH=1,
+			MINOR_APPROACH,
+		};
+		enum Intersection_Type_Keys
+		{
+			NO_CONTROL=0,
+			YIELD_SIGN,
+			ALL_WAY_STOP_SIGN,
+			TWO_WAY_STOP_SIGN,
+			PRE_TIMED_SIGNAL_CONTROL, 
+			ACTUATED_SIGNAL_CONTROL, 
+			ADAPTIVE_SIGNAL_CONTROL,
+		};
 
 	}
 
@@ -97,7 +97,7 @@ namespace Intersection_Control_Components
 			//duration
 			feature_accessor(starting_time, none, none);
 			feature_accessor(ending_time, none, none);
-				
+			
 			//type
 			feature_accessor(control_type, none, none);
 
@@ -132,17 +132,15 @@ namespace Intersection_Control_Components
 			
 			feature_prototype void set_node_current_control_plan_index()
 			{
+				// Make interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
+				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();				
 
 				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
-
-				Component_Type* this_monitor=this_component();
-
 				typename _Control_Plans_Container_Interface::Component_Type* monitor=control_plan_data_array<_Control_Plans_Container_Interface::Component_Type*>();
 
-
+				// Loop over all control plans, if current_time lies within range for the plan, set as current
 				for (int i=0;i<(int)control_plan_data_array<_Control_Plans_Container_Interface&>().size();i++)
 				{
 					_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)control_plan_data_array<_Control_Plans_Container_Interface&>()[i];
@@ -158,10 +156,11 @@ namespace Intersection_Control_Components
 
 			feature_prototype void intersection_control_update()
 			{
-
+				// Make Interfaces
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				int control_type = current_control_plan<_Control_Plan_Interface*>()->template control_type<int>();
 
+				// Perform Different Update Based on Type
 				switch(control_type)
 				{
 					case NO_CONTROL:
@@ -190,10 +189,13 @@ namespace Intersection_Control_Components
 			
 			feature_prototype void no_control_state_update()
 			{
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 				
+
+				// Figure out time bounds for the signal vs. the simulation interval
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 	
 				int t_start = current_time;
@@ -202,20 +204,20 @@ namespace Intersection_Control_Components
 				int starting_time = current_control_plan<_Control_Plan_Interface*>()->template starting_time<int>();
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
 
-
-
 				// calculate green time
 				this->template calculate_turn_movement_green_time_no_control<NULLTYPE>();
 
-				//end of the control plan
+				// end of the control plan
 				if (t_end == ending_time || (t_start < ending_time && t_end > ending_time))
 				{
-					//advance control plan
+					// advance control plan
 					this->template advance_control_plan_period<NULLTYPE>();
 				}
 			};
+			
 			feature_prototype void calculate_turn_movement_green_time_no_control()
 			{
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
@@ -228,12 +230,16 @@ namespace Intersection_Control_Components
 				//green times for each movement are assumed to be the length of the simulation interval
 				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_inbound_movements_itr;
+				
+				// Loop over outbound movements
 				for (outbound_inbound_movements_itr=outbound_inbound_movements_container.begin();outbound_inbound_movements_itr!=outbound_inbound_movements_container.end();outbound_inbound_movements_itr++)
 				{
 					_Outbound_Inbound_Movements_Interface* outbound_inbound_movements = (_Outbound_Inbound_Movements_Interface*)(*outbound_inbound_movements_itr);
 
 					_Inbound_Movements_Container_Interface& inbound_movements_container = outbound_inbound_movements->template inbound_movements<_Inbound_Movements_Container_Interface&>();
 					typename _Inbound_Movements_Container_Interface::iterator inbound_movement_itr;
+
+					// Loop over inbound movements for each outbound movement
 					for (inbound_movement_itr=inbound_movements_container.begin();inbound_movement_itr!=inbound_movements_container.end();inbound_movement_itr++)
 					{
 						_Inbound_Movement_Interface* inbound_movement = (_Inbound_Movement_Interface*)(*inbound_movement_itr);
@@ -242,12 +248,14 @@ namespace Intersection_Control_Components
 						//allowed
 						if (inbound_movement->template movement_rule<int>() == ALLOWED)
 						{
-							inbound_movement->template green_time<float>(((_Scenario_Interface*)scenario)->template simulation_interval_length<int>()*1.0f);
+							// Set green time as interval length
+							inbound_movement->template green_time<float>(((_Scenario_Interface*)scenario)->template simulation_interval_length<float>());
 						}
 
 						//prihibited
 						if (inbound_movement->template movement_rule<int>() == PROHIBITED)
 						{
+							// Set green time as 0
 							inbound_movement->template green_time<float>(0.0);
 						}
 
@@ -259,6 +267,7 @@ namespace Intersection_Control_Components
 
 			feature_prototype void calculate_turn_movement_green_time_yield_control()
 			{
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
@@ -273,43 +282,56 @@ namespace Intersection_Control_Components
 				//green times for each movement are assumed to be the length of the simulation interval
 				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_inbound_movements_itr;
+				
+				// Loop over outbound movements
 				for (outbound_inbound_movements_itr=outbound_inbound_movements_container.begin();outbound_inbound_movements_itr!=outbound_inbound_movements_container.end();outbound_inbound_movements_itr++)
 				{
 					_Outbound_Inbound_Movements_Interface* outbound_inbound_movements = (_Outbound_Inbound_Movements_Interface*)(*outbound_inbound_movements_itr);
 
 					_Inbound_Movements_Container_Interface& inbound_movements_container = outbound_inbound_movements->template inbound_movements<_Inbound_Movements_Container_Interface&>();
 					typename _Inbound_Movements_Container_Interface::iterator inbound_movement_itr;
+					
+					// Loop over inbound movements for each outbound movement
 					for (inbound_movement_itr=inbound_movements_container.begin();inbound_movement_itr!=inbound_movements_container.end();inbound_movement_itr++)
 					{
 						_Inbound_Movement_Interface* inbound_movement = (_Inbound_Movement_Interface*)(*inbound_movement_itr);
 						_Link_Interface* inbound_link = inbound_movement->template inbound_link<_Link_Interface*>();
+						
 						//turn movement green time
 						//allowed
 						if (inbound_movement->template movement_rule<int>() == ALLOWED)
 						{
-							inbound_movement->template green_time<float>(((_Scenario_Interface*)scenario)->template simulation_interval_length<int>()*1.0f);
+							// Set green time as interval length
+							inbound_movement->template green_time<float>(((_Scenario_Interface*)scenario)->template simulation_interval_length<float>());
 						}
 
-						//prihibited
+						//prohibited
 						if (inbound_movement->template movement_rule<int>() == PROHIBITED)
 						{
+							// Set green time as 0
 							inbound_movement->template green_time<float>(0.0);
 						}
 
 						//merge priority
 						_Approaches_Container_Interface& approaches_container = current_control_plan<_Control_Plan_Interface*>()->template approach_data_array<_Approaches_Container_Interface&>();
+						
+						// Loop over all approaches
 						for (int approach_index=0;approach_index<(int)approaches_container.size();approach_index++)
 						{
 							_Approach_Interface* approach = approaches_container[approach_index];
 							int approach_link_index = approach->template inbound_link<_Link_Interface*>()->template internal_id<int>();
+							
+							// Find the matching approach
 							if (approach_link_index == inbound_link->template internal_id<int>())
 							{
 								if (approach->template approach_type<int>() == MAJOR_APPROACH)
 								{
+									// Set merge priority high
 									inbound_movement->template merge_priority<int>(1);
 								}
 								else
 								{
+									// Set merge priority low
 									inbound_movement->template merge_priority<int>(0.0);
 								}
 
@@ -320,11 +342,13 @@ namespace Intersection_Control_Components
 						//highway : mainline and ramp
 						if (inbound_link->template link_type<int>() == FREEWAY || inbound_link-> template link_type<int>() == FREEWAY || EXPRESSWAY)
 						{
+							// Set merge priority high
 							inbound_movement->template merge_priority<int>(1);
 						}
 
 						if (inbound_link->template link_type<int>() == ON_RAMP)
 						{
+							// Set merge priority low
 							inbound_movement->template merge_priority<int>(0.0);
 						}
 					}
@@ -333,12 +357,13 @@ namespace Intersection_Control_Components
 
 			feature_prototype void yield_sign_control_state_update()
 			{
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
+				// Figure out time bounds for the signal vs. the simulation interval
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
-
 
 				int t_start = current_time;
 				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
@@ -346,11 +371,10 @@ namespace Intersection_Control_Components
 				int starting_time = current_control_plan<_Control_Plan_Interface*>()->template starting_time<int>();
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
 
-
-				//calculate green time
+				// calculate green time
 				this->template calculate_turn_movement_green_time_yield_control<NULLTYPE>();
 
-				//end of the control plan
+				// end of the control plan
 				if (t_end == ending_time || (t_start < ending_time && t_end > ending_time))
 				{
 					//advance control plan
@@ -360,10 +384,12 @@ namespace Intersection_Control_Components
 
 			feature_prototype void all_way_stop_control_state_update()
 			{
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
+				// Figure out time bounds for the signal vs. the simulation interval
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
@@ -372,10 +398,10 @@ namespace Intersection_Control_Components
 				int starting_time = current_control_plan<_Control_Plan_Interface*>()->template starting_time<int>();
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
 
-				//calculate green time
+				// calculate green time
 				this->template calculate_turn_movement_green_time_no_control<NULLTYPE>();
 
-				//end of the control plan
+				// end of the control plan
 				if (t_end == ending_time || (t_start < ending_time && t_end > ending_time))
 				{
 					//advance control plan
@@ -385,10 +411,12 @@ namespace Intersection_Control_Components
 
 			feature_prototype void two_way_stop_control_state_update()
 			{
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
+				// Figure out time bounds for the signal vs. the simulation interval
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
@@ -410,10 +438,12 @@ namespace Intersection_Control_Components
 
 			feature_prototype void pre_timed_signal_control_state_update()
 			{
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
+				// Figure out time bounds for the signal vs. the simulation interval
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
@@ -443,10 +473,12 @@ namespace Intersection_Control_Components
 
 			feature_prototype void actuated_signal_control_state_update()
 			{
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
+				// Figure out time bounds for the signal vs. the simulation interval
 				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				int t_start = current_time;
@@ -458,13 +490,12 @@ namespace Intersection_Control_Components
 				//start of the control plan
 				if (t_start == starting_time)
 				{
-					//calcualte starting times of green, yellow, and red of each phase; green_cycle_ratio
+					//calculate starting times of green, yellow, and red of each phase; green_cycle_ratio
 					this->template calculate_green_yellow_red_starting_times_and_green_cycle_ratio<NULLTYPE>();
 				}
 
 				//change signal parameters in response to demand
 				this->template actuated_signal_control_response<NULLTYPE>();
-
 
 				//calculate green time
 				this->template initialize_node_turn_movement_green_time<NULLTYPE>();
@@ -481,6 +512,7 @@ namespace Intersection_Control_Components
 
 			feature_prototype void actuated_signal_control_response()
 			{
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
@@ -545,7 +577,7 @@ namespace Intersection_Control_Components
 						}
 					}
 
-					//determine the extenstion of the green time to discharge the maximum queue
+					//determine the extension of the green time to discharge the maximum queue
 					float maximum_flow_rate_per_second = critical_link_array[iphase]->template maximum_flow_rate<float>() * critical_link_array[iphase]->template num_lanes<int>() / 3600.0f;
 					critical_link_discharge_time_array[iphase] = (int) ((critical_link_queue_length_array[iphase] * 1.0f) / maximum_flow_rate_per_second);
 
@@ -576,7 +608,7 @@ namespace Intersection_Control_Components
 					{
 						current_critical_link_discharge_time = maximum_green_time + current_green_starting_time - current_yellow_starting_time;
 					}
-		
+					
 					//check for min_green 
 					if ((current_yellow_starting_time + current_critical_link_discharge_time - current_green_starting_time) < minimum_green_time)
 					{
@@ -606,8 +638,7 @@ namespace Intersection_Control_Components
 
 				if (current_critical_link_discharge_time != 0)
 				{
-					//redefine the starting and ending of green time for all consequent phases
-			
+					//redefine the starting and ending of green time for all subsequent phases
 					current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[current_phase]->template yellow_starting_time<int>(current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[current_phase]->template yellow_starting_time<int>() + current_critical_link_discharge_time);
 					current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[current_phase]->template red_start_time<int>(current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[current_phase]->template red_start_time<int>() + current_critical_link_discharge_time);
 					current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[current_phase]->template adjusted_green_time<int>( 
@@ -634,13 +665,12 @@ namespace Intersection_Control_Components
 
 			feature_prototype void adaptive_signal_control_state_update()
 			{
-
 				this->template no_control_state_update<NULLTYPE>();
 			};
 
 			feature_prototype void calculate_green_yellow_red_starting_times_and_green_cycle_ratio()
 			{
-
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
@@ -773,6 +803,7 @@ namespace Intersection_Control_Components
 
 			feature_prototype void initialize_node_turn_movement_green_time()
 			{
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
@@ -799,7 +830,7 @@ namespace Intersection_Control_Components
 
 			feature_prototype void calculate_turn_movement_green_time()
 			{
-
+				// Make Interfaces
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
@@ -986,7 +1017,6 @@ namespace Intersection_Control_Components
 				current_control_plan<_Control_Plan_Interface*>()->template cycle_ending_time<int>(current_time + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>() + cycle_leftover_time + cycle_length);
 				current_control_plan<_Control_Plan_Interface*>()->template cycle_leftover_time<int>(cycle_leftover_time + cycle_length);
 			};
-
 			
 			feature_prototype void advance_control_plan_period()
 			{

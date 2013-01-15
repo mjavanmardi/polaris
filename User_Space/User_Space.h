@@ -14,6 +14,7 @@
 //#include "Polaris_Operation_Implementation.h"
 #include "Polaris_Zone_Implementation.h"
 
+#include "Polaris_Sensor_Implementation.h"
 
 #include "User_Space\Population_Synthesis\Population_Unit_Implementations.h"
 
@@ -23,6 +24,6 @@
 
 #include "Population_Synthesis\PopSyn_Implementations.h"
 
-#include "Person_Prototype.h"
+//#include "Person_Prototype.h"
 
 

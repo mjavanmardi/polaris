@@ -434,8 +434,6 @@ namespace Intersection_Components
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
 
-
-
 				// apply transfers of y(a,a''t) for each turn;
 				//int arrived_vehicles = this->template network_cumulative_arrived_vehicles;
 				//int in_network_vehicles = this->template network_in_network_vehicles;
@@ -491,8 +489,6 @@ namespace Intersection_Components
 						
 						if (num_transfer_vehicles_of_turn_movement>0)
 						{
-
-							
 							//move vehicles for this turn movement
 							for (int iv=0;iv<num_transfer_vehicles_of_turn_movement;iv++)
 							{
@@ -667,7 +663,6 @@ namespace Intersection_Components
 
 						if (((current_simulation_interval_index+1)*simulation_interval_length)%scenario->template assignment_interval_length<int>() == 0)
 						{	
-
 							float turn_travel_penalty = 0.0;
 							for (int t_cached_time=0;t_cached_time<scenario->template num_simulation_intervals_per_assignment_interval<int>();t_cached_time++)
 							{

@@ -147,6 +147,7 @@
     <ClInclude Include="Polaris_Operation_Implementation.h" />
     <ClInclude Include="Polaris_Routing_Implementation.h" />
     <ClInclude Include="Polaris_Scenario_Implementation.h" />
+    <ClInclude Include="Polaris_Sensor_Implementation.h" />
     <ClInclude Include="Polaris_Traveler_Implementation.h" />
     <ClInclude Include="Polaris_Vehicle_Implementation.h" />
     <ClInclude Include="Polaris_Zone_Implementation.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="Routable_Link_Implementation.h" />
     <ClInclude Include="Routing_Prototype.h" />
     <ClInclude Include="Scenario_Prototype.h" />
+    <ClInclude Include="Sensor_Prototype.h" />
     <ClInclude Include="Traveler_Prototype.h" />
     <ClInclude Include="User_Space.h" />
     <ClInclude Include="User_Space_Includes.h" />
