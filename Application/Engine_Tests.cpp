@@ -1,9 +1,7 @@
-
-//#define ENGINE_TESTS
+#include "Model_Selection.h"
 
 #ifdef ENGINE_TESTS
 #include "Application_Includes.h"
-
 static volatile long long visited=0;
 
 implementation struct Test:public Polaris_Component_Class<Test,MasterType,Execution_Object>
@@ -11,14 +9,15 @@ implementation struct Test:public Polaris_Component_Class<Test,MasterType,Execut
 public:
 	void Initialize()
 	{
-		Load_Register<Test>(&When_Do_Stuff<NULLTYPE>,&Do_Stuff<NULLTYPE>,0);
+		Load_Register<Test>(&When_Do_Stuff<NULLTYPE>,&Do_Stuff<NULLTYPE>,0,0);
 		x=0;
 	}
 
 	declare_feature_conditional(When_Do_Stuff)
 	{
 		response.result = (_iteration%2==0);
-		response.next = _iteration + 1;
+		response.next._iteration = _iteration+1;
+		response.next._sub_iteration = 0;
 	}
 
 	declare_feature_event(Do_Stuff)
@@ -39,8 +38,7 @@ void main()
 
 	double allocation_time,run_time;
 
-	const unsigned int num_agents=1000000;
-
+	const unsigned int num_agents=10;
 	const int pages=(num_agents*sizeof(Test<MasterType*>))/_Page_Size;
 
 	QueryPerformanceFrequency(&frequency);

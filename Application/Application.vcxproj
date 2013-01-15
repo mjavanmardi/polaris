@@ -130,12 +130,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Application_Includes.h" />
+    <ClInclude Include="Model_Selection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Engine_Tests.cpp" />
     <ClCompile Include="NetworkModel.cpp" />
     <ClCompile Include="PopSyn_Example.cpp" />
+    <ClCompile Include="Sensor_Model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\File_IO\File_IO.vcxproj">

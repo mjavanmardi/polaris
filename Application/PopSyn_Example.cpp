@@ -1,6 +1,7 @@
+#include "Model_Selection.h"
 
+#ifdef PopSyn
 #include "Application_Includes.h"
-
 //concept struct Is_Agent
 //{
 //	check_method(Has_Initialize,Initialize,void(*)(char*));
@@ -153,3 +154,4 @@ int main()
 	cout <<endl<<endl<<"Done, press a key.";
 	cin >> pause;
 }
+#endif

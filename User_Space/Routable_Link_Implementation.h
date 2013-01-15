@@ -16,8 +16,7 @@ namespace Link_Components
 	
 	namespace Implementations
 	{
-		template<typename MasterType>
-		struct Routable_Link_Implementation {
+		implementation struct Routable_Link_Implementation {
 
 			typedef typename MasterType::link_type network_link_type;
 

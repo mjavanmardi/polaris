@@ -25,7 +25,6 @@ namespace Intersection_Control_Components
 			ACTUATED_SIGNAL_CONTROL, 
 			ADAPTIVE_SIGNAL_CONTROL,
 		};
-
 	}
 
 	namespace Concepts

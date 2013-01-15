@@ -135,7 +135,7 @@ public:
 			this_revision._sub_iteration = _sub_iteration;
 			this_revision._iteration = _iteration;
 			
-			// condition for success is whether the next_revision occurs before the start of the next full iteration
+			// condition for collection is whether the next_revision occurs before the start of the next full iteration
 			if(ex_next_revision >= this_revision && ex_next_revision < next_iteration)
 			{
 				// if the _iteration will be repeated, make sure all threads are collected before starting the new loop

@@ -1,6 +1,6 @@
-#define EXAMPLE
+#include "Model_Selection.h"
 
-#ifndef EXAMPLE
+#ifdef EXAMPLE
 #include "Application_Includes.h"
 
 int main()

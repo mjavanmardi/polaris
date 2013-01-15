@@ -35,16 +35,15 @@ namespace Intersection_Components
 
 		};
 
-		template<typename MasterType>
-		struct Routable_Outbound_Inbound_Movements_Implementation
+		
+		implementation struct Routable_Outbound_Inbound_Movements_Implementation
 		{
 			member_component(typename MasterType::routable_link_type, outbound_link_reference, none, none);
 			member_container(vector<typename MasterType::routable_movement_type*>, inbound_movements, none, none);
 
 		};
 
-		template<typename MasterType>
-		struct Routable_Intersection_Implementation
+		implementation struct Routable_Intersection_Implementation
 		{
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);

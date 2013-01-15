@@ -34,8 +34,7 @@ namespace Vehicle_Components
 
 		};
 
-		template<typename MasterType>
-		struct Polaris_Vehicle_Implementation
+		implementation struct Polaris_Vehicle_Implementation
 		{
 			member_data(int, current_trajectory_unit_index, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, departed_simulation_interval_index, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));

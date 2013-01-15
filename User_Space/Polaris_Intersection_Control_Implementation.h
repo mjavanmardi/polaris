@@ -7,7 +7,6 @@ namespace Intersection_Control_Components
 {
 	namespace Types
 	{
-	
 	}
 
 	namespace Concepts
@@ -16,7 +15,6 @@ namespace Intersection_Control_Components
 	
 	namespace Implementations
 	{
-
 		implementation struct Polaris_Phase_Movement_Implementation
 		{
 			member_component(typename MasterType::movement_type, movement, none, none);
@@ -72,7 +70,7 @@ namespace Intersection_Control_Components
 			//duration
 			member_data(int, starting_time, none, none);
 			member_data(int, ending_time, none, none);
-				
+			
 			//type
 			member_data(Intersection_Components::Types::Intersection_Type_Keys, control_type, none, none);
 

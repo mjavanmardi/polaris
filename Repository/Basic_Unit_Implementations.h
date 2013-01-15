@@ -138,7 +138,7 @@ namespace Basic_Units
 
 
 //=================================================================================================================
-// SIMULATION TIMER DEFINITION - Used by aents as a wrapper for the global _iteration variable
+// SIMULATION TIMER DEFINITION - Used by agents as a wrapper for the global _iteration variable
 typedef Polaris_Component<Basic_Units::Implementations::Seconds_Implementation, NULLTYPE, Data_Object> Basic_Time;
 template<typename Base_Time_Type>
 struct Simulation_Timer
@@ -155,4 +155,5 @@ struct Simulation_Timer
 		return  current_time + additional_time;
 	}
 };
+
 Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;

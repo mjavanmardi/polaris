@@ -76,6 +76,9 @@ public:
 				// instruct threads to leave the finished queue (and the simulation)
 				threads_finished_counter=0;
 
+				// let all threads terminate before exiting
+				while(threads_finished_counter!=_num_threads) SLEEP(0);
+
 				break;
 			}
 			else
@@ -149,6 +152,9 @@ static void* Thread_Loop(void* package_ptr)
 		// thread waits until all threads have left the finished queue to begin actual operation
 		while(world->threads_running_counter!=_num_threads) SLEEP(0);
 	}
+
+	// let the world know that this thread is completely finished
+	AtomicIncrement(&world->threads_finished_counter);
 
 	return 0;
 }

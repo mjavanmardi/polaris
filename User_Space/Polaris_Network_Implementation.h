@@ -16,8 +16,7 @@ namespace Network_Components
 	
 	namespace Implementations
 	{
-		template<typename MasterType>
-		struct Polaris_Network_Implementation
+		implementation struct Polaris_Network_Implementation
 		{
 			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
