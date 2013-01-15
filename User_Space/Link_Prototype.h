@@ -56,13 +56,6 @@ namespace Link_Components
 			EXPRESSWAY,
 			ARTERIAL,
 		};
-		
-		enum Link_Simulation_Status
-		{
-			NONE_COMPLETE,
-			COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE,
-			COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE
-		};
 	}
 
 	namespace Concepts
@@ -529,12 +522,10 @@ namespace Link_Components
 
 			}
 
-			feature_accessor(link_simulation_status, none, none);
-			
 			feature_prototype void Initialize()
 			{
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				load_event(ComponentType,Newells_Conditional,Compute_Step_Flow_Supply_Update,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,NULLTYPE);
+				load_event(ComponentType,Newells_Conditional,Compute_Step_Flow_Supply_Update,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_ITERATION,NULLTYPE);
 			}
 
 			/*
@@ -554,37 +545,24 @@ namespace Link_Components
 				_Link_Interface* _this_ptr=(_Link_Interface*)_pthis;
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface, get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				long link_current_revision=_pthis->object_current_revision();
-				
 				if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_ITERATION)
 				{
 					_pthis->Swap_Event((Event)&Link_Prototype::Compute_Step_Flow_Supply_Update<NULLTYPE>);
 					response.result=true;
-					response.next=_iteration;
+					response.next._iteration=_iteration;
+					response.next._sub_iteration = Scenario_Components::Types::Type_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING;
 				}
 				else if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING)
 				{
 					_pthis->Swap_Event((Event)&Link_Prototype::Compute_Step_Flow_Link_Moving<NULLTYPE>);
 					response.result=true;
-					response.next=_iteration+_this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
+					response.next._iteration=_iteration+_this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_ITERATION;
 				}
 				else
 				{
-					response.result=false;
-					response.next=_iteration;
-				}
-			}
-			
-			feature_prototype string getStatus()
-			{
-				switch(link_simulation_status<Types::Link_Simulation_Status>())
-				{
-				case Types::Link_Simulation_Status::NONE_COMPLETE:
-					return "NONE_COMPLETE";
-				case Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE:
-					return "COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE";
-				case Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE:
-					return "COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE";
+					assert(false);
+					cout << "Should never reach here in link conditional!" << endl;
 				}
 			}
 
@@ -600,8 +578,6 @@ namespace Link_Components
 				//step 1: link supply update based on a given traffic flow model
 				//_this_ptr->template link_moving<ComponentType>();
 				_this_ptr->template link_supply_update<ComponentType>();
-
-				_this_ptr->template link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_SUPPLY_UPDATE_COMPLETE);
 
 				double calculation_time_end = ::get_current_cpu_time_in_seconds();
 				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template operation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
@@ -626,8 +602,6 @@ namespace Link_Components
 				//step 8: link network state update
 				_this_ptr->template network_state_update<ComponentType>();
 
-				_this_ptr->template link_simulation_status<Types::Link_Simulation_Status>(Types::Link_Simulation_Status::COMPUTE_STEP_FLOW_LINK_MOVING_COMPLETE);
-				
 				double calculation_time_end = ::get_current_cpu_time_in_seconds();
 				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template operation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
 

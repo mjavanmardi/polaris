@@ -67,16 +67,6 @@ namespace Intersection_Components
 			ACTUATED_SIGNAL_CONTROL, 
 			ADAPTIVE_SIGNAL_CONTROL,
 		};
-#ifdef WINDOWS
-		enum Intersection_Simulation_Status
-		{
-			NONE_COMPLETE,
-			PROCESS_SKIPPED,
-			COMPUTE_STEP_CONTROL_COMPLETE,
-			COMPUTE_STEP_FLOW_COMPLETE,
-			NETWORK_STATE_UPDATE_COMPLETE
-		};
-#endif
 	}
 
 	namespace Concepts
@@ -188,8 +178,6 @@ namespace Intersection_Components
 			feature_accessor(z_position, none, none);
 
 			feature_accessor(intersection_type, none, none);
-
-			feature_accessor(intersection_simulation_status, none, none);
 
 			feature_accessor(intersection_control, none, none);
 
@@ -808,15 +796,11 @@ namespace Intersection_Components
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_component_interface(_Intersection_Control_Interface, get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
 
-				if (outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>().size() == 0 || inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>().size() == 0)
+				if (outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>().size() > 0 && inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>().size() > 0)
 				{
-					// no outbound or no inbound
-					this->template intersection_simulation_status<Intersection_Components::Types::Intersection_Simulation_Status>(Intersection_Components::Types::Intersection_Simulation_Status::PROCESS_SKIPPED);
-				}
-				else {
-					network_reference<_Network_Interface*>()->template increment_intersection_finish_target<NULLTYPE>();
-					load_event(ComponentType,Newells_Conditional,Compute_Step_Flow,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,NULLTYPE);
 					intersection_control<_Intersection_Control_Interface*>()->template Initialize<NULLTYPE>();
+					network_reference<_Network_Interface*>()->template increment_intersection_finish_target<NULLTYPE>();
+					load_event(ComponentType,Newells_Conditional,Compute_Step_Flow,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_ITERATION,NULLTYPE);
 				}
 			}
 
@@ -830,29 +814,26 @@ namespace Intersection_Components
 
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
-
-				long intersection_current_revision=_pthis->object_current_revision();
-
 				
-				typedef Link_Components::Types::Link_Simulation_Status link_simulation_status_type;
-
 				if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_ITERATION)
 				{
 					_pthis->Swap_Event((Event)&Intersection_Prototype::Compute_Step_Flow<NULLTYPE>);
 					response.result=true;
-					response.next=_iteration;
+					response.next._iteration=_iteration;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE;
 				}
 				else if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE)
 				{
 
 					_pthis->Swap_Event((Event)&Intersection_Prototype::Network_State_Update<NULLTYPE>);
 					response.result=true;
-					response.next=_iteration + _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
+					response.next._iteration=_iteration + _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_ITERATION;
 				} 
 				else
 				{
-					response.result=false;
-					response.next=_iteration;
+					assert(false);
+					cout << "Should never reach here in intersection conditional!" << endl;
 				}
 			}
 
@@ -879,8 +860,6 @@ namespace Intersection_Components
 
 				_this_ptr->template origin_link_loading<NULLTYPE>();
 
-				_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE);
-
 				double calculation_time_end = ::get_current_cpu_time_in_seconds();
 				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
 			}
@@ -897,29 +876,10 @@ namespace Intersection_Components
 
 				//step 9: intersection network state update
 				_this_ptr->template network_state_update<NULLTYPE>();
-
-				_this_ptr->template intersection_simulation_status<Types::Intersection_Simulation_Status>(Types::Intersection_Simulation_Status::NETWORK_STATE_UPDATE_COMPLETE);
 				_this_ptr->template network_reference<_Network_Interface*>()->template increment_intersection_finish_counter<NULLTYPE>();
 
 				double calculation_time_end = ::get_current_cpu_time_in_seconds();
 				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
-			}
-
-			feature_prototype string getStatus()
-			{
-				switch(intersection_simulation_status<Types::Intersection_Simulation_Status>())
-				{
-				case Types::Intersection_Simulation_Status::NONE_COMPLETE:
-					return "NONE_COMPLETE";
-				case Types::Intersection_Simulation_Status::PROCESS_SKIPPED:
-					return "PROCESS_SKIPPED";
-				case Types::Intersection_Simulation_Status::COMPUTE_STEP_CONTROL_COMPLETE:
-					return "COMPUTE_STEP_CONTROL_COMPLETE";
-				case Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE:
-					return "COMPUTE_STEP_FLOW_COMPLETE";
-				case Types::Intersection_Simulation_Status::NETWORK_STATE_UPDATE_COMPLETE:
-					return "NETWORK_STATE_UPDATE_COMPLETE";
-				}
 			}
 
 			feature_prototype void supply_allocation_based_on_driving_rule()

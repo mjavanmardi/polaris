@@ -120,8 +120,6 @@ namespace Link_Components
 			member_data(float, jam_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, critical_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
-			member_data(Types::Link_Simulation_Status, link_simulation_status, none, none);
-
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
 		//------------------------------------------------------------------------------------------------------------------

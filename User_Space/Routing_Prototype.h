@@ -332,9 +332,17 @@ namespace Routing_Components
 				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
 				define_component_interface(_Traveler_Interface, get_type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
-				int uuid=_this_ptr->template traveler<_Traveler_Interface*>()->template uuid<int>();
-				response.next=END;
-				response.result=true;
+				if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::DEMAND_ITERATION)
+				{
+					response.result=true;
+					response.next._iteration=END;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Iteration_keys::DEMAND_ITERATION;
+				}
+				else
+				{
+					assert(false);
+					cout << "Should never reach here in routing conditional!" << endl;
+				}
 			}
 
 			feature_prototype bool one_to_one_link_based_least_time_path_a_star()
@@ -515,7 +523,7 @@ namespace Routing_Components
 			{
 				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				load_event(ComponentType,Compute_Route_Condition,Compute_Route,departed_time,NULLTYPE);
+				load_event(ComponentType,Compute_Route_Condition,Compute_Route,departed_time,Scenario_Components::Types::Type_Iteration_keys::DEMAND_ITERATION,NULLTYPE);
 			}
 
 			//first event
@@ -527,7 +535,6 @@ namespace Routing_Components
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
 				typedef Vehicle_Components::Prototypes::Vehicle_Prototype<typename ComponentType::vehicle_type, ComponentType> _Vehicle_Interface;
 				typedef Routing_Components::Prototypes::Routable_Network_Prototype<typename ComponentType::routable_network_type, ComponentType> _Routable_Network_Interface;
-
 				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 

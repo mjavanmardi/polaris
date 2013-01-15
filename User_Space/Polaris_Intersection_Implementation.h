@@ -131,9 +131,6 @@ namespace Intersection_Components
 
 			member_data(Intersection_Components::Types::Intersection_Type_Keys, intersection_type, none, none);
 
-			member_data(Types::Intersection_Simulation_Status, intersection_simulation_status, none, none);
-
-
 			member_container(vector<typename MasterType::link_type*>, inbound_links, none, none);
 
 

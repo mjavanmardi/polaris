@@ -1012,12 +1012,15 @@ namespace Intersection_Control_Components
 			feature_prototype void Initialize()
 			{
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				load_event(ComponentType,Newells_Conditional,Compute_Step_Control,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,NULLTYPE);
+				load_event(ComponentType,Newells_Conditional,Compute_Step_Control,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Iteration_keys::CONTROL_ITERATION,NULLTYPE);
+
 			}
 
 			declare_feature_conditional(Newells_Conditional)
 			{
 				typedef Intersection_Control_Prototype<ComponentType, ComponentType> _Intersection_Control_Interface;
+define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Intersection_Control_Interface* _this_ptr=(_Intersection_Control_Interface*)_this;
@@ -1025,12 +1028,14 @@ namespace Intersection_Control_Components
 				{
 					_pthis->Swap_Event((Event)&Intersection_Control_Prototype::Compute_Step_Control<NULLTYPE>);
 					response.result=true;
-					response.next=_iteration + _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
+					response.next._iteration=_iteration + _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Iteration_keys::CONTROL_ITERATION;
+
 				}
 				else
 				{
-					response.result=false;
-					response.next=_iteration;
+					assert(false);
+					cout << "Should never reach here in intersection control conditional!" << endl;
 				}
 			}
 
