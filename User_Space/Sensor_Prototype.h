@@ -13,19 +13,6 @@ namespace Sensor_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Location:public ComponentType
-		{
-			tag_as_prototype;
-
-			feature_accessor(link,none,none);
-			feature_accessor(lane,none,none);
-			feature_accessor(offset,none,none);
-
-			feature_accessor(x,none,none);
-			feature_accessor(y,none,none);
-			feature_accessor(z,none,none);
-		};
-
 		prototype struct Sensor:public ComponentType
 		{
 			tag_as_prototype;

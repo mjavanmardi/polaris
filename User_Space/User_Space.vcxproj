@@ -136,6 +136,7 @@
     <ClInclude Include="Intersection_Control_Prototype.h" />
     <ClInclude Include="Intersection_Prototype.h" />
     <ClInclude Include="Link_Prototype.h" />
+    <ClInclude Include="Location_Prototype.h" />
     <ClInclude Include="Network_Prototype.h" />
     <ClInclude Include="Operation_Prototype.h" />
     <ClInclude Include="Polaris_Activity_Location_Implementation.h" />
@@ -148,7 +149,9 @@
     <ClInclude Include="Polaris_Routing_Implementation.h" />
     <ClInclude Include="Polaris_Scenario_Implementation.h" />
     <ClInclude Include="Polaris_Sensor_Implementation.h" />
+    <ClInclude Include="Polaris_Traffic_Management_Center_Implementation.h" />
     <ClInclude Include="Polaris_Traveler_Implementation.h" />
+    <ClInclude Include="Polaris_Variable_Message_Sign_Implementation.h" />
     <ClInclude Include="Polaris_Vehicle_Implementation.h" />
     <ClInclude Include="Polaris_Zone_Implementation.h" />
     <ClInclude Include="Population_Synthesis\File_Reader.h" />
@@ -170,9 +173,11 @@
     <ClInclude Include="Routing_Prototype.h" />
     <ClInclude Include="Scenario_Prototype.h" />
     <ClInclude Include="Sensor_Prototype.h" />
+    <ClInclude Include="Traffic_Management_Center_Prototype.h" />
     <ClInclude Include="Traveler_Prototype.h" />
     <ClInclude Include="User_Space.h" />
     <ClInclude Include="User_Space_Includes.h" />
+    <ClInclude Include="Variable_Message_Sign_Prototype.h" />
     <ClInclude Include="Vehicle_Prototype.h" />
     <ClInclude Include="Zone_Prototype.h" />
   </ItemGroup>

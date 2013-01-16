@@ -160,5 +160,20 @@
     <ClInclude Include="Polaris_Sensor_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Location_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Traffic_Management_Center_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Variable_Message_Sign_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Variable_Message_Sign_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Traffic_Management_Center_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
