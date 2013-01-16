@@ -99,7 +99,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		
 		long long dist=(long long)(_this-(Byte*)memory_root_ptr->pages);
 
-		_this=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
+		_this=((dist/(_Page_Size/ComponentType::page_factor))*(_Page_Size/ComponentType::page_factor)+(Byte*)memory_root_ptr->pages);
 		
 		// finally, cast to PTEX
 		Typed_Execution_Page<ComponentType>* execution_page=(Typed_Execution_Page<ComponentType>*)_this;
@@ -183,7 +183,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		// Must first locate PTEX corresponding to self
 		Byte* _this=(Byte*)this;
 		long long dist=(long long)(_this-(Byte*)memory_root_ptr->pages);
-		_this=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
+		_this=((dist/(_Page_Size/ComponentType::page_factor))*(_Page_Size/ComponentType::page_factor)+(Byte*)memory_root_ptr->pages);
 		Typed_Execution_Page<ComponentType>* execution_page=(Typed_Execution_Page<ComponentType>*)_this;
 
 		if(starting_iteration <= execution_page->ptex_next_revision)

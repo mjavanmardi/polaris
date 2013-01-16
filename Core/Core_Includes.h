@@ -64,13 +64,13 @@ static const int inc_val=1;
 #else
 #define SLEEP(Seconds) usleep(Seconds*1000000)
 #endif
-class NULLCLASS{};
-
+struct NULLCLASS{static const int page_factor=1;};
+const int NULLCLASS::page_factor;
 
 
 typedef volatile long _lock;
 #define LOCK(LOCK_VARIABLE) while(AtomicExchange(&LOCK_VARIABLE,1)) SLEEP(0)
-#define UNLOCK(LOCK_VARIABLE) mem_lock=0
+#define UNLOCK(LOCK_VARIABLE) LOCK_VARIABLE=0
 
 #define none true
 #define not_available false

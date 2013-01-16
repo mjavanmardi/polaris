@@ -22,10 +22,14 @@ DataType* Typed_Execution_Pages<DataType>::Allocate()
 			type_activated=true;
 		}
 
-		Typed_Execution_Page<DataType>* new_page=(Typed_Execution_Page<DataType>*)memory_root_ptr->Allocate();
+		Typed_Execution_Page<DataType>* new_pages=(Typed_Execution_Page<DataType>*)memory_root_ptr->Allocate();
 
-		new_page->Initialize();
-		pages_with_free_cells.Push(new_page);
+		for(int i=0;i<DataType::page_factor;i++)
+		{
+			new_pages->Initialize();
+			pages_with_free_cells.Push(new_pages);
+			new_pages=(Typed_Execution_Page<DataType>*)(((Byte*)new_pages)+(unsigned int)(_Page_Size/DataType::page_factor));
+		}
 	}
 
 	if(pages_with_free_cells.First()->Empty())
@@ -57,7 +61,7 @@ void Typed_Execution_Pages<DataType>::Free(DataType* _object)
 	// find the page which this object resides in
 	Byte* object=(Byte*)_object;
 	long long dist=(long long)(object-(Byte*)memory_root_ptr->pages);
-	object=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
+	object=((dist/(_Page_Size/DataType::page_factor))*(_Page_Size/DataType::page_factor)+(Byte*)memory_root_ptr->pages);
 	Typed_Execution_Page<DataType>*exe_page=(Typed_Execution_Page<DataType>*)object;
 
 	// check if need to inform type that this page has space now
@@ -87,12 +91,15 @@ DataType* Typed_Data_Pages<DataType>::Allocate()
 	if( pages_with_free_cells.Empty() )
 	//if(pages_with_free_cells.size()==0)
 	{
-		Typed_Data_Page<DataType>* new_page=(Typed_Data_Page<DataType>*)memory_root_ptr->Allocate();
+		
+		Typed_Data_Page<DataType>* new_pages=(Typed_Data_Page<DataType>*)memory_root_ptr->Allocate();
 
-		new_page->Initialize();
-
-		pages_with_free_cells.Push(new_page);
-		//pages_with_free_cells.push_back(new_page);
+		for(int i=0;i<DataType::page_factor;i++)
+		{
+			new_pages->Initialize();
+			pages_with_free_cells.Push(new_pages);
+			new_pages=(Typed_Data_Page<DataType>*)(((Byte*)new_pages)+(unsigned int)(_Page_Size/DataType::page_factor));
+		}
 	}
 
 	Byte* return_value=(Byte*)(pages_with_free_cells.First()->Allocate());
@@ -122,7 +129,7 @@ void Typed_Data_Pages<DataType>::Free(DataType* _object)
 	// find the page which this object resides in
 	Byte* object=(Byte*)_object;
 	long long dist=(long long)(object-(Byte*)memory_root_ptr->pages);
-	object=((dist/_Page_Size)*_Page_Size+(Byte*)memory_root_ptr->pages);
+	object=((dist/(_Page_Size/DataType::page_factor))*(_Page_Size/DataType::page_factor)+(Byte*)memory_root_ptr->pages);
 	Typed_Data_Page<DataType>* data_page=(Typed_Data_Page<DataType>*)object;
 
 	// check if need to inform type that this page has space now

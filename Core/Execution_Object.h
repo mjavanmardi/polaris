@@ -195,12 +195,12 @@ typedef void (*Execution_Directive)(void*,Revision&);
 /// Tight loop function to process a given execution page
 ///============================================================================
 
-template<typename DataType,const int iterations,const int stride>
+template<typename DataType>
 void Execution_Loop(void* page_in, Revision& ptex_response)
 {
-	Bytes<stride>* page=(Bytes<stride>*)page_in;
+	Bytes<sizeof(DataType)>* page=(Bytes<sizeof(DataType)>*)page_in;
 	
-	const Bytes<stride>* const __restrict end_page=page+iterations;
+	const Bytes<sizeof(DataType)>* const __restrict end_page=page+(_Page_Size/DataType::page_factor-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType);
 	
 	const Revision this_revision=_revision;
 	

@@ -94,7 +94,7 @@ struct Typed_Execution_Page
 };
 
 template<typename DataType>
-const int Typed_Execution_Page<DataType>::num_cells=(_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType);
+const int Typed_Execution_Page<DataType>::num_cells=(_Page_Size/DataType::page_factor-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType);
 
 template<typename DataType>
 const int Typed_Execution_Page<DataType>::stride=sizeof(DataType);
@@ -110,8 +110,8 @@ template<typename DataType>
 class Typed_Execution_Pages
 {
 public:
-	Typed_Execution_Pages(Execution_Directive execution_function=(Execution_Directive)Execution_Loop<DataType,(_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType),sizeof(DataType)>):stride(sizeof(DataType)),type_activated(false),
-	num_cells((_Page_Size-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType)),
+	Typed_Execution_Pages(Execution_Directive execution_function=(Execution_Directive)Execution_Loop<DataType>):stride(sizeof(DataType)),type_activated(false),
+	num_cells((_Page_Size/DataType::page_factor-sizeof(Typed_Execution_Page<DataType>))/sizeof(DataType)),
 	process_directive(execution_function)
 	{
 		tex_lock=0;

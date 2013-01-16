@@ -75,7 +75,7 @@ struct Typed_Data_Page
 };
 
 template<typename DataType>
-const int Typed_Data_Page<DataType>::num_cells=(_Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType);
+const int Typed_Data_Page<DataType>::num_cells=((_Page_Size/DataType::page_factor)-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType);
 
 template<typename DataType>
 const int Typed_Data_Page<DataType>::stride=sizeof(DataType);
@@ -89,7 +89,7 @@ template<typename DataType>
 class Typed_Data_Pages
 {
 public:
-	Typed_Data_Pages():stride(sizeof(DataType)),num_cells((_Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType))
+	Typed_Data_Pages():stride(sizeof(DataType)),num_cells(((_Page_Size/DataType::page_factor)-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType))
 	{
 		mem_lock=0;
 	}
