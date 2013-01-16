@@ -1,2 +1,0 @@
-num_zones	num_activity_locations	num_nodes	num_links	num_turn_movements	num_vehicles	first_departure_time	last_departure_time
-4	4	9	16	36	60420	00:00:00	23:59:59	00:00:00	24:00:00
