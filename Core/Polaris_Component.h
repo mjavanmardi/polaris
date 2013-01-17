@@ -49,7 +49,7 @@ public:
 	friend class ImplementationTemplate<MasterType>;
 #endif
 
-	static const int page_factor;
+	static const unsigned int page_factor;
 
 	static const int component_index;
 	typedef typename ObjectToSingleton<ObjectType,Polaris_Component>::type Singleton_Type;
@@ -86,7 +86,7 @@ public:
 #else
 	friend class ImplementationTemplate<MasterType>;
 #endif
-	static const int page_factor;
+	static const unsigned int page_factor;
 
 	static const int component_index;
 	typedef typename ObjectToSingleton<ObjectType,Polaris_Component>::type Singleton_Type;
@@ -188,7 +188,7 @@ public:
 #if STATE_CHECKS
 	virtual void State_Check(){};
 #endif
-	static const int page_factor;
+	static const unsigned int page_factor;
 
 	static const int component_index;
 	typedef typename ObjectToSingleton<ObjectType,ImplementationTemplate<MasterType,ParentType>>::type Singleton_Type;
@@ -221,7 +221,7 @@ public:
 #if STATE_CHECKS
 	virtual void State_Check(){};
 #endif
-	static const int page_factor;
+	static const unsigned int page_factor;
 
 	static const int component_index;
 	typedef typename ObjectToSingleton<ObjectType,ImplementationTemplate<MasterType,NULLTYPE>>::type Singleton_Type;
@@ -275,7 +275,7 @@ public:
 ///============================================================================
 
 template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
-const int Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,ParentType,PageFactor,GroupList>::page_factor=PageFactor;
+const unsigned int Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,ParentType,PageFactor,GroupList>::page_factor=PageFactor;
 
 template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
 const int Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,ParentType,PageFactor,GroupList>::component_index=_component_counter++;
@@ -291,7 +291,7 @@ typename Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,Pa
 	
 
 template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,unsigned int PageFactor,typename GroupList>
-const int Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::page_factor=PageFactor;
+const unsigned int Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::page_factor=PageFactor;
 
 template<template<class,class> class ImplementationTemplate,typename MasterType,typename ObjectType,unsigned int PageFactor,typename GroupList>
 const int Polaris_Component_Class<ImplementationTemplate,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::component_index=_component_counter++;

@@ -24,7 +24,7 @@ DataType* Typed_Execution_Pages<DataType>::Allocate()
 
 		Typed_Execution_Page<DataType>* new_pages=(Typed_Execution_Page<DataType>*)memory_root_ptr->Allocate();
 
-		for(int i=0;i<DataType::page_factor;i++)
+		for(unsigned int i=0;i<DataType::page_factor;i++)
 		{
 			new_pages->Initialize();
 			pages_with_free_cells.Push(new_pages);
@@ -94,7 +94,7 @@ DataType* Typed_Data_Pages<DataType>::Allocate()
 		
 		Typed_Data_Page<DataType>* new_pages=(Typed_Data_Page<DataType>*)memory_root_ptr->Allocate();
 
-		for(int i=0;i<DataType::page_factor;i++)
+		for(unsigned int i=0;i<DataType::page_factor;i++)
 		{
 			new_pages->Initialize();
 			pages_with_free_cells.Push(new_pages);
