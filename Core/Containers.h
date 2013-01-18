@@ -104,11 +104,16 @@ struct Random_Access_Sequence_Prototype
 	typedef true_type Is_Sequence_Type;
 
 	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,TargetValueType> iterator;
+	typedef Input_Iterator<typename ComponentType::reverse_iterator,ComponentType,CallerType,TargetValueType> reverse_iterator;
 	typedef typename ComponentType::size_type size_type;
 
 	iterator begin(){return (iterator)((ComponentType*)this)->begin();}
 
 	iterator end(){return (iterator)((ComponentType*)this)->end();}
+
+	reverse_iterator rbegin(){return (reverse_iterator)((ComponentType*)this)->rbegin();}
+
+	reverse_iterator rend(){return (reverse_iterator)((ComponentType*)this)->rend();}
 	
 	size_type size(){return ((ComponentType*)this)->size();}
 
