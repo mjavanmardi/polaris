@@ -35,12 +35,6 @@ namespace Vehicle_Components {
 		forward_declare_prototype struct Vehicle_Prototype;
 	}
 };
-namespace Routing_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Routable_Network_Prototype;
-	}
-};
 namespace Intersection_Components {
 	namespace Prototypes
 	{
@@ -86,6 +80,12 @@ namespace Network_Components
 			typedef _ParamType ParamType;
 		};
 
+		enum Scan_List_Status_Keys
+		{
+				UNSCANNED=0,
+				SCANNED,
+				INSELIST,
+		};
 	}
 
 	namespace Concepts
@@ -106,8 +106,12 @@ namespace Network_Components
 			feature_accessor(activity_locations_container, none, none);
 			feature_accessor(zones_container, none, none);
 			feature_accessor(routable_network, none, none);
-
 			feature_accessor(routable_networks_container, none, none);
+
+			// features for routable network
+			feature_accessor(scan_list, none, none);
+			feature_accessor(reversed_path_container, none, none);
+
 
 			volatile long _intersection_finish_counter; // To track the end of an iteration, track how many links have finished processing
 			long _intersection_finish_target; // If link_finish_counter reaches link_finish_target, then an iteration has completed
@@ -1175,7 +1179,7 @@ namespace Network_Components
 			feature_prototype void construct_routable_network()
 			{
 
-				define_container_and_value_interface(_Routable_Networks_Container_Interface, _Routable_Network_Interface, get_type_of(routable_networks_container), Random_Access_Sequence_Prototype, Routing_Components::Prototypes::Routable_Network_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Networks_Container_Interface, _Routable_Network_Interface, get_type_of(routable_networks_container), Random_Access_Sequence_Prototype, Network_Components::Prototypes::Network_Prototype, ComponentType);
 				_Routable_Networks_Container_Interface& routable_networks=routable_networks_container<_Routable_Networks_Container_Interface&>();
 
 				for(int i=0;i<_num_threads;i++)
@@ -1654,6 +1658,168 @@ namespace Network_Components
 				network_data.network_zone_size = (int)network_data.zone_data_array.size();
 			}
 
+			feature_prototype void Reset()
+			{
+				typedef typename ComponentType::scan_list_type ScanListType;
+				scan_list<ScanListType&>().clear();
+	
+				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);  
+				reversed_path_container<_Reversed_Path_Container_Interface&>().clear();
+				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				typename _Routable_Links_Container_Interface::iterator link_itr;
+
+				for(link_itr=links_container<_Routable_Links_Container_Interface&>().begin();link_itr!=links_container<_Routable_Links_Container_Interface&>().end();link_itr++)
+				{
+					_Routable_Link_Interface* link_ptr = (_Routable_Link_Interface*)(*link_itr);
+					link_ptr->template label_cost<float>(INFINITY_FLOAT);
+					link_ptr->template label_pointer<_Routable_Link_Interface*>(link_ptr);
+					link_ptr->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::UNSCANNED);
+					link_ptr->template f_cost<float>(0.0);
+					link_ptr->template h_cost<float>(0.0);
+				}
+			}
+
+			feature_prototype void read_routable_network_data(void* regular_network)
+			{
+				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Intersections_Container_Interface, _Routable_Intersection_Interface, get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Outbound_Inbound_Movements_Container_Interface, _Routable_Outbound_Inbound_Movements_Interface, _Routable_Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype,Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Inbound_Outbound_Movements_Container_Interface, _Routable_Inbound_Outbound_Movements_Interface, _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, _Routable_Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+
+				typedef Network_Components::Prototypes::Network_Prototype<typename ComponentType::regular_network_type, ComponentType> _Regular_Network_Interface;
+				define_container_and_value_interface(_Regular_Links_Container_Interface, _Regular_Link_Interface, ComponentType::regular_network_type::links_container_type, Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Regular_Intersections_Container_Interface, _Regular_Intersection_Interface, ComponentType::regular_network_type::intersections_container_type, Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_container_and_value_interface(_Regular_Outbound_Inbound_Movements_Container_Interface, _Regular_Outbound_Inbound_Movements_Interface, _Regular_Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Regular_Inbound_Outbound_Movements_Container_Interface, _Regular_Inbound_Outbound_Movements_Interface, _Regular_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Regular_Movements_Container_Interface, _Regular_Movement_Interface, _Regular_Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				
+
+				max_free_flow_speed<float>(((_Regular_Network_Interface*)regular_network)->template max_free_flow_speed<float>());
+
+				
+				_Regular_Links_Container_Interface& regular_links_container = ((_Regular_Network_Interface*)regular_network)->template links_container<_Regular_Links_Container_Interface&>();
+				
+				// copy all links
+				cout << "copying links" << endl;
+				dense_hash_map<int, _Routable_Link_Interface*> linksMap;
+				linksMap.set_empty_key(-1);
+				linksMap.set_deleted_key(-2);
+				typename _Regular_Links_Container_Interface::iterator regular_link_itr;
+				for(regular_link_itr=regular_links_container.begin(); regular_link_itr!=regular_links_container.end(); regular_link_itr++)
+				{
+					_Regular_Link_Interface* regular_link = (_Regular_Link_Interface*)(*regular_link_itr);
+					_Routable_Link_Interface* routable_link =  (_Routable_Link_Interface*)Allocate<typename _Routable_Link_Interface::Component_Type>();
+					routable_link->template network_link_reference<_Regular_Link_Interface*>(regular_link);
+					routable_link->template f_cost<float>(0.0);
+					routable_link->template h_cost<float>(0.0);
+					routable_link->template label_pointer<void*>(routable_link);
+					routable_link->template label_cost<float>(0.0);
+					routable_link->template uuid<int>(regular_link->template uuid<int>());
+					routable_link->template internal_id<int>(regular_link->template internal_id<int>());
+					routable_link->template travel_time<float>(regular_link->template travel_time<float>());
+					links_container<_Routable_Links_Container_Interface&>().push_back(routable_link);
+					linksMap.insert(pair<int, _Routable_Link_Interface*>(regular_link->template internal_id<int>(), routable_link));
+					regular_link->template replicas_container<_Routable_Links_Container_Interface&>().push_back(routable_link);
+				}
+				cout << "copying intersections" << endl;
+				// copy all intersections
+				int counter = -1;
+				_Regular_Intersections_Container_Interface& regular_intersections_container = ((_Regular_Network_Interface*)regular_network)->template intersections_container<_Regular_Intersections_Container_Interface&>();
+				dense_hash_map<int, _Routable_Intersection_Interface*> intersectionsMap;
+				intersectionsMap.set_empty_key(-1);
+				intersectionsMap.set_deleted_key(-2);
+				typename _Regular_Intersections_Container_Interface::iterator regular_intersection_itr;
+				for(regular_intersection_itr=regular_intersections_container.begin(); regular_intersection_itr!=regular_intersections_container.end(); regular_intersection_itr++)
+				{
+					if (++counter % 10000 == 0)
+					{
+						cout << counter << " intersections copied" << endl;
+					}
+					_Regular_Intersection_Interface* regular_intersection = (_Regular_Intersection_Interface*)(*regular_intersection_itr);
+					_Routable_Intersection_Interface* routable_intersection =  (_Routable_Intersection_Interface*)Allocate<typename _Routable_Intersection_Interface::Component_Type>();
+					routable_intersection->template x_position<float>(regular_intersection->template x_position<float>());
+					routable_intersection->template y_position<float>(regular_intersection->template y_position<float>());
+					routable_intersection->template uuid<int>(regular_intersection->template uuid<int>());
+					routable_intersection->template internal_id<int>(regular_intersection->template internal_id<int>());
+					
+					// create inbound_outbound_movements
+					_Regular_Inbound_Outbound_Movements_Container_Interface& regular_inbound_outbound_movements_container = regular_intersection->template inbound_outbound_movements<_Regular_Inbound_Outbound_Movements_Container_Interface&>();
+					typename _Regular_Inbound_Outbound_Movements_Container_Interface::iterator regular_inbound_outbound_movements_itr;
+					
+					for(regular_inbound_outbound_movements_itr=regular_inbound_outbound_movements_container.begin(); regular_inbound_outbound_movements_itr!=regular_inbound_outbound_movements_container.end(); regular_inbound_outbound_movements_itr++)
+					{
+						_Regular_Inbound_Outbound_Movements_Interface* regular_inbound_outbound_movements = (_Regular_Inbound_Outbound_Movements_Interface*)(*regular_inbound_outbound_movements_itr);
+						_Routable_Inbound_Outbound_Movements_Interface* routable_inbound_outbound_movements = (_Routable_Inbound_Outbound_Movements_Interface*)Allocate<typename _Routable_Inbound_Outbound_Movements_Interface::Component_Type>();
+						_Regular_Link_Interface* regular_link = regular_inbound_outbound_movements->template inbound_link_reference<_Regular_Link_Interface*>();
+						_Routable_Link_Interface* routable_link = linksMap.find(regular_link->template internal_id<int>())->second;
+						routable_inbound_outbound_movements->template inbound_link_reference<_Routable_Link_Interface*>(routable_link);
+						//another level of loop
+						_Regular_Movements_Container_Interface& regular_outbound_movements_container = regular_inbound_outbound_movements->template outbound_movements<_Regular_Movements_Container_Interface&>();
+						typename _Regular_Movements_Container_Interface::iterator regular_outbound_movement_itr;
+						for(regular_outbound_movement_itr=regular_outbound_movements_container.begin(); regular_outbound_movement_itr!=regular_outbound_movements_container.end(); regular_outbound_movement_itr++)
+						{
+							_Regular_Movement_Interface* regular_outbound_movement = (_Regular_Movement_Interface*)(*regular_outbound_movement_itr);
+							_Routable_Movement_Interface* routable_outbound_movement = (_Routable_Movement_Interface*)Allocate<typename _Routable_Movement_Interface::Component_Type>();
+							routable_outbound_movement->template forward_link_turn_travel_time<float>(regular_outbound_movement->template forward_link_turn_travel_time<float>());
+							_Regular_Link_Interface* regular_outbound_link = regular_outbound_movement->template outbound_link<_Regular_Link_Interface*>();
+							_Routable_Link_Interface* routable_outbound_link = linksMap.find(regular_outbound_link->template internal_id<int>())->second;
+							routable_outbound_movement->template outbound_link<_Routable_Link_Interface*>(routable_outbound_link);
+							regular_outbound_movement->template replicas_container<_Routable_Movements_Container_Interface&>().push_back(routable_outbound_movement);
+							routable_inbound_outbound_movements->template outbound_movements<_Routable_Movements_Container_Interface&>().push_back(routable_outbound_movement);
+						}
+						routable_intersection->template inbound_outbound_movements<_Routable_Inbound_Outbound_Movements_Container_Interface&>().push_back(routable_inbound_outbound_movements);
+					}
+					
+					// create outbound_inbound_movements
+					_Regular_Outbound_Inbound_Movements_Container_Interface& regular_outbound_inbound_movements_container = regular_intersection->template outbound_inbound_movements<_Regular_Outbound_Inbound_Movements_Container_Interface&>();
+					typename _Regular_Outbound_Inbound_Movements_Container_Interface::iterator regular_outbound_inbound_movements_itr;
+					
+					for(regular_outbound_inbound_movements_itr=regular_outbound_inbound_movements_container.begin(); regular_outbound_inbound_movements_itr!=regular_outbound_inbound_movements_container.end(); regular_outbound_inbound_movements_itr++)
+					{
+						_Regular_Outbound_Inbound_Movements_Interface* regular_outbound_inbound_movements = (_Regular_Outbound_Inbound_Movements_Interface*)(*regular_outbound_inbound_movements_itr);
+						_Routable_Outbound_Inbound_Movements_Interface* routable_outbound_inbound_movements = (_Routable_Outbound_Inbound_Movements_Interface*)Allocate<typename _Routable_Outbound_Inbound_Movements_Interface::Component_Type>();
+						_Regular_Link_Interface* regular_link = regular_outbound_inbound_movements->template outbound_link_reference<_Regular_Link_Interface*>();
+						_Routable_Link_Interface* routable_link = linksMap.find(regular_link->template internal_id<int>())->second;
+						routable_outbound_inbound_movements->template outbound_link_reference<_Routable_Link_Interface*>(routable_link);
+						//another level of loop
+						_Regular_Movements_Container_Interface& regular_inbound_movements_container = regular_outbound_inbound_movements->template inbound_movements<_Regular_Movements_Container_Interface&>();
+						typename _Regular_Movements_Container_Interface::iterator regular_inbound_movement_itr;
+						for(regular_inbound_movement_itr=regular_inbound_movements_container.begin(); regular_inbound_movement_itr!=regular_inbound_movements_container.end(); regular_inbound_movement_itr++)
+						{
+							_Regular_Movement_Interface* regular_inbound_movement = (_Regular_Movement_Interface*)(*regular_inbound_movement_itr);
+							_Routable_Movement_Interface* routable_inbound_movement = (_Routable_Movement_Interface*)Allocate<typename _Routable_Movement_Interface::Component_Type>();
+							routable_inbound_movement->template forward_link_turn_travel_time<float>(regular_inbound_movement->template forward_link_turn_travel_time<float>());
+							_Regular_Link_Interface* regular_inbound_link = regular_inbound_movement->template inbound_link<_Regular_Link_Interface*>();
+							_Routable_Link_Interface* routable_inbound_link = linksMap.find(regular_inbound_link->template internal_id<int>())->second;
+							routable_inbound_movement->template inbound_link<_Routable_Link_Interface*>(routable_inbound_link);
+							regular_inbound_movement->template replicas_container<_Routable_Movements_Container_Interface&>().push_back(routable_inbound_movement);
+							routable_outbound_inbound_movements->template inbound_movements<_Routable_Movements_Container_Interface&>().push_back(routable_inbound_movement);
+						}
+						routable_intersection->template outbound_inbound_movements<_Routable_Outbound_Inbound_Movements_Container_Interface&>().push_back(routable_outbound_inbound_movements);
+					}
+
+					intersections_container<_Routable_Intersections_Container_Interface&>().push_back(routable_intersection);
+					intersectionsMap.insert(pair<int, _Routable_Intersection_Interface*>(regular_intersection->template internal_id<int>(), routable_intersection));
+				}
+				cout << " adding up/down streams to each link" << endl;
+				// add upstream and downstream to each link
+				typename _Routable_Links_Container_Interface::iterator routable_link_itr;
+				for(routable_link_itr=links_container<_Routable_Links_Container_Interface&>().begin(); routable_link_itr!=links_container<_Routable_Links_Container_Interface&>().end(); routable_link_itr++)
+				{
+
+					_Routable_Link_Interface* routable_link = (_Routable_Link_Interface*)(*routable_link_itr);
+					_Regular_Link_Interface* regular_link = routable_link->template network_link_reference<_Regular_Link_Interface*>();
+		
+					_Regular_Intersection_Interface* regular_upstream_intersection = regular_link->template upstream_intersection<_Regular_Intersection_Interface*>();
+					_Routable_Intersection_Interface* routable_upstream_intersection = intersectionsMap.find(regular_upstream_intersection->template internal_id<int>())->second;
+					routable_link->template upstream_intersection<_Routable_Intersection_Interface*>(routable_upstream_intersection);
+					_Regular_Intersection_Interface* regular_downstream_intersection = regular_link->template downstream_intersection<_Regular_Intersection_Interface*>();
+					_Routable_Intersection_Interface* routable_downstream_intersection = intersectionsMap.find(regular_downstream_intersection->template internal_id<int>())->second;
+					routable_link->template downstream_intersection<_Routable_Intersection_Interface*>(routable_downstream_intersection);
+				}
+				cout << " streams added" << endl;
+			}
 		};
 	}
 }

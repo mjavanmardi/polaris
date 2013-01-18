@@ -24,9 +24,9 @@ namespace Routing_Components
 			member_data(scan_list_typedef, scan_list, none, none);
 			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
-			member_container(vector<typename MasterType::routable_intersection_type*>, intersections, none, none);
+			member_container(vector<typename MasterType::routable_intersection_type*>, intersections_container, none, none);
 
-			member_container(vector<typename MasterType::routable_link_type*>, links, none, none);
+			member_container(vector<typename MasterType::routable_link_type*>, links_container, none, none);
 
 			member_container(vector<typename MasterType::link_type*>, reversed_path_container, none, none);
 			typedef typename MasterType::network_type regular_network_type;
@@ -72,11 +72,11 @@ namespace Routing_Components
 
 			typedef Random_Access_Sequence_Prototype<_Links_Container_Type, NULLTYPE, void*> _Links_Container_Interface;
 
-			typedef Routing_Components::Prototypes::Routable_Network_Prototype<typename MasterType::routable_network_type, NULLTYPE> _Routable_Network_Interface;
+			typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::routable_network_type, NULLTYPE> _Routable_Network_Interface;
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType routable_origin()
 			{
-				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links<_Links_Container_Interface&>()[_routable_origin]);
+				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links_container<_Links_Container_Interface&>()[_routable_origin]);
 			}
 			tag_getter_as_available(routable_origin);
 
@@ -92,7 +92,7 @@ namespace Routing_Components
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType routable_destination()
 			{
-				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links<_Links_Container_Interface&>()[_routable_destination]);
+				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links_container<_Links_Container_Interface&>()[_routable_destination]);
 			}
 			tag_getter_as_available(routable_destination);
 
