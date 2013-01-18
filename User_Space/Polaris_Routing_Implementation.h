@@ -61,11 +61,11 @@ namespace Routing_Components
 
 			
 			template<typename ComponentType, typename CallerType, typename TargetType>
-			void origin_link(TargetType set_value)
+			void routable_origin(TargetType set_value)
 			{
-				_origin_link = set_value->template internal_id<int>();
+				_routable_origin = set_value->template internal_id<int>();
 			}
-			tag_setter_as_available(origin_link);
+			tag_setter_as_available(routable_origin);
 
 			typedef vector<typename MasterType::routable_link_type*> routable_links_container_type;
 			typedef Polaris_Container<routable_links_container_type> _Links_Container_Type;
@@ -74,29 +74,29 @@ namespace Routing_Components
 
 			typedef Routing_Components::Prototypes::Routable_Network_Prototype<typename MasterType::routable_network_type, NULLTYPE> _Routable_Network_Interface;
 			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType origin_link()
+			TargetType routable_origin()
 			{
-				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links<_Links_Container_Interface&>()[_origin_link]);
+				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links<_Links_Container_Interface&>()[_routable_origin]);
 			}
-			tag_getter_as_available(origin_link);
+			tag_getter_as_available(routable_origin);
 
-			int _origin_link;
+			int _routable_origin;
 
 			template<typename ComponentType, typename CallerType, typename TargetType>
-			void destination_link(TargetType set_value)
+			void routable_destination(TargetType set_value)
 			{
-				_destination_link = set_value->template internal_id<int>();
+				_routable_destination = set_value->template internal_id<int>();
 			}
-			tag_setter_as_available(destination_link);
+			tag_setter_as_available(routable_destination);
 
 			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType destination_link()
+			TargetType routable_destination()
 			{
-				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links<_Links_Container_Interface&>()[_destination_link]);
+				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links<_Links_Container_Interface&>()[_routable_destination]);
 			}
-			tag_getter_as_available(destination_link);
+			tag_getter_as_available(routable_destination);
 
-			int _destination_link;	
+			int _routable_destination;	
 			
 			typedef typename MasterType::link_type regular_link_type;
 			typedef typename MasterType::routable_link_type routable_link_type;

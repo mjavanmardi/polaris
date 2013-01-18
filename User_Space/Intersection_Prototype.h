@@ -1,6 +1,7 @@
 #pragma once
 #include "User_Space_Includes.h"
 #include "Intersection_Control_Prototype.h"
+#include "Vehicle_Prototype.h"
 #include "../File_IO/utilities.h"
 //#include "Signal_Prototypes.h"
 
@@ -35,6 +36,12 @@ namespace Intersection_Control_Components {
 	namespace Prototypes
 	{
 		forward_declare_prototype struct Intersection_Control_Prototype;
+	}
+};
+namespace Movement_Plan_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Movement_Plan_Prototype;
 	}
 };
 /*------------------------------------------------*/
@@ -200,6 +207,7 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, _Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface, _Link_Interface::get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype,  ComponentType);
+				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
 				//define_component_interface(_Detector_Interface,  _Movement_Interface_type::get_type_of(detector), Signal_Components::Prototypes::Detector_Prototype, ComponentType);
 
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
@@ -230,7 +238,9 @@ namespace Intersection_Components
 
 						inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
 
-						if(((_Vehicle_Interface*)vehicle)->template next_link<_Link_Interface*>()==outbound_link && ((_Vehicle_Interface*)vehicle)->template current_link<_Link_Interface*>()==inbound_link)
+						_Movement_Plan_Interface* mp = ((_Vehicle_Interface*)vehicle)->template movement_plan<_Movement_Plan_Interface*>();
+
+						if(mp->template next_link<_Link_Interface*>()==outbound_link && mp->template current_link<_Link_Interface*>()==inbound_link)
 						{
 							
 							//_Detector_Interface* detector;
@@ -399,8 +409,7 @@ namespace Intersection_Components
 						{
 							inbound_movement->template turn_movement_cumulative_shifted_arrived_vehicles<int>(0.0);
 						}
-					
-
+				
 
 						int movement_demand = inbound_movement->template turn_movement_cumulative_shifted_arrived_vehicles<int>() - inbound_movement->template turn_movement_cumulative_vehicles<int>();
 
@@ -427,7 +436,9 @@ namespace Intersection_Components
 				define_component_interface(_Link_Interface,  _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_simple_container_interface(_Float_Container_Interface, _Movement_Interface::get_type_of(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array), Random_Access_Sequence_Prototype, float, ComponentType);
+				
 				typedef Vehicle_Components::Prototypes::Vehicle_Prototype<typename ComponentType::vehicle_type, ComponentType> _Vehicle_Interface;
+				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 
 				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
 				
@@ -495,9 +506,9 @@ namespace Intersection_Components
 								_Vehicle_Interface* vehicle=inbound_movement->template pull_vehicle<_Vehicle_Interface*>();
 
 								//update vehicle state: transfer to next link
-								int enter_time=vehicle->template get_current_link_enter_time<NULLTYPE>();
+								int enter_time=vehicle->template movement_plan<_Movement_Plan_Interface*>()->template get_current_link_enter_time<int>();
 								int delayed_time = int((scenario->template current_simulation_time<int>() - enter_time) - inbound_link->template link_fftt<float>());
-								int enter_interval_index = vehicle->template current_link_enter_interval_index<int>();
+								int enter_interval_index = enter_time / scenario->simulation_interval_length<int>();
 								int delayed_interval = current_simulation_interval_index - enter_interval_index;
 
 								//update inbound link state: N(a',L,t)
@@ -726,14 +737,12 @@ namespace Intersection_Components
 
 							vehicle=(_Vehicle_Interface*)outbound_link->template link_origin_vehicle_array<_Vehicles_Origin_Container_Interface&>()[iv];
 						
-							int departure_interval=vehicle->template departed_simulation_interval_index<int>();
-
 							outbound_link->template link_origin_vehicle_queue<_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
 							outbound_link->template link_origin_arrived_vehicles<int&>()++;
 							outbound_link->template link_origin_loaded_vehicles<int&>()++;
 							outbound_link->template link_origin_cumulative_arrived_vehicles<int&>()++;
 
-								scenario->template network_cumulative_loaded_vehicles<int&>()++;
+							scenario->template network_cumulative_loaded_vehicles<int&>()++;
 						}
 					}
 
@@ -763,7 +772,7 @@ namespace Intersection_Components
 								outbound_link->template link_origin_vehicle_queue<_Vehicle_Origin_Queue_Interface&>().pop_front();
 
 								//update vehicle state
-								vehicle->template load_to_origin_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
+								vehicle->template load<Vehicle_Components::Types::Load_To_Origin_Link>();
 							
 								//update link state
 								outbound_link->template link_origin_cumulative_departed_vehicles<int&>()++;

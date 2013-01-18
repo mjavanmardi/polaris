@@ -20,9 +20,8 @@ namespace Traveler_Components
 			member_data(int, internal_id, none, none);
 
 			member_component(typename MasterType::routing_type, router, none, none);
-
 			member_component(typename MasterType::vehicle_type, vehicle, none, none);
-
+			member_component(typename MasterType::plan_type, plan, none, none);
 		};
 	}
 

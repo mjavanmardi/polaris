@@ -1,5 +1,6 @@
 #pragma once
 #include "User_Space_Includes.h"
+#include "Vehicle_Prototype.h"
 
 /*
  * Needed for Linux compatability. Do not hurt Windows compilation.
@@ -194,7 +195,7 @@ namespace Link_Components
 				define_container_and_value_interface(_Link_Origin_Vehicles_Container_Interface, _Vehicle_Interface,get_type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
 				link_origin_vehicle_array<_Link_Origin_Vehicles_Container_Interface&>().push_back(vehicle);
-				veh->template load_to_entry_queue<NULLTYPE>();
+				vehicle->template load<Vehicle_Components::Types::Load_To_Entry_Queue>();
 			}
 
 			feature_prototype void accept_vehicle(TargetType veh, float a_delayed_time/*,requires(TargetType,IsLoaded)*/)
@@ -202,6 +203,7 @@ namespace Link_Components
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Vehicle_Queue_Interface, _Vehicle_Interface, get_type_of(current_vehicle_queue), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_container_and_value_interface(_Destination_Vehicle_Queue_Interface, _Vehicle_Interface_2, get_type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
 
 				typedef Link_Prototype<ComponentType, ComponentType> _Link_Interface;
 
@@ -210,12 +212,12 @@ namespace Link_Components
 				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
 				int simulation_interval_length = scenario->template simulation_interval_length<int>();
 				_Vehicle_Interface* vehicle=(_Vehicle_Interface*)veh;
+				_Movement_Plan_Interface* mp = vehicle->movement_plan<_Movement_Plan_Interface*>();
+				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
-				vehicle->template transfer_to_next_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length,a_delayed_time);
-
-				if(this->template internal_id<int>()==(vehicle->template destination_link<_Link_Interface*>())->template internal_id<int>())
+				if(this->template internal_id<int>()==(mp->template destination<_Link_Interface*>())->template internal_id<int>())
 				{
-					vehicle->template arrive_to_destination_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
+					vehicle->template unload<NULLTYPE>();
 					
 					//update link state: N_destination(a,t)
 					link_destination_cumulative_arrived_vehicles<int&>()++;
@@ -385,7 +387,7 @@ namespace Link_Components
 							link_origin_vehicle_queue<_Vehicle_Origin_Queue_Interface&>().pop_front();
 
 							//update vehicle state
-							vehicle->template load_to_origin_link<NULLTYPE>(current_simulation_interval_index,simulation_interval_length);
+							vehicle->template load<Load_To_Origin_Link>();
 							
 							//update link state
 							link_origin_cumulative_departed_vehicles<int&>()++;

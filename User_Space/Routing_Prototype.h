@@ -320,12 +320,12 @@ namespace Routing_Components
 		{
 			tag_as_prototype;
 
-			feature_accessor(vehicle, none, none);
 			feature_accessor(network, none, none);
 			feature_accessor(traveler, none, none);
+			feature_accessor(vehicle, none, none);
 			feature_accessor(routable_network, none, none);
-			feature_accessor(origin_link, none, none);
-			feature_accessor(destination_link, none, none);
+			feature_accessor(routable_origin, none, none);
+			feature_accessor(routable_destination, none, none);
 
 			declare_feature_conditional(Compute_Route_Condition)
 			{
@@ -351,7 +351,6 @@ namespace Routing_Components
 				define_component_interface(_Routable_Network_Interface, get_type_of(routable_network), Routing_Components::Prototypes::Routable_Network_Prototype, ComponentType);
 				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, _Routable_Network_Interface::get_type_of(links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-
 				//typedef Link_Interface<typename ComponentType::routable_link_type, ComponentType> _Routable_Link_Interface;
 				define_component_interface(_Routable_Intersection_Interface, ComponentType::routable_link_type::upstream_intersection_type, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
@@ -367,8 +366,8 @@ namespace Routing_Components
 				ScanListType& scan_list=routable_net->template scan_list<ScanListType&>();
 				//NumSearchesType& num_searches=routable_network->template num_searches<NumSearchesType&>();
 
-				_Routable_Link_Interface* origin_link_ptr=origin_link<_Routable_Link_Interface*>();
-				_Routable_Link_Interface* destination_link_ptr=destination_link<_Routable_Link_Interface*>();
+				_Routable_Link_Interface* origin_link_ptr=routable_origin<_Routable_Link_Interface*>();
+				_Routable_Link_Interface* destination_link_ptr=routable_destination<_Routable_Link_Interface*>();
 				_Regular_Link_Interface* destination_reference=destination_link_ptr->template network_link_reference<_Regular_Link_Interface*>();
 				
 				_Regular_Link_Interface* net_origin_link=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>();
@@ -497,7 +496,7 @@ namespace Routing_Components
 
 					_Reversed_Path_Container_Interface& reversed_path_container=routable_network<_Routable_Network_Interface*>()->template reversed_path_container<_Reversed_Path_Container_Interface&>();
 
-					current_link=destination_link<_Routable_Link_Interface*>();
+					current_link=routable_destination<_Routable_Link_Interface*>();
 				
 					while (true)
 					{
@@ -529,39 +528,33 @@ namespace Routing_Components
 			//first event
 			declare_feature_event(Compute_Route)
 			{
-				double calculation_time_start = ::get_current_cpu_time_in_seconds();
 				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
 				typedef Link_Components::Prototypes::Link_Prototype<typename ComponentType::routable_link_type, ComponentType> _Routable_Link_Interface;
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
-				typedef Vehicle_Components::Prototypes::Vehicle_Prototype<typename ComponentType::vehicle_type, ComponentType> _Vehicle_Interface;
 				typedef Routing_Components::Prototypes::Routable_Network_Prototype<typename ComponentType::routable_network_type, ComponentType> _Routable_Network_Interface;
 				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Traveler_Interface, get_type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
+				define_component_interface(_Vehicle_Interface, _Traveler_Interface::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 
 				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, ComponentType::routable_network_type::type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				
-				_Vehicle_Interface* veh=_this_ptr->template vehicle<_Vehicle_Interface*>();
-				
 
-				_Regular_Link_Interface* origin_link=veh->template origin_link<_Regular_Link_Interface*>();
-				_Regular_Link_Interface* destination_link=veh->template destination_link<_Regular_Link_Interface*>();
+				_Vehicle_Interface* veh = _this_ptr->template vehicle<_Vehicle_Interface*>();
+				_Movement_Plan_Interface* mp= veh->template movement_plan<_Movement_Plan_Interface*>();
+				_Regular_Link_Interface* origin_link=mp->template origin<_Regular_Link_Interface*>();
+				_Regular_Link_Interface* destination_link=mp->template destination<_Regular_Link_Interface*>();
 				
-				_this_ptr->template origin_link<_Regular_Link_Interface*>(origin_link);
-				_this_ptr->template destination_link<_Regular_Link_Interface*>(destination_link);
+				_this_ptr->template routable_origin<_Regular_Link_Interface*>(origin_link);
+				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
 
 				bool pathFound = _this_ptr->template one_to_one_link_based_least_time_path_a_star<NULLTYPE>();
 				if (pathFound)
 				{
-	
 					_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
-				
-					veh->set_route_links(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
-				
-
+					mp->set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
 					origin_link->p_vehicle(veh);
 				}
-				double calculation_time_end = ::get_current_cpu_time_in_seconds();
-				_this_ptr->template network<_Regular_Network_Interface*>()->template scenario_reference<_Scenario_Interface*>()->template assignment_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
 			}
 		};
 	}

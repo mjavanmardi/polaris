@@ -13,6 +13,8 @@
 #include "Polaris_Intersection_Control_Implementation.h"
 #include "Polaris_Operation_Implementation.h"
 #include "Polaris_Zone_Implementation.h"
+#include "Polaris_Plan_Implementation.h"
+#include "Polaris_Movement_Plan_Implementation.h"
 
 #include "Polaris_Sensor_Implementation.h"
 

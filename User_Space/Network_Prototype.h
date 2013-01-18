@@ -997,7 +997,7 @@ namespace Network_Components
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
 				//write_network_link_flow<NULLTYPE>();
-				write_network_link_turn_time<NULLTYPE>();
+				//write_network_link_turn_time<NULLTYPE>();
 				write_output_summary<NULLTYPE>();
 
 			}
@@ -1196,9 +1196,9 @@ namespace Network_Components
 				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, _Link_Interface::get_type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_container_and_value_interface(_Trajecotry_Container_Interface, _Trajectory_Unit_Interface, _Vehicle_Interface::get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Trajectory_Unit_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
+				define_container_and_value_interface(_Trajecotry_Container_Interface, _Trajectory_Unit_Interface, _Movement_Plan_Interface::get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				
 				fstream& vehicle_trajectory_file = scenario_reference<_Scenario_Interface*>()->template vehicle_trajectory_file<fstream&>();
 				
 				for(int i = 0; i < (int)this->template links_container<_Links_Container_Interface&>().size(); i++)
@@ -1209,31 +1209,32 @@ namespace Network_Components
 					{//output vehicle trajectory
 						while(num_arrived_vehicls_of_a_link)
 						{
-							_Vehicle_Interface* vehicle = destination_link->link_destination_vehicle_queue<_Vehicles_Container_Interface&>().front();
+							_Vehicle_Interface* vehicle = destination_link->template link_destination_vehicle_queue<_Vehicles_Container_Interface&>().front();
+							_Movement_Plan_Interface* movement_plan = vehicle->template movement_plan<_Movement_Plan_Interface*>();
 							destination_link->link_destination_vehicle_queue<_Vehicles_Container_Interface&>().pop_front();
 
 							int vehicle_id = vehicle->template uuid<int>();
-							int origin_zone_index = vehicle->template origin_zone<_Zone_Interface*>()->template uuid<int>();
-							int destination_zone_index = vehicle->template destination_zone<_Zone_Interface*>()->template uuid<int>();;
-							int origin_activity_location_index = vehicle->template origin_activity_location<_Activity_Location_Interface*>()->template uuid<int>();
-							int destination_activity_location_index = vehicle->template destination_activity_location<_Activity_Location_Interface*>()->template uuid<int>();;
-							int origin_link_index = vehicle->template origin_link<_Link_Interface*>()->template uuid<int>();
-							int destination_link_index = vehicle->template destination_link<_Link_Interface*>()->template uuid<int>();
-							int num_links = (int)vehicle->trajectory_container<_Trajecotry_Container_Interface&>().size();
+							int origin_zone_index = 0;
+							int destination_zone_index = 0;
+							int origin_activity_location_index = 0;
+							int destination_activity_location_index = 0;
+							int origin_link_index = movement_plan->template origin<_Link_Interface*>()->template uuid<int>();
+							int destination_link_index = movement_plan->template destination<_Link_Interface*>()->template uuid<int>();
+							int num_links = (int)movement_plan->trajectory_container<_Trajecotry_Container_Interface&>().size();
 
-							int departure_time = vehicle->template departed_time<int>();
-							int arrival_time = vehicle->template arrived_time<int>();
+							int departure_time = movement_plan->template departed_time<int>();
+							int arrival_time = movement_plan->template arrived_time<int>();
 							float travel_time = float ((arrival_time - departure_time)/60.0f);
 
 							
 							vehicle_trajectory_file
 								<< vehicle_id << ","
-								<< vehicle->template origin_zone<_Zone_Interface*>()->template uuid<int>() << ","
-								<< vehicle->template destination_zone<_Zone_Interface*>()->template uuid<int>() << ","
-								<< vehicle->template origin_activity_location<_Activity_Location_Interface*>()->template uuid<int>() << ","
-								<< vehicle->template destination_activity_location<_Activity_Location_Interface*>()->template uuid<int>() << ","
-								<< vehicle->template origin_link<_Link_Interface*>()->template uuid<int>() << ","
-								<< vehicle->template destination_link<_Link_Interface*>()->template uuid<int>() << ","
+								<< 0 << ","
+								<< 0 << ","
+								<< 0 << ","
+								<< 0 << ","
+								<< origin_link_index << ","
+								<< destination_link_index << ","
 								<< num_links << ","
 								<< convert_seconds_to_hhmmss(departure_time)<< ","
 								<< convert_seconds_to_hhmmss(arrival_time)<< ","
@@ -1244,12 +1245,13 @@ namespace Network_Components
 							for (int route_link_counter=0;route_link_counter<num_links;route_link_counter++)
 							{
 
-								_Trajectory_Unit_Interface* trajectory_unit = vehicle->trajectory_container<_Trajecotry_Container_Interface&>()[route_link_counter];
+								_Trajectory_Unit_Interface* trajectory_unit = movement_plan->trajectory_container<_Trajecotry_Container_Interface&>()[route_link_counter];
 								_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
 								int route_link_id = route_link->template uuid<int>();
 								int route_link_enter_time = trajectory_unit->enter_time<int>();
 								float route_link_delayed_time = float(trajectory_unit->delayed_time<float>()/60.0f);
-								int route_link_exit_time = vehicle->get_route_link_exit_time<NULLTYPE>(route_link_counter);
+								
+								int route_link_exit_time = movement_plan->get_route_link_exit_time<NULLTYPE>(route_link_counter);
 								float route_link_travel_time = float((route_link_exit_time - route_link_enter_time)/60.0f);
 
 								path_delayed_time+=route_link_delayed_time;

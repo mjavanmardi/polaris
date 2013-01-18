@@ -526,3 +526,4 @@ namespace Scenario_Components
 }
 
 using namespace Scenario_Components::Prototypes;
+static void *_global_scenario;
