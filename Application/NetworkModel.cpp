@@ -295,6 +295,13 @@ struct MasterType
 
 	typedef Polaris_Component<Zone_Components::Implementations::Polaris_Zone_Implementation, MasterType, Data_Object> zone_type;
 
+	typedef Polaris_Component<Plan_Components::Implementations::Polaris_Plan_Implementation, MasterType, Data_Object> plan_type;
+
+	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<MasterType> movement_plan_type;
+
+	//typedef Polaris_Component<Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation, MasterType, Data_Object> movement_plan_type;
+
+	typedef Polaris_Component<Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation, MasterType, Data_Object> trajectory_unit_type;
 };
 
 ostream* stream_ptr;
@@ -324,6 +331,7 @@ int main()
 	cout << "reading input data..." <<endl;	
 	define_component_interface(_Scenario_Interface, MasterType::scenario_type, Scenario_Prototype, NULLTYPE);
 	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<MasterType::scenario_type>();
+	_global_scenario = scenario;
 	scenario->read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);
 	//scenario->write_scenario_data<NULLTYPE>(scenario_data_for_output);
 
