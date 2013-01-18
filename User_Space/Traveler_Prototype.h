@@ -32,6 +32,7 @@ namespace Traveler_Components
 			feature_accessor(vehicle, none, none);
 			feature_accessor(uuid, none, none);
 			feature_accessor(internal_id, none, none);
+			feature_accessor(plan, none, none);
 			
 			feature_prototype void Schedule_New_Departure(int departed_time)
 			{
