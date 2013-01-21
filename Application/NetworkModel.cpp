@@ -27,59 +27,63 @@ struct MasterType
 
 	//==============================================================================================
 	// Network Types
-	typedef Polaris_Component<Scenario_Components::Implementations::Polaris_Scenario_Implementation, MasterType, Data_Object> scenario_type;
+	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<MasterType> scenario_type;
 	
-	typedef Polaris_Component<Network_Components::Implementations::Polaris_Network_Implementation, MasterType, Data_Object> network_type;
+	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
 	
-	typedef Polaris_Component<Intersection_Components::Implementations::Polaris_Intersection_Implementation, MasterType, Execution_Object> intersection_type;
+	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	
-	typedef Polaris_Component<Intersection_Components::Implementations::Polaris_Movement_Implementation, MasterType, Data_Object> movement_type;
+	typedef Intersection_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
 	
-	typedef Polaris_Component<Link_Components::Implementations::Polaris_Link_Implementation, MasterType, Execution_Object> link_type;
+	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
 	
-	typedef Polaris_Component<Intersection_Components::Implementations::Polaris_Movement_Implementation, MasterType, Data_Object> turn_movement_type;
+	typedef Intersection_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
 	
-	typedef Polaris_Component<Vehicle_Components::Implementations::Polaris_Vehicle_Implementation, MasterType, Data_Object> vehicle_type;
+	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
 
-	typedef Polaris_Component<Routing_Components::Implementations::Routable_Network_Implementation, MasterType, Data_Object> routable_network_type;
+	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
-	typedef Polaris_Component<Routing_Components::Implementations::Polaris_Routing_Implementation, MasterType, Execution_Object> routing_type;
+	typedef Routing_Components::Implementations::Polaris_Routing_Implementation<MasterType> routing_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Routable_Intersection_Implementation, MasterType, Data_Object> routable_intersection_type;
+	typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
 
-	typedef Polaris_Component<Link_Components::Implementations::Routable_Link_Implementation, MasterType, Data_Object> routable_link_type;
+	typedef Link_Components::Implementations::Routable_Link_Implementation<MasterType> routable_link_type;
 
-	typedef Polaris_Component<Demand_Components::Implementations::Polaris_Demand_Implementation, MasterType, Data_Object> demand_type;
+	typedef Demand_Components::Implementations::Polaris_Demand_Implementation<MasterType> demand_type;
 
-	typedef Polaris_Component<Activity_Location_Components::Implementations::Polaris_Activity_Location_Implementation, MasterType, Data_Object> activity_location_type;
+	typedef Activity_Location_Components::Implementations::Polaris_Activity_Location_Implementation<MasterType> activity_location_type;
 
-	typedef Polaris_Component<Traveler_Components::Implementations::Polaris_Traveler_Implementation, MasterType, Data_Object> traveler_type;
+	typedef Traveler_Components::Implementations::Polaris_Traveler_Implementation<MasterType> traveler_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Polaris_Inbound_Outbound_Movements_Implementation, MasterType, Data_Object> inbound_outbound_movements_type;
+	typedef Intersection_Components::Implementations::Polaris_Inbound_Outbound_Movements_Implementation<MasterType> inbound_outbound_movements_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Polaris_Outbound_Inbound_Movements_Implementation, MasterType, Data_Object> outbound_inbound_movements_type;
+	typedef Intersection_Components::Implementations::Polaris_Outbound_Inbound_Movements_Implementation<MasterType> outbound_inbound_movements_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation, MasterType, Data_Object> routable_inbound_outbound_movements_type;
+	typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<MasterType> routable_inbound_outbound_movements_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation, MasterType, Data_Object> routable_outbound_inbound_movements_type;
+	typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<MasterType> routable_outbound_inbound_movements_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Routable_Movement_Implementation, MasterType, Data_Object> routable_movement_type;
+	typedef Intersection_Components::Implementations::Routable_Movement_Implementation<MasterType> routable_movement_type;
 
+	typedef Operation_Components::Implementations::Polaris_Operation_Implementation<MasterType> operation_type;
 	
-	typedef Polaris_Component<Operation_Components::Implementations::Polaris_Operation_Implementation, MasterType, Data_Object> operation_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation<MasterType> intersection_control_type;
+
+	typedef Intersection_Control_Components::Implementations::Polaris_Control_Plan_Implementation<MasterType> control_plan_type;
+
+	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Implementation<MasterType> phase_type;
+
+	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation<MasterType> phase_movement_type;
 	
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation, MasterType, Execution_Object> intersection_control_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<MasterType> approach_type;
 
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Control_Plan_Implementation, MasterType, Data_Object> control_plan_type;
+	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<MasterType> zone_type;
 
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Phase_Implementation, MasterType, Data_Object> phase_type;
+	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<MasterType> plan_type;
 
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation, MasterType, Data_Object> phase_movement_type;
-	
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Approach_Implementation, MasterType, Data_Object> approach_type;
+	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<MasterType> movement_plan_type;
 
-	typedef Polaris_Component<Zone_Components::Implementations::Polaris_Zone_Implementation, MasterType, Data_Object> zone_type;
-
+	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 
 };
 
@@ -243,65 +247,64 @@ struct MasterType
 
 	//==============================================================================================
 	// Network Types
-	typedef Polaris_Component<Scenario_Components::Implementations::Polaris_Scenario_Implementation, MasterType, Data_Object> scenario_type;
+	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<MasterType> scenario_type;
 	
-	typedef Polaris_Component<Network_Components::Implementations::Polaris_Network_Implementation, MasterType, Data_Object> network_type;
+	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
 	
-	typedef Polaris_Component<Intersection_Components::Implementations::Polaris_Intersection_Implementation, MasterType, Execution_Object> intersection_type;
+	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	
-	typedef Polaris_Component<Intersection_Components::Implementations::Polaris_Movement_Implementation, MasterType, Data_Object> movement_type;
+	typedef Intersection_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
 	
-	typedef Polaris_Component<Link_Components::Implementations::Polaris_Link_Implementation, MasterType, Execution_Object> link_type;
+	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
 	
-	typedef Polaris_Component<Intersection_Components::Implementations::Polaris_Movement_Implementation, MasterType, Data_Object> turn_movement_type;
+	typedef Intersection_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
 	
-	typedef Polaris_Component<Vehicle_Components::Implementations::Polaris_Vehicle_Implementation, MasterType, Data_Object> vehicle_type;
+	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
 
-	typedef Polaris_Component<Routing_Components::Implementations::Routable_Network_Implementation, MasterType, Data_Object> routable_network_type;
+	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
-	typedef Polaris_Component<Routing_Components::Implementations::Polaris_Routing_Implementation, MasterType, Execution_Object> routing_type;
+	typedef Routing_Components::Implementations::Polaris_Routing_Implementation<MasterType> routing_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Routable_Intersection_Implementation, MasterType, Data_Object> routable_intersection_type;
+	typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
 
-	typedef Polaris_Component<Link_Components::Implementations::Routable_Link_Implementation, MasterType, Data_Object> routable_link_type;
+	typedef Link_Components::Implementations::Routable_Link_Implementation<MasterType> routable_link_type;
 
-	typedef Polaris_Component<Demand_Components::Implementations::Polaris_Demand_Implementation, MasterType, Data_Object> demand_type;
+	typedef Demand_Components::Implementations::Polaris_Demand_Implementation<MasterType> demand_type;
 
-	typedef Polaris_Component<Activity_Location_Components::Implementations::Polaris_Activity_Location_Implementation, MasterType, Data_Object> activity_location_type;
+	typedef Activity_Location_Components::Implementations::Polaris_Activity_Location_Implementation<MasterType> activity_location_type;
 
-	typedef Polaris_Component<Traveler_Components::Implementations::Polaris_Traveler_Implementation, MasterType, Data_Object> traveler_type;
+	typedef Traveler_Components::Implementations::Polaris_Traveler_Implementation<MasterType> traveler_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Polaris_Inbound_Outbound_Movements_Implementation, MasterType, Data_Object> inbound_outbound_movements_type;
+	typedef Intersection_Components::Implementations::Polaris_Inbound_Outbound_Movements_Implementation<MasterType> inbound_outbound_movements_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Polaris_Outbound_Inbound_Movements_Implementation, MasterType, Data_Object> outbound_inbound_movements_type;
+	typedef Intersection_Components::Implementations::Polaris_Outbound_Inbound_Movements_Implementation<MasterType> outbound_inbound_movements_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation, MasterType, Data_Object> routable_inbound_outbound_movements_type;
+	typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<MasterType> routable_inbound_outbound_movements_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation, MasterType, Data_Object> routable_outbound_inbound_movements_type;
+	typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<MasterType> routable_outbound_inbound_movements_type;
 
-	typedef Polaris_Component<Intersection_Components::Implementations::Routable_Movement_Implementation, MasterType, Data_Object> routable_movement_type;
+	typedef Intersection_Components::Implementations::Routable_Movement_Implementation<MasterType> routable_movement_type;
 
-	typedef Polaris_Component<Operation_Components::Implementations::Polaris_Operation_Implementation, MasterType, Data_Object> operation_type;
+	typedef Operation_Components::Implementations::Polaris_Operation_Implementation<MasterType> operation_type;
 	
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation, MasterType, Execution_Object> intersection_control_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation<MasterType> intersection_control_type;
 
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Control_Plan_Implementation, MasterType, Data_Object> control_plan_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Control_Plan_Implementation<MasterType> control_plan_type;
 
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Phase_Implementation, MasterType, Data_Object> phase_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Implementation<MasterType> phase_type;
 
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation, MasterType, Data_Object> phase_movement_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation<MasterType> phase_movement_type;
 	
-	typedef Polaris_Component<Intersection_Control_Components::Implementations::Polaris_Approach_Implementation, MasterType, Data_Object> approach_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<MasterType> approach_type;
 
-	typedef Polaris_Component<Zone_Components::Implementations::Polaris_Zone_Implementation, MasterType, Data_Object> zone_type;
+	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<MasterType> zone_type;
 
-	typedef Polaris_Component<Plan_Components::Implementations::Polaris_Plan_Implementation, MasterType, Data_Object> plan_type;
+	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<MasterType> plan_type;
 
 	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<MasterType> movement_plan_type;
 
-	//typedef Polaris_Component<Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation, MasterType, Data_Object> movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 
-	typedef Polaris_Component<Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation, MasterType, Data_Object> trajectory_unit_type;
 };
 
 ostream* stream_ptr;
