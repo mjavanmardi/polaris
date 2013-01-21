@@ -75,11 +75,11 @@ namespace Routing_Components
 				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
 				define_component_interface(_Traveler_Interface, get_type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
-				if(_sub_iteration == Scenario_Components::Types::Type_Iteration_keys::DEMAND_ITERATION)
+				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION)
 				{
 					response.result=true;
 					response.next._iteration=END;
-					response.next._sub_iteration=Scenario_Components::Types::Type_Iteration_keys::DEMAND_ITERATION;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION;
 				}
 				else
 				{
@@ -265,7 +265,7 @@ namespace Routing_Components
 			{
 				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				load_event(ComponentType,Compute_Route_Condition,Compute_Route,departed_time,Scenario_Components::Types::Type_Iteration_keys::DEMAND_ITERATION,NULLTYPE);
+				load_event(ComponentType,Compute_Route_Condition,Compute_Route,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 			}
 
 			//first event
@@ -296,7 +296,7 @@ namespace Routing_Components
 				{
 					_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
 					mp->set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
-					origin_link->p_vehicle(veh);
+					origin_link->load_vehicle(veh);
 				}
 			}
 		};

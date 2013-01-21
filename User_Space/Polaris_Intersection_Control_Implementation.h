@@ -15,13 +15,13 @@ namespace Intersection_Control_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Phase_Movement_Implementation
+		implementation struct Polaris_Phase_Movement_Implementation:public Polaris_Component_Class<Polaris_Phase_Movement_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_component(typename MasterType::movement_type, movement, none, none);
 			member_data(Intersection_Control_Components::Types::Movement_Priority_Type_Keys, movement_priority_type, none, none);
 		};
 
-		implementation struct Polaris_Phase_Implementation
+		implementation struct Polaris_Phase_Implementation:public Polaris_Component_Class<Polaris_Phase_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_data(int, phase_index, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));	// the index counter on all phases in the network
 			member_data(int, phase_sequence_number, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));	// 
@@ -55,7 +55,7 @@ namespace Intersection_Control_Components
 			member_container(vector<typename MasterType::phase_movement_type*>, turn_movements_in_the_phase_array, none, none);
 		};
 
-		implementation struct Polaris_Approach_Implementation
+		implementation struct Polaris_Approach_Implementation:public Polaris_Component_Class<Polaris_Approach_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_data(int, approach_index, none, none);
 			member_data(Intersection_Control_Components::Types::Approach_Type_Keys, approach_type, none, none);
@@ -63,7 +63,7 @@ namespace Intersection_Control_Components
 			member_data(float, green_cycle_ratio, none, none);
 		};
 
-		implementation struct Polaris_Control_Plan_Implementation
+		implementation struct Polaris_Control_Plan_Implementation:public Polaris_Component_Class<Polaris_Control_Plan_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_data(int, control_plan_index, none, none);
 
@@ -95,7 +95,7 @@ namespace Intersection_Control_Components
 			member_container(vector<typename MasterType::approach_type*>, minor_approach_data_array, none, none);
 		};
 
-		implementation struct Polaris_Intersection_Control_Implementation
+		implementation struct Polaris_Intersection_Control_Implementation:public Polaris_Component_Class<Polaris_Intersection_Control_Implementation,MasterType,Execution_Object,ParentType>
 		{
 			member_component(typename MasterType::intersection_type, intersection, none, none);
 			member_component(typename MasterType::control_plan_type, current_control_plan, none, none);

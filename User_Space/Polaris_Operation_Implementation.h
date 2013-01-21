@@ -14,7 +14,7 @@ namespace Operation_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Operation_Implementation
+		implementation struct Polaris_Operation_Implementation:public Polaris_Component_Class<Polaris_Operation_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_component(typename MasterType::network_type, network_reference, none, none);
 		};

@@ -15,7 +15,7 @@ namespace Demand_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Demand_Implementation
+		implementation struct Polaris_Demand_Implementation:public Polaris_Component_Class<Polaris_Demand_Implementation,MasterType,Data_Object,ParentType>
 		{
 
 			member_component(typename MasterType::scenario_type, scenario_reference, none, none);

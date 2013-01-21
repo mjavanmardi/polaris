@@ -15,7 +15,7 @@ namespace Movement_Plan_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Trajectory_Unit_Implementation
+		implementation struct Polaris_Trajectory_Unit_Implementation:public Polaris_Component_Class<Polaris_Trajectory_Unit_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_data(int, delayed_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, enter_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -33,7 +33,7 @@ namespace Movement_Plan_Components
 
 		implementation struct Polaris_Movement_Plan_Implementation:public Polaris_Component_Class<Polaris_Movement_Plan_Implementation,MasterType,Data_Object,ParentType>
 		{
-			typedef Polaris_Component<Implementations::Polaris_Trajectory_Unit_Implementation, MasterType> trajectory_unit_type;
+			typedef Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 			member_container(vector<trajectory_unit_type*>, trajectory_container, none, none);
 			
 			//==================================================================================================================

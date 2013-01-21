@@ -58,7 +58,7 @@ namespace Link_Components
 	//==================================================================================================================
 	/// Polaris_Link_Base
 	//------------------------------------------------------------------------------------------------------------------
-		implementation struct Polaris_Link_Implementation
+		implementation struct Polaris_Link_Implementation:public Polaris_Component_Class<Polaris_Link_Implementation,MasterType,Execution_Object,ParentType>
 		{
 		//==================================================================================================================
 		/// Simple Link Members
@@ -196,6 +196,138 @@ namespace Link_Components
 			member_data(int, link_num_vehicles_in_queue, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_container(deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, none, none);
+
+
+
+			feature_implementation void link_supply_update()
+			{
+				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				_Scenario_Interface* scenario=scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
+
+				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
+				int simulation_interval_length = scenario->template simulation_interval_length<int>();
+
+
+				//Newell's model
+				if(true)
+				{
+		
+					//jam density * length * num_lanes = Kj(a,t)*L(a)*nlanes(a,t)
+					
+					float num_vehicles_under_jam_density_on_inbound_link = _num_lanes * _jam_density * _length/5280.0;
+
+					int t_minus_one_fftt = -1;
+					int link_upstream_cumulative_vehicles_by_t_minus_one = 0;	
+					
+					int t_minus_bwtt = -1;
+					int link_downstream_cumulative_vehicles_by_t_minus_bwtt = 0;	
+
+					float link_available_spaces = -1;
+
+					//N(a,0,t-1)
+					if (current_simulation_interval_index>0)
+					{
+						t_minus_one_fftt = (current_simulation_interval_index-1)%_link_fftt_cached_simulation_interval_size;
+						link_upstream_cumulative_vehicles_by_t_minus_one = _cached_link_upstream_cumulative_vehicles_array[t_minus_one_fftt];
+					}
+					
+					//N(a,L(a),t-bwtt)
+					if (current_simulation_interval_index >= _link_bwtt_cached_simulation_interval_size)
+					{
+						t_minus_bwtt = (current_simulation_interval_index + 1 - _link_bwtt_cached_simulation_interval_size)%_link_bwtt_cached_simulation_interval_size;
+						link_downstream_cumulative_vehicles_by_t_minus_bwtt = _cached_link_downstream_cumulative_vehicles_array[t_minus_bwtt];
+					}
+					
+					//supply(a,t) = Kj(a,t)*L(a)*nlanes(a,t) + N(a,L(a),t-bwtt) -N(a,0,t-1) = backward wave propogation in link
+					link_available_spaces = num_vehicles_under_jam_density_on_inbound_link + link_downstream_cumulative_vehicles_by_t_minus_bwtt - link_upstream_cumulative_vehicles_by_t_minus_one;
+					_link_supply = max(0.0,(double)link_available_spaces);
+
+					float current_link_capacity = 0.0;
+					current_link_capacity =  (float) (simulation_interval_length * _num_lanes * _maximum_flow_rate/3600.0);
+					_link_capacity = current_link_capacity;
+				}
+
+			}
+			
+			feature_implementation void network_state_update()
+			{
+				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				_Scenario_Interface* scenario=scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
+
+				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
+				int simulation_interval_length = scenario->template simulation_interval_length<int>();
+
+				//calculate upstream cumulative vehicles using the three detector method
+				int t_minus_bwtt=-1;			
+				
+				int bwtt_cached_simulation_interval_size=_link_bwtt_cached_simulation_interval_size;
+				int fftt_cached_simulation_interval_size=_link_fftt_cached_simulation_interval_size;
+				
+				if(current_simulation_interval_index >= bwtt_cached_simulation_interval_size)
+				{
+					t_minus_bwtt = (current_simulation_interval_index + 1- bwtt_cached_simulation_interval_size)%bwtt_cached_simulation_interval_size;
+				}
+
+				int upstream_cumulative_departed_vehicles = 0;
+				upstream_cumulative_departed_vehicles = 
+					_link_upstream_cumulative_arrived_vehicles + 
+					_link_origin_cumulative_departed_vehicles - 
+					_link_destination_cumulative_arrived_vehicles;
+
+				upstream_cumulative_departed_vehicles = max(0,upstream_cumulative_departed_vehicles);
+
+				if (t_minus_bwtt>-1)
+				{
+					int jam_vehicles = (int) (_num_lanes * _length * _jam_density);
+
+					int cached=_cached_link_downstream_cumulative_vehicles_array[t_minus_bwtt]+jam_vehicles;
+					_link_upstream_cumulative_vehicles = min(upstream_cumulative_departed_vehicles,cached);
+				}
+				else
+				{
+					_link_upstream_cumulative_vehicles = upstream_cumulative_departed_vehicles;
+				}
+
+				int t_fftt = -1;
+				int t_bwtt = -1;
+				int t_cached_delay = -1;
+
+				if (current_simulation_interval_index>0)
+				{
+					t_fftt = (current_simulation_interval_index)%fftt_cached_simulation_interval_size;
+					t_bwtt = (current_simulation_interval_index)%bwtt_cached_simulation_interval_size;
+					t_cached_delay = (current_simulation_interval_index)%scenario->template num_simulation_intervals_per_assignment_interval<int>();
+				}
+				else
+				{
+					t_fftt = 0;
+					t_bwtt = 0;
+					t_cached_delay = 0;
+				}
+
+				_cached_link_upstream_cumulative_vehicles_array[t_fftt] = _link_upstream_cumulative_vehicles;
+				_cached_link_downstream_cumulative_vehicles_array[t_bwtt] = _link_downstream_cumulative_vehicles;
+
+				//network data
+				int t_minus_fftt = -1;
+				int link_shifted_cumulative_arrived_vehicles = 0;
+
+				int cached_fftt=_link_fftt_cached_simulation_interval_size;
+
+				if((current_simulation_interval_index+1) >= cached_fftt)
+				{
+					t_minus_fftt = (current_simulation_interval_index + 1 - cached_fftt) % cached_fftt;
+					link_shifted_cumulative_arrived_vehicles = _cached_link_upstream_cumulative_vehicles_array[t_minus_fftt];
+				}
+				else
+				{
+					link_shifted_cumulative_arrived_vehicles = 0;
+				}
+				
+				_link_num_vehicles_in_queue = link_shifted_cumulative_arrived_vehicles - _link_downstream_cumulative_vehicles;
+
+			}
+
 		};
 			
 	}

@@ -14,7 +14,7 @@ namespace Scenario_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Scenario_Implementation
+		implementation struct Polaris_Scenario_Implementation:public Polaris_Component_Class<Polaris_Scenario_Implementation,MasterType,Data_Object,ParentType>
 		{
 			//member_data(int, current_simulation_interval_index);
 			

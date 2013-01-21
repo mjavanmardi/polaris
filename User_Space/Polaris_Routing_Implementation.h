@@ -18,7 +18,7 @@ namespace Routing_Components
 	namespace Implementations
 	{
 
-		implementation	struct Routable_Network_Implementation
+		implementation	struct Routable_Network_Implementation:public Polaris_Component_Class<Routable_Network_Implementation,MasterType,Data_Object,ParentType>
 		{
 			typedef set<pair<float, void*>> scan_list_typedef;
 			member_data(scan_list_typedef, scan_list, none, none);
@@ -32,7 +32,7 @@ namespace Routing_Components
 			typedef typename MasterType::network_type regular_network_type;
 		};
 
-		implementation struct Polaris_Routing_Implementation
+		implementation struct Polaris_Routing_Implementation:public Polaris_Component_Class<Polaris_Routing_Implementation,MasterType,Execution_Object,ParentType>
 		{
 
 

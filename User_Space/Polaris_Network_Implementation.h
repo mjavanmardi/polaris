@@ -16,7 +16,7 @@ namespace Network_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Network_Implementation
+		implementation struct Polaris_Network_Implementation:public Polaris_Component_Class<Polaris_Network_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 

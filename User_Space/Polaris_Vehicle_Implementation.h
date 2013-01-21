@@ -15,7 +15,7 @@ namespace Vehicle_Components
 	namespace Implementations
 	{
 
-		implementation struct Polaris_Vehicle_Implementation
+		implementation struct Polaris_Vehicle_Implementation:public Polaris_Component_Class<Polaris_Vehicle_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_data(Vehicle_Components::Types::Vehicle_Status_Keys, simulation_status, none, none);
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));

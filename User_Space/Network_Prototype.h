@@ -98,24 +98,39 @@ namespace Network_Components
 		{
 			tag_as_prototype;
 
-			feature_accessor(scenario_reference, none, none);
-			feature_accessor(max_free_flow_speed, none, none);
+			//==================================================================================================================
+			/// basic network
+			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(intersections_container, none, none);
 			feature_accessor(links_container, none, none);
+			feature_accessor(max_free_flow_speed, none, none);
+			//------------------------------------------------------------------------------------------------------------------
+			
+			//==================================================================================================================
+			/// transportation network
+			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(turn_movements_container, none, none);
 			feature_accessor(activity_locations_container, none, none);
 			feature_accessor(zones_container, none, none);
+			//------------------------------------------------------------------------------------------------------------------
+
+			//==================================================================================================================
+			/// routable network
+			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(routable_network, none, none);
 			feature_accessor(routable_networks_container, none, none);
-
-			// features for routable network
 			feature_accessor(scan_list, none, none);
 			feature_accessor(reversed_path_container, none, none);
+			//------------------------------------------------------------------------------------------------------------------
 
-
+			//==================================================================================================================
+			/// simulation network
+			//------------------------------------------------------------------------------------------------------------------
+			feature_accessor(scenario_reference, none, none);
 			volatile long _intersection_finish_counter; // To track the end of an iteration, track how many links have finished processing
 			long _intersection_finish_target; // If link_finish_counter reaches link_finish_target, then an iteration has completed
-			
+			//------------------------------------------------------------------------------------------------------------------
+
 			feature_prototype void read_network_data(typename TargetType::ParamType& network_mapping,
 				requires(check_2(TargetType::NetIOType,Types::ODB_Network,is_same)))
 			{
@@ -1001,7 +1016,7 @@ namespace Network_Components
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
 				//write_network_link_flow<NULLTYPE>();
-				//write_network_link_turn_time<NULLTYPE>();
+				write_network_link_turn_time<NULLTYPE>();
 				write_output_summary<NULLTYPE>();
 
 			}
