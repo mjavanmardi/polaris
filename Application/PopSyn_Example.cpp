@@ -42,21 +42,21 @@ int main()
 	agent_itf* agent = (agent_itf*)Allocate<MasterType::Person>();
 	agent->Initialize<NULLTYPE>();
 	agent_properties_itf* properties = agent->Properties<agent_properties_itf*>();
-	//
-	//properties->My_Length<Basic_Units::Length_Variables::Feet>(20.0);
-	//cout << properties->My_Length<Basic_Units::Length_Variables::Centimeters>();
+	
+	properties->My_Length<Basic_Units::Length_Variables::Feet>(20.0);
+	cout << properties->My_Length<Basic_Units::Length_Variables::Centimeters>();
 
-	//properties->My_Area<Basic_Units::Area_Variables::Square_Inches>(144.0);
-	//cout <<endl<< properties->My_Area<Basic_Units::Area_Variables::Square_Feet>();
+	properties->My_Area<Basic_Units::Area_Variables::Square_Inches>(144.0);
+	cout <<endl<< properties->My_Area<Basic_Units::Area_Variables::Square_Feet>();
 
-	//properties->My_Time<Basic_Units::Time_Variables::Time_Minutes>(1440.0);
-	//cout <<endl<<properties->My_Time<Basic_Units::Time_Variables::Time_Days>();
+	properties->My_Time<Basic_Units::Time_Variables::Time_Minutes>(1440.0);
+	cout <<endl<<properties->My_Time<Basic_Units::Time_Variables::Time_Days>();
 
-	//properties->My_Speed<Basic_Units::Speed_Variables::Kilometers_Per_Hour>(100.0);
-	//cout <<endl<<properties->My_Speed<Basic_Units::Speed_Variables::Feet_Per_Second>();
+	properties->My_Speed<Basic_Units::Speed_Variables::Kilometers_Per_Hour>(100.0);
+	cout <<endl<<properties->My_Speed<Basic_Units::Speed_Variables::Feet_Per_Second>();
 
-	//properties->HH_Income<Basic_Units::Currency_Variables::Dollars>(100000.0);
-	//cout <<endl<<properties->HH_Income<Basic_Units::Currency_Variables::Thousand_Dollars>();
+	properties->HH_Income<Basic_Units::Currency_Variables::Dollars>(100000.0);
+	cout <<endl<<properties->HH_Income<Basic_Units::Currency_Variables::Thousand_Dollars>();
 	
 	//ofstream out;
 	//out.open("full_population_chicag.xls",ios_base::out);
