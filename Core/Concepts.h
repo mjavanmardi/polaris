@@ -157,4 +157,6 @@ static const int success=sizeof(small_type);
 #define sub_check_as_given(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS) CONCEPT_NAME<TYPE_TO_TEST>::SUB_CHECK_ALIAS
 #define sub_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,SUB_CHECK_ALIAS) CONCEPT_NAME<CALL_REQUIREMENTS_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS
 
+#define concat(...) __VA_ARGS__
+
 //#define requires_member(CONCEPT_NAME) CONCEPT_NAME<strip_modifiers(TargetType)>::value
