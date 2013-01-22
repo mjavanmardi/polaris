@@ -47,6 +47,25 @@ static const int success=sizeof(small_type);
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
 
+#define check_getter(CHECK_ALIAS, FEATURE_NAME)\
+	struct CHECK_ALIAS##_procedure\
+	{\
+		template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_getter_tag*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	};\
+	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
+
+#define check_setter(CHECK_ALIAS, FEATURE_NAME)\
+	struct CHECK_ALIAS##_procedure\
+	{\
+		template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_setter_tag*);\
+		template<typename U> static large_type has_matching_typename(...);\
+		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	};\
+	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;\
+
+
 #define check_named_member(CHECK_ALIAS,MEMBER_NAME)\
 	struct CHECK_ALIAS##_procedure\
 	{\
