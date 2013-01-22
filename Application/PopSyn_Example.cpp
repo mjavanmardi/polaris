@@ -4,14 +4,48 @@
 #include "Application_Includes.h"
 
 
+prototype struct Agent : ComponentType
+{
+	feature_accessor(My_time,none,none);
+
+	feature_prototype void Initialize()
+	{
+		this_component()->Initialize<ComponentType,CallerType,TargetType>();
+	}
+
+	feature_prototype void Do_Stuff()
+	{
+		Basic_Units::Time_Variables::Time_Minutes t = this->My_time<Basic_Units::Time_Variables::Time_Minutes>();
+		this->Did_Stuff<Basic_Units::Time_Variables::Time_Minutes>(t);
+	}
+
+	feature_prototype void Did_Stuff(TargetType stuff)
+	{
+		//Basic_Units::Prototypes::Time_Prototype<Basic_Units::Implementations::Time_Implementation<MasterType>,NULLTYPE>* time_itf;
+		cout << Basic_Units::Prototypes::Time_Prototype<Basic_Units::Implementations::Time_Implementation<MasterType>,NULLTYPE>::Convert_Value<Target_Type<Basic_Units::Time_Variables::Time_Seconds,TargetType>>(stuff);
+	}
+};
+
+implementation struct Agent_Imp : Polaris_Component_Class<Agent_Imp, MasterType, Data_Object>
+{
+	feature_implementation void Initialize()
+	{
+		this->My_time<ComponentType,CallerType,Basic_Units::Time_Variables::Time_Hours>(2);
+	}
+	member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,Time,none,none);
+	member_component_feature(My_time,Time,Value,Basic_Units::Prototypes::Time_Prototype);
+};
+
+
 // notice how components are no longer doubly defined, they are defined once in MasterType now
 struct MasterType
 {
 	typedef MasterType M;
 
+
 	typedef Person_Components::Implementations::Person_Implementation<M>	Person;
-	typedef Person_Components::Implementations::Person_Properties_Implementation<M,Person> Person_Properties;
-	typedef Person_Components::Implementations::Person_Planner_Implementation<M,Person> Person_Planner;
+	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<M,Person> Person_Properties;
+	typedef Person_Components::Implementations::ADAPTS_Person_Planner_Implementation<M,Person> Person_Planner;
 	typedef Person_Components::Implementations::Activity_Plan_Implementation<M,Person> Activity_Plan;
 	typedef Person_Components::Implementations::Movement_Plan_Implementation<M,Person> Movement_Plan;
 	//typedef Polaris_Component<Routing_Components::Implementations::Polaris_Routing_Implementation, MasterType, Execution_Object> routing_type;
@@ -24,7 +58,8 @@ struct MasterType
 	//typedef Polaris_Component<Basic_Units::Implementations::Feet_Per_Second_Implementation, M, D, Agent> Agent_Speed;
 	//typedef Polaris_Component<Basic_Units::Implementations::Dollars_Implementation, M, D, Agent> Agent_Income;
 
-	//typedef Polaris_Component<RNG_Components::Implementations::RngStream_Implementation, M, D> RNG;
+	typedef Polaris_Component<RNG_Components::Implementations::RngStream_Implementation, M, Data_Object> RNG;
+
 	//typedef m_array<int>	matrix_int;
 	//typedef m_array<double> matrix_double;
 	//typedef Polaris_Component<PopSyn::Implementations::Synthesis_Zone_Implementation, M, D> zone;
@@ -37,10 +72,16 @@ struct MasterType
 
 int main()
 {
+	//define_component_interface(agent_itf,Agent_Imp<NULLTYPE>,Agent,NULLTYPE);
+	//agent_itf* my_agent = (agent_itf*)Allocate<Agent_Imp<NULLTYPE,NULLTYPE>>();
+	//my_agent->Initialize<NULLTYPE>();
+	//my_agent->Do_Stuff<NULLTYPE>();
+
+
 	define_component_interface(agent_itf,MasterType::Person,Person_Components::Prototypes::Person_Prototype,NULLTYPE);
 	define_component_interface(agent_properties_itf,MasterType::Person_Properties,Person_Components::Prototypes::Person_Properties,NULLTYPE);
 	agent_itf* agent = (agent_itf*)Allocate<MasterType::Person>();
-	agent->Initialize<NULLTYPE>();
+	agent->Initialize<long>(3);
 	agent_properties_itf* properties = agent->Properties<agent_properties_itf*>();
 	
 	properties->My_Length<Basic_Units::Length_Variables::Feet>(20.0);
@@ -58,6 +99,10 @@ int main()
 	properties->HH_Income<Basic_Units::Currency_Variables::Dollars>(100000.0);
 	cout <<endl<<properties->HH_Income<Basic_Units::Currency_Variables::Thousand_Dollars>();
 	
+
+
+
+
 	//ofstream out;
 	//out.open("full_population_chicag.xls",ios_base::out);
 	//ofstream marg_out;

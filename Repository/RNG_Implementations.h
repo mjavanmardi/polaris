@@ -35,10 +35,13 @@ namespace RNG_Components
 			{
 				_generator.seed(_seed);
 			}
+			tag_feature_as_available(Initialize);
+
 			feature_implementation TargetType Next_Rand()
 			{
 				return (TargetType) _distribution(_generator);
 			}
+			tag_feature_as_available(Next_Rand);
 
 			member_data(unsigned long, seed, none, none);
 			member_data(mt19937, generator, none, none);
@@ -73,6 +76,8 @@ namespace RNG_Components
 
 				_distribution = uniform_real<double>(_minimum,_maximum);
 			}
+			tag_feature_as_available(Initialize);
+
 			member_data(double, maximum, none, none);
 			member_data(double, minimum, none, none);
 		};
@@ -107,11 +112,13 @@ namespace RNG_Components
 
 				_distribution = uniform_real<double>(_minimum,_maximum);
 			}
+			tag_feature_as_available(Initialize);
 
 			feature_implementation TargetType Next_Rand()
 			{
 				return (TargetType) _distribution(_generator);
 			}
+			tag_feature_as_available(Next_Rand);
 
 			member_data(normal_distribution<double>, distribution, none, none);
 			member_data(double, location, none, none);
@@ -142,10 +149,13 @@ namespace RNG_Components
 			{
 				_distribution.SetSeed(_seed);
 			}
+			tag_feature_as_available(Initialize);
+
 			feature_implementation TargetType Next_Rand()
 			{
 				return (TargetType) _distribution.RandU01();
 			}
+			tag_feature_as_available(Next_Rand);
 
 			member_data(unsigned long, seed, check(ReturnValueType,is_arithmetic), check(SetValueType,is_arithmetic));
 			member_data(double, maximum, check(ReturnValueType,is_arithmetic), not_available);

@@ -1,6 +1,21 @@
 #pragma once
 #include "Repository_Includes.h"
 
+template<typename TargetType, typename InputType>
+TargetType Round(InputType value, requires(check(TargetType, is_integral) && check(InputType,is_arithmetic) && (check(InputType,!is_integral))))
+{
+	InputType remain = value - (InputType)((TargetType)value);
+	if (remain >= 0.5) return (TargetType)(value - remain + 1);
+	else return (TargetType)(value - remain);
+}
+template<typename TargetType, typename InputType>
+TargetType Round(InputType value, requires(check(TargetType, !is_integral) || check(InputType,!is_arithmetic) || (check(InputType,is_integral))))
+{
+	assert_check(TargetType,is_integral,"ReturnType must be integral");
+	assert_check(InputType,is_arithmetic,"InputType must be arithmetic");
+	assert_check(InputType,!is_integral,"InputType must be floating point type");
+}
+
 
 namespace Basic_Units
 {

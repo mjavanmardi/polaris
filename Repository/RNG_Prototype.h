@@ -10,6 +10,12 @@ namespace RNG_Components
 
 	namespace Concepts
 	{
+		concept struct Is_RNG
+		{
+			check_feature(Has_Rand_Defined,Next_Rand);
+			check_feature(Has_Rand_Defined_Prototype, Component_Type::Next_Rand);
+			define_default_check(Has_Rand_Defined || Has_Rand_Defined_Prototype);
+		};
 	}
 	
 	namespace Prototypes
