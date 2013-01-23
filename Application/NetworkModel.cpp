@@ -135,37 +135,25 @@ int main()
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
 	cout << "converting network data..." << endl;
-	network->write_network_data<NULLTYPE>(network_data_for_output);
+	network->write_network_data<Target_Type<void,network_models::network_information::network_data_information::NetworkData&>>(network_data_for_output);
 	network_models::network_information::network_data_information::write_network_data("", network_data_for_output);
 	//cout<<"writing network data..."<<endl;
 	//network_models::network_information::network_data_information::write_network_data(output_dir_name,network_data_for_output);
 
 
 	//cout << "initializing simulation..." <<endl;	
-	//network->simulation_initialize<NULLTYPE>();
-	//
+	network->simulation_initialize<NULLTYPE>();
 
-
-	//////network cost
-	//cout << "constructing network cost..." <<endl;
-	//network->construct_network_cost<NULLTYPE>();
-	
-	////routable network
-//cout << "constructing routable network..." <<endl;
-//network->construct_routable_network<NULLTYPE>();
-
-
-
-	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	//_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
-	//demand->scenario_reference<_Scenario_Interface*>(scenario);
-	//demand->network_reference<_Network_Interface*>(network);
-	//cout << "reading demand data..." <<endl;
-	//demand->read_demand_data<Net_IO_Type>(network_io_maps);
-	//cout << "converting demand data..." << endl;
-	//demand->write_demand_data<NULLTYPE>(demand_data_for_output);
-	//cout<<"writing demand data..."<<endl;
-	//network_models::network_information::demand_data_information::write_demand_vehicle(output_dir_name,scenario_data_for_output,demand_data_for_output,network_data_for_output);
+	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
+	_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
+	demand->scenario_reference<_Scenario_Interface*>(scenario);
+	demand->network_reference<_Network_Interface*>(network);
+	cout << "reading demand data..." <<endl;
+	demand->read_demand_data<Net_IO_Type>(network_io_maps);
+	cout << "converting demand data..." << endl;
+	demand->write_demand_data<NULLTYPE>(demand_data_for_output);
+	cout<<"writing demand data..."<<endl;
+	network_models::network_information::demand_data_information::write_demand_vehicle(output_dir_name,scenario_data_for_output,demand_data_for_output,network_data_for_output);
 
 
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
@@ -183,7 +171,7 @@ int main()
 	//network_models::write_data("",scenario_data_for_output,demand_data_for_output,network_data_for_output, operation_data_for_output);
 
 	////initialize network agents
-//#define COMPLETE_WORK
+#define COMPLETE_WORK
 #ifdef COMPLETE_WORK	
 	cout << "initializing link agents..." <<endl;
 	define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Prototype, NULLTYPE);
@@ -204,11 +192,7 @@ int main()
 		intersections_itr!=network->intersections_container<MasterType::network_type::intersections_container_type&>().end();
 		intersections_itr++)
 	{
-		//int id=((_Intersection_Interface*)(*intersections_itr))->uuid<int>();
 		((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
-		((_Intersection_Interface*)(*intersections_itr))->intersection_simulation_status<Intersection_Components::Types::Intersection_Simulation_Status>(Intersection_Components::Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE);
-		//if(id!=0 && id!=4 && id!=6) ((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();		
-		//else ((_Intersection_Interface*)(*intersections_itr))->intersection_simulation_status<Intersection_Components::Types::Intersection_Simulation_Status>(Intersection_Components::Types::Intersection_Simulation_Status::COMPUTE_STEP_FLOW_COMPLETE);
 	}
 	
 	cout << "starting sim..." <<endl;
@@ -312,7 +296,7 @@ ostream* stream_ptr;
 int main()
 {
 	Network_Components::Types::Network_IO_Maps network_io_maps;
-	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps> Net_IO_Type;
+	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::File_Network,network_models::network_information::network_data_information::NetworkData&> Net_IO_Type;
 
 	//reading from files
 	network_models::network_information::scenario_data_information::ScenarioData scenario_data;
@@ -342,7 +326,7 @@ int main()
 	_Network_Interface* network = (_Network_Interface*)Allocate<MasterType::network_type>();
 	
 	network->scenario_reference<_Scenario_Interface*>(scenario);
-	network->read_network_data<Network_Components::Types::File_Network>(network_data);
+	network->read_network_data<Net_IO_Type>(network_data);
 	//network->write_network_data<NULLTYPE>(network_data_for_output);
 
 	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
@@ -366,15 +350,6 @@ int main()
 
 	network->simulation_initialize<NULLTYPE>();
 	
-
-	////network cost
-	cout << "constructing network cost..." <<endl;
-	network->construct_network_cost<NULLTYPE>();
-	//network->printNetwork<NULLTYPE>();
-	
-	////routable network
-	network->construct_routable_network<NULLTYPE>();
-
 	cout << "world started..." << endl;
 	////initialize network agents
 	
