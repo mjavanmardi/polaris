@@ -7,6 +7,14 @@ namespace Person_Components
 
 namespace Concepts
 {
+	concept struct Is_Person
+	{
+		check_feature(Has_Initialize_Defined,Initialize);
+		check_getter(Has_Properties_Defined,Properties);
+		check_getter(Has_Planner_Defined,Planning_Faculty);
+		define_default_check(Has_Initialize_Defined && Has_Properties_Defined && Has_Planner_Defined);
+	};
+
 	concept struct Has_Initialize
 	{
 		check_feature(Has_Initialize_Defined,Initialize);
@@ -28,10 +36,6 @@ namespace Types
 
 namespace Variables
 {
-	namespace Plan_Horizons
-	{
-		polaris_variable(Impulsive,long,Impulsive_tag,Minutes_tag);
-	}
 }
 
 namespace Prototypes
@@ -47,26 +51,37 @@ namespace Prototypes
 		}
 		declare_feature_event(Agent_Event)
 		{
-			//cout << endl << "Current time in minutes: "<<Simulation_Time.Current_Time<Time_Minutes>();
+			cout << endl << "Current time in minutes: "<<Simulation_Time.Current_Time<Time_Minutes>();
 		}
 
 		// Initializer
-		//define_feature_exists_check(Initialize,Has_Initialize);
-		feature_prototype void Initialize(requires(check(ComponentType,Concepts::Has_Initialize)))
+		feature_prototype void Initialize(TargetType id, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
 			//load_event(ComponentType,Agent_Conditional,Agent_Event,0,NULLTYPE);
 			((ComponentType*)this)->Load_Register<ComponentType>((&Agent_Conditional<NULLTYPE>),(&Agent_Event<NULLTYPE>),0,0);
-			this_component()->Initialize<ComponentType, CallerType, TargetType>();
+			this_component()->Initialize<ComponentType, CallerType, TargetType>(id);
 		}
-		feature_prototype void Initialize(requires(!check(ComponentType,Concepts::Has_Initialize)))
+		feature_prototype void Initialize(TargetType id, requires(!check(ComponentType,Concepts::Has_Initialize)))
+		{
+			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+		}
+		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type trip, requires(check(ComponentType,Concepts::Has_Initialize)))
+		{
+			//load_event(ComponentType,Agent_Conditional,Agent_Event,0,NULLTYPE);
+			((ComponentType*)this)->Load_Register<ComponentType>((&Agent_Conditional<NULLTYPE>),(&Agent_Event<NULLTYPE>),0,0);
+			this_component()->Initialize<ComponentType, CallerType, TargetType>(id, trip);
+		}
+		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type trip, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
 
 		// Primary faculty accessors
+		feature_accessor(ID,none,none);
 		feature_accessor(Planning_Faculty,none,none);
 		feature_accessor(Moving_Faculty,none,none);
 		feature_accessor(Properties,none,none);
+		feature_accessor(Next_Rand,none,none);
 	};
 
 
@@ -137,7 +152,7 @@ namespace Prototypes
 				// otherwise move on to next main iteration
 				else
 				{
-					response.next._iteration = Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Planning_Time_Increment<Time_Minutes>());
+					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Planning_Time_Increment<Time_Minutes>()));
 					response.next._sub_iteration = 0;
 					response.result = false;
 				}
@@ -164,7 +179,7 @@ namespace Prototypes
 				// otherwise, finish activity generation and move on to next main iteration
 				else
 				{
-					response.next._iteration = Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Planning_Time_Increment<Time_Minutes>());
+					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Planning_Time_Increment<Time_Minutes>()));
 					response.next._sub_iteration = 0;
 					response.result = true;
 				}
@@ -184,7 +199,7 @@ namespace Prototypes
 				// otherwise, finish activity planning and move on to next main iteration
 				else
 				{
-					response.next._iteration = Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Planning_Time_Increment<Time_Minutes>());
+					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Planning_Time_Increment<Time_Minutes>()));
 					response.next._sub_iteration = 0;
 					response.result = true;
 				}
@@ -194,13 +209,13 @@ namespace Prototypes
 			{
 				// swap in movement event
 				_pthis->Swap_Event((Event)&Person_Planner::Movement_Planning_Event<NULLTYPE>);
-				response.next._iteration = Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Planning_Time_Increment<Time_Minutes>());
+				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Planning_Time_Increment<Time_Minutes>()));
 				response.next._sub_iteration = 0;
 				response.result = true;
 			}
 			else
 			{
-				response.next._iteration = Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Planning_Time_Increment<Time_Minutes>());
+				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Planning_Time_Increment<Time_Minutes>()));
 				response.next._sub_iteration = 0;
 				response.result = false;
 			}
@@ -213,21 +228,12 @@ namespace Prototypes
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
-			define_container_and_value_interface(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Plan_Prototype,ComponentType);
-			Activity_Plan* act = (Activity_Plan*)Allocate<type_of(Activity_Plans_Container)::unqualified_value_type>();
-			act->Activity_Plan_ID<long>(_iteration);
-			Activity_Plans* activities = this_ptr->Activity_Plans_Container<Activity_Plans*>();
-			activities->insert(Simulation_Time.Future_Time<Time_Minutes>(15),act);
-
-			define_container_and_value_interface(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Prototype,ComponentType);
-			Movement_Plan* move = (Movement_Plan*)Allocate<type_of(Movement_Plans_Container)::unqualified_value_type>();
-			move->Movement_Plan_ID<long>(_iteration);
-			Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();
-			movements->insert(Simulation_Time.Future_Time<Time_Minutes>(30),move);
+			// Call specific implementation of the activity generation routine
+			_pthis->Activity_Generation<ComponentType,CallerType,TargetType>();
 
 			// set next activity generation occurence
-			this_ptr->Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Generation_Time_Increment<Time_Minutes>()));
-			cout << endl << "Doing Activity Generation for Activity " << _iteration;
+			this_ptr->Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Time_Minutes>(this_ptr->Generation_Time_Increment<Time_Minutes>())));
+			cout << endl << "Doing Activity Generation for iteration " << _iteration;
 		}
 		declare_feature_event(Activity_Planning_Event)
 		{
@@ -254,11 +260,14 @@ namespace Prototypes
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
+			// Get referecne to movement plans
 			define_container_and_value_interface(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Prototype,ComponentType);
 			Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();
 			
+			// Get all movement plans scheduled for current iteration
 			pair<Movement_Plans::iterator,Movement_Plans::iterator> range = movements->equal_range(_iteration);
 			
+			// Execute movement plans and remove from schedule
 			for (Movement_Plans::iterator move_itr = range.first; move_itr != range.second; ++move_itr)
 			{
 				Movement_Plan* move = move_itr->second;
@@ -269,10 +278,19 @@ namespace Prototypes
 		
 		feature_prototype void Initialize(requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
-			this_component()->Load_Register<ComponentType>((&Planning_Conditional<NULLTYPE>),(&Activity_Generation_Event<NULLTYPE>),0,1);
+			this_component()->Load_Register<ComponentType>((&Planning_Conditional<NULLTYPE>),(&Activity_Generation_Event<NULLTYPE>),0,0);
 			this_component()->Initialize<ComponentType, CallerType, TargetType>();
 		}
 		feature_prototype void Initialize(requires(!check(ComponentType,Concepts::Has_Initialize)))
+		{
+			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+		}
+		feature_prototype void Initialize(TargetType initializer, requires(check(ComponentType,Concepts::Has_Initialize)))
+		{
+			this_component()->Load_Register<ComponentType>((&Planning_Conditional<NULLTYPE>),(&Movement_Planning_Event<NULLTYPE>),0,0);
+			this_component()->Initialize<ComponentType, CallerType, TargetType>(initializer);
+		}
+		feature_prototype void Initialize(TargetType initializer, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
@@ -325,87 +343,5 @@ namespace Prototypes
 	};
 }
 
-namespace Implementations
-{
-	implementation struct Person_Implementation : public Polaris_Component_Class<Person_Implementation,MasterType,Execution_Object,ParentType>
-	{
-		feature_implementation void Initialize()
-		{	
-			define_component_interface(properties_itf,type_of(Properties),Prototypes::Person_Properties,ComponentType);
-			properties_itf* properties = (properties_itf*)Allocate<type_of(Properties)>();
-			properties->Initialize<NULLTYPE>();
-			this->Properties<ComponentType,ComponentType,properties_itf*>(properties);
-
-			define_component_interface(planner_itf,type_of(Planning_Faculty),Prototypes::Person_Planner,ComponentType);
-			planner_itf* planner = (planner_itf*)Allocate<type_of(Planning_Faculty)>();
-			planner->Initialize<NULLTYPE>();
-			this->Planning_Faculty<ComponentType,ComponentType,planner_itf*>(planner);
-			
-		} tag_feature_as_available(Initialize);	
-
-		member_component(typename MasterType::Person_Properties,Properties,none,check_2(ComponentType,CallerType, Is_Same_Entity));
-
-		member_component(typename MasterType::Person_Planner,Planning_Faculty,none,check_2(ComponentType,CallerType, Is_Same_Entity));
-	};
-
-	implementation struct Person_Planner_Implementation : public Polaris_Component_Class<Person_Planner_Implementation,MasterType,Execution_Object,ParentType>
-	{
-		feature_implementation void Initialize()
-		{	
-			this->Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
-			this->Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
-			this->Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(0);
-			
-		} tag_feature_as_available(Initialize);
-
-		member_data(Simulation_Timestep_Increment,Next_Activity_Generation_Time,none,none);
-		member_data(Simulation_Timestep_Increment,Planning_Time_Increment,none,none);
-		member_data(Simulation_Timestep_Increment,Generation_Time_Increment,none,none);
-
-		typedef hash_multimap<long,typename MasterType::Activity_Plan*> act_map_type;
-		member_associative_container(act_map_type,Activity_Plans_Container,none,none);
-		typedef hash_multimap<long,typename MasterType::Movement_Plan*> move_map_type;
-		member_associative_container(move_map_type,Movement_Plans_Container,none,none);
-	};
-
-	implementation struct Person_Properties_Implementation : public Polaris_Component_Class<Person_Properties_Implementation,MasterType,Data_Object,ParentType>
-	{
-		feature_implementation void Initialize(requires(check_2(ComponentType,CallerType,Is_Same_Entity)))
-		{	
-			this->Length<ComponentType, CallerType, type_of(Length)*>(Allocate<type_of(Length)>());
-			this->Area<ComponentType, CallerType, type_of(Area)*>(Allocate<type_of(Area)>());
-			this->Time<ComponentType, CallerType, type_of(Time)*>(Allocate<type_of(Time)>());
-			this->Speed<ComponentType, CallerType,type_of(Speed)*>(Allocate<type_of(Speed)>());
-			this->Income<ComponentType, CallerType, type_of(Income)*>(Allocate<type_of(Income)>());
-		}	tag_feature_as_available(Initialize);
-
-		// Length member
-		typedef Basic_Units::Implementations::Length_In_Feet<MasterType,ComponentType> length_type;
-		member_component(length_type,Length,none,none);
-		member_component_feature(My_Length, Length, Value, Basic_Units::Prototypes::Length_Prototype);
-		// Volume member
-		member_component(typename Basic_Units::Implementations::Area_In_Square_Feet<concat(MasterType,ComponentType)>,Area,none,none);
-		member_component_feature(My_Area, Area, Value, Basic_Units::Prototypes::Area_Prototype);
-		// Time member
-		member_component(typename Basic_Units::Implementations::Time_In_Minutes<concat(MasterType,ComponentType)>,Time,none,none);
-		member_component_feature(My_Time, Time, Value, Basic_Units::Prototypes::Time_Prototype);
-		// Speed member
-		member_component(typename Basic_Units::Implementations::Speed_In_Miles_Per_Hour<concat(MasterType,ComponentType)>,Speed,none,none);
-		member_component_feature(My_Speed, Speed, Value, Basic_Units::Prototypes::Speed_Prototype);
-		// Income member
-		member_component(typename Basic_Units::Implementations::Currency_In_Dollars<concat(MasterType,ComponentType)>,Income,none,none);
-		member_component_feature(HH_Income, Income, Value, Basic_Units::Prototypes::Currency_Prototype);
-	};
-
-	implementation struct Activity_Plan_Implementation : public Polaris_Component_Class<Activity_Plan_Implementation,MasterType,Data_Object,ParentType>
-	{
-		member_data(long,Activity_Plan_ID,none,none);
-	};
-
-	implementation struct Movement_Plan_Implementation : public Polaris_Component_Class<Movement_Plan_Implementation,MasterType,Data_Object,ParentType>
-	{
-		member_data(long,Movement_Plan_ID,none,none);
-	};
-}
 
 }

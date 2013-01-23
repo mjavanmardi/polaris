@@ -140,6 +140,8 @@
     <ClInclude Include="Movement_Plan_Prototype.h" />
     <ClInclude Include="Network_Prototype.h" />
     <ClInclude Include="Operation_Prototype.h" />
+    <ClInclude Include="Person_Implementations.h" />
+    <ClInclude Include="Person_Prototype.h" />
     <ClInclude Include="Plan_Prototype.h" />
     <ClInclude Include="Polaris_Activity_Location_Implementation.h" />
     <ClInclude Include="Polaris_Demand_Implementation.h" />
