@@ -102,7 +102,7 @@ namespace Routing_Components
 				typedef typename _Routable_Network_Interface::get_type_of(scan_list) ScanListType;
 
 				_Routable_Network_Interface* routable_net=routable_network<_Routable_Network_Interface*>();
-				routable_net->template Reset<NULLTYPE>();
+				routable_net->template reset_routable_network<NULLTYPE>();
 				
 				//RoutableNetworkInterface* routable_network=routable_network<RoutableNetworkInterface*>();
 				float max_free_flow_speed=routable_net->template max_free_flow_speed<float>();
@@ -296,7 +296,7 @@ namespace Routing_Components
 				{
 					_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
 					mp->set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
-					origin_link->load_vehicle(veh);
+					origin_link->push_vehicle(veh);
 				}
 			}
 		};

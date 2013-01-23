@@ -108,13 +108,18 @@ namespace Link_Components
 			//==================================================================================================================
 			/// simulation link
 			//------------------------------------------------------------------------------------------------------------------
-			feature_accessor(scenario_reference, none, none);
+
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
 			/// queueing link
 			//------------------------------------------------------------------------------------------------------------------
+
+			// fast way to check if any external entities are trying to access this feature
+			//feature_accessor(link_destination_cumulative_arrived_vehicles, requires(check_2(CallerType,ComponentType,is_same)), requires(check_2(CallerType,ComponentType,is_same)));
 			feature_accessor(link_destination_cumulative_arrived_vehicles, none, none);
+			
+			
 			feature_accessor(link_destination_arrived_vehicles, none, none);
 			feature_accessor(link_destination_vehicle_queue, none, none);
 			feature_accessor(current_vehicle_queue, none, none);	
@@ -174,74 +179,24 @@ namespace Link_Components
 
 			//------------------------------------------------------------------------------------------------------------------
 
-			feature_prototype void push_vehicle(TargetType vehicle, float a_delayed_time)
+			feature_prototype void push_vehicle(TargetType vehicle)
 			{
-				accept_vehicle<TargetType>(vehicle, a_delayed_time);
+				accept_vehicle<TargetType>(vehicle);
 			}
 
-			feature_prototype void load_vehicle(TargetType* veh/*,requires(TargetType,IsUnloaded)*/)
+			feature_prototype void accept_vehicle(TargetType vehicle)
 			{
-				link_origin_cumulative_arrived_vehicles<int&>()++;
-				define_container_and_value_interface(_Link_Origin_Vehicles_Container_Interface, _Vehicle_Interface,get_type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
-				link_origin_vehicle_array<_Link_Origin_Vehicles_Container_Interface&>().push_back(vehicle);
-				vehicle->template load<Vehicle_Components::Types::Load_To_Entry_Queue>();
+				this_component()->accept_vehicle<ComponentType,CallerType,TargetType>(vehicle);
 			}
 
-			feature_prototype void accept_vehicle(TargetType veh, float a_delayed_time/*,requires(TargetType,IsLoaded)*/)
+			feature_prototype typename TargetType::ReturnType link_supply_update(typename TargetType::ParamType supply_container,typename TargetType::Param2Type capacity_container)
 			{
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				define_container_and_value_interface(_Vehicle_Queue_Interface, _Vehicle_Interface, get_type_of(current_vehicle_queue), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_container_and_value_interface(_Destination_Vehicle_Queue_Interface, _Vehicle_Interface_2, get_type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
-
-				typedef Link_Prototype<ComponentType, ComponentType> _Link_Interface;
-
-				_Scenario_Interface* scenario=scenario_reference<_Scenario_Interface*>();
-				
-				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
-				int simulation_interval_length = scenario->template simulation_interval_length<int>();
-				_Vehicle_Interface* vehicle=(_Vehicle_Interface*)veh;
-				_Movement_Plan_Interface* mp = vehicle->movement_plan<_Movement_Plan_Interface*>();
-				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
-
-				if(this->template internal_id<int>()==(mp->template destination<_Link_Interface*>())->template internal_id<int>())
-				{
-					vehicle->template unload<NULLTYPE>();
-					link_destination_cumulative_arrived_vehicles<int&>()++;
-					link_destination_arrived_vehicles<int&>()++;
-					this->template link_destination_vehicle_queue<_Destination_Vehicle_Queue_Interface&>().push_back(vehicle);
-					scenario->template network_cumulative_arrived_vehicles<int&>()++;
-					scenario->template network_in_network_vehicles<int&>()--;
-				}
-				else
-				{
-					current_vehicle_queue<_Vehicle_Queue_Interface&>().push_back(vehicle);
-				}
+				this_component()->link_supply_update<ComponentType,CallerType,TargetType>(supply_container, capacity_container);
 			}
 			
-			feature_prototype void link_supply_update()
-			{
-				this_component()->link_supply_update<ComponentType,CallerType,TargetType>();
-			}
-
 			feature_prototype void link_moving()
 			{
-				define_container_and_value_interface(_Vehicle_Queue_Interface, _Vehicle_Interface, get_type_of(current_vehicle_queue), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_component_interface(_Intersection_Interface, get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-
-				_Intersection_Interface* intersection=downstream_intersection<_Intersection_Interface*>();
-
-				typename _Vehicle_Queue_Interface::iterator vehicle_itr;
-
-				_Vehicle_Queue_Interface& cur_vehicle_queue=current_vehicle_queue<_Vehicle_Queue_Interface&>();
-
-				for(vehicle_itr=cur_vehicle_queue.begin();vehicle_itr!=cur_vehicle_queue.end();vehicle_itr++)
-				{
-					intersection->template push_vehicle<NULLTYPE>((*vehicle_itr), -1, -1);
-				}
-
-				cur_vehicle_queue.clear();
+				this_component()->link_moving<ComponentType,CallerType,TargetType>();
 			}
 
 			//feature_prototype void origin_link_loading()
@@ -349,70 +304,16 @@ namespace Link_Components
 
 			feature_prototype void Initialize()
 			{
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				load_event(ComponentType,Newells_Conditional,Compute_Step_Flow_Supply_Update,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION,NULLTYPE);
+				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}
 
-			declare_feature_conditional(Newells_Conditional)
+			feature_prototype void reset_routable_link()
 			{
-				typedef Link_Prototype<ComponentType, ComponentType> _Link_Interface;
-				ComponentType* _pthis = (ComponentType*)_this;
-				_Link_Interface* _this_ptr=(_Link_Interface*)_pthis;
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				define_component_interface(_Intersection_Interface, get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
-				{
-					_pthis->Swap_Event((Event)&Link_Prototype::Compute_Step_Flow_Supply_Update<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=_iteration;
-					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION;
-				}
-				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION)
-				{
-					_pthis->Swap_Event((Event)&Link_Prototype::Compute_Step_Flow_Link_Moving<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=_iteration+_this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
-					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION;
-				}
-				else
-				{
-					assert(false);
-					cout << "Should never reach here in link conditional!" << endl;
-				}
+				this_component()->reset_routable_link<ComponentType,CallerType,TargetType>();
 			}
-
-			declare_feature_event(Compute_Step_Flow_Supply_Update)
+			feature_prototype void construct_routable_from_regular(TargetType regular_link)
 			{
-
-				typedef Link_Prototype<ComponentType,ComponentType> _Link_Interface;
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				
-				double calculation_time_start = ::get_current_cpu_time_in_seconds();
-				
-				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
-				//step 1: link supply update based on a given traffic flow model
-				//_this_ptr->template link_moving<ComponentType>();
-				_this_ptr->template link_supply_update<ComponentType>();
-
-				double calculation_time_end = ::get_current_cpu_time_in_seconds();
-				_this_ptr->template scenario_reference<_Scenario_Interface*>()->template operation_time_in_seconds<double&>() += calculation_time_end - calculation_time_start;
-			}
-
-			declare_feature_event(Compute_Step_Flow_Link_Moving)
-			{
-				
-				typedef Link_Prototype<ComponentType,ComponentType> _Link_Interface;
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
-
-				//step 7: load vehicles to origin links
-				//_this_ptr->template origin_link_loading<ComponentType>();
-				
-				//step 7.5: link moving -- no link moving in Newell's simplified model -- it can be used to determine turn bay curve
-				_this_ptr->template link_moving<ComponentType>();
-
-				//step 8: link network state update
-				_this_ptr->template network_state_update<ComponentType>();
+				this_component()->construct_routable_from_regular<ComponentType,CallerType,TargetType>(regular_link);
 			}
 		};
 

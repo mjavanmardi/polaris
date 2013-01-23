@@ -177,7 +177,7 @@ namespace Demand_Components
 				typedef Traveler_Components::Prototypes::Traveler_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
 				define_component_interface(_Routing_Interface, _Traveler_Interface::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
-				define_component_interface(_Movmement_Plan_Interface, _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				
 
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, get_type_of(network_reference)::type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -332,11 +332,11 @@ namespace Demand_Components
 			}
 
 
-			feature_prototype void read_demand_data(requires(!check_2(TargetType,Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,Network_Components::Types::Hard_Coded_Network,is_same)))
+			feature_prototype void read_demand_data(requires(!check_2(TargetType,Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,Network_Components::Types::File_Network,is_same)))
 			{
 				assert_check_2(TargetType,Types::ODB_Network,is_same,"TargetType is ill-defined");
 				assert_check_2(TargetType,Types::ODB_Network,is_same,"TargetType should indicate ODB_Network if you want to read it in with ODB");
-				assert_check_2(TargetType,Types::Hard_Coded_Network,is_same,"TargetType should indicate Static_Network if you want to read in the hard coded network");
+				assert_check_2(TargetType,Types::File_Network,is_same,"TargetType should indicate Static_Network if you want to read in the hard coded network");
 			}
 
 			feature_prototype void read_demand_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data, network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::demand_data_information::DemandData& demand_data)
@@ -416,6 +416,9 @@ namespace Demand_Components
 				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+				typedef Traveler_Components::Prototypes::Traveler_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
+				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 
 				demand_data.first_vehicle_departure_time = this->first_vehicle_departure_time<int>();
 				demand_data.last_vehicle_departure_time = this->last_vehicle_departure_time<int>();
@@ -429,24 +432,25 @@ namespace Demand_Components
 						cout << counter << " vehicles converted " << endl;
 					}
 					_Vehicle_Interface* vehicle = vehicles_container<_Vehicles_Container_Interface&>()[i];
+					_Movement_Plan_Interface* movement_plan = vehicle->template movement_plan<_Movement_Plan_Interface*>();
 					network_models::network_information::demand_data_information::VehicleData vehicle_data;
 					
 					vehicle_data.set_vehicle_id(vehicle->template uuid<int>());
 					vehicle_data.set_vehicle_index(vehicle->template internal_id<int>());
 
-					vehicle_data.set_origin_link_index(vehicle->template origin_link<_Link_Interface*>()->template internal_id<int>());
-					vehicle_data.set_destination_link_index(vehicle->template destination_link<_Link_Interface*>()->template internal_id<int>());
-					vehicle_data.set_origin_activity_location_index(vehicle->template origin_activity_location<_Activity_Location_Interface*>()->template internal_id<int>());
-					vehicle_data.set_destination_activity_location_index(vehicle->template destination_activity_location<_Activity_Location_Interface*>()->template internal_id<int>());
-					vehicle_data.set_origin_zone_index(vehicle->template origin_zone<_Zone_Interface*>()->template internal_id<int>());
-					vehicle_data.set_destination_zone_index(vehicle->template destination_zone<_Zone_Interface*>()->template internal_id<int>());
+					vehicle_data.set_origin_link_index(movement_plan->template origin<_Link_Interface*>()->template internal_id<int>());
+					vehicle_data.set_destination_link_index(movement_plan->template destination<_Link_Interface*>()->template internal_id<int>());
+					vehicle_data.set_origin_activity_location_index(0);
+					vehicle_data.set_destination_activity_location_index(0);
+					vehicle_data.set_origin_zone_index(0);
+					vehicle_data.set_destination_zone_index(0);
 
-					vehicle_data.set_departure_time(vehicle->departed_time<int>());
-					vehicle_data.set_departure_simulation_interval_index(vehicle->template departed_simulation_interval_index<int>());
-					vehicle_data.set_departure_assignment_interval_index(vehicle->template departed_assignment_interval_index<int>());
+					vehicle_data.set_departure_time(movement_plan->template departed_time<int>());
+					vehicle_data.set_departure_simulation_interval_index(movement_plan->template departed_time<int>() / ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>());
+					vehicle_data.set_departure_assignment_interval_index(movement_plan->template departed_time<int>() / ((_Scenario_Interface*)_global_scenario)->assignment_interval_length<int>());
 
 					demand_data.vehilce_data_array.push_back(vehicle_data);
-					demand_data.time_dependent_vehicle_index_array[vehicle->departed_time<int>()].push_back(vehicle_data.get_vehicle_index());
+					demand_data.time_dependent_vehicle_index_array[movement_plan->departed_time<int>()].push_back(vehicle_data.get_vehicle_index());
 
 				}
 				demand_data.demand_vehicle_size = (int)demand_data.vehilce_data_array.size();

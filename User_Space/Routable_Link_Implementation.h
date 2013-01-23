@@ -36,6 +36,27 @@ namespace Link_Components
 			member_component(typename MasterType::routable_intersection_type, upstream_intersection, none, none);
 			member_component(typename MasterType::routable_intersection_type, downstream_intersection, none, none);
 
+			feature_implementation void reset_routable_link()
+			{
+				_label_cost = INFINITY_FLOAT;
+				_label_pointer = this;
+				_scan_list_status = Network_Components::Types::UNSCANNED;
+				_f_cost = 0.0;
+				_h_cost = 0.0;
+			}
+
+			feature_implementation void construct_routable_from_regular(TargetType regular_link)
+			{
+				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;	
+				_network_link_reference = (typename MasterType::link_type*)regular_link;
+				_f_cost = 0.0;
+				_h_cost = 0.0;
+				_label_pointer = this;
+				_label_cost = 0.0;
+				_uuid = ((_Link_Interface*)regular_link)->template uuid<int>();
+				_internal_id = ((_Link_Interface*)regular_link)->template internal_id<int>();
+				_travel_time = ((_Link_Interface*)regular_link)->template travel_time<float>();
+			}
 		};
 		
 	}
