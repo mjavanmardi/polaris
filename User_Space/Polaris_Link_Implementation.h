@@ -167,12 +167,13 @@ namespace Link_Components
 			// convert this to a service which returns or stores supply in user-provided container
 			feature_implementation void link_supply_update(int& supply_container, int& capacity_container)
 			{
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario=(_Scenario_Interface*)_global_scenario;
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
 				// time unification
-				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
-				int simulation_interval_length = scenario->template simulation_interval_length<int>();
+				int current_simulation_interval_index = network->template current_simulation_interval_index<int>();
+				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
 				//Newell's model
 
@@ -216,11 +217,12 @@ namespace Link_Components
 			// add many comments
 			feature_implementation void network_state_update()
 			{
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario=(_Scenario_Interface*)_global_scenario;
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
-				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
-				int simulation_interval_length = scenario->template simulation_interval_length<int>();
+				int current_simulation_interval_index = network->template current_simulation_interval_index<int>();
+				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
 				//calculate upstream cumulative vehicles using the three detector method
 				int t_minus_bwtt=-1;			
@@ -261,7 +263,7 @@ namespace Link_Components
 				{
 					t_fftt = (current_simulation_interval_index)%fftt_cached_simulation_interval_size;
 					t_bwtt = (current_simulation_interval_index)%bwtt_cached_simulation_interval_size;
-					t_cached_delay = (current_simulation_interval_index)%scenario->template num_simulation_intervals_per_assignment_interval<int>();
+					t_cached_delay = (current_simulation_interval_index)%((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
 				}
 				else
 				{
@@ -308,12 +310,13 @@ namespace Link_Components
 				define_container_and_value_interface(_Vehicle_Queue_Interface, _Vehicle_Interface, type_of(current_vehicle_queue), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_container_and_value_interface(_Destination_Vehicle_Queue_Interface, _Vehicle_Interface_2, type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 				typedef Link_Prototype<ComponentType, ComponentType> _Link_Interface;
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				
-				int current_simulation_interval_index = ((_Scenario_Interface*)_global_scenario)->template current_simulation_interval_index<int>();
-				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+				int current_simulation_interval_index = network_reference<ComponentType,CallerType,_Network_Interface*>()->template current_simulation_interval_index<int>();
+				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
 				_Vehicle_Interface* vehicle=(_Vehicle_Interface*)veh;
 				_Movement_Plan_Interface* mp = vehicle->movement_plan<_Movement_Plan_Interface*>();
 				float a_delayed_time;
@@ -324,7 +327,7 @@ namespace Link_Components
 				}
 				else
 				{
-					a_delayed_time = (int)((((_Scenario_Interface*)_global_scenario)->template current_simulation_time<int>() - mp->template get_current_link_enter_time<int>()) - _link_fftt);
+					a_delayed_time = (int)((network_reference<ComponentType,CallerType,_Network_Interface*>()->template start_of_current_simulation_interval_relative<int>() - mp->template get_current_link_enter_time<int>()) - _link_fftt);
 				}
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
@@ -365,6 +368,8 @@ namespace Link_Components
 			declare_feature_conditional(Newells_Conditional)
 			{
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
+				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
 				{
 					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Supply_Update<NULLTYPE>);

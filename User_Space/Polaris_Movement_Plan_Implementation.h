@@ -74,14 +74,14 @@ namespace Movement_Plan_Components
 
 			feature_implementation void arrive_to_destination()
 			{
-				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 				_trajectory_container[_current_trajectory_index]->_delayed_time = 0.0;
-				_arrived_time = ((_Scenario_Interface*)_global_scenario)->template current_simulation_time<int>();
+				_arrived_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
 			}
 
 			feature_implementation void transfer_to_next_link(int delayed_time)
 			{
-				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype<typename MasterType::trajectory_unit_type,ComponentType> _Trajectory_Unit_Interface;
 
 				if (_current_trajectory_index != -1)
@@ -90,7 +90,7 @@ namespace Movement_Plan_Components
 				}
 				
 				((Movement_Plan_Prototype<ComponentType,ComponentType>*)this)->advance_trajectory<_Trajectory_Unit_Interface*>();
-				_trajectory_container[_current_trajectory_index]->_enter_time = ((_Scenario_Interface*)_global_scenario)->template current_simulation_time<int>();
+				_trajectory_container[_current_trajectory_index]->_enter_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
 			}
 		};
 	}

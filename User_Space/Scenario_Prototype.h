@@ -27,7 +27,7 @@ namespace Scenario_Components
 
 			enum Type_Sub_Iteration_keys
 			{
-				START_OF_ITERATION=0,
+				START_OF_ITERATION = 0,
 				TRAVELER_SET_DEPARTURE_SUB_ITERATION,
 				ROUTING_SUB_ITERATION,
 				CONTROL_SUB_ITERATION,
@@ -50,10 +50,10 @@ namespace Scenario_Components
 			tag_as_prototype;
 
 
-			feature_accessor(current_simulation_interval_index, none, none);
+
 			feature_accessor(simulation_interval_length, none, none);
 			feature_accessor(assignment_interval_length, none, none);
-			feature_accessor(current_time, none, none);
+
 
 			feature_accessor(planning_horizon, none, none);
 			feature_accessor(simulation_start_time, none, none);
@@ -73,8 +73,8 @@ namespace Scenario_Components
 			feature_accessor(io_source_flag, none, none);
 
 			feature_accessor(path_calculation_interval_length, none, none);
-			feature_accessor(current_assignment_interval_index, none, none);
-			feature_accessor(current_simulation_time, none, none);
+
+
 			feature_accessor(current_day_index, none, none);
 			
 
@@ -221,10 +221,6 @@ namespace Scenario_Components
 				num_assignment_intervals<int>(scenario_data.num_assignment_intervals);
 				num_simulation_intervals_per_assignment_interval<int>(scenario_data.num_simulation_intervals_per_assignment_interval);
 
-				current_simulation_interval_index<int>(scenario_data.current_simulation_interval_index);
-				current_assignment_interval_index<int>(scenario_data.current_assignment_interval_index);
-				current_day_index<int>(scenario_data.current_day_index);
-
 				assignment_mode<int>(scenario_data.assignment_mode);
 
 				iseed<unsigned long>(scenario_data.iseed);
@@ -264,11 +260,6 @@ namespace Scenario_Components
 
 				scenario_data.num_threads = num_threads<int>();
 				scenario_data.demand_od_flag = 0;
-				scenario_data.current_simulation_interval_index = current_simulation_interval_index<int>();
-				scenario_data.current_assignment_interval_index = current_assignment_interval_index<int>();
-				scenario_data.current_time = current_time<int>();	//from 00::00:00
-				scenario_data.current_simulation_time = current_simulation_time<int>(); // from simulation_start_time
-				scenario_data.current_day_index = current_day_index<int>();
 
 				scenario_data.assignment_mode = assignment_mode<network_models::network_information::scenario_data_information::Assignment_Simulation_Mode_Keys>();
 

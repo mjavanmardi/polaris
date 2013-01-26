@@ -151,8 +151,9 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype,  ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario=(_Scenario_Interface*)_global_scenario;
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
 				_Link_Interface* outbound_link;
 				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<ComponentType,CallerType,_Outbound_Inbound_Movements_Container_Interface&>();
@@ -162,7 +163,7 @@ namespace Intersection_Components
 				{
 					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
 
-					float outbound_link_capacity = (float)(scenario->template simulation_interval_length<int>() * outbound_link->template num_lanes<int>() * (outbound_link->template maximum_flow_rate<float>()/3600.0));
+					float outbound_link_capacity = (float)(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() * outbound_link->template num_lanes<int>() * (outbound_link->template maximum_flow_rate<float>()/3600.0));
 
 					_Link_Interface* inbound_link;
 					_Movements_Container_Interface& inbound_links_container=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
@@ -177,7 +178,7 @@ namespace Intersection_Components
 						inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
 						float inbound_link_capacity = inbound_link->template link_capacity<float>(); 
 						float green_time = inbound_movement->green_time<float>();
-						float green_time_ratio = inbound_movement->green_time<float>()*1.0f/((float)scenario->template simulation_interval_length<int>());
+						float green_time_ratio = inbound_movement->green_time<float>()*1.0f/((float)((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
 						if(_intersection_type == Types::Intersection_Type_Keys::NO_CONTROL)
 						{
 							inbound_movement->template movement_capacity<float>(min(inbound_link_capacity,outbound_link_capacity)*green_time_ratio);
@@ -197,11 +198,12 @@ namespace Intersection_Components
 				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_simple_container_interface(_Int_Container_Interface, _Movement_Interface::get_type_of(cached_turn_movement_cumulative_shifted_arrived_vehicles_array), Random_Access_Sequence_Prototype, int, ComponentType);
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario=(_Scenario_Interface*)_global_scenario;
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				
-				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
-				int simulation_interval_length = scenario->template simulation_interval_length<int>();
+				int current_simulation_interval_index = network->template current_simulation_interval_index<int>();
+				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
 
 
@@ -270,15 +272,14 @@ namespace Intersection_Components
 				define_component_interface(_Link_Interface,  _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_simple_container_interface(_Float_Container_Interface, _Movement_Interface::get_type_of(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array), Random_Access_Sequence_Prototype, float, ComponentType);
-				
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				typedef Vehicle_Components::Prototypes::Vehicle_Prototype<typename MasterType::vehicle_type, ComponentType> _Vehicle_Interface;
 				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario=(_Scenario_Interface*)_global_scenario;
-				
-				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
-				int simulation_interval_length = scenario->template simulation_interval_length<int>();
+				int current_simulation_interval_index = network->template current_simulation_interval_index<int>();
+				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
 				// apply transfers of y(a,a''t) for each turn;
 				//int arrived_vehicles = this->template network_cumulative_arrived_vehicles;
@@ -342,8 +343,8 @@ namespace Intersection_Components
 
 								//update vehicle state: transfer to next link
 								int enter_time=vehicle->template movement_plan<_Movement_Plan_Interface*>()->template get_current_link_enter_time<int>();
-								int delayed_time = int((scenario->template current_simulation_time<int>() - enter_time) - inbound_link->template link_fftt<float>());
-								int enter_interval_index = enter_time / scenario->simulation_interval_length<int>();
+								int delayed_time = int((network->template start_of_current_simulation_interval_relative<int>() - enter_time) - inbound_link->template link_fftt<float>());
+								int enter_interval_index = enter_time / ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
 								int delayed_interval = current_simulation_interval_index - enter_interval_index;
 
 								//update inbound link state: N(a',L,t)
@@ -361,7 +362,7 @@ namespace Intersection_Components
 								//find the departed time
 								int departed_time_position = -1;
 								
-								int num_intervals=scenario->template num_simulation_intervals_per_assignment_interval<int>();
+								int num_intervals=((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
 
 								if (current_simulation_interval_index>=num_intervals)
 								{
@@ -400,7 +401,7 @@ namespace Intersection_Components
 									int t_minus_one = -1;
 									if (current_simulation_interval_index>0)
 									{
-										t_minus_one = (current_simulation_interval_index-1)%scenario->template num_simulation_intervals_per_assignment_interval<int>();
+										t_minus_one = (current_simulation_interval_index-1)%((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
 
 										float delay = simulation_interval_length +
 											inbound_movement->template cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>()[t_minus_one];
@@ -426,11 +427,12 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_simple_container_interface(_Float_Container_Interface, _Movement_Interface::get_type_of(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array), Random_Access_Sequence_Prototype, float, ComponentType);
 				define_simple_container_interface(_Int_Container_Interface, _Movement_Interface::get_type_of(cached_turn_movement_cumulative_shifted_arrived_vehicles_array), Random_Access_Sequence_Prototype, int, ComponentType);
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario=(_Scenario_Interface*)_global_scenario;
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				
-				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
-				int simulation_interval_length = scenario->template simulation_interval_length<int>();
+				int current_simulation_interval_index = network->template current_simulation_interval_index<int>();
+				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
 
 				
@@ -459,7 +461,7 @@ namespace Intersection_Components
 					{
 						t_fftt = (current_simulation_interval_index)%outbound_link->template link_fftt_cached_simulation_interval_size<int>();
 						t_bwtt = (current_simulation_interval_index)%outbound_link->template link_bwtt_cached_simulation_interval_size<int>();
-						t_cached_delay = (current_simulation_interval_index)%scenario->template num_simulation_intervals_per_assignment_interval<int>();
+						t_cached_delay = (current_simulation_interval_index)%((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
 					}
 					else
 					{
@@ -496,15 +498,15 @@ namespace Intersection_Components
 
 						inbound_movement->template cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>()[t_cached_delay] = inbound_movement->template outbound_link_arrived_time_based_experienced_link_turn_travel_delay<float>();
 
-						if (((current_simulation_interval_index+1)*simulation_interval_length)%scenario->template assignment_interval_length<int>() == 0)
+						if (((current_simulation_interval_index+1)*simulation_interval_length)%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 						{	
 							float turn_travel_penalty = 0.0;
-							for (int t_cached_time=0;t_cached_time<scenario->template num_simulation_intervals_per_assignment_interval<int>();t_cached_time++)
+							for (int t_cached_time=0;t_cached_time<((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();t_cached_time++)
 							{
 								turn_travel_penalty += inbound_movement->template cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array<_Float_Container_Interface&>()[t_cached_time];
 							}
 
-							turn_travel_penalty = (float) ( turn_travel_penalty/((float)scenario->template num_simulation_intervals_per_assignment_interval<int>()) );
+							turn_travel_penalty = (float) ( turn_travel_penalty/((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()) );
 							inbound_movement->template turn_travel_penalty<float>(turn_travel_penalty);
 							inbound_movement->template forward_link_turn_travel_time<float>(outbound_link->template travel_time<float>()+inbound_movement->template turn_travel_penalty<float>());
 						}
@@ -522,10 +524,12 @@ namespace Intersection_Components
 				define_component_interface(_Intersection_Interface, _Link_Interface::get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype,  ComponentType);
 				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
 				//define_component_interface(_Detector_Interface,  _Movement_Interface_type::get_type_of(detector), Signal_Components::Prototypes::Detector_Prototype, ComponentType);
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario=(_Scenario_Interface*)_global_scenario;
-				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
-				int simulation_interval_length = scenario->template simulation_interval_length<int>();
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
+
+				int current_simulation_interval_index = network->template current_simulation_interval_index<int>();
+				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
 				_Link_Interface* outbound_link;
 
@@ -561,16 +565,16 @@ namespace Intersection_Components
 
 							char s[100];
 #ifdef WINDOWS
-							sprintf_s(s, "stop:%i:%i:%i\n", inbound_link->template uuid<int>(), _uuid, scenario->template current_time<int>());
+							sprintf_s(s, "stop:%i:%i:%i\n", inbound_link->template uuid<int>(), _uuid, network->template start_of_current_simulation_interval_absolute<int>());
 #else
-							sprintf(s, "stop:%i:%i:%i\n", inbound_link->template uuid<int>(), _uuid, scenario->template current_time<int>());
+							sprintf(s, "stop:%i:%i:%i\n", inbound_link->template uuid<int>(), _uuid, network->template start_of_current_simulation_interval_absolute<int>());
 #endif
 							std::string s1 = s;
 							//scenario->template output<NULLTYPE>(s1);
 #ifdef WINDOWS							
-							sprintf_s(s, "advanced:%i:%i:%i\n", outbound_link->template uuid<int>(), outbound_link->template downstream_intersection<_Intersection_Interface*>()->template uuid<int>(), scenario->template current_time<int>());
+							sprintf_s(s, "advanced:%i:%i:%i\n", outbound_link->template uuid<int>(), outbound_link->template downstream_intersection<_Intersection_Interface*>()->template uuid<int>(), network->template start_of_current_simulation_interval_absolute<int>());
 #else
-							sprintf(s, "advanced:%i:%i:%i\n", outbound_link->template uuid<int>(), outbound_link->template downstream_intersection<_Intersection_Interface*>()->template uuid<int>(), scenario->template current_time<int>());
+							sprintf(s, "advanced:%i:%i:%i\n", outbound_link->template uuid<int>(), outbound_link->template downstream_intersection<_Intersection_Interface*>()->template uuid<int>(), network->template start_of_current_simulation_interval_absolute<int>());
 #endif
 							std::string s2 = s;
 							//scenario->template output<NULLTYPE>(s2);
@@ -614,12 +618,10 @@ namespace Intersection_Components
 
 			feature_implementation void supply_allocation_based_on_driving_rule()
 			{
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 
-				_Scenario_Interface* scenario=(_Scenario_Interface*)_global_scenario;
 				_Link_Interface* outbound_link;
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
 
@@ -811,8 +813,7 @@ namespace Intersection_Components
 
 			feature_implementation void origin_link_loading()
 			{
-
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;		
+	
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
@@ -820,11 +821,12 @@ namespace Intersection_Components
 				define_simple_container_interface(_Int_Container_Interface, _Movement_Interface::get_type_of(cached_turn_movement_cumulative_shifted_arrived_vehicles_array), Random_Access_Sequence_Prototype, int, ComponentType);
 				define_container_and_value_interface(_Vehicles_Origin_Container_Interface, _Vehicle_Interface,_Link_Interface::get_type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_container_interface(_Vehicle_Origin_Queue_Interface, _Link_Interface::get_type_of(link_origin_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
-				_Scenario_Interface* scenario=(_Scenario_Interface*)_global_scenario;
-				
-				int current_simulation_interval_index = scenario->template current_simulation_interval_index<int>();
-				int simulation_interval_length = scenario->template simulation_interval_length<int>();
+				int current_simulation_interval_index = network->template current_simulation_interval_index<int>();
+				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
 				_Link_Interface* outbound_link;
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
@@ -853,7 +855,7 @@ namespace Intersection_Components
 							outbound_link->template link_origin_loaded_vehicles<int&>()++;
 							outbound_link->template link_origin_cumulative_arrived_vehicles<int&>()++;
 
-							scenario->template network_cumulative_loaded_vehicles<int&>()++;
+							((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int&>()++;
 						}
 					}
 
@@ -893,8 +895,8 @@ namespace Intersection_Components
 
 								outbound_link->template push_vehicle<_Vehicle_Interface*>(vehicle);
 
-								scenario->template network_cumulative_departed_vehicles<int&>()++;
-								scenario->template network_in_network_vehicles<int&>()++;
+								((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int&>()++;
+								((_Scenario_Interface*)_global_scenario)->template network_in_network_vehicles<int&>()++;
 							}
 						}
 					}
@@ -903,23 +905,28 @@ namespace Intersection_Components
 
 			feature_implementation void Initialize()
 			{
-				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;		
-				define_component_interface(_Intersection_Control_Interface, get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Intersection_Control_Interface, type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
+
 				if (_outbound_inbound_movements.size() > 0 && _inbound_outbound_movements.size() > 0)
 				{
 					((_Intersection_Control_Interface*)_intersection_control)->template Initialize<NULLTYPE>();
-					load_event(ComponentType,Newells_Conditional,Compute_Step_Flow,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,NULLTYPE);
+					int start_iteration = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1;
+					load_event(ComponentType,Newells_Conditional,Compute_Step_Flow,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,NULLTYPE);
+
 				}
 			}
 			
 			declare_feature_conditional(Newells_Conditional)
 			{
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;

@@ -100,7 +100,7 @@ namespace Intersection_Control_Components
 			member_component(typename MasterType::intersection_type, intersection, none, none);
 			member_component(typename MasterType::control_plan_type, current_control_plan, none, none);
 			member_container(vector<typename MasterType::control_plan_type*>, control_plan_data_array, none, none);
-			member_component(typename MasterType::scenario_type, scenario_reference, none, none);
+			member_component(typename MasterType::network_type, network_reference, none, none);
 		};
 	}
 }

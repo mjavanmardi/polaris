@@ -127,16 +127,14 @@ namespace Intersection_Control_Components
 			feature_accessor(intersection, none, none);
 			feature_accessor(current_control_plan, none, none);
 			feature_accessor(control_plan_data_array, none, none);
-			feature_accessor(scenario_reference, none, none);
+			feature_accessor(network_reference, none, none);
 			
-			feature_prototype void set_node_current_control_plan_index()
+			feature_prototype void set_node_control_plan_index(int time)
 			{
 				// Make interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();				
-
-				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
+				int t_start = time%(24*60*60);
 				typename _Control_Plans_Container_Interface::Component_Type* monitor=control_plan_data_array<_Control_Plans_Container_Interface::Component_Type*>();
 
 				// Loop over all control plans, if current_time lies within range for the plan, set as current
@@ -145,7 +143,7 @@ namespace Intersection_Control_Components
 					_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)control_plan_data_array<_Control_Plans_Container_Interface&>()[i];
 					int current_control_plan_start_time = control_plan->template starting_time<int>();
 					int current_control_plan_end_time = control_plan->template ending_time<int>();
-					if (current_time >=current_control_plan_start_time && current_time<current_control_plan_end_time)
+					if (t_start >= current_control_plan_start_time && t_start < current_control_plan_end_time)
 					{
 						current_control_plan<_Control_Plan_Interface*>(control_plan);
 						break;
@@ -189,16 +187,13 @@ namespace Intersection_Control_Components
 			feature_prototype void no_control_state_update()
 			{
 				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
-				
 
 				// Figure out time bounds for the signal vs. the simulation interval
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
-	
-				int t_start = current_time;
-				int t_end = t_start + ((_Scenario_Interface*)scenario)->simulation_interval_length<int>();
+				int t_start = network_reference<_Network_Interface*>()->template start_of_current_simulation_interval_absolute<int>()%(24*60*60);
+				int t_end = t_start + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 	
 				int starting_time = current_control_plan<_Control_Plan_Interface*>()->template starting_time<int>();
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
@@ -216,16 +211,13 @@ namespace Intersection_Control_Components
 			
 			feature_prototype void calculate_turn_movement_green_time_no_control()
 			{
-				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
-				
 				//green times for each movement are assumed to be the length of the simulation interval
 				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_inbound_movements_itr;
@@ -248,7 +240,7 @@ namespace Intersection_Control_Components
 						if (inbound_movement->template movement_rule<int>() == ALLOWED)
 						{
 							// Set green time as interval length
-							inbound_movement->template green_time<float>(((_Scenario_Interface*)scenario)->template simulation_interval_length<float>());
+							inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
 						}
 
 						//prihibited
@@ -266,17 +258,14 @@ namespace Intersection_Control_Components
 
 			feature_prototype void calculate_turn_movement_green_time_yield_control()
 			{
-				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 				define_component_interface(_Link_Interface,_Approach_Interface::get_type_of(inbound_link),Link_Components::Prototypes::Link_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
-
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
 				//green times for each movement are assumed to be the length of the simulation interval
 				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
@@ -301,7 +290,7 @@ namespace Intersection_Control_Components
 						if (inbound_movement->template movement_rule<int>() == ALLOWED)
 						{
 							// Set green time as interval length
-							inbound_movement->template green_time<float>(((_Scenario_Interface*)scenario)->template simulation_interval_length<float>());
+							inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
 						}
 
 						//prohibited
@@ -356,16 +345,13 @@ namespace Intersection_Control_Components
 
 			feature_prototype void yield_sign_control_state_update()
 			{
-				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
-
 				// Figure out time bounds for the signal vs. the simulation interval
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
-				int t_start = current_time;
-				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+				int t_start = network_reference<_Network_Interface*>()->template start_of_current_simulation_interval_absolute<int>()%(24*60*60);
+				int t_end = t_start + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 	
 				int starting_time = current_control_plan<_Control_Plan_Interface*>()->template starting_time<int>();
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
@@ -384,15 +370,14 @@ namespace Intersection_Control_Components
 			feature_prototype void all_way_stop_control_state_update()
 			{
 				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				// Figure out time bounds for the signal vs. the simulation interval
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
-				int t_start = current_time;
-				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+				int t_start = network_reference<_Network_Interface*>()->template start_of_current_simulation_interval_absolute<int>()%(24*60*60);;
+				int t_end = t_start + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 	
 				int starting_time = current_control_plan<_Control_Plan_Interface*>()->template starting_time<int>();
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
@@ -411,15 +396,14 @@ namespace Intersection_Control_Components
 			feature_prototype void two_way_stop_control_state_update()
 			{
 				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				// Figure out time bounds for the signal vs. the simulation interval
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
-				int t_start = current_time;
-				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+				int t_start = network_reference<_Network_Interface*>()->template start_of_current_simulation_interval_absolute<int>()%(24*60*60);;
+				int t_end = t_start + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 	
 				int starting_time = current_control_plan<_Control_Plan_Interface*>()->template starting_time<int>();
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
@@ -437,16 +421,14 @@ namespace Intersection_Control_Components
 
 			feature_prototype void pre_timed_signal_control_state_update()
 			{
-				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				// Figure out time bounds for the signal vs. the simulation interval
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
-				int t_start = current_time;
-				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+				int t_start = network_reference<_Network_Interface*>()->template start_of_current_simulation_interval_absolute<int>()%(24*60*60);;
+				int t_end = t_start + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 	
 				int starting_time = current_control_plan<_Control_Plan_Interface*>()->template starting_time<int>();
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
@@ -472,16 +454,14 @@ namespace Intersection_Control_Components
 
 			feature_prototype void actuated_signal_control_state_update()
 			{
-				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
 				// Figure out time bounds for the signal vs. the simulation interval
-				int current_time = ((_Scenario_Interface*)scenario)->current_time<int>()%(24*60*60);
 
-				int t_start = current_time;
-				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+				int t_start = network_reference<_Network_Interface*>()->template start_of_current_simulation_interval_absolute<int>()%(24*60*60);;
+				int t_end = t_start + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 	
 				int starting_time = current_control_plan<_Control_Plan_Interface*>()->template starting_time<int>();
 				int ending_time = current_control_plan<_Control_Plan_Interface*>()->template ending_time<int>();
@@ -512,15 +492,13 @@ namespace Intersection_Control_Components
 			feature_prototype void actuated_signal_control_response()
 			{
 				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
 				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
-
-				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 				int num_phases = (int)current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>().size();
 				int last_phase = num_phases - 1;
@@ -536,11 +514,11 @@ namespace Intersection_Control_Components
 					return;
 				}
 
-				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>(); // in second
+				int t_end = t_start + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>(); // in second
 				int t_start_next;
 				int new_cycle_leftover_time;
 
-				int next_cycle_leftover_time = cycle_leftover_time - ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+				int next_cycle_leftover_time = cycle_leftover_time - ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 	
 				if (next_cycle_leftover_time>=0)
 				{//same cycle
@@ -617,9 +595,9 @@ namespace Intersection_Control_Components
 				else
 				{//
 					current_critical_link_discharge_time = extended_green_ending_time - current_yellow_starting_time;
-					if (current_critical_link_discharge_time + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>() <= 0)
+					if (current_critical_link_discharge_time + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() <= 0)
 					{
-						current_critical_link_discharge_time = 0 - ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+						current_critical_link_discharge_time = 0 - ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					}
 
 					//check for min_green 
@@ -669,17 +647,14 @@ namespace Intersection_Control_Components
 
 			feature_prototype void calculate_green_yellow_red_starting_times_and_green_cycle_ratio()
 			{
-				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
 				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
-
-				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 
 				int num_phases = (int)current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>().size();
 
@@ -802,8 +777,8 @@ namespace Intersection_Control_Components
 
 			feature_prototype void initialize_node_turn_movement_green_time()
 			{
-				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
@@ -830,16 +805,15 @@ namespace Intersection_Control_Components
 			feature_prototype void calculate_turn_movement_green_time()
 			{
 				// Make Interfaces
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
 				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
-				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
 				int num_phases = (int)current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>().size();
 				int offset = current_control_plan<_Control_Plan_Interface*>()->template offset<int>();
 				int last_phase = num_phases - 1;
@@ -847,10 +821,10 @@ namespace Intersection_Control_Components
 					current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[last_phase]->template all_red_time<int>();
 	
 				int cycle_leftover_time = current_control_plan<_Control_Plan_Interface*>()->template cycle_leftover_time<int>();
-				int next_cycle_leftover_time = cycle_leftover_time - ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+				int next_cycle_leftover_time = cycle_leftover_time - ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 	
 				int t_start = cycle_length - cycle_leftover_time;
-				int t_end = t_start + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+				int t_end = t_start + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 				int t_start_next;
 	
 				if (next_cycle_leftover_time >=0)
@@ -883,9 +857,9 @@ namespace Intersection_Control_Components
 						tmp_green_time = t_start_next - current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template green_starting_time<int>();
 					}
 
-					if (tmp_green_time>((_Scenario_Interface*)scenario)->template simulation_interval_length<int>())
+					if (tmp_green_time>((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())
 					{
-						tmp_green_time = ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+						tmp_green_time = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					}
 
 					if (tmp_green_time < 0.05)
@@ -930,7 +904,7 @@ namespace Intersection_Control_Components
 					{
 						current_control_plan<_Control_Plan_Interface*>()->template cycle_leftover_time<int>( 
 							current_control_plan<_Control_Plan_Interface*>()->template cycle_leftover_time<int>() - 
-							((_Scenario_Interface*)scenario)->template simulation_interval_length<int>());
+							((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
 					}
 				}
 				else
@@ -959,9 +933,9 @@ namespace Intersection_Control_Components
 							tmp_green_time = t_start_next - current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template green_starting_time<int>();
 						}
 
-						if (tmp_green_time>((_Scenario_Interface*)scenario)->template simulation_interval_length<int>())
+						if (tmp_green_time>((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())
 						{
-							tmp_green_time = ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>();
+							tmp_green_time = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 						}
 
 						if (tmp_green_time < 0.05)
@@ -994,16 +968,17 @@ namespace Intersection_Control_Components
 			feature_prototype void advance_signal_control_cycle(int cycle_leftover_time)
 			{
 
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
 				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Movement_Interface::get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
-				_Scenario_Interface* scenario = scenario_reference<_Scenario_Interface*>();
 
-				int current_time = ((_Scenario_Interface*)scenario)->template current_time<int>()%(24*60*60);
+				int t_start = network_reference<_Network_Interface*>()->template start_of_current_simulation_interval_absolute<int>()%(24*60*60);
+				int t_end = t_start + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 				int num_phases = (int)current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>().size();
 
 
@@ -1012,8 +987,8 @@ namespace Intersection_Control_Components
 					current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[last_phase]->template all_red_time<int>();
 
 				current_control_plan<_Control_Plan_Interface*>()->template cycle_index<int&>()++;
-				current_control_plan<_Control_Plan_Interface*>()->template cycle_starting_time<int>(current_time + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>() + cycle_leftover_time);
-				current_control_plan<_Control_Plan_Interface*>()->template cycle_ending_time<int>(current_time + ((_Scenario_Interface*)scenario)->template simulation_interval_length<int>() + cycle_leftover_time + cycle_length);
+				current_control_plan<_Control_Plan_Interface*>()->template cycle_starting_time<int>(t_end + cycle_leftover_time);
+				current_control_plan<_Control_Plan_Interface*>()->template cycle_ending_time<int>(t_end + cycle_leftover_time + cycle_length);
 				current_control_plan<_Control_Plan_Interface*>()->template cycle_leftover_time<int>(cycle_leftover_time + cycle_length);
 			};
 			
@@ -1040,24 +1015,24 @@ namespace Intersection_Control_Components
 
 			feature_prototype void Initialize()
 			{
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				load_event(ComponentType,Newells_Conditional,Compute_Step_Control,scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION,NULLTYPE);
-
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				load_event(ComponentType,Newells_Conditional,Compute_Step_Control,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION,NULLTYPE);
 			}
 
 			declare_feature_conditional(Newells_Conditional)
 			{
 				typedef Intersection_Control_Prototype<ComponentType, ComponentType> _Intersection_Control_Interface;
-define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-
-				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Intersection_Interface,get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Intersection_Control_Interface* _this_ptr=(_Intersection_Control_Interface*)_this;
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION)
 				{
 					_pthis->Swap_Event((Event)&Intersection_Control_Prototype::Compute_Step_Control<NULLTYPE>);
 					response.result=true;
-					response.next._iteration=_iteration + _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>();
+					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION;
 
 				}

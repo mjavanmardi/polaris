@@ -65,8 +65,7 @@ namespace Network_Components
 		struct ODB_Network{};
 		struct File_Network{};
 		struct Regular_Network{};
-
-				
+			
 		struct Network_IO_Maps
 		{
 			dense_hash_map<int,void*> intersection_id_to_ptr;
@@ -148,7 +147,6 @@ namespace Network_Components
 				this_component()->write_network_data<ComponentType,CallerType,TargetType>(data_destination);
 			}
 
-
 			feature_prototype void simulation_initialize()
 			{
 				this_component()->simulation_initialize<ComponentType,CallerType,TargetType>();
@@ -159,9 +157,32 @@ namespace Network_Components
 				this_component()->reset_routable_network<ComponentType,CallerType,TargetType>();
 			}
 
+			feature_prototype TargetType current_simulation_interval_index()
+			{
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				return (TargetType)(start_of_current_simulation_interval_relative<TargetType>() / scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>());
+			}
 
+			feature_prototype TargetType start_of_current_simulation_interval_relative()
+			{
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				int current_time = Simulation_Time.Current_Time<Basic_Units::Time_Variables::Time_Seconds>();
+				if (current_time < scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>() - 1) 
+				{
+					cout << "_iteration must start from (simulation_interval_length - 1)" << endl;
+					exit(1);
+				}
+				return (TargetType)(current_time - (scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>() - 1));
+			}
+
+			feature_prototype TargetType start_of_current_simulation_interval_absolute()
+			{
+				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				return (TargetType)(start_of_current_simulation_interval_relative<TargetType>() + scenario_reference<_Scenario_Interface*>()->template simulation_start_time<int>());
+			}
 		};
 	}
 }
 
 using namespace Network_Components::Prototypes;
+void* _global_network;
