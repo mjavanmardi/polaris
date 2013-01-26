@@ -166,13 +166,13 @@ namespace Network_Components
 			feature_prototype TargetType start_of_current_simulation_interval_relative()
 			{
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				int current_time = Simulation_Time.Current_Time<Basic_Units::Time_Variables::Time_Seconds>();
+				int current_time = int(floor(Simulation_Time.Current_Time<Basic_Units::Time_Variables::Time_Seconds>() + 0.5));
 				if (current_time < scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>() - 1) 
 				{
 					cout << "_iteration must start from (simulation_interval_length - 1)" << endl;
 					exit(1);
 				}
-				return (TargetType)(current_time - (scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>() - 1));
+				return (TargetType)(_iteration - (scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>() - 1));
 			}
 
 			feature_prototype TargetType start_of_current_simulation_interval_absolute()
