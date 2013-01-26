@@ -324,7 +324,7 @@ int main()
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
 	_Network_Interface* network = (_Network_Interface*)Allocate<MasterType::network_type>();
-	
+	_global_network = network;
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 	network->read_network_data<Net_IO_Type>(network_data);
 	//network->write_network_data<NULLTYPE>(network_data_for_output);
