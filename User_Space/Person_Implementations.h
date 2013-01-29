@@ -27,11 +27,6 @@ namespace Person_Components
 				planner->Initialize<NULLTYPE>();
 				this->Planning_Faculty<ComponentType,ComponentType,planner_itf*>(planner);
 
-				// Seed the RNG with the agent ID
-				define_component_interface(rng_itf,type_of(RNG),RNG_Components::Prototypes::RNG_Prototype,ComponentType);
-				rng_itf* rng = this->RNG<ComponentType,ComponentType,rng_itf*>();		
-				rng->Initialize<TargetType>((sin((double)id)+1.0) * 1000000.0);
-
 				// Create and Initialize the routing faculty
 				define_component_interface(_Routing_Interface, type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
@@ -45,6 +40,11 @@ namespace Person_Components
 				vehicle->template uuid<int>(id);
 				vehicle->template internal_id<int>(id);
 				vehicle->template traveler<ComponentType*>(this);
+
+				// Seed the RNG with the agent ID
+				define_component_interface(rng_itf,type_of(RNG),RNG_Components::Prototypes::RNG_Prototype,ComponentType);
+				rng_itf* rng = this->RNG<ComponentType,ComponentType,rng_itf*>();		
+				rng->Initialize<TargetType>((sin((double)id)+1.0) * 1000000.0);
 
 				// Add basic traveler properties							
 				this->template uuid<ComponentType,ComponentType,int>(id);
@@ -215,13 +215,13 @@ namespace Person_Components
 				Activity_Plan* act = (Activity_Plan*)Allocate<type_of(Activity_Plans_Container)::unqualified_value_type>();
 				act->Activity_Plan_ID<long>(_iteration);
 				Activity_Plans* activities = this_ptr->Activity_Plans_Container<Activity_Plans*>();
-				activities->insert(Simulation_Time.Future_Time<Time_Minutes>(15),act);
+				activities->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(15),act);
 
 				define_container_and_value_interface(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Prototypes::Movement_Plan_Prototype,ComponentType);
 				Movement_Plan* move = (Movement_Plan*)Allocate<type_of(Movement_Plans_Container)::unqualified_value_type>();
 				move->Movement_Plan_ID<long>(_iteration);
 				Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();
-				movements->insert(Simulation_Time.Future_Time<Time_Minutes>(30),move);
+				movements->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(30),move);
 			}
 			tag_feature_as_available(Activity_Generation);
 		};
@@ -285,7 +285,7 @@ namespace Person_Components
 					// departure time from current time, in minutes
 					t += parent->Next_Rand<double>()*6.0*60.0;
 
-					Basic_Units::Time_Variables::Time_Minutes time = Simulation_Time.Future_Time<Target_Type<Basic_Units::Time_Variables::Time_Minutes, Basic_Units::Time_Variables::Time_Minutes>>(t);
+					Basic_Units::Time_Variables::Time_Minutes time = Simulation_Time.Future_Time<Basic_Units::Time_Variables::Time_Minutes, Basic_Units::Time_Variables::Time_Minutes>(t);
 		
 					if (O != D)
 					{
