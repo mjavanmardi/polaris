@@ -58,7 +58,7 @@ namespace Basic_Units
 		//================================================================================================
 		/// Basic Time base clase and Time Horizon Classes.
 		#pragma region Time Implementations
-		implementation struct _Time {typedef true_type Time_tag; typedef true_type DRSeconds_tag; member_data(Value_Type,Value,none,none);};
+		implementation struct _Time {typedef true_type Time_tag; typedef true_type Seconds_tag; member_data(Value_Type,Value,none,none);};
 		implementation struct Time_Implementation : _Time<MasterType,ParentType>, public Polaris_Component_Class<Time_Implementation,MasterType,Data_Object,ParentType>{};
 		/*struct _DRSeconds	{typedef true_type DRSeconds_tag;};
 		struct _Seconds		{typedef true_type Seconds_tag;};
@@ -139,19 +139,19 @@ namespace Basic_Units
 // SIMULATION TIMER DEFINITION - Used by agents as a wrapper for the global _iteration variable
 typedef Basic_Units::Implementations::Time_Implementation<NULLTYPE,NULLTYPE> Basic_Time;
 template<typename Base_Time_Type>
-struct Simulation_Timer
+struct Simulation_Timer : Base_Time_Type
 {
 	typedef typename Base_Time_Type::ValueType Value_Type;
 	template<typename TargetType> TargetType Current_Time(requires(check(Base_Time_Type,Basic_Units::Concepts::Is_Time_Value) && check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
 	{
 		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Base_Time_Type>>((Base_Time_Type::ValueType)_iteration);
 	}
-	template<typename TargetType> Base_Time_Type Future_Time(TargetType Additional_Time_Increment, requires(check(Base_Time_Type,Basic_Units::Concepts::Is_Time_Value) && check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
+	template<typename TargetType> typename TargetType::ReturnType Future_Time(typename TargetType::ParamType Additional_Time_Increment, requires(check(Base_Time_Type,Basic_Units::Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Basic_Units::Concepts::Is_Time_Value)&& check(typename TargetType::ParamType,Basic_Units::Concepts::Is_Time_Value)))
 	{
-		Base_Time_Type current_time;
-		current_time = (Base_Time_Type::ValueType)_iteration;
-		TargetType additional_time = Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<Base_Time_Type,TargetType>>(Additional_Time_Increment);
-		return  current_time + additional_time;
+		Simulation_Timestep_Increment current_time;
+		current_time = (Simulation_Timestep_Increment)_iteration;
+		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<Simulation_Timestep_Increment,TargetType::ParamType>>(Additional_Time_Increment);
+		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType::ReturnType,Simulation_Timestep_Increment>>(current_time + additional_time);
 	}
 };
 

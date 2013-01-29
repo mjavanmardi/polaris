@@ -7,6 +7,19 @@
 
 namespace PopSyn
 {
+	enum POPSYN_ITERATIONS
+	{
+		MAIN_INITIALIZE,
+		MAIN_PROCESS
+	};
+	enum POPSYN_SUBITERATIONS
+	{
+		INITIALIZE,
+		START_TIMING,
+		PROCESS,
+		STOP_TIMING,
+		OUTPUT
+	};
 	namespace Concepts
 	{
 		concept struct Uses_Linker_File
@@ -27,7 +40,7 @@ namespace PopSyn
 			// Schedules the first event from above
 			feature_prototype void Initialize()
 			{
-				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,1,0,NULLTYPE);
+				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::INITIALIZE,NULLTYPE);
 				//load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,4,NULLTYPE);
 			}
 
@@ -38,28 +51,38 @@ namespace PopSyn
 			declare_feature_conditional(Start_Popsyn_Conditional)
 			{
 				ComponentType* pthis = (ComponentType*)_this;
-				switch (_iteration)
+				switch (_sub_iteration)
 				{
-				case 1:
+				case POPSYN_SUBITERATIONS::INITIALIZE:
 					response.result = true;
+					response.next._iteration = _iteration;
+					response.next._sub_iteration = POPSYN_SUBITERATIONS::START_TIMING;
 					break;
-				case 3:
+				case POPSYN_SUBITERATIONS::START_TIMING:
 					response.result = true;
 					pthis->Swap_Event(&Start_Main_Timer<NULLTYPE>);
+					response.next._iteration = POPSYN_ITERATIONS::MAIN_PROCESS;
+					response.next._sub_iteration = POPSYN_SUBITERATIONS::STOP_TIMING;
 					break;
-				case 5:
+				case POPSYN_SUBITERATIONS::STOP_TIMING:
 					response.result = true;
 					pthis->Swap_Event(&Stop_Main_Timer<NULLTYPE>);
+					response.next._iteration = _iteration;
+					response.next._sub_iteration = POPSYN_SUBITERATIONS::OUTPUT;
 					break;
-				case 7:
+				case POPSYN_SUBITERATIONS::OUTPUT:
 					response.result = true;
 					pthis->Swap_Event(&Output_Popsyn_Event<NULLTYPE>);
+					response.next._iteration = END;
+					response.next._sub_iteration = 0;
 					break;
 				default:
 					response.result = false;
+					response.next._iteration = END;
+					response.next._sub_iteration = 0;
 				}
 				
-				response.next = _iteration + 1;
+				
 			}
 			declare_feature_event(Start_Popsyn_Event)
 			{
@@ -159,6 +182,7 @@ namespace PopSyn
 						// create new region
 						new_region = (region_itf*)Allocate<region_type>();
 						new_region->Initialize<NULLTYPE>();
+						new_region->parent_reference(this);
 						dist = new_region->Target_Joint_Distribution<joint_itf*>();
 						marg = new_region->Target_Marginal_Distribution<marginal_itf*>();
 						Rand_Interface* my_rand = (Rand_Interface*)Allocate<MasterType::RNG>(); // ALLOCATION TEST
@@ -219,12 +243,6 @@ namespace PopSyn
 				}
 				fr.Close();
 
-				//for (region_itr = regions->begin(); region_itr != regions->end(); ++region_itr)
-				//{
-				//	// print the distributions to output file
-				//}
-
-
 
 				//===============================================================================================================
 				// Read zone file, fill marginal data
@@ -262,7 +280,7 @@ namespace PopSyn
 
 					// Read marginal data from file and add to ZONE
 					zone_itf* zone = (zone_itf*)Allocate<zone_type>(); // ALLOCATION_TEST
-					//zone_itf* zone = (zone_itf*)(new zone_type());
+					zone->parent_reference(region);
 
 					zone->ID(ID);
 					solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>(); // ALLOCATION_TEST
@@ -295,16 +313,10 @@ namespace PopSyn
 				}
 				zone_fr.Close();
 
-
-
-
 				//------------------------
 				// TIMER
 				cout <<"Setup Runtime (ms): "<<timer.Stop();
 				//------------------------
-
-				//this_component()->swap_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,3,NULLTYPE);
-
 			}
 			feature_prototype bool Start_Popsyn(requires(check(ComponentType,!Concepts::Uses_Linker_File)))
 			{
@@ -394,9 +406,11 @@ namespace PopSyn
 			}
 			
 			//----------------------------------------------------------------
-			// Required Features - necessary for any synthesis routing
+			// Required Features - necessary for any synthesis routine
 			feature_accessor(Synthesis_Regions_Collection,none,none);
 			feature_accessor(Solution_Settings,none,none);
+			feature_accessor(scenario_reference, none, none);
+			feature_accessor(network_reference, none, none);
 
 			//----------------------------------------------------------------
 			// Optional Features - used for specific solution types

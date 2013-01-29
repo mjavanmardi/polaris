@@ -193,5 +193,11 @@
     <ClInclude Include="Person_Implementations.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Activity_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Activity_Implementations.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

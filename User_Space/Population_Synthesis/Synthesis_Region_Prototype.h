@@ -24,22 +24,23 @@ namespace PopSyn
 			// Load the execution event
 			feature_prototype void Initialize()
 			{
-				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population,4,0,NULLTYPE);
+				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population,POPSYN_ITERATIONS::MAIN_PROCESS,POPSYN_SUBITERATIONS::PROCESS,NULLTYPE);
 			}
 
 			//==============================================================================================================
 			// This handles the main population synthesis loop on the region-level, calls IPF and Selection for each zone
 			declare_feature_conditional(Call_Synthesize_Population_Conditional)
 			{
-				if (_iteration == 4)
+				if (_sub_iteration == POPSYN_SUBITERATIONS::PROCESS)
 				{
 					response.result = true;
-					response.next = END;
+					response.next._iteration = END;
+					response.next._sub_iteration = 0;
 				}
 				else
 				{
-					response.result = false;
-					response.next = _iteration + 1;
+					response.next._iteration = END;
+					response.next._sub_iteration = 0;
 				}
 			}
 			declare_feature_event(Call_Synthesize_Population)
@@ -71,13 +72,7 @@ namespace PopSyn
 				// MAIN SYNTHESIS ROUTINE. 
 				//----------------------------------------------------------
 				// A. Fit the region distribution to region marginal
-				//this->Output_Stream<ostream&>()<<endl<<"REGION DISTRIBUTION BEFORE IPF:"<<endl;
-				//mway.write(this->Output_Stream<ostream&>());
-				//this->Output_Stream<ostream&>()<<endl<<"MARGINAL DISTRIBUTION:"<<endl;
-				//marg.write(this->Output_Stream<ostream&>());
 				Synthesis_Zone_Prototype<ComponentType,CallerType>::Fit_Joint_Distribution_To_Marginal_Data<NULLTYPE>();
-				//this->Output_Stream<ostream&>()<<endl<<"REGION DISTRIBUTION AFTER:"<<endl;
-				//mway.write(this->Output_Stream<ostream&>());
 				//----------------------------------------------------------
 				// B. Cycle through zones and solve for each
 				for (zones_itf::iterator zone_itr = zones_collection.begin(); zone_itr != zones_collection.end(); ++zone_itr)

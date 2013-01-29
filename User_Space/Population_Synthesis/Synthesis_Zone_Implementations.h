@@ -18,12 +18,22 @@ namespace PopSyn
 				return this->_Target_Joint_Distribution.get_index(multi_dimensional_index_vector);
 			}
 
+			feature_implementation TargetType scenario_reference()
+			{
+				return this->parent_reference<ComponentType,CallerType,type_of(parent_reference)&>().scenario_reference<ComponentType,CallerType,TargetType>();
+			}tag_getter_as_available(scenario_reference);
+			feature_implementation TargetType network_reference()
+			{
+				return this->parent_reference<ComponentType,CallerType,type_of(parent_reference)&>().network_reference<ComponentType,CallerType,TargetType>();
+			}tag_getter_as_available(network_reference);
+
 			member_data(double,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 			member_container(m_array<double>,Target_Joint_Distribution,none,not_available);
 			member_container(s_array<double>,Target_Marginal_Distribution, none, not_available);
 
 			member_component(typename MasterType::IPF_Solver_Settings,Solver_Settings,none,none);
 			member_component(typename MasterType::RNG, Rand,none,none);
+			member_component(typename MasterType::region, parent_reference, none,none);
 	
 			typedef hash_multimap<uint, typename MasterType::pop_unit*> __sample_map_type;		
 			member_associative_container(__sample_map_type, Sample_Data, none, none); 

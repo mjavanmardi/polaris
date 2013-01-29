@@ -166,8 +166,11 @@ namespace PopSyn
 			//===================================================================================================================================
 			// Defintion of the Household/Person selection procedure - can be used for IPF, Combinatorial Optimization, etc. methods
 			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, 
-				requires(check(ComponentType, Concepts::Is_Probabilistic_Selection)   && check_as_given(TargetType,is_pointer)                        && check(TargetType,Containers::Concepts::Is_Associative)))
+				requires(check(ComponentType, Concepts::Is_Probabilistic_Selection)   && check_as_given(TargetType,is_pointer) && check(TargetType,Containers::Concepts::Is_Associative)))
 			{
+				define_component_interface(_Network_Interface,MasterType::network_type,Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_component_interface(_Scenario_Interface,MasterType::scenario_type,Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
+
 				// Get the fitted distribution
 				typedef get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
 				define_simple_container_interface(mway_itf, get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
@@ -219,6 +222,13 @@ namespace PopSyn
 								zone_sample->insert(p->Index<uint>(),p);
 								int size = sizeof(typename sample_itf::Component_Type);
 								num_generated++;
+
+								// create the actual person agent
+								/*typedef Person_Components::Prototypes::Person_Prototype<typename MasterType::person_type, ComponentType> _Traveler_Interface;
+								_Traveler_Interface* traveler=(_Traveler_Interface*)Allocate<typename MasterType::person_type>();
+								traveler->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
+								traveler->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
+								traveler->Initialize<int>(i);*/
 							}
 						}
 						// reduce the number required by the number generated and the cumulative weight
@@ -260,7 +270,7 @@ namespace PopSyn
 				}		
 			}
 			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, 
-				requires(!(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check_as_given(TargetType,is_pointer)                        && check(TargetType,Containers::Concepts::Is_Associative))))
+				requires(!(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check_as_given(TargetType,is_pointer) && check(TargetType,Containers::Concepts::Is_Associative))))
 			{
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
 				assert_check(TargetType, is_pointer,"Is not a pointer");
@@ -275,6 +285,9 @@ namespace PopSyn
 			//===================================================================================================================================
 			// REQUIRED: Accessor for the Synthesized Population (if the component is a zone) or the sample population (if it is a region)
 			feature_accessor(Sample_Data,none,none);
+			feature_accessor(scenario_reference, none, none);
+			feature_accessor(network_reference, none, none);
+			feature_accessor(parent_reference, none, none);
 			
 			//===================================================================================================================================
 			// OPTIONAL: Other accessors that may be of use

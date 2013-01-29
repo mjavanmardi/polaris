@@ -147,6 +147,7 @@ namespace RNG_Components
 												TargetType shape = (TargetType)1,
 												requires(check(TargetType,is_arithmetic)))
 			{
+				_seed = seed_value;
 				_distribution.SetSeed(_seed);
 			}
 			tag_feature_as_available(Initialize);
