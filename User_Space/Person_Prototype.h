@@ -77,7 +77,7 @@ namespace Prototypes
 		// Event handling
 		declare_feature_conditional(Agent_Conditional)
 		{
-			response.next._iteration = Simulation_Time.Future_Time<Target_Type<Simulation_Timestep_Increment,Time_Minutes>>(5);
+			response.next._iteration = Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(5);
 			response.next._sub_iteration = 0;
 			response.result = true;
 		}
@@ -196,7 +196,7 @@ namespace Prototypes
 				// otherwise move on to next main iteration
 				else
 				{
-					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Target_Type<Simulation_Timestep_Increment,Simulation_Timestep_Increment>>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
+					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
 					response.next._sub_iteration = 0;
 					response.result = false;
 				}
@@ -223,7 +223,7 @@ namespace Prototypes
 				// otherwise, finish activity generation and move on to next main iteration
 				else
 				{
-					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Target_Type<Simulation_Timestep_Increment,Simulation_Timestep_Increment>>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
+					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
 					response.next._sub_iteration = 0;
 					response.result = true;
 				}
@@ -243,7 +243,7 @@ namespace Prototypes
 				// otherwise, finish activity planning and move on to next main iteration
 				else
 				{
-					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Target_Type<Simulation_Timestep_Increment,Simulation_Timestep_Increment>>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
+					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
 					response.next._sub_iteration = 0;
 					response.result = true;
 				}
@@ -253,13 +253,13 @@ namespace Prototypes
 			{
 				// swap in movement event
 				_pthis->Swap_Event((Event)&Person_Planner::Movement_Planning_Event<NULLTYPE>);
-				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Target_Type<Simulation_Timestep_Increment,Simulation_Timestep_Increment>>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
+				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
 				response.next._sub_iteration = 0;
 				response.result = true;
 			}
 			else
 			{
-				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Target_Type<Simulation_Timestep_Increment,Simulation_Timestep_Increment>>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
+				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
 				response.next._sub_iteration = 0;
 				response.result = false;
 			}
@@ -276,7 +276,7 @@ namespace Prototypes
 			_pthis->Activity_Generation<ComponentType,CallerType,TargetType>();
 
 			// set next activity generation occurence
-			this_ptr->Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Target_Type<Simulation_Timestep_Increment,Simulation_Timestep_Increment>>(this_ptr->Generation_Time_Increment<Simulation_Timestep_Increment>())));
+			this_ptr->Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Generation_Time_Increment<Simulation_Timestep_Increment>())));
 		}
 		declare_feature_event(Activity_Planning_Event)
 		{

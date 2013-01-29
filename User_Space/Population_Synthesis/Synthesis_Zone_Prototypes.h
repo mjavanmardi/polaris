@@ -224,11 +224,11 @@ namespace PopSyn
 								num_generated++;
 
 								// create the actual person agent
-								/*typedef Person_Components::Prototypes::Person_Prototype<typename MasterType::person_type, ComponentType> _Traveler_Interface;
-								_Traveler_Interface* traveler=(_Traveler_Interface*)Allocate<typename MasterType::person_type>();
-								traveler->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
-								traveler->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
-								traveler->Initialize<int>(i);*/
+								typedef Person_Components::Prototypes::Person_Prototype<typename MasterType::person_type, ComponentType> _Person_Interface;
+								_Person_Interface* person=(_Person_Interface*)Allocate<typename MasterType::person_type>();
+								person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
+								person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
+								person->Initialize<int>(i);
 							}
 						}
 						// reduce the number required by the number generated and the cumulative weight
