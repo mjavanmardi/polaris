@@ -146,12 +146,12 @@ struct Simulation_Timer : Base_Time_Type
 	{
 		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Base_Time_Type>>((Base_Time_Type::ValueType)_iteration);
 	}
-	template<typename TargetType> typename TargetType::ReturnType Future_Time(typename TargetType::ParamType Additional_Time_Increment, requires(check(Base_Time_Type,Basic_Units::Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Basic_Units::Concepts::Is_Time_Value)&& check(typename TargetType::ParamType,Basic_Units::Concepts::Is_Time_Value)))
+	template<typename InputType, typename TargetType> TargetType Future_Time(InputType Additional_Time_Increment, requires(check(Base_Time_Type,Basic_Units::Concepts::Is_Time_Value) && check(TargetType,Basic_Units::Concepts::Is_Time_Value)&& check(InputType,Basic_Units::Concepts::Is_Time_Value)))
 	{
 		Simulation_Timestep_Increment current_time;
 		current_time = (Simulation_Timestep_Increment)_iteration;
-		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<Simulation_Timestep_Increment,TargetType::ParamType>>(Additional_Time_Increment);
-		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType::ReturnType,Simulation_Timestep_Increment>>(current_time + additional_time);
+		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<Simulation_Timestep_Increment,InputType>>(Additional_Time_Increment);
+		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Simulation_Timestep_Increment>>(current_time + additional_time);
 	}
 };
 
