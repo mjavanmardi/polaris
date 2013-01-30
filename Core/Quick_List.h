@@ -152,16 +152,16 @@ private:
 		unsigned int alloc_cells=0;
 
 		const unsigned int megabyte=1048576;
-		const unsigned int num_megabytes=200;
+		const unsigned int num_megabytes=500;
 
 		if(sizeof(List_Cell)*num_cells < megabyte*num_megabytes)
 		{
-			//if allocation amount under 200 MB, double the container size
+			//if allocation amount under num_megabytes, double the container size
 			alloc_cells=num_cells;
 		}
 		else
 		{
-			//if allocation amount over 200 MB, just add another 200 MB
+			//if allocation amount over num_megabytes, just add another num_megabytes
 			alloc_cells=(megabyte*num_megabytes)/sizeof(List_Cell);
 		}
 

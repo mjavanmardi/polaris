@@ -202,6 +202,8 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 	}
 	
 
-	conditional_register=conditional;
+	//conditional_register=conditional;
+	Execution_Object::Conditional_Holder<ComponentType>::conditional_register=conditional;
+
 	event_register=p_event;
 }

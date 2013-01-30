@@ -134,8 +134,10 @@ static void* Thread_Loop(void* package_ptr)
 	
 	while(world->run)
 	{
+
+
 		exe->Process();
-		
+
 #ifndef WINDOWS
 		interprocess_root_ptr->Exchange();
 #endif
@@ -151,6 +153,8 @@ static void* Thread_Loop(void* package_ptr)
 
 		// thread waits until all threads have left the finished queue to begin actual operation
 		while(world->threads_running_counter!=_num_threads) SLEEP(0);
+
+
 	}
 
 	// let the world know that this thread is completely finished

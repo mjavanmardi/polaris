@@ -32,7 +32,7 @@ struct Typed_Execution_Page
 			current_cell->next_revision._iteration=LONG_MAX;
 			current_cell->next_revision._sub_iteration=0;
 			//current_cell->event_register=nullptr;//shared with first free list pointer, cannot initialize
-			current_cell->conditional_register=&False_Condition;
+			//current_cell->conditional_register=&False_Condition;
 			current_cell=(Execution_Object*)((Byte*)current_cell+stride);
 		}
 	}

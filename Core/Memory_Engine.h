@@ -41,6 +41,8 @@ public:
 		
 		first_free_page=first_free_page->next_free_page;
 		
+		assert(first_free_page!=end_page);
+
 		return return_val;
 	}
 

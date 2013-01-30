@@ -2,7 +2,7 @@
 
 #ifdef ENGINE_TESTS
 #include "Application_Includes.h"
-static volatile long long visited=0;
+static volatile unsigned long visited=0;
 
 implementation struct Test:public Polaris_Component_Class<Test,MasterType,Execution_Object>
 {
@@ -22,7 +22,11 @@ public:
 
 	declare_feature_event(Do_Stuff)
 	{
-		visited=visited+2+((Test*)_this)->x;
+		if(!((Test*)_this)->x)
+		{
+			AtomicIncrement(&visited);
+			AtomicIncrement(&visited);
+		}
 	}
 
 	int x;
@@ -38,7 +42,7 @@ void main()
 
 	double allocation_time,run_time;
 
-	const unsigned int num_agents=10;
+	const unsigned int num_agents=10000;
 	const int pages=(num_agents*sizeof(Test<MasterType*>))/_Page_Size;
 
 	QueryPerformanceFrequency(&frequency);
@@ -72,5 +76,6 @@ void main()
 
 	bool pause=true;
 }
+
 
 #endif

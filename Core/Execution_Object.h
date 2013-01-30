@@ -22,6 +22,7 @@ struct Typed_Execution_Page;
 /// One activated every step, another activated should the first return true
 ///============================================================================
 
+
 struct Execution_Object
 {
 	Execution_Object()
@@ -32,58 +33,6 @@ struct Execution_Object
 
 	permit_state_checking;
 
-	
-	//inline long object_current_revision()
-	//{
-	//	return current_revision;
-	//}
-
-	//inline long object_next_check()
-	//{
-	//	return next_iteration;
-	//}
-	
-
-	//template<typename ComponentType>
-	//inline Revision&& type_current_revision()
-	//{
-	//	return Revision(allocator_template<ComponentType>::allocator_reference.tex_current_revision);
-	//}
-
-	//template<typename ComponentType>
-	//inline Revision&& type_next_check()
-	//{
-	//	return Revision(allocator_template<ComponentType>::allocator_reference.tex_next_revision);
-	//}
-	
-	//inline long object_current_revision()
-	//{
-	//	return current_revision;
-	//}
-
-	//inline long object_next_iteration()
-	//{
-	//	return next_iteration;
-	//}
-
-	//template<typename ComponentType>
-	//inline long type_current_revision()
-	//{
-	//	return allocator_template<ComponentType>::allocator_reference.current_revision._iteration;
-	//}
-
-	//template<typename ComponentType>
-	//inline long type_next_revision()
-	//{
-	//	return allocator_template<ComponentType>::allocator_reference.next_revision._iteration;
-	//}	
-	
-	//void Unload_Register()
-	//{
-	//	//conditional_register=&False;
-	//	event_register=nullptr;
-	//}
-
 
 	__forceinline void Swap_Event(Event new_event)
 	{
@@ -93,8 +42,13 @@ struct Execution_Object
 	template<typename ComponentType>
 	void Load_Register(Conditional conditional,Event p_event,int start_iteration,int start_sub_iteration);
 	
-	//static Conditional conditional_register;
-	Conditional conditional_register;
+	template<typename DataType=NULLTYPE>
+	struct Conditional_Holder
+	{
+		static Conditional conditional_register;
+	};
+
+	//Conditional conditional_register;
 
 	///============================================================================
 	/// packed_iteration - strips out 4th bit for internal purposes
@@ -187,7 +141,8 @@ struct Execution_Object
 	};
 };
 
-//Conditional Execution_Object::conditional_register;
+template<typename DataType>
+Conditional Execution_Object::Conditional_Holder<DataType>::conditional_register=&False_Condition;
 
 typedef void (*Execution_Directive)(void*,Revision&);
 
@@ -214,8 +169,10 @@ void Execution_Loop(void* page_in, Revision& ptex_response)
 
 		if( ((Execution_Object*)page)->next_revision._revision == this_revision._revision )
 		{
-			((Execution_Object*)page)->conditional_register(page,optex_response);
+			//((Execution_Object*)page)->conditional_register(page,optex_response);
 
+			Execution_Object::Conditional_Holder<DataType>::conditional_register(page,optex_response);
+			
 			((Execution_Object*)page)->next_revision=optex_response.next;
 
 			if(optex_response.result) ((Execution_Object*)page)->event_register(page);

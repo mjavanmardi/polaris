@@ -100,7 +100,6 @@ public:
 				}
 			}
 
-			
 			while(AtomicExchange(&ex_lock,1)) SLEEP(0); // lock the execution engine
 			
 				// EX slice has revealed that it wishes to return some time in the future
