@@ -188,6 +188,7 @@ namespace PopSyn
 				// loop through all cells in the regional mway matrix, and make N = Mway(i,j,...) attempts to add each pop_unit corresponding to that index
 				// The code below grabs a range for each index in the MWAY matrix which has corresponding samples which can be chosen.
 				// note that this routine does not work when a loss function can be used (i.e. households are not uniquely assigned to one mway index)
+				int num_created = 0;
 				for (sample_itf::iterator itr = sample->begin(); itr != sample->end(); ++itr)
 				{
 					//----------------------------------------------------------------------------------
@@ -228,7 +229,8 @@ namespace PopSyn
 								_Person_Interface* person=(_Person_Interface*)Allocate<typename MasterType::person_type>();
 								person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
 								person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
-								person->Initialize<int>(i);
+								person->Initialize<int>(num_created);
+								num_created++;
 							}
 						}
 						// reduce the number required by the number generated and the cumulative weight

@@ -34,7 +34,6 @@ namespace PopSyn
 		prototype struct Population_Synthesizer_Prototype : public ComponentType
 		{
 			tag_as_prototype; // Declare class as a polaris prototype
-			Counter timer;
 
 			//----------------------------------------------------------------
 			// Schedules the first event from above
@@ -331,7 +330,7 @@ namespace PopSyn
 			}
 			feature_prototype void Start_Timer()
 			{
-				this->timer.Start();
+				//this->timer.Start();
 				//load_event(ComponentType,Stop_Main_Timer_Conditional,Stop_Main_Timer,5,NULLTYPE);
 
 			}
@@ -344,7 +343,7 @@ namespace PopSyn
 			}
 			feature_prototype void Stop_Timer()
 			{
-				cout << endl<<"Main Algorithm run-time: " << this->timer.Stop();
+				//cout << endl<<"Main Algorithm run-time: " << this->timer.Stop();
 				//cout << endl<<"freq: " << this->timer.get_freq_value() << ", start: "<<this->timer.get_start_value() <<", l: "<<this->timer.get_l_value();
 				//load_event(ComponentType,Output_Popsyn_Conditional,Output_Popsyn_Event,6,NULLTYPE);
 			}
