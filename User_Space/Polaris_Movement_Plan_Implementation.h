@@ -67,8 +67,15 @@ namespace Movement_Plan_Components
 
 			member_component(typename MasterType::link_type, origin, none, none);
 			member_component(typename MasterType::link_type, destination, none, none);
-			member_data(int, departed_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-			member_data(int, arrived_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			//member_data(int, departed_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			//member_data(int, arrived_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			// departed Time member
+			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_departed_time,none,none);
+			member_component_feature(departed_time, _departed_time, Value, Basic_Units::Prototypes::Time_Prototype);
+			// arrive_Time member
+			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_arrived_time,none,none);
+			member_component_feature(arrived_time, _arrived_time, Value, Basic_Units::Prototypes::Time_Prototype);
+
 			member_component(typename MasterType::plan_type, plan, none, none);
 
 
@@ -76,7 +83,7 @@ namespace Movement_Plan_Components
 			{
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 				_trajectory_container[_current_trajectory_index]->_delayed_time = 0.0;
-				_arrived_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
+				this->arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>( ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() );
 			}
 
 			feature_implementation void transfer_to_next_link(int delayed_time)

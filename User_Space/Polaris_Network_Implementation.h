@@ -6,8 +6,6 @@ namespace Network_Components
 {
 	namespace Types
 	{
-
-
 	}
 
 	namespace Concepts
@@ -182,7 +180,7 @@ namespace Network_Components
 				//determine minimum merge rate
 				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
 				define_simple_container_interface(_Float_Container_Interface, _Inbound_Movement_Interface::get_type_of(cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array), Random_Access_Sequence_Prototype, float, ComponentType);
 				define_container_and_value_interface(_Vehicles_Queue_Interface, _Vehicle_Interface_2, _Inbound_Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
@@ -210,6 +208,7 @@ namespace Network_Components
 						for (inbound_movement_itr=inbound_movements_container.begin();inbound_movement_itr!=inbound_movements_container.end();inbound_movement_itr++)
 						{
 							_Inbound_Movement_Interface* inbound_movement = (_Inbound_Movement_Interface*)(*inbound_movement_itr);
+							// put this in movement
 							inbound_movement->template movement_capacity<float>(0.0);
 							inbound_movement->template movement_demand<float>(0.0);
 							inbound_movement->template movement_supply<float>(0.0);
@@ -243,7 +242,7 @@ namespace Network_Components
 								inbound_movement->template cached_turn_movement_cumulative_shifted_arrived_vehicles_array<_Int_Container_Interface&>()[j] = 0; 
 							}
 
-							if (inbound_movement->template movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>() == Intersection_Components::Types::THROUGH_TURN)
+							if (inbound_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>() == Turn_Movement_Components::Types::THROUGH_TURN)
 							{
 								inbound_movement->template minimum_merge_rate<float>(1.0);
 							}
@@ -257,27 +256,10 @@ namespace Network_Components
 
 			}
 
-			feature_implementation void printResults() 
-			{
-						
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
-				_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
-				_Network_Interface* _this_ptr = (_Network_Interface*)this;
-				printf("%s, ", convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str());
-				printf("loaded=%7d, departed=%7d, arrived=%7d, in_network=%7d\n",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>());
-
-				//write_node_control_state<NULLTYPE>();
-				//write_vehicle_trajectory<NULLTYPE>();
-				//write_network_link_flow<NULLTYPE>();
-				write_network_link_turn_time<ComponentType,CallerType,TargetType>();
-				write_output_summary<ComponentType,CallerType,TargetType>();
-
-			}
 
 			feature_implementation void construct_network_cost()
 			{
-
+				// break up between links and movements
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typename _Links_Container_Interface::iterator links_itr;
 				_max_free_flow_speed = -1.0;			
@@ -293,7 +275,7 @@ namespace Network_Components
 					link->template travel_time<float>(link_travel_time);
 				}
 		
-				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				typename _Turn_Movements_Container_Interface::iterator turn_movements_itr;
 				for (turn_movements_itr = _turn_movements_container.begin(); turn_movements_itr != _turn_movements_container.end(); turn_movements_itr++)
 				{
@@ -303,7 +285,7 @@ namespace Network_Components
 					_Link_Interface* outboundLink = mvmt_itf->template outbound_link<_Link_Interface*>();
 
 					float turn_travel_penalty = 0.0f;
-					if (mvmt_itf->movement_rule<int>() == Intersection_Components::Types::PROHIBITED)
+					if (mvmt_itf->movement_rule<int>() == Turn_Movement_Components::Types::PROHIBITED)
 					{
 						turn_travel_penalty = INFINITY_FLOAT;
 					}
@@ -333,13 +315,32 @@ namespace Network_Components
 				}
 			}
 
+			//==================================================================================================================
+			/// Write out intermediate simulation results
+			//------------------------------------------------------------------------------------------------------------------
+			feature_implementation void printResults() 
+			{
+						
+				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
+				_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
+				_Network_Interface* _this_ptr = (_Network_Interface*)this;
+				printf("%s, ", convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str());
+				printf("loaded=%7d, departed=%7d, arrived=%7d, in_network=%7d\n",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>());
 
-			// these are called by printResults; move to implementation
+				//write_node_control_state<NULLTYPE>();
+				//write_vehicle_trajectory<NULLTYPE>();
+				//write_network_link_flow<NULLTYPE>();
+				write_network_link_turn_time<ComponentType,CallerType,TargetType>();
+				write_output_summary<ComponentType,CallerType,TargetType>();
+
+			}
+
 			feature_implementation void write_vehicle_trajectory()
 			{
 				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, get_type_of(turn_movements_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, get_type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);			
 				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, _Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
@@ -468,7 +469,7 @@ namespace Network_Components
 			{
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, _Link_Interface::get_type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
@@ -530,8 +531,8 @@ namespace Network_Components
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, _Intersection_Control_Interface::get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
-				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_component_interface(_Network_Interface, ComponentType, Network_Components::Prototypes::Network_Prototype, ComponentType);
@@ -604,8 +605,8 @@ namespace Network_Components
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, _Intersection_Control_Interface::get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
-				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typedef typename Network_Prototype<MasterType::network_type> _Network_Interface;
@@ -625,886 +626,48 @@ namespace Network_Components
 					<<endl;
 			}
 
-			feature_implementation void write_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
-			{
-				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
-				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);			
-				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, _Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
-				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
-				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			//==================================================================================================================
+			/// Convert network data from Polaris structure to C++ data structure to be written to a file
+			//------------------------------------------------------------------------------------------------------------------
+			feature_implementation void write_network_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-				network_models::network_information::network_data_information::network_data_initialization(network_data);
+			feature_implementation void write_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-				typename _Intersections_Container_Interface::iterator intersection_itr;
-				cout << "writing intersections" << endl;
-				for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
-				{
-					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersection_itr);
-					network_models::network_information::network_data_information::NodeData node_data;
-					node_data.uuid = intersection->template uuid<int>();
-					node_data.node_index = intersection->template internal_id<int>();
-					node_data.x = intersection->template x_position<float>();
-					node_data.y = intersection->template y_position<float>();
-					node_data.node_type = intersection->template intersection_type<network_models::network_information::network_data_information::Node_Type_Keys>();
-					network_data.node_data_array.push_back(node_data);
-				}
-				network_data.network_node_size = (int)network_data.node_data_array.size();
-				cout << "writing links" << endl;
-				network_data.network_link_size = (int)_links_container.size();
-				typename _Links_Container_Interface::iterator link_itr;
-				for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
-				{
-					//flow
-					_Link_Interface* link = (_Link_Interface*)(*link_itr);
-					_Intersection_Interface* upstream_intersection = link->template upstream_intersection<_Intersection_Interface*>();
-					network_models::network_information::network_data_information::LinkData link_data;
-					
-					link_data.unode_index = upstream_intersection->template internal_id<int>();
+			feature_implementation void write_link_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-					_Intersection_Interface* downstream_intersection = link->template downstream_intersection<_Intersection_Interface*>();
-					link_data.dnode_index = downstream_intersection->template internal_id<int>();
+			feature_implementation void write_turn_movement_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-					link_data.uuid = link->template uuid<int>();
-					link_data.link_index = link->template internal_id<int>();
-					link_data.num_lanes = link->template num_lanes<int>();
-					link_data.link_type = link->template link_type<network_models::network_information::network_data_information::Link_Type_Keys>();
-					link_data.length = link->template length<float>();
-					link_data.speed_limit = link->template speed_limit<float>();
-					link_data.maximum_flow_rate = link->template maximum_flow_rate<float>();
-					link_data.backward_wave_speed = link->template backward_wave_speed<float>();
-					link_data.free_flow_speed = link->template free_flow_speed<float>();
-					link_data.jam_density = link->template jam_density<float>();
-					link_data.left_turn_bay_length = link->template left_turn_bay_length<float>();
-					link_data.right_turn_bay_length = link->template right_turn_bay_length<float>();
-					link_data.num_left_turn_bays = link->template num_left_turn_bays<int>();
-					link_data.num_right_turn_bays = link->template num_right_turn_bays<int>();
+			feature_implementation void write_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-					network_data.link_data_array.push_back(link_data);
-				}
-				network_data.network_link_size = (int)network_data.link_data_array.size();
+			feature_implementation void write_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-				//========================================================================================================
-				//Create inbound/outbound links for each intersection
-				//--------------------------------------------------------------------------------------------------------
-				//
+			//==================================================================================================================
+			/// read from database
+			//------------------------------------------------------------------------------------------------------------------
+			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps);
 
-				for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
-				{
-					_Link_Interface* link = (_Link_Interface*)(*link_itr);
-					int unode_index = network_data.link_data_array[link->template internal_id<int>()].unode_index;
-					network_data.node_data_array[unode_index].outbound_link_index_array.push_back(network_data.link_data_array[link->template internal_id<int>()].link_index);
-					
-					int dnode_index = network_data.link_data_array[link->template internal_id<int>()].dnode_index;
-					network_data.node_data_array[dnode_index].inbound_link_index_array.push_back(network_data.link_data_array[link->template internal_id<int>()].link_index);
-				}
+			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
-				for (int i = 0; i < network_data.network_node_size; i++) {
-					network_data.node_data_array[i].outbound_link_size = (int)network_data.node_data_array[i].outbound_link_index_array.size();
-					network_data.node_data_array[i].inbound_link_size = (int)network_data.node_data_array[i].inbound_link_index_array.size();
-				}
-				cout << "writing turn movements" << endl;
-				typename _Turn_Movements_Container_Interface::iterator movement_itr;
-				for (movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
-				{
+			feature_implementation void read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps&);
 
-					_Turn_Movement_Interface* turn_movement = (_Turn_Movement_Interface*)(*movement_itr);
-					
-					network_models::network_information::network_data_information::TurnMovementData turn_movement_data;
+			feature_implementation void read_turn_movement_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
-					turn_movement_data.inbound_link_index = turn_movement->template inbound_link<_Link_Interface*>()->template internal_id<int>();
-					turn_movement_data.outbound_link_index = turn_movement->template outbound_link<_Link_Interface*>()->template internal_id<int>();
-					turn_movement_data.turn_movement_type = turn_movement->template movement_type<network_models::network_information::network_data_information::Turn_Movement_Type_Keys>();
-					turn_movement_data.turn_movement_rule = turn_movement->template movement_rule<network_models::network_information::network_data_information::Turn_Movement_Rule_Keys>();
-					turn_movement_data.uuid = turn_movement->template uuid<int>();
-					turn_movement_data.turn_movement_index = turn_movement->internal_id<int>();
-					//// assign the detector
-					//turn_movement_1->template detector<Detector_Interface*>(lane->template Detector_Thru<Detector_Interface*>());
-					network_data.turn_movement_data_array.push_back(turn_movement_data);
-				}
-				network_data.network_turn_movement_size = (int)network_data.turn_movement_data_array.size();
+			feature_implementation void read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
-				for (movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
-				{
-					_Turn_Movement_Interface* turn_mvmt=(_Turn_Movement_Interface*)(*movement_itr);
-					network_models::network_information::network_data_information::TurnMovementData& turn_movement_data = network_data.turn_movement_data_array[turn_mvmt->template internal_id<int>()];
+			//==================================================================================================================
+			/// Convert network data from C++ data structure to Plaris structure
+			//------------------------------------------------------------------------------------------------------------------
+			feature_implementation void read_network_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-					//outbound turn movement of an inbound link
-					_Link_Interface* inbound_link = turn_mvmt->template inbound_link<_Link_Interface*>();
-					
-					network_data.link_data_array[inbound_link->template internal_id<int>()].outbound_turn_movement_index_array.push_back(turn_movement_data.turn_movement_index);
-					
-					//inbound turn movement of an outbound link
-					_Link_Interface* outbound_link = turn_mvmt->template outbound_link<_Link_Interface*>();
-					
-					network_data.link_data_array[outbound_link->template internal_id<int>()].inbound_turn_movement_index_array.push_back(turn_movement_data.turn_movement_index);
-				}
+			feature_implementation void read_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-				for (int i = 0; i < network_data.network_link_size; i++)
-				{
-					network_data.link_data_array[i].outbound_turn_movement_size = (int)network_data.link_data_array[i].outbound_turn_movement_index_array.size();
-					network_data.link_data_array[i].inbound_turn_movement_size = (int)network_data.link_data_array[i].inbound_turn_movement_index_array.size();
-				}
-	
-				cout << "writing activity locations" << endl;
-				typename _Activity_Locations_Container_Interface::iterator activity_location_itr;
-				for (activity_location_itr = _activity_locations_container.begin(); activity_location_itr != _activity_locations_container.end(); activity_location_itr++) 
-				{
-					_Activity_Location_Interface* activity_location = (_Activity_Location_Interface*)(*activity_location_itr);
-					
-					network_models::network_information::network_data_information::ActivityLocationData activity_location_data;
+			feature_implementation void read_link_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-					int j;
-					int link_index;
-					// initialize origins
-					for (j = 0; j < (int)activity_location->template origin_links<_Links_Container_Interface&>().size(); j++) 
-					{
-						link_index = activity_location->template origin_links<_Links_Container_Interface&>()[j]->template internal_id<int>();
-						activity_location_data.origin_link_index_array.push_back(link_index);
-						activity_location_data.origin_link_choice_cdf_array.push_back(link_index);
-					}
-					activity_location_data.num_origin_links = (int)activity_location->template origin_links<_Links_Container_Interface&>().size();
+			feature_implementation void read_turn_movement_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-					// initialize destinations
-					for (j = 0; j < (int)activity_location->template destination_links<_Links_Container_Interface&>().size(); j++) 
-					{
-						link_index = activity_location->template destination_links<_Links_Container_Interface&>()[j]->template internal_id<int>();
-						activity_location_data.destination_link_index_array.push_back(link_index);
-						activity_location_data.destination_link_choice_cdf_array.push_back(link_index);
-					}
-					activity_location_data.num_destination_links = (int)activity_location->template destination_links<_Links_Container_Interface&>().size();
+			feature_implementation void read_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
-					activity_location_data.uuid = activity_location->template uuid<int>();
-					activity_location_data.activity_location_index = activity_location->template internal_id<int>();
-					activity_location_data.zone_index = activity_location->template zone<_Zone_Interface*>()-> template internal_id<int>();
-					network_data.activity_location_data_array.push_back(activity_location_data);
-				}
-				network_data.network_activity_location_size = (int)network_data.activity_location_data_array.size();
-
-				cout << "writing zones" << endl;
-				typename _Zones_Container_Interface::iterator zone_itr;
-				for (zone_itr = _zones_container.begin(); zone_itr != _zones_container.end(); zone_itr++) 
-				{
-					_Zone_Interface* zone = (_Zone_Interface*)(*zone_itr);
-					
-					network_models::network_information::network_data_information::ZoneData zone_data;
-
-					int j;
-					int activity_location_index;
-
-					// initialize origins
-					for (j = 0; j < (int)zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().size(); j++) 
-					{
-						activity_location_index = zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>()[j]->template internal_id<int>();
-						zone_data.origin_activity_location_index_array.push_back(activity_location_index);
-						zone_data.origin_activity_location_choice_cdf_array.push_back(activity_location_index);
-					}
-					zone_data.num_origin_activity_locations = (int)zone_data.origin_activity_location_index_array.size();
-
-					// initialize destinations
-					for (j = 0; j < (int)zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().size(); j++) 
-					{
-						activity_location_index = zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>()[j]->template internal_id<int>();
-						zone_data.destination_activity_location_index_array.push_back(activity_location_index);
-						zone_data.destination_activity_location_choice_cdf_array.push_back(activity_location_index);
-					}
-					zone_data.num_destination_activity_locations = (int)zone_data.destination_activity_location_index_array.size();
-
-					zone_data.uuid = zone->template uuid<int>();
-					zone_data.zone_index = zone->template internal_id<int>();
-					network_data.zone_data_array.push_back(zone_data);
-				}
-				network_data.network_zone_size = (int)network_data.zone_data_array.size();
-			}
-
-			
-			feature_implementation void read_network_data(typename TargetType::ParamType net_io_maps,
-				requires(check_2(TargetType::NetIOType,Types::ODB_Network,is_same)))
-			{
-				using namespace odb;
-				using namespace pio;
-				string name("chicago_with_demand_no_ref.sqlite");
-				auto_ptr<database> db (open_sqlite_database (name));
-
-
-				int counter=0;
-				const float link_length = 5280.0; // in foot
-				const float speed_limit = 60.0; // in miles per hour
-				const float speed_limit_ramp = 30.0; 
-				const float maximum_flow_rate = 2200.0; // in vehicles per hour per lane
-				const float maximum_flow_rate_ramp = 600.0; // 
-				const float maximum_flow_rate_arterial = 900;
-				const float jam_density = 220.0; // in vehiles per mile per lane
-				const float backward_wave_speed = 12.0;
-				const float distance_factor = 1.5;				
-
-				_max_free_flow_speed = -1;
-
-				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
-				type_of(intersections_container)& intersections_container_monitor=(type_of(intersections_container)&)(*intersections_container_ptr);
-				define_component_interface(_Intersection_Control_Interface, _Intersection_Interface::get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
-				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, _Intersection_Control_Interface::get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-				typedef Scenario_Components::Prototypes::Scenario_Prototype<MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario = scenario_Interface<_Scenario_Interface*>();
-				intersections_container_ptr->clear();
-				
-				transaction t(db->begin());
-
-				result<Node> node_result=db->query<Node>(query<Node>::true_expr);
-
-				net_io_maps.intersection_id_to_ptr.set_empty_key(-1);
-				net_io_maps.intersection_id_to_ptr.set_deleted_key(-2);
-
-				_Intersection_Interface* intersection;
-
-				counter=-1;
-
-				cout << "Reading Nodes" << endl;
-
-				for(result<Node>::iterator db_itr = node_result.begin (); db_itr != node_result.end (); ++db_itr)
-				{
-					counter++;
-					if(counter%10000==0) cout << "\t" << counter << endl;
-
-					intersection=(_Intersection_Interface*)Allocate<typename _Intersection_Interface::Component_Type>();
-
-					intersection->template uuid<int>( db_itr->getNode() );
-					intersection->template internal_id<int>(counter);
-					intersection->template x_position<float>( scenario->meterToFoot<NULLTYPE>(db_itr->getX()));
-					intersection->template y_position<float>( scenario->meterToFoot<NULLTYPE>(db_itr->getY()));
-					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
-					
-					net_io_maps.intersection_id_to_ptr[db_itr->getNode()]=intersection;
-
-					if (scenario->intersection_control_flag<int>() == 0) 
-					{
-						intersection->template intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
-
-						_Intersection_Control_Interface* intersection_control = (_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
-						intersection_control->template intersection<_Intersection_Interface*>(intersection);
-					
-						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
-						control_plan->template control_plan_index<int>(0.0);
-						control_plan->template control_type<int>(Intersection_Components::Types::NO_CONTROL);
-						control_plan->template starting_time<int>(0.0);
-						control_plan->template ending_time<int>(24*60*60);
-						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
-						intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
-					}
-					intersections_container_ptr->push_back(intersection);
-				}
-				
-
-
-
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				_Links_Container_Interface* links_container_ptr=links_container<ComponentType,CallerType,_Links_Container_Interface*>();
-				type_of(links_container)& links_container_monitor=(type_of(links_container)&)(*links_container_ptr);				
-				
-
-				union Link_ID_Dir
-				{
-					struct
-					{
-						long id;
-						long dir;
-					};
-
-					long long id_dir;
-				} link_id_dir;
-				
-
-				result<Link> link_result=db->query<Link>(query<Link>::true_expr);
-
-				net_io_maps.link_id_dir_to_ptr.set_empty_key(-1);
-				net_io_maps.link_id_dir_to_ptr.set_deleted_key(-2);
-
-				_Link_Interface* link;
-				
-				counter=0;
-
-				cout << "Reading Links" << endl;
-				
-				int link_counter=-1;
-
-				for(result<Link>::iterator db_itr = link_result.begin (); db_itr != link_result.end (); ++db_itr)
-				{
-					counter++;
-					if(counter%10000==0) cout << "\t" << counter << endl;
-
-					if(db_itr->getLanes_Ab()>0)
-					{
-						link=(_Link_Interface*)Allocate<typename _Link_Interface::Component_Type>();
-						
-						link_id_dir.id=db_itr->getLink();
-						link_id_dir.dir=0;
-
-						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir]=link;
-
-
-
-						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
-						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
-
-						
-						link->template uuid<int>(++link_counter);
-						link->template internal_id<int>(link_counter);
-
-						link->template num_lanes<int>(db_itr->getLanes_Ab());
-						
-						link->template length<float>(scenario->meterToFoot<NULLTYPE>(db_itr->getLength()));
-						link->template speed_limit<float>(scenario->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()));
-						
-						link->template num_left_turn_bays<int>(db_itr->getLeft_Ab());
-						link->template num_right_turn_bays<int>(db_itr->getRight_Ab());
-						
-						link->template left_turn_bay_length<float>(scenario->meterToFoot<NULLTYPE>(0.0));
-						link->template right_turn_bay_length<float>(scenario->meterToFoot<NULLTYPE>(0.0));
-
-						
-						const string& facility_type=db_itr->getType();
-
-						if(facility_type=="FREEWAY")
-						{
-							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::FREEWAY);
-						}
-						else if(facility_type=="EXPRESSWAY")
-						{
-							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::EXPRESSWAY);
-						}
-						else if(facility_type=="RAMP")
-						{
-							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ON_RAMP);
-						}
-						else
-						{
-							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
-						}
-
-						link->template free_flow_speed<float>(scenario->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()) + 10.0);
-						link->template maximum_flow_rate<float>(maximum_flow_rate);
-						link->template backward_wave_speed<float>(backward_wave_speed);
-						link->template jam_density<float>(jam_density);
-
-
-
-						_max_free_flow_speed = max(_max_free_flow_speed,link->template free_flow_speed<float>());
-
-						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
-
-						links_container<ComponentType,CallerType,_Links_Container_Interface&>().push_back(link);
-					}
-
-					if(db_itr->getLanes_Ba()>0)
-					{
-						link=(_Link_Interface*)Allocate<typename _Link_Interface::Component_Type>();
-
-						link_id_dir.id=db_itr->getLink();
-						link_id_dir.dir=1;
-
-						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir]=link;
-
-						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
-						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
-
-						
-						link->template uuid<int>(++link_counter);
-						link->template internal_id<int>(link_counter);
-
-						link->template num_lanes<int>(db_itr->getLanes_Ba());
-						
-						link->template length<float>(scenario->meterToFoot<NULLTYPE>(db_itr->getLength()));
-						link->template speed_limit<float>(scenario->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()));
-						
-						link->template num_left_turn_bays<int>(db_itr->getLeft_Ba());
-						link->template num_right_turn_bays<int>(db_itr->getRight_Ba());
-						
-						link->template left_turn_bay_length<float>(scenario->meterToFoot<NULLTYPE>(0.0));
-						link->template right_turn_bay_length<float>(scenario->meterToFoot<NULLTYPE>(0.0));
-
-						
-						const string& facility_type=db_itr->getType();
-
-						if(facility_type=="FREEWAY")
-						{
-							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::FREEWAY);
-						}
-						else if(facility_type=="EXPRESSWAY")
-						{
-							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::EXPRESSWAY);
-						}
-						else if(facility_type=="RAMP")
-						{
-							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ON_RAMP);
-						}
-						else
-						{
-							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
-						}
-
-						link->template free_flow_speed<float>(scenario->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()) + 10.0);
-						link->template maximum_flow_rate<float>(maximum_flow_rate);
-						link->template backward_wave_speed<float>(backward_wave_speed);
-						link->template jam_density<float>(jam_density);
-
-
-
-						_max_free_flow_speed = max(_max_free_flow_speed,link->template free_flow_speed<float>());
-
-						link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
-						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
-
-						links_container<ComponentType,CallerType,_Links_Container_Interface&>().push_back(link);
-					}
-				}
-
-
-				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
-				_Turn_Movement_Interface* turn_movement;
-				type_of(turn_movements_container)& turn_movements_monitor=turn_movements_container<ComponentType,CallerType,type_of(turn_movements_container)&>();
-
-				result<Connect> connect_result=db->query<Connect>(query<Connect>::true_expr);
-				
-				counter=-1;
-
-				cout << "Reading Connections" << endl;
-
-				for(result<Connect>::iterator db_itr = connect_result.begin (); db_itr != connect_result.end (); ++db_itr)
-				{
-
-					if(counter%10000==0) cout << "\t" << counter << endl;
-
-					turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
-
-					link_id_dir.id=db_itr->getLink()->getLink();
-					link_id_dir.dir=db_itr->getDir();
-					
-					assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
-					
-					counter++;
-					link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
-
-					turn_movement->template inbound_link<_Link_Interface*>(link);
-
-					int target_intersection_id=access(_Intersection_Interface,link->template downstream_intersection).internal_id<int>();
-
-
-					link_id_dir.id=db_itr->getTo_Link()->getLink();
-					link_id_dir.dir=0;
-
-					if(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
-					{
-						link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
-
-						if(access(_Intersection_Interface,link->template upstream_intersection).internal_id<int>()!=target_intersection_id)
-						{
-							link_id_dir.dir=1;
-							assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
-							link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
-						}
-					}
-					else
-					{
-						link_id_dir.dir=1;
-						assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
-						link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
-					}
-
-					turn_movement->template outbound_link<_Link_Interface*>(link);
-
-					turn_movement->template uuid<int>(db_itr->getAuto_id());
-					turn_movement->template internal_id<int>(counter);
-
-					const string& connect_type=db_itr->getType();
-
-					if(connect_type=="THRU")
-					{
-						turn_movement->template movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
-					}
-					else if(connect_type=="LEFT" || connect_type=="L_SPLIT" || connect_type=="L_MERGE")
-					{
-						turn_movement->template movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::LEFT_TURN);
-					}
-					else if(connect_type=="RIGHT" || connect_type=="R_SPLIT" || connect_type=="R_MERGE")
-					{
-						turn_movement->template movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::RIGHT_TURN);
-					}
-					else if(connect_type=="UTURN")
-					{
-						turn_movement->template movement_type<Intersection_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::U_TURN);
-					}
-					else
-					{
-						assert(false);
-						break;
-					}
-
-					
-					turn_movement->template movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
-
-
-					turn_movements_container<ComponentType,CallerType,_Turn_Movements_Container_Interface&>().push_back(turn_movement);
-				}
-
-				cout << "Configuring Connections" << endl;
-
-				typename _Turn_Movements_Container_Interface::iterator turn_movements_itr;
-				for(turn_movements_itr = _turn_movements_container.begin(); turn_movements_itr != _turn_movements_container.end(); turn_movements_itr++)
-				{
-					_Turn_Movement_Interface* turn_mvmt=(_Turn_Movement_Interface*)(*turn_movements_itr);
-
-					//outbound turn movement of an inbound link
-					_Link_Interface* inbound_link = turn_mvmt->template inbound_link<_Link_Interface*>();
-					inbound_link->template outbound_turn_movements<_Turn_Movements_Container_Interface&>().push_back(turn_mvmt);
-					//inbound turn movement of an outbound link
-					_Link_Interface* outbound_link = turn_mvmt->template outbound_link<_Link_Interface*>();
-					outbound_link->template inbound_turn_movements<_Turn_Movements_Container_Interface&>().push_back(turn_mvmt);
-				}
-
-				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);			
-
-				// configure outbound_inbound_movements
-				typename _Intersections_Container_Interface::iterator intersections_itr;
-
-				cout << "Configuring Outbound Inbound Movements" << endl;
-
-				for(intersections_itr = _intersections_container.begin(); intersections_itr != _intersections_container.end(); intersections_itr++)
-				{
-					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersections_itr);
-					get_type_of(intersections_container)::type_of(unqualified_value)& intersection_monitor=(get_type_of(intersections_container)::type_of(unqualified_value)&)*intersection;
-
-					_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
-					
-					// skip intersections_container that do not have any outbound links
-					if (outbound_links.size() == 0) continue;
-					
-					typename _Links_Container_Interface::iterator links_itr;
-					
-					for (links_itr = outbound_links.begin(); links_itr != outbound_links.end(); links_itr++)
-					{
-						_Link_Interface* outboundLink = (_Link_Interface*)(*links_itr);
-						
-						_Outbound_Inbound_Movements_Interface* outboundInboundMovements = (_Outbound_Inbound_Movements_Interface*)Allocate<typename _Outbound_Inbound_Movements_Interface::Component_Type>();
-						
-						outboundInboundMovements->template outbound_link_reference<_Link_Interface*>(outboundLink);
-						_Turn_Movements_Container_Interface& inboundTurnMovements = outboundLink->template inbound_turn_movements<_Turn_Movements_Container_Interface&>();
-						
-						for (int k = 0; k < (int)inboundTurnMovements.size(); k++)
-						{
-							outboundInboundMovements->template inbound_movements<_Turn_Movements_Container_Interface&>().push_back(inboundTurnMovements[k]);
-						}
-
-						intersection->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>().push_back(outboundInboundMovements);
-					}
-				}
-
-				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, _Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
-
-				cout << "Configuring Inbound Outbound Movements" << endl;
-
-				// configure inbound_outbound_movements
-				for (int i = 0; i < (int)_intersections_container.size(); i++)
-				{
-					_Intersection_Interface* intersection = (_Intersection_Interface*)_intersections_container[i];
-					
-					// skip intersections_container that do not have any inbound links
-					if (intersection->template inbound_links<_Links_Container_Interface&>().size() == 0) continue;
-					
-					for (int j = 0; j < (int)intersection->template inbound_links<_Links_Container_Interface&>().size(); j++) 
-					{
-						_Inbound_Outbound_Movements_Interface* inboundOutboundMovements = (_Inbound_Outbound_Movements_Interface*)Allocate<typename _Inbound_Outbound_Movements_Interface::Component_Type>();
-						_Link_Interface* inboundLink = (_Link_Interface*)intersection->template inbound_links<_Links_Container_Interface&>()[j];
-						inboundOutboundMovements->template inbound_link_reference<_Link_Interface*>(inboundLink);
-						_Turn_Movements_Container_Interface& outboundTurnMovements = inboundLink->template outbound_turn_movements<_Turn_Movements_Container_Interface&>();
-
-						for (int k = 0; k < (int)outboundTurnMovements.size(); k++)
-						{
-							inboundOutboundMovements->template outbound_movements<_Turn_Movements_Container_Interface&>().push_back(outboundTurnMovements[k]);
-						}
-						intersection->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>().push_back(inboundOutboundMovements);
-					}
-				}
-
-
-
-				cout << "Reading Activity Locations" << endl;
-
-				counter=-1;
-
-				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
-				_activity_locations_container.clear();
-
-				result<Location> location_result=db->query<Location>(query<Location>::true_expr);
-				
-				// create a single zone
-				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-				_zones_container.clear();
-				_Zone_Interface* zone = (_Zone_Interface*)Allocate<typename _Zone_Interface::Component_Type>();
-				zone->template uuid<int>(1.0);
-				zone->template internal_id<int>(0.0);
-				zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().push_back(zone);
-
-				_Activity_Location_Interface* activity_location;
-				int skipped_counter=0;
-				for(result<Location>::iterator db_itr = location_result.begin (); db_itr != location_result.end (); ++db_itr)
-				{
-
-					link_id_dir.id=db_itr->getLink()->getLink();
-					link_id_dir.dir=db_itr->getDir();
-
-					if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
-					{
-						if(++skipped_counter%10000==0)
-						{
-							cout << skipped_counter << " locations skipped" << endl;
-						}
-						continue;				
-					}
-
-					++counter;
-					if(counter%10000==0) cout << "\t" << counter << endl;
-
-					activity_location = (_Activity_Location_Interface*)Allocate<typename _Activity_Location_Interface::Component_Type>();
-					assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
-					link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
-
-					activity_location->origin_links<_Links_Container_Interface&>().push_back(link);
-					zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-					activity_location->destination_links<_Links_Container_Interface&>().push_back(link);
-					zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-					activity_location->zone<_Zone_Interface*>(zone);
-					activity_location->uuid<int>(db_itr->getPrimaryKey());
-					activity_location->internal_id<int>(counter);
-					
-					activity_locations_container<ComponentType,CallerType,_Activity_Locations_Container_Interface&>().push_back(activity_location);
-				}
-
-			}
-
-
-
-			feature_implementation void read_network_data(typename TargetType::ParamType network_data, requires(check_2(TargetType::NetIOType,Types::File_Network,is_same)))
-			{
-				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
-				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);			
-				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, _Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
-				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
-				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-				define_component_interface(_Intersection_Control_Interface, _Intersection_Interface::get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
-
-				int i;
-				_Intersection_Interface* intersection;
-				for (i = 0; i < network_data.network_node_size; i++) {
-					intersection = (_Intersection_Interface*)Allocate<typename _Intersection_Interface::Component_Type>();
-					intersection->template uuid<int>(network_data.node_data_array[i].uuid);
-					intersection->template internal_id<int>(i);
-					intersection->template x_position<float>(network_data.node_data_array[i].x);
-					intersection->template y_position<float>(network_data.node_data_array[i].y);
-					intersection->template intersection_type<int>(network_data.node_data_array[i].node_type);
-					intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
-					intersections_container<ComponentType,CallerType,_Intersections_Container_Interface&>().push_back(intersection);
-				}
-
-				_Link_Interface* link;
-				for (i = 0; i < network_data.network_link_size; i++) {
-					link = (_Link_Interface*)Allocate<typename _Link_Interface::Component_Type>();
-					int upstream_intersection_id = network_data.link_data_array[i].unode_index;
-					_Intersection_Interface* upstream_intersection = (_Intersection_Interface*)_intersections_container.at(upstream_intersection_id);
-					link->template upstream_intersection<_Intersection_Interface*>(upstream_intersection);
-
-					int downstream_intersection_id = network_data.link_data_array[i].dnode_index;
-					_Intersection_Interface* downstream_intersection = (_Intersection_Interface*)_intersections_container.at(downstream_intersection_id);
-					link->template downstream_intersection<_Intersection_Interface*>(downstream_intersection);
-
-					network_models::network_information::network_data_information::LinkData& raw_link = network_data.link_data_array[i];
-					link->template uuid<int>(raw_link.uuid);
-					link->template internal_id<int>(i);
-					link->template num_lanes<int>(raw_link.num_lanes);
-					link->template link_type<int>(raw_link.link_type);
-					link->template length<float>(raw_link.length);
-					link->template speed_limit<float>(raw_link.speed_limit);
-					link->template maximum_flow_rate<float>(raw_link.maximum_flow_rate);
-					link->template backward_wave_speed<float>(raw_link.backward_wave_speed);
-					link->template free_flow_speed<float>(raw_link.free_flow_speed);
-					link->template jam_density<float>(raw_link.jam_density);
-					link->template left_turn_bay_length<float>(raw_link.left_turn_bay_length);
-					link->template right_turn_bay_length<float>(raw_link.right_turn_bay_length);
-					link->template num_left_turn_bays<int>(raw_link.num_left_turn_bays);
-					link->template num_right_turn_bays<int>(raw_link.num_right_turn_bays);
-
-					links_container<ComponentType,CallerType,_Links_Container_Interface&>().push_back(link);
-				}
-
-				//========================================================================================================
-				//Create inbound/outbound links for each intersection
-				//--------------------------------------------------------------------------------------------------------
-				//
-				typename _Links_Container_Interface::iterator links_itr;
-				for (links_itr = _links_container.begin(); links_itr != _links_container.end(); links_itr++)
-				{
-					_Link_Interface* link = (_Link_Interface*)(*links_itr);
-					link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
-					link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
-				}
-				
-				_Turn_Movement_Interface* turn_movement;
-				for (i = 0; i < network_data.network_turn_movement_size; i++)
-				{
-
-					turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
-					
-					network_models::network_information::network_data_information::TurnMovementData& raw_turn_movement = network_data.turn_movement_data_array[i];
-
-					turn_movement->template inbound_link<_Link_Interface*>((_Link_Interface*)_links_container.at(raw_turn_movement.inbound_link_index));
-					turn_movement->template outbound_link<_Link_Interface*>((_Link_Interface*)_links_container.at(raw_turn_movement.outbound_link_index));
-					turn_movement->template movement_type<int>(raw_turn_movement.turn_movement_type);
-					turn_movement->template movement_rule<int>(raw_turn_movement.turn_movement_rule);
-
-					turn_movement->template uuid<int>(raw_turn_movement.uuid);
-					turn_movement->template internal_id<int>(i);
-					//// assign the detector
-					//turn_movement_1->template detector<Detector_Interface*>(lane->template Detector_Thru<Detector_Interface*>());
-					turn_movements_container<ComponentType,CallerType,_Turn_Movements_Container_Interface&>().push_back(turn_movement);
-				}
-
-				typename _Turn_Movements_Container_Interface::iterator turn_movements_itr;
-				for (turn_movements_itr = _turn_movements_container.begin(); turn_movements_itr != _turn_movements_container.end(); turn_movements_itr++)
-				{
-					_Turn_Movement_Interface* turn_mvmt=(_Turn_Movement_Interface*)(*turn_movements_itr);
-
-					//outbound turn movement of an inbound link
-					_Link_Interface* inbound_link = turn_mvmt->template inbound_link<_Link_Interface*>();
-					inbound_link->template outbound_turn_movements<_Turn_Movements_Container_Interface&>().push_back(turn_mvmt);
-					//inbound turn movement of an outbound link
-					_Link_Interface* outbound_link = turn_mvmt->template outbound_link<_Link_Interface*>();
-					outbound_link->template inbound_turn_movements<_Turn_Movements_Container_Interface&>().push_back(turn_mvmt);
-				}
-
-				// configure outbound_inbound_movements
-				typename _Intersections_Container_Interface::iterator intersections_itr;
-				for (intersections_itr = _intersections_container.begin(); intersections_itr != _intersections_container.end(); intersections_itr++)
-				{
-					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersections_itr);
-					_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
-					// skip intersections_container that do not have any outbound links
-					if (outbound_links.size() == 0)
-						continue;
-					typename _Links_Container_Interface::iterator links_itr;
-					
-					for (links_itr = outbound_links.begin(); links_itr != outbound_links.end(); links_itr++)
-					{
-						_Link_Interface* outboundLink = (_Link_Interface*)(*links_itr);
-						
-						_Outbound_Inbound_Movements_Interface* outboundInboundMovements = (_Outbound_Inbound_Movements_Interface*)Allocate<typename _Outbound_Inbound_Movements_Interface::Component_Type>();
-						
-						outboundInboundMovements->template outbound_link_reference<_Link_Interface*>(outboundLink);
-						_Turn_Movements_Container_Interface& inboundTurnMovements = outboundLink->template inbound_turn_movements<_Turn_Movements_Container_Interface&>();
-						
-						for (int k = 0; k < (int)inboundTurnMovements.size(); k++)
-						{
-							outboundInboundMovements->template inbound_movements<_Turn_Movements_Container_Interface&>().push_back(inboundTurnMovements[k]);
-						}
-						intersection->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>().push_back(outboundInboundMovements);
-					}
-					size_t size = intersection->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>().size();
-				}
-
-				// configure inbound_outbound_movements
-				for (i = 0; i < (int)_intersections_container.size(); i++)
-				{
-					_Intersection_Interface* intersection = (_Intersection_Interface*)_intersections_container[i];
-					// skip intersections_container that do not have any inbound links
-					if (intersection->template inbound_links<_Links_Container_Interface&>().size() == 0)
-						continue;
-					
-					for (int j = 0; j < (int)intersection->template inbound_links<_Links_Container_Interface&>().size(); j++) 
-					{
-						_Inbound_Outbound_Movements_Interface* inboundOutboundMovements = (_Inbound_Outbound_Movements_Interface*)Allocate<typename _Inbound_Outbound_Movements_Interface::Component_Type>();
-						_Link_Interface* inboundLink = (_Link_Interface*)intersection->template inbound_links<_Links_Container_Interface&>()[j];
-						inboundOutboundMovements->template inbound_link_reference<_Link_Interface*>(inboundLink);
-						_Turn_Movements_Container_Interface& outboundTurnMovements = inboundLink->template outbound_turn_movements<_Turn_Movements_Container_Interface&>();
-						for (int k = 0; k < (int)outboundTurnMovements.size(); k++)
-						{
-							inboundOutboundMovements->template outbound_movements<_Turn_Movements_Container_Interface&>().push_back(outboundTurnMovements[k]);
-						}
-						intersection->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>().push_back(inboundOutboundMovements);
-					}
-				}
-
-
-				_Activity_Location_Interface* activity_location;
-				for (i = 0; i < network_data.network_activity_location_size; i++) 
-				{
-					activity_location = (_Activity_Location_Interface*)Allocate<typename _Activity_Location_Interface::Component_Type>();
-					network_models::network_information::network_data_information::ActivityLocationData& raw_activity_location = network_data.activity_location_data_array[i];
-
-					int j;
-					int link_index;
-					// initialize origins
-					for (j = 0; j < raw_activity_location.num_origin_links; j++) 
-					{
-						link_index = raw_activity_location.origin_link_index_array[j];
-						activity_location->template origin_links<_Links_Container_Interface&>().push_back((_Link_Interface*)_links_container.at(link_index));
-						activity_location->template origin_link_choice_cdfs<vector<float>&>().push_back(raw_activity_location.origin_link_choice_cdf_array[j]);
-					}
-					// initialize destinations
-					for (j = 0; j < raw_activity_location.num_destination_links; j++) 
-					{
-						link_index = raw_activity_location.destination_link_index_array[j];
-						activity_location->template destination_links<_Links_Container_Interface&>().push_back((_Link_Interface*)_links_container.at(link_index));
-						activity_location->template destination_link_choice_cdfs<vector<float>&>().push_back(raw_activity_location.destination_link_choice_cdf_array[j]);
-					}
-					activity_location->template uuid<int>(raw_activity_location.uuid);
-					activity_location->template internal_id<int>(i);
-					activity_locations_container<ComponentType,CallerType,_Activity_Locations_Container_Interface&>().push_back(activity_location);
-				}
-
-				_Zone_Interface* zone;
-				for (i = 0; i < network_data.network_zone_size; i++)
-				{
-					zone = (_Zone_Interface*)Allocate<typename _Zone_Interface::Component_Type>();
-					network_models::network_information::network_data_information::ZoneData& raw_zone = network_data.zone_data_array[i];
-
-					int j;
-					int activity_location_index;
-
-					// initialize origins
-					for (j = 0; j < raw_zone.num_origin_activity_locations; j++) 
-					{
-						activity_location_index = raw_zone.origin_activity_location_index_array[j];
-						zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back((_Activity_Location_Interface*)_activity_locations_container.at(activity_location_index));
-						zone->template origin_activity_location_choice_cdfs<vector<float>&>().push_back(raw_zone.origin_activity_location_choice_cdf_array[j]);
-					}
-					// initialize destinations
-					for (j = 0; j < raw_zone.num_destination_activity_locations; j++) 
-					{
-						activity_location_index = raw_zone.destination_activity_location_index_array[j];
-						zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back((_Activity_Location_Interface*)_activity_locations_container.at(activity_location_index));
-						zone->template destination_activity_location_choice_cdfs<vector<float>&>().push_back(raw_zone.destination_activity_location_choice_cdf_array[j]);
-					}
-					
-					zone->template uuid<int>(raw_zone.uuid);
-					zone->template internal_id<int>(i);
-					zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().push_back(zone);
-				}
-
-				for (i = 0; i < network_data.network_activity_location_size; i++)
-				{
-					network_models::network_information::network_data_information::ActivityLocationData& raw_activity_location = network_data.activity_location_data_array[i];
-					_Activity_Location_Interface* activity_location = (_Activity_Location_Interface*)_activity_locations_container[i];
-					activity_location->template zone<_Zone_Interface*>((_Zone_Interface*)_zones_container.at(raw_activity_location.zone_index));
-				}
-			}
-
-
+			feature_implementation void read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
 		};
-
-
 	}
-
 }

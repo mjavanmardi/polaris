@@ -92,7 +92,7 @@ ostream* stream_ptr;
 int main()
 {
 	Network_Components::Types::Network_IO_Maps network_io_maps;
-	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps> Net_IO_Type;
+	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
 
 	//===============
 	// OUTPUT OPTIONS
@@ -117,10 +117,12 @@ int main()
 	define_component_interface(_Scenario_Interface, MasterType::scenario_type, Scenario_Prototype, NULLTYPE);
 	
 	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<MasterType::scenario_type>();
+	_global_scenario = scenario;
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
 	
 	_Network_Interface* network=(_Network_Interface*)Allocate<MasterType::network_type>();
+	_global_network = network;
 	network->template scenario_reference<_Scenario_Interface*>(scenario);
 	
 	////data input
@@ -237,11 +239,11 @@ struct MasterType
 	
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	
-	typedef Intersection_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
+	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
 	
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
 	
-	typedef Intersection_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
+	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
 	
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
 
@@ -288,6 +290,16 @@ struct MasterType
 	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<MasterType> movement_plan_type;
 
 	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
+
+	typedef Person_Components::Implementations::Person_Implementation<MasterType, demand_type> person_type;
+
+    typedef Person_Components::Implementations::TRANSIMS_Person_Planner_Implementation<MasterType, person_type> person_planner_type;
+
+    typedef Person_Components::Implementations::TRANSIMS_Person_Properties_Implementation<MasterType,person_type> person_properties_type;
+
+    typedef Polaris_Component<RNG_Components::Implementations::RngStream_Implementation, MasterType, Data_Object> RNG;
+
+    typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
 
 };
 

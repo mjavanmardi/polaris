@@ -32,6 +32,14 @@
 
 #define feature_implementation public: template<typename ComponentType,typename CallerType,typename TargetType>
 
+///====================================================================================
+/// feature_implementation_definition - standard definition for implementation features
+///====================================================================================
+
+#define feature_implementation_definition\
+	template<typename MasterType,typename ParentType>\
+	template<typename ComponentType,typename CallerType,typename TargetType>
+
 ///============================================================================
 /// declare_feature_event - header for a basic event feature
 ///============================================================================

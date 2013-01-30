@@ -21,7 +21,7 @@ namespace Vehicle_Components
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
 			member_component(typename MasterType::movement_plan_type, movement_plan, none, none);
-			member_component(typename MasterType::traveler_type, traveler, none, none);
+			member_component(typename MasterType::person_type, traveler, none, none);
 			
 			feature_implementation void load(requires(check_2(TargetType,Types::Load_To_Entry_Queue,is_same)))
 			{

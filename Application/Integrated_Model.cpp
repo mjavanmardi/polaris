@@ -238,11 +238,11 @@ struct MasterType
 	
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	
-	typedef Intersection_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
+	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
 	
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
 	
-	typedef Intersection_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
+	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
 	
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
 
@@ -291,7 +291,7 @@ struct MasterType
 
 	// DEMAND AGENT CLASSES
 
-	typedef Demand_Components::Implementations::CTRAMP_Demand_Implementation<MasterType> demand_type;
+	//typedef Demand_Components::Implementations::Polaris_Demand_Implementation<MasterType> demand_type;
 
 	typedef Person_Components::Implementations::Person_Implementation<MasterType> person_type;
 
@@ -330,11 +330,8 @@ int main()
 	network_models::network_information::demand_data_information::DemandData demand_data;
 	network_models::network_information::operation_data_information::OperationData operation_data;
 	network_models::initialization(scenario_data,network_data,demand_data,operation_data);
-	scenario_data.input_dir_name = "C:\\Users\\jauld\\Desktop\\Polaris_Shared_v0.3\\Test_Data\\Network_Model\\";
-	scenario_data.output_dir_name = "C:\\Users\\jauld\\Desktop\\Polaris_Shared_v0.3\\Test_Data\\Network_Model\\";
-	//scenario_data.input_dir_name = "";
-	//scenario_data.output_dir_name = "";
-
+	scenario_data.input_dir_name = "";
+	scenario_data.output_dir_name = "";
 	network_models::read_data(scenario_data,network_data,demand_data,operation_data);
 
 	//converting between k and p
@@ -353,18 +350,10 @@ int main()
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
 	_Network_Interface* network = (_Network_Interface*)Allocate<MasterType::network_type>();
-	
+	_global_network = network;
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 	network->read_network_data<Net_IO_Type>(network_data);
 	//network->write_network_data<NULLTYPE>(network_data_for_output);
-
-	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	//_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
-	//
-	//demand->scenario_reference<_Scenario_Interface*>(scenario);
-	//demand->network_reference<_Network_Interface*>(network);
-	//demand->read_demand_data<Network_Components::Types::File_Network>(scenario_data, network_data, demand_data);
-	//demand->write_demand_data<NULLTYPE>(demand_data_for_output);
 
 
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
@@ -419,7 +408,7 @@ int main()
 
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
-	popsyn->linker_file_path<string>(string("C:\\Users\\Jauld\\Desktop\\Popsyn_data\\LINK_person_small.txt"));
+	popsyn->linker_file_path<string>(string("linker_file.txt"));
 	popsyn->Solution_Settings<solver_itf*>(solver);
 	popsyn->Output_Stream<ostream&>(out);
 	popsyn->Marginal_Output_Stream<ostream&>(marg_out);

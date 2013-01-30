@@ -3,7 +3,7 @@
 #include "Routable_Intersection_Implementation.h"
 #include "Routable_Link_Implementation.h"
 #include "Polaris_Vehicle_Implementation.h"
-#include "Traveler_Prototype.h"
+#include "Person_Implementations.h"
 #include <iostream>
 namespace Routing_Components
 {
@@ -55,14 +55,14 @@ namespace Routing_Components
 				define_container_and_value_interface(_Routable_Intersections_Container_Interface, _Routable_Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Outbound_Inbound_Movements_Container_Interface, _Routable_Outbound_Inbound_Movements_Interface, _Routable_Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype,Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Inbound_Outbound_Movements_Container_Interface, _Routable_Inbound_Outbound_Movements_Interface, _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
-				define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, _Routable_Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, _Routable_Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				typedef Network_Components::Prototypes::Network_Prototype<regular_network_type> _Regular_Network_Interface;
 				define_container_and_value_interface(_Regular_Links_Container_Interface, _Regular_Link_Interface, regular_network_type::links_container_type, Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Regular_Intersections_Container_Interface, _Regular_Intersection_Interface, regular_network_type::intersections_container_type, Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Regular_Outbound_Inbound_Movements_Container_Interface, _Regular_Outbound_Inbound_Movements_Interface, _Regular_Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Regular_Inbound_Outbound_Movements_Container_Interface, _Regular_Inbound_Outbound_Movements_Interface, _Regular_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
-				define_container_and_value_interface(_Regular_Movements_Container_Interface, _Regular_Movement_Interface, _Regular_Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Regular_Movements_Container_Interface, _Regular_Movement_Interface, _Regular_Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				
 
 				_max_free_flow_speed = ((_Regular_Network_Interface*)regular_network)->template max_free_flow_speed<float>();
@@ -131,8 +131,8 @@ namespace Routing_Components
 		{
 
 
-			member_component(typename MasterType::traveler_type, traveler, none, none);
-			define_component_interface(_Traveler_Interface, MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
+			member_component(typename MasterType::person_type, traveler, none, none);
+			define_component_interface(_Traveler_Interface, MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType vehicle()
 			{

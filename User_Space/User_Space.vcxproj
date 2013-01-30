@@ -212,6 +212,9 @@
     <ClInclude Include="Polaris_Link_Implementation.h" />
     <ClInclude Include="Polaris_Movement_Plan_Implementation.h" />
     <ClInclude Include="Polaris_Network_Implementation.h" />
+    <ClInclude Include="Polaris_Network_Implementation_Input_DB.h" />
+    <ClInclude Include="Polaris_Network_Implementation_Input_File.h" />
+    <ClInclude Include="Polaris_Network_Implementation_Output_File.h" />
     <ClInclude Include="Polaris_Operation_Implementation.h" />
     <ClInclude Include="Polaris_Plan_Implementation.h" />
     <ClInclude Include="Polaris_Routing_Implementation.h" />
@@ -219,6 +222,7 @@
     <ClInclude Include="Polaris_Sensor_Implementation.h" />
     <ClInclude Include="Polaris_Traffic_Management_Center_Implementation.h" />
     <ClInclude Include="Polaris_Traveler_Implementation.h" />
+    <ClInclude Include="Polaris_Turn_Movement_Implementation.h" />
     <ClInclude Include="Polaris_Variable_Message_Sign_Implementation.h" />
     <ClInclude Include="Polaris_Vehicle_Implementation.h" />
     <ClInclude Include="Polaris_Zone_Implementation.h" />
@@ -243,6 +247,7 @@
     <ClInclude Include="Sensor_Prototype.h" />
     <ClInclude Include="Traffic_Management_Center_Prototype.h" />
     <ClInclude Include="Traveler_Prototype.h" />
+    <ClInclude Include="Turn_Movement_Prototype.h" />
     <ClInclude Include="User_Space.h" />
     <ClInclude Include="User_Space_Includes.h" />
     <ClInclude Include="Variable_Message_Sign_Prototype.h" />

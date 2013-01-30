@@ -112,6 +112,8 @@ namespace Scenario_Components
 			feature_accessor(output_time_in_seconds, none, none);
 			feature_accessor(condition_time_in_seconds, none, none);
 
+			feature_accessor(database_name, none, none);
+
 			feature_prototype void read_scenario_data()
 			{
 				CfgReader cfgReader;
@@ -174,6 +176,7 @@ namespace Scenario_Components
 				else if (io_source_string.compare("ODB_IO_SOURCE") == 0)
 				{
 					io_source_flag<int>(Scenario_Components::Types::IO_Source_Keys::ODB_IO_SOURCE);
+					cfgReader.getParameter("database_name", database_name<std::string*>());
 				} 
 				else
 				{

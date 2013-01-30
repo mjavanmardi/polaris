@@ -15,6 +15,10 @@
 #include "Polaris_Zone_Implementation.h"
 #include "Polaris_Plan_Implementation.h"
 #include "Polaris_Movement_Plan_Implementation.h"
+#include "Polaris_Turn_Movement_Implementation.h"
+#include "Polaris_Network_Implementation_Input_File.h"
+#include "Polaris_Network_Implementation_Input_DB.h"
+#include "Polaris_Network_Implementation_Output_File.h"
 
 
 #include "Polaris_Sensor_Implementation.h"

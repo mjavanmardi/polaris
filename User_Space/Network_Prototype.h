@@ -142,6 +142,8 @@ namespace Network_Components
 				assert_check_2(TargetType::NetIOType,Types::Regular_Network,is_same,"TargetType should indicate Regular_Network if you want to create a routable network from a regular network");
 			}
 
+
+
 			feature_prototype void write_network_data(typename TargetType::ParamType data_destination)
 			{
 				this_component()->write_network_data<ComponentType,CallerType,TargetType>(data_destination);

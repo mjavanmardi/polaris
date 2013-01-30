@@ -11,6 +11,26 @@ namespace Movement_Plan_Components
 
 	namespace Concepts
 	{
+		concept struct Is_Movement_Plan
+		{
+			check_getter(has_trajectory, trajectory_container);
+			check_getter(has_origin, origin);
+			check_getter(has_destination, destination);
+			check_getter(has_departed_time, departed_time);
+			check_getter(has_arrived_time, arrived_time);
+
+			define_default_check(has_trajectory && has_origin && has_destination && has_departed_time && has_arrived_time);
+		};
+		concept struct Is_Movement_Plan_Prototype
+		{
+			check_getter(has_trajectory, Component_Type::trajectory_container);
+			check_getter(has_origin, Component_Type::origin);
+			check_getter(has_destination, Component_Type::destination);
+			check_getter(has_departed_time, Component_Type::departed_time);
+			check_getter(has_arrived_time, Component_Type::arrived_time);
+
+			define_default_check(has_trajectory && has_origin && has_destination && has_departed_time && has_arrived_time);
+		};
 	}
 	
 	namespace Prototypes

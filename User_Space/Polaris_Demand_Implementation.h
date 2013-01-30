@@ -28,7 +28,7 @@ namespace Demand_Components
 
 			member_data(int, last_vehicle_departure_time, none, none);
 			
-			typedef typename MasterType::traveler_type traveler_type;
+			typedef typename MasterType::person_type traveler_type;
 		};
 
 
