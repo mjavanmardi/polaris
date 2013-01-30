@@ -1,6 +1,8 @@
 #pragma once
 
 #include "User_Space\Person_Prototype.h"
+#include "Polaris_Movement_Plan_Implementation.h"
+#include "Activity_Implementations.h"
 
 namespace Person_Components
 {
