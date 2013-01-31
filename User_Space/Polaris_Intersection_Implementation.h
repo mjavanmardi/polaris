@@ -19,16 +19,14 @@ namespace Intersection_Components
 	
 	namespace Implementations
 	{
-
-
 		implementation struct Polaris_Outbound_Inbound_Movements_Implementation:public Polaris_Component_Class<Polaris_Outbound_Inbound_Movements_Implementation,MasterType,Data_Object,ParentType>
 		{
-
-
+			// pointer to the outbound link
 			member_component(typename MasterType::link_type, outbound_link_reference, none, none);
-
+			// container of inbound movements
 			member_container(vector<typename MasterType::movement_type*>, inbound_movements, none, none);
 			
+			// update state of outbound link and inbound movements
 			feature_implementation void update_state()
 			{
 				define_component_interface(_Link_Interface, get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype,  ComponentType);
@@ -37,9 +35,7 @@ namespace Intersection_Components
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 
 				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
-
 				((_Link_Interface*)_outbound_link_reference)->template travel_time<float>(((_Link_Interface*)_outbound_link_reference)->template link_fftt<float>());
-
 				int t_fftt = -1;
 				int t_bwtt = -1;
 				int t_cached_delay = -1;
@@ -65,6 +61,7 @@ namespace Intersection_Components
 				}
 			}
 
+			// allocate supply based on driving rule
 			feature_implementation void supply_allocation_based_on_driving_rule()
 			{
 				define_component_interface(_Link_Interface, get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -94,11 +91,8 @@ namespace Intersection_Components
 						for(inbound_itr=_inbound_movements.begin();inbound_itr!=_inbound_movements.end();inbound_itr++)
 						{
 							inbound_movement=(_Movement_Interface*)(*inbound_itr);
-
 							inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
-
 							total_transfer_demand += inbound_movement->template movement_demand<float>();
-					
 							if (inbound_movement->template merge_priority<int>() == 1)
 							{
 								protected_turn_movement = inbound_movement;
@@ -109,8 +103,6 @@ namespace Intersection_Components
 							}
 						}
 							
-						//Move for loop outside and conditions inside the loop if it makes code cleaner
-
 						if (total_transfer_demand>0)
 						{
 							if (total_transfer_demand<=((_Link_Interface*)_outbound_link_reference)->template link_supply<float>())
@@ -187,6 +179,7 @@ namespace Intersection_Components
 				}
 			}
 
+			// compute total transfer demand
 			feature_implementation float compute_total_transfer_demand()
 			{
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
@@ -200,7 +193,7 @@ namespace Intersection_Components
 				return total_transfer_demand;
 			}
 
-
+			// allocate supply proprotional to demand
 			feature_implementation void supply_allocation_proportion_to_demand()
 			{
 				define_component_interface(_Link_Interface, get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -246,122 +239,52 @@ namespace Intersection_Components
 	
 		implementation struct Polaris_Inbound_Outbound_Movements_Implementation:public Polaris_Component_Class<Polaris_Inbound_Outbound_Movements_Implementation,MasterType,Data_Object,ParentType>
 		{
-
 			member_component(typename MasterType::link_type, inbound_link_reference, none, none);
-
 			member_container(vector<typename MasterType::movement_type*>, outbound_movements, none, none);
-
 		};
 		
 		implementation struct Polaris_Intersection_Implementation:public Polaris_Component_Class<Polaris_Intersection_Implementation,MasterType,Execution_Object,ParentType>
 		{
-
-			
-
-//			member_component(typename MasterType::SIGNAL_TYPE,signal, none, none);
-
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
 			member_data(float, x_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, y_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, z_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-
 			member_data(Intersection_Components::Types::Intersection_Type_Keys, intersection_type, none, none);
-
 			member_container(vector<typename MasterType::link_type*>, inbound_links, none, none);
-
-
 			member_container(vector<typename MasterType::link_type*>, outbound_links, none, none);
-
 			member_container(vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, none, none);
 			member_container(vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, none, none);
-
 			member_data(User_Space::RngStream, rng_stream, none, none);
 			member_component(typename MasterType::network_type, network_reference, none, none);
-
 			member_component(typename MasterType::intersection_control_type, intersection_control, none, none);
 
 			typedef typename MasterType::vehicle_type vehicle_type;
+//			member_component(typename MasterType::SIGNAL_TYPE,signal, none, none);
 
-			feature_implementation void turn_movement_capacity_update()
-			{
-				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype,  ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
-				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
-				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
-
-				_Link_Interface* outbound_link;
-				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<ComponentType,CallerType,_Outbound_Inbound_Movements_Container_Interface&>();
-				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
-	
-				for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
-				{
-					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
-					_Movements_Container_Interface& inbound_links_container=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
-					typename _Movements_Container_Interface::iterator inbound_itr;
-					_Movement_Interface* inbound_movement;
-					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
-					{
-						inbound_movement=(_Movement_Interface*)(*inbound_itr);
-						inbound_movement->update_capacity<Types::Intersection_Type_Keys>(_intersection_type);
-					}
-				}
-			}
-
-			feature_implementation void turn_movement_flow_calculation()
-			{
-				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
-
-				_Link_Interface* outbound_link;
-				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<ComponentType,CallerType,_Outbound_Inbound_Movements_Container_Interface&>();
-				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
-
-				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
-				{
-					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
-					_Movement_Interface* inbound_movement;
-					_Movements_Container_Interface& inbound_links_container = ((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
-					typename _Movements_Container_Interface::iterator inbound_itr;
-					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
-					{
-						inbound_movement=(_Movement_Interface*)(*inbound_itr);
-						inbound_movement->update_flow<int>();
-					}
-				}
-			}
-
+			// transfer vehicles 
 			feature_implementation void node_transfer()
 			{
-
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_component_interface(_Link_Interface,  _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 
-				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<ComponentType,CallerType,_Outbound_Inbound_Movements_Container_Interface&>();
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
 				_Link_Interface* outbound_link;
-				for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
+				for(outbound_itr=_outbound_inbound_movements.begin(); outbound_itr!=_outbound_inbound_movements.end(); outbound_itr++)
 				{
 					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
-
 					_Movement_Interface* inbound_movement;
 					_Link_Interface* inbound_link;
-
 					_Movements_Container_Interface& inbound_links_container = ((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
 					typename _Movements_Container_Interface::iterator inbound_itr;
-					
-					//initialization ->template  move to network state update
 					outbound_link->template link_upstream_arrived_vehicles<int>(0.0);
 					outbound_link->template link_destination_arrived_vehicles<int>(0.0);
-
 					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
 					{
 						inbound_movement=(_Movement_Interface*)(*inbound_itr);
 						inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
-						if(outbound_itr==outbound_links_container.begin())
+						if(outbound_itr==_outbound_inbound_movements.begin())
 						{
 							//initialization
 							inbound_link->template link_downstream_departed_vehicles<int>(0.0);
@@ -370,71 +293,44 @@ namespace Intersection_Components
 					}
 				}
 			}
-			
-			feature_implementation void network_state_update()
-			{
 
-				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
-
-				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<ComponentType,CallerType,_Outbound_Inbound_Movements_Container_Interface&>();
-				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
-
-				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
-				{
-					((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template update_state<NULLTYPE>();
-				}
-			}
-
+			// accept a vehicle
 			feature_implementation void accept_vehicle(void* vehicle)
 			{
-
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, _Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
 
-				_Link_Interface* outbound_link;
-
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
-
+				_Link_Interface* outbound_link;
 				for (outbound_itr=_outbound_inbound_movements.begin(); outbound_itr!=_outbound_inbound_movements.end(); outbound_itr++)
 				{
 					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
-
 					_Movement_Interface* inbound_movement;
 					_Link_Interface* inbound_link;
-					
-					
 					_Movements_Container_Interface& inbound_movements = ((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
 					typename _Movements_Container_Interface::iterator inbound_itr;
-
 					for(inbound_itr=inbound_movements.begin();inbound_itr!=inbound_movements.end();inbound_itr++)
 					{
 						inbound_movement=(_Movement_Interface*)(*inbound_itr);
-
 						inbound_link=inbound_movement->template inbound_link<_Link_Interface*>();
-
 						_Movement_Plan_Interface* mp = ((_Vehicle_Interface*)vehicle)->template movement_plan<_Movement_Plan_Interface*>();
-
 						if(mp->template next_link<_Link_Interface*>()==outbound_link && mp->template current_link<_Link_Interface*>()==inbound_link)
 						{
-							
 							//_Detector_Interface* detector;
 							//detector = inbound_movement->template detector<_Detector_Interface*>();
 							//if (detector != NULL) detector->template detect_vehicle<int>();
-							
 							inbound_movement->template accept_vehicle<void*>(vehicle);
 						}
 					}
 				}
 			}
 
+			// allocate supply among turn movements
 			feature_implementation void turn_movement_supply_allocation()
 			{
-
 				define_component_interface(_Intersection_Control_Interface, type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
 				define_component_interface(_Control_Plan_Interface, _Intersection_Control_Interface::get_type_of(current_control_plan), Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 
@@ -465,10 +361,10 @@ namespace Intersection_Components
 				}
 			}
 
+			// allocate supply based on driving rule
 			feature_implementation void supply_allocation_based_on_driving_rule()
 			{
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
 
 				for (outbound_itr=_outbound_inbound_movements.begin(); outbound_itr!=_outbound_inbound_movements.end(); outbound_itr++)
@@ -477,6 +373,7 @@ namespace Intersection_Components
 				}
 			}
 
+			// allocate supply proportional to demand
 			feature_implementation void supply_allocation_proportion_to_demand()
 			{
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
@@ -487,9 +384,9 @@ namespace Intersection_Components
 				}
 			}
 
+			// load vehicles to their origin link
 			feature_implementation void origin_link_loading()
 			{
-	
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 
@@ -505,7 +402,6 @@ namespace Intersection_Components
 
 			feature_implementation void Initialize()
 			{
-				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Intersection_Control_Interface, type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
@@ -514,17 +410,11 @@ namespace Intersection_Components
 					((_Intersection_Control_Interface*)_intersection_control)->template Initialize<NULLTYPE>();
 					int start_iteration = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1;
 					load_event(ComponentType,Newells_Conditional,Compute_Step_Flow,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,NULLTYPE);
-
 				}
 			}
 			
 			declare_feature_conditional(Newells_Conditional)
 			{
-				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
-
-				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
@@ -556,8 +446,6 @@ namespace Intersection_Components
 			declare_feature_event(Compute_Step_Flow)
 			{
 				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
 
 				//step 2: turn vehicles updating based on node control and link management, inbound link demand, and outbound link supply
@@ -569,25 +457,21 @@ namespace Intersection_Components
 				//step 4: determine turn movement flow rate based on demand, capacity, and supply
 				_this_ptr->template turn_movement_flow_calculation<NULLTYPE>();
 
-				//step 6: node transfer
+				//step 5: node transfer
 				_this_ptr->template node_transfer<NULLTYPE>();
 
+				//step 6: origin link loading
 				_this_ptr->template origin_link_loading<NULLTYPE>();
 
 			}
 
 			declare_feature_event(Network_State_Update)
 			{
-				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
-				
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
-
 				//step 9: intersection network state update
 				_this_ptr->template network_state_update<NULLTYPE>();
-
 			}
 		};
 	}
-
 }

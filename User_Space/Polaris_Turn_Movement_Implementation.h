@@ -173,57 +173,7 @@ namespace Turn_Movement_Components
 						
 				if (num_transfer_vehicles_of_turn_movement>0)
 				{
-					// look at this loop and see if it can be broken down into a sub-function
-
-					//move vehicles for this turn movement
-					for (int iv=0;iv<num_transfer_vehicles_of_turn_movement;iv++)
-					{
-						_Vehicle_Interface* vehicle=((_Turn_Movement_Interface*)this)->pull_vehicle<_Vehicle_Interface*>();
-
-						//update vehicle state: transfer to next link
-						int enter_time=vehicle->template movement_plan<_Movement_Plan_Interface*>()->template get_current_link_enter_time<int>();
-						int delayed_time = int((((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - enter_time) - ((_Link_Interface*)_inbound_link)->template link_fftt<float>());
-						int enter_interval_index = enter_time / ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
-						int delayed_interval = current_simulation_interval_index - enter_interval_index;
-
-						//update inbound link state: N(a',L,t)
-						((_Link_Interface*)_inbound_link)->template link_downstream_cumulative_vehicles<int&>()++;
-						((_Link_Interface*)_inbound_link)->template link_downstream_departed_vehicles<int&>()++;
-
-						((_Link_Interface*)_outbound_link)->template link_upstream_arrived_vehicles<int&>()++;
-						((_Link_Interface*)_outbound_link)->template link_upstream_cumulative_arrived_vehicles<int&>()++;
-						//update turn movement state: N(a',a,t)
-						_turn_movement_cumulative_vehicles++;
-
-						//update link_turn_travel_delay
-						_outbound_link_arrived_time_based_experienced_link_turn_travel_delay += delayed_time;
-
-						//find the departed time
-						int departed_time_position = -1;
-								
-						int num_intervals=((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
-
-						if (current_simulation_interval_index>=num_intervals)
-						{
-							departed_time_position = (current_simulation_interval_index+num_intervals-delayed_interval)%num_intervals;
-						}
-						else
-						{
-							departed_time_position = enter_interval_index;
-						}
-
-						_cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array[departed_time_position]+=delayed_interval*((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
-								
-						((_Link_Interface*)_outbound_link)->template push_vehicle<_Vehicle_Interface*>(vehicle);
-					}
-
-					//float delay=_outbound_link_arrived_time_based_experienced_link_turn_travel_delay/((float)num_transfer_vehicles_of_turn_movement);
-					//_outbound_link_arrived_time_based_experienced_link_turn_travel_delay= delay;
-				}
-
-				// move this section of code up and append the else to the first if
-				if (num_transfer_vehicles_of_turn_movement>0)
-				{
+					push_vehicles_to_outbound_link<ComponentType,CallerType,NULLTYPE>(num_transfer_vehicles_of_turn_movement);
 					float delay=_outbound_link_arrived_time_based_experienced_link_turn_travel_delay/((float)num_transfer_vehicles_of_turn_movement);
 					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay= delay;
 				}
@@ -256,6 +206,55 @@ namespace Turn_Movement_Components
 					}
 				}
 			}
+
+			feature_implementation void push_vehicles_to_outbound_link(int num_transfer_vehicles_of_turn_movement)
+			{
+				define_component_interface(_Link_Interface, get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+				typedef Vehicle_Components::Prototypes::Vehicle_Prototype<typename MasterType::vehicle_type, ComponentType> _Vehicle_Interface;
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
+				typedef Turn_Movement_Components::Prototypes::Movement_Prototype<typename MasterType::movement_type> _Turn_Movement_Interface;
+				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				//move vehicles for this turn movement
+				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->current_simulation_interval_index<int>();
+				for (int iv=0;iv<num_transfer_vehicles_of_turn_movement;iv++)
+				{
+					_Vehicle_Interface* vehicle=((_Turn_Movement_Interface*)this)->pull_vehicle<_Vehicle_Interface*>();
+
+					//update vehicle state: transfer to next link
+					int enter_time=vehicle->template movement_plan<_Movement_Plan_Interface*>()->template get_current_link_enter_time<int>();
+					int delayed_time = int((((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - enter_time) - ((_Link_Interface*)_inbound_link)->template link_fftt<float>());
+					int enter_interval_index = enter_time / ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
+					int delayed_interval = current_simulation_interval_index - enter_interval_index;
+
+					//update inbound link state: N(a',L,t)
+					((_Link_Interface*)_inbound_link)->template link_downstream_cumulative_vehicles<int&>()++;
+					((_Link_Interface*)_inbound_link)->template link_downstream_departed_vehicles<int&>()++;
+
+					((_Link_Interface*)_outbound_link)->template link_upstream_arrived_vehicles<int&>()++;
+					((_Link_Interface*)_outbound_link)->template link_upstream_cumulative_arrived_vehicles<int&>()++;
+					//update turn movement state: N(a',a,t)
+					_turn_movement_cumulative_vehicles++;
+
+					//update link_turn_travel_delay
+					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay += delayed_time;
+
+					//find the departed time
+					int departed_time_position = -1;
+					int num_intervals=((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
+					if (current_simulation_interval_index>=num_intervals)
+					{
+						departed_time_position = (current_simulation_interval_index+num_intervals-delayed_interval)%num_intervals;
+					}
+					else
+					{
+						departed_time_position = enter_interval_index;
+					}
+					_cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array[departed_time_position]+=delayed_interval*((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
+					((_Link_Interface*)_outbound_link)->template push_vehicle<_Vehicle_Interface*>(vehicle);
+				}
+			}
+
 
 			feature_implementation void update_state(int t_cached_delay)
 			{

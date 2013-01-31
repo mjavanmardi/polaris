@@ -1047,7 +1047,7 @@ namespace Intersection_Control_Components
 			{
 				typedef Intersection_Control_Prototype<ComponentType, ComponentType> _Intersection_Control_Interface;
 				_Intersection_Control_Interface* _this_ptr=(_Intersection_Control_Interface*)_this;
-				//step 0: update control
+				//step 1: update control
 				_this_ptr->template intersection_control_update<NULLTYPE>();
 			}
 		};

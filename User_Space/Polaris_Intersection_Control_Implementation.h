@@ -23,8 +23,9 @@ namespace Intersection_Control_Components
 
 		implementation struct Polaris_Phase_Implementation:public Polaris_Component_Class<Polaris_Phase_Implementation,MasterType,Data_Object,ParentType>
 		{
-			member_data(int, phase_index, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));	// the index counter on all phases in the network
-			member_data(int, phase_sequence_number, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));	// 
+			// index counter on all phases in the network
+			member_data(int, phase_index, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));	
+			member_data(int, phase_sequence_number, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));	 
 				
 			//starting time of green, yellow, and red
 			member_data(int, green_starting_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -86,7 +87,6 @@ namespace Intersection_Control_Components
 			member_container(vector<typename MasterType::phase_type*>, phase_data_array, none, none);
 
 			//approach data
-
 			member_container(vector<typename MasterType::approach_type*>, approach_data_array, none, none);
 
 			//two-way stop and yield sign

@@ -16,8 +16,6 @@ namespace Scenario_Components
 	{
 		implementation struct Polaris_Scenario_Implementation:public Polaris_Component_Class<Polaris_Scenario_Implementation,MasterType,Data_Object,ParentType>
 		{
-			//member_data(int, current_simulation_interval_index);
-			
 			member_data(int, simulation_interval_length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, assignment_interval_length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, simulation_start_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -28,7 +26,6 @@ namespace Scenario_Components
 			member_data(int, assignment_mode, none, none);
 			member_data(unsigned long, iseed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, num_threads, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-
 
 			member_data(int, planning_horizon, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, num_simulation_intervals, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -62,8 +59,6 @@ namespace Scenario_Components
 			member_data(fstream, vehicle_transfer_file, none, none);
 
 			member_data(ofstream, output_writer, none, none);
-
-
 
 			member_data(int, network_cumulative_loaded_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, network_cumulative_departed_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));

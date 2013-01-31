@@ -20,19 +20,15 @@ namespace Intersection_Components
 		implementation struct Routable_Movement_Implementation:public Polaris_Component_Class<Routable_Movement_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_data(float, forward_link_turn_travel_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-			
 			member_component(typename MasterType::routable_link_type, inbound_link, none, none);
 			member_component(typename MasterType::routable_link_type, outbound_link, none, none);
-
 		};
 
 
 		implementation struct Routable_Inbound_Outbound_Movements_Implementation:public Polaris_Component_Class<Routable_Inbound_Outbound_Movements_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_component(typename MasterType::routable_link_type, inbound_link_reference, none, none);
-
 			member_container(vector<typename MasterType::routable_movement_type*>, outbound_movements, none, none);
-
 		};
 
 		
@@ -40,7 +36,6 @@ namespace Intersection_Components
 		{
 			member_component(typename MasterType::routable_link_type, outbound_link_reference, none, none);
 			member_container(vector<typename MasterType::routable_movement_type*>, inbound_movements, none, none);
-
 		};
 
 		implementation struct Routable_Intersection_Implementation:public Polaris_Component_Class<Routable_Intersection_Implementation,MasterType,Data_Object,ParentType>

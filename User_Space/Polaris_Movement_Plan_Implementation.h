@@ -39,7 +39,6 @@ namespace Movement_Plan_Components
 			//==================================================================================================================
 			/// current_trajectory_position
 			//------------------------------------------------------------------------------------------------------------------
-
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType current_trajectory_position(requires(check_2(TargetType,int,is_same) || check_2(TargetType,int&,is_same)))
 			{
@@ -59,25 +58,17 @@ namespace Movement_Plan_Components
 			{
 				_current_trajectory_index=val;
 			}
-
 			tag_setter_as_available(current_trajectory_position);
-
 			int _current_trajectory_index;
 			//------------------------------------------------------------------------------------------------------------------
 
 			member_component(typename MasterType::link_type, origin, none, none);
 			member_component(typename MasterType::link_type, destination, none, none);
-			//member_data(int, departed_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-			//member_data(int, arrived_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-			// departed Time member
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_departed_time,none,none);
 			member_component_feature(departed_time, _departed_time, Value, Basic_Units::Prototypes::Time_Prototype);
-			// arrive_Time member
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_arrived_time,none,none);
 			member_component_feature(arrived_time, _arrived_time, Value, Basic_Units::Prototypes::Time_Prototype);
-
 			member_component(typename MasterType::plan_type, plan, none, none);
-
 
 			feature_implementation void arrive_to_destination()
 			{

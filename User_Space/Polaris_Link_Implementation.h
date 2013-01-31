@@ -125,16 +125,12 @@ namespace Link_Components
 
 			member_component(typename MasterType::network_type, network_reference, none, none);
 
-
 		//==================================================================================================================
 		/// Upstream and Downstream Intersections Reference
 		//------------------------------------------------------------------------------------------------------------------			
 
-			
 			member_component(typename MasterType::intersection_type, upstream_intersection, none, none);
 			member_component(typename MasterType::intersection_type, downstream_intersection, none, none);
-
-
 
 		//==================================================================================================================
 		/// Containers of Cached Cumulative Vehicle Statistics
@@ -147,9 +143,7 @@ namespace Link_Components
 		/// Vehicle Origin Containers
 		//------------------------------------------------------------------------------------------------------------------
 			member_data(int, link_origin_vehicle_current_position, none, none);
-
 			member_container(vector<typename MasterType::vehicle_type*>, link_origin_vehicle_array, none, none);
-
 			member_container(deque<typename MasterType::vehicle_type*>, link_origin_vehicle_queue, none, none);
 	
 		//==================================================================================================================
@@ -157,12 +151,18 @@ namespace Link_Components
 		//------------------------------------------------------------------------------------------------------------------
 			member_container(vector<typename MasterType::vehicle_type*>, current_vehicle_queue, none, none);
 
+		//==================================================================================================================
+		/// Replicas Container
+		//------------------------------------------------------------------------------------------------------------------
+			member_container(vector<typename MasterType::routable_link_type*>, replicas_container, none, none);
 
 		//==================================================================================================================
 		/// Replicas Containers
 		//------------------------------------------------------------------------------------------------------------------
-			member_container(vector<typename MasterType::routable_link_type*>, replicas_container, none, none);
 
+			member_component(typename MasterType::approach_type, approach, none, none);
+			member_data(int, link_num_vehicles_in_queue, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_container(deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, none, none);
 
 		//==================================================================================================================
 		/// travel_time
@@ -186,13 +186,7 @@ namespace Link_Components
 
 			float _travel_time;
 
-			member_component(typename MasterType::approach_type, approach, none, none);
-			member_data(int, link_num_vehicles_in_queue, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-
-			member_container(deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, none, none);
-
-
-			// convert this to a service which returns or stores supply in user-provided container
+			// update link supply
 			feature_implementation void link_supply_update()
 			{
 				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
@@ -240,7 +234,7 @@ namespace Link_Components
 				_link_capacity = current_link_capacity;
 			}
 			
-			// add many comments
+			// update network state
 			feature_implementation void network_state_update()
 			{
 				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
@@ -387,43 +381,18 @@ namespace Link_Components
 				{
 					((_Intersection_Interface*)_downstream_intersection)->template push_vehicle<NULLTYPE>((*vehicle_itr));
 				}
-
 				_current_vehicle_queue.clear();
 			}
 
 			feature_implementation void origin_link_loading(User_Space::RngStream& rng_stream)
 			{
-				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
-				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
-				define_component_interface(_Intersection_Interface, get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				define_container_and_value_interface(_Vehicles_Origin_Container_Interface, _Vehicle_Interface,get_type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_container_interface(_Vehicle_Origin_Queue_Interface, get_type_of(link_origin_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				typedef Link_Components::Prototypes::Link_Prototype<typename MasterType::link_type, ComponentType> _Link_Interface;
-				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
-				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-
-				_Vehicle_Interface* vehicle;
 				_link_origin_departed_vehicles = 0;
 				_link_origin_loaded_vehicles = 0;
 				//arrived vehicles at current interval
 				int current_position = _link_origin_vehicle_current_position;
 				if(current_position<(int)_link_origin_vehicle_array.size())
 				{
-					// put this as a utility function
-
-					for(int iv=current_position;iv<(int)_link_origin_vehicle_array.size();iv++)
-					{
-						//update current position
-						_link_origin_vehicle_current_position++;
-
-						vehicle=(_Vehicle_Interface*)link_origin_vehicle_array<ComponentType,CallerType,_Vehicles_Origin_Container_Interface&>()[iv];
-						
-						link_origin_vehicle_queue<ComponentType,CallerType,_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
-						_link_origin_arrived_vehicles++;
-						_link_origin_loaded_vehicles++;
-						_link_origin_cumulative_arrived_vehicles++;
-						((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int&>()++;
-					}
+					queue_vehicles<ComponentType,CallerType,TargetType>(current_position);
 				}
 
 				//have demand
@@ -444,29 +413,52 @@ namespace Link_Components
 					}
 
 					if(num_link_origin_departed_vehicles_allowed>0)
-					{//
+					{
 						int num_departed_vehicles = min(_link_origin_arrived_vehicles,num_link_origin_departed_vehicles_allowed);
-						// put this as a sub-function using num_departed_vehicles as a parameter
-						for (int iv=0;iv<num_departed_vehicles;iv++)
-						{//
-							vehicle=(_Vehicle_Interface*)link_origin_vehicle_queue<ComponentType,CallerType,_Vehicle_Origin_Queue_Interface&>().front();
-							link_origin_vehicle_queue<ComponentType,CallerType,_Vehicle_Origin_Queue_Interface&>().pop_front();
-
-							//update vehicle state
-							vehicle->template load<Vehicle_Components::Types::Load_To_Origin_Link>();
-							
-							//update link state
-							_link_origin_cumulative_departed_vehicles++;
-							_link_origin_departed_vehicles++;
-
-							_link_origin_arrived_vehicles--;
-
-							((_Link_Interface*)this)->push_vehicle<_Vehicle_Interface*>(vehicle);
-
-							((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int&>()++;
-							((_Scenario_Interface*)_global_scenario)->template network_in_network_vehicles<int&>()++;
-						}
+						load_vehicles<ComponentType,CallerType,TargetType>(num_departed_vehicles);
 					}
+				}
+			}
+			
+			feature_implementation void load_vehicles(int num_departed_vehicles)
+			{
+				define_container_and_value_interface(_Vehicles_Origin_Container_Interface, _Vehicle_Interface,get_type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				typedef Link_Components::Prototypes::Link_Prototype<typename MasterType::link_type, ComponentType> _Link_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+
+				_Vehicle_Interface* vehicle;
+				for (int iv=0;iv<num_departed_vehicles;iv++)
+				{
+					vehicle=(_Vehicle_Interface*)_link_origin_vehicle_queue.front();
+					_link_origin_vehicle_queue.pop_front();
+					//update vehicle state
+					vehicle->template load<Vehicle_Components::Types::Load_To_Origin_Link>();
+					//update link state
+					_link_origin_cumulative_departed_vehicles++;
+					_link_origin_departed_vehicles++;
+					_link_origin_arrived_vehicles--;
+					((_Link_Interface*)this)->push_vehicle<_Vehicle_Interface*>(vehicle);
+					((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int&>()++;
+					((_Scenario_Interface*)_global_scenario)->template network_in_network_vehicles<int&>()++;
+				}
+			}
+
+			feature_implementation void queue_vehicles(int current_position)
+			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+				define_container_and_value_interface(_Vehicles_Origin_Container_Interface, _Vehicle_Interface,get_type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_container_interface(_Vehicle_Origin_Queue_Interface, get_type_of(link_origin_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+
+				for(int iv=current_position;iv<(int)_link_origin_vehicle_array.size();iv++)
+				{
+					//update current position
+					_link_origin_vehicle_current_position++;
+					_Vehicle_Interface* vehicle = (_Vehicle_Interface*)link_origin_vehicle_array<ComponentType,CallerType,_Vehicles_Origin_Container_Interface&>()[iv];
+					link_origin_vehicle_queue<ComponentType,CallerType,_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
+					_link_origin_arrived_vehicles++;
+					_link_origin_loaded_vehicles++;
+					_link_origin_cumulative_arrived_vehicles++;
+					((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int&>()++;
 				}
 			}
 
@@ -504,28 +496,18 @@ namespace Link_Components
 
 			declare_feature_event(Compute_Step_Flow_Supply_Update)
 			{
-
 				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
 				//step 1: link supply update based on a given traffic flow model
-				//_this_ptr->template link_moving<ComponentType>();
-
 				_this_ptr->template link_supply_update<NULLTYPE>();
 			}
 
 			declare_feature_event(Compute_Step_Flow_Link_Moving)
 			{
-				
 				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
-
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
 
-				//step 7: load vehicles to origin links
-				//_this_ptr->template origin_link_loading<ComponentType>();
-				
-				//step 7.5: link moving -- no link moving in Newell's simplified model -- it can be used to determine turn bay curve
-
-
+				//step 7: link moving -- no link moving in Newell's simplified model -- it can be used to determine turn bay curve
 				_this_ptr->template link_moving<NULLTYPE>();
 
 				//step 8: link network state update

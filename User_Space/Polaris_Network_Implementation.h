@@ -29,7 +29,6 @@ namespace Network_Components
 
 			member_container(vector<typename MasterType::turn_movement_type*>, turn_movements_container, none, none);
 
-
 			member_container(vector<typename MasterType::activity_location_type*>, activity_locations_container, none, none);
 
 			member_container(vector<typename MasterType::zone_type*>, zones_container, none, none);

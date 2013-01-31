@@ -139,24 +139,55 @@ namespace Intersection_Components
 
 			feature_prototype void turn_movement_capacity_update()
 			{
-				this_component()->turn_movement_capacity_update<ComponentType,CallerType,TargetType>();
+				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+
+				_Link_Interface* outbound_link;
+				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
+				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
+				for(outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
+				{
+					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
+					_Movements_Container_Interface& inbound_links_container=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
+					typename _Movements_Container_Interface::iterator inbound_itr;
+					_Movement_Interface* inbound_movement;
+					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
+					{
+						inbound_movement=(_Movement_Interface*)(*inbound_itr);
+						inbound_movement->update_capacity<Types::Intersection_Type_Keys>(intersection_type<Types::Intersection_Type_Keys>());
+					}
+				}
 			}
 
-			//implementation distinguishes
-			//feature_prototype void turn_movement_supply_allocation(requires(check_2(get_type_of(intersection_control),Yield_Type,is_same)))
-			//{
-			//	this_component()->turn_movement_supply_allocation<ComponentType,CallerType,TargetType>(); //supply_allocation_based_on_driving_rule<NULLTYPE>();
-			//}
+			feature_prototype void turn_movement_flow_calculation()
+			{
+				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+
+				_Link_Interface* outbound_link;
+				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
+				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
+				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
+				{
+					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
+					_Movement_Interface* inbound_movement;
+					_Movements_Container_Interface& inbound_links_container = ((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template inbound_movements<_Movements_Container_Interface&>();
+					typename _Movements_Container_Interface::iterator inbound_itr;
+					for(inbound_itr=inbound_links_container.begin();inbound_itr!=inbound_links_container.end();inbound_itr++)
+					{
+						inbound_movement=(_Movement_Interface*)(*inbound_itr);
+						inbound_movement->update_flow<int>();
+					}
+				}
+			}
 
 			feature_prototype void turn_movement_supply_allocation()
 			{
 				this_component()->turn_movement_supply_allocation<ComponentType,CallerType,TargetType>();
 			}
 
-			feature_prototype void turn_movement_flow_calculation()
-			{
-				this_component()->turn_movement_flow_calculation<ComponentType,CallerType,TargetType>();
-			}
 
 			feature_prototype void node_transfer()
 			{
@@ -165,7 +196,14 @@ namespace Intersection_Components
 
 			feature_prototype void network_state_update()
 			{
-				this_component()->network_state_update<ComponentType,CallerType,TargetType>();
+				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+
+				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
+				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
+				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
+				{
+					((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template update_state<NULLTYPE>();
+				}
 			}
 			
 			feature_prototype void origin_link_loading()

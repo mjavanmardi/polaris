@@ -84,7 +84,7 @@ namespace Link_Components
 			//------------------------------------------------------------------------------------------------------------------
 
 			// fast way to check if any external entities are trying to access this feature
-			//feature_accessor(link_destination_cumulative_arrived_vehicles, requires(check_2(CallerType,ComponentType,is_same)), requires(check_2(CallerType,ComponentType,is_same)));
+			// feature_accessor(link_destination_cumulative_arrived_vehicles, requires(check_2(CallerType,ComponentType,is_same)), requires(check_2(CallerType,ComponentType,is_same)));
 			feature_accessor(link_destination_cumulative_arrived_vehicles, none, none);			
 			feature_accessor(link_destination_arrived_vehicles, none, none);
 			feature_accessor(link_destination_vehicle_queue, none, none);
