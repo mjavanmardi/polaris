@@ -19,6 +19,7 @@
 #include "Polaris_Network_Implementation_Input_File.h"
 #include "Polaris_Network_Implementation_Input_DB.h"
 #include "Polaris_Network_Implementation_Output_File.h"
+#include "Polaris_Network_Implementation_Results.h"
 
 
 #include "Polaris_Sensor_Implementation.h"

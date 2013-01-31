@@ -161,7 +161,10 @@ namespace Turn_Movement_Components
 			{
 				this_component()->accept_vehicle<ComponentType,CallerType,TargetType>(param);
 			}
-
+			feature_prototype void initialize_features()
+			{
+				this_component()->initialize_features<ComponentType,CallerType,TargetType>();
+			}
 		};
 	}
 }

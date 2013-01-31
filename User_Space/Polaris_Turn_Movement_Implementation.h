@@ -301,7 +301,53 @@ namespace Turn_Movement_Components
 				vehicles_container<ComponentType,CallerType,_Vehicles_Container_Interface&>().push_back((_Vehicle_Interface*)vehicle);
 				_turn_movement_cumulative_arrived_vehicles++;
 			}
+
+			feature_implementation void initialize_features()
+			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Link_Interface, get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+
+				_movement_capacity = 0.0;
+				_movement_demand = 0.0;
+				_movement_supply = 0.0;
+				_movement_flow = 0.0;
+				_movement_transferred = 0;
+				_turn_movement_cumulative_vehicles = 0;
+				_turn_movement_cumulative_arrived_vehicles = 0;
+				_turn_movement_cumulative_shifted_arrived_vehicles = 0;
+							
+				//_vehicles_container<_Vehicles_Queue_Interface&>().clear();
+							
+				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = 0.0;
+				_inbound_link_departed_time_based_experienced_link_turn_travel_delay = 0.0;
+				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array.clear();
+				_cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array.clear();
+				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array.resize(((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
+				_cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array.resize(((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>());
+				int j;
+
+				for (j=0;j<((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();j++)
+				{
+					_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[j] = 0.0;
+					_cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array[j] = 0.0;
+				}
+									
+				_cached_turn_movement_cumulative_shifted_arrived_vehicles_array.clear();
+				_cached_turn_movement_cumulative_shifted_arrived_vehicles_array.resize(((_Link_Interface*)_inbound_link)->template link_fftt_cached_simulation_interval_size<int>());
+				for (j=0;j<((_Link_Interface*)_inbound_link)->template link_fftt_cached_simulation_interval_size<int>();j++)
+				{
+					_cached_turn_movement_cumulative_shifted_arrived_vehicles_array[j] = 0; 
+				}
+
+				if (_movement_type == Turn_Movement_Components::Types::THROUGH_TURN)
+				{
+					_minimum_merge_rate= 1.0;
+				}
+				else
+				{
+					_minimum_merge_rate = 0.2;
+				}
+			}
 		};
 	}
-
 }

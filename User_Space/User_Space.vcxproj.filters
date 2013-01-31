@@ -214,5 +214,8 @@
     <ClInclude Include="Polaris_Network_Implementation_Output_File.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Polaris_Network_Implementation_Results.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

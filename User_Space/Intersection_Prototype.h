@@ -211,6 +211,11 @@ namespace Intersection_Components
 				this_component()->origin_link_loading<ComponentType,CallerType,TargetType>();
 			}
 
+			feature_prototype void initialize_features(TargetType param)
+			{
+				this_component()->initialize_features<ComponentType,CallerType,TargetType>(param);
+			}
+
 			feature_prototype void Initialize()
 			{
 				this_component()->Initialize<ComponentType,CallerType,TargetType>();

@@ -215,6 +215,7 @@
     <ClInclude Include="Polaris_Network_Implementation_Input_DB.h" />
     <ClInclude Include="Polaris_Network_Implementation_Input_File.h" />
     <ClInclude Include="Polaris_Network_Implementation_Output_File.h" />
+    <ClInclude Include="Polaris_Network_Implementation_Results.h" />
     <ClInclude Include="Polaris_Operation_Implementation.h" />
     <ClInclude Include="Polaris_Plan_Implementation.h" />
     <ClInclude Include="Polaris_Routing_Implementation.h" />

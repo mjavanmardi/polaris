@@ -60,7 +60,7 @@ namespace Link_Components
 		/// Simple Link Members
 		//------------------------------------------------------------------------------------------------------------------
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-			member_data(int, internal_id, none, none);
+			member_data(int, internal_id, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, num_lanes, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, speed_limit, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -459,6 +459,64 @@ namespace Link_Components
 					_link_origin_loaded_vehicles++;
 					_link_origin_cumulative_arrived_vehicles++;
 					((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int&>()++;
+				}
+			}
+
+			feature_implementation void initialize_features(void* network)
+			{
+				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+				//network_data
+				_link_origin_cumulative_arrived_vehicles = 0;
+				_link_origin_vehicle_array.clear();
+
+				_network_reference = (typename MasterType::network_type*)network;
+
+				//init link simulation model
+				_link_capacity = 0;
+				_link_upstream_arrived_vehicles = 0;
+				_link_downstream_departed_vehicles = 0;
+				_link_origin_arrived_vehicles = 0;
+				_link_origin_departed_vehicles = 0;
+				_link_origin_loaded_vehicles = 0;
+				_link_destination_arrived_vehicles = 0;
+				_link_origin_vehicle_current_position = 0;
+					
+				//supply
+				_link_supply = _num_lanes * _length * _jam_density;
+					
+				//cumulative vehicles
+				_link_destination_arrived_vehicles = 0;
+				_link_origin_cumulative_arrived_vehicles = 0;
+				_link_origin_cumulative_departed_vehicles = 0;
+				_link_upstream_cumulative_arrived_vehicles = 0;
+				_link_upstream_cumulative_vehicles = 0;
+				
+				////bwtt and fftt
+				float bwtt = (float) (_length/(_backward_wave_speed*5280.0/3600.0)); // in seconds
+				float fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
+				_link_fftt = fftt;
+				_link_bwtt = bwtt;
+				
+				_link_fftt_cached_simulation_interval_size = (int(ceil(float(fftt/(float(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()))))));
+				_link_bwtt_cached_simulation_interval_size = (int(ceil(float(bwtt/(float(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()))))));
+
+				//downstream cumulative vehicles
+				_cached_link_downstream_cumulative_vehicles_array.clear();
+				_cached_link_downstream_cumulative_vehicles_array.resize(_link_bwtt_cached_simulation_interval_size);
+					
+				int j;
+				for (j = 0; j < (int)_cached_link_downstream_cumulative_vehicles_array.size(); j++)
+				{
+					_cached_link_downstream_cumulative_vehicles_array[j] = 0;
+				}
+
+				//upstream cumulative vehicles
+				_cached_link_upstream_cumulative_vehicles_array.clear();
+				_cached_link_upstream_cumulative_vehicles_array.resize(_link_fftt_cached_simulation_interval_size);
+				for (j = 0; j < (int)_cached_link_upstream_cumulative_vehicles_array.size(); j++)
+				{
+					_cached_link_upstream_cumulative_vehicles_array[j] = 0;
 				}
 			}
 

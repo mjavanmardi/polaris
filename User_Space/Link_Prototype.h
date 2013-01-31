@@ -172,8 +172,12 @@ namespace Link_Components
 			{
 				this_component()->construct_routable_from_regular<ComponentType,CallerType,TargetType>(regular_link);
 			}
-		};
 
+			feature_prototype void initialize_features(TargetType param)
+			{
+				this_component()->initialize_features<ComponentType,CallerType,TargetType>(param);
+			}
+		};
 	}
 }
 
