@@ -7,24 +7,10 @@
 class Antares : public wxFrame
 {
 public:
-	wxMenu* file_menu;
-	wxMenuBar* menu_bar;
-
-	Antares(wxFrame* parent) : wxFrame(parent,-1,"Antares")
+	Antares::Antares(wxFrame* parent):wxFrame(parent,-1,"Antares")
 	{
-		file_menu=new wxMenu();
-		file_menu->Append(wxID_OPEN,"Open");
-		file_menu->Append(wxID_SAVE,"Save");
-		file_menu->AppendSeparator();
-		file_menu->Append(wxID_EXIT,"Exit");
 
-		menu_bar=new wxMenuBar();
-
-		menu_bar->Append(file_menu,"File");
-		
-		SetMenuBar(menu_bar);
 	}
-
 };
 
 class Antares_App: public wxApp
@@ -65,4 +51,4 @@ void Antares_App::Start_UI(int argc, char** argv, void* ptr)
 	CreateThread(NULL,0,Wx_Loop,this,0,NULL);
 }
 
-static Antares_App* antares=new Antares_App();
+Antares_App* antares=new Antares_App();
