@@ -15,6 +15,8 @@ struct Typed_Data_Page
 		//stride=sizeof(DataType);
 		//num_cells=(_Page_Size-sizeof(Typed_Data_Page<DataType>))/sizeof(DataType);
 
+		num_allocated=0;
+
 		Data_Object* current_cell=first_free_cell;
 
 		const Data_Object* end=(Data_Object*)((Byte*)first_free_cell+num_cells*stride);
@@ -29,12 +31,14 @@ struct Typed_Data_Page
 
 	bool Empty()
 	{
-		return ((Byte*)first_free_cell)==(((Byte*)this)+sizeof(Typed_Data_Page<DataType>));
+		return num_allocated==0;
+		//return ((Byte*)first_free_cell)==(((Byte*)this)+sizeof(Typed_Data_Page<DataType>));
 	}
 
 	bool Full()
 	{
-		return ((Byte*)first_free_cell)==(((Byte*)this)+sizeof(Typed_Data_Page<DataType>))+num_cells*stride;
+		return num_allocated==num_cells;
+		//return ((Byte*)first_free_cell)==(((Byte*)this)+sizeof(Typed_Data_Page<DataType>))+num_cells*stride;
 	}
 
 	Data_Object* Allocate()
@@ -43,6 +47,8 @@ struct Typed_Data_Page
 
 		first_free_cell=first_free_cell->next_free_cell;
 		
+		++num_allocated;
+
 		return return_val;
 	}
 
@@ -67,11 +73,14 @@ struct Typed_Data_Page
 			cell->next_free_cell=current_cell->next_free_cell;
 			current_cell->next_free_cell=cell;
 		}
+
+		--num_allocated;
 	}
 
 	Data_Object* first_free_cell;
 	const static int num_cells;
 	const static int stride;
+	int num_allocated;
 };
 
 template<typename DataType>
@@ -96,7 +105,7 @@ public:
 	
 	DataType* Allocate();
 
-	void Queue_Free(DataType* object){Free(object);}
+	inline void Queue_Free(DataType* object){Free(object);}
 
 	void Free(DataType* object);
 

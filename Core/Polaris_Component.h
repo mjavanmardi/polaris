@@ -361,7 +361,7 @@ DataType* Allocate(void)
 ///============================================================================
 
 template<typename DataType>
-void Free(DataType* object)
+inline void Free(DataType* object)
 {
 	(DataType::singleton_reference)->Queue_Free(object);
 }

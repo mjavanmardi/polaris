@@ -122,7 +122,73 @@ public:
 	List_Cell* Begin() { return first_allocated_cell; }
 
 	// Not yet implemented
-	void Erase(List_Cell*) { assert(false); }
+	void Erase(List_Cell* target)
+	{
+		assert(false);
+	}
+	
+	void Erase(List_Cell* target,List_Cell* previous)
+	{
+		// first link into the memory allocation list
+		List_Cell* current_cell = first_free_cell;
+		List_Cell* target_cell = target;
+
+		if( target_cell < first_free_cell || first_free_cell == nullptr )
+		{
+			// link to front
+			target_cell->next_free_cell = first_free_cell;
+			first_free_cell = target_cell;
+		}
+		else
+		{
+			// link to middle
+
+			while( target_cell->id > current_cell->next_free_cell->id )
+			{
+				current_cell = current_cell->next_free_cell;
+			}
+
+			target_cell->next_free_cell = current_cell->next_free_cell;
+			current_cell->next_free_cell = target_cell;
+		}
+
+		// next link into the allocation order list
+		if(previous==nullptr)
+		{
+			assert(first_allocated_cell==target);
+
+			//you are first allocated, same procedure as popping
+
+			if( first_allocated_cell == last_allocated_cell )
+			{
+				// no allocated cells
+				last_allocated_cell = nullptr;
+				first_allocated_cell->next_allocated_cell = nullptr;
+				first_allocated_cell = nullptr;
+			}
+			else
+			{
+				// at least one allocated cell to link to
+				current_cell = first_allocated_cell;
+				first_allocated_cell = first_allocated_cell->next_allocated_cell;
+				current_cell->next_allocated_cell = nullptr;
+			}
+		}
+		else if(target==last_allocated_cell)
+		{
+			//you are last allocated, but there is at least one before you
+			last_allocated_cell = previous;
+			previous->next_allocated_cell = nullptr;
+		}
+		else
+		{
+			//you are simply somewhere in the middle, link before and after
+
+			previous->next_allocated_cell = target->next_allocated_cell;
+		}
+
+		--num_allocated;
+	}
 
 private:
 	void Initialize_Memory(List_Cell* start_ptr,int alloc_cells)

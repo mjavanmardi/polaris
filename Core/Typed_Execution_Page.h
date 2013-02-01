@@ -21,6 +21,7 @@ struct Typed_Execution_Page
 		ptex_next_next_revision._sub_iteration=0;
 		ptex_lock=0;
 		ptex_threads_counter=0;
+		num_allocated=0;
 
 		Execution_Object* current_cell=first_free_cell;
 
@@ -43,6 +44,8 @@ struct Typed_Execution_Page
 
 		first_free_cell=first_free_cell->next_free_cell;
 		
+		++num_allocated;
+
 		return return_val;
 	}
 	
@@ -66,18 +69,23 @@ struct Typed_Execution_Page
 			current_cell->next_free_cell=cell;
 		}
 
-		//TODO
 		//cell->next_iteration.set_free();
+		cell->next_revision._iteration=END;
+		cell->next_revision._sub_iteration=0;
+
+		--num_allocated;
 	}
 	
 	bool Empty()
 	{
-		return ((Byte*)first_free_cell)==(((Byte*)this)+sizeof(Typed_Execution_Page<DataType>));
+		return num_allocated==0;
+		//return ((Byte*)first_free_cell)==(((Byte*)this)+sizeof(Typed_Execution_Page<DataType>));
 	}
 
 	bool Full()
 	{
-		return ((Byte*)first_free_cell)==(((Byte*)this)+sizeof(Typed_Execution_Page<DataType>))+num_cells*stride;
+		return num_allocated==num_cells;
+		//return ((Byte*)first_free_cell)==(((Byte*)this)+sizeof(Typed_Execution_Page<DataType>))+num_cells*stride;
 	}
 
 	Revision ptex_current_revision;
@@ -91,6 +99,8 @@ struct Typed_Execution_Page
 
 	static const int stride;
 	static const int num_cells;
+
+	volatile int num_allocated;
 };
 
 template<typename DataType>
@@ -201,13 +211,19 @@ public:
 				if(execution_page->Empty())
 				{
 					Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* fitr=active_pages.Begin();
+
+					// as long as you will be looping through structure, take the liberty of passing linking information
+					Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* litr=nullptr;
+
 					while(fitr!=nullptr)
 					{
 						if(fitr->data==execution_page)
 						{
-							active_pages.Erase(fitr);
+							active_pages.Erase(fitr,litr);
 							break;
 						}
+
+						litr=fitr;
 						fitr=fitr->next_allocated_cell;
 					}
 				}
@@ -220,10 +236,11 @@ public:
 	
 	DataType* Allocate();
 
-	void Queue_Free(DataType* object)
+	inline void Queue_Free(DataType* object)
 	{
 		//execution pages only mark memory to be freed
-		((Execution_Object*)object)->next_iteration.queue_free();
+		((Execution_Object*)object)->next_revision=-1;
+		//((Execution_Object*)object)->next_iteration.queue_free();
 	}
 	
 	void Free(DataType* object);

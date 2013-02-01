@@ -1,6 +1,10 @@
 #include "Model_Selection.h"
 
 #ifdef ENGINE_TESTS
+
+#define TEST_2
+
+#ifdef TEST_1
 #include "Application_Includes.h"
 static volatile unsigned long visited=0;
 
@@ -76,6 +80,74 @@ void main()
 
 	bool pause=true;
 }
+#endif
 
+#ifdef TEST_2
+#include "Application_Includes.h"
+static volatile unsigned long visited=0;
+
+implementation struct Test:public Polaris_Component_Class<Test,MasterType,Execution_Object>
+{
+public:
+	void Initialize()
+	{
+		Load_Register<Test>(&When_Do_Stuff<NULLTYPE>,&Do_Stuff<NULLTYPE>,0,0);
+	}
+
+	declare_feature_conditional(When_Do_Stuff)
+	{
+		response.result = true;
+		response.next._iteration = _iteration+1;
+		response.next._sub_iteration = 0;
+	}
+
+	declare_feature_event(Do_Stuff)
+	{
+		Test* pthis=(Test*)_this;
+
+		if(pthis->id==_iteration)
+		{
+			Free<Test>(pthis);
+		}
+		else
+		{
+			AtomicIncrement(&visited);
+		}
+	}
+
+	int id;
+};
+
+struct MasterType{};
+
+void main()
+{
+	const unsigned int num_agents=1000;
+	const int pages=(num_agents*sizeof(Test<MasterType*>))/_Page_Size;
+
+	for(int i=0;i<num_agents;i++)
+	{
+		Test<MasterType>* test=Allocate<Test<MasterType>>();
+		test->Initialize();
+		test->id=i;
+	}
+	
+	START();
+
+	int agents=num_agents;
+	int ideal_visited=0;
+
+	for(int i=0;i<_num_iterations;i++)
+	{
+		--agents;
+		ideal_visited+=agents;
+	}
+
+	cout << "accuracy results: " << endl;
+	cout << "\t" << visited << ", " << ideal_visited << ": " << (bool)(visited==ideal_visited) << endl;
+
+	bool pause=true;
+}
+#endif
 
 #endif
