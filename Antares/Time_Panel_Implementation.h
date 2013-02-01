@@ -6,14 +6,40 @@
 #include "Time_Panel.h"
 
 //---------------------------------------------------------
+//	Time_Panel - time panel class definition
+//---------------------------------------------------------
+
+implementation class Time_Panel_Implementation : public wxPanel
+{
+public:
+	Time_Panel_Implementation(wxFrame* parent);
+	virtual ~Time_Panel_Implementation(void){};
+	
+	void Update_Time(int updated_time);
+	void OnPlay(wxCommandEvent& event);
+    void OnStop(wxCommandEvent& event);
+
+	wxBitmapButton* play;
+	wxBitmap play_button;
+	wxBitmap pause_button;
+	
+	wxBoxSizer* sizer;
+
+	wxTextCtrl* time_display;
+
+	//Canvas_Implementation* canvas_ptr;
+};
+
+//---------------------------------------------------------
 //	Time_Panel - time_panel initialization
 //---------------------------------------------------------
 
-Time_Panel::Time_Panel(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxCLIP_CHILDREN )
+template<typename MasterType,typename ParentType>
+Time_Panel_Implementation<MasterType,ParentType>::Time_Panel_Implementation(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxCLIP_CHILDREN )
 {
 	//---- miscellaneous initialization ----
 
-	//canvas_ptr=((Antares *) GetParent())->canvas;
+	//canvas_ptr=((Antares_Implementation *) GetParent())->canvas;
 
 	//---- initialize the sizers ----
 	
@@ -25,7 +51,7 @@ Time_Panel::Time_Panel(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wx
 	pause_button=wxBitmap("Pause.png",wxBITMAP_TYPE_PNG);
 
 	play=new wxBitmapButton(this,wxID_ANY,play_button,wxDefaultPosition,wxSize(62,50));
-	Connect(play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel::OnPlay));
+	Connect(play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
 	play->SetToolTip("Play");
 	sizer->Add(play);
 
@@ -47,29 +73,32 @@ Time_Panel::Time_Panel(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wx
 //	OnPlay - user presses the play button
 //---------------------------------------------------------
 
-void Time_Panel::OnPlay(wxCommandEvent& event)
+template<typename MasterType,typename ParentType>
+void Time_Panel_Implementation<MasterType,ParentType>::OnPlay(wxCommandEvent& event)
 {
 	play->SetBitmapLabel(pause_button);
 	Refresh();
-	Connect(play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel::OnStop));
+	Connect(play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnStop));
 }
 
 //---------------------------------------------------------
 //	OnStop - user presses the stop button
 //---------------------------------------------------------
 
-void Time_Panel::OnStop(wxCommandEvent& event)
+template<typename MasterType,typename ParentType>
+void Time_Panel_Implementation<MasterType,ParentType>::OnStop(wxCommandEvent& event)
 {
 	play->SetBitmapLabel(play_button);
 	Refresh();
-	Connect(play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel::OnPlay));
+	Connect(play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
 }
 
 //---------------------------------------------------------
 //	Update_Time - convert seconds/base_step_length to a 24:00 clock display
 //---------------------------------------------------------
 
-void Time_Panel::Update_Time(int updated_time)
+template<typename MasterType,typename ParentType>
+void Time_Panel_Implementation<MasterType,ParentType>::Update_Time(int updated_time)
 {
 	//---- extract hours, minutes, and seconds from time value given ----
 

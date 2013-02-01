@@ -23,6 +23,14 @@ namespace Network_Components
 				auto_ptr<database> db (open_sqlite_database (db_file));
 				transaction t(db->begin());
 
+				read_links(db);
+			}
+
+			void read_links(auto_ptr<database>& db)
+			{
+				using namespace odb;
+				using namespace pio;
+
 				result<Link> link_result=db->query<Link>(query<Link>::true_expr);
 				
 				int counter=0;
@@ -36,9 +44,8 @@ namespace Network_Components
 					counter++;
 					if(counter%10000==0) cout << "\t" << counter << endl;
 				}
-
-
 			}
+
 		};
 	}
 }

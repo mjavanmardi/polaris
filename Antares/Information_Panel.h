@@ -8,12 +8,3 @@
 //---------------------------------------------------------
 //	Information_Panel - information panel class definition
 //---------------------------------------------------------
-
-class Information_Panel : public wxPanel
-{
-public:
-	Information_Panel(wxFrame* parent);
-	virtual ~Information_Panel(void){};
-
-	//Canvas* canvas_ptr;
-};

@@ -12,3 +12,4 @@
 #include "wxPLplotwindow.h"
 #include "User_Space\User_Space.h"
 
+implementation class Antares_Implementation;

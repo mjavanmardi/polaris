@@ -4,13 +4,36 @@
 
 #pragma once
 #include "Antares_Frame.h"
+#include "Control_Panel_Implementation.h"
+#include "Time_Panel_Implementation.h"
+#include "Information_Panel_Implementation.h"
+#include "Canvas_Implementation.h"
 
 //---------------------------------------------------------
-//	Antares - aui initialization
+//	Antares_Implementation - aui initialization
 //---------------------------------------------------------
+
+template<typename MasterType, typename ParentType>
+class Antares_Implementation : public wxFrame
+{
+public:
+	Antares_Implementation(wxFrame* parent,void* _simulation_ptr,string& _db_name);
+
+	virtual ~Antares_Implementation(void){mgr.UnInit();}
+
+	Control_Panel_Implementation<MasterType,Antares_Implementation>* control_panel;
+	Time_Panel_Implementation<MasterType,Antares_Implementation>* time_panel;
+	Information_Panel_Implementation<MasterType,Antares_Implementation>* information_panel;
+	Canvas_Implementation<MasterType,Antares_Implementation>* canvas;
+	
+	wxAuiManager mgr;
+	
+	string db_name;
+	void* simulation_ptr;
+};
 
 template<typename MasterType,typename ParentType>
-Antares<MasterType,ParentType>::Antares(wxFrame* parent,void* _simulation_ptr,string& _db_name):wxFrame(parent,-1,"Antares")
+Antares_Implementation<MasterType,ParentType>::Antares_Implementation(wxFrame* parent,void* _simulation_ptr,string& _db_name):wxFrame(parent,-1,"Antares")
 {
 	simulation_ptr=_simulation_ptr;
 	db_name=_db_name;
@@ -31,19 +54,19 @@ Antares<MasterType,ParentType>::Antares(wxFrame* parent,void* _simulation_ptr,st
 
 	int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32, 0};
 
-	canvas=new Canvas<MasterType,Antares>(this,args);
+	canvas=new Canvas_Implementation<MasterType,Antares_Implementation>(this,args);
 
 	mgr.AddPane(canvas,wxAuiPaneInfo().Name("Canvas").CenterPane());
 
-	control_panel=new Control_Panel(this);
+	control_panel=new Control_Panel_Implementation<MasterType,Antares_Implementation>(this);
 	
 	mgr.AddPane(control_panel,wxAuiPaneInfo().Name("Control_Panel").Left());
 	
-	time_panel=new Time_Panel(this);
+	time_panel=new Time_Panel_Implementation<MasterType,Antares_Implementation>(this);
 	
 	mgr.AddPane(time_panel,wxAuiPaneInfo().Name("Time_Panel").Bottom());
 
-	information_panel=new Information_Panel(this);
+	information_panel=new Information_Panel_Implementation<MasterType,Antares_Implementation>(this);
 		
 	mgr.AddPane(information_panel,wxAuiPaneInfo().Name("Information_Panel").Bottom());
 

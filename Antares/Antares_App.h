@@ -32,7 +32,7 @@ public:
 	
 	virtual bool OnInit()
 	{
-		main=new Antares<MasterType,Antares_App>(nullptr,simulation_pointer,db_name);
+		main=new Antares_Implementation<MasterType,Antares_App>(nullptr,simulation_pointer,db_name);
 
 		main->Maximize();
 		main->Show();
@@ -76,7 +76,7 @@ public:
 		CreateThread(NULL,0,Wx_Loop<MasterType>,this,0,NULL);
 	}
 
-	Antares<MasterType,Antares_App>* main;
+	Antares_Implementation<MasterType,Antares_App>* main;
 	void* simulation_pointer;
 	string db_name;
 };

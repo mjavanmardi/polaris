@@ -6,10 +6,27 @@
 #include "Control_Panel.h"
 
 //---------------------------------------------------------
-//	Control_Panel - control_panel initialization
+//	Control_Panel_Implementation - control panel class definition
 //---------------------------------------------------------
 
-Control_Panel::Control_Panel(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize)
+implementation class Control_Panel_Implementation : public wxPanel
+{
+public:
+	Control_Panel_Implementation(wxFrame* parent);
+	virtual ~Control_Panel_Implementation(void){};
+
+	wxAuiNotebook* control_book;
+
+	wxBoxSizer* sizer;
+
+};
+
+//---------------------------------------------------------
+//	Control_Panel_Implementation - control_panel initialization
+//---------------------------------------------------------
+
+template<typename MasterType,typename ParentType>
+Control_Panel_Implementation<MasterType,ParentType>::Control_Panel_Implementation(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize)
 {
 	SetBackgroundColour(wxColor(255,255,255));
 
