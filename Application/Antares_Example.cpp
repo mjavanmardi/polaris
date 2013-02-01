@@ -8,7 +8,7 @@ void main(int argc,char** argv)
 {
 	START_UI(argc,argv,nullptr);
 
-	for(int i=0;i<1000;i++)
+	for(int i=0;i<10000;i++)
 	{
 		cout << i << endl;
 		Sleep(1000);

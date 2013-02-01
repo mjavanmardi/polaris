@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Prototypes">
+      <UniqueIdentifier>{c9a79d3d-42f1-43f2-9c34-3715f1485866}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Implementations">
+      <UniqueIdentifier>{d57cae35-d575-443d-a589-50fa72526ede}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Antares_Includes.h">
@@ -21,12 +27,45 @@
     <ClInclude Include="Antares.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Antares_Frame.h">
+    <ClInclude Include="Antares_App.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Frame_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Canvas_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Control_Panel_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Information_Panel_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Time_Panel_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Time_Panel.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Information_Panel.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Control_Panel.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Canvas.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Frame.h">
+      <Filter>Prototypes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glew.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

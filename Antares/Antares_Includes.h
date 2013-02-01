@@ -1,5 +1,15 @@
 #pragma once
 
+#include "gl\glew.h"
+#include "wx\glcanvas.h"
+
 #include "wx\wx.h"
+#include "wx\aui\aui.h"
+
+#include "wx\panel.h"
+#include "wx\tglbtn.h"
+
 #include "wxPLplotwindow.h"
 #include "User_Space\User_Space.h"
+
+class Canvas;
