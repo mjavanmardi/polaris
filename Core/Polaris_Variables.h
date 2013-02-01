@@ -29,6 +29,8 @@ struct VARIABLE_NAME \
 	VARIABLE_NAME& operator--(){Value = Value - 1; return *this;}  \
 };
 
+using namespace std;
+
 namespace Basic_Units
 {
 
