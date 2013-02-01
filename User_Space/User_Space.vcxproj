@@ -250,6 +250,7 @@
     <ClInclude Include="Traveler_Prototype.h" />
     <ClInclude Include="Turn_Movement_Prototype.h" />
     <ClInclude Include="User_Space.h" />
+    <ClInclude Include="User_Space_Forward_Declaration.h" />
     <ClInclude Include="User_Space_Includes.h" />
     <ClInclude Include="Variable_Message_Sign_Prototype.h" />
     <ClInclude Include="Vehicle_Prototype.h" />

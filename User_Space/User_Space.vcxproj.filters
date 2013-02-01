@@ -217,5 +217,8 @@
     <ClInclude Include="Polaris_Network_Implementation_Results.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="User_Space_Forward_Declaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
