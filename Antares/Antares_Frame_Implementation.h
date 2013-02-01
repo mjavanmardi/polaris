@@ -9,8 +9,12 @@
 //	Antares - aui initialization
 //---------------------------------------------------------
 
-Antares::Antares(wxFrame* parent):wxFrame(parent,-1,"Antares")
+template<typename MasterType,typename ParentType>
+Antares<MasterType,ParentType>::Antares(wxFrame* parent,void* _simulation_ptr,string& _db_name):wxFrame(parent,-1,"Antares")
 {
+	simulation_ptr=_simulation_ptr;
+	db_name=_db_name;
+
 	//---- initialize aui ----
 
 	mgr.SetManagedWindow(this);
@@ -27,7 +31,7 @@ Antares::Antares(wxFrame* parent):wxFrame(parent,-1,"Antares")
 
 	int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32, 0};
 
-	canvas=new Canvas(this,args);
+	canvas=new Canvas<MasterType,Antares>(this,args);
 
 	mgr.AddPane(canvas,wxAuiPaneInfo().Name("Canvas").CenterPane());
 

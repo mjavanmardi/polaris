@@ -27,5 +27,5 @@ public:
 
 	wxTextCtrl* time_display;
 
-	Canvas* canvas_ptr;
+	//Canvas* canvas_ptr;
 };

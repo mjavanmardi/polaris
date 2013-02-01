@@ -183,6 +183,8 @@
     <ClInclude Include="Canvas_Implementation.h" />
     <ClInclude Include="Control_Panel.h" />
     <ClInclude Include="Control_Panel_Implementation.h" />
+    <ClInclude Include="Graphical_Link_Implementation.h" />
+    <ClInclude Include="Graphical_Network_Implementation.h" />
     <ClInclude Include="Information_Panel.h" />
     <ClInclude Include="Information_Panel_Implementation.h" />
     <ClInclude Include="Time_Panel.h" />

@@ -13,7 +13,7 @@ Time_Panel::Time_Panel(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wx
 {
 	//---- miscellaneous initialization ----
 
-	canvas_ptr=((Antares *) GetParent())->canvas;
+	//canvas_ptr=((Antares *) GetParent())->canvas;
 
 	//---- initialize the sizers ----
 	

@@ -15,5 +15,5 @@ public:
 	Information_Panel(wxFrame* parent);
 	virtual ~Information_Panel(void){};
 
-	Canvas* canvas_ptr;
+	//Canvas* canvas_ptr;
 };

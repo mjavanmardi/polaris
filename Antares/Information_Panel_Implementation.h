@@ -13,5 +13,5 @@ Information_Panel::Information_Panel(wxFrame* parent) : wxPanel(parent,-1,wxDefa
 {
 	//---- miscellaneous initialization ----
 
-	canvas_ptr=((Antares *) GetParent())->canvas;
+	//canvas_ptr=((Antares *) GetParent())->canvas;
 }

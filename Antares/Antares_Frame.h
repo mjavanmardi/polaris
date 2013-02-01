@@ -12,16 +12,20 @@
 //	Antares - aui initialization
 //---------------------------------------------------------
 
-class Antares : public wxFrame
+implementation class Antares : public wxFrame
 {
 public:
-	Antares::Antares(wxFrame* parent);
+	Antares(wxFrame* parent,void* _simulation_ptr,string& _db_name);
 
 	virtual ~Antares(void){mgr.UnInit();}
 
 	Control_Panel* control_panel;
 	Time_Panel* time_panel;
 	Information_Panel* information_panel;
-	Canvas* canvas;
+	Canvas<MasterType,Antares>* canvas;
+	
 	wxAuiManager mgr;
+	
+	string db_name;
+	void* simulation_ptr;
 };
