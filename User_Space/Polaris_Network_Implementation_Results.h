@@ -1,6 +1,5 @@
 #pragma once
 #include "Network_Prototype.h"
-#include "Polaris_Intersection_Implementation.h"
 
 namespace Network_Components
 {

@@ -1,22 +1,5 @@
 #pragma once
-#include "User_Space_Includes.h"
-
-/*
- * Needed for Linux compatability. Do not hurt Windows compilation.
- */
-namespace Scenario_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Scenario_Prototype;
-	}
-};
-namespace Intersection_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Intersection_Prototype;
-	}
-};
-/*------------------------------------------------*/
+#include "User_Space.h"
 
 namespace Vehicle_Components
 {

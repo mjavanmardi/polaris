@@ -1,9 +1,5 @@
 #pragma once
-#include "User_Space_Includes.h"
-#include "Link_Prototype.h"
-#include "Vehicle_Prototype.h"
-#include "Polaris_Link_Implementation.h"
-#include "Intersection_Prototype.h"
+#include "Turn_Movement_Prototype.h"
 
 namespace Turn_Movement_Components
 {

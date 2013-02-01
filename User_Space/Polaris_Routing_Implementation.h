@@ -1,9 +1,11 @@
 #pragma once
-#include "User_Space_Includes.h"
-#include "Routable_Intersection_Implementation.h"
+#include "Routing_Prototype.h"
 #include "Routable_Link_Implementation.h"
-#include "Polaris_Vehicle_Implementation.h"
+#include "Routable_Intersection_Implementation.h"
+#ifndef FOR_LINUX_PORTING
 #include "Person_Implementations.h"
+#endif
+
 #include <iostream>
 namespace Routing_Components
 {
@@ -130,9 +132,13 @@ namespace Routing_Components
 		implementation struct Polaris_Routing_Implementation:public Polaris_Component_Class<Polaris_Routing_Implementation,MasterType,Execution_Object,ParentType>
 		{
 
-
+#ifndef FOR_LINUX_PORTING
 			member_component(typename MasterType::person_type, traveler, none, none);
 			define_component_interface(_Traveler_Interface, MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
+#else
+			member_component(typename MasterType::traveler_type, traveler, none, none);
+			define_component_interface(_Traveler_Interface, MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
+#endif
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType vehicle()
 			{

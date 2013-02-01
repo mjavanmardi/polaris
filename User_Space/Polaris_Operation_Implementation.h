@@ -1,5 +1,4 @@
 #pragma once
-#include "User_Space_Includes.h"
 #include "Operation_Prototype.h"
 
 namespace Operation_Components

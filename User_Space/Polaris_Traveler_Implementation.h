@@ -1,5 +1,4 @@
 #pragma once
-#include "User_Space_Includes.h"
 #include "Traveler_Prototype.h"
 
 namespace Traveler_Components

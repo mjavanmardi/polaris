@@ -1,49 +1,12 @@
 #pragma once
-#include "Intersection_Prototype.h"
-#include "Network_Prototype.h"
+#include "User_Space.h"
 #include "../File_IO/utilities.h"
 
 #ifndef WINDOWS
 // for hash_map
 using namespace __gnu_cxx;
 #endif
-/*
- * Needed for Linux compatability. Do not hurt Windows compilation.
- */
 
-namespace Link_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Link_Prototype;
-	}
-};
-namespace Vehicle_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Vehicle_Prototype;
-	}
-};
-namespace Intersection_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Intersection_Prototype;
-		forward_declare_prototype struct Movement_Prototype;
-		forward_declare_prototype struct Outbound_Inbound_Movements_Prototype;
-		forward_declare_prototype struct Inbound_Outbound_Movements_Prototype;
-	}
-};
-namespace Routing_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Routing_Prototype;
-	}
-};
-namespace Traveler_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Traveler_Prototype;
-	}
-};
 /*------------------------------------------------*/
 
 namespace Routing_Components

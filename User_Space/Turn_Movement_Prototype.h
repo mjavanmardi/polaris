@@ -1,49 +1,8 @@
 #pragma once
-#include "User_Space_Includes.h"
-#include "Intersection_Control_Prototype.h"
-#include "Vehicle_Prototype.h"
+#include "User_Space.h"
 #include "../File_IO/utilities.h"
 //#include "Signal_Prototypes.h"
 
-/*
- * Needed for Linux compatability. Do not hurt Windows compilation.
- */
-namespace Scenario_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Scenario_Prototype;
-	}
-};
-namespace Link_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Link_Prototype;
-	}
-};
-namespace Vehicle_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Vehicle_Prototype;
-	}
-};
-namespace Network_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Network_Prototype;
-	}
-};
-namespace Intersection_Control_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Intersection_Control_Prototype;
-	}
-};
-namespace Movement_Plan_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Movement_Plan_Prototype;
-	}
-};
 /*------------------------------------------------*/
 
 namespace Turn_Movement_Components

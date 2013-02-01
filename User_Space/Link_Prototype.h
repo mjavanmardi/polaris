@@ -1,7 +1,5 @@
 #pragma once
-
-
-/*------------------------------------------------*/
+#include "User_Space.h"
 
 namespace Link_Components
 {

@@ -1,16 +1,5 @@
 #pragma once
-#include "User_Space_Includes.h"
-
-/*
- * Needed for Linux compatability. Do not hurt Windows compilation.
- */
-namespace Routing_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Routing_Prototype;
-	}
-};
-/*------------------------------------------------*/
+#include "User_Space.h"
 
 namespace Traveler_Components
 {

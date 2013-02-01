@@ -1,7 +1,5 @@
 #pragma once
-#include "Intersection_Prototype.h"
 #include "Intersection_Control_Prototype.h"
-
 
 namespace Intersection_Control_Components
 {

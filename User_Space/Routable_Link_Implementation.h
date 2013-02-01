@@ -1,8 +1,5 @@
 #pragma once
-
-#include "Polaris_Link_Implementation.h"
-#include "Routing_Prototype.h"
-#include "Network_Prototype.h"
+#include "Link_Prototype.h"
 
 namespace Link_Components
 { 

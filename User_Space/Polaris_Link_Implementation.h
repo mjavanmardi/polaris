@@ -1,37 +1,7 @@
 #pragma once
-#include "User_Space_Includes.h"
-#include "Polaris_Scenario_Implementation.h"
-#include "Link_Prototype.h"
-#include "Intersection_Prototype.h"
-#include "Polaris_Vehicle_Implementation.h"
 
-/*
- * Needed for Linux compatability. Do not hurt Windows compilation.
- */
-namespace Scenario_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Scenario_Prototype;
-	}
-};
-namespace Network_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Network_Prototype;
-	}
-};
-namespace Intersection_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Intersection_Prototype;
-	}
-};
-namespace Vehicle_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Vehicle_Prototype;
-	}
-};
+#include "Link_Prototype.h"
+#include "Polaris_Scenario_Implementation.h"
 
 namespace Link_Components
 {

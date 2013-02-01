@@ -2,61 +2,9 @@
 #include <hash_map>
 #include "User_Space.h"
 #include "../File_IO/utilities.h"
-
 #include "../File_IO/network_data.h"
 //using namespace Basic_Units::Data_Structures;
 //using namespace Signal_Components::Data_Structures;
-
-/*
- * Needed for Linux compatability. Do not hurt Windows compilation.
- */
-namespace Scenario_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Scenario_Prototype;
-	}
-};
-
-namespace Activity_Location_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Activity_Location_Prototype;
-	}
-};
-namespace Link_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Link_Prototype;
-	}
-};
-namespace Vehicle_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Vehicle_Prototype;
-	}
-};
-namespace Intersection_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Intersection_Prototype;
-		forward_declare_prototype struct Movement_Prototype;
-		forward_declare_prototype struct Outbound_Inbound_Movements_Prototype;
-		forward_declare_prototype struct Inbound_Outbound_Movements_Prototype;
-	}
-};
-namespace Zone_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Zone_Prototype;
-	}
-};
-namespace Intersection_Control_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Intersection_Control_Prototype;
-	}
-};
-/*------------------------------------------------*/
 
 namespace Network_Components
 {
