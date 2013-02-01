@@ -330,9 +330,7 @@ namespace PopSyn
 			}
 			feature_prototype void Start_Timer()
 			{
-				//this->timer.Start();
-				//load_event(ComponentType,Stop_Main_Timer_Conditional,Stop_Main_Timer,5,NULLTYPE);
-
+				this->timer<Counter&>().Start();
 			}
 			
 			// 3.) Stop timing event - called after individual objects end processing (at timestep 5)
@@ -343,9 +341,8 @@ namespace PopSyn
 			}
 			feature_prototype void Stop_Timer()
 			{
-				//cout << endl<<"Main Algorithm run-time: " << this->timer.Stop();
-				//cout << endl<<"freq: " << this->timer.get_freq_value() << ", start: "<<this->timer.get_start_value() <<", l: "<<this->timer.get_l_value();
-				//load_event(ComponentType,Output_Popsyn_Conditional,Output_Popsyn_Event,6,NULLTYPE);
+				cout << endl<<"Main Algorithm run-time: " << this->timer<Counter&>().Stop();
+				cout << endl<<"freq: " << this->timer<Counter&>().get_freq_value() << ", start: "<<this->timer<Counter&>().get_start_value() <<", l: "<<this->timer<Counter&>().get_l_value();
 			}
 			
 			// 4.) Output results event - called after timing is stopped (at timestep 7)
@@ -410,6 +407,7 @@ namespace PopSyn
 			feature_accessor(Solution_Settings,none,none);
 			feature_accessor(scenario_reference, none, none);
 			feature_accessor(network_reference, none, none);
+			feature_accessor(timer,none,none);
 
 			//----------------------------------------------------------------
 			// Optional Features - used for specific solution types

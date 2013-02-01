@@ -90,8 +90,7 @@ namespace Prototypes
 		feature_prototype void Initialize(TargetType id, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
 			this_component()->Initialize<ComponentType, CallerType, TargetType>(id);
-
-			((ComponentType*)this)->Load_Register<ComponentType>((&Agent_Conditional<NULLTYPE>),(&Agent_Event<NULLTYPE>),this->First_Iteration<Simulation_Timestep_Increment>(),0);
+			load_event(ComponentType,Agent_Conditional,Agent_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
 		feature_prototype void Initialize(TargetType id, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{
@@ -100,7 +99,7 @@ namespace Prototypes
 		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type trip, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
 			this_component()->Initialize<ComponentType, CallerType, TargetType>(id, trip);
-			((ComponentType*)this)->Load_Register<ComponentType>((&Agent_Conditional<NULLTYPE>),(&Agent_Event<NULLTYPE>),this->First_Iteration<Simulation_Timestep_Increment>(),0);
+			load_event(ComponentType,Agent_Conditional,Agent_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
 		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type trip, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{
@@ -320,8 +319,16 @@ namespace Prototypes
 			for (Movement_Plans::iterator move_itr = range.first; move_itr != range.second; ++move_itr)
 			{		
 				Movement_Plan* move = move_itr->second;
-				vehicle->movement_plan<Movement_Plan*>(move);
-				this_ptr->Schedule_New_Departure<NULLTYPE>(move->departed_time<Simulation_Timestep_Increment>());
+				// make sure vehicle is not already being simulated, skip movement if it is
+				if (vehicle->simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() != Vehicle_Components::Types::Vehicle_Status_Keys::IN_NETWORK)
+				{
+					vehicle->movement_plan<Movement_Plan*>(move);
+					this_ptr->Schedule_New_Departure<NULLTYPE>(move->departed_time<Simulation_Timestep_Increment>());
+				}
+
+				//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
+				break;
+
 			}
 			movements->erase(range.first, range.second);
 		}
@@ -330,8 +337,9 @@ namespace Prototypes
 		{
 			define_component_interface(parent_itf,get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
 			parent_itf* parent = this->Parent_Person<parent_itf*>();
+			long first_iter = parent->First_Iteration<Simulation_Timestep_Increment>();
 			this_component()->Initialize<ComponentType, CallerType, TargetType>();
-			this_component()->Load_Register<ComponentType>((&Planning_Conditional<NULLTYPE>),(&Activity_Generation_Event<NULLTYPE>),parent->First_Iteration<Simulation_Timestep_Increment>(),0);
+			load_event(ComponentType,Planning_Conditional,Activity_Generation_Event,first_iter,0,NULLTYPE);
 		}
 		feature_prototype void Initialize(requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{

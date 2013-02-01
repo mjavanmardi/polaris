@@ -27,7 +27,7 @@ namespace PopSyn
 				return this->parent_reference<ComponentType,CallerType,type_of(parent_reference)&>().network_reference<ComponentType,CallerType,TargetType>();
 			}tag_getter_as_available(network_reference);
 
-			member_data(double,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			member_data(long long,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 			member_container(m_array<double>,Target_Joint_Distribution,none,not_available);
 			member_container(s_array<double>,Target_Marginal_Distribution, none, not_available);
 

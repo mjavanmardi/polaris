@@ -13,6 +13,7 @@ namespace PopSyn
 			member_component(typename MasterType::scenario_type, scenario_reference, none, none);
 			member_component(typename MasterType::network_type, network_reference, none, none);
 
+			member_data(Counter, timer,none,none);
 			member_data(string, linker_file_path, none,none);
 			member_pointer(ostream,Output_Stream,none,none);
 			member_pointer(ostream,Marginal_Output_Stream,none,none);

@@ -9,7 +9,7 @@ namespace PopSyn
 	{
 		implementation struct Synthesis_Region_Implementation : public Synthesis_Zone_Implementation<MasterType>
 		{
-			typedef hash_map<double, typename MasterType::zone*> zone_map_type;
+			typedef hash_map<long long, typename MasterType::zone*> zone_map_type;
 			member_associative_container(zone_map_type, Synthesis_Zone_Collection,none,none);
 			member_pointer(ostream,Output_Stream,none,none);
 			member_component(typename MasterType::popsyn_solver, parent_reference, none,none);

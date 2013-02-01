@@ -234,7 +234,11 @@ namespace Person_Components
 			{	
 				this->Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
 				this->Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
-				this->Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(0);	
+
+				// get reference to the parent pointer and set the first activity generation time to be the parent first iteration
+				define_component_interface(parent_itf,get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+				parent_itf* parent = this->Parent_Person<ComponentType,CallerType,parent_itf*>();
+				this->Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(parent->First_Iteration<Time_Minutes>());	
 			}
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
 			{	
