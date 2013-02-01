@@ -31,6 +31,9 @@
 #include "Polaris_Sensor_Implementation.h"
 
 #ifndef FOR_LINUX_PORTING
+
+#include "Polaris_Network_Skimming_Implementation.h"
+
 #include "Activity_Implementations.h"
 #include "User_Space\Population_Synthesis\Population_Unit_Implementations.h"
 #include "User_Space\Population_Synthesis\Synthesis_Zone_Implementations.h"

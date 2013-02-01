@@ -37,6 +37,94 @@ namespace Network_Components
 
 	namespace Concepts
 	{
+		concept struct Is_Basic_Network
+		{
+			check_getter(has_intersections, intersections_container);
+			check_getter(has_links, links_container);
+			check_feature(has_read_function, read_network_data); 
+			define_default_check(has_intersections && has_links && has_read_function);
+		};
+
+		concept struct Is_Transportation_Network
+		{
+			check_concept(is_basic_network, Is_Basic_Network);
+			check_getter(has_turns, turn_movements_container);
+			check_getter(has_locations, activity_locations_container);
+			check_getter(has_zones, zones_container); 
+			define_default_check(is_basic_network && has_intersections && has_links && has_read_function);
+		};
+
+		concept struct Is_Routable_Network
+		{
+			check_concept(is_basic_network, Is_Basic_Network);
+			check_getter(has_routable_network, routable_network);
+			check_getter(has_routable_networks_container, routable_networks_container);
+			check_getter(has_scan_list, scan_list); 
+			define_default_check(is_basic_network && has_routable_network && has_routable_networks_container && has_scan_list);
+		};
+		
+		concept struct Is_Simulation_Network
+		{
+			check_concept(is_routable_network, Is_Routable_Network);
+			check_getter(has_scenario_reference, scenario_reference);
+			check_getter(has_max_free_flow_speed, max_free_flow_speed);
+			define_default_check(is_basic_network && is_routable_network && has_scenario_reference && has_max_free_flow_speed);
+		};
+		
+		concept struct Is_Trasportation_Simulation_Network
+		{
+			check_concept(is_transportation_network, Is_Transportation_Network);
+			check_concept(is_routable_network, Is_Routable_Network);
+			check_getter(has_scenario_reference, scenario_reference);
+			check_getter(has_max_free_flow_speed, max_free_flow_speed);
+			define_default_check(is_transportation_network && is_routable_network && has_scenario_reference && has_max_free_flow_speed);
+		};
+
+
+		// prototype versions of the network concepts
+
+		concept struct Is_Basic_Network_Prototype
+		{
+			check_getter(has_intersections, Component_Type::intersections_container);
+			check_getter(has_links, Component_Type::links_container);
+			check_feature(has_read_function, Component_Type::read_network_data); 
+			define_default_check(has_intersections && has_links && has_read_function);
+		};
+
+		concept struct Is_Transportation_Network_Prototype
+		{
+			check_concept(is_basic_network, Is_Basic_Network_Prototype);
+			check_getter(has_turns, Component_Type::turn_movements_container);
+			check_getter(has_locations, Component_Type::activity_locations_container);
+			check_getter(has_zones, Component_Type::zones_container); 
+			define_default_check(is_basic_network && has_intersections && has_links && has_read_function);
+		};
+
+		concept struct Is_Routable_Network_Prototype
+		{
+			check_concept(is_basic_network, Is_Basic_Network_Prototype);
+			check_getter(has_routable_network, Component_Type::routable_network);
+			check_getter(has_routable_networks_container, Component_Type::routable_networks_container);
+			check_getter(has_scan_list, Component_Type::scan_list); 
+			define_default_check(is_basic_network && has_routable_network && has_routable_networks_container && has_scan_list);
+		};
+
+		concept struct Is_Simulation_Network_Prototype
+		{
+			check_concept(is_routable_network, Is_Routable_Network_Prototype);
+			check_getter(has_scenario_reference, scenario_reference);
+			check_getter(has_max_free_flow_speed, max_free_flow_speed);
+			define_default_check(is_routable_network && has_scenario_reference && has_max_free_flow_speed);
+		};
+
+		concept struct Is_Trasportation_Simulation_Network_Prototype
+		{
+			check_concept(is_transportation_network, Is_Transportation_Network_Prototype);
+			check_concept(is_routable_network, Is_Routable_Network_Prototype);
+			check_getter(has_scenario_reference, Component_Type::scenario_reference);
+			check_getter(has_max_free_flow_speed, Component_Type::max_free_flow_speed);
+			define_default_check(is_transportation_network && is_routable_network && has_scenario_reference && has_max_free_flow_speed);
+		};
 	}
 	
 	namespace Prototypes

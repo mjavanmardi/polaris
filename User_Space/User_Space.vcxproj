@@ -201,6 +201,7 @@
     <ClInclude Include="Location_Prototype.h" />
     <ClInclude Include="Movement_Plan_Prototype.h" />
     <ClInclude Include="Network_Prototype.h" />
+    <ClInclude Include="Network_Skimming_Prototype.h" />
     <ClInclude Include="Operation_Prototype.h" />
     <ClInclude Include="Person_Implementations.h" />
     <ClInclude Include="Person_Prototype.h" />
@@ -216,6 +217,7 @@
     <ClInclude Include="Polaris_Network_Implementation_Input_File.h" />
     <ClInclude Include="Polaris_Network_Implementation_Output_File.h" />
     <ClInclude Include="Polaris_Network_Implementation_Results.h" />
+    <ClInclude Include="Polaris_Network_Skimming_Implementation.h" />
     <ClInclude Include="Polaris_Operation_Implementation.h" />
     <ClInclude Include="Polaris_Plan_Implementation.h" />
     <ClInclude Include="Polaris_Routing_Implementation.h" />

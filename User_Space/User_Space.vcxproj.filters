@@ -220,5 +220,11 @@
     <ClInclude Include="User_Space_Forward_Declaration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Network_Skimming_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Network_Skimming_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
