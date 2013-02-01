@@ -172,7 +172,7 @@ namespace Network_Components
 			// call it from initilization; move to implementation
 			feature_implementation void construct_routable_network()
 			{
-				typedef Network_Prototype<MasterType::network_type> _Regular_Network_Interface;
+				typedef Network_Prototype<typename MasterType::network_type> _Regular_Network_Interface;
 				typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Regular_Network,_Regular_Network_Interface*> Net_IO_Type;
 				define_container_and_value_interface(_Routable_Networks_Container_Interface, _Routable_Network_Interface, type_of(routable_networks_container), Random_Access_Sequence_Prototype, Network_Components::Prototypes::Network_Prototype, ComponentType);
 				for(int i=0;i<_num_threads;i++)

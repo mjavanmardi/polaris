@@ -117,12 +117,12 @@ int main()
 	cout << "allocating data structures..." <<endl;	
 	define_component_interface(_Scenario_Interface, MasterType::scenario_type, Scenario_Prototype, NULLTYPE);
 	
-	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<MasterType::scenario_type>();
+	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
 	
-	_Network_Interface* network=(_Network_Interface*)Allocate<MasterType::network_type>();
+	_Network_Interface* network=(_Network_Interface*)Allocate<typename MasterType::network_type>();
 	_global_network = network;
 	network->template scenario_reference<_Scenario_Interface*>(scenario);
 	
@@ -148,7 +148,7 @@ int main()
 	network->simulation_initialize<NULLTYPE>();
 
 	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
+	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
 	demand->scenario_reference<_Scenario_Interface*>(scenario);
 	demand->network_reference<_Network_Interface*>(network);
 	cout << "reading demand data..." <<endl;
@@ -160,7 +160,7 @@ int main()
 
 
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-	_Operation_Interface* operation = (_Operation_Interface*)Allocate<MasterType::operation_type>();
+	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
 	operation->network_reference<_Network_Interface*>(network);
 	if (scenario->intersection_control_flag<int>() == 1) {
 		cout <<"reading operation data..." << endl;
@@ -191,8 +191,8 @@ int main()
 	define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, _Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Prototype, NULLTYPE);
 	_Intersections_Container_Interface::iterator intersections_itr;
 
-	for(intersections_itr=network->intersections_container<MasterType::network_type::intersections_container_type&>().begin();
-		intersections_itr!=network->intersections_container<MasterType::network_type::intersections_container_type&>().end();
+	for(intersections_itr=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().begin();
+		intersections_itr!=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().end();
 		intersections_itr++)
 	{
 		((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
@@ -332,20 +332,20 @@ int main()
 
 	cout << "reading input data..." <<endl;	
 	define_component_interface(_Scenario_Interface, MasterType::scenario_type, Scenario_Prototype, NULLTYPE);
-	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<MasterType::scenario_type>();
+	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
 	scenario->read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);
 	//scenario->write_scenario_data<NULLTYPE>(scenario_data_for_output);
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
-	_Network_Interface* network = (_Network_Interface*)Allocate<MasterType::network_type>();
+	_Network_Interface* network = (_Network_Interface*)Allocate<typename MasterType::network_type>();
 	_global_network = network;
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 	network->read_network_data<Net_IO_Type>(network_data);
 	//network->write_network_data<NULLTYPE>(network_data_for_output);
 
 	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
+	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
 	
 	demand->scenario_reference<_Scenario_Interface*>(scenario);
 	demand->network_reference<_Network_Interface*>(network);
@@ -354,7 +354,7 @@ int main()
 
 
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-	_Operation_Interface* operation = (_Operation_Interface*)Allocate<MasterType::operation_type>();
+	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
 	operation->network_reference<_Network_Interface*>(network);
 	operation->read_operation_data<Operation_Components::Types::File_Operation>(scenario_data, network_data, operation_data);
 	//operation->write_operation_data<NULLTYPE>(network_data_for_output, operation_data_for_output);
@@ -381,8 +381,8 @@ int main()
 	define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, _Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Prototype, NULLTYPE);
 	_Intersections_Container_Interface::iterator intersections_itr;
 
-	for(intersections_itr=network->intersections_container<MasterType::network_type::intersections_container_type&>().begin();
-		intersections_itr!=network->intersections_container<MasterType::network_type::intersections_container_type&>().end();
+	for(intersections_itr=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().begin();
+		intersections_itr!=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().end();
 		intersections_itr++)
 	{
 

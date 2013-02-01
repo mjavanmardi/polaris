@@ -21,11 +21,11 @@ namespace Network_Components
 	
 	namespace Implementations
 	{
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
+		feature_implementation_definition void Polaris_Network_Implementation<typename MasterType,ParentType>::read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
 		{
 			using namespace odb;
 			using namespace pio;
-			typedef Scenario_Components::Prototypes::Scenario_Prototype<MasterType::scenario_type> _Scenario_Interface;
+			typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 			string name(scenario_reference<ComponentType,CallerType,_Scenario_Interface*>()->template database_name<string&>());
 			auto_ptr<database> db (open_sqlite_database (name));
 			transaction t(db->begin());
@@ -35,7 +35,7 @@ namespace Network_Components
 			read_activity_location_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 		}
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+		feature_implementation_definition void Polaris_Network_Implementation<typename MasterType,ParentType>::read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 		{
 			using namespace odb;
 			using namespace pio;
@@ -45,7 +45,7 @@ namespace Network_Components
 			type_of(intersections_container)& intersections_container_monitor=(type_of(intersections_container)&)(*intersections_container_ptr);
 			define_component_interface(_Intersection_Control_Interface, _Intersection_Interface::get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
 			define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, _Intersection_Control_Interface::get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
-			typedef Scenario_Components::Prototypes::Scenario_Prototype<MasterType::scenario_type> _Scenario_Interface;
+			typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 			_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
 				
 			intersections_container_ptr->clear();
@@ -95,7 +95,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+		feature_implementation_definition void Polaris_Network_Implementation<typename MasterType,ParentType>::read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 		{
 			using namespace odb;
 			using namespace pio;
@@ -115,7 +115,7 @@ namespace Network_Components
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			_Links_Container_Interface* links_container_ptr=links_container<ComponentType,CallerType,_Links_Container_Interface*>();
 			type_of(links_container)& links_container_monitor=(type_of(links_container)&)(*links_container_ptr);				
-			typedef Scenario_Components::Prototypes::Scenario_Prototype<MasterType::scenario_type> _Scenario_Interface;
+			typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 			_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();				
 
 			Types::Link_ID_Dir link_id_dir;

@@ -287,7 +287,7 @@ namespace Network_Components
 			define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 			define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-			typedef typename Network_Prototype<MasterType::network_type> _Network_Interface;
+			typedef typename Network_Prototype<typename MasterType::network_type> _Network_Interface;
 			define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 			_Network_Interface* _this_ptr = (_Network_Interface*)this;
