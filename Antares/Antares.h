@@ -7,3 +7,7 @@
 #include "Control_Panel_Implementation.h"
 #include "Information_Panel_Implementation.h"
 #include "Canvas_Implementation.h"
+#include "Render.h"
+#include "Visibility_Testing.h"
+#include "Draw_Network.h"
+#include "Navigation.h"

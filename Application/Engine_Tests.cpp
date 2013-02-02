@@ -1,11 +1,10 @@
 #include "Model_Selection.h"
 
 #ifdef ENGINE_TESTS
-
-#define TEST_2
+#include "Application_Includes.h"
+#define TEST_3
 
 #ifdef TEST_1
-#include "Application_Includes.h"
 static volatile unsigned long visited=0;
 
 implementation struct Test:public Polaris_Component_Class<Test,MasterType,Execution_Object>
@@ -83,7 +82,7 @@ void main()
 #endif
 
 #ifdef TEST_2
-#include "Application_Includes.h"
+
 static volatile unsigned long visited=0;
 
 implementation struct Test:public Polaris_Component_Class<Test,MasterType,Execution_Object>
@@ -148,6 +147,26 @@ void main()
 
 	bool pause=true;
 }
+#endif
+
+#ifdef TEST_3
+
+struct MasterType{};
+
+implementation class Agent:public Polaris_Component_Class<Agent,MasterType>
+{
+	feature_implementation void Test_1(typename TargetType::ParamType x, typename TargetType::Param2Type y, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
+	{
+	}
+};
+
+void main()
+{
+	Agent<MasterType> yo;
+
+	yo.Test_1<Agent<MasterType>,NULLTYPE,Target_Type<_Time<MasterType>,int,int>>(3,4);
+}
+
 #endif
 
 #endif

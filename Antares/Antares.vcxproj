@@ -183,12 +183,18 @@
     <ClInclude Include="Canvas_Implementation.h" />
     <ClInclude Include="Control_Panel.h" />
     <ClInclude Include="Control_Panel_Implementation.h" />
+    <ClInclude Include="Draw_Network.h" />
+    <ClInclude Include="Geometry.h" />
+    <ClInclude Include="Geometry_Implementation.h" />
     <ClInclude Include="Graphical_Link_Implementation.h" />
     <ClInclude Include="Graphical_Network_Implementation.h" />
     <ClInclude Include="Information_Panel.h" />
     <ClInclude Include="Information_Panel_Implementation.h" />
+    <ClInclude Include="Navigation.h" />
+    <ClInclude Include="Render.h" />
     <ClInclude Include="Time_Panel.h" />
     <ClInclude Include="Time_Panel_Implementation.h" />
+    <ClInclude Include="Visibility_Testing.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp" />

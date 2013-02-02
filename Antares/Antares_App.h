@@ -32,6 +32,29 @@ public:
 	
 	virtual bool OnInit()
 	{
+		//if(argc!=2)
+		//{
+		//	wxMessageBox("Database File Not Provided!");
+		//	exit(0);
+		//}
+		//else
+		//{
+		//	db_name=argv[1];
+
+		//	ifstream test;
+		//	test.open(db_name);
+
+		//	if(!test.is_open())
+		//	{
+		//		wxMessageBox("Invalid Database File Provided!");
+		//		exit(0);
+		//	}
+
+		//	test.close();
+		//}
+
+
+
 		main=new Antares_Implementation<MasterType,Antares_App>(nullptr,simulation_pointer,db_name);
 
 		main->Maximize();

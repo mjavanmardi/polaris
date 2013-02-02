@@ -30,6 +30,12 @@ struct ObjectToSingleton<Communication_Object,ComponentType>
 	typedef ComponentType type;
 };
 
+template<typename ComponentType>
+struct ObjectToSingleton<NULLTYPE,ComponentType>
+{
+	typedef NULLTYPE type;
+};
+
 ///============================================================================
 /// Polaris_Component - adds implementation, with parent
 ///============================================================================
@@ -269,6 +275,43 @@ public:
 	ParentType* _parent;
 };
 
+///============================================================================
+/// Polaris_Component_Class - adds implementation, non allocable variant
+///============================================================================
+
+template<template<class,class> class ImplementationTemplate,typename MasterType,unsigned int PageFactor,typename GroupList>
+class Polaris_Component_Class<ImplementationTemplate,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>
+{
+public:
+#if STATE_CHECKS
+	virtual void State_Check(){};
+#endif
+	static const unsigned int page_factor;
+
+	static const int component_index;
+	typedef typename ObjectToSingleton<NULLTYPE,ImplementationTemplate<MasterType,NULLTYPE>>::type Singleton_Type;
+	static Singleton_Type* const singleton_reference;
+	static vector<void*>* const all_components_reference;
+
+	typedef ImplementationTemplate<MasterType,NULLTYPE> This_Type;
+	typedef ImplementationTemplate<MasterType,NULLTYPE> Component_Type;
+	typedef ImplementationTemplate<MasterType,NULLTYPE> ComponentType;
+
+	typedef ImplementationTemplate<MasterType,NULLTYPE> Implementation_Type;
+	typedef NULLTYPE Object_Type;
+	typedef MasterType Master_Type;
+	
+	typedef typename RemoveDuplicates<TypeList<GroupList,NULLTYPE>>::Result Group_List;
+
+	typedef NULLTYPE Parent_Type;
+	
+	Parent_Type* Parent()
+	{
+		return nullptr;
+	}
+
+	typedef ImplementationTemplate<MasterType,NULLTYPE> Entity_Type;
+};
 
 ///============================================================================
 /// Polaris_Component_Class type tracking information

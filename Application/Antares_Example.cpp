@@ -9,6 +9,8 @@ struct MasterType
 	typedef Graphical_Network_Implementation<MasterType> graphical_network_type;
 };
 
+//IMPLEMENT_APP(Antares_App<MasterType>);
+
 void main(int argc,char** argv)
 {
 	START_UI(argc,argv,MasterType,nullptr);

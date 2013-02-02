@@ -67,8 +67,8 @@ Antares_Implementation<MasterType,ParentType>::Antares_Implementation(wxFrame* p
 	mgr.AddPane(time_panel,wxAuiPaneInfo().Name("Time_Panel").Bottom());
 
 	information_panel=new Information_Panel_Implementation<MasterType,Antares_Implementation>(this);
-		
-	mgr.AddPane(information_panel,wxAuiPaneInfo().Name("Information_Panel").Bottom());
+	
+	mgr.AddPane(information_panel,wxAuiPaneInfo().Name("Information_Panel").Bottom().MinSize(800,200));
 
 	mgr.Update();
 }

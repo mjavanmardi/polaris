@@ -62,6 +62,24 @@
     <ClInclude Include="Graphical_Link_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Visibility_Testing.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw_Network.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">
