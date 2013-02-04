@@ -137,16 +137,15 @@ namespace Basic_Units
 
 //=================================================================================================================
 // SIMULATION TIMER DEFINITION - Used by agents as a wrapper for the global _iteration variable
-typedef Basic_Units::Implementations::Time_Implementation<NULLTYPE,NULLTYPE> Basic_Time;
+typedef Basic_Units::Implementations::Time_Implementation<NULLTYPE> Basic_Time;
 template<typename Base_Time_Type>
-struct Simulation_Timer : Base_Time_Type
+struct _Simulation_Timer
 {
-	typedef typename Base_Time_Type::ValueType Value_Type;
-	template<typename TargetType> TargetType Current_Time(requires(check(Base_Time_Type,Basic_Units::Concepts::Is_Time_Value) && check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
+	template<typename TargetType> TargetType Current_Time()
 	{
 		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Base_Time_Type>>((Base_Time_Type::ValueType)_iteration);
 	}
-	template<typename InputType, typename TargetType> TargetType Future_Time(InputType Additional_Time_Increment, requires(check(Base_Time_Type,Basic_Units::Concepts::Is_Time_Value) && check(TargetType,Basic_Units::Concepts::Is_Time_Value)&& check(InputType,Basic_Units::Concepts::Is_Time_Value)))
+	template<typename InputType, typename TargetType> TargetType Future_Time(InputType Additional_Time_Increment)
 	{
 		Simulation_Timestep_Increment current_time;
 		current_time = (Simulation_Timestep_Increment)_iteration;
@@ -155,4 +154,4 @@ struct Simulation_Timer : Base_Time_Type
 	}
 };
 
-Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;
+_Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;

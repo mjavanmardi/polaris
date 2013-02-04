@@ -1,5 +1,5 @@
 #pragma once
-#include "User_Space_Includes.h"
+#include "User_Space.h"
 
 namespace Network_Skimming_Components
 {
@@ -14,26 +14,6 @@ namespace Network_Skimming_Components
 
 	namespace Concepts
 	{
-		concept struct Is_Movement_Plan
-		{
-			check_getter(has_trajectory, trajectory_container);
-			check_getter(has_origin, origin);
-			check_getter(has_destination, destination);
-			check_getter(has_departed_time, departed_time);
-			check_getter(has_arrived_time, arrived_time);
-
-			define_default_check(has_trajectory && has_origin && has_destination && has_departed_time && has_arrived_time);
-		};
-		concept struct Is_Movement_Plan_Prototype
-		{
-			check_getter(has_trajectory, Component_Type::trajectory_container);
-			check_getter(has_origin, Component_Type::origin);
-			check_getter(has_destination, Component_Type::destination);
-			check_getter(has_departed_time, Component_Type::departed_time);
-			check_getter(has_arrived_time, Component_Type::arrived_time);
-
-			define_default_check(has_trajectory && has_origin && has_destination && has_departed_time && has_arrived_time);
-		};
 	}
 	
 	namespace Prototypes
@@ -46,7 +26,7 @@ namespace Network_Skimming_Components
 			// Primary data accessors
 			//---------------------------------------------
 			// links back to the network to be skimmed
-			feature_accessor(network_reference, none, none);
+			feature_accessor(network_reference, check(ReturnValueType,Network_Components::Concepts::Is_Transportation_Network_Prototype), check(SetValueType,Network_Components::Concepts::Is_Transportation_Network_Prototype) || check(SetValueType,Network_Components::Concepts::Is_Transportation_Network_Prototype));
 			// contains a map of skim_tables, one for each specified time slice
 			feature_accessor(skim_tables_container, none, none);
 			// reference to the current, completed skim table from skim_tables_container, based on simulation time, where skim_table
@@ -62,6 +42,9 @@ namespace Network_Skimming_Components
 			{
 			}
 			feature_prototype void Initialize(TargetType input_file)
+			{
+			}
+			feature_prototype void Initialize(TargetType input_file, requires()
 			{
 			}
 			feature_prototype bool Update_Skims();
