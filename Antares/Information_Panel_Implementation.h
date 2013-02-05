@@ -18,7 +18,7 @@ public:
 	wxPLplotwindow( parent, id, pos, size, style, pl_style ){};
 };
 
-implementation class Information_Panel_Implementation : public wxPanel
+implementation class Information_Panel_Implementation : public Polaris_Component_Class<Information_Panel_Implementation,MasterType>,public wxPanel
 {
 public:
 	Information_Panel_Implementation(wxFrame* parent);
@@ -27,8 +27,7 @@ public:
 	void Plot();
 	void OnResize(wxSizeEvent& event);
 
-	MyPlotwindow* plotwindow;
-    bool bgcolor;
+	member_pointer(MyPlotwindow,plotwindow,none,none);
 
 	//Canvas_Implementation* canvas_ptr;
 };
@@ -44,25 +43,20 @@ Information_Panel_Implementation<MasterType,ParentType>::Information_Panel_Imple
 
 	//canvas_ptr=((Antares_Implementation *) GetParent())->canvas;
 
-	bgcolor = true;
-
-    //wxPanel* panel = new wxPanel( this ,-1,wxDefaultPosition,wxDefaultSize);
     wxBoxSizer* box = new wxBoxSizer( wxVERTICAL );
 //#define wxUSE_GRAPHICS_CONTEXT 1
 
-    plotwindow = new MyPlotwindow( this, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS,
+    _plotwindow = new MyPlotwindow( this, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS,
 #if wxUSE_GRAPHICS_CONTEXT
         wxPLPLOT_BACKEND_GC | wxPLPLOT_DRAW_TEXT );
 #else
         wxPLPLOT_BACKEND_AGG | wxPLPLOT_DRAW_TEXT );
 #endif
 
-    box->Add( plotwindow, 1, wxALL | wxEXPAND, 0 );
-    //panel->SetSizer( box );
+    box->Add( _plotwindow, 1, wxALL | wxEXPAND, 0 );
 
 	SetSizer(box);
 	SetSize( 800, 200 );      // set frame size
-    //SetSizeHints( 220, 150 ); // set minimum frame size
 
 	Connect(wxEVT_SIZE,wxSizeEventHandler(Information_Panel_Implementation::OnResize));
 }
@@ -93,7 +87,7 @@ void Information_Panel_Implementation<MasterType,ParentType>::Plot()
 		ymax = ( ( ymax ) < ( y[i] ) ? ( y[i] ) : ( ymax ) );
     }
     
-	wxPLplotstream* pls = plotwindow->GetStream();
+	wxPLplotstream* pls = _plotwindow->GetStream();
 
     pls->adv( 0 );
 
@@ -109,5 +103,5 @@ void Information_Panel_Implementation<MasterType,ParentType>::Plot()
     pls->width( 2 );
     pls->line( np, x, y );
 
-    plotwindow->RenewPlot();
+    _plotwindow->RenewPlot();
 }

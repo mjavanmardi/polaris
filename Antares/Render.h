@@ -12,7 +12,7 @@
 template<typename MasterType,typename ParentType>
 void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 {
-	//wxGLCanvas::SetCurrent(*glcontext);
+	//wxGLCanvas::SetCurrent(*_glcontext);
 	//wxPaintDC(this);
 
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -52,7 +52,9 @@ void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 
 	//---- clear and initialize drawing ----
 
-	wxGLCanvas::SetCurrent(*glcontext);
+	int this_iteration = _iteration - 1;
+
+	wxGLCanvas::SetCurrent(*_glcontext);
 	wxPaintDC(this);
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

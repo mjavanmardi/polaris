@@ -9,16 +9,14 @@
 //	Control_Panel_Implementation - control panel class definition
 //---------------------------------------------------------
 
-implementation class Control_Panel_Implementation : public wxPanel
+implementation class Control_Panel_Implementation : public Polaris_Component_Class<Control_Panel_Implementation,MasterType,NULLTYPE>,public wxPanel
 {
 public:
 	Control_Panel_Implementation(wxFrame* parent);
 	virtual ~Control_Panel_Implementation(void){};
 
-	wxAuiNotebook* control_book;
-
-	wxBoxSizer* sizer;
-
+	member_pointer(wxAuiNotebook,control_book,none,none);
+	member_pointer(wxBoxSizer,sizer,none,none);
 };
 
 //---------------------------------------------------------
@@ -32,14 +30,14 @@ Control_Panel_Implementation<MasterType,ParentType>::Control_Panel_Implementatio
 
 	//---- initialize the sizer and container notebook ----
 	
-	sizer=new wxBoxSizer(wxVERTICAL);
+	_sizer=new wxBoxSizer(wxVERTICAL);
 
-	control_book=new wxAuiNotebook(this,-1,wxDefaultPosition,wxDefaultSize,wxAUI_NB_TOP);
-	sizer->Add(control_book,1,wxEXPAND);
+	_control_book=new wxAuiNotebook(this,-1,wxDefaultPosition,wxDefaultSize,wxAUI_NB_TOP);
+	_sizer->Add(_control_book,1,wxEXPAND);
 	
 	//---- initialize and add the components ----
 
 	//---- set the sizer ----
 
-	SetSizerAndFit(sizer);
+	SetSizerAndFit(_sizer);
 }

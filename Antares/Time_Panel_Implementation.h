@@ -9,7 +9,7 @@
 //	Time_Panel - time panel class definition
 //---------------------------------------------------------
 
-implementation class Time_Panel_Implementation : public wxPanel
+implementation class Time_Panel_Implementation : public Polaris_Component_Class<Time_Panel_Implementation,MasterType,NULLTYPE>, public wxPanel
 {
 public:
 	Time_Panel_Implementation(wxFrame* parent);
@@ -19,13 +19,15 @@ public:
 	void OnPlay(wxCommandEvent& event);
     void OnStop(wxCommandEvent& event);
 
-	wxBitmapButton* play;
-	wxBitmap play_button;
-	wxBitmap pause_button;
-	
-	wxBoxSizer* sizer;
+	member_pointer(wxBitmapButton,play,none,none);
+	member_data(wxBitmap,play_button,none,none);
+	member_data(wxBitmap,pause_button,none,none);
 
-	wxTextCtrl* time_display;
+	member_pointer(wxBoxSizer,sizer,none,none);
+	member_pointer(wxTextCtrl,time_display,none,none);
+
+	member_prototype(Conductor,conductor,typename MasterType::conductor_type,Time_Panel_Implementation,none,none);
+	define_component_interface(Conductor_Interface, type_of(conductor), Conductor, Time_Panel_Implementation);
 
 	//Canvas_Implementation* canvas_ptr;
 };
@@ -39,34 +41,34 @@ Time_Panel_Implementation<MasterType,ParentType>::Time_Panel_Implementation(wxFr
 {
 	//---- miscellaneous initialization ----
 
-	//canvas_ptr=((Antares_Implementation *) GetParent())->canvas;
+	_conductor=(Conductor_Interface*)((Antares_Implementation<MasterType>*)GetParent())->_conductor;
 
 	//---- initialize the sizers ----
 	
-	sizer=new wxBoxSizer(wxHORIZONTAL);
+	_sizer=new wxBoxSizer(wxHORIZONTAL);
 
 	//---- initialize and add the components ----
 	
-	play_button=wxBitmap("Play.png",wxBITMAP_TYPE_PNG);
-	pause_button=wxBitmap("Pause.png",wxBITMAP_TYPE_PNG);
+	_play_button=wxBitmap("Play.png",wxBITMAP_TYPE_PNG);
+	_pause_button=wxBitmap("Pause.png",wxBITMAP_TYPE_PNG);
 
-	play=new wxBitmapButton(this,wxID_ANY,play_button,wxDefaultPosition,wxSize(62,50));
-	Connect(play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
-	play->SetToolTip("Play");
-	sizer->Add(play);
+	_play=new wxBitmapButton(this,wxID_ANY,_play_button,wxDefaultPosition,wxSize(62,50));
+	Connect(_play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
+	_play->SetToolTip("Play");
+	_sizer->Add(_play);
 
-	time_display=new wxTextCtrl(this,wxID_ANY,"00:00:00",wxDefaultPosition,wxSize(100,-1),wxTE_READONLY);
+	_time_display=new wxTextCtrl(this,wxID_ANY,"00:00:00",wxDefaultPosition,wxSize(100,-1),wxTE_READONLY);
 
-	time_display->SetFont(wxFont(14,wxSWISS,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
-	time_display->SetBackgroundStyle(wxBG_STYLE_COLOUR);
-	time_display->SetBackgroundColour(wxColour(152.5,202.5,255,0));
-	time_display->Disable();
+	_time_display->SetFont(wxFont(14,wxSWISS,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
+	_time_display->SetBackgroundStyle(wxBG_STYLE_COLOUR);
+	_time_display->SetBackgroundColour(wxColour(152.5,202.5,255,0));
+	_time_display->Disable();
 
-	sizer->Add(time_display);
+	_sizer->Add(_time_display);
 
 	//---- set the sizer ----
 	
-	SetSizerAndFit(sizer);
+	SetSizerAndFit(_sizer);
 }
 
 //---------------------------------------------------------
@@ -76,9 +78,10 @@ Time_Panel_Implementation<MasterType,ParentType>::Time_Panel_Implementation(wxFr
 template<typename MasterType,typename ParentType>
 void Time_Panel_Implementation<MasterType,ParentType>::OnPlay(wxCommandEvent& event)
 {
-	play->SetBitmapLabel(pause_button);
+	_play->SetBitmapLabel(_pause_button);
 	Refresh();
-	Connect(play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnStop));
+	Connect(_play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnStop));
+	_conductor->pause<bool>(false);
 }
 
 //---------------------------------------------------------
@@ -88,9 +91,10 @@ void Time_Panel_Implementation<MasterType,ParentType>::OnPlay(wxCommandEvent& ev
 template<typename MasterType,typename ParentType>
 void Time_Panel_Implementation<MasterType,ParentType>::OnStop(wxCommandEvent& event)
 {
-	play->SetBitmapLabel(play_button);
+	_play->SetBitmapLabel(_play_button);
 	Refresh();
-	Connect(play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
+	Connect(_play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
+	_conductor->pause<bool>(true);
 }
 
 //---------------------------------------------------------
@@ -122,7 +126,7 @@ void Time_Panel_Implementation<MasterType,ParentType>::Update_Time(int updated_t
 	if(seconds<10) s << "0";
 	s << seconds;
 	
-	time_display->SetValue(s.str());
+	_time_display->SetValue(s.str());
 
-	time_display->Refresh();
+	_time_display->Refresh();
 }

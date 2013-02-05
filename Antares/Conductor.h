@@ -1,21 +1,22 @@
 //*********************************************************
-//	Time_Panel.h - Time Navigation Control
+//	Conductor.h - Controls Visualization Progression
 //*********************************************************
 
 #pragma once
 #include "Antares_Includes.h"
 
 //---------------------------------------------------------
-//	Time_Panel - time panel class definition
+//	Conductor - conductor class definition
 //---------------------------------------------------------
 
-prototype struct Time_Panel
+prototype struct Conductor
 {
 	tag_as_prototype;
 
-	feature_accessor(play,none,none);
-	feature_accessor(play_button,none,none);
-	feature_accessor(pause_button,none,none);
-	feature_accessor(sizer,none,none);
-	feature_accessor(time_display,none,none);
+	feature_prototype void Initialize()
+	{
+		this_component()->Initialize<ComponentType,CallerType,TargetType>();
+	}
+
+	feature_accessor(pause,none,none);
 };

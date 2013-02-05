@@ -8,3 +8,10 @@
 //---------------------------------------------------------
 //	Information_Panel - information panel class definition
 //---------------------------------------------------------
+
+prototype struct Information_Panel
+{
+	tag_as_prototype;
+
+	feature_accessor(plotwindow,none,none);
+};

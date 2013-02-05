@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Frame.h"
+#include "Antares_Frame_Implementation.h"
 
 //---------------------------------------------------------
 //	START_UI - macro to start the UI
@@ -60,7 +60,7 @@ public:
 		main->Maximize();
 		main->Show();
 
-		main->canvas->Initialize();
+		main->_canvas->Initialize<NULLTYPE>();
 
 		return true;
 	}
@@ -71,6 +71,8 @@ public:
 	
 	void Start_UI(int argc, char** argv, void* ptr)
 	{
+		wxDISABLE_DEBUG_SUPPORT();
+
 		simulation_pointer=ptr;
 
 		wxEntryStart(argc,argv);

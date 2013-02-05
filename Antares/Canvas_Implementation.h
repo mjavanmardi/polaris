@@ -4,19 +4,18 @@
 
 #pragma once
 #include "Canvas.h"
-#include "Graphical_Network_Implementation.h"
 
 //---------------------------------------------------------
 //	Canvas_Implementation - canvas class definition
 //---------------------------------------------------------
 
-implementation class Canvas_Implementation : public wxGLCanvas
+implementation class Canvas_Implementation : public Polaris_Component_Class<Canvas_Implementation,MasterType,NULLTYPE>, public wxGLCanvas
 {
 public:
 	Canvas_Implementation(wxFrame* parent, int* args);
-	virtual ~Canvas_Implementation(void) {delete glcontext;}
+	virtual ~Canvas_Implementation(void) {delete _glcontext;}
 
-	void Initialize();
+	feature_implementation void Initialize();
 	void Initialize_GLCanvas();
 	void Calculate_Bounds();
 	void Draw_Network();
@@ -32,10 +31,8 @@ public:
 	void OnLeave(wxMouseEvent& event);
 	void Zoom(wxIdleEvent& event);
 
-	wxGLContext* glcontext;
-	
-	Antares_Implementation<MasterType,NULLTYPE>* antares_ptr;
-	
+	member_pointer(wxGLContext,glcontext,none,none);
+
 	member_data(Rectangle_XY<MasterType>,canvas_bounds,none,none);
 
 	member_data(float,near_plane,none,none);
@@ -76,7 +73,7 @@ public:
 	GLdouble modelview[16];
 	GLdouble projection[16];
 
-	member_prototype(typename MasterType::graphical_network_type,graphical_network,Network_Prototype,Canvas_Implementation,none,none);
+	member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,Canvas_Implementation,none,none);
 };
 
 //---------------------------------------------------------
@@ -88,7 +85,7 @@ Canvas_Implementation<MasterType,ParentType>::Canvas_Implementation(wxFrame* par
 {
 	//antares_ptr=((Antares_Implementation<MasterType>*)GetParent());
 
-	glcontext = new wxGLContext(this);
+	_glcontext = new wxGLContext(this);
 
 	//---- initialize image handling ----
 
@@ -127,13 +124,14 @@ Canvas_Implementation<MasterType,ParentType>::Canvas_Implementation(wxFrame* par
 //---------------------------------------------------------
 
 template<typename MasterType,typename ParentType>
+template<typename ComponentType,typename CallerType,typename TargetType>
 void Canvas_Implementation<MasterType,ParentType>::Initialize()
 {
 	Initialize_GLCanvas();
 
 	_graphical_network = (Network_Prototype<type_of(graphical_network),Canvas_Implementation>*) Allocate<type_of(graphical_network)>();
 
-	_graphical_network->read_network_data<Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Graphical_Network,string&>>(((Antares_Implementation<MasterType>*)GetParent())->db_name);
+	_graphical_network->read_network_data<Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Graphical_Network,string&>>( ((Antares_Implementation<MasterType>*)GetParent())->_db_name );
 
 	// set canvas bounds as network bounds
 	Rectangle_Prototype<typename type_of(graphical_network)::type_of(network_bounds)>* net_bounds=_graphical_network->network_bounds<Rectangle_Prototype<typename type_of(graphical_network)::type_of(network_bounds)>*>();
@@ -183,7 +181,7 @@ void Canvas_Implementation<MasterType,ParentType>::Initialize_GLCanvas()
 {
 	//---- initialize the opengl canvas settings ----
 
-	wxGLCanvas::SetCurrent(*glcontext);
+	wxGLCanvas::SetCurrent(*_glcontext);
 	
 	glewInit();
 
