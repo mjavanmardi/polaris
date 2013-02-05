@@ -288,19 +288,15 @@ struct MasterType
 
 	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 
-
+	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<MasterType> network_skim_type;
 	// DEMAND AGENT CLASSES
 
 	//typedef Demand_Components::Implementations::Polaris_Demand_Implementation<MasterType> demand_type;
 
 	typedef Person_Components::Implementations::Person_Implementation<MasterType> person_type;
-
 	typedef Person_Components::Implementations::CTRAMP_Person_Planner_Implementation<MasterType, person_type> person_planner_type;
-
 	typedef Person_Components::Implementations::TRANSIMS_Person_Properties_Implementation<MasterType,person_type> person_properties_type;
-	
 	typedef Polaris_Component<RNG_Components::Implementations::RngStream_Implementation, MasterType, Data_Object> RNG;
-	
 	typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
 
 	
@@ -347,6 +343,7 @@ int main()
 	_global_scenario = scenario;
 	scenario->read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);
 	//scenario->write_scenario_data<NULLTYPE>(scenario_data_for_output);
+	
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
 	_Network_Interface* network = (_Network_Interface*)Allocate<MasterType::network_type>();
@@ -367,6 +364,12 @@ int main()
 
 
 	network->simulation_initialize<NULLTYPE>();
+
+	
+	define_component_interface(_Skim_Interface, _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,NULLTYPE);
+	_Skim_Interface* skim_faculty = (_Skim_Interface*)Allocate<_Network_Interface::get_type_of(skimming_faculty)>();
+	skim_faculty->Initialize<_Network_Interface*>(network);
+
 	
 	cout << "world started..." << endl;
 	////initialize network agents
