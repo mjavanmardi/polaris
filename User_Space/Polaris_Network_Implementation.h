@@ -233,7 +233,7 @@ namespace Network_Components
 			/// read from database
 			//------------------------------------------------------------------------------------------------------------------
 #ifndef FOR_LINUX_PORTING
-			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps);
+			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); tag_feature_as_available(read_network_data);
 
 			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
@@ -257,6 +257,23 @@ namespace Network_Components
 			feature_implementation void read_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
 			feature_implementation void read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
+		};
+
+
+		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Network_Implementation<MasterType,ParentType>
+		{
+			member_component(typename MasterType::network_skim_type, skimming_faculty,none,none);
+
+			feature_implementation typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator)
+			{
+				Polaris_Network_Implementation<MasterType,ParentType>* base_this = (Polaris_Network_Implementation<MasterType,ParentType>*)this;
+				
+				define_component_interface(skim_faculty_itf,type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,CallerType);
+
+				skim_faculty_itf* skim_faculty = this->skimming_faculty<ComponentType,CallerType,skim_faculty_itf*>();
+
+				return (TargetType::ReturnType)(skim_faculty->Get_Current_LOS<TargetType>(Origin,Destination,Mode_Indicator));
+			}
 		};
 	}
 }

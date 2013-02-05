@@ -97,7 +97,7 @@ namespace PopSyn
 				//------------------------
 
 				int ndim, ans;
-				Linker linker;
+				Linker linker = Linker();
 				File_IO::File_Writer fw, fw_sample;
 
 				ostream& out = this->Output_Stream<ostream&>();

@@ -285,7 +285,7 @@ namespace Person_Components
 					Movement_Plan* move = (Movement_Plan*)Allocate<type_of(Movement_Plans_Container)::unqualified_value_type>();
 
 					// Get a random origin and destination and departure time
-					int size = network->links_container<_Links_Container_Interface&>().size();
+					int size = (int)network->links_container<_Links_Container_Interface&>().size();
 					int O = (parent->Next_Rand<double>()-0.000001) * size;
 					int D = (parent->Next_Rand<double>()-0.000001) * size;
 					// departure time from current time, in minutes

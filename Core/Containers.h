@@ -189,7 +189,7 @@ struct Associative_Container_Prototype : public ComponentType
 	}
 
 	iterator insert(key_type key, TargetValueType& value)
-	{
+	{	
 		return ((ComponentType*)this)->insert(pair<key_type,Component_Type::mapped_type>(key,(Component_Type::mapped_type)value));
 	}
 	iterator insert(key_type key, TargetValueType&& value)

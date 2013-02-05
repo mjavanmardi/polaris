@@ -27,6 +27,7 @@
 #ifndef FOR_LINUX_PORTING
 #include "Polaris_Network_Implementation_Input_DB.h"
 #endif
+#include "Polaris_Network_Skimming_Implementation.h"
 
 #include "Polaris_Sensor_Implementation.h"
 

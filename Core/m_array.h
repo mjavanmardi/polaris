@@ -462,7 +462,6 @@ m_array<T>& m_array<T>::operator=(const m_array<T>& obj)
 	return *this;
 }
 
-
 // M_array destructor
 template <class T>
 m_array<T>::~m_array(void)
@@ -524,5 +523,385 @@ void m_array<T>::print(ostream& stream, int n)
 		_cursor[n] = i;
 		print(stream, n+1);
 	}
+}
+
+
+
+
+//-------------------------------------------------------------
+//	MATRIX CLASS WITH TWO DIMENSIONS
+//-------------------------------------------------------------
+template<class T>
+class matrix_iterator
+{
+
+public:
+       typedef std::random_access_iterator_tag	iterator_category;
+       typedef T								value_type;
+       typedef value_type &						reference;
+       typedef value_type *						pointer;
+       typedef int								difference_type;
+	   typedef uint								size_type;
+
+      matrix_iterator()
+       {      // default constructor
+		   m_Ptr = NULL;
+       }
+
+      matrix_iterator(T* data, size_type index)
+       {
+			m_Ptr = &data[index];
+			_data = data;
+       }
+
+	   reference operator*() const
+       {  
+		   // return designated object
+           return (*m_Ptr);
+       }
+
+	   matrix_iterator& operator=(const matrix_iterator& obj)
+       {      
+              m_Ptr = obj.m_Ptr;
+			  _data = obj._data;
+             return (*this);
+       }
+
+       matrix_iterator& operator++()
+       {   
+		   mptr++;
+			return (*this);
+       }
+
+	   matrix_iterator& operator--()
+       {      // predecrement
+              --m_Ptr;
+             return (*this);
+       }
+
+      matrix_iterator operator++(int)
+       {      // postincrement
+              m_array_iterator _Tmp = *this;
+              ++*this;
+              return (_Tmp);
+       }
+
+      matrix_iterator operator--(int)
+
+      {      // postdecrement
+              m_array_iterator _Tmp = *this;
+              --*this;
+              return (_Tmp);
+       }
+
+      bool operator==(const matrix_iterator &_Right) const
+       {      // test for iterator equality
+              return (m_Ptr == _Right.m_Ptr);
+       }
+
+      bool operator!=(const matrix_iterator &_Right) const
+       {      // test for iterator inequality
+              return (!(m_Ptr == _Right.m_Ptr));
+       }
+
+private:
+	T *m_Ptr;                                            // pointer to container value type
+	T * _data;
+ };
+
+ template <class T>
+class matrix
+{
+public:
+
+	typedef T							value_type;
+	typedef value_type&					reference;
+	typedef value_type*					pointer;
+	typedef const value_type&			const_reference;
+	typedef matrix_iterator<T>			iterator;
+	typedef const matrix_iterator<T>	const_iterator;
+	typedef int							difference_type;
+	typedef uint						size_type;
+	typedef const uint					const_size_type;
+	typedef pair<size_type,size_type>	index_type;
+	typedef const index_type&			const_index_type;
+	typedef const index_type&			const_dimensional_type;
+
+	// Members added for STL compliance
+	reference		at(const_index_type i){return _data[i];}
+	const_reference	at(const_index_type i) const {return _data[i];}
+	reference		front(){return _data[0];}
+	const_reference	front() const {return _data[0];}
+	reference		back(){return _data[_size-1];}
+	iterator		begin()
+    {
+		_cursor_start();
+		return iterator(this->_data, 0);
+    }
+	iterator		end() {return iterator();}
+	bool			empty(){ return (_size==0);}
+	void			clear(){_cleanup();}
+	void			resize(size_type rows, size_type cols)
+	{
+		pair<size_type,size_type> new_dimenstions = pair<size_type,size_type>(rows,cols);
+		m_array<T> tmp = m_array<T>(*this);
+		this->_cleanup();
+		this->_init(new_dimensions);
+		*this = m_array<T>(new_dimensions, value);
+		this->_nrow = rows; this->_ncol = cols;
+
+		iterator itr = this->begin();
+
+		for (itr; itr != this->end(); ++itr)
+		{
+			const vector<size_type>& index = itr.get_index();
+			if (tmp.valid_index(index))
+			{
+				size_type i = tmp.get_index(index);
+				(*itr) = tmp._data[i];
+			}
+			else (*itr) = value;
+			
+		}
+
+		for (int i = 0; i< this->size(); i++)
+		{
+			cout <<"**"<< this->_data[i] << " @ " << &this->_data[i]<<endl;
+		}
+	}
+	void			resize(vector<size_type> new_dimensions, value_type value)
+	{
+		m_array<T> tmp = m_array<T>(*this);
+		this->_cleanup();
+		this->_init(new_dimensions);
+		*this = m_array<T>(new_dimensions, value);
+
+		iterator itr = this->begin();
+
+		for (itr; itr != this->end(); ++itr)
+		{
+			const index_type index = (index_type)itr.get_index();
+			if (tmp.valid_index(index))
+			{
+				size_type i = tmp.get_index(index);
+				(*itr) = tmp._data[i];
+			}
+			else (*itr) = value;
+			
+		}
+	}
+
+	// MArray constructors/destructor
+	matrix (void){_size = 0;}
+	matrix (const_index_type dim_sizes);
+	matrix (const_index_type dim_sizes, T init_val);
+	matrix (const matrix& obj);
+	void Init(const_index_type dim_sizes);
+	void Copy(const matrix& obj);
+	matrix& operator=(const matrix& obj);
+	~matrix (void);
+
+
+	// MArray operators overloads for data acces
+	reference operator()(const_size_type row_index, const_size_type col_index)
+	{
+		size_type i = get_index(pair<size_type,size_type>(row_index,col_index));
+		return _data[i];
+	} 
+	const_reference operator()(const_size_type row, const_size_type col) const // get data at given index
+	{
+		size_type i = get_index(pair<size_type,size_type>(row_index,col_index));
+		return _data[i];
+	} 
+	reference operator[](const_index_type index) // get data at given index
+	{
+		size_type i = get_index(index);
+		return _data[i];
+	} 
+	const_reference operator[](const_index_type index) const // get data at given index
+	{
+		size_type i = get_index(index);
+		return _data[i];
+	} 
+	reference operator[](size_type index) // get data at given index
+	{
+		return _data[index];
+	} 
+	const_reference operator[](const_size_type index) const // get data at given index
+	{
+		return _data[index];
+	} 
+	
+	// Property access members
+	const size_type& size() {return _size;}
+	const size_type& size(size_type dimension) 
+	{
+		if (dimension==0) return _nrow;
+		if (dimension==1) return _ncol;
+		const char* mess = string("Error, can not request dimension size for dimension higher than 1").c_str();
+		throw new std::exception(mess);
+	}
+	const_index_type dimensions(){return _dim_sizes;}
+	const size_type& num_dimensions() {return _ndim;}
+	const size_type& num_rows() {return _nrow;}
+	const size_type& num_cols() {return _ncol;}
+
+	// display member
+	void print(ostream& stream);
+
+	size_type get_index(const_index_type index)
+	{
+		size_type ind=0;
+
+		if (index.first >= _nrow || index.second >= _ncol)
+		{
+			const char* mess = string("Error, index outside of matrix bounds for dimension").c_str();
+			throw new std::exception(mess);
+		}
+		ind = index.first *_ncol + index.second;
+		return ind;
+	}
+protected:
+	index_type _dim_sizes;
+	index_type _cursor;
+	size_type _ndim;
+	size_type _nrow;
+	size_type _ncol;
+	size_type _size;
+	pointer _data;
+
+	void _init(const_index_type dim_sizes);
+	void _copy(const matrix& obj);
+	void _cleanup()
+	{
+		if (_size > 0) delete _data;
+		_size=0;
+		_ndim=0;
+		_dim_sizes.first=0; _dim_sizes.second=0;
+		_cursor_start();
+	}
+
+
+	bool valid_index(const_index_type index)
+	{
+		if (index.size() != _ndim)
+		{
+			return false;
+		}
+		for (size_type i = 0; i< index.size(); i++)
+		{
+			if (index[i] >= _dim_sizes[i]) return false;
+		}
+		return true;
+	}
+	void _cursor_start()
+	{
+		_cursor.first = 0; _cursor.second = 0;
+	}
+	void _cursor_end()
+	{
+		_cursor.first = _nrow-1;
+		_cursor.second = _ncol-1;
+	}
+
+	void print(ostream& stream, int n);
+
+};
+
+// Multi-dim Array Constructors, copiers, assignment, etc.
+template <class T>
+matrix<T>::matrix(const_index_type dim_sizes)
+{
+	_init(dim_sizes);
+}
+template <class T>
+matrix<T>::matrix(const_index_type dim_sizes, T init_val)
+{
+	_init(dim_sizes);
+	for (size_type i=0; i<_size; i++) _data[i]=init_val;
+}
+template <class T>
+matrix<T>::matrix(const matrix<T>& obj)
+{
+	_copy(obj);
+}
+template <class T>
+void matrix<T>::Copy(const matrix<T>& obj)
+{
+	if (this==&obj) return;
+	_cleanup();
+	_copy(obj);
+}
+template <class T>
+void matrix<T>::_copy(const matrix<T>& obj)
+{
+	this->_cursor_start();
+	this->_dim_sizes.first = obj._dim_sizes.first; this->_dim_sizes.second=obj._dim_sizes.second;
+
+	_ndim = 2;
+	_size = obj._size;
+	_nrow = obj._nrow;
+	_ncol = obj._ncol;
+
+	_data = new T[_size];
+
+	for (size_type i=0; i<_size; i++) _data[i] = obj._data[i];
+}
+template <class T>
+void matrix<T>::Init(const_index_type dim_sizes)
+{
+	_cleanup();
+	_init(dim_sizes);
+}
+template <class T>
+void matrix<T>::_init(const_index_type dim_sizes)
+{
+	_ndim = 2;
+	_dim_sizes.first = dim_sizes.first; _dim_sizes.second = dim_sizes.second;
+	_size = dim_sizes.first * dim_sizes.second;
+	_nrow = dim_sizes.first;
+	_ncol = dim_sizes.second;
+
+	_data = new value_type[_size];
+}
+template <class T>
+matrix<T>& matrix<T>::operator=(const matrix<T>& obj)
+{
+	if (this != &obj)
+	{
+		_cleanup();
+		_copy(obj);
+	}
+	return *this;
+}
+
+
+// M_array destructor
+template <class T>
+matrix<T>::~matrix(void)
+{
+	_cleanup();
+}
+
+// display member functions
+template <class T>
+void matrix<T>::print(ostream& stream)
+{
+	this->begin();
+	print(stream, 0);
+}
+template <class T>
+void matrix<T>::print(ostream& stream, int n)
+{
+	// print 2d matrix of last 2 dimensions
+	for (uint i=0; i<_dim_sizes.first; i++)
+	{
+		for (uint j=0; j<_dim_sizes.second; j++)
+		{
+			stream<<this->operator[](pair<size_type, size_type>(i,j))<<"\t";
+		}
+		stream<<endl;
+	}
+	stream<<endl<<endl;
 }
 

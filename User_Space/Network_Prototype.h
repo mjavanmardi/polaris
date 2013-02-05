@@ -62,7 +62,7 @@ namespace Network_Components
 			check_getter(has_turns, Component_Type::turn_movements_container);
 			check_getter(has_locations, Component_Type::activity_locations_container);
 			check_getter(has_zones, Component_Type::zones_container); 
-			define_default_check(is_basic_network && has_intersections && has_links && has_read_function);
+			define_default_check(is_basic_network && has_turns && has_locations && has_zones);
 		};
 		concept struct Is_Transportation_Network
 		{
@@ -137,7 +137,7 @@ namespace Network_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Network_Prototype
+		prototype struct Network_Prototype : ComponentType
 		{
 			tag_as_prototype;
 
@@ -169,8 +169,19 @@ namespace Network_Components
 			/// simulation network
 			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(scenario_reference, none, none);
-			feature_accessor(max_free_flow_speed, none, none);
-			
+			feature_accessor(max_free_flow_speed, none, none);		
+			//------------------------------------------------------------------------------------------------------------------
+
+			//==================================================================================================================
+			/// demand compatible network
+			//------------------------------------------------------------------------------------------------------------------
+			feature_accessor(skimming_faculty, none, none);
+			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
+			{
+				define_component_interface(_skim_interface,get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
+				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
+				skim->Get_Current_LOS<TargetType>(Origin, Destination, Mode_Indicator);
+			}
 			//------------------------------------------------------------------------------------------------------------------
 
 			feature_prototype void read_network_data(typename TargetType::ParamType data_source, requires(check_2(TargetType::NetIOType,Types::ODB_Network,is_same) || check_2(TargetType::NetIOType,Types::File_Network,is_same) || check_2(TargetType::NetIOType,Types::Regular_Network,is_same)))
@@ -185,8 +196,6 @@ namespace Network_Components
 				assert_check_2(TargetType::NetIOType,Types::File_Network,is_same,"TargetType should indicate File_Network if you want to read from file");
 				assert_check_2(TargetType::NetIOType,Types::Regular_Network,is_same,"TargetType should indicate Regular_Network if you want to create a routable network from a regular network");
 			}
-
-
 
 			feature_prototype void write_network_data(typename TargetType::ParamType data_destination)
 			{
