@@ -35,7 +35,7 @@ namespace Routing_Components
 
 			feature_implementation void reset_routable_network()
 			{
-				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface_in_implementation(_Routable_Links_Container_Interface, _Routable_Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
 				typedef scan_list_type ScanListType;
 				_scan_list.clear();
@@ -46,15 +46,15 @@ namespace Routing_Components
 				for(link_itr=_links_container.begin();link_itr!=_links_container.end();link_itr++)
 				{
 					_Routable_Link_Interface* link_ptr = (_Routable_Link_Interface*)(*link_itr);
-					link_ptr->reset_routable_link<NULLTYPE>();
+					link_ptr->template reset_routable_link<NULLTYPE>();
 				}
 			}
 
 			feature_implementation void read_network_data(typename TargetType::ParamType regular_network, requires(check_2(TargetType::NetIOType,Network_Components::Types::Regular_Network,is_same)))
 			{
 
-				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Routable_Intersections_Container_Interface, _Routable_Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_container_and_value_interface_in_implementation(_Routable_Links_Container_Interface, _Routable_Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface_in_implementation(_Routable_Intersections_Container_Interface, _Routable_Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Outbound_Inbound_Movements_Container_Interface, _Routable_Outbound_Inbound_Movements_Interface, _Routable_Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype,Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Inbound_Outbound_Movements_Container_Interface, _Routable_Inbound_Outbound_Movements_Interface, _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, _Routable_Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
