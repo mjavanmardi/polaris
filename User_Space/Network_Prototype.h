@@ -199,17 +199,17 @@ namespace Network_Components
 
 			feature_prototype void write_network_data(typename TargetType::ParamType data_destination)
 			{
-				this_component()->write_network_data<ComponentType,CallerType,TargetType>(data_destination);
+				this_component()->template write_network_data<ComponentType,CallerType,TargetType>(data_destination);
 			}
 
 			feature_prototype void simulation_initialize()
 			{
-				this_component()->simulation_initialize<ComponentType,CallerType,TargetType>();
+				this_component()->template simulation_initialize<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void reset_routable_network()
 			{
-				this_component()->reset_routable_network<ComponentType,CallerType,TargetType>();
+				this_component()->template reset_routable_network<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype TargetType current_simulation_interval_index()
@@ -221,7 +221,11 @@ namespace Network_Components
 			feature_prototype TargetType start_of_current_simulation_interval_relative()
 			{
 				define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+#ifndef FOR_LINUX_PORTING
 				int current_time = int(floor(Simulation_Time.Current_Time<Basic_Units::Time_Variables::Time_Seconds>() + 0.5));
+#else
+				int current_time = _iteration;
+#endif
 				if (current_time < scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>() - 1) 
 				{
 					cout << "_iteration must start from (simulation_interval_length - 1)" << endl;
@@ -240,4 +244,3 @@ namespace Network_Components
 }
 
 using namespace Network_Components::Prototypes;
-void* _global_network;
