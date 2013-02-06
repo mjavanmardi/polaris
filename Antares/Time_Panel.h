@@ -13,6 +13,11 @@ prototype struct Time_Panel
 {
 	tag_as_prototype;
 
+	feature_prototype void Update_Time(int updated_time)
+	{
+		this_component()->Update_Time(updated_time);
+	}
+
 	feature_accessor(play,none,none);
 	feature_accessor(play_button,none,none);
 	feature_accessor(pause_button,none,none);

@@ -17,9 +17,13 @@ prototype struct Canvas
 	{
 		this_component()->Initialize<ComponentType,CallerType,TargetType>();
 	}
-	
-	feature_accessor(cached_iteration,none,none);
 
+	feature_prototype void Refresh()
+	{
+		this_component()->Refresh();
+	}
+
+	feature_accessor(cached_iteration,none,none);
 	
 	feature_accessor(glcontext,none,none);
 
@@ -62,5 +66,6 @@ prototype struct Canvas
 	feature_accessor(modelview,none,none);
 	feature_accessor(projection,none,none);
 
+	feature_accessor(time_panel,none,none);
 	feature_accessor(graphical_network,none,none);
 };

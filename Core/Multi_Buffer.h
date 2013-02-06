@@ -2,15 +2,15 @@
 #include "Core_Includes.h"
 
 ///============================================================================
-/// Double_Buffer
+/// Multi_Buffer
 /// A simple translator between _iteration and data based on period and offset
 ///============================================================================
 
-template<typename DataType,const int period=1>
-struct Double_Buffer
+template<typename DataType,const int buffer_size=2,const int period=1>
+struct Multi_Buffer
 {
 public:
-	Double_Buffer():offset(0){};
+	Multi_Buffer():offset(0){};
 	
 	static_assert(period > 0, "period must be greater 0!");
 
@@ -18,10 +18,10 @@ public:
 
 	DataType& operator[](int itr)
 	{
-		return double_buffer[((itr-offset)/period)%2];
+		return multi_buffer[((itr-offset)/period)%buffer_size];
 	}
 
 private:
-	DataType double_buffer[2];
+	DataType multi_buffer[buffer_size];
 	int offset;
 };

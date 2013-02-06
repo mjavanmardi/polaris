@@ -56,17 +56,10 @@ void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 
 	if(current_iteration!=_cached_iteration)
 	{
-		//if(_cached_iteration>=0)
-		//{
-		//	Double_Buffer< vector< Point_3D<MasterType> >[_num_threads] >& vehs_db=_graphical_network->vehicle_coordinates< Double_Buffer< vector< Point_3D<MasterType> >[_num_threads] >& >();
-
-		//	vector<Point_3D<MasterType>> (&vehicles)[_num_threads] = vehs_db[_cached_iteration];
-
-		//	for(int i=0;i<_num_threads;i++) vehicles[i].clear();
-		//}
-
 		_temporal_change=true;
 		_cached_iteration=current_iteration;
+
+		if(current_iteration>=0) _time_panel->Update_Time<NULLTYPE>(current_iteration);
 	}
 
 	wxGLCanvas::SetCurrent(*_glcontext);

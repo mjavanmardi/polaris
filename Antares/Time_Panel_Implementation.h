@@ -110,9 +110,9 @@ void Time_Panel_Implementation<MasterType,ParentType>::Update_Time(int updated_t
 	//int minutes=(updated_time-hours*(3600*((Canvas *)canvas_ptr)->base_step_factor))/(60*((Canvas *)canvas_ptr)->base_step_factor);
 	//int seconds=(updated_time-hours*3600*((Canvas *)canvas_ptr)->base_step_factor-minutes*60*((Canvas *)canvas_ptr)->base_step_factor)/((Canvas *)canvas_ptr)->base_step_factor;
 
-	int hours=0;
-	int minutes=0;
-	int seconds=0;
+	int hours=updated_time/3600;
+	int minutes=(updated_time-hours*3600)/60;
+	int seconds=updated_time-hours*3600-minutes*60;
 
 	//---- assemble time string and input ----
 

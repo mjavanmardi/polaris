@@ -9,8 +9,7 @@
 //	Antares_Implementation - aui initialization
 //---------------------------------------------------------
 
-template<typename MasterType, typename ParentType=NULLTYPE>
-class Antares_Implementation : public Polaris_Component_Class<Antares_Implementation,MasterType,NULLTYPE>,public wxFrame
+implementation class Antares_Implementation : public Polaris_Component_Class<Antares_Implementation,MasterType,NULLTYPE>,public wxFrame
 {
 public:
 	Antares_Implementation(wxFrame* parent,void* _simulation_ptr,string& _db_name);
@@ -83,4 +82,6 @@ Antares_Implementation<MasterType,ParentType>::Antares_Implementation(wxFrame* p
 
 	_aui_manager.Update();
 
+	_conductor->canvas<Canvas_Interface*>(_canvas);
+	_canvas->time_panel<Time_Panel_Interface*>(_time_panel);
 }

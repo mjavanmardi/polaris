@@ -3,4 +3,4 @@
 #include "Features.h"
 #include "Min_Pool.h"
 #include "Fibonacci_Heap.h"
-#include "Double_Buffer.h"
+#include "Multi_Buffer.h"

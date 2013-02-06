@@ -19,4 +19,5 @@ prototype struct Conductor
 	}
 
 	feature_accessor(pause,none,none);
+	feature_accessor(canvas,none,none);
 };

@@ -14,7 +14,7 @@ void Canvas_Implementation<MasterType,ParentType>::Draw_Vehicles(int current_ite
 {
 	if(current_iteration >= 0)
 	{
-		Double_Buffer< vector< Point_3D<MasterType> >[_num_threads] >& vehs_db=_graphical_network->vehicle_coordinates< Double_Buffer< vector< Point_3D<MasterType> >[_num_threads] >& >();
+		Multi_Buffer< vector< Point_3D<MasterType> >[_num_threads], 3>& vehs_db=_graphical_network->vehicle_coordinates< Multi_Buffer< vector< Point_3D<MasterType> >[_num_threads], 3 >& >();
 
 		vector<Point_3D<MasterType>> (&vehicles)[_num_threads] = vehs_db[current_iteration];
 

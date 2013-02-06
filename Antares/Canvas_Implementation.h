@@ -78,6 +78,7 @@ public:
 	GLdouble projection[16];
 
 	member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,Canvas_Implementation,none,none);
+	member_prototype(Time_Panel,time_panel,typename MasterType::type_of(time_panel),Canvas_Implementation,none,none);
 };
 
 //---------------------------------------------------------
@@ -142,7 +143,7 @@ void Canvas_Implementation<MasterType,ParentType>::Initialize()
 	_graphical_network->read_network_data<Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Graphical_Network,string&>>( ((Antares_Implementation<MasterType>*)GetParent())->_db_name );
 
 	// set canvas bounds as network bounds
-	Rectangle_Prototype<typename type_of(graphical_network)::type_of(network_bounds)>* net_bounds=_graphical_network->network_bounds<Rectangle_Prototype<typename type_of(graphical_network)::type_of(network_bounds)>*>();
+	Rectangle_Prototype<typename MasterType::type_of(graphical_network)::type_of(network_bounds)>* net_bounds=_graphical_network->network_bounds< Rectangle_Prototype<typename MasterType::type_of(graphical_network)::type_of(network_bounds)>* >();
 
 	_canvas_bounds._xmin = net_bounds->xmin<float>();
 	_canvas_bounds._xmax = net_bounds->xmax<float>();

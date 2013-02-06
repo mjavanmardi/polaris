@@ -23,6 +23,14 @@ namespace Network_Components
 
 				_vehicle_coordinates[_iteration][_thread_id].push_back(coordinates);
 			}
+			
+			feature_implementation void clear_vehicle_coordinates(int iteration)
+			{
+				for(int i=0;i<_num_threads;i++)
+				{
+					_vehicle_coordinates[iteration][i].clear();
+				}
+			}
 
 			feature_implementation void read_network_data(string& name)
 			{
@@ -255,7 +263,7 @@ namespace Network_Components
 			member_data(Rectangle_XY<MasterType>, network_bounds,none,none);
 			member_data(vector< Point_2D<MasterType> >, link_lines,none,none);
 
-			member_data(Double_Buffer< vector< Point_3D<MasterType> >[_num_threads] >,vehicle_coordinates,none,none);
+			member_data(concat(Multi_Buffer< vector< Point_3D<MasterType> >[_num_threads], 3 >),vehicle_coordinates,none,none);
 
 			member_container(vector<typename MasterType::graphical_intersection_type*>, intersections_container, none, none);
 			member_container(vector<typename MasterType::graphical_link_type*>, links_container, none, none);
