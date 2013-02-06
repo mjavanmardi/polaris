@@ -28,6 +28,7 @@ void* _global_scenario;
 #include "Polaris_Network_Implementation_Output_File.h"
 #include "Polaris_Network_Implementation_Results.h"
 #ifndef FOR_LINUX_PORTING
+#include "Polaris_Network_Skimming_Implementation.h"
 #include "Polaris_Network_Implementation_Input_DB.h"
 #include "Activity_Implementations.h"
 #include "User_Space\Population_Synthesis\Population_Unit_Implementations.h"
