@@ -2,7 +2,7 @@
 
 #ifdef ENGINE_TESTS
 #include "Application_Includes.h"
-#define TEST_3
+#define TEST_1
 
 #ifdef TEST_1
 static volatile unsigned long visited=0;
