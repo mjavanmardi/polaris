@@ -172,6 +172,7 @@ namespace Network_Components
 			feature_accessor(max_free_flow_speed, none, none);		
 			//------------------------------------------------------------------------------------------------------------------
 
+#ifndef FOR_LINUX_PORTING
 			//==================================================================================================================
 			/// demand compatible network
 			//------------------------------------------------------------------------------------------------------------------
@@ -183,7 +184,7 @@ namespace Network_Components
 				skim->Get_Current_LOS<TargetType>(Origin, Destination, Mode_Indicator);
 			}
 			//------------------------------------------------------------------------------------------------------------------
-
+#endif
 			feature_prototype void read_network_data(typename TargetType::ParamType data_source, requires(check_2(TargetType::NetIOType,Types::ODB_Network,is_same) || check_2(TargetType::NetIOType,Types::File_Network,is_same) || check_2(TargetType::NetIOType,Types::Regular_Network,is_same)))
 			{
 				this_component()->template read_network_data<ComponentType,CallerType,TargetType>(data_source);

@@ -227,7 +227,7 @@ namespace Network_Components
 			}
 		}
 	
-
+#ifndef FOR_LINUX_PORTING
 		// EXTRANEOUS DEFINITIONS FOR SKIMMABLE NETWORK
 		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
@@ -443,5 +443,6 @@ namespace Network_Components
 				activity_location->template zone<_Zone_Interface*>((_Zone_Interface*)_zones_container.at(raw_activity_location.zone_index));
 			}
 		}
+#endif
 	}
 }

@@ -158,11 +158,11 @@ namespace Routing_Components
 			
 			tag_getter_as_available(routable_network);			
 			
-			
+#ifndef FOR_LINUX_PORTING			
 			// time increment at which skim tables are updated - set in the initializer
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
 			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time_Prototype);
-			
+#endif			
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			void routable_origin(TargetType set_value)
 			{

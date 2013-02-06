@@ -234,7 +234,7 @@ namespace Network_Components
 			network_data.network_zone_size = (int)network_data.zone_data_array.size();
 		}
 	
-
+#ifndef FOR_LINUX_PORTING
 		// EXTRANEOUS DEFINITIONS FOR SKIMMABLE NETWORK
 		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::write_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
@@ -457,6 +457,6 @@ namespace Network_Components
 			}
 			network_data.network_zone_size = (int)network_data.zone_data_array.size();
 		}
-	
+#endif	
 	}
 }

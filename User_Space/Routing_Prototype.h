@@ -45,12 +45,13 @@ namespace Routing_Components
 					response.next._iteration=END;
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION;
 				}
+#ifndef FOR_LINUX_PORTING
 				else if (_sub_iteration == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
 				{
 					response.result=true;
 					response.next._iteration=END;
 					response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
-				}
+#endif				
 				else
 				{
 					assert(false);
