@@ -52,7 +52,7 @@ public:
 #ifdef WINDOWS
 	friend ImplementationTemplate<MasterType,ParentType>;
 #else
-	friend class ImplementationTemplate<MasterType>;
+	friend class ImplementationTemplate<MasterType,ParentType>;
 #endif
 
 	static const unsigned int page_factor;
@@ -90,7 +90,7 @@ public:
 #ifdef WINDOWS
 	friend ImplementationTemplate<MasterType,NULLTYPE>;
 #else
-	friend class ImplementationTemplate<MasterType>;
+	friend class ImplementationTemplate<MasterType,NULLTYPE>;
 #endif
 	static const unsigned int page_factor;
 
