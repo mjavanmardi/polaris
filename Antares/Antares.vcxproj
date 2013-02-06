@@ -185,6 +185,7 @@
     <ClInclude Include="Control_Panel_Implementation.h" />
     <ClInclude Include="Conductor_Implementation.h" />
     <ClInclude Include="Draw_Network.h" />
+    <ClInclude Include="Draw_Vehicles.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="Geometry_Implementation.h" />
     <ClInclude Include="Graphical_Intersection_Implementation.h" />

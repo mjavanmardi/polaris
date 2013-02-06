@@ -92,6 +92,9 @@
     <ClInclude Include="Conductor_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Draw_Vehicles.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">

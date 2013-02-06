@@ -52,7 +52,22 @@ void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 
 	//---- clear and initialize drawing ----
 
-	int this_iteration = _iteration - 1;
+	int current_iteration = _iteration - 1;
+
+	if(current_iteration!=_cached_iteration)
+	{
+		//if(_cached_iteration>=0)
+		//{
+		//	Double_Buffer< vector< Point_3D<MasterType> >[_num_threads] >& vehs_db=_graphical_network->vehicle_coordinates< Double_Buffer< vector< Point_3D<MasterType> >[_num_threads] >& >();
+
+		//	vector<Point_3D<MasterType>> (&vehicles)[_num_threads] = vehs_db[_cached_iteration];
+
+		//	for(int i=0;i<_num_threads;i++) vehicles[i].clear();
+		//}
+
+		_temporal_change=true;
+		_cached_iteration=current_iteration;
+	}
 
 	wxGLCanvas::SetCurrent(*_glcontext);
 	wxPaintDC(this);
@@ -82,7 +97,11 @@ void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 	//---- detailed network is opaque, draw front to back ----
 
 	Draw_Network();
+	
+	//---- detailed network is opaque, draw front to back ----
 
+	Draw_Vehicles(current_iteration);
+	
 	//---- flush and display ----
 
 	glFlush();

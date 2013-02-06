@@ -17,8 +17,6 @@ struct MasterType
 	typedef Graphical_Intersection_Implementation<MasterType> graphical_intersection_type;
 };
 
-//IMPLEMENT_APP(Antares_App<MasterType>);
-
 void main(int argc,char** argv)
 {
 	START_UI(argc,argv,MasterType,nullptr);

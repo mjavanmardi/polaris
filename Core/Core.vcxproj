@@ -192,6 +192,7 @@
     <ClInclude Include="Data_Engine.h" />
     <ClInclude Include="Data_Object.h" />
     <ClInclude Include="Data_Structures.h" />
+    <ClInclude Include="Double_Buffer.h" />
     <ClInclude Include="Execution_Detail.h" />
     <ClInclude Include="Execution_Engine.h" />
     <ClInclude Include="Execution_Object.h" />

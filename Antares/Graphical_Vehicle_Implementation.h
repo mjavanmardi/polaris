@@ -26,9 +26,9 @@ namespace Vehicle_Components
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
 
-			member_prototype(static Network_Prototype, graphical_network, typename MasterType::type_of(network), Graphical_Vehicle_Implementation, none, none);
+			member_prototype(static Network_Prototype, graphical_network, typename MasterType::type_of(graphical_network), Graphical_Vehicle_Implementation, none, none);
 			
-			member_prototype(static Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type, Graphical_Vehicle_Implementation, none, none);
+			member_prototype(Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type, Graphical_Vehicle_Implementation, none, none);
 			//member_component(typename MasterType::movement_plan_type, movement_plan, none, none);
 #ifndef FOR_LINUX_PORTING
 			member_component(typename MasterType::person_type, traveler, none, none);
@@ -38,7 +38,7 @@ namespace Vehicle_Components
 			define_component_interface(Link_Interface,type_of(MasterType::link),Link_Prototype,Graphical_Vehicle_Implementation);
 			define_component_interface(Intersection_Interface,type_of(MasterType::intersection),Intersection_Prototype,Graphical_Vehicle_Implementation);
 
-			declare_feature_conditional(compute_vehicle_condition)
+			declare_feature_conditional(compute_vehicle_position_condition)
 			{
 				response.result=true;
 				response.next._iteration=_iteration+1;
@@ -47,7 +47,9 @@ namespace Vehicle_Components
 
 			declare_feature_event(compute_vehicle_position)
 			{
-				Link_Interface* link=_movement_plan->current_link<Link_Interface*>();
+				Graphical_Vehicle_Implementation* pthis=(Graphical_Vehicle_Implementation*)_this;
+
+				Link_Interface* link=pthis->_movement_plan->current_link<Link_Interface*>();
 
 				assert(link==nullptr);
 
@@ -73,7 +75,7 @@ namespace Vehicle_Components
 				_simulation_status =  Types::Vehicle_Status_Keys::IN_NETWORK;
 				((_Movement_Plan_Interface*)_movement_plan)->template initialize_trajectory<NULLTYPE>();
 
-				Load_Register(&compute_vehicle_condition<NULLTYPE>,&compute_vehicle_event<NULLTYPE>,_iteration+1,Scenario_Components::Types::END_OF_ITERATION);
+				Load_Register<Graphical_Vehicle_Implementation>(&compute_vehicle_position_condition<NULLTYPE>,&compute_vehicle_position<NULLTYPE>,_iteration+1,Scenario_Components::Types::END_OF_ITERATION);
 			}
 
 			feature_implementation void load(requires(!check_2(TargetType,Types::Load_To_Origin_Link,is_same) && !check_2(TargetType,Types::Load_To_Entry_Queue,is_same)))
@@ -87,6 +89,12 @@ namespace Vehicle_Components
 			}
 
 		};
+
+		template<typename MasterType,typename ParentType>
+		Network_Prototype<typename MasterType::type_of(graphical_network),Graphical_Vehicle_Implementation<MasterType,ParentType>>* Graphical_Vehicle_Implementation<MasterType,ParentType>::_graphical_network;
+
 	}
 
 }
+
+using namespace Vehicle_Components::Implementations;

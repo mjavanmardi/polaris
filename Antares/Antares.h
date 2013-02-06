@@ -9,9 +9,10 @@
 #include "Graphical_Network_Implementation.h"
 #include "Graphical_Link_Implementation.h"
 #include "Graphical_Intersection_Implementation.h"
-
+#include "Graphical_Vehicle_Implementation.h"
 
 #include "Navigation.h"
 #include "Render.h"
 #include "Visibility_Testing.h"
 #include "Draw_Network.h"
+#include "Draw_Vehicles.h"

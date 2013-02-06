@@ -149,6 +149,9 @@
     <ClInclude Include="Simple_Pool.h">
       <Filter>Data_Structures</Filter>
     </ClInclude>
+    <ClInclude Include="Double_Buffer.h">
+      <Filter>Data_Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">

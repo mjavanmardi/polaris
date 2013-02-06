@@ -17,7 +17,10 @@ prototype struct Canvas
 	{
 		this_component()->Initialize<ComponentType,CallerType,TargetType>();
 	}
+	
+	feature_accessor(cached_iteration,none,none);
 
+	
 	feature_accessor(glcontext,none,none);
 
 	feature_accessor(canvas_bounds,none,none);

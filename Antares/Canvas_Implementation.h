@@ -19,6 +19,8 @@ public:
 	void Initialize_GLCanvas();
 	void Calculate_Bounds();
 	void Draw_Network();
+	void Draw_Vehicles(int current_iteration);
+
 	void Render(wxPaintEvent& event);
 	void OnResize(wxSizeEvent& event);
 	void OnLeftDown(wxMouseEvent& event);
@@ -34,6 +36,8 @@ public:
 	member_pointer(wxGLContext,glcontext,none,none);
 
 	member_data(Rectangle_XY<MasterType>,canvas_bounds,none,none);
+
+	member_data(int,cached_iteration,none,none);
 
 	member_data(float,near_plane,none,none);
 	member_data(float,far_plane,none,none);
@@ -117,6 +121,7 @@ Canvas_Implementation<MasterType,ParentType>::Canvas_Implementation(wxFrame* par
 
 	_spatial_change=true;
 	_temporal_change=false;
+	_cached_iteration=-1;
 }
 
 //---------------------------------------------------------
@@ -130,6 +135,9 @@ void Canvas_Implementation<MasterType,ParentType>::Initialize()
 	Initialize_GLCanvas();
 
 	_graphical_network = (Network_Prototype<type_of(graphical_network),Canvas_Implementation>*) Allocate<type_of(graphical_network)>();
+	
+	// make the vital connection between graphical network and graphical vehicle
+	Graphical_Vehicle_Implementation<MasterType>::_graphical_network=(Network_Prototype<type_of(graphical_network),Graphical_Vehicle_Implementation<MasterType>>*)_graphical_network;
 
 	_graphical_network->read_network_data<Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Graphical_Network,string&>>( ((Antares_Implementation<MasterType>*)GetParent())->_db_name );
 

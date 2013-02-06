@@ -14,7 +14,7 @@ implementation class Conductor_Implementation : public Polaris_Component_Class<C
 public:
 	feature_implementation void Initialize()
 	{
-		Load_Register<Conductor_Implementation>(&advance_simulation_condition<NULLTYPE>,&advance_simulation<NULLTYPE>,0,Scenario_Components::Types::END_OF_ITERATION);
+		Load_Register<Conductor_Implementation>(&advance_simulation_condition<NULLTYPE>,&advance_simulation<NULLTYPE>,0,Scenario_Components::Types::END_OF_ITERATION+1);
 		_pause=true;
 	}
 
@@ -22,7 +22,7 @@ public:
 	{
 		response.result=true;
 		response.next._iteration=_iteration+1;
-		response.next._sub_iteration=Scenario_Components::Types::END_OF_ITERATION;
+		response.next._sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
 	}
 
 	declare_feature_event(advance_simulation)
