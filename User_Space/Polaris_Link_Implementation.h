@@ -2,6 +2,7 @@
 
 #include "Link_Prototype.h"
 #include "Polaris_Scenario_Implementation.h"
+#include "Vehicle_Prototype.h"
 
 namespace Link_Components
 {

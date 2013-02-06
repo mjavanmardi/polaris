@@ -37,6 +37,7 @@ namespace Network_Components
 
 	namespace Concepts
 	{
+#ifndef FOR_LINUX_PORTING
 		concept struct Is_Basic_Network_Prototype
 		{
 			check_getter(has_intersections, Component_Type::intersections_container);
@@ -133,6 +134,7 @@ namespace Network_Components
 			define_sub_check(is_transportation_simulation_network, is_transportation_network && is_routable_network && has_scenario_reference && has_max_free_flow_speed);
 			define_default_check(is_transportation_simulation_network || is_transportation_simulation_network_prototype);
 		};
+#endif
 	}
 	
 	namespace Prototypes

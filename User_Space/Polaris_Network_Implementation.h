@@ -72,7 +72,7 @@ namespace Network_Components
 
 			declare_feature_conditional(End_Iteration_Conditional)
 			{
-				define_component_interface_in_implementation(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface_in_implementation(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
 				
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
 				{
@@ -91,7 +91,7 @@ namespace Network_Components
 			declare_feature_event(End_Iteration_Handler)
 			{
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
-				define_component_interface_in_implementation(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface_in_implementation(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
 				
 				_Network_Interface* _this_ptr = (_Network_Interface*)_this;
 				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
@@ -259,7 +259,7 @@ namespace Network_Components
 			feature_implementation void read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
 		};
 
-
+#ifndef FOR_LINUX_PORTING
 		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Component_Class<Integrated_Polaris_Network_Implementation,MasterType,Execution_Object,ParentType>
 		{
 			member_component(typename MasterType::network_skim_type, skimming_faculty,none,none);
@@ -495,7 +495,6 @@ namespace Network_Components
 			//==================================================================================================================
 			/// read from database
 			//------------------------------------------------------------------------------------------------------------------
-#ifndef FOR_LINUX_PORTING
 			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); tag_feature_as_available(read_network_data);
 
 			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
@@ -505,7 +504,7 @@ namespace Network_Components
 			feature_implementation void read_turn_movement_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
 			feature_implementation void read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
-#endif
+
 			//==================================================================================================================
 			/// Convert network data from C++ data structure to Plaris structure
 			//------------------------------------------------------------------------------------------------------------------
@@ -522,5 +521,6 @@ namespace Network_Components
 			feature_implementation void read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
 			#pragma endregion
 		};
+#endif
 	}
 }
