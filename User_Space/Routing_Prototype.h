@@ -215,7 +215,7 @@ namespace Routing_Components
 					{
 						reversed_path_container.push_back(current_link->template network_link_reference<_Regular_Link_Interface*>());
 
-						if (current_link->label_pointer<_Routable_Link_Interface*>() != current_link)
+						if (current_link->template label_pointer<_Routable_Link_Interface*>() != current_link)
 						{
 							current_link=current_link->template label_pointer<_Routable_Link_Interface*>();
 						}
@@ -380,7 +380,7 @@ namespace Routing_Components
 				if (pathFound)
 				{
 					_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
-					mp->set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
+					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
 					origin_link->push_vehicle(veh);
 				}
 //*** Below is an example to calculate one-to-all shortest path tree and to access the tree. The unit of cost is second.
