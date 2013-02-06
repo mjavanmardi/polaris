@@ -138,7 +138,7 @@ static void* Thread_Loop(void* package_ptr)
 
 		exe->Process();
 
-#ifndef WINDOWS
+#ifdef INTERPROCESS
 		interprocess_root_ptr->Exchange();
 #endif
 

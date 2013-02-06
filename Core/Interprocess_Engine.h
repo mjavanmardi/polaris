@@ -24,7 +24,7 @@ struct Communication_Object
 	Communication_Handler communication_handler_register;
 };
 
-#ifdef WINDOWS
+#ifndef INTERPROCESS
 class Interprocess_Engine
 {
 

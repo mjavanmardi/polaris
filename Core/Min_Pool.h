@@ -1,8 +1,6 @@
 #pragma once
 #include "Core_Includes.h"
-#ifndef WINDOWS
-#define FLT_MAX	3.402823466e+38F	/* max value */
-#endif
+
 //---------------------------------------------------------
 //	Min_Pool - memory pool adept at pulling minimum values
 //---------------------------------------------------------
