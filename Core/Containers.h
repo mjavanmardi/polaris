@@ -185,16 +185,16 @@ struct Associative_Container_Prototype : public ComponentType
 
 	pair<iterator,bool> insert(pair<key_type,TargetValueType>& p)
 	{
-		return ((ComponentType*)this)->insert(pair<key_type,Component_Type::mapped_type>(p.first,(typename Component_Type::mapped_type)(p.second)));
+		return ((ComponentType*)this)->insert(pair<key_type,typename Component_Type::mapped_type>(p.first,(typename Component_Type::mapped_type)(p.second)));
 	}
 
 	iterator insert(key_type key, TargetValueType& value)
 	{	
-		return ((ComponentType*)this)->insert(pair<key_type,Component_Type::mapped_type>(key,(typename Component_Type::mapped_type)value));
+		return ((ComponentType*)this)->insert(pair<key_type,typename Component_Type::mapped_type>(key,(typename Component_Type::mapped_type)value));
 	}
 	iterator insert(key_type key, TargetValueType&& value)
 	{
-		return ((ComponentType*)this)->insert(pair<key_type,Component_Type::mapped_type&&>(key,(typename Component_Type::mapped_type&&)value));
+		return ((ComponentType*)this)->insert(pair<key_type,typename Component_Type::mapped_type&&>(key,(typename Component_Type::mapped_type&&)value));
 	}
 
 	//iterator insert(iterator p, TargetValueType t){return ((ComponentType*)this)->insert(p,t);}
@@ -258,13 +258,11 @@ struct Multidimensional_Random_Access_Array_Prototype : public ComponentType
 	TargetValueType& front(size_type dimension, size_type index){return (TargetValueType&)(((ComponentType*)this)->front(dimension, index));}
 
 	void clear(){return ((ComponentType*)this)->clear();}
-// for compilation in Linux
-#ifndef FOR_LINUX_PORTING
+
 	void Copy(const Multidimensional_Random_Access_Array_Prototype<ComponentType,CallerType,TargetValueType>& obj)
 	{
-		((ComponentType*)this)->Copy(*((Multidimensional_Random_Access_Array_Prototype<ComponentType,CallerType,TargetValueType>::Component_Type::Container_Type*)&obj));
+		((ComponentType*)this)->Copy(*((typename Multidimensional_Random_Access_Array_Prototype<ComponentType,CallerType,TargetValueType>::Component_Type::Container_Type*)&obj));
 	}
-#endif
 
 	void write(ostream& s){return ((ComponentType*)this)->print(s);}
 
