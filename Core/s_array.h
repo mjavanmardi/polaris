@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef WINDOWS
 #include <stdio.h>
 #include <tchar.h>
 #include <stdlib.h>
@@ -428,3 +429,6 @@ void s_array<T>::print(ostream& stream)
 	}
 	
 }
+#endif
+
+

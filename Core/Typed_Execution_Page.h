@@ -151,7 +151,7 @@ public:
 		this_revision._sub_iteration = _sub_iteration;
 		this_revision._iteration = _iteration;
 
-		Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* itr=active_pages.Begin();
+		typename Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* itr=active_pages.Begin();
 
 		Byte* current_page;
 
@@ -210,10 +210,10 @@ public:
 				// inform type that this page is no longer relevant for the execution
 				if(execution_page->Empty())
 				{
-					Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* fitr=active_pages.Begin();
+					typename Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* fitr=active_pages.Begin();
 
 					// as long as you will be looping through structure, take the liberty of passing linking information
-					Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* litr=nullptr;
+					typename Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* litr=nullptr;
 
 					while(fitr!=nullptr)
 					{

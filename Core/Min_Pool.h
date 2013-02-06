@@ -60,7 +60,7 @@ public:
 		for(;ptr_storage!=end_pool_itr;ptr_storage++)
 		{
 			ptr_storage->next_free_ptr=ptr_storage+1;
-			ptr_storage->value=FLT_MAX;
+			ptr_storage->value=UINT_MAX;
 			ptr_storage->larger_ptr=nullptr;
 			ptr_storage->smaller_ptr=nullptr;
 		}
@@ -83,7 +83,7 @@ public:
 		for(;ptr_storage!=(furthest_allocated+1);ptr_storage++)
 		{
 			ptr_storage->next_free_ptr=ptr_storage+1;
-			ptr_storage->value=FLT_MAX;
+			ptr_storage->value=UINT_MAX;
 			ptr_storage->larger_ptr=nullptr;
 			ptr_storage->smaller_ptr=nullptr;
 		}
@@ -562,7 +562,7 @@ public:
 		float retval=ptr_storage->value;
 		ret_container=ptr_storage->data;
 		
-		ptr_storage->value=FLT_MAX;
+		ptr_storage->value=UINT_MAX;
 		ptr_storage->smaller_ptr=nullptr;
 		ptr_storage->larger_ptr=nullptr;
 

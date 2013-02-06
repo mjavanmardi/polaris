@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef WINDOWS
 #include <stdio.h>
 #include <tchar.h>
 #include <stdlib.h>
@@ -904,4 +905,5 @@ void matrix<T>::print(ostream& stream, int n)
 	}
 	stream<<endl<<endl;
 }
+#endif
 
