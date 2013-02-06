@@ -1,6 +1,5 @@
 #pragma once
-//#include "../Polaris_IO/Polaris_IO.h"
-#include "Core/Core.h"
+#include "../Core/Core.h"
 
 
 //#define member_feature_accessor(FEATURE_ALIAS, MEMBER_COMPONENT_NAME, MEMBER_COMPONENT_FEATURE, MEMBER_COMPONENT_PROTOTYPE)\

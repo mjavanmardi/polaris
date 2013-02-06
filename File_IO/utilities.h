@@ -11,7 +11,7 @@
 
 //container
 #include <string>
-#include <hash_map>
+#include <map>
 #include <vector>
 #include <list>
 #include <queue>
@@ -36,7 +36,7 @@
 #endif
 
 #ifdef LINUX
-// for hash_map
+// for map
 using namespace __gnu_cxx;
 #endif
 
@@ -59,7 +59,9 @@ string convert_seconds_to_hhmmss(int time_in_seconds);
 
 string convert_seconds_to_hhmm(int time_in_seconds);
 
-void string_split(std::vector<std::string>& results, const std::string &source, const int fields, string delimiter);
+void string_split(std::vector<std::string>& results, const std::string &source, const int fields);
+
+void string_split(std::vector<std::string>& results, const std::string &source);
 
 double get_current_cpu_time_in_seconds();
 

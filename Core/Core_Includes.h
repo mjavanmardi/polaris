@@ -165,10 +165,12 @@ static void False_Condition(void*,Conditional_Response& resp)
 
 #define START() world->Start_Turning()
 
+#ifndef FOR_LINUX_PORTING
 static LARGE_INTEGER thread_start_timers[_num_threads];
 static LARGE_INTEGER thread_stop_timers[_num_threads];
 static LARGE_INTEGER thread_start_timers_B[_num_threads];
 static LARGE_INTEGER thread_stop_timers_B[_num_threads];
+#endif
 
 ///============================================================================
 /// _all_components - type singletons for all compiled components

@@ -1,7 +1,7 @@
 #include "network_data.h"
 
 //#ifdef LINUX
-//// for hash_map
+//// for map
 //using namespace __gnu_cxx;
 //#endif
 
@@ -962,7 +962,7 @@ void network_data_information::read_node(string input_dir_name, NetworkData& net
 				//2 - y
 				//3 - type
 				token_size = 4;
-				string_split(tokens, line, token_size, "\t");
+				string_split(tokens, line, token_size);
 
 				node_data.uuid = stoi(tokens[0]);
 				node_data.x = stof(tokens[1]);
@@ -1025,7 +1025,7 @@ void network_data_information::read_link(string input_dir_name, NetworkData& net
 				int unode_id;
 				int dnode_id;
 				token_size = 12;
-				string_split(tokens, line, token_size, "\t");
+				string_split(tokens, line, token_size);
 
 				link_data.uuid = stoi(tokens[0]);
 				unode_id = stoi(tokens[1]);
@@ -1149,7 +1149,7 @@ void network_data_information::read_turn_movement(string input_dir_name, Network
 			if(iline >= 2) // skip the first line
 			{
 				token_size = 5;
-				string_split(tokens, line, token_size, "\t");
+				string_split(tokens, line, token_size);
 
 				int turn_movement_uuid = stoi(tokens[0]);
 				int inbound_link_id = stoi(tokens[1]);
@@ -1199,7 +1199,7 @@ void network_data_information::read_zone(string input_dir_name, NetworkData& net
 
 				//0 - uuid
 				token_size = 1;
-				string_split(tokens, line, token_size, "\t");
+				string_split(tokens, line, token_size);
 				zone_data.uuid = stoi(tokens[0]);
 
 				zone_index = zone_index + 1;
@@ -1251,7 +1251,7 @@ void network_data_information::read_activity_location(string input_dir_name, Net
 				if ((iline-1)%3 == 1)
 				{//read first line of an activity location
 					token_size = 4;
-					string_split(tokens, line, token_size, "\t");
+					string_split(tokens, line, token_size);
 					activity_location_data.uuid = stoi(tokens[0]);
 					zone_id = stoi(tokens[1]);
 					activity_location_data.num_origin_links = stoi(tokens[2]);
@@ -1265,7 +1265,7 @@ void network_data_information::read_activity_location(string input_dir_name, Net
 					activity_location_data.origin_link_index_array.clear();
 					activity_location_data.origin_link_index_array.resize(activity_location_data.num_origin_links);
 					token_size = activity_location_data.num_origin_links;
-					string_split(tokens, line, token_size, "\t");
+					string_split(tokens, line, token_size);
 
 					for (int j=0;j<token_size;j++)
 					{
@@ -1279,7 +1279,7 @@ void network_data_information::read_activity_location(string input_dir_name, Net
 					activity_location_data.destination_link_index_array.clear();
 					activity_location_data.destination_link_index_array.resize(activity_location_data.num_destination_links);
 					token_size = activity_location_data.num_destination_links;
-					string_split(tokens, line, token_size, "\t");
+					string_split(tokens, line, token_size);
 					
 					for (int j=0;j<token_size;j++)
 					{

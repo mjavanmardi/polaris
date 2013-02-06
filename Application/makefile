@@ -1,12 +1,12 @@
 CC = g++
-CFLAGS = -g -std=c++0x -pthread 
+CFLAGS = -g -std=c++0x -pthread -D LINUX
 LDFLAGS = -g -pthread -lstdc++ -lrt
 HEADERS = ../Core/*.h ../User_Space/*.h ../Repository/*.h
-all: Application
+all: NetworkModel
 clean: 
-	rm Application
-	rm Application.o
-Application: Application.o 
-	$(CC) -o Application $(LDFLAGS) Application.o -L../Scenario_Manager -ljson
-Application.o: Application.cpp $(HEADERS)
-	$(CC) -w -c $(CFLAGS) Application.cpp
+	rm NetworkModel
+	rm NetworkModel.o
+NetworkModel: NetworkModel.o 
+	$(CC) -o NetworkModel $(LDFLAGS) NetworkModel.o -L../Scenario_Manager -ljson -L../File_IO -lfileio
+NetworkModel.o: NetworkModel.cpp $(HEADERS)
+	$(CC) -w -c $(CFLAGS) NetworkModel.cpp

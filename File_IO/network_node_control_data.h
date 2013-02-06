@@ -105,8 +105,8 @@ namespace network_models
 				int num_approaches;
 				vector<ApproachData> approach_data_array;
 
-				hash_map<int,int> link_approach_map;
-				hash_map<int,int>::iterator link_approach_map_itr;
+				map<int,int> link_approach_map;
+				map<int,int>::iterator link_approach_map_itr;
 
 				//two-way stop and yield sign
 				int num_major_approaches;

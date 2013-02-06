@@ -105,6 +105,7 @@ namespace Demand_Components
 			feature_accessor(vehicles_container, none, none);
 			feature_accessor(first_vehicle_departure_time, none, none);
 			feature_accessor(last_vehicle_departure_time, none, none);
+#ifndef FOR_LINUX_PORTING
 			feature_prototype void read_demand_data(typename TargetType::ParamType& network_mapping,
 				requires(check_2(TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
@@ -139,7 +140,7 @@ namespace Demand_Components
 
 				transaction t(db->begin());
 
-				result<TripNoRef> trip_result=db->query<TripNoRef>(query<TripNoRef>::true_expr);
+				result<TripNoRef> trip_result=db->template query<TripNoRef>(query<TripNoRef>::true_expr);
 				
 				
 				_Traveler_Interface* traveler;
@@ -151,11 +152,9 @@ namespace Demand_Components
 				int traveler_id_counter=-1;
 				
 				
-
 				dense_hash_map<int,_Activity_Location_Interface*> activity_id_to_ptr;
 				activity_id_to_ptr.set_empty_key(-1);
 				activity_id_to_ptr.set_deleted_key(-2);
-
 				typename _Activity_Locations_Container_Interface::iterator activity_locations_itr;
 
 				cout << "Building Temporary Activity Map" << endl;
@@ -174,12 +173,12 @@ namespace Demand_Components
 				int departed_time;
 				int skipped_counter=0;
 
-				this->first_vehicle_departure_time<int>(24*60*60.0);
-				this->last_vehicle_departure_time<int>(0.0);
+				this->template first_vehicle_departure_time<int>(24*60*60.0);
+				this->template last_vehicle_departure_time<int>(0.0);
 
 
-				int simulation_start_time = scenario->simulation_start_time<int>();
-				int simulation_end_time = scenario->simulation_end_time<int>();
+				int simulation_start_time = scenario->template simulation_start_time<int>();
+				int simulation_end_time = scenario->template simulation_end_time<int>();
 
 				for(result<TripNoRef>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
@@ -218,9 +217,9 @@ namespace Demand_Components
 
 					_Activity_Location_Interface* origin_activity_location = activity_id_to_ptr[org_key];
 					_Activity_Location_Interface* destination_activity_location = activity_id_to_ptr[dst_key];
-					_Link_Interface* origin_link = origin_activity_location->origin_links<_Links_Container_Interface&>()[0];
-					_Link_Interface* destination_link = destination_activity_location->destination_links<_Links_Container_Interface&>()[0];
-					if (origin_link->internal_id<int>() == destination_link->internal_id<int>()  || (origin_link->outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
+					_Link_Interface* origin_link = origin_activity_location->template origin_links<_Links_Container_Interface&>()[0];
+					_Link_Interface* destination_link = destination_activity_location->template destination_links<_Links_Container_Interface&>()[0];
+					if (origin_link->template internal_id<int>() == destination_link->template internal_id<int>()  || (origin_link->template outbound_turn_movements<_Movements_Container_Interface&>().size() == 0 || destination_link->template inbound_turn_movements<_Movements_Container_Interface&>().size() == 0))
 					{
 						// No path can be found. Discard the trip
 						continue;
@@ -238,7 +237,7 @@ namespace Demand_Components
 					assert(activity_id_to_ptr.count(org_key));
 					assert(activity_id_to_ptr.count(dst_key));
 
-					departed_time = departed_time - scenario->simulation_start_time<int>();
+					departed_time = departed_time - scenario->template simulation_start_time<int>();
 					
 					traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
 					vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
@@ -278,13 +277,13 @@ namespace Demand_Components
 					}
 				}
 			}
+#endif
 
-
-			feature_prototype void read_demand_data(requires(!check_2(TargetType,Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,Network_Components::Types::File_Network,is_same)))
+			feature_prototype void read_demand_data(requires(!check_2_no_typename(TargetType,typename Network_Components::Types::ODB_Network,is_same) && !check_2_no_typename(TargetType,typename Network_Components::Types::File_Network,is_same)))
 			{
-				assert_check_2(TargetType,Types::ODB_Network,is_same,"TargetType is ill-defined");
-				assert_check_2(TargetType,Types::ODB_Network,is_same,"TargetType should indicate ODB_Network if you want to read it in with ODB");
-				assert_check_2(TargetType,Types::File_Network,is_same,"TargetType should indicate Static_Network if you want to read in the hard coded network");
+				assert_check_2_no_typename(TargetType,typename Network_Components::Types::ODB_Network,is_same,"TargetType is ill-defined");
+				assert_check_2_no_typename(TargetType,typename Network_Components::Types::ODB_Network,is_same,"TargetType should indicate ODB_Network if you want to read it in with ODB");
+				assert_check_2_no_typename(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType should indicate Static_Network if you want to read in the hard coded network");
 			}
 
 			feature_prototype void read_demand_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data, network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::demand_data_information::DemandData& demand_data)
@@ -307,8 +306,8 @@ namespace Demand_Components
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, get_type_of(vehicles_container), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				
-				this->first_vehicle_departure_time<int>(demand_data.first_vehicle_departure_time);
-				this->last_vehicle_departure_time<int>(demand_data.last_vehicle_departure_time);
+				this->template first_vehicle_departure_time<int>(demand_data.first_vehicle_departure_time);
+				this->template last_vehicle_departure_time<int>(demand_data.last_vehicle_departure_time);
 				int i;
 				for (i = 0; i < demand_data.demand_vehicle_size; i++)
 				{
@@ -357,10 +356,10 @@ namespace Demand_Components
 				
 			}
 
-			feature_prototype void read_demand_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data, network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::demand_data_information::DemandData& demand_data, requires(!check_2(TargetType,Network_Components::Types::File_Network,is_same)))
+			feature_prototype void read_demand_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data, network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::demand_data_information::DemandData& demand_data, requires(!check_2_no_typename(TargetType,typename Network_Components::Types::File_Network,is_same)))
 			{
-				assert_check_2(TargetType,Types::File_Network,is_same,"TargetType is ill-defined");
-				assert_check_2(TargetType,Types::File_Network,is_same,"TargetType should indicate File_Network if you want to read it in from file");
+				assert_check_2_no_typename(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType is ill-defined");
+				assert_check_2_no_typename(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType should indicate File_Network if you want to read it in from file");
 			}
 
 
@@ -374,10 +373,10 @@ namespace Demand_Components
 				typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
 				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+                define_component_interface(_Scenario_Interface, get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
-				demand_data.first_vehicle_departure_time = this->first_vehicle_departure_time<int>();
-				demand_data.last_vehicle_departure_time = this->last_vehicle_departure_time<int>();
+				demand_data.first_vehicle_departure_time = this->template first_vehicle_departure_time<int>();
+				demand_data.last_vehicle_departure_time = this->template last_vehicle_departure_time<int>();
 				demand_data.time_dependent_vehicle_index_array.resize(scenario_reference<_Scenario_Interface*>()->template planning_horizon<int>());
 				int counter = -1;
 
@@ -402,11 +401,11 @@ namespace Demand_Components
 					vehicle_data.set_destination_zone_index(0);
 
 					vehicle_data.set_departure_time(movement_plan->template departed_time<int>());
-					vehicle_data.set_departure_simulation_interval_index(movement_plan->template departed_time<int>() / ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>());
-					vehicle_data.set_departure_assignment_interval_index(movement_plan->template departed_time<int>() / ((_Scenario_Interface*)_global_scenario)->assignment_interval_length<int>());
+					vehicle_data.set_departure_simulation_interval_index(movement_plan->template departed_time<int>() / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+					vehicle_data.set_departure_assignment_interval_index(movement_plan->template departed_time<int>() / ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>());
 
 					demand_data.vehilce_data_array.push_back(vehicle_data);
-					demand_data.time_dependent_vehicle_index_array[movement_plan->departed_time<int>()].push_back(vehicle_data.get_vehicle_index());
+					demand_data.time_dependent_vehicle_index_array[movement_plan->template departed_time<int>()].push_back(vehicle_data.get_vehicle_index());
 
 				}
 				demand_data.demand_vehicle_size = (int)demand_data.vehilce_data_array.size();

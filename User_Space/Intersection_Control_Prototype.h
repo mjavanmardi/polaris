@@ -135,7 +135,6 @@ namespace Intersection_Control_Components
 				define_component_interface(_Network_Interface, get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				int t_start = time%(24*60*60);
-				typename _Control_Plans_Container_Interface::Component_Type* monitor=control_plan_data_array<_Control_Plans_Container_Interface::Component_Type*>();
 
 				// Loop over all control plans, if current_time lies within range for the plan, set as current
 				for (int i=0;i<(int)control_plan_data_array<_Control_Plans_Container_Interface&>().size();i++)
@@ -312,7 +311,7 @@ namespace Intersection_Control_Components
 							// Find the matching approach
 							if (approach_link_index == inbound_link->template internal_id<int>())
 							{
-								if (approach->template approach_type<int>() == MAJOR_APPROACH)
+								if (approach->template approach_type<int>() == Types::MAJOR_APPROACH)
 								{
 									// Set merge priority high
 									inbound_movement->template merge_priority<int>(1);
@@ -328,13 +327,13 @@ namespace Intersection_Control_Components
 						}
 
 						//highway : mainline and ramp
-						if (inbound_link->template link_type<int>() == FREEWAY || inbound_link-> template link_type<int>() == FREEWAY || EXPRESSWAY)
+						if (inbound_link->template link_type<int>() == Link_Components::Types::FREEWAY || inbound_link->template link_type<int>() == Link_Components::Types::FREEWAY || Link_Components::Types::EXPRESSWAY)
 						{
 							// Set merge priority high
 							inbound_movement->template merge_priority<int>(1);
 						}
 
-						if (inbound_link->template link_type<int>() == ON_RAMP)
+						if (inbound_link->template link_type<int>() == Link_Components::Types::ON_RAMP)
 						{
 							// Set merge priority low
 							inbound_movement->template merge_priority<int>(0.0);
@@ -759,7 +758,7 @@ namespace Intersection_Control_Components
 					for (int turn_movement=0;turn_movement<num_turn_movements_in_the_phase;turn_movement++)
 					{
 						_Phase_Movement_Interface* phase_movement = current_control_plan<_Control_Plan_Interface*>()->template phase_data_array<_Phases_Container_Interface&>()[iphase]->template turn_movements_in_the_phase_array<_Phase_Movements_Container_Interface&>()[turn_movement];
-						_Movement_Interface* movement = phase_movement->movement<_Movement_Interface*>();
+						_Movement_Interface* movement = phase_movement->template movement<_Movement_Interface*>();
 					
 						// we need to distinguish protected and permitted here
 						_Link_Interface* inbound_link = movement->template inbound_link<_Link_Interface*>();
@@ -874,7 +873,7 @@ namespace Intersection_Control_Components
 						_Movement_Interface* movement = phase_movement->template movement<_Movement_Interface*>();
 									
 						// we need to distinguish protected and permitted here
-						if (phase_movement->template movement_priority_type<int>() == PROTECTED)
+						if (phase_movement->template movement_priority_type<int>() == Types::PROTECTED)
 						{
 							movement->template merge_priority<int>(1);
 						}
@@ -890,7 +889,7 @@ namespace Intersection_Control_Components
 								continue;
 							}
 						}
-						movement->green_time<float&>() +=  tmp_green_time*1.0f;
+						movement->template green_time<float&>() +=  tmp_green_time*1.0f;
 					}
 				}
 
@@ -952,12 +951,12 @@ namespace Intersection_Control_Components
 							// we need to distinguish protected and permitted here
 							if (iphase>0)
 							{
-								if (movement->green_time<float>()>0)
+								if (movement->template green_time<float>()>0)
 								{
 									continue;
 								}
 							}
-							movement->green_time<float&>() +=  tmp_green_time*1.0f;
+							movement->template green_time<float&>() +=  tmp_green_time*1.0f;
 						}
 					}
 

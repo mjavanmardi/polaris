@@ -35,11 +35,11 @@ namespace network_models
 				vector<float> turn_movement_green_time_array; //by movement
 				vector<float> link_green_cycle_ratio_array; //by in bound link
 
-				hash_map<int,string> movement_priority_type_int_string_map;
-				hash_map<string,int> movement_priority_type_string_int_map;
+				map<int,string> movement_priority_type_int_string_map;
+				map<string,int> movement_priority_type_string_int_map;
 
-				hash_map<int,string> approach_type_int_string_map;
-				hash_map<string,int> approach_type_string_int_map;
+				map<int,string> approach_type_int_string_map;
+				map<string,int> approach_type_string_int_map;
 
 			};
 

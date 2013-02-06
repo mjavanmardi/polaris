@@ -3,10 +3,10 @@
 
 #include "utilities.h"
 
-//#include <hash_map>
+//#include <map>
 
 //#ifdef LINUX
-//// for hash_map
+//// for map
 //using namespace __gnu_cxx;
 //#endif
 using namespace std;
@@ -57,10 +57,10 @@ namespace network_models
 
 				Assignment_Simulation_Mode_Keys assignment_mode;
 
-				hash_map<Assignment_Simulation_Mode_Keys,string> assignment_simulation_mode_int_string_map;
-				hash_map<string,Assignment_Simulation_Mode_Keys> assignment_simulation_mode_string_int_map;
-				hash_map<Input_Data_Format_Keys,string> input_data_format_int_string_map;
-				hash_map<string,Input_Data_Format_Keys> input_data_format_string_int_map;
+				map<Assignment_Simulation_Mode_Keys,string> assignment_simulation_mode_int_string_map;
+				map<string,Assignment_Simulation_Mode_Keys> assignment_simulation_mode_string_int_map;
+				map<Input_Data_Format_Keys,string> input_data_format_int_string_map;
+				map<string,Input_Data_Format_Keys> input_data_format_string_int_map;
 
 				unsigned long iseed;
 

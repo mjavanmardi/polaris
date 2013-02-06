@@ -11,7 +11,7 @@
 #include "utilities.h"
 //
 #ifdef LINUX
-// for hash_map
+// for map
 using namespace __gnu_cxx;
 #endif
 
@@ -46,26 +46,26 @@ namespace network_models
 				vector<ZoneData> zone_data_array;
 
 				//map
-				hash_map<int,int> node_id_index_map;
-				hash_map<int,int>::iterator node_id_index_map_itr;
-				hash_map<int,int> link_id_index_map;
-				hash_map<int,int>::iterator link_id_index_map_itr;
-				hash_map<int,int> turn_movement_id_index_map;
-				hash_map<int,int>::iterator turn_movement_id_index_map_itr;
-				hash_map<int,int> zone_id_index_map;
-				hash_map<int,int>::iterator zone_id_index_map_itr;
-				hash_map<int,int> activity_location_id_index_map;
-				hash_map<int,int>::iterator activity_location_id_index_map_itr;
+				map<int,int> node_id_index_map;
+				map<int,int>::iterator node_id_index_map_itr;
+				map<int,int> link_id_index_map;
+				map<int,int>::iterator link_id_index_map_itr;
+				map<int,int> turn_movement_id_index_map;
+				map<int,int>::iterator turn_movement_id_index_map_itr;
+				map<int,int> zone_id_index_map;
+				map<int,int>::iterator zone_id_index_map_itr;
+				map<int,int> activity_location_id_index_map;
+				map<int,int>::iterator activity_location_id_index_map_itr;
 
 				//
-				hash_map<Node_Type_Keys,string> node_type_int_string_map;
-				hash_map<string,Node_Type_Keys> node_type_string_int_map;
-				hash_map<Link_Type_Keys,string> link_type_int_string_map;
-				hash_map<string,Link_Type_Keys> link_type_string_int_map;
-				hash_map<Turn_Movement_Type_Keys,string> turn_movement_type_int_string_map;
-				hash_map<string,Turn_Movement_Type_Keys> turn_movement_type_string_int_map;
-				hash_map<Turn_Movement_Rule_Keys,string> turn_movement_rule_int_string_map;
-				hash_map<string,Turn_Movement_Rule_Keys> turn_movement_rule_string_int_map;
+				map<Node_Type_Keys,string> node_type_int_string_map;
+				map<string,Node_Type_Keys> node_type_string_int_map;
+				map<Link_Type_Keys,string> link_type_int_string_map;
+				map<string,Link_Type_Keys> link_type_string_int_map;
+				map<Turn_Movement_Type_Keys,string> turn_movement_type_int_string_map;
+				map<string,Turn_Movement_Type_Keys> turn_movement_type_string_int_map;
+				map<Turn_Movement_Rule_Keys,string> turn_movement_rule_int_string_map;
+				map<string,Turn_Movement_Rule_Keys> turn_movement_rule_string_int_map;
 
 				//node - link map
 				map<pair<int,int>,int> node_link_map;

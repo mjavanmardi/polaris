@@ -8,6 +8,7 @@
 
 
 #include "Repository_Includes.h"
+#ifndef FOR_LINUX_PORTING
 #include "RNG_Implementations.h"
 #include "Basic_Unit_Implementations.h"
-
+#endif

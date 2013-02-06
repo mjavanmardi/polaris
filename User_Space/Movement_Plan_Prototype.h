@@ -42,7 +42,7 @@ namespace Movement_Plan_Components
 			
 			feature void Initialize(TargetType val)
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>(val);
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>(val);
 			}
 
 			feature_accessor(link, none, none);
@@ -77,7 +77,7 @@ namespace Movement_Plan_Components
 				for(itr = path_container.rbegin(); itr != path_container.rend(); itr++)
 				{
 					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
-					vehicle_trajectory_data->Initialize<typename TargetType::Component_Type::unqualified_value_type*>((typename TargetType::Component_Type::unqualified_value_type*)*itr);
+					vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::unqualified_value_type*>((typename TargetType::Component_Type::unqualified_value_type*)*itr);
 					//vehicle_trajectory_data->Initialize<_Link_Interface*>((_Link_Interface*)*itr);
 					trajectory.push_back(vehicle_trajectory_data);
 				}
@@ -97,7 +97,7 @@ namespace Movement_Plan_Components
 			
 			feature_prototype void load()
 			{
-				this_component()->load<ComponentType,CallerType,TargetType>();
+				this_component()->template load<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype TargetType next_link()
@@ -131,12 +131,12 @@ namespace Movement_Plan_Components
 
 			feature_prototype void arrive_to_destination()
 			{
-				this_component()->arrive_to_destination<ComponentType,CallerType,TargetType>();
+				this_component()->template arrive_to_destination<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void transfer_to_next_link(int delayed_time)
 			{
-				this_component()->transfer_to_next_link<ComponentType,CallerType,TargetType>(delayed_time);
+				this_component()->template transfer_to_next_link<ComponentType,CallerType,TargetType>(delayed_time);
 			}
 
 			feature_prototype TargetType get_current_link_enter_time()

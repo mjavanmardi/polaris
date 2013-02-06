@@ -47,7 +47,7 @@ void demand_data_information::read_demand_vehicle(string input_dir_name,Scenario
 			{
 				//time_in_second_parse_tokens_start = get_current_cpu_time_in_seconds();
 				token_size = 3;
-				string_split(tokens, line, token_size, "\t");
+				string_split(tokens, line, token_size);
 				//time_in_second_parse_tokens = get_current_cpu_time_in_seconds() - time_in_second_parse_tokens_start;
 
 				demand_data.demand_vehicle_size = stoi(tokens[0]);
@@ -63,7 +63,7 @@ void demand_data_information::read_demand_vehicle(string input_dir_name,Scenario
 				
 				//time_in_second_parse_tokens_start = get_current_cpu_time_in_seconds();
 				token_size = 8;
-				string_split(tokens, line, token_size, "\t");
+				string_split(tokens, line, token_size);
 				//time_in_second_parse_tokens = get_current_cpu_time_in_seconds() - time_in_second_parse_tokens_start;
 
 				//double time_in_second_parse_read_tokens_start = get_current_cpu_time_in_seconds();
@@ -598,7 +598,7 @@ void demand_data_information::read_demand_od(string input_dir_name,ScenarioData&
 			if (iline == 1)
 			{//time of day hourly pattern
 				token_size = 24;
-				string_split(tokens, line, token_size, "\t");
+				string_split(tokens, line, token_size);
 
 				for (int j=0;j<token_size;j++)
 				{
@@ -613,7 +613,7 @@ void demand_data_information::read_demand_od(string input_dir_name,ScenarioData&
 				if (iline%2 == 0)
 				{//read first line of an origin zone
 					token_size = 1;
-					string_split(tokens, line, token_size, "\t");
+					string_split(tokens, line, token_size);
 					origin_zone_id = stoi(tokens[0]);
 				}
 
@@ -622,7 +622,7 @@ void demand_data_information::read_demand_od(string input_dir_name,ScenarioData&
 				{//read third line of an activity location - destination links
 
 					token_size = network_data.network_zone_size;
-					string_split(tokens, line, token_size, "\t");
+					string_split(tokens, line, token_size);
 
 					int origin_zone_index = network_data.zone_id_index_map[origin_zone_id];
 					int destination_zone_index;

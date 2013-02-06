@@ -6,7 +6,7 @@
 #include "utilities.h"
 
 #ifdef LINUX
-// for hash_map
+// for map
 using namespace __gnu_cxx;
 #endif
 
@@ -34,8 +34,8 @@ namespace network_models
 				int first_vehicle_departure_time;
 				int last_vehicle_departure_time;
 				//map
-				hash_map<int,int> vehicle_id_index_map;
-				hash_map<int,int>::iterator vehicle_id_index_map_itr;
+				map<int,int> vehicle_id_index_map;
+				map<int,int>::iterator vehicle_id_index_map_itr;
 				
 				//time-varying vehicle demand
 				vector<vector<int>> time_dependent_vehicle_index_array;

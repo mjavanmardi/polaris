@@ -61,29 +61,63 @@ int convert_hhmm_to_seconds(string hhmm)
 	return time_in_seconds;
 };
 
-void string_split(std::vector<std::string>& results, const std::string &source, const int fields, string delimiter)
+void string_split(std::vector<std::string>& results, const std::string &source, const int fields)
 {
     results.clear();
-	results.resize(fields);
+    results.resize(fields);
 
-    size_t prev = 0;
-    size_t next = 0;
+    const char* s = source.c_str();
+	const char* s2;
+    int count;
     int pos = 0;
-    while ((next = source.find_first_of(delimiter, prev)) != std::string::npos)
+    while (pos < fields)
     {
-        if (next - prev != 0)
+        count = 0;
+        while(*s != '\0' && (*s == '\t' || *s == ' ' || *s == '\r')) s++;
+        if (*s == '\0')
         {
-            results[pos].assign(source.substr(prev, next - prev));
-            pos++;
+            break;
         }
-        prev = next + 1;
+        s2 = s;
+        while(*s2 != '\0' && *s2 != '\t' && *s2 != ' ' && *s2 != '\r')
+        {
+            s2++;
+            count++;
+        }
+        results[pos].assign(s, count);
+        s = s2;
+        pos++;
     }
+};
 
-    if (prev < source.size())
+void string_split(std::vector<std::string>& results, const std::string &source)
+{
+    results.clear();
+
+    const char* s = source.c_str();
+	const char* s2;
+    int count;
+    while (true)
     {
-        results[pos].assign(source.substr(prev));
+        count = 0;
+        while(*s != '\0' && (*s == '\t' || *s == ' ' || *s == '\r')) s++;
+        if (*s == '\0')
+        {
+            break;
+        }
+        s2 = s;
+        while(*s2 != '\0' && *s2 != '\t' && *s2 != ' ' && *s2 != '\r')
+        {
+            s2++;
+            count++;
+        }
+        std::string str;
+        str.assign(s, count);
+        results.push_back(str);
+        s = s2;
     }
-}
+};
+
 //convert seconds to hh:mm:ss
 string convert_seconds_to_hhmmss(int time_in_seconds)
 {

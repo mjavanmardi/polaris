@@ -31,7 +31,6 @@ namespace Operation_Components
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, _Intersection_Control_Interface::get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
-				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Network_Interface::get_type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -140,7 +139,7 @@ namespace Operation_Components
 					movement->template inbound_link_green_cycle_ratio<float>(operation_data.link_green_cycle_ratio_array[p]);
 				}
 			}
-
+#ifndef FOR_LINUX_PORTING
 			feature_prototype void read_operation_data(typename TargetType::ParamType& network_mapping,requires(check_2(TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
 				Network_Components::Types::Network_IO_Maps& net_io_maps=(Network_Components::Types::Network_IO_Maps&)network_mapping;
@@ -156,8 +155,6 @@ namespace Operation_Components
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, _Intersection_Control_Interface::get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
-				
-				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Network_Interface::get_type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 
@@ -192,7 +189,7 @@ namespace Operation_Components
 
 				cout << "Reading Signals" << endl;
 
-				result<Signal> signal_result=db->query<Signal>(query<Signal>::true_expr);
+				result<Signal> signal_result=db->template query<Signal>(query<Signal>::true_expr);
 
 				for(result<Signal>::iterator db_itr=signal_result.begin();db_itr!=signal_result.end();++db_itr)
 				{
@@ -233,7 +230,7 @@ namespace Operation_Components
 						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
 
 						
-						_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
+						_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
 
 						typename _Inbound_Outbound_Container_Interface::iterator inbound_itr;
 
@@ -241,7 +238,7 @@ namespace Operation_Components
 						{
 							_Approach_Interface* approach = (_Approach_Interface*)Allocate<typename _Approach_Interface::Component_Type>();
 							_Inbound_Outbound_Interface* inbound_outbound = (*inbound_itr);
-							_Link_Interface* link = inbound_outbound->inbound_link_reference<_Link_Interface*>();
+							_Link_Interface* link = inbound_outbound->template inbound_link_reference<_Link_Interface*>();
 							approach->template inbound_link<_Link_Interface*>(link);
 							approach->template green_cycle_ratio<int>(0.0);
 
@@ -259,7 +256,7 @@ namespace Operation_Components
 
 				cout << "Reading Timing" << endl;
 
-				result<Timing> timing_result=db->query<Timing>(query<Timing>::true_expr);
+				result<Timing> timing_result=db->template query<Timing>(query<Timing>::true_expr);
 				
 				// pass over each timing once
 				// every iteration one set of timing phases will be committed to one or more control plans
@@ -289,9 +286,9 @@ namespace Operation_Components
 
 						// match timing reference
 
-						if(control_plan->cycle_index<int>()==db_itr->getTiming())
+						if(control_plan->template cycle_index<int>()==db_itr->getTiming())
 						{
-							if(control_plan->phase_data_array<_Phases_Container_Interface&>().size()>0) break;
+							if(control_plan->template phase_data_array<_Phases_Container_Interface&>().size()>0) break;
 
 							// fill out phases for this timing
 
@@ -333,7 +330,7 @@ namespace Operation_Components
 
 				
 				
-				result<Phasing> phasing_result=db->query<Phasing>(query<Phasing>::true_expr);
+				result<Phasing> phasing_result=db->template query<Phasing>(query<Phasing>::true_expr);
 				
 				counter=0;
 
@@ -355,7 +352,7 @@ namespace Operation_Components
 					if(++counter%10000==0) cout << "\t" << counter << endl;
 					_Intersection_Control_Interface* intersection_control = intersection->template intersection_control<_Intersection_Control_Interface*>();
 
-					_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
+					_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
 
 					typename _Control_Plans_Container_Interface::iterator control_plan_itr;
 
@@ -363,15 +360,15 @@ namespace Operation_Components
 
 					// find control plans which call for this particular phasing label
 
-					for(control_plan_itr=intersection_control->control_plan_data_array<_Control_Plans_Container_Interface&>().begin();
-						control_plan_itr!=intersection_control->control_plan_data_array<_Control_Plans_Container_Interface&>().end();
+					for(control_plan_itr=intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().begin();
+						control_plan_itr!=intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().end();
 						control_plan_itr++)
 					{
 						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)(*control_plan_itr);
 
 						typename _Inbound_Outbound_Container_Interface::iterator inbound_itr;
 
-						if(control_plan->control_plan_index<int>()==db_itr->getPhasing())
+						if(control_plan->template control_plan_index<int>()==db_itr->getPhasing())
 						{
 							// something is inaccurate, should fit into the phase data array
 							if(db_itr->getPhase() > control_plan->template phase_data_array<_Phases_Container_Interface&>().size()) break;
@@ -412,7 +409,7 @@ namespace Operation_Components
 								{
 									// an upstream intersection match confirms this is the correct out_link
 
-									if(((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->upstream_intersection<_Intersection_Interface*>()==intersection)
+									if(((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->template upstream_intersection<_Intersection_Interface*>()==intersection)
 									{
 										out_link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 									}
@@ -426,7 +423,7 @@ namespace Operation_Components
 								{
 									// an upstream intersection match confirms this is the correct out_link
 
-									if(((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->upstream_intersection<_Intersection_Interface*>()==intersection)
+									if(((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->template upstream_intersection<_Intersection_Interface*>()==intersection)
 									{
 										out_link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 									}
@@ -444,13 +441,13 @@ namespace Operation_Components
 
 									// match the in_link of the inbound_outbound structure with the in_link we want
 
-									_Link_Interface* in_link_check=inbound_outbound->inbound_link_reference<_Link_Interface*>();
+									_Link_Interface* in_link_check=inbound_outbound->template inbound_link_reference<_Link_Interface*>();
 
 									if(in_link_check==in_link)
 									{
 										typename _Movements_Container_Interface::iterator outbound_itr;
 
-										_Movements_Container_Interface& outbound_mvmts_container=inbound_outbound->outbound_movements<_Movements_Container_Interface&>();
+										_Movements_Container_Interface& outbound_mvmts_container=inbound_outbound->template outbound_movements<_Movements_Container_Interface&>();
 
 
 
@@ -462,7 +459,7 @@ namespace Operation_Components
 
 											// match the out_link of the outbound_movements structure with the out_link we want
 
-											_Link_Interface* out_link_check=mvmt->outbound_link<_Link_Interface*>();
+											_Link_Interface* out_link_check=mvmt->template outbound_link<_Link_Interface*>();
 
 											if(out_link_check==out_link)
 											{
@@ -518,7 +515,7 @@ namespace Operation_Components
 
 				cout << "Reading Signs" << endl;
 
-				result<Sign> sign_result=db->query<Sign>(query<Sign>::true_expr);
+				result<Sign> sign_result=db->template query<Sign>(query<Sign>::true_expr);
 
 				for(result<Sign>::iterator db_itr=sign_result.begin();db_itr!=sign_result.end();++db_itr)
 				{
@@ -530,15 +527,15 @@ namespace Operation_Components
 					assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
 
 
-					_Intersection_Interface* intersection=((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->downstream_intersection<_Intersection_Interface*>();
+					_Intersection_Interface* intersection=((_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir])->template downstream_intersection<_Intersection_Interface*>();
 
 					_Intersection_Control_Interface* intersection_control;
 					
-					if(intersection->intersection_control<_Intersection_Control_Interface*>()==nullptr)
+					if(intersection->template intersection_control<_Intersection_Control_Interface*>()==nullptr)
 					{
 						intersection_control=(_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
 
-						intersection->intersection_control<_Intersection_Control_Interface*>(intersection_control);
+						intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
 
 						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
 						
@@ -555,7 +552,7 @@ namespace Operation_Components
 						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
 
 						
-						_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
+						_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
 
 						typename _Inbound_Outbound_Container_Interface::iterator inbound_itr;
 
@@ -564,7 +561,7 @@ namespace Operation_Components
 							_Approach_Interface* approach = (_Approach_Interface*)Allocate<typename _Approach_Interface::Component_Type>();
 							_Inbound_Outbound_Interface* inbound_outbound = (*inbound_itr);
 
-							_Link_Interface* link=inbound_outbound->inbound_link_reference<_Link_Interface*>();
+							_Link_Interface* link=inbound_outbound->template inbound_link_reference<_Link_Interface*>();
 
 							approach->template inbound_link<_Link_Interface*>(link);
 							approach->template green_cycle_ratio<int>(0.0);
@@ -581,19 +578,19 @@ namespace Operation_Components
 
 				cout << "Filling All Unreferenced Intersections With 4 Way Stops" << endl;
 
-				_Intersections_Container_Interface& intersections=network->intersections_container<_Intersections_Container_Interface&>();
+				_Intersections_Container_Interface& intersections=network->template intersections_container<_Intersections_Container_Interface&>();
 
 				for(typename _Intersections_Container_Interface::iterator itr=intersections.begin();itr!=intersections.end();itr++)
 				{
 					_Intersection_Interface* intersection=(*itr);
 					
-					if(intersection->intersection_control<_Intersection_Control_Interface*>()==nullptr)
+					if(intersection->template intersection_control<_Intersection_Control_Interface*>()==nullptr)
 					{
 						if(++counter%1000==0) cout << "\t" << counter << endl;
 
 						_Intersection_Control_Interface* intersection_control=(_Intersection_Control_Interface*)Allocate<typename _Intersection_Control_Interface::Component_Type>();
 
-						intersection->intersection_control<_Intersection_Control_Interface*>(intersection_control);
+						intersection->template intersection_control<_Intersection_Control_Interface*>(intersection_control);
 
 						_Control_Plan_Interface* control_plan = (_Control_Plan_Interface*)Allocate<typename _Control_Plan_Interface::Component_Type>();
 						
@@ -610,7 +607,7 @@ namespace Operation_Components
 						intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().push_back(control_plan);
 
 						
-						_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
+						_Inbound_Outbound_Container_Interface& inbound_outbound_container=intersection->template inbound_outbound_movements<_Inbound_Outbound_Container_Interface&>();
 
 						typename _Inbound_Outbound_Container_Interface::iterator inbound_itr;
 
@@ -619,7 +616,7 @@ namespace Operation_Components
 							_Approach_Interface* approach = (_Approach_Interface*)Allocate<typename _Approach_Interface::Component_Type>();
 							_Inbound_Outbound_Interface* inbound_outbound = (*inbound_itr);
 
-							_Link_Interface* link=inbound_outbound->inbound_link_reference<_Link_Interface*>();
+							_Link_Interface* link=inbound_outbound->template inbound_link_reference<_Link_Interface*>();
 
 							approach->template inbound_link<_Link_Interface*>(link);
 							approach->template green_cycle_ratio<int>(0.0);
@@ -631,6 +628,7 @@ namespace Operation_Components
 					}
 				}
 			}
+#endif
 
 			feature_prototype void write_operation_data(network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::operation_data_information::OperationData& operation_data)
 			{
@@ -640,7 +638,6 @@ namespace Operation_Components
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, _Intersection_Control_Interface::get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Phases_Container_Interface, _Phase_Interface, _Control_Plan_Interface::get_type_of(phase_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Prototype, ComponentType);
 				define_container_and_value_interface(_Phase_Movements_Container_Interface, _Phase_Movement_Interface, _Phase_Interface::get_type_of(turn_movements_in_the_phase_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Phase_Movement_Prototype, ComponentType);
-				define_component_interface(_Movement_Interface, _Phase_Movement_Interface::get_type_of(movement), Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Network_Interface::get_type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -653,13 +650,13 @@ namespace Operation_Components
 					_Intersection_Interface* intersection = intersections_container[i];
 
 					network_models::network_information::operation_data_information::NodeControlData node_control_data;
-					_Intersection_Control_Interface* intersection_control = intersection->intersection_control<_Intersection_Control_Interface*>();
+					_Intersection_Control_Interface* intersection_control = intersection->template intersection_control<_Intersection_Control_Interface*>();
 					
 					node_control_data.node_index = intersection->template internal_id<int>();
 
-					for (int j = 0; j < (int)intersection_control->control_plan_data_array<_Control_Plans_Container_Interface&>().size(); j++) 
+					for (int j = 0; j < (int)intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>().size(); j++) 
 					{
-						_Control_Plan_Interface* control_plan = intersection_control->control_plan_data_array<_Control_Plans_Container_Interface&>()[j];
+						_Control_Plan_Interface* control_plan = intersection_control->template control_plan_data_array<_Control_Plans_Container_Interface&>()[j];
 						network_models::network_information::operation_data_information::ControlPlanData control_plan_data;
 						
 						control_plan_data.control_plan_index = control_plan->template control_plan_index<int>();
@@ -673,9 +670,9 @@ namespace Operation_Components
 						control_plan_data.cycle_ending_time = control_plan->template cycle_ending_time<int>();
 						control_plan_data.cycle_leftover_time = control_plan->template cycle_leftover_time<int>();
 
-						for (int k = 0; k < (int)control_plan->phase_data_array<_Phases_Container_Interface&>().size(); k++)
+						for (int k = 0; k < (int)control_plan->template phase_data_array<_Phases_Container_Interface&>().size(); k++)
 						{
-							_Phase_Interface* phase = control_plan->phase_data_array<_Phases_Container_Interface&>()[k];
+							_Phase_Interface* phase = control_plan->template phase_data_array<_Phases_Container_Interface&>()[k];
 							network_models::network_information::operation_data_information::PhaseData phase_data;
 							
 							phase_data.phase_index = phase->template phase_index<int>();
@@ -694,12 +691,12 @@ namespace Operation_Components
 							phase_data.adjusted_maximum_green_time = phase->template adjusted_maximum_green_time<int>();
 							phase_data.adjusted_minimum_green_time = phase->template adjusted_minimum_green_time<int>();
 
-							for (int l = 0; l < (int)phase->turn_movements_in_the_phase_array<_Phase_Movements_Container_Interface&>().size(); l++)
+							for (int l = 0; l < (int)phase->template turn_movements_in_the_phase_array<_Phase_Movements_Container_Interface&>().size(); l++)
 							{
 								_Phase_Movement_Interface* phase_movement = phase->template turn_movements_in_the_phase_array<_Phase_Movements_Container_Interface&>()[l];
 								network_models::network_information::operation_data_information::PhaseMovementData phase_movement_data;
 								
-								_Movement_Interface* movement = phase_movement->movement<_Movement_Interface*>();
+								_Movement_Interface* movement = phase_movement->template movement<_Movement_Interface*>();
 								phase_movement_data.turn_movement_index = phase_movement->template movement<_Movement_Interface*>()->template internal_id<int>();
 								phase_movement_data.movement_priority_type = phase_movement->template movement_priority_type<network_models::network_information::operation_data_information::Movement_Priority_Type_Keys>();
 								phase_movement_data.phase_movement_index = l;
@@ -713,9 +710,9 @@ namespace Operation_Components
 						}
 						control_plan_data.num_phases = (int)control_plan_data.phase_data_array.size();
 
-						for (int m = 0; m < (int)control_plan->approach_data_array<_Approaches_Container_Interface&>().size(); m++)
+						for (int m = 0; m < (int)control_plan->template approach_data_array<_Approaches_Container_Interface&>().size(); m++)
 						{
-							_Approach_Interface* approach = control_plan->approach_data_array<_Approaches_Container_Interface&>()[m];
+							_Approach_Interface* approach = control_plan->template approach_data_array<_Approaches_Container_Interface&>()[m];
 							network_models::network_information::operation_data_information::ApproachData approach_data;
 							
 							approach_data.approach_index = approach->template approach_index<int>();
@@ -726,14 +723,14 @@ namespace Operation_Components
 						}
 						control_plan_data.num_approaches = (int)control_plan_data.approach_data_array.size();
 
-						for (int n = 0; n < (int)control_plan->major_approach_data_array<_Phases_Container_Interface&>().size(); n++)
+						for (int n = 0; n < (int)control_plan->template major_approach_data_array<_Phases_Container_Interface&>().size(); n++)
 						{
 							_Approach_Interface* approach = (_Approach_Interface*)control_plan->template major_approach_data_array<_Approaches_Container_Interface&>()[n];
 							control_plan_data.major_approach_data_array.push_back(approach->template approach_index<int>());
 						}
 						control_plan_data.num_major_approaches = (int)control_plan_data.major_approach_data_array.size();
 
-						for (int o = 0; o < (int)control_plan->minor_approach_data_array<_Phases_Container_Interface&>().size(); o++)
+						for (int o = 0; o < (int)control_plan->template minor_approach_data_array<_Phases_Container_Interface&>().size(); o++)
 						{
 							_Approach_Interface* approach = (_Approach_Interface*)control_plan->template minor_approach_data_array<_Approaches_Container_Interface&>()[o];
 							control_plan_data.minor_approach_data_array.push_back(approach->template approach_index<int>());
