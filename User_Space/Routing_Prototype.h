@@ -22,7 +22,7 @@ namespace Routing_Components
 	namespace Prototypes
 	{
 
-		prototype struct Routing_Prototype
+		prototype struct Routing_Prototype : ComponentType
 		{
 			tag_as_prototype;
 
@@ -32,6 +32,7 @@ namespace Routing_Components
 			feature_accessor(routable_network, none, none);
 			feature_accessor(routable_origin, none, none);
 			feature_accessor(routable_destination, none, none);
+			feature_accessor(update_increment,none,none);
 
 			declare_feature_conditional(Compute_Route_Condition)
 			{
@@ -43,6 +44,12 @@ namespace Routing_Components
 					response.result=true;
 					response.next._iteration=END;
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION;
+				}
+				else if (_sub_iteration == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
+				{
+					response.result=true;
+					response.next._iteration=END;
+					response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
 				}
 				else
 				{
@@ -338,6 +345,14 @@ namespace Routing_Components
 				load_event(ComponentType,Compute_Route_Condition,Compute_Route,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 			}
 
+			feature_prototype void Initialize_Tree_Computation(int departed_time)
+			{
+				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				load_event(ComponentType,Compute_Route_Condition,Compute_Tree,departed_time,Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING,NULLTYPE);
+			}
+
+
 			//first event
 			declare_feature_event(Compute_Route)
 			{
@@ -382,6 +397,29 @@ namespace Routing_Components
 //					_Routable_Link_Interface* link_ptr = (_Routable_Link_Interface*)(*link_itr);
 //					cout << "link " << link_ptr->internal_id<int>() << ", path_cost=" << link_ptr->label_cost<float>() << endl;
 //				}
+			}
+
+			declare_feature_event(Compute_Tree)
+			{
+				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
+				typedef Link_Components::Prototypes::Link_Prototype<typename ComponentType::routable_link_type, ComponentType> _Routable_Link_Interface;
+				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
+				typedef Network_Components::Prototypes::Network_Prototype<typename ComponentType::routable_network_type, ComponentType> _Routable_Network_Interface;
+				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				
+				_Routable_Link_Interface* origin_link = _this_ptr->routable_origin<_Routable_Link_Interface*>();
+
+				bool pathFound = _this_ptr->template one_to_all_link_based_least_time_path_label_setting<NULLTYPE>();
+
+				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, _Routable_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				typename _Routable_Links_Container_Interface::iterator link_itr;
+				cout << "origin_link = " << origin_link->internal_id<int>() << endl;
+				for(link_itr=_this_ptr->routable_network<_Routable_Network_Interface*>()->links_container<_Routable_Links_Container_Interface&>().begin();link_itr!=_this_ptr->routable_network<_Routable_Network_Interface*>()->links_container<_Routable_Links_Container_Interface&>().end();link_itr++)
+				{
+					_Routable_Link_Interface* link_ptr = (_Routable_Link_Interface*)(*link_itr);
+					cout << "link " << link_ptr->internal_id<int>() << ", path_cost=" << link_ptr->label_cost<float>() << endl;
+				}				
 			}
 		};
 	}

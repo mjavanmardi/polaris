@@ -14,7 +14,8 @@ namespace Network_Skimming_Components
 		{
 			INITIALIZE = 19,
 			PROCESS = 20,
-			UPDATE = 21
+			PATH_BUILDING = 21,
+			UPDATE = 22
 		};
 	}
 
@@ -43,6 +44,26 @@ namespace Network_Skimming_Components
 					response.next._sub_iteration = Types::SUB_ITERATIONS::INITIALIZE;
 					response.result = false;
 				}
+				else if (_sub_iteration == Types::SUB_ITERATIONS::INITIALIZE)
+				{
+					response.next._iteration = _iteration;
+					response.next._sub_iteration = Types::SUB_ITERATIONS::PROCESS;
+					response.result = false;
+				}
+				else if (_sub_iteration == Types::SUB_ITERATIONS::PROCESS)
+				{
+					_pthis->Swap_Event((Event)&Process_Skim_Trees_Event<NULLTYPE>);
+					response.next._iteration = _iteration;
+					response.next._sub_iteration = Types::SUB_ITERATIONS::UPDATE;
+					response.result = true;
+				}
+				else if (_sub_iteration == Types::SUB_ITERATIONS::UPDATE)
+				{
+					_pthis->Swap_Event((Event)&Update_Skim_Tables_Event<NULLTYPE>);
+					response.next._iteration = Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->update_increment<Simulation_Timestep_Increment>());
+					response.next._sub_iteration = 0;
+					response.result = true;
+				}
 				else
 				{
 					response.next._iteration = Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->update_increment<Simulation_Timestep_Increment>());
@@ -50,13 +71,17 @@ namespace Network_Skimming_Components
 					response.result = true;
 				}
 			}
-			declare_feature_event(Update_Skims_Event)
+			declare_feature_event(Process_Skim_Trees_Event)
+			{
+
+			}
+			declare_feature_event(Update_Skim_Tables_Event)
 			{
 				typedef Network_Skimming_Prototype<ComponentType, CallerType> _Skim_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Skim_Interface* this_ptr=(_Skim_Interface*)_pthis;
 
-				this_ptr->Update_Skims<NULLTYPE>();
+				this_ptr->Update_Skim_Tables<NULLTYPE>();
 			}
 
 
@@ -91,7 +116,7 @@ namespace Network_Skimming_Components
 				// set the network references
 				this->network_reference<TargetType>(network_reference);
 
-				load_event(ComponentType,Skim_Table_Update_Conditional,Update_Skims_Event,0,Types::SUB_ITERATIONS::INITIALIZE,NULLTYPE);
+				load_event(ComponentType,Skim_Table_Update_Conditional,Update_Skim_Tables_Event,0,Types::SUB_ITERATIONS::INITIALIZE,NULLTYPE);
 
 			}			
 			feature_prototype void Initialize(TargetType network_reference, requires(!check_as_given(TargetType, is_pointer) || !check(TargetType, Network_Components::Concepts::Is_Transportation_Network_Prototype)))
@@ -114,9 +139,13 @@ namespace Network_Skimming_Components
 				assert_check(TargetType, Network_Components::Concepts::Is_Transportation_Network_Prototype, "TargetType is not a valid Transportation_Network interface");
 			}
 			
-			feature_prototype bool Update_Skims()
+			feature_prototype bool Process_Skim_Trees()
 			{
-				return this_component()->Update_Skims<ComponentType,CallerType,TargetType>();
+				return this_component()->Process_Skim_Trees<ComponentType,CallerType,TargetType>();
+			}
+			feature_prototype bool Update_Skim_Tables()
+			{
+				return this_component()->Update_Skim_Tables<ComponentType,CallerType,TargetType>();
 			}
 
 			//=============================================
@@ -145,6 +174,8 @@ namespace Network_Skimming_Components
 
 			// Associative Container of skim matrices, keyed on Mode Indicator values
 			feature_accessor(skim_tables_container,none,none);
+			// Associative Container of skim matrices, keyed on Mode Indicator values
+			feature_accessor(path_trees_container,none,none);
 			// links back to the network to be skimmed
 			feature_accessor(network_reference, none, none);
 			// links back to the skimming faculty
@@ -181,6 +212,20 @@ namespace Network_Skimming_Components
 				assert_check(TargetType, Network_Components::Concepts::Is_Transportation_Network_Prototype, "TargetType is not a valid Transportation_Network interface");
 			}
 			
+			feature_prototype bool Process_Skims()
+			{
+				// tree builder interface
+				//define_container_and_value_interface(tree_builder_list_itf, tree_builder_itf, type_of(path_trees_container),Random_Access_Sequence_Prototype,Routing_Components::Prototypes::Routing_Prototype,ComponentType);
+				//tree_builder_list_itf* tree_list = this->path_trees_container<tree_builder_list_itf*>();
+				//tree_builder_list_itf::iterator tree_itr;
+				//for (tree_itr = tree_list->begin(); tree_itr = tree_list->end(); ++tree_itr)
+				//{
+				//	// Schedule the tree building
+				//	(*tree_itr)->Schedule_Tree_Computation<NULLTYPE>(_iteration);
+				//}
+
+				//return this_component()->Process_Skims<ComponentType,CallerType,TargetType>();
+			}
 			feature_prototype bool Update_LOS()
 			{
 				return this_component()->Update_LOS<ComponentType,CallerType,TargetType>();
@@ -191,71 +236,71 @@ namespace Network_Skimming_Components
 			}
 		};
 
-		prototype struct Network_Path_Tree_Builder_Prototype
-		{
-			tag_as_prototype;
+		//prototype struct Network_Path_Tree_Builder_Prototype
+		//{
+		//	tag_as_prototype;
 
-			feature_accessor(mode_type_id,none,none);
-			// number of nodes selected per zone used to estimate zonal travel times
-			feature_accessor(origin_node_zone_pair,none,none);
-			// Associative Container of skim matrices, keyed on Mode Indicator values
-			feature_accessor(destination_node_zone_list,none,none);
-			// links back to the network to be skimmed
-			feature_accessor(network_reference, none, none);
-			// links back to the skimming faculty
-			feature_accessor(skim_reference, none, none);
-			feature_accessor(event_time,none,none);
+		//	feature_accessor(mode_type_id,none,none);
+		//	// number of nodes selected per zone used to estimate zonal travel times
+		//	feature_accessor(origin_node_zone_pair,none,none);
+		//	// Associative Container of skim matrices, keyed on Mode Indicator values
+		//	feature_accessor(destination_node_zone_list,none,none);
+		//	// links back to the network to be skimmed
+		//	feature_accessor(network_reference, none, none);
+		//	// links back to the skimming faculty
+		//	feature_accessor(skim_reference, none, none);
+		//	feature_accessor(event_time,none,none);
 
 
-			//=============================================
-			// Primary events
-			//---------------------------------------------
-			declare_feature_conditional(tree_builder_conditional)
-			{
-				typedef Network_Path_Tree_Builder_Prototype<ComponentType, CallerType> _Path_Tree_Interface;
-				ComponentType* _pthis = (ComponentType*)_this;
-				_Path_Tree_Interface* this_ptr=(_Path_Tree_Interface*)_pthis;
+		//	//=============================================
+		//	// Primary events
+		//	//---------------------------------------------
+		//	declare_feature_conditional(tree_builder_conditional)
+		//	{
+		//		typedef Network_Path_Tree_Builder_Prototype<ComponentType, CallerType> _Path_Tree_Interface;
+		//		ComponentType* _pthis = (ComponentType*)_this;
+		//		_Path_Tree_Interface* this_ptr=(_Path_Tree_Interface*)_pthis;
 	
-				define_component_interface(skim_itf, get_type_of(skim_reference),Prototypes::Network_Skimming_Prototype,ComponentType);
-				skim_itf* skimmer = this_ptr->skim_reference<skim_itf*>();
+		//		define_component_interface(skim_itf, get_type_of(skim_reference),Prototypes::Network_Skimming_Prototype,ComponentType);
+		//		skim_itf* skimmer = this_ptr->skim_reference<skim_itf*>();
 
-				if (_sub_iteration == Types::PROCESS)
-				{
-					response.next._iteration = Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(skimmer->update_increment<Simulation_Timestep_Increment>());
-					response.next._sub_iteration = Types::PROCESS;
-					response.result = true;
-				}
-				else
-				{
-					static_assert(false);
-				}
+		//		if (_sub_iteration == Types::PROCESS)
+		//		{
+		//			response.next._iteration = Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(skimmer->update_increment<Simulation_Timestep_Increment>());
+		//			response.next._sub_iteration = Types::PROCESS;
+		//			response.result = true;
+		//		}
+		//		else
+		//		{
+		//			static_assert(false);
+		//		}
 
-			}
+		//	}
 
-			declare_feature_event(tree_builder_event)
-			{
-				typedef Network_Path_Tree_Builder_Prototype<ComponentType, CallerType> _Path_Tree_Interface;
-				ComponentType* _pthis = (ComponentType*)_this;
-				_Path_Tree_Interface* this_ptr=(_Path_Tree_Interface*)_pthis;
+		//	declare_feature_event(tree_builder_event)
+		//	{
+		//		typedef Network_Path_Tree_Builder_Prototype<ComponentType, CallerType> _Path_Tree_Interface;
+		//		ComponentType* _pthis = (ComponentType*)_this;
+		//		_Path_Tree_Interface* this_ptr=(_Path_Tree_Interface*)_pthis;
 
-				define_container_and_value_interface(pair_list_itf, pair_itf,get_type_of(destination_node_zone_list),Random_Access_Sequence_Prototype, Node_Zone_Pair_Prototype, ComponentType);
-				pair_itf* orig = this_ptr->origin_node_zone_pair<pair_itf*>();
-				cout << endl<<"building tree from : " << orig->node_index;
-				
-				pair_list_itf* dest_list = this_ptr->destination_node_zone_list<pair_list_itf*>();
-				pair_list_itf::iterator itr = dest_list->begin();
+		//		define_container_and_value_interface(pair_list_itf, pair_itf,get_type_of(destination_node_zone_list),Random_Access_Sequence_Prototype, Node_Zone_Pair_Prototype, ComponentType);
+		//		pair_itf* orig = this_ptr->origin_node_zone_pair<pair_itf*>();
+		//		cout << endl<<"building tree from : " << orig->node_index;
+		//		
+		//		pair_list_itf* dest_list = this_ptr->destination_node_zone_list<pair_list_itf*>();
+		//		pair_list_itf::iterator itr = dest_list->begin();
 
-				for (;itr != dest_list->end(); ++itr)
-				{
-					cout << endl<<"to: "<<*itr->node_index;
-				}
-			}
-			
-			feature_prototype void Initialize()
-			{
-				load_event(ComponentType,tree_builder_conditional,tree_builder_event,this->event_time<Simulation_Timestep_Increment>(),Types::SUB_ITERATIONS::PROCESS,NULLTYPE);
-			}
-		};
+		//		for (;itr != dest_list->end(); ++itr)
+		//		{
+		//			cout << endl<<"to: "<<*itr->node_index;
+		//		}
+		//	}
+		//	
+		//	feature_prototype void Initialize()
+		//	{
+		//		load_event(ComponentType,tree_builder_conditional,tree_builder_event,this->event_time<Simulation_Timestep_Increment>(),Types::SUB_ITERATIONS::PROCESS,NULLTYPE);
+		//	}
+		//};
 
 		prototype struct Node_Zone_Pair_Prototype
 		{
