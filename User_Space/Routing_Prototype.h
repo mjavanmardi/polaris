@@ -51,6 +51,7 @@ namespace Routing_Components
 					response.result=true;
 					response.next._iteration=END;
 					response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
+				}
 #endif				
 				else
 				{
