@@ -1,6 +1,6 @@
 #pragma once
-
 #ifdef WINDOWS
+
 #include <stdio.h>
 #include <tchar.h>
 #include <stdlib.h>
@@ -670,26 +670,14 @@ public:
 			cout <<"**"<< this->_data[i] << " @ " << &this->_data[i]<<endl;
 		}
 	}
-	void			resize(vector<size_type> new_dimensions, value_type value)
+	void			resize(index_type new_dimensions, value_type value)
 	{
-		m_array<T> tmp = m_array<T>(*this);
+		matrix<T> tmp = matrix<T>(*this);
 		this->_cleanup();
 		this->_init(new_dimensions);
-		*this = m_array<T>(new_dimensions, value);
+		*this = matrix<T>(new_dimensions, value);
 
-		iterator itr = this->begin();
-
-		for (itr; itr != this->end(); ++itr)
-		{
-			const index_type index = (index_type)itr.get_index();
-			if (tmp.valid_index(index))
-			{
-				size_type i = tmp.get_index(index);
-				(*itr) = tmp._data[i];
-			}
-			else (*itr) = value;
-			
-		}
+		for (size_type i=0; i<_size; i++) _data[i]=value;
 	}
 
 	// MArray constructors/destructor
@@ -894,6 +882,8 @@ void matrix<T>::print(ostream& stream)
 template <class T>
 void matrix<T>::print(ostream& stream, int n)
 {
+	stream<<endl;
+
 	// print 2d matrix of last 2 dimensions
 	for (uint i=0; i<_dim_sizes.first; i++)
 	{
@@ -905,5 +895,6 @@ void matrix<T>::print(ostream& stream, int n)
 	}
 	stream<<endl<<endl;
 }
+
 #endif
 

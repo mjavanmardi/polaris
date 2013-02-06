@@ -234,7 +234,7 @@ struct MasterType
 	// Network Types
 	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<MasterType> scenario_type;
 	
-	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
+	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<MasterType> network_type;
 	
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	
@@ -248,7 +248,7 @@ struct MasterType
 
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
-	typedef Routing_Components::Implementations::Polaris_Routing_Implementation<MasterType> routing_type;
+	typedef Routing_Components::Implementations::Polaris_Integrated_Routing_Implementation<MasterType> routing_type;
 
 	typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
 
@@ -317,6 +317,8 @@ ostream* stream_ptr;
 
 int main()
 {
+
+#pragma region COPY FROM NETWORKMODEL.CPP
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::File_Network,network_models::network_information::network_data_information::NetworkData&> Net_IO_Type;
 
@@ -339,14 +341,13 @@ int main()
 
 	cout << "reading input data..." <<endl;	
 	define_component_interface(_Scenario_Interface, MasterType::scenario_type, Scenario_Prototype, NULLTYPE);
-	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<MasterType::scenario_type>();
+	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
 	scenario->read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);
 	//scenario->write_scenario_data<NULLTYPE>(scenario_data_for_output);
-	
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
-	_Network_Interface* network = (_Network_Interface*)Allocate<MasterType::network_type>();
+	_Network_Interface* network = (_Network_Interface*)Allocate<typename MasterType::network_type>();
 	_global_network = network;
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 	network->read_network_data<Net_IO_Type>(network_data);
@@ -354,7 +355,7 @@ int main()
 
 
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-	_Operation_Interface* operation = (_Operation_Interface*)Allocate<MasterType::operation_type>();
+	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
 	operation->network_reference<_Network_Interface*>(network);
 	operation->read_operation_data<Operation_Components::Types::File_Operation>(scenario_data, network_data, operation_data);
 	//operation->write_operation_data<NULLTYPE>(network_data_for_output, operation_data_for_output);
@@ -364,12 +365,6 @@ int main()
 
 
 	network->simulation_initialize<NULLTYPE>();
-
-	
-	define_component_interface(_Skim_Interface, _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,NULLTYPE);
-	_Skim_Interface* skim_faculty = (_Skim_Interface*)Allocate<_Network_Interface::get_type_of(skimming_faculty)>();
-	skim_faculty->Initialize<_Network_Interface*>(network);
-
 	
 	cout << "world started..." << endl;
 	////initialize network agents
@@ -387,14 +382,20 @@ int main()
 	define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, _Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Prototype, NULLTYPE);
 	_Intersections_Container_Interface::iterator intersections_itr;
 
-	for(intersections_itr=network->intersections_container<MasterType::network_type::intersections_container_type&>().begin();
-		intersections_itr!=network->intersections_container<MasterType::network_type::intersections_container_type&>().end();
+	for(intersections_itr=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().begin();
+		intersections_itr!=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().end();
 		intersections_itr++)
 	{
 
 		((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();		
 	}
 
+#pragma endregion
+
+	define_component_interface(_network_skim_itf, _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,NULLTYPE);
+	_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<_Network_Interface::get_type_of(skimming_faculty)>();
+	skimmer->Initialize<_Network_Interface*>(network);
+	network->skimming_faculty<_network_skim_itf*>(skimmer);
 	
 	//==================================================================================================================================
 	// POPSYN stuff

@@ -316,6 +316,8 @@ namespace PopSyn
 				// TIMER
 				cout <<"Setup Runtime (ms): "<<timer.Stop();
 				//------------------------
+
+				return true;
 			}
 			feature_prototype bool Start_Popsyn(requires(check(ComponentType,!Concepts::Uses_Linker_File)))
 			{
