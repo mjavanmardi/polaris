@@ -159,7 +159,7 @@ namespace Link_Components
 			// update link supply
 			feature_implementation void link_supply_update()
 			{
-				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface_in_implementation(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
@@ -207,7 +207,7 @@ namespace Link_Components
 			// update network state
 			feature_implementation void network_state_update()
 			{
-				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface_in_implementation(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
@@ -287,34 +287,36 @@ namespace Link_Components
 
 			}
 
-			feature_implementation void accept_vehicle(TargetType veh,requires(!check_2(CallerType,typename MasterType::movement_type,is_same) && !check_2(CallerType,ComponentType,is_same) && !check_2(CallerType,typename MasterType::routing_type,is_same)))
+			feature_implementation void accept_vehicle(TargetType veh,requires(!check_2_no_typename(CallerType,typename MasterType::movement_type,is_same) && !check_2_no_typename(CallerType,ComponentType,is_same) && !check_2_no_typename(CallerType,typename MasterType::routing_type,is_same)))
 			{
-				static_assert(false,"shouldn't be here!");
+				assert_check_2_no_typename(CallerType,typename MasterType::movement_type,is_same,"Invalid CallerType");
+				assert_check_2_no_typename(CallerType,ComponentType,is_same,"Invalid CallerType");
+				assert_check_2_no_typename(CallerType,typename MasterType::routing_type,is_same,"Invalid CallerType");
 			}
 
-			feature_implementation void accept_vehicle(TargetType veh,requires(check_2(CallerType,typename MasterType::routing_type,is_same)))
+			feature_implementation void accept_vehicle(TargetType veh,requires(check_2_no_typename(CallerType,typename MasterType::routing_type,is_same)))
 			{
-				define_container_and_value_interface(_Link_Origin_Vehicles_Container_Interface, _Vehicle_Interface,type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_container_and_value_interface_in_implementation(_Link_Origin_Vehicles_Container_Interface, _Vehicle_Interface,type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				_link_origin_cumulative_arrived_vehicles++;
 				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
 				_link_origin_vehicle_array.push_back((typename MasterType::vehicle_type*)vehicle);
 				vehicle->template load<Vehicle_Components::Types::Load_To_Entry_Queue>();
 			}
 
-			feature_implementation void accept_vehicle(TargetType veh,requires(check_2(CallerType,typename MasterType::movement_type,is_same) || check_2(CallerType,ComponentType,is_same)))
+			feature_implementation void accept_vehicle(TargetType veh,requires(check_2_no_typename(CallerType,typename MasterType::movement_type,is_same) || check_2_no_typename(CallerType,ComponentType,is_same)))
 			{
-				define_container_and_value_interface(_Vehicle_Queue_Interface, _Vehicle_Interface, type_of(current_vehicle_queue), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_container_and_value_interface(_Destination_Vehicle_Queue_Interface, _Vehicle_Interface_2, type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_container_and_value_interface_in_implementation(_Vehicle_Queue_Interface, _Vehicle_Interface, type_of(current_vehicle_queue), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_container_and_value_interface_in_implementation(_Destination_Vehicle_Queue_Interface, _Vehicle_Interface_2, type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
-				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface_in_implementation(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 				typedef Link_Prototype<ComponentType, ComponentType> _Link_Interface;
 				
 				int current_simulation_interval_index = network_reference<ComponentType,CallerType,_Network_Interface*>()->template current_simulation_interval_index<int>();
-				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
+				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 				_Vehicle_Interface* vehicle=(_Vehicle_Interface*)veh;
-				_Movement_Plan_Interface* mp = vehicle->movement_plan<_Movement_Plan_Interface*>();
+				_Movement_Plan_Interface* mp = vehicle->template movement_plan<_Movement_Plan_Interface*>();
 				float a_delayed_time;
 
 				if (mp->template current_trajectory_position<int>() == -1)
@@ -344,7 +346,7 @@ namespace Link_Components
 
 			feature_implementation void link_moving()
 			{
-				define_component_interface(_Intersection_Interface, type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_component_interface_in_implementation(_Intersection_Interface, type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				typename vector<typename MasterType::vehicle_type*>::iterator vehicle_itr;
 
 				for(vehicle_itr=_current_vehicle_queue.begin();vehicle_itr!=_current_vehicle_queue.end();vehicle_itr++)
@@ -392,7 +394,7 @@ namespace Link_Components
 			
 			feature_implementation void load_vehicles(int num_departed_vehicles)
 			{
-				define_container_and_value_interface(_Vehicles_Origin_Container_Interface, _Vehicle_Interface,get_type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_container_and_value_interface_in_implementation(_Vehicles_Origin_Container_Interface, _Vehicle_Interface, type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				typedef Link_Components::Prototypes::Link_Prototype<typename MasterType::link_type, ComponentType> _Link_Interface;
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 
@@ -407,7 +409,7 @@ namespace Link_Components
 					_link_origin_cumulative_departed_vehicles++;
 					_link_origin_departed_vehicles++;
 					_link_origin_arrived_vehicles--;
-					((_Link_Interface*)this)->push_vehicle<_Vehicle_Interface*>(vehicle);
+					((_Link_Interface*)this)->template push_vehicle<_Vehicle_Interface*>(vehicle);
 					((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int&>()++;
 					((_Scenario_Interface*)_global_scenario)->template network_in_network_vehicles<int&>()++;
 				}
@@ -416,8 +418,8 @@ namespace Link_Components
 			feature_implementation void queue_vehicles(int current_position)
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
-				define_container_and_value_interface(_Vehicles_Origin_Container_Interface, _Vehicle_Interface,get_type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_container_interface(_Vehicle_Origin_Queue_Interface, get_type_of(link_origin_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_container_and_value_interface_in_implementation(_Vehicles_Origin_Container_Interface, _Vehicle_Interface, type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_container_interface_in_implementation(_Vehicle_Origin_Queue_Interface, type_of(link_origin_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 
 				for(int iv=current_position;iv<(int)_link_origin_vehicle_array.size();iv++)
 				{
@@ -434,7 +436,7 @@ namespace Link_Components
 
 			feature_implementation void initialize_features(void* network)
 			{
-				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface_in_implementation(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 				//network_data
 				_link_origin_cumulative_arrived_vehicles = 0;

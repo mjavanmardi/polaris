@@ -33,12 +33,12 @@ namespace Sensor_Components
 
 			feature_prototype void Initialize()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
 			}
 
 			declare_feature_conditional(Maintenance_Condition)
 			{
-				response.next._iteration=_iteration+((Sensor*)_this)->storage_interval<int>();
+				response.next._iteration=_iteration+((Sensor*)_this)->template storage_interval<int>();
 				response.next._sub_iteration=0;
 
 				response.result=true;
@@ -46,7 +46,7 @@ namespace Sensor_Components
 
 			declare_feature_event(Maintenance)
 			{
-				((Sensor*)_this)->Perform_Maintenance<NULLTYPE>();
+				((Sensor*)_this)->template Perform_Maintenance<NULLTYPE>();
 			}
 
 			feature_prototype void Perform_Maintenance()
@@ -68,7 +68,7 @@ namespace Sensor_Components
 
 			feature_prototype typename TargetType::ReturnType Average(typename TargetType::ParamType time_start,typename TargetType::Param2Type time_end)
 			{
-				return this_component()->Average<ComponentType,CallerType,TargetType>(time_start,time_end);
+				return this_component()->template Average<ComponentType,CallerType,TargetType>(time_start,time_end);
 			}
 
 			feature_prototype void Push_Data(typename TargetType::ParamType value, typename TargetType::Param2Type time)
@@ -87,12 +87,12 @@ namespace Sensor_Components
 			
 			feature_prototype typename TargetType::ReturnType Pull_Data(typename TargetType::ParamType time_start,typename TargetType::Param2Type time_end)
 			{
-				return this_component()->Pull_Data<ComponentType,CallerType,TargetType>(time_start,time_end);
+				return this_component()->template Pull_Data<ComponentType,CallerType,TargetType>(time_start,time_end);
 			}
 
 			feature_prototype void Push_Data(typename TargetType::ParamType value,typename TargetType::Param2Type time_start,typename TargetType::Param3Type time_end)
 			{
-				this_component()->Push_Data<ComponentType,CallerType,TargetType>(value,time_start,time_end);
+				this_component()->template Push_Data<ComponentType,CallerType,TargetType>(value,time_start,time_end);
 			}
 		};
 	}

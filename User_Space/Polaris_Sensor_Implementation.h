@@ -1,7 +1,8 @@
 #pragma once
 #include "Sensor_Prototype.h"
-#include "Repository\Basic_Unit_Implementations.h"
-
+#ifndef FOR_LINUX_PORTING
+#include "../Repository/Basic_Unit_Implementations.h"
+#endif
 namespace Sensor_Components
 {
 	namespace Types{}

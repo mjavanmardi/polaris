@@ -126,3 +126,21 @@ namespace Vehicle_Components {
 		forward_declare_prototype struct Vehicle_Prototype;
 	}
 };
+namespace Zone_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Zone_Prototype;
+	}
+};
+namespace Person_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Person_Prototype;
+	}
+};
+namespace Plan_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Plan_Prototype;
+	}
+};

@@ -65,9 +65,6 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, _Routable_Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_component_interface(_Routable_Link_Interface, _Routable_Inbound_Outbound_Movements_Interface::get_type_of(inbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType); 
 
-				//dense_hash_map<int, _Routable_Link_Interface*>& linksMap = linksMap_param;
-				//_Regular_Intersection_Interface* regular_intersection = regular_intersection_param;
-
 				_x_position = regular_intersection->template x_position<float>();
 				_y_position = regular_intersection->template y_position<float>();
 				_uuid = regular_intersection->template uuid<int>();

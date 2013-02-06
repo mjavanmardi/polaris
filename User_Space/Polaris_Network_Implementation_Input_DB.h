@@ -40,7 +40,7 @@ namespace Network_Components
 			using namespace odb;
 			using namespace pio;
 
-			define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+			define_container_and_value_interface_in_implementation(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
 			type_of(intersections_container)& intersections_container_monitor=(type_of(intersections_container)&)(*intersections_container_ptr);
 			define_component_interface(_Intersection_Control_Interface, _Intersection_Interface::get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
@@ -50,7 +50,7 @@ namespace Network_Components
 				
 			intersections_container_ptr->clear();
 
-			result<Node> node_result=db->query<Node>(query<Node>::true_expr);
+			result<Node> node_result=db->template query<Node>(query<Node>::true_expr);
 
 			net_io_maps.intersection_id_to_ptr.set_empty_key(-1);
 			net_io_maps.intersection_id_to_ptr.set_deleted_key(-2);
@@ -70,13 +70,13 @@ namespace Network_Components
 
 				intersection->template uuid<int>( db_itr->getNode() );
 				intersection->template internal_id<int>(counter);
-				intersection->template x_position<float>( scenario->meterToFoot<NULLTYPE>(db_itr->getX()));
-				intersection->template y_position<float>( scenario->meterToFoot<NULLTYPE>(db_itr->getY()));
+				intersection->template x_position<float>( scenario->template meterToFoot<NULLTYPE>(db_itr->getX()));
+				intersection->template y_position<float>( scenario->template meterToFoot<NULLTYPE>(db_itr->getY()));
 				intersection->template intersection_control<_Intersection_Control_Interface*>((_Intersection_Control_Interface*)nullptr);
 					
 				net_io_maps.intersection_id_to_ptr[db_itr->getNode()]=intersection;
 
-				if (scenario->intersection_control_flag<int>() == 0) 
+				if (scenario->template intersection_control_flag<int>() == 0) 
 				{
 					intersection->template intersection_type<int>(Intersection_Components::Types::NO_CONTROL);
 
@@ -111,8 +111,8 @@ namespace Network_Components
 			const float distance_factor = 1.5;				
 
 			_max_free_flow_speed = -1;
-			define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface_in_implementation(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+			define_container_and_value_interface_in_implementation(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			_Links_Container_Interface* links_container_ptr=links_container<ComponentType,CallerType,_Links_Container_Interface*>();
 			type_of(links_container)& links_container_monitor=(type_of(links_container)&)(*links_container_ptr);				
 			typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
@@ -120,7 +120,7 @@ namespace Network_Components
 
 			Types::Link_ID_Dir link_id_dir;
 				
-			result<Link> link_result=db->query<Link>(query<Link>::true_expr);
+			result<Link> link_result=db->template query<Link>(query<Link>::true_expr);
 
 			net_io_maps.link_id_dir_to_ptr.set_empty_key(-1);
 			net_io_maps.link_id_dir_to_ptr.set_deleted_key(-2);
@@ -158,14 +158,14 @@ namespace Network_Components
 
 					link->template num_lanes<int>(db_itr->getLanes_Ab());
 						
-					link->template length<float>(scenario->meterToFoot<NULLTYPE>(db_itr->getLength()));
-					link->template speed_limit<float>(scenario->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()));
+					link->template length<float>(scenario->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+					link->template speed_limit<float>(scenario->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()));
 						
 					link->template num_left_turn_bays<int>(db_itr->getLeft_Ab());
 					link->template num_right_turn_bays<int>(db_itr->getRight_Ab());
 						
-					link->template left_turn_bay_length<float>(scenario->meterToFoot<NULLTYPE>(0.0));
-					link->template right_turn_bay_length<float>(scenario->meterToFoot<NULLTYPE>(0.0));
+					link->template left_turn_bay_length<float>(scenario->template meterToFoot<NULLTYPE>(0.0));
+					link->template right_turn_bay_length<float>(scenario->template meterToFoot<NULLTYPE>(0.0));
 
 						
 					const string& facility_type=db_itr->getType();
@@ -187,7 +187,7 @@ namespace Network_Components
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
 					}
 
-					link->template free_flow_speed<float>(scenario->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()) + 10.0);
+					link->template free_flow_speed<float>(scenario->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()) + 10.0);
 					link->template maximum_flow_rate<float>(maximum_flow_rate);
 					link->template backward_wave_speed<float>(backward_wave_speed);
 					link->template jam_density<float>(jam_density);
@@ -220,14 +220,14 @@ namespace Network_Components
 
 					link->template num_lanes<int>(db_itr->getLanes_Ba());
 						
-					link->template length<float>(scenario->meterToFoot<NULLTYPE>(db_itr->getLength()));
-					link->template speed_limit<float>(scenario->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()));
+					link->template length<float>(scenario->template meterToFoot<NULLTYPE>(db_itr->getLength()));
+					link->template speed_limit<float>(scenario->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()));
 						
 					link->template num_left_turn_bays<int>(db_itr->getLeft_Ba());
 					link->template num_right_turn_bays<int>(db_itr->getRight_Ba());
 						
-					link->template left_turn_bay_length<float>(scenario->meterToFoot<NULLTYPE>(0.0));
-					link->template right_turn_bay_length<float>(scenario->meterToFoot<NULLTYPE>(0.0));
+					link->template left_turn_bay_length<float>(scenario->template meterToFoot<NULLTYPE>(0.0));
+					link->template right_turn_bay_length<float>(scenario->template meterToFoot<NULLTYPE>(0.0));
 
 						
 					const string& facility_type=db_itr->getType();
@@ -249,7 +249,7 @@ namespace Network_Components
 						link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
 					}
 
-					link->template free_flow_speed<float>(scenario->mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()) + 10.0);
+					link->template free_flow_speed<float>(scenario->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()) + 10.0);
 					link->template maximum_flow_rate<float>(maximum_flow_rate);
 					link->template backward_wave_speed<float>(backward_wave_speed);
 					link->template jam_density<float>(jam_density);
@@ -273,13 +273,13 @@ namespace Network_Components
 
 			Types::Link_ID_Dir link_id_dir;
 
-			define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-			define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+			define_container_and_value_interface_in_implementation(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+			define_container_and_value_interface_in_implementation(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface_in_implementation(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 			_Turn_Movement_Interface* turn_movement;
 			type_of(turn_movements_container)& turn_movements_monitor=turn_movements_container<ComponentType,CallerType,type_of(turn_movements_container)&>();
 
-			result<Connect> connect_result=db->query<Connect>(query<Connect>::true_expr);
+			result<Connect> connect_result=db->template query<Connect>(query<Connect>::true_expr);
 				
 			int counter=-1;
 
@@ -453,12 +453,12 @@ namespace Network_Components
 
 			int counter=-1;
 
-			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			define_container_and_value_interface_in_implementation(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface_in_implementation(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			define_container_and_value_interface_in_implementation(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			_activity_locations_container.clear();
 
-			result<Location> location_result=db->query<Location>(query<Location>::true_expr);
+			result<Location> location_result=db->template query<Location>(query<Location>::true_expr);
 				
 			// create a single zone
 			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
@@ -493,13 +493,13 @@ namespace Network_Components
 				assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
 				link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 
-				activity_location->origin_links<_Links_Container_Interface&>().push_back(link);
+				activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
 				zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-				activity_location->destination_links<_Links_Container_Interface&>().push_back(link);
+				activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
 				zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-				activity_location->zone<_Zone_Interface*>(zone);
-				activity_location->uuid<int>(db_itr->getPrimaryKey());
-				activity_location->internal_id<int>(counter);
+				activity_location->template zone<_Zone_Interface*>(zone);
+				activity_location->template uuid<int>(db_itr->getPrimaryKey());
+				activity_location->template internal_id<int>(counter);
 					
 				activity_locations_container<ComponentType,CallerType,_Activity_Locations_Container_Interface&>().push_back(activity_location);
 			}

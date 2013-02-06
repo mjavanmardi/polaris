@@ -86,7 +86,7 @@ namespace Turn_Movement_Components
 
 			feature_implementation void update_capacity(Intersection_Components::Types::Intersection_Type_Keys intersection_type)
 			{
-				define_component_interface(_Link_Interface, get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				define_component_interface_in_implementation(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				float outbound_link_capacity = (float)(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() * ((_Link_Interface*)_outbound_link)->template num_lanes<int>() * ((_Link_Interface*)_outbound_link)->template maximum_flow_rate<float>()/3600.0);
 				float inbound_link_capacity = ((_Link_Interface*)_inbound_link)->template link_capacity<float>(); 
@@ -103,11 +103,11 @@ namespace Turn_Movement_Components
 
 			feature_implementation void update_flow()
 			{
-				define_component_interface(_Link_Interface, get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				define_component_interface_in_implementation(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 
-				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->current_simulation_interval_index<int>();
+				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
 				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
 				int t_minus_fftt = -1;
@@ -138,14 +138,14 @@ namespace Turn_Movement_Components
 
 			feature_implementation void transfer_vehicles(User_Space::RngStream& rng_stream)
 			{
-				define_component_interface(_Link_Interface, get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				define_component_interface_in_implementation(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 				typedef Vehicle_Components::Prototypes::Vehicle_Prototype<typename MasterType::vehicle_type, ComponentType> _Vehicle_Interface;
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
 				typedef Turn_Movement_Components::Prototypes::Movement_Prototype<typename MasterType::movement_type> _Turn_Movement_Interface;
 				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 
-				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->current_simulation_interval_index<int>();
+				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
 
 				_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = 0.0;
 				_inbound_link_departed_time_based_experienced_link_turn_travel_delay = 0.0;
@@ -191,7 +191,7 @@ namespace Turn_Movement_Components
 							if (current_simulation_interval_index>0)
 							{
 								t_minus_one = (current_simulation_interval_index-1)%((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>();
-								float delay = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>() + _cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_minus_one];
+								float delay = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() + _cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_minus_one];
 								_outbound_link_arrived_time_based_experienced_link_turn_travel_delay = delay;
 							}
 							else
@@ -205,22 +205,22 @@ namespace Turn_Movement_Components
 
 			feature_implementation void push_vehicles_to_outbound_link(int num_transfer_vehicles_of_turn_movement)
 			{
-				define_component_interface(_Link_Interface, get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				define_component_interface_in_implementation(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 				typedef Vehicle_Components::Prototypes::Vehicle_Prototype<typename MasterType::vehicle_type, ComponentType> _Vehicle_Interface;
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
 				typedef Turn_Movement_Components::Prototypes::Movement_Prototype<typename MasterType::movement_type> _Turn_Movement_Interface;
 				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				//move vehicles for this turn movement
-				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->current_simulation_interval_index<int>();
+				int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
 				for (int iv=0;iv<num_transfer_vehicles_of_turn_movement;iv++)
 				{
-					_Vehicle_Interface* vehicle=((_Turn_Movement_Interface*)this)->pull_vehicle<_Vehicle_Interface*>();
+					_Vehicle_Interface* vehicle=((_Turn_Movement_Interface*)this)->template pull_vehicle<_Vehicle_Interface*>();
 
 					//update vehicle state: transfer to next link
 					int enter_time=vehicle->template movement_plan<_Movement_Plan_Interface*>()->template get_current_link_enter_time<int>();
 					int delayed_time = int((((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - enter_time) - ((_Link_Interface*)_inbound_link)->template link_fftt<float>());
-					int enter_interval_index = enter_time / ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
+					int enter_interval_index = enter_time / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					int delayed_interval = current_simulation_interval_index - enter_interval_index;
 
 					//update inbound link state: N(a',L,t)
@@ -246,7 +246,7 @@ namespace Turn_Movement_Components
 					{
 						departed_time_position = enter_interval_index;
 					}
-					_cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array[departed_time_position]+=delayed_interval*((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
+					_cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array[departed_time_position]+=delayed_interval*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					((_Link_Interface*)_outbound_link)->template push_vehicle<_Vehicle_Interface*>(vehicle);
 				}
 			}
@@ -254,7 +254,7 @@ namespace Turn_Movement_Components
 
 			feature_implementation void update_state(int t_cached_delay)
 			{
-				define_component_interface(_Link_Interface, get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				define_component_interface_in_implementation(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
 
@@ -291,8 +291,8 @@ namespace Turn_Movement_Components
 
 			feature_implementation void accept_vehicle(void* vehicle)
 			{
-				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				define_container_and_value_interface_in_implementation(_Vehicles_Container_Interface, _Vehicle_Interface, type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface_in_implementation(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
 			
 				vehicles_container<ComponentType,CallerType,_Vehicles_Container_Interface&>().push_back((_Vehicle_Interface*)vehicle);
 				_turn_movement_cumulative_arrived_vehicles++;
@@ -301,7 +301,7 @@ namespace Turn_Movement_Components
 			feature_implementation void initialize_features()
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
-				define_component_interface(_Link_Interface, get_type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				define_component_interface_in_implementation(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
 
 				_movement_capacity = 0.0;
 				_movement_demand = 0.0;
