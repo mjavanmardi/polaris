@@ -159,10 +159,10 @@ static const int success=sizeof(small_type);
 
 #define ASSERT_CHECK_PARAMS_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2) TYPE_TO_TEST_1,TYPE_TO_TEST_2
 
-#define assert_default_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<ASSERT_CHECK_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
-#define assert_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<ASSERT_CHECK_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
+#define assert_default_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<ASSERT_CHECK_PARAMS_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
+#define assert_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<ASSERT_CHECK_PARAMS_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 
-#define assert_sub_check_2(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS,ERROR_MESSAGE) static_assert(CONCEPT_NAME<ASSERT_REQUIREMENTS_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
+#define assert_sub_check_2(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS,ERROR_MESSAGE) static_assert(CONCEPT_NAME<ASSERT_REQUIREMENTS_PARAMS_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 
 #define CALL_CHECK_PARAMS_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2) TYPE_TO_TEST_1,TYPE_TO_TEST_2
 
@@ -171,7 +171,7 @@ static const int success=sizeof(small_type);
 #define requires_setter(...) char(*)[__VA_ARGS__ && True_Concept<SetValueType>::value]=NULL
 #define check(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<strip_modifiers(TYPE_TO_TEST)>::value
 #define check_as_given(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<TYPE_TO_TEST>::value
-#define check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<CALL_CHECK_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::value
+#define check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<CALL_CHECK_PARAMS_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value
 
 // for compilation in Linux
 #define check_2_no_typename(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<CALL_CHECK_PARAMS_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value
@@ -179,7 +179,7 @@ static const int success=sizeof(small_type);
 
 #define sub_check(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS) CONCEPT_NAME<strip_modifiers(TYPE_TO_TEST)>::SUB_CHECK_ALIAS
 #define sub_check_as_given(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS) CONCEPT_NAME<TYPE_TO_TEST>::SUB_CHECK_ALIAS
-#define sub_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,SUB_CHECK_ALIAS) CONCEPT_NAME<CALL_REQUIREMENTS_PARAMS_2(typename TYPE_TO_TEST_1,typename TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS
+#define sub_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,SUB_CHECK_ALIAS) CONCEPT_NAME<CALL_REQUIREMENTS_PARAMS_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS
 
 #define concat(...) __VA_ARGS__
 
