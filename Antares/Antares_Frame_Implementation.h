@@ -84,4 +84,5 @@ Antares_Implementation<MasterType,ParentType>::Antares_Implementation(wxFrame* p
 
 	_conductor->canvas<Canvas_Interface*>(_canvas);
 	_canvas->time_panel<Time_Panel_Interface*>(_time_panel);
+	_canvas->information_panel<Information_Panel_Interface*>(_information_panel);
 }

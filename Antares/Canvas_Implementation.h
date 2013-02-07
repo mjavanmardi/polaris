@@ -79,6 +79,7 @@ public:
 
 	member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,Canvas_Implementation,none,none);
 	member_prototype(Time_Panel,time_panel,typename MasterType::type_of(time_panel),Canvas_Implementation,none,none);
+	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),Canvas_Implementation,none,none);
 };
 
 //---------------------------------------------------------

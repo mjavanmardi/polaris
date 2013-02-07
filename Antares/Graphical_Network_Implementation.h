@@ -256,8 +256,6 @@ namespace Network_Components
 					_link_lines.push_back(current_point);
 				}
 			}
-			
-
 
 			member_data(Point_2D<MasterType>, input_offset,none,none);
 			member_data(Rectangle_XY<MasterType>, network_bounds,none,none);

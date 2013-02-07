@@ -173,7 +173,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>C:\glew-1.7.0\include;$(SolutionDir);$(SolutionDir)\Polaris_IO\odb_include;C:\wxWidgets-2.9.3\include\;C:\wxWidgets-2.9.3\include\msvc;C:\Program Files\plplot\include\plplot</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\glew-1.7.0\include;$(SolutionDir);$(SolutionDir)\Polaris_IO\odb_include;C:\wxWidgets-2.9.3\include\;C:\wxWidgets-2.9.3\include\msvc;C:\plplot\include\plplot</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>NDEBUG;_UNICODE;GLEW_STATIC;ANTARES;WIN32 ;WINVER=0x0600;__WXMSW__ ;_WINDOWS ;_MBCS;wxUSE_GUI=1;_CRT_SECURE_NO_DEPRECATE ;_CRT_NONSTDC_NO_DEPRECATE ;LIBODB_STATIC_LIB;LIBODB_SQLITE_STATIC_LIB;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>
@@ -187,7 +187,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\glew-1.7.0\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)\Polaris_IO\odb_include\lib_release;C:\wxWidgets-2.9.3\lib\vc_lib;C:\Program Files\plplot\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\glew-1.7.0\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)\Polaris_IO\odb_include\lib_release;C:\wxWidgets-2.9.3\lib\vc_lib;C:\plplot\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>antares.lib;plplotd.lib;plplotcxxd.lib;csirocsa.lib;qsastime.lib;plplotwxwidgetsd.lib;comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wxpng.lib;wsock32.lib;sqlite3.lib;odb-sqlite-2.1-vc10.lib;odb-2.1-vc10.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>

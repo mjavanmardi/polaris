@@ -67,5 +67,7 @@ prototype struct Canvas
 	feature_accessor(projection,none,none);
 
 	feature_accessor(time_panel,none,none);
+	feature_accessor(information_panel,none,none);
+
 	feature_accessor(graphical_network,none,none);
 };

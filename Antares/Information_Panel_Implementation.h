@@ -28,8 +28,7 @@ public:
 	void OnResize(wxSizeEvent& event);
 
 	member_pointer(MyPlotwindow,plotwindow,none,none);
-
-	//Canvas_Implementation* canvas_ptr;
+	member_pointer(wxBoxSizer,box,none,none);
 };
 
 //---------------------------------------------------------
@@ -41,22 +40,17 @@ Information_Panel_Implementation<MasterType,ParentType>::Information_Panel_Imple
 {
 	//---- miscellaneous initialization ----
 
-	//canvas_ptr=((Antares_Implementation *) GetParent())->canvas;
+	_box = new wxBoxSizer( wxVERTICAL );
 
-    wxBoxSizer* box = new wxBoxSizer( wxVERTICAL );
-//#define wxUSE_GRAPHICS_CONTEXT 1
+	_plotwindow = new MyPlotwindow( this, -1, wxDefaultPosition, wxSize(1920,1080), wxWANTS_CHARS,wxPLPLOT_BACKEND_GC | wxPLPLOT_DRAW_TEXT );
 
-    _plotwindow = new MyPlotwindow( this, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS,
-#if wxUSE_GRAPHICS_CONTEXT
-        wxPLPLOT_BACKEND_GC | wxPLPLOT_DRAW_TEXT );
-#else
-        wxPLPLOT_BACKEND_AGG | wxPLPLOT_DRAW_TEXT );
-#endif
+	_plotwindow->SetMaxSize( wxSize(1920,1080) );
 
-    box->Add( _plotwindow, 1, wxALL | wxEXPAND, 0 );
+	Plot();
 
-	SetSizer(box);
-	SetSize( 800, 200 );      // set frame size
+	_box->Add( _plotwindow, 1, wxEXPAND );
+	
+	SetSizer(_box);
 
 	Connect(wxEVT_SIZE,wxSizeEventHandler(Information_Panel_Implementation::OnResize));
 }
@@ -64,44 +58,86 @@ Information_Panel_Implementation<MasterType,ParentType>::Information_Panel_Imple
 template<typename MasterType,typename ParentType>
 void Information_Panel_Implementation<MasterType,ParentType>::OnResize(wxSizeEvent& event)
 {
-	Plot();
+	_box->SetDimension(wxPoint(0,0),GetSize());
 }
 
 template<typename MasterType,typename ParentType>
 void Information_Panel_Implementation<MasterType,ParentType>::Plot()
 {
-    const size_t np = 500;
-    PLFLT x[np], y[np];
-    PLFLT xmin, xmax;
-    PLFLT ymin = 1e30, ymax = 1e-30;
+	const size_t np = 500;
+	PLFLT x[np], y[np];
+	PLFLT xmin, xmax;
+	PLFLT ymin = 1e30, ymax = 1e-30;
 
-    xmin = -2.0;
-    xmax = 10.0;
-    for ( size_t i = 0; i < np; i++ )
-    {
-        x[i] = ( xmax - xmin ) * i / np + xmin;
-        y[i] = 1.0;
-        if ( x[i] != 0.0 ) y[i] = sin( x[i] ) / x[i];
+	xmin = 0;
+	xmax = _iteration + 5;
 
+	for ( size_t i = 0; i < np; i++ )
+	{
+		x[i] = ( xmax - xmin ) * i / np + xmin;
+		y[i] = 1.0;
+		if ( x[i] != 0.0 ) y[i] = sin( x[i] ) / x[i] + x[i];
+		
 		ymin = ( ( ymin ) < ( y[i] ) ? ( ymin ) : ( y[i] ) );
 		ymax = ( ( ymax ) < ( y[i] ) ? ( y[i] ) : ( ymax ) );
-    }
-    
+	}
+
 	wxPLplotstream* pls = _plotwindow->GetStream();
 
-    pls->adv( 0 );
+	pls->adv( 0 );
+	pls->scol0( 0, 255, 255, 255 );
+	pls->scol0( 15, 0, 0, 0 );
 
-    pls->scol0( 0, 255, 255, 255 );
-    pls->scol0( 15, 0, 0, 0 );
+	pls->col0( 1 );
+	pls->env( xmin, xmax, ymin, ymax, 0, 0 );
+	pls->col0( 15 );
+	pls->lab( "Iteration", "Value", "Vehicles In Network" );
 
-    pls->col0( 1 );
-    pls->env( xmin, xmax, ymin, ymax, 0, 0 );
-    pls->col0( 2 );
-    pls->lab( "x", "y", "sin(x)/x" );
+	pls->col0( 3 );
+	pls->width( 2 );
 
-    pls->col0( 3 );
-    pls->width( 2 );
-    pls->line( np, x, y );
+	//pls->hist(np,y,ymin,ymax,10,PL_HIST_DEFAULT);
 
-    _plotwindow->RenewPlot();
+	pls->line( np, x, y );
+
+	_plotwindow->RenewPlot();
 }
+
+//template<typename MasterType,typename ParentType>
+//void Information_Panel_Implementation<MasterType,ParentType>::Plot()
+//{
+//    const size_t np = 500;
+//    PLFLT x[np], y[np];
+//    PLFLT xmin, xmax;
+//    PLFLT ymin = 1e30, ymax = 1e-30;
+//
+//    xmin = -2.0;
+//    xmax = 10.0;
+//    for ( size_t i = 0; i < np; i++ )
+//    {
+//        x[i] = ( xmax - xmin ) * i / np + xmin;
+//        y[i] = 1.0;
+//        if ( x[i] != 0.0 ) y[i] = sin( x[i] ) / x[i];
+//
+//		ymin = ( ( ymin ) < ( y[i] ) ? ( ymin ) : ( y[i] ) );
+//		ymax = ( ( ymax ) < ( y[i] ) ? ( y[i] ) : ( ymax ) );
+//    }
+//    
+//	wxPLplotstream* pls = _plotwindow->GetStream();
+//
+//    pls->adv( 0 );
+//
+//    pls->scol0( 0, 255, 255, 255 );
+//    pls->scol0( 15, 0, 0, 0 );
+//
+//    pls->col0( 1 );
+//    pls->env( xmin, xmax, ymin, ymax, 0, 0 );
+//    pls->col0( 2 );
+//    pls->lab( "x", "y", "sin(x)/x" );
+//
+//    pls->col0( 3 );
+//    pls->width( 2 );
+//    pls->line( np, x, y );
+//
+//    _plotwindow->RenewPlot();
+//}

@@ -12,44 +12,6 @@
 template<typename MasterType,typename ParentType>
 void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 {
-	//wxGLCanvas::SetCurrent(*_glcontext);
-	//wxPaintDC(this);
-
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	////Test Code Works
-	//glViewport(0,0,_panel_width,_panel_height);
-
-	//glMatrixMode(GL_PROJECTION);
-	//glLoadIdentity();
-	//
-	//gluPerspective(45.0f,(GLfloat)_panel_width/(GLfloat)_panel_height,0.1f,100.0f);
-
-	//glMatrixMode(GL_MODELVIEW);
-	//glLoadIdentity();
-	//
-	//glColor4f(1,0,0,1);
-
-	//glTranslatef(-1.5f,0.0f,-6.0f);
-
-	//glBegin(GL_TRIANGLES);                      // Drawing Using Triangles
-	//glVertex3f( 0.0f, 1.0f, 0.0f);              // Top
-	//glVertex3f(-1.0f,-1.0f, 0.0f);              // Bottom Left
-	//glVertex3f( 1.0f,-1.0f, 0.0f);              // Bottom Right
-	//glEnd();                            // Finished Drawing The Triangle
-	//	
-	//glTranslatef(3.0f,0.0f,0.0f);                   // Move Right 3 Units
-
-	//glBegin(GL_QUADS);                      // Draw A Quad
-	//glVertex3f(-1.0f, 1.0f, 0.0f);              // Top Left
-	//glVertex3f( 1.0f, 1.0f, 0.0f);              // Top Right
-	//glVertex3f( 1.0f,-1.0f, 0.0f);              // Bottom Right
-	//glVertex3f(-1.0f,-1.0f, 0.0f);              // Bottom Left
-	//glEnd();                            // Done Drawing The Quad
-	//
-	//glFlush();
-	//SwapBuffers();
-
 	//---- clear and initialize drawing ----
 
 	int current_iteration = _iteration - 1;
@@ -59,7 +21,11 @@ void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 		_temporal_change=true;
 		_cached_iteration=current_iteration;
 
-		if(current_iteration>=0) _time_panel->Update_Time<NULLTYPE>(current_iteration);
+		if(current_iteration>=0)
+		{
+			_time_panel->Update_Time<NULLTYPE>(current_iteration);
+			_information_panel->Plot<NULLTYPE>();
+		}
 	}
 
 	wxGLCanvas::SetCurrent(*_glcontext);
