@@ -317,8 +317,9 @@ namespace Demand_Components
 					_Routing_Interface* router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 					//_Plan_Interface* plan = (_Plan_Interface*)Allocate<typename _Plan_Interface::Component_Type>();
 					_Movement_Plan_Interface* movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
-//					_Planning_Interface* planner = (_Planning_Interface*)Allocate<_Traveler_Interface::get_type_of(Planning_Faculty)>();
-
+#ifndef FOR_LINUX_PORTING
+					_Planning_Interface* planner = (_Planning_Interface*)Allocate<_Traveler_Interface::get_type_of(Planning_Faculty)>();
+#endif
 
 					vehicle->template uuid<int>(raw_vehicle.get_vehicle_id());
 					vehicle->template internal_id<int>(i);

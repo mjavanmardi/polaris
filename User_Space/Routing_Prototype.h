@@ -374,7 +374,7 @@ namespace Routing_Components
 				define_component_interface(_Scenario_Interface, _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				load_event(ComponentType,Compute_Route_Condition,Compute_Tree,departed_time,Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING,NULLTYPE);
 			}
-
+#ifndef FOR_LINUX_PORTING
 			feature_prototype TargetType Get_Tree_Results_For_Destination(int destination_internal_id, requires(check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
 			{
 				// get reference to travel times
@@ -384,7 +384,7 @@ namespace Routing_Components
 				// return travel time to destion in requested time units
 				return Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Simulation_Timestep_Increment>>(travel_times->at(destination_internal_id));
 			}
-
+#endif
 
 			//first event
 			declare_feature_event(Compute_Route)
