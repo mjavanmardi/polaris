@@ -26,7 +26,7 @@ namespace Traveler_Components
 			feature_prototype void Schedule_New_Departure(int departed_time)
 			{
 				// schedule routing
-				define_component_interface(_Routing_Interface, get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+				define_component_interface(_Routing_Interface, typename get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 				_Routing_Interface* itf= router<_Routing_Interface*>();
 				itf->template Schedule_Route_Computation<NULLTYPE>(departed_time);
 				

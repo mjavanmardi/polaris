@@ -40,9 +40,9 @@ namespace Network_Components
 
 			feature_implementation void initialize_intersection_control()
 			{
-				define_container_and_value_interface_in_implementation(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				define_component_interface(_Intersection_Control_Interface, _Intersection_Interface::get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
-				define_component_interface_in_implementation(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_component_interface(_Intersection_Control_Interface, typename _Intersection_Interface::get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
 				typename _Intersections_Container_Interface::iterator intersection_itr;
@@ -66,13 +66,13 @@ namespace Network_Components
 
 			feature_implementation void initialize_network_agent()
 			{
-				define_component_interface_in_implementation(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				load_event(ComponentType,End_Iteration_Conditional,End_Iteration_Handler, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION,NULLTYPE);
 			}
 
 			declare_feature_conditional(End_Iteration_Conditional)
 			{
-				define_component_interface_in_implementation(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
+				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
 				
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
 				{
@@ -91,7 +91,7 @@ namespace Network_Components
 			declare_feature_event(End_Iteration_Handler)
 			{
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
-				define_component_interface_in_implementation(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
+				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
 				
 				_Network_Interface* _this_ptr = (_Network_Interface*)_this;
 				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
@@ -104,7 +104,7 @@ namespace Network_Components
 
 			feature_implementation void initialize_links()
 			{
-				define_container_and_value_interface_in_implementation(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typename _Links_Container_Interface::iterator links_itr;
 				for (links_itr = _links_container.begin(); links_itr != _links_container.end(); links_itr++)
 				{
@@ -115,7 +115,7 @@ namespace Network_Components
 			feature_implementation void initialize_intersections()
 			{
 				//determine minimum merge rate
-				define_container_and_value_interface_in_implementation(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typename _Intersections_Container_Interface::iterator intersection_itr;
 				for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
@@ -128,7 +128,7 @@ namespace Network_Components
 			feature_implementation void construct_network_cost()
 			{
 				// break up between links and movements
-				define_container_and_value_interface_in_implementation(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typename _Links_Container_Interface::iterator links_itr;
 				_max_free_flow_speed = -1.0;			
 				for (links_itr = _links_container.begin(); links_itr != _links_container.end(); links_itr++)
@@ -143,7 +143,7 @@ namespace Network_Components
 					link->template travel_time<float>(link_travel_time);
 				}
 		
-				define_container_and_value_interface_in_implementation(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				typename _Turn_Movements_Container_Interface::iterator turn_movements_itr;
 				for (turn_movements_itr = _turn_movements_container.begin(); turn_movements_itr != _turn_movements_container.end(); turn_movements_itr++)
 				{
@@ -174,7 +174,7 @@ namespace Network_Components
 			{
 				typedef Network_Prototype<typename MasterType::network_type> _Regular_Network_Interface;
 				typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Regular_Network,_Regular_Network_Interface*> Net_IO_Type;
-				define_container_and_value_interface_in_implementation(_Routable_Networks_Container_Interface, _Routable_Network_Interface, type_of(routable_networks_container), Random_Access_Sequence_Prototype, Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Routable_Networks_Container_Interface, _Routable_Network_Interface, type_of(routable_networks_container), Random_Access_Sequence_Prototype, Network_Components::Prototypes::Network_Prototype, ComponentType);
 				for(int i=0;i<_num_threads;i++)
 				{
 					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();

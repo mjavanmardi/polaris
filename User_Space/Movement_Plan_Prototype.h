@@ -70,8 +70,8 @@ namespace Movement_Plan_Components
 
 			feature_prototype void set_trajectory(TargetType& path_container)
 			{
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, typename _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
 				typename TargetType::reverse_iterator itr;
 				for(itr = path_container.rbegin(); itr != path_container.rend(); itr++)
@@ -85,7 +85,7 @@ namespace Movement_Plan_Components
 
 			feature_prototype void advance_trajectory()
 			{
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 
 				current_trajectory_position<int&>()++;
 			}
@@ -103,7 +103,7 @@ namespace Movement_Plan_Components
 			feature_prototype TargetType next_link()
 			{
 
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 				if((size_t)current_trajectory_position<int>() < trajectory_container<_Trajectory_Container_Interface&>().size() - 1)
 				{
 					_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)trajectory_container<_Trajectory_Container_Interface&>()[current_trajectory_position<int>() + 1];
@@ -117,7 +117,7 @@ namespace Movement_Plan_Components
 
 			feature_prototype TargetType current_link()
 			{
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 
 				if(current_trajectory_position<int>() != -1)
 				{
@@ -141,13 +141,13 @@ namespace Movement_Plan_Components
 
 			feature_prototype TargetType get_current_link_enter_time()
 			{
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 				return (TargetType)current_trajectory_position<_Trajectory_Unit_Interface*>()->template enter_time<TargetType>();
 			}
 
 			feature_prototype int get_route_link_exit_time(int trajectory_unit_index)
 			{
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 				int route_link_exit_time = 0;
 				if (trajectory_unit_index < trajectory_container<_Trajectory_Container_Interface&>().size()-1)
 				{

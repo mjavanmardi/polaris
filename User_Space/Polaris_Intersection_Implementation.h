@@ -26,8 +26,8 @@ namespace Intersection_Components
 			// update state of outbound link and inbound movements
 			feature_implementation void update_state()
 			{
-				define_component_interface_in_implementation(_Link_Interface, type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype,  ComponentType);
-				define_container_and_value_interface_in_implementation(_Movements_Container_Interface, _Movement_Interface, type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				define_container_and_value_interface_unqualified_container(_Movements_Container_Interface, _Movement_Interface, type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 
@@ -61,8 +61,8 @@ namespace Intersection_Components
 			// allocate supply based on driving rule
 			feature_implementation void supply_allocation_based_on_driving_rule()
 			{
-				define_component_interface_in_implementation(_Link_Interface, type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface_in_implementation(_Movements_Container_Interface, _Movement_Interface, type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Movements_Container_Interface, _Movement_Interface, type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				_Movement_Interface* inbound_movement;
 				_Link_Interface* inbound_link;
@@ -179,7 +179,7 @@ namespace Intersection_Components
 			// compute total transfer demand
 			feature_implementation float compute_total_transfer_demand()
 			{
-				define_container_and_value_interface_in_implementation(_Movements_Container_Interface, _Movement_Interface, type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Movements_Container_Interface, _Movement_Interface, type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				float total_transfer_demand = 0.0f;
 				typename _Movements_Container_Interface::iterator inbound_itr;
@@ -193,8 +193,8 @@ namespace Intersection_Components
 			// allocate supply proprotional to demand
 			feature_implementation void supply_allocation_proportion_to_demand()
 			{
-				define_component_interface_in_implementation(_Link_Interface, type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface_in_implementation(_Movements_Container_Interface, _Movement_Interface, type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Movements_Container_Interface, _Movement_Interface, type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				_Movement_Interface* inbound_movement;
 
@@ -262,9 +262,9 @@ namespace Intersection_Components
 			// transfer vehicles 
 			feature_implementation void node_transfer()
 			{
-				define_container_and_value_interface_in_implementation(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-				define_component_interface(_Link_Interface,  _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
 				_Link_Interface* outbound_link;
@@ -294,11 +294,11 @@ namespace Intersection_Components
 			// accept a vehicle
 			feature_implementation void accept_vehicle(void* vehicle)
 			{
-				define_container_and_value_interface_in_implementation(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
-				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, _Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-				define_component_interface(_Movement_Plan_Interface, _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
+				define_container_and_value_interface_unqualified_container(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename _Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
 
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
 				_Link_Interface* outbound_link;
@@ -328,8 +328,8 @@ namespace Intersection_Components
 			// allocate supply among turn movements
 			feature_implementation void turn_movement_supply_allocation()
 			{
-				define_component_interface_in_implementation(_Intersection_Control_Interface, type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
-				define_component_interface(_Control_Plan_Interface, _Intersection_Control_Interface::get_type_of(current_control_plan), Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
+				define_component_interface(_Intersection_Control_Interface, type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
+				define_component_interface(_Control_Plan_Interface, typename _Intersection_Control_Interface::get_type_of(current_control_plan), Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
 
 				Types::Intersection_Type_Keys control_type = ((_Intersection_Control_Interface*)_intersection_control)->template current_control_plan<_Control_Plan_Interface*>()->template control_type<Types::Intersection_Type_Keys>();
 				switch(control_type)
@@ -361,7 +361,7 @@ namespace Intersection_Components
 			// allocate supply based on driving rule
 			feature_implementation void supply_allocation_based_on_driving_rule()
 			{
-				define_container_and_value_interface_in_implementation(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
 
 				for (outbound_itr=_outbound_inbound_movements.begin(); outbound_itr!=_outbound_inbound_movements.end(); outbound_itr++)
@@ -373,7 +373,7 @@ namespace Intersection_Components
 			// allocate supply proportional to demand
 			feature_implementation void supply_allocation_proportion_to_demand()
 			{
-				define_container_and_value_interface_in_implementation(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
 				for (outbound_itr=_outbound_inbound_movements.begin(); outbound_itr!=_outbound_inbound_movements.end(); outbound_itr++)
 				{
@@ -384,8 +384,8 @@ namespace Intersection_Components
 			// load vehicles to their origin link
 			feature_implementation void origin_link_loading()
 			{
-				define_container_and_value_interface_in_implementation(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
 
 				_Link_Interface* outbound_link;
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
@@ -399,8 +399,8 @@ namespace Intersection_Components
 
 			feature_implementation void initialize_features(void* network)
 			{
-				define_container_and_value_interface_in_implementation(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
-				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 
@@ -425,7 +425,7 @@ namespace Intersection_Components
 
 			feature_implementation void Initialize()
 			{
-				define_component_interface_in_implementation(_Intersection_Control_Interface, type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
+				define_component_interface(_Intersection_Control_Interface, type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
 				if (_outbound_inbound_movements.size() > 0 && _inbound_outbound_movements.size() > 0)

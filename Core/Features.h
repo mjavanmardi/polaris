@@ -490,33 +490,23 @@ struct member_function_ptr_types<Type,setter_type>
 	typedef PROTOTYPE_TEMPLATE<FEATURE_TYPE,CALLER_TYPE> COMPONENT_INTERFACE_ALIAS
 
 #define define_container_and_value_interface(CONTAINER_ALIAS, VALUE_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_PROTOTYPE,CALLER_TYPE)\
+	typedef VALUE_PROTOTYPE<CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> VALUE_ALIAS;\
+	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,VALUE_ALIAS*> CONTAINER_ALIAS
+
+#define define_container_and_value_interface_unqualified_container(CONTAINER_ALIAS, VALUE_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_PROTOTYPE,CALLER_TYPE)\
 	typedef VALUE_PROTOTYPE<typename CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> VALUE_ALIAS;\
 	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,VALUE_ALIAS*> CONTAINER_ALIAS
 
 #define define_container_interface(CONTAINER_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_PROTOTYPE,CALLER_TYPE)\
+	typedef VALUE_PROTOTYPE<CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> value_alias;\
+	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,value_alias*> CONTAINER_ALIAS
+
+#define define_container_interface_unqualified_container(CONTAINER_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_PROTOTYPE,CALLER_TYPE)\
 	typedef VALUE_PROTOTYPE<typename CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> value_alias;\
 	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,value_alias*> CONTAINER_ALIAS
 
 #define define_simple_container_interface(CONTAINER_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_TYPE, CALLER_TYPE)\
 	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,VALUE_TYPE> CONTAINER_ALIAS
-
-///============================================================================
-/// local definition macros for compilation in Linux
-///============================================================================
-#define define_component_interface_in_implementation(COMPONENT_INTERFACE_ALIAS, FEATURE_TYPE, PROTOTYPE_TEMPLATE, CALLER_TYPE)\
-	typedef PROTOTYPE_TEMPLATE<FEATURE_TYPE,CALLER_TYPE> COMPONENT_INTERFACE_ALIAS
-
-#define define_container_and_value_interface_in_implementation(CONTAINER_ALIAS, VALUE_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_PROTOTYPE,CALLER_TYPE)\
-	typedef VALUE_PROTOTYPE<typename CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> VALUE_ALIAS;\
-	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,VALUE_ALIAS*> CONTAINER_ALIAS
-
-#define define_container_interface_in_implementation(CONTAINER_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_PROTOTYPE,CALLER_TYPE)\
-	typedef VALUE_PROTOTYPE<typename CONTAINER_TYPE::unqualified_value_type,CALLER_TYPE> value_alias;\
-	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,value_alias*> CONTAINER_ALIAS
-
-#define define_simple_container_interface_in_implementation(CONTAINER_ALIAS, CONTAINER_TYPE, CONTAINER_PROTOTYPE, VALUE_TYPE, CALLER_TYPE)\
-	typedef CONTAINER_PROTOTYPE<CONTAINER_TYPE,CALLER_TYPE,VALUE_TYPE> CONTAINER_ALIAS
-///============================================================================
 
 #define type_of(FEATURE_NAME) FEATURE_NAME##_type
 #define get_type_of(FEATURE_NAME) Component_Type::FEATURE_NAME##_type
