@@ -884,9 +884,16 @@ void matrix<T>::print(ostream& stream, int n)
 {
 	stream<<endl;
 
+	// print header
+	for (uint j=0; j<_dim_sizes.second; j++)
+	{
+		stream << '\t' << j <<'|';
+	}
+	stream << endl;
 	// print 2d matrix of last 2 dimensions
 	for (uint i=0; i<_dim_sizes.first; i++)
 	{
+		stream << i <<'|'<<'\t';
 		for (uint j=0; j<_dim_sizes.second; j++)
 		{
 			stream<<this->operator[](pair<size_type, size_type>(i,j))<<"\t";

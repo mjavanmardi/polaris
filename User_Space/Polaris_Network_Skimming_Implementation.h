@@ -35,6 +35,8 @@ namespace Network_Skimming_Components
 		//--------------------------------------------------------------------------------------
 		implementation struct _Basic_Network_Skimming_Elements
 		{
+			typedef Time_Minutes Stored_Time_Type;
+
 			// reference to the transportation network
 			member_component(typename MasterType::network_type, network_reference, none, none);
 
@@ -49,8 +51,9 @@ namespace Network_Skimming_Components
 
 			// link-to-zone mapping for use in skimming
 			member_associative_container(concat(hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),origin_node_to_zone_map,none,none);
-			member_associative_container(concat(hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),destination_link_to_zone_map,none,none);
+			member_associative_container(concat(hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),destination_node_to_zone_map,none,none);
 
+			member_data(Counter, timer,none,none);
 		};
 
 

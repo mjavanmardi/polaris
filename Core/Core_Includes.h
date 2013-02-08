@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <type_traits>
 #include <random>
+#include <sstream>
 #else
 #define nullptr NULL
 #include <time.h>
@@ -172,6 +173,13 @@ static LARGE_INTEGER thread_start_timers_B[_num_threads];
 static LARGE_INTEGER thread_stop_timers_B[_num_threads];
 #endif
 
+#define THROW_EXCEPTION(MESSAGE_STREAM) \
+{std::stringstream s;\
+s << MESSAGE_STREAM;\
+std::cerr << s.str();\
+throw new std::exception(s.str().c_str());}
+
+
 ///============================================================================
 /// _all_components - type singletons for all compiled components
 ///============================================================================
@@ -227,6 +235,12 @@ void end_timer(timespec& start,long long& total)
 }
 
 #endif
+
+#define THROW_EXCEPTION(MESSAGE_STREAM) \
+{std::stringstream s;\
+s << MESSAGE_STREAM;\
+std::cerr << s.str();\
+throw new std::exception(s.str().c_str());}
 
 
 #ifdef DEBUG_1

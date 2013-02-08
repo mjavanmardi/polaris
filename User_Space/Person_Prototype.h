@@ -1,6 +1,6 @@
 #pragma once
 
-#include "User_Space_Includes.h"
+#include "User_Space.h"
 
 //===============================================================
 #pragma region FORWARD DECLARATIONS
@@ -77,13 +77,25 @@ namespace Prototypes
 		// Event handling
 		declare_feature_conditional(Agent_Conditional)
 		{
-			response.next._iteration = Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(5);
+			response.next._iteration = Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(15);
 			response.next._sub_iteration = 0;
 			response.result = true;
 		}
 		declare_feature_event(Agent_Event)
 		{
-			//cout << endl << "Current time in minutes: "<<Simulation_Time.Current_Time<Time_Minutes>();
+			typedef Person_Prototype<ComponentType, ComponentType> _Person_Interface;
+			ComponentType* _pthis = (ComponentType*)_this;
+			_Person_Interface* pthis =(_Person_Interface*)_pthis;
+
+			define_component_interface(_network_itf,get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,CallerType);
+			_network_itf* network = pthis->network_reference<_network_itf*>();
+
+			if (pthis->internal_id<int>() == 4090)
+			{
+				cout << endl << "At time in minutes: "<<Simulation_Time.Current_Time<Time_Minutes>();
+				cout << endl << "Agent "<<pthis->internal_id<int>()<<"'s travel time from zone 1 to zone 3 is :" << network->Get_LOS<Target_Type<Time_Minutes,int,int>>(1,3,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+
+			}
 		}
 
 		// Initializer
