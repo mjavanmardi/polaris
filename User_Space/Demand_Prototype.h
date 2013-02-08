@@ -279,11 +279,11 @@ namespace Demand_Components
 			}
 #endif
 
-			feature_prototype void read_demand_data(requires(!check_2_no_typename(TargetType,typename Network_Components::Types::ODB_Network,is_same) && !check_2_no_typename(TargetType,typename Network_Components::Types::File_Network,is_same)))
+			feature_prototype void read_demand_data(requires(!check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,typename Network_Components::Types::File_Network,is_same)))
 			{
-				assert_check_2_no_typename(TargetType,typename Network_Components::Types::ODB_Network,is_same,"TargetType is ill-defined");
-				assert_check_2_no_typename(TargetType,typename Network_Components::Types::ODB_Network,is_same,"TargetType should indicate ODB_Network if you want to read it in with ODB");
-				assert_check_2_no_typename(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType should indicate Static_Network if you want to read in the hard coded network");
+				assert_check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same,"TargetType is ill-defined");
+				assert_check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same,"TargetType should indicate ODB_Network if you want to read it in with ODB");
+				assert_check_2(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType should indicate Static_Network if you want to read in the hard coded network");
 			}
 
 			feature_prototype void read_demand_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data, network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::demand_data_information::DemandData& demand_data)
@@ -357,10 +357,10 @@ namespace Demand_Components
 				
 			}
 
-			feature_prototype void read_demand_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data, network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::demand_data_information::DemandData& demand_data, requires(!check_2_no_typename(TargetType,typename Network_Components::Types::File_Network,is_same)))
+			feature_prototype void read_demand_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data, network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::demand_data_information::DemandData& demand_data, requires(!check_2(TargetType,typename Network_Components::Types::File_Network,is_same)))
 			{
-				assert_check_2_no_typename(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType is ill-defined");
-				assert_check_2_no_typename(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType should indicate File_Network if you want to read it in from file");
+				assert_check_2(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType is ill-defined");
+				assert_check_2(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType should indicate File_Network if you want to read it in from file");
 			}
 
 

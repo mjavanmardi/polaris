@@ -40,13 +40,13 @@ namespace Movement_Plan_Components
 			/// current_trajectory_position
 			//------------------------------------------------------------------------------------------------------------------
 			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType current_trajectory_position(requires(check_2_no_typename(TargetType,int,is_same) || check_2_no_typename(TargetType,int&,is_same)))
+			TargetType current_trajectory_position(requires(check_2(TargetType,int,is_same) || check_2(TargetType,int&,is_same)))
 			{
 				return (TargetType)_current_trajectory_index;
 			}
 
 			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType current_trajectory_position(requires(!check_2_no_typename(TargetType,int,is_same) && !check_2_no_typename(TargetType,int&,is_same)))
+			TargetType current_trajectory_position(requires(!check_2(TargetType,int,is_same) && !check_2(TargetType,int&,is_same)))
 			{
 				return (TargetType)_trajectory_container[_current_trajectory_index];
 			}
@@ -54,7 +54,7 @@ namespace Movement_Plan_Components
 			tag_getter_as_available(current_trajectory_position);
 
 			template<typename ComponentType, typename CallerType, typename TargetType>
-			void current_trajectory_position(TargetType val,requires(check_2_no_typename(TargetType,int,is_same) || check_2_no_typename(TargetType,int&,is_same)))
+			void current_trajectory_position(TargetType val,requires(check_2(TargetType,int,is_same) || check_2(TargetType,int&,is_same)))
 			{
 				_current_trajectory_index=val;
 			}

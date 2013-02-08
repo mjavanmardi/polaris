@@ -26,22 +26,22 @@ namespace Vehicle_Components
 #else
 			member_component(typename MasterType::traveler_type, traveler, none, none);
 #endif
-			feature_implementation void load(requires(check_2_no_typename(TargetType,typename Types::Load_To_Entry_Queue,is_same)))
+			feature_implementation void load(requires(check_2(TargetType,typename Types::Load_To_Entry_Queue,is_same)))
 			{
 				_simulation_status = Types::Vehicle_Status_Keys::IN_ENTRY_QUEUE;
 			}
 
-			feature_implementation void load(requires(check_2_no_typename(TargetType,typename Types::Load_To_Origin_Link,is_same)))
+			feature_implementation void load(requires(check_2(TargetType,typename Types::Load_To_Origin_Link,is_same)))
 			{
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
 				_simulation_status =  Types::Vehicle_Status_Keys::IN_NETWORK;
 				((_Movement_Plan_Interface*)_movement_plan)->template initialize_trajectory<NULLTYPE>();
 			}
 
-			feature_implementation void load(requires(!check_2_no_typename(TargetType,typename Types::Load_To_Origin_Link,is_same) && !check_2_no_typename(TargetType,typename Types::Load_To_Entry_Queue,is_same)))
+			feature_implementation void load(requires(!check_2(TargetType,typename Types::Load_To_Origin_Link,is_same) && !check_2(TargetType,typename Types::Load_To_Entry_Queue,is_same)))
 			{
-                assert_check_2_no_typename(TargetType,typename Vehicle_Components::Types::Load_To_Origin_Link,is_same,"no match");
-                assert_check_2_no_typename(TargetType,typename Vehicle_Components::Types::Load_To_Entry_Queue,is_same,"no match");
+                assert_check_2(TargetType,typename Vehicle_Components::Types::Load_To_Origin_Link,is_same,"no match");
+                assert_check_2(TargetType,typename Vehicle_Components::Types::Load_To_Entry_Queue,is_same,"no match");
 			}
 
 			feature_implementation void unload()

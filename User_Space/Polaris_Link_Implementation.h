@@ -288,14 +288,14 @@ namespace Link_Components
 
 			}
 
-			feature_implementation void accept_vehicle(TargetType veh,requires(!check_2_no_typename(CallerType,typename MasterType::movement_type,is_same) && !check_2_no_typename(CallerType,ComponentType,is_same) && !check_2_no_typename(CallerType,typename MasterType::routing_type,is_same)))
+			feature_implementation void accept_vehicle(TargetType veh,requires(!check_2(CallerType,typename MasterType::movement_type,is_same) && !check_2(CallerType,ComponentType,is_same) && !check_2(CallerType,typename MasterType::routing_type,is_same)))
 			{
-				assert_check_2_no_typename(CallerType,typename MasterType::movement_type,is_same,"Invalid CallerType");
-				assert_check_2_no_typename(CallerType,ComponentType,is_same,"Invalid CallerType");
-				assert_check_2_no_typename(CallerType,typename MasterType::routing_type,is_same,"Invalid CallerType");
+				assert_check_2(CallerType,typename MasterType::movement_type,is_same,"Invalid CallerType");
+				assert_check_2(CallerType,ComponentType,is_same,"Invalid CallerType");
+				assert_check_2(CallerType,typename MasterType::routing_type,is_same,"Invalid CallerType");
 			}
 
-			feature_implementation void accept_vehicle(TargetType veh,requires(check_2_no_typename(CallerType,typename MasterType::routing_type,is_same)))
+			feature_implementation void accept_vehicle(TargetType veh,requires(check_2(CallerType,typename MasterType::routing_type,is_same)))
 			{
 				define_container_and_value_interface_unqualified_container(_Link_Origin_Vehicles_Container_Interface, _Vehicle_Interface,type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				_link_origin_cumulative_arrived_vehicles++;
@@ -304,7 +304,7 @@ namespace Link_Components
 				vehicle->template load<Vehicle_Components::Types::Load_To_Entry_Queue>();
 			}
 
-			feature_implementation void accept_vehicle(TargetType veh,requires(check_2_no_typename(CallerType,typename MasterType::movement_type,is_same) || check_2_no_typename(CallerType,ComponentType,is_same)))
+			feature_implementation void accept_vehicle(TargetType veh,requires(check_2(CallerType,typename MasterType::movement_type,is_same) || check_2(CallerType,ComponentType,is_same)))
 			{
 				define_container_and_value_interface_unqualified_container(_Vehicle_Queue_Interface, _Vehicle_Interface, type_of(current_vehicle_queue), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_container_and_value_interface_unqualified_container(_Destination_Vehicle_Queue_Interface, _Vehicle_Interface_2, type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
