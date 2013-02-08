@@ -158,8 +158,8 @@ public:
 	Revision ex_next_revision;
 	Revision ex_current_revision;
 
-	volatile int ex_lock;
+	volatile unsigned int ex_lock;
 
-	volatile int ex_threads_counter_begin;
-	volatile int ex_threads_counter_end;
+	volatile unsigned int ex_threads_counter_begin;
+	volatile unsigned int ex_threads_counter_end;
 };

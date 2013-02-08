@@ -92,15 +92,15 @@ struct Typed_Execution_Page
 	Revision ptex_next_revision;
 	Revision ptex_next_next_revision;
 
-	volatile int ptex_threads_counter;
-	volatile int ptex_lock;
+	volatile unsigned int ptex_threads_counter;
+	volatile unsigned int ptex_lock;
 
 	Execution_Object* first_free_cell;
 
 	static const int stride;
 	static const int num_cells;
 
-	volatile int num_allocated;
+	volatile unsigned int num_allocated;
 };
 
 template<typename DataType>
@@ -248,11 +248,11 @@ public:
 	Quick_List<Typed_Execution_Page<DataType>*> active_pages;
 	Quick_List<Typed_Execution_Page<DataType>*> pages_with_free_cells;
 
-	volatile int tex_lock;
+	volatile unsigned int tex_lock;
 
-	volatile int mem_lock;
+	volatile unsigned int mem_lock;
 
-	volatile int tex_threads_counter;
+	volatile unsigned int tex_threads_counter;
 
 	Revision tex_next_next_revision;
 	Revision tex_next_revision;

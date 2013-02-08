@@ -1105,10 +1105,10 @@ public:
 	string host_ip;
 	bool is_head_node;
 
-	volatile int ipc_lock;
+	volatile unsigned int ipc_lock;
 
-	volatile int ipc_threads_counter_A;
-	volatile int ipc_threads_counter_B;
+	volatile unsigned int ipc_threads_counter_A;
+	volatile unsigned int ipc_threads_counter_B;
 
 	vector<string> all_names;
 	vector<string> all_ips;

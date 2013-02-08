@@ -116,7 +116,7 @@ public:
 	//bool type_activated;
 	//volatile long tde_lock;
 	
-	volatile int mem_lock;
+	volatile unsigned int mem_lock;
 
 	const unsigned int stride;
 	

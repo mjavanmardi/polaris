@@ -18,7 +18,7 @@ struct Exchange_Data
 	int next_next_exchange;
 	int exchange_interval;
 	
-	volatile int comm_lock;
+	volatile unsigned int comm_lock;
 };
 
 ///============================================================================
@@ -29,7 +29,7 @@ struct Processing_Parcel
 {
 	int message_offset;
 	int num_messages;
-	volatile int parcel_lock;
+	volatile unsigned int parcel_lock;
 };
 
 ///============================================================================
@@ -50,7 +50,7 @@ struct Process_Data
 		num_parcels=0;
 	}
 	
-	volatile int process_data_lock;
+	volatile unsigned int process_data_lock;
 	
 	Byte_Balloon process_buffer;
 	

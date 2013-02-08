@@ -69,7 +69,7 @@ struct NULLCLASS{static const int page_factor=1;};
 const int NULLCLASS::page_factor;
 
 
-typedef volatile int _lock;
+typedef volatile unsigned int _lock;
 #define LOCK(LOCK_VARIABLE) while(AtomicExchange(&LOCK_VARIABLE,1)) SLEEP(0)
 #define UNLOCK(LOCK_VARIABLE) LOCK_VARIABLE=0
 
@@ -87,7 +87,7 @@ typedef char Page[_Page_Size];
 
 static volatile long long* request_sum=new volatile long long();
 static volatile long long* exec_sum=new volatile long long();
-static volatile int stdout_lock=0;
+static volatile unsigned int stdout_lock=0;
 
 #ifdef WINDOWS
 static __declspec(thread) int _thread_id;
