@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -g -std=c++0x -pthread -D LINUX
 LDFLAGS = -g -pthread -lstdc++ -lrt
-HEADERS = ../Core/*.h ../User_Space/*.h ../Repository/*.h
+HEADERS = ../Core/*.h ../User_Space/*.h ../Repository/*.h ./*.h
 all: NetworkModel
 clean: 
 	rm NetworkModel
