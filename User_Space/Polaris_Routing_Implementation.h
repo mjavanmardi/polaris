@@ -50,7 +50,7 @@ namespace Routing_Components
 				}
 			}
 
-			feature_implementation void read_network_data(typename TargetType::ParamType regular_network, requires(check_2(TargetType::NetIOType,Network_Components::Types::Regular_Network,is_same)))
+			feature_implementation void read_network_data(typename TargetType::ParamType regular_network, requires(check_2(typename TargetType::NetIOType,Network_Components::Types::Regular_Network,is_same)))
 			{
 
 				define_container_and_value_interface_in_implementation(_Routable_Links_Container_Interface, _Routable_Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -134,10 +134,10 @@ namespace Routing_Components
 
 #ifndef FOR_LINUX_PORTING
 			member_component(typename MasterType::person_type, traveler, none, none);
-			define_component_interface(_Traveler_Interface, MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
+			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
 #else
 			member_component(typename MasterType::traveler_type, traveler, none, none);
-			define_component_interface(_Traveler_Interface, MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
+			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
 #endif
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType vehicle()
@@ -149,7 +149,7 @@ namespace Routing_Components
 
 			member_component(typename MasterType::network_type, network, none, none);
 
-			define_component_interface(_Network_Interface, MasterType::network_type, Network_Components::Prototypes::Network_Prototype, NULLTYPE);
+			define_component_interface(_Network_Interface, typename MasterType::network_type, Network_Components::Prototypes::Network_Prototype, NULLTYPE);
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType routable_network()
 			{
@@ -220,10 +220,10 @@ namespace Routing_Components
 
 #ifndef FOR_LINUX_PORTING
 			member_component(typename MasterType::person_type, traveler, none, none);
-			define_component_interface(_Traveler_Interface, MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
+			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
 #else
 			member_component(typename MasterType::traveler_type, traveler, none, none);
-			define_component_interface(_Traveler_Interface, MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
+			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
 #endif
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType vehicle()
@@ -235,7 +235,7 @@ namespace Routing_Components
 
 			member_component(typename MasterType::network_type, network, none, none);
 
-			define_component_interface(_Network_Interface, MasterType::network_type, Network_Components::Prototypes::Network_Prototype, NULLTYPE);
+			define_component_interface(_Network_Interface, typename MasterType::network_type, Network_Components::Prototypes::Network_Prototype, NULLTYPE);
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType routable_network()
 			{

@@ -107,7 +107,7 @@ namespace Demand_Components
 			feature_accessor(last_vehicle_departure_time, none, none);
 #ifndef FOR_LINUX_PORTING
 			feature_prototype void read_demand_data(typename TargetType::ParamType& network_mapping,
-				requires(check_2(TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
+				requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
 				using namespace odb;
 				using namespace pio;

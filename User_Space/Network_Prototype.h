@@ -183,16 +183,16 @@ namespace Network_Components
 			{
 				define_component_interface(_skim_interface,get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
-				skim->Get_Current_LOS<TargetType>(Origin, Destination, Mode_Indicator);
+				return skim->Get_LOS<TargetType>(Origin, Destination, Mode_Indicator);
 			}
 			//------------------------------------------------------------------------------------------------------------------
 #endif
-			feature_prototype void read_network_data(typename TargetType::ParamType data_source, requires(check_2(TargetType::NetIOType,Types::ODB_Network,is_same) || check_2(TargetType::NetIOType,Types::File_Network,is_same) || check_2(TargetType::NetIOType,Types::Regular_Network,is_same)))
+			feature_prototype void read_network_data(typename TargetType::ParamType data_source, requires(check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) || check_2(typename TargetType::NetIOType,Types::File_Network,is_same) || check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
 			{
 				this_component()->template read_network_data<ComponentType,CallerType,TargetType>(data_source);
 			}
 
-			feature_prototype void read_network_data(requires(!check_2(TargetType::NetIOType,Types::ODB_Network,is_same) && !check_2(TargetType::NetIOType,Types::File_Network,is_same) && !check_2(TargetType::NetIOType,Types::Regular_Network,is_same)))
+			feature_prototype void read_network_data(requires(!check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) && !check_2(typename TargetType::NetIOType,Types::File_Network,is_same) && !check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
 			{
 				//assert_check(false,"TargetType::NetIOType is not supported");
 				assert_check_2(TargetType::NetIOType,Types::ODB_Network,is_same,"TargetType should indicate ODB_Network if you want to read it in with ODB");

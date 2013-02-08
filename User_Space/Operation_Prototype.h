@@ -140,7 +140,7 @@ namespace Operation_Components
 				}
 			}
 #ifndef FOR_LINUX_PORTING
-			feature_prototype void read_operation_data(typename TargetType::ParamType& network_mapping,requires(check_2(TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
+			feature_prototype void read_operation_data(typename TargetType::ParamType& network_mapping,requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
 				Network_Components::Types::Network_IO_Maps& net_io_maps=(Network_Components::Types::Network_IO_Maps&)network_mapping;
 
