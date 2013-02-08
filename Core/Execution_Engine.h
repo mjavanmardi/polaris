@@ -13,9 +13,9 @@ public:
 	Execution_Root()
 	{
 		ex_current_revision=-1;
-		ex_next_revision._iteration=LONG_MAX;
+		ex_next_revision._iteration=INT_MAX;
 		ex_next_revision._sub_iteration=0;
-		ex_next_next_revision._iteration=LONG_MAX;
+		ex_next_next_revision._iteration=INT_MAX;
 		ex_next_next_revision._sub_iteration=0;
 
 		ex_lock=0;
@@ -86,7 +86,7 @@ public:
 							// final thread, in charge of getting ready for the next _revision, but only if something actually happened this _revision
 							execution_type->tex_current_revision=this_revision;
 							execution_type->tex_next_revision=execution_type->tex_next_next_revision;
-							execution_type->tex_next_next_revision._iteration=LONG_MAX;
+							execution_type->tex_next_next_revision._iteration=INT_MAX;
 							execution_type->tex_next_next_revision._sub_iteration=0;
 							execution_type->tex_threads_counter=0;
 						}
@@ -118,7 +118,7 @@ public:
 			{
 				ex_current_revision=this_revision;
 				ex_next_revision=ex_next_next_revision;
-				ex_next_next_revision._iteration=LONG_MAX;
+				ex_next_next_revision._iteration=INT_MAX;
 				ex_next_next_revision._sub_iteration=0;
 
 				sub_tick_tock=!sub_tick_tock;
@@ -158,8 +158,8 @@ public:
 	Revision ex_next_revision;
 	Revision ex_current_revision;
 
-	volatile long ex_lock;
+	volatile int ex_lock;
 
-	volatile long ex_threads_counter_begin;
-	volatile long ex_threads_counter_end;
+	volatile int ex_threads_counter_begin;
+	volatile int ex_threads_counter_end;
 };

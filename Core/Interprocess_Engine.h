@@ -566,7 +566,7 @@ public:
 			
 			// one thread per exchange
 			
-			long process = AtomicIncrement(&partition_exchange_data->comm_lock);
+			int process = AtomicIncrement(&partition_exchange_data->comm_lock);
 			
 			//cout << "\t\tstatus of exchange with " << i << ": " << (bool)(partition_exchange_data->current_exchange==_iteration) << endl;
 			
@@ -932,7 +932,7 @@ public:
 		{
 			Processing_Parcel* parcel = (Processing_Parcel*)&process_data->processing_parcels.buffer()[i*sizeof(Processing_Parcel)];
 			
-			long process = AtomicIncrement(&parcel->parcel_lock);
+			int process = AtomicIncrement(&parcel->parcel_lock);
 			
 			if(process == 1)
 			{
@@ -1105,10 +1105,10 @@ public:
 	string host_ip;
 	bool is_head_node;
 
-	volatile long ipc_lock;
+	volatile int ipc_lock;
 
-	volatile long ipc_threads_counter_A;
-	volatile long ipc_threads_counter_B;
+	volatile int ipc_threads_counter_A;
+	volatile int ipc_threads_counter_B;
 
 	vector<string> all_names;
 	vector<string> all_ips;

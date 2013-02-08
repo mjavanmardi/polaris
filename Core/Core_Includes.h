@@ -69,7 +69,7 @@ struct NULLCLASS{static const int page_factor=1;};
 const int NULLCLASS::page_factor;
 
 
-typedef volatile long _lock;
+typedef volatile int _lock;
 #define LOCK(LOCK_VARIABLE) while(AtomicExchange(&LOCK_VARIABLE,1)) SLEEP(0)
 #define UNLOCK(LOCK_VARIABLE) LOCK_VARIABLE=0
 
@@ -87,7 +87,7 @@ typedef char Page[_Page_Size];
 
 static volatile long long* request_sum=new volatile long long();
 static volatile long long* exec_sum=new volatile long long();
-static volatile long stdout_lock=0;
+static volatile int stdout_lock=0;
 
 #ifdef WINDOWS
 static __declspec(thread) int _thread_id;
@@ -114,35 +114,29 @@ typedef void (*Event)(void*);
 union Revision
 {
 	Revision():_revision(0){};
-	Revision(long sub_revision,long revision):_sub_iteration(sub_revision),_iteration(revision){};
+	Revision(int sub_revision,int revision):_sub_iteration(sub_revision),_iteration(revision){};
 	Revision(Revision& copy):_revision(copy._revision){};
 
 	inline void operator = (const long long val){_revision=val;}
 	inline operator long long&(){return _revision;}
-#ifdef WINDOWS
+
 	struct
 	{
-		long _sub_iteration;
-		long _iteration;
+		int _sub_iteration;
+		int _iteration;
 	};
-#else
-	struct
-	{
-		long _iteration;
-		long _sub_iteration;
-	};
-#endif
+
 	long long _revision;
 };
 
 static Revision _revision;
-static long& _sub_iteration=_revision._sub_iteration;
-static long& _iteration=_revision._iteration;
+static int& _sub_iteration=_revision._sub_iteration;
+static int& _iteration=_revision._iteration;
 
 
 struct Conditional_Response
 {
-	Conditional_Response():result(false){next._iteration=LONG_MAX;next._sub_iteration=0;};
+	Conditional_Response():result(false){next._iteration=INT_MAX;next._sub_iteration=0;};
 
 	Revision next;
 	bool result;

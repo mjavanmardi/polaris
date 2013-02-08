@@ -27,7 +27,7 @@ struct Execution_Object
 {
 	Execution_Object()
 	{
-		next_revision._iteration=LONG_MAX;
+		next_revision._iteration=INT_MAX;
 		next_revision._sub_iteration=0;
 	}
 

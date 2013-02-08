@@ -89,10 +89,10 @@ public:
 		}
 	}
 	
-	volatile long run;
+	volatile int run;
 
-	volatile long threads_finished_counter;
-	volatile long threads_running_counter;
+	volatile int threads_finished_counter;
+	volatile int threads_running_counter;
 
 	//LARGE_INTEGER frequency;
 	//LARGE_INTEGER start;

@@ -15,9 +15,9 @@ struct Typed_Execution_Page
 		first_free_cell=(Execution_Object*)((Byte*)this+sizeof(Typed_Execution_Page<DataType>));
 
 		ptex_current_revision=-1;
-		ptex_next_revision._iteration=LONG_MAX;
+		ptex_next_revision._iteration=INT_MAX;
 		ptex_next_revision._sub_iteration=0;
-		ptex_next_next_revision._iteration=LONG_MAX;
+		ptex_next_next_revision._iteration=INT_MAX;
 		ptex_next_next_revision._sub_iteration=0;
 		ptex_lock=0;
 		ptex_threads_counter=0;
@@ -30,7 +30,7 @@ struct Typed_Execution_Page
 		while(current_cell!=end)
 		{
 			current_cell->next_free_cell=(Execution_Object*)((Byte*)current_cell+stride);
-			current_cell->next_revision._iteration=LONG_MAX;
+			current_cell->next_revision._iteration=INT_MAX;
 			current_cell->next_revision._sub_iteration=0;
 			//current_cell->event_register=nullptr;//shared with first free list pointer, cannot initialize
 			//current_cell->conditional_register=&False_Condition;
@@ -92,8 +92,8 @@ struct Typed_Execution_Page
 	Revision ptex_next_revision;
 	Revision ptex_next_next_revision;
 
-	volatile long ptex_threads_counter;
-	volatile long ptex_lock;
+	volatile int ptex_threads_counter;
+	volatile int ptex_lock;
 
 	Execution_Object* first_free_cell;
 
@@ -128,9 +128,9 @@ public:
 		mem_lock=0;
 		type_process_directive=&Typed_Execution_Pages::Process;
 		tex_current_revision=-1;
-		tex_next_revision._iteration=LONG_MAX;
+		tex_next_revision._iteration=INT_MAX;
 		tex_next_revision._sub_iteration=0;
-		tex_next_next_revision._iteration=LONG_MAX;
+		tex_next_next_revision._iteration=INT_MAX;
 		tex_next_next_revision._sub_iteration=0;
 		tex_threads_counter=0;
 	}
@@ -162,7 +162,7 @@ public:
 		while(itr!=nullptr)
 		{
 			execution_page = itr->data;
-			long process = AtomicIncrement(&execution_page->ptex_threads_counter);
+			int process = AtomicIncrement(&execution_page->ptex_threads_counter);
 
 			if(process == 1)
 			{
@@ -193,7 +193,7 @@ public:
 					
 					execution_page->ptex_current_revision=this_revision;
 					execution_page->ptex_next_revision=execution_page->ptex_next_next_revision;
-					execution_page->ptex_next_next_revision._iteration=LONG_MAX;
+					execution_page->ptex_next_next_revision._iteration=INT_MAX;
 					execution_page->ptex_next_next_revision._sub_iteration=0;
 					
 					execution_page->ptex_lock=0; // unlock the page
@@ -248,11 +248,11 @@ public:
 	Quick_List<Typed_Execution_Page<DataType>*> active_pages;
 	Quick_List<Typed_Execution_Page<DataType>*> pages_with_free_cells;
 
-	volatile long tex_lock;
+	volatile int tex_lock;
 
-	volatile long mem_lock;
+	volatile int mem_lock;
 
-	volatile long tex_threads_counter;
+	volatile int tex_threads_counter;
 
 	Revision tex_next_next_revision;
 	Revision tex_next_revision;

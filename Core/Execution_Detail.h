@@ -79,7 +79,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 					// we will not otherwise be updated this _revision
 
 					execution_type->tex_next_revision=starting_iteration;
-					execution_type->tex_next_next_revision._iteration=LONG_MAX;
+					execution_type->tex_next_next_revision._iteration=INT_MAX;
 					execution_type->tex_next_next_revision._sub_iteration=0;
 				}
 			}
@@ -135,7 +135,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 			if(starting_iteration < execution_page->ptex_next_revision)
 			{
 				execution_page->ptex_next_revision=starting_iteration;
-				execution_page->ptex_next_next_revision._iteration=LONG_MAX;
+				execution_page->ptex_next_next_revision._iteration=INT_MAX;
 				execution_page->ptex_next_next_revision._sub_iteration=0;
 			}
 		}
@@ -156,7 +156,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		if(starting_iteration <= execution_root_ptr->ex_next_revision)
 		{
 			execution_root_ptr->ex_next_revision=starting_iteration;
-			execution_root_ptr->ex_next_next_revision._iteration=LONG_MAX;
+			execution_root_ptr->ex_next_next_revision._iteration=INT_MAX;
 			execution_root_ptr->ex_next_next_revision._sub_iteration=0;
 		}
 		else if(starting_iteration < execution_root_ptr->ex_next_next_revision)
@@ -171,7 +171,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		if(starting_iteration <= execution_type->tex_next_revision)
 		{
 			execution_type->tex_next_revision=starting_iteration;
-			execution_type->tex_next_next_revision._iteration=LONG_MAX;
+			execution_type->tex_next_next_revision._iteration=INT_MAX;
 			execution_type->tex_next_next_revision._sub_iteration=0;
 		}
 		else if(starting_iteration < execution_type->tex_next_next_revision)
@@ -189,7 +189,7 @@ void Execution_Object::Load_Register(Conditional conditional,Event p_event,int s
 		if(starting_iteration <= execution_page->ptex_next_revision)
 		{
 			execution_page->ptex_next_revision=starting_iteration;
-			execution_page->ptex_next_next_revision._iteration=LONG_MAX;
+			execution_page->ptex_next_next_revision._iteration=INT_MAX;
 			execution_page->ptex_next_next_revision._sub_iteration=0;
 		}
 		else if(starting_iteration < execution_page->ptex_next_next_revision)
