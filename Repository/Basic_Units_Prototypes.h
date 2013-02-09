@@ -240,7 +240,7 @@ namespace Basic_Units
 			define_get_set_exists_check(Value, Get_Value_exists, Set_Value_exists);
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Length_Value)))
 			{
-				return ReturnValueType(this_component()->Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
+				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Length_Value)))
 			{
@@ -249,21 +249,21 @@ namespace Basic_Units
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Length_Value)))
 			{
-				this_component()->Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
+				this_component()->template Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Length_Value)))
 			{
-				assert_requirements(ComponentType,set_exists_check(Value), "Setter does not exists for this accessor.");
-				assert_requirements(SetValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
+				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
+				assert_check(SetValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
 			}
 
-			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(typename TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Length_Value) && check(typename TargetType::ReturnType,Concepts::Is_Length_Value)))
+			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Length_Value) && check(typename TargetType::ReturnType,Concepts::Is_Length_Value)))
 			{
-				Value_Type convert_component_value_to_param = Conversion_Factor<TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = Conversion_Factor<TargetType::ReturnType>();
-				return TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = Conversion_Factor<typename TargetType::ReturnType>();
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
-			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(typename TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Length_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Length_Value)))
+			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Length_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Length_Value)))
 			{
 				assert_check(TargetType,Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Length_Value, "TargetTyp::ReturnType is not a valid length value structure.");
@@ -435,12 +435,12 @@ namespace Basic_Units
 
 			feature_prototype TargetType Value()
 			{
-				return ((Length_Prototype<ComponentType,CallerType>*)this)->Value<TargetType>();
+				return ((Length_Prototype<ComponentType,CallerType>*)this)->template Value<TargetType>();
 			}
 
 			feature_prototype void Value(TargetType value)
 			{
-				((Length_Prototype<ComponentType,CallerType>*)this)->Value<TargetType>(value);
+				((Length_Prototype<ComponentType,CallerType>*)this)->template Value<TargetType>(value);
 			}
 		};
 
@@ -448,41 +448,42 @@ namespace Basic_Units
 		{
 			feature_prototype TargetType Value()
 			{
-				return ((Length_Prototype<ComponentType,CallerType>*)this)->Value<TargetType>();
+				return ((Length_Prototype<ComponentType,CallerType>*)this)->template Value<TargetType>();
 			}
 
 			feature_prototype void Value(TargetType value)
 			{
-				((Length_Prototype<ComponentType,CallerType>*)this)->Value<TargetType>(value);
+				((Length_Prototype<ComponentType,CallerType>*)this)->templateValue<TargetType>(value);
 			}
 		};
 
 		prototype struct Area_Prototype : public Length_Prototype<ComponentType, CallerType>
 		{
+			typedef Length_Prototype<ComponentType, CallerType> base_type;
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ReturnValueType,Concepts::Is_Area_Value)))
 			{		
-				return ((Length_Prototype<ComponentType,CallerType>*)this)->Value<ReturnValueType>()*((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<ReturnValueType>();
+				return ((Length_Prototype<ComponentType,CallerType>*)this)->template Value<ReturnValueType>()*((Length_Prototype<ComponentType,CallerType>*)this)->template Conversion_Factor<ReturnValueType>();
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ReturnValueType,!Concepts::Is_Area_Value)))
 			{
-				assert_check(ReturnValueType,Concepts::Is_Area_Value,"Your target type is not identified as an area measure.")
+				assert_check(ReturnValueType,Concepts::Is_Area_Value,"Your target type is not identified as an area measure.");
 			}
 
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(SetValueType,Concepts::Is_Area_Value)))
 			{
-				((Length_Prototype<ComponentType,CallerType>*)this)->Value<SetValueType>(value / ((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<SetValueType>());
+				((Length_Prototype<ComponentType,CallerType>*)this)->template Value<SetValueType>(value / ((Length_Prototype<ComponentType,CallerType>*)this)->template Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(SetValueType,!Concepts::Is_Area_Value)))
 			{
-				assert_check(SetValueType,Concepts::Is_Area_Value,"Your target type is not identified as an area measure.")
+				assert_check(SetValueType,Concepts::Is_Area_Value,"Your target type is not identified as an area measure.");
 			}
 
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Area_Value) && check(typename TargetType::ReturnType,Concepts::Is_Area_Value)))
 			{
-				Value_Type convert_component_value_to_param = Conversion_Factor<TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = Conversion_Factor<TargetType::ReturnType>();
+				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
 				Value_Type conversion = convert_component_value_to_return / convert_component_value_to_param;
-				return TargetType::ReturnType((Value_Type)(input_value.Value) * pow(conversion,2.0));
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * pow(conversion,2.0));
 			}
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Area_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Area_Value)))
 			{
@@ -494,30 +495,32 @@ namespace Basic_Units
 
 		prototype struct Volume_Prototype : protected  Length_Prototype<ComponentType, CallerType>
 		{
+			typedef Length_Prototype<ComponentType, CallerType> base_type;
+
 			template<typename ReturnValueType>  ReturnValueType Value(requires_getter(check(ReturnValueType,Concepts::Is_Volume_Value)))
 			{		
-				return ((Length_Prototype<ComponentType,CallerType>*)this)->Value<ReturnValueType>()*((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<ReturnValueType>()*((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<ReturnValueType>();
+				return ((Length_Prototype<ComponentType,CallerType>*)this)->template Value<ReturnValueType>()*((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<ReturnValueType>()*((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<ReturnValueType>();
 			}
 			template<typename ReturnValueType>  ReturnValueType Value(requires_getter(check(ReturnValueType,!Concepts::Is_Volume_Value)))
 			{
-				assert_check(ReturnValueType,Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.")
+				assert_check(ReturnValueType,Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.");
 			}
 
 			template<typename SetValueType>  void Value(SetValueType value,requires_setter(check(SetValueType,Concepts::Is_Volume_Value)))
 			{
-				((Length_Prototype<ComponentType,CallerType>*)this)->Value<SetValueType>(value / ((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<SetValueType>() / ((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<SetValueType>());
+				((Length_Prototype<ComponentType,CallerType>*)this)->template Value<SetValueType>(value / ((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<SetValueType>() / ((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType>  void Value(SetValueType value, requires_setter(check(SetValueType,!Concepts::Is_Volume_Value)))
 			{
-				assert_check(SetValueType,Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.")
+				assert_check(SetValueType,Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.");
 			}
 
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Volume_Value) && check(typename TargetType::ReturnType,Concepts::Is_Volume_Value)))
 			{
-				Value_Type convert_component_value_to_param = Conversion_Factor<TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = Conversion_Factor<TargetType::ReturnType>();
+				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
 				Value_Type conversion = convert_component_value_to_return / convert_component_value_to_param;
-				return TargetType::ReturnType((Value_Type)(input_value.Value) * pow(conversion,3.0));
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * pow(conversion,3.0));
 			}
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Volume_Value) || check(typename TargetType::ParamType,!Concepts::Is_Volume_Value)))
 			{
@@ -534,28 +537,28 @@ namespace Basic_Units
 			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Time_Value)))
 			{
-				return ReturnValueType(this_component()->Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
+				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Time_Value)))
 			{
-				assert_check(ComponentType,get_exists_check(Value), "Getter does not exists for this accessor.");
+				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
 				assert_check(ReturnValueType,Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Time_Value)))
 			{
-				this_component()->Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
+				this_component()->template Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Time_Value)))
 			{
-				assert_check(ComponentType,set_exists_check(Value), "Setter does not exists for this accessor.");
+				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
 				assert_check(SetValueType,Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
 			{
-				Value_Type convert_component_value_to_param = Time_Prototype::Conversion_Factor<TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = Time_Prototype::Conversion_Factor<TargetType::ReturnType>();
-				return TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = Time_Prototype::Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = Time_Prototype::Conversion_Factor<typename TargetType::ReturnType>();
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
 			{
@@ -677,41 +680,42 @@ namespace Basic_Units
 			feature_prototype void Write()
 			{
 				//cout <<"Total Seconds: "<<pthis->Total_Seconds<ComponentType, CallerType, TargetType>()<<endl;
-				cout << "Day "<< this->Time_Component<Data_Structures::Time_Days>()<<":  ";
-				cout << this->Time_Component<Data_Structures::Time_Hours>()<<":"<<this->Time_Component<Data_Structures::Time_Minutes>()<<":"<<this->Time_Component<Data_Structures::Time_Seconds>()<<"."<< this->Time_Component<Data_Structures::Time_DRSeconds>();
+				cout << "Day "<< this->Time_Component<Time_Days>()<<":  ";
+				cout << this->Time_Component<Time_Hours>()<<":"<<this->Time_Component<Time_Minutes>()<<":"<<this->Time_Component<Time_Seconds>()<<"."<< this->Time_Component<Time_DRSeconds>();
 			}
 		};
 
 		prototype struct Rate_Prototype : protected Time_Prototype<ComponentType,CallerType>
 		{
 			tag_as_prototype;
+			typedef Time_Prototype<ComponentType, CallerType> base_type;
 
 			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Time_Value)))
 			{
-				ReturnValueType val = Time_Prototype<ComponentType,CallerType>::Conversion_Factor<ReturnValueType>();
-				return ReturnValueType(this_component()->Value<ComponentType,CallerType,Value_Type>() / val);
+				ReturnValueType val = base_type::template Conversion_Factor<ReturnValueType>();
+				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() / val);
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Time_Value)))
 			{
-				assert_check(ComponentType,get_exists_check(Value), "Getter does not exists for this accessor.");
-				assert_check(TargetType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
+				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
+				assert_check(ReturnValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Time_Value)))
 			{
-				this_component()->Value<ComponentType,CallerType,Value_Type>(value * Conversion_Factor<SetValueType>());
+				this_component()->template Value<ComponentType,CallerType,Value_Type>(value * base_type::template Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Time_Value)))
 			{
-				assert_check(ComponentType,set_exists_check(Value), "Setter does not exists for this accessor.");
+				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
 				assert_check(SetValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
 			{
-				Value_Type convert_component_value_to_param = Time_Prototype::Conversion_Factor<TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = Time_Prototype::Conversion_Factor<TargetType::ReturnType>();
-				return TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
 			}
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
 			{
@@ -724,13 +728,15 @@ namespace Basic_Units
 		prototype struct Speed_Prototype : protected Time_Prototype<ComponentType,CallerType>, protected Length_Prototype<ComponentType,CallerType>
 		{
 			tag_as_prototype;
+			typedef Length_Prototype<ComponentType, CallerType> length_base;
+			typedef Time_Prototype<ComponentType, CallerType> time_base;
 
 			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ComponentType, Concepts::Is_Speed_Component) && check(ReturnValueType,Concepts::Is_Speed_Value)))
 			{
-				ReturnValueType len_val = Length_Prototype<ComponentType,CallerType>::Conversion_Factor<ReturnValueType>();
-				ReturnValueType time_val = Time_Prototype<ComponentType,CallerType>::Conversion_Factor<ReturnValueType>();
-				return ReturnValueType(this_component()->Value<ComponentType,CallerType,Value_Type>() * len_val / time_val );
+				ReturnValueType len_val = length_base::template Conversion_Factor<ReturnValueType>();
+				ReturnValueType time_val = time_base::template Conversion_Factor<ReturnValueType>();
+				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * len_val / time_val );
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(!check(ComponentType,Get_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(ReturnValueType,Concepts::Is_Speed_Value)))
 			{
@@ -740,9 +746,9 @@ namespace Basic_Units
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(ComponentType, Concepts::Is_Speed_Component) && check(SetValueType,Concepts::Is_Speed_Value)))
 			{
-				SetValueType len_val = Length_Prototype<ComponentType,CallerType>::Conversion_Factor<SetValueType>();
-				SetValueType time_val = Time_Prototype<ComponentType,CallerType>::Conversion_Factor<SetValueType>();
-				this_component()->Value<ComponentType,CallerType,Value_Type>(Value_Type(value * time_val / len_val));
+				SetValueType len_val = length_base::template Conversion_Factor<SetValueType>();
+				SetValueType time_val = time_base::template Conversion_Factor<SetValueType>();
+				this_component()->template Value<ComponentType,CallerType,Value_Type>(Value_Type(value * time_val / len_val));
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(!check(ComponentType,Set_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(SetValueType,Concepts::Is_Speed_Value)))
 			{
@@ -753,9 +759,9 @@ namespace Basic_Units
 			
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
 			{
-				Value_Type convert_component_value_to_param = Time_Prototype::Conversion_Factor<TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = Time_Prototype::Conversion_Factor<TargetType::ReturnType>();
-				return TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<typename TargetType::ReturnType>();
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
 			}
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
 			{
@@ -772,7 +778,7 @@ namespace Basic_Units
 			define_get_set_exists_check(Value, Get_Value_exists, Set_Value_exists);
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Currency_Value)))
 			{
-				return ReturnValueType(this_component()->Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
+				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Currency_Value)))
 			{
@@ -781,7 +787,7 @@ namespace Basic_Units
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Currency_Value)))
 			{
-				this_component()->Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
+				this_component()->template Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Currency_Value)))
 			{
@@ -789,13 +795,13 @@ namespace Basic_Units
 				assert_check(SetValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
 			}
 
-			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(typename TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Currency_Value) && check(typename TargetType::ReturnType,Concepts::Is_Currency_Value)))
+			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Currency_Value) && check(typename TargetType::ReturnType,Concepts::Is_Currency_Value)))
 			{
-				Value_Type convert_component_value_to_param = Conversion_Factor<TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = Conversion_Factor<TargetType::ReturnType>();
-				return TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = Conversion_Factor<typename TargetType::ReturnType>();
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
-			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(typename TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Currency_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Currency_Value)))
+			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Currency_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Currency_Value)))
 			{
 				assert_check(TargetType,Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Length_Value, "TargetTyp::ReturnType is not a valid length value structure.");

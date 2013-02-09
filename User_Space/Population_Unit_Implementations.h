@@ -1,6 +1,6 @@
 #pragma once
 
-#include "User_Space\Population_Synthesis\Population_Unit_Prototype.h"
+#include "Population_Unit_Prototype.h"
 
 namespace PopSyn
 {

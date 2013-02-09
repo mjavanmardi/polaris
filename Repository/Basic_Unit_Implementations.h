@@ -73,7 +73,7 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Time Horizon base clase.
-		implementation struct _Horizon : _Time<MasterType,ParentType> {typedef true_type Horizon_tag;};
+		/*implementation struct _Horizon : _Time<MasterType,ParentType> {typedef true_type Horizon_tag;};
 		implementation struct Horizon_Impulsive		: _Minutes, _Horizon<MasterType,ParentType>, public Polaris_Component_Class<Horizon_Impulsive,MasterType,Data_Object,ParentType>	{typedef true_type Impulsive_tag;};
 		implementation struct Horizon_Within_1_Hour : _Minutes, _Horizon<MasterType,ParentType>, public Polaris_Component_Class<Horizon_Within_1_Hour,MasterType,Data_Object,ParentType>{typedef true_type Within_1_Hour_tag;};
 		implementation struct Horizon_Within_Hours	: _Minutes, _Horizon<MasterType,ParentType>, public Polaris_Component_Class<Horizon_Within_Hours,MasterType,Data_Object,ParentType>	{typedef true_type Within_Hours_tag;};
@@ -83,7 +83,7 @@ namespace Basic_Units
 		implementation struct Horizon_Same_Week		: _Minutes, _Horizon<MasterType,ParentType>, public Polaris_Component_Class<Horizon_Same_Week,MasterType,Data_Object,ParentType>	{typedef true_type Same_Week_tag;};
 		implementation struct Horizon_Same_Month	: _Minutes, _Horizon<MasterType,ParentType>, public Polaris_Component_Class<Horizon_Same_Month,MasterType,Data_Object,ParentType>	{typedef true_type Same_Month_tag;};
 		implementation struct Horizon_Preplanned	: _Minutes, _Horizon<MasterType,ParentType>, public Polaris_Component_Class<Horizon_Preplanned,MasterType,Data_Object,ParentType>	{typedef true_type Preplanned_tag;};
-		implementation struct Horizon_Routine		: _Minutes, _Horizon<MasterType,ParentType>, public Polaris_Component_Class<Horizon_Routine,MasterType,Data_Object,ParentType>		{typedef true_type Routine_tag;};
+		implementation struct Horizon_Routine		: _Minutes, _Horizon<MasterType,ParentType>, public Polaris_Component_Class<Horizon_Routine,MasterType,Data_Object,ParentType>		{typedef true_type Routine_tag;};*/
 		#pragma endregion
 
 		//================================================================================================
@@ -143,7 +143,7 @@ struct _Simulation_Timer
 {
 	template<typename TargetType> TargetType Current_Time()
 	{
-		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Base_Time_Type>>((Base_Time_Type::ValueType)_iteration);
+		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Base_Time_Type>>((typename Base_Time_Type::ValueType)_iteration);
 	}
 	template<typename InputType, typename TargetType> TargetType Future_Time(InputType Additional_Time_Increment)
 	{

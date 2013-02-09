@@ -1,6 +1,6 @@
 #pragma once
 #include "RNG_Prototype.h"
-#include "User_Space\RngStream.h"
+#include "RngStream.h"
 
 namespace RNG_Components
 {
@@ -44,12 +44,14 @@ namespace RNG_Components
 			tag_feature_as_available(Next_Rand);
 
 			member_data(unsigned long, seed, none, none);
-			member_data(mt19937, generator, none, none);
-			member_data(uniform_real<double>, distribution, none, none);
+			member_data(std::mt19937, generator, none, none);
+			member_data(std::tr1::uniform_real<double>, distribution, none, none);
 		};
 
 		implementation struct MT_Uniform_Double : public MT_Probability_Double<MasterType,ParentType>
 		{
+			typedef MT_Probability_Double<MasterType,ParentType> BaseType;
+
 			MT_Uniform_Double<MasterType,ParentType>() : MT_Probability_Double<MasterType,ParentType>()
 			{
 				_minimum = 0.0;
@@ -58,8 +60,8 @@ namespace RNG_Components
 
 			feature_implementation void Initialize()
 			{		
-				_generator.seed(_seed);
-				_distribution = uniform_real<double>(_minimum,_maximum);
+				BaseType::_generator.seed(BaseType::_seed);
+				BaseType::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
 			}
 
 			feature_implementation void Initialize(	TargetType seed_value,
@@ -70,11 +72,11 @@ namespace RNG_Components
 												TargetType shape = (TargetType)1,
 												requires(check(TargetType,is_arithmetic)))
 			{
-				_generator.seed(_seed);
-				this->minimum<ComponentType, CallerType, TargetType>(min);
-				this->maximum<ComponentType, CallerType, TargetType>(max);
+				BaseType::_generator.seed(BaseType::_seed);
+				this->template minimum<ComponentType, CallerType, TargetType>(min);
+				this->template maximum<ComponentType, CallerType, TargetType>(max);
 
-				_distribution = uniform_real<double>(_minimum,_maximum);
+				BaseType::_distribution = uniform_real<double>(_minimum,_maximum);
 			}
 			tag_feature_as_available(Initialize);
 
@@ -84,6 +86,8 @@ namespace RNG_Components
 
 		implementation struct MT_Normal_Double : public MT_Uniform_Double<MasterType,ParentType>
 		{
+			typedef MT_Uniform_Double<MasterType,ParentType> BaseType;
+
 			MT_Normal_Double<MasterType,ParentType>() : MT_Uniform_Double<MasterType,ParentType>()
 			{
 				_location = 0.0;
@@ -93,8 +97,8 @@ namespace RNG_Components
 			feature_implementation void Initialize()
 			{		
 				assert(_scale > 0);
-				_generator.seed(_seed);
-				_distribution = std::tr1::normal_distribution<double>(_location,_scale);
+				BaseType::_generator.seed(BaseType::_seed);
+				BaseType::_distribution = std::tr1::normal_distribution<double>(_location,_scale);
 			}
 
 			feature_implementation void Initialize(	TargetType seed_value,
@@ -105,18 +109,18 @@ namespace RNG_Components
 												TargetType shape = (TargetType)1,
 												requires(check(TargetType,is_arithmetic)))
 			{
-				state_check(Is_Positive)(this,_scale);
-				_generator.seed(_seed);
-				this->location<ComponentType, CallerType, TargetType>(location);
-				this->scale<ComponentType, CallerType, TargetType>(scale);
+				//state_check(Is_Positive)(this,_scale);
+				BaseType::_generator.seed(BaseType::_seed);
+				this->template location<ComponentType, CallerType, TargetType>(location);
+				this->template scale<ComponentType, CallerType, TargetType>(scale);
 
-				_distribution = uniform_real<double>(_minimum,_maximum);
+				BaseType::_distribution = uniform_real<double>(BaseType::_minimum,BaseType::_maximum);
 			}
 			tag_feature_as_available(Initialize);
 
 			feature_implementation TargetType Next_Rand()
 			{
-				return (TargetType) _distribution(_generator);
+				return (TargetType) BaseType::_distribution(BaseType::_generator);
 			}
 			tag_feature_as_available(Next_Rand);
 

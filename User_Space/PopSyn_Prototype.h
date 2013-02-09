@@ -1,8 +1,8 @@
 #pragma once
 
-#include "User_Space\User_Space_Includes.h"
-#include "User_Space\Population_Synthesis\linker.h"
-#include "User_Space\Population_Synthesis\Synthesis_Region_Implementation.h"
+#include "User_Space.h"
+#include "linker.h"
+
 
 
 namespace PopSyn

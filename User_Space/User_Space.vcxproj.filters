@@ -15,11 +15,11 @@
     <Filter Include="Prototypes">
       <UniqueIdentifier>{9da4cbf3-1852-4bb9-a898-879a9b1dca5f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Prototypes\PopSyn">
-      <UniqueIdentifier>{e2be1135-7b85-4a1c-8e27-7b0ca214a53a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Implementations\PopSyn">
-      <UniqueIdentifier>{a19a3332-f1de-427c-9256-85c12c36802a}</UniqueIdentifier>
+      <UniqueIdentifier>{c283e071-ba7b-4f6a-a3da-43b4a7cf085a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Prototypes\PopSyn">
+      <UniqueIdentifier>{8049d577-d1c2-4809-ad17-bc7bf5b7bb5d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -93,48 +93,6 @@
     </ClInclude>
     <ClInclude Include="Vehicle_Prototype.h">
       <Filter>Prototypes</Filter>
-    </ClInclude>
-    <ClInclude Include="RngStream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\Synthesis_Zone_Implementations.h">
-      <Filter>Implementations\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\File_Reader.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\File_Writer.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\linker.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\PopSyn_Prototype.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\Population_Unit_Prototype.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\Synthesis_Zone_Prototypes.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\Linker_Implementations.h">
-      <Filter>Implementations\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\PopSyn_Implementations.h">
-      <Filter>Implementations\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\Region_Implementations.h">
-      <Filter>Implementations\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\Synthesis_Region_Implementation.h">
-      <Filter>Implementations\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\Synthesis_Region_Prototype.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Synthesis\Population_Unit_Implementations.h">
-      <Filter>Implementations\PopSyn</Filter>
     </ClInclude>
     <ClInclude Include="Intersection_Control_Prototype.h">
       <Filter>Prototypes</Filter>
@@ -225,6 +183,42 @@
     </ClInclude>
     <ClInclude Include="Polaris_Network_Skimming_Implementation.h">
       <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="PopSyn_Implementations.h">
+      <Filter>Implementations\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="Synthesis_Region_Implementation.h">
+      <Filter>Implementations\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="Synthesis_Zone_Implementations.h">
+      <Filter>Implementations\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="Linker_Implementations.h">
+      <Filter>Implementations\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="Population_Unit_Implementations.h">
+      <Filter>Implementations\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="File_Reader.h">
+      <Filter>Prototypes\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="File_Writer.h">
+      <Filter>Prototypes\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="linker.h">
+      <Filter>Prototypes\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="PopSyn_Prototype.h">
+      <Filter>Prototypes\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="Population_Unit_Prototype.h">
+      <Filter>Prototypes\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="Synthesis_Region_Prototype.h">
+      <Filter>Prototypes\PopSyn</Filter>
+    </ClInclude>
+    <ClInclude Include="Synthesis_Zone_Prototypes.h">
+      <Filter>Prototypes\PopSyn</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "User_Space\User_Space_includes.h"
-#include "User_Space\Population_Synthesis\Population_Unit_Implementations.h"
+#include "User_Space.h"
+
 
 using namespace std;
 

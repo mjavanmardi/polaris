@@ -187,6 +187,7 @@
     <ClInclude Include="Choice_Model_Prototypes.h" />
     <ClInclude Include="Repository.h" />
     <ClInclude Include="Repository_Includes.h" />
+    <ClInclude Include="RngStream.h" />
     <ClInclude Include="RNG_Implementations.h" />
     <ClInclude Include="RNG_Prototype.h" />
     <ClInclude Include="TEMPLATE_Implementations.h" />

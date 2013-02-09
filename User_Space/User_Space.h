@@ -31,9 +31,9 @@ void* _global_scenario;
 #include "Polaris_Network_Skimming_Implementation.h"
 #include "Polaris_Network_Implementation_Input_DB.h"
 #include "Activity_Implementations.h"
-#include "User_Space\Population_Synthesis\Population_Unit_Implementations.h"
-#include "User_Space\Population_Synthesis\Synthesis_Zone_Implementations.h"
-#include "User_Space\Population_Synthesis\Synthesis_Region_Implementation.h"
-#include "Population_Synthesis\PopSyn_Implementations.h"
+#include "Population_Unit_Implementations.h"
+#include "Synthesis_Zone_Implementations.h"
+#include "Synthesis_Region_Implementation.h"
+#include "PopSyn_Implementations.h"
 #include "Person_Implementations.h"
 #endif

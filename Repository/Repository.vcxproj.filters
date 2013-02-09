@@ -47,6 +47,9 @@
     <ClInclude Include="Choice_Model_Prototypes.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
+    <ClInclude Include="RngStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository.cpp">
