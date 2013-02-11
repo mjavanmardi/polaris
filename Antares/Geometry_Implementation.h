@@ -21,6 +21,14 @@ implementation struct Point_2D : public Polaris_Component_Class<Point_2D,MasterT
 
 implementation struct Point_3D : public Polaris_Component_Class<Point_3D,MasterType,NULLTYPE>
 {
+	Point_3D& operator= (Point_3D& setval)
+	{
+		_x=setval._x;
+		_y=setval._y;
+		_z=setval._z;
+		return *this;
+	};
+
 	member_data(float,x,none,none);
 	member_data(float,y,none,none);
 	member_data(float,z,none,none);
@@ -60,4 +68,39 @@ implementation struct Rectangle_XY : public Polaris_Component_Class<Rectangle_XY
 	{
 		return 0;
 	}
+};
+
+//---------------------------------------------------------
+//	True_Color_RGB - rgba color implementation
+//---------------------------------------------------------
+
+implementation struct True_Color_RGB : public Polaris_Component_Class<True_Color_RGB,MasterType,NULLTYPE>
+{
+	member_data(unsigned char,r,none,none);
+	member_data(unsigned char,g,none,none);
+	member_data(unsigned char,b,none,none);
+};
+
+//---------------------------------------------------------
+//	True_Color_RGBA - rgba color implementation
+//---------------------------------------------------------
+
+implementation struct True_Color_RGBA : public Polaris_Component_Class<True_Color_RGBA,MasterType,NULLTYPE>
+{
+	True_Color_RGBA():_r(0),_g(0),_b(0),_a(255){}
+	True_Color_RGBA(unsigned char rval, unsigned char gval, unsigned char bval, unsigned char aval):_r(rval),_g(gval),_b(bval),_a(aval){}
+
+	True_Color_RGBA& operator= (True_Color_RGBA& setval)
+	{
+		_r=setval._r;
+		_g=setval._g;
+		_b=setval._b;
+		_a=setval._a;
+		return *this;
+	};
+
+	member_data(unsigned char,r,none,none);
+	member_data(unsigned char,g,none,none);
+	member_data(unsigned char,b,none,none);
+	member_data(unsigned char,a,none,none);
 };

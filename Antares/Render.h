@@ -24,7 +24,6 @@ void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 		if(current_iteration>=0)
 		{
 			_time_panel->Update_Time<NULLTYPE>(current_iteration);
-			_information_panel->Plot<NULLTYPE>();
 		}
 	}
 
@@ -53,13 +52,18 @@ void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 
 	if(_spatial_change) Calculate_Bounds();
 
-	//---- detailed network is opaque, draw front to back ----
+	//---- loop over and draw all layers ----
 
-	Draw_Network();
+	list<Antares_Layer_Interface*>::iterator itr;
+
+	for(itr=_3D_layers.begin();itr!=_3D_layers.end();itr++)
+	{
+		Draw_Layer(current_iteration,current_iteration,(*itr));
+	}
 	
 	//---- detailed network is opaque, draw front to back ----
 
-	Draw_Vehicles(current_iteration);
+	//Draw_Vehicles(current_iteration);
 	
 	//---- flush and display ----
 

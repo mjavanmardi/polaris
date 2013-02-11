@@ -26,30 +26,26 @@ private:
 	int offset;
 };
 
-//template<typename DataType>
-//struct Dynamic_Multi_Buffer
-//{
-//public:
-//	Dynamic_Multi_Buffer():offset(0),buffer_size(2),period(1)
-//	{
-//		multi_buffer=new DataType[buffer_size];
-//	};
-//
-//	Dynamic_Multi_Buffer(int _offset, int _buffer_size, int _period):offset(_offset),buffer_size(_buffer_size),period(_period)
-//	{
-//		multi_buffer=new DataType[buffer_size];
-//	};
-//
-//	static_assert(period > 0, "period must be greater 0!");
-//
-//	DataType& operator[](int itr)
-//	{
-//		return multi_buffer[((itr-offset)/period)%buffer_size];
-//	}
-//
-//private:
-//	DataType* multi_buffer;
-//	int offset;
-//	int buffer_size;
-//	int period;
-//};
+template<typename DataType>
+struct Dynamic_Multi_Buffer
+{
+public:
+	void Initialize(unsigned int _offset=0, unsigned int _period=1, unsigned int _buffer_size=3)
+	{
+		offset=_offset;
+		buffer_size=_buffer_size;
+		period=_period;
+		multi_buffer=new DataType[buffer_size];
+	};
+
+	DataType& operator[](int itr) const
+	{
+		return multi_buffer[((itr-offset)/period)%buffer_size];
+	}
+
+
+	DataType* multi_buffer;
+	unsigned int offset;
+	unsigned int buffer_size;
+	unsigned int period;
+};

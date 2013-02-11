@@ -6,6 +6,20 @@
 #include "Canvas_Implementation.h"
 
 //---------------------------------------------------------
+//	OnResize - handles when canvas is resized
+//---------------------------------------------------------
+
+template<typename MasterType,typename ParentType>
+void Canvas_Implementation<MasterType,ParentType>::OnResize(wxSizeEvent& event)
+{
+	_panel_width=(float)GetSize().x;
+	_panel_height=(float)GetSize().y;
+	
+	_spatial_change=true;
+	Refresh();
+}
+
+//---------------------------------------------------------
 //	OnLeftDown - initialize panning procedure or selection
 //---------------------------------------------------------
 

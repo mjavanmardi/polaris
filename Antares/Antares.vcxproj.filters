@@ -74,9 +74,6 @@
     <ClInclude Include="Visibility_Testing.h">
       <Filter>Implementations</Filter>
     </ClInclude>
-    <ClInclude Include="Draw_Network.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
     <ClInclude Include="Navigation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
@@ -92,7 +89,19 @@
     <ClInclude Include="Conductor_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
-    <ClInclude Include="Draw_Vehicles.h">
+    <ClInclude Include="Antares_Layer_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw_Layer.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Layer.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw_Layer_2D.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Render_2D.h">
       <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>

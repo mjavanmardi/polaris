@@ -5,6 +5,8 @@
 #pragma once
 #include "Antares_Includes.h"
 #include "User_Space\Network_Prototype.h"
+#include "Canvas.h"
+#include "Information_Panel.h"
 
 namespace Network_Components
 {
@@ -16,20 +18,20 @@ namespace Network_Components
 
 		implementation struct Graphical_Network_Implementation:public Polaris_Component_Class<Graphical_Network_Implementation,MasterType,Data_Object,ParentType>
 		{
+			feature_implementation void submit_num_vehicles()
+			{
+				_num_vehicles->Push_Element<NULLTYPE>((void*)&_vehicles_counter,sizeof(int));
+				_vehicles_counter=0;
+			}
+
 			feature_implementation void accept_vehicle_coordinates(Point_3D<MasterType>& coordinates)
 			{
 				coordinates._x+= _input_offset._x;
 				coordinates._y+= _input_offset._y;
 
-				_vehicle_coordinates[_iteration][_thread_id].push_back(coordinates);
-			}
-			
-			feature_implementation void clear_vehicle_coordinates(int iteration)
-			{
-				for(int i=0;i<_num_threads;i++)
-				{
-					_vehicle_coordinates[iteration][i].clear();
-				}
+				_vehicle_points->Push_Element<NULLTYPE>(&coordinates,sizeof(Point_3D<MasterType>));
+
+				_vehicles_counter++;
 			}
 
 			feature_implementation void read_network_data(string& name)
@@ -61,6 +63,24 @@ namespace Network_Components
 				
 				// read links
 				read_link_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
+
+				
+				// configure vehicle layer
+				_vehicle_points=_canvas->Allocate_New_Layer< Target_Type< Antares_Layer<type_of(vehicle_points),Graphical_Network_Implementation>*, string& > >(string("Vehicles"));
+
+				Antares_Layer_Configuration cfg;
+				cfg.Configure_Points();
+
+				_vehicle_points->Initialize<NULLTYPE>(cfg);
+
+
+				// configure plot layer
+				_num_vehicles=_information_panel->Allocate_New_Layer< Target_Type< Antares_Layer<type_of(num_vehicles),Graphical_Network_Implementation>*, string& > >(string("Number of Vehicles"));
+
+				Antares_Layer_Configuration pcfg;
+				pcfg.Configure_Plot();
+
+				_num_vehicles->Initialize<NULLTYPE>(pcfg);
 			}
 
 			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
@@ -68,7 +88,6 @@ namespace Network_Components
 				using namespace odb;
 				using namespace pio;
 
-				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
 
 				result<Node> node_result=db->query<Node>(query<Node>::true_expr);
@@ -120,14 +139,13 @@ namespace Network_Components
 				}
 			}
 
+
 			feature_implementation void read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
 				using namespace odb;
 				using namespace pio;
 
-				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				_Links_Container_Interface* links_container_ptr=links_container<ComponentType,CallerType,_Links_Container_Interface*>();			
 				
 				result<Link> link_result=db->query<Link>(query<Link>::true_expr);
@@ -140,7 +158,18 @@ namespace Network_Components
 				
 				int link_counter=-1;
 				
-				Point_2D<MasterType> current_point;
+				_link_lines=_canvas->Allocate_New_Layer< Target_Type< Antares_Layer<type_of(link_lines),Graphical_Network_Implementation>*, string& > >(string("Links"));
+
+				Antares_Layer_Configuration cfg;
+				cfg.Configure_Lines();
+
+				_link_lines->Initialize<NULLTYPE>(cfg);
+
+				struct Link_Line
+				{
+					Point_3D<MasterType> a;
+					Point_3D<MasterType> b;
+				} current_line;
 
 				for(result<Link>::iterator db_itr = link_result.begin (); db_itr != link_result.end (); ++db_itr)
 				{
@@ -192,8 +221,6 @@ namespace Network_Components
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
 						}
-
-						links_container<ComponentType,CallerType,_Links_Container_Interface&>().push_back(link);
 					}
 
 					if(db_itr->getLanes_Ba()>0)
@@ -241,30 +268,39 @@ namespace Network_Components
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
 						}
-
-						links_container<ComponentType,CallerType,_Links_Container_Interface&>().push_back(link);
 					}
 
-					current_point._x = link->upstream_intersection<_Intersection_Interface*>()->x_position<float>() + _input_offset._x;
-					current_point._y = link->upstream_intersection<_Intersection_Interface*>()->y_position<float>() + _input_offset._y;
+					current_line.a._x = link->upstream_intersection<_Intersection_Interface*>()->x_position<float>() + _input_offset._x;
+					current_line.a._y = link->upstream_intersection<_Intersection_Interface*>()->y_position<float>() + _input_offset._y;
+					current_line.a._z = 0;
 
-					_link_lines.push_back(current_point);
+					current_line.b._x = link->downstream_intersection<_Intersection_Interface*>()->x_position<float>() + _input_offset._x;
+					current_line.b._y = link->downstream_intersection<_Intersection_Interface*>()->y_position<float>() + _input_offset._y;
+					current_line.b._z = 0;
 
-					current_point._x = link->downstream_intersection<_Intersection_Interface*>()->x_position<float>() + _input_offset._x;
-					current_point._y = link->downstream_intersection<_Intersection_Interface*>()->y_position<float>() + _input_offset._y;
-
-					_link_lines.push_back(current_point);
+					_link_lines->Push_Element<NULLTYPE>(&current_line,sizeof(Link_Line));
 				}
 			}
 
 			member_data(Point_2D<MasterType>, input_offset,none,none);
 			member_data(Rectangle_XY<MasterType>, network_bounds,none,none);
-			member_data(vector< Point_2D<MasterType> >, link_lines,none,none);
+			
+			member_prototype(Antares_Layer,link_lines,typename type_of(MasterType::antares_layer),Graphical_Network_Implementation,none,none);
+			member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),Graphical_Network_Implementation,none,none);
+			
+			member_prototype(Antares_Layer,num_vehicles,typename type_of(MasterType::antares_layer),Graphical_Network_Implementation,none,none);
+			member_data(volatile int,vehicles_counter,none,none);
 
-			member_data(concat(Multi_Buffer< vector< Point_3D<MasterType> >[_num_threads], 3 >),vehicle_coordinates,none,none);
+			//member_data(concat(Multi_Buffer< vector< Point_3D<MasterType> >[_num_threads], 3 >),vehicle_coordinates,none,none);
+
+			member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),Graphical_Network_Implementation,none,none);
+			member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),Graphical_Network_Implementation,none,none);
 
 			member_container(vector<typename MasterType::graphical_intersection_type*>, intersections_container, none, none);
 			member_container(vector<typename MasterType::graphical_link_type*>, links_container, none, none);
+			
+			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 		};
 	}
 }

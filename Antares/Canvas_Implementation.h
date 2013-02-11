@@ -18,6 +18,23 @@ public:
 	feature_implementation void Initialize();
 	void Initialize_GLCanvas();
 	void Calculate_Bounds();
+
+	typedef Antares_Layer<typename type_of(MasterType::antares_layer),Canvas_Implementation> Antares_Layer_Interface;
+
+	feature_implementation Antares_Layer_Interface* Allocate_New_Layer(string& name)
+	{
+		Antares_Layer_Interface* new_layer=(Antares_Layer_Interface*)Allocate<typename type_of(MasterType::antares_layer)>();
+
+		_3D_layers.push_back(new_layer);
+
+		new_layer->list_index<int>(_3D_layers.size() - 1);
+		new_layer->name<string&>(name);
+
+		return new_layer;
+	}
+
+	void Draw_Layer(int start_iteration, int end_iteration, Antares_Layer_Interface* layer);
+	
 	void Draw_Network();
 	void Draw_Vehicles(int current_iteration);
 
@@ -80,6 +97,8 @@ public:
 	member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,Canvas_Implementation,none,none);
 	member_prototype(Time_Panel,time_panel,typename MasterType::type_of(time_panel),Canvas_Implementation,none,none);
 	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),Canvas_Implementation,none,none);
+
+	list<Antares_Layer_Interface*> _3D_layers;
 };
 
 //---------------------------------------------------------
@@ -124,6 +143,9 @@ Canvas_Implementation<MasterType,ParentType>::Canvas_Implementation(wxFrame* par
 	_spatial_change=true;
 	_temporal_change=false;
 	_cached_iteration=-1;
+	
+	//---- construct layers ----
+
 }
 
 //---------------------------------------------------------
@@ -138,6 +160,9 @@ void Canvas_Implementation<MasterType,ParentType>::Initialize()
 
 	_graphical_network = (Network_Prototype<type_of(graphical_network),Canvas_Implementation>*) Allocate<type_of(graphical_network)>();
 	
+	_graphical_network->canvas< Canvas<ComponentType,type_of(graphical_network)> *>( (Canvas<ComponentType,type_of(graphical_network)>*)this );
+	_graphical_network->information_panel< Information_Panel<typename MasterType::type_of(information_panel),type_of(graphical_network)> *>( (Information_Panel<typename MasterType::type_of(information_panel),type_of(graphical_network)>*)_information_panel );
+
 	// make the vital connection between graphical network and graphical vehicle
 	Graphical_Vehicle_Implementation<MasterType>::_graphical_network=(Network_Prototype<type_of(graphical_network),Graphical_Vehicle_Implementation<MasterType>>*)_graphical_network;
 
@@ -166,20 +191,6 @@ void Canvas_Implementation<MasterType,ParentType>::Initialize()
 
 	// connect the paint handler
 	Connect(wxEVT_PAINT,wxPaintEventHandler(Canvas_Implementation::Render));
-}
-
-//---------------------------------------------------------
-//	OnResize - handles when canvas is resized
-//---------------------------------------------------------
-
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::OnResize(wxSizeEvent& event)
-{
-	_panel_width=(float)GetSize().x;
-	_panel_height=(float)GetSize().y;
-	
-	_spatial_change=true;
-	Refresh();
 }
 
 //---------------------------------------------------------

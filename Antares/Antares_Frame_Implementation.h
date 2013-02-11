@@ -83,6 +83,7 @@ Antares_Implementation<MasterType,ParentType>::Antares_Implementation(wxFrame* p
 	_aui_manager.Update();
 
 	_conductor->canvas<Canvas_Interface*>(_canvas);
+	_conductor->information_panel<Information_Panel_Interface*>(_information_panel);
 	_canvas->time_panel<Time_Panel_Interface*>(_time_panel);
 	_canvas->information_panel<Information_Panel_Interface*>(_information_panel);
 }

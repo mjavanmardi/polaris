@@ -19,6 +19,20 @@ prototype struct Point_Prototype
 };
 
 //---------------------------------------------------------
+//	Color_Prototype - rgba color
+//---------------------------------------------------------
+
+prototype struct Color_Prototype
+{
+	tag_as_prototype;
+
+	feature_accessor(r,none,none);
+	feature_accessor(g,none,none);
+	feature_accessor(b,none,none);
+	feature_accessor(a,none,none);
+};
+
+//---------------------------------------------------------
 //	Rectangle - Rectangle oriented in 2D or 3D Flexible API
 //---------------------------------------------------------
 

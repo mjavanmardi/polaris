@@ -13,7 +13,10 @@ implementation class Conductor_Implementation : public Polaris_Component_Class<C
 {
 public:
 	define_component_interface(Graphical_Network_Interface,typename MasterType::type_of(graphical_network),Network_Prototype,Conductor_Implementation);
+
 	member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),Conductor_Implementation,none,none);
+	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),Conductor_Implementation,none,none);
+	//member_prototype(Graphical_Network,graphical_network,typename MasterType::type_of(graphical_network),Conductor_Implementation,none,none);
 
 	feature_implementation void Initialize()
 	{
@@ -38,16 +41,18 @@ public:
 		}
 		else
 		{
-			Sleep(100);
+			//Sleep(100);
 		}
 
 		Graphical_Network_Interface* graphical_net=pthis->_canvas->graphical_network<Graphical_Network_Interface*>();
 
-		graphical_net->clear_vehicle_coordinates<NULLTYPE>(_iteration + 1);
-
 		cout << _iteration << endl;
+		
+		graphical_net->submit_num_vehicles<NULLTYPE>();
 
 		pthis->_canvas->Refresh<NULLTYPE>();
+
+		pthis->_information_panel->Render<NULLTYPE>();
 	}
 
 	member_data(bool,pause,none,none);

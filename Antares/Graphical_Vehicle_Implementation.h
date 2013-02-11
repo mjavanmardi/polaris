@@ -35,8 +35,8 @@ namespace Vehicle_Components
 #else
 			member_component(typename MasterType::traveler_type, traveler, none, none);
 #endif
-			define_component_interface(Link_Interface,type_of(MasterType::link),Link_Prototype,Graphical_Vehicle_Implementation);
-			define_component_interface(Intersection_Interface,type_of(MasterType::intersection),Intersection_Prototype,Graphical_Vehicle_Implementation);
+			define_component_interface(Link_Interface,typename type_of(MasterType::link),Link_Prototype,Graphical_Vehicle_Implementation);
+			define_component_interface(Intersection_Interface,typename type_of(MasterType::intersection),Intersection_Prototype,Graphical_Vehicle_Implementation);
 
 			declare_feature_conditional(compute_vehicle_position_condition)
 			{
