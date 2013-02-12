@@ -161,10 +161,10 @@ static void False_Condition(void*,Conditional_Response& resp)
 #define START() world->Start_Turning()
 
 #ifdef WINDOWS
-static LARGE_INTEGER thread_start_timers[_num_threads];
-static LARGE_INTEGER thread_stop_timers[_num_threads];
-static LARGE_INTEGER thread_start_timers_B[_num_threads];
-static LARGE_INTEGER thread_stop_timers_B[_num_threads];
+//static LARGE_INTEGER thread_start_timers[_num_threads];
+//static LARGE_INTEGER thread_stop_timers[_num_threads];
+//static LARGE_INTEGER thread_start_timers_B[_num_threads];
+//static LARGE_INTEGER thread_stop_timers_B[_num_threads];
 #endif
 
 #define THROW_EXCEPTION(MESSAGE_STREAM) \

@@ -61,10 +61,6 @@ void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 		Draw_Layer(current_iteration,current_iteration,(*itr));
 	}
 	
-	//---- detailed network is opaque, draw front to back ----
-
-	//Draw_Vehicles(current_iteration);
-	
 	//---- flush and display ----
 
 	glFlush();

@@ -26,8 +26,9 @@ namespace Network_Components
 
 			feature_implementation void accept_vehicle_coordinates(Point_3D<MasterType>& coordinates)
 			{
-				coordinates._x+= _input_offset._x;
-				coordinates._y+= _input_offset._y;
+				coordinates._x += _input_offset._x;
+				coordinates._y += _input_offset._y;
+				coordinates._z += 1;
 
 				_vehicle_points->Push_Element<NULLTYPE>(&coordinates,sizeof(Point_3D<MasterType>));
 
@@ -183,7 +184,7 @@ namespace Network_Components
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
 						
-						link->template group_reference<int>(db_itr->getLink());
+						//link->template group_reference<int>(db_itr->getLink());
 
 						link->template uuid<int>(++link_counter);
 						link->template internal_id<int>(link_counter);
@@ -231,7 +232,7 @@ namespace Network_Components
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 
-						link->template group_reference<int>(db_itr->getLink());
+						//link->template group_reference<int>(db_itr->getLink());
 						
 						link->template uuid<int>(++link_counter);
 						link->template internal_id<int>(link_counter);

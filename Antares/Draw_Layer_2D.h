@@ -68,7 +68,11 @@ void Information_Panel_Implementation<MasterType,ParentType>::Draw_Layer(const i
 	pls->scol0( 15, 0, 0, 0 );
 
 	pls->col0( 1 );
-	pls->env( xmin, xmax, ymin, ymax + 1, 0, 0 );
+	
+	ymax+=1;
+	ymax*=1.2;
+
+	pls->env( xmin, xmax, ymin, ymax, 0, 0 );
 	pls->col0( 15 );
 	pls->lab( "Iteration", "Value", layer->name<string&>().c_str() );
 	

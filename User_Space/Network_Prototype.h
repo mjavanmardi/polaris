@@ -1,6 +1,6 @@
 #pragma once
 #include <hash_map>
-#include "User_Space.h"
+#include "User_Space_Includes.h"
 #include "../File_IO/utilities.h"
 #include "../File_IO/network_data.h"
 //using namespace Basic_Units::Data_Structures;
@@ -13,7 +13,8 @@ namespace Network_Components
 		struct ODB_Network{};
 		struct File_Network{};
 		struct Regular_Network{};
-			
+		struct Graphical_Network{};
+
 		struct Network_IO_Maps
 		{
 			dense_hash_map<int,void*> intersection_id_to_ptr;
@@ -174,6 +175,27 @@ namespace Network_Components
 			feature_accessor(max_free_flow_speed, none, none);		
 			//------------------------------------------------------------------------------------------------------------------
 
+			//==================================================================================================================
+			/// graphical network
+			//------------------------------------------------------------------------------------------------------------------
+			feature_accessor(network_bounds, none, none);
+			feature_accessor(link_lines, none, none);
+			feature_accessor(vehicle_coordinates, none, none);
+			feature_accessor(canvas, none, none);
+			feature_accessor(information_panel, none, none);
+
+			feature_prototype void push_vehicle_coordinates(typename TargetType::ParamType data_source)
+			{
+				this_component()->template accept_vehicle_coordinates<ComponentType,CallerType,TargetType>(data_source);
+			}
+
+			feature_prototype void submit_num_vehicles()
+			{
+				this_component()->template submit_num_vehicles<ComponentType,CallerType,TargetType>();
+			}
+
+
+			//------------------------------------------------------------------------------------------------------------------
 #ifndef FOR_LINUX_PORTING
 			//==================================================================================================================
 			/// demand compatible network
