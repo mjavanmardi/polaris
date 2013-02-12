@@ -83,6 +83,8 @@ namespace Turn_Movement_Components
 			member_data(int, merge_priority, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, green_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, inbound_link_green_cycle_ratio, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			
+			member_data(_lock,mvmt_lock,none,none);
 
 			feature_implementation void update_capacity(Intersection_Components::Types::Intersection_Type_Keys intersection_type)
 			{
@@ -289,13 +291,19 @@ namespace Turn_Movement_Components
 				}
 			}
 
+
+
 			feature_implementation void accept_vehicle(void* vehicle)
 			{
 				define_container_and_value_interface_unqualified_container(_Vehicles_Container_Interface, _Vehicle_Interface, type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
-			
+
+				LOCK(_mvmt_lock);
+
 				vehicles_container<ComponentType,CallerType,_Vehicles_Container_Interface&>().push_back((_Vehicle_Interface*)vehicle);
 				_turn_movement_cumulative_arrived_vehicles++;
+				
+				UNLOCK(_mvmt_lock);
 			}
 
 			feature_implementation void initialize_features()

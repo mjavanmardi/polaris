@@ -135,6 +135,8 @@ namespace Link_Components
 			member_data(int, link_num_vehicles_in_queue, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_container(deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, none, none);
 
+			member_data(_lock,link_lock,none,none);
+
 		//==================================================================================================================
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------
@@ -295,13 +297,20 @@ namespace Link_Components
 				assert_check_2(CallerType,typename MasterType::routing_type,is_same,"Invalid CallerType");
 			}
 
+
+
 			feature_implementation void accept_vehicle(TargetType veh,requires(check_2(CallerType,typename MasterType::routing_type,is_same)))
 			{
 				define_container_and_value_interface_unqualified_container(_Link_Origin_Vehicles_Container_Interface, _Vehicle_Interface,type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				_link_origin_cumulative_arrived_vehicles++;
 				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
+
+				LOCK(_link_lock);
+
 				_link_origin_vehicle_array.push_back((typename MasterType::vehicle_type*)vehicle);
 				vehicle->template load<Vehicle_Components::Types::Load_To_Entry_Queue>();
+
+				UNLOCK(_link_lock);
 			}
 
 			feature_implementation void accept_vehicle(TargetType veh,requires(check_2(CallerType,typename MasterType::movement_type,is_same) || check_2(CallerType,ComponentType,is_same)))
@@ -335,7 +344,9 @@ namespace Link_Components
 					vehicle->template unload<NULLTYPE>();
 					_link_destination_cumulative_arrived_vehicles++;
 					_link_destination_arrived_vehicles++;
+
 					_link_destination_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
+
 					((_Scenario_Interface*)_global_scenario)->template network_cumulative_arrived_vehicles<int&>()++;
 					((_Scenario_Interface*)_global_scenario)->template network_in_network_vehicles<int&>()--;
 				}
