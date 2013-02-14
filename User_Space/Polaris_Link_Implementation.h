@@ -25,7 +25,7 @@ namespace Link_Components
 	//==================================================================================================================
 	/// Polaris_Link_Base
 	//------------------------------------------------------------------------------------------------------------------
-		implementation struct Polaris_Link_Implementation:public Polaris_Component_Class<Polaris_Link_Implementation,MasterType,Execution_Object,ParentType>
+		implementation struct Polaris_Link_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Link_Implementation),MasterType,Execution_Object,ParentType>
 		{
 		//==================================================================================================================
 		/// Simple Link Members
@@ -376,7 +376,7 @@ namespace Link_Components
 				int current_position = _link_origin_vehicle_current_position;
 				if(current_position<(int)_link_origin_vehicle_array.size())
 				{
-					queue_vehicles<ComponentType,CallerType,TargetType>(current_position);
+					queue_vehicles<CallerType,TargetType>(current_position);
 				}
 
 				//have demand
@@ -399,7 +399,7 @@ namespace Link_Components
 					if(num_link_origin_departed_vehicles_allowed>0)
 					{
 						int num_departed_vehicles = min(_link_origin_arrived_vehicles,num_link_origin_departed_vehicles_allowed);
-						load_vehicles<ComponentType,CallerType,TargetType>(num_departed_vehicles);
+						load_vehicles<CallerType,TargetType>(num_departed_vehicles);
 					}
 				}
 			}

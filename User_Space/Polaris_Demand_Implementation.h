@@ -15,7 +15,7 @@ namespace Demand_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Demand_Implementation:public Polaris_Component_Class<Polaris_Demand_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Polaris_Demand_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Demand_Implementation),MasterType,Data_Object,ParentType>
 		{
 
 			member_component(typename MasterType::scenario_type, scenario_reference, none, none);
@@ -27,9 +27,13 @@ namespace Demand_Components
 			member_data(int, first_vehicle_departure_time, none, none);
 
 			member_data(int, last_vehicle_departure_time, none, none);
-		
-			typedef typename MasterType::person_type traveler_type;
 
+// to comment back
+#ifndef FOR_LINUX_PORTING
+			typedef typename MasterType::person_type traveler_type;
+#else
+			typedef typename MasterType::traveler_type traveler_type;
+#endif
 		};
 
 

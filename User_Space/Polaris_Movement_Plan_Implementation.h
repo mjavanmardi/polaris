@@ -15,7 +15,7 @@ namespace Movement_Plan_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Trajectory_Unit_Implementation:public Polaris_Component_Class<Polaris_Trajectory_Unit_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Polaris_Trajectory_Unit_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Trajectory_Unit_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_data(int, delayed_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, enter_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -31,7 +31,7 @@ namespace Movement_Plan_Components
 
 		};
 
-		implementation struct Polaris_Movement_Plan_Implementation:public Polaris_Component_Class<Polaris_Movement_Plan_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Polaris_Movement_Plan_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Movement_Plan_Implementation),MasterType,Data_Object,ParentType>
 		{
 			typedef Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 			member_container(vector<trajectory_unit_type*>, trajectory_container, none, none);
@@ -64,15 +64,16 @@ namespace Movement_Plan_Components
 
 			member_component(typename MasterType::link_type, origin, none, none);
 			member_component(typename MasterType::link_type, destination, none, none);
-//#ifndef FOR_LINUX_PORTING
+// to comment back
+#ifndef FOR_LINUX_PORTING
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_departed_time,none,none);
 			member_component_feature(departed_time, _departed_time, Value, Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_arrived_time,none,none);
 			member_component_feature(arrived_time, _arrived_time, Value, Basic_Units::Prototypes::Time_Prototype);
-//#else
-//			member_data(int,departed_time,none,none);
-//			member_data(int,arrived_time,none,none);
-//#endif
+#else
+			member_data(int,departed_time,none,none);
+			member_data(int,arrived_time,none,none);
+#endif
 			member_component(typename MasterType::plan_type, plan, none, none);
 			feature_implementation void arrive_to_destination()
 			{

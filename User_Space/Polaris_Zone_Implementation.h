@@ -13,7 +13,7 @@ namespace Zone_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Zone_Implementation:public Polaris_Component_Class<Polaris_Zone_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Polaris_Zone_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Zone_Implementation),MasterType,Data_Object,ParentType>
 		{
 
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));

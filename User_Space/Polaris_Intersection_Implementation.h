@@ -16,7 +16,7 @@ namespace Intersection_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Outbound_Inbound_Movements_Implementation:public Polaris_Component_Class<Polaris_Outbound_Inbound_Movements_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Polaris_Outbound_Inbound_Movements_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Outbound_Inbound_Movements_Implementation),MasterType,Data_Object,ParentType>
 		{
 			// pointer to the outbound link
 			member_component(typename MasterType::link_type, outbound_link_reference, none, none);
@@ -209,7 +209,7 @@ namespace Intersection_Components
 				else
 				{//divide space based on merging policy
 					///propotional to demand
-					float total_transfer_demand = compute_total_transfer_demand<ComponentType,CallerType,float>();
+					float total_transfer_demand = compute_total_transfer_demand<CallerType,float>();
 					for(inbound_itr=_inbound_movements.begin();inbound_itr!=_inbound_movements.end();inbound_itr++)
 					{
 						inbound_movement=(_Movement_Interface*)(*inbound_itr);
@@ -234,13 +234,13 @@ namespace Intersection_Components
 			}
 		};
 	
-		implementation struct Polaris_Inbound_Outbound_Movements_Implementation:public Polaris_Component_Class<Polaris_Inbound_Outbound_Movements_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Polaris_Inbound_Outbound_Movements_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Inbound_Outbound_Movements_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_component(typename MasterType::link_type, inbound_link_reference, none, none);
 			member_container(vector<typename MasterType::movement_type*>, outbound_movements, none, none);
 		};
 		
-		implementation struct Polaris_Intersection_Implementation:public Polaris_Component_Class<Polaris_Intersection_Implementation,MasterType,Execution_Object,ParentType>
+		implementation struct Polaris_Intersection_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Intersection_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
@@ -335,25 +335,25 @@ namespace Intersection_Components
 				switch(control_type)
 				{
 					case Types::NO_CONTROL:
-						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
 						break;
 					case Types::YIELD_SIGN:
-						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
 						break;
 					case Types::ALL_WAY_STOP_SIGN:
-						supply_allocation_proportion_to_demand<ComponentType,CallerType,TargetType>();
+						supply_allocation_proportion_to_demand<CallerType,TargetType>();
 						break;
 					case Types::TWO_WAY_STOP_SIGN:
-						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
 						break;
 					case Types::PRE_TIMED_SIGNAL_CONTROL:
-						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
 						break;
 					case Types::ACTUATED_SIGNAL_CONTROL:
-						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
 						break;
 					case Types::ADAPTIVE_SIGNAL_CONTROL:
-						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
 						break;
 				}
 			}

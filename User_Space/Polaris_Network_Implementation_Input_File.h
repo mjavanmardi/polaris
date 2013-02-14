@@ -12,16 +12,16 @@ namespace Network_Components
 	
 	namespace Implementations
 	{
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::read_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			read_intersection_data<ComponentType,CallerType,TargetType>(network_data);
-			read_link_data<ComponentType,CallerType,TargetType>(network_data);
-			read_turn_movement_data<ComponentType,CallerType,TargetType>(network_data);
-			read_activity_location_data<ComponentType,CallerType,TargetType>(network_data);
-			read_zone_data<ComponentType,CallerType,TargetType>(network_data);
+			read_intersection_data<CallerType,TargetType>(network_data);
+			read_link_data<CallerType,TargetType>(network_data);
+			read_turn_movement_data<CallerType,TargetType>(network_data);
+			read_activity_location_data<CallerType,TargetType>(network_data);
+			read_zone_data<CallerType,TargetType>(network_data);
 		}
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::read_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			_Intersection_Interface* intersection;
@@ -36,7 +36,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::read_link_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_link_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -74,7 +74,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::read_turn_movement_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_turn_movement_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -156,7 +156,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::read_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
@@ -188,7 +188,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
@@ -230,16 +230,16 @@ namespace Network_Components
 
 
 		// EXTRANEOUS DEFINITIONS FOR SKIMMABLE NETWORK
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			read_intersection_data<ComponentType,CallerType,TargetType>(network_data);
-			read_link_data<ComponentType,CallerType,TargetType>(network_data);
-			read_turn_movement_data<ComponentType,CallerType,TargetType>(network_data);
-			read_activity_location_data<ComponentType,CallerType,TargetType>(network_data);
-			read_zone_data<ComponentType,CallerType,TargetType>(network_data);
+			read_intersection_data<CallerType,TargetType>(network_data);
+			read_link_data<CallerType,TargetType>(network_data);
+			read_turn_movement_data<CallerType,TargetType>(network_data);
+			read_activity_location_data<CallerType,TargetType>(network_data);
+			read_zone_data<CallerType,TargetType>(network_data);
 		}
 
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			_Intersection_Interface* intersection;
@@ -254,7 +254,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_link_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_link_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -292,7 +292,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_turn_movement_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_turn_movement_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -374,7 +374,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
@@ -406,7 +406,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data)
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);

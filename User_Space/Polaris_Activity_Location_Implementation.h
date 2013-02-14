@@ -12,7 +12,7 @@ namespace Activity_Location_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Activity_Location_Implementation:public Polaris_Component_Class<Polaris_Activity_Location_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Polaris_Activity_Location_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Activity_Location_Implementation),MasterType,Data_Object,ParentType>
 		{
 
 			member_component(typename MasterType::zone_type, zone, none, none);

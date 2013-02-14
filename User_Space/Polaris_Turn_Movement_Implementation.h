@@ -14,7 +14,7 @@ namespace Turn_Movement_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Movement_Implementation:public Polaris_Component_Class<Polaris_Movement_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Polaris_Movement_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Movement_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_data(float, turn_travel_penalty, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
@@ -171,7 +171,7 @@ namespace Turn_Movement_Components
 						
 				if (num_transfer_vehicles_of_turn_movement>0)
 				{
-					push_vehicles_to_outbound_link<ComponentType,CallerType,NULLTYPE>(num_transfer_vehicles_of_turn_movement);
+					push_vehicles_to_outbound_link<CallerType,NULLTYPE>(num_transfer_vehicles_of_turn_movement);
 					float delay=_outbound_link_arrived_time_based_experienced_link_turn_travel_delay/((float)num_transfer_vehicles_of_turn_movement);
 					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay= delay;
 				}

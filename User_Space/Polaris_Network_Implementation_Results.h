@@ -14,7 +14,7 @@ namespace Network_Components
 	namespace Implementations
 	{
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::write_vehicle_trajectory()
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_vehicle_trajectory()
 		{
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -103,7 +103,7 @@ namespace Network_Components
 
 		};
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::write_network_link_flow()
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_network_link_flow()
 		{
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename _Link_Interface::get_type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
@@ -142,7 +142,7 @@ namespace Network_Components
 			}
 		};
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::write_network_link_turn_time()
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_network_link_turn_time()
 		{
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename _Link_Interface::get_type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
@@ -199,7 +199,7 @@ namespace Network_Components
 
 		};
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::write_node_control_state()
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_node_control_state()
 		{
 
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
@@ -272,7 +272,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType>::write_output_summary()
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_output_summary()
 		{
 
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
@@ -301,7 +301,7 @@ namespace Network_Components
 		}
 
 		// EXTRANEOUS DEFINITIONS FOR SKIMMABLE NETWORK
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::write_vehicle_trajectory()
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_vehicle_trajectory()
 		{
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -390,7 +390,7 @@ namespace Network_Components
 
 		};
 
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::write_network_link_flow()
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_network_link_flow()
 		{
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename _Link_Interface::get_type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
@@ -429,7 +429,7 @@ namespace Network_Components
 			}
 		};
 
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::write_network_link_turn_time()
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_network_link_turn_time()
 		{
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename _Link_Interface::get_type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
@@ -486,7 +486,7 @@ namespace Network_Components
 
 		};
 
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::write_node_control_state()
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_node_control_state()
 		{
 
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
@@ -559,7 +559,7 @@ namespace Network_Components
 			}
 		}
 
-		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::write_output_summary()
+		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_output_summary()
 		{
 
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);

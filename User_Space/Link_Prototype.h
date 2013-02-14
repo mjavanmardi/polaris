@@ -135,47 +135,47 @@ namespace Link_Components
 
 			feature_prototype void accept_vehicle(TargetType vehicle)
 			{
-				this_component()->template accept_vehicle<ComponentType,CallerType,TargetType>(vehicle);
+				this_component()->template accept_vehicle<CallerType,TargetType>(vehicle);
 			}
 
 			feature_prototype void link_supply_update()
 			{
-				this_component()->template link_supply_update<ComponentType,CallerType,TargetType>();
+				this_component()->template link_supply_update<CallerType,TargetType>();
 			}
 			
 			feature_prototype void link_moving()
 			{
-				this_component()->template link_moving<ComponentType,CallerType,TargetType>();
+				this_component()->template link_moving<CallerType,TargetType>();
 			}
 
 			feature_prototype void origin_link_loading(TargetType param)
 			{
-				this_component()->template origin_link_loading<ComponentType,CallerType,TargetType>(param);
+				this_component()->template origin_link_loading<CallerType,TargetType>(param);
 			}
 
 			feature_prototype void network_state_update()
 			{
-				this_component()->template network_state_update<ComponentType,CallerType,TargetType>();
+				this_component()->template network_state_update<CallerType,TargetType>();
 			}
 
 			feature_prototype void Initialize()
 			{
-				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->template Initialize<CallerType,TargetType>();
 			}
 
 			feature_prototype void reset_routable_link()
 			{
-				this_component()->template reset_routable_link<ComponentType,CallerType,TargetType>();
+				this_component()->template reset_routable_link<CallerType,TargetType>();
 			}
 
 			feature_prototype void construct_routable_from_regular(TargetType regular_link)
 			{
-				this_component()->template construct_routable_from_regular<ComponentType,CallerType,TargetType>(regular_link);
+				this_component()->template construct_routable_from_regular<CallerType,TargetType>(regular_link);
 			}
 
 			feature_prototype void initialize_features(TargetType param)
 			{
-				this_component()->template initialize_features<ComponentType,CallerType,TargetType>(param);
+				this_component()->template initialize_features<CallerType,TargetType>(param);
 			}
 		};
 	}

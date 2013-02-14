@@ -37,7 +37,7 @@
 ///====================================================================================
 
 #define feature_implementation_definition\
-	template<typename MasterType,typename ParentType>\
+	template<typename MasterType,typename ParentType,typename InheritanceList>\
 	template<typename CallerType,typename TargetType>
 
 ///============================================================================

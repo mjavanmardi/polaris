@@ -13,7 +13,7 @@ namespace Network_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Network_Implementation:public Polaris_Component_Class<Polaris_Network_Implementation,MasterType,Execution_Object,ParentType>
+		implementation struct Polaris_Network_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
@@ -56,12 +56,12 @@ namespace Network_Components
 
 			feature_implementation void simulation_initialize()
 			{
-				initialize_intersection_control<ComponentType,CallerType,TargetType>();
-				initialize_links<ComponentType,CallerType,TargetType>();
-				initialize_intersections<ComponentType,CallerType,TargetType>();
-				construct_network_cost<ComponentType,CallerType,TargetType>();
-				construct_routable_network<ComponentType,CallerType,TargetType>();
-				initialize_network_agent<ComponentType,CallerType,TargetType>();
+				initialize_intersection_control<CallerType,TargetType>();
+				initialize_links<CallerType,TargetType>();
+				initialize_intersections<CallerType,TargetType>();
+				construct_network_cost<CallerType,TargetType>();
+				construct_routable_network<CallerType,TargetType>();
+				initialize_network_agent<CallerType,TargetType>();
 			}
 
 			feature_implementation void initialize_network_agent()
@@ -94,7 +94,7 @@ namespace Network_Components
 				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
 				
 				_Network_Interface* _this_ptr = (_Network_Interface*)_this;
-				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
+				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE>();
 				if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>() && _this_ptr->template scenario_reference<_Scenario_Interface*>()->template network_in_network_vehicles<int>() == 0)
 				{
 					_this_ptr->template scenario_reference<_Scenario_Interface*>()->template close_output_files<NULLTYPE>();
@@ -199,8 +199,9 @@ namespace Network_Components
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
 				//write_network_link_flow<NULLTYPE>();
-				//write_network_link_turn_time<ComponentType,CallerType,TargetType>();
-				//write_output_summary<ComponentType,CallerType,TargetType>();
+// to comment back
+				write_network_link_turn_time<CallerType,TargetType>();
+				write_output_summary<CallerType,TargetType>();
 
 			}
 
@@ -260,7 +261,7 @@ namespace Network_Components
 		};
 
 
-		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Component_Class<Integrated_Polaris_Network_Implementation,MasterType,Execution_Object,ParentType>
+		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Component<APPEND_CHILD(Integrated_Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			member_component(typename MasterType::network_skim_type, skimming_faculty,none,none);
 
@@ -318,12 +319,12 @@ namespace Network_Components
 
 			feature_implementation void simulation_initialize()
 			{
-				initialize_intersection_control<ComponentType,CallerType,TargetType>();
-				initialize_links<ComponentType,CallerType,TargetType>();
-				initialize_intersections<ComponentType,CallerType,TargetType>();
-				construct_network_cost<ComponentType,CallerType,TargetType>();
-				construct_routable_network<ComponentType,CallerType,TargetType>();
-				initialize_network_agent<ComponentType,CallerType,TargetType>();
+				initialize_intersection_control<CallerType,TargetType>();
+				initialize_links<CallerType,TargetType>();
+				initialize_intersections<CallerType,TargetType>();
+				construct_network_cost<CallerType,TargetType>();
+				construct_routable_network<CallerType,TargetType>();
+				initialize_network_agent<CallerType,TargetType>();
 			}
 
 			feature_implementation void initialize_network_agent()
@@ -461,8 +462,8 @@ namespace Network_Components
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
 				//write_network_link_flow<NULLTYPE>();
-				//write_network_link_turn_time<ComponentType,CallerType,TargetType>();
-				//write_output_summary<ComponentType,CallerType,TargetType>();
+				//write_network_link_turn_time<CallerType,TargetType>();
+				//write_output_summary<CallerType,TargetType>();
 
 			}
 

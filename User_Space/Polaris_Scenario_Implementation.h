@@ -14,7 +14,7 @@ namespace Scenario_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Scenario_Implementation:public Polaris_Component_Class<Polaris_Scenario_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Polaris_Scenario_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Scenario_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_data(int, simulation_interval_length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, assignment_interval_length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));

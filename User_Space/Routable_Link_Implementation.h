@@ -14,7 +14,7 @@ namespace Link_Components
 	
 	namespace Implementations
 	{
-		implementation struct Routable_Link_Implementation:public Polaris_Component_Class<Routable_Link_Implementation,MasterType,Data_Object,ParentType> 
+		implementation struct Routable_Link_Implementation:public Polaris_Component<APPEND_CHILD(Routable_Link_Implementation),MasterType,Data_Object,ParentType> 
 		{
 
 			typedef typename MasterType::link_type network_link_type;

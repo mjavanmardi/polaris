@@ -13,7 +13,7 @@ namespace Traveler_Components
 	
 	namespace Implementations
 	{
-		implementation struct Polaris_Traveler_Implementation:public Polaris_Component_Class<Polaris_Traveler_Implementation,MasterType,Execution_Object,ParentType>
+		implementation struct Polaris_Traveler_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Traveler_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);

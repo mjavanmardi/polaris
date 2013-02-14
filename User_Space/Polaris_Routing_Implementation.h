@@ -2,8 +2,10 @@
 #include "Routing_Prototype.h"
 #include "Routable_Link_Implementation.h"
 #include "Routable_Intersection_Implementation.h"
+// to comment back
+#ifndef FOR_LINUX_PORTING
 #include "Person_Implementations.h"
-
+#endif
 #include <iostream>
 namespace Routing_Components
 {
@@ -18,7 +20,7 @@ namespace Routing_Components
 	namespace Implementations
 	{
 
-		implementation	struct Routable_Network_Implementation:public Polaris_Component_Class<Routable_Network_Implementation,MasterType,Data_Object,ParentType>
+		implementation	struct Routable_Network_Implementation:public Polaris_Component<APPEND_CHILD(Routable_Network_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_data(Min_Pool<void*>,scan_list,none,none);
 			//member_data(concat(set<pair<float, void*>>), scan_list, none, none);
@@ -106,7 +108,7 @@ namespace Routing_Components
 					_Regular_Intersection_Interface* regular_intersection = (_Regular_Intersection_Interface*)(*regular_intersection_itr);
 					_Routable_Intersection_Interface* routable_intersection =  (_Routable_Intersection_Interface*)Allocate<typename _Routable_Intersection_Interface::Component_Type>();
 					typedef dense_hash_map<int,_Routable_Link_Interface*>& linksMapType;
-					routable_intersection->template construct_routable_from_regular<Target_Type<void,_Regular_Intersection_Interface*,linksMapType>>(regular_intersection, linksMap);
+					routable_intersection->template construct_routable_from_regular<Target_Type<NULLTYPE,void,_Regular_Intersection_Interface*,linksMapType>>(regular_intersection, linksMap);
 
 					intersections_container<ComponentType,CallerType,_Routable_Intersections_Container_Interface&>().push_back(routable_intersection);
 					intersectionsMap.insert(pair<int, _Routable_Intersection_Interface*>(regular_intersection->template internal_id<int>(), routable_intersection));
@@ -131,16 +133,16 @@ namespace Routing_Components
 			}
 		};
 
-		implementation struct Polaris_Routing_Implementation:public Polaris_Component_Class<Polaris_Routing_Implementation,MasterType,Execution_Object,ParentType>
+		implementation struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType>
 		{
-
-//#ifndef FOR_LINUX_PORTING
+// to comment back
+#ifndef FOR_LINUX_PORTING
 			member_component(typename MasterType::person_type, traveler, none, none);
 			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
-//#else
-//			member_component(typename MasterType::traveler_type, traveler, none, none);
-//			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
-//#endif
+#else
+			member_component(typename MasterType::traveler_type, traveler, none, none);
+			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
+#endif
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType vehicle()
 			{
@@ -160,7 +162,8 @@ namespace Routing_Components
 			
 			tag_getter_as_available(routable_network);			
 					
-
+// to comment back
+#ifndef FOR_LINUX_PORTING
 			// time increment at which skim tables are updated - set in the initializer
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
 			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time_Prototype);
@@ -170,7 +173,7 @@ namespace Routing_Components
 			member_component_feature(start_time,_start_time,Value,Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_end_time,none,none);
 			member_component_feature(end_time,_end_time,Value,Basic_Units::Prototypes::Time_Prototype);
-		
+#endif		
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			void routable_origin(TargetType set_value)
 			{
@@ -215,17 +218,17 @@ namespace Routing_Components
 			typedef typename MasterType::routable_network_type routable_network_type;
 		};
 
-		implementation struct Polaris_Integrated_Routing_Implementation:public Polaris_Component_Class<Polaris_Integrated_Routing_Implementation,MasterType,Execution_Object,ParentType>
+		implementation struct Polaris_Integrated_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Integrated_Routing_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			member_container(vector<float>,travel_times_to_link_container,none,none);
-
-//#ifndef FOR_LINUX_PORTING
+//to comment back
+#ifndef FOR_LINUX_PORTING
 			member_component(typename MasterType::person_type, traveler, none, none);
 			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
-//#else
-//			member_component(typename MasterType::traveler_type, traveler, none, none);
-//			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
-//#endif
+#else
+			member_component(typename MasterType::traveler_type, traveler, none, none);
+			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
+#endif
 			template<typename ThisType, typename CallerType, typename TargetType>
 			TargetType vehicle()
 			{
@@ -244,9 +247,9 @@ namespace Routing_Components
 			}
 			
 			tag_getter_as_available(routable_network);			
-			
-//#ifndef FOR_LINUX_PORTING			
-//
+// to comment back			
+#ifndef FOR_LINUX_PORTING			
+
 			// time increment at which skim tables are updated - set in the initializer
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
 			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time_Prototype);
@@ -256,7 +259,7 @@ namespace Routing_Components
 			member_component_feature(start_time,_start_time,Value,Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_end_time,none,none);
 			member_component_feature(end_time,_end_time,Value,Basic_Units::Prototypes::Time_Prototype);
-/*#endif		*/	
+#endif	
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			void routable_origin(TargetType set_value)
 			{
