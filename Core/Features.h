@@ -345,9 +345,9 @@ struct member_function_ptr_types<Type,setter_type>
 /// member_prototype – similar to member_component, but stores prototype
 ///============================================================================
 
-#define member_prototype(PROTOTYPE,FEATURE_NAME,COMPONENT_TYPE,CALLER_TYPE,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+#define member_prototype(PROTOTYPE,FEATURE_NAME,COMPONENT_TYPE,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 	public:\
-		PROTOTYPE<COMPONENT_TYPE,CALLER_TYPE>* _##FEATURE_NAME;\
+		PROTOTYPE<COMPONENT_TYPE,ComponentType>* _##FEATURE_NAME;\
 		typedef COMPONENT_TYPE FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
@@ -361,10 +361,10 @@ struct member_function_ptr_types<Type,setter_type>
 		tag_getter_as_available(FEATURE_NAME);\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
-		{_##FEATURE_NAME=(PROTOTYPE<COMPONENT_TYPE,CALLER_TYPE>*)(&value);}\
+		{_##FEATURE_NAME=(PROTOTYPE<COMPONENT_TYPE,ComponentType>*)(&value);}\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
-		{_##FEATURE_NAME=(PROTOTYPE<COMPONENT_TYPE,CALLER_TYPE>*)(value);}\
+		{_##FEATURE_NAME=(PROTOTYPE<COMPONENT_TYPE,ComponentType>*)(value);}\
 		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
 		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
