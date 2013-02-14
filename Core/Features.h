@@ -17,7 +17,7 @@
 /// implementation - standard declarator for all implementations
 ///============================================================================
 
-#define implementation template<typename MasterType, typename ParentType=NULLTYPE>
+#define implementation template<typename MasterType,typename ParentType=NULLTYPE,typename InheritanceList=NULLTYPELIST>
 
 ///============================================================================
 /// feature - standard declarator for all prototype features
@@ -30,7 +30,7 @@
 /// feature_implementation - standard declarator for all implementation features
 ///============================================================================
 
-#define feature_implementation public: template<typename ComponentType,typename CallerType,typename TargetType>
+#define feature_implementation public: template<typename CallerType,typename TargetType>
 
 ///====================================================================================
 /// feature_implementation_definition - standard definition for implementation features
@@ -38,7 +38,7 @@
 
 #define feature_implementation_definition\
 	template<typename MasterType,typename ParentType>\
-	template<typename ComponentType,typename CallerType,typename TargetType>
+	template<typename CallerType,typename TargetType>
 
 ///============================================================================
 /// declare_feature_event - header for a basic event feature
@@ -52,7 +52,7 @@ struct event_type{};
 
 #define declare_feature_event_implementation(FEATURE_NAME)\
 	typedef event_type FEATURE_NAME##_event_tag;\
-	template<typename ComponentType,typename CallerType,typename TargetType> static void FEATURE_NAME(void* _this)
+	template<typename CallerType,typename TargetType> static void FEATURE_NAME(void* _this)
 
 template<typename Type>
 struct member_function_ptr_types<Type,event_type>
@@ -525,9 +525,10 @@ struct member_function_ptr_types<Type,setter_type>
 /// Target_Type structure for large function signatures
 ///============================================================================
 
-template<typename Return_Type=NULLTYPE, typename Param_Type=NULLTYPE, typename Param2_Type=NULLTYPE, typename Param3_Type=NULLTYPE, typename Param4_Type=NULLTYPE, typename Param5_Type=NULLTYPE, typename Param6_Type=NULLTYPE, typename Param7_Type=NULLTYPE, typename Param8_Type=NULLTYPE>
+template<typename Control_Type=NULLTYPE, typename Return_Type=NULLTYPE, typename Param_Type=NULLTYPE, typename Param2_Type=NULLTYPE, typename Param3_Type=NULLTYPE, typename Param4_Type=NULLTYPE, typename Param5_Type=NULLTYPE, typename Param6_Type=NULLTYPE, typename Param7_Type=NULLTYPE, typename Param8_Type=NULLTYPE>
 struct Target_Type
 {
+	typedef Control_Type ControlType;
 	typedef Return_Type ReturnType;
 	typedef Param_Type ParamType;
 	typedef Param2_Type Param2Type;

@@ -55,6 +55,8 @@ struct TypeList
 };
 
 #define TYPELIST_1(T1) TypeList<T1,NULLTYPE>
+#define NULLTYPELIST TypeList<NULLTYPE,NULLTYPE>
+#define APPEND_CHILD(IMPLEMENTATION) typename Append<InheritanceList,IMPLEMENTATION<MasterType,ParentType>>::Result
 
 ///============================================================================
 /// IndexOf Implementation
@@ -82,6 +84,24 @@ template<>
 struct ValidIndex<-1>
 {
 	typedef false_type type;
+};
+
+///============================================================================
+/// TypeAt Implementation
+///============================================================================
+
+template<class TList, unsigned int index> struct TypeAt;
+
+template<class Head, class Tail>
+struct TypeAt<TypeList<Head, Tail>,0>
+{
+	typedef Head Result;
+};
+
+template<class Head, class Tail, unsigned int i>
+struct TypeAt<TypeList<Head, Tail>, i>
+{
+	typedef typename TypeAt<Tail,i-1>::Result Result;
 };
 
 ///============================================================================

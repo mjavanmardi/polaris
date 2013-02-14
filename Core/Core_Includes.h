@@ -77,8 +77,7 @@ typedef volatile unsigned int _lock;
 #define not_available false
 
 struct NULLTYPE{};
-struct UNKNOWN{};
-class NC{};
+typedef NULLTYPE NT;
 
 template<typename A> struct NULLTEMPLATE{};
 template<typename A,typename B> struct NULLTEMPLATE_2{};
