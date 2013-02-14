@@ -218,7 +218,7 @@ namespace PopSyn
 						{
 							if (rand.template Next_Rand<double>() < w/cumulative_weight)
 							{					
-								pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
+								pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>(); // ALLOCATE
 								//pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
 								pop_unit_itf* obj = range.first->second;
 								p->template Initialize<pop_unit_itf&>(*obj);
@@ -247,11 +247,19 @@ namespace PopSyn
 					// add a copy of the last unit until num_required < 1
 					while (num_required > 1.0)
 					{
-						pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
+						pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>(); // ALLOCATE
 						//pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
 						pop_unit_itf* obj = stored_pop_unit;
 						p->Initialize<pop_unit_itf&>(*obj);
 						zone_sample->insert(p->template Index<uint>(),p);
+						// create the actual person agent
+						typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
+						_Person_Interface* person=(_Person_Interface*)Allocate<typename ComponentType::Master_Type::person_type>();
+						person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
+						person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
+						person->Initialize<int>(num_created);
+						num_created++;
+
 						num_required--;
 					}
 
@@ -259,11 +267,18 @@ namespace PopSyn
 					// if a fractional num_required is left, add another unit with probability of num_required
 					if (num_required > 0.0 && rand.template Next_Rand<double>() < num_required)
 					{
-						pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
+						pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>(); // ALLOCATE
 						//pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
 						pop_unit_itf* obj = stored_pop_unit;
 						p->Initialize<pop_unit_itf&>(*obj);
 						zone_sample->insert(p->template Index<uint>(),p);
+						// create the actual person agent
+						typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
+						_Person_Interface* person=(_Person_Interface*)Allocate<typename ComponentType::Master_Type::person_type>();
+						person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
+						person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
+						person->Initialize<int>(num_created);
+						num_created++;
 						num_required--;
 					}
 

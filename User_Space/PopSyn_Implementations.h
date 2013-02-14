@@ -17,6 +17,12 @@ namespace PopSyn
 			member_data(string, linker_file_path, none,none);
 			member_pointer(ostream,Output_Stream,none,none);
 			member_pointer(ostream,Marginal_Output_Stream,none,none);
+
+			feature_implementation void Initialize()
+			{
+				this->_Synthesis_Regions_Collection.set_empty_key(-1);
+				this->_Synthesis_Regions_Collection.set_deleted_key(-2);
+			}
 		};
 	}
 }

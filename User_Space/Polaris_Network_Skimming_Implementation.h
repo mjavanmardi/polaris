@@ -53,6 +53,14 @@ namespace Network_Skimming_Components
 			member_associative_container(concat(dense_hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),destination_node_to_zone_map,none,none);
 
 			member_data(Counter, timer,none,none);
+
+			feature_implementation void Initialize()
+			{
+				this->_origin_node_to_zone_map.set_empty_key(-1);
+				this->_origin_node_to_zone_map.set_deleted_key(-2);
+				this->_destination_node_to_zone_map.set_empty_key(-1);
+				this->_destination_node_to_zone_map.set_deleted_key(-2);
+			}
 		};
 
 
@@ -82,68 +90,8 @@ namespace Network_Skimming_Components
 			//---------------------------------------------
 			feature_implementation void Initialize()
 			{
-				//// set the network reference
-				//define_simple_container_interface(skim_table_itf,type_of(skim_table),Containers::Multidimensional_Random_Access_Array_Prototype,double,ComponentType);
-				//define_component_interface(network_itf,type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
-				//define_component_interface(skimmer_itf,type_of(skim_reference),Prototypes::Network_Skimming_Prototype,ComponentType);
-				//network_itf* network = this->network_reference<ComponentType,CallerType,network_itf*>();
-				//skimmer_itf* skim = this->skim_reference<ComponentType,CallerType,skimmer_itf*>();
-
-				//// create the LOS container
-				//define_container_and_value_interface(zones_itf,zone_itf,network_itf::get_type_of(zones_container),Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
-				//define_container_and_value_interface(locations_itf,location_itf,zone_itf::get_type_of(origin_activity_locations),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-				//define_container_and_value_interface(links_itf,link_itf,location_itf::get_type_of(origin_links),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-				//zones_itf* zones_container = network->zones_container<zones_itf*>();
-				//zones_itf::iterator orig_itr = zones_container->begin();
-				//zones_itf::iterator dest_itr = zones_container->begin();
-
-				//
-				//// create the LOS matrix
-				//typedef matrix<double>::size_type size_t;
-				//matrix<double>* vehicle_los = new matrix<double>(pair<size_t,size_t>((size_t)zones_container->size(),(size_t)zones_container->size()), 0);
-
-				//// tree builder interface
-				//define_container_and_value_interface(tree_builder_list_itf, tree_builder_itf, type_of(path_trees_container),Associative_Container_Prototype,Routing_Components::Prototypes::Routing_Prototype,ComponentType);
-				//tree_builder_list_itf* tree_list = this->path_trees_container<ComponentType,CallerType,tree_builder_list_itf*>();
-				//
-				//for (;orig_itr != zones_container->end(); ++orig_itr)
-				//{
-				//	long orig;
-				//	zone_itf* orig_zone = *orig_itr;
-				//	orig = orig_zone->internal_id<long>();
-
-				//	// Allocate a tree_builder for each origin node
-				//	locations_itf* activity_locations = orig_zone->origin_activity_locations<locations_itf*>();	
-				//	location_itf* orig_node = *(activity_locations->begin());
-				//	tree_builder_itf* tree_builder = (tree_builder_itf*)Allocate<MasterType::routing_type>();
-				//	// Set the current origin for the tree builder
-				//	tree_builder->routable_origin<link_itf*>(*(orig_node->origin_links<links_itf*>()->begin()));
-				//	tree_builder->network<network_itf*>(network);
-				//	// Set the start, end and update times for the router
-				//	tree_builder->update_increment<Simulation_Timestep_Increment>(skim->update_increment<Simulation_Timestep_Increment>());
-				//	tree_builder->start_time<Simulation_Timestep_Increment>(this->start_time<ComponentType,CallerType,Simulation_Timestep_Increment>());
-				//	tree_builder->end_time<Simulation_Timestep_Increment>(this->end_time<ComponentType,CallerType,Simulation_Timestep_Increment>());
-				//	// Add the tree_builder to the list for future processing
-				//	tree_builder->Initialize_Tree_Computation<NULLTYPE>(_iteration);
-				//	tree_list->insert(pair<long,tree_builder_itf*>(orig,tree_builder));
-
-				//	// initialize LOS table values
-				//	for (dest_itr = zones_container->begin(); dest_itr != zones_container->end(); ++dest_itr)
-				//	{
-				//		long dest;
-				//		zone_itf* dest_zone = *dest_itr;
-				//		dest = dest_zone->internal_id<long>();
-
-				//		locations_itf* activity_locations = dest_zone->origin_activity_locations<locations_itf*>();	
-				//		location_itf* dest_node = *(activity_locations->begin());
-
-				//		(*vehicle_los)(orig,dest) = 0;
-				//	}
-				//}
-
-				//skim_tables_itf* skim_tables = this->skim_tables_container<ComponentType,CallerType,skim_tables_itf*>();
-				////pair<long,matrix<double>*> p = pair<long,matrix<double>*>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV,vehicle_los);
-				//skim_tables->insert(pair<long,matrix<double>*>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV,vehicle_los));
+				this->_path_trees_container.set_empty_key(-1);
+				this->_path_trees_container.set_deleted_key(-2);
 			}
 			feature_implementation bool Update_LOS()
 			{
@@ -261,7 +209,7 @@ namespace Network_Skimming_Components
 
 				
 				// create the skim_table time periods, for basic create only a single time period skim_table
-				skim_table_itf* skim_table = (skim_table_itf*)Allocate<type_of(skims_by_time_container)::unqualified_value_type>();
+				skim_table_itf* skim_table = (skim_table_itf*)Allocate<typename type_of(skims_by_time_container)::unqualified_value_type>();
 				skim_table->template network_reference<network_itf*>(network);
 				skim_table->template skim_reference<skimmer_itf*>(skim);
 				skim_table->template start_time<Simulation_Timestep_Increment>(0);
@@ -291,24 +239,26 @@ namespace Network_Skimming_Components
 
 			member_associative_container(concat(dense_hash_map<long,Mode_Skim_Table_Implementation<MasterType,ParentType>*>), mode_skim_table_container, none, none);
 
+			member_container(list<int>, available_modes_container, none, none);
+
 			feature_implementation void Initialize()
 			{
+				// call base initializer
+				((base_type*)this)->Initialize<ComponentType,ComponentType,TargetType>();
+				
+				// initialize dense_hash_map keys
+				this->_mode_skim_table_container.set_empty_key(-1);
+				this->_mode_skim_table_container.set_deleted_key(-2);
+
+				// create interface to this and set skimming parameters
 				typedef Prototypes::Network_Skimming_Prototype<ComponentType,ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
 				pthis->template update_increment<Time_Hours>(1);
 				pthis->template scheduled_update_time<Simulation_Timestep_Increment>(0);
 				pthis->template nodes_per_zone<long>(1);
 
-				// add a mode_skim_table for each mode available in simulation - for basic, only add SOV container
-				define_container_and_value_interface_unqualified_container(_skim_container_itf,_skim_itf,type_of(mode_skim_table_container),Containers::Associative_Container_Prototype,Prototypes::Mode_Skim_Table_Prototype,ComponentType);				
-				define_component_interface(_Network_Itf, typename base_type::type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
-				_skim_itf* skim = (_skim_itf*)Allocate<type_of(mode_skim_table_container)::unqualified_value_type>();
-				skim->template skim_reference<ComponentType*>(this);
-				skim->template network_reference<_Network_Itf*>(pthis->template network_reference<_Network_Itf*>());
-				skim->template mode_id<long>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				skim->template Initialize<NULLTYPE>();
-				pthis->template mode_skim_table_container<_skim_container_itf*>()->insert(pair<long,_skim_itf*>(skim->template mode_id<long>(), skim));
-
+				// add the available modes for the current model
+				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 			}
 
 			feature_implementation typename TargetType::ReturnType Get_Current_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator/*, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value))*/)

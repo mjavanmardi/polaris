@@ -98,7 +98,8 @@ namespace Network_Skimming_Components
 			// links back to the network to be skimmed
 			//feature_accessor(network_reference, check(ReturnValueType,Network_Components::Concepts::Is_Transportation_Network_Prototype), check(SetValueType,Network_Components::Concepts::Is_Transportation_Network_Prototype) || check(SetValueType,Network_Components::Concepts::Is_Transportation_Network_Prototype));
 			feature_accessor(network_reference, none,none);
-			
+			// ids of the modes contained in the model, set in implementation
+			feature_accessor(available_modes_container, none, none);
 			// contains a map of skim_tables, one for each specified mode
 			feature_accessor(mode_skim_table_container, none, none);
 			// reference to the current, completed skim table from skim_tables_container, based on simulation time, where skim_table
@@ -117,12 +118,15 @@ namespace Network_Skimming_Components
 			// Primary function accessors - used to pass through to the specific skimm table based on time-key
 			//---------------------------------------------
 			feature_prototype void Initialize()
-			{
-				// create the lists of origins/destination to route from/to
+			{				
+				// Call implementation Initializer - this sets the implementation specific data members
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
+
+				// get network reference
 				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 				network_itf* network = this->network_reference<network_itf*>();
 
-				// create the references to network items
+				// create the references to network items and create the lists of origins/destination to route from/to
 				define_container_and_value_interface(zones_itf,zone_itf,typename network_itf::get_type_of(zones_container),Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 				define_container_and_value_interface(locations_itf,location_itf,typename zone_itf::get_type_of(origin_activity_locations),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 				define_container_and_value_interface(links_itf,link_itf,typename location_itf::get_type_of(origin_links),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
@@ -132,7 +136,7 @@ namespace Network_Skimming_Components
 				destination_map_itf* destination_map = this->template destination_node_to_zone_map<destination_map_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
 
-				// Loop through zones, choose origin,destination points to route from, and add to maps
+				// Loop through zones, choose origin,destination points to route from/to, and add to maps
 				typename zones_itf::iterator itr;
 				typename locations_itf::iterator loc_itr;
 				for (itr= zones_container->begin();itr != zones_container->end(); ++itr)
@@ -143,7 +147,10 @@ namespace Network_Skimming_Components
 					location_itf* orig_node = *loc_itr;
 					origin_item_itf* orig_item = (origin_item_itf*)Allocate<typename get_type_of(origin_node_to_zone_map)::unqualified_value_type>();
 					orig_item->template initialize<Target_Type<NULLTYPE,long,float>>(orig_node->template internal_id<long>(),orig_zone->template internal_id<long>(),this->template nodes_per_zone<float>());
-					origin_map->insert(pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item));
+					
+					pair<long,origin_item_itf*> item = pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item);
+					//origin_map->insert(pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item));
+					origin_map->insert(item);
 				}
 				for (itr = zones_container->begin();itr != zones_container->end(); ++itr)
 				{
@@ -151,17 +158,33 @@ namespace Network_Skimming_Components
 					loc_itr = dest_zone->template origin_activity_locations<locations_itf*>()->begin();
 					if (loc_itr == dest_zone->template origin_activity_locations<locations_itf*>()->end()) THROW_EXCEPTION("error, destination zone " << dest_zone->template internal_id<int>() << "has no activity locations associated with it");
 					location_itf* dest_node = *(dest_zone->template origin_activity_locations<locations_itf*>()->begin());
-					//link_itf* dest_link = *(dest_node->destination_links<links_itf*>()->begin());
 					destination_item_itf* dest_item = (destination_item_itf*)Allocate<typename get_type_of(destination_node_to_zone_map)::unqualified_value_type>();
-					/*dest_item->initialize<Target_Type<NULLTYPE,long,float>>(dest_link->internal_id<long>(),dest_zone->internal_id<long>(),this->nodes_per_zone<float>());
-					destination_map->insert(pair<long,destination_item_itf*>(dest_link->internal_id<long>(),dest_item));*/
 					dest_item->template initialize<Target_Type<NULLTYPE,long,float>>(dest_node->template internal_id<long>(),dest_zone->template internal_id<long>(),this->template nodes_per_zone<float>());
-					destination_map->insert(pair<long,destination_item_itf*>(dest_node->template internal_id<long>(),dest_item));
+					
+					pair<long,destination_item_itf*> item = pair<long,destination_item_itf*>(dest_node->template internal_id<long>(),dest_item);
+					//destination_map->insert(pair<long,destination_item_itf*>(dest_node->template internal_id<long>(),dest_item));
+					destination_map->insert(item);
 				}
 
-				// this sets the implementation specific data members
-				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
+				// Create individual mode-skim tables for each available mode
+				define_container_and_value_interface(_skim_container_itf,_skim_itf,typename get_type_of(mode_skim_table_container),Containers::Associative_Container_Prototype,Prototypes::Mode_Skim_Table_Prototype,ComponentType);				
+				define_simple_container_interface(_available_modes_itf,typename get_type_of(available_modes_container),Containers::Back_Insertion_Sequence_Prototype,typename get_type_of(available_modes_container)::unqualified_value_type,CallerType);
+				_available_modes_itf* modes = this->template available_modes_container<_available_modes_itf*>();
+				typename _available_modes_itf::iterator mode_itr = modes->begin();
+				for (; mode_itr != modes->end(); ++mode_itr)
+				{
+					_skim_itf* skim = (_skim_itf*)Allocate<typename get_type_of(mode_skim_table_container)::unqualified_value_type>();
+					skim->skim_reference(this);
+					skim->network_reference(network);
+					skim->mode_id(*mode_itr);
+					skim->template Initialize<NULLTYPE>();
 
+					pair<long,_skim_itf*> item = pair<long,_skim_itf*>(skim->template mode_id<long>(), skim);
+					//this->template mode_skim_table_container<_skim_container_itf*>()->insert(pair<long,_skim_itf*>(skim->template mode_id<long>(), skim));
+					this->template mode_skim_table_container<_skim_container_itf*>()->insert(item);
+				}
+
+				// Load the skim updating event, which recalculates network skims at every Update interval (set in implementation)
 				load_event(ComponentType,Skim_Table_Update_Conditional,Update_Skim_Tables_Event,0,Types::SUB_ITERATIONS::INITIALIZE,NULLTYPE);
 			}
 			feature_prototype void Initialize(TargetType network_reference, requires(check_as_given(TargetType, is_pointer) && check(TargetType, Network_Components::Concepts::Is_Transportation_Network_Prototype)))
@@ -319,6 +342,9 @@ namespace Network_Skimming_Components
 			//---------------------------------------------
 			feature_prototype void Initialize()
 			{
+				// call implementation initializer
+				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+
 				// set the network reference
 				define_simple_container_interface(skim_table_itf,typename get_type_of(skim_table),Containers::Multidimensional_Random_Access_Array_Prototype,typename get_type_of(skim_table)::unqualified_value_type,ComponentType);
 				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
@@ -371,7 +397,10 @@ namespace Network_Skimming_Components
 
 					// Add the tree_builder to the list for future processing
 					tree_builder->template Initialize_Tree_Computation<NULLTYPE>(_iteration);
-					tree_list->insert(pair<long,tree_builder_itf*>(orig,tree_builder));
+
+					pair<long,tree_builder_itf*> item = pair<long,tree_builder_itf*>(orig,tree_builder);
+					tree_list->insert(item);
+					//tree_list->insert(pair<long,tree_builder_itf*>(orig,tree_builder));
 				}
 			}			
 
@@ -430,7 +459,7 @@ namespace Network_Skimming_Components
 						location_itf* dest_node = activity_locations->at(dest_node_index);
 						long dest_link_index = (*(dest_node->template destination_links<links_itf*>()->begin()))->template internal_id<long>();
 						long dest_zone_index = dest->template zone_index<long>();
-						(*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)] = tree->template Get_Tree_Results_For_Destination<skimmer_itf::Component_Type::Stored_Time_Type>(dest_link_index);
+						(*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)] = tree->template Get_Tree_Results_For_Destination<typename skimmer_itf::Component_Type::Stored_Time_Type>(dest_link_index);
 					}
 				}
 

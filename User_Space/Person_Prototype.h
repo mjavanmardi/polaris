@@ -290,7 +290,8 @@ namespace Prototypes
 				Activity_Plan* act = act_itr->second;
 				act->template Do_Activity_Planning<NULLTYPE>();	
 			}
-			activities->erase(range.first, range.second);
+			activities->erase(_iteration);
+			//activities->erase(range.first, range.second);
 		}
 		declare_feature_event(Movement_Planning_Event)
 		{
@@ -327,7 +328,8 @@ namespace Prototypes
 				break;
 
 			}
-			movements->erase(range.first, range.second);
+			movements->erase(_iteration);
+			//movements->erase(range.first, range.second);
 		}
 
 

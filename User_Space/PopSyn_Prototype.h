@@ -27,6 +27,8 @@ namespace PopSyn
 			// Schedules the first event from above
 			feature_prototype void Initialize()
 			{
+				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+
 				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::INITIALIZE,NULLTYPE);
 				//load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,4,NULLTYPE);
 			}
@@ -191,7 +193,9 @@ namespace PopSyn
 						new_region->template Solver_Settings<solver_itf*>(region_solver);
 
 						// add new region to the list
-						regions->insert(pair<typename regions_itf::key_type, region_itf*>(ID, new_region));
+						pair<typename regions_itf::key_type, region_itf*> item = pair<typename regions_itf::key_type, region_itf*>(ID, new_region);
+						//regions->insert(pair<typename regions_itf::key_type, region_itf*>(ID, new_region));
+						regions->insert(item);
 					}
 					else
 					{
@@ -265,7 +269,8 @@ namespace PopSyn
 					regional_marg = region->template Target_Marginal_Distribution<marginal_itf*>();
 
 					// Read marginal data from file and add to ZONE
-					zone_itf* zone = (zone_itf*)Allocate<zone_type>(); // ALLOCATION_TEST
+					zone_itf* zone = (zone_itf*)Allocate<zone_type>();
+					zone->template Initialize<NULLTYPE>();
 					zone->parent_reference(region);
 
 					zone->ID(ID);
@@ -295,7 +300,9 @@ namespace PopSyn
 						}
 
 					}
-					region->template Synthesis_Zone_Collection<zones_itf*>()->insert(pair<typename zone_type::ID_type,zone_itf*>(ID,zone));
+					pair<typename zone_type::ID_type,zone_itf*> item = pair<typename zone_type::ID_type,zone_itf*>(ID,zone);
+					//region->template Synthesis_Zone_Collection<zones_itf*>()->insert(pair<typename zone_type::ID_type,zone_itf*>(ID,zone));
+					region->template Synthesis_Zone_Collection<zones_itf*>()->insert(item);
 				}
 				zone_fr.Close();
 

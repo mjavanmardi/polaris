@@ -13,6 +13,10 @@ namespace PopSyn
 			typedef true_type Probabilistic_Selection_Type;
 			typedef double Value_Type;
 			
+			feature_implementation void Initialize()
+			{
+
+			}
 			feature_implementation typename TargetType::ReturnType Get_1D_Index(typename TargetType::ParamType& multi_dimensional_index_vector)
 			{
 				return this->_Target_Joint_Distribution.get_index(multi_dimensional_index_vector);

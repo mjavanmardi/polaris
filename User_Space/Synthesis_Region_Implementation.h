@@ -14,6 +14,11 @@ namespace PopSyn
 			member_pointer(ostream,Output_Stream,none,none);
 			member_component(typename MasterType::popsyn_solver, parent_reference, none,none);
 
+			feature_implementation void Initialize()
+			{
+				this->_Synthesis_Zone_Collection.set_empty_key(-1);
+				this->_Synthesis_Zone_Collection.set_deleted_key(-2);
+			}
 			feature_implementation TargetType scenario_reference()
 			{
 				return this->parent_reference<ComponentType,CallerType,type_of(parent_reference)&>().scenario_reference<ComponentType,CallerType,TargetType>();

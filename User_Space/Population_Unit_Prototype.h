@@ -18,10 +18,10 @@ namespace PopSyn
 			typedef Population_Unit_Prototype<ComponentType, CallerType> This_Type;
 			feature_prototype void Initialize(TargetType object_to_copy/*, requires(check_2(TargetType,This_Type,is_same))*/)
 			{
-				uint i = object_to_copy.ID<get_type_of(ID)>();
-				this->ID<get_type_of(ID)>(object_to_copy.ID<get_type_of(ID)>());
-				this->Weight<get_type_of(Weight)>(object_to_copy.Weight<get_type_of(Weight)>());
-				this->Index<get_type_of(Index)>(object_to_copy.Index<get_type_of(Index)>());
+				uint i = object_to_copy.ID<typename get_type_of(ID)>();
+				this->ID<typename get_type_of(ID)>(object_to_copy.ID<typename get_type_of(ID)>());
+				this->Weight<typename get_type_of(Weight)>(object_to_copy.Weight<typename get_type_of(Weight)>());
+				this->Index<typename get_type_of(Index)>(object_to_copy.Index<typename get_type_of(Index)>());
 
 				typedef typename get_type_of(Characteristics)::unqualified_value_type value_type;
 				define_simple_container_interface(characteristics_itf,typename get_type_of(Characteristics),Random_Access_Sequence_Prototype,value_type,NULLTYPE);

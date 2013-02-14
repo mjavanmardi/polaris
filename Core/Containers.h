@@ -185,7 +185,8 @@ struct Associative_Container_Prototype : public ComponentType
 
 	pair<iterator,bool> insert(pair<key_type,TargetValueType>& p)
 	{
-		return ((ComponentType*)this)->insert(pair<key_type,typename Component_Type::mapped_type>(p.first,(typename Component_Type::mapped_type)(p.second)));
+		pair<key_type,Val_Type> t = pair<key_type,Val_Type>(p.first,(Val_Type)(p.second));
+		return ((ComponentType*)this)->insert(t);
 	}
 
 	iterator insert(key_type key, TargetValueType& value)
@@ -201,6 +202,7 @@ struct Associative_Container_Prototype : public ComponentType
 	//
 	//void insert(iterator p, iterator i, TargetValueType t){return ((ComponentType*)this)->insert(p,i,t);}
 
+	size_type erase (key_type key){return ((ComponentType*)this)->erase(key);}
 	iterator erase(iterator p){return ((ComponentType*)this)->erase(p);}
 	
 	iterator erase(iterator p, iterator q){return ((ComponentType*)this)->erase(p,q);}

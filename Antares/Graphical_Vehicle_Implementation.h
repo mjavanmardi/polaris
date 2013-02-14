@@ -49,9 +49,18 @@ namespace Vehicle_Components
 			{
 				Graphical_Vehicle_Implementation* pthis=(Graphical_Vehicle_Implementation*)_this;
 
+				if(pthis->_movement_plan == NULL)
+				{
+					cout << "verified!" << endl;
+					return;
+				}
 				Link_Interface* link=pthis->_movement_plan->current_link<Link_Interface*>();
 
-				assert(link==nullptr);
+				if(link == nullptr)
+				{
+					cout << "verified!" << endl;
+					return;
+				}
 
 				Intersection_Interface* upstream_intersection=link->upstream_intersection<Intersection_Interface*>();
 
