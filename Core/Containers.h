@@ -168,7 +168,7 @@ struct Associative_Container_Prototype : public ComponentType
 	typedef typename ComponentType::size_type size_type;
 	typedef typename ComponentType::key_type key_type;
 	//typedef typename ComponentType::key_compare key_compare;
-	typedef typename ComponentType::value_compare value_compare;
+	//typedef typename ComponentType::value_compare value_compare;
 	typedef typename ComponentType::mapped_type Val_Type;
 
 	typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,pair<key_type,TargetValueType>> iterator;
@@ -209,7 +209,7 @@ struct Associative_Container_Prototype : public ComponentType
 
 	//key_compare key_comp() const { return ((ComponentType*)this)->key_comp();}
 
-	value_compare value_comp() const { return ((ComponentType*)this)->value_comp();}
+	//value_compare value_comp() const { return ((ComponentType*)this)->value_comp();}
 
 	iterator find ( const key_type& x ) { return ((ComponentType*)this)->find(x);}
 

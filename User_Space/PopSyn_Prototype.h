@@ -134,8 +134,6 @@ namespace PopSyn
 				typename regions_itf::iterator region_itr;
 				this->Synthesis_Regions_Collection<regions_itf*>(regions);
 
-				//hash_map<int, Region> regions;
-				//vector<Zone>::iterator zone_itr;
 				typename joint_itf::index_type dimensions;
 				typename joint_itf::index_type index;
 				for (vector<int>::iterator i = dims.begin(); i != dims.end(); ++i) 

@@ -49,8 +49,8 @@ namespace Network_Skimming_Components
 			member_data(long, nodes_per_zone, check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 
 			// link-to-zone mapping for use in skimming
-			member_associative_container(concat(hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),origin_node_to_zone_map,none,none);
-			member_associative_container(concat(hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),destination_node_to_zone_map,none,none);
+			member_associative_container(concat(dense_hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),origin_node_to_zone_map,none,none);
+			member_associative_container(concat(dense_hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),destination_node_to_zone_map,none,none);
 
 			member_data(Counter, timer,none,none);
 		};
@@ -62,7 +62,7 @@ namespace Network_Skimming_Components
 		implementation struct Skim_Table_Implementation : public Polaris_Component_Class<Skim_Table_Implementation,MasterType,Data_Object,ParentType>
 		{
 			member_container(matrix<double>, skim_table, none,none);
-			member_associative_container(concat(hash_map<long,typename MasterType::routing_type*>), path_trees_container,none,none);
+			member_associative_container(concat(dense_hash_map<long,typename MasterType::routing_type*>), path_trees_container,none,none);
 
 			// start and end times of the period represented by the skim table
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_start_time,none,none);
@@ -289,7 +289,7 @@ namespace Network_Skimming_Components
 		{
 			typedef _Basic_Network_Skimming_Elements<MasterType> base_type;
 
-			member_associative_container(concat(hash_map<long,Mode_Skim_Table_Implementation<MasterType,ParentType>*>), mode_skim_table_container, none, none);
+			member_associative_container(concat(dense_hash_map<long,Mode_Skim_Table_Implementation<MasterType,ParentType>*>), mode_skim_table_container, none, none);
 
 			feature_implementation void Initialize()
 			{

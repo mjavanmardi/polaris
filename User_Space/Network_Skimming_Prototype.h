@@ -21,7 +21,7 @@ namespace Network_Skimming_Components
 
 	namespace Concepts
 	{
-	}
+	} 
 	
 	namespace Prototypes
 	{
