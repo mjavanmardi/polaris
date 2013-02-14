@@ -244,12 +244,12 @@ namespace Network_Components
 			feature_prototype TargetType start_of_current_simulation_interval_relative()
 			{
 				define_component_interface(_Scenario_Interface, typename get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-// to comment back
-#ifndef FOR_LINUX_PORTING
+
+//#ifndef FOR_LINUX_PORTING
 				int current_time = int(floor(Simulation_Time.Current_Time<Basic_Units::Time_Variables::Time_Seconds>() + 0.5));
-#else
-				int current_time = _iteration;
-#endif
+//#else
+//				int current_time = _iteration;
+//#endif
 				if (current_time < scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>() - 1) 
 				{
 					cout << "_iteration must start from (simulation_interval_length - 1)" << endl;

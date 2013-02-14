@@ -21,12 +21,11 @@ namespace Vehicle_Components
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
 			member_component(typename MasterType::movement_plan_type, movement_plan, none, none);
-// to comment back
-#ifndef FOR_LINUX_PORTING
+//#ifndef FOR_LINUX_PORTING
 			member_component(typename MasterType::person_type, traveler, none, none);
-#else
-			member_component(typename MasterType::traveler_type, traveler, none, none);
-#endif
+//#else
+//			member_component(typename MasterType::traveler_type, traveler, none, none);
+//#endif
 			feature_implementation void load(requires(check_2(TargetType,typename Types::Load_To_Entry_Queue,is_same)))
 			{
 				_simulation_status = Types::Vehicle_Status_Keys::IN_ENTRY_QUEUE;

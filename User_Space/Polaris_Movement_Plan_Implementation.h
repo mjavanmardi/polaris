@@ -64,8 +64,7 @@ namespace Movement_Plan_Components
 
 			member_component(typename MasterType::link_type, origin, none, none);
 			member_component(typename MasterType::link_type, destination, none, none);
-// to comment back
-#ifndef FOR_LINUX_PORTING
+//#ifndef FOR_LINUX_PORTING
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_departed_time,none,none);
 			member_component_feature(departed_time, _departed_time, Value, Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_arrived_time,none,none);

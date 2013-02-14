@@ -28,17 +28,14 @@ void* _global_scenario;
 #include "Polaris_Network_Implementation_Input_File.h"
 #include "Polaris_Network_Implementation_Output_File.h"
 #include "Polaris_Network_Implementation_Results.h"
-//to comment back
-//#include "Polaris_Network_Skimming_Implementation.h"
+#include "Polaris_Network_Skimming_Implementation.h"
 
 #ifndef FOR_LINUX_PORTING
 #include "Polaris_Network_Implementation_Input_DB.h"
-// to comment back
-//#endif
+#endif
 #include "Activity_Implementations.h"
 #include "Population_Unit_Implementations.h"
 #include "Synthesis_Zone_Implementations.h"
 #include "Synthesis_Region_Implementation.h"
 #include "PopSyn_Implementations.h"
 #include "Person_Implementations.h"
-#endif
