@@ -234,6 +234,7 @@
     <ClInclude Include="Polaris_Vehicle_Implementation.h" />
     <ClInclude Include="Polaris_Zone_Implementation.h" />
     <ClInclude Include="PopSyn_Implementations.h" />
+    <ClInclude Include="popsyn_includes.h" />
     <ClInclude Include="PopSyn_Prototype.h" />
     <ClInclude Include="Population_Unit_Implementations.h" />
     <ClInclude Include="Population_Unit_Prototype.h" />

@@ -144,3 +144,15 @@ namespace Plan_Components {
 		forward_declare_prototype struct Plan_Prototype;
 	}
 };
+namespace Activity_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Activity_Plan_Prototype;
+	}
+};
+namespace Network_Skimming_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Network_Skimming_Prototype;
+	}
+};

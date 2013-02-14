@@ -227,7 +227,8 @@ namespace Network_Components
 			}
 		}
 	
-#ifndef FOR_LINUX_PORTING
+
+
 		// EXTRANEOUS DEFINITIONS FOR SKIMMABLE NETWORK
 		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
@@ -240,7 +241,7 @@ namespace Network_Components
 
 		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, typename type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			_Intersection_Interface* intersection;
 			for (int i = 0; i < network_data.network_node_size; i++) {
 				intersection = (_Intersection_Interface*)Allocate<typename _Intersection_Interface::Component_Type>();
@@ -255,8 +256,8 @@ namespace Network_Components
 
 		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_link_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, typename type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			_Link_Interface* link;
 			for (int i = 0; i < network_data.network_link_size; i++) {
 				link = (_Link_Interface*)Allocate<typename _Link_Interface::Component_Type>();
@@ -293,9 +294,9 @@ namespace Network_Components
 
 		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_turn_movement_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, typename type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-			define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, typename type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 			define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, typename _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);			
 			define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, typename _Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
 			_Turn_Movement_Interface* turn_movement;
@@ -375,8 +376,8 @@ namespace Network_Components
 
 		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			_Activity_Location_Interface* activity_location;
 			for (int i = 0; i < network_data.network_activity_location_size; i++) 
 			{
@@ -407,8 +408,8 @@ namespace Network_Components
 
 		feature_implementation_definition void Integrated_Polaris_Network_Implementation<MasterType,ParentType>::read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 
 			_Zone_Interface* zone;
 			for (int i = 0; i < network_data.network_zone_size; i++)
@@ -443,6 +444,5 @@ namespace Network_Components
 				activity_location->template zone<_Zone_Interface*>((_Zone_Interface*)_zones_container.at(raw_activity_location.zone_index));
 			}
 		}
-#endif
 	}
 }

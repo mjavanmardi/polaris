@@ -27,11 +27,9 @@ namespace Demand_Components
 			member_data(int, first_vehicle_departure_time, none, none);
 
 			member_data(int, last_vehicle_departure_time, none, none);
-#ifndef FOR_LINUX_PORTING			
+		
 			typedef typename MasterType::person_type traveler_type;
-#else
-			typedef typename MasterType::traveler_type traveler_type;
-#endif
+
 		};
 
 

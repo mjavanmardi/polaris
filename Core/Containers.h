@@ -167,7 +167,7 @@ struct Associative_Container_Prototype : public ComponentType
 
 	typedef typename ComponentType::size_type size_type;
 	typedef typename ComponentType::key_type key_type;
-	typedef typename ComponentType::key_compare key_compare;
+	//typedef typename ComponentType::key_compare key_compare;
 	typedef typename ComponentType::value_compare value_compare;
 	typedef typename ComponentType::mapped_type Val_Type;
 
@@ -207,7 +207,7 @@ struct Associative_Container_Prototype : public ComponentType
 
 	void clear(){return ((ComponentType*)this)->clear();}
 
-	key_compare key_comp() const { return ((ComponentType*)this)->key_comp();}
+	//key_compare key_comp() const { return ((ComponentType*)this)->key_comp();}
 
 	value_compare value_comp() const { return ((ComponentType*)this)->value_comp();}
 

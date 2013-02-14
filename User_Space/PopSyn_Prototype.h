@@ -1,25 +1,13 @@
 #pragma once
 
-#include "User_Space.h"
-#include "linker.h"
+#include "User_Space_Includes.h"
+#include "Synthesis_Region_Implementation.h"
 
 
 
 namespace PopSyn
 {
-	enum POPSYN_ITERATIONS
-	{
-		MAIN_INITIALIZE,
-		MAIN_PROCESS
-	};
-	enum POPSYN_SUBITERATIONS
-	{
-		INITIALIZE,
-		START_TIMING,
-		PROCESS,
-		STOP_TIMING,
-		OUTPUT
-	};
+
 	namespace Concepts
 	{
 		concept struct Uses_Linker_File
@@ -31,7 +19,7 @@ namespace PopSyn
 
 	namespace Prototypes
 	{
-		prototype struct Population_Synthesizer_Prototype : public ComponentType
+		prototype struct Population_Synthesizer_Prototype
 		{
 			tag_as_prototype; // Declare class as a polaris prototype
 
@@ -107,14 +95,15 @@ namespace PopSyn
 				// Initialize settings
 				//---------------------------------------------------------------------------------------------------------------
 				// CREATE RNG for later use
-				define_component_interface(Rand_Interface,MasterType::RNG,RNG_Prototype,NULLTYPE);
-				Rand_Interface* rand = (Rand_Interface*)Allocate<MasterType::RNG>();
+				define_component_interface(Rand_Interface,typename ComponentType::Master_Type::RNG,RNG_Prototype,NULLTYPE);
+				Rand_Interface* rand = (Rand_Interface*)Allocate<typename ComponentType::Master_Type::RNG>();
 				//Rand_Interface* rand = (Rand_Interface*)(new MasterType::RNG()); // ALLOCATION TEST
 				rand->Initialize<double>(0);
 
 				// IPF Solver Settings
-				define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,ComponentType);
-				solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
+				define_component_interface(solver_itf,typename get_type_of(Solution_Settings),PopSyn::Prototypes::Solver_Settings_Prototype,ComponentType);
+				solver_itf* solver = this->Solution_Settings<solver_itf*>();
+
 				//solver_itf* solver = (solver_itf*)(new MasterType::IPF_Solver_Settings()); // ALLOCATION TEST
 
 				//===============================================================================================================
@@ -125,28 +114,30 @@ namespace PopSyn
 				ndim = (int)dims.size();
 
 				// Define iterators and get pointer to the region collection
-				typedef get_type_of(Synthesis_Regions_Collection)			region_collection_type;
-				typedef region_collection_type::unqualified_value_type		region_type;
-				typedef region_type::Sample_Data_type						sample_collection_type;
-				typedef sample_collection_type::unqualified_value_type		sample_type;
-				typedef region_type::Synthesis_Zone_Collection_type			zone_collection_type;
-				typedef zone_collection_type::unqualified_value_type		zone_type;
+				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
+				typedef typename region_collection_type::unqualified_value_type			region_type;
+				typedef typename region_type::Sample_Data_type							sample_collection_type;
+				typedef typename sample_collection_type::unqualified_value_type			sample_type;
+				typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
+				typedef typename zone_collection_type::unqualified_value_type			zone_type;
+				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
+				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
 
-				define_container_and_value_interface(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
-				define_container_and_value_interface(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
-				define_container_and_value_interface(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,ComponentType);
-				define_simple_container_interface(joint_itf,MasterType::region::Target_Joint_Distribution_type,Multidimensional_Random_Access_Array_Prototype, MasterType::region::Target_Joint_Distribution_type::unqualified_value_type ,NULLTYPE);
-				define_simple_container_interface(marginal_itf,MasterType::region::Target_Marginal_Distribution_type,Multidimensional_Random_Access_Array_Prototype, MasterType::region::Target_Marginal_Distribution_type::unqualified_value_type ,NULLTYPE);
+				define_container_and_value_interface_unqualified_container(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,ComponentType);
+				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
+				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
 	
 				
 				regions_itf* regions = this->Synthesis_Regions_Collection<regions_itf*>();
-				regions_itf::iterator region_itr;
+				typename regions_itf::iterator region_itr;
 				this->Synthesis_Regions_Collection<regions_itf*>(regions);
 
 				//hash_map<int, Region> regions;
 				//vector<Zone>::iterator zone_itr;
-				joint_itf::index_type dimensions;
-				joint_itf::index_type index;
+				typename joint_itf::index_type dimensions;
+				typename joint_itf::index_type index;
 				for (vector<int>::iterator i = dims.begin(); i != dims.end(); ++i) 
 				{
 					dimensions.push_back(*i);
@@ -171,24 +162,23 @@ namespace PopSyn
 
 				while(fr.Read())
 				{
-					regions_itf::key_type ID;
+					typename regions_itf::key_type ID;
 		
 					// read the region data from input file
-					if(!fr.Get_Data<regions_itf::key_type>(ID,linker.region_id_col)) break; 
+					if(!fr.Get_Data<typename regions_itf::key_type>(ID,linker.region_id_col)) break; 
 
 					if ((region_itr = regions->find(ID)) == regions->end())
 					{
 						// create new region
 						new_region = (region_itf*)Allocate<region_type>();
-						new_region->Initialize<NULLTYPE>();
+						new_region->template Initialize<NULLTYPE>();
 						new_region->parent_reference(this);
-						dist = new_region->Target_Joint_Distribution<joint_itf*>();
-						marg = new_region->Target_Marginal_Distribution<marginal_itf*>();
-						Rand_Interface* my_rand = (Rand_Interface*)Allocate<MasterType::RNG>(); // ALLOCATION TEST
-						//Rand_Interface* my_rand = (Rand_Interface*)(new MasterType::RNG());
-						my_rand->Initialize<double>(ID/*rand->Next_Rand<double>()*(double)SHRT_MAX*/);
-						new_region->Output_Stream<ostream&>(out);
-						((zone_itf*)new_region)->Rand<Rand_Interface*>(my_rand);
+						dist = new_region->template Target_Joint_Distribution<joint_itf*>();
+						marg = new_region->template Target_Marginal_Distribution<marginal_itf*>();
+						Rand_Interface* my_rand = (Rand_Interface*)Allocate<typename zone_itf::get_type_of(Rand)>(); // ALLOCATION TEST
+						my_rand->template Initialize<double>(ID);
+						new_region->template Output_Stream<ostream&>(out);
+						((zone_itf*)new_region)->template Rand<Rand_Interface*>(my_rand);
 
 						//-----------------------------------------------------------------------------------------
 						// Initialize the distribution and marginals
@@ -196,24 +186,23 @@ namespace PopSyn
 						dist->resize(dimensions,0.0);
 						marg->resize(dimensions,0.0);
 
-						new_region->ID<int>(ID);
-						solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>(); // ALLOCATION TEST
-						//solver = (solver_itf*)(new MasterType::IPF_Solver_Settings());
+						new_region->template ID<int>(ID);
+						solver_itf* region_solver = (solver_itf*)Allocate<typename get_type_of(Solution_Settings)>(); // ALLOCATION TEST
 
-						solver->Initialize<Target_Type<void,double,int>>(0.05,100);
-						new_region->Solver_Settings<solver_itf*>(solver);
+						region_solver->template Initialize<Target_Type<void,double,int>>(solver->template Tolerance<double>(),solver->template Iterations<int>());
+						new_region->template Solver_Settings<solver_itf*>(region_solver);
 
 						// add new region to the list
-						regions->insert(pair<regions_itf::key_type, region_itf*>(ID, new_region));
+						regions->insert(pair<typename regions_itf::key_type, region_itf*>(ID, new_region));
 					}
 					else
 					{
 						new_region = region_itr->second;
 					}
 					// next add the sample data
-					dist = new_region->Target_Joint_Distribution<joint_itf*>();
-					marg = new_region->Target_Marginal_Distribution<marginal_itf*>();
-					sample = new_region->Sample_Data<sample_data_itf*>();
+					dist = new_region->template Target_Joint_Distribution<joint_itf*>();
+					marg = new_region->template Target_Marginal_Distribution<marginal_itf*>();
+					sample = new_region->template Sample_Data<sample_data_itf*>();
 
 					double x;
 					for (int i=0; i<ndim; i++)
@@ -222,22 +211,22 @@ namespace PopSyn
 						index[i] = linker.find_index_in_dimension(i,x);
 					}
 
-					sample_type::ID_type sample_id;
-					sample_type::Weight_type weight;
-					fr.Get_Data<sample_type::ID_type>(sample_id,linker.sample_id_col);
-					fr.Get_Data<sample_type::Weight_type>(weight, linker.sample_weight_col);
-					sample_type::Characteristics_type data;
-					fr.Get_Data<sample_type::Characteristics_type::unqualified_value_type>(data,linker.get_pums_data_cols());
+					typename sample_type::ID_type sample_id;
+					typename sample_type::Weight_type weight;
+					fr.Get_Data<typename sample_type::ID_type>(sample_id,linker.sample_id_col);
+					fr.Get_Data<typename sample_type::Weight_type>(weight, linker.sample_weight_col);
+					typename sample_type::Characteristics_type data;
+					fr.Get_Data<typename sample_type::Characteristics_type::unqualified_value_type>(data,linker.get_pums_data_cols());
 
 					pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>(); //ALLOCATION_TEST
 					//pop_unit_itf* p = (pop_unit_itf*)(new sample_type());
 					p->ID(sample_id);
-					p->Index(new_region->Get_1D_Index<Target_Type<joint_itf::size_type,joint_itf::index_type>>(index));
+					p->Index(new_region->template Get_1D_Index<Target_Type<typename joint_itf::size_type,typename joint_itf::index_type>>(index));
 					p->Weight(weight);
 					p->Characteristics(data);
 
 					// Update the sample and joint distribution with the current population unit
-					sample->insert(p->Index<sample_collection_type::key_type>(), p);
+					sample->insert(p->template Index<typename sample_collection_type::key_type>(), p);
 					(*dist)[index] += weight;
 				}
 				fr.Close();
@@ -253,16 +242,16 @@ namespace PopSyn
 				}
 				while(zone_fr.Read())
 				{
-					zone_type::ID_type ID;
-					regions_itf::key_type RID;
+					typename zone_type::ID_type ID;
+					typename regions_itf::key_type RID;
 					double x;
 		
 					// get ID values for ZONE and REGION
-					if(!zone_fr.Get_Data<zone_type::ID_type>(ID,linker.zone_id_col))
+					if(!zone_fr.Get_Data<typename zone_type::ID_type>(ID,linker.zone_id_col))
 					{
 						cout<<"ERROR: could not retrieve zone id from zone file"; return EXIT_FAILURE;
 					}
-					if(!zone_fr.Get_Data<regions_itf::key_type>(RID,linker.region_in_zone_id_col))
+					if(!zone_fr.Get_Data<typename regions_itf::key_type>(RID,linker.region_in_zone_id_col))
 					{
 						cout<<"ERROR: could not retrieve region id from zone file"; return EXIT_FAILURE;
 					}
@@ -275,40 +264,40 @@ namespace PopSyn
 						return EXIT_FAILURE;
 					}
 					region_itf* region = region_itr->second;
-					regional_marg = region->Target_Marginal_Distribution<marginal_itf*>();
+					regional_marg = region->template Target_Marginal_Distribution<marginal_itf*>();
 
 					// Read marginal data from file and add to ZONE
 					zone_itf* zone = (zone_itf*)Allocate<zone_type>(); // ALLOCATION_TEST
 					zone->parent_reference(region);
 
 					zone->ID(ID);
-					solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>(); // ALLOCATION_TEST
+					solver_itf* zone_solver = (solver_itf*)Allocate<typename get_type_of(Solution_Settings)>(); // ALLOCATION_TEST
 					//solver = (solver_itf*)(new MasterType::IPF_Solver_Settings());
 
-					solver->Initialize<Target_Type<void,double,int>>(0.05,100);
-					zone->Solver_Settings<solver_itf*>(solver);
-					joint_itf* mway = zone->Target_Joint_Distribution<joint_itf*>();
-					marginal_itf* marg = zone->Target_Marginal_Distribution<marginal_itf*>();
+					zone_solver->Initialize<Target_Type<void,double,int>>(solver->template Tolerance<double>(),solver->template Iterations<int>());
+					zone->template Solver_Settings<solver_itf*>(zone_solver);
+					joint_itf* mway = zone->template Target_Joint_Distribution<joint_itf*>();
+					marginal_itf* marg = zone->template Target_Marginal_Distribution<marginal_itf*>();
 					mway->resize(dimensions,0);
 					marg->resize(dimensions,0);
-					Rand_Interface* my_rand = (Rand_Interface*)Allocate<MasterType::RNG>(); // ALLOCATION_TEST
+					Rand_Interface* my_rand = (Rand_Interface*)Allocate<typename zone_itf::get_type_of(Rand)>(); // ALLOCATION_TEST
 					//Rand_Interface* my_rand = (Rand_Interface*)(new MasterType::RNG());
-					my_rand->Initialize<double>(rand->Next_Rand<double>()*(double)SHRT_MAX);
+					my_rand->template Initialize<double>(rand->template Next_Rand<double>()*(double)SHRT_MAX);
 					
 
-					zone->Rand<Rand_Interface*>(my_rand);
+					zone->template Rand<Rand_Interface*>(my_rand);
 
-					for (marginal_itf::size_type i=0; i<dimensions.size(); i++)
+					for (typename marginal_itf::size_type i=0; i<dimensions.size(); i++)
 					{
-						for (marginal_itf::size_type j=0; j<dimensions[i]; j++)
+						for (typename marginal_itf::size_type j=0; j<dimensions[i]; j++)
 						{
 							if (!zone_fr.Get_Data<double>(x,linker.get_sf3_column(i,j))) break;
-							(*marg)[pair<marginal_itf::size_type,marginal_itf::size_type>(i,j)] = x;
-							(*regional_marg)[pair<marginal_itf::size_type,marginal_itf::size_type>(i,j)] += x;
+							(*marg)[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] = x;
+							(*regional_marg)[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] += x;
 						}
 
 					}
-					region->Synthesis_Zone_Collection<zones_itf*>()->insert(pair<zone_type::ID_type,zone_itf*>(ID,zone));;
+					region->template Synthesis_Zone_Collection<zones_itf*>()->insert(pair<typename zone_type::ID_type,zone_itf*>(ID,zone));
 				}
 				zone_fr.Close();
 
@@ -344,12 +333,14 @@ namespace PopSyn
 			feature_prototype void Stop_Timer()
 			{
 				cout << endl<<"Main Algorithm run-time: " << this->timer<Counter&>().Stop();
-				cout << endl<<"freq: " << this->timer<Counter&>().get_freq_value() << ", start: "<<this->timer<Counter&>().get_start_value() <<", l: "<<this->timer<Counter&>().get_l_value();
+				//cout << endl<<"freq: " << this->timer<Counter&>().get_freq_value() << ", start: "<<this->timer<Counter&>().get_start_value() <<", l: "<<this->timer<Counter&>().get_l_value();
 			}
 			
 			// 4.) Output results event - called after timing is stopped (at timestep 7)
 			declare_feature_event(Output_Popsyn_Event)
 			{
+				return;
+
 				Counter timer;
 				timer.Start();
 
@@ -359,42 +350,45 @@ namespace PopSyn
 				ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
 				
 				// Define iterators and get pointer to the region collection
-				typedef get_type_of(Synthesis_Regions_Collection)			region_collection_type;
-				typedef region_collection_type::unqualified_value_type		region_type;
-				typedef region_type::Sample_Data_type						sample_collection_type;
-				typedef sample_collection_type::unqualified_value_type		sample_type;
-				typedef region_type::Synthesis_Zone_Collection_type			zone_collection_type;
-				typedef zone_collection_type::unqualified_value_type		zone_type;
+				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
+				typedef typename region_collection_type::unqualified_value_type			region_type;
+				typedef typename region_type::Sample_Data_type							sample_collection_type;
+				typedef typename sample_collection_type::unqualified_value_type			sample_type;
+				typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
+				typedef typename zone_collection_type::unqualified_value_type			zone_type;
+				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
+				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
 
-				define_container_and_value_interface(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
-				define_container_and_value_interface(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
-				define_container_and_value_interface(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,ComponentType);
-				define_simple_container_interface(joint_itf,MasterType::region::Target_Joint_Distribution_type,Multidimensional_Random_Access_Array_Prototype, MasterType::region::Target_Joint_Distribution_type::unqualified_value_type ,NULLTYPE);
-				define_simple_container_interface(marginal_itf,MasterType::region::Target_Marginal_Distribution_type,Multidimensional_Random_Access_Array_Prototype, MasterType::region::Target_Marginal_Distribution_type::unqualified_value_type ,NULLTYPE);
+				define_container_and_value_interface_unqualified_container(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,ComponentType);
+				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
+				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
 	
+
 				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
-				regions_itf::iterator r_itr;
-				zones_itf::iterator z_itr;
+				typename regions_itf::iterator r_itr;
+				typename zones_itf::iterator z_itr;
 
 				for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 				{
 					region_itf* region = r_itr->second;
-					zones_itf* zones = region->Synthesis_Zone_Collection<zones_itf*>();
+					zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
 					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 					{
 						zone_itf* zone = z_itr->second;
-						marg_out <<endl<<endl<<"ZONE_ID: "<<zone->ID<long long int>();
-						zone->Target_Joint_Distribution<joint_itf*>()->write(marg_out);
+						marg_out <<endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
+						zone->template Target_Joint_Distribution<joint_itf*>()->write(marg_out);
 						marg_out <<endl;
-						zone->Target_Marginal_Distribution<marginal_itf*>()->write(marg_out);
+						zone->template Target_Marginal_Distribution<marginal_itf*>()->write(marg_out);
 						marg_out <<endl;
 
-						sample_data_itf* sample = zone->Sample_Data<sample_data_itf*>();
+						sample_data_itf* sample = zone->template Sample_Data<sample_data_itf*>();
 						
-						sample_out << endl<<endl<<"ZONE_ID: "<<zone->ID<long long int>();
-						for (sample_data_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
+						sample_out << endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
+						for (typename sample_data_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
 						{
-							sample_out << endl << "ID: " << s_itr->second->ID<uint>() << ",  weight: "<<s_itr->second->Weight<float>() <<", index: "<<s_itr->second->Index<uint>();
+							sample_out << endl << "ID: " << s_itr->second->template ID<uint>() << ",  weight: "<<s_itr->second->template Weight<float>() <<", index: "<<s_itr->second->template Index<uint>();
 						}
 
 					}

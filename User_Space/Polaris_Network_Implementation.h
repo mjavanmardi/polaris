@@ -199,8 +199,8 @@ namespace Network_Components
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
 				//write_network_link_flow<NULLTYPE>();
-				write_network_link_turn_time<ComponentType,CallerType,TargetType>();
-				write_output_summary<ComponentType,CallerType,TargetType>();
+				//write_network_link_turn_time<ComponentType,CallerType,TargetType>();
+				//write_output_summary<ComponentType,CallerType,TargetType>();
 
 			}
 
@@ -233,7 +233,7 @@ namespace Network_Components
 			/// read from database
 			//------------------------------------------------------------------------------------------------------------------
 #ifndef FOR_LINUX_PORTING
-			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); tag_feature_as_available(read_network_data);
+			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); 
 
 			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
@@ -246,7 +246,7 @@ namespace Network_Components
 			//==================================================================================================================
 			/// Convert network data from C++ data structure to Plaris structure
 			//------------------------------------------------------------------------------------------------------------------
-			feature_implementation void read_network_data(network_models::network_information::network_data_information::NetworkData& network_data);
+			feature_implementation void read_network_data(network_models::network_information::network_data_information::NetworkData& network_data); tag_feature_as_available(read_network_data);
 
 			feature_implementation void read_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
@@ -259,7 +259,7 @@ namespace Network_Components
 			feature_implementation void read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
 		};
 
-#ifndef FOR_LINUX_PORTING
+
 		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Component_Class<Integrated_Polaris_Network_Implementation,MasterType,Execution_Object,ParentType>
 		{
 			member_component(typename MasterType::network_skim_type, skimming_faculty,none,none);
@@ -272,12 +272,11 @@ namespace Network_Components
 
 				skim_faculty_itf* skim_faculty = this->skimming_faculty<ComponentType,CallerType,skim_faculty_itf*>();
 
-				return (TargetType::ReturnType)(skim_faculty->Get_Current_LOS<TargetType>(Origin,Destination,Mode_Indicator));
+				return (TargetType::ReturnType)(skim_faculty->template Get_Current_LOS<TargetType>(Origin,Destination,Mode_Indicator));
 			}
 		
 			//===================================================
 			// Copied network stuff, need to make inheritable from Polaris_Network_Implementation, without including Polaris_Component_Class somehow
-			#pragma region ** stuff which should be inherited
 			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_container(vector<typename MasterType::intersection_type*>, intersections_container, none, none);
@@ -303,8 +302,8 @@ namespace Network_Components
 
 			feature_implementation void initialize_intersection_control()
 			{
-				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				define_component_interface(_Intersection_Control_Interface, _Intersection_Interface::get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_component_interface(_Intersection_Control_Interface, typename _Intersection_Interface::get_type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
@@ -335,7 +334,7 @@ namespace Network_Components
 
 			declare_feature_conditional(End_Iteration_Conditional)
 			{
-				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
 				
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
 				{
@@ -354,7 +353,7 @@ namespace Network_Components
 			declare_feature_event(End_Iteration_Handler)
 			{
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
-				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
 				
 				_Network_Interface* _this_ptr = (_Network_Interface*)_this;
 				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
@@ -367,23 +366,23 @@ namespace Network_Components
 
 			feature_implementation void initialize_links()
 			{
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typename _Links_Container_Interface::iterator links_itr;
 				for (links_itr = _links_container.begin(); links_itr != _links_container.end(); links_itr++)
 				{
-					((_Link_Interface*)(*links_itr))->initialize_features<ComponentType*>(this);
+					((_Link_Interface*)(*links_itr))->template initialize_features<ComponentType*>(this);
 				}
 			}
 
 			feature_implementation void initialize_intersections()
 			{
 				//determine minimum merge rate
-				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typename _Intersections_Container_Interface::iterator intersection_itr;
 				for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
 				{
-					((_Intersection_Interface*)(*intersection_itr))->initialize_features<ComponentType*>(this);
+					((_Intersection_Interface*)(*intersection_itr))->template initialize_features<ComponentType*>(this);
 				}
 			}
 
@@ -391,7 +390,7 @@ namespace Network_Components
 			feature_implementation void construct_network_cost()
 			{
 				// break up between links and movements
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typename _Links_Container_Interface::iterator links_itr;
 				_max_free_flow_speed = -1.0;			
 				for (links_itr = _links_container.begin(); links_itr != _links_container.end(); links_itr++)
@@ -406,7 +405,7 @@ namespace Network_Components
 					link->template travel_time<float>(link_travel_time);
 				}
 		
-				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				typename _Turn_Movements_Container_Interface::iterator turn_movements_itr;
 				for (turn_movements_itr = _turn_movements_container.begin(); turn_movements_itr != _turn_movements_container.end(); turn_movements_itr++)
 				{
@@ -416,7 +415,7 @@ namespace Network_Components
 					_Link_Interface* outboundLink = mvmt_itf->template outbound_link<_Link_Interface*>();
 
 					float turn_travel_penalty = 0.0f;
-					if (mvmt_itf->movement_rule<int>() == Turn_Movement_Components::Types::PROHIBITED)
+					if (mvmt_itf->template movement_rule<int>() == Turn_Movement_Components::Types::PROHIBITED)
 					{
 						turn_travel_penalty = INFINITY_FLOAT;
 					}
@@ -437,7 +436,7 @@ namespace Network_Components
 			{
 				typedef Network_Prototype<typename MasterType::network_type> _Regular_Network_Interface;
 				typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Regular_Network,_Regular_Network_Interface*> Net_IO_Type;
-				define_container_and_value_interface(_Routable_Networks_Container_Interface, _Routable_Network_Interface, type_of(routable_networks_container), Random_Access_Sequence_Prototype, Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Routable_Networks_Container_Interface, _Routable_Network_Interface, type_of(routable_networks_container), Random_Access_Sequence_Prototype, Network_Components::Prototypes::Network_Prototype, ComponentType);
 				for(int i=0;i<_num_threads;i++)
 				{
 					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
@@ -462,8 +461,8 @@ namespace Network_Components
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
 				//write_network_link_flow<NULLTYPE>();
-				write_network_link_turn_time<ComponentType,CallerType,TargetType>();
-				write_output_summary<ComponentType,CallerType,TargetType>();
+				//write_network_link_turn_time<ComponentType,CallerType,TargetType>();
+				//write_output_summary<ComponentType,CallerType,TargetType>();
 
 			}
 
@@ -495,7 +494,8 @@ namespace Network_Components
 			//==================================================================================================================
 			/// read from database
 			//------------------------------------------------------------------------------------------------------------------
-			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); tag_feature_as_available(read_network_data);
+#ifndef FOR_LINUX_PORTING
+			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); 
 
 			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
@@ -504,11 +504,11 @@ namespace Network_Components
 			feature_implementation void read_turn_movement_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
 			feature_implementation void read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
-
+#endif
 			//==================================================================================================================
 			/// Convert network data from C++ data structure to Plaris structure
 			//------------------------------------------------------------------------------------------------------------------
-			feature_implementation void read_network_data(network_models::network_information::network_data_information::NetworkData& network_data);
+			feature_implementation void read_network_data(network_models::network_information::network_data_information::NetworkData& network_data); tag_feature_as_available(read_network_data);
 
 			feature_implementation void read_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
@@ -519,8 +519,7 @@ namespace Network_Components
 			feature_implementation void read_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
 			feature_implementation void read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
-			#pragma endregion
 		};
-#endif
+
 	}
 }

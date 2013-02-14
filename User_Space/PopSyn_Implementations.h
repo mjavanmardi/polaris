@@ -6,7 +6,7 @@ namespace PopSyn
 {
 	namespace Implementations
 	{
-		implementation struct ADAPTS_Population_Synthesis_Implementation
+		implementation struct ADAPTS_Population_Synthesis_Implementation : public Polaris_Component_Class<ADAPTS_Population_Synthesis_Implementation, MasterType, Execution_Object, ParentType>
 		{
 			member_associative_container(concat(hash_map<typename MasterType::region::ID_type, typename MasterType::region*>),Synthesis_Regions_Collection, none,none);
 			member_component(typename MasterType::IPF_Solver_Settings,Solution_Settings,none,none);

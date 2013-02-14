@@ -1,10 +1,10 @@
 #pragma once
 #include "Core_Includes.h"
 
-#ifndef FOR_LINUX_PORTING
+
 #include "m_array.h"
 #include "s_array.h"
-#endif
+
 
 #include "Sparsehash/dense_hash_map.h"
 using google::dense_hash_map;

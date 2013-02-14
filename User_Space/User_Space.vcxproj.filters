@@ -220,5 +220,8 @@
     <ClInclude Include="Synthesis_Zone_Prototypes.h">
       <Filter>Prototypes\PopSyn</Filter>
     </ClInclude>
+    <ClInclude Include="popsyn_includes.h">
+      <Filter>Prototypes\PopSyn</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

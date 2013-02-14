@@ -1,6 +1,6 @@
 #pragma once
 #include <hash_map>
-#include "User_Space_Includes.h"
+#include "User_Space.h"
 #include "../File_IO/utilities.h"
 #include "../File_IO/network_data.h"
 //using namespace Basic_Units::Data_Structures;
@@ -14,7 +14,6 @@ namespace Network_Components
 		struct File_Network{};
 		struct Regular_Network{};
 		struct Graphical_Network{};
-
 		struct Network_IO_Maps
 		{
 			dense_hash_map<int,void*> intersection_id_to_ptr;
@@ -38,7 +37,6 @@ namespace Network_Components
 
 	namespace Concepts
 	{
-#ifndef FOR_LINUX_PORTING
 		concept struct Is_Basic_Network_Prototype
 		{
 			check_getter(has_intersections, Component_Type::intersections_container);
@@ -72,8 +70,9 @@ namespace Network_Components
 			check_getter(has_turns, turn_movements_container);
 			check_getter(has_locations, activity_locations_container);
 			check_getter(has_zones, zones_container); 
+			//define_default_check(is_basic_network && has_turns && has_locations && has_zones);
 			check_concept(is_transportation_network_prototype, Is_Transportation_Network_Prototype);
-			define_sub_check(is_transportation_network, is_basic_network && has_intersections && has_links && has_read_function);
+			define_sub_check(is_transportation_network, is_basic_network && has_turns && has_locations && has_zones);
 			define_default_check(is_transportation_network || is_transportation_network_prototype);
 		};
 
@@ -135,12 +134,11 @@ namespace Network_Components
 			define_sub_check(is_transportation_simulation_network, is_transportation_network && is_routable_network && has_scenario_reference && has_max_free_flow_speed);
 			define_default_check(is_transportation_simulation_network || is_transportation_simulation_network_prototype);
 		};
-#endif
 	}
 	
 	namespace Prototypes
 	{
-		prototype struct Network_Prototype : ComponentType
+		prototype struct Network_Prototype
 		{
 			tag_as_prototype;
 
@@ -166,6 +164,7 @@ namespace Network_Components
 			feature_accessor(routable_networks_container, none, none);
 			feature_accessor(scan_list, none, none);
 			feature_accessor(reversed_path_container, none, none);
+			feature_accessor(reset_links, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
@@ -174,6 +173,7 @@ namespace Network_Components
 			feature_accessor(scenario_reference, none, none);
 			feature_accessor(max_free_flow_speed, none, none);		
 			//------------------------------------------------------------------------------------------------------------------
+
 
 			//==================================================================================================================
 			/// graphical network
@@ -193,22 +193,20 @@ namespace Network_Components
 			{
 				this_component()->template submit_num_vehicles<ComponentType,CallerType,TargetType>();
 			}
-
-
 			//------------------------------------------------------------------------------------------------------------------
-#ifndef FOR_LINUX_PORTING
+
 			//==================================================================================================================
 			/// demand compatible network
 			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(skimming_faculty, none, none);
 			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
 			{
-				define_component_interface(_skim_interface,get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
+				define_component_interface(_skim_interface,typename get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
 				return skim->Get_LOS<TargetType>(Origin, Destination, Mode_Indicator);
 			}
 			//------------------------------------------------------------------------------------------------------------------
-#endif
+
 			feature_prototype void read_network_data(typename TargetType::ParamType data_source, requires(check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) || check_2(typename TargetType::NetIOType,Types::File_Network,is_same) || check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
 			{
 				this_component()->template read_network_data<ComponentType,CallerType,TargetType>(data_source);
@@ -246,11 +244,11 @@ namespace Network_Components
 			feature_prototype TargetType start_of_current_simulation_interval_relative()
 			{
 				define_component_interface(_Scenario_Interface, typename get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-#ifndef FOR_LINUX_PORTING
+//#ifndef FOR_LINUX_PORTING
 				int current_time = int(floor(Simulation_Time.Current_Time<Basic_Units::Time_Variables::Time_Seconds>() + 0.5));
-#else
-				int current_time = _iteration;
-#endif
+//#else
+//				int current_time = _iteration;
+//#endif
 				if (current_time < scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>() - 1) 
 				{
 					cout << "_iteration must start from (simulation_interval_length - 1)" << endl;

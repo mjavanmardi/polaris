@@ -1,8 +1,6 @@
 #pragma once
 
-#ifdef WINDOWS
 #include <stdio.h>
-#include <tchar.h>
 #include <stdlib.h>
 #include <cstdlib>
 #include <sstream>
@@ -51,7 +49,7 @@ public:
 		// copy constructor
 		_fixed_dim = fixed_dim;
 		_fixed_dim_val = fixed_dim_val;
-		_row_sizes = (vector<size_type>*)dim_sizes;
+		_row_sizes = (vector<size_type>*)row_sizes;
 		_cursor = pair<size_type,size_type>(cursor->first, cursor->second);
 
 		m_Ptr = &data[get_index(_cursor)];
@@ -104,7 +102,7 @@ public:
 
     s_array_iterator& operator--()
     {
-		cursor.second--;
+		_cursor.second--;
 
 		if (_fixed_dim > 0 && _cursor.second == 0)
 		{
@@ -115,7 +113,7 @@ public:
 		if (_cursor.second == 0)
 		{
 			_cursor.first--;
-			_cursor.second = _row_sizes[_cursor.first]-1;;
+			_cursor.second = (uint)_row_sizes[_cursor.first]-1;
 		}
 
 		if (_cursor.first == 0)
@@ -154,11 +152,11 @@ private:
 	{
 		uint ind=0;
 
-		if (index.first >= _row_sizes->size()) throw new std::exception("Error, row index points to a row outside of array bounds.");
+		if (index.first >= _row_sizes->size()) THROW_EXCEPTION("Error, row index points to a row outside of array bounds.");
 
 		for (uint i = 0; i< index.first; i++) ind += (*_row_sizes)[i];
 
-		if (index.second >= (*_row_sizes)[index.first]) throw new std::exception("Error, column index points to a column outside of array bounds.");
+		if (index.second >= (*_row_sizes)[index.first]) THROW_EXCEPTION("Error, column index points to a column outside of array bounds.");
 		ind += index.second;
 
 		return _data[ind];
@@ -305,11 +303,11 @@ protected:
 	{
 		uint ind=0;
 
-		if (index.first >= _row_sizes.size()) throw new std::exception("Error, row index points to a row outside of array bounds.");
+		if (index.first >= _row_sizes.size()) THROW_EXCEPTION("Error, row index points to a row outside of array bounds.");
 
 		for (uint i = 0; i< index.first; i++) ind += _row_sizes[i];
 
-		if (index.second >= _row_sizes[index.first]) throw new std::exception("Error, column index points to a column outside of array bounds.");
+		if (index.second >= _row_sizes[index.first]) THROW_EXCEPTION("Error, column index points to a column outside of array bounds.");
 		ind += index.second;
 
 		return ind;
@@ -429,6 +427,6 @@ void s_array<T>::print(ostream& stream)
 	}
 	
 }
-#endif
+
 
 

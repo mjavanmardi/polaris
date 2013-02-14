@@ -94,6 +94,8 @@ namespace Intersection_Components
 						routable_outbound_movement->template outbound_link<_Routable_Link_Interface*>(routable_outbound_link);
 						regular_outbound_movement->template replicas_container<_Routable_Movements_Container_Interface&>().push_back(routable_outbound_movement);
 						routable_inbound_outbound_movements->template outbound_movements<_Routable_Movements_Container_Interface&>().push_back(routable_outbound_movement);
+						
+						routable_link->template outbound_turn_movements<_Routable_Movements_Container_Interface&>().push_back(routable_outbound_movement);
 					}
 					inbound_outbound_movements<ComponentType,CallerType,_Routable_Inbound_Outbound_Movements_Container_Interface&>().push_back(routable_inbound_outbound_movements);
 				}

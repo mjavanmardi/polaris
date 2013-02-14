@@ -23,11 +23,11 @@ namespace PopSyn
 				this->Weight<get_type_of(Weight)>(object_to_copy.Weight<get_type_of(Weight)>());
 				this->Index<get_type_of(Index)>(object_to_copy.Index<get_type_of(Index)>());
 
-				typedef get_type_of(Characteristics)::unqualified_value_type value_type;
-				define_simple_container_interface(characteristics_itf,get_type_of(Characteristics),Random_Access_Sequence_Prototype,value_type,NULLTYPE);
+				typedef typename get_type_of(Characteristics)::unqualified_value_type value_type;
+				define_simple_container_interface(characteristics_itf,typename get_type_of(Characteristics),Random_Access_Sequence_Prototype,value_type,NULLTYPE);
 				characteristics_itf& data = this->Characteristics<characteristics_itf&>();
 				characteristics_itf& obj_data = object_to_copy.Characteristics<characteristics_itf&>();
-				characteristics_itf::iterator itr = obj_data.begin();
+				typename characteristics_itf::iterator itr = obj_data.begin();
 				for (itr; itr != obj_data.end(); ++itr) data.push_back(*itr);
 			}
 			feature_accessor(ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));

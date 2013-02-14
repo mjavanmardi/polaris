@@ -76,7 +76,7 @@ namespace RNG_Components
 				this->template minimum<ComponentType, CallerType, TargetType>(min);
 				this->template maximum<ComponentType, CallerType, TargetType>(max);
 
-				BaseType::_distribution = uniform_real<double>(_minimum,_maximum);
+				BaseType::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
 			}
 			tag_feature_as_available(Initialize);
 
@@ -114,7 +114,7 @@ namespace RNG_Components
 				this->template location<ComponentType, CallerType, TargetType>(location);
 				this->template scale<ComponentType, CallerType, TargetType>(scale);
 
-				BaseType::_distribution = uniform_real<double>(BaseType::_minimum,BaseType::_maximum);
+				BaseType::_distribution = std::tr1::uniform_real<double>(BaseType::_minimum,BaseType::_maximum);
 			}
 			tag_feature_as_available(Initialize);
 

@@ -27,6 +27,9 @@ namespace Link_Components
 			member_component(typename MasterType::routable_link_type, label_pointer, none, none);
 			member_data(float, label_cost, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(Network_Components::Types::Scan_List_Status_Keys, scan_list_status, none, none);
+			
+			member_data(int, scan_list_position, none, none);
+			member_data(bool, reset_list_status, none, none);
 
 			member_component(typename MasterType::link_type, network_link_reference, none, none);
 		
@@ -38,6 +41,7 @@ namespace Link_Components
 				_label_cost = INFINITY_FLOAT;
 				_label_pointer = this;
 				_scan_list_status = Network_Components::Types::UNSCANNED;
+				_reset_list_status = false;
 				_f_cost = 0.0;
 				_h_cost = 0.0;
 			}
@@ -54,6 +58,8 @@ namespace Link_Components
 				_internal_id = ((_Link_Interface*)regular_link)->template internal_id<int>();
 				_travel_time = ((_Link_Interface*)regular_link)->template travel_time<float>();
 			}
+
+			member_container(vector<typename MasterType::turn_movement_type*>, outbound_turn_movements, none, none);
 		};
 		
 	}

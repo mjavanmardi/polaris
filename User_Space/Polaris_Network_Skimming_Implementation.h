@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Network_Skimming_Prototype.h"
-#include "Polaris_Network_Implementation.h"
-#include "Polaris_Zone_Implementation.h"
+
 
 namespace Network_Skimming_Components
 {
@@ -21,9 +20,9 @@ namespace Network_Skimming_Components
 		{
 			feature_implementation void initialize(typename TargetType::ParamType loc_index, typename TargetType::ParamType zone_index, typename TargetType::Param2Type weight)
 			{
-				this->loc_index<ComponentType,ComponentType,TargetType::ParamType>(loc_index);
-				this->zone_index<ComponentType,ComponentType,TargetType::ParamType>(zone_index);
-				this->weight<ComponentType,ComponentType,TargetType::ParamType>(weight);
+				this->template loc_index<ComponentType,ComponentType,typename TargetType::ParamType>(loc_index);
+				this->template zone_index<ComponentType,ComponentType,typename TargetType::ParamType>(zone_index);
+				this->template weight<ComponentType,ComponentType,typename TargetType::ParamType>(weight);
 			}
 			member_data(long, loc_index,check(ReturnValueType,is_integral),check_2(ComponentType,CallerType, Is_Same_Component));
 			member_data(long, zone_index,check(ReturnValueType,is_integral),check_2(ComponentType,CallerType, Is_Same_Component));
@@ -254,82 +253,28 @@ namespace Network_Skimming_Components
 			feature_implementation void Initialize()
 			{
 				// set the network and skimmer references
-				define_container_and_value_interface(skim_tables_itf,skim_table_itf,type_of(skims_by_time_container),Containers::Random_Access_Sequence_Prototype,Prototypes::Skim_Table_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(skim_tables_itf,skim_table_itf,type_of(skims_by_time_container),Containers::Random_Access_Sequence_Prototype,Prototypes::Skim_Table_Prototype,ComponentType);
 				define_component_interface(network_itf,type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_component_interface(skimmer_itf,type_of(skim_reference),Prototypes::Network_Skimming_Prototype,ComponentType);
-				network_itf* network = this->network_reference<ComponentType,CallerType,network_itf*>();
-				skimmer_itf* skim = this->skim_reference<ComponentType,CallerType,skimmer_itf*>();
+				network_itf* network = this->template network_reference<ComponentType,CallerType,network_itf*>();
+				skimmer_itf* skim = this->template skim_reference<ComponentType,CallerType,skimmer_itf*>();
 
 				
 				// create the skim_table time periods, for basic create only a single time period skim_table
 				skim_table_itf* skim_table = (skim_table_itf*)Allocate<type_of(skims_by_time_container)::unqualified_value_type>();
-				skim_table->network_reference<network_itf*>(network);
-				skim_table->skim_reference<skimmer_itf*>(skim);
-				skim_table->start_time<Simulation_Timestep_Increment>(0);
-				skim_table->end_time<Simulation_Timestep_Increment>(END);
-				skim_table->Initialize<NULLTYPE>();
+				skim_table->template network_reference<network_itf*>(network);
+				skim_table->template skim_reference<skimmer_itf*>(skim);
+				skim_table->template start_time<Simulation_Timestep_Increment>(0);
+				skim_table->template end_time<Simulation_Timestep_Increment>(END);
+				skim_table->template Initialize<NULLTYPE>();
 
 				// add time period skim tables to the container
-				skim_tables_itf* skim_tables = this->skims_by_time_container<ComponentType,CallerType,skim_tables_itf*>();
+				skim_tables_itf* skim_tables = this->template skims_by_time_container<ComponentType,CallerType,skim_tables_itf*>();
 				skim_tables->push_back(skim_table);
 
 
 			}
-			feature_implementation bool Update_LOS()
-			{
-				// get the network reference
-				define_simple_container_interface(skim_tables_itf,type_of(skim_tables_container),Containers::Associative_Container_Prototype,matrix<double>,ComponentType);
-				define_component_interface(network_itf,type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
-				define_container_and_value_interface(zones_itf,zone_itf,network_itf::get_type_of(zones_container),Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
-				define_container_and_value_interface(locations_itf,location_itf,zone_itf::get_type_of(origin_activity_locations),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-				define_container_and_value_interface(destinations_itf,destination_itf,zone_itf::get_type_of(destination_activity_locations),Random_Access_Sequence_Prototype,Link_Components::Prototypes::Link_Prototype,ComponentType);
-				define_container_and_value_interface(links_itf,link_itf,location_itf::get_type_of(origin_links),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-				network_itf* network = this->network_reference<ComponentType,CallerType,network_itf*>();
 
-				// get reference to the routers used to create path-trees from each origin
-				define_container_and_value_interface(path_trees_itf,path_tree_itf,type_of(path_trees_container),Associative_Container_Prototype,Routing_Components::Prototypes::Routing_Prototype,ComponentType);
-					
-				typedef Network_Components::Prototypes::Network_Prototype<typename path_tree_itf::Component_Type::routable_network_type, ComponentType> _Routable_Network_Interface;
-			
-				define_container_and_value_interface(_Routable_Links_Container_Interface,_Routable_Link_Interface,_Routable_Network_Interface::get_type_of(links_container),Random_Access_Sequence_Prototype,Link_Components::Prototypes::Link_Prototype,ComponentType);
-				path_trees_itf* trees_container = this->path_trees_container<ComponentType,CallerType,path_trees_itf*>();
-				path_trees_itf::iterator tree_itr = trees_container->begin();
-
-				// get reference to zones_container
-				define_container_and_value_interface(zones_itf,zone_itf,network_itf::get_type_of(zones_container),Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
-				zones_itf* zones_container = network->zones_container<zones_itf*>();
-				zones_itf::iterator orig_itr = zones_container->begin();
-				zones_itf::iterator dest_itr = zones_container->begin();
-					
-				skim_tables_itf* skim_tables = this->skim_tables_container<ComponentType,CallerType,skim_tables_itf*>();
-				skim_tables_itf::iterator skim_table_itr = skim_tables->begin();
-
-				// loop through all mode skim tables
-				for (; skim_table_itr != skim_tables->end(); ++skim_table_itr)
-				{
-					// LOS Table reference for current mode
-					matrix<double>& los_skim = skim_table_itr->second;
-
-					for (;tree_itr != trees_container->end(); ++tree_itr)
-					{
-						long orig = tree_itr->first;
-						path_tree_itf* tree = tree_itr->second;
-
-						_Routable_Links_Container_Interface::iterator link_itr;
-						for(link_itr=tree->routable_network<_Routable_Network_Interface*>()->links_container<_Routable_Links_Container_Interface&>().begin();link_itr!=tree->routable_network<_Routable_Network_Interface*>()->links_container<_Routable_Links_Container_Interface&>().end();link_itr++)
-						{
-							_Routable_Link_Interface* link_ptr = (_Routable_Link_Interface*)(*link_itr);
-							cout << "link " << link_ptr->internal_id<int>() << ", path_cost=" << link_ptr->label_cost<float>() << endl;
-						}
-					}
-
-					los_skim.print(cout);
-				}
-
-
-
-				return true;
-			}
 			feature_implementation typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator)
 			{		
 				return (TargetType::ReturnType)(Basic_Units::Time_Variables::Time_Minutes(5));
@@ -342,40 +287,35 @@ namespace Network_Skimming_Components
 		//--------------------------------------------------------------------------------------
 		implementation struct Basic_Network_Skimming_Implementation : public Polaris_Component_Class<Basic_Network_Skimming_Implementation,MasterType,Execution_Object,ParentType>, public _Basic_Network_Skimming_Elements<MasterType>
 		{
+			typedef _Basic_Network_Skimming_Elements<MasterType> base_type;
+
 			member_associative_container(concat(hash_map<long,Mode_Skim_Table_Implementation<MasterType,ParentType>*>), mode_skim_table_container, none, none);
 
 			feature_implementation void Initialize()
 			{
 				typedef Prototypes::Network_Skimming_Prototype<ComponentType,ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
-				pthis->update_increment<Time_Hours>(1);
-				pthis->scheduled_update_time<Simulation_Timestep_Increment>(0);
-				pthis->nodes_per_zone<long>(1);
+				pthis->template update_increment<Time_Hours>(1);
+				pthis->template scheduled_update_time<Simulation_Timestep_Increment>(0);
+				pthis->template nodes_per_zone<long>(1);
 
 				// add a mode_skim_table for each mode available in simulation - for basic, only add SOV container
-				define_container_and_value_interface(_skim_container_itf,_skim_itf,type_of(mode_skim_table_container),Containers::Associative_Container_Prototype,Prototypes::Mode_Skim_Table_Prototype,ComponentType);				
-				define_component_interface(_Network_Itf, type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(_skim_container_itf,_skim_itf,type_of(mode_skim_table_container),Containers::Associative_Container_Prototype,Prototypes::Mode_Skim_Table_Prototype,ComponentType);				
+				define_component_interface(_Network_Itf, typename base_type::type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 				_skim_itf* skim = (_skim_itf*)Allocate<type_of(mode_skim_table_container)::unqualified_value_type>();
-				skim->skim_reference<ComponentType*>(this);
-				skim->network_reference<_Network_Itf*>(pthis->network_reference<_Network_Itf*>());
-				skim->mode_id<long>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				skim->Initialize<NULLTYPE>();
-				pthis->mode_skim_table_container<_skim_container_itf*>()->insert(pair<long,_skim_itf*>(skim->mode_id<long>(), skim));
+				skim->template skim_reference<ComponentType*>(this);
+				skim->template network_reference<_Network_Itf*>(pthis->template network_reference<_Network_Itf*>());
+				skim->template mode_id<long>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				skim->template Initialize<NULLTYPE>();
+				pthis->template mode_skim_table_container<_skim_container_itf*>()->insert(pair<long,_skim_itf*>(skim->template mode_id<long>(), skim));
 
-			}
-			feature_implementation bool Process_Skim_Trees()
-			{
-				//define_component_interface(_skim_interface,type_of(current_skim_table),Prototypes::Skim_Table_Prototype,ComponentType);
-				//_skim_interface* skim = this->current_skim_table<ComponentType,CallerType,_skim_interface*>();
-				//return skim->Process_Skims<NULLTYPE>();
-			return true;
 			}
 
 			feature_implementation typename TargetType::ReturnType Get_Current_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator/*, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value))*/)
 			{
-				define_component_interface(_skim_interface,type_of(current_skim_table),Prototypes::Skim_Table_Prototype,ComponentType);
-				_skim_interface* skim = this->current_skim_table<ComponentType,CallerType,_skim_interface*>();
-				return skim->Get_LOS<TargetType>(Origin_ID, Destination_ID, Mode_Indicator);
+				define_component_interface(_skim_interface,typename base_type::type_of(current_skim_table),Prototypes::Skim_Table_Prototype,ComponentType);
+				_skim_interface* skim = this->template current_skim_table<ComponentType,CallerType,_skim_interface*>();
+				return skim->template Get_LOS<TargetType>(Origin_ID, Destination_ID, Mode_Indicator);
 			}	
 		};
 

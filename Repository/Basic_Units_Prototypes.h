@@ -453,7 +453,7 @@ namespace Basic_Units
 
 			feature_prototype void Value(TargetType value)
 			{
-				((Length_Prototype<ComponentType,CallerType>*)this)->templateValue<TargetType>(value);
+				((Length_Prototype<ComponentType,CallerType>*)this)->template Value<TargetType>(value);
 			}
 		};
 
@@ -499,7 +499,7 @@ namespace Basic_Units
 
 			template<typename ReturnValueType>  ReturnValueType Value(requires_getter(check(ReturnValueType,Concepts::Is_Volume_Value)))
 			{		
-				return ((Length_Prototype<ComponentType,CallerType>*)this)->template Value<ReturnValueType>()*((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<ReturnValueType>()*((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<ReturnValueType>();
+				return ((Length_Prototype<ComponentType,CallerType>*)this)->template Value<ReturnValueType>()*((Length_Prototype<ComponentType,CallerType>*)this)->template Conversion_Factor<ReturnValueType>()*((Length_Prototype<ComponentType,CallerType>*)this)->template Conversion_Factor<ReturnValueType>();
 			}
 			template<typename ReturnValueType>  ReturnValueType Value(requires_getter(check(ReturnValueType,!Concepts::Is_Volume_Value)))
 			{
@@ -508,7 +508,7 @@ namespace Basic_Units
 
 			template<typename SetValueType>  void Value(SetValueType value,requires_setter(check(SetValueType,Concepts::Is_Volume_Value)))
 			{
-				((Length_Prototype<ComponentType,CallerType>*)this)->template Value<SetValueType>(value / ((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<SetValueType>() / ((Length_Prototype<ComponentType,CallerType>*)this)->Conversion_Factor<SetValueType>());
+				((Length_Prototype<ComponentType,CallerType>*)this)->template Value<SetValueType>(value / ((Length_Prototype<ComponentType,CallerType>*)this)->template Conversion_Factor<SetValueType>() / ((Length_Prototype<ComponentType,CallerType>*)this)->template Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType>  void Value(SetValueType value, requires_setter(check(SetValueType,!Concepts::Is_Volume_Value)))
 			{

@@ -1,6 +1,8 @@
 #include "Model_Selection.h"
 
 #ifdef IntegratedModelApplication
+#define FOR_LINUX_PORTING
+
 //#define DBIO
 #ifdef DBIO
 #define WINDOWS
@@ -214,6 +216,23 @@ int main()
 struct MasterType
 {
 	typedef MasterType M;
+
+#ifdef ANTARES
+	typedef Conductor_Implementation<MasterType> conductor_type;
+	typedef Control_Panel_Implementation<MasterType> control_panel_type;
+	typedef Time_Panel_Implementation<MasterType> time_panel_type;
+	typedef Information_Panel_Implementation<MasterType> information_panel_type;
+	typedef Canvas_Implementation<MasterType> canvas_type;
+	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
+
+	typedef Graphical_Network_Implementation<MasterType> graphical_network_type;
+	typedef Graphical_Link_Implementation<MasterType> graphical_link_type;
+	typedef Graphical_Intersection_Implementation<MasterType> graphical_intersection_type;
+	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<MasterType> vehicle_type;
+#else
+	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
+#endif
+
 	//==============================================================================================
 	// Signalization Types
 	//typedef Signal_Components::Components::HCM_Signal_Full<T>::type				SIGNAL_TYPE;
@@ -243,8 +262,6 @@ struct MasterType
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
 	
 	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
-	
-	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
 
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
@@ -301,13 +318,11 @@ struct MasterType
 
 	
 	// POPULATION SYNTHESIS CLASSES
-	typedef Data_Object D;
-	typedef Execution_Object E;
-	typedef Polaris_Component<PopSyn::Implementations::Synthesis_Zone_Implementation, M, D> zone;
-	typedef Polaris_Component<PopSyn::Implementations::Synthesis_Region_Implementation, M, E> region;
-	typedef Polaris_Component<PopSyn::Implementations::IPF_Solver_Settings_Implementation, M, D> IPF_Solver_Settings;
-	typedef Polaris_Component<PopSyn::Implementations::ADAPTS_Population_Unit_Implementation, M, D> pop_unit;
-	typedef Polaris_Component<PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation, M, E> popsyn_solver;
+	typedef PopSyn::Implementations::Synthesis_Zone_Implementation<M> zone;
+	typedef PopSyn::Implementations::Synthesis_Region_Implementation<M> region;
+	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<M> IPF_Solver_Settings;
+	typedef PopSyn::Implementations::ADAPTS_Population_Unit_Implementation<M> pop_unit;
+	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<M> popsyn_solver;
 };
 
 ostream* stream_ptr;
@@ -315,8 +330,12 @@ ostream* stream_ptr;
 
 
 
-int main()
+int main(int argc,char** argv)
 {
+
+#ifdef ANTARES
+	START_UI(argc,argv, MasterType,NULL);
+#endif
 
 #pragma region COPY FROM NETWORKMODEL.CPP
 	Network_Components::Types::Network_IO_Maps network_io_maps;
@@ -392,8 +411,12 @@ int main()
 
 #pragma endregion
 
+	//==================================================================================================================================
+	// Network Skimming stuff
+	//----------------------------------------------------------------------------------------------------------------------------------
 	define_component_interface(_network_skim_itf, _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,NULLTYPE);
 	_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<_Network_Interface::get_type_of(skimming_faculty)>();
+
 	skimmer->Initialize<_Network_Interface*>(network);
 	network->skimming_faculty<_network_skim_itf*>(skimmer);
 	

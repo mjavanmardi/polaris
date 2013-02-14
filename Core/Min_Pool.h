@@ -64,7 +64,7 @@ public:
 		}
 	}
 
-	void Reset()
+	void clear()
 	{
 		first_free_ptr=pool;
 
@@ -89,7 +89,7 @@ public:
 		furthest_allocated=pool;
 	}
 
-	void Update_Mid()
+	void update_mid()
 	{
 		int mid;
 
@@ -120,9 +120,11 @@ public:
 		assert(mid_ptr!=nullptr);
 	}
 
-	inline unsigned int Push(ValType& data,float fscore)
+	inline unsigned int push(ValType& data,float fscore)
 	{
 		++alloc_counter;
+
+		assert(alloc_counter < size);
 
 		if(first_free_ptr > furthest_allocated) furthest_allocated=first_free_ptr;
 
@@ -292,12 +294,12 @@ public:
 		}
 
 		// determine if mid needs to shift
-		Update_Mid();
+		update_mid();
 
 		return retval;
 	}
 
-	inline bool Empty()
+	inline bool empty()
 	{
 		if( min_ptr==nullptr ) return true;
 		else return false;
@@ -305,7 +307,7 @@ public:
 
 	//---- update a value ----
 
-	inline void Update_Value(int index,float fscore)
+	inline void update_value(int index,float fscore)
 	{
 		// unlink yourself from the min_ptr list
 
@@ -518,12 +520,12 @@ public:
 		}
 		
 		// determine if mid_ptr needs to shift
-		Update_Mid();
+		update_mid();
 	}
 
 	//---- pop the minimum value ----
 
-	inline float Pop_Min(ValType& ret_container)
+	inline float pop_min(ValType& ret_container)
 	{
 		--alloc_counter;
 
@@ -552,7 +554,7 @@ public:
 		{
 			// more structure to go
 			--mid_position;
-			Update_Mid();
+			update_mid();
 
 			min_ptr->smaller_ptr=nullptr;
 		}

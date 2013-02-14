@@ -1,8 +1,6 @@
 #pragma once
-#ifdef WINDOWS
 
 #include <stdio.h>
-#include <tchar.h>
 #include <stdlib.h>
 #include <cstdlib>
 #include <sstream>
@@ -151,11 +149,11 @@ private:
 	{
 		uint ind=0;
 
-		if (index.size() != _dimensions->size()) throw new std::exception("Error, incorrect number of dimensions in index.");
+		if (index.size() != _dimensions->size()) THROW_EXCEPTION("Error, incorrect number of dimensions in index.");
 
 		for (int i = 0; i< index.size(); i++)
 		{
-			if (index[i] >= (*_dimensions)[i]) throw new std::exception( string("Error, index outside of array bounds for dimension: %i", i).c_str());
+			if (index[i] >= (*_dimensions)[i]) THROW_EXCEPTION("Error, index outside of array bounds for dimension: " << i);
 
 			int multiplier = 1;
 			for (int j=i+1; j< index.size(); j++)
@@ -236,7 +234,7 @@ public:
 		m_array<T> tmp = m_array<T>(*this);
 		this->_cleanup();
 		this->_init(new_dimensions);
-		*this = m_array<T>(new_dimensions, value);
+		*this = m_array<T>(new_dimensions);
 
 		iterator itr = this->begin();
 
@@ -248,7 +246,7 @@ public:
 				size_type i = tmp.get_index(index);
 				(*itr) = tmp._data[i];
 			}
-			else (*itr) = value;
+			else (*itr) = 0;
 			
 		}
 
@@ -325,15 +323,13 @@ public:
 
 		if (index.size() != _ndim)
 		{
-			const char* mess = "Error, incorrect number of dimensions in index.";
-			throw new std::exception(mess);
+			THROW_EXCEPTION("Error, incorrect number of dimensions in index.");
 		}
 		for (size_type i = 0; i< index.size(); i++)
 		{
 			if (index[i] >= _dim_sizes[i]) 
 			{
-				const char* mess = string("Error, index outside of array bounds for dimension: %i", i).c_str();
-				throw new std::exception(mess);
+				THROW_EXCEPTION("Error, index outside of array bounds for dimension: " << i);
 			}
 			size_type multiplier = 1;
 			for (size_type j=i+1; j< index.size(); j++)
@@ -570,7 +566,7 @@ public:
 
        matrix_iterator& operator++()
        {   
-		   mptr++;
+		   m_Ptr++;
 			return (*this);
        }
 
@@ -582,7 +578,7 @@ public:
 
       matrix_iterator operator++(int)
        {      // postincrement
-              m_array_iterator _Tmp = *this;
+              m_array_iterator<T> _Tmp = *this;
               ++*this;
               return (_Tmp);
        }
@@ -590,7 +586,7 @@ public:
       matrix_iterator operator--(int)
 
       {      // postdecrement
-              m_array_iterator _Tmp = *this;
+              m_array_iterator<T> _Tmp = *this;
               --*this;
               return (_Tmp);
        }
@@ -642,9 +638,9 @@ public:
 	iterator		end() {return iterator();}
 	bool			empty(){ return (_size==0);}
 	void			clear(){_cleanup();}
-	void			resize(size_type rows, size_type cols)
+	void			resize(size_type rows, size_type cols, value_type value)
 	{
-		pair<size_type,size_type> new_dimenstions = pair<size_type,size_type>(rows,cols);
+		pair<size_type,size_type> new_dimensions = pair<size_type,size_type>(rows,cols);
 		m_array<T> tmp = m_array<T>(*this);
 		this->_cleanup();
 		this->_init(new_dimensions);
@@ -697,7 +693,7 @@ public:
 		size_type i = get_index(pair<size_type,size_type>(row_index,col_index));
 		return _data[i];
 	} 
-	const_reference operator()(const_size_type row, const_size_type col) const // get data at given index
+	const_reference operator()(const_size_type row_index, const_size_type col_index) const // get data at given index
 	{
 		size_type i = get_index(pair<size_type,size_type>(row_index,col_index));
 		return _data[i];
@@ -727,8 +723,7 @@ public:
 	{
 		if (dimension==0) return _nrow;
 		if (dimension==1) return _ncol;
-		const char* mess = string("Error, can not request dimension size for dimension higher than 1").c_str();
-		throw new std::exception(mess);
+		THROW_EXCEPTION("Error, can not request dimension size for dimension higher than 1");
 	}
 	const_index_type dimensions(){return _dim_sizes;}
 	const size_type& num_dimensions() {return _ndim;}
@@ -744,8 +739,7 @@ public:
 
 		if (index.first >= _nrow || index.second >= _ncol)
 		{
-			const char* mess = string("Error, index outside of matrix bounds for dimension").c_str();
-			throw new std::exception(mess);
+			THROW_EXCEPTION("Error, index outside of matrix bounds for dimension");
 		}
 		ind = index.first *_ncol + index.second;
 		return ind;
@@ -773,15 +767,8 @@ protected:
 
 	bool valid_index(const_index_type index)
 	{
-		if (index.size() != _ndim)
-		{
-			return false;
-		}
-		for (size_type i = 0; i< index.size(); i++)
-		{
-			if (index[i] >= _dim_sizes[i]) return false;
-		}
-		return true;
+		if (index.first < _nrow && index.second << _ncol) return true;
+		return false;
 	}
 	void _cursor_start()
 	{
@@ -902,6 +889,4 @@ void matrix<T>::print(ostream& stream, int n)
 	}
 	stream<<endl<<endl;
 }
-
-#endif
 

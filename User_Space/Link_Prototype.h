@@ -67,6 +67,8 @@ namespace Link_Components
 			feature_accessor(label_pointer, none, none);
 			feature_accessor(label_cost, none, none);
 			feature_accessor(scan_list_status, none, none);
+			feature_accessor(scan_list_position, none, none);
+			feature_accessor(reset_list_status, none, none);
 			feature_accessor(network_link_reference, none, none);
 			feature_accessor(replicas_container, none, none);
 			//------------------------------------------------------------------------------------------------------------------

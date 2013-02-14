@@ -1,6 +1,7 @@
 #pragma once
 
-#include "User_Space.h"
+#include "User_Space_Includes.h"
+#include "Population_Unit_Implementations.h"
 
 
 using namespace std;
@@ -30,7 +31,7 @@ namespace PopSyn
 		{
 			check_typename_defined(Has_Value_Type, Value_Type);
 			check_typename_state(Has_Loss_Function_Selection_Defined, Loss_Function_Selection_Type, true_type);
-			define_default_check(Has_Probabilistic_Selection_Defined && Has_Value_Type);
+			define_default_check(Has_Loss_Function_Selection_Defined && Has_Value_Type);
 		};
 
 
@@ -49,18 +50,19 @@ namespace PopSyn
 
 	namespace Prototypes
 	{
-		prototype struct Solver_Settings_Prototype : public ComponentType
+		prototype struct Solver_Settings_Prototype
 		{
 			tag_as_prototype;
+
 			feature_prototype void Initialize(typename TargetType::ParamType tolerance, typename TargetType::Param2Type iterations)
 			{
-				this_component()->initialize<ComponentType,CallerType,TargetType>(tolerance,iterations);
+				this_component()->Initialize<ComponentType,CallerType,TargetType>(tolerance,iterations);
 			}
-			feature_accessor(Tolerance,check(ReturnValueType, is_arithmetic),not_available);
-			feature_accessor(Iterations,check(ReturnValueType, is_arithmetic),not_available);
+			feature_accessor(Tolerance,check(ReturnValueType, is_arithmetic),none);
+			feature_accessor(Iterations,check(ReturnValueType, is_arithmetic),none);
 		};
 
-		prototype struct Synthesis_Zone_Prototype : public ComponentType
+		prototype struct Synthesis_Zone_Prototype
 		{
 			tag_as_prototype;
 			feature_prototype void Initialize()
@@ -73,23 +75,23 @@ namespace PopSyn
 			feature_prototype void Fit_Joint_Distribution_To_Marginal_Data(requires(check(ComponentType,Concepts::Is_IPF_Capable)))
 			{
 				// Get the solution settings
-				define_component_interface(solution_settings_itf,get_type_of(Solver_Settings),Prototypes::Solver_Settings_Prototype,NULLTYPE);
+				define_component_interface(solution_settings_itf,typename get_type_of(Solver_Settings),Prototypes::Solver_Settings_Prototype,NULLTYPE);
 				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
 
 				// IPF version of fitting the joint distribution to marginal distribution
-				typedef get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
-				define_simple_container_interface(mway_itf, get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
-				define_simple_container_interface(marg_itf, get_type_of(Target_Marginal_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
+				typedef typename get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
+				define_simple_container_interface(mway_itf, typename get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
+				define_simple_container_interface(marg_itf,typename get_type_of(Target_Marginal_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
 
-				mway_itf::iterator itr;
-				marg_itf::iterator marg_itr;
-				typedef marg_itf::index_type index;
+				typename mway_itf::iterator itr;
+				typename marg_itf::iterator marg_itr;
+				typedef typename marg_itf::index_type index;
 
 
 				// get the distribution
 				mway_itf& mway = this->Target_Joint_Distribution<mway_itf&>();
-				mway_itf::const_index_type dimensions = mway.dimensions();
-				mway_itf::size_type num_dim = (mway_itf::size_type)(dimensions.size());
+				typename mway_itf::const_index_type dimensions = mway.dimensions();
+				typename mway_itf::size_type num_dim = (typename mway_itf::size_type)(dimensions.size());
 
 				// get the marginals
 				marg_itf& marg = this->Target_Marginal_Distribution<marg_itf&>();
@@ -97,7 +99,7 @@ namespace PopSyn
 				// Main Execution loop - loop over each dimension, and each index within each dimensions and fit to the marginal
 				value_type max_error = (value_type)INT_MAX;
 				uint iterations = 0;
-				while (iterations < settings.Iterations<uint>() && max_error > settings.Tolerance<value_type>())
+				while (iterations < settings.template Iterations<uint>() && max_error > settings.template Tolerance<value_type>())
 				{
 					// 0. reset max error to 0, then store the highest value for current iteration
 					max_error = 0;
@@ -137,25 +139,25 @@ namespace PopSyn
 			}
 			feature_prototype void Normalize_Sample()
 			{
-				define_container_and_value_interface(sample_itf,unit_itf,get_type_of(Sample_Data),Containers::Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,NULLTYPE);
+				define_container_and_value_interface(sample_itf,unit_itf,typename get_type_of(Sample_Data),Containers::Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,NULLTYPE);
 				sample_itf& sample = this->Sample_Data<sample_itf&>();
 				
 				
-				for (sample_itf::iterator itr = sample.begin(); itr != sample.end(); ++itr)
+				for (typename sample_itf::iterator itr = sample.begin(); itr != sample.end(); ++itr)
 				{
 					double sum = 0;
-					sample_itf::key_type stored_key = itr->first;
-					pair<sample_itf::iterator,sample_itf::iterator> range = sample.equal_range(stored_key);
+					typename sample_itf::key_type stored_key = itr->first;
+					pair<typename sample_itf::iterator,typename sample_itf::iterator> range = sample.equal_range(stored_key);
 					while (range.first != range.second)
 					{
-						sum += range.first->second->Weight<double>();
+						sum += range.first->second->template Weight<double>();
 						++range.first;
 					}
 
 					range = sample.equal_range(stored_key);
 					while (range.first != range.second)
 					{
-						range.first->second->Weight<double>(range.first->second->Weight<double>()/sum);
+						range.first->second->template Weight<double>(range.first->second->template Weight<double>()/sum);
 						++range.first;
 					}
 					itr = range.second;
@@ -168,39 +170,39 @@ namespace PopSyn
 			feature_prototype void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, 
 				requires(check(ComponentType, Concepts::Is_Probabilistic_Selection)   && check_as_given(TargetType,is_pointer) && check(TargetType,Containers::Concepts::Is_Associative)))
 			{
-				define_component_interface(_Network_Interface,MasterType::network_type,Network_Components::Prototypes::Network_Prototype,ComponentType);
-				define_component_interface(_Scenario_Interface,MasterType::scenario_type,Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
+				define_component_interface(_Network_Interface,typename ComponentType::Master_Type::network_type,Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_component_interface(_Scenario_Interface,typename ComponentType::Master_Type::scenario_type,Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
 
 				// Get the fitted distribution
-				typedef get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
-				define_simple_container_interface(mway_itf, get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
+				typedef typename get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
+				define_simple_container_interface(mway_itf, typename get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
 				mway_itf& mway = this->Target_Joint_Distribution<mway_itf&>();
 
 				// Get pointers to the regional and zonal household samples
-				define_container_and_value_interface(sample_itf, pop_unit_itf, get_type_of(Sample_Data), Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
+				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
 				sample_itf* sample = Region_Sample_Ptr;
 				sample_itf* zone_sample = this->Sample_Data<sample_itf*>();
 				
 				// Get interface to the zone random number generator
-				define_component_interface(rand_itf,get_type_of(Rand),RNG_Components::Prototypes::RNG_Prototype,NULLTYPE);		
+				define_component_interface(rand_itf,typename get_type_of(Rand),RNG_Components::Prototypes::RNG_Prototype,NULLTYPE);		
 				rand_itf& rand = this->Rand<rand_itf&>();
 
 				// loop through all cells in the regional mway matrix, and make N = Mway(i,j,...) attempts to add each pop_unit corresponding to that index
 				// The code below grabs a range for each index in the MWAY matrix which has corresponding samples which can be chosen.
 				// note that this routine does not work when a loss function can be used (i.e. households are not uniquely assigned to one mway index)
 				int num_created = 0;
-				for (sample_itf::iterator itr = sample->begin(); itr != sample->end(); ++itr)
+				for (typename sample_itf::iterator itr = sample->begin(); itr != sample->end(); ++itr)
 				{
 					//----------------------------------------------------------------------------------
 					// get a pointer to the value of the iterator for IDE support
 					pop_unit_itf* stored_pop_unit;
 
 					// get the current key (i.e. index into mway)
-					sample_itf::key_type index = itr->first;
+					typename sample_itf::key_type index = itr->first;
 					double num_required = mway[index];
 				
 					// grab all sample units which link to this cell
-					pair<sample_itf::iterator,sample_itf::iterator> range = sample->equal_range(index);
+					pair<typename sample_itf::iterator,typename sample_itf::iterator> range = sample->equal_range(index);
 
 					stored_pop_unit = range.first->second;
 					double cumulative_weight = 1;
@@ -210,23 +212,23 @@ namespace PopSyn
 					while (range.first != range.second)
 					{
 						int num_generated=0;
-						double w = range.first->second->Weight<double>();
+						double w = range.first->second->template Weight<double>();
 						
 						for (int i = 0; i<num_required; ++i)
 						{
-							if (rand.Next_Rand<double>() < w/cumulative_weight)
+							if (rand.template Next_Rand<double>() < w/cumulative_weight)
 							{					
-								//pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
-								pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
+								pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
+								//pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
 								pop_unit_itf* obj = range.first->second;
-								p->Initialize<pop_unit_itf&>(*obj);
-								zone_sample->insert(p->Index<uint>(),p);
+								p->template Initialize<pop_unit_itf&>(*obj);
+								zone_sample->insert(p->template Index<uint>(),p);
 								int size = sizeof(typename sample_itf::Component_Type);
 								num_generated++;
 
 								// create the actual person agent
-								typedef Person_Components::Prototypes::Person_Prototype<typename MasterType::person_type, ComponentType> _Person_Interface;
-								_Person_Interface* person=(_Person_Interface*)Allocate<typename MasterType::person_type>();
+								typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
+								_Person_Interface* person=(_Person_Interface*)Allocate<typename ComponentType::Master_Type::person_type>();
 								person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
 								person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
 								person->Initialize<int>(num_created);
@@ -245,23 +247,23 @@ namespace PopSyn
 					// add a copy of the last unit until num_required < 1
 					while (num_required > 1.0)
 					{
-						//pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
-						pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
+						pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
+						//pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
 						pop_unit_itf* obj = stored_pop_unit;
 						p->Initialize<pop_unit_itf&>(*obj);
-						zone_sample->insert(p->Index<uint>(),p);
+						zone_sample->insert(p->template Index<uint>(),p);
 						num_required--;
 					}
 
 					//----------------------------------------------------------------------------------
 					// if a fractional num_required is left, add another unit with probability of num_required
-					if (num_required > 0.0 && rand.Next_Rand<double>() < num_required)
+					if (num_required > 0.0 && rand.template Next_Rand<double>() < num_required)
 					{
-						//pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
-						pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
+						pop_unit_itf* p = (pop_unit_itf*)Allocate<pop_unit_itf::Component_Type>(); // ALLOCATE
+						//pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
 						pop_unit_itf* obj = stored_pop_unit;
 						p->Initialize<pop_unit_itf&>(*obj);
-						zone_sample->insert(p->Index<uint>(),p);
+						zone_sample->insert(p->template Index<uint>(),p);
 						num_required--;
 					}
 
@@ -275,8 +277,8 @@ namespace PopSyn
 				requires(!(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check_as_given(TargetType,is_pointer) && check(TargetType,Containers::Concepts::Is_Associative))))
 			{
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
-				assert_check(TargetType, is_pointer,"Is not a pointer");
-				assert_check_strip(TargetType, Containers::Concepts::Is_Associative, "Container is not associative.");
+				assert_check_as_given(TargetType, is_pointer,"Is not a pointer");
+				assert_check(TargetType, Containers::Concepts::Is_Associative, "Container is not associative.");
 			}
 
 			//===================================================================================================================================

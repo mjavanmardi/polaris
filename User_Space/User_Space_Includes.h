@@ -1,12 +1,21 @@
 #pragma once
 #include "../Repository/Repository.h"
+#include "User_Space_Forward_Declaration.h"
+#include "popsyn_includes.h"
+
 //#include "RngStream.h"
 #include <time.h>
 #include <iostream>
 #include <fstream>
-#include <hash_map>
 
-#ifndef	FOR_LINUX_PORTING
+// use hashmap
+#include <hash_map>
+#ifndef WINDOWS
+#include <ext/hash_map>
+using namespace __gnu_cxx;
+#endif
+
+#ifdef HIDE
 //================================================================================================================================================================
 //================================= TEMPORARY CORE METASTRUCTURE UPDATES =========================================================================================
 //================================================================================================================================================================
@@ -205,7 +214,14 @@ struct DATA_STRUCT_NAME \
 
 #define get_exists_check(FEATURE_NAME) FEATURE_NAME##_get_exists
 #define set_exists_check(FEATURE_NAME) FEATURE_NAME##_set_exists
+//================================================================================================================================================================
+//================================================================================================================================================================
+//================================================================================================================================================================
+#pragma endregion
+#endif
 
+
+#ifdef WINDOWS
 struct Counter
 {
 private:
@@ -235,16 +251,42 @@ public:
 		cout << endl << "approx clock time (s) = "<< (double)(_t_end - _t_start) / (double)CLOCKS_PER_SEC<<endl;
 		return (double)(_l.QuadPart - _start)/_freq;
 	}
-	const __int64& get_start_value(){return _start;}
-	const double& get_freq_value(){return _freq;}
-	const long long& get_l_value(){return _l.QuadPart;}
+	//const __int64& get_start_value(){return _start;}
+	//const double& get_freq_value(){return _freq;}
+	//const long long& get_l_value(){return _l.QuadPart;}
 };
-
-//================================================================================================================================================================
-//================================================================================================================================================================
-//================================================================================================================================================================
-#pragma endregion
+#else
+struct Counter
+{
+private:
+	timespec _start;
+	long long _l;
+	//clock_t _t_start;
+	//clock_t _t_end;
+public:
+	Counter()
+	{
+	}
+	void Start()
+	{
+		_l=0;
+		start_timer(_start);
+	}
+	double Stop()
+	{
+		end_timer(_start,_l);
+		cout << endl << "approx clock time (ns) = "<< _l<<endl;
+		return (double)(_l);
+	}
+	//const __int64& get_start_value(){return _start;}
+	//const double& get_freq_value(){return _freq;}
+	//const long long& get_l_value(){return _l.QuadPart;}
+};
 #endif
+
+
+
+
 #ifndef WINDOWS
 #define FLT_MAX	3.402823466e+38F	/* max value */
 #endif

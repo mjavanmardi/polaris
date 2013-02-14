@@ -6,7 +6,7 @@ namespace PopSyn
 {
 	namespace Implementations
 	{
-		implementation struct ADAPTS_Population_Unit_Implementation
+		implementation struct ADAPTS_Population_Unit_Implementation : public Polaris_Component_Class<ADAPTS_Population_Unit_Implementation, MasterType, Data_Object, ParentType>
 		{
 			member_data(double,ID,none,none);
 			member_data(double,Weight,none,none);

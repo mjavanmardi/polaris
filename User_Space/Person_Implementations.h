@@ -1,8 +1,9 @@
 #pragma once
 
-#include "User_Space\Person_Prototype.h"
-#include "Polaris_Movement_Plan_Implementation.h"
-#include "Activity_Implementations.h"
+#include "Person_Prototype.h"
+#include "Movement_Plan_Prototype.h"
+#include "Activity_Prototype.h"
+
 
 namespace Person_Components
 {
@@ -13,28 +14,28 @@ namespace Person_Components
 			feature_implementation void Initialize(TargetType id)
 			{	
 				// Set the initial iteration to process
-				this->First_Iteration<ComponentType,CallerType,Time_Minutes>(15.0);
+				this->template First_Iteration<ComponentType,CallerType,Time_Minutes>(15.0);
 
 				// Create and Initialize the Properties faculty
 				define_component_interface(properties_itf,type_of(Properties),Prototypes::Person_Properties,ComponentType);
 				properties_itf* properties = (properties_itf*)Allocate<type_of(Properties)>();
-				properties->Initialize<NULLTYPE>();
-				properties->Parent_Person<ComponentType*>(this);
-				this->Properties<ComponentType,ComponentType,properties_itf*>(properties);
+				properties->template Initialize<NULLTYPE>();
+				properties->template Parent_Person<ComponentType*>(this);
+				this->template Properties<ComponentType,ComponentType,properties_itf*>(properties);
 
 				// Create and Initialize the Planner faculty
 				define_component_interface(planner_itf,type_of(Planning_Faculty),Prototypes::Person_Planner,ComponentType);
 				planner_itf* planner = (planner_itf*)Allocate<type_of(Planning_Faculty)>();	
-				planner->Parent_Person<ComponentType*>(this);
-				planner->Initialize<NULLTYPE>();
-				this->Planning_Faculty<ComponentType,ComponentType,planner_itf*>(planner);
+				planner->template Parent_Person<ComponentType*>(this);
+				planner->template Initialize<NULLTYPE>();
+				this->template Planning_Faculty<ComponentType,ComponentType,planner_itf*>(planner);
 
 				// Create and Initialize the routing faculty
 				define_component_interface(_Routing_Interface, type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				_Routing_Interface* router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 				router->template traveler<ComponentType*>(this);
-				router->template network<_Network_Interface*>(this->network_reference<ComponentType,CallerType,_Network_Interface*>());	
+				router->template network<_Network_Interface*>(this->template network_reference<ComponentType,CallerType,_Network_Interface*>());	
 
 				// Create and Initialize the vehicle
 				define_component_interface(_Vehicle_Interface, type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
@@ -45,8 +46,8 @@ namespace Person_Components
 
 				// Seed the RNG with the agent ID
 				define_component_interface(rng_itf,type_of(RNG),RNG_Components::Prototypes::RNG_Prototype,ComponentType);
-				rng_itf* rng = this->RNG<ComponentType,ComponentType,rng_itf*>();		
-				rng->Initialize<TargetType>((sin((double)id)+1.0) * 1000000.0);
+				rng_itf* rng = this->template RNG<ComponentType,ComponentType,rng_itf*>();		
+				rng->template Initialize<TargetType>((sin((double)id)+1.0) * 1000000.0);
 
 				// Add basic traveler properties							
 				this->template uuid<ComponentType,ComponentType,int>(id);
@@ -57,30 +58,30 @@ namespace Person_Components
 			feature_implementation void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type trip)
 			{	
 				// Set the initial iteration to process
-				this->First_Iteration<Time_Minutes>(15.0);
+				this->template First_Iteration<Time_Minutes>(15.0);
 
 				// Set the agent ID
-				this->uuid<ComponentType,CallerType,TargetType::ParamType>(id);
-				this->internal_id<ComponentType,CallerType,TargetType::ParamType>(id);
+				this->template uuid<ComponentType,CallerType,TargetType::ParamType>(id);
+				this->template internal_id<ComponentType,CallerType,TargetType::ParamType>(id);
 
 				// Create and Initialize the Properties faculty
 				define_component_interface(properties_itf,type_of(Properties),Prototypes::Person_Properties,ComponentType);
 				properties_itf* properties = (properties_itf*)Allocate<type_of(Properties)>();
-				properties->Initialize<NULLTYPE>();
-				properties->Parent_Person<ComponentType*>(this);
-				this->Properties<ComponentType,ComponentType,properties_itf*>(properties);
+				properties->template Initialize<NULLTYPE>();
+				properties->template Parent_Person<ComponentType*>(this);
+				this->template Properties<ComponentType,ComponentType,properties_itf*>(properties);
 
 				// Create and Initialize the Planner faculty
 				define_component_interface(planner_itf,type_of(Planning_Faculty),Prototypes::Person_Planner,ComponentType);
 				planner_itf* planner = (planner_itf*)Allocate<type_of(Planning_Faculty)>();
-				planner->Initialize<TargetType::Param2Type>(trip);
-				planner->Parent_Person<ComponentType*>(this);
-				this->Planning_Faculty<ComponentType,ComponentType,planner_itf*>(planner);		
+				planner->template Initialize<TargetType::Param2Type>(trip);
+				planner->template Parent_Person<ComponentType*>(this);
+				this->template Planning_Faculty<ComponentType,ComponentType,planner_itf*>(planner);		
 
 				// Seed the RNG with the agent ID
 				define_component_interface(rng_itf,type_of(RNG),RNG_Components::Prototypes::RNG_Prototype,ComponentType);
-				rng_itf* rng = this->RNG<ComponentType,ComponentType,rng_itf*>();	
-				rng->Initialize<TargetType::ParamType>(id);
+				rng_itf* rng = this->template RNG<ComponentType,ComponentType,rng_itf*>();	
+				rng->template Initialize<TargetType::ParamType>(id);
 			}
 			tag_feature_as_available(Initialize);	
 
@@ -131,22 +132,22 @@ namespace Person_Components
 			{
 			}
 			tag_feature_as_available(Activity_Generation);
-			feature_implementation TargetType current_movement_plan(requires(check(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
+			feature_implementation TargetType current_movement_plan(requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
 				// Define interfaces to the container members of the class			
-				define_container_and_value_interface(Movement_Plans_List,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Prototype,ComponentType);		
-				Movement_Plans_List* movement_plans = this_ptr->Movement_Plans_Container<ComponentType, CallerType, Movement_Plans_List*>();
-				Movement_Plans_List::iterator itr;
+				define_container_and_value_interface_unqualified_container(Movement_Plans_List,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Prototype,ComponentType);		
+				Movement_Plans_List* movement_plans = this->template Movement_Plans_Container<ComponentType, CallerType, Movement_Plans_List*>();
+				typename Movement_Plans_List::iterator itr;
 				if ((itr = movement_plans->find(_iteration)) != movement_plans->end()) return (TargetType)*itr;
 				else return NULL;
 			}
 			tag_feature_as_available(current_movement_plan);
-			feature_implementation TargetType current_activity_plan(requires(check(TargetType,is_pointer) && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
+			feature_implementation TargetType current_activity_plan(requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
 				// Define interfaces to the container members of the class
-				define_container_and_value_interface(Activity_Plans_List,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Plan_Prototype,ComponentType);
-				Activity_Plans_List* activity_plans = this_ptr->Activity_Plans_Container<Activity_Plans_List*>();
-				Activity_Plans_List::iterator itr;
+				define_container_and_value_interface_unqualified_container(Activity_Plans_List,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Plan_Prototype,ComponentType);
+				Activity_Plans_List* activity_plans = this->template Activity_Plans_Container<Activity_Plans_List*>();
+				typename Activity_Plans_List::iterator itr;
 				if ((itr = activity_plans->find(_iteration)) != activity_plans->end()) return (TargetType)*itr;
 				else return NULL;
 			}
@@ -155,14 +156,14 @@ namespace Person_Components
 			// Adding activities and movements to the planning schedules
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
-				define_container_and_value_interface(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 				Movement_Plan* move = (Movement_Plan*)movement_plan;
 				// key the movement plan on the planning timestep just prior to departure
-				long t1 = move->departed_time<Simulation_Timestep_Increment>();
+				long t1 = move->template departed_time<Simulation_Timestep_Increment>();
 				long t2 = this->Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
 				long remain = (long)(t1 / t2);
-				Simulation_Timestep_Increment departure_time = remain * this->Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
-				Movement_Plans* movements = this->Movement_Plans_Container<ComponentType,CallerType,Movement_Plans*>();
+				Simulation_Timestep_Increment departure_time = remain * this->template Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
+				Movement_Plans* movements = this->template Movement_Plans_Container<ComponentType,CallerType,Movement_Plans*>();
 				movements->insert(departure_time,move);
 			}
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(!check_as_given(TargetType,is_pointer) || !check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
@@ -173,25 +174,33 @@ namespace Person_Components
 			tag_feature_as_available(Add_Movement_Plan);
 			feature_implementation void Add_Activity_Plan(TargetType activity_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
-				define_container_and_value_interface(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);	
+				define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);	
 				Activity_Plan* act = (Activity_Plan*)activity_plan;
+
+				long t1 = act->template Activity_Plan_Horizon<Simulation_Timestep_Increment>();
+				long t2 = this->template Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
+				long remain = (long)(t1 / t2);
+				Simulation_Timestep_Increment departure_time = remain * this->template Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
+
 				// key the movement plan on the planning timestep just prior to departure
-				Activity_Plans* activities = this_ptr->Activity_Plans_Container<Activity_Plans*>();
-				activities->insert(departure_time,move);
+				Activity_Plans* activities = this->template Activity_Plans_Container<Activity_Plans*>();
+				activities->insert(departure_time,act);
 			}
 		};
 
 		implementation struct ADAPTS_Person_Planner_Implementation : public Polaris_Component_Class<ADAPTS_Person_Planner_Implementation,MasterType,Execution_Object,ParentType>, public General_Person_Planner_Implementation<MasterType, ParentType>
 		{
+			typedef General_Person_Planner_Implementation<MasterType, ParentType> base_type;
+
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
-				this->Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
-				this->Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
+				this->template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
+				this->template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
 
 				// get reference to the parent pointer and set the first activity generation time to be the parent first iteration
-				define_component_interface(parent_itf,get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
-				parent_itf* parent = this->Parent_Person<ComponentType,CallerType,parent_itf*>();
-				this->Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(parent->First_Iteration<Time_Minutes>());	
+				define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
+				this->template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(parent->template First_Iteration<Time_Minutes>());	
 			}
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
 			{	
@@ -208,21 +217,21 @@ namespace Person_Components
 				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
 
 				// get reference to the parent pointer
-				define_component_interface(parent_itf,get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
-				parent_itf* parent = this->Parent_Person<ComponentType,CallerType,parent_itf*>();
+				define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
 
 				// Generate average of 4 activities per day
 
-				define_container_and_value_interface(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Prototypes::Activity_Plan_Prototype,ComponentType);
-				Activity_Plan* act = (Activity_Plan*)Allocate<type_of(Activity_Plans_Container)::unqualified_value_type>();
-				act->Activity_Plan_ID<long>(_iteration);
-				Activity_Plans* activities = this_ptr->Activity_Plans_Container<Activity_Plans*>();
+				define_container_and_value_interface(Activity_Plans,Activity_Plan,typename base_type::type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
+				Activity_Plan* act = (Activity_Plan*)Allocate<typename base_type::type_of(Activity_Plans_Container)::unqualified_value_type>();
+				act->template Activity_Plan_ID<long>(_iteration);
+				Activity_Plans* activities = this_ptr->template Activity_Plans_Container<Activity_Plans*>();
 				activities->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(15),act);
 
-				define_container_and_value_interface(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Prototypes::Movement_Plan_Prototype,ComponentType);
-				Movement_Plan* move = (Movement_Plan*)Allocate<type_of(Movement_Plans_Container)::unqualified_value_type>();
-				move->Movement_Plan_ID<long>(_iteration);
-				Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();
+				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Movement_Plans_Container)::unqualified_value_type>();
+				move->template Movement_Plan_ID<long>(_iteration);
+				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();
 				movements->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(30),move);
 			}
 			tag_feature_as_available(Activity_Generation);
@@ -230,15 +239,17 @@ namespace Person_Components
 
 		implementation struct CTRAMP_Person_Planner_Implementation : public Polaris_Component_Class<CTRAMP_Person_Planner_Implementation,MasterType,Execution_Object,ParentType>, public General_Person_Planner_Implementation<MasterType, ParentType>
 		{
+			typedef General_Person_Planner_Implementation<MasterType, ParentType> base_type;
+
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
-				this->Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
-				this->Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
+				this->template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
+				this->template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
 
 				// get reference to the parent pointer and set the first activity generation time to be the parent first iteration
-				define_component_interface(parent_itf,get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
-				parent_itf* parent = this->Parent_Person<ComponentType,CallerType,parent_itf*>();
-				this->Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(parent->First_Iteration<Time_Minutes>());	
+				define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
+				this->template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(parent->template First_Iteration<Time_Minutes>());	
 			}
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
 			{	
@@ -250,31 +261,31 @@ namespace Person_Components
 
 			feature_implementation void Activity_Generation()
 			{
-				// Create alias for this to use in conditional
+				// Create alias for this to use
 				typedef Prototypes::Person_Planner<ComponentType, ComponentType> _Planning_Interface;
 				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
 
 				// get reference to the parent pointer
-				define_component_interface(parent_itf,get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
-				parent_itf* parent = this->Parent_Person<ComponentType,CallerType,parent_itf*>();
+				define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
 
 				// get references to the plan containers
-				define_container_and_value_interface(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
-				define_container_and_value_interface(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-				Activity_Plans* activities = this_ptr->Activity_Plans_Container<Activity_Plans*>();
-				Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();	
+				define_container_and_value_interface(Activity_Plans,Activity_Plan,typename base_type::type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
+				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				Activity_Plans* activities = this_ptr->template Activity_Plans_Container<Activity_Plans*>();
+				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();	
 
 				// external knowledge references
-				define_component_interface(_Scenario_Interface, get_type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				define_component_interface(_Network_Interface, get_type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
-				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-				_Network_Interface* network = parent->network_reference<_Network_Interface*>();
-				_Scenario_Interface* scenario = parent->scenario_reference<_Scenario_Interface*>();
+				define_component_interface(_Scenario_Interface, typename base_type::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Network_Interface, typename base_type::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
+				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+				_Network_Interface* network = parent->template network_reference<_Network_Interface*>();
+				_Scenario_Interface* scenario = parent->template scenario_reference<_Scenario_Interface*>();
 
 				// Generate average of 3 activities per day
-				double r = parent->Next_Rand<double>();
+				double r = parent->template Next_Rand<double>();
 				int num_activities = r *6.0 + 1;
 
 				double t = 0;
@@ -282,26 +293,26 @@ namespace Person_Components
 				for (int i = 0; i < num_activities; i++)
 				{
 					// Create movement plan and give it an ID
-					Movement_Plan* move = (Movement_Plan*)Allocate<type_of(Movement_Plans_Container)::unqualified_value_type>();
-
+					Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Movement_Plans_Container)::unqualified_value_type>();
+					move->template initialize_trajectory<NULLTYPE>();
 					// Get a random origin and destination and departure time
-					int size = (int)network->links_container<_Links_Container_Interface&>().size();
-					int O = (parent->Next_Rand<double>()-0.000001) * size;
-					int D = (parent->Next_Rand<double>()-0.000001) * size;
-					// departure time from current time, in minutes
-					t += parent->Next_Rand<double>()*6.0*60.0;
+					int size = (int)network->template links_container<_Links_Container_Interface&>().size();
+					int O = (parent->template Next_Rand<double>()-0.000001) * size;
+					int D = (parent->template Next_Rand<double>()-0.000001) * size;
+					// departure time from current time, in minutes, approximately every six hours
+					t += parent->template Next_Rand<double>()*6.0*60.0*10.0;
 
-					Basic_Units::Time_Variables::Time_Minutes time = Simulation_Time.Future_Time<Basic_Units::Time_Variables::Time_Minutes, Basic_Units::Time_Variables::Time_Minutes>(t);
+					Basic_Units::Time_Variables::Time_Seconds time = Simulation_Time.Future_Time<Basic_Units::Time_Variables::Time_Seconds, Basic_Units::Time_Variables::Time_Seconds>(t);
 		
 					if (O != D)
 					{
-						move->template origin<_Link_Interface*>(network->links_container<_Links_Container_Interface&>().at(O));
-						move->template destination<_Link_Interface*>(network->links_container<_Links_Container_Interface&>().at(D));
-						move->template departed_time<Basic_Units::Time_Variables::Time_Minutes>(time);
+						move->template origin<_Link_Interface*>(network->template links_container<_Links_Container_Interface&>().at(O));
+						move->template destination<_Link_Interface*>(network->template links_container<_Links_Container_Interface&>().at(D));
+						move->template departed_time<Basic_Units::Time_Variables::Time_Seconds>(time);
 					}
 
 					// Add to plans
-					this_ptr->Add_Movement_Plan<Movement_Plan*>(move);
+					this_ptr->template Add_Movement_Plan<Movement_Plan*>(move);
 				}
 			}
 			tag_feature_as_available(Activity_Generation);
@@ -309,22 +320,24 @@ namespace Person_Components
 		
 		implementation struct TRANSIMS_Person_Planner_Implementation : public Polaris_Component_Class<TRANSIMS_Person_Planner_Implementation,MasterType,Execution_Object,ParentType>, public General_Person_Planner_Implementation<MasterType, ParentType>
 		{
+			typedef General_Person_Planner_Implementation<MasterType, ParentType> base_type;
+
 			feature_implementation void Initialize(TargetType trip, requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
 				// Set the event schedule parameters
-				this->Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
-				this->Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
-				this->Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(END);
+				this->template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
+				this->template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
+				this->template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(END);
 
 				// Create alias for this to use in conditional
 				typedef Prototypes::Person_Planner<ComponentType, ComponentType> _Planning_Interface;
 				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
 
 				// Add the trip input parameter to the movement schedule
-				define_container_and_value_interface(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-				Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();
+				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();
 				Movement_Plan* move = (Movement_Plan*)trip;
-				this->Add_Movement_Plan<ComponentType,CallerType,Movement_Plan*>(move);
+				this->template Add_Movement_Plan<ComponentType,CallerType,Movement_Plan*>(move);
 			
 			} 
 			feature_implementation void Initialize(TargetType trip, requires(check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
@@ -333,7 +346,7 @@ namespace Person_Components
 			}
 			feature_implementation void Initialize()
 			{	
-				static_assert(false, "\n\n\n[--------- Error, a TRANSIMS Planner Initialization must be called with an input trip parameter. ---------]\n\n");
+				//static_assert(false, "\n\n\n[--------- Error, a TRANSIMS Planner Initialization must be called with an input trip parameter. ---------]\n\n");
 			}
 			tag_feature_as_available(Initialize);
 		};

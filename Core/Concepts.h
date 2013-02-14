@@ -70,7 +70,7 @@ static const int success=sizeof(small_type);
 #define check_named_member(CHECK_ALIAS,MEMBER_NAME)\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U> static small_type has_matching_named_member(is_member_object_pointer<decltype(&U::MEMBER_NAME)>::type);\
+		template<typename U> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&U::MEMBER_NAME)>::type);\
 		template<typename U> static large_type has_matching_named_member(...);\
 		static const bool value=sizeof(has_matching_named_member<T>(true_val))==success;\
 	};\
@@ -88,7 +88,7 @@ static const int success=sizeof(small_type);
 #define check_typed_member(CHECK_ALIAS,MEMBER_NAME,DESIRED_TYPE)\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U> static small_type has_matching_named_member(is_member_object_pointer<decltype(&U::MEMBER_NAME)>::type);\
+		template<typename U> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&U::MEMBER_NAME)>::type);\
 		template<typename U> static large_type has_matching_named_member(...);\
 		static const bool member_exists=sizeof(has_matching_named_member<T>(true_val))==success;\
 		template<class U,bool B> struct p_conditional{typedef false_type type;};\

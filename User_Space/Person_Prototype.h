@@ -1,24 +1,10 @@
 #pragma once
 
-#include "User_Space.h"
+#include "User_Space_Includes.h"
+#include "Activity_Implementations.h"
+#include "Polaris_Movement_Plan_Implementation.h"
 
-//===============================================================
-#pragma region FORWARD DECLARATIONS
-namespace Activity_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Activity_Plan_Prototype;
-	}
-};
 
-namespace Movement_Plan_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Movement_Plan_Prototype;
-	}
-};
-#pragma endregion
-//===============================================================
 
 
 namespace Person_Components
@@ -72,8 +58,10 @@ namespace Variables
 
 namespace Prototypes
 {
-	prototype struct Person_Prototype : ComponentType
+	prototype struct Person_Prototype
 	{
+		tag_as_prototype;
+
 		// Event handling
 		declare_feature_conditional(Agent_Conditional)
 		{
@@ -87,15 +75,8 @@ namespace Prototypes
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
 
-			define_component_interface(_network_itf,get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,CallerType);
+			define_component_interface(_network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,CallerType);
 			_network_itf* network = pthis->network_reference<_network_itf*>();
-
-			if (pthis->internal_id<int>() == 4090)
-			{
-				cout << endl << "At time in minutes: "<<Simulation_Time.Current_Time<Time_Minutes>();
-				cout << endl << "Agent "<<pthis->internal_id<int>()<<"'s travel time from zone 1 to zone 3 is :" << network->Get_LOS<Target_Type<Time_Minutes,int,int>>(1,3,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-
-			}
 		}
 
 		// Initializer
@@ -137,8 +118,10 @@ namespace Prototypes
 	};
 
 
-	prototype struct Person_Properties : ComponentType
+	prototype struct Person_Properties
 	{
+		tag_as_prototype;
+
 		// Initializer
 		define_feature_exists_check(Initialize,Has_Initialize);
 		feature_prototype void Initialize(requires(check(ComponentType,Has_Initialize)))
@@ -161,8 +144,10 @@ namespace Prototypes
 	};
 
 
-	prototype struct Person_Planner : ComponentType
+	prototype struct Person_Planner
 	{
+		tag_as_prototype;
+
 		// Event handling
 		declare_feature_conditional(Planning_Conditional)
 		{
@@ -175,8 +160,8 @@ namespace Prototypes
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
 			// Define interfaces to the container members of the class
-			define_container_and_value_interface(Activity_Plans_List,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Plan_Prototype,ComponentType);
-			define_container_and_value_interface(Movement_Plans_List,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Activity_Plans_List,Activity_Plan,typename get_type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Movement_Plans_List,Movement_Plan,typename get_type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 			Activity_Plans_List* activity_plans = this_ptr->Activity_Plans_Container<Activity_Plans_List*>();
 			Movement_Plans_List* movement_plans = this_ptr->Movement_Plans_Container<Movement_Plans_List*>();
 
@@ -284,10 +269,10 @@ namespace Prototypes
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
 			// Call specific implementation of the activity generation routine
-			_pthis->Activity_Generation<ComponentType,CallerType,TargetType>();
+			_pthis->template Activity_Generation<ComponentType,CallerType,TargetType>();
 
 			// set next activity generation occurence
-			this_ptr->Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Generation_Time_Increment<Simulation_Timestep_Increment>())));
+			this_ptr->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
 		}
 		declare_feature_event(Activity_Planning_Event)
 		{
@@ -296,14 +281,14 @@ namespace Prototypes
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
-			define_container_and_value_interface(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Activity_Plans,Activity_Plan,typename get_type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Plan_Prototype,ComponentType);
 			Activity_Plans* activities = this_ptr->Activity_Plans_Container<Activity_Plans*>();
-			pair<Activity_Plans::iterator,Activity_Plans::iterator> range = activities->equal_range(_iteration);
+			pair<typename Activity_Plans::iterator,typename Activity_Plans::iterator> range = activities->equal_range(_iteration);
 			
-			for (Activity_Plans::iterator act_itr = range.first; act_itr != range.second; ++act_itr)
+			for (typename Activity_Plans::iterator act_itr = range.first; act_itr != range.second; ++act_itr)
 			{
 				Activity_Plan* act = act_itr->second;
-				act->Do_Activity_Planning<NULLTYPE>();	
+				act->template Do_Activity_Planning<NULLTYPE>();	
 			}
 			activities->erase(range.first, range.second);
 		}
@@ -315,27 +300,27 @@ namespace Prototypes
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
 			// Get reference to movement plans
-			define_container_and_value_interface(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Movement_Plans,Movement_Plan,typename get_type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 			Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();
 			
 			// Get all movement plans scheduled for current iteration
-			pair<Movement_Plans::iterator,Movement_Plans::iterator> range = movements->equal_range(_iteration);
+			pair<typename Movement_Plans::iterator, typename Movement_Plans::iterator> range = movements->equal_range(_iteration);
 
 			// Get reference to vehicle, and add current movement plan to it for routing
-			define_component_interface(parent_itf,type_of(Parent_Person),Person_Components::Prototypes::Person_Prototype,ComponentType);
-			define_component_interface(vehicle_itf,type_of(Parent_Person)::type_of(vehicle),Vehicle_Components::Prototypes::Vehicle_Prototype,ComponentType);
+			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Person_Components::Prototypes::Person_Prototype,ComponentType);
+			define_component_interface(vehicle_itf,typename get_type_of(Parent_Person)::type_of(vehicle),Vehicle_Components::Prototypes::Vehicle_Prototype,ComponentType);
 			parent_itf* parent = this_ptr->Parent_Person<parent_itf*>();
-			vehicle_itf* vehicle = parent->vehicle<vehicle_itf*>();
+			vehicle_itf* vehicle = parent->template vehicle<vehicle_itf*>();
 			
 			// Execute movement plans and remove from schedule
-			for (Movement_Plans::iterator move_itr = range.first; move_itr != range.second; ++move_itr)
+			for (typename Movement_Plans::iterator move_itr = range.first; move_itr != range.second; ++move_itr)
 			{		
 				Movement_Plan* move = move_itr->second;
 				// make sure vehicle is not already being simulated, skip movement if it is
-				if (vehicle->simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() != Vehicle_Components::Types::Vehicle_Status_Keys::IN_NETWORK)
+				if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() != Vehicle_Components::Types::Vehicle_Status_Keys::IN_NETWORK)
 				{
-					vehicle->movement_plan<Movement_Plan*>(move);
-					this_ptr->Schedule_New_Departure<NULLTYPE>(move->departed_time<Simulation_Timestep_Increment>());
+					vehicle->template movement_plan<Movement_Plan*>(move);
+					this_ptr->template Schedule_New_Departure<NULLTYPE>(move->template departed_time<Simulation_Timestep_Increment>());
 				}
 
 				//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
@@ -345,11 +330,12 @@ namespace Prototypes
 			movements->erase(range.first, range.second);
 		}
 
+
 		feature_prototype void Initialize(requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
-			define_component_interface(parent_itf,get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
 			parent_itf* parent = this->Parent_Person<parent_itf*>();
-			long first_iter = parent->First_Iteration<Simulation_Timestep_Increment>();
+			long first_iter = parent->template First_Iteration<Simulation_Timestep_Increment>();
 			this_component()->Initialize<ComponentType, CallerType, TargetType>();
 			load_event(ComponentType,Planning_Conditional,Activity_Generation_Event,first_iter,0,NULLTYPE);
 		}
@@ -359,10 +345,10 @@ namespace Prototypes
 		}
 		feature_prototype void Initialize(TargetType initializer, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
-			define_component_interface(parent_itf,get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
 			parent_itf* parent = this->Parent_Person<parent_itf*>();
 			this_component()->Initialize<ComponentType, CallerType, TargetType>(initializer);
-			this_component()->Load_Register<ComponentType>((&Planning_Conditional<NULLTYPE>),(&Movement_Planning_Event<NULLTYPE>),parent->First_Iteration<Simulation_Timestep_Increment>(),0);
+			load_event(ComponentType,Planning_Conditional,Movement_Planning_Event,parent->template First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
 		feature_prototype void Initialize(TargetType initializer, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{
@@ -372,16 +358,16 @@ namespace Prototypes
 		feature_prototype bool Schedule_New_Departure(int departed_time)
 		{
 			// schedule routing		
-			define_component_interface(Parent_Person_Itf, get_type_of(Parent_Person), Person_Components::Prototypes::Person_Prototype, ComponentType);
-			define_component_interface(Vehicle_Itf, get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-			define_component_interface(Routing_Itf, get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person_Prototype, ComponentType);
+			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 
 			Parent_Person_Itf* person_itf = this->Parent_Person<Parent_Person_Itf*>();
-			Routing_Itf* itf= person_itf->router<Routing_Itf*>();	
-			Vehicle_Itf* vehicle_itf = person_itf->vehicle<Vehicle_Itf*>();
+			Routing_Itf* itf= person_itf->template router<Routing_Itf*>();	
+			Vehicle_Itf* vehicle_itf = person_itf->template vehicle<Vehicle_Itf*>();
 			
 			// Schedule the routing if the vehicle is not already in the network, otherwise return false
-			if (vehicle_itf->simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() != Vehicle_Components::Types::Vehicle_Status_Keys::IN_NETWORK)
+			if (vehicle_itf->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() != Vehicle_Components::Types::Vehicle_Status_Keys::IN_NETWORK)
 			{
 				itf->template Schedule_Route_Computation<NULLTYPE>(departed_time);
 				return true;
