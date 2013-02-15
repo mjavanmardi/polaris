@@ -14,25 +14,21 @@ namespace RNG_Components
 	
 	namespace Implementations
 	{
-		implementation struct MT_Probability_Double
+		implementation struct MT_Probability_Double : public Polaris_Component<APPEND_CHILD(MT_Probability_Double),MasterType,Data_Object,ParentType>
 		{
-			MT_Probability_Double<MasterType,ParentType>()
+			MT_Probability_Double()
 			{
 				_seed = time(NULL);
 				_generator.seed(_seed);
 			}
 			feature_implementation void Initialize()
 			{
+				_seed = time(NULL);
 				_generator.seed(_seed);
 			}
-			feature_implementation void Initialize(	TargetType seed_value,
-												TargetType min = (TargetType)0,
-												TargetType max = (TargetType)1,
-												TargetType location = (TargetType)1,
-												TargetType scale = (TargetType)1,
-												TargetType shape = (TargetType)1,
-												requires(check(TargetType,is_arithmetic)))
+			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)1, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
 			{
+				_seed = seed_value;
 				_generator.seed(_seed);
 			}
 			tag_feature_as_available(Initialize);
@@ -48,12 +44,13 @@ namespace RNG_Components
 			member_data(std::tr1::uniform_real<double>, distribution, none, none);
 		};
 
-		implementation struct MT_Uniform_Double : public MT_Probability_Double<MasterType,ParentType>
+		implementation struct MT_Uniform_Double : public MT_Probability_Double<MasterType,ParentType,APPEND_CHILD(MT_Uniform_Double)>
 		{
-			typedef MT_Probability_Double<MasterType,ParentType> BaseType;
+			typedef MT_Probability_Double<MasterType,ParentType,InheritanceList> BaseType;
 
-			MT_Uniform_Double<MasterType,ParentType>() : MT_Probability_Double<MasterType,ParentType>()
+			MT_Uniform_Double ()
 			{
+				BaseType();
 				_minimum = 0.0;
 				_maximum = 1.0;
 			}
@@ -64,19 +61,13 @@ namespace RNG_Components
 				BaseType::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
 			}
 
-			feature_implementation void Initialize(	TargetType seed_value,
-												TargetType min = (TargetType)0,
-												TargetType max = (TargetType)1,
-												TargetType location = (TargetType)1,
-												TargetType scale = (TargetType)1,
-												TargetType shape = (TargetType)1,
-												requires(check(TargetType,is_arithmetic)))
+			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)1, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
 			{
-				BaseType::_generator.seed(BaseType::_seed);
+				_generator.seed(MT_Probability_Double::_seed);
 				this->template minimum<ComponentType, CallerType, TargetType>(min);
 				this->template maximum<ComponentType, CallerType, TargetType>(max);
 
-				BaseType::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
+				MT_Probability_Double::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
 			}
 			tag_feature_as_available(Initialize);
 
@@ -84,12 +75,11 @@ namespace RNG_Components
 			member_data(double, minimum, none, none);
 		};
 
-		implementation struct MT_Normal_Double : public MT_Uniform_Double<MasterType,ParentType>
+		implementation struct MT_Normal_Double : public MT_Uniform_Double<MasterType,ParentType, APPEND_CHILD(MT_Normal_Double)>
 		{
-			typedef MT_Uniform_Double<MasterType,ParentType> BaseType;
-
-			MT_Normal_Double<MasterType,ParentType>() : MT_Uniform_Double<MasterType,ParentType>()
+			MT_Normal_Double()
 			{
+				MT_Uniform_Double();
 				_location = 0.0;
 				_scale = 1.0;
 			}
@@ -97,30 +87,25 @@ namespace RNG_Components
 			feature_implementation void Initialize()
 			{		
 				assert(_scale > 0);
-				BaseType::_generator.seed(BaseType::_seed);
-				BaseType::_distribution = std::tr1::normal_distribution<double>(_location,_scale);
+				MT_Probability_Double::_generator.seed(MT_Probability_Double::_seed);
+				_distribution = std::tr1::normal_distribution<double>(_location,_scale);
 			}
 
-			feature_implementation void Initialize(	TargetType seed_value,
-												TargetType min = (TargetType)0,
-												TargetType max = (TargetType)1,
-												TargetType location = (TargetType)1,
-												TargetType scale = (TargetType)1,
-												TargetType shape = (TargetType)1,
-												requires(check(TargetType,is_arithmetic)))
+			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)1, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
 			{
 				//state_check(Is_Positive)(this,_scale);
-				BaseType::_generator.seed(BaseType::_seed);
+				MT_Probability_Double::_generator.seed(MT_Probability_Double::_seed);
 				this->template location<ComponentType, CallerType, TargetType>(location);
 				this->template scale<ComponentType, CallerType, TargetType>(scale);
 
-				BaseType::_distribution = std::tr1::uniform_real<double>(BaseType::_minimum,BaseType::_maximum);
+				_distribution = std::tr1::normal_distribution<double>(_location,_scale);
+				//_distribution = std::tr1::uniform_real<double>(MT_Uniform_Double::_minimum,MT_Uniform_Double::_maximum);
 			}
 			tag_feature_as_available(Initialize);
 
 			feature_implementation TargetType Next_Rand()
 			{
-				return (TargetType) BaseType::_distribution(BaseType::_generator);
+				return (TargetType) _distribution(MT_Probability_Double::_generator);
 			}
 			tag_feature_as_available(Next_Rand);
 
@@ -129,9 +114,9 @@ namespace RNG_Components
 			member_data(double, scale, none, none);
 		};
 
-		implementation struct RngStream_Implementation
+		implementation struct RngStream_Implementation : public Polaris_Component<APPEND_CHILD(RngStream_Implementation),MasterType,Data_Object,ParentType>
 		{
-			RngStream_Implementation<MasterType,ParentType>()
+			RngStream_Implementation()
 			{
 				_seed = time(NULL);
 				_distribution.SetSeed(_seed);

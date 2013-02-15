@@ -432,7 +432,6 @@ namespace Basic_Units
 
 		prototype struct Width_Prototype : public Length_Prototype<ComponentType,CallerType>
 		{
-
 			feature_prototype TargetType Value()
 			{
 				return ((Length_Prototype<ComponentType,CallerType>*)this)->template Value<TargetType>();
@@ -754,7 +753,15 @@ namespace Basic_Units
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
 				assert_check(SetValueType,Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
+				assert_sub_check(ComponentType,Is_Polaris_Component,has_this_type, "Doesn't have This_Type");
+				assert_sub_check(ComponentType,Is_Polaris_Component,has_parent_type,"Doesn't have Parent_Type");
+				assert_sub_check(ComponentType,Is_Polaris_Component,has_group_list,"Doesn't have Group_List");
+				assert_sub_check(ComponentType,Is_Polaris_Component,has_object_type,"Doesn't have Object_Type");
+				assert_sub_check(ComponentType,Is_Polaris_Component,has_master_type,"Doesn't have Master_Type");
+				assert_sub_check(ComponentType,Concepts::Is_Speed_Component,Is_Speed,"The CompentType is not tagged with Speed_tag.");
 				assert_check(ComponentType,Concepts::Is_Speed_Component, "The specified ComponentType is not a valid Speed component, ensure that ComponentType is tagged as a Speed_Type and has Value member}");
+
+
 			}
 			
 			feature_prototype static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))

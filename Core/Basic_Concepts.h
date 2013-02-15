@@ -32,7 +32,7 @@ struct False_Concept
 concept struct Is_Polaris_Component
 {
 	// Basic check to satisfy polaris component requirements
-	check_typename_defined(has_this_type,This_Type);
+	//check_typename_defined(has_this_type,This_Type);
 	check_typename_defined(has_parent_type,Parent_Type);
 	check_typename_defined(has_group_list,Group_List);
 	check_typename_defined(has_object_type,Object_Type);
@@ -43,7 +43,7 @@ concept struct Is_Polaris_Component
 	check_typename_state(is_execution_object,Object_Type, Execution_Object);
 
 	// default check when concept is used
-	define_default_check(has_this_type && has_parent_type && has_group_list && has_object_type && has_master_type && (is_data_object || is_execution_object));
+	define_default_check(/*has_this_type && */has_parent_type && has_group_list && has_object_type && has_master_type && (is_data_object || is_execution_object));
 };
 
 
