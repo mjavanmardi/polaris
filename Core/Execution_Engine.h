@@ -12,7 +12,6 @@ class Execution_Root
 public:
 	Execution_Root()
 	{
-		ex_current_revision=-1;
 		ex_next_revision._iteration=INT_MAX;
 		ex_next_revision._sub_iteration=0;
 		ex_next_next_revision._iteration=INT_MAX;
@@ -84,7 +83,6 @@ public:
 						if(++execution_type->tex_threads_counter == _num_threads)
 						{
 							// final thread, in charge of getting ready for the next _revision, but only if something actually happened this _revision
-							execution_type->tex_current_revision=this_revision;
 							execution_type->tex_next_revision=execution_type->tex_next_next_revision;
 							execution_type->tex_next_next_revision._iteration=INT_MAX;
 							execution_type->tex_next_next_revision._sub_iteration=0;
@@ -101,22 +99,21 @@ public:
 			}
 
 			while(AtomicExchange(&ex_lock,1)) SLEEP(0); // lock the execution engine
-			
+				
 				// EX slice has revealed that it wishes to return some time in the future
-			
+				
 				if(ex_response < ex_next_next_revision)
 				{
 					// EX slice wishes to return sooner in the future than already assumed
 					ex_next_next_revision=ex_response;
 				}
-			
+				
 			ex_lock=0; // unlock the execution engine
 			
 			// collect all threads and advance the _sub_iteration
 			
 			if(AtomicIncrement(&ex_threads_counter_begin) == _num_threads)
 			{
-				ex_current_revision=this_revision;
 				ex_next_revision=ex_next_next_revision;
 				ex_next_next_revision._iteration=INT_MAX;
 				ex_next_next_revision._sub_iteration=0;
@@ -156,9 +153,8 @@ public:
 
 	Revision ex_next_next_revision;
 	Revision ex_next_revision;
-	Revision ex_current_revision;
 
-	volatile unsigned int ex_lock;
+	_lock ex_lock;
 
 	volatile unsigned int ex_threads_counter_begin;
 	volatile unsigned int ex_threads_counter_end;

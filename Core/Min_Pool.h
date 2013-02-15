@@ -313,7 +313,6 @@ public:
 
 		Memory_Cell* current=pool+index;
 		
-		
 		// eliminate the case where you are both min and max
 
 		if(current == min_ptr && current == max_ptr)
@@ -321,7 +320,6 @@ public:
 			current->value=fscore;
 			return;
 		}
-
 
 		if( current->value < mid_ptr->value )
 		{

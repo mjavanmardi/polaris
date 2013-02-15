@@ -127,23 +127,12 @@ public:
 		tex_lock=0;
 		mem_lock=0;
 		type_process_directive=&Typed_Execution_Pages::Process;
-		tex_current_revision=-1;
 		tex_next_revision._iteration=INT_MAX;
 		tex_next_revision._sub_iteration=0;
 		tex_next_next_revision._iteration=INT_MAX;
 		tex_next_next_revision._sub_iteration=0;
 		tex_threads_counter=0;
 	}
-	
-	//inline long type_current_revision()
-	//{
-	//	return tex_current_revision._iteration;
-	//}
-
-	//inline long type_next_check()
-	//{
-	//	return tex_next_revision._iteration;
-	//}
 
 	void Process(Revision& tex_response)
 	{
@@ -248,15 +237,14 @@ public:
 	Quick_List<Typed_Execution_Page<DataType>*> active_pages;
 	Quick_List<Typed_Execution_Page<DataType>*> pages_with_free_cells;
 
-	volatile unsigned int tex_lock;
+	_lock tex_lock;
 
-	volatile unsigned int mem_lock;
+	_lock mem_lock;
 
 	volatile unsigned int tex_threads_counter;
 
 	Revision tex_next_next_revision;
 	Revision tex_next_revision;
-	Revision tex_current_revision;
 
 	bool type_activated;
 
