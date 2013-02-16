@@ -27,7 +27,7 @@ namespace PopSyn
 			// Schedules the first event from above
 			feature_prototype void Initialize()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->Initialize<CallerType,TargetType>();
 
 				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::INITIALIZE,NULLTYPE);
 				//load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,4,NULLTYPE);
@@ -189,7 +189,7 @@ namespace PopSyn
 						new_region->template ID<int>(ID);
 						solver_itf* region_solver = (solver_itf*)Allocate<typename get_type_of(Solution_Settings)>(); // ALLOCATION TEST
 
-						region_solver->template Initialize<Target_Type<void,double,int>>(solver->template Tolerance<double>(),solver->template Iterations<int>());
+						region_solver->template Initialize<Target_Type<NULLTYPE,void,double,int>>(solver->template Tolerance<double>(),solver->template Iterations<int>());
 						new_region->template Solver_Settings<solver_itf*>(region_solver);
 
 						// add new region to the list
@@ -223,7 +223,7 @@ namespace PopSyn
 					pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>(); //ALLOCATION_TEST
 					//pop_unit_itf* p = (pop_unit_itf*)(new sample_type());
 					p->ID(sample_id);
-					p->Index(new_region->template Get_1D_Index<Target_Type<typename joint_itf::size_type,typename joint_itf::index_type>>(index));
+					p->Index(new_region->template Get_1D_Index<Target_Type<NULLTYPE,typename joint_itf::size_type,typename joint_itf::index_type>>(index));
 					p->Weight(weight);
 					p->Characteristics(data);
 
@@ -277,7 +277,7 @@ namespace PopSyn
 					solver_itf* zone_solver = (solver_itf*)Allocate<typename get_type_of(Solution_Settings)>(); // ALLOCATION_TEST
 					//solver = (solver_itf*)(new MasterType::IPF_Solver_Settings());
 
-					zone_solver->Initialize<Target_Type<void,double,int>>(solver->template Tolerance<double>(),solver->template Iterations<int>());
+					zone_solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(solver->template Tolerance<double>(),solver->template Iterations<int>());
 					zone->template Solver_Settings<solver_itf*>(zone_solver);
 					joint_itf* mway = zone->template Target_Joint_Distribution<joint_itf*>();
 					marginal_itf* marg = zone->template Target_Marginal_Distribution<marginal_itf*>();

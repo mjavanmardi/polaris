@@ -24,11 +24,11 @@ namespace PopSyn
 
 			feature_implementation TargetType scenario_reference()
 			{
-				return this->parent_reference<ComponentType,CallerType,type_of(parent_reference)&>().scenario_reference<ComponentType,CallerType,TargetType>();
+				return this->parent_reference<CallerType,type_of(parent_reference)&>().scenario_reference<CallerType,TargetType>();
 			}tag_getter_as_available(scenario_reference);
 			feature_implementation TargetType network_reference()
 			{
-				return this->parent_reference<ComponentType,CallerType,type_of(parent_reference)&>().network_reference<ComponentType,CallerType,TargetType>();
+				return this->parent_reference<CallerType,type_of(parent_reference)&>().network_reference<CallerType,TargetType>();
 			}tag_getter_as_available(network_reference);
 
 			member_data(long long,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
@@ -42,16 +42,15 @@ namespace PopSyn
 			typedef hash_multimap<uint, typename MasterType::pop_unit*> __sample_map_type;		
 			member_associative_container(__sample_map_type, Sample_Data, none, none); 
 		};
-		implementation struct Synthesis_Zone_Implementation : public Polaris_Component_Class<Synthesis_Zone_Implementation, MasterType, Data_Object, ParentType>, _Synthesis_Zone_Implementation<MasterType,ParentType>
-		{
-		};
 
-		implementation struct IPF_Solver_Settings_Implementation : public Polaris_Component_Class<IPF_Solver_Settings_Implementation, MasterType, Data_Object, ParentType>
+		implementation struct Synthesis_Zone_Implementation : public Polaris_Component<APPEND_CHILD(Synthesis_Zone_Implementation), MasterType, Data_Object, ParentType>, _Synthesis_Zone_Implementation<MasterType,ParentType> {};
+
+		implementation struct IPF_Solver_Settings_Implementation : public Polaris_Component<APPEND_CHILD(IPF_Solver_Settings_Implementation), MasterType, Data_Object, ParentType>
 		{
 			feature_implementation void Initialize(typename TargetType::ParamType tolerance, typename TargetType::Param2Type iterations)
 			{
-				this->Tolerance<ComponentType, CallerType, typename TargetType::ParamType>(tolerance);
-				this->Iterations<ComponentType, CallerType, typename TargetType::Param2Type>(iterations);
+				this->Tolerance<CallerType, typename TargetType::ParamType>(tolerance);
+				this->Iterations<CallerType, typename TargetType::Param2Type>(iterations);
 			}
 			member_data(double, Tolerance, check(ReturnValueType,is_arithmetic),check(SetValueType, is_arithmetic));
 			member_data(int, Iterations, check(ReturnValueType,is_arithmetic),check(SetValueType, is_arithmetic));

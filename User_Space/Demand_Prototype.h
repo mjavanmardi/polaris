@@ -453,9 +453,9 @@ namespace Demand_Components
 				char print;
 				cout <<endl<<"Getting Trips"<<endl;
 				Demand_Interface* demand = pthis;
-				demand->template Get_Current_Trips_From_External<ComponentType,CallerType,TargetType>();
-				demand->template Display_Timestep<ComponentType,CallerType,TargetType>();
-				demand->template Increment_Time<ComponentType,CallerType,TargetType>();
+				demand->template Get_Current_Trips_From_External<CallerType,TargetType>();
+				demand->template Display_Timestep<CallerType,TargetType>();
+				demand->template Increment_Time<CallerType,TargetType>();
 
 				cout <<endl<<"Print trips to screen ('y' or 'n'): ";
 				cin >> print;

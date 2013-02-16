@@ -64,8 +64,8 @@ namespace RNG_Components
 			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)1, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
 			{
 				_generator.seed(MT_Probability_Double::_seed);
-				this->template minimum<ComponentType, CallerType, TargetType>(min);
-				this->template maximum<ComponentType, CallerType, TargetType>(max);
+				this->template minimum<CallerType, TargetType>(min);
+				this->template maximum<CallerType, TargetType>(max);
 
 				MT_Probability_Double::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
 			}
@@ -95,8 +95,8 @@ namespace RNG_Components
 			{
 				//state_check(Is_Positive)(this,_scale);
 				MT_Probability_Double::_generator.seed(MT_Probability_Double::_seed);
-				this->template location<ComponentType, CallerType, TargetType>(location);
-				this->template scale<ComponentType, CallerType, TargetType>(scale);
+				this->template location<CallerType, TargetType>(location);
+				this->template scale<CallerType, TargetType>(scale);
 
 				_distribution = std::tr1::normal_distribution<double>(_location,_scale);
 				//_distribution = std::tr1::uniform_real<double>(MT_Uniform_Double::_minimum,MT_Uniform_Double::_maximum);

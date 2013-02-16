@@ -16,58 +16,23 @@ namespace Network_Skimming_Components
 	
 	namespace Implementations
 	{
-		implementation struct Location_To_Zone_Map_Item : public Polaris_Component_Class<Location_To_Zone_Map_Item,MasterType,Data_Object,ParentType>
+		implementation struct Location_To_Zone_Map_Item : public Polaris_Component<APPEND_CHILD(Location_To_Zone_Map_Item),MasterType,Data_Object,ParentType>
 		{
 			feature_implementation void initialize(typename TargetType::ParamType loc_index, typename TargetType::ParamType zone_index, typename TargetType::Param2Type weight)
 			{
-				this->template loc_index<ComponentType,ComponentType,typename TargetType::ParamType>(loc_index);
-				this->template zone_index<ComponentType,ComponentType,typename TargetType::ParamType>(zone_index);
-				this->template weight<ComponentType,ComponentType,typename TargetType::ParamType>(weight);
+				this->template loc_index<ComponentType,typename TargetType::ParamType>(loc_index);
+				this->template zone_index<ComponentType,typename TargetType::ParamType>(zone_index);
+				this->template weight<ComponentType,typename TargetType::ParamType>(weight);
 			}
-			member_data(long, loc_index,check(ReturnValueType,is_integral),check_2(ComponentType,CallerType, Is_Same_Component));
-			member_data(long, zone_index,check(ReturnValueType,is_integral),check_2(ComponentType,CallerType, Is_Same_Component));
-			member_data(double, weight,check(ReturnValueType,is_arithmetic),check_2(ComponentType,CallerType, Is_Same_Component));
+			member_data(long, loc_index,check(ReturnValueType,is_integral),none);
+			member_data(long, zone_index,check(ReturnValueType,is_integral),none);
+			member_data(double, weight,check(ReturnValueType,is_arithmetic),none);
 		};
-
-		//======================================================================================
-		/// Common elements to all network skimming components
-		//--------------------------------------------------------------------------------------
-		implementation struct _Basic_Network_Skimming_Elements
-		{
-			typedef Time_Minutes Stored_Time_Type;
-
-			// reference to the transportation network
-			member_component(typename MasterType::network_type, network_reference, none, none);
-
-			// time increment at which skim tables are updated - set in the initializer
-			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
-			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time_Prototype);
-
-			// time at which skim tables are next updated - set in the initializer and updated every time update is called
-			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_scheduled_update_time,none,none);
-			member_component_feature(scheduled_update_time,_scheduled_update_time,Value,Basic_Units::Prototypes::Time_Prototype);
-			member_data(long, nodes_per_zone, check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
-
-			// link-to-zone mapping for use in skimming
-			member_associative_container(concat(dense_hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),origin_node_to_zone_map,none,none);
-			member_associative_container(concat(dense_hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),destination_node_to_zone_map,none,none);
-
-			member_data(Counter, timer,none,none);
-
-			feature_implementation void Initialize()
-			{
-				this->_origin_node_to_zone_map.set_empty_key(-1);
-				this->_origin_node_to_zone_map.set_deleted_key(-2);
-				this->_destination_node_to_zone_map.set_empty_key(-1);
-				this->_destination_node_to_zone_map.set_deleted_key(-2);
-			}
-		};
-
 
 		//======================================================================================
 		/// Skim table which holds the values for LOS
 		//--------------------------------------------------------------------------------------
-		implementation struct Skim_Table_Implementation : public Polaris_Component_Class<Skim_Table_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Skim_Table_Implementation : public Polaris_Component<APPEND_CHILD(Skim_Table_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_container(matrix<double>, skim_table, none,none);
 			member_associative_container(concat(dense_hash_map<long,typename MasterType::routing_type*>), path_trees_container,none,none);
@@ -184,7 +149,7 @@ namespace Network_Skimming_Components
 		//======================================================================================
 		/// A collection of skim_tables for a given mode
 		//--------------------------------------------------------------------------------------
-		implementation struct Mode_Skim_Table_Implementation : public Polaris_Component_Class<Mode_Skim_Table_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Mode_Skim_Table_Implementation : public Polaris_Component<APPEND_CHILD(Mode_Skim_Table_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_data(long, mode_id, check(ReturnValueType,is_arithmetic),  check(SetValueType,is_arithmetic));
 			member_container(vector<Skim_Table_Implementation<MasterType>*>, skims_by_time_container,none,none);
@@ -204,8 +169,8 @@ namespace Network_Skimming_Components
 				define_container_and_value_interface_unqualified_container(skim_tables_itf,skim_table_itf,type_of(skims_by_time_container),Containers::Random_Access_Sequence_Prototype,Prototypes::Skim_Table_Prototype,ComponentType);
 				define_component_interface(network_itf,type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_component_interface(skimmer_itf,type_of(skim_reference),Prototypes::Network_Skimming_Prototype,ComponentType);
-				network_itf* network = this->template network_reference<ComponentType,CallerType,network_itf*>();
-				skimmer_itf* skim = this->template skim_reference<ComponentType,CallerType,skimmer_itf*>();
+				network_itf* network = this->template network_reference<CallerType,network_itf*>();
+				skimmer_itf* skim = this->template skim_reference<CallerType,skimmer_itf*>();
 
 				
 				// create the skim_table time periods, for basic create only a single time period skim_table
@@ -217,7 +182,7 @@ namespace Network_Skimming_Components
 				skim_table->template Initialize<NULLTYPE>();
 
 				// add time period skim tables to the container
-				skim_tables_itf* skim_tables = this->template skims_by_time_container<ComponentType,CallerType,skim_tables_itf*>();
+				skim_tables_itf* skim_tables = this->template skims_by_time_container<CallerType,skim_tables_itf*>();
 				skim_tables->push_back(skim_table);
 
 
@@ -231,11 +196,29 @@ namespace Network_Skimming_Components
 
 
 		//======================================================================================
-		/// Basic skimming implementation with only the current LOS being stored
+		/// Basic skimming implementation
 		//--------------------------------------------------------------------------------------
-		implementation struct Basic_Network_Skimming_Implementation : public Polaris_Component_Class<Basic_Network_Skimming_Implementation,MasterType,Execution_Object,ParentType>, public _Basic_Network_Skimming_Elements<MasterType>
+		implementation struct Basic_Network_Skimming_Implementation : public Polaris_Component<APPEND_CHILD(Basic_Network_Skimming_Implementation),MasterType,Execution_Object,ParentType>
 		{
-			typedef _Basic_Network_Skimming_Elements<MasterType> base_type;
+			typedef Time_Minutes Stored_Time_Type;
+
+			// reference to the transportation network
+			member_component(typename MasterType::network_type, network_reference, none, none);
+
+			// time increment at which skim tables are updated - set in the initializer
+			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
+			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time_Prototype);
+
+			// time at which skim tables are next updated - set in the initializer and updated every time update is called
+			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_scheduled_update_time,none,none);
+			member_component_feature(scheduled_update_time,_scheduled_update_time,Value,Basic_Units::Prototypes::Time_Prototype);
+			member_data(long, nodes_per_zone, check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+
+			// link-to-zone mapping for use in skimming
+			member_associative_container(concat(dense_hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),origin_node_to_zone_map,none,none);
+			member_associative_container(concat(dense_hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),destination_node_to_zone_map,none,none);
+
+			member_data(Counter, timer,none,none);
 
 			member_associative_container(concat(dense_hash_map<long,Mode_Skim_Table_Implementation<MasterType,ParentType>*>), mode_skim_table_container, none, none);
 
@@ -243,9 +226,11 @@ namespace Network_Skimming_Components
 
 			feature_implementation void Initialize()
 			{
-				// call base initializer
-				((base_type*)this)->Initialize<ComponentType,ComponentType,TargetType>();
-				
+				this->_origin_node_to_zone_map.set_empty_key(-1);
+				this->_origin_node_to_zone_map.set_deleted_key(-2);
+				this->_destination_node_to_zone_map.set_empty_key(-1);
+				this->_destination_node_to_zone_map.set_deleted_key(-2);
+
 				// initialize dense_hash_map keys
 				this->_mode_skim_table_container.set_empty_key(-1);
 				this->_mode_skim_table_container.set_deleted_key(-2);
@@ -264,13 +249,16 @@ namespace Network_Skimming_Components
 			feature_implementation typename TargetType::ReturnType Get_Current_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator/*, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value))*/)
 			{
 				define_component_interface(_skim_interface,typename base_type::type_of(current_skim_table),Prototypes::Skim_Table_Prototype,ComponentType);
-				_skim_interface* skim = this->template current_skim_table<ComponentType,CallerType,_skim_interface*>();
+				_skim_interface* skim = this->template current_skim_table<CallerType,_skim_interface*>();
 				return skim->template Get_LOS<TargetType>(Origin_ID, Destination_ID, Mode_Indicator);
 			}	
 		};
 
 
-		implementation struct Advanced_Network_Skimming_Implementation : public _Basic_Network_Skimming_Elements<MasterType>, public Polaris_Component_Class<Advanced_Network_Skimming_Implementation,MasterType,Execution_Object,ParentType>
+		//======================================================================================
+		/// More advance skimming implementation not yet implemented
+		//--------------------------------------------------------------------------------------
+		implementation struct Advanced_Network_Skimming_Implementation : public Basic_Network_Skimming_Implementation<MasterType, ParentType,APPEND_CHILD(Advanced_Network_Skimming_Implementation)>
 		{
 
 		};

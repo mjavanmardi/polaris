@@ -75,14 +75,14 @@ struct _Simulation_Timer
 {
 	template<typename TargetType> TargetType Current_Time()
 	{
-		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Base_Time_Type>>((typename Base_Time_Type::ValueType)_iteration);
+		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Base_Time_Type>>((typename Base_Time_Type::ValueType)_iteration);
 	}
 	template<typename InputType, typename TargetType> TargetType Future_Time(InputType Additional_Time_Increment)
 	{
 		Simulation_Timestep_Increment current_time;
 		current_time = (Simulation_Timestep_Increment)_iteration;
-		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<Simulation_Timestep_Increment,InputType>>(Additional_Time_Increment);
-		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Simulation_Timestep_Increment>>(current_time + additional_time);
+		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,Simulation_Timestep_Increment,InputType>>(Additional_Time_Increment);
+		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Simulation_Timestep_Increment>>(current_time + additional_time);
 	}
 };
 

@@ -439,7 +439,7 @@ namespace Routing_Components
 				travel_times_itf* travel_times = this->travel_times_to_link_container<travel_times_itf*>();
 
 				// return travel time to destion in requested time units
-				return Time_Prototype<Basic_Time>::Convert_Value<Target_Type<TargetType,Simulation_Timestep_Increment>>(travel_times->at(destination_internal_id));
+				return Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Simulation_Timestep_Increment>>(travel_times->at(destination_internal_id));
 			}
 //#endif
 

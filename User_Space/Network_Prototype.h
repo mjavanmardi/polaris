@@ -183,18 +183,16 @@ namespace Network_Components
 			feature_accessor(vehicle_coordinates, none, none);
 			feature_accessor(canvas, none, none);
 			feature_accessor(information_panel, none, none);
-
 			feature_prototype void push_vehicle_coordinates(typename TargetType::ParamType data_source)
 			{
 				this_component()->template accept_vehicle_coordinates<CallerType,TargetType>(data_source);
 			}
-
 			feature_prototype void submit_num_vehicles()
 			{
 				this_component()->template submit_num_vehicles<CallerType,TargetType>();
 			}
 			//------------------------------------------------------------------------------------------------------------------
-#ifndef FOR_LINUX_PORTING
+
 			//==================================================================================================================
 			/// demand compatible network
 			//------------------------------------------------------------------------------------------------------------------
@@ -206,7 +204,7 @@ namespace Network_Components
 				return skim->Get_LOS<TargetType>(Origin, Destination, Mode_Indicator);
 			}
 			//------------------------------------------------------------------------------------------------------------------
-#endif
+
 			feature_prototype void read_network_data(typename TargetType::ParamType data_source, requires(check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) || check_2(typename TargetType::NetIOType,Types::File_Network,is_same) || check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
 			{
 				this_component()->template read_network_data<CallerType,TargetType>(data_source);

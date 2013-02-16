@@ -7,7 +7,7 @@ namespace PopSyn
 
 	namespace Implementations
 	{
-		implementation struct Synthesis_Region_Implementation : public Polaris_Component_Class<Synthesis_Region_Implementation, MasterType, Execution_Object, ParentType>, public _Synthesis_Zone_Implementation<MasterType,ParentType>
+		implementation struct Synthesis_Region_Implementation : public Polaris_Component<APPEND_CHILD(Synthesis_Region_Implementation),MasterType,Execution_Object,ParentType>, _Synthesis_Zone_Implementation<MasterType,ParentType>
 		{
 			typedef dense_hash_map<long long, typename MasterType::zone*> zone_map_type;
 			member_associative_container(zone_map_type, Synthesis_Zone_Collection,none,none);
@@ -21,11 +21,11 @@ namespace PopSyn
 			}
 			feature_implementation TargetType scenario_reference()
 			{
-				return this->parent_reference<ComponentType,CallerType,type_of(parent_reference)&>().scenario_reference<ComponentType,CallerType,TargetType>();
+				return this->parent_reference<CallerType,type_of(parent_reference)&>().scenario_reference<CallerType,TargetType>();
 			}tag_getter_as_available(scenario_reference);
 			feature_implementation TargetType network_reference()
 			{
-				return this->parent_reference<ComponentType,CallerType,type_of(parent_reference)&>().network_reference<ComponentType,CallerType,TargetType>();
+				return this->parent_reference<CallerType,type_of(parent_reference)&>().network_reference<CallerType,TargetType>();
 			}tag_getter_as_available(network_reference);
 		};
 	}

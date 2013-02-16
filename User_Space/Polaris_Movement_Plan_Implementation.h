@@ -69,10 +69,10 @@ namespace Movement_Plan_Components
 			member_component_feature(departed_time, _departed_time, Value, Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_arrived_time,none,none);
 			member_component_feature(arrived_time, _arrived_time, Value, Basic_Units::Prototypes::Time_Prototype);
-#else
-			member_data(int,departed_time,none,none);
-			member_data(int,arrived_time,none,none);
-#endif
+//#else
+			/*member_data(int,departed_time,none,none);
+			member_data(int,arrived_time,none,none);*/
+//#endif
 			member_component(typename MasterType::plan_type, plan, none, none);
 			feature_implementation void arrive_to_destination()
 			{

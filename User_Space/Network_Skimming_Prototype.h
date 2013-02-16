@@ -120,7 +120,7 @@ namespace Network_Skimming_Components
 			feature_prototype void Initialize()
 			{				
 				// Call implementation Initializer - this sets the implementation specific data members
-				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->template Initialize<CallerType,TargetType>();
 
 				// get network reference
 				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
@@ -146,7 +146,7 @@ namespace Network_Skimming_Components
 					if (loc_itr == orig_zone->template origin_activity_locations<locations_itf*>()->end()) THROW_EXCEPTION("error, origin zone " << orig_zone->template internal_id<int>() << "has no activity locations associated with it");
 					location_itf* orig_node = *loc_itr;
 					origin_item_itf* orig_item = (origin_item_itf*)Allocate<typename get_type_of(origin_node_to_zone_map)::unqualified_value_type>();
-					orig_item->template initialize<Target_Type<NULLTYPE,long,float>>(orig_node->template internal_id<long>(),orig_zone->template internal_id<long>(),this->template nodes_per_zone<float>());
+					orig_item->template initialize<Target_Type<NULLTYPE,NULLTYPE,long,float>>(orig_node->template internal_id<long>(),orig_zone->template internal_id<long>(),this->template nodes_per_zone<float>());
 					
 					pair<long,origin_item_itf*> item = pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item);
 					//origin_map->insert(pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item));
@@ -159,7 +159,7 @@ namespace Network_Skimming_Components
 					if (loc_itr == dest_zone->template origin_activity_locations<locations_itf*>()->end()) THROW_EXCEPTION("error, destination zone " << dest_zone->template internal_id<int>() << "has no activity locations associated with it");
 					location_itf* dest_node = *(dest_zone->template origin_activity_locations<locations_itf*>()->begin());
 					destination_item_itf* dest_item = (destination_item_itf*)Allocate<typename get_type_of(destination_node_to_zone_map)::unqualified_value_type>();
-					dest_item->template initialize<Target_Type<NULLTYPE,long,float>>(dest_node->template internal_id<long>(),dest_zone->template internal_id<long>(),this->template nodes_per_zone<float>());
+					dest_item->template initialize<Target_Type<NULLTYPE,NULLTYPE,long,float>>(dest_node->template internal_id<long>(),dest_zone->template internal_id<long>(),this->template nodes_per_zone<float>());
 					
 					pair<long,destination_item_itf*> item = pair<long,destination_item_itf*>(dest_node->template internal_id<long>(),dest_item);
 					//destination_map->insert(pair<long,destination_item_itf*>(dest_node->template internal_id<long>(),dest_item));
@@ -232,7 +232,7 @@ namespace Network_Skimming_Components
 			// This returns the travel time based on the current simulation time
 			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
 			{
-				return this->template Get_LOS<Target_Type<typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, Simulation_Timestep_Increment>>(Origin_ID, Destination_ID, Mode_Indicator, Simulation_Time.Current_Time<Simulation_Timestep_Increment>());
+				return this->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, Simulation_Timestep_Increment>>(Origin_ID, Destination_ID, Mode_Indicator, Simulation_Time.Current_Time<Simulation_Timestep_Increment>());
 			}
 			// This returns the travel time during a specific time interval
 			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator, typename TargetType::Param3Type Start_Time, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
@@ -245,7 +245,7 @@ namespace Network_Skimming_Components
 				if ((itr = skim->find(Mode_Indicator)) == skim->end()) assert(false);
 
 				// call mode_skim_tables get los functionality
-				return itr->second->Get_LOS<Target_Type<typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param3Type>>(Origin_ID,Destination_ID,Start_Time);
+				return itr->second->Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param3Type>>(Origin_ID,Destination_ID,Start_Time);
 			}
 
 		};
@@ -268,11 +268,11 @@ namespace Network_Skimming_Components
 			//---------------------------------------------
 			feature_prototype void Initialize()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->Initialize<CallerType,TargetType>();
 			}				
 			feature_prototype void Initialize(typename TargetType::ParamType input_file, typename TargetType::Param2Type, requires(check_as_given(typename TargetType::Param2Type, is_pointer) && check(typename TargetType::Param2Type, Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>(input_file, network_reference);
+				this_component()->Initialize<CallerType,TargetType>(input_file, network_reference);
 			}
 			feature_prototype void Initialize(typename TargetType::ParamType input_file, typename TargetType::Param2Type, requires(!check_as_given(typename TargetType::Param2Type, is_pointer) || !check(typename TargetType::Param2Type, Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
@@ -311,7 +311,7 @@ namespace Network_Skimming_Components
 				for (; itr != skims->end(); ++itr)
 				{
 					skim_table = *itr;
-					if (skim_table->template end_time<typename TargetType::Param2Type>() > Time) return skim_table->template Get_LOS<Target_Type<typename TargetType::ReturnType,typename TargetType::ParamType>>(Origin_ID,Destination_ID);
+					if (skim_table->template end_time<typename TargetType::Param2Type>() > Time) return skim_table->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType,typename TargetType::ParamType>>(Origin_ID,Destination_ID);
 				}
 				// if the code gets here, then the requested time does not fall within any skim_table time period
 				assert(false);
@@ -343,7 +343,7 @@ namespace Network_Skimming_Components
 			feature_prototype void Initialize()
 			{
 				// call implementation initializer
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->Initialize<CallerType,TargetType>();
 
 				// set the network reference
 				define_simple_container_interface(skim_table_itf,typename get_type_of(skim_table),Containers::Multidimensional_Random_Access_Array_Prototype,typename get_type_of(skim_table)::unqualified_value_type,ComponentType);
@@ -490,7 +490,7 @@ namespace Network_Skimming_Components
 				define_component_interface(skimmer_itf,typename get_type_of(skim_reference),Prototypes::Network_Skimming_Prototype,ComponentType);
 				skim_table_itf* los = this->skim_table<skim_table_itf*>();
 				typename skimmer_itf::Component_Type::Stored_Time_Type value = (*los)[skim_table_itf::index_type(Origin_ID,Destination_ID)];
-				return Time_Prototype<Basic_Time>::Convert_Value<Target_Type<typename TargetType::ReturnType,typename skimmer_itf::Component_Type::Stored_Time_Type>>(value);
+				return Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,typename TargetType::ReturnType,typename skimmer_itf::Component_Type::Stored_Time_Type>>(value);
 			}
 		};
 
@@ -499,7 +499,7 @@ namespace Network_Skimming_Components
 			tag_as_prototype;
 			feature_prototype void initialize(typename TargetType::ParamType loc_index, typename TargetType::ParamType zone_index, typename TargetType::Param2Type weight)
 			{
-				this_component()->initialize<ComponentType,CallerType,TargetType>(loc_index,zone_index,weight);
+				this_component()->initialize<CallerType,TargetType>(loc_index,zone_index,weight);
 			}
 			feature_accessor(loc_index,none,none);
 			feature_accessor(zone_index,none,none);

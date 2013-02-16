@@ -56,7 +56,7 @@ namespace PopSyn
 
 			feature_prototype void Initialize(typename TargetType::ParamType tolerance, typename TargetType::Param2Type iterations)
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>(tolerance,iterations);
+				this_component()->Initialize<CallerType,TargetType>(tolerance,iterations);
 			}
 			feature_accessor(Tolerance,check(ReturnValueType, is_arithmetic),none);
 			feature_accessor(Iterations,check(ReturnValueType, is_arithmetic),none);
@@ -67,7 +67,7 @@ namespace PopSyn
 			tag_as_prototype;
 			feature_prototype void Initialize()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->Initialize<CallerType,TargetType>();
 			}
 
 			//===================================================================================================================================
@@ -317,7 +317,7 @@ namespace PopSyn
 
 			feature_prototype typename TargetType::ReturnType Get_1D_Index(typename TargetType::ParamType& multi_dimensional_index_vector)
 			{
-				return this_component()->Get_1D_Index<ComponentType,CallerType,TargetType>(multi_dimensional_index_vector);
+				return this_component()->Get_1D_Index<CallerType,TargetType>(multi_dimensional_index_vector);
 			}
 		};
 
