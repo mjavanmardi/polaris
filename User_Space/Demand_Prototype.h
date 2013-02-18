@@ -348,7 +348,7 @@ namespace Demand_Components
 					movement_plan->template destination<_Link_Interface*>(network_reference<_Network_Interface*>()->template links_container<_Links_Container_Interface&>().at(raw_vehicle.get_destination_link_index()));
 
 					int departed_time = raw_vehicle.get_departure_time();
-/
+
 //#ifndef FOR_LINUX_PORTING
 					traveler->template Planning_Faculty<_Planning_Interface*>()->template Schedule_New_Departure<NULLTYPE>(departed_time);
 //#else

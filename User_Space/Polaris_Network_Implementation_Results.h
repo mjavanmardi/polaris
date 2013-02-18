@@ -150,7 +150,7 @@ namespace Network_Components
 			typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
-			_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
+			_Scenario_Interface* scenario = (_Scenario_Interface*)_scenario_reference;
 			int simulation_interval_length = scenario->template simulation_interval_length<int>();
 			int simulation_interval_index = ((_Network_Interface*)this)->template current_simulation_interval_index<int>();
 			int simulation_start_time = scenario->template simulation_start_time<int>();
@@ -287,7 +287,7 @@ namespace Network_Components
 			define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 			_Network_Interface* _this_ptr = (_Network_Interface*)this;
-			_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
+			_Scenario_Interface* scenario = scenario_reference<CallerType,_Scenario_Interface*>();
 
 			fstream& output_summary_file = scenario->template output_summary_file<fstream&>();
 

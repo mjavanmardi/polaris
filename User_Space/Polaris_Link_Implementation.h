@@ -141,9 +141,9 @@ namespace Link_Components
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------
 			typedef Link_Prototype<typename MasterType::routable_link_type, NULLTYPE> replica_interface;
-			template<typename ComponentType, typename CallerType, typename TargetType>
+			template<typename CallerType, typename TargetType>
 			TargetType travel_time(){return (TargetType)(_travel_time);} tag_getter_as_available(travel_time);
-			template<typename ComponentType, typename CallerType, typename TargetType>
+			template<typename CallerType, typename TargetType>
 			void travel_time(TargetType set_value)
 			{
 				_travel_time = (float)set_value;
@@ -163,7 +163,7 @@ namespace Link_Components
 			feature_implementation void link_supply_update()
 			{
 				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
-				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
+				_Network_Interface* network = (_Network_Interface*)_network_reference;
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
 				// time unification
@@ -211,7 +211,7 @@ namespace Link_Components
 			feature_implementation void network_state_update()
 			{
 				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
-				_Network_Interface* network = network_reference<ComponentType,CallerType,_Network_Interface*>();
+				_Network_Interface* network = (_Network_Interface*)_network_reference;
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 
 				int current_simulation_interval_index = network->template current_simulation_interval_index<int>();
@@ -323,7 +323,7 @@ namespace Link_Components
 
 				typedef Link_Prototype<ComponentType, ComponentType> _Link_Interface;
 				
-				int current_simulation_interval_index = network_reference<ComponentType,CallerType,_Network_Interface*>()->template current_simulation_interval_index<int>();
+				int current_simulation_interval_index = ((_Network_Interface*)_network_reference)->template current_simulation_interval_index<int>();
 				int simulation_interval_length = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 				_Vehicle_Interface* vehicle=(_Vehicle_Interface*)veh;
 				_Movement_Plan_Interface* mp = vehicle->template movement_plan<_Movement_Plan_Interface*>();
@@ -335,7 +335,7 @@ namespace Link_Components
 				}
 				else
 				{
-					a_delayed_time = (int)((network_reference<ComponentType,CallerType,_Network_Interface*>()->template start_of_current_simulation_interval_relative<int>() - mp->template get_current_link_enter_time<int>()) - _link_fftt);
+					a_delayed_time = (int)((((_Network_Interface*)_network_reference)->template start_of_current_simulation_interval_relative<int>() - mp->template get_current_link_enter_time<int>()) - _link_fftt);
 				}
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
@@ -437,8 +437,8 @@ namespace Link_Components
 				{
 					//update current position
 					_link_origin_vehicle_current_position++;
-					_Vehicle_Interface* vehicle = (_Vehicle_Interface*)link_origin_vehicle_array<ComponentType,CallerType,_Vehicles_Origin_Container_Interface&>()[iv];
-					link_origin_vehicle_queue<ComponentType,CallerType,_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
+					_Vehicle_Interface* vehicle = (_Vehicle_Interface*)link_origin_vehicle_array<CallerType,_Vehicles_Origin_Container_Interface&>()[iv];
+					link_origin_vehicle_queue<CallerType,_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
 					_link_origin_arrived_vehicles++;
 					_link_origin_loaded_vehicles++;
 					_link_origin_cumulative_arrived_vehicles++;

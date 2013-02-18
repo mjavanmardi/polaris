@@ -23,7 +23,7 @@ namespace Network_Components
 
 			member_container(vector<typename MasterType::routable_network_type*>, routable_networks_container, none, none);
 
-			template<typename ComponentType, typename CallerType, typename TargetType>
+			template<typename CallerType, typename TargetType>
 			TargetType routable_network(){return (TargetType)(_routable_networks_container[_thread_id]);}tag_getter_as_available(routable_network);
 
 			member_container(vector<typename MasterType::turn_movement_type*>, turn_movements_container, none, none);
@@ -191,7 +191,7 @@ namespace Network_Components
 						
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
-				_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
+				_Scenario_Interface* scenario = scenario_reference<CallerType,_Scenario_Interface*>();
 				_Network_Interface* _this_ptr = (_Network_Interface*)this;
 				printf("%s, ", convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str());
 				printf("loaded=%7d, departed=%7d, arrived=%7d, in_network=%7d\n",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>());
@@ -199,8 +199,8 @@ namespace Network_Components
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
 				//write_network_link_flow<NULLTYPE>();
-				//write_network_link_turn_time<CallerType,TargetType>();
-				//write_output_summary<CallerType,TargetType>();
+				write_network_link_turn_time<CallerType,TargetType>();
+				write_output_summary<CallerType,TargetType>();
 			}
 
 			feature_implementation void write_vehicle_trajectory();
