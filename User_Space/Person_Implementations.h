@@ -46,7 +46,7 @@ namespace Person_Components
 
 				// Seed the RNG with the agent ID
 				define_component_interface(rng_itf,type_of(RNG),RNG_Components::Prototypes::RNG_Prototype,ComponentType);
-				rng_itf* rng = this->template RNG<ComponentType,ComponentType,rng_itf*>();		
+				rng_itf* rng = this->template RNG<ComponentType,rng_itf*>();		
 				rng->template Initialize<TargetType>((sin((double)id)+1.0) * 1000000.0);
 
 				// Add basic traveler properties							
@@ -243,8 +243,8 @@ namespace Person_Components
 
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
-				this->template Generation_Time_Increment<CallerType,Time_Minutes>(END);
-				this->template Planning_Time_Increment<CallerType,Time_Minutes>(15);
+				General_Person_Planner_Implementation::Generation_Time_Increment<CallerType,Time_Minutes>(END);
+				General_Person_Planner_Implementation::Planning_Time_Increment<CallerType,Time_Minutes>(15);
 
 				// get reference to the parent pointer and set the first activity generation time to be the parent first iteration
 				define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);

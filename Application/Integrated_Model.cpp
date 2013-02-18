@@ -313,7 +313,7 @@ struct MasterType
 	typedef Person_Components::Implementations::Person_Implementation<MasterType> person_type;
 	typedef Person_Components::Implementations::CTRAMP_Person_Planner_Implementation<MasterType, person_type> person_planner_type;
 	typedef Person_Components::Implementations::TRANSIMS_Person_Properties_Implementation<MasterType,person_type> person_properties_type;
-	typedef Polaris_Component<RNG_Components::Implementations::RngStream_Implementation, MasterType, Data_Object> RNG;
+	typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
 	typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
 
 	
@@ -384,7 +384,6 @@ int main(int argc,char** argv)
 
 
 	network->simulation_initialize<NULLTYPE>();
-	
 	cout << "world started..." << endl;
 	////initialize network agents
 	
@@ -431,10 +430,11 @@ int main(int argc,char** argv)
 	// IPF Solver Settings
 	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
 	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
-	solver->Initialize<Target_Type<void,double,int>>(0.05,100);
+	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,0.1,100);
 
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
+	popsyn->write_output_flag<bool>(true);
 	popsyn->linker_file_path<string>(string("linker_file.txt"));
 	popsyn->Solution_Settings<solver_itf*>(solver);
 	popsyn->Output_Stream<ostream&>(out);

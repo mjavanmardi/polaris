@@ -47,13 +47,15 @@ namespace PopSyn
 
 		implementation struct IPF_Solver_Settings_Implementation : public Polaris_Component<APPEND_CHILD(IPF_Solver_Settings_Implementation), MasterType, Data_Object, ParentType>
 		{
-			feature_implementation void Initialize(typename TargetType::ParamType tolerance, typename TargetType::Param2Type iterations)
+			feature_implementation void Initialize(typename TargetType::ParamType tolerance, typename TargetType::ParamType percent_to_synthesize, typename TargetType::Param2Type iterations)
 			{
 				this->Tolerance<CallerType, typename TargetType::ParamType>(tolerance);
+				this->Percentage_to_synthesize<CallerType, typename TargetType::ParamType>(percent_to_synthesize);
 				this->Iterations<CallerType, typename TargetType::Param2Type>(iterations);
 			}
 			member_data(double, Tolerance, check(ReturnValueType,is_arithmetic),check(SetValueType, is_arithmetic));
 			member_data(int, Iterations, check(ReturnValueType,is_arithmetic),check(SetValueType, is_arithmetic));
+			member_data(double, Percentage_to_synthesize, check(ReturnValueType,is_arithmetic),check(SetValueType, is_arithmetic));
 		};
 	}
 }

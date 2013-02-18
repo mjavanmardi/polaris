@@ -235,6 +235,13 @@ s << MESSAGE_STREAM;\
 std::cerr << s.str();\
 throw new std::exception(s.str().c_str());}
 
+#ifdef _DEBUG
+#define ADD_DEBUG_INFO : ComponentType
+#else
+#define ADD_DEBUG_INFO
+#endif
+
+
 
 #ifdef DEBUG_1
 #define debug_1(MESSAGE) cout << MESSAGE

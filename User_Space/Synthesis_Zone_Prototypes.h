@@ -50,19 +50,20 @@ namespace PopSyn
 
 	namespace Prototypes
 	{
-		prototype struct Solver_Settings_Prototype
+		prototype struct Solver_Settings_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
-			feature_prototype void Initialize(typename TargetType::ParamType tolerance, typename TargetType::Param2Type iterations)
+			feature_prototype void Initialize(typename TargetType::ParamType tolerance, typename TargetType::ParamType percent_to_synthesize, typename TargetType::Param2Type iterations)
 			{
-				this_component()->Initialize<CallerType,TargetType>(tolerance,iterations);
+				this_component()->Initialize<CallerType,TargetType>(tolerance,percent_to_synthesize,iterations);
 			}
 			feature_accessor(Tolerance,check(ReturnValueType, is_arithmetic),none);
 			feature_accessor(Iterations,check(ReturnValueType, is_arithmetic),none);
+			feature_accessor(Percentage_to_synthesize,none,none);
 		};
 
-		prototype struct Synthesis_Zone_Prototype
+		prototype struct Synthesis_Zone_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			feature_prototype void Initialize()
@@ -172,6 +173,8 @@ namespace PopSyn
 			{
 				define_component_interface(_Network_Interface,typename ComponentType::Master_Type::network_type,Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_component_interface(_Scenario_Interface,typename ComponentType::Master_Type::scenario_type,Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
+				define_component_interface(solution_settings_itf,typename get_type_of(Solver_Settings),Prototypes::Solver_Settings_Prototype,NULLTYPE);
+				solution_settings_itf& settings = this->Solver_Settings<solution_settings_itf&>();
 
 				// Get the fitted distribution
 				typedef typename get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
@@ -213,18 +216,19 @@ namespace PopSyn
 					{
 						int num_generated=0;
 						double w = range.first->second->template Weight<double>();
+
+						int attempts_to_make = (int)((float)num_required * settings.Percentage_to_synthesize<float>());
 						
-						for (int i = 0; i<num_required; ++i)
+						for (int i = 0; i<attempts_to_make; ++i)
 						{
 							if (rand.template Next_Rand<double>() < w/cumulative_weight)
 							{					
-								pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>(); // ALLOCATE
-								//pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
+								pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>();
 								pop_unit_itf* obj = range.first->second;
 								p->template Initialize<pop_unit_itf&>(*obj);
 								zone_sample->insert(p->template Index<uint>(),p);
 								int size = sizeof(typename sample_itf::Component_Type);
-								num_generated++;
+								num_generated += (int)(1.0f / settings.Percentage_to_synthesize<float>());
 
 								// create the actual person agent
 								typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
@@ -232,7 +236,7 @@ namespace PopSyn
 								person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
 								person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
 								person->Initialize<int>(num_created);
-								num_created++;
+								num_created += (int)(1.0f / settings.Percentage_to_synthesize<float>());
 							}
 						}
 						// reduce the number required by the number generated and the cumulative weight
@@ -247,8 +251,7 @@ namespace PopSyn
 					// add a copy of the last unit until num_required < 1
 					while (num_required > 1.0)
 					{
-						pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>(); // ALLOCATE
-						//pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
+						pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>();
 						pop_unit_itf* obj = stored_pop_unit;
 						p->Initialize<pop_unit_itf&>(*obj);
 						zone_sample->insert(p->template Index<uint>(),p);
@@ -258,17 +261,16 @@ namespace PopSyn
 						person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
 						person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
 						person->Initialize<int>(num_created);
-						num_created++;
+						num_created+=(int)(1.0f / settings.Percentage_to_synthesize<float>());
 
-						num_required--;
+						num_required-=(int)(1.0f / settings.Percentage_to_synthesize<float>());
 					}
 
 					//----------------------------------------------------------------------------------
 					// if a fractional num_required is left, add another unit with probability of num_required
 					if (num_required > 0.0 && rand.template Next_Rand<double>() < num_required)
 					{
-						pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>(); // ALLOCATE
-						//pop_unit_itf* p = (pop_unit_itf*)(new pop_unit_itf::Component_Type());
+						pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>();
 						pop_unit_itf* obj = stored_pop_unit;
 						p->Initialize<pop_unit_itf&>(*obj);
 						zone_sample->insert(p->template Index<uint>(),p);
@@ -278,8 +280,8 @@ namespace PopSyn
 						person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
 						person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
 						person->Initialize<int>(num_created);
-						num_created++;
-						num_required--;
+						num_created+=(int)(1.0f / settings.Percentage_to_synthesize<float>());
+						num_required-=(int)(1.0f / settings.Percentage_to_synthesize<float>());
 					}
 
 

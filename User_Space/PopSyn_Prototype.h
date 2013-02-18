@@ -19,7 +19,7 @@ namespace PopSyn
 
 	namespace Prototypes
 	{
-		prototype struct Population_Synthesizer_Prototype
+		prototype struct Population_Synthesizer_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype; // Declare class as a polaris prototype
 
@@ -99,14 +99,12 @@ namespace PopSyn
 				// CREATE RNG for later use
 				define_component_interface(Rand_Interface,typename ComponentType::Master_Type::RNG,RNG_Prototype,NULLTYPE);
 				Rand_Interface* rand = (Rand_Interface*)Allocate<typename ComponentType::Master_Type::RNG>();
-				//Rand_Interface* rand = (Rand_Interface*)(new MasterType::RNG()); // ALLOCATION TEST
+
 				rand->Initialize<double>(0);
 
 				// IPF Solver Settings
 				define_component_interface(solver_itf,typename get_type_of(Solution_Settings),PopSyn::Prototypes::Solver_Settings_Prototype,ComponentType);
 				solver_itf* solver = this->Solution_Settings<solver_itf*>();
-
-				//solver_itf* solver = (solver_itf*)(new MasterType::IPF_Solver_Settings()); // ALLOCATION TEST
 
 				//===============================================================================================================
 				// Initialize file linker
@@ -189,7 +187,7 @@ namespace PopSyn
 						new_region->template ID<int>(ID);
 						solver_itf* region_solver = (solver_itf*)Allocate<typename get_type_of(Solution_Settings)>(); // ALLOCATION TEST
 
-						region_solver->template Initialize<Target_Type<NULLTYPE,void,double,int>>(solver->template Tolerance<double>(),solver->template Iterations<int>());
+						region_solver->template Initialize<Target_Type<NULLTYPE,void,double,int>>(solver->template Tolerance<double>(),solver->template Percentage_to_synthesize<double>(),solver->template Iterations<int>());
 						new_region->template Solver_Settings<solver_itf*>(region_solver);
 
 						// add new region to the list
@@ -220,8 +218,7 @@ namespace PopSyn
 					typename sample_type::Characteristics_type data;
 					fr.Get_Data<typename sample_type::Characteristics_type::unqualified_value_type>(data,linker.get_pums_data_cols());
 
-					pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>(); //ALLOCATION_TEST
-					//pop_unit_itf* p = (pop_unit_itf*)(new sample_type());
+					pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>();
 					p->ID(sample_id);
 					p->Index(new_region->template Get_1D_Index<Target_Type<NULLTYPE,typename joint_itf::size_type,typename joint_itf::index_type>>(index));
 					p->Weight(weight);
@@ -277,14 +274,13 @@ namespace PopSyn
 					solver_itf* zone_solver = (solver_itf*)Allocate<typename get_type_of(Solution_Settings)>(); // ALLOCATION_TEST
 					//solver = (solver_itf*)(new MasterType::IPF_Solver_Settings());
 
-					zone_solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(solver->template Tolerance<double>(),solver->template Iterations<int>());
+					zone_solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(solver->template Tolerance<double>(),solver->template Percentage_to_synthesize<double>(), solver->template Iterations<int>());
 					zone->template Solver_Settings<solver_itf*>(zone_solver);
 					joint_itf* mway = zone->template Target_Joint_Distribution<joint_itf*>();
 					marginal_itf* marg = zone->template Target_Marginal_Distribution<marginal_itf*>();
 					mway->resize(dimensions,0);
 					marg->resize(dimensions,0);
-					Rand_Interface* my_rand = (Rand_Interface*)Allocate<typename zone_itf::get_type_of(Rand)>(); // ALLOCATION_TEST
-					//Rand_Interface* my_rand = (Rand_Interface*)(new MasterType::RNG());
+					Rand_Interface* my_rand = (Rand_Interface*)Allocate<typename zone_itf::get_type_of(Rand)>();
 					my_rand->template Initialize<double>(rand->template Next_Rand<double>()*(double)SHRT_MAX);
 					
 
@@ -344,13 +340,12 @@ namespace PopSyn
 			// 4.) Output results event - called after timing is stopped (at timestep 7)
 			declare_feature_event(Output_Popsyn_Event)
 			{
-				return;
+				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
+				if (pthis->write_output_flag<bool>() != true) return;
 
 				Counter timer;
 				timer.Start();
-
-				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
-				
+		
 				ostream& sample_out = pthis->Output_Stream<ostream&>();
 				ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
 				
@@ -409,6 +404,7 @@ namespace PopSyn
 			feature_accessor(scenario_reference, none, none);
 			feature_accessor(network_reference, none, none);
 			feature_accessor(timer,none,none);
+			feature_accessor(write_output_flag,none,none);
 
 			//----------------------------------------------------------------
 			// Optional Features - used for specific solution types

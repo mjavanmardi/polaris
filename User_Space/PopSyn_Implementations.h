@@ -14,6 +14,7 @@ namespace PopSyn
 			member_component(typename MasterType::network_type, network_reference, none, none);
 
 			member_data(Counter, timer,none,none);
+			member_data(bool, write_output_flag,check(ReturnValueType,is_integral),check(SetValueType,is_integral));
 			member_data(string, linker_file_path, none,none);
 			member_pointer(ostream,Output_Stream,none,none);
 			member_pointer(ostream,Marginal_Output_Stream,none,none);
