@@ -196,6 +196,9 @@
     <ClInclude Include="Graphical_Vehicle_Implementation.h" />
     <ClInclude Include="Information_Panel.h" />
     <ClInclude Include="Information_Panel_Implementation.h" />
+    <ClInclude Include="Layer_Management.h" />
+    <ClInclude Include="Layer_Options.h" />
+    <ClInclude Include="Layer_Options_Implementation.h" />
     <ClInclude Include="Navigation.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="Render_2D.h" />

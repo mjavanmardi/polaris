@@ -9,14 +9,14 @@
 //	Conductor_Implementation - conductor class definition
 //---------------------------------------------------------
 
-implementation class Conductor_Implementation : public Polaris_Component_Class<Conductor_Implementation,MasterType,Execution_Object,ParentType>
+implementation class Conductor_Implementation : public Polaris_Component<APPEND_CHILD(Conductor_Implementation),MasterType,Execution_Object,ParentType>
 {
 public:
 	define_component_interface(Graphical_Network_Interface,typename MasterType::type_of(graphical_network),Network_Prototype,Conductor_Implementation);
 
-	member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),Conductor_Implementation,none,none);
-	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),Conductor_Implementation,none,none);
-	//member_prototype(Graphical_Network,graphical_network,typename MasterType::type_of(graphical_network),Conductor_Implementation,none,none);
+	member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),none,none);
+	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),none,none);
+	//member_prototype(Graphical_Network,graphical_network,typename MasterType::type_of(graphical_network),none,none);
 
 	feature_implementation void Initialize()
 	{

@@ -16,7 +16,7 @@ namespace Network_Components
 		//	Graphical_Network_Implementation - network class definition
 		//---------------------------------------------------------
 
-		implementation struct Graphical_Network_Implementation:public Polaris_Component_Class<Graphical_Network_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Graphical_Network_Implementation:public Polaris_Component<APPEND_CHILD(Graphical_Network_Implementation),MasterType,Data_Object,ParentType>
 		{
 			feature_implementation void submit_num_vehicles()
 			{
@@ -46,10 +46,10 @@ namespace Network_Components
 				transaction t(db->begin());
 				
 				// reset bounds, they will be set in the node reading function
-				_network_bounds.reset<type_of(network_bounds),Graphical_Network_Implementation,NULLTYPE>();
+				_network_bounds.reset<Graphical_Network_Implementation,NULLTYPE>();
 
 				// read intersections
-				read_intersection_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
+				read_intersection_data<CallerType,TargetType>(db, net_io_maps);
 
 				// set up input_offset and shift network bounds
 				_input_offset._x = -( _network_bounds._xmax + _network_bounds._xmin )/2.0f;
@@ -63,11 +63,11 @@ namespace Network_Components
 				_network_bounds._ymin += _input_offset._y;
 				
 				// read links
-				read_link_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
+				read_link_data<CallerType,TargetType>(db, net_io_maps);
 
 				
 				// configure vehicle layer
-				_vehicle_points=_canvas->Allocate_New_Layer< Target_Type< Antares_Layer<type_of(vehicle_points),Graphical_Network_Implementation>*, string& > >(string("Vehicles"));
+				_vehicle_points=_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Graphical_Network_Implementation>*, string& > >(string("Vehicles"));
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Points();
@@ -76,7 +76,7 @@ namespace Network_Components
 
 
 				// configure plot layer
-				_num_vehicles=_information_panel->Allocate_New_Layer< Target_Type< Antares_Layer<type_of(num_vehicles),Graphical_Network_Implementation>*, string& > >(string("Number of Vehicles"));
+				_num_vehicles=_information_panel->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(num_vehicles),Graphical_Network_Implementation>*, string& > >(string("Number of Vehicles"));
 
 				Antares_Layer_Configuration pcfg;
 				pcfg.Configure_Plot();
@@ -89,7 +89,7 @@ namespace Network_Components
 				using namespace odb;
 				using namespace pio;
 
-				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
+				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<CallerType,_Intersections_Container_Interface*>();
 
 				result<Node> node_result=db->query<Node>(query<Node>::true_expr);
 
@@ -146,8 +146,8 @@ namespace Network_Components
 				using namespace odb;
 				using namespace pio;
 
-				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
-				_Links_Container_Interface* links_container_ptr=links_container<ComponentType,CallerType,_Links_Container_Interface*>();			
+				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<CallerType,_Intersections_Container_Interface*>();
+				_Links_Container_Interface* links_container_ptr=links_container<CallerType,_Links_Container_Interface*>();			
 				
 				result<Link> link_result=db->query<Link>(query<Link>::true_expr);
 
@@ -159,7 +159,7 @@ namespace Network_Components
 				
 				int link_counter=-1;
 				
-				_link_lines=_canvas->Allocate_New_Layer< Target_Type< Antares_Layer<type_of(link_lines),Graphical_Network_Implementation>*, string& > >(string("Links"));
+				_link_lines=_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(link_lines),Graphical_Network_Implementation>*, string& > >(string("Links"));
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Lines();
@@ -286,16 +286,16 @@ namespace Network_Components
 			member_data(Point_2D<MasterType>, input_offset,none,none);
 			member_data(Rectangle_XY<MasterType>, network_bounds,none,none);
 			
-			member_prototype(Antares_Layer,link_lines,typename type_of(MasterType::antares_layer),Graphical_Network_Implementation,none,none);
-			member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),Graphical_Network_Implementation,none,none);
+			member_prototype(Antares_Layer,link_lines,typename type_of(MasterType::antares_layer),none,none);
+			member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),none,none);
 			
-			member_prototype(Antares_Layer,num_vehicles,typename type_of(MasterType::antares_layer),Graphical_Network_Implementation,none,none);
+			member_prototype(Antares_Layer,num_vehicles,typename type_of(MasterType::antares_layer),none,none);
 			member_data(volatile int,vehicles_counter,none,none);
 
 			//member_data(concat(Multi_Buffer< vector< Point_3D<MasterType> >[_num_threads], 3 >),vehicle_coordinates,none,none);
 
-			member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),Graphical_Network_Implementation,none,none);
-			member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),Graphical_Network_Implementation,none,none);
+			member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),none,none);
+			member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),none,none);
 
 			member_container(vector<typename MasterType::graphical_intersection_type*>, intersections_container, none, none);
 			member_container(vector<typename MasterType::graphical_link_type*>, links_container, none, none);

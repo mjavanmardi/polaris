@@ -9,8 +9,8 @@
 //	Draw_Layer
 //--------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::Draw_Layer(int start_iteration, int end_iteration, Antares_Layer_Interface* layer)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(int start_iteration, int end_iteration, Antares_Layer_Interface* layer)
 {
 	const bool draw=layer->draw<bool>();
 

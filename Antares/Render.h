@@ -9,8 +9,8 @@
 //	Render
 //--------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Render(wxPaintEvent& event)
 {
 	//---- clear and initialize drawing ----
 
@@ -56,7 +56,7 @@ void Canvas_Implementation<MasterType,ParentType>::Render(wxPaintEvent& event)
 
 	list<Antares_Layer_Interface*>::iterator itr;
 
-	for(itr=_3D_layers.begin();itr!=_3D_layers.end();itr++)
+	for(itr=_3D_Layers.begin();itr!=_3D_Layers.end();itr++)
 	{
 		Draw_Layer(current_iteration,current_iteration,(*itr));
 	}

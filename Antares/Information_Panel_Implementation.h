@@ -9,7 +9,7 @@
 //	Information_Panel_Implementation - information panel class definition
 //---------------------------------------------------------
 
-implementation class Information_Panel_Implementation : public Polaris_Component_Class<Information_Panel_Implementation,MasterType>,public wxPanel
+implementation class Information_Panel_Implementation : public Polaris_Component<APPEND_CHILD(Information_Panel_Implementation),MasterType,NULLTYPE>,public wxPanel
 {
 public:
 	Information_Panel_Implementation(wxFrame* parent);
@@ -45,8 +45,8 @@ public:
 //	Information_Panel - information initialization
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-Information_Panel_Implementation<MasterType,ParentType>::Information_Panel_Implementation(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxCLIP_CHILDREN )
+template<typename MasterType,typename ParentType,typename InheritanceList>
+Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Information_Panel_Implementation(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxCLIP_CHILDREN )
 {
 	//---- miscellaneous initialization ----
 
@@ -63,8 +63,8 @@ Information_Panel_Implementation<MasterType,ParentType>::Information_Panel_Imple
 	Connect(wxEVT_SIZE,wxSizeEventHandler(Information_Panel_Implementation::OnResize));
 }
 
-template<typename MasterType,typename ParentType>
-void Information_Panel_Implementation<MasterType,ParentType>::OnResize(wxSizeEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::OnResize(wxSizeEvent& event)
 {
 	_box->SetDimension(wxPoint(0,0),GetSize());
 }

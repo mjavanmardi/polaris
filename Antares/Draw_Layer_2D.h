@@ -9,8 +9,8 @@
 //	Draw_Layer
 //--------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Information_Panel_Implementation<MasterType,ParentType>::Draw_Layer(const int start_iteration, const int end_iteration, Antares_Layer_Interface* layer)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(const int start_iteration, const int end_iteration, Antares_Layer_Interface* layer)
 {
 	int np = end_iteration - start_iteration + 1;
 

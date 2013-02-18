@@ -20,15 +20,15 @@ namespace Vehicle_Components
 	
 	namespace Implementations
 	{
-		implementation struct Graphical_Vehicle_Implementation:public Polaris_Component_Class<Graphical_Vehicle_Implementation,MasterType,Execution_Object,ParentType>
+		implementation struct Graphical_Vehicle_Implementation:public Polaris_Component<APPEND_CHILD(Graphical_Vehicle_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			member_data(Vehicle_Components::Types::Vehicle_Status_Keys, simulation_status, none, none);
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
 
-			member_prototype(static Network_Prototype, graphical_network, typename MasterType::type_of(graphical_network), Graphical_Vehicle_Implementation, none, none);
+			member_prototype(static Network_Prototype, graphical_network, typename MasterType::type_of(graphical_network), none, none);
 			
-			member_prototype(Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type, Graphical_Vehicle_Implementation, none, none);
+			member_prototype(Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type, none, none);
 			//member_component(typename MasterType::movement_plan_type, movement_plan, none, none);
 #ifndef FOR_LINUX_PORTING
 			member_component(typename MasterType::person_type, traveler, none, none);
@@ -70,7 +70,7 @@ namespace Vehicle_Components
 				coordinate._y=upstream_intersection->y_position<float>();
 				coordinate._z=0;
 
-				_graphical_network->push_vehicle_coordinates< Target_Type< NULLTYPE, Point_3D<MasterType>& > >(coordinate);
+				_graphical_network->push_vehicle_coordinates< Target_Type< NULLTYPE, NULLTYPE, Point_3D<MasterType>& > >(coordinate);
 			}
 
 			feature_implementation void load(requires(check_2(TargetType,Types::Load_To_Entry_Queue,is_same)))
@@ -99,8 +99,8 @@ namespace Vehicle_Components
 
 		};
 
-		template<typename MasterType,typename ParentType>
-		Network_Prototype<typename MasterType::type_of(graphical_network),Graphical_Vehicle_Implementation<MasterType,ParentType>>* Graphical_Vehicle_Implementation<MasterType,ParentType>::_graphical_network;
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		Network_Prototype<typename MasterType::type_of(graphical_network),Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_graphical_network;
 
 	}
 

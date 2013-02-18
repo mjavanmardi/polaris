@@ -9,9 +9,9 @@
 //	Render
 //--------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-template<typename ComponentType,typename CallerType,typename TargetType>
-void Information_Panel_Implementation<MasterType,ParentType>::Render()
+template<typename MasterType,typename ParentType,typename InheritanceList>
+template<typename CallerType,typename TargetType>
+void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Render()
 {
 	int current_iteration = _iteration - 1;
 

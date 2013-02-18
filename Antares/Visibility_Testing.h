@@ -9,8 +9,8 @@
 //	Calculate_Bounds
 //--------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::Calculate_Bounds()
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Calculate_Bounds()
 {
 	GLdouble modelview_matrix[16], projection_matrix[16];
 	GLint viewport_matrix[4];

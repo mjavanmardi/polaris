@@ -52,5 +52,5 @@ prototype struct Rectangle_Prototype
 	feature_accessor(width,none,none);
 	feature_accessor(height,none,none);
 
-	feature_prototype void reset(){this_component()->reset<ComponentType,CallerType,TargetType>();}
+	feature_prototype void reset(){this_component()->reset<CallerType,TargetType>();}
 };

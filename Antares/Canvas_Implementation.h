@@ -9,7 +9,7 @@
 //	Canvas_Implementation - canvas class definition
 //---------------------------------------------------------
 
-implementation class Canvas_Implementation : public Polaris_Component_Class<Canvas_Implementation,MasterType,NULLTYPE>, public wxGLCanvas
+implementation class Canvas_Implementation : public Polaris_Component<APPEND_CHILD(Canvas_Implementation),MasterType,NULLTYPE>, public wxGLCanvas
 {
 public:
 	Canvas_Implementation(wxFrame* parent, int* args);
@@ -21,17 +21,8 @@ public:
 
 	typedef Antares_Layer<typename type_of(MasterType::antares_layer),Canvas_Implementation> Antares_Layer_Interface;
 
-	feature_implementation Antares_Layer_Interface* Allocate_New_Layer(string& name)
-	{
-		Antares_Layer_Interface* new_layer=(Antares_Layer_Interface*)Allocate<typename type_of(MasterType::antares_layer)>();
-
-		_3D_layers.push_back(new_layer);
-
-		new_layer->list_index<int>(_3D_layers.size() - 1);
-		new_layer->name<string&>(name);
-
-		return new_layer;
-	}
+	feature_implementation Antares_Layer_Interface* Allocate_New_Layer(string& name);
+	feature_implementation void Toggle_Layer(int identifier);
 
 	void Draw_Layer(int start_iteration, int end_iteration, Antares_Layer_Interface* layer);
 	
@@ -94,19 +85,22 @@ public:
 	GLdouble modelview[16];
 	GLdouble projection[16];
 
-	member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,Canvas_Implementation,none,none);
-	member_prototype(Time_Panel,time_panel,typename MasterType::type_of(time_panel),Canvas_Implementation,none,none);
-	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),Canvas_Implementation,none,none);
+	member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,none,none);
+	member_prototype(Time_Panel,time_panel,typename MasterType::type_of(time_panel),none,none);
+	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),none,none);
+	member_prototype(Control_Panel,control_panel,typename MasterType::type_of(control_panel),none,none);
 
-	list<Antares_Layer_Interface*> _3D_layers;
+	member_prototype(Layer_Options,layer_options,typename MasterType::type_of(layer_options),none,none);
+
+	list<Antares_Layer_Interface*> _3D_Layers;
 };
 
 //---------------------------------------------------------
 //	Canvas_Implementation - canvas initialization
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-Canvas_Implementation<MasterType,ParentType>::Canvas_Implementation(wxFrame* parent, int* args) : wxGLCanvas(parent,-1,args,wxDefaultPosition,wxDefaultSize,wxFULL_REPAINT_ON_RESIZE)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementation(wxFrame* parent, int* args) : wxGLCanvas(parent,-1,args,wxDefaultPosition,wxDefaultSize,wxFULL_REPAINT_ON_RESIZE)
 {
 	//antares_ptr=((Antares_Implementation<MasterType>*)GetParent());
 
@@ -152,9 +146,9 @@ Canvas_Implementation<MasterType,ParentType>::Canvas_Implementation(wxFrame* par
 //	Initialize - general initialization of canvas
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-template<typename ComponentType,typename CallerType,typename TargetType>
-void Canvas_Implementation<MasterType,ParentType>::Initialize()
+template<typename MasterType,typename ParentType,typename InheritanceList>
+template<typename CallerType,typename TargetType>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize()
 {
 	Initialize_GLCanvas();
 
@@ -197,8 +191,8 @@ void Canvas_Implementation<MasterType,ParentType>::Initialize()
 //	Initialize_Canvas - initialization of GL Canvas
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::Initialize_GLCanvas()
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize_GLCanvas()
 {
 	//---- initialize the opengl canvas settings ----
 

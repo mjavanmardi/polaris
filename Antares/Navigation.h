@@ -9,8 +9,8 @@
 //	OnResize - handles when canvas is resized
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::OnResize(wxSizeEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnResize(wxSizeEvent& event)
 {
 	_panel_width=(float)GetSize().x;
 	_panel_height=(float)GetSize().y;
@@ -23,8 +23,8 @@ void Canvas_Implementation<MasterType,ParentType>::OnResize(wxSizeEvent& event)
 //	OnLeftDown - initialize panning procedure or selection
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::OnLeftDown(wxMouseEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeftDown(wxMouseEvent& event)
 {
 	_left_down=true;
 
@@ -77,8 +77,8 @@ void Canvas_Implementation<MasterType,ParentType>::OnLeftDown(wxMouseEvent& even
 //	OnMotion - mouse motion calculations
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::OnMotion(wxMouseEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMouseEvent& event)
 {
 	SetFocus();
 
@@ -136,8 +136,8 @@ void Canvas_Implementation<MasterType,ParentType>::OnMotion(wxMouseEvent& event)
 //	OnLeftUp - stop panning
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::OnLeftUp(wxMouseEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeftUp(wxMouseEvent& event)
 {
 	_left_down=false;
 
@@ -148,8 +148,8 @@ void Canvas_Implementation<MasterType,ParentType>::OnLeftUp(wxMouseEvent& event)
 //	OnRightDown - initialize rotation procedure
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::OnRightDown(wxMouseEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnRightDown(wxMouseEvent& event)
 {
 	_right_down=true;
 
@@ -163,8 +163,8 @@ void Canvas_Implementation<MasterType,ParentType>::OnRightDown(wxMouseEvent& eve
 //	OnRotationMotion - rotation calculations
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::OnRotationMotion(wxMouseEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnRotationMotion(wxMouseEvent& event)
 {
 	SetFocus();
 
@@ -205,8 +205,8 @@ void Canvas_Implementation<MasterType,ParentType>::OnRotationMotion(wxMouseEvent
 //	OnRightUp - stop rotating
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::OnRightUp(wxMouseEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnRightUp(wxMouseEvent& event)
 {
 	_right_down=false;
 	Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnRotationMotion));
@@ -216,8 +216,8 @@ void Canvas_Implementation<MasterType,ParentType>::OnRightUp(wxMouseEvent& event
 //	OnWheel - zoom calculations
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::OnWheel(wxMouseEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnWheel(wxMouseEvent& event)
 {
 	SetFocus();
 
@@ -241,8 +241,8 @@ void Canvas_Implementation<MasterType,ParentType>::OnWheel(wxMouseEvent& event)
 //	OnLeave - stop motion
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Canvas_Implementation<MasterType,ParentType>::OnLeave(wxMouseEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeave(wxMouseEvent& event)
 {
 	_left_down=false;
 

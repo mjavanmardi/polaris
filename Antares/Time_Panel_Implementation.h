@@ -9,7 +9,7 @@
 //	Time_Panel - time panel class definition
 //---------------------------------------------------------
 
-implementation class Time_Panel_Implementation : public Polaris_Component_Class<Time_Panel_Implementation,MasterType,NULLTYPE>, public wxPanel
+implementation class Time_Panel_Implementation : public Polaris_Component<APPEND_CHILD(Time_Panel_Implementation),MasterType,NULLTYPE>, public wxPanel
 {
 public:
 	Time_Panel_Implementation(wxFrame* parent);
@@ -19,14 +19,14 @@ public:
 	void OnPlay(wxCommandEvent& event);
     void OnStop(wxCommandEvent& event);
 
-	member_pointer(wxBitmapButton,play,none,none);
+	member_pointer(wxBitmapToggleButton,play,none,none);
 	member_data(wxBitmap,play_button,none,none);
 	member_data(wxBitmap,pause_button,none,none);
 
 	member_pointer(wxBoxSizer,sizer,none,none);
 	member_pointer(wxTextCtrl,time_display,none,none);
 
-	member_prototype(Conductor,conductor,typename MasterType::conductor_type,Time_Panel_Implementation,none,none);
+	member_prototype(Conductor,conductor,typename MasterType::conductor_type,none,none);
 	define_component_interface(Conductor_Interface, type_of(conductor), Conductor, Time_Panel_Implementation);
 
 	//Canvas_Implementation* canvas_ptr;
@@ -36,8 +36,8 @@ public:
 //	Time_Panel - time_panel initialization
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-Time_Panel_Implementation<MasterType,ParentType>::Time_Panel_Implementation(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxCLIP_CHILDREN )
+template<typename MasterType,typename ParentType,typename InheritanceList>
+Time_Panel_Implementation<MasterType,ParentType,InheritanceList>::Time_Panel_Implementation(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxCLIP_CHILDREN )
 {
 	//---- miscellaneous initialization ----
 
@@ -52,8 +52,8 @@ Time_Panel_Implementation<MasterType,ParentType>::Time_Panel_Implementation(wxFr
 	_play_button=wxBitmap("Play.png",wxBITMAP_TYPE_PNG);
 	_pause_button=wxBitmap("Pause.png",wxBITMAP_TYPE_PNG);
 
-	_play=new wxBitmapButton(this,wxID_ANY,_play_button,wxDefaultPosition,wxSize(62,50));
-	Connect(_play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
+	_play=new wxBitmapToggleButton(this,wxID_ANY,_play_button,wxDefaultPosition,wxSize(62,50));
+	Connect(_play->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
 	_play->SetToolTip("Play");
 	_sizer->Add(_play);
 
@@ -75,12 +75,13 @@ Time_Panel_Implementation<MasterType,ParentType>::Time_Panel_Implementation(wxFr
 //	OnPlay - user presses the play button
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Time_Panel_Implementation<MasterType,ParentType>::OnPlay(wxCommandEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Time_Panel_Implementation<MasterType,ParentType,InheritanceList>::OnPlay(wxCommandEvent& event)
 {
 	_play->SetBitmapLabel(_pause_button);
+	_play->SetValue(false);
 	Refresh();
-	Connect(_play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnStop));
+	Connect(_play->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnStop));
 	_conductor->pause<bool>(false);
 }
 
@@ -88,12 +89,13 @@ void Time_Panel_Implementation<MasterType,ParentType>::OnPlay(wxCommandEvent& ev
 //	OnStop - user presses the stop button
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Time_Panel_Implementation<MasterType,ParentType>::OnStop(wxCommandEvent& event)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Time_Panel_Implementation<MasterType,ParentType,InheritanceList>::OnStop(wxCommandEvent& event)
 {
 	_play->SetBitmapLabel(_play_button);
+	_play->SetValue(true);
 	Refresh();
-	Connect(_play->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
+	Connect(_play->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
 	_conductor->pause<bool>(true);
 }
 
@@ -101,8 +103,8 @@ void Time_Panel_Implementation<MasterType,ParentType>::OnStop(wxCommandEvent& ev
 //	Update_Time - convert seconds/base_step_length to a 24:00 clock display
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType>
-void Time_Panel_Implementation<MasterType,ParentType>::Update_Time(int updated_time)
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Time_Panel_Implementation<MasterType,ParentType,InheritanceList>::Update_Time(int updated_time)
 {
 	//---- extract hours, minutes, and seconds from time value given ----
 

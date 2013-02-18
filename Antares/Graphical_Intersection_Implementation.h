@@ -18,7 +18,7 @@ namespace Intersection_Components
 	
 	namespace Implementations
 	{
-		implementation struct Graphical_Intersection_Implementation:public Polaris_Component_Class<Graphical_Intersection_Implementation,MasterType,Data_Object,ParentType>
+		implementation struct Graphical_Intersection_Implementation:public Polaris_Component<APPEND_CHILD(Graphical_Intersection_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);

@@ -104,6 +104,15 @@
     <ClInclude Include="Render_2D.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Layer_Options.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer_Options_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer_Management.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">

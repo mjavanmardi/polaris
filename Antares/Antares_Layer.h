@@ -17,12 +17,12 @@ prototype struct Antares_Layer
 	
 	feature_prototype void Push_Element(void* data, int size, int iteration = _iteration)
 	{
-		this_component()->Push_Element<ComponentType,CallerType,TargetType>(data,size,iteration);
+		this_component()->Push_Element<CallerType,TargetType>(data,size,iteration);
 	}
 	
 	feature_prototype void Initialize(Antares_Layer_Configuration& cfg)
 	{
-		this_component()->Initialize<ComponentType,CallerType,TargetType>(cfg);
+		this_component()->Initialize<CallerType,TargetType>(cfg);
 	}
 
 	feature_accessor(list_index,none,none);
@@ -71,6 +71,7 @@ struct Antares_Layer_Configuration
 	void Configure_Lines()
 	{
 		dynamic_data=false;
+		target_sub_iteration=-1;
 
 		storage_offset=_iteration;
 		storage_size=1;
@@ -80,13 +81,18 @@ struct Antares_Layer_Configuration
 
 		primitive_type=_LINE;
 		
+		color=false;
 		head_color._r=0;
 		head_color._g=0;
 		head_color._b=0;
 		head_color._a=200;
-
-		color=false;
+		
 		normal=false;
+		head_normal._x=0;
+		head_normal._y=0;
+		head_normal._z=1;
+		
+		head_size_value=1;
 
 		num_vertices=2;
 
@@ -105,7 +111,6 @@ struct Antares_Layer_Configuration
 		draw=true;
 
 		primitive_type=_POINT;
-		head_size_value=8;
 
 		color=false;
 		head_color._r=255;
@@ -114,6 +119,11 @@ struct Antares_Layer_Configuration
 		head_color._a=255;
 
 		normal=false;
+		head_normal._x=0;
+		head_normal._y=0;
+		head_normal._z=1;
+		
+		head_size_value=4;
 
 		num_vertices=1;
 
@@ -123,6 +133,7 @@ struct Antares_Layer_Configuration
 	void Configure_Plot()
 	{
 		dynamic_data=false;
+		target_sub_iteration=-1;
 
 		storage_offset=_iteration;
 		storage_size=_num_iterations;
@@ -130,11 +141,24 @@ struct Antares_Layer_Configuration
 
 		draw=true;
 
+		primitive_type=_PLOT;
+
 		color=false;
 		head_color._r=255;
 		head_color._g=0;
 		head_color._b=0;
 		head_color._a=255;
+
+		normal=false;
+		head_normal._x=0;
+		head_normal._y=0;
+		head_normal._z=1;
+
+		head_size_value=0;
+
+		num_vertices=0;
+
+		data_stride=sizeof(int);
 	}
 
 	bool dynamic_data;

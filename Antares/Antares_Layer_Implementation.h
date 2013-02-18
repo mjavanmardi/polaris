@@ -9,22 +9,7 @@
 //	Antares_Layer_Implementation - layer definition
 //---------------------------------------------------------
 
-//struct Index
-//{
-//	unsigned int thread:5;
-//	unsigned int iteration:32;
-//	unsigned int position:27;
-//};
-
-//Index Push_Element(void* data, int size, int iteration=_iteration)
-
-//Index retval;
-//retval.thread=_thread_id;
-//retval.iteration=_thread_id;
-//retval.position=storage_reference.size();
-
-
-implementation struct Antares_Layer_Implementation:public Polaris_Component_Class<Antares_Layer_Implementation,MasterType,Execution_Object>
+implementation struct Antares_Layer_Implementation:public Polaris_Component<APPEND_CHILD(Antares_Layer_Implementation),MasterType,Execution_Object>
 {
 	feature_implementation void Push_Element(void* data, int size, int iteration)
 	{
