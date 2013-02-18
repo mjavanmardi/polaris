@@ -199,8 +199,8 @@ namespace Network_Components
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
 				//write_network_link_flow<NULLTYPE>();
-				write_network_link_turn_time<CallerType,TargetType>();
-				write_output_summary<CallerType,TargetType>();
+				//write_network_link_turn_time<CallerType,TargetType>();
+				//write_output_summary<CallerType,TargetType>();
 			}
 
 			feature_implementation void write_vehicle_trajectory();
