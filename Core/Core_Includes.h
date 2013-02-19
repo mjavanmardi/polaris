@@ -8,6 +8,7 @@
 #include <deque>
 #include <queue>
 #include <string>
+#include <stdexcept>
 
 #ifdef WINDOWS
 #include <Windows.h>
@@ -166,12 +167,6 @@ static void False_Condition(void*,Conditional_Response& resp)
 //static LARGE_INTEGER thread_stop_timers_B[_num_threads];
 #endif
 
-#define THROW_EXCEPTION(MESSAGE_STREAM) \
-{std::stringstream s;\
-s << MESSAGE_STREAM;\
-std::cerr << s.str();\
-throw new std::exception(s.str().c_str());}
-
 
 ///============================================================================
 /// _all_components - type singletons for all compiled components
@@ -229,11 +224,13 @@ void end_timer(timespec& start,long long& total)
 
 #endif
 
+
 #define THROW_EXCEPTION(MESSAGE_STREAM) \
 {std::stringstream s;\
 s << MESSAGE_STREAM;\
 std::cerr << s.str();\
-throw new std::exception(s.str().c_str());}
+throw new std::runtime_error(s.str().c_str());}
+
 
 #ifdef _DEBUG
 #define ADD_DEBUG_INFO : ComponentType
