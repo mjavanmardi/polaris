@@ -35,17 +35,17 @@ namespace Intersection_Components
 
 			feature_prototype void update_state()
 			{
-				this_component()->template update_state<CallerType,TargetType>();
+				this_component()->template update_state<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void supply_allocation_based_on_driving_rule()
 			{
-				this_component()->template supply_allocation_based_on_driving_rule<CallerType,TargetType>();
+				this_component()->template supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void supply_allocation_proportion_to_demand()
 			{
-				this_component()->template supply_allocation_proportion_to_demand<CallerType,TargetType>();
+				this_component()->template supply_allocation_proportion_to_demand<ComponentType,CallerType,TargetType>();
 			}
 		};
 
@@ -91,7 +91,7 @@ namespace Intersection_Components
 
 			feature_prototype void accept_vehicle(void* vehicle)
 			{
-				this_component()->template accept_vehicle<CallerType,TargetType>(vehicle);
+				this_component()->template accept_vehicle<ComponentType,CallerType,TargetType>(vehicle);
 			}
 
 			feature_prototype void turn_movement_capacity_update()
@@ -142,13 +142,13 @@ namespace Intersection_Components
 
 			feature_prototype void turn_movement_supply_allocation()
 			{
-				this_component()->template turn_movement_supply_allocation<CallerType,TargetType>();
+				this_component()->template turn_movement_supply_allocation<ComponentType,CallerType,TargetType>();
 			}
 
 
 			feature_prototype void node_transfer()
 			{
-				this_component()->template node_transfer<CallerType,TargetType>();
+				this_component()->template node_transfer<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void network_state_update()
@@ -165,22 +165,22 @@ namespace Intersection_Components
 			
 			feature_prototype void origin_link_loading()
 			{
-				this_component()->template origin_link_loading<CallerType,TargetType>();
+				this_component()->template origin_link_loading<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void initialize_features(TargetType param)
 			{
-				this_component()->template initialize_features<CallerType,TargetType>(param);
+				this_component()->template initialize_features<ComponentType,CallerType,TargetType>(param);
 			}
 
 			feature_prototype void Initialize()
 			{
-				this_component()->template Initialize<CallerType,TargetType>();
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void construct_routable_from_regular(typename TargetType::ParamType regular_intersection_param, typename TargetType::Param2Type linksMap_param)
 			{
-				this_component()->template construct_routable_from_regular<CallerType,TargetType>(regular_intersection_param, linksMap_param);
+				this_component()->template construct_routable_from_regular<ComponentType,CallerType,TargetType>(regular_intersection_param, linksMap_param);
 			}
 		};
 	}

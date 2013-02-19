@@ -15,11 +15,11 @@ namespace Network_Components
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
 			network_models::network_information::network_data_information::network_data_initialization(network_data);
-			write_intersection_data<CallerType,TargetType>(network_data);
-			write_link_data<CallerType,TargetType>(network_data);
-			write_turn_movement_data<CallerType,TargetType>(network_data);
-			write_activity_location_data<CallerType,TargetType>(network_data);
-			write_zone_data<CallerType,TargetType>(network_data);
+			write_intersection_data<ComponentType,CallerType,TargetType>(network_data);
+			write_link_data<ComponentType,CallerType,TargetType>(network_data);
+			write_turn_movement_data<ComponentType,CallerType,TargetType>(network_data);
+			write_activity_location_data<ComponentType,CallerType,TargetType>(network_data);
+			write_zone_data<ComponentType,CallerType,TargetType>(network_data);
 		}
 
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data)

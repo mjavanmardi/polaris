@@ -97,7 +97,7 @@ namespace Intersection_Components
 						
 						routable_link->template outbound_turn_movements<_Routable_Movements_Container_Interface&>().push_back(routable_outbound_movement);
 					}
-					inbound_outbound_movements<CallerType,_Routable_Inbound_Outbound_Movements_Container_Interface&>().push_back(routable_inbound_outbound_movements);
+					inbound_outbound_movements<ComponentType,CallerType,_Routable_Inbound_Outbound_Movements_Container_Interface&>().push_back(routable_inbound_outbound_movements);
 				}
 					
 				// create outbound_inbound_movements
@@ -125,7 +125,7 @@ namespace Intersection_Components
 						regular_inbound_movement->template replicas_container<_Routable_Movements_Container_Interface&>().push_back(routable_inbound_movement);
 						routable_outbound_inbound_movements->template inbound_movements<_Routable_Movements_Container_Interface&>().push_back(routable_inbound_movement);
 					}
-					outbound_inbound_movements<CallerType,_Routable_Outbound_Inbound_Movements_Container_Interface&>().push_back(routable_outbound_inbound_movements);
+					outbound_inbound_movements<ComponentType,CallerType,_Routable_Outbound_Inbound_Movements_Container_Interface&>().push_back(routable_outbound_inbound_movements);
 				}
 			}
 		};

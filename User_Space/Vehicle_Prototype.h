@@ -59,13 +59,13 @@ namespace Vehicle_Components
 
 			feature_prototype void load()
 			{
-				this_component()->template load<CallerType, TargetType>();
+				this_component()->template load<ComponentType,CallerType, TargetType>();
 			}
 
 			feature_prototype void unload()
 			{
 				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
-				this_component()->template unload<CallerType, TargetType>();
+				this_component()->template unload<ComponentType,CallerType, TargetType>();
 				movement_plan<_Movement_Plan_Interface*>()->template arrive_to_destination<NULLTYPE>();
 			}
 		};

@@ -23,7 +23,7 @@ namespace Network_Components
 
 			member_container(vector<typename MasterType::routable_network_type*>, routable_networks_container, none, none);
 
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType routable_network(){return (TargetType)(_routable_networks_container[_thread_id]);}tag_getter_as_available(routable_network);
 
 			member_container(vector<typename MasterType::turn_movement_type*>, turn_movements_container, none, none);
@@ -50,18 +50,18 @@ namespace Network_Components
 				{
 					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersection_itr);
 					intersection->template intersection_control<_Intersection_Control_Interface*>()->template network_reference<_Network_Interface*>((_Network_Interface*)this);
-					intersection->template intersection_control<_Intersection_Control_Interface*>()->template set_node_control_plan_index<NULLTYPE>(scenario_reference<CallerType,_Scenario_Interface*>()->template simulation_start_time<int>());
+					intersection->template intersection_control<_Intersection_Control_Interface*>()->template set_node_control_plan_index<NULLTYPE>(scenario_reference<ComponentType,CallerType,_Scenario_Interface*>()->template simulation_start_time<int>());
 				}
 			}
 
 			feature_implementation void simulation_initialize()
 			{
-				initialize_intersection_control<CallerType,TargetType>();
-				initialize_links<CallerType,TargetType>();
-				initialize_intersections<CallerType,TargetType>();
-				construct_network_cost<CallerType,TargetType>();
-				construct_routable_network<CallerType,TargetType>();
-				initialize_network_agent<CallerType,TargetType>();
+				initialize_intersection_control<ComponentType,CallerType,TargetType>();
+				initialize_links<ComponentType,CallerType,TargetType>();
+				initialize_intersections<ComponentType,CallerType,TargetType>();
+				construct_network_cost<ComponentType,CallerType,TargetType>();
+				construct_routable_network<ComponentType,CallerType,TargetType>();
+				initialize_network_agent<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_implementation void initialize_network_agent()
@@ -94,7 +94,7 @@ namespace Network_Components
 				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
 				
 				_Network_Interface* _this_ptr = (_Network_Interface*)_this;
-				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE>();
+				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
 				if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>() && _this_ptr->template scenario_reference<_Scenario_Interface*>()->template network_in_network_vehicles<int>() == 0)
 				{
 					_this_ptr->template scenario_reference<_Scenario_Interface*>()->template close_output_files<NULLTYPE>();
@@ -191,7 +191,7 @@ namespace Network_Components
 						
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
-				_Scenario_Interface* scenario = scenario_reference<CallerType,_Scenario_Interface*>();
+				_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
 				_Network_Interface* _this_ptr = (_Network_Interface*)this;
 				printf("%s, ", convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str());
 				printf("loaded=%7d, departed=%7d, arrived=%7d, in_network=%7d\n",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>());
@@ -199,8 +199,8 @@ namespace Network_Components
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
 				//write_network_link_flow<NULLTYPE>();
-				//write_network_link_turn_time<CallerType,TargetType>();
-				//write_output_summary<CallerType,TargetType>();
+				//write_network_link_turn_time<ComponentType,CallerType,TargetType>();
+				write_output_summary<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_implementation void write_vehicle_trajectory();

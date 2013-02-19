@@ -42,7 +42,7 @@ namespace Movement_Plan_Components
 			
 			feature void Initialize(TargetType val)
 			{
-				this_component()->template Initialize<CallerType,TargetType>(val);
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>(val);
 			}
 
 			feature_accessor(link, none, none);
@@ -97,7 +97,7 @@ namespace Movement_Plan_Components
 			
 			feature_prototype void load()
 			{
-				this_component()->template load<CallerType,TargetType>();
+				this_component()->template load<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype TargetType next_link()
@@ -131,12 +131,12 @@ namespace Movement_Plan_Components
 
 			feature_prototype void arrive_to_destination()
 			{
-				this_component()->template arrive_to_destination<CallerType,TargetType>();
+				this_component()->template arrive_to_destination<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void transfer_to_next_link(int delayed_time)
 			{
-				this_component()->template transfer_to_next_link<CallerType,TargetType>(delayed_time);
+				this_component()->template transfer_to_next_link<ComponentType,CallerType,TargetType>(delayed_time);
 			}
 
 			feature_prototype TargetType get_current_link_enter_time()

@@ -39,13 +39,13 @@ namespace Movement_Plan_Components
 			//==================================================================================================================
 			/// current_trajectory_position
 			//------------------------------------------------------------------------------------------------------------------
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType current_trajectory_position(requires(check_2(TargetType,int,is_same) || check_2(TargetType,int&,is_same)))
 			{
 				return (TargetType)_current_trajectory_index;
 			}
 
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType current_trajectory_position(requires(!check_2(TargetType,int,is_same) && !check_2(TargetType,int&,is_same)))
 			{
 				return (TargetType)_trajectory_container[_current_trajectory_index];
@@ -53,7 +53,7 @@ namespace Movement_Plan_Components
 			
 			tag_getter_as_available(current_trajectory_position);
 
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			void current_trajectory_position(TargetType val,requires(check_2(TargetType,int,is_same) || check_2(TargetType,int&,is_same)))
 			{
 				_current_trajectory_index=val;
@@ -64,21 +64,21 @@ namespace Movement_Plan_Components
 
 			member_component(typename MasterType::link_type, origin, none, none);
 			member_component(typename MasterType::link_type, destination, none, none);
-//#ifndef FOR_LINUX_PORTING
+#ifndef FOR_LINUX_PORTING
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_departed_time,none,none);
 			member_component_feature(departed_time, _departed_time, Value, Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_arrived_time,none,none);
 			member_component_feature(arrived_time, _arrived_time, Value, Basic_Units::Prototypes::Time_Prototype);
-//#else
-			/*member_data(int,departed_time,none,none);
-			member_data(int,arrived_time,none,none);*/
-//#endif
+#else
+			member_data(int,departed_time,none,none);
+			member_data(int,arrived_time,none,none);
+#endif
 			member_component(typename MasterType::plan_type, plan, none, none);
 			feature_implementation void arrive_to_destination()
 			{
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 				_trajectory_container[_current_trajectory_index]->_delayed_time = 0.0;
-				this->template arrived_time<CallerType,Simulation_Timestep_Increment>( ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() );
+				this->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>( ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() );
 			}
 
 			feature_implementation void transfer_to_next_link(int delayed_time)

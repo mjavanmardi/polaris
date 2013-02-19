@@ -46,9 +46,9 @@ namespace Turn_Movement_Components
             typedef Turn_Movement_Components::Prototypes::Movement_Prototype<typename replicas_container_type::unqualified_value_type,NULLTYPE> _Replica_Interface;
             typedef Random_Access_Sequence_Prototype<replicas_container_type,NULLTYPE,_Replica_Interface*> _Replicas_Container_Interface;
 			
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType,typename CallerType, typename TargetType>
 			TargetType forward_link_turn_travel_time(){return (TargetType)(_forward_link_turn_travel_time);} tag_getter_as_available(forward_link_turn_travel_time);
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType,typename CallerType, typename TargetType>
 			void forward_link_turn_travel_time(TargetType set_value)
 			{
 				_forward_link_turn_travel_time = (float)set_value;
@@ -171,7 +171,7 @@ namespace Turn_Movement_Components
 						
 				if (num_transfer_vehicles_of_turn_movement>0)
 				{
-					push_vehicles_to_outbound_link<CallerType,NULLTYPE>(num_transfer_vehicles_of_turn_movement);
+					push_vehicles_to_outbound_link<ComponentType,CallerType,NULLTYPE>(num_transfer_vehicles_of_turn_movement);
 					float delay=_outbound_link_arrived_time_based_experienced_link_turn_travel_delay/((float)num_transfer_vehicles_of_turn_movement);
 					_outbound_link_arrived_time_based_experienced_link_turn_travel_delay= delay;
 				}
@@ -287,7 +287,7 @@ namespace Turn_Movement_Components
 
 					turn_travel_penalty = (float) ( turn_travel_penalty/((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()) );
 					_turn_travel_penalty = turn_travel_penalty;
-					forward_link_turn_travel_time<CallerType,float>(((_Link_Interface*)_outbound_link)->template travel_time<float>()+_turn_travel_penalty);
+					forward_link_turn_travel_time<ComponentType,CallerType,float>(((_Link_Interface*)_outbound_link)->template travel_time<float>()+_turn_travel_penalty);
 				}
 			}
 
@@ -300,7 +300,7 @@ namespace Turn_Movement_Components
 
 				LOCK(_mvmt_lock);
 
-				vehicles_container<CallerType,_Vehicles_Container_Interface&>().push_back((_Vehicle_Interface*)vehicle);
+				vehicles_container<ComponentType,CallerType,_Vehicles_Container_Interface&>().push_back((_Vehicle_Interface*)vehicle);
 				_turn_movement_cumulative_arrived_vehicles++;
 				
 				UNLOCK(_mvmt_lock);

@@ -2,9 +2,9 @@
 #include "Routing_Prototype.h"
 #include "Routable_Link_Implementation.h"
 #include "Routable_Intersection_Implementation.h"
-//#ifndef FOR_LINUX_PORTING
+#ifndef FOR_LINUX_PORTING
 #include "Person_Implementations.h"
-//#endif
+#endif
 #include <iostream>
 namespace Routing_Components
 {
@@ -86,7 +86,7 @@ namespace Routing_Components
 					_Regular_Link_Interface* regular_link = (_Regular_Link_Interface*)(*regular_link_itr);
 					_Routable_Link_Interface* routable_link =  (_Routable_Link_Interface*)Allocate<typename _Routable_Link_Interface::Component_Type>();
 					routable_link->template construct_routable_from_regular<_Regular_Link_Interface*>(regular_link);
-					links_container<CallerType,_Routable_Links_Container_Interface&>().push_back(routable_link);
+					links_container<ComponentType,CallerType,_Routable_Links_Container_Interface&>().push_back(routable_link);
 					linksMap.insert(pair<int, _Routable_Link_Interface*>(regular_link->template internal_id<int>(), routable_link));
 					regular_link->template replicas_container<_Routable_Links_Container_Interface&>().push_back(routable_link);
 				}
@@ -109,7 +109,7 @@ namespace Routing_Components
 					typedef dense_hash_map<int,_Routable_Link_Interface*>& linksMapType;
 					routable_intersection->template construct_routable_from_regular<Target_Type<NULLTYPE,void,_Regular_Intersection_Interface*,linksMapType>>(regular_intersection, linksMap);
 
-					intersections_container<CallerType,_Routable_Intersections_Container_Interface&>().push_back(routable_intersection);
+					intersections_container<ComponentType,CallerType,_Routable_Intersections_Container_Interface&>().push_back(routable_intersection);
 					intersectionsMap.insert(pair<int, _Routable_Intersection_Interface*>(regular_intersection->template internal_id<int>(), routable_intersection));
 				}
 				cout << " adding up/down streams to each link" << endl;
@@ -134,14 +134,14 @@ namespace Routing_Components
 
 		implementation struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType>
 		{
-//#ifndef FOR_LINUX_PORTING
+#ifndef FOR_LINUX_PORTING
 			member_component(typename MasterType::person_type, traveler, none, none);
 			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
-//#else
-//			member_component(typename MasterType::traveler_type, traveler, none, none);
-//			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
-//#endif
-			template<typename CallerType, typename TargetType>
+#else
+			member_component(typename MasterType::traveler_type, traveler, none, none);
+			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
+#endif
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType vehicle()
 			{
 				return ((_Traveler_Interface*)_traveler)->template vehicle<TargetType>();
@@ -152,16 +152,14 @@ namespace Routing_Components
 			member_component(typename MasterType::network_type, network, none, none);
 
 			define_component_interface(_Network_Interface, typename MasterType::network_type, Network_Components::Prototypes::Network_Prototype, NULLTYPE);
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType routable_network()
 			{
 				return ((_Network_Interface*)_network)->template routable_network<TargetType>();
 			}
 			
 			tag_getter_as_available(routable_network);			
-					
-
-//#ifndef FOR_LINUX_PORTING
+#ifndef FOR_LINUX_PORTING
 			// time increment at which skim tables are updated - set in the initializer
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
 			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time_Prototype);
@@ -171,8 +169,8 @@ namespace Routing_Components
 			member_component_feature(start_time,_start_time,Value,Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_end_time,none,none);
 			member_component_feature(end_time,_end_time,Value,Basic_Units::Prototypes::Time_Prototype);
-//#endif		
-			template<typename CallerType, typename TargetType>
+#endif		
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			void routable_origin(TargetType set_value)
 			{
 				_routable_origin = set_value->template internal_id<int>();
@@ -185,7 +183,7 @@ namespace Routing_Components
 			typedef Random_Access_Sequence_Prototype<_Links_Container_Type, NULLTYPE, void*> _Links_Container_Interface;
 
 			typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::routable_network_type, NULLTYPE> _Routable_Network_Interface;
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType routable_origin()
 			{
 				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links_container<_Links_Container_Interface&>()[_routable_origin]);
@@ -194,14 +192,14 @@ namespace Routing_Components
 
 			int _routable_origin;
 
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			void routable_destination(TargetType set_value)
 			{
 				_routable_destination = set_value->template internal_id<int>();
 			}
 			tag_setter_as_available(routable_destination);
 
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType routable_destination()
 			{
 				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links_container<_Links_Container_Interface&>()[_routable_destination]);
@@ -219,15 +217,14 @@ namespace Routing_Components
 		implementation struct Polaris_Integrated_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Integrated_Routing_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			member_container(vector<float>,travel_times_to_link_container,none,none);
-
-//#ifndef FOR_LINUX_PORTING
+#ifndef FOR_LINUX_PORTING
 			member_component(typename MasterType::person_type, traveler, none, none);
 			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
-//#else
-//			member_component(typename MasterType::traveler_type, traveler, none, none);
-//			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
-//#endif
-			template<typename CallerType, typename TargetType>
+#else
+			member_component(typename MasterType::traveler_type, traveler, none, none);
+			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
+#endif
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType vehicle()
 			{
 				return ((_Traveler_Interface*)_traveler)->template vehicle<TargetType>();
@@ -238,15 +235,14 @@ namespace Routing_Components
 			member_component(typename MasterType::network_type, network, none, none);
 
 			define_component_interface(_Network_Interface, typename MasterType::network_type, Network_Components::Prototypes::Network_Prototype, NULLTYPE);
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType routable_network()
 			{
 				return ((_Network_Interface*)_network)->template routable_network<TargetType>();
 			}
 			
 			tag_getter_as_available(routable_network);			
-	
-//#ifndef FOR_LINUX_PORTING			
+#ifndef FOR_LINUX_PORTING			
 
 			// time increment at which skim tables are updated - set in the initializer
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
@@ -257,8 +253,8 @@ namespace Routing_Components
 			member_component_feature(start_time,_start_time,Value,Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_end_time,none,none);
 			member_component_feature(end_time,_end_time,Value,Basic_Units::Prototypes::Time_Prototype);
-//#endif	
-			template<typename CallerType, typename TargetType>
+#endif	
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			void routable_origin(TargetType set_value)
 			{
 				_routable_origin = set_value->template internal_id<int>();
@@ -271,7 +267,7 @@ namespace Routing_Components
 			typedef Random_Access_Sequence_Prototype<_Links_Container_Type, NULLTYPE, void*> _Links_Container_Interface;
 
 			typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::routable_network_type, NULLTYPE> _Routable_Network_Interface;
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType routable_origin()
 			{
 				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links_container<_Links_Container_Interface&>()[_routable_origin]);
@@ -280,14 +276,14 @@ namespace Routing_Components
 
 			int _routable_origin;
 
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			void routable_destination(TargetType set_value)
 			{
 				_routable_destination = set_value->template internal_id<int>();
 			}
 			tag_setter_as_available(routable_destination);
 
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType routable_destination()
 			{
 				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links_container<_Links_Container_Interface&>()[_routable_destination]);

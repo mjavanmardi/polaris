@@ -29,10 +29,10 @@ namespace Network_Components
 			string name(scenario_reference<ComponentType,CallerType,_Scenario_Interface*>()->template database_name<string&>());
 			auto_ptr<database> db (open_sqlite_database (name));
 			transaction t(db->begin());
-			read_intersection_data<CallerType,TargetType>(db, net_io_maps);
-			read_link_data<CallerType,TargetType>(db, net_io_maps);
-			read_turn_movement_data<CallerType,TargetType>(db, net_io_maps);
-			read_activity_location_data<CallerType,TargetType>(db, net_io_maps);
+			read_intersection_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
+			read_link_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
+			read_turn_movement_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
+			read_activity_location_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 		}
 
 		feature_implementation_definition void Polaris_Network_Implementation<typename MasterType,ParentType>::read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)

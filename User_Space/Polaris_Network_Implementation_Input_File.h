@@ -14,11 +14,11 @@ namespace Network_Components
 	{
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			read_intersection_data<CallerType,TargetType>(network_data);
-			read_link_data<CallerType,TargetType>(network_data);
-			read_turn_movement_data<CallerType,TargetType>(network_data);
-			read_activity_location_data<CallerType,TargetType>(network_data);
-			read_zone_data<CallerType,TargetType>(network_data);
+			read_intersection_data<ComponentType,CallerType,TargetType>(network_data);
+			read_link_data<ComponentType,CallerType,TargetType>(network_data);
+			read_turn_movement_data<ComponentType,CallerType,TargetType>(network_data);
+			read_activity_location_data<ComponentType,CallerType,TargetType>(network_data);
+			read_zone_data<ComponentType,CallerType,TargetType>(network_data);
 		}
 
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_intersection_data(network_models::network_information::network_data_information::NetworkData& network_data)
@@ -32,7 +32,7 @@ namespace Network_Components
 				intersection->template x_position<float>(network_data.node_data_array[i].x);
 				intersection->template y_position<float>(network_data.node_data_array[i].y);
 				intersection->template intersection_type<int>(network_data.node_data_array[i].node_type);
-				intersections_container<CallerType,_Intersections_Container_Interface&>().push_back(intersection);
+				intersections_container<ComponentType,CallerType,_Intersections_Container_Interface&>().push_back(intersection);
 			}
 		}
 
@@ -70,7 +70,7 @@ namespace Network_Components
 				link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
 				link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
 
-				links_container<CallerType,_Links_Container_Interface&>().push_back(link);
+				links_container<ComponentType,CallerType,_Links_Container_Interface&>().push_back(link);
 			}
 		}
 
@@ -95,7 +95,7 @@ namespace Network_Components
 				turn_movement->template internal_id<int>(i);
 				//// assign the detector
 				//turn_movement_1->template detector<Detector_Interface*>(lane->template Detector_Thru<Detector_Interface*>());
-				turn_movements_container<CallerType,_Turn_Movements_Container_Interface&>().push_back(turn_movement);
+				turn_movements_container<ComponentType,CallerType,_Turn_Movements_Container_Interface&>().push_back(turn_movement);
 			}
 
 			typename _Turn_Movements_Container_Interface::iterator turn_movements_itr;
@@ -184,7 +184,7 @@ namespace Network_Components
 				}
 				activity_location->template uuid<int>(raw_activity_location.uuid);
 				activity_location->template internal_id<int>(i);
-				activity_locations_container<CallerType,_Activity_Locations_Container_Interface&>().push_back(activity_location);
+				activity_locations_container<ComponentType,CallerType,_Activity_Locations_Container_Interface&>().push_back(activity_location);
 			}
 		}
 
@@ -217,7 +217,7 @@ namespace Network_Components
 					
 				zone->template uuid<int>(raw_zone.uuid);
 				zone->template internal_id<int>(i);
-				zones_container<CallerType,_Zones_Container_Interface&>().push_back(zone);
+				zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().push_back(zone);
 			}
 			for (int i = 0; i < network_data.network_activity_location_size; i++)
 			{

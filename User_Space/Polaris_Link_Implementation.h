@@ -141,9 +141,9 @@ namespace Link_Components
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------
 			typedef Link_Prototype<typename MasterType::routable_link_type, NULLTYPE> replica_interface;
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType travel_time(){return (TargetType)(_travel_time);} tag_getter_as_available(travel_time);
-			template<typename CallerType, typename TargetType>
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			void travel_time(TargetType set_value)
 			{
 				_travel_time = (float)set_value;
@@ -376,7 +376,7 @@ namespace Link_Components
 				int current_position = _link_origin_vehicle_current_position;
 				if(current_position<(int)_link_origin_vehicle_array.size())
 				{
-					queue_vehicles<CallerType,TargetType>(current_position);
+					queue_vehicles<ComponentType,CallerType,TargetType>(current_position);
 				}
 
 				//have demand
@@ -399,7 +399,7 @@ namespace Link_Components
 					if(num_link_origin_departed_vehicles_allowed>0)
 					{
 						int num_departed_vehicles = min(_link_origin_arrived_vehicles,num_link_origin_departed_vehicles_allowed);
-						load_vehicles<CallerType,TargetType>(num_departed_vehicles);
+						load_vehicles<ComponentType,CallerType,TargetType>(num_departed_vehicles);
 					}
 				}
 			}
@@ -437,8 +437,8 @@ namespace Link_Components
 				{
 					//update current position
 					_link_origin_vehicle_current_position++;
-					_Vehicle_Interface* vehicle = (_Vehicle_Interface*)link_origin_vehicle_array<CallerType,_Vehicles_Origin_Container_Interface&>()[iv];
-					link_origin_vehicle_queue<CallerType,_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
+					_Vehicle_Interface* vehicle = (_Vehicle_Interface*)link_origin_vehicle_array<ComponentType,CallerType,_Vehicles_Origin_Container_Interface&>()[iv];
+					link_origin_vehicle_queue<ComponentType,CallerType,_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
 					_link_origin_arrived_vehicles++;
 					_link_origin_loaded_vehicles++;
 					_link_origin_cumulative_arrived_vehicles++;

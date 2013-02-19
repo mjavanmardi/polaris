@@ -287,7 +287,7 @@ namespace Network_Components
 			define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 			_Network_Interface* _this_ptr = (_Network_Interface*)this;
-			_Scenario_Interface* scenario = scenario_reference<CallerType,_Scenario_Interface*>();
+			_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
 
 			fstream& output_summary_file = scenario->template output_summary_file<fstream&>();
 

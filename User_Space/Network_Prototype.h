@@ -185,11 +185,11 @@ namespace Network_Components
 			feature_accessor(information_panel, none, none);
 			feature_prototype void push_vehicle_coordinates(typename TargetType::ParamType data_source)
 			{
-				this_component()->template accept_vehicle_coordinates<CallerType,TargetType>(data_source);
+				this_component()->template accept_vehicle_coordinates<ComponentType,CallerType,TargetType>(data_source);
 			}
 			feature_prototype void submit_num_vehicles()
 			{
-				this_component()->template submit_num_vehicles<CallerType,TargetType>();
+				this_component()->template submit_num_vehicles<ComponentType,CallerType,TargetType>();
 			}
 			//------------------------------------------------------------------------------------------------------------------
 
@@ -207,7 +207,7 @@ namespace Network_Components
 
 			feature_prototype void read_network_data(typename TargetType::ParamType data_source, requires(check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) || check_2(typename TargetType::NetIOType,Types::File_Network,is_same) || check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
 			{
-				this_component()->template read_network_data<CallerType,TargetType>(data_source);
+				this_component()->template read_network_data<ComponentType,CallerType,TargetType>(data_source);
 			}
 
 			feature_prototype void read_network_data(requires(!check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) && !check_2(typename TargetType::NetIOType,Types::File_Network,is_same) && !check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
@@ -220,17 +220,17 @@ namespace Network_Components
 
 			feature_prototype void write_network_data(typename TargetType::ParamType data_destination)
 			{
-				this_component()->template write_network_data<CallerType,TargetType>(data_destination);
+				this_component()->template write_network_data<ComponentType,CallerType,TargetType>(data_destination);
 			}
 
 			feature_prototype void simulation_initialize()
 			{
-				this_component()->template simulation_initialize<CallerType,TargetType>();
+				this_component()->template simulation_initialize<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void reset_routable_network()
 			{
-				this_component()->template reset_routable_network<CallerType,TargetType>();
+				this_component()->template reset_routable_network<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype TargetType current_simulation_interval_index()
@@ -242,12 +242,11 @@ namespace Network_Components
 			feature_prototype TargetType start_of_current_simulation_interval_relative()
 			{
 				define_component_interface(_Scenario_Interface, typename get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-
-//#ifndef FOR_LINUX_PORTING
+#ifndef FOR_LINUX_PORTING
 				int current_time = int(floor(Simulation_Time.Current_Time<Basic_Units::Time_Variables::Time_Seconds>() + 0.5));
-//#else
-//				int current_time = _iteration;
-//#endif
+#else
+				int current_time = _iteration;
+#endif
 				if (current_time < scenario_reference<_Scenario_Interface*>()->template simulation_interval_length<int>() - 1) 
 				{
 					cout << "_iteration must start from (simulation_interval_length - 1)" << endl;

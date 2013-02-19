@@ -98,31 +98,31 @@ namespace Turn_Movement_Components
 			
 			feature_prototype void update_capacity(TargetType param)
 			{
-				this_component()->template update_capacity<CallerType,TargetType>(param);
+				this_component()->template update_capacity<ComponentType,CallerType,TargetType>(param);
 			}
 
 			feature_prototype void update_flow()
 			{
-				this_component()->template update_flow<CallerType,TargetType>();
+				this_component()->template update_flow<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void transfer_vehicles(TargetType param)
 			{
-				this_component()->template transfer_vehicles<CallerType,TargetType>(param);
+				this_component()->template transfer_vehicles<ComponentType,CallerType,TargetType>(param);
 			}
 
 			feature_prototype void update_state(TargetType param)
 			{
-				this_component()->template update_state<CallerType,TargetType>(param);
+				this_component()->template update_state<ComponentType,CallerType,TargetType>(param);
 			}
 
 			feature_prototype void accept_vehicle(TargetType param)
 			{
-				this_component()->template accept_vehicle<CallerType,TargetType>(param);
+				this_component()->template accept_vehicle<ComponentType,CallerType,TargetType>(param);
 			}
 			feature_prototype void initialize_features()
 			{
-				this_component()->template initialize_features<CallerType,TargetType>();
+				this_component()->template initialize_features<ComponentType,CallerType,TargetType>();
 			}
 		};
 	}

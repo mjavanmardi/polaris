@@ -209,7 +209,7 @@ namespace Intersection_Components
 				else
 				{//divide space based on merging policy
 					///propotional to demand
-					float total_transfer_demand = compute_total_transfer_demand<CallerType,float>();
+					float total_transfer_demand = compute_total_transfer_demand<ComponentType,CallerType,float>();
 					for(inbound_itr=_inbound_movements.begin();inbound_itr!=_inbound_movements.end();inbound_itr++)
 					{
 						inbound_movement=(_Movement_Interface*)(*inbound_itr);
@@ -335,25 +335,25 @@ namespace Intersection_Components
 				switch(control_type)
 				{
 					case Types::NO_CONTROL:
-						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
 						break;
 					case Types::YIELD_SIGN:
-						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
 						break;
 					case Types::ALL_WAY_STOP_SIGN:
-						supply_allocation_proportion_to_demand<CallerType,TargetType>();
+						supply_allocation_proportion_to_demand<ComponentType,CallerType,TargetType>();
 						break;
 					case Types::TWO_WAY_STOP_SIGN:
-						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
 						break;
 					case Types::PRE_TIMED_SIGNAL_CONTROL:
-						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
 						break;
 					case Types::ACTUATED_SIGNAL_CONTROL:
-						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
 						break;
 					case Types::ADAPTIVE_SIGNAL_CONTROL:
-						supply_allocation_based_on_driving_rule<CallerType,TargetType>();
+						supply_allocation_based_on_driving_rule<ComponentType,CallerType,TargetType>();
 						break;
 				}
 			}
