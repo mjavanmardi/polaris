@@ -30,7 +30,7 @@
 /// feature_implementation - standard declarator for all implementation features
 ///============================================================================
 
-#define feature_implementation public: template<typename CallerType,typename TargetType>
+#define feature_implementation public: template<typename ComponentType,typename CallerType,typename TargetType>
 
 ///====================================================================================
 /// feature_implementation_definition - standard definition for implementation features
@@ -38,7 +38,7 @@
 
 #define feature_implementation_definition\
 	template<typename MasterType,typename ParentType,typename InheritanceList>\
-	template<typename CallerType,typename TargetType>
+	template<typename ComponentType,typename CallerType,typename TargetType>
 
 ///============================================================================
 /// declare_feature_event - header for a basic event feature
@@ -52,7 +52,7 @@ struct event_type{};
 
 #define declare_feature_event_implementation(FEATURE_NAME)\
 	typedef event_type FEATURE_NAME##_event_tag;\
-	template<typename CallerType,typename TargetType> static void FEATURE_NAME(void* _this)
+	template<typename ComponentType,typename CallerType,typename TargetType> static void FEATURE_NAME(void* _this)
 
 template<typename Type>
 struct member_function_ptr_types<Type,event_type>
@@ -72,7 +72,7 @@ struct conditional_type{};
 
 #define declare_feature_conditional_implementation(FEATURE_NAME)\
 	typedef conditional_type FEATURE_NAME##_conditional_tag;\
-	template<typename CallerType,typename TargetType> static void FEATURE_NAME(void* _this,Conditional_Response& response)
+	template<typename ComponentType,typename CallerType,typename TargetType> static void FEATURE_NAME(void* _this,Conditional_Response& response)
 
 template<typename Type>
 struct member_function_ptr_types<Type,conditional_type>
@@ -182,7 +182,7 @@ struct member_function_ptr_types<Type,communication_handler_type>
 		template<typename SetValueType>\
 		void FEATURE_NAME(SetValueType set_value,requires_setter(check(ComponentType,FEATURE_NAME##_set_check) && (SETTER_REQUIREMENTS)))\
 		{\
-			this_component()->template FEATURE_NAME<CallerType,SetValueType>(set_value);\
+			this_component()->template FEATURE_NAME<ComponentType,CallerType,SetValueType>(set_value);\
 		}\
 		template<typename SetValueType>\
 		void FEATURE_NAME(SetValueType set_value,requires_setter(!check(ComponentType,FEATURE_NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
@@ -200,7 +200,7 @@ struct member_function_ptr_types<Type,communication_handler_type>
 		template<typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(check(ComponentType,FEATURE_NAME##_get_check) && (GETTER_REQUIREMENTS)))\
 		{\
-			return this_component()->template FEATURE_NAME<CallerType,ReturnValueType>();\
+			return this_component()->template FEATURE_NAME<ComponentType,CallerType,ReturnValueType>();\
 		}\
 		template<typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check(ComponentType,FEATURE_NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
@@ -260,23 +260,23 @@ struct member_function_ptr_types<Type,setter_type>
 	public:\
 	    DATA_TYPE* _##FEATURE_NAME;\
 		typedef DATA_TYPE FEATURE_NAME##_type;\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(*_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
 		{static_assert(!(GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(DATA_TYPE*)(&value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(DATA_TYPE*)(value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
 		{static_assert(!(SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
@@ -285,23 +285,23 @@ struct member_function_ptr_types<Type,setter_type>
 	public:\
 		DATA_TYPE _##FEATURE_NAME;\
 		typedef DATA_TYPE FEATURE_NAME##_type;\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(&_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
 		{static_assert((GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=((DATA_TYPE)value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(DATA_TYPE)(*value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
 		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
@@ -314,23 +314,23 @@ struct member_function_ptr_types<Type,setter_type>
 	public:\
 		COMPONENT_TYPE* _##FEATURE_NAME;\
 		typedef COMPONENT_TYPE FEATURE_NAME##_type;\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(*_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
 		{static_assert((GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(COMPONENT_TYPE*)(&value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(COMPONENT_TYPE*)(value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
 		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
@@ -339,23 +339,23 @@ struct member_function_ptr_types<Type,setter_type>
 	public:\
 		COMPONENT_TYPE _##FEATURE_NAME;\
 		typedef COMPONENT_TYPE FEATURE_NAME##_type;\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(&_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
 		{static_assert((GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(COMPONENT_TYPE)(value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(COMPONENT_TYPE)(*value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
 		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
@@ -369,23 +369,23 @@ struct member_function_ptr_types<Type,setter_type>
 	public:\
 		PROTOTYPE<COMPONENT_TYPE,ComponentType>* _##FEATURE_NAME;\
 		typedef COMPONENT_TYPE FEATURE_NAME##_type;\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(*_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
 		{static_assert((GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(PROTOTYPE<COMPONENT_TYPE,ComponentType>*)(&value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(check_as_given(SetValueType,is_pointer) && (SETTER_REQUIREMENTS)))\
 		{_##FEATURE_NAME=(PROTOTYPE<COMPONENT_TYPE,ComponentType>*)(value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
 		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
@@ -424,23 +424,23 @@ struct member_function_ptr_types<Type,setter_type>
 	public:\
 		Polaris_Container<CONTAINER_TYPE> _##FEATURE_NAME;\
 		typedef Polaris_Container<CONTAINER_TYPE> FEATURE_NAME##_type;\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && GETTER_REQUIREMENTS))\
 		{return (ReturnValueType)(_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(check_as_given(ReturnValueType,is_pointer) && GETTER_REQUIREMENTS))\
 		{return (ReturnValueType)(&_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
 		{static_assert((GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && SETTER_REQUIREMENTS))\
 		{_##FEATURE_NAME=(Polaris_Container<CONTAINER_TYPE>&)value;}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(check_as_given(SetValueType,is_pointer) && SETTER_REQUIREMENTS))\
 		{_##FEATURE_NAME=(Polaris_Container<CONTAINER_TYPE>&)(*value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
 		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
@@ -449,23 +449,23 @@ struct member_function_ptr_types<Type,setter_type>
 	public:\
 		Polaris_Associative_Container<CONTAINER_TYPE> _##FEATURE_NAME;\
 		typedef Polaris_Associative_Container<CONTAINER_TYPE> FEATURE_NAME##_type;\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && GETTER_REQUIREMENTS))\
 		{return (ReturnValueType)(_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(check_as_given(ReturnValueType,is_pointer) && GETTER_REQUIREMENTS))\
 		{return (ReturnValueType)(&_##FEATURE_NAME);}\
-		template<typename CallerType, typename ReturnValueType>\
+		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!(GETTER_REQUIREMENTS)))\
 		{static_assert((GETTER_REQUIREMENTS) && True_Concept<ReturnValueType>::value,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_getter_as_available(FEATURE_NAME);\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(!check_as_given(SetValueType,is_pointer) && SETTER_REQUIREMENTS))\
 		{_##FEATURE_NAME=(Polaris_Associative_Container<CONTAINER_TYPE>&)value;}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		void FEATURE_NAME(SetValueType value,requires_setter(check_as_given(SetValueType,is_pointer) && SETTER_REQUIREMENTS))\
 		{_##FEATURE_NAME=(Polaris_Associative_Container<CONTAINER_TYPE>&)(*value);}\
-		template<typename CallerType, typename SetValueType>\
+		template<typename ComponentType, typename CallerType, typename SetValueType>\
 		SetValueType FEATURE_NAME(SetValueType value, requires_setter(!(SETTER_REQUIREMENTS)))\
 		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
@@ -473,27 +473,27 @@ struct member_function_ptr_types<Type,setter_type>
 
 #define member_component_feature(FEATURE_NAME, MEMBER_COMPONENT_NAME, MEMBER_COMPONENT_FEATURE, MEMBER_COMPONENT_PROTOTYPE)\
 	define_get_set_exists_delay_check(MEMBER_COMPONENT_NAME,get_##MEMBER_COMPONENT_NAME, set_##MEMBER_COMPONENT_NAME);\
-	template<typename CallerType, typename ReturnValueType>\
+	template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 	ReturnValueType FEATURE_NAME(requires_getter(check_2(ComponentType,CallerType,get_##MEMBER_COMPONENT_NAME) /*&& check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
 	{\
 		define_component_interface(MEMBER_COMPONENT_NAME##_itf,type_of(typename ComponentType::MEMBER_COMPONENT_NAME),MEMBER_COMPONENT_PROTOTYPE,ComponentType);\
 		MEMBER_COMPONENT_NAME##_itf* itf = this->template MEMBER_COMPONENT_NAME<CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
 		return itf->template MEMBER_COMPONENT_FEATURE<ReturnValueType>();\
 	}\
-	template<typename CallerType, typename ReturnValueType>\
+	template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 	ReturnValueType FEATURE_NAME(requires_getter(!check_2(ComponentType,CallerType,get_##MEMBER_COMPONENT_NAME) /*|| !check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
 	{\
 		assert_check(ComponentType,get_##MEMBER_COMPONENT_NAME,"Getter for \"" #MEMBER_COMPONENT_NAME"\" could not be found.");\
 		/*assert_check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity,"Component does not have permission to access " #MEMBER_COMPONENT_NAME "based on the entity type.");*/\
 	}\
-	template<typename CallerType, typename SetValueType>\
+	template<typename ComponentType, typename CallerType, typename SetValueType>\
 	void FEATURE_NAME(SetValueType value, requires_setter(check_2(ComponentType,CallerType,set_##MEMBER_COMPONENT_NAME) /*&& check_2(ComponentType,typename type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
 	{\
 		define_component_interface(MEMBER_COMPONENT_NAME##_itf,type_of(typename ComponentType::MEMBER_COMPONENT_NAME),MEMBER_COMPONENT_PROTOTYPE,ComponentType);\
 		MEMBER_COMPONENT_NAME##_itf* itf = this->template MEMBER_COMPONENT_NAME<CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
 		itf->template MEMBER_COMPONENT_FEATURE<SetValueType>(value);\
 	}\
-	template<typename CallerType, typename SetValueType>\
+	template<typename ComponentType, typename CallerType, typename SetValueType>\
 	void FEATURE_NAME(SetValueType value, requires_setter(!check_2(ComponentType,CallerType,set_##MEMBER_COMPONENT_NAME) /*|| !check_2(ComponentType,typename type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
 	{\
 		assert_check(ComponentType,set_##MEMBER_COMPONENT_NAME,"Setter for \"" #MEMBER_COMPONENT_NAME"\" could not be found.");\
