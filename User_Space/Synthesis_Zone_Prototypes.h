@@ -217,26 +217,27 @@ namespace PopSyn
 						int num_generated=0;
 						double w = range.first->second->template Weight<double>();
 
-						int attempts_to_make = (int)((float)num_required * settings.Percentage_to_synthesize<float>());
+						int attempts_to_make = (int)((float)num_required * settings.template Percentage_to_synthesize<float>());
 						
 						for (int i = 0; i<attempts_to_make; ++i)
 						{
 							if (rand.template Next_Rand<double>() < w/cumulative_weight)
 							{					
-								pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>();
+								//pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>();
 								pop_unit_itf* obj = range.first->second;
-								p->template Initialize<pop_unit_itf&>(*obj);
-								zone_sample->insert(p->template Index<uint>(),p);
+								//p->template Initialize<pop_unit_itf&>(*obj);
+								zone_sample->insert(obj->template Index<uint>(),obj);
 								int size = sizeof(typename sample_itf::Component_Type);
-								num_generated += (int)(1.0f / settings.Percentage_to_synthesize<float>());
+								num_generated += (int)(1.0f / settings.template Percentage_to_synthesize<float>());
 
 								// create the actual person agent
-								typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
+								this->Create_Person<int>(num_created);
+								/*typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
 								_Person_Interface* person=(_Person_Interface*)Allocate<typename ComponentType::Master_Type::person_type>();
 								person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
 								person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
-								person->Initialize<int>(num_created);
-								num_created += (int)(1.0f / settings.Percentage_to_synthesize<float>());
+								person->Initialize<int>(num_created);*/
+								num_created += (int)(1.0f / settings.template Percentage_to_synthesize<float>());
 							}
 						}
 						// reduce the number required by the number generated and the cumulative weight
@@ -256,14 +257,9 @@ namespace PopSyn
 						p->Initialize<pop_unit_itf&>(*obj);
 						zone_sample->insert(p->template Index<uint>(),p);
 						// create the actual person agent
-						typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
-						_Person_Interface* person=(_Person_Interface*)Allocate<typename ComponentType::Master_Type::person_type>();
-						person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
-						person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
-						person->Initialize<int>(num_created);
-						num_created+=(int)(1.0f / settings.Percentage_to_synthesize<float>());
-
-						num_required-=(int)(1.0f / settings.Percentage_to_synthesize<float>());
+						this->Create_Person<int>(num_created);
+						num_created+=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
+						num_required-=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
 					}
 
 					//----------------------------------------------------------------------------------
@@ -275,15 +271,10 @@ namespace PopSyn
 						p->Initialize<pop_unit_itf&>(*obj);
 						zone_sample->insert(p->template Index<uint>(),p);
 						// create the actual person agent
-						typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
-						_Person_Interface* person=(_Person_Interface*)Allocate<typename ComponentType::Master_Type::person_type>();
-						person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
-						person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
-						person->Initialize<int>(num_created);
-						num_created+=(int)(1.0f / settings.Percentage_to_synthesize<float>());
-						num_required-=(int)(1.0f / settings.Percentage_to_synthesize<float>());
+						this->Create_Person<int>(num_created);
+						num_created+=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
+						num_required-=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
 					}
-
 
 					// if at the end of the map, break so that increment does not go past end of data_structure
 					itr = range.second;
@@ -296,6 +287,17 @@ namespace PopSyn
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
 				assert_check_as_given(TargetType, is_pointer,"Is not a pointer");
 				assert_check(TargetType, Containers::Concepts::Is_Associative, "Container is not associative.");
+			}
+			feature_prototype void Create_Person(TargetType id)
+			{
+				define_component_interface(_Network_Interface,typename ComponentType::Master_Type::network_type,Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_component_interface(_Scenario_Interface,typename ComponentType::Master_Type::scenario_type,Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
+				typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
+
+				_Person_Interface* person=(_Person_Interface*)Allocate<typename ComponentType::Master_Type::person_type>();
+				person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
+				person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
+				person->Initialize<int>(id);
 			}
 
 			//===================================================================================================================================

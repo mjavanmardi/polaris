@@ -190,7 +190,7 @@ namespace Person_Components
 
 		implementation struct ADAPTS_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(ADAPTS_Person_Planner_Implementation)>
 		{
-			typedef General_Person_Planner_Implementation base_type;
+			typedef General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(ADAPTS_Person_Planner_Implementation)> base_type;
 
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
@@ -239,12 +239,12 @@ namespace Person_Components
 
 		implementation struct CTRAMP_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(CTRAMP_Person_Planner_Implementation)>
 		{
-			typedef General_Person_Planner_Implementation base_type;
+			typedef General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(CTRAMP_Person_Planner_Implementation)> base_type;
 
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
-				General_Person_Planner_Implementation::Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
-				General_Person_Planner_Implementation::Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
+				base_type::template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
+				base_type::template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
 
 				// get reference to the parent pointer and set the first activity generation time to be the parent first iteration
 				define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
@@ -320,14 +320,14 @@ namespace Person_Components
 		
 		implementation struct TRANSIMS_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(TRANSIMS_Person_Planner_Implementation)>
 		{
-			typedef General_Person_Planner_Implementation base_type;
+			typedef General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(TRANSIMS_Person_Planner_Implementation)> base_type;
 
 			feature_implementation void Initialize(TargetType trip, requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
 				// Set the event schedule parameters
-				this->template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
-				this->template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
-				this->template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(END);
+				base_type::template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
+				base_type::template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
+				base_type::template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(END);
 
 				// Create alias for this to use in conditional
 				typedef Prototypes::Person_Planner<ComponentType, ComponentType> _Planning_Interface;

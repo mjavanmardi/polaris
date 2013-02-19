@@ -1,7 +1,7 @@
 #pragma once
 #include "User_Space.h"
 #include "../File_IO/utilities.h"
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 #include "Network_Skimming_Prototype.h"
 #endif
 #ifndef WINDOWS
@@ -50,7 +50,7 @@ namespace Routing_Components
 					response.next._iteration=END;
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION;
 				}
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 				else if (_sub_iteration == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
 				{
 					if (_iteration >= _this_ptr->start_time<Simulation_Timestep_Increment>() && _iteration < _this_ptr->end_time<Simulation_Timestep_Increment>())
@@ -411,7 +411,7 @@ namespace Routing_Components
 				define_component_interface(_Scenario_Interface, typename _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				load_event(ComponentType,Compute_Route_Condition,Compute_Route,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 			}
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 			feature_prototype void Initialize_Tree_Computation(int departed_time)
 			{
 				// initialize the containers for skimmed travel times to links

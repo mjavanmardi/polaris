@@ -79,9 +79,9 @@ namespace PopSyn
 			}
 			feature_prototype bool Start_Popsyn(requires(check(ComponentType,Concepts::Uses_Linker_File)))
 			{
-				cout<<endl<<"====================================================="<<endl<<"Starting synthetic population generation:"<<endl;
 				//------------------------
 				// TIMER
+				cout<<endl<<"====================================================="<<endl<<"Starting synthetic population generation:"<<endl;
 				Counter timer;
 				timer.Start();
 				//------------------------
@@ -89,7 +89,6 @@ namespace PopSyn
 				int ndim, ans;
 				Linker linker = Linker();
 				File_IO::File_Writer fw, fw_sample;
-
 				ostream& out = this->Output_Stream<ostream&>();
 
 
@@ -99,7 +98,6 @@ namespace PopSyn
 				// CREATE RNG for later use
 				define_component_interface(Rand_Interface,typename ComponentType::Master_Type::RNG,RNG_Prototype,NULLTYPE);
 				Rand_Interface* rand = (Rand_Interface*)Allocate<typename ComponentType::Master_Type::RNG>();
-
 				rand->Initialize<double>(0);
 
 				// IPF Solver Settings
@@ -180,7 +178,6 @@ namespace PopSyn
 
 						//-----------------------------------------------------------------------------------------
 						// Initialize the distribution and marginals
-
 						dist->resize(dimensions,0.0);
 						marg->resize(dimensions,0.0);
 

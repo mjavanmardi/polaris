@@ -21,7 +21,7 @@ namespace Vehicle_Components
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
 			member_component(typename MasterType::movement_plan_type, movement_plan, none, none);
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 			member_component(typename MasterType::person_type, traveler, none, none);
 #else
 			member_component(typename MasterType::traveler_type, traveler, none, none);

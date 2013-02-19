@@ -1,7 +1,10 @@
 #include "Model_Selection.h"
 
-#ifdef IntegratedModelApplication
 #define FOR_LINUX_PORTING
+//#define EXCLUDE_DEMAND
+
+#ifdef IntegratedModelApplication
+
 
 //#define DBIO
 #ifdef DBIO

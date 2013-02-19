@@ -472,29 +472,29 @@ struct member_function_ptr_types<Type,setter_type>
 
 
 #define member_component_feature(FEATURE_NAME, MEMBER_COMPONENT_NAME, MEMBER_COMPONENT_FEATURE, MEMBER_COMPONENT_PROTOTYPE)\
-	define_get_set_exists_delay_check(MEMBER_COMPONENT_NAME,get_##MEMBER_COMPONENT_NAME, set_##MEMBER_COMPONENT_NAME);\
+	define_get_set_exists_check(MEMBER_COMPONENT_NAME,get_##MEMBER_COMPONENT_NAME, set_##MEMBER_COMPONENT_NAME);\
 	template<typename ComponentType, typename CallerType, typename ReturnValueType>\
-	ReturnValueType FEATURE_NAME(requires_getter(check_2(ComponentType,CallerType,get_##MEMBER_COMPONENT_NAME) /*&& check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
+	ReturnValueType FEATURE_NAME(requires_getter(check(ComponentType,get_##MEMBER_COMPONENT_NAME) /*&& check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
 	{\
 		define_component_interface(MEMBER_COMPONENT_NAME##_itf,type_of(typename ComponentType::MEMBER_COMPONENT_NAME),MEMBER_COMPONENT_PROTOTYPE,ComponentType);\
 		MEMBER_COMPONENT_NAME##_itf* itf = this->template MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
 		return itf->template MEMBER_COMPONENT_FEATURE<ReturnValueType>();\
 	}\
 	template<typename ComponentType, typename CallerType, typename ReturnValueType>\
-	ReturnValueType FEATURE_NAME(requires_getter(!check_2(ComponentType,CallerType,get_##MEMBER_COMPONENT_NAME) /*|| !check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
+	ReturnValueType FEATURE_NAME(requires_getter(!check(ComponentType,get_##MEMBER_COMPONENT_NAME) /*|| !check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
 	{\
 		assert_check(ComponentType,get_##MEMBER_COMPONENT_NAME,"Getter for \"" #MEMBER_COMPONENT_NAME"\" could not be found.");\
 		/*assert_check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity,"Component does not have permission to access " #MEMBER_COMPONENT_NAME "based on the entity type.");*/\
 	}\
 	template<typename ComponentType, typename CallerType, typename SetValueType>\
-	void FEATURE_NAME(SetValueType value, requires_setter(check_2(ComponentType,CallerType,set_##MEMBER_COMPONENT_NAME) /*&& check_2(ComponentType,typename type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
+	void FEATURE_NAME(SetValueType value, requires_setter(check(ComponentType,set_##MEMBER_COMPONENT_NAME) /*&& check_2(ComponentType,typename type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
 	{\
 		define_component_interface(MEMBER_COMPONENT_NAME##_itf,type_of(typename ComponentType::MEMBER_COMPONENT_NAME),MEMBER_COMPONENT_PROTOTYPE,ComponentType);\
 		MEMBER_COMPONENT_NAME##_itf* itf = this->template MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
 		itf->template MEMBER_COMPONENT_FEATURE<SetValueType>(value);\
 	}\
 	template<typename ComponentType, typename CallerType, typename SetValueType>\
-	void FEATURE_NAME(SetValueType value, requires_setter(!check_2(ComponentType,CallerType,set_##MEMBER_COMPONENT_NAME) /*|| !check_2(ComponentType,typename type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
+	void FEATURE_NAME(SetValueType value, requires_setter(!check(ComponentType,set_##MEMBER_COMPONENT_NAME) /*|| !check_2(ComponentType,typename type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
 	{\
 		assert_check(ComponentType,set_##MEMBER_COMPONENT_NAME,"Setter for \"" #MEMBER_COMPONENT_NAME"\" could not be found.");\
 		/*assert_check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity,"Component does not have permission to access " #MEMBER_COMPONENT_NAME" based on the entity type.");*/\

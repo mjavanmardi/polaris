@@ -46,7 +46,7 @@ namespace RNG_Components
 
 		implementation struct MT_Uniform_Double : public MT_Probability_Double<MasterType,ParentType,APPEND_CHILD(MT_Uniform_Double)>
 		{
-			typedef MT_Probability_Double<MasterType,ParentType,InheritanceList> BaseType;
+			typedef MT_Probability_Double<MasterType,ParentType,APPEND_CHILD(MT_Uniform_Double)> BaseType;
 
 			MT_Uniform_Double ()
 			{
@@ -63,11 +63,11 @@ namespace RNG_Components
 
 			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)1, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
 			{
-				_generator.seed(MT_Probability_Double::_seed);
+				BaseType::_generator.seed(BaseType::_seed);
 				this->template minimum<ComponentType,CallerType, TargetType>(min);
 				this->template maximum<ComponentType,CallerType, TargetType>(max);
 
-				MT_Probability_Double::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
+				BaseType::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
 			}
 			tag_feature_as_available(Initialize);
 
@@ -77,9 +77,12 @@ namespace RNG_Components
 
 		implementation struct MT_Normal_Double : public MT_Uniform_Double<MasterType,ParentType, APPEND_CHILD(MT_Normal_Double)>
 		{
+			typedef MT_Uniform_Double<MasterType,ParentType,APPEND_CHILD(MT_Normal_Double)> BaseType;
+			typedef typename BaseType::BaseType GrandBaseType;
+
 			MT_Normal_Double()
 			{
-				MT_Uniform_Double();
+				BaseType();
 				_location = 0.0;
 				_scale = 1.0;
 			}
@@ -87,14 +90,14 @@ namespace RNG_Components
 			feature_implementation void Initialize()
 			{		
 				assert(_scale > 0);
-				MT_Probability_Double::_generator.seed(MT_Probability_Double::_seed);
+				GrandBaseType::_generator.seed(GrandBaseType::_seed);
 				_distribution = std::tr1::normal_distribution<double>(_location,_scale);
 			}
 
 			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)1, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
 			{
 				//state_check(Is_Positive)(this,_scale);
-				MT_Probability_Double::_generator.seed(MT_Probability_Double::_seed);
+				GrandBaseType::_generator.seed(GrandBaseType::_seed);
 				this->template location<ComponentType,CallerType, TargetType>(location);
 				this->template scale<ComponentType,CallerType, TargetType>(scale);
 
@@ -105,7 +108,7 @@ namespace RNG_Components
 
 			feature_implementation TargetType Next_Rand()
 			{
-				return (TargetType) _distribution(MT_Probability_Double::_generator);
+				return (TargetType) _distribution(GrandBaseType::_generator);
 			}
 			tag_feature_as_available(Next_Rand);
 

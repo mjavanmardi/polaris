@@ -294,13 +294,13 @@ namespace Demand_Components
 				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 				typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
 #else
 				typedef Traveler_Components::Prototypes::Traveler_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
 #endif
 				define_component_interface(_Routing_Interface, typename _Traveler_Interface::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 				define_component_interface(_Planning_Interface, typename _Traveler_Interface::get_type_of(Planning_Faculty), Person_Components::Prototypes::Person_Planner, ComponentType);
 #endif
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename get_type_of(vehicles_container), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
@@ -317,7 +317,7 @@ namespace Demand_Components
 					_Routing_Interface* router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 					//_Plan_Interface* plan = (_Plan_Interface*)Allocate<typename _Plan_Interface::Component_Type>();
 					_Movement_Plan_Interface* movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 					_Planning_Interface* planner = (_Planning_Interface*)Allocate<_Traveler_Interface::get_type_of(Planning_Faculty)>();
 #endif
 
@@ -330,7 +330,7 @@ namespace Demand_Components
 					traveler->template internal_id<int>(i);
 					traveler->template router<_Routing_Interface*>(router);
 					traveler->template vehicle<_Vehicle_Interface*>(vehicle);
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 					traveler->template Planning_Faculty<_Planning_Interface*>(planner);
 					traveler->template Planning_Faculty<_Planning_Interface*>()->template Parent_Person<_Traveler_Interface*>(traveler);
 #endif
@@ -344,7 +344,7 @@ namespace Demand_Components
 					movement_plan->template destination<_Link_Interface*>(network_reference<_Network_Interface*>()->template links_container<_Links_Container_Interface&>().at(raw_vehicle.get_destination_link_index()));
 
 					int departed_time = raw_vehicle.get_departure_time();
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 					traveler->template Planning_Faculty<_Planning_Interface*>()->template Schedule_New_Departure<NULLTYPE>(departed_time);
 #else
 					traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);

@@ -245,13 +245,6 @@ namespace Network_Skimming_Components
 				// add the available modes for the current model
 				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 			}
-
-			feature_implementation typename TargetType::ReturnType Get_Current_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator/*, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value))*/)
-			{
-				define_component_interface(_skim_interface,typename base_type::type_of(current_skim_table),Prototypes::Skim_Table_Prototype,ComponentType);
-				_skim_interface* skim = this->template current_skim_table<ComponentType,CallerType,_skim_interface*>();
-				return skim->template Get_LOS<TargetType>(Origin_ID, Destination_ID, Mode_Indicator);
-			}	
 		};
 
 

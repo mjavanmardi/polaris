@@ -2,7 +2,7 @@
 #include "Routing_Prototype.h"
 #include "Routable_Link_Implementation.h"
 #include "Routable_Intersection_Implementation.h"
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 #include "Person_Implementations.h"
 #endif
 #include <iostream>
@@ -134,7 +134,7 @@ namespace Routing_Components
 
 		implementation struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType>
 		{
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 			member_component(typename MasterType::person_type, traveler, none, none);
 			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
 #else
@@ -159,7 +159,7 @@ namespace Routing_Components
 			}
 			
 			tag_getter_as_available(routable_network);			
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 			// time increment at which skim tables are updated - set in the initializer
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
 			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time_Prototype);
@@ -217,7 +217,7 @@ namespace Routing_Components
 		implementation struct Polaris_Integrated_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Integrated_Routing_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			member_container(vector<float>,travel_times_to_link_container,none,none);
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 			member_component(typename MasterType::person_type, traveler, none, none);
 			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
 #else
@@ -242,7 +242,7 @@ namespace Routing_Components
 			}
 			
 			tag_getter_as_available(routable_network);			
-#ifndef FOR_LINUX_PORTING			
+#ifndef EXCLUDE_DEMAND			
 
 			// time increment at which skim tables are updated - set in the initializer
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);

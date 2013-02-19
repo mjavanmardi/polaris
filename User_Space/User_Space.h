@@ -1,5 +1,6 @@
 #pragma once
 
+
 #ifndef FOR_LINUX_PORTING
 #include "../Polaris_IO/Polaris_IO.h"
 #endif
@@ -35,7 +36,7 @@ void* _global_scenario;
 
 
 #ifndef FOR_LINUX_PORTING
-#include "Polaris_Network_Implementation_Input_DB.h"
+//#include "Polaris_Network_Implementation_Input_DB.h"
 #endif
 
 #include "Activity_Implementations.h"
