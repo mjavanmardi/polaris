@@ -95,19 +95,19 @@ namespace Choice_Model_Components
 			/// INTERFACE FUNCTION EXAMPLE - this example dispatched the Initialize function call to the component base
 			feature void Initialize()
 			{
-				this_component()->Initialize<CallerType,TargetType>();
+				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}
 
 			feature void Evaluate_Probability(requires(check(ComponentType, Concepts::Choice_Is_Rule_Based)))
 			{
 				// Dispatch to probability rules written in base
-				TargetType prob = this_component()->Evaluate_Probability<CallerType,TargetType>();
+				TargetType prob = this_component()->Evaluate_Probability<ComponentType,CallerType,TargetType>();
 				this->probability<TargetType>(prob);
 			}
 
 			feature void Evaluate_Utility(call_requirements(requires(ComponentType, Concepts::Choice_Is_Utility_Based)))
 			{
-				TargetType util = this_component()->Evaluate_Utility<CallerType,TargetType>();
+				TargetType util = this_component()->Evaluate_Utility<ComponentType,CallerType,TargetType>();
 				this->utility<TargetType>(util);
 			}
 			 
@@ -130,7 +130,7 @@ namespace Choice_Model_Components
 			/// BASIC INITIALIZER
 			feature void Initialize()
 			{
-				return this_component()->Initialize<CallerType,TargetType>();
+				return this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}
 
 			feature void Add_Choice_Option(TargetType new_choice_option_data, call_requires(strip_modifiers(TargetType), Is_Polaris_Component))

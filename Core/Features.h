@@ -477,7 +477,7 @@ struct member_function_ptr_types<Type,setter_type>
 	ReturnValueType FEATURE_NAME(requires_getter(check_2(ComponentType,CallerType,get_##MEMBER_COMPONENT_NAME) /*&& check_2(ComponentType, type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
 	{\
 		define_component_interface(MEMBER_COMPONENT_NAME##_itf,type_of(typename ComponentType::MEMBER_COMPONENT_NAME),MEMBER_COMPONENT_PROTOTYPE,ComponentType);\
-		MEMBER_COMPONENT_NAME##_itf* itf = this->template MEMBER_COMPONENT_NAME<CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
+		MEMBER_COMPONENT_NAME##_itf* itf = this->template MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
 		return itf->template MEMBER_COMPONENT_FEATURE<ReturnValueType>();\
 	}\
 	template<typename ComponentType, typename CallerType, typename ReturnValueType>\
@@ -490,7 +490,7 @@ struct member_function_ptr_types<Type,setter_type>
 	void FEATURE_NAME(SetValueType value, requires_setter(check_2(ComponentType,CallerType,set_##MEMBER_COMPONENT_NAME) /*&& check_2(ComponentType,typename type_of(MEMBER_COMPONENT_NAME),Is_Same_Entity)*/))\
 	{\
 		define_component_interface(MEMBER_COMPONENT_NAME##_itf,type_of(typename ComponentType::MEMBER_COMPONENT_NAME),MEMBER_COMPONENT_PROTOTYPE,ComponentType);\
-		MEMBER_COMPONENT_NAME##_itf* itf = this->template MEMBER_COMPONENT_NAME<CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
+		MEMBER_COMPONENT_NAME##_itf* itf = this->template MEMBER_COMPONENT_NAME<ComponentType,CallerType,MEMBER_COMPONENT_NAME##_itf*>();\
 		itf->template MEMBER_COMPONENT_FEATURE<SetValueType>(value);\
 	}\
 	template<typename ComponentType, typename CallerType, typename SetValueType>\

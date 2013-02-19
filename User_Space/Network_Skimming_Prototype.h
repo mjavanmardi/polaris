@@ -120,7 +120,7 @@ namespace Network_Skimming_Components
 			feature_prototype void Initialize()
 			{				
 				// Call implementation Initializer - this sets the implementation specific data members
-				this_component()->template Initialize<CallerType,TargetType>();
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
 
 				// get network reference
 				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
@@ -268,11 +268,11 @@ namespace Network_Skimming_Components
 			//---------------------------------------------
 			feature_prototype void Initialize()
 			{
-				this_component()->Initialize<CallerType,TargetType>();
+				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}				
 			feature_prototype void Initialize(typename TargetType::ParamType input_file, typename TargetType::Param2Type, requires(check_as_given(typename TargetType::Param2Type, is_pointer) && check(typename TargetType::Param2Type, Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
-				this_component()->Initialize<CallerType,TargetType>(input_file, network_reference);
+				this_component()->Initialize<ComponentType,CallerType,TargetType>(input_file, network_reference);
 			}
 			feature_prototype void Initialize(typename TargetType::ParamType input_file, typename TargetType::Param2Type, requires(!check_as_given(typename TargetType::Param2Type, is_pointer) || !check(typename TargetType::Param2Type, Network_Components::Concepts::Is_Transportation_Network_Prototype)))
 			{
@@ -343,7 +343,7 @@ namespace Network_Skimming_Components
 			feature_prototype void Initialize()
 			{
 				// call implementation initializer
-				this_component()->Initialize<CallerType,TargetType>();
+				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 
 				// set the network reference
 				define_simple_container_interface(skim_table_itf,typename get_type_of(skim_table),Containers::Multidimensional_Random_Access_Array_Prototype,typename get_type_of(skim_table)::unqualified_value_type,ComponentType);
@@ -499,7 +499,7 @@ namespace Network_Skimming_Components
 			tag_as_prototype;
 			feature_prototype void initialize(typename TargetType::ParamType loc_index, typename TargetType::ParamType zone_index, typename TargetType::Param2Type weight)
 			{
-				this_component()->initialize<CallerType,TargetType>(loc_index,zone_index,weight);
+				this_component()->initialize<ComponentType,CallerType,TargetType>(loc_index,zone_index,weight);
 			}
 			feature_accessor(loc_index,none,none);
 			feature_accessor(zone_index,none,none);

@@ -240,7 +240,7 @@ namespace Basic_Units
 			define_get_set_exists_check(Value, Get_Value_exists, Set_Value_exists);
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Length_Value)))
 			{
-				return ReturnValueType(this_component()->template Value<CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
+				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Length_Value)))
 			{
@@ -249,7 +249,7 @@ namespace Basic_Units
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Length_Value)))
 			{
-				this_component()->template Value<CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
+				this_component()->template Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Length_Value)))
 			{
@@ -536,7 +536,7 @@ namespace Basic_Units
 			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Time_Value)))
 			{
-				return ReturnValueType(this_component()->template Value<CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
+				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Time_Value)))
 			{
@@ -545,7 +545,7 @@ namespace Basic_Units
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Time_Value)))
 			{
-				this_component()->template Value<CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
+				this_component()->template Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Time_Value)))
 			{
@@ -693,7 +693,7 @@ namespace Basic_Units
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Time_Value)))
 			{
 				ReturnValueType val = base_type::template Conversion_Factor<ReturnValueType>();
-				return ReturnValueType(this_component()->template Value<CallerType,Value_Type>() / val);
+				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() / val);
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Time_Value)))
 			{
@@ -702,7 +702,7 @@ namespace Basic_Units
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Time_Value)))
 			{
-				this_component()->template Value<CallerType,Value_Type>(value * base_type::template Conversion_Factor<SetValueType>());
+				this_component()->template Value<ComponentType,CallerType,Value_Type>(value * base_type::template Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Time_Value)))
 			{
@@ -735,7 +735,7 @@ namespace Basic_Units
 			{
 				ReturnValueType len_val = length_base::template Conversion_Factor<ReturnValueType>();
 				ReturnValueType time_val = time_base::template Conversion_Factor<ReturnValueType>();
-				return ReturnValueType(this_component()->template Value<CallerType,Value_Type>() * len_val / time_val );
+				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * len_val / time_val );
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(!check(ComponentType,Get_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(ReturnValueType,Concepts::Is_Speed_Value)))
 			{
@@ -747,7 +747,7 @@ namespace Basic_Units
 			{
 				SetValueType len_val = length_base::template Conversion_Factor<SetValueType>();
 				SetValueType time_val = time_base::template Conversion_Factor<SetValueType>();
-				this_component()->template Value<CallerType,Value_Type>(Value_Type(value * time_val / len_val));
+				this_component()->template Value<ComponentType,CallerType,Value_Type>(Value_Type(value * time_val / len_val));
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(!check(ComponentType,Set_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(SetValueType,Concepts::Is_Speed_Value)))
 			{
@@ -785,7 +785,7 @@ namespace Basic_Units
 			define_get_set_exists_check(Value, Get_Value_exists, Set_Value_exists);
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,Get_Value_exists) && check(ReturnValueType,Concepts::Is_Currency_Value)))
 			{
-				return ReturnValueType(this_component()->template Value<CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
+				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
 			}
 			template<typename ReturnValueType> ReturnValueType Value(requires_getter(check(ComponentType,!Get_Value_exists) || check(ReturnValueType,!Concepts::Is_Currency_Value)))
 			{
@@ -794,7 +794,7 @@ namespace Basic_Units
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,Set_Value_exists) && check(SetValueType,Concepts::Is_Currency_Value)))
 			{
-				this_component()->template Value<CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
+				this_component()->template Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
 			}
 			template<typename SetValueType> void Value(SetValueType value, requires_setter(check(ComponentType,!Set_Value_exists) || check(SetValueType,!Concepts::Is_Currency_Value)))
 			{

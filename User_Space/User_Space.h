@@ -31,6 +31,9 @@ void* _global_scenario;
 #include "Polaris_Network_Implementation_Results.h"
 #include "Polaris_Network_Skimming_Implementation.h"
 
+#endif
+
+
 #ifndef FOR_LINUX_PORTING
 #include "Polaris_Network_Implementation_Input_DB.h"
 #endif
@@ -42,4 +45,4 @@ void* _global_scenario;
 #include "PopSyn_Implementations.h"
 #include "Person_Implementations.h"
 
-#endif
+

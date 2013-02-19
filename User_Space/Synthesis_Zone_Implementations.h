@@ -24,11 +24,11 @@ namespace PopSyn
 
 			feature_implementation TargetType scenario_reference()
 			{
-				return this->parent_reference<CallerType,type_of(parent_reference)&>().scenario_reference<CallerType,TargetType>();
+				return this->parent_reference<ComponentType,CallerType,type_of(parent_reference)&>().scenario_reference<type_of(parent_reference),CallerType,TargetType>();
 			}tag_getter_as_available(scenario_reference);
 			feature_implementation TargetType network_reference()
 			{
-				return this->parent_reference<CallerType,type_of(parent_reference)&>().network_reference<CallerType,TargetType>();
+				return this->parent_reference<ComponentType,CallerType,type_of(parent_reference)&>().network_reference<type_of(parent_reference),CallerType,TargetType>();
 			}tag_getter_as_available(network_reference);
 
 			member_data(long long,ID,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
@@ -49,9 +49,9 @@ namespace PopSyn
 		{
 			feature_implementation void Initialize(typename TargetType::ParamType tolerance, typename TargetType::ParamType percent_to_synthesize, typename TargetType::Param2Type iterations)
 			{
-				this->Tolerance<CallerType, typename TargetType::ParamType>(tolerance);
-				this->Percentage_to_synthesize<CallerType, typename TargetType::ParamType>(percent_to_synthesize);
-				this->Iterations<CallerType, typename TargetType::Param2Type>(iterations);
+				this->Tolerance<ComponentType,CallerType, typename TargetType::ParamType>(tolerance);
+				this->Percentage_to_synthesize<ComponentType,CallerType, typename TargetType::ParamType>(percent_to_synthesize);
+				this->Iterations<ComponentType,CallerType, typename TargetType::Param2Type>(iterations);
 			}
 			member_data(double, Tolerance, check(ReturnValueType,is_arithmetic),check(SetValueType, is_arithmetic));
 			member_data(int, Iterations, check(ReturnValueType,is_arithmetic),check(SetValueType, is_arithmetic));

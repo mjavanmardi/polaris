@@ -58,7 +58,7 @@ namespace EXAMPLE_COMPONENTS
 			/// INTERFACE FUNCTION EXAMPLE - this example dispatched the Initialize function call to the component base
 			feature void Initialize()
 			{
-				return cast_self_to_component().Initialize<CallerType,TargetType>();
+				return cast_self_to_component().Initialize<ComponentType,CallerType,TargetType>();
 			}
 			 
 			// ACCESSOR EXAMPLE - this creates an accessor called ACCESSOR_NAME

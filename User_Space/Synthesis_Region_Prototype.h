@@ -25,7 +25,7 @@ namespace PopSyn
 			// Load the execution event
 			feature_prototype void Initialize()
 			{
-				this_component()->Initialize<CallerType,TargetType>();
+				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population,PopSyn::POPSYN_ITERATIONS::MAIN_PROCESS,PopSyn::POPSYN_SUBITERATIONS::PROCESS,NULLTYPE);
 			}
 

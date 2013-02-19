@@ -36,7 +36,7 @@ namespace RNG_Components
 												TargetType shape = (TargetType)1,
 												requires(check(TargetType,is_arithmetic)))
 			{
-				this_component()->Initialize<CallerType,TargetType>(seed_value, min, max, location, scale, shape);
+				this_component()->Initialize<ComponentType,CallerType,TargetType>(seed_value, min, max, location, scale, shape);
 			}
 			feature_prototype void Initialize(	TargetType seed_value,
 												TargetType min = (TargetType)0,
@@ -51,7 +51,7 @@ namespace RNG_Components
 
 			feature_prototype TargetType Next_Rand()
 			{
-				return this_component()->Next_Rand<CallerType,TargetType>();
+				return this_component()->Next_Rand<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_accessor(seed, check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));

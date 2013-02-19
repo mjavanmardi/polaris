@@ -82,7 +82,7 @@ namespace Prototypes
 		// Initializer
 		feature_prototype void Initialize(TargetType id, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
-			this_component()->Initialize<CallerType, TargetType>(id);
+			this_component()->Initialize<ComponentType,CallerType, TargetType>(id);
 			load_event(ComponentType,Agent_Conditional,Agent_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
 		feature_prototype void Initialize(TargetType id, requires(!check(ComponentType,Concepts::Has_Initialize)))
@@ -91,7 +91,7 @@ namespace Prototypes
 		}
 		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type trip, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
-			this_component()->Initialize<CallerType, TargetType>(id, trip);
+			this_component()->Initialize<ComponentType,CallerType, TargetType>(id, trip);
 			load_event(ComponentType,Agent_Conditional,Agent_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
 		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type trip, requires(!check(ComponentType,Concepts::Has_Initialize)))
@@ -126,7 +126,7 @@ namespace Prototypes
 		define_feature_exists_check(Initialize,Has_Initialize);
 		feature_prototype void Initialize(requires(check(ComponentType,Has_Initialize)))
 		{
-			this_component()->Initialize<CallerType, TargetType>();
+			this_component()->Initialize<ComponentType,CallerType, TargetType>();
 		}
 		feature_prototype void Initialize(requires(!check(ComponentType,Has_Initialize)))
 		{
@@ -269,7 +269,7 @@ namespace Prototypes
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
 			// Call specific implementation of the activity generation routine
-			_pthis->template Activity_Generation<CallerType,TargetType>();
+			_pthis->template Activity_Generation<ComponentType,CallerType,TargetType>();
 
 			// set next activity generation occurence
 			this_ptr->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
@@ -338,7 +338,7 @@ namespace Prototypes
 			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
 			parent_itf* parent = this->Parent_Person<parent_itf*>();
 			long first_iter = parent->template First_Iteration<Simulation_Timestep_Increment>();
-			this_component()->Initialize<CallerType, TargetType>();
+			this_component()->Initialize<ComponentType,CallerType, TargetType>();
 			load_event(ComponentType,Planning_Conditional,Activity_Generation_Event,first_iter,0,NULLTYPE);
 		}
 		feature_prototype void Initialize(requires(!check(ComponentType,Concepts::Has_Initialize)))
@@ -349,7 +349,7 @@ namespace Prototypes
 		{
 			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
 			parent_itf* parent = this->Parent_Person<parent_itf*>();
-			this_component()->Initialize<CallerType, TargetType>(initializer);
+			this_component()->Initialize<ComponentType,CallerType, TargetType>(initializer);
 			load_event(ComponentType,Planning_Conditional,Movement_Planning_Event,parent->template First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
 		feature_prototype void Initialize(TargetType initializer, requires(!check(ComponentType,Concepts::Has_Initialize)))
@@ -386,11 +386,11 @@ namespace Prototypes
 		feature_accessor(current_activity_plan,none,none);
 		feature_prototype void Add_Movement_Plan(TargetType movement_plan)
 		{
-			this_component()->Add_Movement_Plan<CallerType,TargetType>(movement_plan);
+			this_component()->Add_Movement_Plan<ComponentType,CallerType,TargetType>(movement_plan);
 		}
 		feature_prototype void Add_Activity_Plan(TargetType activity_plan)
 		{
-			this_component()->Add_Activity_Plan<CallerType,TargetType>(activity_plan);
+			this_component()->Add_Activity_Plan<ComponentType,CallerType,TargetType>(activity_plan);
 		}
 
 		// indicators used to determine next iteration for generation/planning events

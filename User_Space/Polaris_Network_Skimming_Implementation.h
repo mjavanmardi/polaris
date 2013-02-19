@@ -20,9 +20,9 @@ namespace Network_Skimming_Components
 		{
 			feature_implementation void initialize(typename TargetType::ParamType loc_index, typename TargetType::ParamType zone_index, typename TargetType::Param2Type weight)
 			{
-				this->template loc_index<ComponentType,typename TargetType::ParamType>(loc_index);
-				this->template zone_index<ComponentType,typename TargetType::ParamType>(zone_index);
-				this->template weight<ComponentType,typename TargetType::ParamType>(weight);
+				this->template loc_index<ComponentType,ComponentType,typename TargetType::ParamType>(loc_index);
+				this->template zone_index<ComponentType,ComponentType,typename TargetType::ParamType>(zone_index);
+				this->template weight<ComponentType,ComponentType,typename TargetType::ParamType>(weight);
 			}
 			member_data(long, loc_index,check(ReturnValueType,is_integral),none);
 			member_data(long, zone_index,check(ReturnValueType,is_integral),none);
@@ -169,8 +169,8 @@ namespace Network_Skimming_Components
 				define_container_and_value_interface_unqualified_container(skim_tables_itf,skim_table_itf,type_of(skims_by_time_container),Containers::Random_Access_Sequence_Prototype,Prototypes::Skim_Table_Prototype,ComponentType);
 				define_component_interface(network_itf,type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_component_interface(skimmer_itf,type_of(skim_reference),Prototypes::Network_Skimming_Prototype,ComponentType);
-				network_itf* network = this->template network_reference<CallerType,network_itf*>();
-				skimmer_itf* skim = this->template skim_reference<CallerType,skimmer_itf*>();
+				network_itf* network = this->template network_reference<ComponentType,CallerType,network_itf*>();
+				skimmer_itf* skim = this->template skim_reference<ComponentType,CallerType,skimmer_itf*>();
 
 				
 				// create the skim_table time periods, for basic create only a single time period skim_table
@@ -182,7 +182,7 @@ namespace Network_Skimming_Components
 				skim_table->template Initialize<NULLTYPE>();
 
 				// add time period skim tables to the container
-				skim_tables_itf* skim_tables = this->template skims_by_time_container<CallerType,skim_tables_itf*>();
+				skim_tables_itf* skim_tables = this->template skims_by_time_container<ComponentType,CallerType,skim_tables_itf*>();
 				skim_tables->push_back(skim_table);
 
 
@@ -249,7 +249,7 @@ namespace Network_Skimming_Components
 			feature_implementation typename TargetType::ReturnType Get_Current_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator/*, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value))*/)
 			{
 				define_component_interface(_skim_interface,typename base_type::type_of(current_skim_table),Prototypes::Skim_Table_Prototype,ComponentType);
-				_skim_interface* skim = this->template current_skim_table<CallerType,_skim_interface*>();
+				_skim_interface* skim = this->template current_skim_table<ComponentType,CallerType,_skim_interface*>();
 				return skim->template Get_LOS<TargetType>(Origin_ID, Destination_ID, Mode_Indicator);
 			}	
 		};
