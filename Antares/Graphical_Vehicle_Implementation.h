@@ -27,7 +27,7 @@ namespace Vehicle_Components
 			member_data(int, internal_id, none, none);
 
 			member_prototype(static Network_Prototype, graphical_network, typename MasterType::type_of(graphical_network), none, none);
-			
+
 			member_prototype(Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type, none, none);
 			//member_component(typename MasterType::movement_plan_type, movement_plan, none, none);
 #ifndef FOR_LINUX_PORTING

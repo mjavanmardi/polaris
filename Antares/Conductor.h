@@ -15,7 +15,7 @@ prototype struct Conductor
 
 	feature_prototype void Initialize()
 	{
-		this_component()->Initialize<CallerType,TargetType>();
+		this_component()->Initialize<ComponentType,CallerType,TargetType>();
 	}
 
 	feature_accessor(pause,none,none);

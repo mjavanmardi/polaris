@@ -17,9 +17,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Antares_Includes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Antares.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -112,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="Layer_Management.h">
       <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Identify.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Includes.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

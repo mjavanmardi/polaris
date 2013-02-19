@@ -11,7 +11,7 @@
 
 implementation struct Antares_Layer_Implementation:public Polaris_Component<APPEND_CHILD(Antares_Layer_Implementation),MasterType,Execution_Object>
 {
-	feature_implementation void Push_Element(void* data, int size, int iteration)
+	feature_implementation void Push_Element(void* data, int size, int iteration,requires(check_2(TargetType,Regular_Element,is_same)))
 	{
 		assert(size == _element_size);
 
@@ -27,6 +27,28 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			data_itr++;
 		}
 	}
+	
+	feature_implementation void Push_Element(void* data, int size, int iteration,requires(check_2(TargetType,Accented_Element,is_same)))
+	{
+		assert(size == _element_size);
+
+		unsigned char* data_itr=(unsigned char*)data;
+
+		vector<unsigned char>& storage_reference=_accent_storage[iteration][_thread_id];
+
+		unsigned char* end_data_itr=data_itr+size;
+		
+		while(data_itr!=end_data_itr)
+		{
+			storage_reference.push_back(*data_itr);
+			data_itr++;
+		}
+	}
+	
+	feature_implementation void Push_Element(void* data, int size, int iteration,requires(!check_2(TargetType,Regular_Element,is_same) && !check_2(TargetType,Accented_Element,is_same)))
+	{
+		assert_check_2(TargetType,Regular_Element,is_same,"Not a recognizable element category! Available options are Regular_Element or Accented_Element.");
+	}
 
 	feature_implementation void Initialize(Antares_Layer_Configuration& cfg)
 	{
@@ -39,6 +61,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		}
 
 		_storage.Initialize(cfg.storage_offset,cfg.storage_period,cfg.storage_size);
+		_accent_storage.Initialize(cfg.storage_offset,cfg.storage_period,cfg.storage_size);
 
 		_draw=cfg.draw;
 
@@ -61,11 +84,14 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		_head_normal=*((Point_3D<MasterType>*)&cfg.head_normal);
 		_head_size_value=cfg.head_size_value;
 	}
-	
+
+	feature_implementation void Identify(const Point_3D<MasterType>& point, int start_iteration, int end_iteration);
+
 	member_data(bool,dynamic_data,none,none);
 	member_data(int,target_sub_iteration,none,none);
 
-	member_data(Dynamic_Multi_Buffer< vector<unsigned char>[_num_threads] >,storage,none,none);
+	member_data(Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >,storage,none,none);
+	member_data(Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >,accent_storage,none,none);
 
 	// Identification values
 	member_data(string,name,none,none);
@@ -90,6 +116,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	
 	member_data(int,element_size,none,none);
 
+
 	// Agent behavior
 
 	declare_feature_conditional(Update_Condition)
@@ -105,11 +132,13 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	{
 		Antares_Layer_Implementation* pthis=(Antares_Layer_Implementation*)_this;
 
-		for(int i=0;i<_num_threads;i++)
+		for(int i=0;i<_num_antares_threads;i++)
 		{
 			pthis->_storage[_iteration + pthis->_storage.period][i].clear();
+			pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].clear();
 		}
 	}
+
 };
 
 

@@ -16,6 +16,7 @@
 
 #include "Navigation.h"
 #include "Render.h"
+#include "Identify.h"
 #include "Render_2D.h"
 #include "Visibility_Testing.h"
 #include "Draw_Layer.h"

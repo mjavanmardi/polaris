@@ -194,6 +194,7 @@
     <ClInclude Include="Graphical_Link_Implementation.h" />
     <ClInclude Include="Graphical_Network_Implementation.h" />
     <ClInclude Include="Graphical_Vehicle_Implementation.h" />
+    <ClInclude Include="Identify.h" />
     <ClInclude Include="Information_Panel.h" />
     <ClInclude Include="Information_Panel_Implementation.h" />
     <ClInclude Include="Layer_Management.h" />

@@ -11,24 +11,33 @@ struct Antares_Layer_Configuration;
 //	Antares_Layer - layer definition
 //---------------------------------------------------------
 
+struct Accented_Element{};
+struct Regular_Element{};
+
 prototype struct Antares_Layer
 {
 	tag_as_prototype;
 	
 	feature_prototype void Push_Element(void* data, int size, int iteration = _iteration)
 	{
-		this_component()->Push_Element<CallerType,TargetType>(data,size,iteration);
+		this_component()->Push_Element<ComponentType,CallerType,TargetType>(data,size,iteration);
 	}
-	
+
 	feature_prototype void Initialize(Antares_Layer_Configuration& cfg)
 	{
-		this_component()->Initialize<CallerType,TargetType>(cfg);
+		this_component()->Initialize<ComponentType,CallerType,TargetType>(cfg);
+	}
+	
+	feature_prototype void Identify(typename TargetType::ParamType point, int start_iteration, int end_iteration)
+	{
+		this_component()->Identify<ComponentType,CallerType,TargetType>(point,start_iteration,end_iteration);
 	}
 
 	feature_accessor(list_index,none,none);
 	feature_accessor(name,none,none);
 	
 	feature_accessor(storage,none,none);
+	feature_accessor(accent_storage,none,none);
 
 	feature_accessor(primitive_type,none,none);
 

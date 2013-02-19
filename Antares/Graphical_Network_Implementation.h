@@ -20,7 +20,7 @@ namespace Network_Components
 		{
 			feature_implementation void submit_num_vehicles()
 			{
-				_num_vehicles->Push_Element<NULLTYPE>((void*)&_vehicles_counter,sizeof(int));
+				_num_vehicles->Push_Element<Regular_Element>((void*)&_vehicles_counter,sizeof(int));
 				_vehicles_counter=0;
 			}
 
@@ -30,7 +30,7 @@ namespace Network_Components
 				coordinates._y += _input_offset._y;
 				coordinates._z += 1;
 
-				_vehicle_points->Push_Element<NULLTYPE>(&coordinates,sizeof(Point_3D<MasterType>));
+				_vehicle_points->Push_Element<Regular_Element>(&coordinates,sizeof(Point_3D<MasterType>));
 
 				_vehicles_counter++;
 			}
@@ -46,10 +46,10 @@ namespace Network_Components
 				transaction t(db->begin());
 				
 				// reset bounds, they will be set in the node reading function
-				_network_bounds.reset<Graphical_Network_Implementation,NULLTYPE>();
+				_network_bounds.reset<type_of(network_bounds),Graphical_Network_Implementation,NULLTYPE>();
 
 				// read intersections
-				read_intersection_data<CallerType,TargetType>(db, net_io_maps);
+				read_intersection_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 
 				// set up input_offset and shift network bounds
 				_input_offset._x = -( _network_bounds._xmax + _network_bounds._xmin )/2.0f;
@@ -63,7 +63,7 @@ namespace Network_Components
 				_network_bounds._ymin += _input_offset._y;
 				
 				// read links
-				read_link_data<CallerType,TargetType>(db, net_io_maps);
+				read_link_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 
 				
 				// configure vehicle layer
@@ -89,7 +89,7 @@ namespace Network_Components
 				using namespace odb;
 				using namespace pio;
 
-				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<CallerType,_Intersections_Container_Interface*>();
+				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
 
 				result<Node> node_result=db->query<Node>(query<Node>::true_expr);
 
@@ -146,8 +146,8 @@ namespace Network_Components
 				using namespace odb;
 				using namespace pio;
 
-				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<CallerType,_Intersections_Container_Interface*>();
-				_Links_Container_Interface* links_container_ptr=links_container<CallerType,_Links_Container_Interface*>();			
+				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
+				_Links_Container_Interface* links_container_ptr=links_container<ComponentType,CallerType,_Links_Container_Interface*>();			
 				
 				result<Link> link_result=db->query<Link>(query<Link>::true_expr);
 
@@ -279,7 +279,7 @@ namespace Network_Components
 					current_line.b._y = link->downstream_intersection<_Intersection_Interface*>()->y_position<float>() + _input_offset._y;
 					current_line.b._z = 0;
 
-					_link_lines->Push_Element<NULLTYPE>(&current_line,sizeof(Link_Line));
+					_link_lines->Push_Element<Regular_Element>(&current_line,sizeof(Link_Line));
 				}
 			}
 
@@ -288,11 +288,9 @@ namespace Network_Components
 			
 			member_prototype(Antares_Layer,link_lines,typename type_of(MasterType::antares_layer),none,none);
 			member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),none,none);
-			
 			member_prototype(Antares_Layer,num_vehicles,typename type_of(MasterType::antares_layer),none,none);
-			member_data(volatile int,vehicles_counter,none,none);
 
-			//member_data(concat(Multi_Buffer< vector< Point_3D<MasterType> >[_num_threads], 3 >),vehicle_coordinates,none,none);
+			member_data(volatile int,vehicles_counter,none,none);
 
 			member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),none,none);
 			member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),none,none);

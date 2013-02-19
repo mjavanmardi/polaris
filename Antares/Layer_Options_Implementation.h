@@ -16,6 +16,8 @@ implementation struct Layer_Options_Implementation:public Polaris_Component<APPE
 
 	void OnSelectLayer(wxCommandEvent& event);
 	void OnToggleLayer(wxCommandEvent& event);
+	void OnNavigate(wxCommandEvent& event);
+    void OnIdentify(wxCommandEvent& event);
 
 	member_pointer(wxBitmapToggleButton,navigate,none,none);
 	member_pointer(wxBitmapToggleButton,identify,none,none);
@@ -25,7 +27,6 @@ implementation struct Layer_Options_Implementation:public Polaris_Component<APPE
 	member_pointer(wxBoxSizer,button_sizer,none,none);
 
 	member_pointer(wxCheckListBox,layers,none,none);
-
 
 	member_pointer(wxBoxSizer,sizer,none,none);
 	
@@ -53,12 +54,15 @@ Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::Layer_Optio
 	_button_sizer->Add(_navigate);
 	_navigate->SetToolTip("Toggle Navigate");
 	_navigate->SetValue(true);
+	Connect(_navigate->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Layer_Options_Implementation::OnNavigate));
+	
 
 	_identify_bitmap=wxBitmap("Identify.png",wxBITMAP_TYPE_PNG);
 	_identify=new wxBitmapToggleButton(this,wxID_ANY,_identify_bitmap,wxDefaultPosition,wxSize(50,50));
 	_button_sizer->Add(_identify,0,wxLEFT,10);
 	_identify->SetToolTip("Toggle Identify");
 	_identify->SetValue(false);
+	Connect(_identify->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Layer_Options_Implementation::OnIdentify));
 
 	_sizer->Add(_button_sizer,0,wxLEFT|wxTOP|wxBOTTOM,10);
 
@@ -80,7 +84,7 @@ Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::Layer_Optio
 //---------------------------------------------------------
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
-template<typename CallerType,typename TargetType>
+template<typename ComponentType,typename CallerType,typename TargetType>
 void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::Allocate_New_Layer(string& name)
 {
 	int layer_id=_layers->Append(name);
@@ -91,6 +95,30 @@ void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::Alloca
 }
 
 //---------------------------------------------------------
+//	OnNavigate - navigate button pressed
+//---------------------------------------------------------
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::OnNavigate(wxCommandEvent& event)
+{
+	_canvas->Set_Mode<NULLTYPE>(NAVIGATE);
+	
+	_identify->SetValue(false);
+}
+
+//---------------------------------------------------------
+//	OnIdentify - identify button pressed
+//---------------------------------------------------------
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::OnIdentify(wxCommandEvent& event)
+{
+	_canvas->Set_Mode<NULLTYPE>(IDENTIFY);
+
+	_navigate->SetValue(false);
+}
+
+//---------------------------------------------------------
 //	OnSelectLayer - layer selected
 //---------------------------------------------------------
 
@@ -98,6 +126,8 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::OnSelectLayer(wxCommandEvent& event)
 {
 	int i=_layers->GetSelection();
+
+	_canvas->Select_Layer<Target_Type<NULLTYPE,void,int>>(i);
 }
 
 //---------------------------------------------------------

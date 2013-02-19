@@ -6,6 +6,26 @@
 #include "Canvas_Implementation.h"
 
 //---------------------------------------------------------
+//	Set_Mode - handles mode change requests
+//---------------------------------------------------------
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+template<typename ComponentType,typename CallerType,typename TargetType>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Set_Mode(ANTARES_MODE mode)
+{
+	_interaction_mode=mode;
+
+	if(mode==IDENTIFY)
+	{
+		Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+	}
+	else
+	{
+		Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+	}
+}
+
+//---------------------------------------------------------
 //	OnResize - handles when canvas is resized
 //---------------------------------------------------------
 
@@ -87,7 +107,16 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 
 	GLdouble winX, winY, winZ;
 	GLdouble posX, posY, posZ;
+
+	//---- load the current opengl matrices ----
 		
+	if(!_left_down)
+	{
+		glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+		glGetDoublev(GL_PROJECTION_MATRIX, projection);
+		glGetIntegerv(GL_VIEWPORT, viewport);
+	}
+
 	//---- get the mouse position and figure out the z coordinate ----
 
 	winX = (double)x_pos;
@@ -111,24 +140,40 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 	double glY=((ymin_screen-ymax_screen)/_panel_height)*(double)y_pos+ymax_screen;
 
 	//---- convert window Y position to object y position ----
-		
+	
 	double z_dist=sin(theta)/cos(theta)*glY+(_near_plane+_far_plane)/2.0;
 
 	winZ=(1.0/_near_plane-1.0/z_dist)/(1.0/_near_plane-1.0/_far_plane);
 
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-	//---- change the "world" translation by the amount moved ----
+	if(_left_down)
+	{
+		//---- change the "world" translation by the amount moved ----
 
-	_x_translation+=posX-_x_start_utm;
-	_y_translation+=posY-_y_start_utm;
+		_x_translation += posX - _x_start_utm;
+		_y_translation += posY - _y_start_utm;
 
-	//---- update start position to current position ----
+		//---- update start position to current position ----
 
-	_x_start_utm=posX;
-	_y_start_utm=posY;
+		_x_start_utm=posX;
+		_y_start_utm=posY;
 
-	_spatial_change=true;
+		_spatial_change=true;
+	}
+	else
+	{
+		Point_3D<MasterType> location;
+		location._x=(float)posX;
+		location._y=(float)posY;
+		location._z=(float)posZ;
+
+		if(_selected_layer != nullptr)
+		{
+			_selected_layer->Identify<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(location,_cached_iteration,_cached_iteration);
+		}
+	}
+	
 	Refresh();
 }
 
@@ -245,7 +290,21 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeave(wxMouseEvent& event)
 {
 	_left_down=false;
+	_right_down=false;
 
 	Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
 	Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnRotationMotion));
+}
+
+//---------------------------------------------------------
+//	OnEnter - resume motion
+//---------------------------------------------------------
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnEnter(wxMouseEvent& event)
+{
+	if(_interaction_mode == IDENTIFY)
+	{
+		Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+	}
 }

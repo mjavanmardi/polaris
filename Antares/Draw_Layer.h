@@ -31,8 +31,10 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	
 	const int data_stride=layer->data_stride<int>();
 	
-	const Dynamic_Multi_Buffer< vector<unsigned char>[_num_threads] >& storage=layer->storage<Dynamic_Multi_Buffer< vector<unsigned char>[_num_threads] >&>();
-	
+	const Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >& storage=layer->storage<Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >&>();
+
+	//---- draw main layer ----
+
 	switch(primitive_type)
 	{
 	case _POINT:
@@ -61,9 +63,81 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	
 	while(current_iteration <= end_iteration)
 	{
-		const vector<unsigned char> (&geometry_by_thread)[_num_threads] = storage[current_iteration];
+		const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = storage[current_iteration];
 
-		for(int i=0;i<_num_threads;i++)
+		for(int i=0;i<_num_antares_threads;i++)
+		{
+			const unsigned char* geometry_itr = &geometry_by_thread[i].front();
+			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+
+			while(geometry_itr != geometry_end)
+			{
+				if(color)
+				{
+					glColor4ubv((GLubyte*)geometry_itr);
+					geometry_itr += sizeof(True_Color_RGBA<MasterType>);
+				}
+
+				if(normal)
+				{
+					glNormal3fv((GLfloat*)geometry_itr);
+					geometry_itr += sizeof(Point_3D<MasterType>);
+				}
+
+				const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+
+				while( geometry_itr != geometry_vert_end )
+				{
+					glVertex3fv((GLfloat*)geometry_itr);
+					geometry_itr += sizeof(Point_3D<MasterType>);
+				}
+
+				geometry_itr += data_stride;
+			}
+		}
+
+		current_iteration++;
+	}
+
+	glEnd();
+
+
+
+	//---- draw layer accents in the second pass ----
+
+	const Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >& accent_storage=layer->accent_storage<Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >&>();
+	
+	switch(primitive_type)
+	{
+	case _POINT:
+		glPointSize( ceil(5.0f*(float)head_size_value) );
+		glBegin(GL_POINTS);
+		break;
+	case _LINE:
+		glLineWidth( ceil(5.0f*(float)head_size_value) );
+		glBegin(GL_LINES);
+		break;
+	case _TRIANGLE:
+		glBegin(GL_TRIANGLES);
+		break;
+	case _QUAD:
+		glBegin(GL_QUADS);
+		break;
+	default:
+		assert(false);
+		break;
+	};
+
+	glColor4ubv((GLubyte*)&head_color);
+	glNormal3fv((GLfloat*)&head_normal);
+	
+	current_iteration = start_iteration;
+	
+	while(current_iteration <= end_iteration)
+	{
+		const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = accent_storage[current_iteration];
+
+		for(int i=0;i<_num_antares_threads;i++)
 		{
 			const unsigned char* geometry_itr = &geometry_by_thread[i].front();
 			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();

@@ -264,3 +264,10 @@ throw new std::runtime_error(s.str().c_str());}
 #define debug_3(MESSAGE) 
 #endif
 
+
+//---------------------------------------------------------
+//	antares - build global antares singleton
+//---------------------------------------------------------
+
+static void* antares;
+static void* canvas;

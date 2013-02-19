@@ -23,6 +23,8 @@ public:
 
 	feature_implementation Antares_Layer_Interface* Allocate_New_Layer(string& name);
 	feature_implementation void Toggle_Layer(int identifier);
+	feature_implementation void Select_Layer(int identifier);
+	feature_implementation void Set_Mode(ANTARES_MODE mode);
 
 	void Draw_Layer(int start_iteration, int end_iteration, Antares_Layer_Interface* layer);
 	
@@ -39,6 +41,7 @@ public:
     void OnRotationMotion(wxMouseEvent& event);
     void OnWheel(wxMouseEvent& event);
 	void OnLeave(wxMouseEvent& event);
+	void OnEnter(wxMouseEvent& event);
 	void Zoom(wxIdleEvent& event);
 
 	member_pointer(wxGLContext,glcontext,none,none);
@@ -89,10 +92,12 @@ public:
 	member_prototype(Time_Panel,time_panel,typename MasterType::type_of(time_panel),none,none);
 	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),none,none);
 	member_prototype(Control_Panel,control_panel,typename MasterType::type_of(control_panel),none,none);
-
 	member_prototype(Layer_Options,layer_options,typename MasterType::type_of(layer_options),none,none);
 
-	list<Antares_Layer_Interface*> _3D_Layers;
+	list<Antares_Layer_Interface*> _layers;
+	member_pointer(Antares_Layer_Interface,selected_layer,none,none);
+
+	member_data(ANTARES_MODE,interaction_mode,none,none);
 };
 
 //---------------------------------------------------------
@@ -117,6 +122,7 @@ Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementat
 	Connect(wxEVT_RIGHT_UP,wxMouseEventHandler(Canvas_Implementation::OnRightUp));
 	Connect(wxEVT_MOUSEWHEEL,wxMouseEventHandler(Canvas_Implementation::OnWheel));
 	Connect(wxEVT_LEAVE_WINDOW,wxMouseEventHandler(Canvas_Implementation::OnLeave));
+	Connect(wxEVT_ENTER_WINDOW,wxMouseEventHandler(Canvas_Implementation::OnEnter));
 
 	//---- navigation ----
 	
@@ -126,6 +132,7 @@ Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementat
 	_x_start_utm=_y_start_utm=0;
 	_x_start_win=_y_start_win=0;
 	_scale=5;
+	_interaction_mode=NAVIGATE;
 
 	//---- visibility ----
 
@@ -140,6 +147,7 @@ Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementat
 	
 	//---- construct layers ----
 
+	_selected_layer=nullptr;
 }
 
 //---------------------------------------------------------
@@ -147,7 +155,7 @@ Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementat
 //---------------------------------------------------------
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
-template<typename CallerType,typename TargetType>
+template<typename ComponentType,typename CallerType,typename TargetType>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize()
 {
 	Initialize_GLCanvas();

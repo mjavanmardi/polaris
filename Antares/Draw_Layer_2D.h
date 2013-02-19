@@ -35,18 +35,18 @@ void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Dr
 
 	const int head_size_value=layer->head_size_value<int>();
 	
-	const Dynamic_Multi_Buffer< vector<unsigned char>[_num_threads] >& storage=layer->storage<Dynamic_Multi_Buffer< vector<unsigned char>[_num_threads] >&>();
+	const Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >& storage=layer->storage<Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >&>();
 
 	int current_iteration=start_iteration;
 	
 	while(current_iteration <= end_iteration)
 	{
-		const vector<unsigned char> (&geometry_by_thread)[_num_threads] = storage[current_iteration];
+		const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = storage[current_iteration];
 
 		x[current_iteration - start_iteration]=current_iteration;
 		y[current_iteration - start_iteration]=0;
 
-		for(int i=0;i<_num_threads;i++)
+		for(int i=0;i<_num_antares_threads;i++)
 		{
 			if(geometry_by_thread[i].size())
 			{

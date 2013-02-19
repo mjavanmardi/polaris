@@ -10,13 +10,15 @@
 //	Canvas - canvas class definition
 //---------------------------------------------------------
 
+enum ANTARES_MODE {NO_MODE,NAVIGATE,IDENTIFY};
+
 prototype struct Canvas
 {
 	tag_as_prototype;
 
 	feature_prototype void Initialize()
 	{
-		this_component()->Initialize<CallerType,TargetType>();
+		this_component()->Initialize<ComponentType,CallerType,TargetType>();
 	}
 
 	feature_prototype void Refresh()
@@ -24,19 +26,24 @@ prototype struct Canvas
 		this_component()->Refresh();
 	}
 	
+	feature_prototype void Set_Mode(ANTARES_MODE mode)
+	{
+		this_component()->Set_Mode<ComponentType,CallerType,TargetType>(mode);
+	}
+
 	feature_prototype typename TargetType::ReturnType Allocate_New_Layer(typename TargetType::ParamType name)
 	{
-		return (TargetType::ReturnType)this_component()->Allocate_New_Layer<CallerType,TargetType>(name);
+		return (TargetType::ReturnType)this_component()->Allocate_New_Layer<ComponentType,CallerType,TargetType>(name);
 	}
 	
 	feature_prototype typename TargetType::ReturnType Select_Layer(typename TargetType::ParamType name)
 	{
-		return (TargetType::ReturnType)this_component()->Select_Layer<CallerType,TargetType>(name);
+		return (TargetType::ReturnType)this_component()->Select_Layer<ComponentType,CallerType,TargetType>(name);
 	}
 	
 	feature_prototype typename TargetType::ReturnType Toggle_Layer(typename TargetType::ParamType name)
 	{
-		return (TargetType::ReturnType)this_component()->Toggle_Layer<CallerType,TargetType>(name);
+		return (TargetType::ReturnType)this_component()->Toggle_Layer<ComponentType,CallerType,TargetType>(name);
 	}
 
 	feature_accessor(time_panel,none,none);

@@ -56,7 +56,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Render(wxPain
 
 	list<Antares_Layer_Interface*>::iterator itr;
 
-	for(itr=_3D_Layers.begin();itr!=_3D_Layers.end();itr++)
+	for(itr=_layers.begin();itr!=_layers.end();itr++)
 	{
 		Draw_Layer(current_iteration,current_iteration,(*itr));
 	}

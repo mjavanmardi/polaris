@@ -9,9 +9,10 @@
 //	START_UI - macro to start the UI
 //---------------------------------------------------------
 
-#define START_UI(ARGC,ARGV,MASTER_TYPE,SIMULATION_PTR) \
+#define START_UI(ARGC,ARGV,MASTER_TYPE) \
 	antares=(void*)new Antares_App<MASTER_TYPE>();\
-	((Antares_App<MASTER_TYPE>*)antares)->Start_UI(ARGC,ARGV,SIMULATION_PTR);\
+	canvas=nullptr;\
+	((Antares_App<MASTER_TYPE>*)antares)->Start_UI(ARGC,ARGV);\
 
 //---------------------------------------------------------
 //	Wx_Loop - declare wx loop function
@@ -53,9 +54,11 @@ public:
 		//	test.close();
 		//}
 
+		_thread_id = _num_threads;
 
+		main=new Antares_Implementation<MasterType,Antares_App>(nullptr,db_name);
 
-		main=new Antares_Implementation<MasterType,Antares_App>(nullptr,simulation_pointer,db_name);
+		canvas = main->_canvas;
 
 		main->Maximize();
 		main->Show();
@@ -69,11 +72,9 @@ public:
 	//	Start_UI - Initialize wx, spin thread to handle events
 	//---------------------------------------------------------
 	
-	void Start_UI(int argc, char** argv, void* ptr)
+	void Start_UI(int argc, char** argv)
 	{
 		wxDISABLE_DEBUG_SUPPORT();
-
-		simulation_pointer=ptr;
 
 		wxEntryStart(argc,argv);
 
@@ -102,7 +103,6 @@ public:
 	}
 
 	Antares_Implementation<MasterType,Antares_App>* main;
-	void* simulation_pointer;
 	string db_name;
 };
 
@@ -119,9 +119,3 @@ DWORD WINAPI Wx_Loop(LPVOID _app)
 	app->MainLoop();
 	return 1;
 }
-
-//---------------------------------------------------------
-//	antares - build global antares singleton
-//---------------------------------------------------------
-
-static void* antares;
