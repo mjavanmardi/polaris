@@ -231,7 +231,7 @@ namespace PopSyn
 								num_generated += (int)(1.0f / settings.template Percentage_to_synthesize<float>());
 
 								// create the actual person agent
-								this->Create_Person<int>(num_created);
+								this->Create_Person<NULLTYPE>();
 								/*typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
 								_Person_Interface* person=(_Person_Interface*)Allocate<typename ComponentType::Master_Type::person_type>();
 								person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
@@ -257,7 +257,7 @@ namespace PopSyn
 						p->Initialize<pop_unit_itf&>(*obj);
 						zone_sample->insert(p->template Index<uint>(),p);
 						// create the actual person agent
-						this->Create_Person<int>(num_created);
+						this->Create_Person<NULLTYPE>();
 						num_created+=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
 						num_required-=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
 					}
@@ -271,7 +271,7 @@ namespace PopSyn
 						p->Initialize<pop_unit_itf&>(*obj);
 						zone_sample->insert(p->template Index<uint>(),p);
 						// create the actual person agent
-						this->Create_Person<int>(num_created);
+						this->Create_Person<NULLTYPE>();
 						num_created+=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
 						num_required-=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
 					}
@@ -288,22 +288,26 @@ namespace PopSyn
 				assert_check_as_given(TargetType, is_pointer,"Is not a pointer");
 				assert_check(TargetType, Containers::Concepts::Is_Associative, "Container is not associative.");
 			}
-			feature_prototype void Create_Person(TargetType id)
+			feature_prototype void Create_Person()
 			{
 				define_component_interface(_Network_Interface,typename ComponentType::Master_Type::network_type,Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_component_interface(_Scenario_Interface,typename ComponentType::Master_Type::scenario_type,Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
-				typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
+				define_container_and_value_interface(persons_itf, person_itf, typename get_type_of(Synthetic_Persons_Container), Containers::Random_Access_Sequence_Prototype, Person_Components::Prototypes::Person_Prototype, NULLTYPE);
+				//typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
+				persons_itf* person_container = (persons_itf*)this->Synthetic_Persons_Container<persons_itf*>();
 
-				_Person_Interface* person=(_Person_Interface*)Allocate<typename ComponentType::Master_Type::person_type>();
+				person_itf* person=(person_itf*)Allocate<typename get_type_of(Synthetic_Persons_Container)::unqualified_value_type>();
 				person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
-				person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
-				person->Initialize<int>(id);
+				person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());	
+				person_container->push_back(person);
+				//person->Initialize<int>(id);
 			}
 
 			//===================================================================================================================================
 			// Accessor for the Joint Distribution (IPF and CO only) and marginal distributions used in synthesis
 			feature_accessor(Target_Joint_Distribution,none,none);
 			feature_accessor(Target_Marginal_Distribution,none,none);
+			feature_accessor(Synthetic_Persons_Container,none,none);
 
 			//===================================================================================================================================
 			// REQUIRED: Accessor for the Synthesized Population (if the component is a zone) or the sample population (if it is a region)

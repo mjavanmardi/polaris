@@ -9,6 +9,9 @@ namespace Person_Components
 {
 	namespace Implementations
 	{
+		//==================================================================================
+		/// Person Agent classes
+		//----------------------------------------------------------------------------------
 		implementation struct Person_Implementation : public Polaris_Component<APPEND_CHILD(Person_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			feature_implementation void Initialize(TargetType id)
@@ -107,6 +110,10 @@ namespace Person_Components
 
 		};
 
+
+		//==================================================================================
+		/// Planning classes
+		//----------------------------------------------------------------------------------
 		implementation struct General_Person_Planner_Implementation : public Polaris_Component<APPEND_CHILD(General_Person_Planner_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			// Pointer to the Parent class
@@ -156,13 +163,21 @@ namespace Person_Components
 			// Adding activities and movements to the planning schedules
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
+				define_component_interface(parent_itf,typename type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
+
 				define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 				Movement_Plan* move = (Movement_Plan*)movement_plan;
 				// key the movement plan on the planning timestep just prior to departure
 				long t1 = move->template departed_time<Simulation_Timestep_Increment>();
 				long t2 = this->Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
 				long remain = (long)(t1 / t2);
-				Simulation_Timestep_Increment departure_time = remain * this->template Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
+				Simulation_Timestep_Increment departure_time = remain * this->template Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>() + parent->template First_Iteration<Simulation_Timestep_Increment>();
+
+				if (departure_time < 1800)
+				{
+					int test = 1;
+				}
 				Movement_Plans* movements = this->template Movement_Plans_Container<ComponentType,CallerType,Movement_Plans*>();
 				movements->insert(departure_time,move);
 			}
@@ -352,15 +367,20 @@ namespace Person_Components
 		};
 
 
-
+		//==================================================================================
+		/// Properties classes
+		//----------------------------------------------------------------------------------
 		implementation struct ADAPTS_Person_Properties_Implementation : public Polaris_Component<APPEND_CHILD(ADAPTS_Person_Properties_Implementation),MasterType,Data_Object,ParentType>
 		{
+			typedef true_type Census_Definition_Compliant;
+
 			member_component(typename MasterType::person_type, Parent_Person, none, none);
 
 			feature_implementation void Initialize(requires(check_2(ComponentType,CallerType,Is_Same_Entity)))
 			{	
 			}	tag_feature_as_available(Initialize);
 
+			member_data(Types::Census_Person_Characteristics::GENDER, Gender, none,none);
 			// Length member
 			member_data_component(Basic_Units::Implementations::Length_Implementation<MasterType>,Length,none,none);
 			member_component_feature(My_Length, Length, Value, Basic_Units::Prototypes::Length_Prototype);

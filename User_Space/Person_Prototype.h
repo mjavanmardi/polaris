@@ -50,10 +50,54 @@ namespace Types
 		MOVEMENT_PLANNING=3,
 	};
 
+	namespace Census_Person_Characteristics
+	{
+
+	enum GENDER
+	{
+		NONE,MALE=1,FEMALE
+	};
+	enum RACE
+	{
+		WHITE=1,BLACK,INDIAN,ASIAN,PACIFIC_ISLANDER,OTHER_RACE,TWO_OR_MORE_RACES,HISPANIC
+	};
+	enum WORKER_CLASS
+	{
+		EMPLOYEE_PRIVATE=1,EMPLOYEE_NON_PROFIT,LOCAL,STATE,FEDERAL,SELF_EMPLOYED,SELF_EMPLOYED_INCORPORATED,FAMILY_BUSINESS_UNPAID,UNEMPLOYED
+	};
+	enum WORK_TRAVEL_MODE
+	{
+		CAR=1,BUS,STREETCAR,SUBWAY,RAILROAD,FERRY,TAXI,MOTORCYCLE,BIKE,WALK,WORK_AT_HOME,OTHER
+	};
+	enum MARITAL_STATUS
+	{
+		MARRIED=1,WIDOWED,DIVORCED,SEPARATED,NEVER_MARRIED
+	};
+	enum HH_RELATIONSHIP
+	{
+		REFERENCE_PERSON,SPOUSE,CHILD,ADOPTED_CHILD,STEPCHILD,SIBLING,PARENT,GRANDCHILD,PARENT_IN_LAW,CHILD_IN_LAW,OTHER_RELATIVE,BOARDER,ROOMATE,PARTNER,FOSTER_CHILD,OTHER_UNRELATED,GQ_INSTITUTIONAL,GQ_NONINSTITUTIONAL
+	};
+	enum SCHOOL_ATTENDANCE
+	{
+		NO,YES_PUBLIC,YES_PRIVATE
+	};
+	enum SCHOOL_GRADE
+	{
+		NO_SCHOOL,PRESCHOOL,KINDERGARTEN,GRADE_1,GRADE_2,GRADE_3,GRADE_4,GRADE_5,GRADE_6,GRADE_7,GRADE_8,GRADE_9,GRADE_10,GRADE_11,GRADE_12,UNDERGRADUATE,GRADUATE_SCHOOL
+	};
+	enum EDUCATIONAL_ATTAINMENT
+	{
+		EDUC_NA,EDUC_NONE,EDUC_PRESCHOOL,EDUC_KINDERGARTEN,EDUC_GRADE_1,EDUC_GRADE_2,EDUC_GRADE_3,EDUC_GRADE_4,EDUC_GRADE_5,EDUC_GRADE_6,EDUC_GRADE_7,EDUC_GRADE_8,EDUC_GRADE_9,EDUC_GRADE_10,EDUC_GRADE_11,EDUC_GRADE_12_NO_DIPLOMA,
+		EDUC_HIGH_SCHOOL_DIPLOMA,EDUC_GED,EDUC_SOME_COLLEGE_UNDER_1YR,EDUC_SOME_COLLEGE_OVER_1YR,EDUC_ASSOCIATE_DEGREE,EDUC_BACHELOR_DEGREE,EDUC_MASTERS_DEGREE,EDUC_PROFESSIONAL_DEGREE,EDUC_DOCTORATE
+	};
+
+
+	}
 }
 
 namespace Variables
 {
+
 }
 
 namespace Prototypes
@@ -210,19 +254,19 @@ namespace Prototypes
 					response.result = true;
 				}
 				// check if movement planning needs to occur, if so do this
-				else if (movement_plans->find(_iteration) != movement_plans->end())
+				else/* if (movement_plans->find(_iteration) != movement_plans->end())*/
 				{
 					response.next._iteration = _iteration;
 					response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING;
 					response.result = true;
 				}
 				// otherwise, finish activity generation and move on to next main iteration
-				else
-				{
-					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
-					response.next._sub_iteration = 0;
-					response.result = true;
-				}
+				//else
+				//{
+				//	response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
+				//	response.next._sub_iteration = 0;
+				//	response.result = true;
+				//}
 			}
 			// during the Activity Planning sub_iteration, swap in the activity-planning event and set up future sub_iteration schedule
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING)
@@ -230,19 +274,19 @@ namespace Prototypes
 				_pthis->Swap_Event((Event)&Person_Planner::Activity_Planning_Event<NULLTYPE>);
 
 				// check if movement planning needs to occur, if so do this next
-				if (movement_plans->find(_iteration) != movement_plans->end())
-				{
+				//if (movement_plans->find(_iteration) != movement_plans->end())
+				//{
 					response.next._iteration = _iteration;
 					response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING;
 					response.result = true;
-				}
+				//}
 				// otherwise, finish activity planning and move on to next main iteration
-				else
-				{
-					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
-					response.next._sub_iteration = 0;
-					response.result = true;
-				}
+			//	else
+			//	{
+			//		response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
+			//		response.next._sub_iteration = 0;
+			//		response.result = true;
+			//	}
 			}
 			// during the Activity Generation sub_iteration, swap in the movement planning event and set up future sub_iteration schedule
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING)

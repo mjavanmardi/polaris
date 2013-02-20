@@ -338,13 +338,7 @@ namespace PopSyn
 			declare_feature_event(Output_Popsyn_Event)
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
-				if (pthis->write_output_flag<bool>() != true) return;
-
-				Counter timer;
-				timer.Start();
-		
-				ostream& sample_out = pthis->Output_Stream<ostream&>();
-				ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
+				
 				
 				// Define iterators and get pointer to the region collection
 				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
@@ -353,6 +347,8 @@ namespace PopSyn
 				typedef typename sample_collection_type::unqualified_value_type			sample_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
 				typedef typename zone_collection_type::unqualified_value_type			zone_type;
+				typedef typename zone_type::get_type_of(Synthetic_Persons_Container)	person_collection_type;
+				typedef typename person_collection_type::unqualified_value_type			person_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
 
@@ -361,11 +357,42 @@ namespace PopSyn
 				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,ComponentType);
 				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
 				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
-	
+				define_container_and_value_interface_unqualified_container(persons_collection_itf, person_itf,person_collection_type,Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person_Prototype,ComponentType);
 
 				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
 				typename regions_itf::iterator r_itr;
 				typename zones_itf::iterator z_itr;
+				typename persons_collection_itf::iterator p_itr;
+
+				// initialize all of the synthesized individuals and assign unique ids
+				long uuid = 0;
+				for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
+				{
+					region_itf* region = r_itr->second;
+					zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
+					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+					{
+						zone_itf* zone = z_itr->second;
+						persons_collection_itf* persons = zone->template Synthetic_Persons_Container<persons_collection_itf*>();
+						for (p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+						{
+							person_itf* person = *p_itr;
+							person->Initialize<long>(uuid);
+							++uuid;
+						}
+					}
+				}
+
+
+				// Handle file output if needed
+				if (pthis->write_output_flag<bool>() != true) return;
+
+				Counter timer;
+				timer.Start();
+		
+				ostream& sample_out = pthis->Output_Stream<ostream&>();
+				ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
+
 
 				for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 				{
