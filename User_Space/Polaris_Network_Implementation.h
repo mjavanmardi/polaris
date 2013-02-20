@@ -231,7 +231,7 @@ namespace Network_Components
 			//==================================================================================================================
 			/// read from database
 			//------------------------------------------------------------------------------------------------------------------
-#ifndef FOR_LINUX_PORTING
+
 			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); 
 
 			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
@@ -241,7 +241,7 @@ namespace Network_Components
 			feature_implementation void read_turn_movement_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
 			feature_implementation void read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
-#endif
+
 			//==================================================================================================================
 			/// Convert network data from C++ data structure to Plaris structure
 			//------------------------------------------------------------------------------------------------------------------

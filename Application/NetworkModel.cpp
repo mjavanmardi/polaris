@@ -1,7 +1,7 @@
 #include "Model_Selection.h"
 
 #ifdef NetworkModelApplication
-#define FOR_LINUX_PORTING
+//define FOR_LINUX_PORTING
 //#define DBIO
 #ifdef DBIO
 #define WINDOWS
@@ -34,11 +34,11 @@ struct MasterType
 	
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	
-	typedef Intersection_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
+	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
 	
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
 	
-	typedef Intersection_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
+	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
 	
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
 
@@ -85,6 +85,19 @@ struct MasterType
 	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<MasterType> movement_plan_type;
 
 	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
+
+//#ifndef FOR_LINUX_PORTING
+	typedef Person_Components::Implementations::Person_Implementation<MasterType, demand_type> person_type;
+
+    typedef Person_Components::Implementations::TRANSIMS_Person_Planner_Implementation<MasterType, person_type> person_planner_type;
+
+    typedef Person_Components::Implementations::TRANSIMS_Person_Properties_Implementation<MasterType,person_type> person_properties_type;
+
+    typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
+
+    typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
+//#endif
+
 
 };
 
@@ -138,7 +151,7 @@ int main()
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
 	cout << "converting network data..." << endl;
-	network->write_network_data<Target_Type<void,network_models::network_information::network_data_information::NetworkData&>>(network_data_for_output);
+	network->write_network_data<Target_Type<NULLTYPE,NULLTYPE,network_models::network_information::network_data_information::NetworkData&>>(network_data_for_output);
 	network_models::network_information::network_data_information::write_network_data("", network_data_for_output);
 	//cout<<"writing network data..."<<endl;
 	//network_models::network_information::network_data_information::write_network_data(output_dir_name,network_data_for_output);

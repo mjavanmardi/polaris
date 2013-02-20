@@ -105,7 +105,7 @@ namespace Demand_Components
 			feature_accessor(vehicles_container, none, none);
 			feature_accessor(first_vehicle_departure_time, none, none);
 			feature_accessor(last_vehicle_departure_time, none, none);
-#ifndef FOR_LINUX_PORTING
+//#ifndef FOR_LINUX_PORTING
 			feature_prototype void read_demand_data(typename TargetType::ParamType& network_mapping,
 				requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
@@ -125,8 +125,10 @@ namespace Demand_Components
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename get_type_of(vehicles_container), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				typedef Traveler_Components::Prototypes::Traveler_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
 				define_component_interface(_Routing_Interface, _Traveler_Interface::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
-				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
-				define_component_interface(_Movement_Plan_Interface, _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+//				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
+//				define_component_interface(_Movement_Plan_Interface, _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename get_type_of(vehicles_container), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				
 
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename get_type_of(network_reference)::type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -146,7 +148,7 @@ namespace Demand_Components
 				_Traveler_Interface* traveler;
 				_Vehicle_Interface* vehicle;
 				_Routing_Interface* router;
-				_Plan_Interface* plan;
+//				_Plan_Interface* plan;
 				_Movement_Plan_Interface* movement_plan;
 				
 				int traveler_id_counter=-1;
@@ -242,13 +244,13 @@ namespace Demand_Components
 					traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
 					vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
 					router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
-					plan = (_Plan_Interface*)Allocate<typename _Plan_Interface::Component_Type>();
+//					plan = (_Plan_Interface*)Allocate<typename _Plan_Interface::Component_Type>();
 					
 					traveler->template uuid<int>(++traveler_id_counter);
 					traveler->template internal_id<int>(traveler_id_counter);
 					traveler->template router<_Routing_Interface*>(router);
 					traveler->template vehicle<_Vehicle_Interface*>(vehicle);
-					traveler->template plan<_Plan_Interface*>(plan);
+//					traveler->template plan<_Plan_Interface*>(plan);
 
 					router->template traveler<_Traveler_Interface*>(traveler);
 					router->template network<_Network_Interface*>(network);
@@ -259,13 +261,13 @@ namespace Demand_Components
 					vehicle->template internal_id<int>(traveler_id_counter);
 					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 
-					plan->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
-					plan->template traveler<_Traveler_Interface*>(traveler);
+//					plan->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
+//					plan->template traveler<_Traveler_Interface*>(traveler);
 
 					movement_plan->template origin<_Link_Interface*>(origin_link);
 					movement_plan->template destination<_Link_Interface*>(destination_link);
 					movement_plan->template departed_time<int>(departed_time);
-					movement_plan->template plan<_Plan_Interface*>(plan);
+//					movement_plan->template plan<_Plan_Interface*>(plan);
 
 					traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
 
@@ -277,7 +279,7 @@ namespace Demand_Components
 					}
 				}
 			}
-#endif
+//#endif
 
 			feature_prototype void read_demand_data(requires(!check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,typename Network_Components::Types::File_Network,is_same)))
 			{
@@ -372,8 +374,11 @@ namespace Demand_Components
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 				typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
-				define_component_interface(_Plan_Interface, typename _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
-				define_component_interface(_Movement_Plan_Interface, typename _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+//				define_component_interface(_Plan_Interface, typename _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
+				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename get_type_of(vehicles_container), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+
+//				define_component_interface(_Movement_Plan_Interface, typename _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
                 define_component_interface(_Scenario_Interface, typename get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 				demand_data.first_vehicle_departure_time = this->template first_vehicle_departure_time<int>();

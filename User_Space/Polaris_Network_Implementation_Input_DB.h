@@ -335,19 +335,19 @@ namespace Network_Components
 
 				if(connect_type=="THRU")
 				{
-					turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::THROUGH_TURN);
+					turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::THROUGH_TURN);
 				}
 				else if(connect_type=="LEFT" || connect_type=="L_SPLIT" || connect_type=="L_MERGE")
 				{
-					turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::LEFT_TURN);
+					turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::LEFT_TURN);
 				}
 				else if(connect_type=="RIGHT" || connect_type=="R_SPLIT" || connect_type=="R_MERGE")
 				{
-					turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::RIGHT_TURN);
+					turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::RIGHT_TURN);
 				}
 				else if(connect_type=="UTURN")
 				{
-					turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Intersection_Components::Types::U_TURN);
+					turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::U_TURN);
 				}
 				else
 				{
@@ -356,7 +356,7 @@ namespace Network_Components
 				}
 
 					
-				turn_movement->template movement_rule<Intersection_Components::Types::Turn_Movement_Rule_Keys>(Intersection_Components::Types::ALLOWED);
+				turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
 
 
 				turn_movements_container<ComponentType,CallerType,_Turn_Movements_Container_Interface&>().push_back(turn_movement);
