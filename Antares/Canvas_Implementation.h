@@ -90,8 +90,6 @@ public:
 
 	member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,none,none);
 
-	member_prototype(Zone_Components::Prototypes::Graphical_Zone_Group,graphical_zone_group,typename MasterType::graphical_zone_group_type,none,none);
-
 	member_prototype(Time_Panel,time_panel,typename MasterType::type_of(time_panel),none,none);
 	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),none,none);
 	member_prototype(Control_Panel,control_panel,typename MasterType::type_of(control_panel),none,none);
@@ -171,20 +169,9 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize()
 	Graphical_Vehicle_Implementation<MasterType>::_graphical_network=(Network_Prototype<type_of(graphical_network),Graphical_Vehicle_Implementation<MasterType>>*)_graphical_network;
 	_graphical_network->read_network_data<Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Graphical_Network,string&>>( ((Antares_Implementation<MasterType>*)GetParent())->_db_name );
 
-	//============================================================================================
-	// Graphical zone group dispaly - integrate to graphical network when database is fixed
-	_graphical_zone_group = (Zone_Components::Prototypes::Graphical_Zone_Group<type_of(graphical_zone_group),Canvas_Implementation>*) Allocate<type_of(graphical_zone_group)>();	
-	_graphical_zone_group->canvas< Canvas<ComponentType,type_of(graphical_zone_group)> *>( (Canvas<ComponentType,type_of(graphical_zone_group)>*)this );
-	Zone_Components::Implementations::Graphical_Zone_Implementation<MasterType>::_graphical_zone_group=(Zone_Components::Prototypes::Graphical_Zone_Group<type_of(graphical_zone_group),Zone_Components::Implementations::Graphical_Zone_Implementation<MasterType>>*)_graphical_zone_group;
-	_graphical_zone_group->configure_zones_layer<NULLTYPE>();
-	// get offsets from graphical network
-	_graphical_zone_group->input_offset<Point_2D<MasterType>*>(_graphical_network->input_offset<Point_2D<MasterType>*>());
-	//--------------------------------------------------------------------------------------------
-
 
 	// set canvas bounds as network bounds
 	Rectangle_Prototype<typename MasterType::type_of(graphical_network)::type_of(network_bounds)>* net_bounds=_graphical_network->network_bounds< Rectangle_Prototype<typename MasterType::type_of(graphical_network)::type_of(network_bounds)>* >();
-	//_graphical_zone_group->network_bounds< Rectangle_Prototype<typename MasterType::type_of(graphical_zone_group)::type_of(network_bounds)>* >(net_bounds);
 
 	_canvas_bounds._xmin = net_bounds->xmin<float>();
 	_canvas_bounds._xmax = net_bounds->xmax<float>();
