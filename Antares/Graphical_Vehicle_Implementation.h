@@ -30,7 +30,7 @@ namespace Vehicle_Components
 
 			member_prototype(Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type, none, none);
 			//member_component(typename MasterType::movement_plan_type, movement_plan, none, none);
-#ifndef FOR_LINUX_PORTING
+#ifndef EXCLUDE_DEMAND
 			member_component(typename MasterType::person_type, traveler, none, none);
 #else
 			member_component(typename MasterType::traveler_type, traveler, none, none);

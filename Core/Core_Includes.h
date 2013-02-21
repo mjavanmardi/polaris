@@ -9,14 +9,15 @@
 #include <queue>
 #include <string>
 #include <stdexcept>
+#include <random>
+#include <sstream>
 
 #ifdef WINDOWS
 #include <Windows.h>
 #include <WinBase.h>
 #include <unordered_map>
 #include <type_traits>
-#include <random>
-#include <sstream>
+
 #else
 #define nullptr NULL
 #include <time.h>
@@ -224,9 +225,15 @@ void end_timer(timespec& start,long long& total)
 
 #endif
 
+#define THROW_WARNING(MESSAGE_STREAM) \
+{std::stringstream s;\
+s << endl << "WARNING at "<<__FILE__<<", line: "<<__LINE__<<endl;\
+s << MESSAGE_STREAM;\
+std::cout << s.str();}
 
 #define THROW_EXCEPTION(MESSAGE_STREAM) \
 {std::stringstream s;\
+s << endl << "RUNTIME_ERROR at "<<__FILE__<<", line: "<<__LINE__<<endl;\
 s << MESSAGE_STREAM;\
 std::cerr << s.str();\
 throw new std::runtime_error(s.str().c_str());}

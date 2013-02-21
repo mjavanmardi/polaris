@@ -19,6 +19,9 @@ namespace Zone_Components
 
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
+			member_data(double, X, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(double, Y, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, population, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_container(vector<typename MasterType::activity_location_type*>, origin_activity_locations, none, none);
 

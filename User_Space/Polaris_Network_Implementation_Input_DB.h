@@ -29,9 +29,11 @@ namespace Network_Components
 			string name(scenario_reference<ComponentType,CallerType,_Scenario_Interface*>()->template database_name<string&>());
 			auto_ptr<database> db (open_sqlite_database (name));
 			transaction t(db->begin());
+
 			read_intersection_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 			read_link_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 			read_turn_movement_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
+			read_zone_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 			read_activity_location_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 		}
 
@@ -442,6 +444,78 @@ namespace Network_Components
 			}
 		}
 
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_zone_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+		{
+			using namespace odb;
+			using namespace pio;
+
+			//Types::Link_ID_Dir link_id_dir;
+
+			cout << "Reading Activity Locations" << endl;
+
+			int counter=-1;
+
+			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+				
+			// initialzie zone hash_map
+			_zones_container.clear();
+			_zones_container.set_empty_key(-1);
+			_zones_container.set_deleted_key(-2);
+			
+			// get zones from database
+			result<Zone> zone_result=db->template query<Zone>(query<Zone>::true_expr);	
+			for(result<Zone>::iterator db_itr = zone_result.begin (); db_itr != zone_result.end (); ++db_itr)
+			{
+				_Zone_Interface* zone = (_Zone_Interface*)Allocate<typename _Zone_Interface::Component_Type>();
+				zone->template uuid<int>(db_itr->getZone());
+				zone->template internal_id<int>(db_itr->getZone());
+				zone->template X<double>(db_itr->getX());
+				zone->template Y<double>(db_itr->getY());
+				zone->template population<int>(db_itr->getPopulation());
+				zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().insert(pair<int,_Zone_Interface*>(zone->template uuid<int>(), zone));
+			}
+
+
+
+			//_Activity_Location_Interface* activity_location;
+			//int skipped_counter=0;
+			//_Link_Interface* link;
+			//for(result<Location>::iterator db_itr = location_result.begin (); db_itr != location_result.end (); ++db_itr)
+			//{
+
+			//	link_id_dir.id=db_itr->getLink()->getLink();
+			//	link_id_dir.dir=db_itr->getDir();
+
+			//	if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
+			//	{
+			//		if(++skipped_counter%10000==0)
+			//		{
+			//			cout << skipped_counter << " locations skipped" << endl;
+			//		}
+			//		continue;				
+			//	}
+
+			//	++counter;
+			//	if(counter%10000==0) cout << "\t" << counter << endl;
+
+			//	activity_location = (_Activity_Location_Interface*)Allocate<typename _Activity_Location_Interface::Component_Type>();
+			//	assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
+			//	link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
+
+			//	activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
+			//	zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+			//	activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
+			//	zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+			//	activity_location->template zone<_Zone_Interface*>(zone);
+			//	activity_location->template uuid<int>(db_itr->getPrimaryKey());
+			//	activity_location->template internal_id<int>(counter);
+			//		
+			//	activity_locations_container<ComponentType,CallerType,_Activity_Locations_Container_Interface&>().push_back(activity_location);
+			//}
+		}
+		
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 		{
 			using namespace odb;
@@ -449,24 +523,25 @@ namespace Network_Components
 
 			Types::Link_ID_Dir link_id_dir;
 
-			cout << "Reading Activity Locations" << endl;
+			cout << "Reading Zones " << endl;
 
 			int counter=-1;
 
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			_activity_locations_container.clear();
 
 			result<Location> location_result=db->template query<Location>(query<Location>::true_expr);
 				
 			// create a single zone
-			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			_zones_container.clear();
-			_Zone_Interface* zone = (_Zone_Interface*)Allocate<typename _Zone_Interface::Component_Type>();
-			zone->template uuid<int>(1.0);
-			zone->template internal_id<int>(0.0);
-			zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().push_back(zone);
+			//define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			//_zones_container.clear();
+			//_Zone_Interface* zone = (_Zone_Interface*)Allocate<typename _Zone_Interface::Component_Type>();
+			//zone->template uuid<int>(1.0);
+			//zone->template internal_id<int>(0.0);
+			_Zones_Container_Interface* zones = this->zones_container<ComponentType,CallerType,_Zones_Container_Interface*>();
+			_Zones_Container_Interface::iterator zone_itr;
 
 			_Activity_Location_Interface* activity_location;
 			int skipped_counter=0;
@@ -489,20 +564,31 @@ namespace Network_Components
 				++counter;
 				if(counter%10000==0) cout << "\t" << counter << endl;
 
+				// get the zone id and pull interface to zone from zone container
+				int zone_id = db_itr->getZone()->getZone();
+				if ((zone_itr=zones->find(zone_id)) == zones->end()) THROW_EXCEPTION("ERROR, zone id: "<<zone_id<<" was not found.");
+				_Zone_Interface* zone = zone_itr->second;
+
 				activity_location = (_Activity_Location_Interface*)Allocate<typename _Activity_Location_Interface::Component_Type>();
 				assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
 				link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 
 				activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
-				zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+				
 				activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
-				zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+				
 				activity_location->template zone<_Zone_Interface*>(zone);
 				activity_location->template uuid<int>(db_itr->getPrimaryKey());
 				activity_location->template internal_id<int>(counter);
+
+				zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+				zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+
 					
 				activity_locations_container<ComponentType,CallerType,_Activity_Locations_Container_Interface&>().push_back(activity_location);
 			}
 		}
+
+		
 	}
 }

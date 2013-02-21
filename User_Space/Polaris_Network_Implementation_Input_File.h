@@ -190,10 +190,17 @@ namespace Network_Components
 
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			typename _Zones_Container_Interface::iterator zone_itr;
+
+			// initialzie zone hash_map
+			_zones_container.clear();
+			_zones_container.set_empty_key(-1);
+			_zones_container.set_deleted_key(-2);
 
 			_Zone_Interface* zone;
+
 			for (int i = 0; i < network_data.network_zone_size; i++)
 			{
 				zone = (_Zone_Interface*)Allocate<typename _Zone_Interface::Component_Type>();
@@ -217,13 +224,28 @@ namespace Network_Components
 					
 				zone->template uuid<int>(raw_zone.uuid);
 				zone->template internal_id<int>(i);
-				zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().push_back(zone);
+				zone->template X<double>(raw_zone.x);
+				zone->template Y<double>(raw_zone.y);
+				zone->template population<int>(raw_zone.population);
+
+				zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().insert(pair<int,_Zone_Interface*>(zone->template uuid<int>(), zone));
+				//zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().push_back(zone);
 			}
 			for (int i = 0; i < network_data.network_activity_location_size; i++)
 			{
 				network_models::network_information::network_data_information::ActivityLocationData& raw_activity_location = network_data.activity_location_data_array[i];
 				_Activity_Location_Interface* activity_location = (_Activity_Location_Interface*)_activity_locations_container[i];
-				activity_location->template zone<_Zone_Interface*>((_Zone_Interface*)_zones_container.at(raw_activity_location.zone_index));
+				if ((zone_itr = _zones_container.find(raw_activity_location.zone_index)) != _zones_container.end())
+				{
+					activity_location->template zone<_Zone_Interface*>(zone_itr->second);
+					zone = (_Zone_Interface*)zone_itr->second;
+					zone->origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+					zone->destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+				}
+				else
+				{
+					THROW_EXCEPTION("ERROR: zone id: " << raw_activity_location.zone_index << ", from activity location: " << activity_location->uuid<int>() << ", was not found.");
+				}
 			}
 		}
 

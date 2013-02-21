@@ -68,19 +68,15 @@ namespace Network_Components
 				
 				// configure vehicle layer
 				_vehicle_points=_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Graphical_Network_Implementation>*, string& > >(string("Vehicles"));
-
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Points();
-
 				_vehicle_points->Initialize<NULLTYPE>(cfg);
 
 
 				// configure plot layer
 				_num_vehicles=_information_panel->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(num_vehicles),Graphical_Network_Implementation>*, string& > >(string("Number of Vehicles"));
-
 				Antares_Layer_Configuration pcfg;
 				pcfg.Configure_Plot();
-
 				_num_vehicles->Initialize<NULLTYPE>(pcfg);
 			}
 
@@ -139,7 +135,6 @@ namespace Network_Components
 					intersections_container_ptr->push_back(intersection);
 				}
 			}
-
 
 			feature_implementation void read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{

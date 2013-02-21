@@ -195,14 +195,14 @@ namespace Network_Components
 
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_zone_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 
 			cout << "writing zones" << endl;
 			typename _Zones_Container_Interface::iterator zone_itr;
 			for (zone_itr = _zones_container.begin(); zone_itr != _zones_container.end(); zone_itr++) 
 			{
-				_Zone_Interface* zone = (_Zone_Interface*)(*zone_itr);
+				_Zone_Interface* zone = (_Zone_Interface*)(zone_itr->second);
 					
 				network_models::network_information::network_data_information::ZoneData zone_data;
 

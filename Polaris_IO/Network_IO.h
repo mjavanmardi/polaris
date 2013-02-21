@@ -181,6 +181,9 @@ public:
 	const double& getMax_Y () const {return max_y;}
 	void setMax_Y (const double& max_y_){max_y = max_y_;}
 	const int& getPrimaryKey () const {return zone;}
+	const long& getPopulation () const {return population;}
+	void setPopulation (const long& population_){population = population_;}
+
 
 //Data Fields
 private:
@@ -191,6 +194,7 @@ private:
 	double y;
 	double z;
 	int area;
+	long population;
 	double min_x;
 	double min_y;
 	double max_x;

@@ -30,7 +30,7 @@ namespace Network_Components
 
 			member_container(vector<typename MasterType::activity_location_type*>, activity_locations_container, none, none);
 
-			member_container(vector<typename MasterType::zone_type*>, zones_container, none, none);
+			member_associative_container(concat(dense_hash_map<int,typename MasterType::zone_type*>), zones_container, none, none);
 			
 			member_container(vector<typename MasterType::movement_type*>, movements_container, none, none);
 
@@ -123,7 +123,6 @@ namespace Network_Components
 					((_Intersection_Interface*)(*intersection_itr))->template initialize_features<ComponentType*>(this_component());
 				}
 			}
-
 
 			feature_implementation void construct_network_cost()
 			{
@@ -241,6 +240,8 @@ namespace Network_Components
 			feature_implementation void read_turn_movement_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
 			feature_implementation void read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
+
+			feature_implementation void read_zone_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
 			//==================================================================================================================
 			/// Convert network data from C++ data structure to Plaris structure

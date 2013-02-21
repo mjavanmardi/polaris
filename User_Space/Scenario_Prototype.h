@@ -117,30 +117,50 @@ namespace Scenario_Components
 			feature_prototype void read_scenario_data()
 			{
 				CfgReader cfgReader;
-				cfgReader.initialize("scenario.json");
-
+				char* path = "scenario.json";
+				bool result = cfgReader.initialize(path);
+				
+				//===============================================
+				// set start time
 				string start_time_in_string;
-				cfgReader.getParameter("starting_time_hh_mm", &start_time_in_string);
-				start_time_in_string += ":00";
-				int start_time = convert_hhmmss_to_seconds(start_time_in_string);
-				//assert(start_time == 0); // to be done for start time > 0
+				int start_time;
+				if (cfgReader.getParameter("starting_time_hh_mm", &start_time_in_string) == PARAMETER_FOUND)
+				{
+					start_time_in_string += ":00";
+					start_time = convert_hhmmss_to_seconds(start_time_in_string);
+					//assert(start_time == 0); // to be done for start time > 0
+				}
+				else start_time = 0;
 				simulation_start_time<int>(start_time);
 				
+				//===============================================
+				// set start time
 				string end_time_in_string;
-				cfgReader.getParameter("ending_time_hh_mm", &end_time_in_string);
-				end_time_in_string += ":00";
-				int end_time = convert_hhmmss_to_seconds(end_time_in_string);
+				int end_time;
+				if (cfgReader.getParameter("ending_time_hh_mm", &end_time_in_string) == PARAMETER_FOUND)
+				{
+					end_time_in_string += ":00";
+					end_time = convert_hhmmss_to_seconds(end_time_in_string);
+				}
+				else end_time = 60*60*24*2;
 				simulation_end_time<int>(end_time);
 
 				planning_horizon<int>(end_time - start_time);
 
-				cfgReader.getParameter("simulation_interval_length_in_second", simulation_interval_length<int*>());
+				//===============================================
+				// set interval length
+				if (cfgReader.getParameter("simulation_interval_length_in_second", simulation_interval_length<int*>()) != PARAMETER_FOUND)simulation_interval_length<int>(6);
+
+				//===============================================
+				// set sim_interval per assignment interval
 				int assignment_intervals;
-				cfgReader.getParameter("num_simulation_intervals_per_assignment_interval", &assignment_intervals);
+				if (cfgReader.getParameter("num_simulation_intervals_per_assignment_interval", &assignment_intervals) != PARAMETER_FOUND) assignment_intervals = 50;
 				assignment_interval_length<int>(assignment_intervals*simulation_interval_length<int>());
 
+				//===============================================
+				// set assignment mode
 				string assignment_mode_string;
-				cfgReader.getParameter("assignment_mode", &assignment_mode_string);
+				if (cfgReader.getParameter("assignment_mode", &assignment_mode_string) != PARAMETER_FOUND) assignment_mode_string = "ONE_SHOT_ASSIGNMENT_SIMULATION_MODE";
 				if (assignment_mode_string.compare("ONE_SHOT_ASSIGNMENT_SIMULATION_MODE") == 0)
 				{
 					assignment_mode<int>(Scenario_Components::Types::Assignment_Simulation_Mode_Keys::ONE_SHOT_ASSIGNMENT_SIMULATION_MODE);
@@ -155,16 +175,17 @@ namespace Scenario_Components
 					assert(false);
 				}
 
-				cfgReader.getParameter("seed", iseed<unsigned long*>());
+				//===============================================
+				// set control parameters
+				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(0);
+				if (cfgReader.getParameter("num_threads", num_threads<int*>())!= PARAMETER_FOUND) num_threads<int>(1);
+				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0);
+				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
 
-				cfgReader.getParameter("num_threads", num_threads<int*>());
-
-				cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>());
-
-				cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>());
-
+				//===============================================
+				// set control parameters
 				string io_source_string;
-				cfgReader.getParameter("io_source_flag", &io_source_string);
+				if (cfgReader.getParameter("io_source_flag", &io_source_string)!= PARAMETER_FOUND) io_source_string = "ODB_IO_SOURCE";
 				if (io_source_string.compare("FILE_IO_SOURCE") == 0)
 				{
 					io_source_flag<int>(Scenario_Components::Types::IO_Source_Keys::FILE_IO_SOURCE);
@@ -176,7 +197,7 @@ namespace Scenario_Components
 				else if (io_source_string.compare("ODB_IO_SOURCE") == 0)
 				{
 					io_source_flag<int>(Scenario_Components::Types::IO_Source_Keys::ODB_IO_SOURCE);
-					cfgReader.getParameter("database_name", database_name<std::string*>());
+					if (cfgReader.getParameter("database_name", database_name<std::string*>())!= PARAMETER_FOUND) database_name<std::string>("chicago-Supply.sqlite");
 				} 
 				else
 				{

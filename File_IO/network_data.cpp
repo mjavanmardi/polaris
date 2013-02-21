@@ -1199,8 +1199,11 @@ void network_data_information::read_zone(string input_dir_name, NetworkData& net
 
 				//0 - uuid
 				token_size = 1;
-				string_split(tokens, line, token_size);
+				string_split(tokens, line);
 				zone_data.uuid = stoi(tokens[0]);
+				zone_data.x = stoi(tokens[1]);
+				zone_data.y = stoi(tokens[2]);
+				zone_data.population = stoi(tokens[3]);
 
 				zone_index = zone_index + 1;
 				zone_data.zone_index = zone_index;
@@ -1257,7 +1260,7 @@ void network_data_information::read_activity_location(string input_dir_name, Net
 					activity_location_data.num_origin_links = stoi(tokens[2]);
 					activity_location_data.num_destination_links = stoi(tokens[3]);
 
-					activity_location_data.zone_index = network_data.zone_id_index_map[zone_id];
+					activity_location_data.zone_index = zone_id;//network_data.zone_id_index_map[zone_id];
 				}
 				
 				if ((iline-1)%3 == 2)
@@ -1324,7 +1327,8 @@ void network_data_information::read_network_data(string input_dir_name, NetworkD
 	//activity location
 	for (int i=0;i<network_data.network_activity_location_size;i++)
 	{
-		int zone_index = network_data.activity_location_data_array[i].zone_index;
+		int zone_id = network_data.activity_location_data_array[i].zone_index;
+		int zone_index = network_data.zone_id_index_map.find(zone_id)->second;
 
 		//origin activity location
 		if (network_data.activity_location_data_array[i].num_origin_links>0)

@@ -127,7 +127,7 @@ namespace Network_Skimming_Components
 				network_itf* network = this->network_reference<network_itf*>();
 
 				// create the references to network items and create the lists of origins/destination to route from/to
-				define_container_and_value_interface(zones_itf,zone_itf,typename network_itf::get_type_of(zones_container),Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+				define_container_and_value_interface(zones_itf,zone_itf,typename network_itf::get_type_of(zones_container),Associative_Container_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 				define_container_and_value_interface(locations_itf,location_itf,typename zone_itf::get_type_of(origin_activity_locations),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 				define_container_and_value_interface(links_itf,link_itf,typename location_itf::get_type_of(origin_links),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 				define_container_and_value_interface(origin_map_itf,origin_item_itf,typename get_type_of(origin_node_to_zone_map), Containers::Associative_Container_Prototype,Prototypes::Location_To_Zone_Map_Item_Prototype,CallerType);
@@ -141,29 +141,41 @@ namespace Network_Skimming_Components
 				typename locations_itf::iterator loc_itr;
 				for (itr= zones_container->begin();itr != zones_container->end(); ++itr)
 				{
-					zone_itf* orig_zone = *itr;
+					zone_itf* orig_zone = itr->second;
 					loc_itr = orig_zone->template origin_activity_locations<locations_itf*>()->begin();
-					if (loc_itr == orig_zone->template origin_activity_locations<locations_itf*>()->end()) THROW_EXCEPTION("error, origin zone " << orig_zone->template internal_id<int>() << "has no activity locations associated with it");
-					location_itf* orig_node = *loc_itr;
-					origin_item_itf* orig_item = (origin_item_itf*)Allocate<typename get_type_of(origin_node_to_zone_map)::unqualified_value_type>();
-					orig_item->template initialize<Target_Type<NULLTYPE,NULLTYPE,long,float>>(orig_node->template internal_id<long>(),orig_zone->template internal_id<long>(),this->template nodes_per_zone<float>());
+					if (loc_itr == orig_zone->template origin_activity_locations<locations_itf*>()->end()) 
+					{
+						THROW_WARNING("warning, origin zone " << orig_zone->template internal_id<int>() << "has no activity locations associated with it");
+					}
+					else
+					{
+						location_itf* orig_node = *loc_itr;
+						origin_item_itf* orig_item = (origin_item_itf*)Allocate<typename get_type_of(origin_node_to_zone_map)::unqualified_value_type>();
+						orig_item->template initialize<Target_Type<NULLTYPE,NULLTYPE,long,float>>(orig_node->template internal_id<long>(),orig_zone->template internal_id<long>(),this->template nodes_per_zone<float>());
 					
-					pair<long,origin_item_itf*> item = pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item);
-					//origin_map->insert(pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item));
-					origin_map->insert(item);
+						pair<long,origin_item_itf*> item = pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item);
+						//origin_map->insert(pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item));
+						origin_map->insert(item);
+					}
 				}
 				for (itr = zones_container->begin();itr != zones_container->end(); ++itr)
 				{
-					zone_itf* dest_zone = *itr;
+					zone_itf* dest_zone = itr->second;
 					loc_itr = dest_zone->template origin_activity_locations<locations_itf*>()->begin();
-					if (loc_itr == dest_zone->template origin_activity_locations<locations_itf*>()->end()) THROW_EXCEPTION("error, destination zone " << dest_zone->template internal_id<int>() << "has no activity locations associated with it");
-					location_itf* dest_node = *(dest_zone->template origin_activity_locations<locations_itf*>()->begin());
-					destination_item_itf* dest_item = (destination_item_itf*)Allocate<typename get_type_of(destination_node_to_zone_map)::unqualified_value_type>();
-					dest_item->template initialize<Target_Type<NULLTYPE,NULLTYPE,long,float>>(dest_node->template internal_id<long>(),dest_zone->template internal_id<long>(),this->template nodes_per_zone<float>());
+					if (loc_itr == dest_zone->template origin_activity_locations<locations_itf*>()->end()) 
+					{
+						THROW_WARNING("warning, destination zone " << dest_zone->template internal_id<int>() << "has no activity locations associated with it");
+					}
+					else
+					{
+						location_itf* dest_node = *(dest_zone->template origin_activity_locations<locations_itf*>()->begin());
+						destination_item_itf* dest_item = (destination_item_itf*)Allocate<typename get_type_of(destination_node_to_zone_map)::unqualified_value_type>();
+						dest_item->template initialize<Target_Type<NULLTYPE,NULLTYPE,long,float>>(dest_node->template internal_id<long>(),dest_zone->template internal_id<long>(),this->template nodes_per_zone<float>());
 					
-					pair<long,destination_item_itf*> item = pair<long,destination_item_itf*>(dest_node->template internal_id<long>(),dest_item);
-					//destination_map->insert(pair<long,destination_item_itf*>(dest_node->template internal_id<long>(),dest_item));
-					destination_map->insert(item);
+						pair<long,destination_item_itf*> item = pair<long,destination_item_itf*>(dest_node->template internal_id<long>(),dest_item);
+						//destination_map->insert(pair<long,destination_item_itf*>(dest_node->template internal_id<long>(),dest_item));
+						destination_map->insert(item);
+					}
 				}
 
 				// Create individual mode-skim tables for each available mode
@@ -230,9 +242,24 @@ namespace Network_Skimming_Components
 			// Primary function accessors - used to pass through to the specific skimm table based on time-key
 			//---------------------------------------------
 			// This returns the travel time based on the current simulation time
-			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
+			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_Zone_ID, typename TargetType::ParamType Destination_Zone_ID, typename TargetType::Param2Type Mode_Indicator, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
 			{
-				return this->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, Simulation_Timestep_Increment>>(Origin_ID, Destination_ID, Mode_Indicator, Simulation_Time.Current_Time<Simulation_Timestep_Increment>());
+				// create the references to network items and create the lists of origins/destination to route from/to
+				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_container_and_value_interface(zones_itf,zone_itf,typename network_itf::get_type_of(zones_container),Associative_Container_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+				network_itf* network = this->network_reference<network_itf*>();
+				zones_itf* zones = network->zones_container<zones_itf*>();
+				typename zones_itf::iterator zone_itr;
+
+				// convert the ids to indices
+				zone_itf *orig_zone, *dest_zone;
+				if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = zone_itr->second;}
+				else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found.");
+				if ((zone_itr = zones->find(Destination_Zone_ID)) != zones->end()){ dest_zone = zone_itr->second;}
+				else THROW_EXCEPTION("ERROR, destination zone id: " << Destination_Zone_ID << " was not found.");
+				
+				// call the get los function
+				return this->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, Simulation_Timestep_Increment>>(orig_zone->internal_id<int>(), dest_zone->internal_id<int>(), Mode_Indicator, Simulation_Time.Current_Time<Simulation_Timestep_Increment>());
 			}
 			// This returns the travel time during a specific time interval
 			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator, typename TargetType::Param3Type Start_Time, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
@@ -353,7 +380,7 @@ namespace Network_Skimming_Components
 				skimmer_itf* skim = this->skim_reference<skimmer_itf*>();
 				
 				// create the LOS container
-				define_container_and_value_interface(zones_itf,zone_itf,typename network_itf::get_type_of(zones_container),Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+				define_container_and_value_interface(zones_itf,zone_itf,typename network_itf::get_type_of(zones_container),Associative_Container_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 				define_container_and_value_interface(locations_itf,location_itf,typename zone_itf::get_type_of(origin_activity_locations),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 				define_container_and_value_interface(links_itf,link_itf,typename location_itf::get_type_of(origin_links),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 				define_container_and_value_interface(origin_map_itf,origin_item_itf,typename skimmer_itf::get_type_of(origin_node_to_zone_map), Containers::Associative_Container_Prototype,Prototypes::Location_To_Zone_Map_Item_Prototype,CallerType);
@@ -364,8 +391,7 @@ namespace Network_Skimming_Components
 				typename origin_map_itf::iterator orig_itr = origin_map->begin();
 				//destination_map_itf::iterator dest_itr = destination_map->begin();
 				locations_itf* activity_locations = network->template activity_locations_container<locations_itf*>();
-
-
+		
 				// create the LOS matrix
 				typedef matrix<double>::size_type size_t;
 				skim_table_itf* los = this->skim_table<skim_table_itf*>();

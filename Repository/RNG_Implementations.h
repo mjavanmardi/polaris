@@ -40,7 +40,7 @@ namespace RNG_Components
 			tag_feature_as_available(Next_Rand);
 
 			member_data(unsigned long, seed, none, none);
-			member_data(std::mt19937, generator, none, none);
+			member_data(std::tr1::mt19937, generator, none, none);
 			member_data(std::tr1::uniform_real<double>, distribution, none, none);
 		};
 
@@ -112,7 +112,7 @@ namespace RNG_Components
 			}
 			tag_feature_as_available(Next_Rand);
 
-			member_data(normal_distribution<double>, distribution, none, none);
+			member_data(std::tr1::normal_distribution<double>, distribution, none, none);
 			member_data(double, location, none, none);
 			member_data(double, scale, none, none);
 		};

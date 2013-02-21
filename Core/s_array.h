@@ -247,7 +247,7 @@ public:
 				size_type i = tmp.get_index(index);
 				(*itr) = tmp._data[i];
 			}
-			else (*itr) = value;		
+			//else (*itr) = value;		
 		}
 	}
 

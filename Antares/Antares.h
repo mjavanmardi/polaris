@@ -13,6 +13,7 @@
 #include "Graphical_Intersection_Implementation.h"
 #include "Graphical_Vehicle_Implementation.h"
 #include "Antares_Layer_Implementation.h"
+#include "Graphical_Zone_Implementation.h"
 
 #include "Navigation.h"
 #include "Render.h"

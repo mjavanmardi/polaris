@@ -138,6 +138,37 @@ struct Antares_Layer_Configuration
 
 		data_stride=0;
 	}
+
+	void Configure_Static_Points(True_Color_RGBA<NULLTYPE>& Color, int size)
+	{
+		dynamic_data=false;
+		target_sub_iteration=-1;
+
+		storage_offset=_iteration;
+		storage_size=1;
+		storage_period=1;
+
+		draw=true;
+
+		primitive_type=_POINT;
+
+		color=false;
+		head_color._r=Color._r;
+		head_color._g=Color._g;
+		head_color._b=Color._b;
+		head_color._a=Color._a;
+
+		normal=false;
+		head_normal._x=0;
+		head_normal._y=0;
+		head_normal._z=1;
+		
+		head_size_value=size;
+
+		num_vertices=1;
+
+		data_stride=0;
+	}
 	
 	void Configure_Plot()
 	{

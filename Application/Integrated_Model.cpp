@@ -1,51 +1,37 @@
 #include "Model_Selection.h"
 
-#define FOR_LINUX_PORTING
+//#define FOR_LINUX_PORTING
 //#define EXCLUDE_DEMAND
 
 #ifdef IntegratedModelApplication
-
-
-#define DBIO
+//#define DBIO
 #ifdef DBIO
 #define WINDOWS
 #include "Application_Includes.h"
 #include "../File_IO/network_models.h"
+
 struct MasterType
 {
 	typedef MasterType M;
 
-#ifdef ANTARES
+	//==============================================================================================
+	// Antares stuff
+	#ifdef ANTARES
 	typedef Conductor_Implementation<MasterType> conductor_type;
 	typedef Control_Panel_Implementation<MasterType> control_panel_type;
 	typedef Time_Panel_Implementation<MasterType> time_panel_type;
 	typedef Information_Panel_Implementation<MasterType> information_panel_type;
 	typedef Canvas_Implementation<MasterType> canvas_type;
 	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
+	typedef Layer_Options_Implementation<MasterType> layer_options_type;
 
 	typedef Graphical_Network_Implementation<MasterType> graphical_network_type;
 	typedef Graphical_Link_Implementation<MasterType> graphical_link_type;
 	typedef Graphical_Intersection_Implementation<MasterType> graphical_intersection_type;
 	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<MasterType> vehicle_type;
-#else
+	#else
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
-#endif
-
-	//==============================================================================================
-	// Signalization Types
-	//typedef Signal_Components::Components::HCM_Signal_Full<T>::type				SIGNAL_TYPE;
-	//typedef Signal_Components::Components::HCM_Phase_Full<T>::type				PHASE_TYPE;
-	//typedef Signal_Components::Components::HCM_LaneGroup_Full<T>::type			LANE_GROUP_TYPE;
-	//typedef Signal_Components::Components::HCM_Approach_Full<T>::type			APPROACH_TYPE;
-	//typedef Signal_Components::Components::Signal_Indicator_Basic_Display<T>::type	INDICATOR_TYPE;
-	//typedef Signal_Components::Components::Signal_Detector<T>::type				DETECTOR_TYPE;
-
-	//typedef Signal_Components::Components::HCM_Signal_Full<T>::type			FULL_SIGNAL_TYPE;
-	//typedef Signal_Components::Components::HCM_Signal_Simple<T>::type		SIMPLE_SIGNAL_TYPE;	
-	//typedef Signal_Components::Components::HCM_Phase_Full<T>::type			FULL_PHASE_TYPE;
-	//typedef Signal_Components::Components::HCM_Phase_Simple<T>::type		SIMPLE_PHASE_TYPE;
-	//typedef Signal_Components::Components::HCM_LaneGroup_Full<T>::type		FULL_LANE_GROUP_TYPE;
-	//typedef Signal_Components::Components::HCM_LaneGroup_Simple<T>::type	SIMPLE_LANE_GROUP_TYPE;
+	#endif
 
 	//==============================================================================================
 	// Network Types
@@ -125,15 +111,23 @@ struct MasterType
 
 ostream* stream_ptr;
 
-int main()
+int main(int argc,char** argv)
 {
-	
+	//==================================================================================================================================
+	// Start Antares UI
+	//----------------------------------------------------------------------------------------------------------------------------------
+	#ifdef ANTARES
+	START_UI(argc,argv, MasterType);
+	#endif
+
+
+	//==================================================================================================================================
+	// NETWORK MODEL STUFF
+	//----------------------------------------------------------------------------------------------------------------------------------
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
 
-	//===============
 	// OUTPUT OPTIONS
-	//----------------
 	ofstream log_file("signal_log3.txt");
 	ostream output_stream(log_file.rdbuf());
 	stream_ptr = &output_stream;	
@@ -174,13 +168,13 @@ int main()
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
 	cout << "converting network data..." << endl;
-	network->write_network_data<Target_Type<NULLTYPE,NULLTYPE,network_models::network_information::network_data_information::NetworkData&>>(network_data_for_output);
+	network->write_network_data<Target_Type<NULLTYPE,void,network_models::network_information::network_data_information::NetworkData&>>(network_data_for_output);
 	network_models::network_information::network_data_information::write_network_data("", network_data_for_output);
-	//cout<<"writing network data..."<<endl;
+	cout<<"writing network data..."<<endl;
 	//network_models::network_information::network_data_information::write_network_data(output_dir_name,network_data_for_output);
 
 
-	//cout << "initializing simulation..." <<endl;	
+	cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
 
 	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
@@ -209,8 +203,7 @@ int main()
 
 	//network_models::write_data("",scenario_data_for_output,demand_data_for_output,network_data_for_output, operation_data_for_output);
 
-	////initialize network agents
-
+	////initialize network agents	
 	cout << "initializing link agents..." <<endl;
 	define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Prototype, NULLTYPE);
 	_Links_Container_Interface::iterator links_itr;
@@ -232,15 +225,11 @@ int main()
 	{
 		((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
 	}
-	
 	cout << "starting sim..." <<endl;
 
-	START();
 
-	cout << "Finished!" << endl;
-	system("PAUSE");
 
-		//==================================================================================================================================
+	//==================================================================================================================================
 	// Network Skimming stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
 	define_component_interface(_network_skim_itf, _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,NULLTYPE);
@@ -249,6 +238,8 @@ int main()
 	skimmer->Initialize<_Network_Interface*>(network);
 	network->skimming_faculty<_network_skim_itf*>(skimmer);
 	
+
+
 	//==================================================================================================================================
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -274,11 +265,17 @@ int main()
 	popsyn->Initialize<NULLTYPE>();
 	//----------------------------------------------------------------------------------------------------------------------------------
 
+	START();
+
+	cout << "Finished!" << endl;
+	system("PAUSE");
 }
 #endif
 
-//#define FILE_IO
-#ifdef FILE_IO
+//============================================
+// USE THIS FOR RUNNING ON LINUX
+//--------------------------------------------
+#ifndef DBIO
 #define WINDOWS
 #include "Application_Includes.h"
 #include "../File_IO/network_models.h"
@@ -293,11 +290,14 @@ struct MasterType
 	typedef Information_Panel_Implementation<MasterType> information_panel_type;
 	typedef Canvas_Implementation<MasterType> canvas_type;
 	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
+	typedef Layer_Options_Implementation<MasterType> layer_options_type;
 
 	typedef Graphical_Network_Implementation<MasterType> graphical_network_type;
 	typedef Graphical_Link_Implementation<MasterType> graphical_link_type;
 	typedef Graphical_Intersection_Implementation<MasterType> graphical_intersection_type;
-	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<MasterType> vehicle_type;
+	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<MasterType> vehicle_type;	
+	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<MasterType> zone_type;
+	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<MasterType> graphical_zone_group_type;
 #else
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
 #endif
@@ -366,8 +366,6 @@ struct MasterType
 	
 	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<MasterType> approach_type;
 
-	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<MasterType> zone_type;
-
 	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<MasterType> plan_type;
 
 	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<MasterType> movement_plan_type;
@@ -403,7 +401,7 @@ int main(int argc,char** argv)
 {
 
 #ifdef ANTARES
-	START_UI(argc,argv, MasterType,NULL);
+	START_UI(argc,argv, MasterType);
 #endif
 
 #pragma region COPY FROM NETWORKMODEL.CPP
@@ -480,6 +478,20 @@ int main(int argc,char** argv)
 #pragma endregion
 
 	//==================================================================================================================================
+	// Set up graphical display
+	//----------------------------------------------------------------------------------------------------------------------------------
+	define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, NULLTYPE);
+	_Zones_Container_Interface::iterator zone_itr;
+	_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
+	for (zone_itr = zone_list->begin(); zone_itr != zone_list->end(); ++zone_itr)
+	{
+		//cout << endl << "at zone initialization";
+		_Zone_Interface* zone = (_Zone_Interface*)zone_itr->second;
+		zone->Push_To_Zone_Display<NULLTYPE>();	
+	}
+
+
+	//==================================================================================================================================
 	// Network Skimming stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
 	define_component_interface(_network_skim_itf, _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,NULLTYPE);
@@ -521,4 +533,5 @@ int main(int argc,char** argv)
 	system("PAUSE");
 }
 #endif
+
 #endif

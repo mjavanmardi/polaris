@@ -16,6 +16,10 @@ namespace network_models
 				int uuid;
 				int zone_index;
 
+				double x;
+				double y;
+				int population;
+
 				//topology
 				int num_origin_activity_locations;
 				int num_destination_activity_locations;

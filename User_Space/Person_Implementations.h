@@ -17,7 +17,7 @@ namespace Person_Components
 			feature_implementation void Initialize(TargetType id)
 			{	
 				// Set the initial iteration to process
-				this->template First_Iteration<ComponentType,CallerType,Time_Minutes>(15.0);
+				this->template First_Iteration<ComponentType,CallerType,Time_Minutes>(1.0);
 
 				// Create and Initialize the Properties faculty
 				define_component_interface(properties_itf,type_of(Properties),Prototypes::Person_Properties,ComponentType);
@@ -169,17 +169,21 @@ namespace Person_Components
 				define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 				Movement_Plan* move = (Movement_Plan*)movement_plan;
 				// key the movement plan on the planning timestep just prior to departure
-				long t1 = move->template departed_time<Simulation_Timestep_Increment>();
+				long t1 = move->template departed_time<Simulation_Timestep_Increment>() - parent->template First_Iteration<Simulation_Timestep_Increment>();
 				long t2 = this->Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
 				long remain = (long)(t1 / t2);
 				Simulation_Timestep_Increment departure_time = remain * this->template Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>() + parent->template First_Iteration<Simulation_Timestep_Increment>();
 
-				if (departure_time < 1800)
+				if (move->template departed_time<Simulation_Timestep_Increment>() < _iteration)
 				{
 					int test = 1;
 				}
-				Movement_Plans* movements = this->template Movement_Plans_Container<ComponentType,CallerType,Movement_Plans*>();
-				movements->insert(departure_time,move);
+				else
+				{
+					Movement_Plans* movements = this->template Movement_Plans_Container<ComponentType,CallerType,Movement_Plans*>();
+					movements->insert(departure_time,move);
+				}
+				
 			}
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(!check_as_given(TargetType,is_pointer) || !check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
@@ -315,7 +319,7 @@ namespace Person_Components
 					int O = (parent->template Next_Rand<double>()-0.000001) * size;
 					int D = (parent->template Next_Rand<double>()-0.000001) * size;
 					// departure time from current time, in minutes, approximately every six hours
-					t += parent->template Next_Rand<double>()*6.0*60.0*10.0;
+					t += parent->template Next_Rand<double>()*60.0*60.0*6.0;
 
 					Basic_Units::Time_Variables::Time_Seconds time = Simulation_Time.Future_Time<Basic_Units::Time_Variables::Time_Seconds, Basic_Units::Time_Variables::Time_Seconds>(t);
 		

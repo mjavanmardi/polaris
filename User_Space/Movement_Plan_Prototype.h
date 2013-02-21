@@ -36,7 +36,7 @@ namespace Movement_Plan_Components
 	namespace Prototypes
 	{
 
-		prototype struct Trajectory_Unit_Prototype
+		prototype struct Trajectory_Unit_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			
@@ -56,7 +56,7 @@ namespace Movement_Plan_Components
 		};
 
 
-		prototype struct Movement_Plan_Prototype
+		prototype struct Movement_Plan_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

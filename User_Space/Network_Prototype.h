@@ -183,6 +183,7 @@ namespace Network_Components
 			feature_accessor(vehicle_coordinates, none, none);
 			feature_accessor(canvas, none, none);
 			feature_accessor(information_panel, none, none);
+			feature_accessor(input_offset, none, none);
 			feature_prototype void push_vehicle_coordinates(typename TargetType::ParamType data_source)
 			{
 				this_component()->template accept_vehicle_coordinates<ComponentType,CallerType,TargetType>(data_source);

@@ -2,6 +2,7 @@
 
 #include "json.h"
 
+#define PARAMETER_FOUND 0
 #define PARAMETER_NOT_SPECIFIED 1
 #define PARAMETER_TYPE_NOT_MATCH 2
 

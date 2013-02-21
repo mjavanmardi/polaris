@@ -382,7 +382,7 @@ namespace PopSyn
 						}
 					}
 				}
-
+				cout <<endl<<endl<<"Total Persons Synthesized: "<<uuid;
 
 				// Handle file output if needed
 				if (pthis->write_output_flag<bool>() != true) return;
