@@ -300,6 +300,7 @@ struct MasterType
 	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<MasterType> graphical_zone_group_type;
 #else
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
+	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<MasterType> zone_type;
 #endif
 
 	//==============================================================================================
@@ -480,6 +481,7 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Set up graphical display
 	//----------------------------------------------------------------------------------------------------------------------------------
+	#ifdef ANTARES
 	define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, NULLTYPE);
 	_Zones_Container_Interface::iterator zone_itr;
 	_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
@@ -489,7 +491,7 @@ int main(int argc,char** argv)
 		_Zone_Interface* zone = (_Zone_Interface*)zone_itr->second;
 		zone->Push_To_Zone_Display<NULLTYPE>();	
 	}
-
+	#endif
 
 	//==================================================================================================================================
 	// Network Skimming stuff

@@ -460,7 +460,6 @@ namespace Network_Components
 			define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 				
 			// initialzie zone hash_map
-			_zones_container.clear();
 			_zones_container.set_empty_key(-1);
 			_zones_container.set_deleted_key(-2);
 			

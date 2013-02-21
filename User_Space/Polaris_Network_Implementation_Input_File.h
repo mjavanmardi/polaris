@@ -195,7 +195,7 @@ namespace Network_Components
 			typename _Zones_Container_Interface::iterator zone_itr;
 
 			// initialzie zone hash_map
-			_zones_container.clear();
+			//_zones_container.clear();
 			_zones_container.set_empty_key(-1);
 			_zones_container.set_deleted_key(-2);
 
