@@ -19,6 +19,7 @@ typename Canvas_Implementation<MasterType,ParentType,InheritanceList>::Antares_L
 	
 	new_layer->list_index<int>(_layers.size() - 1);
 	new_layer->name<string&>(name);
+	new_layer->attributes_panel<attributes_panel_interface*>(_attributes_panel);
 
 	_layer_options->Allocate_New_Layer<Target_Type<NULLTYPE,void,string&>>(name);
 
@@ -70,6 +71,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Select_Layer(
 			break;
 		}
 	}
+
+	_attributes_panel->Push_Schema<Target_Type<NT,NT,string&>>(_selected_layer->attributes_schema<string&>());
 
 	Refresh();
 }

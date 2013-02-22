@@ -13,17 +13,27 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
 void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identify(const Point_3D<MasterType>& point, int start_iteration, int end_iteration)
 {
+
 	if(_primitive_type==_POINT)
 	{
-		const bool color = _color;
-		const bool normal = _normal;
-		const int vert_stride = _num_vertices * sizeof(Point_3D<MasterType>);
+		const bool grouped=_grouped;
+		const bool group_color=_group_color;
+		const bool group_normal=_group_normal;
+	
+		const bool primitive_color=_primitive_color;
+		const bool primitive_normal=_primitive_normal;
+		const int primitive_stride = _primitive_stride;
+	
+		const int vert_stride = _vert_stride;
 		const int data_stride = _data_stride;
-		int current_iteration = start_iteration;
-		const PrimitiveType primitive_type = _primitive_type;	
+
 		float best_dist = FLT_MAX;
 		unsigned char* best_element = nullptr;
 
+		
+
+		int current_iteration=start_iteration;
+	
 		while(current_iteration <= end_iteration)
 		{
 			const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _storage[current_iteration];
@@ -36,35 +46,85 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 				while(geometry_itr != geometry_end)
 				{
 					const unsigned char* const geometry_head = geometry_itr;
+					
+					geometry_itr += data_stride;
 
-					if(color)
+					if(grouped)
 					{
-						geometry_itr += sizeof(True_Color_RGBA<MasterType>);
-					}
-
-					if(normal)
-					{
-						geometry_itr += sizeof(Point_3D<MasterType>);
-					}
-
-					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
-
-					while( geometry_itr != geometry_vert_end )
-					{
-						Point_3D<MasterType>* current = (Point_3D<MasterType>*) geometry_itr;
-
-						float dist = (current->_x - point._x)*(current->_x - point._x) + (current->_y - point._y)*(current->_y - point._y);
-
-						if(dist < best_dist)
+						if(group_color)
 						{
-							best_dist = dist;
-							best_element = (unsigned char*)geometry_head;
+							geometry_itr += sizeof(True_Color_RGBA<MasterType>);
 						}
 
-						geometry_itr += sizeof(Point_3D<MasterType>);
-					}
+						if(group_normal)
+						{
+							geometry_itr += sizeof(Point_3D<MasterType>);
+						}
 
-					geometry_itr += data_stride;
+						const int num_group_primitives=*((int*)geometry_itr);
+						geometry_itr += sizeof(int);
+
+						const unsigned char* const group_end = geometry_itr + primitive_stride * num_group_primitives;
+
+						while( geometry_itr != group_end )
+						{
+							if(primitive_color)
+							{
+								geometry_itr += sizeof(True_Color_RGBA<MasterType>);
+							}
+
+							if(primitive_normal)
+							{
+								geometry_itr += sizeof(Point_3D<MasterType>);
+							}
+
+							const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+
+							while( geometry_itr != geometry_vert_end )
+							{
+								Point_3D<MasterType>* current = (Point_3D<MasterType>*) geometry_itr;
+
+								float dist = (current->_x - point._x)*(current->_x - point._x) + (current->_y - point._y)*(current->_y - point._y);
+
+								if(dist < best_dist)
+								{
+									best_dist = dist;
+									best_element = (unsigned char*)geometry_head;
+								}
+
+								geometry_itr += sizeof(Point_3D<MasterType>);
+							}
+						}
+					}
+					else
+					{
+						if(primitive_color)
+						{
+							geometry_itr += sizeof(True_Color_RGBA<MasterType>);
+						}
+
+						if(primitive_normal)
+						{
+							geometry_itr += sizeof(Point_3D<MasterType>);
+						}
+
+						const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+
+						while( geometry_itr != geometry_vert_end )
+						{
+							Point_3D<MasterType>* current = (Point_3D<MasterType>*) geometry_itr;
+
+							float dist = (current->_x - point._x)*(current->_x - point._x) + (current->_y - point._y)*(current->_y - point._y);
+
+							if(dist < best_dist)
+							{
+								best_dist = dist;
+								best_element = (unsigned char*)geometry_head;
+							}
+
+							geometry_itr += sizeof(Point_3D<MasterType>);
+						}
+					}
 				}
 			}
 
@@ -87,7 +147,17 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 				current_iteration++;
 			}
 
-			Push_Element<ComponentType,CallerType,Accented_Element>(best_element,_element_size,start_iteration);
+
+			Push_Element<ComponentType,CallerType,Accented_Element>(best_element,(primitive_stride + data_stride),start_iteration);
+
+			if(_attributes_callback != nullptr)
+			{
+				string bucket;
+
+				_attributes_callback( *((void**)best_element), bucket );
+
+				_attributes_panel->Push_Attributes<Target_Type<NT,NT,string&>>(bucket);
+			}
 		}
 	}
 }

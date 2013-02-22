@@ -184,12 +184,12 @@ namespace Routing_Components
 						_Routable_Link_Interface* next_link=outbound_movement->template outbound_link<_Routable_Link_Interface*>();
 
 						// in closed set
-						if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>()==Network_Components::Types::SCANNED) continue;
+						if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>() == Network_Components::Types::SCANNED) continue;
 
 						next_cost=outbound_movement->template forward_link_turn_travel_time<float>();
 						new_cost=current_link->template label_cost<float>() + next_cost;
 						
-						if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>()!=Network_Components::Types::INSELIST)
+						if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>() != Network_Components::Types::INSELIST)
 						{
 							// not in open set (or closed set)
 							tentative_better=true;

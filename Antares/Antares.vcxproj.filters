@@ -15,6 +15,9 @@
     <Filter Include="Implementations">
       <UniqueIdentifier>{d57cae35-d575-443d-a589-50fa72526ede}</UniqueIdentifier>
     </Filter>
+    <Filter Include="User_Space">
+      <UniqueIdentifier>{857620d8-0540-430a-886f-871858381072}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Antares.h">
@@ -53,12 +56,6 @@
     <ClInclude Include="Antares_Frame.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
-    <ClInclude Include="Graphical_Network_Implementation.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphical_Link_Implementation.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
     <ClInclude Include="Geometry.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
@@ -72,12 +69,6 @@
       <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Navigation.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphical_Intersection_Implementation.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphical_Vehicle_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Conductor.h">
@@ -116,8 +107,26 @@
     <ClInclude Include="Antares_Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Graphical_Intersection_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphical_Link_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphical_Network_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphical_Vehicle_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
     <ClInclude Include="Graphical_Zone_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Attributes_Panel_Implementation.h">
       <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Attributes_Panel.h">
+      <Filter>Prototypes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

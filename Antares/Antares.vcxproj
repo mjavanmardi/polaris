@@ -181,6 +181,8 @@
     <ClInclude Include="Antares_Includes.h" />
     <ClInclude Include="Antares_Layer.h" />
     <ClInclude Include="Antares_Layer_Implementation.h" />
+    <ClInclude Include="Attributes_Panel.h" />
+    <ClInclude Include="Attributes_Panel_Implementation.h" />
     <ClInclude Include="Canvas.h" />
     <ClInclude Include="Canvas_Implementation.h" />
     <ClInclude Include="Control_Panel.h" />

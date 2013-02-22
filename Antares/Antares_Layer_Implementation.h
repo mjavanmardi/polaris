@@ -13,8 +13,6 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 {
 	feature_implementation void Push_Element(void* data, int size, int iteration,requires(check_2(TargetType,Regular_Element,is_same)))
 	{
-		assert(size == _element_size);
-
 		unsigned char* data_itr=(unsigned char*)data;
 
 		vector<unsigned char>& storage_reference=_storage[iteration][_thread_id];
@@ -30,8 +28,6 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	
 	feature_implementation void Push_Element(void* data, int size, int iteration,requires(check_2(TargetType,Accented_Element,is_same)))
 	{
-		assert(size == _element_size);
-
 		unsigned char* data_itr=(unsigned char*)data;
 
 		vector<unsigned char>& storage_reference=_accent_storage[iteration][_thread_id];
@@ -60,29 +56,54 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			Load_Register<Antares_Layer_Implementation>(&Update_Condition<NULLTYPE>, &Update<NULLTYPE>, _iteration + 1 ,_target_sub_iteration);
 		}
 
-		_storage.Initialize(cfg.storage_offset,cfg.storage_period,cfg.storage_size);
-		_accent_storage.Initialize(cfg.storage_offset,cfg.storage_period,cfg.storage_size);
+		_storage.Initialize(cfg.storage_offset, cfg.storage_period, cfg.storage_size);
+		_accent_storage.Initialize(cfg.storage_offset, cfg.storage_period, cfg.storage_size);
 
 		_draw=cfg.draw;
 
 		_primitive_type=cfg.primitive_type;
 
-		_color=cfg.color;
-		_normal=cfg.normal;
+		_grouped=cfg.grouped;
+			_group_color=cfg.group_color;
+			_group_normal=cfg.group_normal;
 
-		_num_vertices=cfg.num_vertices;
 
-		_data_stride=cfg.data_stride;
-
-		_element_size=0;
-		_element_size+=( _color * sizeof(True_Color_RGBA<MasterType>) );
-		_element_size+=( _normal * sizeof(Point_3D<MasterType>) );
-		_element_size+=( _num_vertices * sizeof(Point_3D<MasterType>) );
-		_element_size+=( _data_stride );
 
 		_head_color=*((True_Color_RGBA<MasterType>*)&cfg.head_color);
 		_head_normal=*((Point_3D<MasterType>*)&cfg.head_normal);
 		_head_size_value=cfg.head_size_value;
+		
+		
+		
+		_primitive_color=cfg.primitive_color;
+		_primitive_normal=cfg.primitive_normal;
+
+		switch(_primitive_type)
+		{
+		case _POINT:
+			_vert_stride = sizeof(Point_3D<MasterType>)*1;
+			break;
+		case _LINE:
+			_vert_stride = sizeof(Point_3D<MasterType>)*2;
+			break;
+		case _TRIANGLE:
+			_vert_stride = sizeof(Point_3D<MasterType>)*3;
+			break;
+		case _QUAD:
+			_vert_stride = sizeof(Point_3D<MasterType>)*4;
+			break;
+		default:
+			assert(false);
+			break;
+		};
+
+		_primitive_stride = _vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>) + _primitive_normal*sizeof(Point_3D<MasterType>);
+
+		_attributes_schema=cfg.attributes_schema;
+		_submission_callback=cfg.submission_callback;
+		_attributes_callback=cfg.attributes_callback;
+
+		_data_stride=cfg.data_stride;
 	}
 
 	feature_implementation void Identify(const Point_3D<MasterType>& point, int start_iteration, int end_iteration);
@@ -102,20 +123,34 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 	member_data(PrimitiveType,primitive_type,none,none);
 	
-	member_data(bool,color,none,none);
+
 	member_data(True_Color_RGBA<MasterType>,head_color,none,none);
-
-	member_data(bool,normal,none,none);
 	member_data(Point_3D<MasterType>,head_normal,none,none);
-
 	member_data(int,head_size_value,none,none);
 	
-	member_data(int,num_vertices,none,none);
+	member_data(bool,grouped,none,none);
+	member_data(bool,group_color,none,none);
+	member_data(bool,group_normal,none,none);
+
+	member_data(int,primitive_stride,none,none);
+
+	member_data(int,vert_stride,none,none);
+	member_data(bool,primitive_color,none,none);
+	member_data(bool,primitive_normal,none,none);
+
+	
+
 	
 	member_data(int,data_stride,none,none);
-	
-	member_data(int,element_size,none,none);
 
+	member_data(string,attributes_schema,none,none);
+
+	typedef bool (*attributes_callback_type)(void*,string&);
+	
+	member_data(attributes_callback_type,submission_callback,none,none);
+	member_data(attributes_callback_type,attributes_callback,none,none);
+
+	member_prototype(Attributes_Panel,attributes_panel,typename MasterType::type_of(attributes_panel),none,none);
 
 	// Agent behavior
 

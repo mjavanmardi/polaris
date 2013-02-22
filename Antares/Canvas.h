@@ -46,8 +46,14 @@ prototype struct Canvas
 		return (TargetType::ReturnType)this_component()->Toggle_Layer<ComponentType,CallerType,TargetType>(name);
 	}
 
+	feature_prototype typename TargetType::ReturnType Scale_Coordinates(typename TargetType::ParamType coordinates)
+	{
+		return (TargetType::ReturnType)this_component()->Scale_Coordinates<ComponentType,CallerType,TargetType>(coordinates);
+	}
+
 	feature_accessor(time_panel,none,none);
 	feature_accessor(information_panel,none,none);
+	feature_accessor(attributes_panel,none,none);
 	feature_accessor(control_panel,none,none);
 	feature_accessor(layer_options,none,none);
 

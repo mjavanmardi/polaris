@@ -7,6 +7,7 @@
 #include "Control_Panel.h"
 #include "Time_Panel.h"
 #include "Information_Panel.h"
+#include "Attributes_Panel.h"
 #include "Canvas.h"
 
 //---------------------------------------------------------

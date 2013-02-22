@@ -6,6 +6,7 @@
 #include "Time_Panel_Implementation.h"
 #include "Information_Panel_Implementation.h"
 #include "Layer_Options_Implementation.h"
+#include "Attributes_Panel_Implementation.h"
 #include "Layer_Management.h"
 #include "Canvas_Implementation.h"
 #include "Graphical_Network_Implementation.h"

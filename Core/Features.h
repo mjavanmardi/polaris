@@ -366,9 +366,10 @@ struct member_function_ptr_types<Type,setter_type>
 ///============================================================================
 
 #define member_prototype(PROTOTYPE,FEATURE_NAME,COMPONENT_TYPE,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	public:\
 		PROTOTYPE<COMPONENT_TYPE,ComponentType>* _##FEATURE_NAME;\
+	public:\
 		typedef COMPONENT_TYPE FEATURE_NAME##_type;\
+		typedef PROTOTYPE<COMPONENT_TYPE,ComponentType> FEATURE_NAME##_interface;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(*_##FEATURE_NAME);}\

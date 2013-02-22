@@ -69,7 +69,7 @@ namespace Zone_Components
 				_graphical_zone_group->push_zone_coordinates<Point_3D<MasterType>& >(coordinate);
 			}
 
-			member_prototype(static Graphical_Zone_Group,graphical_zone_group,typename MasterType::graphical_zone_group_type,none,none);
+			static member_prototype(Graphical_Zone_Group,graphical_zone_group,typename MasterType::graphical_zone_group_type,none,none);
 
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);

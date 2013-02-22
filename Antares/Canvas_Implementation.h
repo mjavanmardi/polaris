@@ -20,6 +20,12 @@ public:
 	void Calculate_Bounds();
 
 	typedef Antares_Layer<typename type_of(MasterType::antares_layer),Canvas_Implementation> Antares_Layer_Interface;
+	
+	feature_implementation void Scale_Coordinates(Point_3D<MasterType>& coordinates)
+	{
+		coordinates._x += _input_offset._x;
+		coordinates._y += _input_offset._y;
+	}
 
 	feature_implementation Antares_Layer_Interface* Allocate_New_Layer(string& name);
 	feature_implementation void Toggle_Layer(int identifier);
@@ -47,6 +53,7 @@ public:
 	member_pointer(wxGLContext,glcontext,none,none);
 
 	member_data(Rectangle_XY<MasterType>,canvas_bounds,none,none);
+	member_data(Point_2D<MasterType>,input_offset,none,none);
 
 	member_data(int,cached_iteration,none,none);
 
@@ -94,6 +101,7 @@ public:
 	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),none,none);
 	member_prototype(Control_Panel,control_panel,typename MasterType::type_of(control_panel),none,none);
 	member_prototype(Layer_Options,layer_options,typename MasterType::type_of(layer_options),none,none);
+	member_prototype(Attributes_Panel,attributes_panel,typename MasterType::type_of(attributes_panel),none,none);
 
 	list<Antares_Layer_Interface*> _layers;
 	member_pointer(Antares_Layer_Interface,selected_layer,none,none);
@@ -169,6 +177,10 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize()
 	Graphical_Vehicle_Implementation<MasterType>::_graphical_network=(Network_Prototype<type_of(graphical_network),Graphical_Vehicle_Implementation<MasterType>>*)_graphical_network;
 	_graphical_network->read_network_data<Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Graphical_Network,string&>>( ((Antares_Implementation<MasterType>*)GetParent())->_db_name );
 
+	Point_2D<MasterType>& net_offset = _graphical_network->input_offset<Point_2D<MasterType>&>();
+	
+	_input_offset._x = net_offset._x;
+	_input_offset._y = net_offset._y;
 
 	// set canvas bounds as network bounds
 	Rectangle_Prototype<typename MasterType::type_of(graphical_network)::type_of(network_bounds)>* net_bounds=_graphical_network->network_bounds< Rectangle_Prototype<typename MasterType::type_of(graphical_network)::type_of(network_bounds)>* >();

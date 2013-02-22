@@ -9,6 +9,8 @@
 #include "wx\panel.h"
 #include "wx\tglbtn.h"
 
+#include "wx\listctrl.h"
+
 #include "wxPLplotwindow.h"
 #include "Polaris_IO/Polaris_IO.h"
 

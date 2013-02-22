@@ -24,14 +24,8 @@ namespace Network_Components
 				_vehicles_counter=0;
 			}
 
-			feature_implementation void accept_vehicle_coordinates(Point_3D<MasterType>& coordinates)
+			feature_implementation void accept_vehicle_coordinates()
 			{
-				coordinates._x += _input_offset._x;
-				coordinates._y += _input_offset._y;
-				coordinates._z += 1;
-
-				_vehicle_points->Push_Element<Regular_Element>(&coordinates,sizeof(Point_3D<MasterType>));
-
 				_vehicles_counter++;
 			}
 
@@ -67,10 +61,7 @@ namespace Network_Components
 
 				
 				// configure vehicle layer
-				_vehicle_points=_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Graphical_Network_Implementation>*, string& > >(string("Vehicles"));
-				Antares_Layer_Configuration cfg;
-				cfg.Configure_Points();
-				_vehicle_points->Initialize<NULLTYPE>(cfg);
+				MasterType::vehicle_type::Initialize_Layer();
 
 
 				// configure plot layer
@@ -282,7 +273,7 @@ namespace Network_Components
 			member_data(Rectangle_XY<MasterType>, network_bounds,none,none);
 			
 			member_prototype(Antares_Layer,link_lines,typename type_of(MasterType::antares_layer),none,none);
-			member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),none,none);
+			//member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),none,none);
 			member_prototype(Antares_Layer,num_vehicles,typename type_of(MasterType::antares_layer),none,none);
 
 			member_data(volatile int,vehicles_counter,none,none);

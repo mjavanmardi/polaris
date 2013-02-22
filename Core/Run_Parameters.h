@@ -2,7 +2,7 @@
 #include "Polaris_Variables.h"
 
 static const long long _Megabytes_To_Allocate=8000;
-static const unsigned int _num_iterations=3600*24*2; // 2 days
+static unsigned int _num_iterations=60*60*24*2; // 2 days
 static const int _num_threads=6;
 
 static const int _num_antares_threads = _num_threads + 1;

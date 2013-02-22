@@ -277,3 +277,5 @@ namespace Network_Components
 		};
 	}
 }
+
+using namespace Network_Components::Implementations;

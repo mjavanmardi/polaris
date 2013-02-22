@@ -38,24 +38,33 @@ prototype struct Antares_Layer
 	
 	feature_accessor(storage,none,none);
 	feature_accessor(accent_storage,none,none);
-
-	feature_accessor(primitive_type,none,none);
-
+	
 	feature_accessor(draw,none,none);
 
-	feature_accessor(head_color,none,none);
-	feature_accessor(color,none,none);
-	
-	feature_accessor(head_normal,none,none);	
-	feature_accessor(normal,none,none);
-
+	feature_accessor(primitive_type,none,none);
 	feature_accessor(head_size_value,none,none);
+	feature_accessor(head_normal,none,none);	
+	
+	
+	feature_accessor(grouped,none,none);
+	feature_accessor(group_color,none,none);
+	feature_accessor(group_normal,none,none);
+	feature_accessor(head_color,none,none);
 
-	feature_accessor(num_vertices,none,none);
+
+	feature_accessor(primitive_color,none,none);
+	feature_accessor(primitive_normal,none,none);
+	feature_accessor(primitive_stride,none,none);
+	feature_accessor(vert_stride,none,none);	
 	
+	
+	feature_accessor(attributes_schema,none,none);
+	feature_accessor(attributes_callback,none,none);
+	feature_accessor(submission_callback,none,none);
+
 	feature_accessor(data_stride,none,none);
-	
-	feature_accessor(element_size,none,none);
+
+	feature_accessor(attributes_panel,none,none);
 };
 
 //---------------------------------------------------------
@@ -90,22 +99,27 @@ struct Antares_Layer_Configuration
 
 		primitive_type=_LINE;
 		
-		color=false;
+		primitive_color=false;
 		head_color._r=0;
 		head_color._g=0;
 		head_color._b=0;
 		head_color._a=200;
 		
-		normal=false;
+		primitive_normal=false;
 		head_normal._x=0;
 		head_normal._y=0;
 		head_normal._z=1;
 		
+		grouped=false;
+
 		head_size_value=1;
 
-		num_vertices=2;
-
 		data_stride=0;
+
+		attributes_schema="";
+
+		submission_callback=nullptr;
+		attributes_callback=nullptr;
 	}
 	
 	void Configure_Points()
@@ -121,22 +135,27 @@ struct Antares_Layer_Configuration
 
 		primitive_type=_POINT;
 
-		color=false;
+		primitive_color=false;
 		head_color._r=255;
 		head_color._g=0;
 		head_color._b=0;
 		head_color._a=255;
 
-		normal=false;
+		primitive_normal=false;
 		head_normal._x=0;
 		head_normal._y=0;
 		head_normal._z=1;
 		
+		grouped=false;
+		
 		head_size_value=4;
 
-		num_vertices=1;
-
 		data_stride=0;
+
+		attributes_schema="";
+
+		submission_callback=nullptr;
+		attributes_callback=nullptr;
 	}
 
 	void Configure_Static_Points(True_Color_RGBA<NULLTYPE>& Color, int size)
@@ -152,22 +171,25 @@ struct Antares_Layer_Configuration
 
 		primitive_type=_POINT;
 
-		color=false;
+		primitive_color=false;
 		head_color._r=Color._r;
 		head_color._g=Color._g;
 		head_color._b=Color._b;
 		head_color._a=Color._a;
 
-		normal=false;
+		primitive_normal=false;
 		head_normal._x=0;
 		head_normal._y=0;
 		head_normal._z=1;
 		
 		head_size_value=size;
 
-		num_vertices=1;
-
 		data_stride=0;
+
+		attributes_schema="";
+
+		submission_callback=nullptr;
+		attributes_callback=nullptr;
 	}
 	
 	void Configure_Plot()
@@ -183,20 +205,20 @@ struct Antares_Layer_Configuration
 
 		primitive_type=_PLOT;
 
-		color=false;
+		primitive_color=false;
 		head_color._r=255;
 		head_color._g=0;
 		head_color._b=0;
 		head_color._a=255;
 
-		normal=false;
+		primitive_normal=false;
 		head_normal._x=0;
 		head_normal._y=0;
 		head_normal._z=1;
 
-		head_size_value=0;
+		grouped=false;
 
-		num_vertices=0;
+		head_size_value=0;
 
 		data_stride=sizeof(int);
 	}
@@ -210,17 +232,37 @@ struct Antares_Layer_Configuration
 
 	bool draw;
 
-	PrimitiveType primitive_type;
 	
-	bool color;
+	
+	PrimitiveType primitive_type;
+
 	True_Color_RGBA<NULLTYPE> head_color;
-
-	bool normal;
 	Point_3D<NULLTYPE> head_normal;
-
 	int head_size_value;
 
-	int num_vertices;
+
+
+
+	bool grouped;
+		bool group_color;
+			// 1 x True_Color_RGBA<NULLTYPE> group_color;
+		bool group_normal;
+			// 1 x Point_3D<NULLTYPE> group_normal;
+		int num_group_primitives;
+			// N x vert
+	
+	
+	
+	bool primitive_color;
+		// 1 x True_Color_RGBA<NULLTYPE> primitive_color;
+	bool primitive_normal;
+		// 1 x Point_3D<NULLTYPE> primitive_normal;
+	
 	
 	int data_stride;
+
+	string attributes_schema;
+
+	bool (*submission_callback)(void*,string&);
+	bool (*attributes_callback)(void*,string&);
 };

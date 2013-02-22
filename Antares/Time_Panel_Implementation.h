@@ -27,9 +27,6 @@ public:
 	member_pointer(wxTextCtrl,time_display,none,none);
 
 	member_prototype(Conductor,conductor,typename MasterType::conductor_type,none,none);
-	define_component_interface(Conductor_Interface, type_of(conductor), Conductor, Time_Panel_Implementation);
-
-	//Canvas_Implementation* canvas_ptr;
 };
 
 //---------------------------------------------------------
@@ -41,7 +38,7 @@ Time_Panel_Implementation<MasterType,ParentType,InheritanceList>::Time_Panel_Imp
 {
 	//---- miscellaneous initialization ----
 
-	_conductor=(Conductor_Interface*)((Antares_Implementation<MasterType>*)GetParent())->_conductor;
+	_conductor=(conductor_interface*)((Antares_Implementation<MasterType>*)GetParent())->_conductor;
 
 	//---- initialize the sizers ----
 	
@@ -79,7 +76,7 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 void Time_Panel_Implementation<MasterType,ParentType,InheritanceList>::OnPlay(wxCommandEvent& event)
 {
 	_play->SetBitmapLabel(_pause_button);
-	_play->SetValue(false);
+	_play->SetValue(true);
 	Refresh();
 	Connect(_play->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnStop));
 	_conductor->pause<bool>(false);
@@ -93,7 +90,7 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 void Time_Panel_Implementation<MasterType,ParentType,InheritanceList>::OnStop(wxCommandEvent& event)
 {
 	_play->SetBitmapLabel(_play_button);
-	_play->SetValue(true);
+	_play->SetValue(false);
 	Refresh();
 	Connect(_play->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));
 	_conductor->pause<bool>(true);
