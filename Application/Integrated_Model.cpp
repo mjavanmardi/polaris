@@ -485,21 +485,6 @@ int main(int argc,char** argv)
 	define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, NULLTYPE);
 	_Zones_Container_Interface::iterator zone_itr;
 	_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
-	typedef Canvas<MasterType::canvas_type,MasterType::graphical_zone_group_type> canvas_itf;
-	canvas_itf* canvas_ptr = (canvas_itf*) canvas;
-	define_component_interface(graphical_network_interface,typename canvas_itf::get_type_of(graphical_network),Network_Components::Prototypes::Network_Prototype,NULLTYPE);
-	//--------------------------------------------------------------------------------------------
-	// Graphical zone group display - integrate to graphical network when database is fixed
-	typedef Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,NULLTYPE> zone_group_interface;
-	zone_group_interface* _graphical_zone_group = (zone_group_interface*) Allocate<MasterType::graphical_zone_group_type>();	
-	_graphical_zone_group->canvas<canvas_itf*>( (canvas_itf*) canvas );
-	// initialize zone static reference to the graphical zone group
-	MasterType::zone_type::_graphical_zone_group=(Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,MasterType::zone_type>*)_graphical_zone_group;
-	_graphical_zone_group->configure_zones_layer<NULLTYPE>();
-	// get offsets from graphical network
-	_graphical_zone_group->input_offset<Point_2D<MasterType>*>(canvas_ptr->graphical_network<graphical_network_interface*>()->input_offset<Point_2D<MasterType>*>());
-	//--------------------------------------------------------------------------------------------
-	// Iterate over each zone and start the zone display by pushing to zone_group_layer
 	for (zone_itr = zone_list->begin(); zone_itr != zone_list->end(); ++zone_itr)
 	{
 		//cout << endl << "at zone initialization";
@@ -528,7 +513,8 @@ int main(int argc,char** argv)
 	// IPF Solver Settings
 	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
 	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
-	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,0.1,100);
+	// Solver settings - IPF tolerance, Percentage of population to synthesis, maximum ipf and selection iterations
+	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,0.01,100);
 
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();

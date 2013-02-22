@@ -362,7 +362,9 @@ namespace Prototypes
 			{		
 				Movement_Plan* move = move_itr->second;
 				// make sure vehicle is not already being simulated, skip movement if it is
-				if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() != Vehicle_Components::Types::Vehicle_Status_Keys::IN_NETWORK)
+				if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED ||
+					vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK
+					)
 				{
 					vehicle->template movement_plan<Movement_Plan*>(move);
 					this_ptr->template Schedule_New_Departure<NULLTYPE>(move->template departed_time<Simulation_Timestep_Increment>());

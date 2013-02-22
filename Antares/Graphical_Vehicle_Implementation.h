@@ -26,7 +26,7 @@ namespace Vehicle_Components
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
 
-			static member_prototype(Network_Prototype, graphical_network, typename MasterType::type_of(graphical_network), none, none);
+			member_prototype(static Network_Prototype, graphical_network, typename MasterType::type_of(graphical_network), none, none);
 
 			member_prototype(Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type, none, none);
 			//member_component(typename MasterType::movement_plan_type, movement_plan, none, none);
@@ -49,9 +49,15 @@ namespace Vehicle_Components
 			{
 				Graphical_Vehicle_Implementation* pthis=(Graphical_Vehicle_Implementation*)_this;
 
+				// don't draw vehicle position if it is not being simulated
+				if (pthis->simulation_status<ComponentType,ComponentType,Vehicle_Components::Types::Vehicle_Status_Keys>() != Vehicle_Components::Types::Vehicle_Status_Keys::IN_NETWORK)
+				{
+					return;
+				}
+
 				if(pthis->_movement_plan == NULL)
 				{
-					cout << "verified!" << endl;
+					cout << "In Graphical_Vehicle_Implementation::compute_vehicle_position - vehicle has null movement plan!" << endl;
 					return;
 				}
 				Link_Interface* link=pthis->_movement_plan->current_link<Link_Interface*>();
@@ -63,28 +69,14 @@ namespace Vehicle_Components
 				}
 
 				Intersection_Interface* upstream_intersection=link->upstream_intersection<Intersection_Interface*>();
-				
-				Canvas<typename MasterType::type_of(canvas),Graphical_Vehicle_Implementation>* my_canvas=((Canvas<typename MasterType::type_of(canvas),Graphical_Vehicle_Implementation>*)canvas);
 
-#pragma pack(push,1)
-				struct attribute_coordinate
-				{
-					void* ptr;
-					Point_3D<MasterType> vertex;
-				} coordinate;
-#pragma pack(pop)
+				Point_3D<MasterType> coordinate;
 
-				coordinate.ptr = _this;
+				coordinate._x=upstream_intersection->x_position<float>();
+				coordinate._y=upstream_intersection->y_position<float>();
+				coordinate._z=0;
 
-				coordinate.vertex._x=upstream_intersection->x_position<float>();
-				coordinate.vertex._y=upstream_intersection->y_position<float>();
-				coordinate.vertex._z=1;
-				
-				my_canvas->Scale_Coordinates<Target_Type<NT,void,Point_3D<MasterType>&>>(coordinate.vertex);
-
-				_vehicle_points->Push_Element<Regular_Element>(&coordinate,sizeof(attribute_coordinate));
-
-				_graphical_network->push_vehicle_coordinates< NULLTYPE >();
+				_graphical_network->push_vehicle_coordinates< Target_Type< NULLTYPE, NULLTYPE, Point_3D<MasterType>& > >(coordinate);
 			}
 
 			feature_implementation void load(requires(check_2(TargetType,Types::Load_To_Entry_Queue,is_same)))
@@ -110,54 +102,11 @@ namespace Vehicle_Components
 			{
 				_simulation_status = Types::Vehicle_Status_Keys::OUT_NETWORK;
 			}
-			
-			static void Initialize_Layer()
-			{
-				Canvas<typename MasterType::type_of(canvas),Graphical_Vehicle_Implementation>* my_canvas=((Canvas<typename MasterType::type_of(canvas),Graphical_Vehicle_Implementation>*)canvas);
-				_vehicle_points=my_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Graphical_Vehicle_Implementation>*, string& > >(string("Vehicles"));
-				Antares_Layer_Configuration cfg;
-				cfg.Configure_Points();
-				cfg.data_stride = sizeof(void*);
 
-				cfg.attributes_schema = string("ID,Status,Current_Link");
-
-				typedef bool (*attributes_callback_type)(void*,string&);
-				
-				cfg.attributes_callback = (attributes_callback_type)&fetch_attributes;
-
-				_vehicle_points->Initialize<NULLTYPE>(cfg);
-			}
-
-			static bool fetch_attributes(Graphical_Vehicle_Implementation* _this,string& bucket)
-			{
-				stringstream s;
-
-				s << _this->_internal_id << ",";
-
-				if(_this->_simulation_status == IN_NETWORK)
-				{
-					s << "IN_NETWORK" << ",";
-				}
-				else
-				{
-					s << "OTHER" << ",";
-				}
-
-				s << _this->_movement_plan->current_link<Link_Prototype<typename MasterType::type_of(link)>*>()->uuid<int>();
-
-				bucket=s.str();
-
-				return true;
-			}
-
-			static member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),none,none);
 		};
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Network_Prototype<typename MasterType::type_of(graphical_network),Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_graphical_network;
-		
-		template<typename MasterType,typename ParentType,typename InheritanceList>
-		Antares_Layer<typename MasterType::type_of(antares_layer),Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_vehicle_points;
 
 	}
 
