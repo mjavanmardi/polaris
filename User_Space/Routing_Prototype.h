@@ -74,26 +74,26 @@ namespace Routing_Components
 				}
 			}
 
-			feature_prototype bool one_to_one_link_based_least_time_path_a_star()
+			feature_prototype float one_to_one_link_based_least_time_path_a_star()
 			{
-				define_component_interface(_Routable_Network_Interface, typename get_type_of(routable_network), Network_Components::Prototypes::Network_Prototype, ComponentType);
-				define_component_interface(_Regular_Network_Interface, typename get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
-				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Routable_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
+				define_component_interface(_Routable_Network_Interface, get_type_of(routable_network), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, _Routable_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				//typedef Link_Interface<typename ComponentType::routable_link_type, ComponentType> _Routable_Link_Interface;
-				define_component_interface(_Routable_Intersection_Interface, typename ComponentType::routable_link_type::upstream_intersection_type, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
-				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_component_interface(_Routable_Intersection_Interface, ComponentType::routable_link_type::upstream_intersection_type, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typedef typename _Routable_Network_Interface::get_type_of(scan_list) ScanListType;
 
 				_Routable_Network_Interface* routable_net=routable_network<_Routable_Network_Interface*>();
 				routable_net->template reset_routable_network<NULLTYPE>();
 				
-				vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< vector<_Routable_Link_Interface*>& >();
-
+				//RoutableNetworkInterface* routable_network=routable_network<RoutableNetworkInterface*>();
 				float max_free_flow_speed=routable_net->template max_free_flow_speed<float>();
 				ScanListType& scan_list=routable_net->template scan_list<ScanListType&>();
+				//NumSearchesType& num_searches=routable_network->template num_searches<NumSearchesType&>();
 
 				_Routable_Link_Interface* origin_link_ptr=routable_origin<_Routable_Link_Interface*>();
 				_Routable_Link_Interface* destination_link_ptr=routable_destination<_Routable_Link_Interface*>();
@@ -101,12 +101,10 @@ namespace Routing_Components
 				
 				_Regular_Link_Interface* net_origin_link=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>();
 				_Movements_Container_Interface& turn_mvmt_container=net_origin_link->template outbound_turn_movements<_Movements_Container_Interface&>();
-				
 				int outbound_turn_movement_size = (int)turn_mvmt_container.size();
-				
 				if (origin_link_ptr != destination_link_ptr && outbound_turn_movement_size == 0)
 				{
-					cerr << "Origin link must have outbound turn movement" << endl;
+					cerr << "Origin link must have outbount turn movement" << endl;
 					assert(false);
 				}
 
@@ -122,7 +120,9 @@ namespace Routing_Components
 				next_cost=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>()->template travel_time<float>();
 				new_cost = next_cost;
 				_Routable_Link_Interface* current_link=origin_link_ptr;
-				
+
+
+				vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< vector<_Routable_Link_Interface*>& >();
 				if(current_link->template reset_list_status<bool>()==0)
 				{
 					reset_links_container.push_back(current_link);
@@ -148,23 +148,13 @@ namespace Routing_Components
 
 				current_link->template label_pointer<_Routable_Link_Interface*>(current_link);
 
-				current_link->template scan_list_position<int>(scan_list.push((void*&)current_link,current_link->template f_cost<float>()));
-				//scan_list.insert(make_pair(current_link->template f_cost<float>(),current_link));
-
+				scan_list.insert(make_pair(current_link->template f_cost<float>(),current_link));
 				current_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
-
-				bool tentative_better=false;
-
+				int cur_link_id;
 				while(!scan_list.empty())
 				{ 
-					scan_list.pop_min((void*&)current_link);
-					//current_link = (_Routable_Link_Interface*)(scan_list.begin()->second);
-					//scan_list.erase(scan_list.begin());			
 
-					if(current_link == destination_link_ptr)
-					{
-						break;
-					}
+					current_link = (_Routable_Link_Interface*)(scan_list.begin()->second);
 
 					if(current_link->template reset_list_status<bool>()==0)
 					{
@@ -172,80 +162,85 @@ namespace Routing_Components
 						current_link->template reset_list_status<bool>(1);
 					}
 
+					cur_link_id=current_link->template network_link_reference<_Regular_Link_Interface*>()->template uuid<int>();
+					if(current_link == destination_link_ptr)
+					{
+						break;
+					}
+
+					scan_list.erase(scan_list.begin());	// no need to find minimum since set is ordered by its first element, i.e. label cost.
 					current_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::SCANNED);
 
-					_Movements_Container_Interface& outbound_movements_container = current_link->template outbound_turn_movements<_Movements_Container_Interface&>();
+					current_intersection=current_link->template downstream_intersection<_Routable_Intersection_Interface*>();
 
-					typename _Movements_Container_Interface::iterator outbound_itr;
-
-					for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
+					
+					//for all outbound turn movements
+					_Inbound_Outbound_Movements_Container_Interface& inbound_outbound_movements_container = current_intersection->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>();
+					typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_itr;
+					for(inbound_itr=inbound_outbound_movements_container.begin(); inbound_itr!=inbound_outbound_movements_container.end(); inbound_itr++)
 					{
-						_Movement_Interface* outbound_movement = (_Movement_Interface*)(*outbound_itr);
-						_Routable_Link_Interface* next_link=outbound_movement->template outbound_link<_Routable_Link_Interface*>();
+						_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_itr);
+						_Routable_Link_Interface* inbound_link = inbound_outbound_movements->template inbound_link_reference<_Routable_Link_Interface*>();
+						int inbound_link_id=inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
 
-						// in closed set
-						if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>() == Network_Components::Types::SCANNED) continue;
-
-						next_cost=outbound_movement->template forward_link_turn_travel_time<float>();
-						new_cost=current_link->template label_cost<float>() + next_cost;
-						
-						if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>() != Network_Components::Types::INSELIST)
+						if (inbound_link == current_link)
 						{
-							// not in open set (or closed set)
-							tentative_better=true;
-						}
-						else if(new_cost < next_link->template label_cost<float>())
-						{
-							// cost tentatively_better
-							tentative_better=true;
-						}
+							_Movements_Container_Interface& outbound_movements_container = inbound_outbound_movements->template outbound_movements<_Movements_Container_Interface&>();
+							typename _Movements_Container_Interface::iterator outbound_itr;
 
-						if(tentative_better)
-						{
-							tentative_better=false;
-
-							if(next_link->template reset_list_status<bool>()==0)
+							for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
 							{
-								reset_links_container.push_back(next_link);
-								next_link->template reset_list_status<bool>(1);
-							}
+								_Movement_Interface* outbound_movement = (_Movement_Interface*)(*outbound_itr);
+								_Routable_Link_Interface* next_link=outbound_movement->template outbound_link<_Routable_Link_Interface*>();
+								int next_link_id=next_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
 
-							next_link->template label_cost<float>(new_cost);
-							next_link->template label_pointer<_Routable_Link_Interface*>(current_link);
 
-							if(next_link->template network_link_reference<_Regular_Link_Interface*>()!=destination_reference)
-							{
-								dx=destination_x - next_link->template upstream_intersection<_Routable_Intersection_Interface*>()->template x_position<float>();
-								dy=destination_y - next_link->template upstream_intersection<_Routable_Intersection_Interface*>()->template y_position<float>();
-								next_link->template h_cost<float>(sqrt(dx*dx+dy*dy)/max_free_flow_speed);
-							}
-							else
-							{
-								next_link->template h_cost<float>(0.0);
-							}
+								next_cost=outbound_movement->template forward_link_turn_travel_time<float>();
+								new_cost=current_link->template label_cost<float>() + next_cost;
 
-							next_link->template f_cost<float>(next_link->template label_cost<float>() + next_link->template h_cost<float>());
+								if(next_link->template label_cost<float>()>new_cost)
+								{
+									if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>()==Network_Components::Types::INSELIST)
+									{
+										scan_list.erase(make_pair(next_link->template f_cost<float>(),next_link)); // delete the old cost
+									}
 
-							if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>()!=Network_Components::Types::INSELIST)
-							{
-								next_link->template scan_list_position<int>(scan_list.push((void*&)next_link,next_link->template f_cost<float>()));
-								//scan_list.insert(make_pair(next_link->template f_cost<float>(),next_link));
-							}
-							else
-							{
-								scan_list.update_value(next_link->template scan_list_position<int>(),next_link->template f_cost<float>()); // update with the new cost
-								//scan_list.erase(make_pair(next_link->template f_cost<float>(),next_link));
-								//scan_list.insert(make_pair(next_link->template f_cost<float>(),next_link));
-							}
+									if(next_link->template reset_list_status<bool>()==0)
+									{
+										reset_links_container.push_back(next_link);
+										next_link->template reset_list_status<bool>(1);
+									}
 
-							next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
+
+									next_link->template label_cost<float>(new_cost);
+									next_link->template label_pointer<_Routable_Link_Interface*>(current_link);
+
+									if(next_link->template network_link_reference<_Regular_Link_Interface*>()!=destination_reference)
+									{
+										dx=destination_x - next_link->template upstream_intersection<_Routable_Intersection_Interface*>()->template x_position<float>();
+										dy=destination_y - next_link->template upstream_intersection<_Routable_Intersection_Interface*>()->template y_position<float>();
+										next_link->template h_cost<float>(sqrt(dx*dx+dy*dy)/max_free_flow_speed);
+									}
+									else
+									{
+										next_link->template h_cost<float>(0.0);
+									}
+
+									next_link->template f_cost<float>(next_link->template label_cost<float>() + next_link->template h_cost<float>());
+
+									scan_list.insert(make_pair(next_link->template f_cost<float>(),next_link)); // update with the new cos
+
+									next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
+								}
+							}
+							break;
 						}
 					}
 				}
 
 				if (destination_link_ptr->template label_pointer<_Routable_Link_Interface*>() == destination_link_ptr)
 				{
-					return false;
+					return -1.0;
 				}
 				else
 				{
@@ -258,7 +253,7 @@ namespace Routing_Components
 					{
 						reversed_path_container.push_back(current_link->template network_link_reference<_Regular_Link_Interface*>());
 
-						if (current_link->template label_pointer<_Routable_Link_Interface*>() != current_link)
+						if (current_link->label_pointer<_Routable_Link_Interface*>() != current_link)
 						{
 							current_link=current_link->template label_pointer<_Routable_Link_Interface*>();
 						}
@@ -269,13 +264,14 @@ namespace Routing_Components
 						
 					}
 
-					return true;
+					return destination_link_ptr->label_cost<float>();
 				}
 
 			};
 
 			feature_prototype bool one_to_all_link_based_least_time_path_label_setting()
 			{
+
 				define_component_interface(_Routable_Network_Interface, typename get_type_of(routable_network), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Regular_Network_Interface, typename get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Routable_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -289,18 +285,17 @@ namespace Routing_Components
 				_Routable_Network_Interface* routable_net=routable_network<_Routable_Network_Interface*>();
 				routable_net->template reset_routable_network<NULLTYPE>();
 				
-				vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< vector<_Routable_Link_Interface*>& >();
-
+				//RoutableNetworkInterface* routable_network=routable_network<RoutableNetworkInterface*>();
 				float max_free_flow_speed=routable_net->template max_free_flow_speed<float>();
 				ScanListType& scan_list=routable_net->template scan_list<ScanListType&>();
+				//NumSearchesType& num_searches=routable_network->template num_searches<NumSearchesType&>();
 
 				_Routable_Link_Interface* origin_link_ptr=routable_origin<_Routable_Link_Interface*>();
 				
 				_Regular_Link_Interface* net_origin_link=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>();
 				_Movements_Container_Interface& turn_mvmt_container=net_origin_link->template outbound_turn_movements<_Movements_Container_Interface&>();
-				
 				int outbound_turn_movement_size = (int)turn_mvmt_container.size();
-
+				
 				if (outbound_turn_movement_size == 0)
 				{
 					cerr << "Origin link must have outbount turn movement" << endl;
@@ -308,100 +303,92 @@ namespace Routing_Components
 				}
 
 				float next_cost,new_cost;
-				
+
+
 				next_cost=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>()->template travel_time<float>();
 				new_cost = next_cost;
 				_Routable_Link_Interface* current_link=origin_link_ptr;
-				
+
+				vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< vector<_Routable_Link_Interface*>& >();
 				if(current_link->template reset_list_status<bool>()==0)
 				{
 					reset_links_container.push_back(current_link);
 					current_link->template reset_list_status<bool>(1);
 				}
-
 				current_link->template label_cost<float>(new_cost); // g - label_cost
 
-				//_Routable_Intersection_Interface* current_intersection;
+				_Routable_Intersection_Interface* current_intersection;
 
 				current_link->template label_pointer<_Routable_Link_Interface*>(current_link);
 
-				current_link->template scan_list_position<int>(scan_list.push((void*&)current_link,current_link->template f_cost<float>()));
-				//scan_list.insert(make_pair(current_link->template f_cost<float>(),current_link));
-
+				scan_list.insert(make_pair(current_link->template label_cost<float>(),current_link));
 				current_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
-
-				bool tentative_better=false;
-
+				int cur_link_id;
 				while(!scan_list.empty())
-				{
-					scan_list.pop_min((void*&)current_link);
-					//current_link = (_Routable_Link_Interface*)(scan_list.begin()->second);
-					//scan_list.erase(scan_list.begin());			
+				{ 
+
+					current_link = (_Routable_Link_Interface*)(scan_list.begin()->second);
 
 					if(current_link->template reset_list_status<bool>()==0)
 					{
 						reset_links_container.push_back(current_link);
 						current_link->template reset_list_status<bool>(1);
 					}
+					cur_link_id=current_link->template network_link_reference<_Regular_Link_Interface*>()->template uuid<int>();
 
+					scan_list.erase(scan_list.begin());	// no need to find minimum since set is ordered by its first element, i.e. label cost.
 					current_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::SCANNED);
 
-					_Movements_Container_Interface& outbound_movements_container = current_link->template outbound_turn_movements<_Movements_Container_Interface&>();
+					current_intersection=current_link->template downstream_intersection<_Routable_Intersection_Interface*>();
 
-					typename _Movements_Container_Interface::iterator outbound_itr;
-
-					for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
+					
+					//for all outbound turn movements
+					_Inbound_Outbound_Movements_Container_Interface& inbound_outbound_movements_container = current_intersection->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>();
+					typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_itr;
+					for(inbound_itr=inbound_outbound_movements_container.begin(); inbound_itr!=inbound_outbound_movements_container.end(); inbound_itr++)
 					{
-						_Movement_Interface* outbound_movement = (_Movement_Interface*)(*outbound_itr);
-						_Routable_Link_Interface* next_link=outbound_movement->template outbound_link<_Routable_Link_Interface*>();
+						_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_itr);
+						_Routable_Link_Interface* inbound_link = inbound_outbound_movements->template inbound_link_reference<_Routable_Link_Interface*>();
+						int inbound_link_id=inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
 
-						// in closed set
-						if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>()==Network_Components::Types::SCANNED) continue;
-
-						next_cost=outbound_movement->template forward_link_turn_travel_time<float>();
-						new_cost=current_link->template label_cost<float>() + next_cost;
-						
-						if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>()!=Network_Components::Types::INSELIST)
+						if (inbound_link == current_link)
 						{
-							// not in open set (or closed set)
-							tentative_better=true;
-						}
-						else if(new_cost < next_link->template label_cost<float>())
-						{
-							// cost tentatively_better
-							tentative_better=true;
-						}
+							_Movements_Container_Interface& outbound_movements_container = inbound_outbound_movements->template outbound_movements<_Movements_Container_Interface&>();
+							typename _Movements_Container_Interface::iterator outbound_itr;
 
-						if(tentative_better)
-						{
-							tentative_better=false;
-
-							if(next_link->template reset_list_status<bool>()==0)
+							for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
 							{
-								reset_links_container.push_back(next_link);
-								next_link->template reset_list_status<bool>(1);
-							}
+								_Movement_Interface* outbound_movement = (_Movement_Interface*)(*outbound_itr);
+								_Routable_Link_Interface* next_link=outbound_movement->template outbound_link<_Routable_Link_Interface*>();
+								int next_link_id=next_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
 
-							next_link->template label_cost<float>(new_cost);
-							next_link->template label_pointer<_Routable_Link_Interface*>(current_link);
+								if(next_link->template reset_list_status<bool>()==0)
+								{
+									reset_links_container.push_back(next_link);
+									next_link->template reset_list_status<bool>(1);
+								}
+								next_cost=outbound_movement->template forward_link_turn_travel_time<float>();
+								new_cost=current_link->template label_cost<float>() + next_cost;
 
-							if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>()!=Network_Components::Types::INSELIST)
-							{
-								next_link->template scan_list_position<int>(scan_list.push((void*&)next_link,next_link->template label_cost<float>()));
-								//scan_list.insert(make_pair(next_link->template f_cost<float>(),next_link));
-							}
-							else
-							{
-								scan_list.update_value(next_link->template scan_list_position<int>(),next_link->template label_cost<float>()); // update with the new cost
-								//scan_list.erase(make_pair(next_link->template f_cost<float>(),next_link));
-								//scan_list.insert(make_pair(next_link->template f_cost<float>(),next_link));
-							}
+								if(next_link->template label_cost<float>()>new_cost)
+								{
+									if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>()==Network_Components::Types::INSELIST)
+									{
+										scan_list.erase(make_pair(next_link->template label_cost<float>(),next_link)); // delete the old cost
+									}
 
-							next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
+									next_link->template label_cost<float>(new_cost);
+									next_link->template label_pointer<_Routable_Link_Interface*>(current_link);
+
+									scan_list.insert(make_pair(next_link->template label_cost<float>(),next_link)); // update with the new cos
+
+									next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
+								}
+							}
+							break;
 						}
 					}
 				}
-
 				return true;
 			};
 

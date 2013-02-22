@@ -53,7 +53,9 @@ namespace Link_Components
 				_f_cost = 0.0;
 				_h_cost = 0.0;
 				_label_pointer = this;
-				_label_cost = 0.0;
+				_label_cost = INFINITY_FLOAT;
+				_reset_list_status = false;
+				_scan_list_status = Network_Components::Types::UNSCANNED;
 				_uuid = ((_Link_Interface*)regular_link)->template uuid<int>();
 				_internal_id = ((_Link_Interface*)regular_link)->template internal_id<int>();
 				_travel_time = ((_Link_Interface*)regular_link)->template travel_time<float>();

@@ -1,7 +1,7 @@
 #include "Model_Selection.h"
-
+#define EXCLUDE_DEMAND
 #ifdef NetworkModelApplication
-//define FOR_LINUX_PORTING
+#define FOR_LINUX_PORTING
 //#define DBIO
 #ifdef DBIO
 #define WINDOWS

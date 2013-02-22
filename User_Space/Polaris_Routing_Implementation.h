@@ -21,8 +21,7 @@ namespace Routing_Components
 
 		implementation	struct Routable_Network_Implementation:public Polaris_Component<APPEND_CHILD(Routable_Network_Implementation),MasterType,Data_Object,ParentType>
 		{
-			member_data(Min_Pool<void*>,scan_list,none,none);
-			//member_data(concat(set<pair<float, void*>>), scan_list, none, none);
+			member_data(concat(set<pair<float, void*>>), scan_list, none, none);
 
 			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
@@ -36,8 +35,9 @@ namespace Routing_Components
 
 			feature_implementation void reset_routable_network()
 			{
-				define_container_and_value_interface_unqualified_container(_Routable_Links_Container_Interface, _Routable_Link_Interface, type_of(reset_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
+				typedef scan_list_type ScanListType;
 				_scan_list.clear();
 				
 				_reversed_path_container.clear();
@@ -46,15 +46,13 @@ namespace Routing_Components
 				for(link_itr=_reset_links.begin();link_itr!=_reset_links.end();link_itr++)
 				{
 					_Routable_Link_Interface* link_ptr = (_Routable_Link_Interface*)(*link_itr);
-					link_ptr->template reset_routable_link<NULLTYPE>();
+					link_ptr->reset_routable_link<NULLTYPE>();
 				}
-
 				_reset_links.clear();
 			}
 
 			feature_implementation void read_network_data(typename TargetType::ParamType regular_network, requires(check_2(typename TargetType::NetIOType,Network_Components::Types::Regular_Network,is_same)))
 			{
-				_scan_list.Initialize(50000);
 
 				define_container_and_value_interface_unqualified_container(_Routable_Links_Container_Interface, _Routable_Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface_unqualified_container(_Routable_Intersections_Container_Interface, _Routable_Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
