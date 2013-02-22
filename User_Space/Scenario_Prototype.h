@@ -517,6 +517,31 @@ namespace Scenario_Components
 				vehicle_transfer_file<fstream&>().close();
 			};
 
+			feature_prototype void increase_network_cumulative_loaded_vehicles()
+			{
+				this_component()->template increase_network_cumulative_loaded_vehicles<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void increase_network_cumulative_departed_vehicles()
+			{
+				this_component()->template increase_network_cumulative_departed_vehicles<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void increase_network_in_network_vehicles()
+			{
+				this_component()->template increase_network_in_network_vehicles<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void decrease_network_in_network_vehicles()
+			{
+				this_component()->template decrease_network_in_network_vehicles<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void increase_network_cumulative_arrived_vehicles()
+			{
+				this_component()->template increase_network_cumulative_arrived_vehicles<ComponentType,CallerType,TargetType>();
+			}
+
 			feature_prototype void output(std::string s)
 			{
 				typedef typename ComponentType::output_writer_type OutputWriterType;

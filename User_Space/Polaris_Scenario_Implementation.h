@@ -60,10 +60,47 @@ namespace Scenario_Components
 
 			member_data(ofstream, output_writer, none, none);
 
+			member_data(_lock, statistics_update_lock, none, none);
+
 			member_data(int, network_cumulative_loaded_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, network_cumulative_departed_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, network_in_network_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, network_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+
+			feature_implementation void increase_network_cumulative_loaded_vehicles()
+			{
+				LOCK(_statistics_update_lock);
+				_network_cumulative_loaded_vehicles++;
+				UNLOCK(_statistics_update_lock);
+			}
+
+			feature_implementation void increase_network_cumulative_departed_vehicles()
+			{
+				LOCK(_statistics_update_lock);
+				_network_cumulative_departed_vehicles++;
+				UNLOCK(_statistics_update_lock);			
+			}
+
+			feature_implementation void increase_network_in_network_vehicles()
+			{
+				LOCK(_statistics_update_lock);
+				_network_in_network_vehicles++;
+				UNLOCK(_statistics_update_lock);			
+			}
+
+			feature_implementation void increase_network_cumulative_arrived_vehicles()
+			{
+				LOCK(_statistics_update_lock);
+				_network_cumulative_arrived_vehicles++;
+				UNLOCK(_statistics_update_lock);			
+			}
+			
+			feature_implementation void decrease_network_in_network_vehicles()
+			{
+				LOCK(_statistics_update_lock);
+				_network_in_network_vehicles--;
+				UNLOCK(_statistics_update_lock);			
+			}
 
 			member_data(double, assignment_time_in_seconds, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(double, simulation_time_in_seconds, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));

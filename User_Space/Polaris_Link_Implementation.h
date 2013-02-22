@@ -347,8 +347,8 @@ namespace Link_Components
 
 					_link_destination_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
 
-					((_Scenario_Interface*)_global_scenario)->template network_cumulative_arrived_vehicles<int&>()++;
-					((_Scenario_Interface*)_global_scenario)->template network_in_network_vehicles<int&>()--;
+					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>();
+					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
 				}
 				else
 				{
@@ -422,8 +422,8 @@ namespace Link_Components
 					_link_origin_departed_vehicles++;
 					_link_origin_arrived_vehicles--;
 					((_Link_Interface*)this)->template push_vehicle<_Vehicle_Interface*>(vehicle);
-					((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int&>()++;
-					((_Scenario_Interface*)_global_scenario)->template network_in_network_vehicles<int&>()++;
+					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_departed_vehicles<NULLTYPE>();
+					((_Scenario_Interface*)_global_scenario)->template increase_network_in_network_vehicles<NULLTYPE>();
 				}
 			}
 
@@ -442,7 +442,7 @@ namespace Link_Components
 					_link_origin_arrived_vehicles++;
 					_link_origin_loaded_vehicles++;
 					_link_origin_cumulative_arrived_vehicles++;
-					((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int&>()++;
+					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_loaded_vehicles<NULLTYPE>();
 				}
 			}
 
