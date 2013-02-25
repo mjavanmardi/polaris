@@ -4,7 +4,7 @@
 #define FOR_LINUX_PORTING
 //#define DBIO
 #ifdef DBIO
-#define WINDOWS
+
 #include "Application_Includes.h"
 #include "../File_IO/network_models.h"
 struct MasterType
@@ -223,7 +223,7 @@ int main()
 
 #define FILE_IO
 #ifdef FILE_IO
-#define WINDOWS
+
 #include "Application_Includes.h"
 #include "../File_IO/network_models.h"
 struct MasterType

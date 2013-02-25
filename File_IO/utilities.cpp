@@ -183,6 +183,7 @@ string convert_seconds_to_hhmm(int time_in_seconds)
 		clock_gettime(CLOCK_REALTIME, &current_cpu_time);
 
 		current_cpu_time_in_seconds = (double)((current_cpu_time.tv_sec * 1000000000 + current_cpu_time.tv_nsec)) / 1000000000.0;
+		return current_cpu_time_in_seconds;
 	};
 #else
 	double get_current_cpu_time_in_seconds()

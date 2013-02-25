@@ -105,7 +105,7 @@ namespace Demand_Components
 			feature_accessor(vehicles_container, none, none);
 			feature_accessor(first_vehicle_departure_time, none, none);
 			feature_accessor(last_vehicle_departure_time, none, none);
-//#ifndef FOR_LINUX_PORTING
+#ifndef FOR_LINUX_PORTING
 			feature_prototype void read_demand_data(typename TargetType::ParamType& network_mapping,
 				requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
@@ -279,7 +279,7 @@ namespace Demand_Components
 					}
 				}
 			}
-//#endif
+#endif
 
 			feature_prototype void read_demand_data(requires(!check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,typename Network_Components::Types::File_Network,is_same)))
 			{

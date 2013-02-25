@@ -72,7 +72,7 @@ namespace Network_Components
 			{
 				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				load_event(ComponentType,End_Iteration_Conditional,End_Iteration_Handler, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION,NULLTYPE);
-                _start_cpu_time_in_seconds = (int)get_current_cpu_time_in_seconds();
+                _start_cpu_time_in_seconds = (long)get_current_cpu_time_in_seconds();
  			}
 
 			declare_feature_conditional(End_Iteration_Conditional)
