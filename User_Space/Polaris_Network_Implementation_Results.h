@@ -291,13 +291,17 @@ namespace Network_Components
 
 			fstream& output_summary_file = scenario->template output_summary_file<fstream&>();
 
-			output_summary_file 
-				<< convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str() << ","
-				<< scenario->template network_cumulative_loaded_vehicles<int>() <<  ","
-				<< scenario->template network_cumulative_departed_vehicles<int>() << ","
-				<< scenario->template network_cumulative_arrived_vehicles<int>() << ","
-				<< scenario->template network_in_network_vehicles<int>()
-				<<endl;
+            _current_cpu_time_in_seconds = (long)get_current_cpu_time_in_seconds();
+
+            long elapsed_time = _current_cpu_time_in_seconds - _start_cpu_time_in_seconds;
+            output_summary_file
+                    << convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str() << ","
+                    << scenario->template network_cumulative_loaded_vehicles<int>() <<  ","
+                    << scenario->template network_cumulative_departed_vehicles<int>() << ","
+                    << scenario->template network_cumulative_arrived_vehicles<int>() << ","
+                    << scenario->template network_in_network_vehicles<int>() << ","
+                    << convert_seconds_to_hhmmss(elapsed_time).c_str()
+                    <<endl;
 		}
 
 	}

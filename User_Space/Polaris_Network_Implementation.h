@@ -38,6 +38,10 @@ namespace Network_Components
 
 			member_container(vector<typename MasterType::intersection_control_type*>, intersection_controls_container, none, none);
 
+            member_data(long,current_cpu_time_in_seconds,none,none);
+
+			member_data(long,start_cpu_time_in_seconds,none,none);
+
 			feature_implementation void initialize_intersection_control()
 			{
 				define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
@@ -68,7 +72,8 @@ namespace Network_Components
 			{
 				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				load_event(ComponentType,End_Iteration_Conditional,End_Iteration_Handler, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION,NULLTYPE);
-			}
+                _start_cpu_time_in_seconds = (int)get_current_cpu_time_in_seconds();
+ 			}
 
 			declare_feature_conditional(End_Iteration_Conditional)
 			{
@@ -226,7 +231,7 @@ namespace Network_Components
 			feature_implementation void write_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
 			feature_implementation void write_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
-
+#ifndef FOR_LINUX_PORTING
 			//==================================================================================================================
 			/// read from database
 			//------------------------------------------------------------------------------------------------------------------
@@ -241,6 +246,7 @@ namespace Network_Components
 			feature_implementation void read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
 			feature_implementation void read_zone_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
+#endif
 			//==================================================================================================================
 			/// Convert network data from C++ data structure to Plaris structure
 			//------------------------------------------------------------------------------------------------------------------

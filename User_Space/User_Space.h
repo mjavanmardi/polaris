@@ -1,7 +1,7 @@
 #pragma once
-
+#ifndef FOR_LINUX_PORTING
 #include "../Polaris_IO/Polaris_IO.h"
-
+#endif
 #include "User_Space_Includes.h"
 //#include "User_Space_Forward_Declaration.h"
 
@@ -31,7 +31,9 @@ void* _global_scenario;
 
 #endif
 
+#ifndef FOR_LINUX_PORTING
 #include "Polaris_Network_Implementation_Input_DB.h"
+#endif
 
 #include "Activity_Implementations.h"
 #include "Population_Unit_Implementations.h"
