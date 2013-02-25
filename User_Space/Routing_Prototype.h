@@ -77,14 +77,14 @@ namespace Routing_Components
 			feature_prototype float one_to_one_link_based_least_time_path_a_star()
 			{
 
-				define_component_interface(_Routable_Network_Interface, get_type_of(routable_network), Network_Components::Prototypes::Network_Prototype, ComponentType);
-				define_component_interface(_Regular_Network_Interface, get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
-				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, _Routable_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_component_interface(_Routable_Network_Interface, typename get_type_of(routable_network), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Regular_Network_Interface, typename get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Routable_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				//typedef Link_Interface<typename ComponentType::routable_link_type, ComponentType> _Routable_Link_Interface;
-				define_component_interface(_Routable_Intersection_Interface, ComponentType::routable_link_type::upstream_intersection_type, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
-				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_component_interface(_Routable_Intersection_Interface, typename ComponentType::routable_link_type::upstream_intersection_type, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typedef typename _Routable_Network_Interface::get_type_of(scan_list) ScanListType;
 
 				_Routable_Network_Interface* routable_net=routable_network<_Routable_Network_Interface*>();
@@ -253,7 +253,7 @@ namespace Routing_Components
 					{
 						reversed_path_container.push_back(current_link->template network_link_reference<_Regular_Link_Interface*>());
 
-						if (current_link->label_pointer<_Routable_Link_Interface*>() != current_link)
+						if (current_link->template label_pointer<_Routable_Link_Interface*>() != current_link)
 						{
 							current_link=current_link->template label_pointer<_Routable_Link_Interface*>();
 						}
@@ -264,7 +264,7 @@ namespace Routing_Components
 						
 					}
 
-					return destination_link_ptr->label_cost<float>();
+					return destination_link_ptr->template label_cost<float>();
 				}
 
 			};

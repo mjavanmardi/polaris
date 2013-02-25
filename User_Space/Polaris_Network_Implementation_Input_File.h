@@ -227,8 +227,9 @@ namespace Network_Components
 				zone->template X<double>(raw_zone.x);
 				zone->template Y<double>(raw_zone.y);
 				zone->template population<int>(raw_zone.population);
-
-				zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().insert(pair<int,_Zone_Interface*>(zone->template uuid<int>(), zone));
+				pair<int,_Zone_Interface*> p = pair<int,_Zone_Interface*>(zone->template uuid<int>(), zone);
+				zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().insert(p);
+				//zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().insert(pair<int,_Zone_Interface*>(zone->template uuid<int>(), zone));
 				//zones_container<ComponentType,CallerType,_Zones_Container_Interface&>().push_back(zone);
 			}
 			for (int i = 0; i < network_data.network_activity_location_size; i++)
@@ -239,12 +240,12 @@ namespace Network_Components
 				{
 					activity_location->template zone<_Zone_Interface*>(zone_itr->second);
 					zone = (_Zone_Interface*)zone_itr->second;
-					zone->origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-					zone->destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+					zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+					zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 				}
 				else
 				{
-					THROW_EXCEPTION("ERROR: zone id: " << raw_activity_location.zone_index << ", from activity location: " << activity_location->uuid<int>() << ", was not found.");
+					THROW_EXCEPTION("ERROR: zone id: " << raw_activity_location.zone_index << ", from activity location: " << activity_location->template uuid<int>() << ", was not found.");
 				}
 			}
 		}

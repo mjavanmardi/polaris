@@ -163,7 +163,7 @@ namespace Person_Components
 			// Adding activities and movements to the planning schedules
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
-				define_component_interface(parent_itf,typename type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+				define_component_interface(parent_itf, type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
 				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
 
 				define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);

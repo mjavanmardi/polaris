@@ -35,7 +35,7 @@ namespace Routing_Components
 
 			feature_implementation void reset_routable_network()
 			{
-				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Routable_Links_Container_Interface, _Routable_Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
 				typedef scan_list_type ScanListType;
 				_scan_list.clear();
@@ -46,7 +46,7 @@ namespace Routing_Components
 				for(link_itr=_reset_links.begin();link_itr!=_reset_links.end();link_itr++)
 				{
 					_Routable_Link_Interface* link_ptr = (_Routable_Link_Interface*)(*link_itr);
-					link_ptr->reset_routable_link<NULLTYPE>();
+					link_ptr->template reset_routable_link<NULLTYPE>();
 				}
 				_reset_links.clear();
 			}

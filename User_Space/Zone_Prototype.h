@@ -19,11 +19,11 @@ namespace Zone_Components
 
 			feature_prototype void push_zone_coordinates(TargetType coordinates)
 			{
-				this_component()->accept_zone_coordinates<ComponentType,CallerType,TargetType>(coordinates);
+				this_component()->template accept_zone_coordinates<ComponentType,CallerType,TargetType>(coordinates);
 			}
 			feature_prototype void configure_zones_layer()
 			{
-				this_component()->configure_zones_layer<ComponentType,CallerType,TargetType>();
+				this_component()->template configure_zones_layer<ComponentType,CallerType,TargetType>();
 			}
 			feature_accessor(input_offset,none,none);
 			feature_accessor(network_bounds,none,none);
@@ -48,7 +48,7 @@ namespace Zone_Components
 			feature_accessor(graphical_zone_group,none,none);
 			feature_prototype void Push_To_Zone_Display()
 			{
-				this_component()->Push_To_Zone_Display<ComponentType,CallerType,TargetType>();
+				this_component()->template Push_To_Zone_Display<ComponentType,CallerType,TargetType>();
 			}
 		};
 	}

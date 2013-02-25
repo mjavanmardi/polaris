@@ -1,9 +1,6 @@
 #pragma once
 
-
-
 #include "../Polaris_IO/Polaris_IO.h"
-
 
 #include "User_Space_Includes.h"
 //#include "User_Space_Forward_Declaration.h"
@@ -34,10 +31,7 @@ void* _global_scenario;
 
 #endif
 
-
-
 #include "Polaris_Network_Implementation_Input_DB.h"
-
 
 #include "Activity_Implementations.h"
 #include "Population_Unit_Implementations.h"
