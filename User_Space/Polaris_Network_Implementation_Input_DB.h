@@ -468,6 +468,7 @@ namespace Network_Components
 			for(result<Zone>::iterator db_itr = zone_result.begin (); db_itr != zone_result.end (); ++db_itr)
 			{
 				_Zone_Interface* zone = (_Zone_Interface*)Allocate<typename _Zone_Interface::Component_Type>();
+				zone->template Initialize<NULLTYPE>();
 				zone->template uuid<int>(db_itr->getZone());
 				zone->template internal_id<int>(db_itr->getZone());
 				zone->template X<double>(db_itr->getX());

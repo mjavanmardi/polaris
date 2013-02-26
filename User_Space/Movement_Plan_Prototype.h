@@ -1,5 +1,7 @@
 #pragma once
 #include "User_Space.h"
+#include "Activity_Location_Prototype.h"
+#include "Link_Prototype.h"
 
 namespace Movement_Plan_Components
 {
@@ -62,11 +64,44 @@ namespace Movement_Plan_Components
 
 			feature_accessor(trajectory_container, none, none);
 			feature_accessor(current_trajectory_position, none, none);
-			feature_accessor(origin, none, none);
-			feature_accessor(destination, none, none);
 			feature_accessor(departed_time, none, none);
 			feature_accessor(arrived_time, none, none);
 			feature_accessor(plan, none, none);
+
+			// overloaded origin and destination, depending on targetType
+			feature_prototype void origin(TargetType activity_location, requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				this_component()->origin_location<ComponentType,CallerType,TargetType>(activity_location);
+			}
+			feature_prototype TargetType origin(requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				return this_component()->origin_location<ComponentType,CallerType,TargetType>();
+			}
+			feature_prototype void destination(TargetType activity_location, requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				this_component()->destination_location<ComponentType,CallerType,TargetType>(activity_location);
+			}
+			feature_prototype TargetType destination(requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				return this_component()->destination_location<ComponentType,CallerType,TargetType>();
+			}
+			feature_prototype void origin(TargetType link, requires(check(TargetType,Link_Components::Concepts::Is_Basic_Link)))
+			{
+				this_component()->origin<ComponentType,CallerType,TargetType>(link);
+			}
+			feature_prototype TargetType origin(requires(check(TargetType,Link_Components::Concepts::Is_Basic_Link)))
+			{
+				return this_component()->origin<ComponentType,CallerType,TargetType>();
+			}
+			feature_prototype void destination(TargetType link, requires(check(TargetType,Link_Components::Concepts::Is_Basic_Link)))
+			{
+				this_component()->destination<ComponentType,CallerType,TargetType>(link);
+			}
+			feature_prototype TargetType destination(requires(check(TargetType,Link_Components::Concepts::Is_Basic_Link)))
+			{
+				return this_component()->destination<ComponentType,CallerType,TargetType>();
+			}
+
 
 			feature_prototype void set_trajectory(TargetType& path_container)
 			{
@@ -127,6 +162,13 @@ namespace Movement_Plan_Components
 				{
 					return nullptr;
 				}
+			}
+			
+			feature_prototype TargetType trajectory_size()
+			{
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				_Trajectory_Container_Interface* trajectory = this->trajectory_container<_Trajectory_Container_Interface*>();
+				return (TargetType)(trajectory->size());
 			}
 
 			feature_prototype void arrive_to_destination()

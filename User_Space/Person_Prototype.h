@@ -344,6 +344,19 @@ namespace Prototypes
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
+			// create aliases for network components from parent
+			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+			define_component_interface(_Network_Interface, typename parent_itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
+			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			parent_itf* parent = this_ptr->template Parent_Person<parent_itf*>();
+			_Network_Interface* network = parent->template network_reference<_Network_Interface*>();
+
+			// Get reference to vehicle, and add current movement plan to it for routing
+			define_component_interface(vehicle_itf,typename parent_itf::get_type_of(vehicle),Vehicle_Components::Prototypes::Vehicle_Prototype,ComponentType);
+			vehicle_itf* vehicle = parent->template vehicle<vehicle_itf*>();
+
 			// Get reference to movement plans
 			define_container_and_value_interface(Movement_Plans,Movement_Plan,typename get_type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 			Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();
@@ -351,25 +364,25 @@ namespace Prototypes
 			// Get all movement plans scheduled for current iteration
 			pair<typename Movement_Plans::iterator, typename Movement_Plans::iterator> range = movements->equal_range(_iteration);
 
-			// Get reference to vehicle, and add current movement plan to it for routing
-			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Person_Components::Prototypes::Person_Prototype,ComponentType);
-			define_component_interface(vehicle_itf,typename get_type_of(Parent_Person)::type_of(vehicle),Vehicle_Components::Prototypes::Vehicle_Prototype,ComponentType);
-			parent_itf* parent = this_ptr->Parent_Person<parent_itf*>();
-			vehicle_itf* vehicle = parent->template vehicle<vehicle_itf*>();
-			
 			// Execute movement plans and remove from schedule
 			for (typename Movement_Plans::iterator move_itr = range.first; move_itr != range.second; ++move_itr)
 			{		
 				Movement_Plan* move = move_itr->second;
 				// make sure vehicle is not already being simulated, skip movement if it is
-				if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED ||
-					vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK
-					)
+				if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED)
 				{
 					vehicle->template movement_plan<Movement_Plan*>(move);
 					this_ptr->template Schedule_New_Departure<NULLTYPE>(move->template departed_time<Simulation_Timestep_Increment>());
-				}
 
+					// increment the zone origin/destination counters based on movement plan
+					_Activity_Location_Interface* orig = move->origin<_Activity_Location_Interface*>();
+					_Activity_Location_Interface* dest = move->destination<_Activity_Location_Interface*>();
+					_Zone_Interface* orig_zone = orig->zone<_Zone_Interface*>();
+					_Zone_Interface* dest_zone = dest->zone<_Zone_Interface*>();
+					orig_zone->production_count<int&>()++;
+					dest_zone->attraction_count<int&>()++;
+				}
+	
 				//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
 				break;
 
@@ -415,7 +428,7 @@ namespace Prototypes
 			Vehicle_Itf* vehicle_itf = person_itf->template vehicle<Vehicle_Itf*>();
 			
 			// Schedule the routing if the vehicle is not already in the network, otherwise return false
-			if (vehicle_itf->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() != Vehicle_Components::Types::Vehicle_Status_Keys::IN_NETWORK)
+			if (vehicle_itf->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED)
 			{
 				itf->template Schedule_Route_Computation<NULLTYPE>(departed_time);
 				return true;

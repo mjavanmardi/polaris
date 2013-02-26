@@ -291,12 +291,14 @@ struct MasterType
 	typedef Canvas_Implementation<MasterType> canvas_type;
 	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
 	typedef Layer_Options_Implementation<MasterType> layer_options_type;
+	typedef Attributes_Panel_Implementation<MasterType> attributes_panel_type;
 
 	typedef Graphical_Network_Implementation<MasterType> graphical_network_type;
 	typedef Graphical_Link_Implementation<MasterType> graphical_link_type;
 	typedef Graphical_Intersection_Implementation<MasterType> graphical_intersection_type;
 	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<MasterType> vehicle_type;	
 	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<MasterType> zone_type;
+	//typedef Zone_Components::Implementations::Polaris_Zone_Implementation<MasterType> zone_type;
 	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<MasterType> graphical_zone_group_type;
 #else
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
@@ -485,13 +487,21 @@ int main(int argc,char** argv)
 	define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, NULLTYPE);
 	_Zones_Container_Interface::iterator zone_itr;
 	_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
-	for (zone_itr = zone_list->begin(); zone_itr != zone_list->end(); ++zone_itr)
-	{
-		//cout << endl << "at zone initialization";
-		_Zone_Interface* zone = (_Zone_Interface*)zone_itr->second;
-		zone->Push_To_Zone_Display<NULLTYPE>();	
-	}
+	typedef Canvas<MasterType::canvas_type,MasterType::graphical_zone_group_type> canvas_itf;
+	canvas_itf* canvas_ptr = (canvas_itf*) canvas;
+	define_component_interface(graphical_network_interface,typename canvas_itf::get_type_of(graphical_network),Network_Components::Prototypes::Network_Prototype,NULLTYPE);
+	//--------------------------------------------------------------------------------------------
+	// Graphical zone group display - integrate to graphical network when database is fixed
+	typedef Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,NULLTYPE> zone_group_interface;
+	zone_group_interface* _graphical_zone_group = (zone_group_interface*) Allocate<MasterType::graphical_zone_group_type>();	
+	_graphical_zone_group->canvas<canvas_itf*>( (canvas_itf*) canvas );
+	// initialize zone static reference to the graphical zone group
+	MasterType::zone_type::_graphical_zone_group=(Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,MasterType::zone_type>*)_graphical_zone_group;
+	_graphical_zone_group->configure_zones_layer<NULLTYPE>();
+	// get offsets from graphical network
+	_graphical_zone_group->input_offset<Point_2D<MasterType>*>(canvas_ptr->graphical_network<graphical_network_interface*>()->input_offset<Point_2D<MasterType>*>());
 	#endif
+
 
 	//==================================================================================================================================
 	// Network Skimming stuff

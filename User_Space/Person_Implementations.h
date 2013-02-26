@@ -163,7 +163,7 @@ namespace Person_Components
 			// Adding activities and movements to the planning schedules
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
-				define_component_interface(parent_itf, type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+				define_component_interface(parent_itf,typename type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
 				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
 
 				define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
@@ -263,7 +263,7 @@ namespace Person_Components
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
 				base_type::template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
-				base_type::template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
+				base_type::template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(5);
 
 				// get reference to the parent pointer and set the first activity generation time to be the parent first iteration
 				define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
@@ -315,7 +315,8 @@ namespace Person_Components
 					Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Movement_Plans_Container)::unqualified_value_type>();
 					move->template initialize_trajectory<NULLTYPE>();
 					// Get a random origin and destination and departure time
-					int size = (int)network->template links_container<_Links_Container_Interface&>().size();
+					//int size = (int)network->template links_container<_Links_Container_Interface&>().size();
+					int size = (int)network->activity_locations_container<_Activity_Locations_Container_Interface&>().size();
 					int O = (parent->template Next_Rand<double>()-0.000001) * size;
 					int D = (parent->template Next_Rand<double>()-0.000001) * size;
 					// departure time from current time, in minutes, approximately every six hours
@@ -325,8 +326,16 @@ namespace Person_Components
 		
 					if (O != D)
 					{
-						move->template origin<_Link_Interface*>(network->template links_container<_Links_Container_Interface&>().at(O));
-						move->template destination<_Link_Interface*>(network->template links_container<_Links_Container_Interface&>().at(D));
+						//move->template origin<_Link_Interface*>(network->template links_container<_Links_Container_Interface&>().at(O));
+						//move->template destination<_Link_Interface*>(network->template links_container<_Links_Container_Interface&>().at(D));
+						//move->template departed_time<Basic_Units::Time_Variables::Time_Seconds>(time);
+						_Activity_Location_Interface *orig, *dest;
+						orig = network->template activity_locations_container<_Activity_Locations_Container_Interface&>().at(O);
+						dest = network->template activity_locations_container<_Activity_Locations_Container_Interface&>().at(D);
+						move->template origin<_Activity_Location_Interface*>(orig);
+						move->template destination<_Activity_Location_Interface*>(dest);
+						move->template origin<_Link_Interface*>(orig->origin_links<_Links_Container_Interface&>().at(0));
+						move->template destination<_Link_Interface*>(dest->origin_links<_Links_Container_Interface&>().at(0));
 						move->template departed_time<Basic_Units::Time_Variables::Time_Seconds>(time);
 					}
 

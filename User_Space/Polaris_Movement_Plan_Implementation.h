@@ -62,6 +62,9 @@ namespace Movement_Plan_Components
 			int _current_trajectory_index;
 			//------------------------------------------------------------------------------------------------------------------
 
+			member_component(typename MasterType::activity_location_type, origin_location, none, none);
+			member_component(typename MasterType::activity_location_type, destination_location, none, none);
+
 			member_component(typename MasterType::link_type, origin, none, none);
 			member_component(typename MasterType::link_type, destination, none, none);
 #ifndef FOR_LINUX_PORTING

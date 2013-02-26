@@ -17,13 +17,13 @@ namespace Zone_Components
 		{
 			tag_as_prototype;
 
-			feature_prototype void push_zone_coordinates(TargetType coordinates)
+			feature_prototype void push_zone_information(typename TargetType::ParamType coordinates, typename TargetType::Param2Type productions, typename TargetType::Param2Type attractions)
 			{
-				this_component()->template accept_zone_coordinates<ComponentType,CallerType,TargetType>(coordinates);
+				this_component()->accept_zone_information<ComponentType,CallerType,TargetType>(coordinates, productions, attractions);
 			}
 			feature_prototype void configure_zones_layer()
 			{
-				this_component()->template configure_zones_layer<ComponentType,CallerType,TargetType>();
+				this_component()->configure_zones_layer<ComponentType,CallerType,TargetType>();
 			}
 			feature_accessor(input_offset,none,none);
 			feature_accessor(network_bounds,none,none);
@@ -46,10 +46,19 @@ namespace Zone_Components
 			feature_accessor(population,none, none);
 
 			feature_accessor(graphical_zone_group,none,none);
+			feature_accessor(update_increment,none,none);
+			feature_prototype void Initialize()
+			{
+				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+			}
 			feature_prototype void Push_To_Zone_Display()
 			{
-				this_component()->template Push_To_Zone_Display<ComponentType,CallerType,TargetType>();
+				this_component()->Push_To_Zone_Display<ComponentType,CallerType,TargetType>();
 			}
+
+			// features for counting productions and attractions, use TargetType as a reference to set for a specific thread and as a value to return the sum total
+			feature_accessor(production_count,none,not_available);
+			feature_accessor(attraction_count,none,not_available);
 		};
 	}
 }

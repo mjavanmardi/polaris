@@ -240,7 +240,8 @@ namespace Routing_Components
 
 				if (destination_link_ptr->template label_pointer<_Routable_Link_Interface*>() == destination_link_ptr)
 				{
-					return -1.0;
+					//return -1.0;
+					return false;
 				}
 				else
 				{

@@ -191,6 +191,41 @@ struct Antares_Layer_Configuration
 		submission_callback=nullptr;
 		attributes_callback=nullptr;
 	}
+		
+	void Configure_Static_Quads(True_Color_RGBA<NULLTYPE>& Color, int size)
+	{
+		dynamic_data=false;
+		target_sub_iteration=-1;
+
+		storage_offset=_iteration;
+		storage_size=1;
+		storage_period=1;
+
+		draw=true;
+
+		primitive_type=_QUAD;
+
+		primitive_color=false;
+		head_color._r=Color._r;
+		head_color._g=Color._g;
+		head_color._b=Color._b;
+		head_color._a=Color._a;
+
+		primitive_normal=false;
+		head_normal._x=0;
+		head_normal._y=0;
+		head_normal._z=1;
+		
+		head_size_value=1;
+		//num_vertices=4;
+
+		data_stride=0;
+
+		attributes_schema="";
+
+		submission_callback=nullptr;
+		attributes_callback=nullptr;
+	}
 	
 	void Configure_Plot()
 	{
@@ -222,6 +257,7 @@ struct Antares_Layer_Configuration
 
 		data_stride=sizeof(int);
 	}
+
 
 	bool dynamic_data;
 	int target_sub_iteration;

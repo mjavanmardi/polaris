@@ -204,6 +204,8 @@ namespace Network_Components
 			for (int i = 0; i < network_data.network_zone_size; i++)
 			{
 				zone = (_Zone_Interface*)Allocate<typename _Zone_Interface::Component_Type>();
+				zone->template Initialize<NULLTYPE>();
+
 				network_models::network_information::network_data_information::ZoneData& raw_zone = network_data.zone_data_array[i];
 				int j;
 				int activity_location_index;
