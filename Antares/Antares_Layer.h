@@ -217,6 +217,8 @@ struct Antares_Layer_Configuration
 		head_normal._z=1;
 		
 		head_size_value=1;
+
+		grouped = false;
 		//num_vertices=4;
 
 		data_stride=0;
