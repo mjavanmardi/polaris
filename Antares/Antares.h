@@ -11,7 +11,6 @@
 #include "Canvas_Implementation.h"
 #include "Graphical_Network_Implementation.h"
 #include "Graphical_Link_Implementation.h"
-#include "Graphical_VMS_Implementation.h"
 #include "Graphical_Intersection_Implementation.h"
 #include "Graphical_Vehicle_Implementation.h"
 #include "Antares_Layer_Implementation.h"
