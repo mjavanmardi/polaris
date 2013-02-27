@@ -13,14 +13,15 @@ struct Antares_Layer_Configuration;
 
 struct Accented_Element{};
 struct Regular_Element{};
+struct Plot_Element{};
 
 prototype struct Antares_Layer
 {
 	tag_as_prototype;
 	
-	feature_prototype void Push_Element(void* data, int size, int iteration = _iteration)
+	feature_prototype void Push_Element(void* data, int iteration = _iteration)
 	{
-		this_component()->Push_Element<ComponentType,CallerType,TargetType>(data,size,iteration);
+		this_component()->Push_Element<ComponentType,CallerType,TargetType>(data,iteration);
 	}
 
 	feature_prototype void Initialize(Antares_Layer_Configuration& cfg)
@@ -182,6 +183,8 @@ struct Antares_Layer_Configuration
 		head_normal._y=0;
 		head_normal._z=1;
 		
+		grouped=false;
+
 		head_size_value=size;
 
 		data_stride=0;
@@ -216,10 +219,11 @@ struct Antares_Layer_Configuration
 		head_normal._y=0;
 		head_normal._z=1;
 		
-		head_size_value=1;
+		grouped=true;
+		group_color=false;
+		group_normal=false;
 
-		grouped = false;
-		//num_vertices=4;
+		head_size_value=1;
 
 		data_stride=0;
 
@@ -286,8 +290,6 @@ struct Antares_Layer_Configuration
 			// 1 x True_Color_RGBA<NULLTYPE> group_color;
 		bool group_normal;
 			// 1 x Point_3D<NULLTYPE> group_normal;
-		int num_group_primitives;
-			// N x vert
 	
 	
 	

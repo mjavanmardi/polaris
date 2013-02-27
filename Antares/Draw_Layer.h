@@ -152,6 +152,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	glEnd();
 
 
+	glDepthFunc(GL_ALWAYS);
 
 	//---- draw layer accents in the second pass ----
 
@@ -178,7 +179,13 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 		break;
 	};
 
-	glColor4ubv((GLubyte*)&head_color);
+	True_Color_RGBA<MasterType> accent_color;
+	accent_color = head_color;
+	accent_color._r = 255-accent_color._r;
+	accent_color._g = 255-accent_color._g;
+	accent_color._b = 255-accent_color._b;
+
+	glColor4ubv((GLubyte*)&accent_color);
 	glNormal3fv((GLfloat*)&head_normal);
 	
 	current_iteration = start_iteration;
@@ -267,4 +274,6 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	}
 
 	glEnd();
+
+	glDepthFunc(GL_LESS);
 }

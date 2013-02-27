@@ -20,7 +20,7 @@ namespace Network_Components
 		{
 			feature_implementation void submit_num_vehicles()
 			{
-				_num_vehicles->Push_Element<Regular_Element>((void*)&_vehicles_counter,sizeof(int));
+				_num_vehicles->Push_Element<Plot_Element>((void*)&_vehicles_counter);
 				_vehicles_counter=0;
 			}
 
@@ -265,7 +265,7 @@ namespace Network_Components
 					current_line.b._y = link->downstream_intersection<_Intersection_Interface*>()->y_position<float>() + _input_offset._y;
 					current_line.b._z = 0;
 
-					_link_lines->Push_Element<Regular_Element>(&current_line,sizeof(Link_Line));
+					_link_lines->Push_Element<Regular_Element>(&current_line);
 				}
 			}
 

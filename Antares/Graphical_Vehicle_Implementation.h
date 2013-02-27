@@ -84,7 +84,7 @@ namespace Vehicle_Components
 				
 				my_canvas->Scale_Coordinates<Target_Type<NT,void,Point_3D<MasterType>&>>(coordinate.vertex);
 
-				_vehicle_points->Push_Element<Regular_Element>(&coordinate,sizeof(attribute_coordinate));
+				_vehicle_points->Push_Element<Regular_Element>(&coordinate);
 
 				_graphical_network->push_vehicle_coordinates< NULLTYPE >();
 			}

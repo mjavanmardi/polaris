@@ -11,6 +11,7 @@ namespace Zone_Components
 		{
 			RED_COLUMN, GREEN_COLUMN, BLUE_COLUMN, GRAY_COLUMN
 		};
+		
 		implementation struct Quad : public Polaris_Component<APPEND_CHILD(Quad),MasterType,NULLTYPE>
 		{
 			Quad()
@@ -26,119 +27,130 @@ namespace Zone_Components
 			Point_3D<MasterType> c;
 			Point_3D<MasterType> d;
 		};
+#pragma pack(push,1)
 		implementation struct Column : public Polaris_Component<APPEND_CHILD(Column),MasterType,NULLTYPE>
 		{
 			Column(Point_3D<MasterType> center_point, int width, int height, COLUMN_COLOR primary_color)
 			{	
+				quads=new Quad<MasterType>[5];
+				num_primitives=5;
+
 				if (primary_color == GREEN_COLUMN || primary_color == GRAY_COLUMN)
 				{
-					east.color._g = 255;
-					west.color._g= 220;
-					north.color._g = 180;
-					south.color._g = 150;
-					top.color._g = 255;
+					quads[0].color._g = 255;
+					quads[1].color._g = 220;
+					quads[2].color._g = 180;
+					quads[3].color._g = 150;
+					quads[4].color._g = 255;
 				}
 				if (primary_color == RED_COLUMN || primary_color == GRAY_COLUMN)
 				{
-					east.color._r = 255;
-					west.color._r= 220;
-					north.color._r = 180;
-					south.color._r = 150;
-					top.color._r = 255;
+					quads[0].color._r = 255;
+					quads[1].color._r = 220;
+					quads[2].color._r = 180;
+					quads[3].color._r = 150;
+					quads[4].color._r = 255;
 				}
 				if (primary_color == BLUE_COLUMN || primary_color == GRAY_COLUMN)
 				{
-					east.color._b = 255;
-					west.color._b= 220;
-					north.color._b = 180;
-					south.color._b = 150;
-					top.color._b = 255;
+					quads[0].color._b = 255;
+					quads[1].color._b = 220;
+					quads[2].color._b = 180;
+					quads[3].color._b = 150;
+					quads[4].color._b = 255;
 				}
 
 				// east side
-				east.a._x = center_point._x + width/4;
-				east.a._y = center_point._y - width/2;
-				east.a._z = center_point._z + 1;
-				east.b._x = center_point._x + width/4;
-				east.b._y = center_point._y + width/2;
-				east.b._z = center_point._z + 1;
-				east.c._x = center_point._x + width/4;
-				east.c._y = center_point._y + width/2;
-				east.c._z = center_point._z + height;
-				east.d._x = center_point._x + width/4;
-				east.d._y = center_point._y - width/2;
-				east.d._z = center_point._z + height;
+				quads[0].a._x = center_point._x + width/4;
+				quads[0].a._y = center_point._y - width/2;
+				quads[0].a._z = center_point._z + 1;
+				quads[0].b._x = center_point._x + width/4;
+				quads[0].b._y = center_point._y + width/2;
+				quads[0].b._z = center_point._z + 1;
+				quads[0].c._x = center_point._x + width/4;
+				quads[0].c._y = center_point._y + width/2;
+				quads[0].c._z = center_point._z + height;
+				quads[0].d._x = center_point._x + width/4;
+				quads[0].d._y = center_point._y - width/2;
+				quads[0].d._z = center_point._z + height;
 				
 				//west side			
-				west.a._x = center_point._x - width/4;
-				west.a._y = center_point._y - width/2;
-				west.a._z = center_point._z + 1;
-				west.b._x = center_point._x - width/4;
-				west.b._y = center_point._y + width/2;
-				west.b._z = center_point._z + 1;
-				west.c._x = center_point._x - width/4;
-				west.c._y = center_point._y + width/2;
-				west.c._z = center_point._z + height;
-				west.d._x = center_point._x - width/4;
-				west.d._y = center_point._y - width/2;
-				west.d._z = center_point._z + height;
+				quads[1].a._x = center_point._x - width/4;
+				quads[1].a._y = center_point._y - width/2;
+				quads[1].a._z = center_point._z + 1;
+				quads[1].b._x = center_point._x - width/4;
+				quads[1].b._y = center_point._y + width/2;
+				quads[1].b._z = center_point._z + 1;
+				quads[1].c._x = center_point._x - width/4;
+				quads[1].c._y = center_point._y + width/2;
+				quads[1].c._z = center_point._z + height;
+				quads[1].d._x = center_point._x - width/4;
+				quads[1].d._y = center_point._y - width/2;
+				quads[1].d._z = center_point._z + height;
 				
 				//north side
-				north.a._x = center_point._x + width/4;
-				north.a._y = center_point._y + width/2;
-				north.a._z = center_point._z + 1;
-				north.b._x = center_point._x - width/4;
-				north.b._y = center_point._y + width/2;
-				north.b._z = center_point._z + 1;
-				north.c._x = center_point._x - width/4;
-				north.c._y = center_point._y + width/2;
-				north.c._z = center_point._z + height;
-				north.d._x = center_point._x + width/4;
-				north.d._y = center_point._y + width/2;
-				north.d._z = center_point._z + height;
+				quads[2].a._x = center_point._x + width/4;
+				quads[2].a._y = center_point._y + width/2;
+				quads[2].a._z = center_point._z + 1;
+				quads[2].b._x = center_point._x - width/4;
+				quads[2].b._y = center_point._y + width/2;
+				quads[2].b._z = center_point._z + 1;
+				quads[2].c._x = center_point._x - width/4;
+				quads[2].c._y = center_point._y + width/2;
+				quads[2].c._z = center_point._z + height;
+				quads[2].d._x = center_point._x + width/4;
+				quads[2].d._y = center_point._y + width/2;
+				quads[2].d._z = center_point._z + height;
 				
 				//south side
-				south.a._x = center_point._x + width/4;
-				south.a._y = center_point._y - width/2;
-				south.a._z = center_point._z + 1;
-				south.b._x = center_point._x - width/4;
-				south.b._y = center_point._y - width/2;
-				south.b._z = center_point._z + 1;
-				south.c._x = center_point._x - width/4;
-				south.c._y = center_point._y - width/2;
-				south.c._z = center_point._z + height;
-				south.d._x = center_point._x + width/4;
-				south.d._y = center_point._y - width/2;
-				south.d._z = center_point._z + height;
+				quads[3].a._x = center_point._x + width/4;
+				quads[3].a._y = center_point._y - width/2;
+				quads[3].a._z = center_point._z + 1;
+				quads[3].b._x = center_point._x - width/4;
+				quads[3].b._y = center_point._y - width/2;
+				quads[3].b._z = center_point._z + 1;
+				quads[3].c._x = center_point._x - width/4;
+				quads[3].c._y = center_point._y - width/2;
+				quads[3].c._z = center_point._z + height;
+				quads[3].d._x = center_point._x + width/4;
+				quads[3].d._y = center_point._y - width/2;
+				quads[3].d._z = center_point._z + height;
 				
 				//top side
-				top.a._x = center_point._x + width/4;
-				top.a._y = center_point._y - width/2;
-				top.a._z = center_point._z + height;
-				top.b._x = center_point._x - width/4;
-				top.b._y = center_point._y - width/2;
-				top.b._z = center_point._z + height;
-				top.c._x = center_point._x - width/4;
-				top.c._y = center_point._y + width/2;
-				top.c._z = center_point._z + height;
-				top.d._x = center_point._x + width/4;
-				top.d._y = center_point._y + width/2;
-				top.d._z = center_point._z + height;
+				quads[4].a._x = center_point._x + width/4;
+				quads[4].a._y = center_point._y - width/2;
+				quads[4].a._z = center_point._z + height;
+				quads[4].b._x = center_point._x - width/4;
+				quads[4].b._y = center_point._y - width/2;
+				quads[4].b._z = center_point._z + height;
+				quads[4].c._x = center_point._x - width/4;
+				quads[4].c._y = center_point._y + width/2;
+				quads[4].c._z = center_point._z + height;
+				quads[4].d._x = center_point._x + width/4;
+				quads[4].d._y = center_point._y + width/2;
+				quads[4].d._z = center_point._z + height;
 			}
 			feature_implementation void Push_To_Layer(TargetType Layer_Reference)
 			{
-				Layer_Reference->Push_Element<Regular_Element>(&east,sizeof(Types::Quad<MasterType>));
-				Layer_Reference->Push_Element<Regular_Element>(&west,sizeof(Types::Quad<MasterType>));
-				Layer_Reference->Push_Element<Regular_Element>(&north,sizeof(Types::Quad<MasterType>));
-				Layer_Reference->Push_Element<Regular_Element>(&south,sizeof(Types::Quad<MasterType>));
-				Layer_Reference->Push_Element<Regular_Element>(&top,sizeof(Types::Quad<MasterType>));
+				Layer_Reference->Push_Element<Regular_Element>(&num_primitives);
+
+				//Layer_Reference->Push_Element<Regular_Element>(&east);
+				//Layer_Reference->Push_Element<Regular_Element>(&west);
+				//Layer_Reference->Push_Element<Regular_Element>(&north);
+				//Layer_Reference->Push_Element<Regular_Element>(&south);
+				//Layer_Reference->Push_Element<Regular_Element>(&top);
 			}
-			Quad<MasterType> east;
-			Quad<MasterType> west;
-			Quad<MasterType> north;
-			Quad<MasterType> south;
-			Quad<MasterType> top;
+
+			int num_primitives;
+			Quad<MasterType>* quads;
+
+			//Quad<MasterType> east;
+			//Quad<MasterType> west;
+			//Quad<MasterType> north;
+			//Quad<MasterType> south;
+			//Quad<MasterType> top;
 		};
+#pragma pack(pop)
 	}
 
 	namespace Concepts
