@@ -113,17 +113,17 @@ template<typename ParentType,typename ObjectType>
 class Polaris_Component<NULLTYPELIST,NULLTYPE,ObjectType,ParentType,0,NULLTYPE>:public ObjectType
 {
 public:
-	ParentType* Parent()
-	{
-		return _parent;
-	}
+	//ParentType* Parent()
+	//{
+	//	return _parent;
+	//}
 
-	void Parent(void* parent)
-	{
-		_parent=(ParentType*)parent;
-	}
+	//void Parent(void* parent)
+	//{
+	//	_parent=(ParentType*)parent;
+	//}
 
-	ParentType* _parent;
+	//ParentType* _parent;
 };
 
 ///============================================================================

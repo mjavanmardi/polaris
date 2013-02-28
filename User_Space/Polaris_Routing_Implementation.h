@@ -19,7 +19,7 @@ namespace Routing_Components
 	namespace Implementations
 	{
 
-		implementation	struct Routable_Network_Implementation:public Polaris_Component<APPEND_CHILD(Routable_Network_Implementation),MasterType,Data_Object,ParentType>
+		implementation struct Routable_Network_Implementation : public Polaris_Component<APPEND_CHILD(Routable_Network_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_data(concat(set<pair<float, void*>>), scan_list, none, none);
 
@@ -130,15 +130,31 @@ namespace Routing_Components
 			}
 		};
 
+
 		implementation struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType>
 		{
-#ifndef EXCLUDE_DEMAND
+			declare_feature_conditional(Compute_Route_Condition)
+			{
+				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
+				define_component_interface(_Traveler_Interface, typename get_type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
+				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
+				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION)
+				{
+					response.result=true;
+					response.next._iteration=END;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION;
+				}
+				else
+				{
+					assert(false);
+					cout << "Should never reach here in routing conditional!" << endl;
+				}
+			}
+
+			// don't need ifdef here - just change the typedef of MasterType::person_type to traveler_implemenationt in the mastertype definition
 			member_component(typename MasterType::person_type, traveler, none, none);
 			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
-#else
-			member_component(typename MasterType::traveler_type, traveler, none, none);
-			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
-#endif
+
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType vehicle()
 			{
@@ -157,17 +173,7 @@ namespace Routing_Components
 			}
 			
 			tag_getter_as_available(routable_network);			
-#ifndef EXCLUDE_DEMAND
-			// time increment at which skim tables are updated - set in the initializer
-			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
-			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time_Prototype);
 
-			// time period during which routing takes place
-			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_start_time,none,none);
-			member_component_feature(start_time,_start_time,Value,Basic_Units::Prototypes::Time_Prototype);
-			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_end_time,none,none);
-			member_component_feature(end_time,_end_time,Value,Basic_Units::Prototypes::Time_Prototype);
-#endif		
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			void routable_origin(TargetType set_value)
 			{
@@ -212,36 +218,38 @@ namespace Routing_Components
 			typedef typename MasterType::routable_network_type routable_network_type;
 		};
 
-		implementation struct Polaris_Integrated_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Integrated_Routing_Implementation),MasterType,Execution_Object,ParentType>
+
+		implementation struct Polaris_Skim_Routing_Implementation: public Polaris_Routing_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Skim_Routing_Implementation)>
 		{
+			declare_feature_conditional(Compute_Route_Condition)
+			{
+				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
+				define_component_interface(_Traveler_Interface, typename get_type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
+				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
+				if(_sub_iteration == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
+				{
+					if (_iteration >= _this_ptr->start_time<Simulation_Timestep_Increment>() && _iteration < _this_ptr->end_time<Simulation_Timestep_Increment>())
+					{
+						response.result=true;
+						response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
+						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
+					}
+					else
+					{
+						response.result=false;
+						response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
+						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
+					}
+				}
+				else
+				{
+					assert(false);
+					cout << "Should never reach here in routing conditional!" << endl;
+				}
+			}
+
 			member_container(vector<float>,travel_times_to_link_container,none,none);
-#ifndef EXCLUDE_DEMAND
-			member_component(typename MasterType::person_type, traveler, none, none);
-			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
-#else
-			member_component(typename MasterType::traveler_type, traveler, none, none);
-			define_component_interface(_Traveler_Interface, typename MasterType::traveler_type, Traveler_Components::Prototypes::Traveler_Prototype, NULLTYPE); 
-#endif
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType vehicle()
-			{
-				return ((_Traveler_Interface*)_traveler)->template vehicle<TargetType>();
-			}
 			
-			tag_getter_as_available(vehicle);
-
-			member_component(typename MasterType::network_type, network, none, none);
-
-			define_component_interface(_Network_Interface, typename MasterType::network_type, Network_Components::Prototypes::Network_Prototype, NULLTYPE);
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType routable_network()
-			{
-				return ((_Network_Interface*)_network)->template routable_network<TargetType>();
-			}
-			
-			tag_getter_as_available(routable_network);			
-#ifndef EXCLUDE_DEMAND			
-
 			// time increment at which skim tables are updated - set in the initializer
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
 			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time_Prototype);
@@ -251,49 +259,7 @@ namespace Routing_Components
 			member_component_feature(start_time,_start_time,Value,Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_end_time,none,none);
 			member_component_feature(end_time,_end_time,Value,Basic_Units::Prototypes::Time_Prototype);
-#endif	
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			void routable_origin(TargetType set_value)
-			{
-				_routable_origin = set_value->template internal_id<int>();
-			}
-			tag_setter_as_available(routable_origin);
 
-			typedef vector<typename MasterType::routable_link_type*> routable_links_container_type;
-			typedef Polaris_Container<routable_links_container_type> _Links_Container_Type;
-
-			typedef Random_Access_Sequence_Prototype<_Links_Container_Type, NULLTYPE, void*> _Links_Container_Interface;
-
-			typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::routable_network_type, NULLTYPE> _Routable_Network_Interface;
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType routable_origin()
-			{
-				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links_container<_Links_Container_Interface&>()[_routable_origin]);
-			}
-			tag_getter_as_available(routable_origin);
-
-			int _routable_origin;
-
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			void routable_destination(TargetType set_value)
-			{
-				_routable_destination = set_value->template internal_id<int>();
-			}
-			tag_setter_as_available(routable_destination);
-
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType routable_destination()
-			{
-				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links_container<_Links_Container_Interface&>()[_routable_destination]);
-			}
-			tag_getter_as_available(routable_destination);
-
-			int _routable_destination;	
-			
-			typedef typename MasterType::link_type regular_link_type;
-			typedef typename MasterType::routable_link_type routable_link_type;
-			typedef typename MasterType::vehicle_type vehicle_type;
-			typedef typename MasterType::routable_network_type routable_network_type;
 		};
 	}
 

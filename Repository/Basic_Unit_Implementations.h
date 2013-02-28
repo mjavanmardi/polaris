@@ -12,7 +12,7 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic Length base clase.
-		implementation struct Length_Implementation : public Polaris_Component<APPEND_CHILD(Length_Implementation),MasterType>
+		implementation struct Length_Implementation : public Polaris_Component<APPEND_CHILD(Length_Implementation),MasterType,NULLTYPE>
 		{
 			typedef true_type Length_tag;
 			typedef true_type Inches_tag;
@@ -29,7 +29,7 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic Time base clase and Time Horizon Classes.
-		implementation struct Time_Implementation : public Polaris_Component<APPEND_CHILD(Time_Implementation),MasterType>
+		implementation struct Time_Implementation : public Polaris_Component<APPEND_CHILD(Time_Implementation),MasterType,NULLTYPE>
 		{
 			typedef true_type Time_tag;
 			typedef true_type Seconds_tag;
@@ -55,7 +55,7 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic Currency base clase.
-		implementation struct Currency_Implementation : public Polaris_Component<APPEND_CHILD(Currency_Implementation),MasterType>
+		implementation struct Currency_Implementation : public Polaris_Component<APPEND_CHILD(Currency_Implementation),MasterType,NULLTYPE>
 		{
 			typedef true_type Currency_tag;
 			typedef true_type Cents_tag; 

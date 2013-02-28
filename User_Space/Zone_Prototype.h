@@ -17,9 +17,9 @@ namespace Zone_Components
 		{
 			tag_as_prototype;
 
-			feature_prototype void push_zone_information(typename TargetType::ParamType coordinates, typename TargetType::Param2Type productions, typename TargetType::Param2Type attractions)
+			feature_prototype void push_zone_information(typename TargetType::ParamType coordinates, void* this_ptr, typename TargetType::Param2Type productions, typename TargetType::Param2Type attractions)
 			{
-				this_component()->accept_zone_information<ComponentType,CallerType,TargetType>(coordinates, productions, attractions);
+				this_component()->accept_zone_information<ComponentType,CallerType,TargetType>(coordinates, this_ptr, productions, attractions);
 			}
 			feature_prototype void configure_zones_layer()
 			{

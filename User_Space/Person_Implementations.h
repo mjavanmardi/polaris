@@ -3,6 +3,7 @@
 #include "Person_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "Activity_Prototype.h"
+#include "Population_Unit_Implementations.h"
 
 
 namespace Person_Components
@@ -48,13 +49,13 @@ namespace Person_Components
 				vehicle->template traveler<ComponentType*>(this);
 
 				// Seed the RNG with the agent ID
-				define_component_interface(rng_itf,type_of(RNG),RNG_Components::Prototypes::RNG_Prototype,ComponentType);
+				/*define_component_interface(rng_itf,type_of(RNG),RNG_Components::Prototypes::RNG_Prototype,ComponentType);
 				rng_itf* rng = this->template RNG<ComponentType,ComponentType,rng_itf*>();		
-				rng->template Initialize<TargetType>((sin((double)id)+1.0) * 1000000.0);
+				rng->template Initialize<TargetType>((sin((double)id)+1.0) * 1000000.0);*/
 
 				// Add basic traveler properties							
 				this->template uuid<ComponentType,ComponentType,int>(id);
-				this->template internal_id<ComponentType,ComponentType,int>(id);
+				//this->template internal_id<ComponentType,ComponentType,int>(id);
 				this->template router<ComponentType,ComponentType,_Routing_Interface*>(router);
 				this->template vehicle<ComponentType,ComponentType,_Vehicle_Interface*>(vehicle);
 			}
@@ -90,19 +91,25 @@ namespace Person_Components
 
 			member_component(typename MasterType::vehicle_type,vehicle,none,none/*check_2(ComponentType,CallerType, Is_Same_Entity)*/);
 			member_component(typename MasterType::routing_type,router,none,none/*check_2(ComponentType,CallerType, Is_Same_Entity)*/);
-			member_component(typename MasterType::person_properties_type,Properties,none,check_2(ComponentType,CallerType, Is_Same_Entity));
+		
 			member_component(typename MasterType::person_planner_type,Planning_Faculty,none,check_2(ComponentType,CallerType, Is_Same_Entity));
+			member_component(typename MasterType::person_properties_type,Properties,none,check_2(ComponentType,CallerType, Is_Same_Entity));
+			member_prototype(PopSyn::Prototypes::Population_Unit_Prototype,Static_Properties,typename MasterType::pop_unit,none,none);
 
 			member_component(typename MasterType::scenario_type, scenario_reference, none, none);
 			member_component(typename MasterType::network_type, network_reference, none, none);
 			
+			//TODO: MOVE THIS TO A GLOBAL RNG - 1 per thread ***
 			// Random number facility - accessed using Next_Rand feature_accessor
-			member_data_component(typename MasterType::RNG, RNG, check(ReturnValueType,RNG_Components::Concepts::Is_RNG), check(SetValueType,RNG_Components::Concepts::Is_RNG) && check_2(ComponentType,CallerType, Is_Same_Entity));
-			member_component_feature(Next_Rand, RNG, Next_Rand, RNG_Components::Prototypes::RNG_Prototype);
+			/*member_data_component(typename MasterType::RNG, RNG, check(ReturnValueType,RNG_Components::Concepts::Is_RNG), check(SetValueType,RNG_Components::Concepts::Is_RNG) && check_2(ComponentType,CallerType, Is_Same_Entity));
+			member_component_feature(Next_Rand, RNG, Next_Rand, RNG_Components::Prototypes::RNG_Prototype);*/
+			feature_implementation TargetType Next_Rand()
+			{
+				return GLOBALS::Global_RNG.Next_Rand<double>();
+			} tag_getter_as_available(Next_Rand);
 
 			// Agent ID
 			member_data(long,uuid,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
-			member_data(long,internal_id,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 
 			// First iteration  - sets the next iteration after all planning is completed
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_First_Iteration,none,none);
@@ -130,9 +137,9 @@ namespace Person_Components
 			member_component_feature(Generation_Time_Increment, _Generation_Time_Increment, Value, Basic_Units::Prototypes::Time_Prototype);
 			//member_data(Simulation_Timestep_Increment,Generation_Time_Increment,none,none);
 
-			// Containers for activity planning events and movement planning events
-			member_associative_container(concat(hash_multimap<long,typename MasterType::activity_plan_type*>),Activity_Plans_Container,none,none);
-			member_associative_container(concat(hash_multimap<long,typename MasterType::movement_plan_type*>),Movement_Plans_Container,none,none);
+			//TODO: Containers for activity planning events and movement planning events - CONVERT TO VECTOR WITH TIME LOOKUP
+			member_container(list<typename MasterType::activity_plan_type*>,Activity_Plans_Container,none,none);
+			member_container(list<typename MasterType::movement_plan_type*>,Movement_Plans_Container,none,none);
 
 			// Activity generation functionality
 			feature_implementation void Activity_Generation()
@@ -166,7 +173,7 @@ namespace Person_Components
 				define_component_interface(parent_itf,typename type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
 				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
 
-				define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 				Movement_Plan* move = (Movement_Plan*)movement_plan;
 				// key the movement plan on the planning timestep just prior to departure
 				long t1 = move->template departed_time<Simulation_Timestep_Increment>() - parent->template First_Iteration<Simulation_Timestep_Increment>();
@@ -181,7 +188,7 @@ namespace Person_Components
 				else
 				{
 					Movement_Plans* movements = this->template Movement_Plans_Container<ComponentType,CallerType,Movement_Plans*>();
-					movements->insert(departure_time,move);
+					movements->push_back(move);
 				}
 				
 			}
@@ -193,7 +200,7 @@ namespace Person_Components
 			tag_feature_as_available(Add_Movement_Plan);
 			feature_implementation void Add_Activity_Plan(TargetType activity_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
-				define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);	
+				define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);	
 				Activity_Plan* act = (Activity_Plan*)activity_plan;
 
 				long t1 = act->template Activity_Plan_Horizon<Simulation_Timestep_Increment>();
@@ -203,7 +210,7 @@ namespace Person_Components
 
 				// key the movement plan on the planning timestep just prior to departure
 				Activity_Plans* activities = this->template Activity_Plans_Container<Activity_Plans*>();
-				activities->insert(departure_time,act);
+				activities->push_back(act);
 			}
 		};
 
@@ -289,8 +296,8 @@ namespace Person_Components
 				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
 
 				// get references to the plan containers
-				define_container_and_value_interface(Activity_Plans,Activity_Plan,typename base_type::type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
-				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				define_container_and_value_interface(Activity_Plans,Activity_Plan,typename base_type::type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
+				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 				Activity_Plans* activities = this_ptr->template Activity_Plans_Container<Activity_Plans*>();
 				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();	
 
@@ -392,6 +399,9 @@ namespace Person_Components
 			feature_implementation void Initialize(requires(check_2(ComponentType,CallerType,Is_Same_Entity)))
 			{	
 			}	tag_feature_as_available(Initialize);
+
+			member_data(int, home_location_id, none, none);
+			member_data(int, work_location_id, none, none);
 
 			member_data(Types::Census_Person_Characteristics::GENDER, Gender, none,none);
 			// Length member

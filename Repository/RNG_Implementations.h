@@ -158,3 +158,32 @@ namespace RNG_Components
 	}
 
 }
+
+namespace GLOBALS
+{
+	implementation struct _Global_RNG : public Polaris_Component<APPEND_CHILD(_Global_RNG),MasterType,NULLTYPE>
+	{
+		typedef RNG_Components::Implementations::RngStream_Implementation<NULLTYPE> RNG_type;
+		_Global_RNG()
+		{
+			for (int i=0; i < _num_threads; i++)
+			{
+				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
+				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
+				rng->Initialize<int>(i);
+			}
+		}
+
+		template <typename ReturnValueType>
+		ReturnValueType Next_Rand()
+		{
+			typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
+			rng_itf* rng = (rng_itf*)&this->thread_rng[_thread_id];
+
+			return rng->Next_Rand<double>();
+		}
+	private:
+		 RNG_type thread_rng[_num_threads];
+	};
+	_Global_RNG<NULLTYPE> Global_RNG;
+}

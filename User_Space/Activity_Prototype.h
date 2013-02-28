@@ -38,6 +38,7 @@ namespace Activity_Components
 			feature_accessor(Activity_Plan_ID, check(ReturnValueType,is_arithmetic), check(SetValueType,is_arithmetic));
 			feature_accessor(Activity_Type,none,none);
 			feature_accessor(Activity_Plan_Horizon,none,none);
+			feature_accessor(planning_time,none,none);
 
 			feature_accessor(Location_Type, none, none);
 			feature_accessor(Location_ID, check(ReturnValueType,is_arithmetic), check(SetValueType,is_arithmetic));

@@ -337,7 +337,9 @@ struct MasterType
 
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
-	typedef Routing_Components::Implementations::Polaris_Integrated_Routing_Implementation<MasterType> routing_type;
+	typedef Routing_Components::Implementations::Polaris_Routing_Implementation<MasterType> routing_type;
+
+	typedef Routing_Components::Implementations::Polaris_Skim_Routing_Implementation<MasterType> skim_routing_type;
 
 	typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
 
@@ -382,7 +384,7 @@ struct MasterType
 
 	typedef Person_Components::Implementations::Person_Implementation<MasterType> person_type;
 	typedef Person_Components::Implementations::CTRAMP_Person_Planner_Implementation<MasterType, person_type> person_planner_type;
-	typedef Person_Components::Implementations::TRANSIMS_Person_Properties_Implementation<MasterType,person_type> person_properties_type;
+	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<MasterType,person_type> person_properties_type;
 	typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
 	typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
 
@@ -402,6 +404,19 @@ ostream* stream_ptr;
 
 int main(int argc,char** argv)
 {
+	cout << endl << "Time unit: " << sizeof(Basic_Units::Implementations::Time_Implementation<MasterType>);
+	cout << endl << "RNG: " << sizeof(MasterType::RNG);
+	cout << endl << "Pop unit: " << sizeof(MasterType::pop_unit);
+	cout << endl << "Pop region: " << sizeof(MasterType::region);
+	cout << endl << "Pop zone: " << sizeof(MasterType::zone);
+	cout << endl << "Person: " << sizeof(MasterType::person_type);
+	cout << endl << "Person - planner: " << sizeof(MasterType::person_planner_type);
+	cout << endl << "Person - properties: " << sizeof(MasterType::person_properties_type);
+	cout << endl << "Person - router: " << sizeof(MasterType::routing_type);
+	cout << endl << "Person - vehicle: " << sizeof(MasterType::vehicle_type);
+	cout << endl << "Movement plans: " << sizeof(MasterType::movement_plan_type);
+	cout << endl << "plan hashmaps: " << sizeof(hash_multimap<long,MasterType::activity_plan_type*>);
+	cout << endl << "plan vectors: " << sizeof(vector<MasterType::activity_plan_type*>);
 
 #ifdef ANTARES
 	START_UI(argc,argv, MasterType);
@@ -524,11 +539,11 @@ int main(int argc,char** argv)
 	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
 	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
 	// Solver settings - IPF tolerance, Percentage of population to synthesis, maximum ipf and selection iterations
-	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,0.01,100);
+	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,1.0,100);
 
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
-	popsyn->write_output_flag<bool>(true);
+	popsyn->write_output_flag<bool>(false);
 	popsyn->linker_file_path<string>(string("linker_file.txt"));
 	popsyn->Solution_Settings<solver_itf*>(solver);
 	popsyn->Output_Stream<ostream&>(out);
@@ -539,8 +554,14 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 
 
-
+	try
+	{
 	START();
+	}
+	catch (std::exception ex)
+	{
+		cout << ex.what();
+	}
 
 	cout << "Finished!" << endl;
 	system("PAUSE");

@@ -8,7 +8,7 @@ namespace User_Space
 	{
 	public:
 
-	RngStream (const char *name = "");
+	RngStream ();
 
 
 	static bool SetPackageSeed (const unsigned long seed[6]);
@@ -60,7 +60,6 @@ namespace User_Space
 	bool anti, incPrec;
 
 
-	std::string name;
 
 
 	static double nextSeed[6];
@@ -375,7 +374,7 @@ namespace User_Space
 	//-------------------------------------------------------------------------
 	// constructor
 	//
-	RngStream::RngStream (const char *s) : name (s)
+	RngStream::RngStream ()
 	{
 	   anti = false;
 	   incPrec = false;
@@ -511,8 +510,6 @@ namespace User_Space
 	void RngStream::WriteState () const
 	{
 		cout << "The current state of the Rngstream";
-		if (name.size() > 0)
-			cout << " " << name;
 		cout << ":\n   Cg = { ";
 
 		for (int i = 0; i < 5; i++) {
@@ -528,8 +525,6 @@ namespace User_Space
 		int i;
 
 		cout << "The RngStream";
-		if (name.size() > 0)
-			cout << " " << name;
 		cout << ":\n   anti = " << (anti ? "true" : "false") << "\n";
 		cout << "   incPrec = " << (incPrec ? "true" : "false") << "\n";
 

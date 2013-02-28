@@ -35,7 +35,7 @@ namespace Network_Skimming_Components
 		implementation struct Skim_Table_Implementation : public Polaris_Component<APPEND_CHILD(Skim_Table_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_container(matrix<double>, skim_table, none,none);
-			member_associative_container(concat(dense_hash_map<long,typename MasterType::routing_type*>), path_trees_container,none,none);
+			member_associative_container(concat(dense_hash_map<long,typename MasterType::skim_routing_type*>), path_trees_container,none,none);
 
 			// start and end times of the period represented by the skim table
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_start_time,none,none);

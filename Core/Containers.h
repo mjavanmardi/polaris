@@ -35,7 +35,13 @@ struct Input_Iterator:public IteratorType
 
 	Input_Iterator& operator++(){return (Input_Iterator&)++(*((IteratorType*)this));}
 
-	void operator++(int){(*((IteratorType*)this))++;}
+	/*void operator++(int){(*((IteratorType*)this))++;}*/
+	Input_Iterator operator++(int)
+	{
+		Input_Iterator a = (*((IteratorType*)this));
+		(*((IteratorType*)this))++;
+		return a;
+	}
 };
 
 ///============================================================================

@@ -299,6 +299,35 @@ namespace PopSyn
 				}
 				zone_fr.Close();
 
+
+				//===============================================================================================================
+				// Fill zonal activity_locations list from network reference
+				//---------------------------------------------------------------------------------------------------------------
+				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_container_and_value_interface(locations_container_itf, location_itf,typename network_itf::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+				network_itf* network = this->network_reference<network_itf*>();
+				locations_container_itf* locations = network->template activity_locations_container<locations_container_itf*>();
+				location_itf* location;
+				region_itf* region;
+				typename locations_container_itf::iterator loc_itr;
+				typename zones_itf::iterator 
+
+				for (loc_itr = locations->begin(); loc_itr != locations->end(); ++loc_itr)
+				{
+					location = *loc_itr;
+					int zone_id = location->census_zone_id<int>();
+
+					for (region_itr itr = regions->begin(); itr != regions->end(); ++itr)
+					{
+						region = *itr;
+
+						zones_itf* zones = region->Synthesis_Zone_Collection<zones_itf*>();
+						
+						zone_itr
+					}
+				}
+
+
 				//------------------------
 				// TIMER
 				cout <<"Setup Runtime (ms): "<<timer.Stop();
@@ -338,8 +367,7 @@ namespace PopSyn
 			declare_feature_event(Output_Popsyn_Event)
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
-				
-				
+					
 				// Define iterators and get pointer to the region collection
 				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
 				typedef typename region_collection_type::unqualified_value_type			region_type;
@@ -369,10 +397,14 @@ namespace PopSyn
 				for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 				{
 					region_itf* region = r_itr->second;
+
 					zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
 					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 					{
 						zone_itf* zone = z_itr->second;
+						//joint_itf* distribution = zone->Target_Joint_Distribution<joint_itf*>();
+						//distribution->resize(pair<int,int>(1,1),0);
+
 						persons_collection_itf* persons = zone->template Synthetic_Persons_Container<persons_collection_itf*>();
 						for (p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
 						{
@@ -385,40 +417,42 @@ namespace PopSyn
 				cout <<endl<<endl<<"Total Persons Synthesized: "<<uuid;
 
 				// Handle file output if needed
-				if (pthis->write_output_flag<bool>() != true) return;
-
-				Counter timer;
-				timer.Start();
-		
-				ostream& sample_out = pthis->Output_Stream<ostream&>();
-				ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
-
-
-				for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
+				if (pthis->write_output_flag<bool>() == true)
 				{
-					region_itf* region = r_itr->second;
-					zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
-					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+
+					Counter timer;
+					timer.Start();
+		
+					ostream& sample_out = pthis->Output_Stream<ostream&>();
+					ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
+
+
+					for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 					{
-						zone_itf* zone = z_itr->second;
-						marg_out <<endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
-						zone->template Target_Joint_Distribution<joint_itf*>()->write(marg_out);
-						marg_out <<endl;
-						zone->template Target_Marginal_Distribution<marginal_itf*>()->write(marg_out);
-						marg_out <<endl;
-
-						sample_data_itf* sample = zone->template Sample_Data<sample_data_itf*>();
-						
-						sample_out << endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
-						for (typename sample_data_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
+						region_itf* region = r_itr->second;
+						zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
+						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 						{
-							sample_out << endl << "ID: " << s_itr->second->template ID<uint>() << ",  weight: "<<s_itr->second->template Weight<float>() <<", index: "<<s_itr->second->template Index<uint>();
+							zone_itf* zone = z_itr->second;
+							marg_out <<endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
+							zone->template Target_Joint_Distribution<joint_itf*>()->write(marg_out);
+							marg_out <<endl;
+							zone->template Target_Marginal_Distribution<marginal_itf*>()->write(marg_out);
+							marg_out <<endl;
+
+							sample_data_itf* sample = zone->template Sample_Data<sample_data_itf*>();
+						
+							sample_out << endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
+							for (typename sample_data_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
+							{
+								sample_out << endl << "ID: " << s_itr->second->template ID<uint>() << ",  weight: "<<s_itr->second->template Weight<float>() <<", index: "<<s_itr->second->template Index<uint>();
+							}
+
 						}
-
 					}
-				}
 
-				cout <<endl<<"File I/O Runtime: "<<timer.Stop();
+					cout <<endl<<"File I/O Runtime: "<<timer.Stop();
+				}
 			}
 			
 			//----------------------------------------------------------------

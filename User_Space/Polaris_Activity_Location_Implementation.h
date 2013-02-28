@@ -25,9 +25,11 @@ namespace Activity_Location_Components
 
 			member_container(vector<float>, destination_link_choice_cdfs, none, none);
 
-			member_data(int, uuid, none, none);
+			member_data(int, uuid, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
 
-			member_data(int, internal_id, none, none);
+			member_data(int, internal_id, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
+
+			member_data(int, census_zone_id, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
 
 		};
 	}

@@ -18,6 +18,8 @@ namespace Activity_Components
 		implementation struct Activity_Plan_Implementation : public Polaris_Component<APPEND_CHILD(Activity_Plan_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_data(long,Activity_Plan_ID,none,none);
+			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_planning_time,none,none);
+			member_component_feature(planning_time, _planning_time, Value, Basic_Units::Prototypes::Time_Prototype);
 		};
 	}
 }

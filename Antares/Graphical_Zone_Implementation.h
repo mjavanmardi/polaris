@@ -132,7 +132,8 @@ namespace Zone_Components
 			}
 			feature_implementation void Push_To_Layer(TargetType Layer_Reference)
 			{
-				Layer_Reference->Push_Element<Regular_Element>(&num_primitives);
+				//Layer_Reference->Push_Element<Regular_Element>(&num_primitives);
+				Layer_Reference->Push_Element<Regular_Element>(this);
 
 				//Layer_Reference->Push_Element<Regular_Element>(&east);
 				//Layer_Reference->Push_Element<Regular_Element>(&west);
@@ -141,6 +142,7 @@ namespace Zone_Components
 				//Layer_Reference->Push_Element<Regular_Element>(&top);
 			}
 
+			void* ptr;
 			int num_primitives;
 			Quad<MasterType>* quads;
 
@@ -161,24 +163,29 @@ namespace Zone_Components
 	{
 		implementation struct Graphical_Zone_Group_Implementation : public Polaris_Component<APPEND_CHILD(Graphical_Zone_Group_Implementation),MasterType,Data_Object,ParentType>
 		{	
-			feature_implementation void accept_zone_information(Point_3D<MasterType>& coordinates, typename TargetType::Param2Type productions, typename TargetType::Param2Type attractions)
+			feature_implementation void accept_zone_information(Point_3D<MasterType>& coordinates, void* ptr, typename TargetType::Param2Type productions, typename TargetType::Param2Type attractions)
 			{
 				int width = 300;
 				int height_prod = productions;
 				int height_att = attractions;
 
 				Point_3D<MasterType> origin_col_center, destination_col_center;
-				origin_col_center._x = coordinates._x + _input_offset._x - width*0.25;
-				origin_col_center._y = coordinates._y + _input_offset._y;
-				destination_col_center._x = coordinates._x + _input_offset._x + width*0.25;
+
+				origin_col_center._x = coordinates._x - width*0.25;
+				origin_col_center._y = coordinates._y ;
+				destination_col_center._x = coordinates._x + width*0.25;
 				destination_col_center._y = origin_col_center._y;
-				
+				_canvas->Scale_Coordinates<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(origin_col_center);
+				_canvas->Scale_Coordinates<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(destination_col_center);
+
 				// construct and push to productions column
 				Types::Column<MasterType> origin_column = Types::Column<MasterType>(origin_col_center,width,height_prod, Types::GREEN_COLUMN);
+				origin_column.ptr = ptr;
 				origin_column.Push_To_Layer<ComponentType,CallerType>(_zone_centroids);
 
 				// construct and push to attractions column
 				Types::Column<MasterType> destination_column = Types::Column<MasterType>(destination_col_center,width,height_att, Types::BLUE_COLUMN);
+				destination_column.ptr = ptr;
 				destination_column.Push_To_Layer<ComponentType,CallerType>(_zone_centroids);
 			}
 
@@ -189,12 +196,18 @@ namespace Zone_Components
 				_zone_centroids=_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(zone_centroids),ComponentType>*, string& > >(string("Zones"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Quads(True_Color_RGBA<NULLTYPE>(0,255,100,255),10);
+				cfg.attributes_schema = string("ID,Productions,Attractions");
 				cfg.dynamic_data = true;
 				cfg.storage_period = 300;
 				cfg.target_sub_iteration = Types::ZONE_UPDATE_SUBITERATION+1;
 				cfg.storage_offset = 60/*_iteration*/;
 				cfg.storage_size = 3;
 				cfg.primitive_color = true;
+				cfg.data_stride = sizeof(void*);
+
+				typedef bool (*attributes_callback_type)(void*,string&);
+
+				cfg.attributes_callback = (attributes_callback_type)&Graphical_Zone_Implementation<MasterType>::fetch_attributes;
 				_zone_centroids->Initialize<NULLTYPE>(cfg);
 			}
 
@@ -259,10 +272,24 @@ namespace Zone_Components
 				int prod_height = base_this->production_count<int>();
 				int att_height = base_this->attraction_count<int>();
 
-				_graphical_zone_group->push_zone_information<Target_Type<NULLTYPE,NULLTYPE,Point_3D<MasterType>&, int> >(coordinate, prod_height*100, att_height*100);
+				_graphical_zone_group->push_zone_information<Target_Type<NULLTYPE,NULLTYPE,Point_3D<MasterType>&, int> >(coordinate, this, prod_height*100, att_height*100);
 			}
 
 			static member_prototype(Graphical_Zone_Group,graphical_zone_group,typename MasterType::graphical_zone_group_type,none,none);
+
+			static bool fetch_attributes(Graphical_Zone_Implementation* _this,string& bucket)
+			{
+				this_itf* this_ptr = (this_itf*)_this;
+				stringstream s;
+
+				s << this_ptr->uuid<int>() << ",";
+				s << this_ptr->production_count<int>() << ",";
+				s << this_ptr->attraction_count<int>();
+
+				bucket=s.str();
+
+				return true;
+			}
 
 		};
 		template<typename MasterType,typename ParentType,typename InheritanceList>
