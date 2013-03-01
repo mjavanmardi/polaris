@@ -13,6 +13,7 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
 void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identify(const Point_3D<MasterType>& point, int start_iteration, int end_iteration)
 {
+
 	if(_primitive_type==_POINT)
 	{
 		const bool grouped = _grouped;
@@ -147,14 +148,17 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 			}
 
 			Push_Element<ComponentType,CallerType,Accented_Element>(best_element,start_iteration);
+			
+			_selected_element = *((void**)best_element);
 
 			if(_attributes_callback != nullptr)
 			{
-				string bucket;
+				vector<string> bucket;
 
 				_attributes_callback( *((void**)best_element), bucket );
-
-				_attributes_panel->Push_Attributes<Target_Type<NT,NT,string&>>(bucket);
+				
+				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
+				//_control_dialog->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
 			}
 		}
 	}
@@ -304,14 +308,17 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 			}
 
 			Push_Element<ComponentType,CallerType,Accented_Element>(best_element,start_iteration);
+			
+			_selected_element = *((void**)best_element);
 
 			if(_attributes_callback != nullptr)
 			{
-				string bucket;
+				vector<string> bucket;
 
 				_attributes_callback( *((void**)best_element), bucket );
 
-				_attributes_panel->Push_Attributes<Target_Type<NT,NT,string&>>(bucket);
+				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
+				//_control_dialog->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
 			}
 		}
 	}

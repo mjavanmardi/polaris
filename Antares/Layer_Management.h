@@ -67,12 +67,17 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Select_Layer(
 	{
 		if(counter==identifier)
 		{
+			if(_selected_layer != nullptr) _selected_layer->Deselect<NULLTYPE>();
+
 			_selected_layer=(*itr);
+
+			_selected_layer->Select<NULLTYPE>();
+			
 			break;
 		}
 	}
 
-	_attributes_panel->Push_Schema<Target_Type<NT,NT,string&>>(_selected_layer->attributes_schema<string&>());
+
 
 	Refresh();
 }

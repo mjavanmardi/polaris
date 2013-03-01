@@ -193,6 +193,7 @@ namespace Zone_Components
 			{
 				// configure vehicle layer
 				cout << "configuring zone layer";
+
 				_zone_centroids=_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(zone_centroids),ComponentType>*, string& > >(string("Zones"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Quads(True_Color_RGBA<NULLTYPE>(0,255,100,255),10);

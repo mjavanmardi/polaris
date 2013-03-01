@@ -308,3 +308,19 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnEnter(wxMou
 		Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
 	}
 }
+
+//---------------------------------------------------------
+//	OnDClick - various double clicking actions
+//---------------------------------------------------------
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnDClick(wxMouseEvent& event)
+{
+	if(_interaction_mode == IDENTIFY)
+	{
+		if(_selected_layer != nullptr)
+		{
+			_selected_layer->Double_Click<NULLTYPE>();
+		}
+	}
+}

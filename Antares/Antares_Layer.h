@@ -4,6 +4,7 @@
 
 #pragma once
 #include "Antares_Includes.h"
+#include "Control_Dialog.h"
 
 struct Antares_Layer_Configuration;
 
@@ -32,6 +33,21 @@ prototype struct Antares_Layer
 	feature_prototype void Identify(typename TargetType::ParamType point, int start_iteration, int end_iteration)
 	{
 		this_component()->Identify<ComponentType,CallerType,TargetType>(point,start_iteration,end_iteration);
+	}
+	
+	feature_prototype void Select()
+	{
+		this_component()->Select<ComponentType,CallerType,TargetType>();
+	}
+	
+	feature_prototype void Deselect()
+	{
+		this_component()->Deselect<ComponentType,CallerType,TargetType>();
+	}
+	
+	feature_prototype void Double_Click()
+	{
+		this_component()->Double_Click<ComponentType,CallerType,TargetType>();
 	}
 
 	feature_accessor(list_index,none,none);
@@ -303,6 +319,6 @@ struct Antares_Layer_Configuration
 
 	string attributes_schema;
 
-	bool (*submission_callback)(void*,string&);
-	bool (*attributes_callback)(void*,string&);
+	attributes_callback_type submission_callback;
+	attributes_callback_type attributes_callback;
 };

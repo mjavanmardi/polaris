@@ -79,7 +79,8 @@ typedef volatile unsigned int _lock;
 #define not_available false
 
 struct NULLTYPE{};
-typedef NULLTYPE NT;
+
+#define NT NULLTYPE
 
 template<typename A> struct NULLTEMPLATE{};
 template<typename A,typename B> struct NULLTEMPLATE_2{};
@@ -150,6 +151,8 @@ static void False_Condition(void*,Conditional_Response& resp)
 	resp.result=false;
 	resp.next=END;
 }
+
+typedef bool (*attributes_callback_type)(void*,vector<string>&);
 
 #define typedef_template(TYPEDEF_NAME,TEMPLATE_NAME) template<typename T> struct TYPEDEF_NAME{typedef TEMPLATE_NAME<T> Type;}
 

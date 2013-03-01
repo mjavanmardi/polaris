@@ -413,7 +413,74 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		_attributes_callback=cfg.attributes_callback;
 
 		_data_stride=cfg.data_stride;
+
+		_selected_element = nullptr;
+		_control_dialog = nullptr;
 	}
+
+	feature_implementation void Select(requires(check_2(CallerType,typename MasterType::canvas_type,is_same)))
+	{
+		_attributes_panel->Push_Schema<Target_Type<NT,NT,string&>>(_attributes_schema);
+	}
+	
+	feature_implementation void Select(requires(!check_2(CallerType,typename MasterType::canvas_type,is_same))){static_assert(false,"Caller Not a Canvas Object");}
+
+	feature_implementation void Deselect(requires(check_2(CallerType,typename MasterType::canvas_type,is_same)))
+	{
+		//current_iteration = start_iteration;
+
+		//while(current_iteration <= end_iteration)
+		//{
+		//	vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
+
+		//	for(int i=0;i<_num_antares_threads;i++)
+		//	{
+		//		geometry_by_thread[i].clear();
+		//	}
+
+		//	current_iteration++;
+		//}
+	}
+
+	feature_implementation void Deselect(requires(!check_2(CallerType,typename MasterType::canvas_type,is_same))){static_assert(false,"Caller Not a Canvas Object");}
+
+	feature_implementation void Double_Click(requires(check_2(CallerType,typename MasterType::canvas_type,is_same)))
+	{
+		if(_control_dialog == nullptr)
+		{
+			_control_dialog = (control_dialog_interface*)new type_of(control_dialog)(_name);
+
+			_control_dialog->Push_Schema<Target_Type<NT,NT,string&>>(_attributes_schema);
+
+			if(_submission_callback != nullptr)
+			{
+				_control_dialog->submission_callback<attributes_callback_type>(_submission_callback);
+			}
+		}
+
+		if(_selected_element != nullptr)
+		{
+			if(_attributes_callback != nullptr)
+			{
+				vector<string> bucket;
+				_attributes_callback( _selected_element, bucket );
+				_control_dialog->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
+
+				if(_submission_callback != nullptr)
+				{
+					_control_dialog->selected_element<void*>(_selected_element);
+				}
+			}
+		}
+
+		
+		_control_dialog->ShowModal<NULLTYPE>();
+
+		
+		_control_dialog->selected_element<void*>(nullptr);
+	}
+	
+	feature_implementation void Double_Click(requires(!check_2(CallerType,typename MasterType::canvas_type,is_same))){static_assert(false,"Caller Not a Canvas Object");}
 
 	feature_implementation void Identify(const Point_3D<MasterType>& point, int start_iteration, int end_iteration);
 
@@ -453,13 +520,14 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	member_data(int,data_stride,none,none);
 
 	member_data(string,attributes_schema,none,none);
-
-	typedef bool (*attributes_callback_type)(void*,string&);
 	
 	member_data(attributes_callback_type,submission_callback,none,none);
 	member_data(attributes_callback_type,attributes_callback,none,none);
 
 	member_prototype(Attributes_Panel,attributes_panel,typename MasterType::type_of(attributes_panel),none,none);
+	member_prototype(Control_Dialog,control_dialog,typename MasterType::type_of(control_dialog),none,none);
+
+	member_pointer(void,selected_element,none,none);
 
 	// Agent behavior
 

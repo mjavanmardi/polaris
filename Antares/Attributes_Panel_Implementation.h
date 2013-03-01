@@ -16,7 +16,7 @@ public:
 	virtual ~Attributes_Panel_Implementation(void){};
 
 	feature_implementation void Push_Schema(string& schema);
-	feature_implementation void Push_Attributes(string& attributes);
+	feature_implementation void Push_Attributes(vector<string>& attributes);
 
 	member_pointer(wxListCtrl,attributes_list,none,none);
 
@@ -102,6 +102,9 @@ void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Pus
 	}
 
 	_attributes_list->SetItem(atts_row_counter,0,new_token.c_str());
+	
+	_attributes_list->SetColumnWidth(0,wxLIST_AUTOSIZE);
+	_attributes_list->SetColumnWidth(1,wxLIST_AUTOSIZE);
 
 	Refresh();
 }
@@ -113,36 +116,24 @@ void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Pus
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
-void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Push_Attributes(string& attributes)
+void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Push_Attributes(vector<string>& attributes)
 {
 	for(int i=0;i<20;i++)
 	{
 		_attributes_list->SetItem(i,1,"");
 	}
 
-	const char* attributes_itr = attributes.c_str();
-	const char* const attributes_end = attributes_itr + attributes.size();
-
 	int atts_row_counter = 0;
-	string new_token("");
 
-	while( attributes_itr != attributes_end )
+	vector<string>::iterator itr;
+
+	for(itr=attributes.begin();itr!=attributes.end();itr++,atts_row_counter++)
 	{
-		if((*attributes_itr) == ',')
-		{
-			_attributes_list->SetItem(atts_row_counter,1,new_token.c_str());
-			new_token.clear();
-			++atts_row_counter;
-		}
-		else
-		{
-			new_token.push_back((*attributes_itr));
-		}
-
-		++attributes_itr;		
+		_attributes_list->SetItem(atts_row_counter,1,(*itr).c_str());
 	}
-
-	_attributes_list->SetItem(atts_row_counter,1,new_token.c_str());
+	
+	_attributes_list->SetColumnWidth(0,wxLIST_AUTOSIZE);
+	_attributes_list->SetColumnWidth(1,wxLIST_AUTOSIZE);
 
 	Refresh();
 }

@@ -122,34 +122,48 @@ namespace Vehicle_Components
 				cfg.data_stride = sizeof(void*);
 
 				cfg.attributes_schema = string("ID,Status,Current_Link");
-
-				typedef bool (*attributes_callback_type)(void*,string&);
 				
 				cfg.attributes_callback = (attributes_callback_type)&fetch_attributes;
+				cfg.submission_callback = (attributes_callback_type)&submit_attributes;
 
 				_vehicle_points->Initialize<NULLTYPE>(cfg);
 			}
 
-			static bool fetch_attributes(Graphical_Vehicle_Implementation* _this,string& bucket)
+			static bool fetch_attributes(Graphical_Vehicle_Implementation* _this,vector<string>& bucket)
 			{
 				stringstream s;
+				
+				s << _this->_internal_id;
+				bucket.push_back(s.str());
+				s.str("");
+				
+				bucket.push_back(string("IN_NETWORK"));
+				
+				s << _this->_movement_plan->current_link<Link_Prototype<typename MasterType::type_of(link)>*>()->uuid<int>();
+				bucket.push_back(s.str());
 
-				s << _this->_internal_id << ",";
+				return true;
+			}
+			
+			static bool submit_attributes(Graphical_Vehicle_Implementation* _this,vector<string>& bucket)
+			{
+				vector<string>::iterator itr;
 
-				if(_this->_simulation_status == IN_NETWORK)
+				for(itr=bucket.begin();itr!=bucket.end();itr++)
 				{
-					s << "IN_NETWORK" << ",";
+					cout << (*itr) << endl;
+				}
+
+				int new_id=atoi(bucket[0].c_str());
+
+				if(new_id%2==0)
+				{
+					return true;
 				}
 				else
 				{
-					s << "OTHER" << ",";
+					return false;
 				}
-
-				s << _this->_movement_plan->current_link<Link_Prototype<typename MasterType::type_of(link)>*>()->uuid<int>();
-
-				bucket=s.str();
-
-				return true;
 			}
 
 			static member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),none,none);

@@ -48,6 +48,7 @@ public:
     void OnWheel(wxMouseEvent& event);
 	void OnLeave(wxMouseEvent& event);
 	void OnEnter(wxMouseEvent& event);
+	void OnDClick(wxMouseEvent& event);
 	void Zoom(wxIdleEvent& event);
 
 	member_pointer(wxGLContext,glcontext,none,none);
@@ -132,6 +133,7 @@ Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementat
 	Connect(wxEVT_MOUSEWHEEL,wxMouseEventHandler(Canvas_Implementation::OnWheel));
 	Connect(wxEVT_LEAVE_WINDOW,wxMouseEventHandler(Canvas_Implementation::OnLeave));
 	Connect(wxEVT_ENTER_WINDOW,wxMouseEventHandler(Canvas_Implementation::OnEnter));
+	Connect(wxEVT_LEFT_DCLICK,wxMouseEventHandler(Canvas_Implementation::OnDClick));
 
 	//---- navigation ----
 	
