@@ -1240,6 +1240,7 @@ void network_data_information::read_activity_location(string input_dir_name, Net
 		int iline = 0;
 		ActivityLocationData activity_location_data;
 		int zone_id;
+		long long tract_id;
 		vector<string> tokens;
 		int token_size =0;
 
@@ -1253,13 +1254,14 @@ void network_data_information::read_activity_location(string input_dir_name, Net
 				//nested structure
 				if ((iline-1)%3 == 1)
 				{//read first line of an activity location
-					token_size = 4;
+					token_size = 5;
 					string_split(tokens, line, token_size);
 					activity_location_data.uuid = stoi(tokens[0]);
 					zone_id = stoi(tokens[1]);
 					activity_location_data.num_origin_links = stoi(tokens[2]);
 					activity_location_data.num_destination_links = stoi(tokens[3]);
-
+					tract_id = stoll(tokens[4]);
+					activity_location_data.census_zone_index = tract_id;
 					activity_location_data.zone_index = zone_id;//network_data.zone_id_index_map[zone_id];
 				}
 				

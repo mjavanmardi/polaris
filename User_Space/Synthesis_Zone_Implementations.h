@@ -42,6 +42,7 @@ namespace PopSyn
 			typedef hash_multimap<uint, typename MasterType::pop_unit*> __sample_map_type;		
 			member_associative_container(__sample_map_type, Sample_Data, none, none); 
 			member_container(vector<typename MasterType::person_type*>, Synthetic_Persons_Container,none,none);
+			member_container(vector<int>, Activity_Locations_Container,none,none);
 		};
 
 		implementation struct Synthesis_Zone_Implementation : public Polaris_Component<APPEND_CHILD(Synthesis_Zone_Implementation), MasterType, Data_Object, ParentType>, _Synthesis_Zone_Implementation<MasterType,ParentType> {};

@@ -70,8 +70,9 @@ struct Back_Insertion_Sequence_Prototype
 
 	TargetValueType front(){return (TargetValueType)(((ComponentType*)this)->front());}
 
-	iterator insert(iterator p, TargetValueType t){return ((ComponentType*)this)->insert(p,t);}
-	
+	//iterator insert(iterator p, TargetValueType t){return ((ComponentType*)this)->insert(p,t);}
+	iterator insert(iterator p, TargetValueType &t){return ((ComponentType*)this)->insert(p,(typename ComponentType::value_type&)t);}
+
 	void insert(iterator p, size_type n, TargetValueType t){return ((ComponentType*)this)->insert(p,n);}
 
 	void insert(iterator p, iterator i, iterator j){return ((ComponentType*)this)->insert(p,i,j);}

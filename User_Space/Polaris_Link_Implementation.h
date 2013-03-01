@@ -337,6 +337,11 @@ namespace Link_Components
 				{
 					a_delayed_time = (int)((((_Network_Interface*)_network_reference)->template start_of_current_simulation_interval_relative<int>() - mp->template get_current_link_enter_time<int>()) - _link_fftt);
 				}
+
+				if (mp->trajectory_size<int>() == 0)
+				{
+					THROW_EXCEPTION("Error, empty trajectory for vehicle " << vehicle->uuid<int>());
+				}
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
 				if(_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())

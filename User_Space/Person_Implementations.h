@@ -105,7 +105,7 @@ namespace Person_Components
 			member_component_feature(Next_Rand, RNG, Next_Rand, RNG_Components::Prototypes::RNG_Prototype);*/
 			feature_implementation TargetType Next_Rand()
 			{
-				return GLOBALS::Global_RNG.Next_Rand<double>();
+				return GLOBALS::Uniform_RNG.Next_Rand<double>();
 			} tag_getter_as_available(Next_Rand);
 
 			// Agent ID
@@ -174,6 +174,8 @@ namespace Person_Components
 				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
 
 				define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan,type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				typename Movement_Plans::iterator move_itr;
+
 				Movement_Plan* move = (Movement_Plan*)movement_plan;
 				// key the movement plan on the planning timestep just prior to departure
 				long t1 = move->template departed_time<Simulation_Timestep_Increment>() - parent->template First_Iteration<Simulation_Timestep_Increment>();
@@ -181,15 +183,17 @@ namespace Person_Components
 				long remain = (long)(t1 / t2);
 				Simulation_Timestep_Increment departure_time = remain * this->template Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>() + parent->template First_Iteration<Simulation_Timestep_Increment>();
 
-				if (move->template departed_time<Simulation_Timestep_Increment>() < _iteration)
+				if (move->template departed_time<Simulation_Timestep_Increment>() < _iteration) return;
+
+				Movement_Plans* movements = this->template Movement_Plans_Container<ComponentType,CallerType,Movement_Plans*>();
+				move_itr = movements->begin();
+				while(move_itr != movements->end())
 				{
-					int test = 1;
+					Movement_Plan* current_move = *move_itr;
+					if (current_move->template departed_time<Simulation_Timestep_Increment>() > move->template departed_time<Simulation_Timestep_Increment>()) break;
+					++move_itr;
 				}
-				else
-				{
-					Movement_Plans* movements = this->template Movement_Plans_Container<ComponentType,CallerType,Movement_Plans*>();
-					movements->push_back(move);
-				}
+				movements->insert(move_itr,move);
 				
 			}
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(!check_as_given(TargetType,is_pointer) || !check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
@@ -311,8 +315,7 @@ namespace Person_Components
 				_Scenario_Interface* scenario = parent->template scenario_reference<_Scenario_Interface*>();
 
 				// Generate average of 3 activities per day
-				double r = parent->template Next_Rand<double>();
-				int num_activities = r *6.0 + 1;
+				int num_activities = 2;
 
 				double t = 0;
 
@@ -324,12 +327,12 @@ namespace Person_Components
 					// Get a random origin and destination and departure time
 					//int size = (int)network->template links_container<_Links_Container_Interface&>().size();
 					int size = (int)network->activity_locations_container<_Activity_Locations_Container_Interface&>().size();
-					int O = (parent->template Next_Rand<double>()-0.000001) * size;
+					int O = parent->Home_Location<int>();
 					int D = (parent->template Next_Rand<double>()-0.000001) * size;
 					// departure time from current time, in minutes, approximately every six hours
-					t += parent->template Next_Rand<double>()*60.0*60.0*6.0;
+					t = Normal_RNG.Next_Rand<double>(8.0*i,2);
 
-					Basic_Units::Time_Variables::Time_Seconds time = Simulation_Time.Future_Time<Basic_Units::Time_Variables::Time_Seconds, Basic_Units::Time_Variables::Time_Seconds>(t);
+					Basic_Units::Time_Variables::Time_Seconds time = Simulation_Time.Future_Time<Basic_Units::Time_Variables::Time_Hours, Basic_Units::Time_Variables::Time_Seconds>(t);
 		
 					if (O != D)
 					{

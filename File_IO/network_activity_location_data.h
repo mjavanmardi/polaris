@@ -25,6 +25,8 @@ namespace network_models
 				vector<float> destination_link_choice_cdf_array;
 
 				int zone_index;
+
+				long long census_zone_index;
 			};
 		}
 

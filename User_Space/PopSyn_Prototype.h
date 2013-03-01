@@ -305,25 +305,34 @@ namespace PopSyn
 				//---------------------------------------------------------------------------------------------------------------
 				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_container_and_value_interface(locations_container_itf, location_itf,typename network_itf::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+				define_simple_container_interface(location_id_container_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);
 				network_itf* network = this->network_reference<network_itf*>();
 				locations_container_itf* locations = network->template activity_locations_container<locations_container_itf*>();
 				location_itf* location;
 				region_itf* region;
+				zone_itf* zone;
 				typename locations_container_itf::iterator loc_itr;
-				typename zones_itf::iterator 
+				typename zones_itf::iterator zone_itr;
 
 				for (loc_itr = locations->begin(); loc_itr != locations->end(); ++loc_itr)
 				{
 					location = *loc_itr;
-					int zone_id = location->census_zone_id<int>();
+					long long zone_id = location->census_zone_id<long long >();
 
-					for (region_itr itr = regions->begin(); itr != regions->end(); ++itr)
+					for (region_itr = regions->begin(); region_itr != regions->end(); ++region_itr)
 					{
-						region = *itr;
+						region = region_itr->second;
 
 						zones_itf* zones = region->Synthesis_Zone_Collection<zones_itf*>();
 						
-						zone_itr
+						zone_itr = zones->find(zone_id);
+
+						if (zone_itr != zones->end())
+						{
+							zone = zone_itr->second;
+							zone->Activity_Locations_Container<location_id_container_itf*>()->push_back(location->internal_id<int>());
+							break;
+						}
 					}
 				}
 
@@ -368,7 +377,8 @@ namespace PopSyn
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
 					
-				// Define iterators and get pointer to the region collection
+				//---------------------------------------------------------------------------------------------
+				// Type defines for sub_objects
 				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
 				typedef typename region_collection_type::unqualified_value_type			region_type;
 				typedef typename region_type::Sample_Data_type							sample_collection_type;
@@ -379,42 +389,66 @@ namespace PopSyn
 				typedef typename person_collection_type::unqualified_value_type			person_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
-
+				//---------------------------------------------------------------------------------------------
+				// Interface defines for sub_objects
 				define_container_and_value_interface_unqualified_container(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
 				define_container_and_value_interface_unqualified_container(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
 				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,ComponentType);
 				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
 				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
 				define_container_and_value_interface_unqualified_container(persons_collection_itf, person_itf,person_collection_type,Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person_Prototype,ComponentType);
-
+				define_simple_container_interface(activity_location_ids_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);
 				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
+				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_container_and_value_interface(activity_locations_itf, activity_location_itf,typename network_itf::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+				network_itf* network = pthis->network_reference<network_itf*>();
+				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
+
 				typename regions_itf::iterator r_itr;
 				typename zones_itf::iterator z_itr;
 				typename persons_collection_itf::iterator p_itr;
 
 				// initialize all of the synthesized individuals and assign unique ids
-				long uuid = 0;
+				long uuid = 0; // globally unique person id
+				// Loop through all regions
 				for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 				{
 					region_itf* region = r_itr->second;
-
 					zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
+					// loop through zones in each region
 					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 					{
 						zone_itf* zone = z_itr->second;
-						//joint_itf* distribution = zone->Target_Joint_Distribution<joint_itf*>();
-						//distribution->resize(pair<int,int>(1,1),0);
+						activity_location_ids_itf* loc_indices = zone->Activity_Locations_Container<activity_location_ids_itf*>();
 
+						// loop through each synthesized person
 						persons_collection_itf* persons = zone->template Synthetic_Persons_Container<persons_collection_itf*>();
 						for (p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
 						{
 							person_itf* person = *p_itr;
+
+							// initialize the person - allocates all person subcomponents
 							person->Initialize<long>(uuid);
+
+							// assign person to a random activity location in the zone
+							
+							if (loc_indices->size() == 0)
+							{
+								int home_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * activity_locations->size());
+								person->Home_Location<int>(home_loc_index);
+							}
+							else
+							{
+								int home_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * loc_indices->size());
+								person->Home_Location<int>(loc_indices->at(home_loc_index));
+							}
+
 							++uuid;
 						}
 					}
 				}
 				cout <<endl<<endl<<"Total Persons Synthesized: "<<uuid;
+
 
 				// Handle file output if needed
 				if (pthis->write_output_flag<bool>() == true)

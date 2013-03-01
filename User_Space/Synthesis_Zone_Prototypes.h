@@ -310,6 +310,7 @@ namespace PopSyn
 			feature_accessor(Target_Joint_Distribution,none,none);
 			feature_accessor(Target_Marginal_Distribution,none,none);
 			feature_accessor(Synthetic_Persons_Container,none,none);
+			feature_accessor(Activity_Locations_Container,none,none);
 
 			//===================================================================================================================================
 			// REQUIRED: Accessor for the Synthesized Population (if the component is a zone) or the sample population (if it is a region)

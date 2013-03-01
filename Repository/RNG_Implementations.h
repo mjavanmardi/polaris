@@ -94,7 +94,7 @@ namespace RNG_Components
 				_distribution = std::tr1::normal_distribution<double>(_location,_scale);
 			}
 
-			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)1, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
+			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)0, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
 			{
 				//state_check(Is_Positive)(this,_scale);
 				GrandBaseType::_generator.seed(GrandBaseType::_seed);
@@ -185,5 +185,33 @@ namespace GLOBALS
 	private:
 		 RNG_type thread_rng[_num_threads];
 	};
-	_Global_RNG<NULLTYPE> Global_RNG;
+	_Global_RNG<NULLTYPE> Uniform_RNG;
+
+	implementation struct _Global_Normal_RNG : public Polaris_Component<APPEND_CHILD(_Global_Normal_RNG),MasterType,NULLTYPE>
+	{
+		typedef RNG_Components::Implementations::MT_Normal_Double<NULLTYPE> RNG_type;
+		_Global_Normal_RNG()
+		{
+			for (int i=0; i < _num_threads; i++)
+			{
+				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
+				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
+				rng->Initialize<int>(i);
+			}
+		}
+
+		template <typename TargetType>
+		TargetType Next_Rand(TargetType mu=0, TargetType sigma=1)
+		{
+			typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
+			rng_itf* rng = (rng_itf*)&this->thread_rng[_thread_id];
+			return rng->Next_Rand<TargetType>()*sigma + mu;
+		}
+	private:
+		 RNG_type thread_rng[_num_threads];
+	};
+
+	_Global_Normal_RNG<NULLTYPE> Normal_RNG;
 }
+
+using namespace GLOBALS;

@@ -290,8 +290,8 @@ namespace Prototypes
 			Movement_Plans_List* movement_plans = this_ptr->Movement_Plans_Container<Movement_Plans_List*>();
 			typename Activity_Plans_List::iterator act_itr = activity_plans->begin();
 			typename Movement_Plans_List::iterator move_itr = movement_plans->begin();
-			Activity_Plan* activity = *act_itr;
-			Movement_Plan* movement = *move_itr;
+			Activity_Plan* activity;
+			Movement_Plan* movement;
 
 			// during the 0th sub_iteration, set up future sub_iteration schedule
 			if (_sub_iteration == 0)
@@ -306,6 +306,7 @@ namespace Prototypes
 				// check if activity planning needs to occur, if so do this
 				else if (act_itr != activity_plans->end())
 				{
+					activity = *act_itr;
 					if (activity->planning_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
 					{
 						response.next._iteration = _iteration;
@@ -316,6 +317,7 @@ namespace Prototypes
 				// check if movement planning needs to occur, if so do this
 				else if (move_itr != movement_plans->end())
 				{
+					movement = *move_itr;
 					if (movement->departed_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
 					{
 						response.next._iteration = _iteration;
@@ -339,6 +341,7 @@ namespace Prototypes
 				// check if activity planning needs to occur, if so do this
 				if (act_itr != activity_plans->end())
 				{
+					activity = *act_itr;
 					if (activity->planning_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
 					{
 						response.next._iteration = _iteration;

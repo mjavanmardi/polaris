@@ -165,6 +165,7 @@ namespace Network_Components
 			{
 				activity_location = (_Activity_Location_Interface*)Allocate<typename _Activity_Location_Interface::Component_Type>();
 				network_models::network_information::network_data_information::ActivityLocationData& raw_activity_location = network_data.activity_location_data_array[i];
+				
 
 				int j;
 				int link_index;
@@ -183,8 +184,10 @@ namespace Network_Components
 					activity_location->template destination_link_choice_cdfs<vector<float>&>().push_back(raw_activity_location.destination_link_choice_cdf_array[j]);
 				}
 				activity_location->template uuid<int>(raw_activity_location.uuid);
-				activity_location->template internal_id<int>(i);
+				activity_location->census_zone_id<long long>(raw_activity_location.census_zone_index);
+				activity_location->template internal_id<int>(i);		
 				activity_locations_container<ComponentType,CallerType,_Activity_Locations_Container_Interface&>().push_back(activity_location);
+				
 			}
 		}
 

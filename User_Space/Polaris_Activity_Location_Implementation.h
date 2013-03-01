@@ -29,7 +29,7 @@ namespace Activity_Location_Components
 
 			member_data(int, internal_id, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
 
-			member_data(int, census_zone_id, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
+			member_data(long long, census_zone_id, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
 
 		};
 	}
