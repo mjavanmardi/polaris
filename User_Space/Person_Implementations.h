@@ -2,6 +2,7 @@
 
 #include "Person_Prototype.h"
 #include "Movement_Plan_Prototype.h"
+#include "Network_Skimming_Prototype.h"
 #include "Activity_Prototype.h"
 #include "Population_Unit_Implementations.h"
 
@@ -99,10 +100,7 @@ namespace Person_Components
 			member_component(typename MasterType::scenario_type, scenario_reference, none, none);
 			member_component(typename MasterType::network_type, network_reference, none, none);
 			
-			//TODO: MOVE THIS TO A GLOBAL RNG - 1 per thread ***
 			// Random number facility - accessed using Next_Rand feature_accessor
-			/*member_data_component(typename MasterType::RNG, RNG, check(ReturnValueType,RNG_Components::Concepts::Is_RNG), check(SetValueType,RNG_Components::Concepts::Is_RNG) && check_2(ComponentType,CallerType, Is_Same_Entity));
-			member_component_feature(Next_Rand, RNG, Next_Rand, RNG_Components::Prototypes::RNG_Prototype);*/
 			feature_implementation TargetType Next_Rand()
 			{
 				return GLOBALS::Uniform_RNG.Next_Rand<double>();
@@ -269,15 +267,24 @@ namespace Person_Components
 
 		implementation struct CTRAMP_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(CTRAMP_Person_Planner_Implementation)>
 		{
+			// IMPLEMENTATION TYPEDEFS AND INTERFACES
 			typedef General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(CTRAMP_Person_Planner_Implementation)> base_type;
-
+			define_component_interface(_Scenario_Interface, typename base_type::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+			define_component_interface(_Network_Interface, typename base_type::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
+			define_component_interface(_Skim_Interface, typename _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
+			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+			define_container_and_value_interface(Activity_Plans,Activity_Plan,typename base_type::type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+		
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
 				base_type::template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
 				base_type::template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(5);
 
 				// get reference to the parent pointer and set the first activity generation time to be the parent first iteration
-				define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
 				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
 				this->template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(parent->template First_Iteration<Time_Minutes>());	
 			}
@@ -295,65 +302,127 @@ namespace Person_Components
 				typedef Prototypes::Person_Planner<ComponentType, ComponentType> _Planning_Interface;
 				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
 
-				// get reference to the parent pointer
-				define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+				// get reference to the parent pointer		
 				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
 
 				// get references to the plan containers
-				define_container_and_value_interface(Activity_Plans,Activity_Plan,typename base_type::type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
-				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 				Activity_Plans* activities = this_ptr->template Activity_Plans_Container<Activity_Plans*>();
 				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();	
 
 				// external knowledge references
-				define_component_interface(_Scenario_Interface, typename base_type::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				define_component_interface(_Network_Interface, typename base_type::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
-				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 				_Network_Interface* network = parent->template network_reference<_Network_Interface*>();
 				_Scenario_Interface* scenario = parent->template scenario_reference<_Scenario_Interface*>();
+				_Activity_Location_Interface *orig, *dest;
 
-				// Generate average of 3 activities per day
+				// Generate average of 2 activities per day
 				int num_activities = 2;
-
-				double t = 0;
-
 				for (int i = 0; i < num_activities; i++)
 				{
 					// Create movement plan and give it an ID
 					Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Movement_Plans_Container)::unqualified_value_type>();
 					move->template initialize_trajectory<NULLTYPE>();
-					// Get a random origin and destination and departure time
-					//int size = (int)network->template links_container<_Links_Container_Interface&>().size();
-					int size = (int)network->activity_locations_container<_Activity_Locations_Container_Interface&>().size();
-					int O = parent->Home_Location<int>();
-					int D = (parent->template Next_Rand<double>()-0.000001) * size;
-					// departure time from current time, in minutes, approximately every six hours
-					t = Normal_RNG.Next_Rand<double>(8.0*i,2);
 
-					Basic_Units::Time_Variables::Time_Seconds time = Simulation_Time.Future_Time<Basic_Units::Time_Variables::Time_Hours, Basic_Units::Time_Variables::Time_Seconds>(t);
-		
-					if (O != D)
+					// Get the origin and destination locations
+					orig = parent->Home_Location<_Activity_Location_Interface*>();
+					dest = this->Destination_Choice<ComponentType,CallerType,_Activity_Location_Interface*>(orig);
+
+					// check that origin and destination are valid
+					if (orig != nullptr && dest != nullptr) 
 					{
-						//move->template origin<_Link_Interface*>(network->template links_container<_Links_Container_Interface&>().at(O));
-						//move->template destination<_Link_Interface*>(network->template links_container<_Links_Container_Interface&>().at(D));
-						//move->template departed_time<Basic_Units::Time_Variables::Time_Seconds>(time);
-						_Activity_Location_Interface *orig, *dest;
-						orig = network->template activity_locations_container<_Activity_Locations_Container_Interface&>().at(O);
-						dest = network->template activity_locations_container<_Activity_Locations_Container_Interface&>().at(D);
-						move->template origin<_Activity_Location_Interface*>(orig);
-						move->template destination<_Activity_Location_Interface*>(dest);
-						move->template origin<_Link_Interface*>(orig->origin_links<_Links_Container_Interface&>().at(0));
-						move->template destination<_Link_Interface*>(dest->origin_links<_Links_Container_Interface&>().at(0));
-						move->template departed_time<Basic_Units::Time_Variables::Time_Seconds>(time);
-					}
+						// If the trip is valid, assign to a movement plan and add to the schedule
+						if (orig->internal_id<int>() != dest->internal_id<int>())
+						{
+							// Get the departure time from current time, in minutes, normally distributed around 7AM and 5pm
+							double t = Normal_RNG.Next_Rand<double>(7.0*(i+1) + 3.0*i, 2.0+i);					
+							Basic_Units::Time_Variables::Time_Seconds time = Simulation_Time.Future_Time<Basic_Units::Time_Variables::Time_Hours, Basic_Units::Time_Variables::Time_Seconds>(t);
 
-					// Add to plans
-					this_ptr->template Add_Movement_Plan<Movement_Plan*>(move);
+							// add attributes to plan
+							move->template origin<_Activity_Location_Interface*>(orig);
+							move->template destination<_Activity_Location_Interface*>(dest);
+							move->template origin<_Link_Interface*>(orig->origin_links<_Links_Container_Interface&>().at(0));
+							move->template destination<_Link_Interface*>(dest->origin_links<_Links_Container_Interface&>().at(0));
+							move->template departed_time<Basic_Units::Time_Variables::Time_Seconds>(time);
+
+							// Add to plans schedule
+							this_ptr->template Add_Movement_Plan<Movement_Plan*>(move);
+						}
+					}
 				}
 			}
 			tag_feature_as_available(Activity_Generation);
+
+			feature_implementation TargetType Destination_Choice(TargetType origin, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				const int set_size=50;
+
+				// Create alias for this to use
+				typedef Prototypes::Person_Planner<ComponentType, ComponentType> _Planning_Interface;
+				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
+
+				// get reference to the parent pointer		
+				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();
+
+				// get references to the plan containers
+				Activity_Plans* activities = this_ptr->template Activity_Plans_Container<Activity_Plans*>();
+				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();	
+
+				// external knowledge references
+				_Network_Interface* network = parent->template network_reference<_Network_Interface*>();
+				_Zones_Container_Interface* zones = network->zones_container<_Zones_Container_Interface*>();
+				_Activity_Locations_Container_Interface* locations = network->activity_locations_container<_Activity_Locations_Container_Interface*>();
+				_Skim_Interface* LOS = network->skimming_faculty<_Skim_Interface*>();
+
+				// get reference to origin zone
+				_Activity_Location_Interface* orig = (_Activity_Location_Interface*)origin;
+
+				// variables used for utility calculation
+				const int size = (int)locations->size();
+				int loc_id;
+				vector<_Activity_Location_Interface*> loc_options;
+				vector<float> utility;
+				vector<float> cum_probability;
+				float ttime, pop, u;
+				float utility_sum = 0;
+				float prob_sum = 0;
+				_Zone_Interface* zone;
+
+				// select zones to choose from and estimate utility
+				for (int i=0; i<set_size; i++)
+				{
+					loc_id = (int)((Uniform_RNG.Next_Rand<float>()*0.999999)*size);
+					_Activity_Location_Interface* loc = locations->at(loc_id);
+					loc_options.push_back(loc);
+					zone = loc->zone<_Zone_Interface*>();
+
+					ttime = LOS->Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->zone<_Zone_Interface*>()->uuid<int>(),zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+					pop = zone->population<float>();
+					u = exp(0.001*pop - 0.1*ttime);
+					utility.push_back(u);
+					utility_sum += u;
+				}
+				if (utility_sum == 0) return nullptr;
+				
+				// convert to cumulative probability
+				for (int i=0; i<set_size; i++)
+				{
+					prob_sum += utility[i] / utility_sum;
+					cum_probability.push_back(prob_sum);
+				}
+
+				// select one of the zones through monte-carlo
+				float r = Uniform_RNG.Next_Rand<float>();
+				for (int i=0; i<set_size; i++)
+				{
+					if (r <= cum_probability[i])
+					{
+						return loc_options[i];
+					}
+				}
+				return nullptr;
+
+			}
+			tag_feature_as_available(Destination_Choice);
+
 		};
 		
 		implementation struct TRANSIMS_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(TRANSIMS_Person_Planner_Implementation)>

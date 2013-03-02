@@ -61,7 +61,7 @@ namespace RNG_Components
 				BaseType::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
 			}
 
-			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)1, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
+			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)0, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
 			{
 				BaseType::_generator.seed(BaseType::_seed);
 				this->template minimum<ComponentType,CallerType, TargetType>(min);
@@ -134,7 +134,7 @@ namespace RNG_Components
 			feature_implementation void Initialize(	TargetType seed_value,
 												TargetType min = (TargetType)0,
 												TargetType max = (TargetType)1,
-												TargetType location = (TargetType)1,
+												TargetType location = (TargetType)0,
 												TargetType scale = (TargetType)1,
 												TargetType shape = (TargetType)1,
 												requires(check(TargetType,is_arithmetic)))
@@ -196,7 +196,7 @@ namespace GLOBALS
 			{
 				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				rng->Initialize<int>(i);
+				rng->Initialize<int>(time(NULL)*(i+1));
 			}
 		}
 
@@ -205,7 +205,8 @@ namespace GLOBALS
 		{
 			typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
 			rng_itf* rng = (rng_itf*)&this->thread_rng[_thread_id];
-			return rng->Next_Rand<TargetType>()*sigma + mu;
+			TargetType r = rng->Next_Rand<TargetType>();
+			return r*sigma + mu;
 		}
 	private:
 		 RNG_type thread_rng[_num_threads];

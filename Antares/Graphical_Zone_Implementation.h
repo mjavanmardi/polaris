@@ -63,72 +63,72 @@ namespace Zone_Components
 				// east side
 				quads[0].a._x = center_point._x + width/4;
 				quads[0].a._y = center_point._y - width/2;
-				quads[0].a._z = center_point._z + 1;
+				quads[0].a._z = 1;
 				quads[0].b._x = center_point._x + width/4;
 				quads[0].b._y = center_point._y + width/2;
-				quads[0].b._z = center_point._z + 1;
+				quads[0].b._z = 1;
 				quads[0].c._x = center_point._x + width/4;
 				quads[0].c._y = center_point._y + width/2;
-				quads[0].c._z = center_point._z + height;
+				quads[0].c._z = height;
 				quads[0].d._x = center_point._x + width/4;
 				quads[0].d._y = center_point._y - width/2;
-				quads[0].d._z = center_point._z + height;
+				quads[0].d._z = height;
 				
 				//west side			
 				quads[1].a._x = center_point._x - width/4;
 				quads[1].a._y = center_point._y - width/2;
-				quads[1].a._z = center_point._z + 1;
+				quads[1].a._z = 1;
 				quads[1].b._x = center_point._x - width/4;
 				quads[1].b._y = center_point._y + width/2;
-				quads[1].b._z = center_point._z + 1;
+				quads[1].b._z = 1;
 				quads[1].c._x = center_point._x - width/4;
 				quads[1].c._y = center_point._y + width/2;
-				quads[1].c._z = center_point._z + height;
+				quads[1].c._z = height;
 				quads[1].d._x = center_point._x - width/4;
 				quads[1].d._y = center_point._y - width/2;
-				quads[1].d._z = center_point._z + height;
+				quads[1].d._z = height;
 				
 				//north side
 				quads[2].a._x = center_point._x + width/4;
 				quads[2].a._y = center_point._y + width/2;
-				quads[2].a._z = center_point._z + 1;
+				quads[2].a._z = 1;
 				quads[2].b._x = center_point._x - width/4;
 				quads[2].b._y = center_point._y + width/2;
-				quads[2].b._z = center_point._z + 1;
+				quads[2].b._z = 1;
 				quads[2].c._x = center_point._x - width/4;
 				quads[2].c._y = center_point._y + width/2;
-				quads[2].c._z = center_point._z + height;
+				quads[2].c._z = height;
 				quads[2].d._x = center_point._x + width/4;
 				quads[2].d._y = center_point._y + width/2;
-				quads[2].d._z = center_point._z + height;
+				quads[2].d._z = height;
 				
 				//south side
 				quads[3].a._x = center_point._x + width/4;
 				quads[3].a._y = center_point._y - width/2;
-				quads[3].a._z = center_point._z + 1;
+				quads[3].a._z = 1;
 				quads[3].b._x = center_point._x - width/4;
 				quads[3].b._y = center_point._y - width/2;
-				quads[3].b._z = center_point._z + 1;
+				quads[3].b._z = 1;
 				quads[3].c._x = center_point._x - width/4;
 				quads[3].c._y = center_point._y - width/2;
-				quads[3].c._z = center_point._z + height;
+				quads[3].c._z = height;
 				quads[3].d._x = center_point._x + width/4;
 				quads[3].d._y = center_point._y - width/2;
-				quads[3].d._z = center_point._z + height;
+				quads[3].d._z = height;
 				
 				//top side
 				quads[4].a._x = center_point._x + width/4;
 				quads[4].a._y = center_point._y - width/2;
-				quads[4].a._z = center_point._z + height;
+				quads[4].a._z = height;
 				quads[4].b._x = center_point._x - width/4;
 				quads[4].b._y = center_point._y - width/2;
-				quads[4].b._z = center_point._z + height;
+				quads[4].b._z = height;
 				quads[4].c._x = center_point._x - width/4;
 				quads[4].c._y = center_point._y + width/2;
-				quads[4].c._z = center_point._z + height;
+				quads[4].c._z = height;
 				quads[4].d._x = center_point._x + width/4;
 				quads[4].d._y = center_point._y + width/2;
-				quads[4].d._z = center_point._z + height;
+				quads[4].d._z = height;
 			}
 			feature_implementation void Push_To_Layer(TargetType Layer_Reference)
 			{
@@ -197,7 +197,7 @@ namespace Zone_Components
 				_zone_centroids=_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(zone_centroids),ComponentType>*, string& > >(string("Zones"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Quads(True_Color_RGBA<NULLTYPE>(0,255,100,255),10);
-				cfg.attributes_schema = string("ID,Productions,Attractions");
+				cfg.attributes_schema = string("ID,Productions,Attractions,Population,Available");
 				cfg.dynamic_data = true;
 				cfg.storage_period = 300;
 				cfg.target_sub_iteration = Types::ZONE_UPDATE_SUBITERATION+1;
@@ -206,9 +206,10 @@ namespace Zone_Components
 				cfg.primitive_color = true;
 				cfg.data_stride = sizeof(void*);
 
-				typedef bool (*attributes_callback_type)(void*,string&);
+				//typedef bool (*attributes_callback_type)(void*,string&);
 
 				cfg.attributes_callback = (attributes_callback_type)&Graphical_Zone_Implementation<MasterType>::fetch_attributes;
+				cfg.submission_callback = (attributes_callback_type)&Graphical_Zone_Implementation<MasterType>::submit_attributes;
 				_zone_centroids->Initialize<NULLTYPE>(cfg);
 			}
 
@@ -228,36 +229,29 @@ namespace Zone_Components
 			typedef Zone_Components::Prototypes::Zone_Prototype<BaseType,BaseType> base_itf;
 			define_container_and_value_interface(activity_locations_interface,activity_location_interface,typename BaseType::type_of(origin_activity_locations), Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,NULLTYPE);
 			
-			feature_implementation void Initialize()
-			{
-				//cout << endl << "Graphical Zone Initialized.";
-				this_itf* pthis = (this_itf*)this;
-				pthis->update_increment<Time_Minutes>(5);
-
-				load_event(ComponentType,Default_Zone_Conditional,Default_Zone_Event,60,Types::ZONE_UPDATE_SUBITERATION,NULLTYPE);
-			}
-
 			declare_feature_conditional(Default_Zone_Conditional)
 			{
-				//cout << endl << "Graphical Zone conditional hit.";
 				this_itf* pthis = (this_itf*)_this;
-
 				response.result=true;
 				response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(pthis->update_increment<Simulation_Timestep_Increment>());
 				response.next._sub_iteration=Types::ZONE_UPDATE_SUBITERATION;
 			}
 			declare_feature_event(Default_Zone_Event)
 			{
-				//cout << endl << "Graphical Zone event fired.";
 				this_itf* pthis = (this_itf*)_this;
-				//cout << endl << "zone event pushed. enter a key: ";
-				//char a;
-				//cin >> a;
 				pthis->Push_To_Zone_Display<NULLTYPE>();
-			}
+				pthis->reset_counters<NULLTYPE>();
+			}		
 
-			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Update_Increment,none,none);
-			member_component_feature(update_increment, _Update_Increment, Value, Basic_Units::Prototypes::Time_Prototype);
+			feature_implementation void Initialize()
+			{
+				base_itf* base_this = (base_itf*)this;
+				base_this->zone_is_available<bool>(true);
+				this_itf* pthis = (this_itf*)this;
+				pthis->update_increment<Time_Minutes>(5);
+
+				load_event(ComponentType,Default_Zone_Conditional,Default_Zone_Event,60,Types::ZONE_UPDATE_SUBITERATION,NULLTYPE);
+			}
 			feature_implementation void Push_To_Zone_Display()
 			{
 				//cout << endl << "at zone push_to_display";
@@ -272,26 +266,63 @@ namespace Zone_Components
 				//int height = base_this->origin_activity_locations<activity_locations_interface*>()->size();
 				int prod_height = base_this->production_count<int>();
 				int att_height = base_this->attraction_count<int>();
+				_production_count_buffer = prod_height;
+				_attraction_count_buffer = att_height;
 
 				_graphical_zone_group->push_zone_information<Target_Type<NULLTYPE,NULLTYPE,Point_3D<MasterType>&, int> >(coordinate, this, prod_height*100, att_height*100);
 			}
 
-			static member_prototype(Graphical_Zone_Group,graphical_zone_group,typename MasterType::graphical_zone_group_type,none,none);
-
-			static bool fetch_attributes(Graphical_Zone_Implementation* _this,string& bucket)
+			static bool fetch_attributes(Graphical_Zone_Implementation* _this,vector<string>& bucket)
 			{
 				this_itf* this_ptr = (this_itf*)_this;
 				stringstream s;
-
-				s << this_ptr->uuid<int>() << ",";
-				s << this_ptr->production_count<int>() << ",";
-				s << this_ptr->attraction_count<int>();
-
-				bucket=s.str();
+				
+				s << this_ptr->uuid<int>();
+				bucket.push_back(s.str());
+				s.str("");
+				s << _this->_production_count_buffer;
+				bucket.push_back(s.str());
+				s.str("");
+				s << _this->_attraction_count_buffer;
+				bucket.push_back(s.str());
+				s.str("");
+				s << this_ptr->population<int>();
+				bucket.push_back(s.str());
+				s.str("");
+				s << std::boolalpha << this_ptr->zone_is_available<bool>();	
+				bucket.push_back(s.str());
+				s.str("");
 
 				return true;
 			}
+			static bool submit_attributes(Graphical_Zone_Implementation* _this,vector<string>& bucket)
+			{
+				this_itf* this_ptr = (this_itf*)_this;
 
+				vector<string>::iterator itr;
+
+
+				if(bucket[4] == "True" ||bucket[4] == "true" || bucket[4] == "t" || bucket[4] == "T" )
+				{
+					this_ptr->zone_is_available<bool>(true);
+					return true;
+				}
+				else if (bucket[4] == "False" || bucket[4] == "false" || bucket[4] == "f" || bucket[4] == "F" )
+				{
+					this_ptr->zone_is_available<bool>(false);
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Update_Increment,none,none);
+			member_component_feature(update_increment, _Update_Increment, Value, Basic_Units::Prototypes::Time_Prototype);
+			static member_prototype(Graphical_Zone_Group,graphical_zone_group,typename MasterType::graphical_zone_group_type,none,none);
+			member_data(int, production_count_buffer,none,none);
+			member_data(int, attraction_count_buffer,none,none);
 		};
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Zone_Components::Prototypes::Graphical_Zone_Group<typename MasterType::type_of(graphical_zone_group),Graphical_Zone_Implementation<MasterType,ParentType,InheritanceList>>* Graphical_Zone_Implementation<MasterType,ParentType,InheritanceList>::_graphical_zone_group;

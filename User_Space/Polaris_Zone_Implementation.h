@@ -27,6 +27,8 @@ namespace Zone_Components
 
 			feature_implementation void Initialize()
 			{
+				_zone_is_available=true;
+				_population = 100;
 				_this_interface* pthis = (_this_interface*)this;
 				pthis->update_increment<Time_Minutes>(2);
 				load_event(ComponentType,Default_Zone_Conditional,Default_Zone_Event,concat(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(2)),0,NULLTYPE);
@@ -52,6 +54,7 @@ namespace Zone_Components
 				//}
 			}
 
+			member_data(bool, zone_is_available,check(ReturnValueType, is_integral), check(SetValueType, is_integral));
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
 			member_data(double, X, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -62,6 +65,11 @@ namespace Zone_Components
 			member_component_feature(update_increment, _Update_Increment, Value, Basic_Units::Prototypes::Time_Prototype);
 
 			// production and attraction counters
+			feature_implementation void reset_counters()
+			{
+				for (int i=0; i< _num_threads; i++) production_counter[i]=0;
+				for (int i=0; i< _num_threads; i++) attraction_counter[i]=0;
+			}
 			feature_implementation TargetType production_count(requires(check_as_given(TargetType, !is_reference) && check(TargetType, is_integral)))
 			{
 				TargetType productions = 0;

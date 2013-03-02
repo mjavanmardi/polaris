@@ -1,5 +1,6 @@
 #pragma once
 #include "User_Space.h"
+#include "Activity_Location_Prototype.h"
 
 namespace Zone_Components
 {
@@ -9,6 +10,25 @@ namespace Zone_Components
 
 	namespace Concepts
 	{
+		concept struct Is_Zone_Prototype
+		{
+			check_getter(has_origin_activity_locations, Component_Type::origin_activity_locations);
+			check_getter(has_destination_activity_locations, Component_Type::destination_activity_locations);
+			check_getter(has_uuid, Component_Type::uuid); 
+			check_getter(has_internal_id, Component_Type::internal_id); 
+			define_default_check(has_origin_activity_locations && has_destination_activity_locations && has_uuid && has_internal_id);
+		};
+		concept struct Is_Zone
+		{
+			check_getter(has_origin_activity_locations, origin_activity_locations);
+			check_getter(has_destination_activity_locations, destination_activity_locations);
+			check_getter(has_uuid, uuid); 
+			check_getter(has_internal_id, internal_id); 
+
+			check_concept(is_zone_prototype, Is_Zone_Prototype);
+			define_sub_check(is_zone_component, has_origin_activity_locations && has_destination_activity_locations && has_uuid && has_internal_id);
+			define_default_check(is_zone_component || is_zone_prototype);
+		};
 	}
 	
 	namespace Prototypes
@@ -45,15 +65,29 @@ namespace Zone_Components
 			feature_accessor(Y,none, none);
 			feature_accessor(population,none, none);
 
+			feature_accessor(zone_is_available,none,none);
 			feature_accessor(graphical_zone_group,none,none);
 			feature_accessor(update_increment,none,none);
 			feature_prototype void Initialize()
 			{
 				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}
+			feature_prototype TargetType Get_Random_Location(requires(check_as_given(TargetType,is_pointer) && check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location)))
+			{
+				define_container_and_value_interface(activity_locations_itf,activity_location_itf, typename get_type_of(origin_activity_locations),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+				activity_locations_itf* locations = this->origin_activity_locations<activity_locations_itf*>();
+				
+				int size = locations->size();
+				int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);
+				return locations->at(loc_index);
+			}
 			feature_prototype void Push_To_Zone_Display()
 			{
 				this_component()->Push_To_Zone_Display<ComponentType,CallerType,TargetType>();
+			}
+			feature_prototype void reset_counters()
+			{
+				this_component()->reset_counters<ComponentType,CallerType,TargetType>();
 			}
 
 			// features for counting productions and attractions, use TargetType as a reference to set for a specific thread and as a value to return the sum total

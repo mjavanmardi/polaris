@@ -9,7 +9,7 @@ namespace Activity_Location_Components
 
 	namespace Concepts
 	{
-		concept struct Is_Activity_Location_Prototype
+		concept struct Is_Activity_Location_Prototype 
 		{
 			check_getter(has_origin_links, Component_Type::origin_links);
 			check_getter(has_destination_links, Component_Type::destination_links);
@@ -34,7 +34,7 @@ namespace Activity_Location_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Activity_Location_Prototype
+		prototype struct Activity_Location_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

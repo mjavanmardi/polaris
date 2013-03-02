@@ -305,8 +305,7 @@ struct MasterType
 
 	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 
-//#ifndef FOR_LINUX_PORTING
-	typedef Person_Components::Implementations::Person_Implementation<MasterType, demand_type> person_type;
+	typedef Traveler_Components::Implementations::Polaris_Traveler_Implementation<MasterType> person_type;
 
     typedef Person_Components::Implementations::TRANSIMS_Person_Planner_Implementation<MasterType, person_type> person_planner_type;
 
@@ -315,7 +314,7 @@ struct MasterType
     typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
 
     typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
-//#endif
+
 
 };
 

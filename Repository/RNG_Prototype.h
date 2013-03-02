@@ -20,7 +20,7 @@ namespace RNG_Components
 	
 	namespace Prototypes
 	{
-		prototype struct RNG_Prototype
+		prototype struct RNG_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -31,7 +31,7 @@ namespace RNG_Components
 			feature_prototype void Initialize(	TargetType seed_value,
 												TargetType min = (TargetType)0,
 												TargetType max = (TargetType)1,
-												TargetType location = (TargetType)1,
+												TargetType location = (TargetType)0,
 												TargetType scale = (TargetType)1,
 												TargetType shape = (TargetType)1,
 												requires(check(TargetType,is_arithmetic)))
@@ -41,7 +41,7 @@ namespace RNG_Components
 			feature_prototype void Initialize(	TargetType seed_value,
 												TargetType min = (TargetType)0,
 												TargetType max = (TargetType)1,
-												TargetType location = (TargetType)1,
+												TargetType location = (TargetType)0,
 												TargetType scale = (TargetType)1,
 												TargetType shape = (TargetType)1,
 												requires(check(TargetType,!is_arithmetic)))

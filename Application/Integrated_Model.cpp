@@ -24,6 +24,7 @@ struct MasterType
 	typedef Canvas_Implementation<MasterType> canvas_type;
 	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
 	typedef Layer_Options_Implementation<MasterType> layer_options_type;
+	typedef Control_Dialog_Implementation<MasterType> control_dialog_type;
 
 	typedef Graphical_Network_Implementation<MasterType> graphical_network_type;
 	typedef Graphical_Link_Implementation<MasterType> graphical_link_type;
@@ -292,6 +293,7 @@ struct MasterType
 	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
 	typedef Layer_Options_Implementation<MasterType> layer_options_type;
 	typedef Attributes_Panel_Implementation<MasterType> attributes_panel_type;
+	typedef Control_Dialog_Implementation<MasterType> control_dialog_type;
 
 	typedef Graphical_Network_Implementation<MasterType> graphical_network_type;
 	typedef Graphical_Link_Implementation<MasterType> graphical_link_type;
@@ -539,7 +541,7 @@ int main(int argc,char** argv)
 	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
 	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
 	// Solver settings - IPF tolerance, Percentage of population to synthesis, maximum ipf and selection iterations
-	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,0.1,100);
+	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,0.01,100);
 
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
