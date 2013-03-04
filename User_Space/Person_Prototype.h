@@ -364,7 +364,7 @@ namespace Prototypes
 			// during the Activity Generation sub_iteration, swap in the activity-generation event and set up future sub_iteration schedule
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
 			{
-				_pthis->Swap_Event((Event)&Person_Planner::Activity_Generation_Event<NULLTYPE>);
+				_pthis->Swap_Event((Event_Callback)&Person_Planner::Activity_Generation_Event<NULLTYPE>);
 
 				// check if activity planning needs to occur, if so do this
 				if (act_itr != activity_plans->end())
@@ -395,7 +395,7 @@ namespace Prototypes
 			// during the Activity Planning sub_iteration, swap in the activity-planning event and set up future sub_iteration schedule
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING)
 			{
-				_pthis->Swap_Event((Event)&Person_Planner::Activity_Planning_Event<NULLTYPE>);
+				_pthis->Swap_Event((Event_Callback)&Person_Planner::Activity_Planning_Event<NULLTYPE>);
 
 				response.next._iteration = _iteration;
 				response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING;
@@ -406,7 +406,7 @@ namespace Prototypes
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING)
 			{
 				// swap in movement event
-				_pthis->Swap_Event((Event)&Person_Planner::Movement_Planning_Event<NULLTYPE>);
+				_pthis->Swap_Event((Event_Callback)&Person_Planner::Movement_Planning_Event<NULLTYPE>);
 				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
 				response.next._sub_iteration = 0;
 				response.result = true;

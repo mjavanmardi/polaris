@@ -110,7 +110,7 @@ namespace Demand_Components
 				requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
 				using namespace odb;
-				using namespace pio;
+				using namespace polaris::io;
 				define_component_interface(_Scenario_Interface, typename get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 				string name(scenario_reference<_Scenario_Interface*>()->template database_name<string&>());

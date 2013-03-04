@@ -522,14 +522,14 @@ namespace Link_Components
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Supply_Update<NULLTYPE>);
+					((typename MasterType::link_type*)_this)->Swap_Event((Event_Callback)&Compute_Step_Flow_Supply_Update<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration;
 					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION;
 				}
 				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Link_Moving<NULLTYPE>);
+					((typename MasterType::link_type*)_this)->Swap_Event((Event_Callback)&Compute_Step_Flow_Link_Moving<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION;

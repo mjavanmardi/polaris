@@ -56,14 +56,14 @@ namespace Network_Skimming_Components
 				}
 				else if (_sub_iteration == Types::SUB_ITERATIONS::PROCESS)
 				{
-					_pthis->Swap_Event((Event)&Process_Skim_Trees_Event<NULLTYPE>);
+					_pthis->Swap_Event((Event_Callback)&Process_Skim_Trees_Event<NULLTYPE>);
 					response.next._iteration = _iteration;
 					response.next._sub_iteration = Types::SUB_ITERATIONS::UPDATE;
 					response.result = true;
 				}
 				else if (_sub_iteration == Types::SUB_ITERATIONS::UPDATE)
 				{
-					_pthis->Swap_Event((Event)&Update_Skim_Tables_Event<NULLTYPE>);
+					_pthis->Swap_Event((Event_Callback)&Update_Skim_Tables_Event<NULLTYPE>);
 					response.next._iteration = Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->update_increment<Simulation_Timestep_Increment>());
 					response.next._sub_iteration = 0;
 					response.result = true;

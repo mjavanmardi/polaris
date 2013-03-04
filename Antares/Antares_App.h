@@ -87,16 +87,16 @@ public:
 		{
 			db_name=argv[1];
 
-			ifstream test;
-			test.open(db_name);
+			//ifstream test;
+			//test.open(db_name);
 
-			if(!test.is_open())
-			{
-				wxMessageBox("Invalid Database File Provided!");
-				exit(0);
-			}
+			//if(!test.is_open())
+			//{
+			//	wxMessageBox("Invalid Database File Provided!");
+			//	exit(0);
+			//}
 
-			test.close();
+			//test.close();
 		}
 
 		CreateThread(NULL,0,Wx_Loop<MasterType>,this,0,NULL);

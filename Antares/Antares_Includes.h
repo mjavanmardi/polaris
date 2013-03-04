@@ -12,7 +12,7 @@
 #include "wx\listctrl.h"
 
 #include "wxPLplotwindow.h"
-#include "Polaris_IO/Polaris_IO.h"
+#include "io/Io.h"
 
 #include "User_Space\User_Space.h"
 

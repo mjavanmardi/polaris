@@ -21,7 +21,7 @@ struct Data_Object
 	
 	union
 	{
-		Event event_register;
+		Event_Callback event_register;
 
 		struct
 		{

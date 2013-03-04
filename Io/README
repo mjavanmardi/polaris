@@ -1,0 +1,37 @@
+Building on Windows
+===================
+Download and unzip the following files:
+http://www.codesynthesis.com/download/odb/2.2/odb-2.2.0-i686-windows.zip
+http://www.codesynthesis.com/download/odb/2.2/libodb-2.2.2.zip
+http://www.codesynthesis.com/download/odb/2.2/libodb-sqlite-2.2.0.zip
+
+Install libodb and libodb-sqlite by following the instructions in the corresponding INSTALL files.
+You can also download all of theose compiled from 
+http://sourceforge.net/projects/polaris-t/files/odb.7z/download
+
+
+Building on Linux
+===================
+Download and unzip the following files:
+http://www.codesynthesis.com/download/odb/2.2/libodb-2.2.2.zip
+http://www.codesynthesis.com/download/odb/2.2/libodb-sqlite-2.2.0.zip 
+
+
+If you do have root access, then install libodb and libodb-sqlite by following the instructions in the corresponding INSTALL files.
+
+If you do not have root access on the machince make sure you specify the prefix
+crate two folders $HOME/odb and $HOME/odb_src
+unzip libodb and libodb-sqlite to $HOME/odb_src
+then run 
+cd $HOME/odb_src/libodb-2.2.2
+./configure --prefix=$HOME/odb
+make
+make install
+
+cd $HOME/odb_src/libodb-sqlite-2.2.0
+./configure --prefix=$HOME/odb --with-libodb=../libodb-2.2.2
+make
+make install
+
+Once you've installed the libodb and libodb-sqlite, you have all of the dependencies to build polaris_io.  
+

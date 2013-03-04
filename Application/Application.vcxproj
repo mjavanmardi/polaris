@@ -70,21 +70,27 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="c:\opt\polarisdeps\all.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="c:\opt\polarisdeps\all.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="c:\opt\polarisdeps\all.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_Antares|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="c:\opt\polarisdeps\all.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="c:\opt\polarisdeps\all.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_Antares|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="c:\opt\polarisdeps\all.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -92,7 +98,6 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\Polaris_IO\odb_include </AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LIBODB_STATIC_LIB;LIBODB_SQLITE_STATIC_LIB;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -103,7 +108,6 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir); $(SolutionDir)\Polaris_IO\odb_include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -113,8 +117,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Polaris_IO\odb_include\lib_debug</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sqlite3.lib;odb-sqlite-d-2.1-vc10.lib;odb-d-2.1-vc10.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);sqlite3-mt-d.lib;odb-mt-d.lib;odb-sqlite-mt-d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -149,7 +152,6 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\Polaris_IO\odb_include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>LIBODB_STATIC_LIB;LIBODB_SQLITE_STATIC_LIB;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>
@@ -163,8 +165,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Polaris_IO\odb_include\lib_release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sqlite3.lib;odb-sqlite-2.1-vc10.lib;odb-2.1-vc10.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);sqlite3-mt.lib;odb-mt.lib;odb-sqlite-mt.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Antares|x64'">
@@ -173,7 +174,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>C:\glew-1.7.0\include;$(SolutionDir);$(SolutionDir)\Polaris_IO\odb_include;C:\wxWidgets-2.9.3\include\;C:\wxWidgets-2.9.3\include\msvc;C:\plplot\include\plplot</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\glew-1.7.0\include;$(SolutionDir);C:\wxWidgets-2.9.3\include\;C:\wxWidgets-2.9.3\include\msvc;C:\plplot\include\plplot</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>NDEBUG;_UNICODE;GLEW_STATIC;ANTARES;WIN32 ;WINVER=0x0600;__WXMSW__ ;_WINDOWS ;_MBCS;wxUSE_GUI=1;_CRT_SECURE_NO_DEPRECATE ;_CRT_NONSTDC_NO_DEPRECATE ;LIBODB_STATIC_LIB;LIBODB_SQLITE_STATIC_LIB;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>
@@ -187,8 +188,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\glew-1.7.0\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)\Polaris_IO\odb_include\lib_release;C:\wxWidgets-2.9.3\lib\vc_lib;C:\plplot\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>antares.lib;plplotd.lib;plplotcxxd.lib;csirocsa.lib;qsastime.lib;plplotwxwidgetsd.lib;comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wxpng.lib;wsock32.lib;sqlite3.lib;odb-sqlite-2.1-vc10.lib;odb-2.1-vc10.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\glew-1.7.0\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\Release\;C:\wxWidgets-2.9.3\lib\vc_lib;C:\plplot\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>antares.lib;plplotd.lib;plplotcxxd.lib;csirocsa.lib;qsastime.lib;plplotwxwidgetsd.lib;comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wxpng.lib;wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);sqlite3-mt.lib;odb-mt.lib;odb-sqlite-mt.lib;io-mt.lib</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -208,9 +209,9 @@
   <ItemGroup>
     <ProjectReference Include="..\File_IO\File_IO.vcxproj">
       <Project>{70f1765f-c7c3-4ee7-89c4-5274cfcc4030}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Polaris_IO\Polaris_IO.vcxproj">
-      <Project>{565dd22f-96fd-4930-85b4-50198d30b88e}</Project>
+    </ProjectReference>  
+    <ProjectReference Include="..\Antares\Antares.vcxproj">
+      <Project>{05a50c9b-ef18-41f4-be3b-092d564ad6f2}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Scenario_Manager\Scenario_Manager.vcxproj">
       <Project>{fe16ca2c-e4c8-4c9c-9a8f-f63dc734205f}</Project>

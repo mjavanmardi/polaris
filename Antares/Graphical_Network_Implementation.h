@@ -32,18 +32,24 @@ namespace Network_Components
 			feature_implementation void read_network_data(string& name)
 			{
 				using namespace odb;
-				using namespace pio;
+				using namespace polaris;
 				
 				Network_Components::Types::Network_IO_Maps net_io_maps;
 
+				cout << "ok pre open: " << name << endl;
+				// It fails here VVV
 				auto_ptr<database> db (open_sqlite_database (name));
+				cout << "ok post open" << endl;
 				transaction t(db->begin());
-				
+				cout << "ok post transaction" << endl;
+
 				// reset bounds, they will be set in the node reading function
 				_network_bounds.reset<type_of(network_bounds),Graphical_Network_Implementation,NULLTYPE>();
 
 				// read intersections
+				cout << "ok pre intersection" << endl;
 				read_intersection_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
+				cout << "ok post intersection" << endl;
 
 				// set up input_offset and shift network bounds
 				_input_offset._x = -( _network_bounds._xmax + _network_bounds._xmin )/2.0f;
@@ -56,8 +62,10 @@ namespace Network_Components
 				_network_bounds._ymax += _input_offset._y;
 				_network_bounds._ymin += _input_offset._y;
 				
+				cout << "ok pre links" << endl;
 				// read links
 				read_link_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
+				cout << "ok post links" << endl;
 
 				
 				// configure vehicle layer
@@ -74,7 +82,7 @@ namespace Network_Components
 			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
 				using namespace odb;
-				using namespace pio;
+				using namespace polaris::io;
 
 				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
 
@@ -130,7 +138,7 @@ namespace Network_Components
 			feature_implementation void read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
 				using namespace odb;
-				using namespace pio;
+				using namespace polaris::io;
 
 				_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
 				_Links_Container_Interface* links_container_ptr=links_container<ComponentType,CallerType,_Links_Container_Interface*>();			
@@ -190,7 +198,7 @@ namespace Network_Components
 						link->template right_turn_bay_length<float>(0.0);
 
 						
-						const string& facility_type=db_itr->getType();
+						const string& facility_type=db_itr->getType()->getLink_Type();
 
 						if(facility_type=="FREEWAY")
 						{
@@ -237,7 +245,7 @@ namespace Network_Components
 						link->template right_turn_bay_length<float>(0.0);
 
 						
-						const string& facility_type=db_itr->getType();
+						const string& facility_type=db_itr->getType()->getLink_Type();;
 
 						if(facility_type=="FREEWAY")
 						{

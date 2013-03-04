@@ -268,7 +268,7 @@ struct MasterType
 	typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
 
 	typedef Link_Components::Implementations::Routable_Link_Implementation<MasterType> routable_link_type;
-
+	
 	typedef Demand_Components::Implementations::Polaris_Demand_Implementation<MasterType> demand_type;
 
 	typedef Activity_Location_Components::Implementations::Polaris_Activity_Location_Implementation<MasterType> activity_location_type;

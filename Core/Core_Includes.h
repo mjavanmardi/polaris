@@ -109,7 +109,7 @@ static unsigned int tick_tock=false;
 static unsigned int sub_tick_tock=false;
 
 
-typedef void (*Event)(void*);
+typedef void (*Event_Callback)(void*);
 
 
 

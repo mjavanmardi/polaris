@@ -24,7 +24,7 @@ namespace Network_Components
 		feature_implementation_definition void Polaris_Network_Implementation<typename MasterType,ParentType,InheritanceList>::read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
 		{
 			using namespace odb;
-			using namespace pio;
+			using namespace polaris::io;
 			typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 			string name(scenario_reference<ComponentType,CallerType,_Scenario_Interface*>()->template database_name<string&>());
 			auto_ptr<database> db (open_sqlite_database (name));
@@ -40,7 +40,7 @@ namespace Network_Components
 		feature_implementation_definition void Polaris_Network_Implementation<typename MasterType,ParentType,InheritanceList>::read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 		{
 			using namespace odb;
-			using namespace pio;
+			using namespace polaris::io;
 
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			_Intersections_Container_Interface* intersections_container_ptr=intersections_container<ComponentType,CallerType,_Intersections_Container_Interface*>();
@@ -100,7 +100,7 @@ namespace Network_Components
 		feature_implementation_definition void Polaris_Network_Implementation<typename MasterType,ParentType,InheritanceList>::read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 		{
 			using namespace odb;
-			using namespace pio;
+			using namespace polaris::io;
 
 			const float link_length = 5280.0; // in foot
 			const float speed_limit = 60.0; // in miles per hour
@@ -271,7 +271,7 @@ namespace Network_Components
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_turn_movement_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 		{
 			using namespace odb;
-			using namespace pio;
+			using namespace polaris::io;
 
 			Types::Link_ID_Dir link_id_dir;
 
@@ -447,7 +447,7 @@ namespace Network_Components
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_zone_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 		{
 			using namespace odb;
-			using namespace pio;
+			using namespace polaris::io;
 
 			//Types::Link_ID_Dir link_id_dir;
 
@@ -519,7 +519,7 @@ namespace Network_Components
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 		{
 			using namespace odb;
-			using namespace pio;
+			using namespace polaris::io;
 
 			Types::Link_ID_Dir link_id_dir;
 

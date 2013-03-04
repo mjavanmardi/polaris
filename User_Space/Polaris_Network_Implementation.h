@@ -81,7 +81,7 @@ namespace Network_Components
 				
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
 				{
-					((typename MasterType::network_type*)_this)->Swap_Event((Event)&End_Iteration_Handler<NULLTYPE>);
+					((typename MasterType::network_type*)_this)->Swap_Event((Event_Callback)&End_Iteration_Handler<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
