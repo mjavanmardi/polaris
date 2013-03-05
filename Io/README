@@ -7,7 +7,11 @@ http://www.codesynthesis.com/download/odb/2.2/libodb-sqlite-2.2.0.zip
 
 Install libodb and libodb-sqlite by following the instructions in the corresponding INSTALL files.
 You can also download all of theose compiled from 
-http://sourceforge.net/projects/polaris-t/files/odb.7z/download
+http://sourceforge.net/projects/polaris-t/files/polarisdeps.7z/download
+make sure that you copy the polarisdeps folder to c:\opt
+if you have access to TRACC internal drive you can copy the folder from
+\\P071162\shared2\POLARIS\polarisdeps
+
 
 
 Building on Linux
