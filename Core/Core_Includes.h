@@ -105,9 +105,6 @@ typedef char Byte;
 template<int Size>
 struct Bytes{char bytes[Size];};
 
-static unsigned int tick_tock=false;
-static unsigned int sub_tick_tock=false;
-
 
 typedef void (*Event_Callback)(void*);
 

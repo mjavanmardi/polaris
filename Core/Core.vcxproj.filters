@@ -35,9 +35,6 @@
     <ClInclude Include="Generic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Interprocess.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Memory_Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>

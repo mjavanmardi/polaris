@@ -360,7 +360,6 @@ struct member_function_ptr_types<Type,setter_type>
 		{static_assert((SETTER_REQUIREMENTS) && True_Concept<SetValueType>::value,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 		tag_setter_as_available(FEATURE_NAME);
 
-
 ///============================================================================
 /// member_prototype – similar to member_component, but stores prototype
 ///============================================================================

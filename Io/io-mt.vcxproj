@@ -52,23 +52,23 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="C:\opt\polarisdeps\all.props" />
-    <Import Project="C:\opt\polarisdeps\odb-step.props" />
+    <Import Project="$(SolutionDir)\all.props" />
+    <Import Project="$(SolutionDir)\odb-step.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="C:\opt\polarisdeps\all.props" />
-    <Import Project="C:\opt\polarisdeps\odb-step.props" />
+    <Import Project="$(SolutionDir)\all.props" />
+    <Import Project="$(SolutionDir)\odb-step.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="C:\opt\polarisdeps\all.props" />
-    <Import Project="C:\opt\polarisdeps\odb-step.props" />
+    <Import Project="$(SolutionDir)\all.props" />
+    <Import Project="$(SolutionDir)\odb-step.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="C:\opt\polarisdeps\all.props" />
-    <Import Project="C:\opt\polarisdeps\odb-step.props" />
+    <Import Project="$(SolutionDir)\all.props" />
+    <Import Project="$(SolutionDir)\odb-step.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -106,6 +106,43 @@ implementation struct True_Color_RGBA : public Polaris_Component<APPEND_CHILD(Tr
 };
 
 //---------------------------------------------------------
+//	Determine distance between point C and line segment AB
+//---------------------------------------------------------
+
+static inline void Point_Segment_Distance(Point_3D<NULLTYPE>& A, Point_3D<NULLTYPE>& B, Point_3D<NULLTYPE>& C, float& dist)
+{
+	//---- u is used to find the projection onto AB ---
+
+	float u=((C._x-A._x)*(B._x-A._x)+(C._y-A._y)*(B._y-A._y))/((A._x-B._x)*(A._x-B._x)+(A._y-B._y)*(A._y-B._y));
+	
+	if(u<0 || u>1)
+	{
+		//---- if u is not between 0 and 1, test distance to endpoints ---
+
+		float tmp_dist;
+
+		//---- to A ---
+
+		dist=sqrt((A._x-C._x)*(A._x-C._x)+(A._y-C._y)*(A._y-C._y));
+		
+		//---- to B ---
+
+		tmp_dist=sqrt((B._x-C._x)*(B._x-C._x)+(B._y-C._y)*(B._y-C._y));
+
+		if(tmp_dist<dist) dist=tmp_dist;
+	}
+	else
+	{
+		//---- if u is between 0 and 1, compute distance to projection ---
+
+		float x=A._x+u*(B._x-A._x);
+		float y=A._y+u*(B._y-A._y);
+
+		dist=sqrt((x-C._x)*(x-C._x)+(y-C._y)*(y-C._y));
+	}
+}
+
+//---------------------------------------------------------
 //	Test point in polygon, Antares version
 //---------------------------------------------------------
 

@@ -132,25 +132,12 @@ namespace Zone_Components
 			}
 			feature_implementation void Push_To_Layer(TargetType Layer_Reference)
 			{
-				//Layer_Reference->Push_Element<Regular_Element>(&num_primitives);
 				Layer_Reference->Push_Element<Regular_Element>(this);
-
-				//Layer_Reference->Push_Element<Regular_Element>(&east);
-				//Layer_Reference->Push_Element<Regular_Element>(&west);
-				//Layer_Reference->Push_Element<Regular_Element>(&north);
-				//Layer_Reference->Push_Element<Regular_Element>(&south);
-				//Layer_Reference->Push_Element<Regular_Element>(&top);
 			}
 
 			void* ptr;
 			int num_primitives;
 			Quad<MasterType>* quads;
-
-			//Quad<MasterType> east;
-			//Quad<MasterType> west;
-			//Quad<MasterType> north;
-			//Quad<MasterType> south;
-			//Quad<MasterType> top;
 		};
 #pragma pack(pop)
 	}
@@ -204,9 +191,6 @@ namespace Zone_Components
 				cfg.storage_offset = 60/*_iteration*/;
 				cfg.storage_size = 3;
 				cfg.primitive_color = true;
-				cfg.data_stride = sizeof(void*);
-
-				//typedef bool (*attributes_callback_type)(void*,string&);
 
 				cfg.attributes_callback = (attributes_callback_type)&Graphical_Zone_Implementation<MasterType>::fetch_attributes;
 				cfg.submission_callback = (attributes_callback_type)&Graphical_Zone_Implementation<MasterType>::submit_attributes;

@@ -47,6 +47,8 @@ public:
 	
 	void Start_Turning()
 	{
+		Execution_Root* const exe=execution_root_ptr;
+
 		run=true;
 
 		// instruct threads to leave the finished queue
@@ -57,19 +59,17 @@ public:
 			// wait until all threads have entered the finished queue
 
 			while(threads_finished_counter!=_num_threads) SLEEP(0);
-		
+			
 			// can safely say no threads are running at this point
 			threads_running_counter=0;
 
-			tick_tock=!tick_tock;
+			_iteration = exe->ex_next_revision._iteration;
 
-			_iteration++;
+			//_iteration++;
 
-			//cout << "Beginning iteration: " << _iteration << endl;
+			//_sub_iteration=0;
 
-			_sub_iteration=0;
-
-			if( _iteration == (_num_iterations-1) )
+			if( (unsigned int)_iteration >= (_num_iterations-1) )
 			{
 				AtomicDecrement(&run);
 

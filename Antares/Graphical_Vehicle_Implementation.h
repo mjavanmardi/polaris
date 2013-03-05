@@ -119,7 +119,6 @@ namespace Vehicle_Components
 				_vehicle_points=my_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Graphical_Vehicle_Implementation>*, string& > >(string("Vehicles"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Points();
-				cfg.data_stride = sizeof(void*);
 
 				cfg.attributes_schema = string("ID,Status,Current_Link");
 				
@@ -149,15 +148,12 @@ namespace Vehicle_Components
 			{
 				vector<string>::iterator itr;
 
-				for(itr=bucket.begin();itr!=bucket.end();itr++)
-				{
-					cout << (*itr) << endl;
-				}
-
 				int new_id=atoi(bucket[0].c_str());
 
 				if(new_id%2==0)
 				{
+					_this->_internal_id = new_id;
+
 					return true;
 				}
 				else

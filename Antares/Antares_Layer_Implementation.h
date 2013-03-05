@@ -389,17 +389,30 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		switch(_primitive_type)
 		{
+		case _PLOT:
+			_vert_stride = 0;
+			_poly = false;
+			break;
 		case _POINT:
 			_vert_stride = sizeof(Point_3D<MasterType>)*1;
+			_poly = false;
 			break;
 		case _LINE:
 			_vert_stride = sizeof(Point_3D<MasterType>)*2;
+			_poly = false;
 			break;
 		case _TRIANGLE:
 			_vert_stride = sizeof(Point_3D<MasterType>)*3;
+			_poly = false;
 			break;
 		case _QUAD:
 			_vert_stride = sizeof(Point_3D<MasterType>)*4;
+			_poly = false;
+			break;
+		case _POLYGON:
+			_vert_stride = sizeof(Point_3D<MasterType>)*1;
+			_poly = true;
+			assert(grouped == true);
 			break;
 		default:
 			assert(false);
@@ -412,7 +425,9 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		_submission_callback=cfg.submission_callback;
 		_attributes_callback=cfg.attributes_callback;
 
-		_data_stride=cfg.data_stride;
+		if(_attributes_callback != nullptr || _submission_callback != nullptr) _data_stride=sizeof(void*);
+		else if(_primitive_type == _PLOT) _data_stride=sizeof(int);
+		else _data_stride=0;
 
 		_selected_element = nullptr;
 		_control_dialog = nullptr;
@@ -498,7 +513,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	member_data(bool,draw,none,none);
 
 	member_data(PrimitiveType,primitive_type,none,none);
-	
+	member_data(bool,poly,none,none);	
 
 	member_data(True_Color_RGBA<MasterType>,head_color,none,none);
 	member_data(Point_3D<MasterType>,head_normal,none,none);

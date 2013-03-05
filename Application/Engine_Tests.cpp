@@ -7,7 +7,7 @@
 #ifdef TEST_1
 static volatile unsigned long visited=0;
 
-implementation struct Test:public Polaris_Component_Class<Test,MasterType,Execution_Object>
+implementation struct Test:public Polaris_Component<APPEND_CHILD(Test),MasterType,Execution_Object>
 {
 public:
 	void Initialize()
@@ -39,13 +39,17 @@ public:
 
 struct MasterType{};
 
+
+
 void main()
 {
+	_num_iterations=1000;
+
 	LARGE_INTEGER start_timer, stop_timer, frequency;
 
 	double allocation_time,run_time;
 
-	const unsigned int num_agents=10000;
+	const unsigned int num_agents=30000;
 	const int pages=(num_agents*sizeof(Test<MasterType*>))/_Page_Size;
 
 	QueryPerformanceFrequency(&frequency);
@@ -57,13 +61,13 @@ void main()
 		Test<MasterType>* test=Allocate<Test<MasterType>>();
 		test->Initialize();
 	}
-	
+
 	QueryPerformanceCounter(&stop_timer);
 
 	allocation_time=((double)stop_timer.QuadPart-(double)start_timer.QuadPart)/((double)frequency.QuadPart);
 
 	QueryPerformanceCounter(&start_timer);
-	
+
 	START();
 
 	QueryPerformanceCounter(&stop_timer);

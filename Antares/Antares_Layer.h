@@ -57,6 +57,8 @@ prototype struct Antares_Layer
 	feature_accessor(accent_storage,none,none);
 	
 	feature_accessor(draw,none,none);
+	
+	feature_accessor(poly,none,none);
 
 	feature_accessor(primitive_type,none,none);
 	feature_accessor(head_size_value,none,none);
@@ -94,7 +96,8 @@ enum PrimitiveType
 	_POINT,
 	_LINE,
 	_TRIANGLE,
-	_QUAD
+	_QUAD,
+	_POLYGON
 };
 
 //---------------------------------------------------------
@@ -103,7 +106,8 @@ enum PrimitiveType
 
 struct Antares_Layer_Configuration
 {
-	void Configure_Lines()
+	// Default Configuration
+	Antares_Layer_Configuration()
 	{
 		dynamic_data=false;
 		target_sub_iteration=-1;
@@ -113,14 +117,12 @@ struct Antares_Layer_Configuration
 		storage_period=1;
 
 		draw=true;
-
-		primitive_type=_LINE;
 		
 		primitive_color=false;
 		head_color._r=0;
 		head_color._g=0;
 		head_color._b=0;
-		head_color._a=200;
+		head_color._a=255;
 		
 		primitive_normal=false;
 		head_normal._x=0;
@@ -131,12 +133,21 @@ struct Antares_Layer_Configuration
 
 		head_size_value=1;
 
-		data_stride=0;
-
 		attributes_schema="";
 
 		submission_callback=nullptr;
 		attributes_callback=nullptr;
+	}
+
+	void Configure_Lines()
+	{
+		primitive_type=_LINE;
+		
+		primitive_color=false;
+		head_color._r=0;
+		head_color._g=125;
+		head_color._b=0;
+		head_color._a=255;
 	}
 	
 	void Configure_Points()
@@ -148,139 +159,54 @@ struct Antares_Layer_Configuration
 		storage_size=3;
 		storage_period=1;
 
-		draw=true;
-
 		primitive_type=_POINT;
 
-		primitive_color=false;
 		head_color._r=255;
 		head_color._g=0;
 		head_color._b=0;
 		head_color._a=255;
-
-		primitive_normal=false;
-		head_normal._x=0;
-		head_normal._y=0;
-		head_normal._z=1;
-		
-		grouped=false;
 		
 		head_size_value=4;
-
-		data_stride=0;
-
-		attributes_schema="";
-
-		submission_callback=nullptr;
-		attributes_callback=nullptr;
 	}
 
 	void Configure_Static_Points(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
-		dynamic_data=false;
-		target_sub_iteration=-1;
-
-		storage_offset=_iteration;
-		storage_size=1;
-		storage_period=1;
-
-		draw=true;
-
 		primitive_type=_POINT;
 
-		primitive_color=false;
 		head_color._r=Color._r;
 		head_color._g=Color._g;
 		head_color._b=Color._b;
 		head_color._a=Color._a;
-
-		primitive_normal=false;
-		head_normal._x=0;
-		head_normal._y=0;
-		head_normal._z=1;
 		
-		grouped=false;
-
 		head_size_value=size;
-
-		data_stride=0;
-
-		attributes_schema="";
-
-		submission_callback=nullptr;
-		attributes_callback=nullptr;
 	}
-		
+	
 	void Configure_Static_Quads(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
-		dynamic_data=false;
-		target_sub_iteration=-1;
-
-		storage_offset=_iteration;
-		storage_size=1;
-		storage_period=1;
-
-		draw=true;
-
 		primitive_type=_QUAD;
 
-		primitive_color=false;
 		head_color._r=Color._r;
 		head_color._g=Color._g;
 		head_color._b=Color._b;
 		head_color._a=Color._a;
-
-		primitive_normal=false;
-		head_normal._x=0;
-		head_normal._y=0;
-		head_normal._z=1;
 		
 		grouped=true;
 		group_color=false;
 		group_normal=false;
-
-		head_size_value=1;
-
-		data_stride=0;
-
-		attributes_schema="";
-
-		submission_callback=nullptr;
-		attributes_callback=nullptr;
 	}
 	
 	void Configure_Plot()
 	{
-		dynamic_data=false;
-		target_sub_iteration=-1;
-
-		storage_offset=_iteration;
 		storage_size=_num_iterations;
-		storage_period=1;
-
-		draw=true;
 
 		primitive_type=_PLOT;
 
-		primitive_color=false;
 		head_color._r=255;
 		head_color._g=0;
 		head_color._b=0;
 		head_color._a=255;
-
-		primitive_normal=false;
-		head_normal._x=0;
-		head_normal._y=0;
-		head_normal._z=1;
-
-		grouped=false;
-
-		head_size_value=0;
-
-		data_stride=sizeof(int);
 	}
-
-
+	
 	bool dynamic_data;
 	int target_sub_iteration;
 
@@ -290,15 +216,12 @@ struct Antares_Layer_Configuration
 
 	bool draw;
 
-	
-	
+
 	PrimitiveType primitive_type;
 
 	True_Color_RGBA<NULLTYPE> head_color;
 	Point_3D<NULLTYPE> head_normal;
 	int head_size_value;
-
-
 
 
 	bool grouped;
@@ -314,8 +237,6 @@ struct Antares_Layer_Configuration
 	bool primitive_normal;
 		// 1 x Point_3D<NULLTYPE> primitive_normal;
 	
-	
-	int data_stride;
 
 	string attributes_schema;
 

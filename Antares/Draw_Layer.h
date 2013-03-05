@@ -27,6 +27,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	const bool group_color=layer->group_color<bool>();
 	const bool group_normal=layer->group_normal<bool>();
 	
+	const bool poly=layer->poly<bool>();
+
 	const bool primitive_color=layer->primitive_color<bool>();
 	const bool primitive_normal=layer->primitive_normal<bool>();
 	const int primitive_stride = layer->primitive_stride<int>();
@@ -55,13 +57,18 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	case _QUAD:
 		glBegin(GL_QUADS);
 		break;
+	case _POLYGON:
+		break;
 	default:
 		assert(false);
 		break;
 	};
-
-	glColor4ubv((GLubyte*)&head_color);
-	glNormal3fv((GLfloat*)&head_normal);
+	
+	if(!poly)
+	{
+		glColor4ubv((GLubyte*)&head_color);
+		glNormal3fv((GLfloat*)&head_normal);
+	}
 
 	int current_iteration=start_iteration;
 	
@@ -80,6 +87,13 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 
 				if(grouped)
 				{
+					if(poly)
+					{
+						glBegin(GL_POLYGON);
+						glColor4ubv((GLubyte*)&head_color);
+						glNormal3fv((GLfloat*)&head_normal);
+					}
+
 					if(group_color)
 					{
 						glColor4ubv((GLubyte*)geometry_itr);
@@ -119,6 +133,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 							geometry_itr += sizeof(Point_3D<MasterType>);
 						}
 					}
+
+					if(poly)
+					{
+						glEnd();
+					}
 				}
 				else
 				{
@@ -149,7 +168,10 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 		current_iteration++;
 	}
 
-	glEnd();
+	if(!poly)
+	{
+		glEnd();
+	}
 
 
 	glDepthFunc(GL_ALWAYS);
@@ -174,6 +196,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	case _QUAD:
 		glBegin(GL_QUADS);
 		break;
+	case _POLYGON:
+		break;
 	default:
 		assert(false);
 		break;
@@ -181,12 +205,15 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 
 	True_Color_RGBA<MasterType> accent_color;
 	accent_color = head_color;
-	accent_color._r = 255-accent_color._r;
-	accent_color._g = 255-accent_color._g;
-	accent_color._b = 255-accent_color._b;
+	accent_color._r = 255 - accent_color._r;
+	accent_color._g = 255 - accent_color._g;
+	accent_color._b = 255 - accent_color._b;
 
-	glColor4ubv((GLubyte*)&accent_color);
-	glNormal3fv((GLfloat*)&head_normal);
+	if(!poly)
+	{
+		glColor4ubv((GLubyte*)&accent_color);
+		glNormal3fv((GLfloat*)&head_normal);
+	}
 	
 	current_iteration = start_iteration;
 	
@@ -205,6 +232,13 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 
 				if(grouped)
 				{
+					if(poly)
+					{
+						glBegin(GL_POLYGON);
+						glColor4ubv((GLubyte*)&head_color);
+						glNormal3fv((GLfloat*)&head_normal);
+					}
+
 					if(group_color)
 					{
 						glColor4ubv((GLubyte*)geometry_itr);
@@ -244,6 +278,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 							geometry_itr += sizeof(Point_3D<MasterType>);
 						}
 					}
+
+					if(poly)
+					{
+						glEnd();
+					}
 				}
 				else
 				{
@@ -273,7 +312,10 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 		current_iteration++;
 	}
 
-	glEnd();
+	if(!poly)
+	{
+		glEnd();
+	}
 
 	glDepthFunc(GL_LESS);
 }

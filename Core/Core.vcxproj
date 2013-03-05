@@ -203,7 +203,6 @@
     <ClInclude Include="Features.h" />
     <ClInclude Include="Generic.h" />
     <ClInclude Include="Grouping.h" />
-    <ClInclude Include="Interprocess.h" />
     <ClInclude Include="Interprocess_Engine.h" />
     <ClInclude Include="Interprocess_Structures.h" />
     <ClInclude Include="Memory_Detail.h" />
@@ -232,6 +231,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Io\io-mt.vcxproj">
+      <Project>{5ed95b61-c4b2-4883-a960-da348347a260}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

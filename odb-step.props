@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="Supply.h">
+      <Message>Running odb compiler on Supply.h</Message>
+      <Command>C:\opt\polarisdeps\odb-2.2.0-i686-windows\bin\odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name Supply Supply.h</Command>
+      <Outputs>Supply-odb.hxx;Supply-odb.ixx;Supply-odb.cxx;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Result.h">
+      <Message>Running odb compiler on Result.h</Message>
+      <Command>C:\opt\polarisdeps\odb-2.2.0-i686-windows\bin\odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name Result Result.h</Command>
+      <Outputs>Result-odb.hxx;Result-odb.ixx;Result-odb.cxx;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Demand.h">
+      <Message>Running odb compiler on Demand.h</Message>
+      <Command>C:\opt\polarisdeps\odb-2.2.0-i686-windows\bin\odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name Demand Demand.h</Command>
+      <Outputs>Demand-odb.hxx;Demand-odb.ixx;Demand-odb.cxx;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="System.h">
+      <Message>Running odb compiler on System.h</Message>
+      <Command>C:\opt\polarisdeps\odb-2.2.0-i686-windows\bin\odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name System System.h</Command>
+      <Outputs>System-odb.hxx;System-odb.ixx;System-odb.cxx;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Supply-odb.hxx" />
+    <ClInclude Include="Result-odb.hxx" />
+    <ClInclude Include="Demand-odb.hxx" />
+    <ClInclude Include="System-odb.hxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Supply-odb.cxx" />
+    <ClCompile Include="Result-odb.cxx" />
+    <ClCompile Include="Demand-odb.cxx" />
+    <ClCompile Include="System-odb.cxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Supply-odb.ixx" />
+    <None Include="Result-odb.ixx" />
+    <None Include="Demand-odb.ixx" />
+    <None Include="System-odb.ixx" />
+  </ItemGroup>
+</Project>
