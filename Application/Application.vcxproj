@@ -207,11 +207,11 @@
     <ClCompile Include="Sensor_Model.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\File_IO\File_IO.vcxproj">
-      <Project>{70f1765f-c7c3-4ee7-89c4-5274cfcc4030}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Antares\Antares.vcxproj">
       <Project>{05a50c9b-ef18-41f4-be3b-092d564ad6f2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\File_IO\File_IO.vcxproj">
+      <Project>{70f1765f-c7c3-4ee7-89c4-5274cfcc4030}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Io\io-mt.vcxproj">
       <Project>{5ed95b61-c4b2-4883-a960-da348347a260}</Project>
