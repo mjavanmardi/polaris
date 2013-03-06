@@ -18,10 +18,16 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scenario_Manager", "Scenario_Manager\Scenario_Manager.vcxproj", "{FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Application\Application.vcxproj", "{098AE0AB-930F-43F6-93E6-19CF9E0C1809}"
+	ProjectSection(ProjectDependencies) = postProject
+		{05A50C9B-EF18-41F4-BE3B-092D564AD6F2} = {05A50C9B-EF18-41F4-BE3B-092D564AD6F2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "File_IO", "File_IO\File_IO.vcxproj", "{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Antares", "Antares\Antares.vcxproj", "{05A50C9B-EF18-41F4-BE3B-092D564AD6F2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5ED95B61-C4B2-4883-A960-DA348347A260} = {5ED95B61-C4B2-4883-A960-DA348347A260}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Transims2Polaris-mt", "Transims2Polaris\Transims2Polaris-mt.vcxproj", "{503AC797-81E4-4B74-BD82-47F166010EF2}"
 EndProject
