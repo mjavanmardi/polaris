@@ -257,8 +257,8 @@ struct member_function_ptr_types<Type,setter_type>
 ///============================================================================
 
 #define member_pointer(DATA_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	public:\
 	    DATA_TYPE* _##FEATURE_NAME;\
+	public:\
 		typedef DATA_TYPE FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
@@ -282,8 +282,8 @@ struct member_function_ptr_types<Type,setter_type>
 		tag_setter_as_available(FEATURE_NAME);
 
 #define member_data(DATA_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	public:\
 		DATA_TYPE _##FEATURE_NAME;\
+	public:\
 		typedef DATA_TYPE FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
@@ -311,8 +311,8 @@ struct member_function_ptr_types<Type,setter_type>
 ///============================================================================
 
 #define member_component(COMPONENT_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	public:\
 		COMPONENT_TYPE* _##FEATURE_NAME;\
+	public:\
 		typedef COMPONENT_TYPE FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
@@ -336,8 +336,8 @@ struct member_function_ptr_types<Type,setter_type>
 		tag_setter_as_available(FEATURE_NAME);
 
 #define member_data_component(COMPONENT_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	public:\
 		COMPONENT_TYPE _##FEATURE_NAME;\
+	public:\
 		typedef COMPONENT_TYPE FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
@@ -421,8 +421,8 @@ struct member_function_ptr_types<Type,setter_type>
 ///============================================================================
 
 #define member_container(CONTAINER_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	public:\
 		Polaris_Container<CONTAINER_TYPE> _##FEATURE_NAME;\
+	public:\
 		typedef Polaris_Container<CONTAINER_TYPE> FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && GETTER_REQUIREMENTS))\
@@ -446,8 +446,8 @@ struct member_function_ptr_types<Type,setter_type>
 		tag_setter_as_available(FEATURE_NAME);
 
 #define member_associative_container(CONTAINER_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
-	public:\
 		Polaris_Associative_Container<CONTAINER_TYPE> _##FEATURE_NAME;\
+	public:\
 		typedef Polaris_Associative_Container<CONTAINER_TYPE> FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && GETTER_REQUIREMENTS))\
