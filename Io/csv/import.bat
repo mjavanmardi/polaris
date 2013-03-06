@@ -1,0 +1,1 @@
+sqlite3 ..\..\Transims2Polaris\out\chicago-Supply.sqlite < import.sql

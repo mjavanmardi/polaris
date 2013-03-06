@@ -3565,6 +3565,2538 @@ namespace odb
     "Supply",
     &access::object_traits_impl< ::polaris::io::Zone, id_sqlite >::create_schema);
 
+  // ZoneLandUse
+  //
+
+  const char alias_traits<  ::polaris::io::Zone,
+    id_sqlite,
+    access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::zone_tag>::
+  table_name[] = "\"zone\"";
+
+  access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::id_type
+  access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  id (const image_type& i)
+  {
+    sqlite::database* db (0);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    id_type id;
+    {
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        id,
+        i.zone_id_value,
+        i.zone_id_null);
+    }
+
+    return id;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  grow (image_type& i, bool* t)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (t);
+
+    bool grew (false);
+
+    // zone_id
+    //
+    t[0UL] = false;
+
+    // zone
+    //
+    t[1UL] = false;
+
+    // area
+    //
+    t[2UL] = false;
+
+    // area_res_low
+    //
+    t[3UL] = false;
+
+    // area_res_hi
+    //
+    t[4UL] = false;
+
+    // area_comm
+    //
+    t[5UL] = false;
+
+    // area_ind
+    //
+    t[6UL] = false;
+
+    // pop_hh
+    //
+    t[7UL] = false;
+
+    // pop_per
+    //
+    t[8UL] = false;
+
+    // pop_gq
+    //
+    t[9UL] = false;
+
+    // emp_tot
+    //
+    t[10UL] = false;
+
+    // emp_ret
+    //
+    t[11UL] = false;
+
+    return grew;
+  }
+
+  void access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  bind (sqlite::bind* b,
+        image_type& i,
+        sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    std::size_t n (0);
+
+    // zone_id
+    //
+    if (sk != statement_update)
+    {
+      b[n].type = sqlite::bind::integer;
+      b[n].buffer = &i.zone_id_value;
+      b[n].is_null = &i.zone_id_null;
+      n++;
+    }
+
+    // zone
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.zone_value;
+    b[n].is_null = &i.zone_null;
+    n++;
+
+    // area
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.area_value;
+    b[n].is_null = &i.area_null;
+    n++;
+
+    // area_res_low
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.area_res_low_value;
+    b[n].is_null = &i.area_res_low_null;
+    n++;
+
+    // area_res_hi
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.area_res_hi_value;
+    b[n].is_null = &i.area_res_hi_null;
+    n++;
+
+    // area_comm
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.area_comm_value;
+    b[n].is_null = &i.area_comm_null;
+    n++;
+
+    // area_ind
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.area_ind_value;
+    b[n].is_null = &i.area_ind_null;
+    n++;
+
+    // pop_hh
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.pop_hh_value;
+    b[n].is_null = &i.pop_hh_null;
+    n++;
+
+    // pop_per
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.pop_per_value;
+    b[n].is_null = &i.pop_per_null;
+    n++;
+
+    // pop_gq
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.pop_gq_value;
+    b[n].is_null = &i.pop_gq_null;
+    n++;
+
+    // emp_tot
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.emp_tot_value;
+    b[n].is_null = &i.emp_tot_null;
+    n++;
+
+    // emp_ret
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.emp_ret_value;
+    b[n].is_null = &i.emp_ret_null;
+    n++;
+  }
+
+  void access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  bind (sqlite::bind* b, id_image_type& i)
+  {
+    std::size_t n (0);
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.id_value;
+    b[n].is_null = &i.id_null;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  init (image_type& i, const object_type& o, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    bool grew (false);
+
+    // zone_id
+    //
+    if (sk == statement_insert)
+    {
+      int const& v =
+        o.zone_id;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.zone_id_value,
+        is_null,
+        v);
+      i.zone_id_null = is_null;
+    }
+
+    // zone
+    //
+    {
+      ::std::tr1::shared_ptr< ::polaris::io::Zone > const& v =
+        o.zone;
+
+      typedef object_traits< ::polaris::io::Zone > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::polaris::io::Zone > > ptr_traits;
+
+      bool is_null (ptr_traits::null_ptr (v));
+      if (!is_null)
+      {
+        const obj_traits::id_type& id (
+          obj_traits::id (ptr_traits::get_ref (v)));
+
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_image (
+          i.zone_value,
+          is_null,
+          id);
+        i.zone_null = is_null;
+      }
+      else
+        i.zone_null = true;
+    }
+
+    // area
+    //
+    {
+      int const& v =
+        o.area;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.area_value,
+        is_null,
+        v);
+      i.area_null = is_null;
+    }
+
+    // area_res_low
+    //
+    {
+      int const& v =
+        o.area_res_low;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.area_res_low_value,
+        is_null,
+        v);
+      i.area_res_low_null = is_null;
+    }
+
+    // area_res_hi
+    //
+    {
+      int const& v =
+        o.area_res_hi;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.area_res_hi_value,
+        is_null,
+        v);
+      i.area_res_hi_null = is_null;
+    }
+
+    // area_comm
+    //
+    {
+      int const& v =
+        o.area_comm;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.area_comm_value,
+        is_null,
+        v);
+      i.area_comm_null = is_null;
+    }
+
+    // area_ind
+    //
+    {
+      int const& v =
+        o.area_ind;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.area_ind_value,
+        is_null,
+        v);
+      i.area_ind_null = is_null;
+    }
+
+    // pop_hh
+    //
+    {
+      int const& v =
+        o.pop_hh;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.pop_hh_value,
+        is_null,
+        v);
+      i.pop_hh_null = is_null;
+    }
+
+    // pop_per
+    //
+    {
+      int const& v =
+        o.pop_per;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.pop_per_value,
+        is_null,
+        v);
+      i.pop_per_null = is_null;
+    }
+
+    // pop_gq
+    //
+    {
+      int const& v =
+        o.pop_gq;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.pop_gq_value,
+        is_null,
+        v);
+      i.pop_gq_null = is_null;
+    }
+
+    // emp_tot
+    //
+    {
+      int const& v =
+        o.emp_tot;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.emp_tot_value,
+        is_null,
+        v);
+      i.emp_tot_null = is_null;
+    }
+
+    // emp_ret
+    //
+    {
+      int const& v =
+        o.emp_ret;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.emp_ret_value,
+        is_null,
+        v);
+      i.emp_ret_null = is_null;
+    }
+
+    return grew;
+  }
+
+  void access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  init (object_type& o, const image_type& i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // zone_id
+    //
+    {
+      int& v =
+        o.zone_id;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.zone_id_value,
+        i.zone_id_null);
+    }
+
+    // zone
+    //
+    {
+      ::std::tr1::shared_ptr< ::polaris::io::Zone >& v =
+        o.zone;
+
+      typedef object_traits< ::polaris::io::Zone > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::polaris::io::Zone > > ptr_traits;
+
+      if (i.zone_null)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_value (
+          id,
+          i.zone_value,
+          i.zone_null);
+
+        // If a compiler error points to the line below, then
+        // it most likely means that a pointer used in a member
+        // cannot be initialized from an object pointer.
+        //
+        v = ptr_traits::pointer_type (
+          static_cast<sqlite::database*> (db)->load<
+            obj_traits::object_type > (id));
+      }
+    }
+
+    // area
+    //
+    {
+      int& v =
+        o.area;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.area_value,
+        i.area_null);
+    }
+
+    // area_res_low
+    //
+    {
+      int& v =
+        o.area_res_low;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.area_res_low_value,
+        i.area_res_low_null);
+    }
+
+    // area_res_hi
+    //
+    {
+      int& v =
+        o.area_res_hi;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.area_res_hi_value,
+        i.area_res_hi_null);
+    }
+
+    // area_comm
+    //
+    {
+      int& v =
+        o.area_comm;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.area_comm_value,
+        i.area_comm_null);
+    }
+
+    // area_ind
+    //
+    {
+      int& v =
+        o.area_ind;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.area_ind_value,
+        i.area_ind_null);
+    }
+
+    // pop_hh
+    //
+    {
+      int& v =
+        o.pop_hh;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.pop_hh_value,
+        i.pop_hh_null);
+    }
+
+    // pop_per
+    //
+    {
+      int& v =
+        o.pop_per;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.pop_per_value,
+        i.pop_per_null);
+    }
+
+    // pop_gq
+    //
+    {
+      int& v =
+        o.pop_gq;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.pop_gq_value,
+        i.pop_gq_null);
+    }
+
+    // emp_tot
+    //
+    {
+      int& v =
+        o.emp_tot;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.emp_tot_value,
+        i.emp_tot_null);
+    }
+
+    // emp_ret
+    //
+    {
+      int& v =
+        o.emp_ret;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.emp_ret_value,
+        i.emp_ret_null);
+    }
+  }
+
+  void access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  init (id_image_type& i, const id_type& id)
+  {
+    {
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.id_value,
+        is_null,
+        id);
+      i.id_null = is_null;
+    }
+  }
+
+  struct access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::container_statement_cache_type
+  {
+    container_statement_cache_type (
+      sqlite::connection&,
+      sqlite::binding&)
+    {
+    }
+  };
+
+  const char access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::persist_statement[] =
+  "INSERT INTO \"ZoneLandUse\" ("
+  "\"zone_id\","
+  "\"zone\","
+  "\"area\","
+  "\"area_res_low\","
+  "\"area_res_hi\","
+  "\"area_comm\","
+  "\"area_ind\","
+  "\"pop_hh\","
+  "\"pop_per\","
+  "\"pop_gq\","
+  "\"emp_tot\","
+  "\"emp_ret\")"
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+
+  const char access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::find_statement[] =
+  "SELECT "
+  "\"ZoneLandUse\".\"zone_id\","
+  "\"ZoneLandUse\".\"zone\","
+  "\"ZoneLandUse\".\"area\","
+  "\"ZoneLandUse\".\"area_res_low\","
+  "\"ZoneLandUse\".\"area_res_hi\","
+  "\"ZoneLandUse\".\"area_comm\","
+  "\"ZoneLandUse\".\"area_ind\","
+  "\"ZoneLandUse\".\"pop_hh\","
+  "\"ZoneLandUse\".\"pop_per\","
+  "\"ZoneLandUse\".\"pop_gq\","
+  "\"ZoneLandUse\".\"emp_tot\","
+  "\"ZoneLandUse\".\"emp_ret\""
+  " FROM \"ZoneLandUse\""
+  " WHERE \"ZoneLandUse\".\"zone_id\"=?";
+
+  const char access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::update_statement[] =
+  "UPDATE \"ZoneLandUse\" SET "
+  "\"zone\"=?,"
+  "\"area\"=?,"
+  "\"area_res_low\"=?,"
+  "\"area_res_hi\"=?,"
+  "\"area_comm\"=?,"
+  "\"area_ind\"=?,"
+  "\"pop_hh\"=?,"
+  "\"pop_per\"=?,"
+  "\"pop_gq\"=?,"
+  "\"emp_tot\"=?,"
+  "\"emp_ret\"=?"
+  " WHERE \"zone_id\"=?";
+
+  const char access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::erase_statement[] =
+  "DELETE FROM \"ZoneLandUse\""
+  " WHERE \"zone_id\"=?";
+
+  const char access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::query_statement[] =
+  "SELECT "
+  "\"ZoneLandUse\".\"zone_id\","
+  "\"ZoneLandUse\".\"zone\","
+  "\"ZoneLandUse\".\"area\","
+  "\"ZoneLandUse\".\"area_res_low\","
+  "\"ZoneLandUse\".\"area_res_hi\","
+  "\"ZoneLandUse\".\"area_comm\","
+  "\"ZoneLandUse\".\"area_ind\","
+  "\"ZoneLandUse\".\"pop_hh\","
+  "\"ZoneLandUse\".\"pop_per\","
+  "\"ZoneLandUse\".\"pop_gq\","
+  "\"ZoneLandUse\".\"emp_tot\","
+  "\"ZoneLandUse\".\"emp_ret\""
+  " FROM \"ZoneLandUse\""
+  " LEFT JOIN \"Zone\" AS \"zone\" ON \"zone\".\"zone\"=\"ZoneLandUse\".\"zone\""
+  " ";
+
+  const char access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::erase_query_statement[] =
+  "DELETE FROM \"ZoneLandUse\""
+  " ";
+
+  const char access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::table_name[] =
+  "\"ZoneLandUse\"";
+
+  void access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  persist (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    callback (db,
+              obj,
+              callback_event::pre_persist);
+
+    image_type& im (sts.image ());
+    binding& imb (sts.insert_image_binding ());
+
+    if (init (im, obj, statement_insert))
+      im.version++;
+
+    if (im.version != sts.insert_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_insert);
+      sts.insert_image_version (im.version);
+      imb.version++;
+    }
+
+    insert_statement& st (sts.persist_statement ());
+    if (!st.execute ())
+      throw object_already_persistent ();
+
+    callback (db,
+              obj,
+              callback_event::post_persist);
+  }
+
+  void access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  update (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace sqlite;
+
+    callback (db, obj, callback_event::pre_update);
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, obj.zone_id);
+
+    image_type& im (sts.image ());
+    if (init (im, obj, statement_update))
+      im.version++;
+
+    bool u (false);
+    binding& imb (sts.update_image_binding ());
+    if (im.version != sts.update_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_update);
+      sts.update_image_version (im.version);
+      imb.version++;
+      u = true;
+    }
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.update_id_image_version () ||
+        idb.version == 0)
+    {
+      if (i.version != sts.id_image_version () ||
+          idb.version == 0)
+      {
+        bind (idb.bind, i);
+        sts.id_image_version (i.version);
+        idb.version++;
+      }
+
+      sts.update_id_image_version (i.version);
+
+      if (!u)
+        imb.version++;
+    }
+
+    if (sts.update_statement ().execute () == 0)
+      throw object_not_persistent ();
+
+    callback (db, obj, callback_event::post_update);
+    pointer_cache_traits::update (db, obj);
+  }
+
+  void access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  erase (database& db, const id_type& id)
+  {
+    using namespace sqlite;
+
+    ODB_POTENTIALLY_UNUSED (db);
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    if (sts.erase_statement ().execute () != 1)
+      throw object_not_persistent ();
+
+    pointer_cache_traits::erase (db, id);
+  }
+
+  access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::pointer_type
+  access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  find (database& db, const id_type& id)
+  {
+    using namespace sqlite;
+
+    {
+      pointer_type p (pointer_cache_traits::find (db, id));
+
+      if (!pointer_traits::null_ptr (p))
+        return p;
+    }
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    if (l.locked ())
+    {
+      if (!find_ (sts, &id))
+        return pointer_type ();
+    }
+
+    pointer_type p (
+      access::object_factory<object_type, pointer_type>::create ());
+    pointer_traits::guard pg (p);
+
+    pointer_cache_traits::insert_guard ig (
+      pointer_cache_traits::insert (db, id, p));
+
+    object_type& obj (pointer_traits::get_ref (p));
+
+    if (l.locked ())
+    {
+      select_statement& st (sts.find_statement ());
+      ODB_POTENTIALLY_UNUSED (st);
+
+      callback (db, obj, callback_event::pre_load);
+      init (obj, sts.image (), &db);
+      load_ (sts, obj);
+      sts.load_delayed ();
+      l.unlock ();
+      callback (db, obj, callback_event::post_load);
+      pointer_cache_traits::load (ig.position ());
+    }
+    else
+      sts.delay_load (id, obj, ig.position ());
+
+    ig.release ();
+    pg.release ();
+    return p;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  find (database& db, const id_type& id, object_type& obj)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    reference_cache_traits::position_type pos (
+      reference_cache_traits::insert (db, id, obj));
+    reference_cache_traits::insert_guard ig (pos);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    load_ (sts, obj);
+    sts.load_delayed ();
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    reference_cache_traits::load (pos);
+    ig.release ();
+    return true;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  reload (database& db, object_type& obj)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    const id_type& id  (
+      obj.zone_id);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    load_ (sts, obj);
+    sts.load_delayed ();
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    return true;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  find_ (statements_type& sts, const id_type* id)
+  {
+    using namespace sqlite;
+
+    id_image_type& i (sts.id_image ());
+    init (i, *id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    select_statement& st (sts.find_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+
+    return r != select_statement::no_data;
+  }
+
+  result< access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::object_type >
+  access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  query (database&, const query_base_type& q)
+  {
+    using namespace sqlite;
+    using odb::details::shared;
+    using odb::details::shared_ptr;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    q.init_parameters ();
+    shared_ptr<select_statement> st (
+      new (shared) select_statement (
+        conn,
+        query_statement + q.clause (),
+        q.parameters_binding (),
+        imb));
+
+    st->execute ();
+
+    shared_ptr< odb::object_result_impl<object_type> > r (
+      new (shared) sqlite::object_result_impl<object_type> (
+        q, st, sts));
+
+    return result<object_type> (r);
+  }
+
+  unsigned long long access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  erase_query (database&, const query_base_type& q)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+
+    q.init_parameters ();
+    delete_statement st (
+      conn,
+      erase_query_statement + q.clause (),
+      q.parameters_binding ());
+
+    return st.execute ();
+  }
+
+  bool access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  create_schema (database& db, unsigned short pass, bool drop)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (pass);
+    ODB_POTENTIALLY_UNUSED (drop);
+
+    if (drop)
+    {
+      switch (pass)
+      {
+        case 1:
+        {
+          db.execute ("DROP TABLE IF EXISTS \"ZoneLandUse\"");
+          return false;
+        }
+      }
+    }
+    else
+    {
+      switch (pass)
+      {
+        case 1:
+        {
+          db.execute ("CREATE TABLE \"ZoneLandUse\" (\n"
+                      "  \"zone_id\" INTEGER NOT NULL PRIMARY KEY,\n"
+                      "  \"zone\" INTEGER,\n"
+                      "  \"area\" INTEGER NOT NULL,\n"
+                      "  \"area_res_low\" INTEGER NOT NULL,\n"
+                      "  \"area_res_hi\" INTEGER NOT NULL,\n"
+                      "  \"area_comm\" INTEGER NOT NULL,\n"
+                      "  \"area_ind\" INTEGER NOT NULL,\n"
+                      "  \"pop_hh\" INTEGER NOT NULL,\n"
+                      "  \"pop_per\" INTEGER NOT NULL,\n"
+                      "  \"pop_gq\" INTEGER NOT NULL,\n"
+                      "  \"emp_tot\" INTEGER NOT NULL,\n"
+                      "  \"emp_ret\" INTEGER NOT NULL,\n"
+                      "  CONSTRAINT \"zone_fk\"\n"
+                      "    FOREIGN KEY (\"zone\")\n"
+                      "    REFERENCES \"Zone\" (\"zone\")\n"
+                      "    DEFERRABLE INITIALLY DEFERRED)");
+          return false;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  static const schema_catalog_entry
+  schema_catalog_entry_polaris_io_ZoneLandUse_ (
+    id_sqlite,
+    "Supply",
+    &access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::create_schema);
+
+  // LocationData
+  //
+
+  const char alias_traits<  ::polaris::io::Location,
+    id_sqlite,
+    access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::location_tag>::
+  table_name[] = "\"location\"";
+
+  const char alias_traits<  ::polaris::io::Link,
+    id_sqlite,
+    access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::link_tag>::
+  table_name[] = "\"link\"";
+
+  const char alias_traits<  ::polaris::io::ZoneLandUse,
+    id_sqlite,
+    access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::zone_tag>::
+  table_name[] = "\"zone\"";
+
+  access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::id_type
+  access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  id (const image_type& i)
+  {
+    sqlite::database* db (0);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    id_type id;
+    {
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        id,
+        i.location_id_value,
+        i.location_id_null);
+    }
+
+    return id;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  grow (image_type& i, bool* t)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (t);
+
+    bool grew (false);
+
+    // location_id
+    //
+    t[0UL] = false;
+
+    // location
+    //
+    t[1UL] = false;
+
+    // link
+    //
+    t[2UL] = false;
+
+    // dir
+    //
+    t[3UL] = false;
+
+    // offset
+    //
+    t[4UL] = false;
+
+    // setback
+    //
+    t[5UL] = false;
+
+    // zone
+    //
+    t[6UL] = false;
+
+    // truck_org
+    //
+    t[7UL] = false;
+
+    // truck_des
+    //
+    t[8UL] = false;
+
+    // auto_org
+    //
+    t[9UL] = false;
+
+    // auto_des
+    //
+    t[10UL] = false;
+
+    // transit
+    //
+    t[11UL] = false;
+
+    // areatype
+    //
+    t[12UL] = false;
+
+    // notes
+    //
+    if (t[13UL])
+    {
+      i.notes_value.capacity (i.notes_size);
+      grew = true;
+    }
+
+    // census_zone
+    //
+    t[14UL] = false;
+
+    // x
+    //
+    t[15UL] = false;
+
+    // y
+    //
+    t[16UL] = false;
+
+    return grew;
+  }
+
+  void access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  bind (sqlite::bind* b,
+        image_type& i,
+        sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    std::size_t n (0);
+
+    // location_id
+    //
+    if (sk != statement_update)
+    {
+      b[n].type = sqlite::bind::integer;
+      b[n].buffer = &i.location_id_value;
+      b[n].is_null = &i.location_id_null;
+      n++;
+    }
+
+    // location
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.location_value;
+    b[n].is_null = &i.location_null;
+    n++;
+
+    // link
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.link_value;
+    b[n].is_null = &i.link_null;
+    n++;
+
+    // dir
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.dir_value;
+    b[n].is_null = &i.dir_null;
+    n++;
+
+    // offset
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.offset_value;
+    b[n].is_null = &i.offset_null;
+    n++;
+
+    // setback
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.setback_value;
+    b[n].is_null = &i.setback_null;
+    n++;
+
+    // zone
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.zone_value;
+    b[n].is_null = &i.zone_null;
+    n++;
+
+    // truck_org
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.truck_org_value;
+    b[n].is_null = &i.truck_org_null;
+    n++;
+
+    // truck_des
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.truck_des_value;
+    b[n].is_null = &i.truck_des_null;
+    n++;
+
+    // auto_org
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.auto_org_value;
+    b[n].is_null = &i.auto_org_null;
+    n++;
+
+    // auto_des
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.auto_des_value;
+    b[n].is_null = &i.auto_des_null;
+    n++;
+
+    // transit
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.transit_value;
+    b[n].is_null = &i.transit_null;
+    n++;
+
+    // areatype
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.areatype_value;
+    b[n].is_null = &i.areatype_null;
+    n++;
+
+    // notes
+    //
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.notes_value.data ();
+    b[n].size = &i.notes_size;
+    b[n].capacity = i.notes_value.capacity ();
+    b[n].is_null = &i.notes_null;
+    n++;
+
+    // census_zone
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.census_zone_value;
+    b[n].is_null = &i.census_zone_null;
+    n++;
+
+    // x
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.x_value;
+    b[n].is_null = &i.x_null;
+    n++;
+
+    // y
+    //
+    b[n].type = sqlite::bind::real;
+    b[n].buffer = &i.y_value;
+    b[n].is_null = &i.y_null;
+    n++;
+  }
+
+  void access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  bind (sqlite::bind* b, id_image_type& i)
+  {
+    std::size_t n (0);
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.id_value;
+    b[n].is_null = &i.id_null;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  init (image_type& i, const object_type& o, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    bool grew (false);
+
+    // location_id
+    //
+    if (sk == statement_insert)
+    {
+      int const& v =
+        o.location_id;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.location_id_value,
+        is_null,
+        v);
+      i.location_id_null = is_null;
+    }
+
+    // location
+    //
+    {
+      ::std::tr1::shared_ptr< ::polaris::io::Location > const& v =
+        o.location;
+
+      typedef object_traits< ::polaris::io::Location > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::polaris::io::Location > > ptr_traits;
+
+      bool is_null (ptr_traits::null_ptr (v));
+      if (!is_null)
+      {
+        const obj_traits::id_type& id (
+          obj_traits::id (ptr_traits::get_ref (v)));
+
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_image (
+          i.location_value,
+          is_null,
+          id);
+        i.location_null = is_null;
+      }
+      else
+        i.location_null = true;
+    }
+
+    // link
+    //
+    {
+      ::std::tr1::shared_ptr< ::polaris::io::Link > const& v =
+        o.link;
+
+      typedef object_traits< ::polaris::io::Link > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::polaris::io::Link > > ptr_traits;
+
+      bool is_null (ptr_traits::null_ptr (v));
+      if (!is_null)
+      {
+        const obj_traits::id_type& id (
+          obj_traits::id (ptr_traits::get_ref (v)));
+
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_image (
+          i.link_value,
+          is_null,
+          id);
+        i.link_null = is_null;
+      }
+      else
+        i.link_null = true;
+    }
+
+    // dir
+    //
+    {
+      int const& v =
+        o.dir;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.dir_value,
+        is_null,
+        v);
+      i.dir_null = is_null;
+    }
+
+    // offset
+    //
+    {
+      double const& v =
+        o.offset;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.offset_value,
+        is_null,
+        v);
+      i.offset_null = is_null;
+    }
+
+    // setback
+    //
+    {
+      int const& v =
+        o.setback;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.setback_value,
+        is_null,
+        v);
+      i.setback_null = is_null;
+    }
+
+    // zone
+    //
+    {
+      ::std::tr1::shared_ptr< ::polaris::io::ZoneLandUse > const& v =
+        o.zone;
+
+      typedef object_traits< ::polaris::io::ZoneLandUse > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::polaris::io::ZoneLandUse > > ptr_traits;
+
+      bool is_null (ptr_traits::null_ptr (v));
+      if (!is_null)
+      {
+        const obj_traits::id_type& id (
+          obj_traits::id (ptr_traits::get_ref (v)));
+
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_image (
+          i.zone_value,
+          is_null,
+          id);
+        i.zone_null = is_null;
+      }
+      else
+        i.zone_null = true;
+    }
+
+    // truck_org
+    //
+    {
+      int const& v =
+        o.truck_org;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.truck_org_value,
+        is_null,
+        v);
+      i.truck_org_null = is_null;
+    }
+
+    // truck_des
+    //
+    {
+      int const& v =
+        o.truck_des;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.truck_des_value,
+        is_null,
+        v);
+      i.truck_des_null = is_null;
+    }
+
+    // auto_org
+    //
+    {
+      int const& v =
+        o.auto_org;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.auto_org_value,
+        is_null,
+        v);
+      i.auto_org_null = is_null;
+    }
+
+    // auto_des
+    //
+    {
+      int const& v =
+        o.auto_des;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.auto_des_value,
+        is_null,
+        v);
+      i.auto_des_null = is_null;
+    }
+
+    // transit
+    //
+    {
+      int const& v =
+        o.transit;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.transit_value,
+        is_null,
+        v);
+      i.transit_null = is_null;
+    }
+
+    // areatype
+    //
+    {
+      int const& v =
+        o.areatype;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.areatype_value,
+        is_null,
+        v);
+      i.areatype_null = is_null;
+    }
+
+    // notes
+    //
+    {
+      ::std::string const& v =
+        o.notes;
+
+      bool is_null (false);
+      std::size_t cap (i.notes_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
+        i.notes_value,
+        i.notes_size,
+        is_null,
+        v);
+      i.notes_null = is_null;
+      grew = grew || (cap != i.notes_value.capacity ());
+    }
+
+    // census_zone
+    //
+    {
+      int const& v =
+        o.census_zone;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.census_zone_value,
+        is_null,
+        v);
+      i.census_zone_null = is_null;
+    }
+
+    // x
+    //
+    {
+      double const& v =
+        o.x;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.x_value,
+        is_null,
+        v);
+      i.x_null = is_null;
+    }
+
+    // y
+    //
+    {
+      double const& v =
+        o.y;
+
+      bool is_null (true);
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_image (
+        i.y_value,
+        is_null,
+        v);
+      i.y_null = is_null;
+    }
+
+    return grew;
+  }
+
+  void access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  init (object_type& o, const image_type& i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // location_id
+    //
+    {
+      int& v =
+        o.location_id;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.location_id_value,
+        i.location_id_null);
+    }
+
+    // location
+    //
+    {
+      ::std::tr1::shared_ptr< ::polaris::io::Location >& v =
+        o.location;
+
+      typedef object_traits< ::polaris::io::Location > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::polaris::io::Location > > ptr_traits;
+
+      if (i.location_null)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_value (
+          id,
+          i.location_value,
+          i.location_null);
+
+        // If a compiler error points to the line below, then
+        // it most likely means that a pointer used in a member
+        // cannot be initialized from an object pointer.
+        //
+        v = ptr_traits::pointer_type (
+          static_cast<sqlite::database*> (db)->load<
+            obj_traits::object_type > (id));
+      }
+    }
+
+    // link
+    //
+    {
+      ::std::tr1::shared_ptr< ::polaris::io::Link >& v =
+        o.link;
+
+      typedef object_traits< ::polaris::io::Link > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::polaris::io::Link > > ptr_traits;
+
+      if (i.link_null)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_value (
+          id,
+          i.link_value,
+          i.link_null);
+
+        // If a compiler error points to the line below, then
+        // it most likely means that a pointer used in a member
+        // cannot be initialized from an object pointer.
+        //
+        v = ptr_traits::pointer_type (
+          static_cast<sqlite::database*> (db)->load<
+            obj_traits::object_type > (id));
+      }
+    }
+
+    // dir
+    //
+    {
+      int& v =
+        o.dir;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.dir_value,
+        i.dir_null);
+    }
+
+    // offset
+    //
+    {
+      double& v =
+        o.offset;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.offset_value,
+        i.offset_null);
+    }
+
+    // setback
+    //
+    {
+      int& v =
+        o.setback;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.setback_value,
+        i.setback_null);
+    }
+
+    // zone
+    //
+    {
+      ::std::tr1::shared_ptr< ::polaris::io::ZoneLandUse >& v =
+        o.zone;
+
+      typedef object_traits< ::polaris::io::ZoneLandUse > obj_traits;
+      typedef odb::pointer_traits< ::std::tr1::shared_ptr< ::polaris::io::ZoneLandUse > > ptr_traits;
+
+      if (i.zone_null)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        sqlite::value_traits<
+            obj_traits::id_type,
+            sqlite::id_integer >::set_value (
+          id,
+          i.zone_value,
+          i.zone_null);
+
+        // If a compiler error points to the line below, then
+        // it most likely means that a pointer used in a member
+        // cannot be initialized from an object pointer.
+        //
+        v = ptr_traits::pointer_type (
+          static_cast<sqlite::database*> (db)->load<
+            obj_traits::object_type > (id));
+      }
+    }
+
+    // truck_org
+    //
+    {
+      int& v =
+        o.truck_org;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.truck_org_value,
+        i.truck_org_null);
+    }
+
+    // truck_des
+    //
+    {
+      int& v =
+        o.truck_des;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.truck_des_value,
+        i.truck_des_null);
+    }
+
+    // auto_org
+    //
+    {
+      int& v =
+        o.auto_org;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.auto_org_value,
+        i.auto_org_null);
+    }
+
+    // auto_des
+    //
+    {
+      int& v =
+        o.auto_des;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.auto_des_value,
+        i.auto_des_null);
+    }
+
+    // transit
+    //
+    {
+      int& v =
+        o.transit;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.transit_value,
+        i.transit_null);
+    }
+
+    // areatype
+    //
+    {
+      int& v =
+        o.areatype;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.areatype_value,
+        i.areatype_null);
+    }
+
+    // notes
+    //
+    {
+      ::std::string& v =
+        o.notes;
+
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        v,
+        i.notes_value,
+        i.notes_size,
+        i.notes_null);
+    }
+
+    // census_zone
+    //
+    {
+      int& v =
+        o.census_zone;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.census_zone_value,
+        i.census_zone_null);
+    }
+
+    // x
+    //
+    {
+      double& v =
+        o.x;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.x_value,
+        i.x_null);
+    }
+
+    // y
+    //
+    {
+      double& v =
+        o.y;
+
+      sqlite::value_traits<
+          double,
+          sqlite::id_real >::set_value (
+        v,
+        i.y_value,
+        i.y_null);
+    }
+  }
+
+  void access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  init (id_image_type& i, const id_type& id)
+  {
+    {
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.id_value,
+        is_null,
+        id);
+      i.id_null = is_null;
+    }
+  }
+
+  struct access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::container_statement_cache_type
+  {
+    container_statement_cache_type (
+      sqlite::connection&,
+      sqlite::binding&)
+    {
+    }
+  };
+
+  const char access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::persist_statement[] =
+  "INSERT INTO \"LocationData\" ("
+  "\"location_id\","
+  "\"location\","
+  "\"link\","
+  "\"dir\","
+  "\"offset\","
+  "\"setback\","
+  "\"zone\","
+  "\"truck_org\","
+  "\"truck_des\","
+  "\"auto_org\","
+  "\"auto_des\","
+  "\"transit\","
+  "\"areatype\","
+  "\"notes\","
+  "\"census_zone\","
+  "\"x\","
+  "\"y\")"
+  " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+  const char access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::find_statement[] =
+  "SELECT "
+  "\"LocationData\".\"location_id\","
+  "\"LocationData\".\"location\","
+  "\"LocationData\".\"link\","
+  "\"LocationData\".\"dir\","
+  "\"LocationData\".\"offset\","
+  "\"LocationData\".\"setback\","
+  "\"LocationData\".\"zone\","
+  "\"LocationData\".\"truck_org\","
+  "\"LocationData\".\"truck_des\","
+  "\"LocationData\".\"auto_org\","
+  "\"LocationData\".\"auto_des\","
+  "\"LocationData\".\"transit\","
+  "\"LocationData\".\"areatype\","
+  "\"LocationData\".\"notes\","
+  "\"LocationData\".\"census_zone\","
+  "\"LocationData\".\"x\","
+  "\"LocationData\".\"y\""
+  " FROM \"LocationData\""
+  " WHERE \"LocationData\".\"location_id\"=?";
+
+  const char access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::update_statement[] =
+  "UPDATE \"LocationData\" SET "
+  "\"location\"=?,"
+  "\"link\"=?,"
+  "\"dir\"=?,"
+  "\"offset\"=?,"
+  "\"setback\"=?,"
+  "\"zone\"=?,"
+  "\"truck_org\"=?,"
+  "\"truck_des\"=?,"
+  "\"auto_org\"=?,"
+  "\"auto_des\"=?,"
+  "\"transit\"=?,"
+  "\"areatype\"=?,"
+  "\"notes\"=?,"
+  "\"census_zone\"=?,"
+  "\"x\"=?,"
+  "\"y\"=?"
+  " WHERE \"location_id\"=?";
+
+  const char access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::erase_statement[] =
+  "DELETE FROM \"LocationData\""
+  " WHERE \"location_id\"=?";
+
+  const char access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::query_statement[] =
+  "SELECT "
+  "\"LocationData\".\"location_id\","
+  "\"LocationData\".\"location\","
+  "\"LocationData\".\"link\","
+  "\"LocationData\".\"dir\","
+  "\"LocationData\".\"offset\","
+  "\"LocationData\".\"setback\","
+  "\"LocationData\".\"zone\","
+  "\"LocationData\".\"truck_org\","
+  "\"LocationData\".\"truck_des\","
+  "\"LocationData\".\"auto_org\","
+  "\"LocationData\".\"auto_des\","
+  "\"LocationData\".\"transit\","
+  "\"LocationData\".\"areatype\","
+  "\"LocationData\".\"notes\","
+  "\"LocationData\".\"census_zone\","
+  "\"LocationData\".\"x\","
+  "\"LocationData\".\"y\""
+  " FROM \"LocationData\""
+  " LEFT JOIN \"Location\" AS \"location\" ON \"location\".\"location\"=\"LocationData\".\"location\""
+  " LEFT JOIN \"Link\" AS \"link\" ON \"link\".\"link\"=\"LocationData\".\"link\""
+  " LEFT JOIN \"ZoneLandUse\" AS \"zone\" ON \"zone\".\"zone_id\"=\"LocationData\".\"zone\""
+  " ";
+
+  const char access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::erase_query_statement[] =
+  "DELETE FROM \"LocationData\""
+  " ";
+
+  const char access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::table_name[] =
+  "\"LocationData\"";
+
+  void access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  persist (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    callback (db,
+              obj,
+              callback_event::pre_persist);
+
+    image_type& im (sts.image ());
+    binding& imb (sts.insert_image_binding ());
+
+    if (init (im, obj, statement_insert))
+      im.version++;
+
+    if (im.version != sts.insert_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_insert);
+      sts.insert_image_version (im.version);
+      imb.version++;
+    }
+
+    insert_statement& st (sts.persist_statement ());
+    if (!st.execute ())
+      throw object_already_persistent ();
+
+    callback (db,
+              obj,
+              callback_event::post_persist);
+  }
+
+  void access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  update (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace sqlite;
+
+    callback (db, obj, callback_event::pre_update);
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, obj.location_id);
+
+    image_type& im (sts.image ());
+    if (init (im, obj, statement_update))
+      im.version++;
+
+    bool u (false);
+    binding& imb (sts.update_image_binding ());
+    if (im.version != sts.update_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_update);
+      sts.update_image_version (im.version);
+      imb.version++;
+      u = true;
+    }
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.update_id_image_version () ||
+        idb.version == 0)
+    {
+      if (i.version != sts.id_image_version () ||
+          idb.version == 0)
+      {
+        bind (idb.bind, i);
+        sts.id_image_version (i.version);
+        idb.version++;
+      }
+
+      sts.update_id_image_version (i.version);
+
+      if (!u)
+        imb.version++;
+    }
+
+    if (sts.update_statement ().execute () == 0)
+      throw object_not_persistent ();
+
+    callback (db, obj, callback_event::post_update);
+    pointer_cache_traits::update (db, obj);
+  }
+
+  void access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  erase (database& db, const id_type& id)
+  {
+    using namespace sqlite;
+
+    ODB_POTENTIALLY_UNUSED (db);
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    if (sts.erase_statement ().execute () != 1)
+      throw object_not_persistent ();
+
+    pointer_cache_traits::erase (db, id);
+  }
+
+  access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::pointer_type
+  access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  find (database& db, const id_type& id)
+  {
+    using namespace sqlite;
+
+    {
+      pointer_type p (pointer_cache_traits::find (db, id));
+
+      if (!pointer_traits::null_ptr (p))
+        return p;
+    }
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    if (l.locked ())
+    {
+      if (!find_ (sts, &id))
+        return pointer_type ();
+    }
+
+    pointer_type p (
+      access::object_factory<object_type, pointer_type>::create ());
+    pointer_traits::guard pg (p);
+
+    pointer_cache_traits::insert_guard ig (
+      pointer_cache_traits::insert (db, id, p));
+
+    object_type& obj (pointer_traits::get_ref (p));
+
+    if (l.locked ())
+    {
+      select_statement& st (sts.find_statement ());
+      ODB_POTENTIALLY_UNUSED (st);
+
+      callback (db, obj, callback_event::pre_load);
+      init (obj, sts.image (), &db);
+      load_ (sts, obj);
+      sts.load_delayed ();
+      l.unlock ();
+      callback (db, obj, callback_event::post_load);
+      pointer_cache_traits::load (ig.position ());
+    }
+    else
+      sts.delay_load (id, obj, ig.position ());
+
+    ig.release ();
+    pg.release ();
+    return p;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  find (database& db, const id_type& id, object_type& obj)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    reference_cache_traits::position_type pos (
+      reference_cache_traits::insert (db, id, obj));
+    reference_cache_traits::insert_guard ig (pos);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    load_ (sts, obj);
+    sts.load_delayed ();
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    reference_cache_traits::load (pos);
+    ig.release ();
+    return true;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  reload (database& db, object_type& obj)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    const id_type& id  (
+      obj.location_id);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    load_ (sts, obj);
+    sts.load_delayed ();
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    return true;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  find_ (statements_type& sts, const id_type* id)
+  {
+    using namespace sqlite;
+
+    id_image_type& i (sts.id_image ());
+    init (i, *id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    select_statement& st (sts.find_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+
+    if (r == select_statement::truncated)
+    {
+      if (grow (im, sts.select_image_truncated ()))
+        im.version++;
+
+      if (im.version != sts.select_image_version ())
+      {
+        bind (imb.bind, im, statement_select);
+        sts.select_image_version (im.version);
+        imb.version++;
+        st.refetch ();
+      }
+    }
+
+    return r != select_statement::no_data;
+  }
+
+  result< access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::object_type >
+  access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  query (database&, const query_base_type& q)
+  {
+    using namespace sqlite;
+    using odb::details::shared;
+    using odb::details::shared_ptr;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    q.init_parameters ();
+    shared_ptr<select_statement> st (
+      new (shared) select_statement (
+        conn,
+        query_statement + q.clause (),
+        q.parameters_binding (),
+        imb));
+
+    st->execute ();
+
+    shared_ptr< odb::object_result_impl<object_type> > r (
+      new (shared) sqlite::object_result_impl<object_type> (
+        q, st, sts));
+
+    return result<object_type> (r);
+  }
+
+  unsigned long long access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  erase_query (database&, const query_base_type& q)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+
+    q.init_parameters ();
+    delete_statement st (
+      conn,
+      erase_query_statement + q.clause (),
+      q.parameters_binding ());
+
+    return st.execute ();
+  }
+
+  bool access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  create_schema (database& db, unsigned short pass, bool drop)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (pass);
+    ODB_POTENTIALLY_UNUSED (drop);
+
+    if (drop)
+    {
+      switch (pass)
+      {
+        case 1:
+        {
+          db.execute ("DROP TABLE IF EXISTS \"LocationData\"");
+          return false;
+        }
+      }
+    }
+    else
+    {
+      switch (pass)
+      {
+        case 1:
+        {
+          db.execute ("CREATE TABLE \"LocationData\" (\n"
+                      "  \"location_id\" INTEGER NOT NULL PRIMARY KEY,\n"
+                      "  \"location\" INTEGER,\n"
+                      "  \"link\" INTEGER,\n"
+                      "  \"dir\" INTEGER NOT NULL,\n"
+                      "  \"offset\" REAL,\n"
+                      "  \"setback\" INTEGER NOT NULL,\n"
+                      "  \"zone\" INTEGER,\n"
+                      "  \"truck_org\" INTEGER NOT NULL,\n"
+                      "  \"truck_des\" INTEGER NOT NULL,\n"
+                      "  \"auto_org\" INTEGER NOT NULL,\n"
+                      "  \"auto_des\" INTEGER NOT NULL,\n"
+                      "  \"transit\" INTEGER NOT NULL,\n"
+                      "  \"areatype\" INTEGER NOT NULL,\n"
+                      "  \"notes\" TEXT NOT NULL,\n"
+                      "  \"census_zone\" INTEGER NOT NULL,\n"
+                      "  \"x\" REAL,\n"
+                      "  \"y\" REAL,\n"
+                      "  CONSTRAINT \"location_fk\"\n"
+                      "    FOREIGN KEY (\"location\")\n"
+                      "    REFERENCES \"Location\" (\"location\")\n"
+                      "    DEFERRABLE INITIALLY DEFERRED,\n"
+                      "  CONSTRAINT \"link_fk\"\n"
+                      "    FOREIGN KEY (\"link\")\n"
+                      "    REFERENCES \"Link\" (\"link\")\n"
+                      "    DEFERRABLE INITIALLY DEFERRED,\n"
+                      "  CONSTRAINT \"zone_fk\"\n"
+                      "    FOREIGN KEY (\"zone\")\n"
+                      "    REFERENCES \"ZoneLandUse\" (\"zone_id\")\n"
+                      "    DEFERRABLE INITIALLY DEFERRED)");
+          return false;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  static const schema_catalog_entry
+  schema_catalog_entry_polaris_io_LocationData_ (
+    id_sqlite,
+    "Supply",
+    &access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::create_schema);
+
   // Shape
   //
 

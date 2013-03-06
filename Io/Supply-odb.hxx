@@ -174,6 +174,98 @@ namespace odb
     callback (database&, const object_type&, callback_event);
   };
 
+  // ZoneLandUse
+  //
+  template <>
+  struct class_traits< ::polaris::io::ZoneLandUse >
+  {
+    static const class_kind kind = class_object;
+  };
+
+  template <>
+  class access::object_traits< ::polaris::io::ZoneLandUse >
+  {
+    public:
+    typedef ::polaris::io::ZoneLandUse object_type;
+    typedef ::std::tr1::shared_ptr< ::polaris::io::ZoneLandUse > pointer_type;
+    typedef odb::pointer_traits<pointer_type> pointer_traits;
+
+    static const bool polymorphic = false;
+
+    typedef int id_type;
+
+    static const bool auto_id = false;
+
+    static const bool abstract = false;
+
+    static id_type
+    id (const object_type&);
+
+    typedef
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
+    pointer_cache_traits;
+
+    typedef
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
+    reference_cache_traits;
+
+    static void
+    callback (database&, object_type&, callback_event);
+
+    static void
+    callback (database&, const object_type&, callback_event);
+  };
+
+  // LocationData
+  //
+  template <>
+  struct class_traits< ::polaris::io::LocationData >
+  {
+    static const class_kind kind = class_object;
+  };
+
+  template <>
+  class access::object_traits< ::polaris::io::LocationData >
+  {
+    public:
+    typedef ::polaris::io::LocationData object_type;
+    typedef ::std::tr1::shared_ptr< ::polaris::io::LocationData > pointer_type;
+    typedef odb::pointer_traits<pointer_type> pointer_traits;
+
+    static const bool polymorphic = false;
+
+    typedef int id_type;
+
+    static const bool auto_id = false;
+
+    static const bool abstract = false;
+
+    static id_type
+    id (const object_type&);
+
+    typedef
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
+    pointer_cache_traits;
+
+    typedef
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
+    reference_cache_traits;
+
+    static void
+    callback (database&, object_type&, callback_event);
+
+    static void
+    callback (database&, const object_type&, callback_event);
+  };
+
   // Shape
   //
   template <>
@@ -2568,6 +2660,879 @@ namespace odb
   template <>
   class access::object_traits_impl< ::polaris::io::Zone, id_common >:
     public access::object_traits_impl< ::polaris::io::Zone, id_sqlite >
+  {
+  };
+
+  // ZoneLandUse
+  //
+  template <typename A>
+  struct pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >
+  {
+    // zone_id
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    zone_id_type_;
+
+    static const zone_id_type_ zone_id;
+
+    // zone
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    zone_type_;
+
+    static const zone_type_ zone;
+
+    // area
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    area_type_;
+
+    static const area_type_ area;
+
+    // area_res_low
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    area_res_low_type_;
+
+    static const area_res_low_type_ area_res_low;
+
+    // area_res_hi
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    area_res_hi_type_;
+
+    static const area_res_hi_type_ area_res_hi;
+
+    // area_comm
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    area_comm_type_;
+
+    static const area_comm_type_ area_comm;
+
+    // area_ind
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    area_ind_type_;
+
+    static const area_ind_type_ area_ind;
+
+    // pop_hh
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    pop_hh_type_;
+
+    static const pop_hh_type_ pop_hh;
+
+    // pop_per
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    pop_per_type_;
+
+    static const pop_per_type_ pop_per;
+
+    // pop_gq
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    pop_gq_type_;
+
+    static const pop_gq_type_ pop_gq;
+
+    // emp_tot
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    emp_tot_type_;
+
+    static const emp_tot_type_ emp_tot;
+
+    // emp_ret
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    emp_ret_type_;
+
+    static const emp_ret_type_ emp_ret;
+  };
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::zone_id_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  zone_id (A::table_name, "\"zone_id\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::zone_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  zone (A::table_name, "\"zone\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::area_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  area (A::table_name, "\"area\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::area_res_low_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  area_res_low (A::table_name, "\"area_res_low\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::area_res_hi_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  area_res_hi (A::table_name, "\"area_res_hi\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::area_comm_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  area_comm (A::table_name, "\"area_comm\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::area_ind_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  area_ind (A::table_name, "\"area_ind\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::pop_hh_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  pop_hh (A::table_name, "\"pop_hh\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::pop_per_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  pop_per (A::table_name, "\"pop_per\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::pop_gq_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  pop_gq (A::table_name, "\"pop_gq\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::emp_tot_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  emp_tot (A::table_name, "\"emp_tot\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::emp_ret_type_
+  pointer_query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  emp_ret (A::table_name, "\"emp_ret\"", 0);
+
+  template <>
+  class access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >:
+    public access::object_traits< ::polaris::io::ZoneLandUse >
+  {
+    public:
+    struct id_image_type
+    {
+      long long id_value;
+      bool id_null;
+
+      std::size_t version;
+    };
+
+    struct image_type
+    {
+      // zone_id
+      //
+      long long zone_id_value;
+      bool zone_id_null;
+
+      // zone
+      //
+      long long zone_value;
+      bool zone_null;
+
+      // area
+      //
+      long long area_value;
+      bool area_null;
+
+      // area_res_low
+      //
+      long long area_res_low_value;
+      bool area_res_low_null;
+
+      // area_res_hi
+      //
+      long long area_res_hi_value;
+      bool area_res_hi_null;
+
+      // area_comm
+      //
+      long long area_comm_value;
+      bool area_comm_null;
+
+      // area_ind
+      //
+      long long area_ind_value;
+      bool area_ind_null;
+
+      // pop_hh
+      //
+      long long pop_hh_value;
+      bool pop_hh_null;
+
+      // pop_per
+      //
+      long long pop_per_value;
+      bool pop_per_null;
+
+      // pop_gq
+      //
+      long long pop_gq_value;
+      bool pop_gq_null;
+
+      // emp_tot
+      //
+      long long emp_tot_value;
+      bool emp_tot_null;
+
+      // emp_ret
+      //
+      long long emp_ret_value;
+      bool emp_ret_null;
+
+      std::size_t version;
+    };
+
+    struct zone_tag;
+
+    using object_traits<object_type>::id;
+
+    static id_type
+    id (const image_type&);
+
+    static bool
+    grow (image_type&, bool*);
+
+    static void
+    bind (sqlite::bind*,
+          image_type&,
+          sqlite::statement_kind);
+
+    static void
+    bind (sqlite::bind*, id_image_type&);
+
+    static bool
+    init (image_type&, const object_type&, sqlite::statement_kind);
+
+    static void
+    init (object_type&, const image_type&, database*);
+
+    static void
+    init (id_image_type&, const id_type&);
+
+    typedef sqlite::object_statements<object_type> statements_type;
+
+    typedef sqlite::query_base query_base_type;
+
+    struct container_statement_cache_type;
+
+    static const std::size_t column_count = 12UL;
+    static const std::size_t id_column_count = 1UL;
+    static const std::size_t inverse_column_count = 0UL;
+    static const std::size_t readonly_column_count = 0UL;
+    static const std::size_t managed_optimistic_column_count = 0UL;
+
+    static const char persist_statement[];
+    static const char find_statement[];
+    static const char update_statement[];
+    static const char erase_statement[];
+    static const char query_statement[];
+    static const char erase_query_statement[];
+
+    static const char table_name[];
+
+    static void
+    persist (database&, const object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
+
+    static bool
+    create_schema (database&, unsigned short pass, bool drop);
+
+    public:
+    static bool
+    find_ (statements_type&, const id_type*);
+
+    static void
+    load_ (statements_type&, object_type&);
+  };
+
+  template <>
+  class access::object_traits_impl< ::polaris::io::ZoneLandUse, id_common >:
+    public access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >
+  {
+  };
+
+  // LocationData
+  //
+  template <typename A>
+  struct pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >
+  {
+    // location_id
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    location_id_type_;
+
+    static const location_id_type_ location_id;
+
+    // location
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    location_type_;
+
+    static const location_type_ location;
+
+    // link
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    link_type_;
+
+    static const link_type_ link;
+
+    // dir
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    dir_type_;
+
+    static const dir_type_ dir;
+
+    // offset
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    offset_type_;
+
+    static const offset_type_ offset;
+
+    // setback
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    setback_type_;
+
+    static const setback_type_ setback;
+
+    // zone
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    zone_type_;
+
+    static const zone_type_ zone;
+
+    // truck_org
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    truck_org_type_;
+
+    static const truck_org_type_ truck_org;
+
+    // truck_des
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    truck_des_type_;
+
+    static const truck_des_type_ truck_des;
+
+    // auto_org
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    auto_org_type_;
+
+    static const auto_org_type_ auto_org;
+
+    // auto_des
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    auto_des_type_;
+
+    static const auto_des_type_ auto_des;
+
+    // transit
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    transit_type_;
+
+    static const transit_type_ transit;
+
+    // areatype
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    areatype_type_;
+
+    static const areatype_type_ areatype;
+
+    // notes
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
+    notes_type_;
+
+    static const notes_type_ notes;
+
+    // census_zone
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    census_zone_type_;
+
+    static const census_zone_type_ census_zone;
+
+    // x
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    x_type_;
+
+    static const x_type_ x;
+
+    // y
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    y_type_;
+
+    static const y_type_ y;
+  };
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::location_id_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  location_id (A::table_name, "\"location_id\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::location_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  location (A::table_name, "\"location\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::link_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  link (A::table_name, "\"link\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::dir_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  dir (A::table_name, "\"dir\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::offset_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  offset (A::table_name, "\"offset\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::setback_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  setback (A::table_name, "\"setback\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::zone_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  zone (A::table_name, "\"zone\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::truck_org_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  truck_org (A::table_name, "\"truck_org\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::truck_des_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  truck_des (A::table_name, "\"truck_des\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::auto_org_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  auto_org (A::table_name, "\"auto_org\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::auto_des_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  auto_des (A::table_name, "\"auto_des\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::transit_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  transit (A::table_name, "\"transit\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::areatype_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  areatype (A::table_name, "\"areatype\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::notes_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  notes (A::table_name, "\"notes\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::census_zone_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  census_zone (A::table_name, "\"census_zone\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::x_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  x (A::table_name, "\"x\"", 0);
+
+  template <typename A>
+  const typename pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::y_type_
+  pointer_query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  y (A::table_name, "\"y\"", 0);
+
+  template <>
+  class access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >:
+    public access::object_traits< ::polaris::io::LocationData >
+  {
+    public:
+    struct id_image_type
+    {
+      long long id_value;
+      bool id_null;
+
+      std::size_t version;
+    };
+
+    struct image_type
+    {
+      // location_id
+      //
+      long long location_id_value;
+      bool location_id_null;
+
+      // location
+      //
+      long long location_value;
+      bool location_null;
+
+      // link
+      //
+      long long link_value;
+      bool link_null;
+
+      // dir
+      //
+      long long dir_value;
+      bool dir_null;
+
+      // offset
+      //
+      double offset_value;
+      bool offset_null;
+
+      // setback
+      //
+      long long setback_value;
+      bool setback_null;
+
+      // zone
+      //
+      long long zone_value;
+      bool zone_null;
+
+      // truck_org
+      //
+      long long truck_org_value;
+      bool truck_org_null;
+
+      // truck_des
+      //
+      long long truck_des_value;
+      bool truck_des_null;
+
+      // auto_org
+      //
+      long long auto_org_value;
+      bool auto_org_null;
+
+      // auto_des
+      //
+      long long auto_des_value;
+      bool auto_des_null;
+
+      // transit
+      //
+      long long transit_value;
+      bool transit_null;
+
+      // areatype
+      //
+      long long areatype_value;
+      bool areatype_null;
+
+      // notes
+      //
+      details::buffer notes_value;
+      std::size_t notes_size;
+      bool notes_null;
+
+      // census_zone
+      //
+      long long census_zone_value;
+      bool census_zone_null;
+
+      // x
+      //
+      double x_value;
+      bool x_null;
+
+      // y
+      //
+      double y_value;
+      bool y_null;
+
+      std::size_t version;
+    };
+
+    struct location_tag;
+    struct link_tag;
+    struct zone_tag;
+
+    using object_traits<object_type>::id;
+
+    static id_type
+    id (const image_type&);
+
+    static bool
+    grow (image_type&, bool*);
+
+    static void
+    bind (sqlite::bind*,
+          image_type&,
+          sqlite::statement_kind);
+
+    static void
+    bind (sqlite::bind*, id_image_type&);
+
+    static bool
+    init (image_type&, const object_type&, sqlite::statement_kind);
+
+    static void
+    init (object_type&, const image_type&, database*);
+
+    static void
+    init (id_image_type&, const id_type&);
+
+    typedef sqlite::object_statements<object_type> statements_type;
+
+    typedef sqlite::query_base query_base_type;
+
+    struct container_statement_cache_type;
+
+    static const std::size_t column_count = 17UL;
+    static const std::size_t id_column_count = 1UL;
+    static const std::size_t inverse_column_count = 0UL;
+    static const std::size_t readonly_column_count = 0UL;
+    static const std::size_t managed_optimistic_column_count = 0UL;
+
+    static const char persist_statement[];
+    static const char find_statement[];
+    static const char update_statement[];
+    static const char erase_statement[];
+    static const char query_statement[];
+    static const char erase_query_statement[];
+
+    static const char table_name[];
+
+    static void
+    persist (database&, const object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
+
+    static bool
+    create_schema (database&, unsigned short pass, bool drop);
+
+    public:
+    static bool
+    find_ (statements_type&, const id_type*);
+
+    static void
+    load_ (statements_type&, object_type&);
+  };
+
+  template <>
+  class access::object_traits_impl< ::polaris::io::LocationData, id_common >:
+    public access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >
   {
   };
 
@@ -12452,6 +13417,657 @@ namespace odb
   const typename query_columns< ::polaris::io::Zone, id_sqlite, A >::max_y_type_
   query_columns< ::polaris::io::Zone, id_sqlite, A >::
   max_y (A::table_name, "\"max_y\"", 0);
+
+  // ZoneLandUse
+  //
+  template <>
+  struct alias_traits<
+    ::polaris::io::Zone,
+    id_sqlite,
+    access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::zone_tag>
+  {
+    static const char table_name[];
+  };
+
+  template <>
+  struct query_columns_base< ::polaris::io::ZoneLandUse, id_sqlite >
+  {
+    // zone
+    //
+    typedef
+    odb::alias_traits<
+      ::polaris::io::Zone,
+      id_sqlite,
+      access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::zone_tag>
+    zone_alias_;
+  };
+
+  template <typename A>
+  struct query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >:
+    query_columns_base< ::polaris::io::ZoneLandUse, id_sqlite >
+  {
+    // zone_id
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    zone_id_type_;
+
+    static const zone_id_type_ zone_id;
+
+    // zone
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    zone_column_type_;
+
+    typedef
+    odb::query_pointer<
+      odb::pointer_query_columns<
+        ::polaris::io::Zone,
+        id_sqlite,
+        zone_alias_ > >
+    zone_pointer_type_;
+
+    struct zone_type_: zone_pointer_type_, zone_column_type_
+    {
+      zone_type_ (const char* t, const char* c, const char* conv)
+        : zone_column_type_ (t, c, conv)
+      {
+      }
+    };
+
+    static const zone_type_ zone;
+
+    // area
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    area_type_;
+
+    static const area_type_ area;
+
+    // area_res_low
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    area_res_low_type_;
+
+    static const area_res_low_type_ area_res_low;
+
+    // area_res_hi
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    area_res_hi_type_;
+
+    static const area_res_hi_type_ area_res_hi;
+
+    // area_comm
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    area_comm_type_;
+
+    static const area_comm_type_ area_comm;
+
+    // area_ind
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    area_ind_type_;
+
+    static const area_ind_type_ area_ind;
+
+    // pop_hh
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    pop_hh_type_;
+
+    static const pop_hh_type_ pop_hh;
+
+    // pop_per
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    pop_per_type_;
+
+    static const pop_per_type_ pop_per;
+
+    // pop_gq
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    pop_gq_type_;
+
+    static const pop_gq_type_ pop_gq;
+
+    // emp_tot
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    emp_tot_type_;
+
+    static const emp_tot_type_ emp_tot;
+
+    // emp_ret
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    emp_ret_type_;
+
+    static const emp_ret_type_ emp_ret;
+  };
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::zone_id_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  zone_id (A::table_name, "\"zone_id\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::zone_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  zone (A::table_name, "\"zone\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::area_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  area (A::table_name, "\"area\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::area_res_low_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  area_res_low (A::table_name, "\"area_res_low\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::area_res_hi_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  area_res_hi (A::table_name, "\"area_res_hi\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::area_comm_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  area_comm (A::table_name, "\"area_comm\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::area_ind_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  area_ind (A::table_name, "\"area_ind\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::pop_hh_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  pop_hh (A::table_name, "\"pop_hh\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::pop_per_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  pop_per (A::table_name, "\"pop_per\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::pop_gq_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  pop_gq (A::table_name, "\"pop_gq\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::emp_tot_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  emp_tot (A::table_name, "\"emp_tot\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::emp_ret_type_
+  query_columns< ::polaris::io::ZoneLandUse, id_sqlite, A >::
+  emp_ret (A::table_name, "\"emp_ret\"", 0);
+
+  // LocationData
+  //
+  template <>
+  struct alias_traits<
+    ::polaris::io::Location,
+    id_sqlite,
+    access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::location_tag>
+  {
+    static const char table_name[];
+  };
+
+  template <>
+  struct alias_traits<
+    ::polaris::io::Link,
+    id_sqlite,
+    access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::link_tag>
+  {
+    static const char table_name[];
+  };
+
+  template <>
+  struct alias_traits<
+    ::polaris::io::ZoneLandUse,
+    id_sqlite,
+    access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::zone_tag>
+  {
+    static const char table_name[];
+  };
+
+  template <>
+  struct query_columns_base< ::polaris::io::LocationData, id_sqlite >
+  {
+    // location
+    //
+    typedef
+    odb::alias_traits<
+      ::polaris::io::Location,
+      id_sqlite,
+      access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::location_tag>
+    location_alias_;
+
+    // link
+    //
+    typedef
+    odb::alias_traits<
+      ::polaris::io::Link,
+      id_sqlite,
+      access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::link_tag>
+    link_alias_;
+
+    // zone
+    //
+    typedef
+    odb::alias_traits<
+      ::polaris::io::ZoneLandUse,
+      id_sqlite,
+      access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::zone_tag>
+    zone_alias_;
+  };
+
+  template <typename A>
+  struct query_columns< ::polaris::io::LocationData, id_sqlite, A >:
+    query_columns_base< ::polaris::io::LocationData, id_sqlite >
+  {
+    // location_id
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    location_id_type_;
+
+    static const location_id_type_ location_id;
+
+    // location
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    location_column_type_;
+
+    typedef
+    odb::query_pointer<
+      odb::pointer_query_columns<
+        ::polaris::io::Location,
+        id_sqlite,
+        location_alias_ > >
+    location_pointer_type_;
+
+    struct location_type_: location_pointer_type_, location_column_type_
+    {
+      location_type_ (const char* t, const char* c, const char* conv)
+        : location_column_type_ (t, c, conv)
+      {
+      }
+    };
+
+    static const location_type_ location;
+
+    // link
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    link_column_type_;
+
+    typedef
+    odb::query_pointer<
+      odb::pointer_query_columns<
+        ::polaris::io::Link,
+        id_sqlite,
+        link_alias_ > >
+    link_pointer_type_;
+
+    struct link_type_: link_pointer_type_, link_column_type_
+    {
+      link_type_ (const char* t, const char* c, const char* conv)
+        : link_column_type_ (t, c, conv)
+      {
+      }
+    };
+
+    static const link_type_ link;
+
+    // dir
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    dir_type_;
+
+    static const dir_type_ dir;
+
+    // offset
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    offset_type_;
+
+    static const offset_type_ offset;
+
+    // setback
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    setback_type_;
+
+    static const setback_type_ setback;
+
+    // zone
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    zone_column_type_;
+
+    typedef
+    odb::query_pointer<
+      odb::pointer_query_columns<
+        ::polaris::io::ZoneLandUse,
+        id_sqlite,
+        zone_alias_ > >
+    zone_pointer_type_;
+
+    struct zone_type_: zone_pointer_type_, zone_column_type_
+    {
+      zone_type_ (const char* t, const char* c, const char* conv)
+        : zone_column_type_ (t, c, conv)
+      {
+      }
+    };
+
+    static const zone_type_ zone;
+
+    // truck_org
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    truck_org_type_;
+
+    static const truck_org_type_ truck_org;
+
+    // truck_des
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    truck_des_type_;
+
+    static const truck_des_type_ truck_des;
+
+    // auto_org
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    auto_org_type_;
+
+    static const auto_org_type_ auto_org;
+
+    // auto_des
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    auto_des_type_;
+
+    static const auto_des_type_ auto_des;
+
+    // transit
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    transit_type_;
+
+    static const transit_type_ transit;
+
+    // areatype
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    areatype_type_;
+
+    static const areatype_type_ areatype;
+
+    // notes
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
+    notes_type_;
+
+    static const notes_type_ notes;
+
+    // census_zone
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    census_zone_type_;
+
+    static const census_zone_type_ census_zone;
+
+    // x
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    x_type_;
+
+    static const x_type_ x;
+
+    // y
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        double,
+        sqlite::id_real >::query_type,
+      sqlite::id_real >
+    y_type_;
+
+    static const y_type_ y;
+  };
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::location_id_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  location_id (A::table_name, "\"location_id\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::location_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  location (A::table_name, "\"location\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::link_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  link (A::table_name, "\"link\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::dir_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  dir (A::table_name, "\"dir\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::offset_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  offset (A::table_name, "\"offset\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::setback_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  setback (A::table_name, "\"setback\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::zone_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  zone (A::table_name, "\"zone\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::truck_org_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  truck_org (A::table_name, "\"truck_org\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::truck_des_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  truck_des (A::table_name, "\"truck_des\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::auto_org_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  auto_org (A::table_name, "\"auto_org\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::auto_des_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  auto_des (A::table_name, "\"auto_des\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::transit_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  transit (A::table_name, "\"transit\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::areatype_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  areatype (A::table_name, "\"areatype\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::notes_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  notes (A::table_name, "\"notes\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::census_zone_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  census_zone (A::table_name, "\"census_zone\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::x_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  x (A::table_name, "\"x\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::LocationData, id_sqlite, A >::y_type_
+  query_columns< ::polaris::io::LocationData, id_sqlite, A >::
+  y (A::table_name, "\"y\"", 0);
 
   // Shape
   //

@@ -21,6 +21,7 @@ namespace io
 //
 class Node;
 class Zone;
+class ZoneLandUse;
 class Shape;
 class Link;
 class Pocket;
@@ -213,6 +214,132 @@ private:
 	double max_y;
 	#pragma db index member(zone)
 
+};
+
+#pragma db object
+class ZoneLandUse
+{
+public:
+    // Default Constructor
+    ZoneLandUse () {}        
+	ZoneLandUse (int zone_id_, shared_ptr<Zone> zone_, int area_, int area_res_low_, int area_res_hi_, int area_comm_, int area_ind_, int pop_hh_, int pop_per_, int pop_gq_, int emp_tot_, int emp_ret_)
+	: zone_id (zone_id_), zone (zone_), area (area_), area_res_low (area_res_low_), area_res_hi (area_res_hi_), area_comm (area_comm_), area_ind (area_ind_), pop_hh (pop_hh_), pop_per (pop_per_), pop_gq (pop_gq_), emp_tot (emp_tot_), emp_ret (emp_ret_)
+	{
+	}
+	//Accessors
+	const int& getPrimaryKey () const {return zone_id;}
+	const int& getZone_Id () const {return zone_id;}
+	void setZone_Id (const int& zone_id_) {zone_id = zone_id_;}
+	void setZone (const int& zone_, InputContainer& container) {zone = container.Zones[zone_];}
+	const shared_ptr<Zone>& getZone () const {return zone;}
+	void setZone (const shared_ptr<Zone>& zone_) {zone = zone_;}
+	const int& getArea () const {return area;}
+	void setArea (const int& area_) {area = area_;}
+	const int& getArea_Res_Low () const {return area_res_low;}
+	void setArea_Res_Low (const int& area_res_low_) {area_res_low = area_res_low_;}
+	const int& getArea_Res_Hi () const {return area_res_hi;}
+	void setArea_Res_Hi (const int& area_res_hi_) {area_res_hi = area_res_hi_;}
+	const int& getArea_Comm () const {return area_comm;}
+	void setArea_Comm (const int& area_comm_) {area_comm = area_comm_;}
+	const int& getArea_Ind () const {return area_ind;}
+	void setArea_Ind (const int& area_ind_) {area_ind = area_ind_;}
+	const int& getPop_Hh () const {return pop_hh;}
+	void setPop_Hh (const int& pop_hh_) {pop_hh = pop_hh_;}
+	const int& getPop_Per () const {return pop_per;}
+	void setPop_Per (const int& pop_per_) {pop_per = pop_per_;}
+	const int& getPop_Gq () const {return pop_gq;}
+	void setPop_Gq (const int& pop_gq_) {pop_gq = pop_gq_;}
+	const int& getEmp_Tot () const {return emp_tot;}
+	void setEmp_Tot (const int& emp_tot_) {emp_tot = emp_tot_;}
+	const int& getEmp_Ret () const {return emp_ret;}
+	void setEmp_Ret (const int& emp_ret_) {emp_ret = emp_ret_;}
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id
+	int zone_id;
+	shared_ptr<Zone> zone;
+	int area;
+	int area_res_low;
+	int area_res_hi;
+	int area_comm;
+	int area_ind;
+	int pop_hh;
+	int pop_per;
+	int pop_gq;
+	int emp_tot;
+	int emp_ret;
+};
+
+#pragma db object
+class LocationData
+{
+public:
+    // Default Constructor
+    LocationData () {}        
+	LocationData (int location_id_, shared_ptr<Location> location_, shared_ptr<Link> link_, int dir_, double offset_, int setback_, shared_ptr<ZoneLandUse> zone_, int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, int census_zone_, double x_, double y_)
+	: location_id (location_id_), location (location_), link (link_), dir (dir_), offset (offset_), setback (setback_), zone (zone_), truck_org (truck_org_), truck_des (truck_des_), auto_org (auto_org_), auto_des (auto_des_), transit (transit_), areatype (areatype_), notes (notes_), census_zone (census_zone_), x (x_), y (y_)
+	{
+	}
+	//Accessors
+	const int& getPrimaryKey () const {return location_id;}
+	const int& getLocation_Id () const {return location_id;}
+	void setLocation_Id (const int& location_id_) {location_id = location_id_;}
+	void setLocation (const int& location_, InputContainer& container) {location = container.Locations[location_];}
+	const shared_ptr<Location>& getLocation () const {return location;}
+	void setLocation (const shared_ptr<Location>& location_) {location = location_;}
+	void setLink (const int& link_, InputContainer& container) {link = container.Links[link_];}
+	const shared_ptr<Link>& getLink () const {return link;}
+	void setLink (const shared_ptr<Link>& link_) {link = link_;}
+	const int& getDir () const {return dir;}
+	void setDir (const int& dir_) {dir = dir_;}
+	const double& getOffset () const {return offset;}
+	void setOffset (const double& offset_) {offset = offset_;}
+	const int& getSetback () const {return setback;}
+	void setSetback (const int& setback_) {setback = setback_;}
+	const shared_ptr<ZoneLandUse>& getZone () const {return zone;}
+	void setZone (const shared_ptr<ZoneLandUse>& zone_) {zone = zone_;}
+	const int& getTruck_Org () const {return truck_org;}
+	void setTruck_Org (const int& truck_org_) {truck_org = truck_org_;}
+	const int& getTruck_Des () const {return truck_des;}
+	void setTruck_Des (const int& truck_des_) {truck_des = truck_des_;}
+	const int& getAuto_Org () const {return auto_org;}
+	void setAuto_Org (const int& auto_org_) {auto_org = auto_org_;}
+	const int& getAuto_Des () const {return auto_des;}
+	void setAuto_Des (const int& auto_des_) {auto_des = auto_des_;}
+	const int& getTransit () const {return transit;}
+	void setTransit (const int& transit_) {transit = transit_;}
+	const int& getAreatype () const {return areatype;}
+	void setAreatype (const int& areatype_) {areatype = areatype_;}
+	const std::string& getNotes () const {return notes;}
+	void setNotes (const std::string& notes_) {notes = notes_;}
+	const int& getCensus_Zone () const {return census_zone;}
+	void setCensus_Zone (const int& census_zone_) {census_zone = census_zone_;}
+	const double& getX () const {return x;}
+	void setX (const double& x_) {x = x_;}
+	const double& getY () const {return y;}
+	void setY (const double& y_) {y = y_;}
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id
+	int location_id;
+	shared_ptr<Location> location;
+	shared_ptr<Link> link;
+	int dir;
+	double offset;
+	int setback;
+	shared_ptr<ZoneLandUse> zone;
+	int truck_org;
+	int truck_des;
+	int auto_org;
+	int auto_des;
+	int transit;
+	int areatype;
+	std::string notes;
+	int census_zone;
+	double x;
+	double y;
 };
 
 #pragma db object //table("SHAPE")

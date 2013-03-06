@@ -109,14 +109,18 @@ public:
             name = field.getAttribute("name")
             
             reference = field.getAttribute("reference")
+            contanerSetter = field.getAttribute("contanerSetter")
             type = field.getAttribute("type")
             key = field.getAttribute("key")
             index = field.getAttribute("index")
             if reference!="":
-                type = "shared_ptr<%s>"%reference          
+                if contanerSetter!="no":
+                    accessors += "\tvoid set%s (const %s& %s_, InputContainer& container) {%s = container.%ss[%s_];}\n"%(name.title(), type, name, name, reference, name)                
+                type = "shared_ptr<%s>"%reference
             if key!="":
                 if key=="yes":
                     data_fields += "\t#pragma db id\n"
+                    accessors += "\tconst %s& getPrimaryKey () const {return %s;}\n"%(type, name) 
             if index!="":
                 if index=="yes":
                     data_fields += "\t#pragma db index\n"

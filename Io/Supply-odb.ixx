@@ -91,6 +91,64 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (e);
   }
 
+  // ZoneLandUse
+  //
+
+  inline
+  access::object_traits< ::polaris::io::ZoneLandUse >::id_type
+  access::object_traits< ::polaris::io::ZoneLandUse >::
+  id (const object_type& o)
+  {
+    return o.zone_id;
+  }
+
+  inline
+  void access::object_traits< ::polaris::io::ZoneLandUse >::
+  callback (database& db, object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::polaris::io::ZoneLandUse >::
+  callback (database& db, const object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  // LocationData
+  //
+
+  inline
+  access::object_traits< ::polaris::io::LocationData >::id_type
+  access::object_traits< ::polaris::io::LocationData >::
+  id (const object_type& o)
+  {
+    return o.location_id;
+  }
+
+  inline
+  void access::object_traits< ::polaris::io::LocationData >::
+  callback (database& db, object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::polaris::io::LocationData >::
+  callback (database& db, const object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
   // Shape
   //
 
@@ -1169,6 +1227,42 @@ namespace odb
 
   inline
   void access::object_traits_impl< ::polaris::io::Zone, id_sqlite >::
+  load_ (statements_type&, object_type&)
+  {
+  }
+
+  // ZoneLandUse
+  //
+
+  inline
+  void access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  erase (database& db, const object_type& obj)
+  {
+    callback (db, obj, callback_event::pre_erase);
+    erase (db, id (obj));
+    callback (db, obj, callback_event::post_erase);
+  }
+
+  inline
+  void access::object_traits_impl< ::polaris::io::ZoneLandUse, id_sqlite >::
+  load_ (statements_type&, object_type&)
+  {
+  }
+
+  // LocationData
+  //
+
+  inline
+  void access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
+  erase (database& db, const object_type& obj)
+  {
+    callback (db, obj, callback_event::pre_erase);
+    erase (db, id (obj));
+    callback (db, obj, callback_event::post_erase);
+  }
+
+  inline
+  void access::object_traits_impl< ::polaris::io::LocationData, id_sqlite >::
   load_ (statements_type&, object_type&)
   {
   }
