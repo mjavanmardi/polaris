@@ -191,6 +191,7 @@
     <ClCompile Include="User_Space.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Activity_Generator_Implementations.h" />
     <ClInclude Include="Activity_Implementations.h" />
     <ClInclude Include="Activity_Location_Prototype.h" />
     <ClInclude Include="Activity_Prototype.h" />
@@ -208,6 +209,8 @@
     <ClInclude Include="Network_Skimming_Prototype.h" />
     <ClInclude Include="Operation_Prototype.h" />
     <ClInclude Include="Person_Implementations.h" />
+    <ClInclude Include="Person_Planner_Implementations.h" />
+    <ClInclude Include="Person_Properties_Implementations.h" />
     <ClInclude Include="Person_Prototype.h" />
     <ClInclude Include="Plan_Prototype.h" />
     <ClInclude Include="Polaris_Activity_Location_Implementation.h" />

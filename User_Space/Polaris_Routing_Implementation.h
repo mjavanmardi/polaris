@@ -153,7 +153,7 @@ namespace Routing_Components
 
 			// don't need ifdef here - just change the typedef of MasterType::person_type to traveler_implemenationt in the mastertype definition
 			member_component(typename MasterType::person_type, traveler, none, none);
-			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person_Prototype, NULLTYPE); 
+			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person, NULLTYPE); 
 
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType vehicle()

@@ -135,9 +135,20 @@ namespace Zone_Components {
 namespace Person_Components {
 	namespace Prototypes
 	{
-		forward_declare_prototype struct Person_Prototype;
+		forward_declare_prototype struct Person;
+		forward_declare_prototype struct Activity_Generator;
+		forward_declare_prototype struct Person_Planner;
+		forward_declare_prototype struct Person_Properties;
 	}
 };
+
+namespace Person_Components {
+	namespace Prototypes
+	{
+		
+	}
+};
+
 namespace Plan_Components {
 	namespace Prototypes
 	{

@@ -297,7 +297,7 @@ namespace Demand_Components
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 #ifndef EXCLUDE_DEMAND
-				typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
+				typedef Person_Components::Prototypes::Person<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
 #else
 				typedef Traveler_Components::Prototypes::Traveler_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
 #endif
@@ -373,7 +373,7 @@ namespace Demand_Components
 				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-				typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
+				typedef Person_Components::Prototypes::Person<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
 //				define_component_interface(_Plan_Interface, typename _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename get_type_of(vehicles_container), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);

@@ -101,7 +101,7 @@ namespace Variables
 
 namespace Prototypes
 {
-	prototype struct Person_Prototype
+	prototype struct Person
 	{
 		tag_as_prototype;
 
@@ -114,7 +114,7 @@ namespace Prototypes
 		}
 		declare_feature_event(Agent_Event)
 		{
-			typedef Person_Prototype<ComponentType, ComponentType> _Person_Interface;
+			typedef Person<ComponentType, ComponentType> _Person_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
 
@@ -159,6 +159,7 @@ namespace Prototypes
 		feature_accessor(internal_id,none,none);
 		feature_accessor(Next_Rand,none,none);
 		feature_accessor(First_Iteration,none,none);
+		feature_accessor(Write_Activity_Files,none,none);
 
 		// Accessors for setting the home/work locations (stores only an index into the network_reference::activity_locations_container) - overloaded to return either th loc_index, the location interface or the zone interface
 		feature_prototype TargetType Home_Location(requires(check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location) && check_as_given(TargetType,is_pointer)))
@@ -178,14 +179,14 @@ namespace Prototypes
 			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
 			define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 			define_container_and_value_interface(activity_locations_container_itf, activity_location_itf, typename network_itf::get_type_of(activity_locations_container), Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-			define_container_and_value_interface(zone_container_itf, zone_itf, typename network_itf::get_type_of(zones_container), Containers::Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+			//define_container_and_value_interface(zone_container_itf, zone_itf, typename network_itf::get_type_of(zones_container), Containers::Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
-			zone_container_itf* zones = network->template zones_container<zone_container_itf*>();
-			int loc_id = properties->template home_location_id<TargetType>();
-			activity_location_itf* loc = *locations[loc_id];	
-			return loc->zone<zone_itf*>();
+			//zone_container_itf* zones = network->template zones_container<zone_container_itf*>();
+			int loc_id = properties->template home_location_id<int>();
+			activity_location_itf* loc = (*locations)[loc_id];	
+			return loc->zone<TargetType>();
 		}
 		feature_prototype TargetType Home_Location(requires(check(TargetType, is_integral)))
 		{
@@ -193,7 +194,7 @@ namespace Prototypes
 			properties_itf* properties = this->Properties<properties_itf*>();
 			return properties->home_location_id<TargetType>();
 		}
-		feature_prototype TargetType Home_Location(requires(check(TargetType, !is_integral) && ( check(TargetType,!Activity_Location_Components::Concepts::Is_Activity_Location) || check_as_given(TargetType,!is_pointer) ) ) )
+		feature_prototype TargetType Home_Location(requires(check(TargetType, !is_integral) && ( (check(TargetType,!Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,!Zone_Components::Concepts::Is_Zone) ) || check_as_given(TargetType,!is_pointer) ) ) )
 		{
 			assert_check(TargetType,is_integral,"Error, Home_Location can only be requested as an Integral type - which returns location index, or as an Activity_Location refernence type, which returns the actual location.");
 		}
@@ -299,8 +300,8 @@ namespace Prototypes
 	prototype struct Person_Planner
 	{
 		tag_as_prototype;
-
-		// Event handling
+		 
+		// Conditonal handling and helper functions
 		declare_feature_conditional(Planning_Conditional)
 		{
 			//----------------------------------------------
@@ -319,106 +320,100 @@ namespace Prototypes
 			typename Activity_Plans_List::iterator act_itr = activity_plans->begin();
 			typename Movement_Plans_List::iterator move_itr = movement_plans->begin();
 			Activity_Plan* activity;
-			Movement_Plan* movement;
+			Movement_Plan* movement;			
+			if (act_itr != activity_plans->end()) activity = *act_itr;
+			if (move_itr != movement_plans->end()) movement = *move_itr;
 
-			// during the 0th sub_iteration, set up future sub_iteration schedule
+			//------------------------------------------------------------------------------------------------------------------------------
+			// SETUP SUBITERATION, set up future sub_iteration schedule
 			if (_sub_iteration == 0)
 			{
 				// If activity generation is to be performed, do that next
-				if(this_ptr->Next_Activity_Generation_Time<Time_Seconds>() == Simulation_Time.Current_Time<Time_Seconds>())
-				{			
-					response.next._iteration = _iteration;
-					response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION;
-					response.result = false;
+				if(this_ptr->Next_Activity_Generation_Time<Time_Seconds>() == Simulation_Time.Current_Time<Time_Seconds>()) 
+				{	
+					this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,false,response);
 				}
 				// check if activity planning needs to occur, if so do this
 				else if (act_itr != activity_plans->end())
 				{
-					activity = *act_itr;
 					if (activity->planning_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
-					{
-						response.next._iteration = _iteration;
-						response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING;
-						response.result = false;
-					}
+						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING,false,response);
+					else
+						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,false,response);
 				}
 				// check if movement planning needs to occur, if so do this
 				else if (move_itr != movement_plans->end())
 				{
-					movement = *move_itr;
 					if (movement->departed_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
-					{
-						response.next._iteration = _iteration;
-						response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING;
-						response.result = false;
-					}
+						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,false,response);
+					else
+						this_ptr->Go_To_Next_Iteration<NT>(false,response);
 				}
 				// otherwise move on to next main iteration
 				else
 				{
-					response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
-					response.next._sub_iteration = 0;
-					response.result = false;
+					this_ptr->Go_To_Next_Iteration<NT>(false,response);
 				}
 			}
-			// during the Activity Generation sub_iteration, swap in the activity-generation event and set up future sub_iteration schedule
+
+			//------------------------------------------------------------------------------------------------------------------------------
+			// ACTIVITY GENERATION SUBITERATION, swap in the activity-generation event and set up future sub_iteration schedule
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
 			{
 				_pthis->Swap_Event((Event_Callback)&Person_Planner::Activity_Generation_Event<NULLTYPE>);
 
-				// check if activity planning needs to occur, if so do this
+				// check if activity planning needs to occur, if so do this otherwise, goto movement plans
 				if (act_itr != activity_plans->end())
 				{
-					activity = *act_itr;
 					if (activity->planning_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
-					{
-						response.next._iteration = _iteration;
-						response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING;
-						response.result = true;
-					}
+						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING,true,response);
+					else
+						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
 				}
 				// check if movement planning needs to occur, if so do this
-				else/* if (movement_plans->find(_iteration) != movement_plans->end())*/
+				else
 				{
-					response.next._iteration = _iteration;
-					response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING;
-					response.result = true;
+					this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
 				}
-				// otherwise, finish activity generation and move on to next main iteration
-				//else
-				//{
-				//	response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
-				//	response.next._sub_iteration = 0;
-				//	response.result = true;
-				//}
 			}
-			// during the Activity Planning sub_iteration, swap in the activity-planning event and set up future sub_iteration schedule
+
+			//------------------------------------------------------------------------------------------------------------------------------
+			// ACTIVITY PLANNING SUBITERATION Planning sub_iteration, swap in the activity-planning event and set up future sub_iteration schedule
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING)
 			{
 				_pthis->Swap_Event((Event_Callback)&Person_Planner::Activity_Planning_Event<NULLTYPE>);
-
-				response.next._iteration = _iteration;
-				response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING;
-				response.result = true;
-
+				this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
 			}
-			// during the Activity Generation sub_iteration, swap in the movement planning event and set up future sub_iteration schedule
+
+			//------------------------------------------------------------------------------------------------------------------------------
+			// MOVEMENT PLANNING SUBITERATION, swap in the movement planning event and set up future sub_iteration schedule
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING)
 			{
-				// swap in movement event
 				_pthis->Swap_Event((Event_Callback)&Person_Planner::Movement_Planning_Event<NULLTYPE>);
-				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
-				response.next._sub_iteration = 0;
-				response.result = true;
+				this_ptr->Go_To_Next_Iteration<NT>(true,response);
 			}
+			//------------------------------------------------------------------------------------------------------------------------------
+			// No valid events scheduled - skip to next iteration
 			else
 			{
-				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()));
-				response.next._sub_iteration = 0;
-				response.result = false;
+				this_ptr->Go_To_Next_Iteration<NT>(false,response);
 			}
 		}
+		feature_prototype void Go_To_Subiteration(Types::PLANNING_ITERATION_STEP_KEYS sub_iteration, bool do_current_event, Conditional_Response& response)
+		{
+			response.next._iteration = _iteration;
+			response.next._sub_iteration = sub_iteration;
+			response.result = do_current_event;
+		}
+		feature_prototype void Go_To_Next_Iteration(bool do_current_event, Conditional_Response& response)
+		{
+			response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Planning_Time_Increment<Simulation_Timestep_Increment>()));
+			response.next._sub_iteration = 0;
+			response.result = do_current_event;
+		}
 		
+
+		// Event handling
 		declare_feature_event(Activity_Generation_Event)
 		{
 			// Create alias for this to use in conditional
@@ -427,7 +422,9 @@ namespace Prototypes
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
 			// Call specific implementation of the activity generation routine
-			_pthis->template Activity_Generation<ComponentType,CallerType,TargetType>();
+			define_component_interface(activity_generator_itf,typename get_type_of(Activity_Generator),Prototypes::Activity_Generator,ComponentType);
+			activity_generator_itf* generator = this_ptr->Activity_Generator<activity_generator_itf*>();
+			generator->template Activity_Generation<TargetType>();
 
 			// set next activity generation occurence
 			this_ptr->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
@@ -480,7 +477,7 @@ namespace Prototypes
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
 			// create aliases for network components from parent
-			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person,ComponentType);
 			define_component_interface(_Network_Interface, typename parent_itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -497,14 +494,24 @@ namespace Prototypes
 			Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();
 			typename Movement_Plans::iterator move_itr = movements->begin();
 
+
+			if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<" >= "<< Simulation_Time.Current_Time<Simulation_Timestep_Increment>() << " && < " <<Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>())<<endl;
+
+
 			while (move_itr != movements->end())
 			{
 				Movement_Plan* move = *move_itr;
+
+				//if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"MOVE_EVENT:," << parent->uuid<int>() << ","<<move->template departed_time<Simulation_Timestep_Increment>()<<",";
+				//if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<" >= "<< Simulation_Time.Current_Time<Simulation_Timestep_Increment>() << " && < " <<Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>())<<endl;
 
 				// if movement happens in the current planning increment, execute movement
 				if (move->template departed_time<Simulation_Timestep_Increment>() >= Simulation_Time.Current_Time<Simulation_Timestep_Increment>() &&
 					move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
 				{
+
+					if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"MOVE_EVENT:," << parent->uuid<int>() << ", PASSED."<<endl;
+				
 					// make sure vehicle is not already being simulated, skip movement if it is
 					if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED)
 					{
@@ -529,6 +536,7 @@ namespace Prototypes
 
 						// add movement plan to the person's vehicle and schedule the departure
 						vehicle->template movement_plan<Movement_Plan*>(move);
+
 						this_ptr->template Schedule_New_Departure<NULLTYPE>(move->template departed_time<Simulation_Timestep_Increment>());
 					}
 	
@@ -583,7 +591,7 @@ namespace Prototypes
 
 		feature_prototype void Initialize(requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
-			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person,ComponentType);
 			parent_itf* parent = this->Parent_Person<parent_itf*>();
 			long first_iter = parent->template First_Iteration<Simulation_Timestep_Increment>();
 			this_component()->Initialize<ComponentType,CallerType, TargetType>();
@@ -595,7 +603,7 @@ namespace Prototypes
 		}
 		feature_prototype void Initialize(TargetType initializer, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
-			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
+			define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person,ComponentType);
 			parent_itf* parent = this->Parent_Person<parent_itf*>();
 			this_component()->Initialize<ComponentType,CallerType, TargetType>(initializer);
 			load_event(ComponentType,Planning_Conditional,Movement_Planning_Event,parent->template First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
@@ -608,7 +616,7 @@ namespace Prototypes
 		feature_prototype bool Schedule_New_Departure(int departed_time)
 		{
 			// schedule routing		
-			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person_Prototype, ComponentType);
+			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
 			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 
@@ -620,7 +628,7 @@ namespace Prototypes
 			// Schedule the routing if the vehicle is not already in the network, otherwise return false
 			if (vehicle_itf->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED)
 			{
-				cout << endl << "Scheduluing route...";
+				if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"SCHEDULE_ROUTER:," << person_itf->uuid<int>() << ","<<departed_time<<endl;
 				itf->template Schedule_Route_Computation<NULLTYPE>(departed_time);
 				return true;
 			}
@@ -629,6 +637,7 @@ namespace Prototypes
 
 	
 		// Activity Plans and Movement plans, stored in a hashmap keyed based on next required plan time (updated in the plan class after plan completion)
+		feature_accessor(Activity_Generator,none,none);
 		feature_accessor(Activity_Plans_Container,none,none);
 		feature_accessor(Movement_Plans_Container,none,none);
 		feature_accessor(Schedule_Container,none,none);	
@@ -636,7 +645,6 @@ namespace Prototypes
 		feature_accessor(current_activity_plan,none,none);
 		feature_prototype void Add_Movement_Plan(TargetType movement_plan)
 		{
-			cout << endl << "Adding Movement Plan for time..." << movement_plan->departed_time<Time_Hours>();
 			this_component()->Add_Movement_Plan<ComponentType,CallerType,TargetType>(movement_plan);
 		}
 		feature_prototype void Add_Activity_Plan(TargetType activity_plan)
@@ -653,6 +661,19 @@ namespace Prototypes
 		feature_accessor(Parent_Person,none,none);
 	};
 
+
+	prototype struct Activity_Generator
+	{
+		tag_as_prototype;
+
+		// accessor to parent class
+		feature_accessor(Parent_Planner,none,none);
+
+		feature_prototype void Activity_Generation()
+		{
+			this_component()->Activity_Generation<ComponentType,CallerType,TargetType>();
+		}
+	};
 }
 
 

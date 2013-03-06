@@ -9,17 +9,44 @@ namespace Containers
 {
 	namespace Concepts
 	{
+		concept struct Is_Iterable
+		{
+			check_concept(is_prototype, Is_Polaris_Prototype);
+			check_typename_defined(has_iterator,iterator);
+			check_feature(has_begin, begin);
+			check_feature(has_end, end);
+			check_feature(has_insert, insert);
+			define_default_check(is_prototype && has_iterator && has_begin && has_end && has_insert);
+		};
+		concept struct Is_Back_Insertion_Sequence
+		{
+			check_concept(is_iterable, Is_Iterable);
+			check_feature(has_front, front);
+			check_feature(has_back, back);
+			check_feature(has_push_back, push_back);
+			check_feature(has_pop_back, pop_back);
+			define_default_check(is_iterable && has_front && has_back && has_push_back && has_pop_back);
+		};
+		concept struct Is_Random_Access_Sequence
+		{
+			check_concept(is_back_insertion_sequence, Is_Back_Insertion_Sequence);
+			check_feature(has_at, at);
+			define_default_check(is_back_insertion_sequence && has_at);
+		};
+		concept struct Is_Multidimensional_Random_Access_Sequence
+		{
+			check_concept(is_random_access, Is_Random_Access_Sequence);
+			check_feature(has_dimensions, dimensions);
+				check_typename_defined(has_index_type,index_type);
+			define_default_check(is_random_access && has_dimensions && has_index_type);
+		};
 		concept struct Is_Associative
 		{
-			check_typename_state(Has_Associative_Type_Defined,Is_Associative_Type,true_type);
-			define_default_check(Has_Associative_Type_Defined);
+			check_concept(is_iterable, Is_Iterable);
+			check_feature(has_find, find);
+			check_feature(has_equal_range, equal_range);
+			define_default_check(is_iterable && has_find && has_equal_range);
 		};
-		concept struct Is_Sequence
-		{
-			check_typename_state(Has_Sequence_Type_Defined,Is_Sequence_Type,true_type);
-			define_default_check(Has_Sequence_Type_Defined);
-		};
-
 	}
 
 template<typename IteratorType,typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
@@ -96,6 +123,16 @@ struct Back_Insertion_Sequence_Prototype
 	void pop_back(){((ComponentType*)this)->pop_back();}
 
 	void pop_front(){((ComponentType*)this)->pop_front();}
+
+	// basic feature tags
+	typedef true_type begin_feature_tag;
+	typedef true_type end_feature_tag;
+	typedef true_type insert_feature_tag;
+	// back_insert feature tags
+	typedef true_type push_back_feature_tag;
+	typedef true_type pop_back_feature_tag;
+	typedef true_type front_feature_tag;
+	typedef true_type back_feature_tag;
 };
 
 ///============================================================================
@@ -162,6 +199,17 @@ struct Random_Access_Sequence_Prototype
 
 	TargetValueType& at(int i){return (TargetValueType&)(((ComponentType*)this)->at(i));}
 
+	// basic feature tags
+	typedef true_type begin_feature_tag;
+	typedef true_type end_feature_tag;
+	typedef true_type insert_feature_tag;
+	// back_insert feature tags
+	typedef true_type push_back_feature_tag;
+	typedef true_type pop_back_feature_tag;
+	typedef true_type front_feature_tag;
+	typedef true_type back_feature_tag;
+	// Random access feature tags
+	typedef true_type at_feature_tag;
 };
 
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::mapped_type> 
@@ -220,10 +268,17 @@ struct Associative_Container_Prototype : public ComponentType
 
 	//value_compare value_comp() const { return ((ComponentType*)this)->value_comp();}
 
-	iterator find ( const key_type& x ) { return ((ComponentType*)this)->find(x);}
+	iterator find ( const key_type& x ) { return ((ComponentType*)this)->find(x);} 
 
 	pair<iterator,iterator>  equal_range ( const key_type& x ) { return ((ComponentType*)this)->equal_range(x);}
 
+	// basic feature tags
+	typedef true_type begin_feature_tag;
+	typedef true_type end_feature_tag;
+	typedef true_type insert_feature_tag;
+	// associative feature tags
+	typedef true_type find_feature_tag;
+	typedef true_type equal_range_feature_tag;
 };
 
 ///============================================================================
@@ -290,6 +345,19 @@ struct Multidimensional_Random_Access_Array_Prototype : public ComponentType
 
 	TargetValueType& at(const_index_type i){return (TargetValueType&)(((ComponentType*)this)->at(i));}
 
+	// basic feature tags
+	typedef true_type begin_feature_tag;
+	typedef true_type end_feature_tag;
+	typedef true_type insert_feature_tag;
+	// back_insert feature tags
+	typedef true_type push_back_feature_tag;
+	typedef true_type pop_back_feature_tag;
+	typedef true_type front_feature_tag;
+	typedef true_type back_feature_tag;
+	// Random access feature tags
+	typedef true_type at_feature_tag;
+	// Multidimensional feature tags
+	typedef true_type dimensions_feature_tag;
 };
 
 ///============================================================================

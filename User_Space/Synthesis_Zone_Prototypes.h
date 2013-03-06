@@ -117,11 +117,19 @@ namespace PopSyn
 
 							// 4. calculate the error against the known marginal value
 							value_type marg_val = marg[index(d,i)];
-							value_type temp_err = (marg_val != 0 ) ? (sum / marg_val) : 1;
-							if (abs((value_type)(temp_err - 1.0)) > max_error) max_error = abs((value_type)(temp_err - 1.0));
-
-							// 5. update the values in the distribution by the error factor
-							if (temp_err > 0) for (itr = mway.begin(d,i); itr != mway.end(); ++itr) *itr = *itr / temp_err;
+							if (marg_val == 0)
+							{
+								// 5a. update the values in the distribution by the error factor
+								for (itr = mway.begin(d,i); itr != mway.end(); ++itr) *itr = 0;
+							}
+							else
+							{
+								value_type temp_err = (marg_val != 0 ) ? (sum / marg_val) : 1;
+								if (abs((value_type)(temp_err - 1.0)) > max_error) max_error = abs((value_type)(temp_err - 1.0));
+								// 5b. update the values in the distribution by the error factor
+								if (temp_err > 0) for (itr = mway.begin(d,i); itr != mway.end(); ++itr) *itr = *itr / temp_err;
+							}
+							
 						}
 					}
 
@@ -223,20 +231,12 @@ namespace PopSyn
 						{
 							if (rand.template Next_Rand<double>() < w/cumulative_weight)
 							{					
-								//pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>();
-								//pop_unit_itf* obj = range.first->second;
-								//p->template Initialize<pop_unit_itf&>(*obj);
-								//zone_sample->insert(obj->template Index<uint>(),obj);
 								int size = sizeof(typename sample_itf::Component_Type);
 								num_generated += (int)(1.0f / settings.template Percentage_to_synthesize<float>());
 
 								// create the actual person agent
 								this->Create_Person<pop_unit_itf*>(stored_pop_unit);
-								/*typedef Person_Components::Prototypes::Person_Prototype<typename ComponentType::Master_Type::person_type, ComponentType> _Person_Interface;
-								_Person_Interface* person=(_Person_Interface*)Allocate<typename ComponentType::Master_Type::person_type>();
-								person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
-								person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());			
-								person->Initialize<int>(num_created);*/
+
 								num_created += (int)(1.0f / settings.template Percentage_to_synthesize<float>());
 							}
 						}
@@ -252,11 +252,6 @@ namespace PopSyn
 					// add a copy of the last unit until num_required < 1
 					while (num_required > 1.0)
 					{
-						//pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>();
-						//pop_unit_itf* obj = stored_pop_unit;
-						//p->Initialize<pop_unit_itf&>(*obj);
-						//zone_sample->insert(p->template Index<uint>(),p);
-
 						// create the actual person agent
 						this->Create_Person<pop_unit_itf*>(stored_pop_unit);
 						num_created+=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
@@ -267,10 +262,6 @@ namespace PopSyn
 					// if a fractional num_required is left, add another unit with probability of num_required
 					if (num_required > 0.0 && rand.template Next_Rand<double>() < num_required)
 					{
-						/*pop_unit_itf* p = (pop_unit_itf*)Allocate<typename pop_unit_itf::Component_Type>();
-						pop_unit_itf* obj = stored_pop_unit;
-						p->Initialize<pop_unit_itf&>(*obj);
-						zone_sample->insert(p->template Index<uint>(),p);*/
 						// create the actual person agent
 						this->Create_Person<pop_unit_itf*>(stored_pop_unit);
 						num_created+=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
@@ -287,13 +278,13 @@ namespace PopSyn
 			{
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
 				assert_check_as_given(TargetType, is_pointer,"Is not a pointer");
-				assert_check(TargetType, Containers::Concepts::Is_Associative, "Container is not associative.");
+				assert_check(TargetType, Containers::Concepts::Is_Associative_Container, "Container is not associative.");
 			}
 			feature_prototype void Create_Person(TargetType static_properties)
 			{
 				define_component_interface(_Network_Interface,typename ComponentType::Master_Type::network_type,Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_component_interface(_Scenario_Interface,typename ComponentType::Master_Type::scenario_type,Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
-				define_container_and_value_interface(persons_itf, person_itf, typename get_type_of(Synthetic_Persons_Container), Containers::Random_Access_Sequence_Prototype, Person_Components::Prototypes::Person_Prototype, NULLTYPE);
+				define_container_and_value_interface(persons_itf, person_itf, typename get_type_of(Synthetic_Persons_Container), Containers::Random_Access_Sequence_Prototype, Person_Components::Prototypes::Person, NULLTYPE);
 				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
 				persons_itf* person_container = (persons_itf*)this->Synthetic_Persons_Container<persons_itf*>();
 

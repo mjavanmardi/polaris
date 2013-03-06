@@ -41,10 +41,6 @@ static const int success=sizeof(small_type);
 	template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_feature_tag*);\
 		template<typename U> static large_type has_matching_typename(...);\
 		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
-		/*static const bool member_exists=sizeof(has_matching_typename<T>(0))==success;\
-		template<class U,bool B> struct p_conditional{typedef false_type type;};\
-		template<class U> struct p_conditional<U,true>{typedef typename is_same<typename U::FEATURE_NAME##_feature_tag,true_type>::type type;};\
-		static const bool value=(member_exists && p_conditional<T,member_exists>::type::value);\*/\
 	};\
 	static const bool CHECK_ALIAS=CHECK_ALIAS##_procedure::value;
 

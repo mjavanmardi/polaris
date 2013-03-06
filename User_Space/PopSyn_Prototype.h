@@ -376,7 +376,9 @@ namespace PopSyn
 			declare_feature_event(Output_Popsyn_Event)
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
-					
+				ostream& sample_out = pthis->Output_Stream<ostream&>();
+				ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
+
 				//---------------------------------------------------------------------------------------------
 				// Type defines for sub_objects
 				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
@@ -396,11 +398,12 @@ namespace PopSyn
 				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,ComponentType);
 				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
 				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
-				define_container_and_value_interface_unqualified_container(persons_collection_itf, person_itf,person_collection_type,Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(persons_collection_itf, person_itf,person_collection_type,Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person,ComponentType);
 				define_simple_container_interface(activity_location_ids_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);
 				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
 				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_container_and_value_interface(activity_locations_itf, activity_location_itf,typename network_itf::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+				define_container_and_value_interface(_Zone_Container_Interface, _Zone_Interface,typename network_itf::get_type_of(zones_container),Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 				network_itf* network = pthis->network_reference<network_itf*>();
 				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
 
@@ -429,25 +432,35 @@ namespace PopSyn
 
 							// initialize the person - allocates all person subcomponents
 							person->Initialize<long>(uuid);
+							int home_loc_index;
 
-							// assign person to a random activity location in the zone
-							
+							// assign person to a random activity location in the zone				
 							if (loc_indices->size() == 0)
 							{
-								int home_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * activity_locations->size());
+								home_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * activity_locations->size());
 								person->Home_Location<int>(home_loc_index);
+
+								//sample_out << zone->ID<long long>() << ","<<activity_locations->at(home_loc_index)->uuid<int>();
 							}
 							else
 							{
-								int home_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * loc_indices->size());
+								home_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * loc_indices->size());
 								person->Home_Location<int>(loc_indices->at(home_loc_index));
+
+								//sample_out << zone->ID<long long>() << ","<<activity_locations->at(loc_indices->at(home_loc_index))->uuid<int>();
 							}
+
+							// get the polaris zone of the synthesized person and increment its population counter;
+							_Zone_Interface* pzone = person->Home_Location<_Zone_Interface*>();
+							pzone->population<int&>()++;
+
+							//sample_out <<","<<pzone->uuid<int>()<<endl;
 
 							++uuid;
 						}
 					}
 				}
-				cout <<endl<<endl<<"Total Persons Synthesized: "<<uuid;
+				cout <<endl<<endl<<"Total Persons Synthesized: "<<uuid<<endl<<endl;
 
 
 				// Handle file output if needed
@@ -456,10 +469,6 @@ namespace PopSyn
 
 					Counter timer;
 					timer.Start();
-		
-					ostream& sample_out = pthis->Output_Stream<ostream&>();
-					ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
-
 
 					for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 					{
@@ -494,7 +503,7 @@ namespace PopSyn
 			feature_accessor(Synthesis_Regions_Collection,none,none);
 			feature_accessor(Solution_Settings,none,none);
 			feature_accessor(scenario_reference, none, none);
-			feature_accessor(network_reference, none, none);
+			feature_accessor(network_reference, check(ReturnValueType,Network_Components::Concepts::Is_Transportation_Network), check(SetValueType,Network_Components::Concepts::Is_Transportation_Network));
 			feature_accessor(timer,none,none);
 			feature_accessor(write_output_flag,none,none);
 

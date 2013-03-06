@@ -285,110 +285,66 @@ struct MasterType
 	typedef MasterType M;
 
 #ifdef ANTARES
-	typedef Conductor_Implementation<MasterType> conductor_type;
-	typedef Control_Panel_Implementation<MasterType> control_panel_type;
-	typedef Time_Panel_Implementation<MasterType> time_panel_type;
-	typedef Information_Panel_Implementation<MasterType> information_panel_type;
-	typedef Canvas_Implementation<MasterType> canvas_type;
-	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
-	typedef Layer_Options_Implementation<MasterType> layer_options_type;
-	typedef Attributes_Panel_Implementation<MasterType> attributes_panel_type;
-	typedef Control_Dialog_Implementation<MasterType> control_dialog_type;
+	typedef Conductor_Implementation<M> conductor_type;
+	typedef Control_Panel_Implementation<M> control_panel_type;
+	typedef Time_Panel_Implementation<M> time_panel_type;
+	typedef Information_Panel_Implementation<M> information_panel_type;
+	typedef Canvas_Implementation<M> canvas_type;
+	typedef Antares_Layer_Implementation<M> antares_layer_type;
+	typedef Layer_Options_Implementation<M> layer_options_type;
+	typedef Attributes_Panel_Implementation<M> attributes_panel_type;
+	typedef Control_Dialog_Implementation<M> control_dialog_type;
 
-	typedef Graphical_Network_Implementation<MasterType> graphical_network_type;
-	typedef Graphical_Link_Implementation<MasterType> graphical_link_type;
-	typedef Graphical_Intersection_Implementation<MasterType> graphical_intersection_type;
-	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<MasterType> vehicle_type;	
-	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<MasterType> zone_type;
-	//typedef Zone_Components::Implementations::Polaris_Zone_Implementation<MasterType> zone_type;
-	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<MasterType> graphical_zone_group_type;
+	typedef Graphical_Network_Implementation<M> graphical_network_type;
+	typedef Graphical_Link_Implementation<M> graphical_link_type;
+	typedef Graphical_Intersection_Implementation<M> graphical_intersection_type;
+	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<M> vehicle_type;	
+	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
+	//typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
+	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;
 #else
-	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
-	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<MasterType> zone_type;
+	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<M> vehicle_type;
+	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 #endif
 
 	//==============================================================================================
-	// Signalization Types
-	//typedef Signal_Components::Components::HCM_Signal_Full<T>::type				SIGNAL_TYPE;
-	//typedef Signal_Components::Components::HCM_Phase_Full<T>::type				PHASE_TYPE;
-	//typedef Signal_Components::Components::HCM_LaneGroup_Full<T>::type			LANE_GROUP_TYPE;
-	//typedef Signal_Components::Components::HCM_Approach_Full<T>::type			APPROACH_TYPE;
-	//typedef Signal_Components::Components::Signal_Indicator_Basic_Display<T>::type	INDICATOR_TYPE;
-	//typedef Signal_Components::Components::Signal_Detector<T>::type				DETECTOR_TYPE;
-
-	//typedef Signal_Components::Components::HCM_Signal_Full<T>::type			FULL_SIGNAL_TYPE;
-	//typedef Signal_Components::Components::HCM_Signal_Simple<T>::type		SIMPLE_SIGNAL_TYPE;	
-	//typedef Signal_Components::Components::HCM_Phase_Full<T>::type			FULL_PHASE_TYPE;
-	//typedef Signal_Components::Components::HCM_Phase_Simple<T>::type		SIMPLE_PHASE_TYPE;
-	//typedef Signal_Components::Components::HCM_LaneGroup_Full<T>::type		FULL_LANE_GROUP_TYPE;
-	//typedef Signal_Components::Components::HCM_LaneGroup_Simple<T>::type	SIMPLE_LANE_GROUP_TYPE;
-
-	//==============================================================================================
 	// Network Types
-	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<MasterType> scenario_type;
+	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<M> scenario_type;
+	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<M> network_type;
+	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<M> intersection_type;
+	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<M> movement_type;
+	typedef Link_Components::Implementations::Polaris_Link_Implementation<M> link_type;
+	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<M> turn_movement_type;
+	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
+	typedef Routing_Components::Implementations::Polaris_Routing_Implementation<M> routing_type;
+	typedef Routing_Components::Implementations::Polaris_Skim_Routing_Implementation<M> skim_routing_type;
+	typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<M> routable_intersection_type;
+	typedef Link_Components::Implementations::Routable_Link_Implementation<M> routable_link_type;
+	typedef Activity_Location_Components::Implementations::Polaris_Activity_Location_Implementation<M> activity_location_type;
+	typedef Traveler_Components::Implementations::Polaris_Traveler_Implementation<M> traveler_type;
+	typedef Intersection_Components::Implementations::Polaris_Inbound_Outbound_Movements_Implementation<M> inbound_outbound_movements_type;
+	typedef Intersection_Components::Implementations::Polaris_Outbound_Inbound_Movements_Implementation<M> outbound_inbound_movements_type;
+	typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<M> routable_inbound_outbound_movements_type;
+	typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<M> routable_outbound_inbound_movements_type;
+	typedef Intersection_Components::Implementations::Routable_Movement_Implementation<M> routable_movement_type;
+	typedef Operation_Components::Implementations::Polaris_Operation_Implementation<M> operation_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation<M> intersection_control_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Control_Plan_Implementation<M> control_plan_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Implementation<M> phase_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation<M> phase_movement_type;
+	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<M> approach_type;
+	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<M> plan_type;
+	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<M> movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<M> trajectory_unit_type;
+	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
 	
-	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<MasterType> network_type;
-	
-	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
-	
-	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
-	
-	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
-	
-	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
-
-	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
-	
-	typedef Routing_Components::Implementations::Polaris_Routing_Implementation<MasterType> routing_type;
-
-	typedef Routing_Components::Implementations::Polaris_Skim_Routing_Implementation<MasterType> skim_routing_type;
-
-	typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
-
-	typedef Link_Components::Implementations::Routable_Link_Implementation<MasterType> routable_link_type;
-
-	typedef Activity_Location_Components::Implementations::Polaris_Activity_Location_Implementation<MasterType> activity_location_type;
-
-	typedef Traveler_Components::Implementations::Polaris_Traveler_Implementation<MasterType> traveler_type;
-
-	typedef Intersection_Components::Implementations::Polaris_Inbound_Outbound_Movements_Implementation<MasterType> inbound_outbound_movements_type;
-
-	typedef Intersection_Components::Implementations::Polaris_Outbound_Inbound_Movements_Implementation<MasterType> outbound_inbound_movements_type;
-
-	typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<MasterType> routable_inbound_outbound_movements_type;
-
-	typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<MasterType> routable_outbound_inbound_movements_type;
-
-	typedef Intersection_Components::Implementations::Routable_Movement_Implementation<MasterType> routable_movement_type;
-
-	typedef Operation_Components::Implementations::Polaris_Operation_Implementation<MasterType> operation_type;
-	
-	typedef Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation<MasterType> intersection_control_type;
-
-	typedef Intersection_Control_Components::Implementations::Polaris_Control_Plan_Implementation<MasterType> control_plan_type;
-
-	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Implementation<MasterType> phase_type;
-
-	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation<MasterType> phase_movement_type;
-	
-	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<MasterType> approach_type;
-
-	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<MasterType> plan_type;
-
-	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<MasterType> movement_plan_type;
-
-	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
-
-	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<MasterType> network_skim_type;
-	// DEMAND AGENT CLASSES
-
-	//typedef Demand_Components::Implementations::Polaris_Demand_Implementation<MasterType> demand_type;
-
-	typedef Person_Components::Implementations::Person_Implementation<MasterType> person_type;
-	typedef Person_Components::Implementations::CTRAMP_Person_Planner_Implementation<MasterType, person_type> person_planner_type;
-	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<MasterType,person_type> person_properties_type;
-	typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
-	typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
+	// DEMAND AGENT Types
+	typedef Person_Components::Implementations::Person_Implementation<M> person_type;
+	typedef Person_Components::Implementations::CTRAMP_Person_Planner_Implementation<M, person_type> person_planner_type;
+	typedef Person_Components::Implementations::CTRAMP_Activity_Generator_Implementation<M, person_type> activity_generator_type;
+	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<M,person_type> person_properties_type;
+	typedef RNG_Components::Implementations::RngStream_Implementation<M> RNG;
+	typedef Activity_Components::Implementations::Activity_Plan_Implementation<M,person_type> activity_plan_type;
 
 	
 	// POPULATION SYNTHESIS CLASSES
@@ -533,19 +489,19 @@ int main(int argc,char** argv)
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
 	ofstream out;
-	out.open("full_population_chicag.xls",ios_base::out);
+	out.open("full_population_chicag.csv",ios_base::out);
 	ofstream marg_out;
-	marg_out.open("marginals_and_distributions_chicago.xls",ios_base::out);
+	marg_out.open("marginals_and_distributions_chicago.csv",ios_base::out);
 
 	// IPF Solver Settings
 	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
 	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
 	// Solver settings - IPF tolerance, Percentage of population to synthesis, maximum ipf and selection iterations
-	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,0.01,100);
+	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,1.0,100);
 
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
-	popsyn->write_output_flag<bool>(false);
+	popsyn->write_output_flag<bool>(true);
 	popsyn->linker_file_path<string>(string("linker_file.txt"));
 	popsyn->Solution_Settings<solver_itf*>(solver);
 	popsyn->Output_Stream<ostream&>(out);
@@ -555,7 +511,20 @@ int main(int argc,char** argv)
 	popsyn->Initialize<NULLTYPE>();
 	//----------------------------------------------------------------------------------------------------------------------------------
 
-
+	//==================================================================================================================================
+	// Logging of activity generation / scheduling outputs
+	//----------------------------------------------------------------------------------------------------------------------------------
+	stringstream logfilename;
+	MasterType::person_planner_type::_write_activity_files = false;
+	for (int i = 0; i < _num_threads; ++i)
+	{
+		logfilename.str("");
+		logfilename << "generated_acts_" << i << ".csv";
+		MasterType::person_planner_type::logs[i].open(logfilename.str());
+		MasterType::person_planner_type::logs[i] << "PERID,DEPART,ORIG,DEST,EST_TTIME"<<endl;
+	}
+	//----------------------------------------------------------------------------------------------------------------------------------
+	
 	try
 	{
 	START();

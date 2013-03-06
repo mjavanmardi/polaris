@@ -36,10 +36,17 @@ void* _global_scenario;
 #endif
 
 #include "Activity_Implementations.h"
+
+// POPSYN COMPONENTS
 #include "Population_Unit_Implementations.h"
 #include "Synthesis_Zone_Implementations.h"
 #include "Synthesis_Region_Implementation.h"
 #include "PopSyn_Implementations.h"
+
+// PERSON AGENT COMPONENTS
+#include "Person_Planner_Implementations.h"
+#include "Activity_Generator_Implementations.h"
+#include "Person_Properties_Implementations.h"
 #include "Person_Implementations.h"
 
 
