@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<root>
+	<type name="Meta" pragma="object">
+		<field key="yes" name="id" type="int"/>
+		<field name="key" type="std::string"/>
+		<field name="value" type="std::string"/>
+
+	</type>
+</root>

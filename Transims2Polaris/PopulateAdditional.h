@@ -1,5 +1,29 @@
 #include "Io\database.h"
 
+void PopulateUseCode(string db_path)
+{
+	auto_ptr<database> db (open_sqlite_database (db_path)); 
+	transaction t (db->begin());
+	shared_ptr<polaris::io::Use_Code> uc (nullptr);
+	uc = make_shared<Use_Code> ( "NONE",		1, 0, "SPECIAL", "", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "RESTRICTED",	2, 0, "SPECIAL", "", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "ANY",		3, 0, "", "SOV|HOV2|HOV3|HOV4|TAXI|LIGHTTRUCK|HEAVYTRUCK|BUS|RAIL|WALK|BICYCLE", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "AUTO",		4, 0, "ANY", "SOV|HOV2|HOV3|HOV4|TAXI", "CAR", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "SOV",		5, 1, "ANY|AUTO", "HOV2|HOV3|HOV4", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "HOV2",		7, 1, "ANY|AUTO|SOV", "HOV3", "HOV4", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "HOV3",		8, 1, "ANY|AUTO|SOV|HOV2", "HOV4", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "HOV4",		9, 1, "ANY|AUTO|SOV|HOV2|HOV3", "", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "TAXI",		10, 1, "ANY|AUTO|SOV", "", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "TRUCK",		11, 0, "ANY", "LIGHTTRUCK|HEAVYTRUCK", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "LIGHTTRUCK",	12, 1, "ANY|TRUCK", "", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "HEAVYTRUCK",	13, 1, "ANY|TRUCK", "", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "BUS",		14, 1, "ANY", "", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "RAIL",		15, 1, "ANY", "", "TROLLEY|STREETCAR|LIGHTRAIL|RAPIDRAIL|REGIONRAIL", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "WALK",		16, 1, "ANY", "", "", "" ); db->persist(uc);
+	uc = make_shared<Use_Code> ( "BICYCLE",	17, 1, "ANY", "", "BIKE", "" ); db->persist(uc);
+	t.commit();
+
+}
 void PopulateLinkType(string db_path, std::map<string,shared_ptr<Link_Type>> *container)
 {
 	auto_ptr<database> db (open_sqlite_database (db_path)); 

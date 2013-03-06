@@ -232,8 +232,8 @@ public:
 	void setLink (const int& link_, InputContainer& container){link = container.Links[link_];}
 	const int& getPoints () const {return points;}
 	void setPoints (const int& points_){points = points_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return zone;}
+	const unsigned long& getZone () const {return zone;}
 
 
 	//Vector that contains the associated nested records
@@ -243,7 +243,7 @@ public:
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long zone;
 	shared_ptr<Link> link;
 	int points;
 	#pragma db index member(link)
@@ -378,14 +378,14 @@ public:
 	void setLength (const double& length_){length = length_;}
 	const double& getOffset () const {return offset;}
 	void setOffset (const double& offset_){offset = offset_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return pocket;}
+	const unsigned long& getPocket () const {return pocket;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long pocket;
 	shared_ptr<Link> link;
 	int dir;
 	std::string type;
@@ -442,14 +442,14 @@ public:
 	void setMin_Delay (const double& min_delay_){min_delay = min_delay_;}
 	const double& getMax_Delay () const {return max_delay;}
 	void setMax_Delay (const double& max_delay_){max_delay = max_delay_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return lane_use;}
+	const unsigned long& getLane_Use () const {return lane_use;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long lane_use;
 	shared_ptr<Link> link;
 	int dir;
 	int lanes;
@@ -507,7 +507,7 @@ public:
 	const int& getOut_High () const {return out_high;}
 	void setOut_High (const int& out_high_){out_high = out_high_;}
 	const unsigned long& getPrimaryKey () const {return conn;}
-	const unsigned long& getAuto_id () const {return conn;}
+	const unsigned long& getConn () const {return conn;}
 
 //Data Fields
 private:
@@ -566,14 +566,14 @@ public:
 	const shared_ptr<Node>& getOut_Node () const {return out_node;}
 	void setOut_Node (const shared_ptr<Node>& out_node_){out_node = out_node_;}
 	void setOut_Node (const int& out_node_, InputContainer& container){out_node = container.Nodes[out_node_];}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return turn_pen;}
+	const unsigned long& getTurn_Pen () const {return turn_pen;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long turn_pen;
 	shared_ptr<Link> link;
 	int dir;
 	shared_ptr<Link> to_link;
@@ -721,14 +721,14 @@ public:
 	void setTime (const double& time_){time = time_;}
 	const int& getCost () const {return cost;}
 	void setCost (const int& cost_){cost = cost_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return access;}
+	const unsigned long& getAccess () const {return access;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long access;
 	shared_ptr<Link> link;
 	int from_id;
 	int from_type;
@@ -759,14 +759,14 @@ public:
 	void setDir (const int& dir_){dir = dir_;}
 	const std::string& getSign () const {return sign;}
 	void setSign (const std::string& sign_){sign = sign_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return sign_id;}
+	const unsigned long& getSign_Id () const {return sign_id;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long sign_id;
 	shared_ptr<Link> link;
 	int dir;
 	std::string sign;
@@ -843,8 +843,8 @@ public:
 	void setOffset (const int& offset_){offset = offset_;}
 	const int& getPhases () const {return phases;}
 	void setPhases (const int& phases_){phases = phases_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return timing_id;}
+	const unsigned long& getTiming_Id() const {return timing_id;}
 
 
 	//Vector that contains the associated nested records
@@ -854,7 +854,7 @@ public:
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long timing_id;
 	shared_ptr<Signal> signal;
 	int timing;
 	int type;
@@ -887,8 +887,8 @@ public:
 	void setDetectors (const std::string& detectors_){detectors = detectors_;}
 	const int& getMovements () const {return movements;}
 	void setMovements (const int& movements_){movements = movements_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return phasing_id;}
+	const unsigned long& getPhasing_Id () const {return phasing_id;}
 
 
 	//Vector that contains the associated nested records
@@ -898,7 +898,7 @@ public:
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long phasing_id;
 	shared_ptr<Signal> signal;
 	int phasing;
 	int phase;
@@ -1083,14 +1083,14 @@ public:
 	void setZone (const int& zone_, InputContainer& container){zone = container.Zones[zone_];}
 	const int& getFlag () const {return flag;}
 	void setFlag (const int& flag_){flag = flag_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return line;}
+	const unsigned long& getLine () const {return line;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long line;
 	int route;
 	shared_ptr<Stop> stops;
 	int mode;
@@ -1122,14 +1122,14 @@ public:
 	const shared_ptr<Stop>& getStop () const {return stop;}
 	void setStop (const shared_ptr<Stop>& stop_){stop = stop_;}
 	void setStop (const int& stop_, InputContainer& container){stop = container.Stops[stop_];}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return schedule;}
+	const unsigned long& getSchedule () const {return schedule;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long schedule;
 	int route;
 	shared_ptr<Stop> stops;
 	shared_ptr<Stop> stop;
@@ -1162,14 +1162,14 @@ public:
 	void setLink (const int& link_, InputContainer& container){link = container.Links[link_];}
 	const int& getDir () const {return dir;}
 	void setDir (const int& dir_){dir = dir_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return driver;}
+	const unsigned long& getDriver () const {return driver;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long driver;
 	int route;
 	shared_ptr<Link> links;
 	int type;
@@ -1214,14 +1214,14 @@ public:
 	void setTime (const double& time_){time = time_;}
 	const double& getSpeed () const {return speed;}
 	void setSpeed (const double& speed_){speed = speed_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return route_nodes;}
+	const unsigned long& getRoute_Nodes () const {return route_nodes;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long route_nodes;
 	int route;
 	int mode;
 	shared_ptr<Veh_Type> veh_type;
@@ -1333,14 +1333,14 @@ public:
 	void setLoad (const int& load_){load = load_;}
 	const double& getFactor () const {return factor;}
 	void setFactor (const double& factor_){factor = factor_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return ridership;}
+	const unsigned long& getRidership () const {return ridership;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long ridership;
 	int mode;
 	int route;
 	int run;
@@ -1412,6 +1412,45 @@ private:
 	std::string alternative_labels;
 	std::string notes;
 };
+
+#pragma db object
+class Use_Code
+{
+public:
+    // Default Constructor
+    Use_Code () {}        
+	Use_Code (std::string use_code_, int rank_, int routable_, std::string subset_of_, std::string superset_of_, std::string alternative_labels_, std::string notes_)
+	: use_code (use_code_), rank (rank_), routable (routable_), subset_of (subset_of_), superset_of (superset_of_), alternative_labels (alternative_labels_), notes (notes_)
+	{
+	}
+	//Accessors
+	const std::string& getUse_Code () const {return use_code;}
+	void setUse_Code (const std::string& use_code_) {use_code = use_code_;}
+	const int& getRank () const {return rank;}
+	void setRank (const int& rank_) {rank = rank_;}
+	const int& getRoutable () const {return routable;}
+	void setRoutable (const int& routable_) {routable = routable_;}
+	const std::string& getSubset_Of () const {return subset_of;}
+	void setSubset_Of (const std::string& subset_of_) {subset_of = subset_of_;}
+	const std::string& getSuperset_Of () const {return superset_of;}
+	void setSuperset_Of (const std::string& superset_of_) {superset_of = superset_of_;}
+	const std::string& getAlternative_Labels () const {return alternative_labels;}
+	void setAlternative_Labels (const std::string& alternative_labels_) {alternative_labels = alternative_labels_;}
+	const std::string& getNotes () const {return notes;}
+	void setNotes (const std::string& notes_) {notes = notes_;}
+//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id
+	std::string use_code;
+	int rank;
+	int routable;
+	std::string subset_of;
+	std::string superset_of;
+	std::string alternative_labels;
+	std::string notes;
+};
+
 #pragma db object
 class Component
 {

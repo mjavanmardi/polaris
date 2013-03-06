@@ -99,7 +99,7 @@ namespace odb
   access::object_traits< ::polaris::io::Shape >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.zone;
   }
 
   inline
@@ -157,7 +157,7 @@ namespace odb
   access::object_traits< ::polaris::io::Pocket >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.pocket;
   }
 
   inline
@@ -186,7 +186,7 @@ namespace odb
   access::object_traits< ::polaris::io::Lane_Use >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.lane_use;
   }
 
   inline
@@ -244,7 +244,7 @@ namespace odb
   access::object_traits< ::polaris::io::Turn_Pen >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.turn_pen;
   }
 
   inline
@@ -331,7 +331,7 @@ namespace odb
   access::object_traits< ::polaris::io::Access >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.access;
   }
 
   inline
@@ -360,7 +360,7 @@ namespace odb
   access::object_traits< ::polaris::io::Sign >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.sign_id;
   }
 
   inline
@@ -418,7 +418,7 @@ namespace odb
   access::object_traits< ::polaris::io::Timing >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.timing_id;
   }
 
   inline
@@ -447,7 +447,7 @@ namespace odb
   access::object_traits< ::polaris::io::Phasing >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.phasing_id;
   }
 
   inline
@@ -563,7 +563,7 @@ namespace odb
   access::object_traits< ::polaris::io::Line >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.line;
   }
 
   inline
@@ -592,7 +592,7 @@ namespace odb
   access::object_traits< ::polaris::io::Schedule >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.schedule;
   }
 
   inline
@@ -621,7 +621,7 @@ namespace odb
   access::object_traits< ::polaris::io::Driver >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.driver;
   }
 
   inline
@@ -650,7 +650,7 @@ namespace odb
   access::object_traits< ::polaris::io::Route_Nodes >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.route_nodes;
   }
 
   inline
@@ -708,7 +708,7 @@ namespace odb
   access::object_traits< ::polaris::io::Ridership >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.ridership;
   }
 
   inline
@@ -780,6 +780,35 @@ namespace odb
 
   inline
   void access::object_traits< ::polaris::io::Link_Type >::
+  callback (database& db, const object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  // Use_Code
+  //
+
+  inline
+  access::object_traits< ::polaris::io::Use_Code >::id_type
+  access::object_traits< ::polaris::io::Use_Code >::
+  id (const object_type& o)
+  {
+    return o.use_code;
+  }
+
+  inline
+  void access::object_traits< ::polaris::io::Use_Code >::
+  callback (database& db, object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::polaris::io::Use_Code >::
   callback (database& db, const object_type& x, callback_event e)
   {
     ODB_POTENTIALLY_UNUSED (db);
@@ -1548,6 +1577,24 @@ namespace odb
 
   inline
   void access::object_traits_impl< ::polaris::io::Link_Type, id_sqlite >::
+  load_ (statements_type&, object_type&)
+  {
+  }
+
+  // Use_Code
+  //
+
+  inline
+  void access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  erase (database& db, const object_type& obj)
+  {
+    callback (db, obj, callback_event::pre_erase);
+    erase (db, id (obj));
+    callback (db, obj, callback_event::post_erase);
+  }
+
+  inline
+  void access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
   load_ (statements_type&, object_type&)
   {
   }

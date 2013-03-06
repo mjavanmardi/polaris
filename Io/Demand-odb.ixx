@@ -12,7 +12,7 @@ namespace odb
   access::object_traits< ::polaris::io::Selection >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.selection;
   }
 
   inline
@@ -41,7 +41,7 @@ namespace odb
   access::object_traits< ::polaris::io::Household >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.household;
   }
 
   inline
@@ -70,7 +70,7 @@ namespace odb
   access::object_traits< ::polaris::io::Vehicle >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.vehicle_id;
   }
 
   inline
@@ -99,7 +99,7 @@ namespace odb
   access::object_traits< ::polaris::io::Trip >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.trip_id;
   }
 
   inline
@@ -128,7 +128,7 @@ namespace odb
   access::object_traits< ::polaris::io::Plan >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.plan;
   }
 
   inline
@@ -157,7 +157,7 @@ namespace odb
   access::object_traits< ::polaris::io::Traveler >::
   id (const object_type& o)
   {
-    return o.auto_id;
+    return o.traveler;
   }
 
   inline

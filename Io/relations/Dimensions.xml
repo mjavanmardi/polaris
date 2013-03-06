@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<root>
+	<type name="table_field" pragma="value">
+		<field name="table" type="std::string"/>
+		<field name="field" type="std::string"/>>
+		<field name="time" type="int"/>
+	</type>
+	<type name="Quantity" pragma="object">
+		<field key="yes" name="tf" type="table_field"/>
+		<field name="quantity" reference="Dimension"/>
+	</type>
+	<type name="Dimension" pragma="object">
+		<field key="yes" name="quantity" type="std::string"/>
+		<field name="mass" type="int"/>
+		<field name="length" type="int"/>
+		<field name="time" type="int"/>
+		<field name="lane" type="int"/>
+		<field name="usd" type="int"/>
+	</type>	
+</root>

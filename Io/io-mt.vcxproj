@@ -160,7 +160,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Control.h" />
     <ClInclude Include="database.h" />
     <ClInclude Include="Dimensions.h" />
     <ClInclude Include="Geometry.h" />

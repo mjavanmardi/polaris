@@ -1278,6 +1278,52 @@ namespace odb
     callback (database&, const object_type&, callback_event);
   };
 
+  // Use_Code
+  //
+  template <>
+  struct class_traits< ::polaris::io::Use_Code >
+  {
+    static const class_kind kind = class_object;
+  };
+
+  template <>
+  class access::object_traits< ::polaris::io::Use_Code >
+  {
+    public:
+    typedef ::polaris::io::Use_Code object_type;
+    typedef ::std::tr1::shared_ptr< ::polaris::io::Use_Code > pointer_type;
+    typedef odb::pointer_traits<pointer_type> pointer_traits;
+
+    static const bool polymorphic = false;
+
+    typedef ::std::string id_type;
+
+    static const bool auto_id = false;
+
+    static const bool abstract = false;
+
+    static id_type
+    id (const object_type&);
+
+    typedef
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
+    pointer_cache_traits;
+
+    typedef
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
+    reference_cache_traits;
+
+    static void
+    callback (database&, object_type&, callback_event);
+
+    static void
+    callback (database&, const object_type&, callback_event);
+  };
+
   // Component
   //
   template <>
@@ -2530,7 +2576,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Shape, id_sqlite, A >
   {
-    // auto_id
+    // zone
     //
     typedef
     sqlite::query_column<
@@ -2538,9 +2584,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    zone_type_;
 
-    static const auto_id_type_ auto_id;
+    static const zone_type_ zone;
 
     // link
     //
@@ -2568,9 +2614,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Shape, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Shape, id_sqlite, A >::zone_type_
   pointer_query_columns< ::polaris::io::Shape, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  zone (A::table_name, "\"zone\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Shape, id_sqlite, A >::link_type_
@@ -2597,10 +2643,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // zone
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long zone_value;
+      bool zone_null;
 
       // link
       //
@@ -3478,7 +3524,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Pocket, id_sqlite, A >
   {
-    // auto_id
+    // pocket
     //
     typedef
     sqlite::query_column<
@@ -3486,9 +3532,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    pocket_type_;
 
-    static const auto_id_type_ auto_id;
+    static const pocket_type_ pocket;
 
     // link
     //
@@ -3564,9 +3610,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Pocket, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Pocket, id_sqlite, A >::pocket_type_
   pointer_query_columns< ::polaris::io::Pocket, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  pocket (A::table_name, "\"pocket\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Pocket, id_sqlite, A >::link_type_
@@ -3613,10 +3659,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // pocket
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long pocket_value;
+      bool pocket_null;
 
       // link
       //
@@ -3749,7 +3795,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Lane_Use, id_sqlite, A >
   {
-    // auto_id
+    // lane_use
     //
     typedef
     sqlite::query_column<
@@ -3757,9 +3803,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    lane_use_type_;
 
-    static const auto_id_type_ auto_id;
+    static const lane_use_type_ lane_use;
 
     // link
     //
@@ -3967,9 +4013,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Lane_Use, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Lane_Use, id_sqlite, A >::lane_use_type_
   pointer_query_columns< ::polaris::io::Lane_Use, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  lane_use (A::table_name, "\"lane_use\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Lane_Use, id_sqlite, A >::link_type_
@@ -4071,10 +4117,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // lane_use
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long lane_use_value;
+      bool lane_use_null;
 
       // link
       //
@@ -4645,7 +4691,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Turn_Pen, id_sqlite, A >
   {
-    // auto_id
+    // turn_pen
     //
     typedef
     sqlite::query_column<
@@ -4653,9 +4699,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    turn_pen_type_;
 
-    static const auto_id_type_ auto_id;
+    static const turn_pen_type_ turn_pen;
 
     // link
     //
@@ -4791,9 +4837,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Turn_Pen, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Turn_Pen, id_sqlite, A >::turn_pen_type_
   pointer_query_columns< ::polaris::io::Turn_Pen, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  turn_pen (A::table_name, "\"turn_pen\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Turn_Pen, id_sqlite, A >::link_type_
@@ -4865,10 +4911,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // turn_pen
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long turn_pen_value;
+      bool turn_pen_null;
 
       // link
       //
@@ -5679,7 +5725,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Access, id_sqlite, A >
   {
-    // auto_id
+    // access
     //
     typedef
     sqlite::query_column<
@@ -5687,9 +5733,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    access_type_;
 
-    static const auto_id_type_ auto_id;
+    static const access_type_ access;
 
     // link
     //
@@ -5789,9 +5835,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Access, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Access, id_sqlite, A >::access_type_
   pointer_query_columns< ::polaris::io::Access, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  access (A::table_name, "\"access\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Access, id_sqlite, A >::link_type_
@@ -5848,10 +5894,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // access
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long access_value;
+      bool access_null;
 
       // link
       //
@@ -5993,7 +6039,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Sign, id_sqlite, A >
   {
-    // auto_id
+    // sign_id
     //
     typedef
     sqlite::query_column<
@@ -6001,9 +6047,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    sign_id_type_;
 
-    static const auto_id_type_ auto_id;
+    static const sign_id_type_ sign_id;
 
     // link
     //
@@ -6043,9 +6089,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Sign, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Sign, id_sqlite, A >::sign_id_type_
   pointer_query_columns< ::polaris::io::Sign, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  sign_id (A::table_name, "\"sign_id\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Sign, id_sqlite, A >::link_type_
@@ -6077,10 +6123,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // sign_id
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long sign_id_value;
+      bool sign_id_null;
 
       // link
       //
@@ -6519,7 +6565,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Timing, id_sqlite, A >
   {
-    // auto_id
+    // timing_id
     //
     typedef
     sqlite::query_column<
@@ -6527,9 +6573,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    timing_id_type_;
 
-    static const auto_id_type_ auto_id;
+    static const timing_id_type_ timing_id;
 
     // signal
     //
@@ -6605,9 +6651,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Timing, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Timing, id_sqlite, A >::timing_id_type_
   pointer_query_columns< ::polaris::io::Timing, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  timing_id (A::table_name, "\"timing_id\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Timing, id_sqlite, A >::signal_type_
@@ -6654,10 +6700,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // timing_id
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long timing_id_value;
+      bool timing_id_null;
 
       // signal
       //
@@ -6861,7 +6907,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Phasing, id_sqlite, A >
   {
-    // auto_id
+    // phasing_id
     //
     typedef
     sqlite::query_column<
@@ -6869,9 +6915,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    phasing_id_type_;
 
-    static const auto_id_type_ auto_id;
+    static const phasing_id_type_ phasing_id;
 
     // signal
     //
@@ -6935,9 +6981,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Phasing, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Phasing, id_sqlite, A >::phasing_id_type_
   pointer_query_columns< ::polaris::io::Phasing, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  phasing_id (A::table_name, "\"phasing_id\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Phasing, id_sqlite, A >::signal_type_
@@ -6979,10 +7025,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // phasing_id
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long phasing_id_value;
+      bool phasing_id_null;
 
       // signal
       //
@@ -8082,7 +8128,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Line, id_sqlite, A >
   {
-    // auto_id
+    // line
     //
     typedef
     sqlite::query_column<
@@ -8090,9 +8136,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    line_type_;
 
-    static const auto_id_type_ auto_id;
+    static const line_type_ line;
 
     // route
     //
@@ -8192,9 +8238,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Line, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Line, id_sqlite, A >::line_type_
   pointer_query_columns< ::polaris::io::Line, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  line (A::table_name, "\"line\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Line, id_sqlite, A >::route_type_
@@ -8251,10 +8297,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // line
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long line_value;
+      bool line_null;
 
       // route
       //
@@ -8399,7 +8445,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Schedule, id_sqlite, A >
   {
-    // auto_id
+    // schedule
     //
     typedef
     sqlite::query_column<
@@ -8407,9 +8453,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    schedule_type_;
 
-    static const auto_id_type_ auto_id;
+    static const schedule_type_ schedule;
 
     // route
     //
@@ -8449,9 +8495,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Schedule, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Schedule, id_sqlite, A >::schedule_type_
   pointer_query_columns< ::polaris::io::Schedule, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  schedule (A::table_name, "\"schedule\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Schedule, id_sqlite, A >::route_type_
@@ -8483,10 +8529,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // schedule
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long schedule_value;
+      bool schedule_null;
 
       // route
       //
@@ -8604,7 +8650,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Driver, id_sqlite, A >
   {
-    // auto_id
+    // driver
     //
     typedef
     sqlite::query_column<
@@ -8612,9 +8658,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    driver_type_;
 
-    static const auto_id_type_ auto_id;
+    static const driver_type_ driver;
 
     // route
     //
@@ -8690,9 +8736,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Driver, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Driver, id_sqlite, A >::driver_type_
   pointer_query_columns< ::polaris::io::Driver, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  driver (A::table_name, "\"driver\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Driver, id_sqlite, A >::route_type_
@@ -8739,10 +8785,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // driver
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long driver_value;
+      bool driver_null;
 
       // route
       //
@@ -8875,7 +8921,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Route_Nodes, id_sqlite, A >
   {
-    // auto_id
+    // route_nodes
     //
     typedef
     sqlite::query_column<
@@ -8883,9 +8929,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    route_nodes_type_;
 
-    static const auto_id_type_ auto_id;
+    static const route_nodes_type_ route_nodes;
 
     // route
     //
@@ -9009,9 +9055,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Route_Nodes, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Route_Nodes, id_sqlite, A >::route_nodes_type_
   pointer_query_columns< ::polaris::io::Route_Nodes, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  route_nodes (A::table_name, "\"route_nodes\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Route_Nodes, id_sqlite, A >::route_type_
@@ -9078,10 +9124,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // route_nodes
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long route_nodes_value;
+      bool route_nodes_null;
 
       // route
       //
@@ -9664,7 +9710,7 @@ namespace odb
   template <typename A>
   struct pointer_query_columns< ::polaris::io::Ridership, id_sqlite, A >
   {
-    // auto_id
+    // ridership
     //
     typedef
     sqlite::query_column<
@@ -9672,9 +9718,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    ridership_type_;
 
-    static const auto_id_type_ auto_id;
+    static const ridership_type_ ridership;
 
     // mode
     //
@@ -9798,9 +9844,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename pointer_query_columns< ::polaris::io::Ridership, id_sqlite, A >::auto_id_type_
+  const typename pointer_query_columns< ::polaris::io::Ridership, id_sqlite, A >::ridership_type_
   pointer_query_columns< ::polaris::io::Ridership, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  ridership (A::table_name, "\"ridership\"", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::polaris::io::Ridership, id_sqlite, A >::mode_type_
@@ -9867,10 +9913,10 @@ namespace odb
 
     struct image_type
     {
-      // auto_id
+      // ridership
       //
-      long long auto_id_value;
-      bool auto_id_null;
+      long long ridership_value;
+      bool ridership_null;
 
       // mode
       //
@@ -10437,6 +10483,286 @@ namespace odb
   template <>
   class access::object_traits_impl< ::polaris::io::Link_Type, id_common >:
     public access::object_traits_impl< ::polaris::io::Link_Type, id_sqlite >
+  {
+  };
+
+  // Use_Code
+  //
+  template <typename A>
+  struct query_columns< ::polaris::io::Use_Code, id_sqlite, A >
+  {
+    // use_code
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
+    use_code_type_;
+
+    static const use_code_type_ use_code;
+
+    // rank
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    rank_type_;
+
+    static const rank_type_ rank;
+
+    // routable
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        int,
+        sqlite::id_integer >::query_type,
+      sqlite::id_integer >
+    routable_type_;
+
+    static const routable_type_ routable;
+
+    // subset_of
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
+    subset_of_type_;
+
+    static const subset_of_type_ subset_of;
+
+    // superset_of
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
+    superset_of_type_;
+
+    static const superset_of_type_ superset_of;
+
+    // alternative_labels
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
+    alternative_labels_type_;
+
+    static const alternative_labels_type_ alternative_labels;
+
+    // notes
+    //
+    typedef
+    sqlite::query_column<
+      sqlite::value_traits<
+        ::std::string,
+        sqlite::id_text >::query_type,
+      sqlite::id_text >
+    notes_type_;
+
+    static const notes_type_ notes;
+  };
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::Use_Code, id_sqlite, A >::use_code_type_
+  query_columns< ::polaris::io::Use_Code, id_sqlite, A >::
+  use_code (A::table_name, "\"use_code\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::Use_Code, id_sqlite, A >::rank_type_
+  query_columns< ::polaris::io::Use_Code, id_sqlite, A >::
+  rank (A::table_name, "\"rank\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::Use_Code, id_sqlite, A >::routable_type_
+  query_columns< ::polaris::io::Use_Code, id_sqlite, A >::
+  routable (A::table_name, "\"routable\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::Use_Code, id_sqlite, A >::subset_of_type_
+  query_columns< ::polaris::io::Use_Code, id_sqlite, A >::
+  subset_of (A::table_name, "\"subset_of\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::Use_Code, id_sqlite, A >::superset_of_type_
+  query_columns< ::polaris::io::Use_Code, id_sqlite, A >::
+  superset_of (A::table_name, "\"superset_of\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::Use_Code, id_sqlite, A >::alternative_labels_type_
+  query_columns< ::polaris::io::Use_Code, id_sqlite, A >::
+  alternative_labels (A::table_name, "\"alternative_labels\"", 0);
+
+  template <typename A>
+  const typename query_columns< ::polaris::io::Use_Code, id_sqlite, A >::notes_type_
+  query_columns< ::polaris::io::Use_Code, id_sqlite, A >::
+  notes (A::table_name, "\"notes\"", 0);
+
+  template <typename A>
+  struct pointer_query_columns< ::polaris::io::Use_Code, id_sqlite, A >:
+    query_columns< ::polaris::io::Use_Code, id_sqlite, A >
+  {
+  };
+
+  template <>
+  class access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >:
+    public access::object_traits< ::polaris::io::Use_Code >
+  {
+    public:
+    struct id_image_type
+    {
+      details::buffer id_value;
+      std::size_t id_size;
+      bool id_null;
+
+      std::size_t version;
+    };
+
+    struct image_type
+    {
+      // use_code
+      //
+      details::buffer use_code_value;
+      std::size_t use_code_size;
+      bool use_code_null;
+
+      // rank
+      //
+      long long rank_value;
+      bool rank_null;
+
+      // routable
+      //
+      long long routable_value;
+      bool routable_null;
+
+      // subset_of
+      //
+      details::buffer subset_of_value;
+      std::size_t subset_of_size;
+      bool subset_of_null;
+
+      // superset_of
+      //
+      details::buffer superset_of_value;
+      std::size_t superset_of_size;
+      bool superset_of_null;
+
+      // alternative_labels
+      //
+      details::buffer alternative_labels_value;
+      std::size_t alternative_labels_size;
+      bool alternative_labels_null;
+
+      // notes
+      //
+      details::buffer notes_value;
+      std::size_t notes_size;
+      bool notes_null;
+
+      std::size_t version;
+    };
+
+    using object_traits<object_type>::id;
+
+    static id_type
+    id (const image_type&);
+
+    static bool
+    grow (image_type&, bool*);
+
+    static void
+    bind (sqlite::bind*,
+          image_type&,
+          sqlite::statement_kind);
+
+    static void
+    bind (sqlite::bind*, id_image_type&);
+
+    static bool
+    init (image_type&, const object_type&, sqlite::statement_kind);
+
+    static void
+    init (object_type&, const image_type&, database*);
+
+    static void
+    init (id_image_type&, const id_type&);
+
+    typedef sqlite::object_statements<object_type> statements_type;
+
+    typedef sqlite::query_base query_base_type;
+
+    struct container_statement_cache_type;
+
+    static const std::size_t column_count = 7UL;
+    static const std::size_t id_column_count = 1UL;
+    static const std::size_t inverse_column_count = 0UL;
+    static const std::size_t readonly_column_count = 0UL;
+    static const std::size_t managed_optimistic_column_count = 0UL;
+
+    static const char persist_statement[];
+    static const char find_statement[];
+    static const char update_statement[];
+    static const char erase_statement[];
+    static const char query_statement[];
+    static const char erase_query_statement[];
+
+    static const char table_name[];
+
+    static void
+    persist (database&, const object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
+
+    static bool
+    create_schema (database&, unsigned short pass, bool drop);
+
+    public:
+    static bool
+    find_ (statements_type&, const id_type*);
+
+    static void
+    load_ (statements_type&, object_type&);
+  };
+
+  template <>
+  class access::object_traits_impl< ::polaris::io::Use_Code, id_common >:
+    public access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >
   {
   };
 
@@ -12155,7 +12481,7 @@ namespace odb
   struct query_columns< ::polaris::io::Shape, id_sqlite, A >:
     query_columns_base< ::polaris::io::Shape, id_sqlite >
   {
-    // auto_id
+    // zone
     //
     typedef
     sqlite::query_column<
@@ -12163,9 +12489,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    zone_type_;
 
-    static const auto_id_type_ auto_id;
+    static const zone_type_ zone;
 
     // link
     //
@@ -12209,9 +12535,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Shape, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Shape, id_sqlite, A >::zone_type_
   query_columns< ::polaris::io::Shape, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  zone (A::table_name, "\"zone\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Shape, id_sqlite, A >::link_type_
@@ -12840,7 +13166,7 @@ namespace odb
   struct query_columns< ::polaris::io::Pocket, id_sqlite, A >:
     query_columns_base< ::polaris::io::Pocket, id_sqlite >
   {
-    // auto_id
+    // pocket
     //
     typedef
     sqlite::query_column<
@@ -12848,9 +13174,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    pocket_type_;
 
-    static const auto_id_type_ auto_id;
+    static const pocket_type_ pocket;
 
     // link
     //
@@ -12942,9 +13268,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Pocket, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Pocket, id_sqlite, A >::pocket_type_
   query_columns< ::polaris::io::Pocket, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  pocket (A::table_name, "\"pocket\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Pocket, id_sqlite, A >::link_type_
@@ -13004,7 +13330,7 @@ namespace odb
   struct query_columns< ::polaris::io::Lane_Use, id_sqlite, A >:
     query_columns_base< ::polaris::io::Lane_Use, id_sqlite >
   {
-    // auto_id
+    // lane_use
     //
     typedef
     sqlite::query_column<
@@ -13012,9 +13338,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    lane_use_type_;
 
-    static const auto_id_type_ auto_id;
+    static const lane_use_type_ lane_use;
 
     // link
     //
@@ -13238,9 +13564,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Lane_Use, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Lane_Use, id_sqlite, A >::lane_use_type_
   query_columns< ::polaris::io::Lane_Use, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  lane_use (A::table_name, "\"lane_use\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Lane_Use, id_sqlite, A >::link_type_
@@ -13692,7 +14018,7 @@ namespace odb
   struct query_columns< ::polaris::io::Turn_Pen, id_sqlite, A >:
     query_columns_base< ::polaris::io::Turn_Pen, id_sqlite >
   {
-    // auto_id
+    // turn_pen
     //
     typedef
     sqlite::query_column<
@@ -13700,9 +14026,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    turn_pen_type_;
 
-    static const auto_id_type_ auto_id;
+    static const turn_pen_type_ turn_pen;
 
     // link
     //
@@ -13902,9 +14228,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Turn_Pen, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Turn_Pen, id_sqlite, A >::turn_pen_type_
   query_columns< ::polaris::io::Turn_Pen, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  turn_pen (A::table_name, "\"turn_pen\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Turn_Pen, id_sqlite, A >::link_type_
@@ -14436,7 +14762,7 @@ namespace odb
   struct query_columns< ::polaris::io::Access, id_sqlite, A >:
     query_columns_base< ::polaris::io::Access, id_sqlite >
   {
-    // auto_id
+    // access
     //
     typedef
     sqlite::query_column<
@@ -14444,9 +14770,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    access_type_;
 
-    static const auto_id_type_ auto_id;
+    static const access_type_ access;
 
     // link
     //
@@ -14562,9 +14888,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Access, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Access, id_sqlite, A >::access_type_
   query_columns< ::polaris::io::Access, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  access (A::table_name, "\"access\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Access, id_sqlite, A >::link_type_
@@ -14634,7 +14960,7 @@ namespace odb
   struct query_columns< ::polaris::io::Sign, id_sqlite, A >:
     query_columns_base< ::polaris::io::Sign, id_sqlite >
   {
-    // auto_id
+    // sign_id
     //
     typedef
     sqlite::query_column<
@@ -14642,9 +14968,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    sign_id_type_;
 
-    static const auto_id_type_ auto_id;
+    static const sign_id_type_ sign_id;
 
     // link
     //
@@ -14700,9 +15026,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Sign, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Sign, id_sqlite, A >::sign_id_type_
   query_columns< ::polaris::io::Sign, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  sign_id (A::table_name, "\"sign_id\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Sign, id_sqlite, A >::link_type_
@@ -14894,7 +15220,7 @@ namespace odb
   struct query_columns< ::polaris::io::Timing, id_sqlite, A >:
     query_columns_base< ::polaris::io::Timing, id_sqlite >
   {
-    // auto_id
+    // timing_id
     //
     typedef
     sqlite::query_column<
@@ -14902,9 +15228,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    timing_id_type_;
 
-    static const auto_id_type_ auto_id;
+    static const timing_id_type_ timing_id;
 
     // signal
     //
@@ -14996,9 +15322,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Timing, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Timing, id_sqlite, A >::timing_id_type_
   query_columns< ::polaris::io::Timing, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  timing_id (A::table_name, "\"timing_id\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Timing, id_sqlite, A >::signal_type_
@@ -15058,7 +15384,7 @@ namespace odb
   struct query_columns< ::polaris::io::Phasing, id_sqlite, A >:
     query_columns_base< ::polaris::io::Phasing, id_sqlite >
   {
-    // auto_id
+    // phasing_id
     //
     typedef
     sqlite::query_column<
@@ -15066,9 +15392,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    phasing_id_type_;
 
-    static const auto_id_type_ auto_id;
+    static const phasing_id_type_ phasing_id;
 
     // signal
     //
@@ -15148,9 +15474,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Phasing, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Phasing, id_sqlite, A >::phasing_id_type_
   query_columns< ::polaris::io::Phasing, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  phasing_id (A::table_name, "\"phasing_id\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Phasing, id_sqlite, A >::signal_type_
@@ -15835,7 +16161,7 @@ namespace odb
   struct query_columns< ::polaris::io::Line, id_sqlite, A >:
     query_columns_base< ::polaris::io::Line, id_sqlite >
   {
-    // auto_id
+    // line
     //
     typedef
     sqlite::query_column<
@@ -15843,9 +16169,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    line_type_;
 
-    static const auto_id_type_ auto_id;
+    static const line_type_ line;
 
     // route
     //
@@ -15993,9 +16319,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Line, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Line, id_sqlite, A >::line_type_
   query_columns< ::polaris::io::Line, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  line (A::table_name, "\"line\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Line, id_sqlite, A >::route_type_
@@ -16083,7 +16409,7 @@ namespace odb
   struct query_columns< ::polaris::io::Schedule, id_sqlite, A >:
     query_columns_base< ::polaris::io::Schedule, id_sqlite >
   {
-    // auto_id
+    // schedule
     //
     typedef
     sqlite::query_column<
@@ -16091,9 +16417,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    schedule_type_;
 
-    static const auto_id_type_ auto_id;
+    static const schedule_type_ schedule;
 
     // route
     //
@@ -16165,9 +16491,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Schedule, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Schedule, id_sqlite, A >::schedule_type_
   query_columns< ::polaris::io::Schedule, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  schedule (A::table_name, "\"schedule\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Schedule, id_sqlite, A >::route_type_
@@ -16230,7 +16556,7 @@ namespace odb
   struct query_columns< ::polaris::io::Driver, id_sqlite, A >:
     query_columns_base< ::polaris::io::Driver, id_sqlite >
   {
-    // auto_id
+    // driver
     //
     typedef
     sqlite::query_column<
@@ -16238,9 +16564,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    driver_type_;
 
-    static const auto_id_type_ auto_id;
+    static const driver_type_ driver;
 
     // route
     //
@@ -16348,9 +16674,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Driver, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Driver, id_sqlite, A >::driver_type_
   query_columns< ::polaris::io::Driver, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  driver (A::table_name, "\"driver\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Driver, id_sqlite, A >::route_type_
@@ -16446,7 +16772,7 @@ namespace odb
   struct query_columns< ::polaris::io::Route_Nodes, id_sqlite, A >:
     query_columns_base< ::polaris::io::Route_Nodes, id_sqlite >
   {
-    // auto_id
+    // route_nodes
     //
     typedef
     sqlite::query_column<
@@ -16454,9 +16780,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    route_nodes_type_;
 
-    static const auto_id_type_ auto_id;
+    static const route_nodes_type_ route_nodes;
 
     // route
     //
@@ -16628,9 +16954,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Route_Nodes, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Route_Nodes, id_sqlite, A >::route_nodes_type_
   query_columns< ::polaris::io::Route_Nodes, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  route_nodes (A::table_name, "\"route_nodes\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Route_Nodes, id_sqlite, A >::route_type_
@@ -16712,7 +17038,7 @@ namespace odb
   struct query_columns< ::polaris::io::Ridership, id_sqlite, A >:
     query_columns_base< ::polaris::io::Ridership, id_sqlite >
   {
-    // auto_id
+    // ridership
     //
     typedef
     sqlite::query_column<
@@ -16720,9 +17046,9 @@ namespace odb
         long unsigned int,
         sqlite::id_integer >::query_type,
       sqlite::id_integer >
-    auto_id_type_;
+    ridership_type_;
 
-    static const auto_id_type_ auto_id;
+    static const ridership_type_ ridership;
 
     // mode
     //
@@ -16862,9 +17188,9 @@ namespace odb
   };
 
   template <typename A>
-  const typename query_columns< ::polaris::io::Ridership, id_sqlite, A >::auto_id_type_
+  const typename query_columns< ::polaris::io::Ridership, id_sqlite, A >::ridership_type_
   query_columns< ::polaris::io::Ridership, id_sqlite, A >::
-  auto_id (A::table_name, "\"auto_id\"", 0);
+  ridership (A::table_name, "\"ridership\"", 0);
 
   template <typename A>
   const typename query_columns< ::polaris::io::Ridership, id_sqlite, A >::mode_type_
@@ -16919,6 +17245,8 @@ namespace odb
   // Area_Type
   //
   // Link_Type
+  //
+  // Use_Code
   //
   // Component
   //

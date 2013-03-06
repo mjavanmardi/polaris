@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<root>
+	<type name="Component" pragma="object">
+		<field name="id" type="int" key="yes"/>
+		<field name="name" type="std::string"/>>
+		<field name="icon" type="std::string"/>
+	</type>
+	<type name="Component_Property_Keys" pragma="object">
+		<field key="yes" name="id" type="int"/>
+		<field name="component_id" reference="Component"/>
+		<field name="key" type="std::string"/>
+		<field name="value_type" type="std::string"/>
+		<field name="value_constraint" type="std::string"/>
+		<field name="is_state" type="bool"/>
+		<field name="required" type="bool"/>
+		<field name="note" type="std::string"/>
+	</type>
+	<type name="Instance" pragma="object">
+		<field key="yes" name="id" type="int"/>
+		<field name="component_id" reference="Component"/>
+		<field name="location_link" type="int"/>
+		<field name="location_offset" type="float"/>
+		<field name="location_x" type="float"/>
+		<field name="location_y" type="float"/>
+		<field name="owner" type="std::string"/>
+		<field name="operational_status" type="int"/>
+		<field name="schedule" type="std::string"/>
+	</type>	
+	<type name="Instance_Property_Values" pragma="object">
+		<field key="yes" name="id" type="int"/>
+		<field name="instatce_id" reference="Instance"/>
+		<field name="key" type="int"/>
+		<field name="value" type="std::string"/>
+	</type>			
+	<type name="Action" pragma="object">
+		<field key="yes" name="id" type="int"/>
+		<field name="component_id" reference="Component"/>
+		<field name="name" type="std::string"/>
+		<field name="note" type="std::string"/>
+	</type>
+	<type name="Action_Keys" pragma="object">
+		<field key="yes" name="id" type="int"/>
+		<field name="action_id" reference="Action"/>
+		<field name="key" type="std::string"/>
+		<field name="value_type" type="std::string"/>
+		<field name="value_constraint" type="std::string"/>
+		<field name="required" type="bool"/>		
+		<field name="note" type="std::string"/>
+	</type>	
+	<type name="Action_Log" pragma="object">
+		<field key="yes" name="id" type="int"/>	
+		<field name="action_id" reference="Action"/>
+		<field name="time_submission" type="int"/>
+		<field name="time_delay" type="int"/>
+		<field name="flag" type="std::string"/>
+		<field name="message" type="std::string"/>
+	</type>		
+</root>

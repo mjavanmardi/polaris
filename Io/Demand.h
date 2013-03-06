@@ -51,14 +51,14 @@ public:
 	void setType (const int& type_){type = type_;}
 	const int& getPartition () const {return partition;}
 	void setPartition (const int& partition_){partition = partition_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return selection;}
+	const unsigned long& getSelection () const {return selection;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long selection;
 	int hhold;
 	int person;
 	int tour;
@@ -106,14 +106,14 @@ public:
 	void setWork (const int& work_){work = work_;}
 	const int& getDrive () const {return drive;}
 	void setDrive (const int& drive_){drive = drive_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return household;}
+	const unsigned long& gehousehold () const {return household;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long household;
 	int hhold;
 	int location;
 	int persons;
@@ -155,14 +155,14 @@ public:
 	void setSubtype (const int& subtype_){subtype = subtype_;}
 	const int& getPartition () const {return partition;}
 	void setPartition (const int& partition_){partition = partition_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return vehicle_id;}
+	const unsigned long& getVehicle_Id () const {return vehicle_id;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long vehicle_id;
 	int hhold;
 	int vehicle;
 	int parking;
@@ -218,14 +218,14 @@ public:
 	void setType (const int& type_){type = type_;}
 	const int& getPartition () const {return partition;}
 	void setPartition (const int& partition_){partition = partition_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return trip_id;}
+	const unsigned long& getTrip_Id () const {return trip_id;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long trip_id;
 	int hhold;
 	int person;
 	int tour;
@@ -294,14 +294,14 @@ public:
 	void setLeg_Cost (const double& leg_cost_){leg_cost = leg_cost_;}
 	const int& getLeg_Imp () const {return leg_imp;}
 	void setLeg_Imp (const int& leg_imp_){leg_imp = leg_imp_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return plan;}
+	const unsigned long& getPlan () const {return plan;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long plan;
 	double depart;
 	double arrive;
 	double activity;
@@ -360,14 +360,14 @@ public:
 	void setOffset (const double& offset_){offset = offset_;}
 	const int& getRoute () const {return route;}
 	void setRoute (const int& route_){route = route_;}
-	const unsigned long& getPrimaryKey () const {return auto_id;}
-	const unsigned long& getAuto_id () const {return auto_id;}
+	const unsigned long& getPrimaryKey () const {return traveler;}
+	const unsigned long& getTraveler () const {return traveler;}
 
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
-	unsigned long auto_id;
+	unsigned long traveler;
 	int hhold;
 	int person;
 	int tour;

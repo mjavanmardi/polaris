@@ -3839,8 +3839,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.zone_value,
+        i.zone_null);
     }
 
     return id;
@@ -3854,7 +3854,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // zone
     //
     t[0UL] = false;
 
@@ -3880,13 +3880,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // zone
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.zone_value;
+      b[n].is_null = &i.zone_null;
       n++;
     }
 
@@ -3925,21 +3925,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // zone
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.zone;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.zone_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.zone_null = is_null;
     }
 
     // link
@@ -3995,18 +3995,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // zone
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.zone;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.zone_value,
+        i.zone_null);
     }
 
     // link
@@ -4084,32 +4084,32 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Shape, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Shape\" ("
-  "\"auto_id\","
+  "\"zone\","
   "\"link\","
   "\"points\")"
   " VALUES (?,?,?)";
 
   const char access::object_traits_impl< ::polaris::io::Shape, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Shape\".\"auto_id\","
+  "\"Shape\".\"zone\","
   "\"Shape\".\"link\","
   "\"Shape\".\"points\""
   " FROM \"Shape\""
-  " WHERE \"Shape\".\"auto_id\"=?";
+  " WHERE \"Shape\".\"zone\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Shape, id_sqlite >::update_statement[] =
   "UPDATE \"Shape\" SET "
   "\"link\"=?,"
   "\"points\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"zone\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Shape, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Shape\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"zone\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Shape, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Shape\".\"auto_id\","
+  "\"Shape\".\"zone\","
   "\"Shape\".\"link\","
   "\"Shape\".\"points\""
   " FROM \"Shape\""
@@ -4145,7 +4145,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.zone_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -4159,10 +4159,10 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.zone = static_cast< id_type > (st.id ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.zone);
 
     binding& idb (sts.id_image_binding ());
     if (i.version != sts.id_image_version () || idb.version == 0)
@@ -4203,7 +4203,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.zone);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -4392,7 +4392,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.zone);
 
     if (!find_ (sts, &id))
       return false;
@@ -4544,7 +4544,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Shape\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"zone\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"points\" INTEGER NOT NULL,\n"
                       "  CONSTRAINT \"link_fk\"\n"
@@ -4561,7 +4561,7 @@ namespace odb
                       "  \"value_z\" REAL,\n"
                       "  CONSTRAINT \"object_id_fk\"\n"
                       "    FOREIGN KEY (\"object_id\")\n"
-                      "    REFERENCES \"Shape\" (\"auto_id\")\n"
+                      "    REFERENCES \"Shape\" (\"zone\")\n"
                       "    ON DELETE CASCADE)");
           db.execute ("CREATE INDEX \"Shape_nested_records_object_id_i\"\n"
                       "  ON \"Shape_nested_records\" (\"object_id\")");
@@ -6512,8 +6512,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.pocket_value,
+        i.pocket_null);
     }
 
     return id;
@@ -6527,7 +6527,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // pocket
     //
     t[0UL] = false;
 
@@ -6573,13 +6573,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // pocket
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.pocket_value;
+      b[n].is_null = &i.pocket_null;
       n++;
     }
 
@@ -6650,21 +6650,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // pocket
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.pocket;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.pocket_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.pocket_null = is_null;
     }
 
     // link
@@ -6787,18 +6787,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // pocket
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.pocket;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.pocket_value,
+        i.pocket_null);
     }
 
     // link
@@ -6930,7 +6930,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Pocket, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Pocket\" ("
-  "\"auto_id\","
+  "\"pocket\","
   "\"link\","
   "\"dir\","
   "\"type\","
@@ -6941,7 +6941,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Pocket, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Pocket\".\"auto_id\","
+  "\"Pocket\".\"pocket\","
   "\"Pocket\".\"link\","
   "\"Pocket\".\"dir\","
   "\"Pocket\".\"type\","
@@ -6949,7 +6949,7 @@ namespace odb
   "\"Pocket\".\"length\","
   "\"Pocket\".\"offset\""
   " FROM \"Pocket\""
-  " WHERE \"Pocket\".\"auto_id\"=?";
+  " WHERE \"Pocket\".\"pocket\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Pocket, id_sqlite >::update_statement[] =
   "UPDATE \"Pocket\" SET "
@@ -6959,15 +6959,15 @@ namespace odb
   "\"lanes\"=?,"
   "\"length\"=?,"
   "\"offset\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"pocket\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Pocket, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Pocket\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"pocket\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Pocket, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Pocket\".\"auto_id\","
+  "\"Pocket\".\"pocket\","
   "\"Pocket\".\"link\","
   "\"Pocket\".\"dir\","
   "\"Pocket\".\"type\","
@@ -7007,7 +7007,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.pocket_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -7021,7 +7021,7 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.pocket = static_cast< id_type > (st.id ());
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -7043,7 +7043,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.pocket);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -7216,7 +7216,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.pocket);
 
     if (!find_ (sts, &id))
       return false;
@@ -7366,7 +7366,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Pocket\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"pocket\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"type\" TEXT NOT NULL,\n"
@@ -7412,8 +7412,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.lane_use_value,
+        i.lane_use_null);
     }
 
     return id;
@@ -7427,7 +7427,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // lane_use
     //
     t[0UL] = false;
 
@@ -7513,13 +7513,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // lane_use
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.lane_use_value;
+      b[n].is_null = &i.lane_use_null;
       n++;
     }
 
@@ -7663,21 +7663,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // lane_use
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.lane_use;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.lane_use_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.lane_use_null = is_null;
     }
 
     // link
@@ -7973,18 +7973,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // lane_use
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.lane_use;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.lane_use_value,
+        i.lane_use_null);
     }
 
     // link
@@ -8269,7 +8269,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Lane_Use, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Lane_Use\" ("
-  "\"auto_id\","
+  "\"lane_use\","
   "\"link\","
   "\"dir\","
   "\"lanes\","
@@ -8291,7 +8291,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Lane_Use, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Lane_Use\".\"auto_id\","
+  "\"Lane_Use\".\"lane_use\","
   "\"Lane_Use\".\"link\","
   "\"Lane_Use\".\"dir\","
   "\"Lane_Use\".\"lanes\","
@@ -8310,7 +8310,7 @@ namespace odb
   "\"Lane_Use\".\"min_delay\","
   "\"Lane_Use\".\"max_delay\""
   " FROM \"Lane_Use\""
-  " WHERE \"Lane_Use\".\"auto_id\"=?";
+  " WHERE \"Lane_Use\".\"lane_use\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Lane_Use, id_sqlite >::update_statement[] =
   "UPDATE \"Lane_Use\" SET "
@@ -8331,15 +8331,15 @@ namespace odb
   "\"rate\"=?,"
   "\"min_delay\"=?,"
   "\"max_delay\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"lane_use\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Lane_Use, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Lane_Use\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"lane_use\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Lane_Use, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Lane_Use\".\"auto_id\","
+  "\"Lane_Use\".\"lane_use\","
   "\"Lane_Use\".\"link\","
   "\"Lane_Use\".\"dir\","
   "\"Lane_Use\".\"lanes\","
@@ -8390,7 +8390,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.lane_use_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -8404,7 +8404,7 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.lane_use = static_cast< id_type > (st.id ());
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -8426,7 +8426,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.lane_use);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -8599,7 +8599,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.lane_use);
 
     if (!find_ (sts, &id))
       return false;
@@ -8735,7 +8735,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Lane_Use\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"lane_use\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"lanes\" INTEGER NOT NULL,\n"
@@ -9999,8 +9999,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.turn_pen_value,
+        i.turn_pen_null);
     }
 
     return id;
@@ -10014,7 +10014,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // turn_pen
     //
     t[0UL] = false;
 
@@ -10076,13 +10076,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // turn_pen
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.turn_pen_value;
+      b[n].is_null = &i.turn_pen_null;
       n++;
     }
 
@@ -10184,21 +10184,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // turn_pen
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.turn_pen;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.turn_pen_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.turn_pen_null = is_null;
     }
 
     // link
@@ -10431,18 +10431,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // turn_pen
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.turn_pen;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.turn_pen_value,
+        i.turn_pen_null);
     }
 
     // link
@@ -10694,7 +10694,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Turn_Pen, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Turn_Pen\" ("
-  "\"auto_id\","
+  "\"turn_pen\","
   "\"link\","
   "\"dir\","
   "\"to_link\","
@@ -10710,7 +10710,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Turn_Pen, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Turn_Pen\".\"auto_id\","
+  "\"Turn_Pen\".\"turn_pen\","
   "\"Turn_Pen\".\"link\","
   "\"Turn_Pen\".\"dir\","
   "\"Turn_Pen\".\"to_link\","
@@ -10723,7 +10723,7 @@ namespace odb
   "\"Turn_Pen\".\"in_node\","
   "\"Turn_Pen\".\"out_node\""
   " FROM \"Turn_Pen\""
-  " WHERE \"Turn_Pen\".\"auto_id\"=?";
+  " WHERE \"Turn_Pen\".\"turn_pen\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Turn_Pen, id_sqlite >::update_statement[] =
   "UPDATE \"Turn_Pen\" SET "
@@ -10738,15 +10738,15 @@ namespace odb
   "\"penalty\"=?,"
   "\"in_node\"=?,"
   "\"out_node\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"turn_pen\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Turn_Pen, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Turn_Pen\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"turn_pen\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Turn_Pen, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Turn_Pen\".\"auto_id\","
+  "\"Turn_Pen\".\"turn_pen\","
   "\"Turn_Pen\".\"link\","
   "\"Turn_Pen\".\"dir\","
   "\"Turn_Pen\".\"to_link\","
@@ -10794,7 +10794,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.turn_pen_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -10808,7 +10808,7 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.turn_pen = static_cast< id_type > (st.id ());
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -10830,7 +10830,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.turn_pen);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -11003,7 +11003,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.turn_pen);
 
     if (!find_ (sts, &id))
       return false;
@@ -11139,7 +11139,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Turn_Pen\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"turn_pen\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"to_link\" INTEGER,\n"
@@ -13214,8 +13214,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.access_value,
+        i.access_null);
     }
 
     return id;
@@ -13229,7 +13229,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // access
     //
     t[0UL] = false;
 
@@ -13279,13 +13279,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // access
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.access_value;
+      b[n].is_null = &i.access_null;
       n++;
     }
 
@@ -13366,21 +13366,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // access
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.access;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.access_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.access_null = is_null;
     }
 
     // link
@@ -13532,18 +13532,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // access
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.access;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.access_value,
+        i.access_null);
     }
 
     // link
@@ -13702,7 +13702,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Access, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Access\" ("
-  "\"auto_id\","
+  "\"access\","
   "\"link\","
   "\"from_id\","
   "\"from_type\","
@@ -13715,7 +13715,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Access, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Access\".\"auto_id\","
+  "\"Access\".\"access\","
   "\"Access\".\"link\","
   "\"Access\".\"from_id\","
   "\"Access\".\"from_type\","
@@ -13725,7 +13725,7 @@ namespace odb
   "\"Access\".\"time\","
   "\"Access\".\"cost\""
   " FROM \"Access\""
-  " WHERE \"Access\".\"auto_id\"=?";
+  " WHERE \"Access\".\"access\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Access, id_sqlite >::update_statement[] =
   "UPDATE \"Access\" SET "
@@ -13737,15 +13737,15 @@ namespace odb
   "\"dir\"=?,"
   "\"time\"=?,"
   "\"cost\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"access\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Access, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Access\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"access\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Access, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Access\".\"auto_id\","
+  "\"Access\".\"access\","
   "\"Access\".\"link\","
   "\"Access\".\"from_id\","
   "\"Access\".\"from_type\","
@@ -13787,7 +13787,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.access_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -13801,7 +13801,7 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.access = static_cast< id_type > (st.id ());
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -13823,7 +13823,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.access);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -13996,7 +13996,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.access);
 
     if (!find_ (sts, &id))
       return false;
@@ -14132,7 +14132,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Access\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"access\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"from_id\" INTEGER NOT NULL,\n"
                       "  \"from_type\" INTEGER NOT NULL,\n"
@@ -14180,8 +14180,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.sign_id_value,
+        i.sign_id_null);
     }
 
     return id;
@@ -14195,7 +14195,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // sign_id
     //
     t[0UL] = false;
 
@@ -14229,13 +14229,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // sign_id
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.sign_id_value;
+      b[n].is_null = &i.sign_id_null;
       n++;
     }
 
@@ -14285,21 +14285,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // sign_id
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.sign_id;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.sign_id_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.sign_id_null = is_null;
     }
 
     // link
@@ -14374,18 +14374,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // sign_id
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.sign_id;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.sign_id_value,
+        i.sign_id_null);
     }
 
     // link
@@ -14475,7 +14475,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Sign, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Sign\" ("
-  "\"auto_id\","
+  "\"sign_id\","
   "\"link\","
   "\"dir\","
   "\"sign\")"
@@ -14483,27 +14483,27 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Sign, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Sign\".\"auto_id\","
+  "\"Sign\".\"sign_id\","
   "\"Sign\".\"link\","
   "\"Sign\".\"dir\","
   "\"Sign\".\"sign\""
   " FROM \"Sign\""
-  " WHERE \"Sign\".\"auto_id\"=?";
+  " WHERE \"Sign\".\"sign_id\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Sign, id_sqlite >::update_statement[] =
   "UPDATE \"Sign\" SET "
   "\"link\"=?,"
   "\"dir\"=?,"
   "\"sign\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"sign_id\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Sign, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Sign\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"sign_id\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Sign, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Sign\".\"auto_id\","
+  "\"Sign\".\"sign_id\","
   "\"Sign\".\"link\","
   "\"Sign\".\"dir\","
   "\"Sign\".\"sign\""
@@ -14540,7 +14540,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.sign_id_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -14554,7 +14554,7 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.sign_id = static_cast< id_type > (st.id ());
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -14576,7 +14576,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.sign_id);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -14749,7 +14749,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.sign_id);
 
     if (!find_ (sts, &id))
       return false;
@@ -14899,7 +14899,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Sign\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"sign_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"link\" INTEGER,\n"
                       "  \"dir\" INTEGER NOT NULL,\n"
                       "  \"sign\" TEXT NOT NULL,\n"
@@ -16386,8 +16386,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.timing_id_value,
+        i.timing_id_null);
     }
 
     return id;
@@ -16401,7 +16401,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // timing_id
     //
     t[0UL] = false;
 
@@ -16443,13 +16443,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // timing_id
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.timing_id_value;
+      b[n].is_null = &i.timing_id_null;
       n++;
     }
 
@@ -16516,21 +16516,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // timing_id
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.timing_id;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.timing_id_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.timing_id_null = is_null;
     }
 
     // signal
@@ -16650,18 +16650,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // timing_id
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.timing_id;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.timing_id_value,
+        i.timing_id_null);
     }
 
     // signal
@@ -16795,7 +16795,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Timing, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Timing\" ("
-  "\"auto_id\","
+  "\"timing_id\","
   "\"signal\","
   "\"timing\","
   "\"type\","
@@ -16806,7 +16806,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Timing, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Timing\".\"auto_id\","
+  "\"Timing\".\"timing_id\","
   "\"Timing\".\"signal\","
   "\"Timing\".\"timing\","
   "\"Timing\".\"type\","
@@ -16814,7 +16814,7 @@ namespace odb
   "\"Timing\".\"offset\","
   "\"Timing\".\"phases\""
   " FROM \"Timing\""
-  " WHERE \"Timing\".\"auto_id\"=?";
+  " WHERE \"Timing\".\"timing_id\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Timing, id_sqlite >::update_statement[] =
   "UPDATE \"Timing\" SET "
@@ -16824,15 +16824,15 @@ namespace odb
   "\"cycle\"=?,"
   "\"offset\"=?,"
   "\"phases\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"timing_id\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Timing, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Timing\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"timing_id\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Timing, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Timing\".\"auto_id\","
+  "\"Timing\".\"timing_id\","
   "\"Timing\".\"signal\","
   "\"Timing\".\"timing\","
   "\"Timing\".\"type\","
@@ -16872,7 +16872,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.timing_id_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -16886,10 +16886,10 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.timing_id = static_cast< id_type > (st.id ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.timing_id);
 
     binding& idb (sts.id_image_binding ());
     if (i.version != sts.id_image_version () || idb.version == 0)
@@ -16930,7 +16930,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.timing_id);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -17119,7 +17119,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.timing_id);
 
     if (!find_ (sts, &id))
       return false;
@@ -17271,7 +17271,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Timing\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"timing_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"signal\" INTEGER,\n"
                       "  \"timing\" INTEGER NOT NULL,\n"
                       "  \"type\" INTEGER NOT NULL,\n"
@@ -17296,7 +17296,7 @@ namespace odb
                       "  \"value_red\" INTEGER NOT NULL,\n"
                       "  CONSTRAINT \"object_id_fk\"\n"
                       "    FOREIGN KEY (\"object_id\")\n"
-                      "    REFERENCES \"Timing\" (\"auto_id\")\n"
+                      "    REFERENCES \"Timing\" (\"timing_id\")\n"
                       "    ON DELETE CASCADE)");
           db.execute ("CREATE INDEX \"Timing_nested_records_object_id_i\"\n"
                       "  ON \"Timing_nested_records\" (\"object_id\")");
@@ -17629,8 +17629,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.phasing_id_value,
+        i.phasing_id_null);
     }
 
     return id;
@@ -17644,7 +17644,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // phasing_id
     //
     t[0UL] = false;
 
@@ -17686,13 +17686,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // phasing_id
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.phasing_id_value;
+      b[n].is_null = &i.phasing_id_null;
       n++;
     }
 
@@ -17756,21 +17756,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // phasing_id
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.phasing_id;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.phasing_id_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.phasing_id_null = is_null;
     }
 
     // signal
@@ -17877,18 +17877,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // phasing_id
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.phasing_id;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.phasing_id_value,
+        i.phasing_id_null);
     }
 
     // signal
@@ -18009,7 +18009,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Phasing, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Phasing\" ("
-  "\"auto_id\","
+  "\"phasing_id\","
   "\"signal\","
   "\"phasing\","
   "\"phase\","
@@ -18019,14 +18019,14 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Phasing, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Phasing\".\"auto_id\","
+  "\"Phasing\".\"phasing_id\","
   "\"Phasing\".\"signal\","
   "\"Phasing\".\"phasing\","
   "\"Phasing\".\"phase\","
   "\"Phasing\".\"detectors\","
   "\"Phasing\".\"movements\""
   " FROM \"Phasing\""
-  " WHERE \"Phasing\".\"auto_id\"=?";
+  " WHERE \"Phasing\".\"phasing_id\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Phasing, id_sqlite >::update_statement[] =
   "UPDATE \"Phasing\" SET "
@@ -18035,15 +18035,15 @@ namespace odb
   "\"phase\"=?,"
   "\"detectors\"=?,"
   "\"movements\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"phasing_id\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Phasing, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Phasing\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"phasing_id\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Phasing, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Phasing\".\"auto_id\","
+  "\"Phasing\".\"phasing_id\","
   "\"Phasing\".\"signal\","
   "\"Phasing\".\"phasing\","
   "\"Phasing\".\"phase\","
@@ -18082,7 +18082,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.phasing_id_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -18096,10 +18096,10 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.phasing_id = static_cast< id_type > (st.id ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.phasing_id);
 
     binding& idb (sts.id_image_binding ());
     if (i.version != sts.id_image_version () || idb.version == 0)
@@ -18140,7 +18140,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.phasing_id);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -18329,7 +18329,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.phasing_id);
 
     if (!find_ (sts, &id))
       return false;
@@ -18495,7 +18495,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Phasing\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"phasing_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"signal\" INTEGER,\n"
                       "  \"phasing\" INTEGER NOT NULL,\n"
                       "  \"phase\" INTEGER NOT NULL,\n"
@@ -18515,7 +18515,7 @@ namespace odb
                       "  \"value_protect\" TEXT NOT NULL,\n"
                       "  CONSTRAINT \"object_id_fk\"\n"
                       "    FOREIGN KEY (\"object_id\")\n"
-                      "    REFERENCES \"Phasing\" (\"auto_id\")\n"
+                      "    REFERENCES \"Phasing\" (\"phasing_id\")\n"
                       "    ON DELETE CASCADE,\n"
                       "  CONSTRAINT \"value_link_fk\"\n"
                       "    FOREIGN KEY (\"value_link\")\n"
@@ -21438,8 +21438,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.line_value,
+        i.line_null);
     }
 
     return id;
@@ -21453,7 +21453,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // line
     //
     t[0UL] = false;
 
@@ -21507,13 +21507,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // line
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.line_value;
+      b[n].is_null = &i.line_null;
       n++;
     }
 
@@ -21598,21 +21598,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // line
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.line;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.line_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.line_null = is_null;
     }
 
     // route
@@ -21789,18 +21789,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // line
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.line;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.line_value,
+        i.line_null);
     }
 
     // route
@@ -21994,7 +21994,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Line, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Line\" ("
-  "\"auto_id\","
+  "\"line\","
   "\"route\","
   "\"stops\","
   "\"mode\","
@@ -22007,7 +22007,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Line, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Line\".\"auto_id\","
+  "\"Line\".\"line\","
   "\"Line\".\"route\","
   "\"Line\".\"stops\","
   "\"Line\".\"mode\","
@@ -22017,7 +22017,7 @@ namespace odb
   "\"Line\".\"zone\","
   "\"Line\".\"flag\""
   " FROM \"Line\""
-  " WHERE \"Line\".\"auto_id\"=?";
+  " WHERE \"Line\".\"line\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Line, id_sqlite >::update_statement[] =
   "UPDATE \"Line\" SET "
@@ -22029,15 +22029,15 @@ namespace odb
   "\"stop\"=?,"
   "\"zone\"=?,"
   "\"flag\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"line\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Line, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Line\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"line\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Line, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Line\".\"auto_id\","
+  "\"Line\".\"line\","
   "\"Line\".\"route\","
   "\"Line\".\"stops\","
   "\"Line\".\"mode\","
@@ -22081,7 +22081,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.line_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -22095,7 +22095,7 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.line = static_cast< id_type > (st.id ());
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -22117,7 +22117,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.line);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -22290,7 +22290,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.line);
 
     if (!find_ (sts, &id))
       return false;
@@ -22440,7 +22440,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Line\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"line\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"route\" INTEGER NOT NULL,\n"
                       "  \"stops\" INTEGER,\n"
                       "  \"mode\" INTEGER NOT NULL,\n"
@@ -22501,8 +22501,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.schedule_value,
+        i.schedule_null);
     }
 
     return id;
@@ -22516,7 +22516,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // schedule
     //
     t[0UL] = false;
 
@@ -22546,13 +22546,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // schedule
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.schedule_value;
+      b[n].is_null = &i.schedule_null;
       n++;
     }
 
@@ -22598,21 +22598,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // schedule
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.schedule;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.schedule_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.schedule_null = is_null;
     }
 
     // route
@@ -22695,18 +22695,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // schedule
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.schedule;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.schedule_value,
+        i.schedule_null);
     }
 
     // route
@@ -22812,7 +22812,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Schedule, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Schedule\" ("
-  "\"auto_id\","
+  "\"schedule\","
   "\"route\","
   "\"stops\","
   "\"stop\")"
@@ -22820,27 +22820,27 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Schedule, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Schedule\".\"auto_id\","
+  "\"Schedule\".\"schedule\","
   "\"Schedule\".\"route\","
   "\"Schedule\".\"stops\","
   "\"Schedule\".\"stop\""
   " FROM \"Schedule\""
-  " WHERE \"Schedule\".\"auto_id\"=?";
+  " WHERE \"Schedule\".\"schedule\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Schedule, id_sqlite >::update_statement[] =
   "UPDATE \"Schedule\" SET "
   "\"route\"=?,"
   "\"stops\"=?,"
   "\"stop\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"schedule\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Schedule, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Schedule\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"schedule\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Schedule, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Schedule\".\"auto_id\","
+  "\"Schedule\".\"schedule\","
   "\"Schedule\".\"route\","
   "\"Schedule\".\"stops\","
   "\"Schedule\".\"stop\""
@@ -22878,7 +22878,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.schedule_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -22892,7 +22892,7 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.schedule = static_cast< id_type > (st.id ());
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -22914,7 +22914,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.schedule);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -23087,7 +23087,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.schedule);
 
     if (!find_ (sts, &id))
       return false;
@@ -23223,7 +23223,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Schedule\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"schedule\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"route\" INTEGER NOT NULL,\n"
                       "  \"stops\" INTEGER,\n"
                       "  \"stop\" INTEGER,\n"
@@ -23275,8 +23275,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.driver_value,
+        i.driver_null);
     }
 
     return id;
@@ -23290,7 +23290,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // driver
     //
     t[0UL] = false;
 
@@ -23332,13 +23332,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // driver
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.driver_value;
+      b[n].is_null = &i.driver_null;
       n++;
     }
 
@@ -23405,21 +23405,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // driver
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.driver;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.driver_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.driver_null = is_null;
     }
 
     // route
@@ -23550,18 +23550,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // driver
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.driver;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.driver_value,
+        i.driver_null);
     }
 
     // route
@@ -23709,7 +23709,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Driver, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Driver\" ("
-  "\"auto_id\","
+  "\"driver\","
   "\"route\","
   "\"links\","
   "\"type\","
@@ -23720,7 +23720,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Driver, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Driver\".\"auto_id\","
+  "\"Driver\".\"driver\","
   "\"Driver\".\"route\","
   "\"Driver\".\"links\","
   "\"Driver\".\"type\","
@@ -23728,7 +23728,7 @@ namespace odb
   "\"Driver\".\"link\","
   "\"Driver\".\"dir\""
   " FROM \"Driver\""
-  " WHERE \"Driver\".\"auto_id\"=?";
+  " WHERE \"Driver\".\"driver\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Driver, id_sqlite >::update_statement[] =
   "UPDATE \"Driver\" SET "
@@ -23738,15 +23738,15 @@ namespace odb
   "\"subtype\"=?,"
   "\"link\"=?,"
   "\"dir\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"driver\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Driver, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Driver\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"driver\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Driver, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Driver\".\"auto_id\","
+  "\"Driver\".\"driver\","
   "\"Driver\".\"route\","
   "\"Driver\".\"links\","
   "\"Driver\".\"type\","
@@ -23787,7 +23787,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.driver_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -23801,7 +23801,7 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.driver = static_cast< id_type > (st.id ());
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -23823,7 +23823,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.driver);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -23996,7 +23996,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.driver);
 
     if (!find_ (sts, &id))
       return false;
@@ -24132,7 +24132,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Driver\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"driver\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"route\" INTEGER NOT NULL,\n"
                       "  \"links\" INTEGER,\n"
                       "  \"type\" INTEGER NOT NULL,\n"
@@ -24192,8 +24192,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.route_nodes_value,
+        i.route_nodes_null);
     }
 
     return id;
@@ -24207,7 +24207,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // route_nodes
     //
     t[0UL] = false;
 
@@ -24269,13 +24269,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // route_nodes
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.route_nodes_value;
+      b[n].is_null = &i.route_nodes_null;
       n++;
     }
 
@@ -24374,21 +24374,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // route_nodes
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.route_nodes;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.route_nodes_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.route_nodes_null = is_null;
     }
 
     // route
@@ -24597,18 +24597,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // route_nodes
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.route_nodes;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.route_nodes_value,
+        i.route_nodes_null);
     }
 
     // route
@@ -24830,7 +24830,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Route_Nodes, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Route_Nodes\" ("
-  "\"auto_id\","
+  "\"route_nodes\","
   "\"route\","
   "\"mode\","
   "\"veh_type\","
@@ -24845,7 +24845,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Route_Nodes, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Route_Nodes\".\"auto_id\","
+  "\"Route_Nodes\".\"route_nodes\","
   "\"Route_Nodes\".\"route\","
   "\"Route_Nodes\".\"mode\","
   "\"Route_Nodes\".\"veh_type\","
@@ -24857,7 +24857,7 @@ namespace odb
   "\"Route_Nodes\".\"time\","
   "\"Route_Nodes\".\"speed\""
   " FROM \"Route_Nodes\""
-  " WHERE \"Route_Nodes\".\"auto_id\"=?";
+  " WHERE \"Route_Nodes\".\"route_nodes\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Route_Nodes, id_sqlite >::update_statement[] =
   "UPDATE \"Route_Nodes\" SET "
@@ -24871,15 +24871,15 @@ namespace odb
   "\"dwell\"=?,"
   "\"time\"=?,"
   "\"speed\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"route_nodes\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Route_Nodes, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Route_Nodes\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"route_nodes\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Route_Nodes, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Route_Nodes\".\"auto_id\","
+  "\"Route_Nodes\".\"route_nodes\","
   "\"Route_Nodes\".\"route\","
   "\"Route_Nodes\".\"mode\","
   "\"Route_Nodes\".\"veh_type\","
@@ -24925,7 +24925,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.route_nodes_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -24939,7 +24939,7 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.route_nodes = static_cast< id_type > (st.id ());
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -24961,7 +24961,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.route_nodes);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -25134,7 +25134,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.route_nodes);
 
     if (!find_ (sts, &id))
       return false;
@@ -25284,7 +25284,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Route_Nodes\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"route_nodes\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"route\" INTEGER NOT NULL,\n"
                       "  \"mode\" INTEGER NOT NULL,\n"
                       "  \"veh_type\" INTEGER,\n"
@@ -26498,8 +26498,8 @@ namespace odb
           long unsigned int,
           sqlite::id_integer >::set_value (
         id,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.ridership_value,
+        i.ridership_null);
     }
 
     return id;
@@ -26513,7 +26513,7 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // ridership
     //
     t[0UL] = false;
 
@@ -26571,13 +26571,13 @@ namespace odb
 
     std::size_t n (0);
 
-    // auto_id
+    // ridership
     //
     if (sk != statement_update)
     {
       b[n].type = sqlite::bind::integer;
-      b[n].buffer = &i.auto_id_value;
-      b[n].is_null = &i.auto_id_null;
+      b[n].buffer = &i.ridership_value;
+      b[n].is_null = &i.ridership_null;
       n++;
     }
 
@@ -26672,21 +26672,21 @@ namespace odb
 
     bool grew (false);
 
-    // auto_id
+    // ridership
     //
     if (sk == statement_insert)
     {
       long unsigned int const& v =
-        o.auto_id;
+        o.ridership;
 
       bool is_null (false);
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_image (
-        i.auto_id_value,
+        i.ridership_value,
         is_null,
         v);
-      i.auto_id_null = is_null;
+      i.ridership_null = is_null;
     }
 
     // mode
@@ -26870,18 +26870,18 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // auto_id
+    // ridership
     //
     {
       long unsigned int& v =
-        o.auto_id;
+        o.ridership;
 
       sqlite::value_traits<
           long unsigned int,
           sqlite::id_integer >::set_value (
         v,
-        i.auto_id_value,
-        i.auto_id_null);
+        i.ridership_value,
+        i.ridership_null);
     }
 
     // mode
@@ -27068,7 +27068,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Ridership, id_sqlite >::persist_statement[] =
   "INSERT INTO \"Ridership\" ("
-  "\"auto_id\","
+  "\"ridership\","
   "\"mode\","
   "\"route\","
   "\"run\","
@@ -27083,7 +27083,7 @@ namespace odb
 
   const char access::object_traits_impl< ::polaris::io::Ridership, id_sqlite >::find_statement[] =
   "SELECT "
-  "\"Ridership\".\"auto_id\","
+  "\"Ridership\".\"ridership\","
   "\"Ridership\".\"mode\","
   "\"Ridership\".\"route\","
   "\"Ridership\".\"run\","
@@ -27095,7 +27095,7 @@ namespace odb
   "\"Ridership\".\"load\","
   "\"Ridership\".\"factor\""
   " FROM \"Ridership\""
-  " WHERE \"Ridership\".\"auto_id\"=?";
+  " WHERE \"Ridership\".\"ridership\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Ridership, id_sqlite >::update_statement[] =
   "UPDATE \"Ridership\" SET "
@@ -27109,15 +27109,15 @@ namespace odb
   "\"alight\"=?,"
   "\"load\"=?,"
   "\"factor\"=?"
-  " WHERE \"auto_id\"=?";
+  " WHERE \"ridership\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Ridership, id_sqlite >::erase_statement[] =
   "DELETE FROM \"Ridership\""
-  " WHERE \"auto_id\"=?";
+  " WHERE \"ridership\"=?";
 
   const char access::object_traits_impl< ::polaris::io::Ridership, id_sqlite >::query_statement[] =
   "SELECT "
-  "\"Ridership\".\"auto_id\","
+  "\"Ridership\".\"ridership\","
   "\"Ridership\".\"mode\","
   "\"Ridership\".\"route\","
   "\"Ridership\".\"run\","
@@ -27161,7 +27161,7 @@ namespace odb
     if (init (im, obj, statement_insert))
       im.version++;
 
-    im.auto_id_null = true;
+    im.ridership_null = true;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -27175,7 +27175,7 @@ namespace odb
     if (!st.execute ())
       throw object_already_persistent ();
 
-    obj.auto_id = static_cast< id_type > (st.id ());
+    obj.ridership = static_cast< id_type > (st.id ());
 
     callback (db,
               static_cast<const object_type&> (obj),
@@ -27197,7 +27197,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     id_image_type& i (sts.id_image ());
-    init (i, obj.auto_id);
+    init (i, obj.ridership);
 
     image_type& im (sts.image ());
     if (init (im, obj, statement_update))
@@ -27370,7 +27370,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.auto_id);
+      obj.ridership);
 
     if (!find_ (sts, &id))
       return false;
@@ -27506,7 +27506,7 @@ namespace odb
         case 1:
         {
           db.execute ("CREATE TABLE \"Ridership\" (\n"
-                      "  \"auto_id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
+                      "  \"ridership\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
                       "  \"mode\" INTEGER NOT NULL,\n"
                       "  \"route\" INTEGER NOT NULL,\n"
                       "  \"run\" INTEGER NOT NULL,\n"
@@ -29034,6 +29034,924 @@ namespace odb
     id_sqlite,
     "Supply",
     &access::object_traits_impl< ::polaris::io::Link_Type, id_sqlite >::create_schema);
+
+  // Use_Code
+  //
+
+  access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::id_type
+  access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  id (const image_type& i)
+  {
+    sqlite::database* db (0);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    id_type id;
+    {
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        id,
+        i.use_code_value,
+        i.use_code_size,
+        i.use_code_null);
+    }
+
+    return id;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  grow (image_type& i, bool* t)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (t);
+
+    bool grew (false);
+
+    // use_code
+    //
+    if (t[0UL])
+    {
+      i.use_code_value.capacity (i.use_code_size);
+      grew = true;
+    }
+
+    // rank
+    //
+    t[1UL] = false;
+
+    // routable
+    //
+    t[2UL] = false;
+
+    // subset_of
+    //
+    if (t[3UL])
+    {
+      i.subset_of_value.capacity (i.subset_of_size);
+      grew = true;
+    }
+
+    // superset_of
+    //
+    if (t[4UL])
+    {
+      i.superset_of_value.capacity (i.superset_of_size);
+      grew = true;
+    }
+
+    // alternative_labels
+    //
+    if (t[5UL])
+    {
+      i.alternative_labels_value.capacity (i.alternative_labels_size);
+      grew = true;
+    }
+
+    // notes
+    //
+    if (t[6UL])
+    {
+      i.notes_value.capacity (i.notes_size);
+      grew = true;
+    }
+
+    return grew;
+  }
+
+  void access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  bind (sqlite::bind* b,
+        image_type& i,
+        sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    std::size_t n (0);
+
+    // use_code
+    //
+    if (sk != statement_update)
+    {
+      b[n].type = sqlite::image_traits<
+        ::std::string,
+        sqlite::id_text>::bind_value;
+      b[n].buffer = i.use_code_value.data ();
+      b[n].size = &i.use_code_size;
+      b[n].capacity = i.use_code_value.capacity ();
+      b[n].is_null = &i.use_code_null;
+      n++;
+    }
+
+    // rank
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.rank_value;
+    b[n].is_null = &i.rank_null;
+    n++;
+
+    // routable
+    //
+    b[n].type = sqlite::bind::integer;
+    b[n].buffer = &i.routable_value;
+    b[n].is_null = &i.routable_null;
+    n++;
+
+    // subset_of
+    //
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.subset_of_value.data ();
+    b[n].size = &i.subset_of_size;
+    b[n].capacity = i.subset_of_value.capacity ();
+    b[n].is_null = &i.subset_of_null;
+    n++;
+
+    // superset_of
+    //
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.superset_of_value.data ();
+    b[n].size = &i.superset_of_size;
+    b[n].capacity = i.superset_of_value.capacity ();
+    b[n].is_null = &i.superset_of_null;
+    n++;
+
+    // alternative_labels
+    //
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.alternative_labels_value.data ();
+    b[n].size = &i.alternative_labels_size;
+    b[n].capacity = i.alternative_labels_value.capacity ();
+    b[n].is_null = &i.alternative_labels_null;
+    n++;
+
+    // notes
+    //
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.notes_value.data ();
+    b[n].size = &i.notes_size;
+    b[n].capacity = i.notes_value.capacity ();
+    b[n].is_null = &i.notes_null;
+    n++;
+  }
+
+  void access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  bind (sqlite::bind* b, id_image_type& i)
+  {
+    std::size_t n (0);
+    b[n].type = sqlite::image_traits<
+      ::std::string,
+      sqlite::id_text>::bind_value;
+    b[n].buffer = i.id_value.data ();
+    b[n].size = &i.id_size;
+    b[n].capacity = i.id_value.capacity ();
+    b[n].is_null = &i.id_null;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  init (image_type& i, const object_type& o, sqlite::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace sqlite;
+
+    bool grew (false);
+
+    // use_code
+    //
+    if (sk == statement_insert)
+    {
+      ::std::string const& v =
+        o.use_code;
+
+      bool is_null (false);
+      std::size_t cap (i.use_code_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
+        i.use_code_value,
+        i.use_code_size,
+        is_null,
+        v);
+      i.use_code_null = is_null;
+      grew = grew || (cap != i.use_code_value.capacity ());
+    }
+
+    // rank
+    //
+    {
+      int const& v =
+        o.rank;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.rank_value,
+        is_null,
+        v);
+      i.rank_null = is_null;
+    }
+
+    // routable
+    //
+    {
+      int const& v =
+        o.routable;
+
+      bool is_null (false);
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_image (
+        i.routable_value,
+        is_null,
+        v);
+      i.routable_null = is_null;
+    }
+
+    // subset_of
+    //
+    {
+      ::std::string const& v =
+        o.subset_of;
+
+      bool is_null (false);
+      std::size_t cap (i.subset_of_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
+        i.subset_of_value,
+        i.subset_of_size,
+        is_null,
+        v);
+      i.subset_of_null = is_null;
+      grew = grew || (cap != i.subset_of_value.capacity ());
+    }
+
+    // superset_of
+    //
+    {
+      ::std::string const& v =
+        o.superset_of;
+
+      bool is_null (false);
+      std::size_t cap (i.superset_of_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
+        i.superset_of_value,
+        i.superset_of_size,
+        is_null,
+        v);
+      i.superset_of_null = is_null;
+      grew = grew || (cap != i.superset_of_value.capacity ());
+    }
+
+    // alternative_labels
+    //
+    {
+      ::std::string const& v =
+        o.alternative_labels;
+
+      bool is_null (false);
+      std::size_t cap (i.alternative_labels_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
+        i.alternative_labels_value,
+        i.alternative_labels_size,
+        is_null,
+        v);
+      i.alternative_labels_null = is_null;
+      grew = grew || (cap != i.alternative_labels_value.capacity ());
+    }
+
+    // notes
+    //
+    {
+      ::std::string const& v =
+        o.notes;
+
+      bool is_null (false);
+      std::size_t cap (i.notes_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
+        i.notes_value,
+        i.notes_size,
+        is_null,
+        v);
+      i.notes_null = is_null;
+      grew = grew || (cap != i.notes_value.capacity ());
+    }
+
+    return grew;
+  }
+
+  void access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  init (object_type& o, const image_type& i, database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // use_code
+    //
+    {
+      ::std::string& v =
+        o.use_code;
+
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        v,
+        i.use_code_value,
+        i.use_code_size,
+        i.use_code_null);
+    }
+
+    // rank
+    //
+    {
+      int& v =
+        o.rank;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.rank_value,
+        i.rank_null);
+    }
+
+    // routable
+    //
+    {
+      int& v =
+        o.routable;
+
+      sqlite::value_traits<
+          int,
+          sqlite::id_integer >::set_value (
+        v,
+        i.routable_value,
+        i.routable_null);
+    }
+
+    // subset_of
+    //
+    {
+      ::std::string& v =
+        o.subset_of;
+
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        v,
+        i.subset_of_value,
+        i.subset_of_size,
+        i.subset_of_null);
+    }
+
+    // superset_of
+    //
+    {
+      ::std::string& v =
+        o.superset_of;
+
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        v,
+        i.superset_of_value,
+        i.superset_of_size,
+        i.superset_of_null);
+    }
+
+    // alternative_labels
+    //
+    {
+      ::std::string& v =
+        o.alternative_labels;
+
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        v,
+        i.alternative_labels_value,
+        i.alternative_labels_size,
+        i.alternative_labels_null);
+    }
+
+    // notes
+    //
+    {
+      ::std::string& v =
+        o.notes;
+
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_value (
+        v,
+        i.notes_value,
+        i.notes_size,
+        i.notes_null);
+    }
+  }
+
+  void access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  init (id_image_type& i, const id_type& id)
+  {
+    bool grew (false);
+    {
+      bool is_null (false);
+      std::size_t cap (i.id_value.capacity ());
+      sqlite::value_traits<
+          ::std::string,
+          sqlite::id_text >::set_image (
+        i.id_value,
+        i.id_size,
+        is_null,
+        id);
+      i.id_null = is_null;
+      grew = grew || (cap != i.id_value.capacity ());
+    }
+
+    if (grew)
+      i.version++;
+  }
+
+  struct access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::container_statement_cache_type
+  {
+    container_statement_cache_type (
+      sqlite::connection&,
+      sqlite::binding&)
+    {
+    }
+  };
+
+  const char access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::persist_statement[] =
+  "INSERT INTO \"Use_Code\" ("
+  "\"use_code\","
+  "\"rank\","
+  "\"routable\","
+  "\"subset_of\","
+  "\"superset_of\","
+  "\"alternative_labels\","
+  "\"notes\")"
+  " VALUES (?,?,?,?,?,?,?)";
+
+  const char access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::find_statement[] =
+  "SELECT "
+  "\"Use_Code\".\"use_code\","
+  "\"Use_Code\".\"rank\","
+  "\"Use_Code\".\"routable\","
+  "\"Use_Code\".\"subset_of\","
+  "\"Use_Code\".\"superset_of\","
+  "\"Use_Code\".\"alternative_labels\","
+  "\"Use_Code\".\"notes\""
+  " FROM \"Use_Code\""
+  " WHERE \"Use_Code\".\"use_code\"=?";
+
+  const char access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::update_statement[] =
+  "UPDATE \"Use_Code\" SET "
+  "\"rank\"=?,"
+  "\"routable\"=?,"
+  "\"subset_of\"=?,"
+  "\"superset_of\"=?,"
+  "\"alternative_labels\"=?,"
+  "\"notes\"=?"
+  " WHERE \"use_code\"=?";
+
+  const char access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::erase_statement[] =
+  "DELETE FROM \"Use_Code\""
+  " WHERE \"use_code\"=?";
+
+  const char access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::query_statement[] =
+  "SELECT "
+  "\"Use_Code\".\"use_code\","
+  "\"Use_Code\".\"rank\","
+  "\"Use_Code\".\"routable\","
+  "\"Use_Code\".\"subset_of\","
+  "\"Use_Code\".\"superset_of\","
+  "\"Use_Code\".\"alternative_labels\","
+  "\"Use_Code\".\"notes\""
+  " FROM \"Use_Code\""
+  " ";
+
+  const char access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::erase_query_statement[] =
+  "DELETE FROM \"Use_Code\""
+  " ";
+
+  const char access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::table_name[] =
+  "\"Use_Code\"";
+
+  void access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  persist (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    callback (db,
+              obj,
+              callback_event::pre_persist);
+
+    image_type& im (sts.image ());
+    binding& imb (sts.insert_image_binding ());
+
+    if (init (im, obj, statement_insert))
+      im.version++;
+
+    if (im.version != sts.insert_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_insert);
+      sts.insert_image_version (im.version);
+      imb.version++;
+    }
+
+    insert_statement& st (sts.persist_statement ());
+    if (!st.execute ())
+      throw object_already_persistent ();
+
+    callback (db,
+              obj,
+              callback_event::post_persist);
+  }
+
+  void access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  update (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace sqlite;
+
+    callback (db, obj, callback_event::pre_update);
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, obj.use_code);
+
+    image_type& im (sts.image ());
+    if (init (im, obj, statement_update))
+      im.version++;
+
+    bool u (false);
+    binding& imb (sts.update_image_binding ());
+    if (im.version != sts.update_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_update);
+      sts.update_image_version (im.version);
+      imb.version++;
+      u = true;
+    }
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.update_id_image_version () ||
+        idb.version == 0)
+    {
+      if (i.version != sts.id_image_version () ||
+          idb.version == 0)
+      {
+        bind (idb.bind, i);
+        sts.id_image_version (i.version);
+        idb.version++;
+      }
+
+      sts.update_id_image_version (i.version);
+
+      if (!u)
+        imb.version++;
+    }
+
+    if (sts.update_statement ().execute () == 0)
+      throw object_not_persistent ();
+
+    callback (db, obj, callback_event::post_update);
+    pointer_cache_traits::update (db, obj);
+  }
+
+  void access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  erase (database& db, const id_type& id)
+  {
+    using namespace sqlite;
+
+    ODB_POTENTIALLY_UNUSED (db);
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    if (sts.erase_statement ().execute () != 1)
+      throw object_not_persistent ();
+
+    pointer_cache_traits::erase (db, id);
+  }
+
+  access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::pointer_type
+  access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  find (database& db, const id_type& id)
+  {
+    using namespace sqlite;
+
+    {
+      pointer_type p (pointer_cache_traits::find (db, id));
+
+      if (!pointer_traits::null_ptr (p))
+        return p;
+    }
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    if (l.locked ())
+    {
+      if (!find_ (sts, &id))
+        return pointer_type ();
+    }
+
+    pointer_type p (
+      access::object_factory<object_type, pointer_type>::create ());
+    pointer_traits::guard pg (p);
+
+    pointer_cache_traits::insert_guard ig (
+      pointer_cache_traits::insert (db, id, p));
+
+    object_type& obj (pointer_traits::get_ref (p));
+
+    if (l.locked ())
+    {
+      select_statement& st (sts.find_statement ());
+      ODB_POTENTIALLY_UNUSED (st);
+
+      callback (db, obj, callback_event::pre_load);
+      init (obj, sts.image (), &db);
+      load_ (sts, obj);
+      sts.load_delayed ();
+      l.unlock ();
+      callback (db, obj, callback_event::post_load);
+      pointer_cache_traits::load (ig.position ());
+    }
+    else
+      sts.delay_load (id, obj, ig.position ());
+
+    ig.release ();
+    pg.release ();
+    return p;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  find (database& db, const id_type& id, object_type& obj)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    reference_cache_traits::position_type pos (
+      reference_cache_traits::insert (db, id, obj));
+    reference_cache_traits::insert_guard ig (pos);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    load_ (sts, obj);
+    sts.load_delayed ();
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    reference_cache_traits::load (pos);
+    ig.release ();
+    return true;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  reload (database& db, object_type& obj)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    const id_type& id  (
+      obj.use_code);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    load_ (sts, obj);
+    sts.load_delayed ();
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    return true;
+  }
+
+  bool access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  find_ (statements_type& sts, const id_type* id)
+  {
+    using namespace sqlite;
+
+    id_image_type& i (sts.id_image ());
+    init (i, *id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    select_statement& st (sts.find_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+
+    if (r == select_statement::truncated)
+    {
+      if (grow (im, sts.select_image_truncated ()))
+        im.version++;
+
+      if (im.version != sts.select_image_version ())
+      {
+        bind (imb.bind, im, statement_select);
+        sts.select_image_version (im.version);
+        imb.version++;
+        st.refetch ();
+      }
+    }
+
+    return r != select_statement::no_data;
+  }
+
+  result< access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::object_type >
+  access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  query (database&, const query_base_type& q)
+  {
+    using namespace sqlite;
+    using odb::details::shared;
+    using odb::details::shared_ptr;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    q.init_parameters ();
+    shared_ptr<select_statement> st (
+      new (shared) select_statement (
+        conn,
+        query_statement + q.clause (),
+        q.parameters_binding (),
+        imb));
+
+    st->execute ();
+
+    shared_ptr< odb::object_result_impl<object_type> > r (
+      new (shared) sqlite::object_result_impl<object_type> (
+        q, st, sts));
+
+    return result<object_type> (r);
+  }
+
+  unsigned long long access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  erase_query (database&, const query_base_type& q)
+  {
+    using namespace sqlite;
+
+    sqlite::connection& conn (
+      sqlite::transaction::current ().connection ());
+
+    q.init_parameters ();
+    delete_statement st (
+      conn,
+      erase_query_statement + q.clause (),
+      q.parameters_binding ());
+
+    return st.execute ();
+  }
+
+  bool access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::
+  create_schema (database& db, unsigned short pass, bool drop)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (pass);
+    ODB_POTENTIALLY_UNUSED (drop);
+
+    if (drop)
+    {
+      switch (pass)
+      {
+        case 1:
+        {
+          db.execute ("DROP TABLE IF EXISTS \"Use_Code\"");
+          return false;
+        }
+      }
+    }
+    else
+    {
+      switch (pass)
+      {
+        case 1:
+        {
+          db.execute ("CREATE TABLE \"Use_Code\" (\n"
+                      "  \"use_code\" TEXT NOT NULL PRIMARY KEY,\n"
+                      "  \"rank\" INTEGER NOT NULL,\n"
+                      "  \"routable\" INTEGER NOT NULL,\n"
+                      "  \"subset_of\" TEXT NOT NULL,\n"
+                      "  \"superset_of\" TEXT NOT NULL,\n"
+                      "  \"alternative_labels\" TEXT NOT NULL,\n"
+                      "  \"notes\" TEXT NOT NULL)");
+          return false;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  static const schema_catalog_entry
+  schema_catalog_entry_polaris_io_Use_Code_ (
+    id_sqlite,
+    "Supply",
+    &access::object_traits_impl< ::polaris::io::Use_Code, id_sqlite >::create_schema);
 
   // Component
   //

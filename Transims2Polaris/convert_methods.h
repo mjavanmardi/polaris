@@ -304,6 +304,12 @@ void AddSpatialiteGeometry(TransimsNetwork *net)
 				goto stop;
 			}
 		}
+		ret = sqlite3_exec (db_handle, "select CreateMbrCache ( 'ZONE', 'GEO' );", NULL, NULL, &err_msg);
+		if (ret != SQLITE_OK)
+		{
+			fprintf (stderr, "Error: %s\n", err_msg);
+			sqlite3_free (err_msg);
+		}
 		ret = sqlite3_exec (db_handle, "COMMIT", NULL, NULL, &err_msg);
 		if (ret != SQLITE_OK)
 		{
@@ -335,6 +341,12 @@ void AddSpatialiteGeometry(TransimsNetwork *net)
 				sqlite3_free (err_msg);
 				goto stop;
 			}
+		}
+		ret = sqlite3_exec (db_handle, "select CreateMbrCache ( 'NODE', 'GEO' );", NULL, NULL, &err_msg);
+		if (ret != SQLITE_OK)
+		{
+			fprintf (stderr, "Error: %s\n", err_msg);
+			sqlite3_free (err_msg);
 		}
 		ret = sqlite3_exec (db_handle, "COMMIT", NULL, NULL, &err_msg);
 		if (ret != SQLITE_OK)
@@ -399,6 +411,24 @@ void AddSpatialiteGeometry(TransimsNetwork *net)
 			}
 		}
 		sqlite3_finalize (stmt);
+		ret = sqlite3_exec (db_handle, "select CreateMbrCache ( 'LINK', 'GEO' );", NULL, NULL, &err_msg);
+		if (ret != SQLITE_OK)
+		{
+			fprintf (stderr, "Error: %s\n", err_msg);
+			sqlite3_free (err_msg);
+		}
+		ret = sqlite3_exec (db_handle, "drop table if exists Shape;", NULL, NULL, &err_msg);
+		if (ret != SQLITE_OK)
+		{
+			fprintf (stderr, "Error: %s\n", err_msg);
+			sqlite3_free (err_msg);
+		}
+		ret = sqlite3_exec (db_handle, "drop table if exists Shape_nested_records;", NULL, NULL, &err_msg);
+		if (ret != SQLITE_OK)
+		{
+			fprintf (stderr, "Error: %s\n", err_msg);
+			sqlite3_free (err_msg);
+		}
 		ret = sqlite3_exec (db_handle, "COMMIT", NULL, NULL, &err_msg);
 		if (ret != SQLITE_OK)
 		{

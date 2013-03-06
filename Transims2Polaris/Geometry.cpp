@@ -14,6 +14,7 @@ int AddGeometryCoumn(sqlite3* db_handle, int srid, std::string table, std::strin
 	if (ret != SQLITE_OK)
 	{
 		fprintf (stderr, "Error: %s\n", err_msg);
+		fprintf (stderr, "Error code: %d\n", ret);
 		sqlite3_free (err_msg);
 		return ret;
 	}

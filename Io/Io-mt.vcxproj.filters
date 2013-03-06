@@ -15,9 +15,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Control.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="database.h">
       <Filter>Header Files</Filter>
     </ClInclude>

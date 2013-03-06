@@ -90,11 +90,14 @@ int main(int argc, char* argv[])
 	/************************************************/	
 	PopulateLinkType(net->path_to_database, &container.Link_Types);
 	PopulateAreaType(net->path_to_database, &container.Area_Types);
+	PopulateUseCode(net->path_to_database);
 	PopulateDimensionQuantity(net->path_to_database);
 	Convert<Node_File,Node, int>(net,container, NODE, "NODE", &container.Nodes);
 	Convert<Link_File,Link, int>(net,container, LINK, "LINK", &container.Links);
 	ConvertNested<Shape_File,Shape, int, shape_geometry>(net,container, SHAPE, "SHAPE");
 	Convert<Zone_File,Zone, int>(net,container, ZONE, "ZONE", &container.Zones);
+	Convert<Lane_Use_File,Lane_Use, int>(net,container, LANE_USE, "LANE_USE");
+	Convert<Detector_File,Detector, int>(net,container, DETECTOR, "DETECTOR");
 
 	ConvertNested<Signal_File,Signal, int, signal_time>(net,container, SIGNAL, "SIGNAL", &container.Signals);
 	Convert<Location_File,Location, int>(net,container, LOCATION, "LOCATION", &container.Locations);
@@ -138,7 +141,7 @@ int main(int argc, char* argv[])
 	struct tm * timeinfo;
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
-	shared_ptr<MetaData> meta_data (new MetaData("TimeStemp", asctime(timeinfo)));
+	shared_ptr<MetaData> meta_data (new MetaData("TimeStamp", asctime(timeinfo)));
 	transaction t (db->begin());
 	db->persist(meta_data);
 	t.commit();
