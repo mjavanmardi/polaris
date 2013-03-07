@@ -739,7 +739,7 @@ public:
 
 		if (index.first >= _nrow || index.second >= _ncol)
 		{
-			THROW_EXCEPTION("Error, index outside of matrix bounds for dimension");
+			THROW_EXCEPTION("Error, index ("<<index.first<<","<<index.second<<") was outside of matrix bounds {"<<_nrow<<","<<_ncol<<"}");
 		}
 		ind = index.first *_ncol + index.second;
 		return ind;

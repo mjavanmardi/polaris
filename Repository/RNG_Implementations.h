@@ -153,7 +153,7 @@ namespace RNG_Components
 			member_data(unsigned long, seed, check(ReturnValueType,is_arithmetic), check(SetValueType,is_arithmetic));
 			member_data(double, maximum, check(ReturnValueType,is_arithmetic), not_available);
 			member_data(double, minimum, check(ReturnValueType,is_arithmetic), not_available);
-			member_data(User_Space::RngStream, distribution, none, not_available);
+			member_data(RNG_Components::RngStream, distribution, none, not_available);
 		};
 	}
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "User_Space.h"
+#include "User_Space_Includes.h"
 
 namespace Network_Skimming_Components
 {
@@ -56,14 +56,14 @@ namespace Network_Skimming_Components
 				}
 				else if (_sub_iteration == Types::SUB_ITERATIONS::PROCESS)
 				{
-					_pthis->Swap_Event((Event_Callback)&Process_Skim_Trees_Event<NULLTYPE>);
+					_pthis->Swap_Event((Event)&Process_Skim_Trees_Event<NULLTYPE>);
 					response.next._iteration = _iteration;
 					response.next._sub_iteration = Types::SUB_ITERATIONS::UPDATE;
 					response.result = true;
 				}
 				else if (_sub_iteration == Types::SUB_ITERATIONS::UPDATE)
 				{
-					_pthis->Swap_Event((Event_Callback)&Update_Skim_Tables_Event<NULLTYPE>);
+					_pthis->Swap_Event((Event)&Update_Skim_Tables_Event<NULLTYPE>);
 					response.next._iteration = Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->update_increment<Simulation_Timestep_Increment>());
 					response.next._sub_iteration = 0;
 					response.result = true;
@@ -473,7 +473,7 @@ namespace Network_Skimming_Components
 					path_tree_itf* tree = tree_itr->second;
 
 					// find the origin reference in origin map and get the zone index of the origin
-					if ((orig_itr = origin_map->find(orig)) == origin_map->end()) assert(true);
+					if ((orig_itr = origin_map->find(orig)) == origin_map->end()) assert(false);
 					long orig_zone_index = orig_itr->second->template zone_index<long>();
 					
 

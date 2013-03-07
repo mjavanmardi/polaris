@@ -177,7 +177,7 @@ namespace Person_Components
 
 					ttime = LOS->Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->zone<_Zone_Interface*>()->uuid<int>(),zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 					pop = zone->population<float>();
-					u = exp(0.001*pop - 0.1*ttime);
+					u = exp(0.00005*pop - 0.1*ttime);
 					utility.push_back(u);
 					utility_sum += u;
 				}

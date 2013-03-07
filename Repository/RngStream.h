@@ -2,7 +2,7 @@
 
  
 #include <string>
-namespace User_Space
+namespace RNG_Components
 {
 	class RngStream
 	{

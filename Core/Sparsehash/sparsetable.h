@@ -358,21 +358,21 @@ class table_iterator {
   pointer operator->()               { return &(operator*()); }
 
   // Helper function to assert things are ok; eg pos is still in range
-  void check() const {
+  void check_it() const {
     assert(table);
     assert(pos <= table->size());
   }
 
   // Arithmetic: we just do arithmetic on pos.  We don't even need to
   // do bounds checking, since STL doesn't consider that its job.  :-)
-  iterator& operator+=(size_type t) { pos += t; check(); return *this; }
-  iterator& operator-=(size_type t) { pos -= t; check(); return *this; }
-  iterator& operator++()            { ++pos; check(); return *this; }
-  iterator& operator--()            { --pos; check(); return *this; }
+  iterator& operator+=(size_type t) { pos += t; check_it(); return *this; }
+  iterator& operator-=(size_type t) { pos -= t; check_it(); return *this; }
+  iterator& operator++()            { ++pos; check_it(); return *this; }
+  iterator& operator--()            { --pos; check_it(); return *this; }
   iterator operator++(int)          { iterator tmp(*this);     // for x++
-                                      ++pos; check(); return tmp; }
+                                      ++pos; check_it(); return tmp; }
   iterator operator--(int)          { iterator tmp(*this);     // for x--
-                                      --pos; check(); return tmp; }
+                                      --pos; check_it(); return tmp; }
   iterator operator+(difference_type i) const  { iterator tmp(*this);
                                                  tmp += i; return tmp; }
   iterator operator-(difference_type i) const  { iterator tmp(*this);
@@ -441,21 +441,21 @@ class const_table_iterator {
   pointer operator->() const        { return &(operator*()); }
 
   // Helper function to assert things are ok; eg pos is still in range
-  void check() const {
+  void check_it() const {
     assert(table);
     assert(pos <= table->size());
   }
 
   // Arithmetic: we just do arithmetic on pos.  We don't even need to
   // do bounds checking, since STL doesn't consider that its job.  :-)
-  const_iterator& operator+=(size_type t) { pos += t; check(); return *this; }
-  const_iterator& operator-=(size_type t) { pos -= t; check(); return *this; }
-  const_iterator& operator++()            { ++pos; check(); return *this; }
-  const_iterator& operator--()            { --pos; check(); return *this; }
+  const_iterator& operator+=(size_type t) { pos += t; check_it(); return *this; }
+  const_iterator& operator-=(size_type t) { pos -= t; check_it(); return *this; }
+  const_iterator& operator++()            { ++pos; check_it(); return *this; }
+  const_iterator& operator--()            { --pos; check_it(); return *this; }
   const_iterator operator++(int)          { const_iterator tmp(*this); // for x++
-                                            ++pos; check(); return tmp; }
+                                            ++pos; check_it(); return tmp; }
   const_iterator operator--(int)          { const_iterator tmp(*this); // for x--
-                                            --pos; check(); return tmp; }
+                                            --pos; check_it(); return tmp; }
   const_iterator operator+(difference_type i) const  { const_iterator tmp(*this);
                                                        tmp += i; return tmp; }
   const_iterator operator-(difference_type i) const  { const_iterator tmp(*this);

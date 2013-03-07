@@ -3,7 +3,7 @@
 
 
 template<typename ComponentType>
-void Execution_Object::Load_Register(Conditional conditional,Event_Callback p_event,int start_iteration,int start_sub_iteration)	
+void Execution_Object::Load_Register(Conditional conditional,Event p_event,int start_iteration,int start_sub_iteration)	
 {
 	Revision starting_iteration;
 	starting_iteration._iteration=start_iteration;

@@ -17,6 +17,7 @@
 /// implementation - standard declarator for all implementations
 ///============================================================================
 
+
 #define implementation template<typename MasterType,typename ParentType=NULLTYPE,typename InheritanceList=NULLTYPELIST>
 
 ///============================================================================
@@ -560,6 +561,7 @@ struct Target_Type
 	typedef Param8_Type Param8Type;
 };
 
+
 concept struct Is_Target_Type_Struct
 {
 	check_typename_defined(check1,ReturnType);
@@ -568,3 +570,4 @@ concept struct Is_Target_Type_Struct
 
 	define_default_check(check1 && check2 && check3);
 };
+

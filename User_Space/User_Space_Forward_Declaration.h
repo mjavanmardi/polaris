@@ -90,6 +90,12 @@ namespace Network_Components {
 		forward_declare_prototype struct Network_Prototype;
 	}
 };
+namespace Network_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Network_DB_Reader_Prototype;
+	}
+};
 namespace Operation_Components {
 	namespace Prototypes
 	{

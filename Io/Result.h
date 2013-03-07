@@ -23,7 +23,7 @@ class Link_Delay;
 class Performance;
 class Problem;
 class Skim;
-class Event;
+class Transims_Event;
 
 #pragma db object //table("LINK_DELAY")
 class Link_Delay
@@ -224,13 +224,13 @@ private:
 };
 
 #pragma db object //table("EVENT")
-class Event
+class Transims_Event
 {
 public:
 	// Default Constructor
-	Event () {}	
+	Transims_Event () {}	
 	//Contructor
-	Event ( int hhold_, int person_, int tour_, int trip_, int mode_, int type_, double schedule_, double actual_, int link_, int dir_, int lane_, double offset_, int route_ )  
+	Transims_Event ( int hhold_, int person_, int tour_, int trip_, int mode_, int type_, double schedule_, double actual_, int link_, int dir_, int lane_, double offset_, int route_ )  
 	: hhold (hhold_), person (person_), tour (tour_), trip (trip_), mode (mode_), type (type_), schedule (schedule_), actual (actual_), link (link_), dir (dir_), lane (lane_), offset (offset_), route (route_)
 	{
 	}

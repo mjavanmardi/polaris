@@ -106,7 +106,7 @@ template<int Size>
 struct Bytes{char bytes[Size];};
 
 
-typedef void (*Event_Callback)(void*);
+typedef void (*Event)(void*);
 
 
 

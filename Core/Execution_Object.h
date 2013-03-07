@@ -34,13 +34,13 @@ struct Execution_Object
 	permit_state_checking;
 
 
-	__forceinline void Swap_Event(Event_Callback new_event)
+	__forceinline void Swap_Event(Event new_event)
 	{
 		event_register=new_event;
 	}
 	
 	template<typename ComponentType>
-	void Load_Register(Conditional conditional,Event_Callback p_event,int start_iteration,int start_sub_iteration);
+	void Load_Register(Conditional conditional,Event p_event,int start_iteration,int start_sub_iteration);
 	
 	template<typename DataType=NULLTYPE>
 	struct Conditional_Holder
@@ -135,7 +135,7 @@ struct Execution_Object
 	
 	union
 	{
-		Event_Callback event_register;
+		Event event_register;
 
 		Execution_Object* next_free_cell;
 	};

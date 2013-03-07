@@ -1,9 +1,11 @@
 #pragma once
 
-#include "User_Space_Includes.h"
-#include "Activity_Implementations.h"
+//#include "User_Space_Includes.h"
+#include "Activity_Prototype.h"
+#include "Activity_Location_Prototype.h"
+#include "Network_Prototype.h"
 #include "Zone_Prototype.h"
-#include "Polaris_Movement_Plan_Implementation.h"
+#include "Movement_Plan_Prototype.h"
 
 
 namespace Person_Components
@@ -117,7 +119,7 @@ namespace Prototypes
 			typedef Person<ComponentType, ComponentType> _Person_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
-
+			
 			define_component_interface(_network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,CallerType);
 			_network_itf* network = pthis->network_reference<_network_itf*>();
 		}
@@ -170,7 +172,7 @@ namespace Prototypes
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
-
+			
 			int loc_id = properties->home_location_id<int>();
 			return (TargetType)(*locations)[loc_id];						
 		}
@@ -360,7 +362,7 @@ namespace Prototypes
 			// ACTIVITY GENERATION SUBITERATION, swap in the activity-generation event and set up future sub_iteration schedule
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
 			{
-				_pthis->Swap_Event((Event_Callback)&Person_Planner::Activity_Generation_Event<NULLTYPE>);
+				_pthis->Swap_Event((Event)&Person_Planner::Activity_Generation_Event<NULLTYPE>);
 
 				// check if activity planning needs to occur, if so do this otherwise, goto movement plans
 				if (act_itr != activity_plans->end())
@@ -381,7 +383,7 @@ namespace Prototypes
 			// ACTIVITY PLANNING SUBITERATION Planning sub_iteration, swap in the activity-planning event and set up future sub_iteration schedule
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING)
 			{
-				_pthis->Swap_Event((Event_Callback)&Person_Planner::Activity_Planning_Event<NULLTYPE>);
+				_pthis->Swap_Event((Event)&Person_Planner::Activity_Planning_Event<NULLTYPE>);
 				this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
 			}
 
@@ -389,7 +391,7 @@ namespace Prototypes
 			// MOVEMENT PLANNING SUBITERATION, swap in the movement planning event and set up future sub_iteration schedule
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING)
 			{
-				_pthis->Swap_Event((Event_Callback)&Person_Planner::Movement_Planning_Event<NULLTYPE>);
+				_pthis->Swap_Event((Event)&Person_Planner::Movement_Planning_Event<NULLTYPE>);
 				this_ptr->Go_To_Next_Iteration<NT>(true,response);
 			}
 			//------------------------------------------------------------------------------------------------------------------------------
