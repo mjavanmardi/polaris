@@ -206,7 +206,7 @@ namespace Network_Components
 				}
 				
 				calculate_realtime_network_moe();
-				output_moe_for_simulation_interval<ComponentType, CallerType, TargetType>();
+				//output_moe_for_simulation_interval<ComponentType, CallerType, TargetType>();
 
 				if (((((_Network_Interface*)this)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{
