@@ -28,6 +28,61 @@ void scenario_data_information::scenario_data_initialization(ScenarioData& scena
 	scenario_data.input_data_format_string_int_map.insert(make_pair("INPUT_FROM_DSP",INPUT_FROM_DSP));
 	scenario_data.input_data_format_string_int_map.insert(make_pair("INPUT_FROM_TSM",INPUT_FROM_TSM));
 	scenario_data.input_data_format_string_int_map.insert(make_pair("INPUT_FROM_DB",INPUT_FROM_DB));
+
+
+	scenario_data.input_length_unit = LENGTH_IN_FOOT;
+	scenario_data.input_length_unit_int_string_map.clear();
+	scenario_data.input_length_unit_int_string_map.insert(make_pair(LENGTH_IN_FOOT,"LENGTH_IN_FOOT"));
+	scenario_data.input_length_unit_int_string_map.insert(make_pair(LENGTH_IN_METER,"LENGTH_IN_METER"));
+	scenario_data.input_length_unit_int_string_map.insert(make_pair(LENGTH_IN_MILE,"LENGTH_IN_MILE"));
+	scenario_data.input_length_unit_int_string_map.insert(make_pair(LENGTH_IN_KILOMETER,"LENGTH_IN_KILOMETER"));
+
+	scenario_data.input_length_unit_string_int_map.clear();
+	scenario_data.input_length_unit_string_int_map.insert(make_pair("LENGTH_IN_FOOT",LENGTH_IN_FOOT));
+	scenario_data.input_length_unit_string_int_map.insert(make_pair("LENGTH_IN_METER",LENGTH_IN_METER));
+	scenario_data.input_length_unit_string_int_map.insert(make_pair("LENGTH_IN_MILE",LENGTH_IN_MILE));
+	scenario_data.input_length_unit_string_int_map.insert(make_pair("LENGTH_IN_KILOMETER",LENGTH_IN_KILOMETER));
+
+	scenario_data.input_speed_unit = SPEED_IN_MILES_PER_HOUR;
+	scenario_data.input_speed_unit_int_string_map.clear();
+	scenario_data.input_speed_unit_int_string_map.insert(make_pair(SPEED_IN_MILES_PER_HOUR,"SPEED_IN_MILES_PER_HOUR"));
+	scenario_data.input_speed_unit_int_string_map.insert(make_pair(SPEED_IN_KILOMETERS_PER_HOUR,"SPEED_IN_KILOMETERS_PER_HOUR"));
+	scenario_data.input_speed_unit_int_string_map.insert(make_pair(SPEED_IN_METERS_PER_SECOND,"SPEED_IN_METERS_PER_SECOND"));
+
+	scenario_data.input_speed_unit_string_int_map.clear();
+	scenario_data.input_speed_unit_string_int_map.insert(make_pair("SPEED_IN_MILES_PER_HOUR",SPEED_IN_MILES_PER_HOUR));
+	scenario_data.input_speed_unit_string_int_map.insert(make_pair("SPEED_IN_KILOMETERS_PER_HOUR",SPEED_IN_KILOMETERS_PER_HOUR));
+	scenario_data.input_speed_unit_string_int_map.insert(make_pair("SPEED_IN_METERS_PER_SECOND",SPEED_IN_METERS_PER_SECOND));
+
+	scenario_data.input_time_unit = TIME_IN_MINUTE;
+	scenario_data.input_time_unit_int_string_map.clear();
+	scenario_data.input_time_unit_int_string_map.insert(make_pair(TIME_IN_MINUTE,"TIME_IN_MINUTE"));
+	scenario_data.input_time_unit_int_string_map.insert(make_pair(TIME_IN_SECOND,"TIME_IN_SECOND"));
+	scenario_data.input_time_unit_int_string_map.insert(make_pair(TIME_IN_HOUR,"TIME_IN_HOUR"));
+
+	scenario_data.input_time_unit_string_int_map.clear();
+	scenario_data.input_time_unit_string_int_map.insert(make_pair("TIME_IN_MINUTE",TIME_IN_MINUTE));
+	scenario_data.input_time_unit_string_int_map.insert(make_pair("TIME_IN_SECOND",TIME_IN_SECOND));
+	scenario_data.input_time_unit_string_int_map.insert(make_pair("TIME_IN_HOUR",TIME_IN_HOUR));
+
+	scenario_data.input_flow_unit = FLOW_IN_VEHICLES_PER_HOUR_PER_LANE;
+	scenario_data.input_flow_unit_int_string_map.clear();
+	scenario_data.input_flow_unit_int_string_map.insert(make_pair(FLOW_IN_VEHICLES_PER_HOUR_PER_LANE,"FLOW_IN_VEHICLES_PER_HOUR_PER_LANE"));
+	scenario_data.input_flow_unit_int_string_map.insert(make_pair(FLOW_IN_PCU_PER_HOUR_PER_LANE,"FLOW_IN_PCU_PER_HOUR_PER_LANE"));
+
+	scenario_data.input_flow_unit_string_int_map.clear();
+	scenario_data.input_flow_unit_string_int_map.insert(make_pair("FLOW_IN_VEHICLES_PER_HOUR_PER_LANE",FLOW_IN_VEHICLES_PER_HOUR_PER_LANE));
+	scenario_data.input_flow_unit_string_int_map.insert(make_pair("FLOW_IN_PCU_PER_HOUR_PER_LANE",FLOW_IN_PCU_PER_HOUR_PER_LANE));
+
+	scenario_data.input_density_unit = DENSITY_IN_VEHICLES_PER_MILE_PER_LANE;
+	scenario_data.input_density_unit_int_string_map.clear();
+	scenario_data.input_density_unit_int_string_map.insert(make_pair(DENSITY_IN_VEHICLES_PER_MILE_PER_LANE,"DENSITY_IN_VEHICLES_PER_MILE_PER_LANE"));
+	scenario_data.input_density_unit_int_string_map.insert(make_pair(DENSITY_IN_VEHICLES_PER_KILOMETER_PER_LANE,"DENSITY_IN_VEHICLES_PER_KILOMETER_PER_LANE"));
+
+	scenario_data.input_density_unit_string_int_map.clear();
+	scenario_data.input_density_unit_string_int_map.insert(make_pair("DENSITY_IN_VEHICLES_PER_MILE_PER_LANE",DENSITY_IN_VEHICLES_PER_MILE_PER_LANE));
+	scenario_data.input_density_unit_string_int_map.insert(make_pair("DENSITY_IN_VEHICLES_PER_KILOMETER_PER_LANE",DENSITY_IN_VEHICLES_PER_KILOMETER_PER_LANE));
+
 };
 void scenario_data_information::read_scenario_data_test(ScenarioData& scenario_data)
 {
@@ -120,6 +175,30 @@ void scenario_data_information::read_scenario_data(string input_dir_name,Scenari
 
 				scenario_data.assignment_mode = scenario_data.assignment_simulation_mode_string_int_map[assignment_mode_string];
 			}
+
+			if (iline == 4)
+			{//unit
+				string input_length_unit_string;
+				string input_speed_unit_string;
+				string input_time_unit_string;
+				string input_flow_unit_string;
+				string input_density_unit_string;
+				for (int j=0;j<tokens.size();j++)
+				{
+					stringstream sss(tokens[j]);
+					if (j==0) sss>>input_length_unit_string;
+					if (j==1) sss>>input_speed_unit_string;
+					if (j==2) sss>>input_time_unit_string;
+					if (j==3) sss>>input_flow_unit_string;
+					if (j==4) sss>>input_density_unit_string;
+				}
+				scenario_data.input_length_unit = scenario_data.input_length_unit_string_int_map[input_length_unit_string];
+				scenario_data.input_speed_unit = scenario_data.input_speed_unit_string_int_map[input_speed_unit_string];
+				scenario_data.input_time_unit = scenario_data.input_time_unit_string_int_map[input_time_unit_string];
+				scenario_data.input_flow_unit = scenario_data.input_flow_unit_string_int_map[input_flow_unit_string];
+				scenario_data.input_density_unit = scenario_data.input_density_unit_string_int_map[input_density_unit_string];
+			}
+
 		}
 	}
 	else

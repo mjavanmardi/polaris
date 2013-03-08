@@ -120,11 +120,34 @@ namespace Turn_Movement_Components
 			{
 				this_component()->template accept_vehicle<ComponentType,CallerType,TargetType>(param);
 			}
+			
 			feature_prototype void initialize_features()
 			{
 				this_component()->template initialize_features<ComponentType,CallerType,TargetType>();
 			}
+			
+			feature_prototype void calculate_moe_for_simulation_interval_from_outbound_link()
+			{
+				this_component()->template calculate_moe_for_simulation_interval_from_outbound_link<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void calculate_moe_for_simulation_interval_from_inbound_link()
+			{
+				this_component()->template calculate_moe_for_simulation_interval_from_inbound_link<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void calculate_moe_for_assignment_interval_from_outbound_link()
+			{
+				this_component()->template calculate_moe_for_assignment_interval_from_outbound_link<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void calculate_moe_for_assignment_interval_from_inbound_link()
+			{
+				this_component()->template calculate_moe_for_assignment_interval_from_inbound_link<ComponentType,CallerType,TargetType>();
+			}
 		};
+
+
 	}
 }
 

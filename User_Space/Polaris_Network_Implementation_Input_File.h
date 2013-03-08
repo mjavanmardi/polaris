@@ -66,6 +66,7 @@ namespace Network_Components
 				link->template right_turn_bay_length<float>(raw_link.right_turn_bay_length);
 				link->template num_left_turn_bays<int>(raw_link.num_left_turn_bays);
 				link->template num_right_turn_bays<int>(raw_link.num_right_turn_bays);
+				link->template original_free_flow_speed<float>(raw_link.original_free_flow_speed);
 
 				link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
 				link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
@@ -165,7 +166,6 @@ namespace Network_Components
 			{
 				activity_location = (_Activity_Location_Interface*)Allocate<typename _Activity_Location_Interface::Component_Type>();
 				network_models::network_information::network_data_information::ActivityLocationData& raw_activity_location = network_data.activity_location_data_array[i];
-				
 
 				int j;
 				int link_index;
@@ -187,7 +187,6 @@ namespace Network_Components
 				activity_location->census_zone_id<long long>(raw_activity_location.census_zone_index);
 				activity_location->template internal_id<int>(i);		
 				activity_locations_container<ComponentType,CallerType,_Activity_Locations_Container_Interface&>().push_back(activity_location);
-				
 			}
 		}
 
@@ -208,7 +207,6 @@ namespace Network_Components
 			{
 				zone = (_Zone_Interface*)Allocate<typename _Zone_Interface::Component_Type>();
 				zone->template Initialize<NULLTYPE>();
-
 				network_models::network_information::network_data_information::ZoneData& raw_zone = network_data.zone_data_array[i];
 				int j;
 				int activity_location_index;

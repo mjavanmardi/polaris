@@ -185,17 +185,17 @@ void VehicleData::load_to_origin_link(int simulation_interval_index, int simulat
 {
 	this->current_link = 0;
 	this->simulation_status = IN_NETWORK;
-	int current_time_in_scecond = simulation_interval_index*simulation_interval_length;
-	this->vehicle_trajectory_data_array[this->current_link].enter_time = current_time_in_scecond;
+	int current_time_in_second = simulation_interval_index*simulation_interval_length;
+	this->vehicle_trajectory_data_array[this->current_link].enter_time = current_time_in_second;
 	this->vehicle_trajectory_data_array[this->current_link].enter_interval_index = simulation_interval_index;
 };
 		
 void VehicleData::arrive_to_destination_link(int simulation_interval_index, int simulation_interval_length)
 {
-	int current_time_in_scecond = simulation_interval_index*simulation_interval_length;
+	int current_time_in_second = simulation_interval_index*simulation_interval_length;
 	this->simulation_status = OUT_NETWORK;
 	this->vehicle_trajectory_data_array[this->current_link].delayed_time = 0;
-	this->set_arrival_time (current_time_in_scecond);
+	this->set_arrival_time (current_time_in_second);
 	this->set_arrival_simulation_interval_index(simulation_interval_index);
 };
 
@@ -258,12 +258,12 @@ void VehicleData::set_route_links(int origin_index, int destination_index,vector
 void VehicleData::transfer_to_next_link(int simulation_interval_index, int simulation_interval_length, int delayed_time)
 {
 	//add exit time to trajectory data
-	int current_time_in_scecond = simulation_interval_index*simulation_interval_length;
+	int current_time_in_second = simulation_interval_index*simulation_interval_length;
 	this->vehicle_trajectory_data_array[this->current_link].delayed_time = delayed_time;
 	
 	//add enter time to the trajectory data
 	this->current_link++;
-	this->vehicle_trajectory_data_array[this->current_link].enter_time = current_time_in_scecond;
+	this->vehicle_trajectory_data_array[this->current_link].enter_time = current_time_in_second;
 	this->vehicle_trajectory_data_array[this->current_link].enter_interval_index = simulation_interval_index;
 };
 

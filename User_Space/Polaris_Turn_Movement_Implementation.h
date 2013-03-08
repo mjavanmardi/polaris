@@ -14,6 +14,15 @@ namespace Turn_Movement_Components
 	
 	namespace Implementations
 	{
+		struct Movement_MOE_Data
+		{
+			float movement_flow_rate; 
+			float turn_penalty;
+			float turn_penalty_standard_deviation;
+			float inbound_link_turn_time;
+			float outbound_link_turn_time;
+		};
+
 		implementation struct Polaris_Movement_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Movement_Implementation),MasterType,Data_Object,ParentType>
 		{
 			member_data(float, turn_travel_penalty, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -85,6 +94,13 @@ namespace Turn_Movement_Components
 			member_data(float, inbound_link_green_cycle_ratio, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
 			member_data(_lock,mvmt_lock,none,none);
+
+			struct Movement_MOE_Data movement_moe_data;
+
+			struct Movement_MOE_Data realtime_movement_moe_data;
+
+			vector<struct Movement_MOE_Data> td_movement_moe_data_array;
+
 
 			feature_implementation void update_capacity(Intersection_Components::Types::Intersection_Type_Keys intersection_type)
 			{
@@ -287,7 +303,9 @@ namespace Turn_Movement_Components
 
 					turn_travel_penalty = (float) ( turn_travel_penalty/((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()) );
 					_turn_travel_penalty = turn_travel_penalty;
-					forward_link_turn_travel_time<ComponentType,CallerType,float>(((_Link_Interface*)_outbound_link)->template travel_time<float>()+_turn_travel_penalty);
+
+					//forward_link_turn_travel_time<ComponentType,CallerType,float>(((_Link_Interface*)_outbound_link)->template travel_time<float>()+_turn_travel_penalty);
+					forward_link_turn_travel_time<ComponentType,CallerType,float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_turn_travel_penalty);
 				}
 			}
 
@@ -351,6 +369,66 @@ namespace Turn_Movement_Components
 				{
 					_minimum_merge_rate = 0.2;
 				}
+
+				td_movement_moe_data_array.clear();
+
+				initialize_moe();
+			}
+
+			void initialize_moe()
+			{
+				movement_moe_data.inbound_link_turn_time = 0.0f;
+				movement_moe_data.outbound_link_turn_time = 0.0f;
+				movement_moe_data.turn_penalty = 0.0f;
+				movement_moe_data.turn_penalty_standard_deviation = 0.0f;
+				movement_moe_data.movement_flow_rate = 0.0f;
+			}
+
+			feature_implementation void calculate_moe_for_simulation_interval_from_outbound_link()
+			{
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+				typedef typename MasterType::link_type _link_component_type;
+
+				realtime_movement_moe_data.turn_penalty = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
+				realtime_movement_moe_data.movement_flow_rate = (float)_movement_transferred;			
+				((_link_component_type*)_outbound_link)->realtime_link_moe_data.link_in_volume += (float)_movement_transferred;
+
+				movement_moe_data.movement_flow_rate += (float)_movement_transferred;
+				
+				
+				((_link_component_type*)_outbound_link)->link_moe_data.link_in_volume += (float)_movement_transferred;
+			}
+
+			feature_implementation void calculate_moe_for_assignment_interval_from_outbound_link()
+			{
+				typedef typename MasterType::link_type _link_component_type;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+
+				float _tmp_turn_travel_penalty;
+				float _tmp_turn_travel_penalty_standard_divation;
+				::calculate_mean_standard_deviation
+					(_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array,
+					_tmp_turn_travel_penalty,
+					_tmp_turn_travel_penalty_standard_divation);
+				movement_moe_data.turn_penalty = _tmp_turn_travel_penalty / 60.0f;
+				movement_moe_data.turn_penalty_standard_deviation = _tmp_turn_travel_penalty_standard_divation / 60.0f;
+				movement_moe_data.outbound_link_turn_time = (((_link_component_type*)_outbound_link)->_link_fftt + _tmp_turn_travel_penalty) / 60.0f;
+				movement_moe_data.movement_flow_rate = movement_moe_data.movement_flow_rate * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>());
+			}
+
+			feature_implementation void calculate_moe_for_simulation_interval_from_inbound_link()
+			{
+				typedef typename MasterType::link_type _link_component_type;
+				((_link_component_type*)_inbound_link)->realtime_link_moe_data.link_out_volume += (float)_movement_transferred;
+				((_link_component_type*)_inbound_link)->link_moe_data.link_out_volume += (float)_movement_transferred;
+			}
+
+			feature_implementation void calculate_moe_for_assignment_interval_from_inbound_link()
+			{
+				typedef typename MasterType::link_type _link_component_type;
+				movement_moe_data.inbound_link_turn_time = (((_link_component_type*)_inbound_link)->_link_fftt/60.0f + movement_moe_data.turn_penalty);
+				td_movement_moe_data_array.push_back(movement_moe_data);
 			}
 		};
 	}

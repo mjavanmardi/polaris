@@ -300,9 +300,267 @@ namespace Network_Components
                     << scenario->template network_cumulative_departed_vehicles<int>() << ","
                     << scenario->template network_cumulative_arrived_vehicles<int>() << ","
                     << scenario->template network_in_network_vehicles<int>() << ","
-                    << convert_seconds_to_hhmmss(elapsed_time).c_str()
+					<< _network_vmt << ","
+					<< _network_vht << ","
+                    << convert_seconds_to_hhmmss(elapsed_time).c_str() << ","
+					<< _this_ptr->template start_of_current_simulation_interval_absolute<int>()
                     <<endl;
 		}
+
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::output_moe_for_simulation_interval()
+		{
+			define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+
+			typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
+			int time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+
+			// output link moe
+			typedef typename MasterType::link_type _link_component_type;
+			typename _Links_Container_Interface::iterator link_itr;
+			for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+			{
+				_link_component_type* link = (_link_component_type*)(*link_itr);
+				((_Scenario_Interface*)_global_scenario)->template out_realtime_link_moe_file<fstream&>()
+					<< convert_seconds_to_hhmmss(time).c_str() << ","
+					<< time << ","
+					<< link->_uuid << ","
+					<< link->_upstream_intersection->_uuid << ","
+					<< link->_downstream_intersection->_uuid << ","
+					<< link->_link_type << ","	
+					<< link->realtime_link_moe_data.link_travel_time << ","
+					<< link->realtime_link_moe_data.link_travel_delay << ","
+					<< link->realtime_link_moe_data.link_queue_length << ","
+					<< link->realtime_link_moe_data.link_speed << ","
+					<< link->realtime_link_moe_data.link_density << ","
+					<< link->realtime_link_moe_data.link_in_volume << ","
+					<< link->realtime_link_moe_data.link_out_volume << ","
+					<< link->realtime_link_moe_data.link_travel_time_ratio << ","
+					<< link->realtime_link_moe_data.link_speed_ratio << ","
+					<< link->realtime_link_moe_data.link_density_ratio << ","
+					<< endl;
+
+			}
+			// output turn movement moe
+			typedef typename MasterType::turn_movement_type _movement_component_type;
+			typename _Turn_Movements_Container_Interface::iterator movement_itr;
+			for(movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
+			{
+				_movement_component_type* movement = (_movement_component_type*)(*movement_itr);
+				((_Scenario_Interface*)_global_scenario)->template out_realtime_movement_moe_file<fstream&>() 
+					<< convert_seconds_to_hhmmss(time).c_str() << ","
+					<< time << ","
+					<< movement->_uuid << ","
+					<< movement->_inbound_link->_uuid << ","
+					<< movement->_outbound_link->_uuid << ","
+					<< movement->_inbound_link->_downstream_intersection->_uuid << ","
+					<< movement->realtime_movement_moe_data.turn_penalty << ","
+					<< movement->realtime_movement_moe_data.inbound_link_turn_time << ","
+					<< movement->realtime_movement_moe_data.outbound_link_turn_time << ","
+					<< movement->realtime_movement_moe_data.movement_flow_rate
+					<<endl;
+
+			}
+			// output network moe
+
+			((_Scenario_Interface*)_global_scenario)->template out_realtime_network_moe_file<fstream&>()
+				<< convert_seconds_to_hhmmss(time).c_str() << ","
+				<< time << ","
+				<< realtime_network_moe_data.num_loaded_vehicles << ","
+				<< realtime_network_moe_data.num_departed_vehicles << ","
+				<< realtime_network_moe_data.num_arrived_vehicles << ","
+				<< realtime_network_moe_data.network_avg_link_travel_time << ","
+				<< realtime_network_moe_data.network_avg_link_speed << ","
+				<< realtime_network_moe_data.network_avg_link_density << ","
+				<< realtime_network_moe_data.network_avg_link_in_volume << ","
+				<< realtime_network_moe_data.network_avg_link_out_volume << ","
+				<< realtime_network_moe_data.network_avg_link_travel_time_ratio << ","
+				<< realtime_network_moe_data.network_avg_link_speed_ratio << ","
+				<< realtime_network_moe_data.network_avg_link_density_ratio << ","
+				<< endl;
+
+		}
+
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::output_moe_for_assignment_interval()
+		{
+			define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+
+			typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
+			int time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+
+			// output link moe
+			typedef typename MasterType::link_type _link_component_type;
+			typename _Links_Container_Interface::iterator link_itr;
+			for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+			{
+				_link_component_type* link = (_link_component_type*)(*link_itr);
+				((_Scenario_Interface*)_global_scenario)->template out_link_moe_file<fstream&>()
+					<< convert_seconds_to_hhmmss(time).c_str() << ","
+					<< time << ","
+					<< link->_uuid << ","
+					<< link->_upstream_intersection->_uuid << ","
+					<< link->_downstream_intersection->_uuid << ","
+					<< link->_link_type << ","	
+					<< link->link_moe_data.link_travel_time << ","
+					<< link->link_moe_data.link_travel_time_standard_deviation << ","
+					<< link->link_moe_data.link_travel_delay << ","
+					<< link->link_moe_data.link_travel_delay_standard_deviation << ","
+					<< link->link_moe_data.link_queue_length << ","
+					<< link->link_moe_data.link_speed << ","
+					<< link->link_moe_data.link_density << ","
+					<< link->link_moe_data.link_in_flow_rate << ","
+					<< link->link_moe_data.link_out_flow_rate << ","
+					<< link->link_moe_data.link_in_volume << ","
+					<< link->link_moe_data.link_out_volume << ","
+					<< link->link_moe_data.link_travel_time_ratio << ","
+					<< link->link_moe_data.link_speed_ratio << ","
+					<< link->link_moe_data.link_density_ratio << ","
+					<< link->link_moe_data.link_in_flow_ratio << ","
+					<< link->link_moe_data.link_out_flow_ratio << ","
+					<< link->_link_vht << ","
+					<< link->_link_vmt
+					<< endl;
+
+			}
+			// output turn movement moe
+			typedef typename MasterType::turn_movement_type _movement_component_type;
+			typename _Turn_Movements_Container_Interface::iterator movement_itr;
+			for(movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
+			{
+				_movement_component_type* movement = (_movement_component_type*)(*movement_itr);
+				((_Scenario_Interface*)_global_scenario)->template out_movement_moe_file<fstream&>() 
+					<< convert_seconds_to_hhmmss(time).c_str() << ","
+					<< time << ","
+					<< movement->_uuid << ","
+					<< movement->_inbound_link->_uuid << ","
+					<< movement->_outbound_link->_uuid << ","
+					<< movement->_inbound_link->_downstream_intersection->_uuid << ","
+					<< movement->movement_moe_data.turn_penalty << ","
+					<< movement->movement_moe_data.turn_penalty_standard_deviation << ","
+					<< movement->movement_moe_data.inbound_link_turn_time << ","
+					<< movement->movement_moe_data.outbound_link_turn_time << ","
+					<< movement->movement_moe_data.movement_flow_rate
+					<<endl;
+
+			}
+			// output network moe
+
+			((_Scenario_Interface*)_global_scenario)->template out_network_moe_file<fstream&>()
+				<< convert_seconds_to_hhmmss(time).c_str() << ","
+				<< time << ","
+				<< network_moe_data.num_loaded_vehicles << ","
+				<< network_moe_data.num_departed_vehicles << ","
+				<< network_moe_data.num_arrived_vehicles << ","
+				<< network_moe_data.network_avg_link_travel_time << ","
+				<< network_moe_data.network_avg_link_speed << ","
+				<< network_moe_data.network_avg_link_density << ","
+				<< network_moe_data.network_avg_link_in_flow_rate << ","
+				<< network_moe_data.network_avg_link_out_flow_rate << ","
+				<< network_moe_data.network_avg_link_in_volume << ","
+				<< network_moe_data.network_avg_link_out_volume << ","
+				<< network_moe_data.network_avg_link_travel_time_ratio << ","
+				<< network_moe_data.network_avg_link_speed_ratio << ","
+				<< network_moe_data.network_avg_link_density_ratio << ","
+				<< network_moe_data.network_avg_link_in_flow_ratio << ","
+				<< network_moe_data.network_avg_link_out_flow_ratio << ","
+				<< _network_vht << ","
+				<< _network_vmt << ","
+				<< network_moe_data.assignment_calculation_time << ","
+				<< network_moe_data.simulation_calculation_time << ","
+				<< network_moe_data.operation_calculation_time << ","
+				<< network_moe_data.output_calculation_time 
+				<< endl;
+
+		}
+
+		//feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::output_moe()
+		//{
+		//	define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+		//	define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+		//	define_container_and_value_interface_unqualified_container(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+
+		//	typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
+		//	int time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+
+		//	// output link moe
+		//	typedef MasterType::link_type _link_component_type;
+		//	typename _Links_Container_Interface::iterator link_itr;
+		//	for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+		//	{
+		//		_link_component_type* link = (_link_component_type*)(*link_itr);
+		//		fprintf_s(((_Scenario_Interface*)_global_scenario)->out_link_moe_file<FILE*>(),
+		//			"%s,%d,%d,%d,%d,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+		//			convert_seconds_to_hhmmss(time).c_str(),
+		//			time,
+		//			link->_uuid,
+		//			link->_upstream_intersection->_uuid,
+		//			link->_downstream_intersection->_uuid,
+		//			link->_link_type,	
+		//			link->link_moe_data.link_travel_time,
+		//			link->link_moe_data.link_travel_time_standard_deviation,
+		//			link->link_moe_data.link_travel_delay,
+		//			link->link_moe_data.link_travel_delay_standard_deviation,
+		//			link->link_moe_data.link_queue_length,
+		//			link->link_moe_data.link_speed,
+		//			link->link_moe_data.link_density,
+		//			link->link_moe_data.link_in_flow_rate,
+		//			link->link_moe_data.link_out_flow_rate,
+		//			link->link_moe_data.link_travel_time_ratio,
+		//			link->link_moe_data.link_speed_ratio,
+		//			link->link_moe_data.link_density_ratio,
+		//			link->link_moe_data.link_in_flow_ratio,
+		//			link->link_moe_data.link_out_flow_ratio
+		//			);
+		//	}
+		//	// output turn movement moe
+		//	typedef MasterType::turn_movement_type _movement_component_type;
+		//	typename _Turn_Movements_Container_Interface::iterator movement_itr;
+		//	for(movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
+		//	{
+		//		_movement_component_type* movement = (_movement_component_type*)(*movement_itr);
+		//		fprintf_s(((_Scenario_Interface*)_global_scenario)->out_link_moe_file<FILE*>(),
+		//			"%s,%d,%d,%d,%d,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+		//			convert_seconds_to_hhmmss(time).c_str(),
+		//			time,
+		//			movement->_uuid,
+		//			movement->_inbound_link->_uuid,
+		//			movement->_outbound_link->_uuid,
+		//			movement->_inbound_link->_downstream_intersection->_uuid,
+		//			movement->movement_moe_data.turn_penalty,
+		//			movement->movement_moe_data.turn_penalty_standard_deviation,
+		//			movement->movement_moe_data.inbound_link_turn_time,
+		//			movement->movement_moe_data.outbound_link_turn_time,
+		//			movement->movement_moe_data.movement_flow_rate
+		//			);
+		//	}
+		//	// output network moe
+
+		//	fprintf_s(((_Scenario_Interface*)_global_scenario)->out_network_moe_file<FILE*>(),
+		//		"%s,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+		//		convert_seconds_to_hhmmss(time).c_str(),
+		//		time,
+		//		network_moe_data.num_loaded_vehicles,
+		//		network_moe_data.num_departed_vehicles,
+		//		network_moe_data.num_arrived_vehicles,
+		//		network_moe_data.network_avg_link_travel_time,
+		//		network_moe_data.network_avg_link_speed,
+		//		network_moe_data.network_avg_link_density,
+		//		network_moe_data.network_avg_link_in_flow_rate,
+		//		network_moe_data.network_avg_link_out_flow_rate,
+		//		network_moe_data.network_avg_link_travel_time_ratio,
+		//		network_moe_data.network_avg_link_speed_ratio,
+		//		network_moe_data.network_avg_link_density_ratio,
+		//		network_moe_data.network_avg_link_in_flow_ratio,
+		//		network_moe_data.network_avg_link_out_flow_ratio,
+		//		network_moe_data.assignment_calculation_time,
+		//		network_moe_data.simulation_calculation_time,
+		//		network_moe_data.operation_calculation_time,
+		//		network_moe_data.output_calculation_time
+		//		);
+		//}
 
 	}
 }

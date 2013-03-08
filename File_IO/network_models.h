@@ -41,7 +41,7 @@ namespace network_models
 			scenario_data.input_data_format == INPUT_FROM_VEHICLE)
 		{
 			cout<<"reading network..."<<endl;
-			read_network_data(input_dir_name,network_data);
+			read_network_data(input_dir_name,network_data,scenario_data);
 	
 			//if (scenario_data.demand_od_flag == 1)
 			if (scenario_data.input_data_format == INPUT_FROM_OD)

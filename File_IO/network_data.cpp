@@ -142,7 +142,8 @@ void network_data_information::write_link(string output_dir_name, NetworkData& n
 			<< "num_left_turn_bays" << "	"
 			<< "num_right_turn_bays" << "	"
 			<< "left_turn_bay_length" << "	"
-			<< "right_turn_bay_length"
+			<< "right_turn_bay_length" << " "
+			<< "original_free_flow_speed"
 			<<endl;
 	}
 	else
@@ -984,7 +985,7 @@ void network_data_information::read_node(string input_dir_name, NetworkData& net
 	input_file.close();
 };
 
-void network_data_information::read_link(string input_dir_name, NetworkData& network_data)
+void network_data_information::read_link(string input_dir_name, NetworkData& network_data, ScenarioData& scenario_data)
 {
 	string filename = input_dir_name + "link";
 	string line;
@@ -1020,18 +1021,42 @@ void network_data_information::read_link(string input_dir_name, NetworkData& net
 				//9 - num_right_turn_bays
 				//10 - left_turn_bay_length
 				//11 - right_turn_bay_length
+				//12 - original_free_flow_speed
 
 				string link_type_string;
 				int unode_id;
 				int dnode_id;
-				token_size = 12;
+				token_size = 13;
 				string_split(tokens, line, token_size);
 
 				link_data.uuid = stoi(tokens[0]);
 				unode_id = stoi(tokens[1]);
 				dnode_id = stoi(tokens[2]);
-				link_data.length = stof(tokens[3]);
-				link_data.free_flow_speed = stof(tokens[4]);
+
+				if (scenario_data.input_length_unit == LENGTH_IN_METER)
+				{
+					link_data.length = convert_meter_to_foot<float>(stof(tokens[3]));
+				}
+				else
+				{
+					link_data.length = stof(tokens[3]);
+				}
+				
+				if (scenario_data.input_speed_unit == SPEED_IN_METERS_PER_SECOND)
+				{
+					link_data.free_flow_speed = convert_meters_per_second_to_miles_per_hour<float>(stof(tokens[4]));
+					link_data.original_free_flow_speed = convert_meters_per_second_to_miles_per_hour<float>(stof(tokens[12]));
+				}
+				else
+				{
+					link_data.free_flow_speed = stof(tokens[4]);
+					link_data.original_free_flow_speed = stof(tokens[12]);
+				}
+
+				//link_data.length = stof(tokens[3]);
+				//link_data.free_flow_speed = stof(tokens[4]);
+				
+				
 				link_data.maximum_flow_rate = stof(tokens[5]);
 				link_data.link_type = network_data.link_type_string_int_map[tokens[6]];
 				link_data.num_lanes = stoi(tokens[7]);
@@ -1240,7 +1265,6 @@ void network_data_information::read_activity_location(string input_dir_name, Net
 		int iline = 0;
 		ActivityLocationData activity_location_data;
 		int zone_id;
-		long long tract_id;
 		vector<string> tokens;
 		int token_size =0;
 
@@ -1254,14 +1278,13 @@ void network_data_information::read_activity_location(string input_dir_name, Net
 				//nested structure
 				if ((iline-1)%3 == 1)
 				{//read first line of an activity location
-					token_size = 5;
+					token_size = 4;
 					string_split(tokens, line, token_size);
 					activity_location_data.uuid = stoi(tokens[0]);
 					zone_id = stoi(tokens[1]);
 					activity_location_data.num_origin_links = stoi(tokens[2]);
 					activity_location_data.num_destination_links = stoi(tokens[3]);
-					tract_id = stoll(tokens[4]);
-					activity_location_data.census_zone_index = tract_id;
+
 					activity_location_data.zone_index = zone_id;//network_data.zone_id_index_map[zone_id];
 				}
 				
@@ -1309,13 +1332,13 @@ void network_data_information::read_activity_location(string input_dir_name, Net
 	input_file.close();
 };
 
-void network_data_information::read_network_data(string input_dir_name, NetworkData& network_data)
+void network_data_information::read_network_data(string input_dir_name, NetworkData& network_data, ScenarioData& scenario_data)
 {
 	//read node
 	read_node(input_dir_name, network_data);
 
 	//read link
-	read_link(input_dir_name, network_data);
+	read_link(input_dir_name, network_data, scenario_data);
 
 	//read turn movement
 	read_turn_movement(input_dir_name, network_data);

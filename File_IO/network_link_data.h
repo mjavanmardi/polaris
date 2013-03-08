@@ -43,6 +43,8 @@ namespace network_models
 				float jam_density;
 				float critical_density;
 
+				float original_free_flow_speed; ///in miels per hour
+
 				//topology
 				int inbound_turn_movement_size;
 				int outbound_turn_movement_size;

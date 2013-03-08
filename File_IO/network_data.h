@@ -7,6 +7,7 @@
 #include "network_activity_location_data.h"
 #include "network_zone_data.h"
 #include "network_route_data.h"
+#include "network_scenario_data.h"
 
 #include "utilities.h"
 //
@@ -19,6 +20,7 @@ using namespace __gnu_cxx;
 
 using namespace std;
 using namespace network_models::network_information::route_data_information;
+using namespace network_models::network_information::scenario_data_information;
 
 namespace network_models
 {
@@ -122,11 +124,11 @@ namespace network_models
 			
 			//input from file
 			void read_node(string input_dir_name, NetworkData& network_data);
-			void read_link(string input_dir_name, NetworkData& network_data);
+			void read_link(string input_dir_name, NetworkData& network_data, ScenarioData& scenario_data);
 			void read_turn_movement(string input_dir_name, NetworkData& network_data);
 			void read_zone(string input_dir_name, NetworkData& network_data);
 			void read_activity_location(string input_dir_name, NetworkData& network_data);
-			void read_network_data(string input_dir_name, NetworkData& network_data);
+			void read_network_data(string input_dir_name, NetworkData& network_data, ScenarioData& scenario_data);
 
 			//input from dsp
 			void read_network_data_dsp(string input_dir_name, NetworkData& network_data);

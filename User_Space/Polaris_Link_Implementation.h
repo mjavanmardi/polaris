@@ -21,7 +21,29 @@ namespace Link_Components
 
 	namespace Implementations
 	{
+		struct Link_MOE_Data
+		{
+			float link_travel_time;
+			float link_travel_time_standard_deviation;
+			float link_queue_length;
+			float link_travel_delay;
+			float link_travel_delay_standard_deviation;
+			float link_speed;
+			float link_density;
+			float link_in_flow_rate;
+			float link_out_flow_rate;
 
+			float link_in_volume;
+			float link_out_volume;
+
+			float link_speed_ratio;
+			float link_in_flow_ratio;
+			float link_out_flow_ratio;
+			float link_density_ratio;
+			float link_travel_time_ratio;
+
+			float num_vehicles_in_link;
+		};
 	//==================================================================================================================
 	/// Polaris_Link_Base
 	//------------------------------------------------------------------------------------------------------------------
@@ -86,6 +108,7 @@ namespace Link_Components
 			member_data(float, backward_wave_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, jam_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, critical_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, original_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
@@ -136,6 +159,16 @@ namespace Link_Components
 			member_container(deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, none, none);
 
 			member_data(_lock,link_lock,none,none);
+
+			member_data(float, link_vmt, none, none);
+			
+			member_data(float, link_vht, none, none);
+
+			struct Link_MOE_Data link_moe_data;
+
+			struct Link_MOE_Data realtime_link_moe_data;
+
+			vector<struct Link_MOE_Data> td_link_moe_data_array;
 
 		//==================================================================================================================
 		/// travel_time
@@ -375,6 +408,9 @@ namespace Link_Components
 
 			feature_implementation void origin_link_loading(RNG_Components::RngStream& rng_stream)
 			{
+				define_container_and_value_interface_unqualified_container(_Movements_Container_Interface, _Movement_Interface, type_of(outbound_turn_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Vehicles_Container_Interface, _Vehicle_Interface, _Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+
 				_link_origin_departed_vehicles = 0;
 				_link_origin_loaded_vehicles = 0;
 				//arrived vehicles at current interval
@@ -388,8 +424,25 @@ namespace Link_Components
 				if(_link_origin_arrived_vehicles>0)
 				{
 					//check available spaces
-					float link_available_spaces = _link_supply - _link_upstream_arrived_vehicles;
-					int num_link_origin_departed_vehicles_allowed = (int) link_available_spaces;
+					//float link_available_spaces = _link_supply - _link_upstream_arrived_vehicles;
+					//int num_link_origin_departed_vehicles_allowed = (int) link_available_spaces;
+
+					int num_vehicles_in_link = 0;
+				    typename _Movements_Container_Interface::iterator outbound_itr;
+					_Movement_Interface* outbound_movement;
+					
+					for(outbound_itr=_outbound_turn_movements.begin();outbound_itr!=_outbound_turn_movements.end();outbound_itr++)
+					{
+						outbound_movement=(_Movement_Interface*)(*outbound_itr);
+						num_vehicles_in_link += int(outbound_movement->template vehicles_container<_Vehicles_Container_Interface&>().size());
+					}
+					num_vehicles_in_link += (int)_current_vehicle_queue.size();
+					//float link_available_spaces = (float)(this->link_supply_array[outbound_link_index]- this->link_upstream_arrived_vehicles_array[outbound_link_index]);
+					float link_available_spaces = (float)(_link_supply - num_vehicles_in_link);
+				
+					int num_link_origin_departed_vehicles_allowed = max(0,int(link_available_spaces));
+
+					//
 					float link_origin_departed_flow_allowed = (float) (link_available_spaces - num_link_origin_departed_vehicles_allowed);
 					
 					if (link_origin_departed_flow_allowed>0.0)
@@ -507,6 +560,92 @@ namespace Link_Components
 				{
 					_cached_link_upstream_cumulative_vehicles_array[j] = 0;
 				}
+
+				td_link_moe_data_array.clear();
+				initialize_moe();
+			}
+
+			void initialize_moe()
+			{
+				link_moe_data.link_density = 0.0f;
+				link_moe_data.link_in_flow_rate = 0.0f;
+				link_moe_data.link_out_flow_rate = 0.0f;
+				link_moe_data.link_queue_length = 0.0f;
+				link_moe_data.link_speed = 0.0f;
+				link_moe_data.link_travel_delay = 0.0f;
+				link_moe_data.link_travel_delay_standard_deviation = 0.0f;
+				link_moe_data.link_travel_time = 0.0f;
+				link_moe_data.link_travel_time_standard_deviation = 0.0f;
+		
+				link_moe_data.link_density_ratio = 0.0f;
+				link_moe_data.link_in_flow_ratio = 0.0f;
+				link_moe_data.link_out_flow_ratio = 0.0f;
+				link_moe_data.link_speed_ratio = 0.0f;
+				link_moe_data.link_travel_time_ratio = 0.0f;
+			}
+
+			feature_implementation void update_vmt_vht()
+			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+				_link_vmt = link_moe_data.link_out_flow_rate * ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>() * _num_lanes * _length / 5280.0f / 3600.0f;
+				_link_vht = link_moe_data.link_out_flow_rate * ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>() * _num_lanes * link_moe_data.link_travel_time / 60.0f / 3600.0f;
+			}
+
+			feature_implementation void calculate_moe_for_simulation_interval()
+			{
+				realtime_link_moe_data.link_out_flow_ratio = realtime_link_moe_data.link_out_flow_rate / _maximum_flow_rate;
+				realtime_link_moe_data.link_in_flow_ratio = realtime_link_moe_data.link_in_flow_rate / _maximum_flow_rate;
+				realtime_link_moe_data.link_queue_length = _link_num_vehicles_in_queue;
+
+				realtime_link_moe_data.link_travel_time_ratio = realtime_link_moe_data.link_travel_time / (_length/5280.0f/_original_free_flow_speed * 60.0f);
+				
+				//link speed
+				realtime_link_moe_data.link_speed = (_length/5280.0f) * 60.0f /	realtime_link_moe_data.link_travel_time;
+
+				realtime_link_moe_data.link_speed_ratio = realtime_link_moe_data.link_speed / _original_free_flow_speed;
+
+				realtime_link_moe_data.link_density = realtime_link_moe_data.num_vehicles_in_link /	(_length/5280.0f)/ float(_num_lanes);
+			
+				realtime_link_moe_data.link_density_ratio =	realtime_link_moe_data.link_density / _jam_density;
+			}
+
+			feature_implementation void calculate_moe_for_assignment_interval()
+			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+
+				link_moe_data.link_in_flow_rate = link_moe_data.link_in_volume * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>()) / _num_lanes;
+				link_moe_data.link_queue_length = link_moe_data.link_queue_length / ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<float>();
+				
+				link_moe_data.link_travel_time = float(_link_fftt / 60.0) + link_moe_data.link_travel_delay;
+					
+				link_moe_data.link_travel_time_standard_deviation = link_moe_data.link_travel_delay_standard_deviation;
+
+				//link travel speed in mph
+				link_moe_data.link_speed = (_length / 5280.0f)/ (link_moe_data.link_travel_time / 60.0f);
+
+				//out flow rate in vehicles per hour per lane
+				
+				link_moe_data.link_out_flow_rate = link_moe_data.link_out_volume * 3600.0f / float(((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>() * 
+				(float)_num_lanes); // vehicles per hour per lane
+				
+				update_vmt_vht<ComponentType,CallerType,TargetType>();
+				
+				//density
+				link_moe_data.link_density =	link_moe_data.link_density / 	float(((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<float>());
+
+				//ratio
+				link_moe_data.link_density_ratio = link_moe_data.link_density / _jam_density;
+				
+				link_moe_data.link_in_flow_ratio = link_moe_data.link_in_flow_rate / _maximum_flow_rate;
+				
+				link_moe_data.link_out_flow_ratio = link_moe_data.link_out_flow_rate / _maximum_flow_rate;
+
+				link_moe_data.link_speed_ratio = link_moe_data.link_speed /	_original_free_flow_speed;
+
+				link_moe_data.link_travel_time_ratio = link_moe_data.link_travel_time /	(_length/5280.0f/(_original_free_flow_speed/60.0f));
+
+				td_link_moe_data_array.push_back(link_moe_data);
+
 			}
 
 			feature_implementation void Initialize()
@@ -561,7 +700,8 @@ namespace Link_Components
 				_this_ptr->template network_state_update<NULLTYPE>();
 			}
 		};
-			
+		
+
 	}
 
 }

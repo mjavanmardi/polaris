@@ -33,6 +33,7 @@ namespace Scenario_Components
 				CONTROL_SUB_ITERATION,
 				LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION,
 				INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,
+				INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION,
 				LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION,
 				INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION,
 				END_OF_ITERATION,
@@ -105,6 +106,14 @@ namespace Scenario_Components
 			
 			feature_accessor(vehicle_transfer_file_name, none, none);
 			feature_accessor(vehicle_transfer_file, none, none);
+
+			feature_accessor(out_network_moe_file, none, none);
+			feature_accessor(out_link_moe_file, none, none);
+			feature_accessor(out_movement_moe_file, none, none);
+
+			feature_accessor(out_realtime_network_moe_file, none, none);
+			feature_accessor(out_realtime_link_moe_file, none, none);
+			feature_accessor(out_realtime_movement_moe_file, none, none);
 
 			feature_accessor(assignment_time_in_seconds, none, none);
 			feature_accessor(simulation_time_in_seconds, none, none);
@@ -458,10 +467,12 @@ namespace Scenario_Components
 						<< "departed" << ","
 						<< "arrived"  << ","
 						<< "in_network" << ","
-						<< "assignment_time_in_seconds" << ","
-						<< "simulation_time_in_seconds" << ","
-						<< "operation_time_in_seconds" << ","
-						<< "output_time_in_seconds"
+						//<< "assignment_time_in_seconds" << ","
+						//<< "simulation_time_in_seconds" << ","
+						//<< "operation_time_in_seconds" << ","
+						//<< "output_time_in_seconds"
+						<< "VMT" << ","
+						<< "VHT" << ","
 						<<endl;
 				}
 				else
@@ -504,6 +515,57 @@ namespace Scenario_Components
 						<< endl;
 				}
 
+				//real-time moe
+				//network
+				string out_realtime_network_moe_file_name = output_dir_name<string&>() + "realtime_moe_network.csv";
+				out_realtime_network_moe_file<fstream&>().open(out_realtime_network_moe_file_name, fstream::out);
+				out_realtime_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio\n";
+
+				//link
+				string out_realtime_link_moe_file_name = output_dir_name<string&>() + "realtime_moe_link.csv";
+				out_realtime_link_moe_file<fstream&>().open(out_realtime_link_moe_file_name, fstream::out);
+				out_realtime_link_moe_file<fstream&>() << "clock,time,link,unode,dnode,link_type,travel_time_in_min,travel_delay_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio\n";
+
+				//movement
+				string out_realtime_movement_moe_file_name = output_dir_name<string&>() + "realtime_moe_movement.csv";
+				out_realtime_movement_moe_file<fstream&>().open(out_realtime_movement_moe_file_name, fstream::out);
+				out_realtime_movement_moe_file<fstream&>() << "clock,time,turn_movement,inbound_link,outbound_link,node,turn_penalty_in_min,turn_penalty_sd_in_min,inbound_link_turn_time_in_min,outbound_link_turn_time_in_min,movement_flow_rate_in_vphpl\n";
+
+				//moe
+				//network
+				string out_network_moe_file_name = output_dir_name<string&>() + "moe_network.csv";
+				out_network_moe_file<fstream&>().open(out_network_moe_file_name, fstream::out);
+				out_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_flow_rate_in_vphpl,avg_link_out_flow_rate_in_vphpl,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,vht,vmt,assignment_calculation_time_in_second,simulation_calculation_time_in_second,operation_calculation_time_in_second,output_calculation_time_in_second\n";
+
+				//link
+				string out_link_moe_file_name = output_dir_name<string&>() + "moe_link.csv";
+				out_link_moe_file<fstream&>().open(out_link_moe_file_name, fstream::out);
+				out_link_moe_file<fstream&>() << "clock,time,link,unode,dnode,link_type,travel_time_in_min,travel_time_sd_in_min,travel_delay_in_min,travel_delay_sd_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_flow_rate_in_vphpl,out_flow_rate_in_vphpl,travel_time_ratio,speed_ratio,density_ratio,in_flow_ratio,out_flow_ratio,vht,vmt\n";
+
+				//movement
+				string out_movement_moe_file_name = output_dir_name<string&>() + "moe_movement.csv";
+				out_movement_moe_file<fstream&>().open(out_movement_moe_file_name, fstream::out);
+				out_movement_moe_file<fstream&>() << "clock,time,turn_movement,inbound_link,outbound_link,node,turn_penalty_in_min,turn_penalty_sd_in_min,inbound_link_turn_time_in_min,outbound_link_turn_time_in_min,movement_flow_rate_in_vphpl\n";
+
+				//				//moe
+				//FILE* fp;
+				////network
+				//string out_network_moe_file_name = output_dir_name<string&>() + "moe_network.csv";
+				//fopen_s(&fp, out_network_moe_file_name.c_str(), "w" );
+				//out_network_moe_file<FILE*>(fp);
+				//fprintf(out_network_moe_file<FILE*>(),"clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time,avg_link_speed,avg_link_density,avg_link_in_flow_rate,avg_link_out_flow_rate,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,assignment_calculation_time,simulation_calculation_time,operation_calculation_time,output_calculation_time\n");
+
+				////link
+				//string out_link_moe_file_name = output_dir_name<string&>() + "moe_link.csv";
+				//fopen_s(&fp, out_link_moe_file_name.c_str(), "w" );
+				//out_link_moe_file<FILE*>(fp);
+				//fprintf(out_link_moe_file<FILE*>(),"clock,time,link,unode,dnode,link_type,travel_time,travel_time_sd,travel_delay,travel_delay_sd,queue_length,speed,density,in_flow_rate,out_flow_rate,travel_time_ratio,speed_ratio,density_ratio,in_flow_ratio,out_flow_ratio\n");
+
+				////movement
+				//string out_movement_moe_file_name = output_dir_name<string&>() + "moe_movement.csv";
+				//fopen_s(&fp, out_movement_moe_file_name.c_str(), "w" );
+				//out_movement_moe_file<FILE*>(fp);
+				//fprintf(out_movement_moe_file<FILE*>(),"clock,time,movement,inbound_link,outbound_link,node,turn_penalty,turn_penalty_sd,inbound_link_turn_time,outbound_link_turn_time,movement_flow_rate\n");
 
 			};
 
@@ -515,6 +577,18 @@ namespace Scenario_Components
 				network_node_control_state_file<fstream&>().close();
 				output_summary_file<fstream&>().close();
 				vehicle_transfer_file<fstream&>().close();
+
+				out_realtime_link_moe_file<fstream&>().close();
+				out_realtime_movement_moe_file<fstream&>().close();
+				out_realtime_network_moe_file<fstream&>().close();
+
+				out_link_moe_file<fstream&>().close();
+				out_movement_moe_file<fstream&>().close();
+				out_network_moe_file<fstream&>().close();
+
+				//fclose(out_link_moe_file<FILE*>());
+				//fclose(out_movement_moe_file<FILE*>());
+				//fclose(out_network_moe_file<FILE*>());
 			};
 
 			feature_prototype void increase_network_cumulative_loaded_vehicles()

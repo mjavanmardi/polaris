@@ -13,6 +13,40 @@ namespace Network_Components
 	
 	namespace Implementations
 	{
+		struct MOE_Data
+		{
+			//int starting_time;
+			//int ending_time;
+
+			double assignment_calculation_time;
+			double simulation_calculation_time;
+			double operation_calculation_time;
+			double output_calculation_time;
+
+			//vector<Link_MOE_Data> link_moe_data_by_type_array;
+
+			int num_generated_vehicles;
+			int num_loaded_vehicles;
+			int num_departed_vehicles;
+			int num_arrived_vehicles;
+			float network_avg_link_travel_time;
+			float network_avg_link_travel_delay;
+			float network_avg_link_speed;
+			float network_avg_link_density;
+			float network_avg_link_in_flow_rate;
+			float network_avg_link_out_flow_rate;
+			float network_avg_link_in_volume;
+			float network_avg_link_out_volume;
+			float network_avg_link_queue_length;
+
+			float network_avg_link_speed_ratio;
+			float network_avg_link_in_flow_ratio;
+			float network_avg_link_out_flow_ratio;
+			float network_avg_link_density_ratio;
+			float network_avg_link_travel_time_ratio;
+
+		};
+
 		implementation struct Polaris_Network_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -38,9 +72,19 @@ namespace Network_Components
 
 			member_container(vector<typename MasterType::intersection_control_type*>, intersection_controls_container, none, none);
 
+			member_data(float, network_vmt, none, none);
+
+			member_data(float, network_vht, none,none);
+
             member_data(long,current_cpu_time_in_seconds,none,none);
 
 			member_data(long,start_cpu_time_in_seconds,none,none);
+
+			struct MOE_Data network_moe_data;
+
+			struct MOE_Data realtime_network_moe_data;
+
+			vector<struct MOE_Data> td_network_moe_data_array;
 
 			feature_implementation void initialize_intersection_control()
 			{
@@ -65,7 +109,47 @@ namespace Network_Components
 				initialize_intersections<ComponentType,CallerType,TargetType>();
 				construct_network_cost<ComponentType,CallerType,TargetType>();
 				construct_routable_network<ComponentType,CallerType,TargetType>();
+				td_network_moe_data_array.clear();
+				_network_vht = 0.0;
+				_network_vmt = 0.0;
+				initialize_moe();
 				initialize_network_agent<ComponentType,CallerType,TargetType>();
+			}
+
+			void initialize_moe()
+			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Network_Interface;
+
+				//network_moe_data.starting_time = ((_Network_Interface*)this)->start_of_current_simulation_interval_absolute<int>();
+				//network_moe_data.ending_time = network_moe_data.starting_time + ((_Scenario_Interface*)_global_scenario)->assignment_interval_length<int>();
+	
+				network_moe_data.assignment_calculation_time = 0.0;
+				network_moe_data.simulation_calculation_time = 0.0f;
+				network_moe_data.operation_calculation_time = 0.0f;
+				network_moe_data.output_calculation_time = 0.0f;
+
+				network_moe_data.num_arrived_vehicles = 0;
+				network_moe_data.num_departed_vehicles = 0;
+				network_moe_data.num_generated_vehicles = 0;
+				network_moe_data.num_loaded_vehicles = 0;
+	
+				network_moe_data.network_avg_link_density = 0.0f;
+				network_moe_data.network_avg_link_density_ratio = 0.0f;
+				network_moe_data.network_avg_link_in_flow_rate = 0.0f;
+				network_moe_data.network_avg_link_in_flow_ratio = 0.0f;
+				network_moe_data.network_avg_link_out_flow_rate = 0.0f;
+				network_moe_data.network_avg_link_out_flow_ratio = 0.0f;
+				network_moe_data.network_avg_link_queue_length = 0.0f;
+				network_moe_data.network_avg_link_speed = 0.0f;
+				network_moe_data.network_avg_link_speed_ratio = 0.0f;
+				network_moe_data.network_avg_link_travel_delay = 0.0f;
+				network_moe_data.network_avg_link_travel_time = 0.0f;
+				network_moe_data.network_avg_link_travel_time_ratio = 0.0f;
+
+				network_moe_data.num_arrived_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_arrived_vehicles<int>();
+				network_moe_data.num_departed_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int>();
+				network_moe_data.num_loaded_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int>();
 			}
 
 			feature_implementation void initialize_network_agent()
@@ -97,13 +181,187 @@ namespace Network_Components
 			{
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
 				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
-				
 				_Network_Interface* _this_ptr = (_Network_Interface*)_this;
-				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
-				if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>() && _this_ptr->template scenario_reference<_Scenario_Interface*>()->template network_in_network_vehicles<int>() == 0)
+				if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>())
 				{
 					_this_ptr->template scenario_reference<_Scenario_Interface*>()->template close_output_files<NULLTYPE>();
 					exit(0);
+				}
+
+				((typename MasterType::network_type*)_this)->template calculate_moe<NULLTYPE,NULLTYPE,NULLTYPE>();
+				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
+				//if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>() && _this_ptr->template scenario_reference<_Scenario_Interface*>()->template network_in_network_vehicles<int>() == 0)
+			}
+
+			feature_implementation void calculate_moe()
+			{
+				define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+
+				typename _Intersections_Container_Interface::iterator intersection_itr;
+				for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
+				{
+					((_Intersection_Interface*)(*intersection_itr))->template calculate_moe_for_simulation_interval<NULLTYPE>();
+				}
+				
+				calculate_realtime_network_moe();
+				output_moe_for_simulation_interval<ComponentType, CallerType, TargetType>();
+
+				if (((((_Network_Interface*)this)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				{
+					for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
+					{
+						((_Intersection_Interface*)(*intersection_itr))->template calculate_moe_for_assignment_interval<NULLTYPE>();
+					}
+					update_moe_for_assignment_interval_with_links();
+					update_moe_for_assignment_interval();
+					output_moe_for_assignment_interval<ComponentType, CallerType, TargetType>();
+					reset_moe_for_assignment_interval();
+				}
+			}
+
+			void calculate_realtime_network_moe()
+			{
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, NULLTYPE);
+				typename _Links_Container_Interface::iterator link_itr;
+				typedef typename MasterType::link_type _link_component_type;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+
+				realtime_network_moe_data.network_avg_link_density = 0.0;
+				realtime_network_moe_data.network_avg_link_out_flow_rate = 0.0;
+				realtime_network_moe_data.network_avg_link_in_flow_rate = 0.0;
+				realtime_network_moe_data.network_avg_link_out_volume = 0.0;
+				realtime_network_moe_data.network_avg_link_in_volume = 0.0;
+				realtime_network_moe_data.network_avg_link_queue_length = 0.0;
+				realtime_network_moe_data.network_avg_link_speed = 0.0;
+				realtime_network_moe_data.network_avg_link_travel_time = 0.0;
+				realtime_network_moe_data.network_avg_link_travel_delay = 0.0;
+
+				realtime_network_moe_data.network_avg_link_density_ratio = 0.0;
+				realtime_network_moe_data.network_avg_link_out_flow_ratio = 0.0;
+				realtime_network_moe_data.network_avg_link_in_flow_ratio = 0.0;
+				realtime_network_moe_data.network_avg_link_speed_ratio = 0.0;
+				realtime_network_moe_data.network_avg_link_travel_time_ratio = 0.0;
+
+				for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+				{
+						
+					_link_component_type* link_component = (_link_component_type*)(*link_itr);
+
+					realtime_network_moe_data.network_avg_link_density += link_component->realtime_link_moe_data.link_density;
+					realtime_network_moe_data.network_avg_link_out_flow_rate += link_component->realtime_link_moe_data.link_out_flow_rate;
+					realtime_network_moe_data.network_avg_link_in_flow_rate += link_component->realtime_link_moe_data.link_in_flow_rate;
+					realtime_network_moe_data.network_avg_link_out_volume += link_component->realtime_link_moe_data.link_out_volume;
+					realtime_network_moe_data.network_avg_link_in_volume += link_component->realtime_link_moe_data.link_in_volume;
+					realtime_network_moe_data.network_avg_link_queue_length += link_component->realtime_link_moe_data.link_queue_length;
+					realtime_network_moe_data.network_avg_link_speed += link_component->realtime_link_moe_data.link_speed;
+					realtime_network_moe_data.network_avg_link_travel_time += link_component->realtime_link_moe_data.link_travel_time;
+					realtime_network_moe_data.network_avg_link_travel_delay += link_component->realtime_link_moe_data.link_travel_delay;
+
+					realtime_network_moe_data.network_avg_link_density_ratio += link_component->realtime_link_moe_data.link_density_ratio;
+					realtime_network_moe_data.network_avg_link_out_flow_ratio += link_component->realtime_link_moe_data.link_out_flow_ratio;
+					realtime_network_moe_data.network_avg_link_in_flow_ratio += link_component->realtime_link_moe_data.link_in_flow_ratio;
+					realtime_network_moe_data.network_avg_link_speed_ratio += link_component->realtime_link_moe_data.link_speed_ratio;
+					realtime_network_moe_data.network_avg_link_travel_time_ratio += link_component->realtime_link_moe_data.link_travel_time_ratio;
+				}
+
+				realtime_network_moe_data.network_avg_link_density /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_out_flow_rate /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_in_flow_rate /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_out_volume /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_in_volume /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_queue_length /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_speed /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_travel_time /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_travel_delay /= float(_links_container.size());
+
+				realtime_network_moe_data.network_avg_link_density_ratio /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_out_flow_ratio /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_in_flow_ratio /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_speed_ratio /= float(_links_container.size());
+				realtime_network_moe_data.network_avg_link_travel_time_ratio /= float(_links_container.size());
+
+				realtime_network_moe_data.num_arrived_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_arrived_vehicles<int>();
+				realtime_network_moe_data.num_departed_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int>();
+				realtime_network_moe_data.num_loaded_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int>();
+			}
+
+
+			void update_moe_for_assignment_interval_with_links()
+			{
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, NULLTYPE);
+				typename _Links_Container_Interface::iterator link_itr;
+				typedef typename MasterType::link_type _link_component_type;
+
+				for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+				{
+						
+					_link_component_type* link_component = (_link_component_type*)(*link_itr);
+					network_moe_data.network_avg_link_travel_delay += link_component->link_moe_data.link_travel_delay;
+					network_moe_data.network_avg_link_travel_time += link_component->link_moe_data.link_travel_time;
+					network_moe_data.network_avg_link_speed += link_component->link_moe_data.link_speed;
+					network_moe_data.network_avg_link_density += link_component->link_moe_data.link_density;
+					network_moe_data.network_avg_link_in_flow_rate += link_component->link_moe_data.link_in_flow_rate;
+					network_moe_data.network_avg_link_out_flow_rate += link_component->link_moe_data.link_out_flow_rate;
+
+					network_moe_data.network_avg_link_density_ratio +=link_component->link_moe_data.link_density_ratio;
+					network_moe_data.network_avg_link_in_flow_ratio += link_component->link_moe_data.link_in_flow_ratio;
+					network_moe_data.network_avg_link_out_flow_ratio += link_component->link_moe_data.link_out_flow_ratio;
+					network_moe_data.network_avg_link_speed_ratio += link_component->link_moe_data.link_speed_ratio;
+					network_moe_data.network_avg_link_travel_time_ratio += link_component->link_moe_data.link_travel_time_ratio;
+
+					_network_vmt += link_component->_link_vmt;
+					_network_vht += link_component->_link_vht;
+				}
+			}
+
+			void update_moe_for_assignment_interval()
+			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+
+				network_moe_data.num_arrived_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_arrived_vehicles<int>() - network_moe_data.num_arrived_vehicles;
+				network_moe_data.num_departed_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int>() - network_moe_data.num_departed_vehicles;
+				network_moe_data.num_loaded_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int>() - network_moe_data.num_loaded_vehicles;
+
+				//performance
+				network_moe_data.network_avg_link_travel_time /= float(_links_container.size()); 
+				network_moe_data.network_avg_link_speed /= float(_links_container.size()); 
+				network_moe_data.network_avg_link_density /= float(_links_container.size()); 
+				network_moe_data.network_avg_link_in_flow_rate  /= float(_links_container.size()); 
+				network_moe_data.network_avg_link_out_flow_rate  /= float(_links_container.size()); 
+				network_moe_data.network_avg_link_queue_length  /= float(_links_container.size()); 
+
+				network_moe_data.network_avg_link_travel_time_ratio /= float(_links_container.size());
+				network_moe_data.network_avg_link_speed_ratio /= float(_links_container.size());
+				network_moe_data.network_avg_link_density_ratio /= float(_links_container.size());
+				network_moe_data.network_avg_link_in_flow_ratio /= float(_links_container.size());
+				network_moe_data.network_avg_link_out_flow_ratio /= float(_links_container.size());
+
+				td_network_moe_data_array.push_back(network_moe_data);
+			}
+
+			void reset_moe_for_assignment_interval()
+			{
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, NULLTYPE);
+				define_container_and_value_interface_unqualified_container(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, NULLTYPE);
+				// reset network moe				
+				initialize_moe();
+				// reset link moe
+				typename _Links_Container_Interface::iterator link_itr;
+				typedef typename MasterType::link_type _link_component_type;
+				for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+				{
+					_link_component_type* link_component = (_link_component_type*)(*link_itr);
+					link_component->initialize_moe();
+				}
+				// reset turn movement moe
+				typename _Turn_Movements_Container_Interface::iterator movement_itr;
+				typedef typename MasterType::turn_movement_type _movement_component_type;
+				for (movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
+				{
+					_movement_component_type* movement_component = (_movement_component_type*)(*movement_itr);
+					movement_component->initialize_moe();
 				}
 			}
 
@@ -198,7 +456,7 @@ namespace Network_Components
 				_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();
 				_Network_Interface* _this_ptr = (_Network_Interface*)this;
 				printf("%s, ", convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str());
-				printf("loaded=%7d, departed=%7d, arrived=%7d, in_network=%7d\n",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>());
+				printf("loaded=%7d, departed=%7d, arrived=%7d, in_network=%7d, VMT=%7f, VHT=%7f\n",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>(),_network_vmt, _network_vht);
 
 				//write_node_control_state<NULLTYPE>();
 				//write_vehicle_trajectory<NULLTYPE>();
@@ -261,6 +519,12 @@ namespace Network_Components
 			feature_implementation void read_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
 			feature_implementation void read_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
+
+			//==================================================================================================================
+			/// output moe
+			//------------------------------------------------------------------------------------------------------------------			
+			feature_implementation void output_moe_for_simulation_interval();
+			feature_implementation void output_moe_for_assignment_interval(); 
 		};
 
 		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Network_Implementation<MasterType,ParentType,APPEND_CHILD(Integrated_Polaris_Network_Implementation)>
@@ -286,6 +550,9 @@ namespace Network_Components
 			}
 		
 		};
+
+
+
 	}
 }
 

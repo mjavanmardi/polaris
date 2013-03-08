@@ -99,7 +99,8 @@ namespace Link_Components
 			//==================================================================================================================
 			/// simulation link
 			//------------------------------------------------------------------------------------------------------------------
-
+			feature_accessor(link_vmt, none, none);
+			feature_accessor(link_vht, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
@@ -150,6 +151,7 @@ namespace Link_Components
 			feature_accessor(jam_density, none, none);
 			feature_accessor(critical_density, none, none);
 			feature_accessor(link_num_vehicles_in_queue, none, none);
+			feature_accessor(original_free_flow_speed, none, none);
 
 			feature_prototype void push_vehicle(TargetType vehicle)
 			{
@@ -200,7 +202,24 @@ namespace Link_Components
 			{
 				this_component()->template initialize_features<ComponentType,CallerType,TargetType>(param);
 			}
+
+			feature_prototype void calculate_moe_for_simulation_interval()
+			{
+				this_component()->template calculate_moe_for_simulation_interval<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void calculate_moe_for_assignment_interval()
+			{
+				this_component()->template calculate_moe_for_assignment_interval<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void update_vmt_vht()
+			{
+				this_component()->template update_vmt_vht<ComponentType,CallerType,TargetType>();
+			}
 		};
+
+
 	}
 }
 

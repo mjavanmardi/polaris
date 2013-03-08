@@ -74,6 +74,7 @@ namespace Network_Components
 				link_data.right_turn_bay_length = link->template right_turn_bay_length<float>();
 				link_data.num_left_turn_bays = link->template num_left_turn_bays<int>();
 				link_data.num_right_turn_bays = link->template num_right_turn_bays<int>();
+				link_data.original_free_flow_speed = link->template original_free_flow_speed<float>();
 
 				network_data.link_data_array.push_back(link_data);
 			}

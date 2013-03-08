@@ -216,6 +216,8 @@ namespace Intersection_Control_Components
 				define_component_interface(_Intersection_Interface,typename get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, typename _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, typename _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 				//green times for each movement are assumed to be the length of the simulation interval
 				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
@@ -225,7 +227,7 @@ namespace Intersection_Control_Components
 				for (outbound_inbound_movements_itr=outbound_inbound_movements_container.begin();outbound_inbound_movements_itr!=outbound_inbound_movements_container.end();outbound_inbound_movements_itr++)
 				{
 					_Outbound_Inbound_Movements_Interface* outbound_inbound_movements = (_Outbound_Inbound_Movements_Interface*)(*outbound_inbound_movements_itr);
-
+					_Link_Interface* outbound_link = outbound_inbound_movements->template outbound_link_reference<_Link_Interface*>();
 					_Inbound_Movements_Container_Interface& inbound_movements_container = outbound_inbound_movements->template inbound_movements<_Inbound_Movements_Container_Interface&>();
 					typename _Inbound_Movements_Container_Interface::iterator inbound_movement_itr;
 
@@ -238,8 +240,51 @@ namespace Intersection_Control_Components
 						//allowed
 						if (inbound_movement->template movement_rule<int>() == ALLOWED)
 						{
-							// Set green time as interval length
-							inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>());
+							if (outbound_link->template link_type<int>() != ARTERIAL || inbound_movements_container.size() <=2)
+							{
+								if (inbound_movement->template movement_type<int>() == THROUGH_TURN)
+								{
+									inbound_movement->green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
+								}
+								else
+								{
+									if (outbound_link->template link_type<int>() == ARTERIAL)
+									{
+										//operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.6f;
+										inbound_movement->green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
+									}
+									else
+									{
+										//operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.9f;
+										inbound_movement->green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
+									}
+								}
+							}
+							else
+							{
+								inbound_movement->green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
+
+								//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == THROUGH_TURN)
+								//{
+								//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*1.0f/
+								//		((inbound_turn_movement_size)*1.0f);
+								//}
+								//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == RIGHT_TURN)
+								//{
+								//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.9f/
+								//		((inbound_turn_movement_size)*1.0f);
+								//}
+								//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == LEFT_TURN)
+								//{
+								//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.9f/
+								//		((inbound_turn_movement_size)*1.0f);
+								//}
+								//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == U_TURN)
+								//{
+								//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.8f/
+								//		((inbound_turn_movement_size)*1.0f);
+								//}
+							}
 						}
 
 						//prihibited
@@ -260,12 +305,14 @@ namespace Intersection_Control_Components
 				define_component_interface(_Network_Interface, typename get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, typename _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				define_container_and_value_interface(_Control_Plans_Container_Interface, _Control_Plan_Interface, typename get_type_of(control_plan_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Control_Plan_Prototype, ComponentType);
+				define_container_and_value_interface(_Major_Approaches_Container_Interface, _Approach_Interface, typename _Control_Plan_Interface::get_type_of(major_approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
+
 				define_component_interface(_Intersection_Interface,typename get_type_of(intersection),Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, typename _Intersection_Interface::get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Approaches_Container_Interface, _Approach_Interface, typename _Control_Plan_Interface::get_type_of(approach_data_array), Random_Access_Sequence_Prototype, Intersection_Control_Components::Prototypes::Approach_Prototype, ComponentType);
 				define_component_interface(_Link_Interface,typename _Approach_Interface::get_type_of(inbound_link),Link_Components::Prototypes::Link_Prototype, ComponentType);
-
+				define_component_interface(_Scenario_Interface, typename _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				//green times for each movement are assumed to be the length of the simulation interval
 				_Outbound_Inbound_Movements_Container_Interface& outbound_inbound_movements_container = intersection<_Intersection_Interface*>()->template outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_inbound_movements_itr;
@@ -320,6 +367,32 @@ namespace Intersection_Control_Components
 								{
 									// Set merge priority low
 									inbound_movement->template merge_priority<int>(0.0);
+									int num_major_approaches = int(current_control_plan<_Control_Plan_Interface*>()->template major_approach_data_array<_Major_Approaches_Container_Interface&>().size());
+									if (inbound_movement->template movement_rule<int>() == ALLOWED)
+									{
+										if (inbound_movement->template movement_type<int>() == THROUGH_TURN)
+										{
+											inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f/
+												(num_major_approaches*1.0f));
+										}
+										if (inbound_movement->template movement_type<int>() == RIGHT_TURN)
+										{
+											inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f/
+												(num_major_approaches*1.0f));
+										}
+										if (inbound_movement->template movement_type<int>() == LEFT_TURN)
+										{
+											inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f/
+												(num_major_approaches*1.0f));
+										}
+										if (inbound_movement->template movement_type<int>() == U_TURN)
+										{
+											inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*0.8f/
+												(num_major_approaches*1.0f));
+										}
+
+									}
+
 								}
 
 								break;

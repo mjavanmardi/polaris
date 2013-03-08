@@ -199,7 +199,7 @@ namespace Network_Components
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
-
+						link->template original_free_flow_speed<float>(link->template free_flow_speed<float>());
 
 
 						_network_reference->max_free_flow_speed<float>(max(_network_reference->max_free_flow_speed<float>(),link->template free_flow_speed<float>()));

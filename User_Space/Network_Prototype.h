@@ -171,7 +171,9 @@ namespace Network_Components
 			/// simulation network
 			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(scenario_reference, none, none);
-			feature_accessor(max_free_flow_speed, none, none);		
+			feature_accessor(max_free_flow_speed, none, none);	
+			feature_accessor(network_vmt, none, none);
+			feature_accessor(network_vht, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 
@@ -184,7 +186,9 @@ namespace Network_Components
 			feature_accessor(canvas, none, none);
 			feature_accessor(information_panel, none, none);
 			feature_accessor(input_offset, none, none);
-			feature_prototype void push_vehicle_coordinates()
+
+
+			feature_prototype void push_vehicle_coordinates(void)
 			{
 				this_component()->template accept_vehicle_coordinates<ComponentType,CallerType,TargetType>();
 			}
@@ -262,6 +266,7 @@ namespace Network_Components
 				return (TargetType)(start_of_current_simulation_interval_relative<TargetType>() + scenario_reference<_Scenario_Interface*>()->template simulation_start_time<int>());
 			}
 		};
+
 	}
 }
 

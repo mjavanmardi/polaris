@@ -182,6 +182,16 @@ namespace Intersection_Components
 			{
 				this_component()->template construct_routable_from_regular<ComponentType,CallerType,TargetType>(regular_intersection_param, linksMap_param);
 			}
+
+			feature_prototype void calculate_moe_for_simulation_interval()
+			{
+				this_component()->template calculate_moe_for_simulation_interval<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void calculate_moe_for_assignment_interval()
+			{
+				this_component()->template calculate_moe_for_assignment_interval<ComponentType,CallerType,TargetType>();
+			}
 		};
 	}
 }

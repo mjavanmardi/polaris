@@ -63,6 +63,24 @@ void string_split(std::vector<std::string>& results, const std::string &source, 
 
 void string_split(std::vector<std::string>& results, const std::string &source);
 
+template<class Type>
+Type convert_meter_to_foot(Type meter)
+{
+	Type foot = Type(3.28084 * meter);
+	return foot;
+};
+
+template<class Type>
+Type convert_meters_per_second_to_miles_per_hour(Type meters_per_second)
+{
+	Type miles_per_hour = Type(3.28084 * meters_per_second * 3600.0 / 5280.0);
+	return miles_per_hour;
+};
+
 double get_current_cpu_time_in_seconds();
+
+void calculate_mean_standard_deviation(const vector<float>& data_array, float& mean, float& standard_deviation);
+
+void calculate_mean(const vector<float>& data_array, float& mean);
 
 #endif

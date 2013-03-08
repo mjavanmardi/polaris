@@ -34,6 +34,40 @@ namespace network_models
 				INPUT_FROM_DB,
 			};
 
+			enum Length_Unit_Keys
+			{
+				LENGTH_IN_FOOT=0,
+				LENGTH_IN_METER,
+				LENGTH_IN_MILE,
+				LENGTH_IN_KILOMETER,
+			};
+
+			enum Speed_Unit_Keys
+			{
+				SPEED_IN_MILES_PER_HOUR=0,
+				SPEED_IN_KILOMETERS_PER_HOUR,
+				SPEED_IN_METERS_PER_SECOND,
+			};
+
+			enum Time_Unit_Keys
+			{
+				TIME_IN_MINUTE = 0,
+				TIME_IN_SECOND,
+				TIME_IN_HOUR,
+			};
+
+			enum Flow_Unit_Keys
+			{
+				FLOW_IN_VEHICLES_PER_HOUR_PER_LANE = 0,
+				FLOW_IN_PCU_PER_HOUR_PER_LANE,
+			};
+
+			enum Density_Unit_Keys
+			{
+				DENSITY_IN_VEHICLES_PER_MILE_PER_LANE = 0,
+				DENSITY_IN_VEHICLES_PER_KILOMETER_PER_LANE = 0,
+			};
+
 			struct ScenarioData
 			{
 				//time
@@ -103,6 +137,30 @@ namespace network_models
 				Input_Data_Format_Keys input_data_format;
 
 				int demand_od_flag;
+
+				//units
+				Length_Unit_Keys input_length_unit;
+				Speed_Unit_Keys input_speed_unit;
+				Time_Unit_Keys input_time_unit;
+				Flow_Unit_Keys input_flow_unit;
+				Density_Unit_Keys input_density_unit;
+
+
+				map<Length_Unit_Keys,string> input_length_unit_int_string_map;
+				map<string,Length_Unit_Keys> input_length_unit_string_int_map;
+
+				map<Speed_Unit_Keys,string> input_speed_unit_int_string_map;
+				map<string,Speed_Unit_Keys> input_speed_unit_string_int_map;
+
+				map<Time_Unit_Keys,string> input_time_unit_int_string_map;
+				map<string,Time_Unit_Keys> input_time_unit_string_int_map;
+
+				map<Flow_Unit_Keys,string> input_flow_unit_int_string_map;
+				map<string,Flow_Unit_Keys> input_flow_unit_string_int_map;
+
+				map<Density_Unit_Keys,string> input_density_unit_int_string_map;
+				map<string,Density_Unit_Keys> input_density_unit_string_int_map;
+
 			};
 
 			void scenario_data_initialization(ScenarioData& scenario_data);

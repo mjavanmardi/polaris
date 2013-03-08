@@ -58,6 +58,18 @@ namespace Scenario_Components
 			member_data(string, vehicle_transfer_file_name, none, none);
 			member_data(fstream, vehicle_transfer_file, none, none);
 
+			member_data(fstream, out_realtime_network_moe_file, none, none);
+			member_data(fstream, out_realtime_link_moe_file, none, none);
+			member_data(fstream, out_realtime_movement_moe_file, none, none);
+
+			member_data(fstream, out_network_moe_file, none, none);
+			member_data(fstream, out_link_moe_file, none, none);
+			member_data(fstream, out_movement_moe_file, none, none);
+
+			//member_pointer(FILE*, out_network_moe_file, none, none);
+			//member_pointer(FILE*, out_link_moe_file, none, none);
+			//member_pointer(FILE*, out_movement_moe_file, none, none);
+
 			member_data(ofstream, output_writer, none, none);
 
 			member_data(_lock, statistics_update_lock, none, none);

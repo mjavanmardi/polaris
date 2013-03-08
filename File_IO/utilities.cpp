@@ -175,6 +175,65 @@ string convert_seconds_to_hhmm(int time_in_seconds)
 	return hhmm;
 };
 
+void calculate_mean_standard_deviation(const vector<float>& data_array, float& mean, float& standard_deviation)
+{
+	int array_size = int(data_array.size());
+	if (array_size>1)
+	{
+		mean = 0.0f;
+		for (int i=0;i<array_size;i++)
+		{
+			mean += data_array[i];
+		}
+		mean = float (mean/(float(array_size)));
+		standard_deviation = 0.0f;
+		for (int i=0;i<array_size;i++)
+		{
+			standard_deviation += (data_array[i] - mean)*(data_array[i] - mean);
+		}
+
+		standard_deviation = float(sqrt(double(standard_deviation/float(array_size-1))));
+	}
+	else
+	{
+		if (array_size ==1)
+		{
+			mean = data_array[0];
+			standard_deviation = 0.0f;
+		}
+		else
+		{
+			mean = 0.0f;
+			standard_deviation = 0.0f;
+		}
+	}
+};
+
+void calculate_mean(const vector<float>& data_array, float& mean)
+{
+	int array_size = int(data_array.size());
+	if (array_size>1)
+	{
+		mean = 0.0f;
+		for (int i=0;i<array_size;i++)
+		{
+			mean += data_array[i];
+		}
+		mean = float (mean/(float(array_size)));
+	}
+	else
+	{
+		if (array_size ==1)
+		{
+			mean = data_array[0];
+		}
+		else
+		{
+			mean = 0.0f;
+		}
+	}
+};
+
 #ifdef LINUX
 	double get_current_cpu_time_in_seconds()
 	{
