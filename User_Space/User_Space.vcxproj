@@ -209,6 +209,8 @@
     <ClInclude Include="Link_Prototype.h" />
     <ClInclude Include="Location_Prototype.h" />
     <ClInclude Include="Movement_Plan_Prototype.h" />
+    <ClInclude Include="Network_DB_Reader_Implementations.h" />
+    <ClInclude Include="Network_DB_Reader_Prototype.h" />
     <ClInclude Include="Network_Prototype.h" />
     <ClInclude Include="Network_Skimming_Prototype.h" />
     <ClInclude Include="Operation_Prototype.h" />
@@ -224,7 +226,6 @@
     <ClInclude Include="Polaris_Link_Implementation.h" />
     <ClInclude Include="Polaris_Movement_Plan_Implementation.h" />
     <ClInclude Include="Polaris_Network_Implementation.h" />
-    <ClInclude Include="Polaris_Network_Implementation_Input_DB.h" />
     <ClInclude Include="Polaris_Network_Implementation_Input_File.h" />
     <ClInclude Include="Polaris_Network_Implementation_Output_File.h" />
     <ClInclude Include="Polaris_Network_Implementation_Results.h" />
@@ -260,6 +261,7 @@
     <ClInclude Include="User_Space.h" />
     <ClInclude Include="User_Space_Forward_Declaration.h" />
     <ClInclude Include="User_Space_Includes.h" />
+    <ClInclude Include="User_Space_with_odb.h" />
     <ClInclude Include="Variable_Message_Sign_Prototype.h" />
     <ClInclude Include="Vehicle_Prototype.h" />
     <ClInclude Include="Zone_Prototype.h" />

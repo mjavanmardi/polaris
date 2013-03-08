@@ -1,5 +1,9 @@
 #pragma once
-#include "User_Space.h"
+
+#include "../io/Io.h"
+
+#include "User_Space_Includes.h"
+#include "Network_Prototype.h"
 #include "../File_IO/network_operation_data.h"
 
 namespace Operation_Components

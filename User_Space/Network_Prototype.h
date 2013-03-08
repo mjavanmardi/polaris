@@ -1,6 +1,5 @@
 #pragma once
-#include <hash_map>
-#include "User_Space.h"
+#include "User_Space_Includes.h"
 #include "../File_IO/utilities.h"
 #include "../File_IO/network_data.h"
 //using namespace Basic_Units::Data_Structures;
@@ -147,6 +146,7 @@ namespace Network_Components
 			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(intersections_container, none, none);
 			feature_accessor(links_container, none, none);
+			feature_accessor(db_reader,none,none);
 			//------------------------------------------------------------------------------------------------------------------
 			
 			//==================================================================================================================

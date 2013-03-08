@@ -5,7 +5,8 @@
 
 #include "../File_IO/utilities.h"
 #include "../File_IO/network_data.h"
-
+#include "Network_Prototype.h"
+#include "Scenario_Prototype.h"
 
 namespace Network_Components
 {

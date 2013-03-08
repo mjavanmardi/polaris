@@ -138,7 +138,7 @@ namespace Turn_Movement_Components
 				_movement_flow = (float) min(min((double)_movement_demand,(double)_movement_capacity),(double)_movement_supply);
 			}
 
-			feature_implementation void transfer_vehicles(User_Space::RngStream& rng_stream)
+			feature_implementation void transfer_vehicles(RNG_Components::RngStream& rng_stream)
 			{
 				define_component_interface(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;

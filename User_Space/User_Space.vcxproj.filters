@@ -163,9 +163,6 @@
     <ClInclude Include="Turn_Movement_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
-    <ClInclude Include="Polaris_Network_Implementation_Input_DB.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
     <ClInclude Include="Polaris_Network_Implementation_Input_File.h">
       <Filter>Implementations</Filter>
     </ClInclude>
@@ -237,6 +234,15 @@
     </ClInclude>
     <ClInclude Include="Person_Properties_Implementations.h">
       <Filter>Implementations\Person Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Network_DB_Reader_Implementations.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Network_DB_Reader_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="User_Space_with_odb.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -81,7 +81,7 @@ namespace Network_Components
 				
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
 				{
-					((typename MasterType::network_type*)_this)->Swap_Event((Event_Callback)&End_Iteration_Handler<NULLTYPE>);
+					((typename MasterType::network_type*)_this)->Swap_Event((Event)&End_Iteration_Handler<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
@@ -235,17 +235,17 @@ namespace Network_Components
 			//==================================================================================================================
 			/// read from database
 			//------------------------------------------------------------------------------------------------------------------
-			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); 
+			//feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); 
 
-			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
+			//feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
-			feature_implementation void read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps&);
+			//feature_implementation void read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps&);
 
-			feature_implementation void read_turn_movement_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
+			//feature_implementation void read_turn_movement_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
-			feature_implementation void read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
+			//feature_implementation void read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
-			feature_implementation void read_zone_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
+			//feature_implementation void read_zone_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 #endif
 			//==================================================================================================================
 			/// Convert network data from C++ data structure to Plaris structure
@@ -265,7 +265,14 @@ namespace Network_Components
 
 		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Network_Implementation<MasterType,ParentType,APPEND_CHILD(Integrated_Polaris_Network_Implementation)>
 		{
+			member_prototype(Prototypes::Network_DB_Reader_Prototype, db_reader, typename MasterType::network_db_reader_type,none,none);
+
 			member_component(typename MasterType::network_skim_type, skimming_faculty,none,none);
+
+			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
+			{
+				_db_reader->template read_network_data<typename TargetType::ParamType>(net_io_maps);
+			}
 
 			feature_implementation typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator)
 			{

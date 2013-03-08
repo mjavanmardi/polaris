@@ -252,7 +252,7 @@ namespace Intersection_Components
 			member_container(vector<typename MasterType::link_type*>, outbound_links, none, none);
 			member_container(vector<typename MasterType::outbound_inbound_movements_type*>, outbound_inbound_movements, none, none);
 			member_container(vector<typename MasterType::inbound_outbound_movements_type*>, inbound_outbound_movements, none, none);
-			member_data(User_Space::RngStream, rng_stream, none, none);
+			member_data(RNG_Components::RngStream, rng_stream, none, none);
 			member_component(typename MasterType::network_type, network_reference, none, none);
 			member_component(typename MasterType::intersection_control_type, intersection_control, none, none);
 
@@ -286,7 +286,7 @@ namespace Intersection_Components
 							//initialization
 							inbound_link->template link_downstream_departed_vehicles<int>(0.0);
 						}
-						inbound_movement->template transfer_vehicles<User_Space::RngStream&>(_rng_stream);
+						inbound_movement->template transfer_vehicles<RNG_Components::RngStream&>(_rng_stream);
 					}
 				}
 			}
@@ -393,7 +393,7 @@ namespace Intersection_Components
 				for (outbound_itr=_outbound_inbound_movements.begin(); outbound_itr!=_outbound_inbound_movements.end(); outbound_itr++)
 				{
 					outbound_link=((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template outbound_link_reference<_Link_Interface*>();
-					outbound_link->template origin_link_loading<User_Space::RngStream&>(_rng_stream);
+					outbound_link->template origin_link_loading<RNG_Components::RngStream&>(_rng_stream);
 				}
 			}
 
@@ -446,7 +446,7 @@ namespace Intersection_Components
 				
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION)
 				{
-					((typename MasterType::intersection_type*)_this)->Swap_Event((Event_Callback)&Compute_Step_Flow<NULLTYPE>);
+					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Compute_Step_Flow<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration;
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION;
@@ -454,7 +454,7 @@ namespace Intersection_Components
 				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION)
 				{
 
-					((typename MasterType::intersection_type*)_this)->Swap_Event((Event_Callback)&Network_State_Update<NULLTYPE>);
+					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Network_State_Update<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION;

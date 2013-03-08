@@ -60,7 +60,8 @@ namespace Zone_Components
 			member_data(double, X, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(double, Y, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, population, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-			
+			member_data(int, employment, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Update_Increment,none,none);
 			member_component_feature(update_increment, _Update_Increment, Value, Basic_Units::Prototypes::Time_Prototype);
 

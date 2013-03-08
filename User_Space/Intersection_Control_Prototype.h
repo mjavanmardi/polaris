@@ -1,5 +1,5 @@
 #pragma once
-#include "User_Space.h"
+#include "User_Space_Includes.h"
 
 namespace Intersection_Control_Components
 {
@@ -1029,7 +1029,7 @@ namespace Intersection_Control_Components
 				_Intersection_Control_Interface* _this_ptr=(_Intersection_Control_Interface*)_this;
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION)
 				{
-					_pthis->Swap_Event((Event_Callback)&Intersection_Control_Prototype::Compute_Step_Control<NULLTYPE>);
+					_pthis->Swap_Event((Event)&Intersection_Control_Prototype::Compute_Step_Control<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION;

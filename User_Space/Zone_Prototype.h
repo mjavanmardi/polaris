@@ -1,5 +1,5 @@
 #pragma once
-#include "User_Space.h"
+#include "User_Space_Includes.h"
 #include "Activity_Location_Prototype.h"
 
 namespace Zone_Components
@@ -64,6 +64,7 @@ namespace Zone_Components
 			feature_accessor(X,none, none);
 			feature_accessor(Y,none, none);
 			feature_accessor(population,none, none);
+			feature_accessor(employment,none, none);
 
 			feature_accessor(zone_is_available,none,none);
 			feature_accessor(graphical_zone_group,none,none);

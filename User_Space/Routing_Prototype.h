@@ -1,9 +1,8 @@
 #pragma once
-#include "User_Space.h"
+#include "User_Space_Includes.h"
 #include "../File_IO/utilities.h"
-#ifndef EXCLUDE_DEMAND
 #include "Network_Skimming_Prototype.h"
-#endif
+
 #ifndef WINDOWS
 // for hash_map
 using namespace __gnu_cxx;

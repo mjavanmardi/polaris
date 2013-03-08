@@ -1,5 +1,5 @@
 #pragma once
-#include "User_Space.h"
+#include "User_Space_Includes.h"
 
 namespace Traveler_Components
 {
@@ -38,7 +38,7 @@ namespace Traveler_Components
 			{
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION)
 				{
-					((ComponentType*)_this)->Swap_Event((Event_Callback)&Traveler_Prototype::Set_Departure<NULLTYPE>);
+					((ComponentType*)_this)->Swap_Event((Event)&Traveler_Prototype::Set_Departure<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=END;
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION;
