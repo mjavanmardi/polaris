@@ -32,7 +32,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	const bool primitive_color=layer->primitive_color<bool>();
 	const bool primitive_normal=layer->primitive_normal<bool>();
 	const int primitive_stride = layer->primitive_stride<int>();
-	
+
+	const int vert_size = layer->vert_size<int>();
 	const int vert_stride = layer->vert_stride<int>();
 
 	const int data_stride=layer->data_stride<int>();
@@ -130,7 +131,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 						while( geometry_itr != geometry_vert_end )
 						{
 							glVertex3fv((GLfloat*)geometry_itr);
-							geometry_itr += sizeof(Point_3D<MasterType>);
+							geometry_itr += vert_size;
 						}
 					}
 
@@ -158,7 +159,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 					while( geometry_itr != geometry_vert_end )
 					{
 						glVertex3fv((GLfloat*)geometry_itr);
-						geometry_itr += sizeof(Point_3D<MasterType>);
+						geometry_itr += vert_size;
 					}
 				}
 
@@ -275,7 +276,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 						while( geometry_itr != geometry_vert_end )
 						{
 							glVertex3fv((GLfloat*)geometry_itr);
-							geometry_itr += sizeof(Point_3D<MasterType>);
+							geometry_itr += vert_size;
 						}
 					}
 
@@ -303,7 +304,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 					while( geometry_itr != geometry_vert_end )
 					{
 						glVertex3fv((GLfloat*)geometry_itr);
-						geometry_itr += sizeof(Point_3D<MasterType>);
+						geometry_itr += vert_size;
 					}
 				}
 			}

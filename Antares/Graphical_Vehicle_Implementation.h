@@ -82,7 +82,7 @@ namespace Vehicle_Components
 				coordinate.vertex._y=upstream_intersection->y_position<float>();
 				coordinate.vertex._z=1;
 				
-				my_canvas->Scale_Coordinates<Target_Type<NT,void,Point_3D<MasterType>&>>(coordinate.vertex);
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(coordinate.vertex);
 
 				_vehicle_points->Push_Element<Regular_Element>(&coordinate);
 
@@ -115,8 +115,7 @@ namespace Vehicle_Components
 			
 			static void Initialize_Layer()
 			{
-				Canvas<typename MasterType::type_of(canvas),Graphical_Vehicle_Implementation>* my_canvas=((Canvas<typename MasterType::type_of(canvas),Graphical_Vehicle_Implementation>*)canvas);
-				_vehicle_points=my_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Graphical_Vehicle_Implementation>*, string& > >(string("Vehicles"));
+				_vehicle_points=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Graphical_Vehicle_Implementation>*, string& > >(string("Vehicles"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Points();
 

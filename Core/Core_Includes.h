@@ -80,7 +80,7 @@ typedef volatile unsigned int _lock;
 
 struct NULLTYPE{};
 
-#define NT NULLTYPE
+typedef NULLTYPE NT;
 
 template<typename A> struct NULLTEMPLATE{};
 template<typename A,typename B> struct NULLTEMPLATE_2{};

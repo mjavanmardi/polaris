@@ -18,9 +18,31 @@ namespace Network_Components
 
 		implementation struct Graphical_Network_Implementation:public Polaris_Component<APPEND_CHILD(Graphical_Network_Implementation),MasterType,Data_Object,ParentType>
 		{
+			vector<Point_2D<MasterType>> vehicle_points;
+
 			feature_implementation void submit_num_vehicles()
 			{
-				_num_vehicles->Push_Element<Plot_Element>((void*)&_vehicles_counter);
+				Point_2D<MasterType> submission;
+				submission._x=_iteration;
+				submission._y=_vehicles_counter;
+
+				vehicle_points.push_back(submission);
+
+#pragma pack(push,1)
+				struct Plot_Element
+				{
+					int num_primitives;
+					Point_2D<MasterType>* points;
+				};
+#pragma pack(pop)
+
+				Plot_Element element;
+
+				element.num_primitives = vehicle_points.size();
+				element.points = &vehicle_points.front();
+
+				_num_vehicles->Push_Element<Regular_Element>((void*)&element);
+				
 				_vehicles_counter=0;
 			}
 
@@ -153,7 +175,7 @@ namespace Network_Components
 				
 				int link_counter=-1;
 				
-				_link_lines=_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(link_lines),Graphical_Network_Implementation>*, string& > >(string("Links"));
+				_link_lines=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_lines),Graphical_Network_Implementation>*, string& > >(string("Links"));
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Lines();

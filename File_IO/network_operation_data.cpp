@@ -916,9 +916,9 @@ void operation_data_information::read_control_dat_dsp(string input_dir_name,Scen
 		int iline_control_start;
 		int iline_control_end;
 		int iline_phase_start;
-		int iline_phase_end;
-		int yeild_two_way_stop_sign_start;
-		int yeild_two_way_stop_sign_end;
+		//int iline_phase_end;
+		//int yeild_two_way_stop_sign_start;
+		//int yeild_two_way_stop_sign_end;
 
 		iline_control_start = 3;
 		iline_control_end = iline_control_start + network_data.network_node_size - 1;

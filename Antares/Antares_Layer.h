@@ -14,7 +14,6 @@ struct Antares_Layer_Configuration;
 
 struct Accented_Element{};
 struct Regular_Element{};
-struct Plot_Element{};
 
 prototype struct Antares_Layer
 {
@@ -75,7 +74,7 @@ prototype struct Antares_Layer
 	feature_accessor(primitive_normal,none,none);
 	feature_accessor(primitive_stride,none,none);
 	feature_accessor(vert_stride,none,none);	
-	
+	feature_accessor(vert_size,none,none);	
 	
 	feature_accessor(attributes_schema,none,none);
 	feature_accessor(attributes_callback,none,none);
@@ -85,6 +84,18 @@ prototype struct Antares_Layer
 
 	feature_accessor(attributes_panel,none,none);
 };
+
+template<typename ComponentType,typename CallerType,typename TargetType>
+typename TargetType::ReturnType Allocate_New_Layer(typename TargetType::ParamType name)
+{
+	return (TargetType::ReturnType)((ComponentType*)canvas)->Allocate_New_Layer<ComponentType,CallerType,TargetType>(name);
+}
+
+template<typename ComponentType,typename CallerType,typename TargetType>
+typename TargetType::ReturnType Scale_Coordinates(typename TargetType::ParamType coordinates)
+{
+	return (TargetType::ReturnType)((ComponentType*)canvas)->Scale_Coordinates<ComponentType,CallerType,TargetType>(coordinates);
+}
 
 //---------------------------------------------------------
 //	PrimitiveType - primitive type options
@@ -115,8 +126,6 @@ struct Antares_Layer_Configuration
 		storage_offset=_iteration;
 		storage_size=1;
 		storage_period=1;
-
-		draw=true;
 		
 		primitive_color=false;
 		head_color._r=0;
@@ -197,7 +206,13 @@ struct Antares_Layer_Configuration
 	
 	void Configure_Plot()
 	{
-		storage_size=_num_iterations;
+		//storage_size=_num_iterations;
+		
+		dynamic_data=true;
+		target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
+
+		storage_size=3;
+		storage_period=1;
 
 		primitive_type=_PLOT;
 
@@ -214,8 +229,6 @@ struct Antares_Layer_Configuration
 	unsigned int storage_size;
 	unsigned int storage_period;
 
-	bool draw;
-
 
 	PrimitiveType primitive_type;
 
@@ -229,7 +242,6 @@ struct Antares_Layer_Configuration
 			// 1 x True_Color_RGBA<NULLTYPE> group_color;
 		bool group_normal;
 			// 1 x Point_3D<NULLTYPE> group_normal;
-	
 	
 	
 	bool primitive_color;

@@ -26,7 +26,7 @@ void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Re
 
 	for(itr=_2D_layers.begin();itr!=_2D_layers.end();itr++)
 	{
-		Draw_Layer(0,current_iteration,(*itr));
+		Draw_Layer(current_iteration,current_iteration,(*itr));
 	}
 	
 	//---- flush and display ----

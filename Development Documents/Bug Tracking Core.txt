@@ -1,1 +1,0 @@
-1.)  Fix bug where passing 0 to an accessor will call the getter instead of setter

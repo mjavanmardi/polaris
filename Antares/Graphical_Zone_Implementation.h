@@ -162,8 +162,8 @@ namespace Zone_Components
 				origin_col_center._y = coordinates._y ;
 				destination_col_center._x = coordinates._x + width*0.25;
 				destination_col_center._y = origin_col_center._y;
-				_canvas->Scale_Coordinates<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(origin_col_center);
-				_canvas->Scale_Coordinates<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(destination_col_center);
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(origin_col_center);
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(destination_col_center);
 
 				// construct and push to productions column
 				Types::Column<MasterType> origin_column = Types::Column<MasterType>(origin_col_center,width,height_prod, Types::GREEN_COLUMN);
@@ -181,7 +181,7 @@ namespace Zone_Components
 				// configure vehicle layer
 				cout << "configuring zone layer";
 
-				_zone_centroids=_canvas->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(zone_centroids),ComponentType>*, string& > >(string("Zones"));
+				_zone_centroids=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(zone_centroids),ComponentType>*, string& > >(string("Zones"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Quads(True_Color_RGBA<NULLTYPE>(0,255,100,255),10);
 				cfg.attributes_schema = string("ID,Productions,Attractions,Population,Available");
