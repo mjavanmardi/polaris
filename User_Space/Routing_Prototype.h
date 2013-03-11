@@ -133,8 +133,8 @@ namespace Routing_Components
 				int outbound_turn_movement_size = (int)turn_mvmt_container.size();
 				if (origin_link_ptr != destination_link_ptr && outbound_turn_movement_size == 0)
 				{
-					cerr << "Origin link must have outbount turn movement" << endl;
-					assert(false);
+					THROW_WARNING("Origin link 'index="<<net_origin_link->internal_id<int>() <<" id="<<net_origin_link->uuid<int>()<<"' has no outbound turn movements, trip not able to be routed.");
+					return false;
 				}
 
 				float next_cost,new_cost;
@@ -328,8 +328,8 @@ namespace Routing_Components
 				
 				if (outbound_turn_movement_size == 0)
 				{
-					cerr << "Origin link must have outbount turn movement" << endl;
-					assert(false);
+					THROW_WARNING("Origin link 'index="<<net_origin_link->internal_id<int>() <<" id="<<net_origin_link->uuid<int>()<<"' has no outbound turn movements, trip not able to be routed.");
+					return false;
 				}
 
 				float next_cost,new_cost;

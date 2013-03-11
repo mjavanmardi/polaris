@@ -529,13 +529,16 @@ namespace Network_Components
 
 		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Network_Implementation<MasterType,ParentType,APPEND_CHILD(Integrated_Polaris_Network_Implementation)>
 		{
-			member_prototype(Prototypes::Network_DB_Reader_Prototype, db_reader, typename MasterType::network_db_reader_type,none,none);
+			member_data_component(typename MasterType::network_db_reader_type, db_reader, none,none);
 
 			member_component(typename MasterType::network_skim_type, skimming_faculty,none,none);
 
 			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
-				_db_reader->template read_network_data<typename TargetType::ParamType>(net_io_maps);
+				define_component_interface(_DB_Interface,type_of(db_reader),Prototypes::Network_DB_Reader_Prototype,ComponentType);
+				_DB_Interface* db = (_DB_Interface*)&_db_reader;
+				db->network_reference<ComponentType*>((ComponentType*)this);
+				db->read_network_data<Network_Components::Types::Network_IO_Maps&>(net_io_maps);
 			}
 
 			feature_implementation typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator)
