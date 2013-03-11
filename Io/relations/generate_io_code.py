@@ -103,35 +103,38 @@ public:
         constructor_2 = ": "
         accessors = "\t//Accessors\n"
         data_fields = "//Data Fields\nprivate:\n\tfriend class odb::access;\n"
+        pragmas = ""
  
-        for field in fields:
-            
-            name = field.getAttribute("name")
-            
+        for field in fields:            
+            name = field.getAttribute("name")            
             reference = field.getAttribute("reference")
             contanerSetter = field.getAttribute("contanerSetter")
-            type = field.getAttribute("type")
+            type_name = field.getAttribute("type")
             key = field.getAttribute("key")
             index = field.getAttribute("index")
             if reference!="":
                 if contanerSetter!="no":
-                    accessors += "\tvoid set%s (const %s& %s_, InputContainer& container) {%s = container.%ss[%s_];}\n"%(name.title(), type, name, name, reference, name)                
-                type = "shared_ptr<%s>"%reference
+                    accessors += "\tvoid set%s (const %s& %s_, InputContainer& container) {%s = container.%ss[%s_];}\n"%(name.title(), type_name, name, name, reference, name)                
+                type_name = "shared_ptr<%s>"%reference
             if key!="":
                 if key=="yes":
                     data_fields += "\t#pragma db id\n"
-                    accessors += "\tconst %s& getPrimaryKey () const {return %s;}\n"%(type, name) 
+                    accessors += "\tconst %s& getPrimaryKey () const {return %s;}\n"%(type_name, name) 
             if index!="":
                 if index=="yes":
                     data_fields += "\t#pragma db index\n"
-            constructor_1 += "%s %s_, "%(type, name)
+            constructor_1 += "%s %s_, "%(type_name, name)
             constructor_2 += "%s (%s_), "%(name,name)
-            accessors += "\tconst %s& get%s () const {return %s;}\n"%(type,name.title(), name)
-            accessors += "\tvoid set%s (const %s& %s_) {%s = %s_;}\n"%(name.title(), type, name, name, name)
-            data_fields += "\t%s %s;\n"%(type,name)
+            accessors += "\tconst %s& get%s () const {return %s;}\n"%(type_name,name.title(), name)
+            accessors += "\tvoid set%s (const %s& %s_) {%s = %s_;}\n"%(name.title(), type_name, name, name, name)
+            data_fields += "\t%s %s;\n"%(type_name,name)
+        pragma_items = type.getElementsByTagName("pragma")
+        for item in pragma_items:
+           pragmas += "\t#pragma " + item.getAttribute("text") +"\n"
         content += constructor_1[:-2] + ")\n\t" + constructor_2[:-2] + "\n\t{\n\t}\n"
         content += accessors
         content += data_fields
+        content += pragmas        
         content += "};\n"
     content += "#endif"
     content = content.replace("$ForwardDeclarations$", ForwardDeclarations)

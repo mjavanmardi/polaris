@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<root>
+	<type name="Location" pragma="object">
+		<field name="location" key="yes" type="int"/>
+		<field name="link" reference="Link" type="int"/>
+		<field name="dir" type="int"/>
+		<field name="offset" type="double"/>
+		<field name="setback" type="double"/>
+		<field name="zone" reference="Zone" type="int"/>
+		<field name="location_data" reference="LocationData" type="int" contanerSetter="no"/>
+		<pragma text="db index member(location)"/>
+	</type>
+	<type name="Zone" pragma="object">
+		<field name="zone" key="yes" type="int"/>
+		<field name="zone_land_use" reference="ZoneLandUse" type="int" contanerSetter="no"/>
+		<field name="x" type="double"/>
+		<field name="y" type="double"/>
+		<field name="z" type="double"/>
+		<field name="area" type="int" reference="Area_Type"/>
+		<field name="min_x" type="double"/>
+		<field name="min_y" type="double"/>
+		<field name="max_x" type="double"/>
+		<field name="max_y" type="double"/>
+		<pragma text="db index member(zone)"/>
+	</type>
+	<type name="ZoneLandUse" pragma="object">
+		<field key="yes" name="zone" type="int"/>
+		<field name="area" type="int"/>
+		<field name="area_res_low" type="int"/>
+		<field name="area_res_hi" type="int"/>
+		<field name="area_comm" type="int"/>
+		<field name="area_ind" type="int"/>
+		<field name="pop_hh" type="int"/>
+		<field name="pop_per" type="int"/>
+		<field name="pop_gq" type="int"/>
+		<field name="emp_tot" type="int"/>
+		<field name="emp_ret" type="int"/>
+	</type>	
+	<type name="LocationData" pragma="object">
+		<field key="yes" name="location" type="int"/>
+		<field name="link" reference="Link" type="int"/>
+		<field name="dir" type="int"/>
+		<field name="offset" type="double"/>
+		<field name="setback" type="int"/>
+		<field name="zone_land_use" reference="ZoneLandUse" type="int" contanerSetter="no"/>
+		<field name="truck_org" type="int"/>
+		<field name="truck_des" type="int"/>
+		<field name="auto_org" type="int"/>
+		<field name="auto_des" type="int"/>
+		<field name="transit" type="int"/>
+		<field name="areatype" type="int"/>
+		<field name="notes" type="std::string"/>
+		<field name="census_zone" type="std::string"/>
+		<field name="x" type="double"/>
+		<field name="y" type="double"/>
+	</type>		
+</root>

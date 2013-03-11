@@ -508,9 +508,9 @@ shared_ptr<Skim> Adapter( Skim_File &file, InputContainer& container)
 	return result;
 }
 //Converter for Event
-shared_ptr<Event> Adapter( Event_File &file, InputContainer& container) 
+shared_ptr<Transims_Event> Adapter( Event_File &file, InputContainer& container) 
 {
-	shared_ptr<Event> result (new Event ());
+	shared_ptr<Transims_Event> result (new Transims_Event ());
 	result->setHhold(file.Household ()); 
 	result->setPerson(file.Person ()); 
 	result->setTour(file.Tour ()); 
