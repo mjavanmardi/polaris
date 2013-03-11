@@ -1,11 +1,6 @@
 #pragma once
 
 #include "Person_Prototype.h"
-#include "Movement_Plan_Prototype.h"
-#include "Network_Skimming_Prototype.h"
-#include "Activity_Prototype.h"
-#include "Population_Unit_Implementations.h"
-#include "Person_Implementations.h"
 
 namespace Person_Components
 {
@@ -73,8 +68,19 @@ namespace Person_Components
 		{
 			// IMPLEMENTATION TYPEDEFS AND INTERFACES
 			typedef General_Activity_Generator_Implementation<MasterType, ParentType, APPEND_CHILD(CTRAMP_Activity_Generator_Implementation)> base_type;
+			typedef base_type base;
 			typedef Prototypes::Activity_Generator<base_type,base_type> base_itf;
+			
+			// Interface definitions
 			define_component_interface(person_itf,typename base_type::type_of(Parent_Planner)::type_of(Parent_Person), Prototypes::Person,ComponentType);
+			define_component_interface(_Scenario_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+			define_component_interface(_Network_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
+			define_component_interface(_Skim_Interface, typename _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
+			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan, typename type_of(Parent_Planner)::type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
+			define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
@@ -162,7 +168,7 @@ namespace Person_Components
 				vector<_Activity_Location_Interface*> loc_options;
 				vector<float> utility;
 				vector<float> cum_probability;
-				float ttime, pop, u;
+				float ttime, pop, emp, u;
 				float utility_sum = 0;
 				float prob_sum = 0;
 				_Zone_Interface* zone;
@@ -177,7 +183,9 @@ namespace Person_Components
 
 					ttime = LOS->Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->zone<_Zone_Interface*>()->uuid<int>(),zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 					pop = zone->population<float>();
-					u = exp(0.00005*pop - 0.1*ttime);
+					emp = zone->employment<float>();
+
+					u = exp(0.00005*pop + 0.0002*emp - 0.1*ttime);
 					utility.push_back(u);
 					utility_sum += u;
 				}

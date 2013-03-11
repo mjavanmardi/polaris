@@ -30,6 +30,7 @@ class Connect;
 class Turn_Pen;
 class Parking;
 class Location;
+class LocationData;
 class Access;
 class Sign;
 class Signal;
@@ -277,7 +278,7 @@ class LocationData
 public:
     // Default Constructor
     LocationData () {}        
-	LocationData (int location_id_, shared_ptr<Location> location_, shared_ptr<Link> link_, int dir_, double offset_, int setback_, shared_ptr<ZoneLandUse> zone_, int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, int census_zone_, double x_, double y_)
+	LocationData (int location_id_, shared_ptr<Location> location_, shared_ptr<Link> link_, int dir_, double offset_, int setback_, shared_ptr<ZoneLandUse> zone_, int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, std::string census_zone_, double x_, double y_)
 	: location_id (location_id_), location (location_), link (link_), dir (dir_), offset (offset_), setback (setback_), zone (zone_), truck_org (truck_org_), truck_des (truck_des_), auto_org (auto_org_), auto_des (auto_des_), transit (transit_), areatype (areatype_), notes (notes_), census_zone (census_zone_), x (x_), y (y_)
 	{
 	}
@@ -313,8 +314,8 @@ public:
 	void setAreatype (const int& areatype_) {areatype = areatype_;}
 	const std::string& getNotes () const {return notes;}
 	void setNotes (const std::string& notes_) {notes = notes_;}
-	const int& getCensus_Zone () const {return census_zone;}
-	void setCensus_Zone (const int& census_zone_) {census_zone = census_zone_;}
+	const std::string& getCensus_Zone () const {return census_zone;}
+	void setCensus_Zone (const std::string& census_zone_) {census_zone = census_zone_;}
 	const double& getX () const {return x;}
 	void setX (const double& x_) {x = x_;}
 	const double& getY () const {return y;}
@@ -337,7 +338,7 @@ private:
 	int transit;
 	int areatype;
 	std::string notes;
-	int census_zone;
+	std::string census_zone;
 	double x;
 	double y;
 };

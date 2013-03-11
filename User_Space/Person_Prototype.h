@@ -6,6 +6,8 @@
 #include "Network_Prototype.h"
 #include "Zone_Prototype.h"
 #include "Movement_Plan_Prototype.h"
+#include "Network_Skimming_Prototype.h"
+#include "Population_Unit_Prototype.h"
 
 
 namespace Person_Components
