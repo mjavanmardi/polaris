@@ -2,7 +2,7 @@
 DELETE FROM ZoneLandUse;
 .import ZoneLandUse ZoneLandUse
 
-.separator "\t"
+.separator ","
 DELETE FROM LocationData;
 .import LocationData LocationData
 --For some reason the UPDATE statement would not wor without sqlite extension being loaded

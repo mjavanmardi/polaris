@@ -273,25 +273,14 @@ class LocationData
 public:
     // Default Constructor
     LocationData () {}        
-	LocationData (int location_, shared_ptr<Link> link_, int dir_, double offset_, int setback_, shared_ptr<ZoneLandUse> zone_land_use_, int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, int census_zone_, double x_, double y_)
-	: location (location_), link (link_), dir (dir_), offset (offset_), setback (setback_), zone_land_use (zone_land_use_), truck_org (truck_org_), truck_des (truck_des_), auto_org (auto_org_), auto_des (auto_des_), transit (transit_), areatype (areatype_), notes (notes_), census_zone (census_zone_), x (x_), y (y_)
+	LocationData (int location_, int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, double census_zone_, double x_, double y_, std::string land_use_)
+	: location (location_), truck_org (truck_org_), truck_des (truck_des_), auto_org (auto_org_), auto_des (auto_des_), transit (transit_), areatype (areatype_), notes (notes_), census_zone (census_zone_), x (x_), y (y_), land_use (land_use_)
 	{
 	}
 	//Accessors
 	const int& getPrimaryKey () const {return location;}
 	const int& getLocation () const {return location;}
 	void setLocation (const int& location_) {location = location_;}
-	void setLink (const int& link_, InputContainer& container) {link = container.Links[link_];}
-	const shared_ptr<Link>& getLink () const {return link;}
-	void setLink (const shared_ptr<Link>& link_) {link = link_;}
-	const int& getDir () const {return dir;}
-	void setDir (const int& dir_) {dir = dir_;}
-	const double& getOffset () const {return offset;}
-	void setOffset (const double& offset_) {offset = offset_;}
-	const int& getSetback () const {return setback;}
-	void setSetback (const int& setback_) {setback = setback_;}
-	const shared_ptr<ZoneLandUse>& getZone_Land_Use () const {return zone_land_use;}
-	void setZone_Land_Use (const shared_ptr<ZoneLandUse>& zone_land_use_) {zone_land_use = zone_land_use_;}
 	const int& getTruck_Org () const {return truck_org;}
 	void setTruck_Org (const int& truck_org_) {truck_org = truck_org_;}
 	const int& getTruck_Des () const {return truck_des;}
@@ -306,22 +295,19 @@ public:
 	void setAreatype (const int& areatype_) {areatype = areatype_;}
 	const std::string& getNotes () const {return notes;}
 	void setNotes (const std::string& notes_) {notes = notes_;}
-	const int& getCensus_Zone () const {return census_zone;}
-	void setCensus_Zone (const int& census_zone_) {census_zone = census_zone_;}
+	const double& getCensus_Zone () const {return census_zone;}
+	void setCensus_Zone (const double& census_zone_) {census_zone = census_zone_;}
 	const double& getX () const {return x;}
 	void setX (const double& x_) {x = x_;}
 	const double& getY () const {return y;}
 	void setY (const double& y_) {y = y_;}
+	const std::string& getLand_Use () const {return land_use;}
+	void setLand_Use (const std::string& land_use_) {land_use = land_use_;}
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id
 	int location;
-	shared_ptr<Link> link;
-	int dir;
-	double offset;
-	int setback;
-	shared_ptr<ZoneLandUse> zone_land_use;
 	int truck_org;
 	int truck_des;
 	int auto_org;
@@ -329,9 +315,10 @@ private:
 	int transit;
 	int areatype;
 	std::string notes;
-	int census_zone;
+	double census_zone;
 	double x;
 	double y;
+	std::string land_use;
 };
 
 

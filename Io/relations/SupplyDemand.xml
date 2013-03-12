@@ -38,11 +38,6 @@
 	</type>	
 	<type name="LocationData" pragma="object">
 		<field key="yes" name="location" type="int"/>
-		<field name="link" reference="Link" type="int"/>
-		<field name="dir" type="int"/>
-		<field name="offset" type="double"/>
-		<field name="setback" type="int"/>
-		<field name="zone_land_use" reference="ZoneLandUse" type="int" contanerSetter="no"/>
 		<field name="truck_org" type="int"/>
 		<field name="truck_des" type="int"/>
 		<field name="auto_org" type="int"/>
@@ -50,8 +45,9 @@
 		<field name="transit" type="int"/>
 		<field name="areatype" type="int"/>
 		<field name="notes" type="std::string"/>
-		<field name="census_zone" type="std::string"/>
+		<field name="census_zone" type="double"/>
 		<field name="x" type="double"/>
 		<field name="y" type="double"/>
+		<field name="land_use" type="std::string"/>
 	</type>		
 </root>
