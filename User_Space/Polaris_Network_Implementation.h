@@ -49,6 +49,8 @@ namespace Network_Components
 
 		implementation struct Polaris_Network_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			member_data_component(typename MasterType::network_db_reader_type, db_reader, none,none);
+
 			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_container(vector<typename MasterType::intersection_type*>, intersections_container, none, none);
@@ -489,11 +491,10 @@ namespace Network_Components
 			feature_implementation void write_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
 			feature_implementation void write_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
-#ifndef FOR_LINUX_PORTING
+
 			//==================================================================================================================
 			/// read from database
-			//------------------------------------------------------------------------------------------------------------------
-			
+			//------------------------------------------------------------------------------------------------------------------		
 			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
 				define_component_interface(_DB_Interface,type_of(db_reader),Prototypes::Network_DB_Reader_Prototype,ComponentType);
@@ -501,18 +502,8 @@ namespace Network_Components
 				db->network_reference<ComponentType*>((ComponentType*)this);
 				db->read_network_data<Network_Components::Types::Network_IO_Maps&>(net_io_maps);
 			}
-			//feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); 
 
-			//feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
 
-			//feature_implementation void read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps&);
-
-			//feature_implementation void read_turn_movement_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
-
-			//feature_implementation void read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
-
-			//feature_implementation void read_zone_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
-#endif
 			//==================================================================================================================
 			/// Convert network data from C++ data structure to Plaris structure
 			//------------------------------------------------------------------------------------------------------------------
@@ -537,7 +528,6 @@ namespace Network_Components
 
 		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Network_Implementation<MasterType,ParentType,APPEND_CHILD(Integrated_Polaris_Network_Implementation)>
 		{
-			member_data_component(typename MasterType::network_db_reader_type, db_reader, none,none);
 
 			member_component(typename MasterType::network_skim_type, skimming_faculty,none,none);
 

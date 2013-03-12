@@ -4,7 +4,7 @@
 //#define EXCLUDE_DEMAND
 
 #ifdef IntegratedModelApplication
-//#define DBIO
+#define DBIO
 #ifdef DBIO
 #define WINDOWS
 #include "Application_Includes.h"
@@ -518,7 +518,7 @@ int main(int argc,char** argv)
 	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
 	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
 	// Solver settings - IPF tolerance, Percentage of population to synthesis, maximum ipf and selection iterations
-	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,1.0,100);
+	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,0.5,100);
 
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
