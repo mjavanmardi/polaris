@@ -211,7 +211,7 @@ namespace Prototypes
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
 
-			if (location_index < 0 || location_index >= locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.");
+			if (location_index < 0 || location_index >= locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.  Index out of range (0,"<<locations->size()<<").");
 			properties->home_location_id<TargetType>(location_index);
 		}
 		feature_prototype void Home_Location(TargetType location_index, requires(check(TargetType, !is_integral)))

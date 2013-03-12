@@ -494,7 +494,7 @@ namespace Network_Components
 			
 				for(result<ZoneLandUse>::iterator db_itr = zone_lu_result.begin (); db_itr != zone_lu_result.end (); ++db_itr)
 				{
-					int zone_id = db_itr->getZone_Id();
+					int zone_id = db_itr->getZone();
 					zone_itr = zones_container.find(zone_id);
 
 					if (zone_itr != zones_container.end())
@@ -526,87 +526,65 @@ namespace Network_Components
 
 				activity_locations_container.clear();
 
-				result<Location> location_result=db->template query<Location>(query<Location>::true_expr);
-				
+				result<Location> location_result=db->query<Location>(query<Location>::true_expr);
+
 				_Zones_Container_Interface* zones = _network_reference->zones_container<_Zones_Container_Interface*>();
 				_Zones_Container_Interface::iterator zone_itr;
 
 				_Activity_Location_Interface* activity_location;
 				int skipped_counter=0;
 				_Link_Interface* link;
+
 				for(result<Location>::iterator db_itr = location_result.begin (); db_itr != location_result.end (); ++db_itr)
-				{
-
-					link_id_dir.id=db_itr->getLink()->getLink();
-					link_id_dir.dir=db_itr->getDir();
-
-					if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
-					{
-						//cout << endl <<"Skipped location: "<<db_itr->getPrimaryKey() << ", " << skipped_counter << " locations skipped";
-						if(++skipped_counter%1000==0)
-						{
-							cout << skipped_counter << " locations skipped" << endl;
-						}
-						continue;				
-					}
-
-					++counter;
-					if(counter%10000==0) cout << "\t" << counter << endl;
-
-					// get the zone id and pull interface to zone from zone container
-					int zone_id = db_itr->getZone()->getZone();
-					if ((zone_itr=zones->find(zone_id)) == zones->end()) THROW_EXCEPTION("ERROR, zone id: "<<zone_id<<" was not found.");
-					_Zone_Interface* zone = zone_itr->second;
-
-					activity_location = (_Activity_Location_Interface*)Allocate<typename _Activity_Location_Interface::Component_Type>();
-					assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
-					link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
-
-					activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
-				
-					activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
-				
-					activity_location->template zone<_Zone_Interface*>(zone);
-					activity_location->template uuid<int>(db_itr->getPrimaryKey());
-					activity_location->template internal_id<int>(counter);
-
-					uuid_to_index.insert(pair<int,int>(db_itr->getPrimaryKey(),counter));
-
-					zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-					zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
-
-					
-					activity_locations_container.push_back(activity_location);
-				}
-
-				cout << "Reading Activity Location Data."<< endl ;
-				// get activity location data
-				result<LocationData> loc_data_result=db->template query<LocationData>(query<LocationData>::true_expr);	
-				int data_counter=0;
-				for(result<LocationData>::iterator db_itr = loc_data_result.begin (); db_itr != loc_data_result.end (); ++db_itr)
 				{
 					try
 					{
-						
-						int loc_id = db_itr->getPrimaryKey();
-						hash_map<int,int>::iterator itr = uuid_to_index.find(loc_id);
-						if (itr == uuid_to_index.end()) continue;
+						link_id_dir.id=db_itr->getLink()->getLink();
+						link_id_dir.dir=db_itr->getDir();
+				
+						if(!net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
+						{
+							//cout << endl <<"Skipped location: "<<db_itr->getPrimaryKey() << ", " << skipped_counter << " locations skipped";
+							if(++skipped_counter%1000==0)
+							{
+								cout << skipped_counter << " locations skipped" << endl;
+							}
+							continue;				
+						}
 
-						int loc_idx = itr->second;
-						activity_location = activity_locations_container[loc_idx];
 						
-						stringstream s;
-						s << db_itr->getCensus_Zone();
+						if(counter%10000==0) cout << "\t" << counter << endl;
 
-						long long zone_id;
-						s >> zone_id;
-						activity_location->census_zone_id<long long>(zone_id);
+						// get the zone id and pull interface to zone from zone container
+						int zone_id = db_itr->getZone()->getZone();
+						if ((zone_itr=zones->find(zone_id)) == zones->end()) THROW_EXCEPTION("ERROR, zone id: "<<zone_id<<" was not found.");
+						_Zone_Interface* zone = zone_itr->second;
+
+						activity_location = (_Activity_Location_Interface*)Allocate<typename _Activity_Location_Interface::Component_Type>();
+						assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
+						link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
+
+						activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
+				
+						activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
+				
+						activity_location->template zone<_Zone_Interface*>(zone);
+						activity_location->template uuid<int>(db_itr->getPrimaryKey());
+						activity_location->template internal_id<int>(counter);
+
+						shared_ptr<LocationData> data_ptr = db_itr->getLocation_Data();
+						if (data_ptr == nullptr) continue;
+						activity_location->template census_zone_id<long long>(data_ptr->getCensus_Zone());
+
+
+						zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+			
+						activity_locations_container.push_back(activity_location);
+						++counter;
 					}
-					catch (std::exception ex)
-					{
-						cerr<< ex.what()<<" at data item "<<data_counter << endl ;
-					}
-					data_counter++;
+					catch (const odb::exception& e) {THROW_WARNING(e.what()); continue;}
+					catch (std::exception e){THROW_WARNING(e.what()); continue;}
 				}
 			}
 

@@ -4,7 +4,7 @@
 //#define EXCLUDE_DEMAND
 
 #ifdef IntegratedModelApplication
-#define DBIO
+//#define DBIO
 #ifdef DBIO
 #define WINDOWS
 #include "Application_Includes.h"
@@ -325,6 +325,8 @@ struct MasterType
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<M> vehicle_type;
 	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 #endif
+
+	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<M> network_db_reader_type;
 
 	//==============================================================================================
 	// Network Types

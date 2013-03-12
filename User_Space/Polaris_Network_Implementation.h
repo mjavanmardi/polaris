@@ -493,6 +493,14 @@ namespace Network_Components
 			//==================================================================================================================
 			/// read from database
 			//------------------------------------------------------------------------------------------------------------------
+			
+			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
+			{
+				define_component_interface(_DB_Interface,type_of(db_reader),Prototypes::Network_DB_Reader_Prototype,ComponentType);
+				_DB_Interface* db = (_DB_Interface*)&_db_reader;
+				db->network_reference<ComponentType*>((ComponentType*)this);
+				db->read_network_data<Network_Components::Types::Network_IO_Maps&>(net_io_maps);
+			}
 			//feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps); 
 
 			//feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps);
@@ -532,14 +540,6 @@ namespace Network_Components
 			member_data_component(typename MasterType::network_db_reader_type, db_reader, none,none);
 
 			member_component(typename MasterType::network_skim_type, skimming_faculty,none,none);
-
-			feature_implementation void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
-			{
-				define_component_interface(_DB_Interface,type_of(db_reader),Prototypes::Network_DB_Reader_Prototype,ComponentType);
-				_DB_Interface* db = (_DB_Interface*)&_db_reader;
-				db->network_reference<ComponentType*>((ComponentType*)this);
-				db->read_network_data<Network_Components::Types::Network_IO_Maps&>(net_io_maps);
-			}
 
 			feature_implementation typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator)
 			{
