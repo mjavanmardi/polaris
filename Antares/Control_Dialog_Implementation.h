@@ -31,7 +31,7 @@ public:
 	member_pointer(wxBoxSizer,sizer,none,none);
 	member_pointer(wxBoxSizer,button_sizer,none,none);
 
-	member_pointer(void,selected_element,none,check_2(CallerType,typename MasterType::type_of(antares_layer),is_same));
+	member_pointer(void,selected_object,none,check_2(CallerType,typename MasterType::type_of(antares_layer),is_same));
 	member_data(attributes_callback_type,submission_callback,none,check_2(CallerType,typename MasterType::type_of(antares_layer),is_same));
 };
 
@@ -91,7 +91,7 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 
 	SetSizer(_sizer);
 
-	_selected_element=nullptr;
+	_selected_object=nullptr;
 	_submission_callback=nullptr;
 
 	string title=name;
@@ -182,7 +182,7 @@ void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Push_
 template<typename MasterType,typename ParentType,typename InheritanceList>
 void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::OnApply(wxCommandEvent& event)
 {
-	if(_selected_element!=nullptr && _submission_callback!=nullptr)
+	if(_selected_object!=nullptr && _submission_callback!=nullptr)
 	{
 		vector<string> new_attributes;
 		wxListItem itr;
@@ -201,7 +201,7 @@ void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::OnApp
 			else new_attributes.push_back(text);
 		}
 
-		if(_submission_callback(_selected_element,new_attributes))
+		if(_submission_callback(_selected_object,new_attributes))
 		{
 			_apply_button->SetBackgroundColour(wxColour(75,200,75));
 		}

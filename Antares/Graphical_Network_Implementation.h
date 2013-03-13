@@ -19,6 +19,15 @@ namespace Network_Components
 		implementation struct Graphical_Network_Implementation:public Polaris_Component<APPEND_CHILD(Graphical_Network_Implementation),MasterType,Data_Object,ParentType>
 		{
 			vector<Point_2D<MasterType>> vehicle_points;
+			vector<Point_2D<MasterType>> vehicle_points_B;
+
+#pragma pack(push,1)
+			struct Plot_Element
+			{
+				int num_primitives;
+				Point_2D<MasterType>* points;
+			};
+#pragma pack(pop)
 
 			feature_implementation void submit_num_vehicles()
 			{
@@ -28,13 +37,9 @@ namespace Network_Components
 
 				vehicle_points.push_back(submission);
 
-#pragma pack(push,1)
-				struct Plot_Element
-				{
-					int num_primitives;
-					Point_2D<MasterType>* points;
-				};
-#pragma pack(pop)
+				submission._y=_vehicles_counter/2;
+				
+				vehicle_points_B.push_back(submission);
 
 				Plot_Element element;
 
@@ -43,7 +48,24 @@ namespace Network_Components
 
 				_num_vehicles->Push_Element<Regular_Element>((void*)&element);
 				
+
+				element.points = &vehicle_points.front();
+				
+				_num_vehicles_B->Push_Element<Regular_Element>((void*)&element);
+
 				_vehicles_counter=0;
+			}
+
+			feature_implementation void accent_num_vehicles()
+			{
+				Plot_Element element;
+
+				element.num_primitives = vehicle_points_B.size();
+				element.points = &vehicle_points_B.front();
+
+				_num_vehicles->Clear_Accented<NT>();
+
+				_num_vehicles->Push_Element<Accented_Element>((void*)&element);
 			}
 
 			feature_implementation void accept_vehicle_coordinates()
@@ -58,20 +80,14 @@ namespace Network_Components
 				
 				Network_Components::Types::Network_IO_Maps net_io_maps;
 
-				cout << "ok pre open: " << name << endl;
-				// It fails here VVV
 				auto_ptr<database> db (open_sqlite_database (name));
-				cout << "ok post open" << endl;
 				transaction t(db->begin());
-				cout << "ok post transaction" << endl;
 
 				// reset bounds, they will be set in the node reading function
 				_network_bounds.reset<type_of(network_bounds),Graphical_Network_Implementation,NULLTYPE>();
 
 				// read intersections
-				cout << "ok pre intersection" << endl;
 				read_intersection_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
-				cout << "ok post intersection" << endl;
 
 				// set up input_offset and shift network bounds
 				_input_offset._x = -( _network_bounds._xmax + _network_bounds._xmin )/2.0f;
@@ -83,12 +99,9 @@ namespace Network_Components
 
 				_network_bounds._ymax += _input_offset._y;
 				_network_bounds._ymin += _input_offset._y;
-				
-				cout << "ok pre links" << endl;
+
 				// read links
 				read_link_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
-				cout << "ok post links" << endl;
-
 				
 				// configure vehicle layer
 				MasterType::vehicle_type::Initialize_Layer();
@@ -99,6 +112,12 @@ namespace Network_Components
 				Antares_Layer_Configuration pcfg;
 				pcfg.Configure_Plot();
 				_num_vehicles->Initialize<NULLTYPE>(pcfg);
+
+
+				_num_vehicles_B=_information_panel->Allocate_New_Layer< Target_Type< NULLTYPE,Antares_Layer<type_of(num_vehicles_B),Graphical_Network_Implementation>*, string& > >(string("Number of Vehicles Green"));
+				pcfg.head_color._r=0;
+				pcfg.head_color._g=255;
+				_num_vehicles_B->Initialize<NULLTYPE>(pcfg);
 			}
 
 			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
@@ -303,8 +322,9 @@ namespace Network_Components
 			member_data(Rectangle_XY<MasterType>, network_bounds,none,none);
 			
 			member_prototype(Antares_Layer,link_lines,typename type_of(MasterType::antares_layer),none,none);
-			//member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),none,none);
+			
 			member_prototype(Antares_Layer,num_vehicles,typename type_of(MasterType::antares_layer),none,none);
+			member_prototype(Antares_Layer,num_vehicles_B,typename type_of(MasterType::antares_layer),none,none);
 
 			member_data(volatile int,vehicles_counter,none,none);
 

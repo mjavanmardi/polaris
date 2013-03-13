@@ -134,6 +134,12 @@
     <ClInclude Include="Graphical_Zone_Implementation.h">
       <Filter>User_Space</Filter>
     </ClInclude>
+    <ClInclude Include="Information_Page.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Information_Page_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">

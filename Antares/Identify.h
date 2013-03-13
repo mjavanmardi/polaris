@@ -11,7 +11,7 @@
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
-void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identify(const Point_3D<MasterType>& point, int start_iteration, int end_iteration)
+bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identify(const Point_3D<MasterType>& point, int start_iteration, int end_iteration)
 {
 
 	if(_primitive_type==_POINT)
@@ -131,25 +131,27 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 			current_iteration++;
 		}
 
-		if(best_element!=nullptr)
+		if(best_element!=nullptr && (void*)best_element!=_selected_element)
 		{
-			current_iteration = start_iteration;
+			Clear_Accented<ComponentType,CallerType,NT>();
 
-			while(current_iteration <= end_iteration)
-			{
-				vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
+			//current_iteration = start_iteration;
 
-				for(int i=0;i<_num_antares_threads;i++)
-				{
-					geometry_by_thread[i].clear();
-				}
+			//while(current_iteration <= end_iteration)
+			//{
+			//	vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
 
-				current_iteration++;
-			}
+			//	for(int i=0;i<_num_antares_threads;i++)
+			//	{
+			//		geometry_by_thread[i].clear();
+			//	}
+
+			//	current_iteration++;
+			//}
 
 			Push_Element<ComponentType,CallerType,Accented_Element>(best_element,start_iteration);
 			
-			_selected_element = *((void**)best_element);
+			_selected_element = (void*)best_element;
 
 			if(_attributes_callback != nullptr)
 			{
@@ -159,6 +161,8 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 				
 				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
 			}
+
+			return true;
 		}
 	}
 	else if(_primitive_type==_LINE)
@@ -278,25 +282,27 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 			current_iteration++;
 		}
 
-		if(best_element!=nullptr)
+		if(best_element!=nullptr && (void*)best_element!=_selected_element)
 		{
-			current_iteration = start_iteration;
+			Clear_Accented<ComponentType,CallerType,NT>();
 
-			while(current_iteration <= end_iteration)
-			{
-				vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
+			//current_iteration = start_iteration;
 
-				for(int i=0;i<_num_antares_threads;i++)
-				{
-					geometry_by_thread[i].clear();
-				}
+			//while(current_iteration <= end_iteration)
+			//{
+			//	vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
 
-				current_iteration++;
-			}
+			//	for(int i=0;i<_num_antares_threads;i++)
+			//	{
+			//		geometry_by_thread[i].clear();
+			//	}
+
+			//	current_iteration++;
+			//}
 
 			Push_Element<ComponentType,CallerType,Accented_Element>(best_element,start_iteration);
 			
-			_selected_element = *((void**)best_element);
+			_selected_element = (void*)best_element;
 
 			if(_attributes_callback != nullptr)
 			{
@@ -306,6 +312,8 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 
 				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
 			}
+
+			return true;
 		}
 	}
 	else if(_primitive_type==_QUAD)
@@ -437,25 +445,27 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 			current_iteration++;
 		}
 
-		if(best_element!=nullptr)
+		if(best_element!=nullptr && (void*)best_element!=_selected_element)
 		{
-			current_iteration = start_iteration;
+			Clear_Accented<ComponentType,CallerType,NT>();
 
-			while(current_iteration <= end_iteration)
-			{
-				vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
+			//current_iteration = start_iteration;
 
-				for(int i=0;i<_num_antares_threads;i++)
-				{
-					geometry_by_thread[i].clear();
-				}
+			//while(current_iteration <= end_iteration)
+			//{
+			//	vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
 
-				current_iteration++;
-			}
+			//	for(int i=0;i<_num_antares_threads;i++)
+			//	{
+			//		geometry_by_thread[i].clear();
+			//	}
+
+			//	current_iteration++;
+			//}
 
 			Push_Element<ComponentType,CallerType,Accented_Element>(best_element,start_iteration);
 			
-			_selected_element = *((void**)best_element);
+			_selected_element = (void*)best_element;
 
 			if(_attributes_callback != nullptr)
 			{
@@ -465,6 +475,8 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 				
 				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
 			}
+
+			return true;
 		}
 	}
 	else if(_primitive_type==_POLYGON)
@@ -563,25 +575,27 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 			current_iteration++;
 		}
 
-		if(best_element!=nullptr)
+		if(best_element!=nullptr && (void*)best_element!=_selected_element)
 		{
-			current_iteration = start_iteration;
+			Clear_Accented<ComponentType,CallerType,NT>();
 
-			while(current_iteration <= end_iteration)
-			{
-				vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
+			//current_iteration = start_iteration;
 
-				for(int i=0;i<_num_antares_threads;i++)
-				{
-					geometry_by_thread[i].clear();
-				}
+			//while(current_iteration <= end_iteration)
+			//{
+			//	vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
 
-				current_iteration++;
-			}
+			//	for(int i=0;i<_num_antares_threads;i++)
+			//	{
+			//		geometry_by_thread[i].clear();
+			//	}
+
+			//	current_iteration++;
+			//}
 
 			Push_Element<ComponentType,CallerType,Accented_Element>(best_element,start_iteration);
 			
-			_selected_element = *((void**)best_element);
+			_selected_element = (void*)best_element;
 
 			if(_attributes_callback != nullptr)
 			{
@@ -591,6 +605,10 @@ void Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 
 				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
 			}
+
+			return true;
 		}
 	}
+
+	return false;
 }

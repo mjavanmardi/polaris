@@ -160,6 +160,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 		_y_start_utm=posY;
 
 		_spatial_change=true;
+
+		Refresh();
 	}
 	else
 	{
@@ -170,11 +172,13 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 
 		if(_selected_layer != nullptr)
 		{
-			_selected_layer->Identify<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(location,_cached_iteration,_cached_iteration);
+			if(_selected_layer->Identify<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(location,_cached_iteration,_cached_iteration))
+			{
+				Refresh();
+				_information_panel->Render<NT>();
+			}
 		}
 	}
-	
-	Refresh();
 }
 
 //---------------------------------------------------------

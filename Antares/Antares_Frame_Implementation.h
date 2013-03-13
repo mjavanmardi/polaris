@@ -68,7 +68,7 @@ Antares_Implementation<MasterType,ParentType,InheritanceList>::Antares_Implement
 
 	_information_panel=(information_panel_interface*)new type_of(information_panel)(this);
 	
-	_aui_manager.AddPane((type_of(information_panel)*)_information_panel,wxAuiPaneInfo().Name("Information_Panel").Bottom().MinSize(1920-300,200));
+	_aui_manager.AddPane((type_of(information_panel)*)_information_panel,wxAuiPaneInfo().Name("Information_Panel").Bottom().MinSize(1920-300,300));
 	
 	_time_panel=(time_panel_interface*)new type_of(time_panel)(this);
 

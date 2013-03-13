@@ -29,9 +29,9 @@ prototype struct Antares_Layer
 		this_component()->Initialize<ComponentType,CallerType,TargetType>(cfg);
 	}
 	
-	feature_prototype void Identify(typename TargetType::ParamType point, int start_iteration, int end_iteration)
+	feature_prototype bool Identify(typename TargetType::ParamType point, int start_iteration, int end_iteration)
 	{
-		this_component()->Identify<ComponentType,CallerType,TargetType>(point,start_iteration,end_iteration);
+		return this_component()->Identify<ComponentType,CallerType,TargetType>(point,start_iteration,end_iteration);
 	}
 	
 	feature_prototype void Select()
@@ -47,6 +47,11 @@ prototype struct Antares_Layer
 	feature_prototype void Double_Click()
 	{
 		this_component()->Double_Click<ComponentType,CallerType,TargetType>();
+	}
+	
+	feature_prototype void Clear_Accented()
+	{
+		this_component()->Clear_Accented<ComponentType,CallerType,TargetType>();
 	}
 
 	feature_accessor(list_index,none,none);

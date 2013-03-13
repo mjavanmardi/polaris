@@ -65,6 +65,8 @@ public:
 
 		main->_canvas->Initialize<NULLTYPE>();
 
+		main->_information_panel->Render<NULLTYPE>();
+
 		return true;
 	}
 	

@@ -204,6 +204,8 @@
     <ClInclude Include="Graphical_Vehicle_Implementation.h" />
     <ClInclude Include="Graphical_Zone_Implementation.h" />
     <ClInclude Include="Identify.h" />
+    <ClInclude Include="Information_Page.h" />
+    <ClInclude Include="Information_Page_Implementation.h" />
     <ClInclude Include="Information_Panel.h" />
     <ClInclude Include="Information_Panel_Implementation.h" />
     <ClInclude Include="Layer_Management.h" />

@@ -251,6 +251,8 @@ struct MasterType
 	
 	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
 	
+	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
+
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	
 	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
@@ -259,7 +261,7 @@ struct MasterType
 	
 	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
 	
-	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
+
 
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
@@ -314,14 +316,38 @@ struct MasterType
     typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
 
     typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
+#ifdef ANTARES
+	typedef Conductor_Implementation<MasterType> conductor_type;
+	typedef Control_Panel_Implementation<MasterType> control_panel_type;
+	typedef Time_Panel_Implementation<MasterType> time_panel_type;
+	typedef Information_Panel_Implementation<MasterType> information_panel_type;
+	typedef Attributes_Panel_Implementation<MasterType> attributes_panel_type;
+	typedef Layer_Options_Implementation<MasterType> layer_options_type;
+	typedef Canvas_Implementation<MasterType> canvas_type;
+	typedef Control_Dialog_Implementation<MasterType> control_dialog_type;
+	typedef Information_Page_Implementation<MasterType> information_page_type;
+
+	typedef Graphical_Network_Implementation<MasterType> graphical_network_type;
+	typedef Graphical_Link_Implementation<MasterType> graphical_link_type;
+	typedef Graphical_Intersection_Implementation<MasterType> graphical_intersection_type;
+	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
+
+	typedef Graphical_Vehicle_Implementation<MasterType> vehicle_type;
+#else
+	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
+#endif
 
 
 };
 
 ostream* stream_ptr;
 
-int main()
+int main(int argc,char** argv)
 {
+#ifdef ANTARES
+	START_UI(argc,argv,MasterType);
+#endif
+
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::File_Network,network_models::network_information::network_data_information::NetworkData&> Net_IO_Type;
 

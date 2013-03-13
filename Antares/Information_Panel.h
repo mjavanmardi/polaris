@@ -4,6 +4,7 @@
 
 #pragma once
 #include "Antares_Includes.h"
+#include "Information_Page.h"
 
 //---------------------------------------------------------
 //	Information_Panel - information panel class definition

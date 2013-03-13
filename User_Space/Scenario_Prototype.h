@@ -206,7 +206,7 @@ namespace Scenario_Components
 				else if (io_source_string.compare("ODB_IO_SOURCE") == 0)
 				{
 					io_source_flag<int>(Scenario_Components::Types::IO_Source_Keys::ODB_IO_SOURCE);
-					if (cfgReader.getParameter("database_name", database_name<std::string*>())!= PARAMETER_FOUND) database_name<std::string>("chicago-Supply.sqlite");
+					if (cfgReader.getParameter("database_name", database_name<std::string*>())!= PARAMETER_FOUND) database_name<std::string>("chicago");
 				} 
 				else
 				{

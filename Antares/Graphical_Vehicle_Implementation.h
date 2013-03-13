@@ -129,6 +129,8 @@ namespace Vehicle_Components
 
 			static bool fetch_attributes(Graphical_Vehicle_Implementation* _this,vector<string>& bucket)
 			{
+				_this->_graphical_network->accent_num_vehicles<NT>();
+
 				stringstream s;
 				
 				s << _this->_internal_id;

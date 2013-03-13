@@ -30,5 +30,5 @@ prototype struct Control_Dialog
 	}
 
 	feature_accessor(submission_callback,none,none);
-	feature_accessor(selected_element,none,none);
+	feature_accessor(selected_object,none,none);
 };

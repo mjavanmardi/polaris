@@ -22,14 +22,14 @@ void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Re
 
 	//---- loop over and draw all layers ----
 
-	list<Antares_Layer_Interface*>::iterator itr;
+	list< Information_Page<typename MasterType::type_of(information_page),ComponentType>* >::iterator itr;
 
 	for(itr=_2D_layers.begin();itr!=_2D_layers.end();itr++)
 	{
-		Draw_Layer(current_iteration,current_iteration,(*itr));
+		(*itr)->Draw_Layer<NULLTYPE>(current_iteration,current_iteration);
 	}
-	
+
 	//---- flush and display ----
 
-	_plotwindow->RenewPlot();
+	//_plotwindow->RenewPlot();
 }

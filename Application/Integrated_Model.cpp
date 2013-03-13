@@ -4,7 +4,7 @@
 //#define EXCLUDE_DEMAND
 
 #ifdef IntegratedModelApplication
-#define DBIO
+//#define DBIO
 #ifdef DBIO
 #define WINDOWS
 #include "Application_Includes.h"
@@ -23,6 +23,7 @@ struct MasterType
 	typedef Layer_Options_Implementation<M> layer_options_type;
 	typedef Attributes_Panel_Implementation<M> attributes_panel_type;
 	typedef Control_Dialog_Implementation<M> control_dialog_type;
+	typedef Information_Page_Implementation<MasterType> information_page_type;
 
 	typedef Graphical_Network_Implementation<M> graphical_network_type;
 	typedef Graphical_Link_Implementation<M> graphical_link_type;
@@ -313,6 +314,7 @@ struct MasterType
 	typedef Layer_Options_Implementation<M> layer_options_type;
 	typedef Attributes_Panel_Implementation<M> attributes_panel_type;
 	typedef Control_Dialog_Implementation<M> control_dialog_type;
+	typedef Information_Page_Implementation<MasterType> information_page_type;
 
 	typedef Graphical_Network_Implementation<M> graphical_network_type;
 	typedef Graphical_Link_Implementation<M> graphical_link_type;

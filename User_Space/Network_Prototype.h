@@ -196,6 +196,12 @@ namespace Network_Components
 			{
 				this_component()->template submit_num_vehicles<ComponentType,CallerType,TargetType>();
 			}
+
+			feature_prototype void accent_num_vehicles()
+			{
+				this_component()->template accent_num_vehicles<ComponentType,CallerType,TargetType>();
+			}
+
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
