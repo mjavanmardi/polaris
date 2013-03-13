@@ -32,7 +32,7 @@ TEST_F(DBTest, LocationFKLocation_Data){
 	typedef odb::query<polaris::io::Location> query;
 	typedef odb::result<polaris::io::Location> result;
 	odb::transaction t(this->db->begin());
-	result r(this->db->query<polaris::io::Location>(query::true_expr));
+	result r(this->db->query<polaris::io::Location>(query::location_data.is_null()));
 	int count = 0;
 	for (result::iterator i (r.begin()); i!=r.end(); ++i)
 	{
@@ -46,7 +46,7 @@ TEST_F(DBTest, ZoneFKZone_Land_Use){
 	typedef odb::query<polaris::io::Zone> query;
 	typedef odb::result<polaris::io::Zone> result;
 	odb::transaction t(this->db->begin());
-	result r(this->db->query<polaris::io::Zone>(query::true_expr));
+	result r(this->db->query<polaris::io::Zone>(query::zone_land_use.is_null()));
 	int count = 0;
 	for (result::iterator i (r.begin()); i!=r.end(); ++i)
 	{
