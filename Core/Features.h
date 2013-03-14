@@ -532,6 +532,14 @@ struct member_function_ptr_types<Type,setter_type>
 #define type_of(FEATURE_NAME) FEATURE_NAME##_type
 #define get_type_of(FEATURE_NAME) Component_Type::FEATURE_NAME##_type
 
+#define static_member_definition(COMPONENT_TYPE, FEATURE_NAME) template<typename MasterType,typename ParentType, typename InheritanceList>\
+	typename COMPONENT_TYPE<MasterType, ParentType, InheritanceList>::type_of(FEATURE_NAME)\
+	COMPONENT_TYPE<MasterType, ParentType, InheritanceList>::_##FEATURE_NAME
+
+#define static_member_initialization(COMPONENT_TYPE, FEATURE_NAME, FEATURE_VALUE) template<typename MasterType,typename ParentType, typename InheritanceList>\
+	typename COMPONENT_TYPE<MasterType, ParentType, InheritanceList>::type_of(FEATURE_NAME)\
+	COMPONENT_TYPE<MasterType, ParentType, InheritanceList>::_##FEATURE_NAME = FEATURE_VALUE
+
 ///============================================================================
 /// component and interface cast macros
 ///============================================================================

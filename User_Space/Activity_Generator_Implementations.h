@@ -72,6 +72,7 @@ namespace Person_Components
 			typedef Prototypes::Activity_Generator<base_type,base_type> base_itf;
 			
 			// Interface definitions
+			define_component_interface(_Destination_Choice_Itf, typename type_of(Parent_Planner)::type_of(Destination_Chooser), Prototypes::Destination_Choice, ComponentType);
 			define_component_interface(person_itf,typename base_type::type_of(Parent_Planner)::type_of(Parent_Person), Prototypes::Person,ComponentType);
 			define_component_interface(_Scenario_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 			define_component_interface(_Network_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
@@ -97,6 +98,8 @@ namespace Person_Components
 			{
 				person_itf* _Parent_Person = base_type::_Parent_Planner->Parent_Person<person_itf*>();
 
+				_Destination_Choice_Itf* destination_chooser = base_type::_Parent_Planner->Destination_Chooser<_Destination_Choice_Itf*>();
+				
 				// get references to the plan containers
 				Activity_Plans* activities = typename base_type::_Parent_Planner->template Activity_Plans_Container<Activity_Plans*>();
 				Movement_Plans* movements = typename base_type::_Parent_Planner->template Movement_Plans_Container<Movement_Plans*>();	
@@ -116,7 +119,7 @@ namespace Person_Components
 
 					// Get the origin and destination locations
 					orig = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-					dest = this->Destination_Choice<ComponentType,CallerType,_Activity_Location_Interface*>(orig);
+					dest = destination_chooser->Choose_Destination<_Activity_Location_Interface*>(orig);
 
 					// check that origin and destination are valid
 					if (orig != nullptr && dest != nullptr) 
@@ -143,74 +146,74 @@ namespace Person_Components
 			}
 			tag_feature_as_available(Activity_Generation);
 
-			feature_implementation TargetType Destination_Choice(TargetType origin, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
-			{
-				person_itf* _Parent_Person = base_type::_Parent_Planner->Parent_Person<person_itf*>();
+			//feature_implementation TargetType Destination_Choice(TargetType origin, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+			//{
+			//	person_itf* _Parent_Person = base_type::_Parent_Planner->Parent_Person<person_itf*>();
 
-				const int set_size=50;
+			//	const int set_size=50;
 
-				// get references to the plan containers
-				Activity_Plans* activities = typename base_type::_Parent_Planner->template Activity_Plans_Container<Activity_Plans*>();
-				Movement_Plans* movements = typename base_type::_Parent_Planner->template Movement_Plans_Container<Movement_Plans*>();	
+			//	// get references to the plan containers
+			//	Activity_Plans* activities = typename base_type::_Parent_Planner->template Activity_Plans_Container<Activity_Plans*>();
+			//	Movement_Plans* movements = typename base_type::_Parent_Planner->template Movement_Plans_Container<Movement_Plans*>();	
 
-				// external knowledge references
-				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				_Zones_Container_Interface* zones = network->zones_container<_Zones_Container_Interface*>();
-				_Activity_Locations_Container_Interface* locations = network->activity_locations_container<_Activity_Locations_Container_Interface*>();
-				_Skim_Interface* LOS = network->skimming_faculty<_Skim_Interface*>();
+			//	// external knowledge references
+			//	_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+			//	_Zones_Container_Interface* zones = network->zones_container<_Zones_Container_Interface*>();
+			//	_Activity_Locations_Container_Interface* locations = network->activity_locations_container<_Activity_Locations_Container_Interface*>();
+			//	_Skim_Interface* LOS = network->skimming_faculty<_Skim_Interface*>();
 
-				// get reference to origin zone
-				_Activity_Location_Interface* orig = (_Activity_Location_Interface*)origin;
+			//	// get reference to origin zone
+			//	_Activity_Location_Interface* orig = (_Activity_Location_Interface*)origin;
 
-				// variables used for utility calculation
-				const int size = (int)locations->size();
-				int loc_id;
-				vector<_Activity_Location_Interface*> loc_options;
-				vector<float> utility;
-				vector<float> cum_probability;
-				float ttime, pop, emp, u;
-				float utility_sum = 0;
-				float prob_sum = 0;
-				_Zone_Interface* zone;
+			//	// variables used for utility calculation
+			//	const int size = (int)locations->size();
+			//	int loc_id;
+			//	vector<_Activity_Location_Interface*> loc_options;
+			//	vector<float> utility;
+			//	vector<float> cum_probability;
+			//	float ttime, pop, emp, u;
+			//	float utility_sum = 0;
+			//	float prob_sum = 0;
+			//	_Zone_Interface* zone;
 
-				// select zones to choose from and estimate utility
-				for (int i=0; i<set_size; i++)
-				{
-					loc_id = (int)((Uniform_RNG.Next_Rand<float>()*0.999999)*size);
-					_Activity_Location_Interface* loc = locations->at(loc_id);
-					loc_options.push_back(loc);
-					zone = loc->zone<_Zone_Interface*>();
+			//	// select zones to choose from and estimate utility
+			//	for (int i=0; i<set_size; i++)
+			//	{
+			//		loc_id = (int)((Uniform_RNG.Next_Rand<float>()*0.999999)*size);
+			//		_Activity_Location_Interface* loc = locations->at(loc_id);
+			//		loc_options.push_back(loc);
+			//		zone = loc->zone<_Zone_Interface*>();
 
-					ttime = LOS->Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->zone<_Zone_Interface*>()->uuid<int>(),zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-					pop = zone->population<float>();
-					emp = zone->employment<float>();
+			//		ttime = LOS->Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->zone<_Zone_Interface*>()->uuid<int>(),zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+			//		pop = zone->population<float>();
+			//		emp = zone->employment<float>();
 
-					u = exp(0.00005*pop + 0.0002*emp - 0.1*ttime);
-					utility.push_back(u);
-					utility_sum += u;
-				}
-				if (utility_sum == 0) return nullptr;
-				
-				// convert to cumulative probability
-				for (int i=0; i<set_size; i++)
-				{
-					prob_sum += utility[i] / utility_sum;
-					cum_probability.push_back(prob_sum);
-				}
+			//		u = exp(0.00005*pop + 0.0002*emp - 0.1*ttime);
+			//		utility.push_back(u);
+			//		utility_sum += u;
+			//	}
+			//	if (utility_sum == 0) return nullptr;
+			//	
+			//	// convert to cumulative probability
+			//	for (int i=0; i<set_size; i++)
+			//	{
+			//		prob_sum += utility[i] / utility_sum;
+			//		cum_probability.push_back(prob_sum);
+			//	}
 
-				// select one of the zones through monte-carlo
-				float r = Uniform_RNG.Next_Rand<float>();
-				for (int i=0; i<set_size; i++)
-				{
-					if (r <= cum_probability[i])
-					{
-						return loc_options[i];
-					}
-				}
-				return nullptr;
+			//	// select one of the zones through monte-carlo
+			//	float r = Uniform_RNG.Next_Rand<float>();
+			//	for (int i=0; i<set_size; i++)
+			//	{
+			//		if (r <= cum_probability[i])
+			//		{
+			//			return loc_options[i];
+			//		}
+			//	}
+			//	return nullptr;
 
-			}
-			tag_feature_as_available(Destination_Choice);
+			//}
+			//tag_feature_as_available(Destination_Choice);
 
 		};
 	

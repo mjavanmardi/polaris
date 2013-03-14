@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Person_Prototype.h"
+#include "Destination_Choice_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "Network_Skimming_Prototype.h"
 #include "Activity_Prototype.h"
@@ -25,6 +26,7 @@ namespace Person_Components
 
 			// Pointer to the child classses
 			member_prototype(Prototypes::Activity_Generator, Activity_Generator, typename MasterType::activity_generator_type,none,none);
+			member_prototype(Prototypes::Destination_Choice, Destination_Chooser, typename MasterType::person_destination_choice_type,none,none);
 
 			// Next Activity Generation Time member - used to schedule the next activity generation
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Generation_Time,none,none);
@@ -144,7 +146,7 @@ namespace Person_Components
 		};
 		// static member definition
 		template<typename MasterType, typename ParentType, typename InheritanceList> ofstream General_Person_Planner_Implementation<MasterType, ParentType, InheritanceList>::logs[_num_threads];
-		template<typename MasterType, typename ParentType, typename InheritanceList> bool General_Person_Planner_Implementation<MasterType, ParentType, InheritanceList>::_write_activity_files;
+		static_member_definition(General_Person_Planner_Implementation,write_activity_files);
 
 		implementation struct ADAPTS_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(ADAPTS_Person_Planner_Implementation)>
 		{

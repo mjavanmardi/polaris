@@ -77,6 +77,7 @@ namespace Network_Skimming_Components
 			}
 			declare_feature_event(Process_Skim_Trees_Event)
 			{
+				cout<<endl<<endl<<"====================================================="<<endl<<"Updating Network Skims:"<<endl;
 				typedef Network_Skimming_Prototype<ComponentType, CallerType> _Skim_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Skim_Interface* this_ptr=(_Skim_Interface*)_pthis;
@@ -155,6 +156,7 @@ namespace Network_Skimming_Components
 					
 						pair<long,origin_item_itf*> item = pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item);
 						//origin_map->insert(pair<long,origin_item_itf*>(orig_node->template internal_id<long>(),orig_item));
+						//cout << endl << "Insert item: "<<orig_node->template internal_id<long>() << ", uuid is "<<orig_node->uuid<long>();
 						origin_map->insert(item);
 					}
 				}

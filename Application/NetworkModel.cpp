@@ -31,6 +31,8 @@ struct MasterType
 	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<MasterType> scenario_type;
 	
 	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
+
+	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
 	
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	
@@ -221,8 +223,7 @@ int main()
 }
 #endif
 
-#define FILE_IO
-#ifdef FILE_IO
+#ifndef DBIO
 
 #include "Application_Includes.h"
 #include "../File_IO/network_models.h"
@@ -250,6 +251,8 @@ struct MasterType
 	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<MasterType> scenario_type;
 	
 	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
+
+	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
 	
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
 

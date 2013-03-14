@@ -642,6 +642,7 @@ namespace Prototypes
 	
 		// Activity Plans and Movement plans, stored in a hashmap keyed based on next required plan time (updated in the plan class after plan completion)
 		feature_accessor(Activity_Generator,none,none);
+		feature_accessor(Destination_Chooser,none,none);
 		feature_accessor(Activity_Plans_Container,none,none);
 		feature_accessor(Movement_Plans_Container,none,none);
 		feature_accessor(Schedule_Container,none,none);	
@@ -676,6 +677,28 @@ namespace Prototypes
 		feature_prototype void Activity_Generation()
 		{
 			this_component()->Activity_Generation<ComponentType,CallerType,TargetType>();
+		}
+	};
+
+
+	prototype struct Destination_Choice
+	{
+		tag_as_prototype;
+
+		// accessor to parent class
+		feature_accessor(Parent_Planner,none,none);
+		feature_accessor(choice_set_size,none,none);
+		feature_accessor(choice_model,none,none);
+
+		
+
+		feature_prototype TargetType Choose_Destination(TargetType origin, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+		{
+			return this_component()->Choose_Destination<ComponentType,CallerType,TargetType>(origin);
+		}
+		feature_prototype typename TargetType::ReturnType Calculate_Utility(typename TargetType::ParamType origin, typename TargetType::ParamType destination, requires(check_as_given(typename TargetType::ParamType,is_pointer) && check(typename TargetType::ParamType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+		{
+			return this_component()->Calculate_Utility<ComponentType,CallerType,TargetType>(origin, destination);
 		}
 	};
 }

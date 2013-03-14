@@ -1,6 +1,6 @@
 #pragma once
 
-#define EXAMPLE
+//#define EXAMPLE
 //#define IntegratedModelApplication
 //#define NetworkModelApplication
 //#define SENSOR

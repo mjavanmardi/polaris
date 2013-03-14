@@ -3,12 +3,17 @@
 //#define FOR_LINUX_PORTING
 //#define EXCLUDE_DEMAND
 
+
+
 #ifdef IntegratedModelApplication
 //#define DBIO
 #ifdef DBIO
 #define WINDOWS
 #include "Application_Includes.h"
 #include "../File_IO/network_models.h"
+
+
+
 struct MasterType
 {
 	typedef MasterType M;
@@ -76,6 +81,7 @@ struct MasterType
 	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<M,person_type> person_properties_type;
 	typedef RNG_Components::Implementations::RngStream_Implementation<M> RNG;
 	typedef Activity_Components::Implementations::Activity_Plan_Implementation<M,person_type> activity_plan_type;
+	typedef Person_Components::Implementations::CTRAMP_Destination_Choice_Implementation<M,person_type> person_destination_choice_type;
 
 	
 	// POPULATION SYNTHESIS CLASSES
@@ -156,18 +162,6 @@ int main(int argc,char** argv)
 	cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
 
-	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	//_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
-	//demand->scenario_reference<_Scenario_Interface*>(scenario);
-	//demand->network_reference<_Network_Interface*>(network);
-	//cout << "reading demand data..." <<endl;
-	//demand->read_demand_data<Net_IO_Type>(network_io_maps);
-	//cout << "converting demand data..." << endl;
-	//demand->write_demand_data<NULLTYPE>(demand_data_for_output);
-	//cout<<"writing demand data..."<<endl;
-	//network_models::network_information::demand_data_information::write_demand_vehicle(output_dir_name,scenario_data_for_output,demand_data_for_output,network_data_for_output);
-
-
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
 	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
 	operation->network_reference<_Network_Interface*>(network);
@@ -238,7 +232,16 @@ int main(int argc,char** argv)
 	_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<_Network_Interface::get_type_of(skimming_faculty)>();
 	skimmer->Initialize<_Network_Interface*>(network);
 	network->skimming_faculty<_network_skim_itf*>(skimmer);
-	
+
+
+	//==================================================================================================================================
+	// Destination choice model - set parameters
+	//----------------------------------------------------------------------------------------------------------------------------------
+	MasterType::person_destination_choice_type::_choice_set_size = 50;
+	MasterType::person_destination_choice_type::_B_TTIME = -0.1;
+	MasterType::person_destination_choice_type::_B_EMPLOYMENT = 0.0002;
+	MasterType::person_destination_choice_type::_B_POPULATION = 0.00005;
+		
 	//==================================================================================================================================
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------

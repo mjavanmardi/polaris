@@ -16,6 +16,8 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct Person_Implementation : public Polaris_Component<APPEND_CHILD(Person_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			
+
 			feature_implementation void Initialize(TargetType id)
 			{	
 				// Set the initial iteration to process
@@ -28,16 +30,20 @@ namespace Person_Components
 				properties->template Parent_Person<ComponentType*>(this);
 				this->template Properties<ComponentType,ComponentType,properties_itf*>(properties);
 
-				// Create and Initialize the Planner faculty
+				// Create and Initialize the Planner faculty and its subcomponents
 				define_component_interface(planner_itf,type_of(Planning_Faculty),Prototypes::Person_Planner,ComponentType);
 				define_component_interface(generator_itf,typename type_of(Planning_Faculty)::type_of(Activity_Generator),Prototypes::Activity_Generator,ComponentType);
+				define_component_interface(destination_choice_itf,typename type_of(Planning_Faculty)::type_of(Destination_Chooser),Prototypes::Destination_Choice,ComponentType);
 				planner_itf* planner = (planner_itf*)Allocate<type_of(Planning_Faculty)>();	
 				planner->template Parent_Person<ComponentType*>(this);
 				planner->template Initialize<NULLTYPE>();
 				this->template Planning_Faculty<ComponentType,ComponentType,planner_itf*>(planner);
 				generator_itf* generator = (generator_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Activity_Generator)>();
 				generator->template Parent_Planner<planner_itf*>(planner);
+				destination_choice_itf* destination_chooser = (destination_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Destination_Chooser)>();
+				destination_chooser->template Parent_Planner<planner_itf*>(planner);
 				planner->template Activity_Generator<generator_itf*>(generator);
+				planner->template Destination_Chooser<destination_choice_itf*>(destination_chooser);
 
 				// Create and Initialize the routing faculty
 				define_component_interface(_Routing_Interface, type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);

@@ -244,5 +244,8 @@
     <ClInclude Include="User_Space_with_odb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Destination_Choice_Implementation.h">
+      <Filter>Implementations\Person Components</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

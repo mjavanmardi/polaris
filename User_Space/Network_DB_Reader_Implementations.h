@@ -517,7 +517,7 @@ namespace Network_Components
 
 				cout << "Reading Activity Locations " << endl;
 
-				int counter=-1;
+				int counter=0;
 
 				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, typename type_of(network_reference)::type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, typename type_of(network_reference)::type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
