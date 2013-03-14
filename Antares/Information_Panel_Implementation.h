@@ -38,6 +38,8 @@ public:
 	
 	feature_implementation void Render();
 	
+	void OnSelect(wxAuiNotebookEvent& event);
+
 	//void OnResize(wxSizeEvent& event);
 
 	member_pointer(wxAuiNotebook,information_book,none,none);
@@ -46,6 +48,8 @@ public:
 	member_data(int,cached_iteration,none,none);
 
 	list< Information_Page<typename MasterType::type_of(information_page),ComponentType>* > _2D_layers;
+
+	member_data(bool,initialized,none,none);
 };
 
 //---------------------------------------------------------
@@ -67,6 +71,15 @@ Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Informa
 	//---- set the sizer ----
 
 	SetSizerAndFit(_sizer);
+	
+	_initialized = false;
+}
+
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::OnSelect(wxAuiNotebookEvent& event)
+{
+	Render<ComponentType,ComponentType,NT>();
 }
 
 //template<typename MasterType,typename ParentType,typename InheritanceList>
