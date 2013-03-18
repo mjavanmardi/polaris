@@ -30,14 +30,16 @@ struct MasterType
 	typedef Control_Dialog_Implementation<M> control_dialog_type;
 	typedef Information_Page_Implementation<MasterType> information_page_type;
 
-	typedef Graphical_Network_Implementation<M> graphical_network_type;
-	typedef Graphical_Link_Implementation<M> graphical_link_type;
-	typedef Graphical_Intersection_Implementation<M> graphical_intersection_type;
+	typedef Antares_Network_Implementation<M> network_type;
+	typedef Antares_Link_Implementation<M> link_type;
+	//typedef Graphical_Intersection_Implementation<M> graphical_intersection_type;
 	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<M> vehicle_type;	
 	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
 	//typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;
 #else
+	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<M> network_type;
+	typedef Link_Components::Implementations::Polaris_Link_Implementation<M> link_type;
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<M> vehicle_type;
 	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 #endif
@@ -45,11 +47,10 @@ struct MasterType
 	//==============================================================================================
 	// Network Types
 	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<M> scenario_type;
-	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<M> network_type;
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<M> network_db_reader_type;
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<M> intersection_type;
 	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<M> movement_type;
-	typedef Link_Components::Implementations::Polaris_Link_Implementation<M> link_type;
+
 	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<M> turn_movement_type;
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
 	typedef Routing_Components::Implementations::Polaris_Routing_Implementation<M> routing_type;
@@ -97,12 +98,7 @@ ostream* stream_ptr;
 
 int main(int argc,char** argv)
 {
-	//==================================================================================================================================
-	// Start Antares UI
-	//----------------------------------------------------------------------------------------------------------------------------------
-	#ifdef ANTARES
-	START_UI(argc,argv, MasterType);
-	#endif
+
 
 
 	//==================================================================================================================================
@@ -152,12 +148,24 @@ int main(int argc,char** argv)
 
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
+
 	cout << "converting network data..." << endl;
 	network->write_network_data<Target_Type<NULLTYPE,void,network_models::network_information::network_data_information::NetworkData&>>(network_data_for_output);
 	network_models::network_information::network_data_information::write_network_data("", network_data_for_output);
 	cout<<"writing network data..."<<endl;
 	//network_models::network_information::network_data_information::write_network_data(output_dir_name,network_data_for_output);
 
+	//==================================================================================================================================
+	// Start Antares UI
+	//----------------------------------------------------------------------------------------------------------------------------------
+#ifdef ANTARES
+	network->set_network_bounds<NULLTYPE>();
+	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
+	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
+	MasterType::vehicle_type::Initialize_Layer();
+	network->initialize_link_layer<NULLTYPE>();
+	MasterType::link_type::configure_link_moes_layer();
+#endif
 
 	cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
@@ -209,19 +217,14 @@ int main(int argc,char** argv)
 	define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, NULLTYPE);
 	_Zones_Container_Interface::iterator zone_itr;
 	_Zones_Container_Interface* zone_list = network->zones_container<_Zones_Container_Interface*>();
-	typedef Canvas<MasterType::canvas_type,MasterType::graphical_zone_group_type> canvas_itf;
-	canvas_itf* canvas_ptr = (canvas_itf*) canvas;
-	define_component_interface(graphical_network_interface,typename canvas_itf::get_type_of(graphical_network),Network_Components::Prototypes::Network_Prototype,NULLTYPE);
+
 	//--------------------------------------------------------------------------------------------
 	// Graphical zone group display - integrate to graphical network when database is fixed
 	typedef Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,NULLTYPE> zone_group_interface;
 	zone_group_interface* _graphical_zone_group = (zone_group_interface*) Allocate<MasterType::graphical_zone_group_type>();	
-	_graphical_zone_group->canvas<canvas_itf*>( (canvas_itf*) canvas );
 	// initialize zone static reference to the graphical zone group
 	MasterType::zone_type::_graphical_zone_group=(Zone_Components::Prototypes::Graphical_Zone_Group<MasterType::graphical_zone_group_type,MasterType::zone_type>*)_graphical_zone_group;
 	_graphical_zone_group->configure_zones_layer<NULLTYPE>();
-	// get offsets from graphical network
-	_graphical_zone_group->input_offset<Point_2D<MasterType>*>(canvas_ptr->graphical_network<graphical_network_interface*>()->input_offset<Point_2D<MasterType>*>());
 	#endif
 
 

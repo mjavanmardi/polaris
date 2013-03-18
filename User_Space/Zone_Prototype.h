@@ -48,7 +48,7 @@ namespace Zone_Components
 			feature_accessor(input_offset,none,none);
 			feature_accessor(network_bounds,none,none);
 			feature_accessor(zone_centroids,none,none);
-			feature_accessor(canvas,none,none);
+			//feature_accessor(canvas,none,none);
 		};
 	
 		prototype struct Zone_Prototype ADD_DEBUG_INFO

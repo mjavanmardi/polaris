@@ -12,11 +12,8 @@
 implementation class Conductor_Implementation : public Polaris_Component<APPEND_CHILD(Conductor_Implementation),MasterType,Execution_Object,ParentType>
 {
 public:
-	define_component_interface(Graphical_Network_Interface,typename MasterType::type_of(graphical_network),Network_Prototype,Conductor_Implementation);
-
 	member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),none,none);
 	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),none,none);
-	//member_prototype(Graphical_Network,graphical_network,typename MasterType::type_of(graphical_network),none,none);
 
 	feature_implementation void Initialize()
 	{
@@ -44,11 +41,7 @@ public:
 			//Sleep(100);
 		}
 
-		Graphical_Network_Interface* graphical_net=pthis->_canvas->graphical_network<Graphical_Network_Interface*>();
-
 		cout << _iteration << endl;
-		
-		graphical_net->submit_num_vehicles<NULLTYPE>();
 
 		pthis->_canvas->Refresh<NULLTYPE>();
 

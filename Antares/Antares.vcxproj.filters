@@ -107,15 +107,6 @@
     <ClInclude Include="Antares_Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphical_Intersection_Implementation.h">
-      <Filter>User_Space</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphical_Link_Implementation.h">
-      <Filter>User_Space</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphical_Network_Implementation.h">
-      <Filter>User_Space</Filter>
-    </ClInclude>
     <ClInclude Include="Graphical_Vehicle_Implementation.h">
       <Filter>User_Space</Filter>
     </ClInclude>
@@ -139,6 +130,15 @@
     </ClInclude>
     <ClInclude Include="Information_Page_Implementation.h">
       <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Network_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Intersection_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Link_Implementation.h">
+      <Filter>User_Space</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

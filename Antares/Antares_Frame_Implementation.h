@@ -12,12 +12,10 @@
 implementation class Antares_Implementation : public Polaris_Component<APPEND_CHILD(Antares_Implementation),MasterType,NULLTYPE>,public wxFrame
 {
 public:
-	Antares_Implementation(wxFrame* parent,string& _db_name);
+	Antares_Implementation(wxFrame* parent);
 	virtual ~Antares_Implementation(void){_aui_manager.UnInit();}
-	void Render(wxPaintEvent& event);
 
 	member_data(wxAuiManager,aui_manager,none,none);
-	member_data(string,db_name,none,none);
 
 	member_prototype(Conductor,conductor,typename MasterType::type_of(conductor),none,none);
 	member_prototype(Control_Panel,control_panel,typename MasterType::type_of(control_panel),none,none);
@@ -30,17 +28,13 @@ public:
 };
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
-Antares_Implementation<MasterType,ParentType,InheritanceList>::Antares_Implementation(wxFrame* parent,string& __db_name):wxFrame(parent,-1,"Antares")
+Antares_Implementation<MasterType,ParentType,InheritanceList>::Antares_Implementation(wxFrame* parent):wxFrame(parent,-1,"Antares")
 {
 	//---- initialize conductor ----
 
 	_conductor=(conductor_interface*)Allocate<typename MasterType::type_of(conductor)>();
 
 	_conductor->Initialize<NULLTYPE>();
-	
-	//---- set references ----
-
-	_db_name=__db_name;
 
 	//---- initialize aui ----
 

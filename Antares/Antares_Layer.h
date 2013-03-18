@@ -209,6 +209,22 @@ struct Antares_Layer_Configuration
 		group_normal=false;
 	}
 	
+	void Configure_Dynamic_Quads(True_Color_RGBA<NULLTYPE>& Color, int size)
+	{
+		dynamic_data=true;
+		storage_size=3;
+		storage_period=1;
+
+		target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
+
+		primitive_type=_QUAD;
+
+		head_color._r=Color._r;
+		head_color._g=Color._g;
+		head_color._b=Color._b;
+		head_color._a=Color._a;
+	}
+
 	void Configure_Plot()
 	{
 		//storage_size=_num_iterations;

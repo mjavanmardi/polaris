@@ -196,12 +196,10 @@ namespace Network_Components
 			{
 				this_component()->template submit_num_vehicles<ComponentType,CallerType,TargetType>();
 			}
-
 			feature_prototype void accent_num_vehicles()
 			{
 				this_component()->template accent_num_vehicles<ComponentType,CallerType,TargetType>();
 			}
-
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
@@ -229,6 +227,15 @@ namespace Network_Components
 				assert_check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same,"TargetType should indicate Regular_Network if you want to create a routable network from a regular network");
 			}
 
+			feature_prototype void set_network_bounds()
+			{
+				this_component()->template set_network_bounds<ComponentType,CallerType,TargetType>();
+			}
+			feature_prototype void initialize_link_layer()
+			{
+				this_component()->template initialize_link_layer<ComponentType,CallerType,TargetType>();
+			}			
+			
 			feature_prototype void write_network_data(typename TargetType::ParamType data_destination)
 			{
 				this_component()->template write_network_data<ComponentType,CallerType,TargetType>(data_destination);

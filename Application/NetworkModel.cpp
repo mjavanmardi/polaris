@@ -31,8 +31,6 @@ struct MasterType
 	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<MasterType> scenario_type;
 	
 	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
-
-	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
 	
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	
@@ -223,13 +221,42 @@ int main()
 }
 #endif
 
-#ifndef DBIO
+#define FILE_IO
+#ifdef FILE_IO
 
 #include "Application_Includes.h"
+#include "../User_Space/Polaris_Operation_Implementation.h"
 #include "../File_IO/network_models.h"
 struct MasterType
 {
+#ifdef ANTARES
+	typedef Conductor_Implementation<MasterType> conductor_type;
+	typedef Control_Panel_Implementation<MasterType> control_panel_type;
+	typedef Time_Panel_Implementation<MasterType> time_panel_type;
+	typedef Information_Panel_Implementation<MasterType> information_panel_type;
+	typedef Canvas_Implementation<MasterType> canvas_type;
+	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
+	typedef Layer_Options_Implementation<MasterType> layer_options_type;
+	typedef Attributes_Panel_Implementation<MasterType> attributes_panel_type;
+	typedef Control_Dialog_Implementation<MasterType> control_dialog_type;
+	typedef Information_Page_Implementation<MasterType> information_page_type;
 
+	typedef Antares_Network_Implementation<MasterType> graphical_network_type;
+	typedef Antares_Link_Implementation<MasterType> graphical_link_type;
+	typedef Antares_Intersection_Implementation<MasterType> graphical_intersection_type;
+
+	typedef Antares_Network_Implementation<MasterType> network_type;
+	typedef Antares_Link_Implementation<MasterType> link_type;
+	//typedef Antares_Link_MOE_Group_Implementation<MasterType> graphical_link_moe_group_type;
+	typedef Antares_Intersection_Implementation<MasterType> intersection_type;
+	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<MasterType> vehicle_type;
+#else
+	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
+	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
+	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
+	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
+
+#endif
 	//==============================================================================================
 	// Signalization Types
 	//typedef Signal_Components::Components::HCM_Signal_Full<T>::type				SIGNAL_TYPE;
@@ -250,21 +277,11 @@ struct MasterType
 	// Network Types
 	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<MasterType> scenario_type;
 	
-	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
-
-	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
-	
-	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
-
-	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
-	
 	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> movement_type;
-	
-	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
 	
 	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<MasterType> turn_movement_type;
 	
-
+	//typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
 
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
@@ -319,37 +336,14 @@ struct MasterType
     typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
 
     typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
-#ifdef ANTARES
-	typedef Conductor_Implementation<MasterType> conductor_type;
-	typedef Control_Panel_Implementation<MasterType> control_panel_type;
-	typedef Time_Panel_Implementation<MasterType> time_panel_type;
-	typedef Information_Panel_Implementation<MasterType> information_panel_type;
-	typedef Attributes_Panel_Implementation<MasterType> attributes_panel_type;
-	typedef Layer_Options_Implementation<MasterType> layer_options_type;
-	typedef Canvas_Implementation<MasterType> canvas_type;
-	typedef Control_Dialog_Implementation<MasterType> control_dialog_type;
-	typedef Information_Page_Implementation<MasterType> information_page_type;
 
-	typedef Graphical_Network_Implementation<MasterType> graphical_network_type;
-	typedef Graphical_Link_Implementation<MasterType> graphical_link_type;
-	typedef Graphical_Intersection_Implementation<MasterType> graphical_intersection_type;
-	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
-
-	typedef Graphical_Vehicle_Implementation<MasterType> vehicle_type;
-#else
-	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
-#endif
-
-
+	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
 };
 
 ostream* stream_ptr;
 
 int main(int argc,char** argv)
 {
-#ifdef ANTARES
-	START_UI(argc,argv,MasterType);
-#endif
 
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::File_Network,network_models::network_information::network_data_information::NetworkData&> Net_IO_Type;
@@ -383,8 +377,32 @@ int main(int argc,char** argv)
 	_global_network = network;
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 	network->read_network_data<Net_IO_Type>(network_data);
-	//network->write_network_data<NULLTYPE>(network_data_for_output);
+	network->set_network_bounds<NULLTYPE>();
 
+	//network->write_network_data<NULLTYPE>(network_data_for_output);
+#ifdef ANTARES
+	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
+	//cout << "Min Bounds: " << local_bounds->_xmin << "," << local_bounds->_ymin << endl;
+	//cout << "Max Bounds: " << local_bounds->_xmax << "," << local_bounds->_ymax << endl;
+	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
+	MasterType::vehicle_type::Initialize_Layer();
+	network->initialize_link_layer<NULLTYPE>();
+	//typedef Canvas<MasterType::canvas_type,MasterType::graphical_link_moe_group_type> canvas_itf;
+	//define_component_interface(graphical_network_interface,typename canvas_itf::get_type_of(graphical_network),Network_Components::Prototypes::Network_Prototype,NULLTYPE);
+	//
+	//canvas_itf* canvas_ptr = (canvas_itf*) canvas;
+	//--------------------------------------------------------------------------------------------
+	// Graphical link moe display
+	//typedef Link_Components::Prototypes::Graphical_Link_MOE_Group<MasterType::graphical_link_moe_group_type> link_moe_group_interface;
+	//_global_graphical_link_moe_group = Allocate<MasterType::graphical_link_moe_group_type>();	
+	//((link_moe_group_interface*)_global_graphical_link_moe_group)->template canvas<canvas_itf*>( (canvas_itf*) canvas );
+	////// initialize zone static reference to the graphical zone group
+	////MasterType::link_type::_graphical_link_moe_group=(Link_Components::Prototypes::Graphical_Link_MOE_Group<MasterType::graphical_link_moe_group_type>*)_graphical_link_moe_group;
+	//((link_moe_group_interface*)_global_graphical_link_moe_group)->template configure_link_moes_layer<NULLTYPE>();
+	//// get offsets from graphical network
+	//((link_moe_group_interface*)_global_graphical_link_moe_group)->template input_offset<Point_2D<MasterType>*>(canvas_ptr->graphical_network<graphical_network_interface*>()->input_offset<Point_2D<MasterType>*>());
+	MasterType::link_type::configure_link_moes_layer();
+#endif
 	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
 	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
 	

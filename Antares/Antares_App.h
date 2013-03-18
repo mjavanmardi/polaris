@@ -9,10 +9,10 @@
 //	START_UI - macro to start the UI
 //---------------------------------------------------------
 
-#define START_UI(ARGC,ARGV,MASTER_TYPE) \
+#define START_UI(MASTER_TYPE,XMIN,YMIN,XMAX,YMAX) \
 	antares=(void*)new Antares_App<MASTER_TYPE>();\
 	canvas=nullptr;\
-	((Antares_App<MASTER_TYPE>*)antares)->Start_UI(ARGC,ARGV);\
+	((Antares_App<MASTER_TYPE>*)antares)->Start_UI(XMIN,YMIN,XMAX,YMAX);\
 
 //---------------------------------------------------------
 //	Wx_Loop - declare wx loop function
@@ -56,16 +56,18 @@ public:
 
 		_thread_id = _num_threads;
 
-		main=new Antares_Implementation<MasterType,Antares_App>(nullptr,db_name);
+		main=new Antares_Implementation<MasterType,Antares_App>(nullptr);
 
 		canvas = main->_canvas;
 
 		main->Maximize();
 		main->Show();
 
-		main->_canvas->Initialize<NULLTYPE>();
+		main->_canvas->Initialize<Target_Type<NT,NT,float,float,float,float>>(xmin,ymin,xmax,ymax);
 
 		main->_information_panel->Render<NULLTYPE>();
+
+		initialized=true;
 
 		return true;
 	}
@@ -74,38 +76,33 @@ public:
 	//	Start_UI - Initialize wx, spin thread to handle events
 	//---------------------------------------------------------
 	
-	void Start_UI(int argc, char** argv)
+	void Start_UI(float _xmin,float _ymin,float _xmax,float _ymax)
 	{
+		initialized=false;
+		int _argc=0;
+		char** _argv=nullptr;
+
+		xmin=_xmin;
+		ymin=_ymin;
+		xmax=_xmax;
+		ymax=_ymax;
+
 		wxDISABLE_DEBUG_SUPPORT();
 
-		wxEntryStart(argc,argv);
-
-		if(argc!=2)
-		{
-			wxMessageBox("Database File Not Provided!");
-			exit(0);
-		}
-		else
-		{
-			db_name=argv[1];
-
-			//ifstream test;
-			//test.open(db_name);
-
-			//if(!test.is_open())
-			//{
-			//	wxMessageBox("Invalid Database File Provided!");
-			//	exit(0);
-			//}
-
-			//test.close();
-		}
+		wxEntryStart(_argc,_argv);
 
 		CreateThread(NULL,0,Wx_Loop<MasterType>,this,0,NULL);
+
+		while(!initialized) Sleep(100);
 	}
 
 	Antares_Implementation<MasterType,Antares_App>* main;
-	string db_name;
+	float xmin;
+	float ymin;
+	float xmax;
+	float ymax;
+
+	volatile bool initialized;
 };
 
 //---------------------------------------------------------

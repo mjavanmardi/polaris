@@ -132,7 +132,7 @@ namespace Zone_Components
 			}
 			feature_implementation void Push_To_Layer(TargetType Layer_Reference)
 			{
-				Layer_Reference->Push_Element<Regular_Element>(this);
+				Layer_Reference->Push_Element<Regular_Element>((void*)this);
 			}
 
 			void* ptr;
@@ -162,6 +162,7 @@ namespace Zone_Components
 				origin_col_center._y = coordinates._y ;
 				destination_col_center._x = coordinates._x + width*0.25;
 				destination_col_center._y = origin_col_center._y;
+
 				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(origin_col_center);
 				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(destination_col_center);
 
@@ -197,12 +198,7 @@ namespace Zone_Components
 				_zone_centroids->Initialize<NULLTYPE>(cfg);
 			}
 
-			member_data(Point_2D<MasterType>, input_offset,none,none);
-			member_data(Rectangle_XY<MasterType>, network_bounds,none,none);
-			
 			member_prototype(Antares_Layer,zone_centroids,typename type_of(MasterType::antares_layer),none,none);
-
-			member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),none,none);
 		};
 
 

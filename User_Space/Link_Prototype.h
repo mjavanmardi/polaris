@@ -217,9 +217,13 @@ namespace Link_Components
 			{
 				this_component()->template update_vmt_vht<ComponentType,CallerType,TargetType>();
 			}
+
+			feature_prototype void visualize_moe()
+			{
+				this_component()->template visualize_moe<ComponentType,CallerType,TargetType>();
+			}
+
 		};
-
-
 	}
 }
 

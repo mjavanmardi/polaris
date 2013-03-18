@@ -431,8 +431,11 @@
     <ClInclude Include="Antares_Frame.h" />
     <ClInclude Include="Antares_Frame_Implementation.h" />
     <ClInclude Include="Antares_Includes.h" />
+    <ClInclude Include="Antares_Intersection_Implementation.h" />
     <ClInclude Include="Antares_Layer.h" />
     <ClInclude Include="Antares_Layer_Implementation.h" />
+    <ClInclude Include="Antares_Link_Implementation.h" />
+    <ClInclude Include="Antares_Network_Implementation.h" />
     <ClInclude Include="Attributes_Panel.h" />
     <ClInclude Include="Attributes_Panel_Implementation.h" />
     <ClInclude Include="Canvas.h" />
@@ -446,9 +449,6 @@
     <ClInclude Include="Draw_Layer_2D.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="Geometry_Implementation.h" />
-    <ClInclude Include="Graphical_Intersection_Implementation.h" />
-    <ClInclude Include="Graphical_Link_Implementation.h" />
-    <ClInclude Include="Graphical_Network_Implementation.h" />
     <ClInclude Include="Graphical_Vehicle_Implementation.h" />
     <ClInclude Include="Graphical_Zone_Implementation.h" />
     <ClInclude Include="Identify.h" />

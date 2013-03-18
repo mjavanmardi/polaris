@@ -24,6 +24,4 @@ prototype struct Antares
 	feature_accessor(canvas,none,none);
 	feature_accessor(aui_manager,none,none);
 	feature_accessor(conductor,none,none);
-	feature_accessor(db_name,none,none);
-	feature_accessor(simulation,none,none);
 };

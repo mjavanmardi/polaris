@@ -16,9 +16,9 @@ prototype struct Canvas
 {
 	tag_as_prototype;
 
-	feature_prototype void Initialize()
+	feature_prototype void Initialize(typename TargetType::ParamType xmin,typename TargetType::Param2Type ymin,typename TargetType::Param3Type xmax,typename TargetType::Param4Type ymax)
 	{
-		this_component()->Initialize<ComponentType,CallerType,TargetType>();
+		this_component()->Initialize<ComponentType,CallerType,TargetType>(xmin,ymin,xmax,ymax);
 	}
 
 	feature_prototype void Refresh()
@@ -31,11 +31,6 @@ prototype struct Canvas
 		this_component()->Set_Mode<ComponentType,CallerType,TargetType>(mode);
 	}
 
-	//feature_prototype typename TargetType::ReturnType Allocate_New_Layer(typename TargetType::ParamType name)
-	//{
-	//	return (TargetType::ReturnType)this_component()->Allocate_New_Layer<ComponentType,CallerType,TargetType>(name);
-	//}
-	
 	feature_prototype typename TargetType::ReturnType Select_Layer(typename TargetType::ParamType name)
 	{
 		return (TargetType::ReturnType)this_component()->Select_Layer<ComponentType,CallerType,TargetType>(name);
@@ -45,11 +40,6 @@ prototype struct Canvas
 	{
 		return (TargetType::ReturnType)this_component()->Toggle_Layer<ComponentType,CallerType,TargetType>(name);
 	}
-
-	//feature_prototype typename TargetType::ReturnType Scale_Coordinates(typename TargetType::ParamType coordinates)
-	//{
-	//	return (TargetType::ReturnType)this_component()->Scale_Coordinates<ComponentType,CallerType,TargetType>(coordinates);
-	//}
 
 	feature_accessor(time_panel,none,none);
 	feature_accessor(information_panel,none,none);

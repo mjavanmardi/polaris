@@ -15,7 +15,7 @@ public:
 	Canvas_Implementation(wxFrame* parent, int* args);
 	virtual ~Canvas_Implementation(void) {delete _glcontext;}
 
-	feature_implementation void Initialize();
+	feature_implementation void Initialize(float xmin,float ymin,float xmax,float ymax);
 	void Initialize_GLCanvas();
 	void Calculate_Bounds();
 
@@ -96,7 +96,7 @@ public:
 	GLdouble modelview[16];
 	GLdouble projection[16];
 
-	member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,none,none);
+	//member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,none,none);
 
 	member_prototype(Time_Panel,time_panel,typename MasterType::type_of(time_panel),none,none);
 	member_prototype(Information_Panel,information_panel,typename MasterType::type_of(information_panel),none,none);
@@ -167,31 +167,21 @@ Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementat
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
-void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize()
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize(float xmin,float ymin,float xmax,float ymax)
 {
 	Initialize_GLCanvas();
 
-	_graphical_network = (Network_Prototype<type_of(graphical_network),Canvas_Implementation>*) Allocate<type_of(graphical_network)>();	
-	_graphical_network->canvas< Canvas<ComponentType,type_of(graphical_network)> *>( (Canvas<ComponentType,type_of(graphical_network)>*)this );
-	_graphical_network->information_panel< Information_Panel<typename MasterType::type_of(information_panel),type_of(graphical_network)> *>( (Information_Panel<typename MasterType::type_of(information_panel),type_of(graphical_network)>*)_information_panel );
-
-	// make the vital connection between graphical network and graphical vehicle
-	Graphical_Vehicle_Implementation<MasterType>::_graphical_network=(Network_Prototype<type_of(graphical_network),Graphical_Vehicle_Implementation<MasterType>>*)_graphical_network;
-	_graphical_network->read_network_data<Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Graphical_Network,string&>>( ((Antares_Implementation<MasterType>*)GetParent())->_db_name );
-
-	Point_2D<MasterType>& net_offset = _graphical_network->input_offset<Point_2D<MasterType>&>();
+	float xmid=(xmin+xmax)/2;
+	float ymid=(ymin+ymax)/2;
 	
-	_input_offset._x = net_offset._x;
-	_input_offset._y = net_offset._y;
+	_input_offset._x = -xmid;
+	_input_offset._y = -ymid;
 
-	// set canvas bounds as network bounds
-	Rectangle_Prototype<typename MasterType::type_of(graphical_network)::type_of(network_bounds)>* net_bounds=_graphical_network->network_bounds< Rectangle_Prototype<typename MasterType::type_of(graphical_network)::type_of(network_bounds)>* >();
+	_canvas_bounds._xmin = xmin - xmid;
+	_canvas_bounds._ymin = ymin - ymid;
 
-	_canvas_bounds._xmin = net_bounds->xmin<float>();
-	_canvas_bounds._xmax = net_bounds->xmax<float>();
-
-	_canvas_bounds._ymin = net_bounds->ymin<float>();
-	_canvas_bounds._ymax = net_bounds->ymax<float>();
+	_canvas_bounds._xmax = xmax - xmid;
+	_canvas_bounds._ymax = ymax - ymid;
 
 	// compute near and far planes with these bounds
 	if(_canvas_bounds._ymax-_canvas_bounds._ymin>_canvas_bounds._xmax-_canvas_bounds._xmin)
@@ -204,7 +194,6 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize()
 		_near_plane=(_canvas_bounds._xmax-_canvas_bounds._xmin)/(tan(25.0*.0174532925)*4.0)*10;
 		_far_plane=(_canvas_bounds._xmax-_canvas_bounds._xmin)/(tan(25.0*.0174532925)*4.0)*10+2.0*(_canvas_bounds._xmax-_canvas_bounds._xmin);
 	}
-
 	// connect the paint handler
 	Connect(wxEVT_PAINT,wxPaintEventHandler(Canvas_Implementation::Render));
 }

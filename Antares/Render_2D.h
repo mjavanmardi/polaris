@@ -13,6 +13,7 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
 void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Render()
 {
+	return;
 	if(!_initialized)
 	{
 		Connect(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,wxAuiNotebookEventHandler(Information_Panel_Implementation::OnSelect));

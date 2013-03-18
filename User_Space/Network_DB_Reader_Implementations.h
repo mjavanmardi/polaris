@@ -485,8 +485,8 @@ namespace Network_Components
 					zone->template Initialize<NULLTYPE>();
 					zone->template uuid<int>(db_itr->getZone());
 					zone->template internal_id<int>(zone_count);
-					zone->template X<double>(db_itr->getX());
-					zone->template Y<double>(db_itr->getY());
+					zone->template X<double>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getX()));
+					zone->template Y<double>( _scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getY()));
 					zones_container.insert(pair<int,_Zone_Interface*>(zone->template uuid<int>(), zone));
 				}
 
