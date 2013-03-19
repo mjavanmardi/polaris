@@ -35,28 +35,53 @@ namespace Zone_Components
 				quads=new Quad<MasterType>[5];
 				num_primitives=5;
 
+				//if (primary_color == GREEN_COLUMN || primary_color == GRAY_COLUMN)
+				//{
+				//	quads[0].color._g = 255;
+				//	quads[1].color._g = 220;
+				//	quads[2].color._g = 180;
+				//	quads[3].color._g = 150;
+				//	quads[4].color._g = 255;
+				//}
+				//if (primary_color == RED_COLUMN || primary_color == GRAY_COLUMN)
+				//{
+				//	quads[0].color._r = 255;
+				//	quads[1].color._r = 220;
+				//	quads[2].color._r = 180;
+				//	quads[3].color._r = 150;
+				//	quads[4].color._r = 255;
+				//}
+				//if (primary_color == BLUE_COLUMN || primary_color == GRAY_COLUMN)
+				//{
+				//	quads[0].color._b = 255;
+				//	quads[1].color._b = 220;
+				//	quads[2].color._b = 180;
+				//	quads[3].color._b = 150;
+				//	quads[4].color._b = 255;
+				//}
+				
 				if (primary_color == GREEN_COLUMN || primary_color == GRAY_COLUMN)
 				{
 					quads[0].color._g = 255;
-					quads[1].color._g = 220;
-					quads[2].color._g = 180;
-					quads[3].color._g = 150;
+					quads[1].color._g = 255;
+					quads[2].color._g = 255;
+					quads[3].color._g = 255;
 					quads[4].color._g = 255;
 				}
 				if (primary_color == RED_COLUMN || primary_color == GRAY_COLUMN)
 				{
 					quads[0].color._r = 255;
-					quads[1].color._r = 220;
-					quads[2].color._r = 180;
-					quads[3].color._r = 150;
+					quads[1].color._r = 255;
+					quads[2].color._r = 255;
+					quads[3].color._r = 255;
 					quads[4].color._r = 255;
 				}
 				if (primary_color == BLUE_COLUMN || primary_color == GRAY_COLUMN)
 				{
 					quads[0].color._b = 255;
-					quads[1].color._b = 220;
-					quads[2].color._b = 180;
-					quads[3].color._b = 150;
+					quads[1].color._b = 255;
+					quads[2].color._b = 255;
+					quads[3].color._b = 255;
 					quads[4].color._b = 255;
 				}
 
@@ -149,7 +174,7 @@ namespace Zone_Components
 	namespace Implementations
 	{
 		implementation struct Graphical_Zone_Group_Implementation : public Polaris_Component<APPEND_CHILD(Graphical_Zone_Group_Implementation),MasterType,Data_Object,ParentType>
-		{	
+		{
 			feature_implementation void accept_zone_information(Point_3D<MasterType>& coordinates, void* ptr, typename TargetType::Param2Type productions, typename TargetType::Param2Type attractions)
 			{
 				int width = 300;
@@ -192,6 +217,7 @@ namespace Zone_Components
 				cfg.storage_offset = 60/*_iteration*/;
 				cfg.storage_size = 3;
 				cfg.primitive_color = true;
+				cfg.primitive_normal = true;
 
 				cfg.attributes_callback = (attributes_callback_type)&Graphical_Zone_Implementation<MasterType>::fetch_attributes;
 				cfg.submission_callback = (attributes_callback_type)&Graphical_Zone_Implementation<MasterType>::submit_attributes;

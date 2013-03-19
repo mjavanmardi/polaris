@@ -227,3 +227,20 @@ static inline bool In_Polygon(vector<Point_3D<NULLTYPE>>& points, float x, float
 	}
 	return (false);
 }
+
+//---------------------------------------------------------
+//	Generic 3 point normal calculation with winding abc
+//---------------------------------------------------------
+
+static inline void Compute_Fast_Normal(Point_3D<NT>& a, Point_3D<NT>& b, Point_3D<NT>& c, Point_3D<NT>& result)
+{
+	result._x=(b._y-a._y)*(c._z-a._z)-(b._z-a._z)*(c._y-a._y);
+	result._y=(b._z-a._z)*(c._x-a._x)-(b._x-a._x)*(c._z-a._z);
+	result._z=(b._x-a._x)*(c._y-a._y)-(b._y-a._y)*(c._x-a._x);
+
+	float unit_length=sqrt(result._x*result._x+result._y*result._y+result._z*result._z);
+	
+	result._x/=unit_length;
+	result._y/=unit_length;
+	result._z/=unit_length;
+}

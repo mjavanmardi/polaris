@@ -41,8 +41,6 @@ public:
 			//Sleep(100);
 		}
 
-		cout << _iteration << endl;
-
 		pthis->_canvas->Refresh<NULLTYPE>();
 
 		pthis->_information_panel->Render<NULLTYPE>();

@@ -29,7 +29,7 @@ namespace Network_Components
 				for(intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
 				{
 					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersection_itr);
-//cout << "x=" << intersection->x_position<float>() << ", y=" << intersection->y_position<float>() << endl;
+
 					if(intersection->template x_position<float>() < _network_bounds._xmin)
 					{
 						_network_bounds._xmin = intersection->template x_position<float>();

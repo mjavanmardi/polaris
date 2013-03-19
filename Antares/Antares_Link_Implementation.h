@@ -92,6 +92,7 @@ namespace Link_Components
 				cfg.storage_period = 6;
 				cfg.storage_offset = 5;
 				cfg.primitive_color = true;
+				cfg.primitive_normal = true;
 				//cfg.dynamic_data = true;
 				//cfg.storage_period = 300;
 				//cfg.target_sub_iteration = Types::ZONE_UPDATE_SUBITERATION+1;

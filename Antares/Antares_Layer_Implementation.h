@@ -23,11 +23,16 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		const bool primitive_color = _primitive_color;
 		const bool primitive_normal = _primitive_normal;
-		const int primitive_stride = _primitive_stride;
+		const int primitive_stride = _vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>);
 		
 		const int vert_size = _vert_size;
 		const int vert_stride = _vert_stride;
 		const int data_stride = _data_stride;
+
+		Point_3D<NT> a;
+		Point_3D<NT> b;
+		Point_3D<NT> c;
+		Point_3D<NT> result;
 
 		vector<unsigned char>& storage_reference=_storage[iteration][_thread_id];
 
@@ -144,7 +149,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 				}
 
 				const int num_group_primitives=*((int*)geometry_itr);
-			
+				
 				const unsigned char* end_size_itr = geometry_itr+sizeof(int);
 
 				while(geometry_itr!=end_size_itr)
@@ -171,12 +176,24 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 					if(primitive_normal)
 					{
-						const unsigned char* end_data_itr = geometry_itr+vert_size;
+						const unsigned char* read_itr = geometry_itr;
 
-						while(geometry_itr!=end_data_itr)
+						a = *((Point_3D<NT>*)read_itr);
+						read_itr += sizeof(Point_3D<NT>);
+						b = *((Point_3D<NT>*)read_itr);						
+						read_itr += sizeof(Point_3D<NT>);
+						c = *((Point_3D<NT>*)read_itr);
+
+						Compute_Fast_Normal(a,b,c,result);
+
+						const unsigned char* write_itr = (const unsigned char*)&result;
+
+						const unsigned char* end_data_itr = write_itr + sizeof(Point_3D<NT>);
+
+						while(write_itr!=end_data_itr)
 						{
-							storage_reference.push_back(*geometry_itr);
-							++geometry_itr;
+							storage_reference.push_back(*write_itr);
+							++write_itr;
 						}
 					}
 
@@ -221,12 +238,24 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 					if(primitive_normal)
 					{
-						const unsigned char* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>);
+						const unsigned char* read_itr = geometry_itr;
 
-						while(geometry_itr!=end_data_itr)
+						a = *((Point_3D<NT>*)read_itr);
+						read_itr += sizeof(Point_3D<NT>);
+						b = *((Point_3D<NT>*)read_itr);						
+						read_itr += sizeof(Point_3D<NT>);
+						c = *((Point_3D<NT>*)read_itr);
+
+						Compute_Fast_Normal(a,b,c,result);
+
+						const unsigned char* write_itr = (const unsigned char*)&result;
+
+						const unsigned char* end_data_itr = write_itr + sizeof(Point_3D<NT>);
+
+						while(write_itr!=end_data_itr)
 						{
-							storage_reference.push_back(*geometry_itr);
-							++geometry_itr;
+							storage_reference.push_back(*write_itr);
+							++write_itr;
 						}
 					}
 

@@ -38,6 +38,14 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 
 	const int data_stride=layer->data_stride<int>();
 	
+	if(primitive_normal)
+	{
+		glEnable(GL_COLOR_MATERIAL);
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+		/*if(!grouped) */glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+	}
+
 	const Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >& storage=layer->storage<Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >&>();
 
 	//---- draw main layer ----
@@ -316,6 +324,14 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	if(!poly)
 	{
 		glEnd();
+	}
+
+	if(primitive_normal)
+	{
+		/*if(!grouped) */glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+		glDisable(GL_COLOR_MATERIAL);
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
 	}
 
 	glDepthFunc(GL_LESS);
