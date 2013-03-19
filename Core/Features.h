@@ -503,6 +503,10 @@ struct member_function_ptr_types<Type,setter_type>
 	tag_getter_as_available(FEATURE_NAME);\
 	tag_setter_as_available(FEATURE_NAME);
 	
+#define member_component_feature_accessor(FEATURE_NAME, MEMBER_COMPONENT_FEATURE_TO_ACCESS, MEMBER_COMPONENT_PROTOTYPE, MEMBER_COMPONENT_TYPE)\
+	member_data_component(MEMBER_COMPONENT_TYPE,_##FEATURE_NAME,none,none);\
+	member_component_feature(FEATURE_NAME,_##FEATURE_NAME,MEMBER_COMPONENT_FEATURE_TO_ACCESS,MEMBER_COMPONENT_PROTOTYPE);
+
 ///============================================================================
 /// local definition macros
 ///============================================================================
