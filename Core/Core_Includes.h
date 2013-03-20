@@ -278,3 +278,4 @@ throw new std::runtime_error(s.str().c_str());}
 
 static void* antares;
 static void* canvas;
+static void* information_panel;

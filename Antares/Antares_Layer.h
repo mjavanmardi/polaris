@@ -14,6 +14,7 @@ struct Antares_Layer_Configuration;
 
 struct Accented_Element{};
 struct Regular_Element{};
+struct Internal_Element{};
 
 prototype struct Antares_Layer
 {
@@ -102,6 +103,12 @@ typename TargetType::ReturnType Scale_Coordinates(typename TargetType::ParamType
 	return (TargetType::ReturnType)((ComponentType*)canvas)->Scale_Coordinates<ComponentType,CallerType,TargetType>(coordinates);
 }
 
+template<typename ComponentType,typename CallerType,typename TargetType>
+typename TargetType::ReturnType Allocate_New_Plot_Layer(typename TargetType::ParamType name)
+{
+	return (TargetType::ReturnType)((ComponentType*)information_panel)->Allocate_New_Layer<ComponentType,CallerType,TargetType>(name);
+}
+
 //---------------------------------------------------------
 //	PrimitiveType - primitive type options
 //---------------------------------------------------------
@@ -125,6 +132,7 @@ struct Antares_Layer_Configuration
 	// Default Configuration
 	Antares_Layer_Configuration()
 	{
+		draw=false;
 		dynamic_data=false;
 		target_sub_iteration=-1;
 
@@ -229,6 +237,7 @@ struct Antares_Layer_Configuration
 	{
 		//storage_size=_num_iterations;
 		
+		draw=true;
 		dynamic_data=true;
 		target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
 
@@ -243,6 +252,7 @@ struct Antares_Layer_Configuration
 		head_color._a=255;
 	}
 	
+	bool draw;
 	bool dynamic_data;
 	int target_sub_iteration;
 

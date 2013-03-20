@@ -18,6 +18,7 @@ typename Canvas_Implementation<MasterType,ParentType,InheritanceList>::Antares_L
 	_layers.push_back(new_layer);
 	
 	new_layer->list_index<int>(_layers.size() - 1);
+
 	new_layer->name<string&>(name);
 	new_layer->attributes_panel<attributes_panel_interface*>(_attributes_panel);
 
@@ -32,7 +33,7 @@ typename Canvas_Implementation<MasterType,ParentType,InheritanceList>::Antares_L
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
-void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Toggle_Layer(int identifier)
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Toggle_Layer(int identifier,bool checked)
 {
 	int counter=0;
 
@@ -42,8 +43,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Toggle_Layer(
 	{
 		if(counter==identifier)
 		{
-			bool current=(*itr)->draw<bool>();
-			(*itr)->draw<bool>(!current);
+			(*itr)->draw<bool>(checked);
 			break;
 		}
 	}

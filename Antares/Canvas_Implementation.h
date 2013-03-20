@@ -28,7 +28,7 @@ public:
 	}
 
 	feature_implementation Antares_Layer_Interface* Allocate_New_Layer(string& name);
-	feature_implementation void Toggle_Layer(int identifier);
+	feature_implementation void Toggle_Layer(int identifier,bool checked);
 	feature_implementation void Select_Layer(int identifier);
 	feature_implementation void Set_Mode(ANTARES_MODE mode);
 

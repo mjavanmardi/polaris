@@ -19,10 +19,10 @@ prototype struct Information_Panel
 		this_component()->Render<ComponentType,CallerType,TargetType>();
 	}
 	
-	feature_prototype typename TargetType::ReturnType Allocate_New_Layer(typename TargetType::ParamType name)
-	{
-		return (TargetType::ReturnType)this_component()->Allocate_New_Layer<ComponentType,CallerType,TargetType>(name);
-	}
+	//feature_prototype typename TargetType::ReturnType Allocate_New_Layer(typename TargetType::ParamType name)
+	//{
+	//	return (TargetType::ReturnType)this_component()->Allocate_New_Layer<ComponentType,CallerType,TargetType>(name);
+	//}
 
 	//feature_accessor(plotwindow,none,none);
 };

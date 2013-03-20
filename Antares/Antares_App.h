@@ -12,6 +12,7 @@
 #define START_UI(MASTER_TYPE,XMIN,YMIN,XMAX,YMAX) \
 	antares=(void*)new Antares_App<MASTER_TYPE>();\
 	canvas=nullptr;\
+	information_panel=nullptr;\
 	((Antares_App<MASTER_TYPE>*)antares)->Start_UI(XMIN,YMIN,XMAX,YMAX);\
 
 //---------------------------------------------------------
@@ -59,6 +60,7 @@ public:
 		main=new Antares_Implementation<MasterType,Antares_App>(nullptr);
 
 		canvas = main->_canvas;
+		information_panel = main->_information_panel;
 
 		main->Maximize();
 		main->Show();

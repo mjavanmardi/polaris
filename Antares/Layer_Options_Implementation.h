@@ -89,7 +89,7 @@ void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::Alloca
 {
 	int layer_id=_layers->Append(name);
 
-	_layers->Check(layer_id);
+	_layers->Check(layer_id,false);
 
 	Refresh();
 }
@@ -139,5 +139,7 @@ void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::OnTogg
 {
 	int i=event.GetInt();
 
-	_canvas->Toggle_Layer<Target_Type<NULLTYPE,void,int>>(i);
+	bool checked=_layers->IsChecked(i);
+
+	_canvas->Toggle_Layer<Target_Type<NULLTYPE,void,int,bool>>(i,checked);
 }

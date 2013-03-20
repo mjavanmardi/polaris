@@ -11,6 +11,11 @@
 
 implementation struct Antares_Layer_Implementation:public Polaris_Component<APPEND_CHILD(Antares_Layer_Implementation),MasterType,Execution_Object>
 {
+	Antares_Layer_Implementation()
+	{
+		_draw=false;
+	}
+
 	feature_implementation void Push_Element(void* data, int iteration, requires(check_2(TargetType,Regular_Element,is_same)))
 	{
 		const unsigned char* geometry_itr=(const unsigned char*)data;
@@ -275,8 +280,273 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			}
 		}
 	}
-	
+
 	feature_implementation void Push_Element(void* data, int iteration, requires(check_2(TargetType,Accented_Element,is_same)))
+	{
+		const unsigned char* geometry_itr=(const unsigned char*)data;
+
+		const bool grouped = _grouped;
+		const bool group_color = _group_color;
+		const bool group_normal = _group_normal;
+		
+		const PrimitiveType primitive_type = _primitive_type;
+
+		const bool primitive_color = _primitive_color;
+		const bool primitive_normal = _primitive_normal;
+		const int primitive_stride = _vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>);
+		
+		const int vert_size = _vert_size;
+		const int vert_stride = _vert_stride;
+		const int data_stride = _data_stride;
+
+		Point_3D<NT> a;
+		Point_3D<NT> b;
+		Point_3D<NT> c;
+		Point_3D<NT> result;
+
+		vector<unsigned char>& storage_reference=_accent_storage[iteration][_thread_id];
+
+		if(primitive_type == _PLOT)
+		{
+			PLFLT point_value;
+			const unsigned char* end_data_itr = (const unsigned char*) ( ((unsigned char*)&point_value) + sizeof(PLFLT) );
+
+			const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+
+			while( geometry_itr != geometry_data_end )
+			{
+				storage_reference.push_back(*geometry_itr);
+				++geometry_itr;
+			}
+
+			if(group_color)
+			{
+				const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+
+				while(geometry_itr!=end_data_itr)
+				{
+					storage_reference.push_back(*geometry_itr);
+					++geometry_itr;
+				}
+			}
+
+			const int num_group_primitives=*((int*)geometry_itr);
+			
+			const unsigned char* end_size_itr = geometry_itr+sizeof(int);
+
+			while(geometry_itr!=end_size_itr)
+			{
+				storage_reference.push_back(*geometry_itr);
+				++geometry_itr;
+			}
+
+			geometry_itr=(*((unsigned char**)geometry_itr));
+			const unsigned char* const group_begin = geometry_itr;
+			const unsigned char* const group_end = geometry_itr + sizeof(Point_2D<MasterType>) * num_group_primitives;
+
+			// Collect x points
+			while( geometry_itr != group_end )
+			{
+				const unsigned char* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>);
+
+				point_value=(PLFLT)(*((float*)geometry_itr));
+				
+				geometry_itr = (unsigned char*)&point_value;
+
+				while( geometry_itr!=end_data_itr )
+				{
+					storage_reference.push_back(*geometry_itr);
+					++geometry_itr;
+				}
+
+				geometry_itr = (const unsigned char*)geometry_vert_end;
+			}
+
+			geometry_itr = group_begin;
+
+			// Collect y points
+			while( geometry_itr != group_end )
+			{
+				const unsigned char* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>);
+
+				geometry_itr += sizeof(Point_2D<MasterType>)/2;
+
+				point_value=(PLFLT)(*((float*)geometry_itr));
+
+				geometry_itr = (unsigned char*)&point_value;
+
+				while( geometry_itr!=end_data_itr )
+				{
+					storage_reference.push_back(*geometry_itr);
+					++geometry_itr;
+				}
+
+				geometry_itr = (const unsigned char*)geometry_vert_end;
+			}
+		}
+		else
+		{
+			if(grouped)
+			{
+				const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+
+				while( geometry_itr != geometry_data_end )
+				{
+					storage_reference.push_back(*geometry_itr);
+					++geometry_itr;
+				}
+
+				if(group_color)
+				{
+					const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+
+					while(geometry_itr!=end_data_itr)
+					{
+						storage_reference.push_back(*geometry_itr);
+						++geometry_itr;
+					}
+				}
+
+				if(group_normal)
+				{
+					const unsigned char* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>);
+					
+					while(geometry_itr!=end_data_itr)
+					{
+						storage_reference.push_back(*geometry_itr);
+						++geometry_itr;
+					}
+				}
+
+				const int num_group_primitives=*((int*)geometry_itr);
+				
+				const unsigned char* end_size_itr = geometry_itr+sizeof(int);
+
+				while(geometry_itr!=end_size_itr)
+				{
+					storage_reference.push_back(*geometry_itr);
+					++geometry_itr;
+				}
+
+				const unsigned char* const group_end = (*((unsigned char**)geometry_itr)) + primitive_stride * num_group_primitives;
+				geometry_itr=(*((unsigned char**)geometry_itr));
+
+				while( geometry_itr != group_end )
+				{
+					if(primitive_color)
+					{
+						const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+
+						while(geometry_itr!=end_data_itr)
+						{
+							storage_reference.push_back(*geometry_itr);
+							++geometry_itr;
+						}
+					}
+
+					if(primitive_normal)
+					{
+						const unsigned char* read_itr = geometry_itr;
+
+						a = *((Point_3D<NT>*)read_itr);
+						read_itr += sizeof(Point_3D<NT>);
+						b = *((Point_3D<NT>*)read_itr);						
+						read_itr += sizeof(Point_3D<NT>);
+						c = *((Point_3D<NT>*)read_itr);
+
+						Compute_Fast_Normal(a,b,c,result);
+
+						const unsigned char* write_itr = (const unsigned char*)&result;
+
+						const unsigned char* end_data_itr = write_itr + sizeof(Point_3D<NT>);
+
+						while(write_itr!=end_data_itr)
+						{
+							storage_reference.push_back(*write_itr);
+							++write_itr;
+						}
+					}
+
+					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+
+					while( geometry_itr != geometry_vert_end )
+					{
+						const unsigned char* end_data_itr = geometry_itr + vert_size;
+
+						while(geometry_itr!=end_data_itr)
+						{
+							storage_reference.push_back(*geometry_itr);
+							++geometry_itr;
+						}
+					}
+				}
+			}
+			else
+			{
+				const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+
+				while( geometry_itr != geometry_data_end )
+				{
+					storage_reference.push_back(*geometry_itr);
+					++geometry_itr;
+				}
+
+				const unsigned char* const group_end = geometry_itr + primitive_stride;
+
+				while( geometry_itr != group_end )
+				{
+					if(primitive_color)
+					{
+						const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+
+						while(geometry_itr!=end_data_itr)
+						{
+							storage_reference.push_back(*geometry_itr);
+							++geometry_itr;
+						}
+					}
+
+					if(primitive_normal)
+					{
+						const unsigned char* read_itr = geometry_itr;
+
+						a = *((Point_3D<NT>*)read_itr);
+						read_itr += sizeof(Point_3D<NT>);
+						b = *((Point_3D<NT>*)read_itr);						
+						read_itr += sizeof(Point_3D<NT>);
+						c = *((Point_3D<NT>*)read_itr);
+
+						Compute_Fast_Normal(a,b,c,result);
+
+						const unsigned char* write_itr = (const unsigned char*)&result;
+
+						const unsigned char* end_data_itr = write_itr + sizeof(Point_3D<NT>);
+
+						while(write_itr!=end_data_itr)
+						{
+							storage_reference.push_back(*write_itr);
+							++write_itr;
+						}
+					}
+
+					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+
+					while( geometry_itr != geometry_vert_end )
+					{
+						const unsigned char* end_data_itr = geometry_itr+vert_size;
+
+						while(geometry_itr!=end_data_itr)
+						{
+							storage_reference.push_back(*geometry_itr);
+							++geometry_itr;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	feature_implementation void Push_Element(void* data, int iteration, requires(check_2(TargetType,Internal_Element,is_same)))
 	{
 		//Clear_Accented<ComponentType,ComponentType,NT>();
 
@@ -302,6 +572,9 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		if(primitive_type == _PLOT)
 		{
+			//this does not reflect what pushing an internal plot looks like
+			exit(0);
+
 			PLFLT point_value;
 			const unsigned char* end_data_itr = (const unsigned char*) ( ((unsigned char*)&point_value) + sizeof(PLFLT) );
 
@@ -536,9 +809,11 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		}
 	}
 
-	feature_implementation void Push_Element(void* data, int size, int iteration,requires(!check_2(TargetType,Regular_Element,is_same) && !check_2(TargetType,Accented_Element,is_same)))
+	feature_implementation void Push_Element(void* data, int size, int iteration,requires(!check_2(TargetType,Regular_Element,is_same) && !check_2(TargetType,Accented_Element,is_same)) && !check_2(TargetType,Internal_Element,is_same))
 	{
-		assert_check_2(TargetType,Regular_Element,is_same,"Not a recognizable element category! Available options are Regular_Element or Accented_Element.");
+		assert_check_2(TargetType,Regular_Element,is_same,"Not a recognizable element category! Available options are Regular_Element, Internal_Element or Accented_Element.");
+		assert_check_2(TargetType,Accented_Element,is_same,"Not a recognizable element category! Available options are Regular_Element, Internal_Element or Accented_Element.");
+		assert_check_2(TargetType,Internal_Element,is_same,"Not a recognizable element category! Available options are Regular_Element, Internal_Element or Accented_Element.");
 	}
 
 	feature_implementation void Initialize(Antares_Layer_Configuration& cfg)
@@ -554,7 +829,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		_storage.Initialize(cfg.storage_offset, cfg.storage_period, cfg.storage_size);
 		_accent_storage.Initialize(cfg.storage_offset, cfg.storage_period, 1);
 
-		_draw=true;
+		_draw=cfg.draw;
 
 		_primitive_type=cfg.primitive_type;
 

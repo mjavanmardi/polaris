@@ -36,9 +36,9 @@ prototype struct Canvas
 		return (TargetType::ReturnType)this_component()->Select_Layer<ComponentType,CallerType,TargetType>(name);
 	}
 	
-	feature_prototype typename TargetType::ReturnType Toggle_Layer(typename TargetType::ParamType name)
+	feature_prototype typename TargetType::ReturnType Toggle_Layer(typename TargetType::ParamType name,typename TargetType::Param2Type checked)
 	{
-		return (TargetType::ReturnType)this_component()->Toggle_Layer<ComponentType,CallerType,TargetType>(name);
+		return (TargetType::ReturnType)this_component()->Toggle_Layer<ComponentType,CallerType,TargetType>(name,checked);
 	}
 
 	feature_accessor(time_panel,none,none);

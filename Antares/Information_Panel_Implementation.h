@@ -19,19 +19,28 @@ public:
 
 	feature_implementation Antares_Layer_Interface* Allocate_New_Layer(string& name)
 	{
-		//---- initialize and add the components ----
+		Antares_Layer_Interface* new_layer=nullptr;
 
-		Information_Page<typename MasterType::type_of(information_page),ComponentType>* layer = (Information_Page<typename MasterType::type_of(information_page),ComponentType>*) new typename MasterType::type_of(information_page)((wxFrame*)this);
+		list< Information_Page<typename MasterType::type_of(information_page),ComponentType>* >::iterator itr;
 
-		_2D_layers.push_back(layer);
-		_information_book->AddPage((wxPanel*)layer,name);
+		for(itr=_2D_layers.begin();itr!=_2D_layers.end();itr++)
+		{
+			if((*itr)->layer<Antares_Layer_Interface*>()==nullptr)
+			{
+				new_layer=(Antares_Layer_Interface*)Allocate<typename type_of(MasterType::antares_layer)>();
 
-		Antares_Layer_Interface* new_layer=(Antares_Layer_Interface*)Allocate<typename type_of(MasterType::antares_layer)>();
+				(*itr)->layer<Antares_Layer_Interface*>(new_layer);
 
-		layer->layer<Antares_Layer_Interface*>(new_layer);
+				new_layer->list_index<int>(_2D_layers.size() - 1);
+				new_layer->name<string&>(name);
 
-		new_layer->list_index<int>(_2D_layers.size() - 1);
-		new_layer->name<string&>(name);
+				int idx=_information_book->GetPageIndex((wxWindow*)(*itr));
+
+				_information_book->SetPageText(idx,name);
+
+				break;
+			}
+		}
 
 		return new_layer;
 	}
@@ -66,12 +75,24 @@ Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Informa
 	_sizer=new wxBoxSizer(wxVERTICAL);
 
 	_information_book=new wxAuiNotebook(this,-1,wxDefaultPosition,wxDefaultSize,wxAUI_NB_TOP);
+
+	for(int i=0;i<5;i++)
+	{
+		Information_Page<typename MasterType::type_of(information_page),ComponentType>* layer = (Information_Page<typename MasterType::type_of(information_page),ComponentType>*) new typename MasterType::type_of(information_page)(_information_book);
+		
+		_2D_layers.push_back(layer);
+		
+		_information_book->AddPage((wxWindow*)layer,"");
+	}
+
 	_sizer->Add(_information_book,1,wxEXPAND);
 
 	//---- set the sizer ----
 
 	SetSizerAndFit(_sizer);
 	
+	Connect(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,wxAuiNotebookEventHandler(Information_Panel_Implementation::OnSelect));
+
 	_initialized = false;
 }
 

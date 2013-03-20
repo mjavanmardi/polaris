@@ -64,6 +64,8 @@ namespace Network_Components
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Lines();
+				cfg.draw=true;
+
 				//cfg.head_size_value = 
 				cfg.attributes_callback = (attributes_callback_type)&MasterType::type_of(link)::fetch_attributes;
 				cfg.attributes_schema = string("Id,Type,Travel time,Travel delay,Speed,Density,In-flow rate,Out-flow rate,Travel time ratio,Speed ratio,Density ratio,In-flow ratio,Out-flow ratio");
@@ -107,6 +109,38 @@ namespace Network_Components
 					_Link_Interface* link = (_Link_Interface*)(*link_itr);
 					link->visualize_moe<NULLTYPE>();
 				}
+
+#pragma pack(push,1)
+				struct Plot_Element
+				{
+					int num_primitives;
+					Point_2D<MasterType>* points;
+				};
+#pragma pack(pop)
+
+				Point_2D<MasterType> submission;
+				submission._x=_iteration;
+				submission._y=MasterType::vehicle_type::_vehicles_counter;
+
+				MasterType::vehicle_type::_num_vehicles_cache.push_back(submission);
+
+				submission._y=MasterType::vehicle_type::_vehicles_counter/2;
+				
+				MasterType::vehicle_type::_num_vehicles_cache_B.push_back(submission);
+
+				Plot_Element element;
+
+				element.num_primitives = MasterType::vehicle_type::_num_vehicles_cache.size();
+				element.points = &MasterType::vehicle_type::_num_vehicles_cache.front();
+
+				MasterType::vehicle_type::_num_vehicles->Push_Element<Regular_Element>((void*)&element);
+				
+
+				element.points = &MasterType::vehicle_type::_num_vehicles_cache_B.front();
+				
+				MasterType::vehicle_type::_num_vehicles_B->Push_Element<Regular_Element>((void*)&element);
+
+				MasterType::vehicle_type::_vehicles_counter=0;
 			}
 
 			//member_data(Point_2D<MasterType>, input_offset,none,none);

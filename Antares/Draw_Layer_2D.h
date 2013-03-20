@@ -161,6 +161,7 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 	}
 
 	wxPLplotstream* pls = _plotwindow->GetStream();
+	//wxPLplotstream* pls = GetStream();
 
 	//pls->adv( 0 );
 	//pls->scol0( 0, 255, 255, 255 );
@@ -268,4 +269,5 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 	//---- flush and display ----
 
 	_plotwindow->RenewPlot();
+	//RenewPlot();
 }
