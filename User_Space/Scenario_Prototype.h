@@ -28,6 +28,7 @@ namespace Scenario_Components
 			enum Type_Sub_Iteration_keys
 			{
 				START_OF_ITERATION = 0,
+				NETWORK_SNAPSHOT_SUB_ITERATION,
 				TRAVELER_SET_DEPARTURE_SUB_ITERATION,
 				ROUTING_SUB_ITERATION,
 				CONTROL_SUB_ITERATION,
@@ -123,6 +124,8 @@ namespace Scenario_Components
 
 			feature_accessor(database_name, none, none);
 
+			feature_accessor(snapshot_period, none, none); 
+
 			feature_prototype void read_scenario_data()
 			{
 				CfgReader cfgReader;
@@ -190,6 +193,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("num_threads", num_threads<int*>())!= PARAMETER_FOUND) num_threads<int>(1);
 				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0);
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
+				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(3600);
 
 				//===============================================
 				// set control parameters
@@ -272,6 +276,8 @@ namespace Scenario_Components
 			    simulation_time_in_seconds<double>(0.0);
 			    operation_time_in_seconds<double>(0.0);
 			    output_time_in_seconds<double>(0.0);
+
+				snapshot_period<int>(300);
 			}
 
 			feature_prototype void write_scenario_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data)

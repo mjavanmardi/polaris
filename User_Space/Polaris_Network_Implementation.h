@@ -82,6 +82,8 @@ namespace Network_Components
 
 			member_data(long,start_cpu_time_in_seconds,none,none);
 
+			member_container(vector<typename MasterType::routable_network_type*>, network_snapshot_container, none, none);
+			
 			struct MOE_Data network_moe_data;
 
 			struct MOE_Data realtime_network_moe_data;
@@ -157,26 +159,53 @@ namespace Network_Components
 			feature_implementation void initialize_network_agent()
 			{
 				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				load_event(ComponentType,End_Iteration_Conditional,End_Iteration_Handler, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION,NULLTYPE);
+				load_event(ComponentType,End_Iteration_Conditional,End_Iteration_Handler, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION,NULLTYPE);
                 _start_cpu_time_in_seconds = (long)get_current_cpu_time_in_seconds();
  			}
 
 			declare_feature_conditional(End_Iteration_Conditional)
 			{
 				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
-				
-				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
+				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION)
+				{
+					((typename MasterType::network_type*)_this)->Swap_Event((Event)&Snapshot_Subiteration_Handler<NULLTYPE>);
+					response.result=true;
+					response.next._iteration=_iteration;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
+				}
+				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
 				{
 					((typename MasterType::network_type*)_this)->Swap_Event((Event)&End_Iteration_Handler<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION;
 				} 
 				else
 				{
-					assert(false);
 					cout << "Should never reach here in network conditional!" << endl;
+					assert(false);
 				}
+			}
+
+			declare_feature_event(Snapshot_Subiteration_Handler)
+			{
+				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
+				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, typename MasterType::network_type);
+				if (((_Network_Interface*)_this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template snapshot_period<int>() == 0)
+				{
+					((typename MasterType::network_type*)_this)->create_snapshot();
+				}
+			}
+
+			void create_snapshot()
+			{
+				typedef Network_Prototype<typename MasterType::network_type> _Regular_Network_Interface;
+				cout << "creating network snapshot at " << ((_Regular_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>() << endl;
+				typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Regular_Network,_Regular_Network_Interface*> Net_IO_Type;
+				define_container_and_value_interface_unqualified_container(_Routable_Networks_Container_Interface, _Routable_Network_Interface, type_of(network_snapshot_container), Random_Access_Sequence_Prototype, Network_Components::Prototypes::Network_Prototype, ComponentType);
+				_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
+				routable_network->template read_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
+				_network_snapshot_container.push_back((typename MasterType::routable_network_type*)routable_network);
 			}
 
 			declare_feature_event(End_Iteration_Handler)

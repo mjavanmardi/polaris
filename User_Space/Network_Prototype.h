@@ -174,6 +174,7 @@ namespace Network_Components
 			feature_accessor(max_free_flow_speed, none, none);	
 			feature_accessor(network_vmt, none, none);
 			feature_accessor(network_vht, none, none);
+			feature_accessor(network_snapshot_container, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 
