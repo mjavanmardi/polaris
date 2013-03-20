@@ -105,7 +105,7 @@ namespace Demand_Components
 			feature_accessor(vehicles_container, none, none);
 			feature_accessor(first_vehicle_departure_time, none, none);
 			feature_accessor(last_vehicle_departure_time, none, none);
-#ifndef FOR_LINUX_PORTING
+//#ifndef FOR_LINUX_PORTING
 			feature_prototype void read_demand_data(typename TargetType::ParamType& network_mapping,
 				requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
@@ -114,7 +114,7 @@ namespace Demand_Components
 				define_component_interface(_Scenario_Interface, typename get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 				string name(scenario_reference<_Scenario_Interface*>()->template database_name<string&>());
-				auto_ptr<database> db (open_sqlite_database (name));
+				auto_ptr<database> db (open_sqlite_demand_database (name));
 
 				define_component_interface(_Network_Interface, typename get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 
@@ -142,7 +142,7 @@ namespace Demand_Components
 
 				transaction t(db->begin());
 
-				result<TripNoRef> trip_result=db->template query<TripNoRef>(query<TripNoRef>::true_expr);
+				result<Trip> trip_result=db->template query<Trip>(query<Trip>::true_expr);
 				
 				
 				_Traveler_Interface* traveler;
@@ -182,8 +182,9 @@ namespace Demand_Components
 				int simulation_start_time = scenario->template simulation_start_time<int>();
 				int simulation_end_time = scenario->template simulation_end_time<int>();
 
-				for(result<TripNoRef>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
+				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
+cout << "one demand record read" << endl;
 					if (++counter % 10000 == 0)
 					{
 						cout << counter << " trips processed" << endl;
@@ -245,7 +246,8 @@ namespace Demand_Components
 					vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
 					router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 //					plan = (_Plan_Interface*)Allocate<typename _Plan_Interface::Component_Type>();
-					
+					movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
+
 					traveler->template uuid<int>(++traveler_id_counter);
 					traveler->template internal_id<int>(traveler_id_counter);
 					traveler->template router<_Routing_Interface*>(router);
@@ -254,8 +256,6 @@ namespace Demand_Components
 
 					router->template traveler<_Traveler_Interface*>(traveler);
 					router->template network<_Network_Interface*>(network);
-
-					movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
 
 					vehicle->template uuid<int>(traveler_id_counter);
 					vehicle->template internal_id<int>(traveler_id_counter);
@@ -279,7 +279,7 @@ namespace Demand_Components
 					}
 				}
 			}
-#endif
+//#endif
 
 			feature_prototype void read_demand_data(requires(!check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,typename Network_Components::Types::File_Network,is_same)))
 			{

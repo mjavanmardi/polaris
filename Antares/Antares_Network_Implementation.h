@@ -55,6 +55,8 @@ namespace Network_Components
 				set_link_data<ComponentType,CallerType,TargetType>();
 			}
 
+
+
 			feature_implementation void set_link_data()
 			{
 				
@@ -62,11 +64,13 @@ namespace Network_Components
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Lines();
-
+				//cfg.head_size_value = 
+				cfg.attributes_callback = (attributes_callback_type)&MasterType::type_of(link)::fetch_attributes;
+				cfg.attributes_schema = string("Id,Type,Travel time,Travel delay,Speed,Density,In-flow rate,Out-flow rate,Travel time ratio,Speed ratio,Density ratio,In-flow ratio,Out-flow ratio");
 				_link_lines->Initialize<NULLTYPE>(cfg);
-
 				struct Link_Line
 				{
+					void* data;
 					Point_3D<MasterType> a;
 					Point_3D<MasterType> b;
 				} current_line;
@@ -89,6 +93,7 @@ namespace Network_Components
 
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(current_line.b);
 
+					current_line.data = (void*)(*link_itr);
 					_link_lines->Push_Element<Regular_Element>(&current_line);
 				}
 			}

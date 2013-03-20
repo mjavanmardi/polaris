@@ -166,6 +166,30 @@ inline auto_ptr<odb::database> open_sqlite_database(const std::string& name)
 	return db;
 }
 
+inline auto_ptr<odb::database> open_sqlite_demand_database(const std::string& name)
+{
+	auto_ptr<database> db (new odb::sqlite::database (make_name(name, db_inventory[2]), SQLITE_OPEN_READWRITE));
+	connection_ptr c (db->connection ());
+	c->execute("PRAGMA synchronous = OFF");
+	c->execute("PRAGMA journal_mode = MEMORY");
+	//ifstream test;
+	//if (db_inventory.size()>1)
+	//{
+	//	for (vector<string>::iterator it = db_inventory.begin()+1; it != db_inventory.end(); ++it)
+	//	{
+	//		test.open(make_name(name, *it));
+
+	//		if(test.is_open())
+	//		{
+	//			test.close();
+	//			c->execute(make_attach_string(name,*it));
+	//		}
+	//		
+	//	}
+	//}
+	return db;
+}
+
 inline auto_ptr<database> create_sqlite_database(const string& name, string& schema)
 {
 	try
