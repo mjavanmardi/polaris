@@ -7,11 +7,11 @@
 #include <string>
 #include "Geometry.h"
 #include <map>
-using odb::database;
-using odb::transaction;
+//using odb::database;
+//using odb::transaction;
 using namespace polaris::io;
 using namespace std;
-using namespace odb::core;
+//using namespace odb::core;
 
 
 static void trace_callback(void *log_file, const char* content)
@@ -31,8 +31,8 @@ void Convert(TransimsNetwork *net, InputContainer &container, System_File_Type f
 	FileType *file = (FileType *) net->System_File_Handle (file_type);
 	try
 	{
-		auto_ptr<database> db (open_sqlite_database (net->path_to_database));
-		transaction t (db->begin());
+		auto_ptr<odb::database> db (open_sqlite_database (net->path_to_database));
+		odb::transaction t (db->begin());
 		while (file->Read(false))
 		{		
 			net->Show_Progress();
@@ -84,8 +84,8 @@ void ConvertNoRef(TransimsNetwork *net, InputContainer &container, System_File_T
 	file->Rewind();
 	try
 	{
-		auto_ptr<database> db (open_sqlite_database (net->path_to_database));
-		transaction t (db->begin());
+		auto_ptr<odb::database> db (open_sqlite_database (net->path_to_database));
+		odb::transaction t (db->begin());
 		while (file->Read(false))
 		{		
 			net->Show_Progress();
@@ -139,8 +139,8 @@ void ConvertNested(TransimsNetwork *net, InputContainer &container, System_File_
 	FileType *file = (FileType *) net->System_File_Handle (file_type);
 	try
 	{
-		auto_ptr<database> db (open_sqlite_database (net->path_to_database));
-		transaction t (db->begin());
+		auto_ptr<odb::database> db (open_sqlite_database (net->path_to_database));
+		odb::transaction t (db->begin());
 		while (file->Read(false))
 		{		
 			net->Show_Progress();
@@ -176,8 +176,8 @@ void ConvertNested(TransimsNetwork *net, InputContainer &container, System_File_
 
 void AddIndeces(TransimsNetwork *net)
 {
-	auto_ptr<database> db (open_sqlite_database (net->path_to_database));
-	connection_ptr c (db->connection ());
+	auto_ptr<odb::database> db (open_sqlite_database (net->path_to_database));
+	odb::connection_ptr c (db->connection ());
 	c->execute("CREATE UNIQUE INDEX IF NOT EXISTS IDX_CONNECTION ON CONNECTION (LINK, T0_LINK, DIR);");
 	c->execute("CREATE UNIQUE INDEX IF NOT EXISTS IDX_SIGN ON SIGN (LINK, DIR);");
 }
@@ -217,8 +217,8 @@ void AddSpatialiteGeometry(TransimsNetwork *net)
 	typedef odb::query<Link> query_link;
 	typedef odb::result<Link> result_link;
 
-	auto_ptr<database> db (open_sqlite_database (net->path_to_database));
-	transaction t(db->begin());
+	auto_ptr<odb::database> db (open_sqlite_database (net->path_to_database));
+	odb::transaction t(db->begin());
 
 	result_link rl(db->query<Link> (query_link::true_expr));
 	int count = 0;

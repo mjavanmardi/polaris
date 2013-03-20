@@ -21,15 +21,15 @@ void test_create(const string& name)
 	container.Nodes[2] = n2;
 	container.Nodes[3] = n3;
 	container.Nodes[4] = n4;
-	//auto_ptr<database> db (create_database (argc, argv));
-	auto_ptr<database> db (create_sqlite_database (name));
+	//auto_ptr<odb::database> db (create_database (argc, argv));
+	auto_ptr<odb::database> db (create_sqlite_database (name));
 	cout << "New database "<< ((odb::sqlite::database*)&(*db))->name() <<" was created\n";
 	//shared_ptr<Link> l1 (new Link(1, "lalal", container.Nodes[1], container.Nodes[2], 1.0, 2.0, 3.0, 10, 20, 2, 0, 8, 12, 0.3, 2,22,22,122,1,33,333,2,3,2,1,2));
 	//shared_ptr<Link> l2 (new Link(2, "lalal", container.Nodes[3], container.Nodes[4], 1.0, 2.0, 3.0, 10, 20, 2, 0, 8, 12, 0.3, 2,22,22,122,1,33,333,2,3,2,1, 3));
 	//container.Links[1] = l1;
 	//container.Links[2] = l2;
 
-	transaction t (db->begin());
+	odb::transaction t (db->begin());
 	db->persist(n1);
 	db->persist(n2);
 	db->persist(n3);
@@ -45,9 +45,9 @@ void test_read(const string& name)
 	typedef odb::query<Link> query;
 	typedef odb::result<Link> result;
 	vector<char>::iterator it;
-	auto_ptr<database> db (open_sqlite_database (name));
+	auto_ptr<odb::database> db (open_sqlite_database (name));
 	cout << "Database "<< ((odb::sqlite::database*)&(*db))->name() <<" was opened\n";
-	transaction t (db->begin ());
+	odb::transaction t (db->begin ());
 	result r (db->query<Link> ( (query::node_a >120)));
     for (result::iterator i (r.begin ()); i != r.end (); ++i)
     {
@@ -71,8 +71,8 @@ int main(int argc, char* argv[])
 		net->Init();
 	else
 		net->Init(argc, argv);
-	//auto_ptr<database> db = create_sqlite_database  (net->path_to_database);
-	shared_ptr<database> db = create_sqlite_database  (net->path_to_database);
+	//auto_ptr<odb::database> db = create_sqlite_database  (net->path_to_database);
+	shared_ptr<odb::database> db = create_sqlite_database  (net->path_to_database);
 	Db_File control_file;
 	char* control_record;
 	string control_content;
@@ -108,13 +108,10 @@ int main(int argc, char* argv[])
 	Convert<Shape_File,Shape, int>(net,container, SHAPE, "SHAPE");
 	Convert<Sign_File,Sign, int>(net,container, SIGN, "SIGN");
 	ConvertNested<Timing_File,Timing, int, timing_phase>(net,container, TIMING_PLAN, "TIMING_PLAN");
-	//Convert<Timing_File,Timing, int>(net,container, TIMING_PLAN, "TIMING_PLAN");
 	ConvertNested<Phasing_File,Phasing, int, phase_movement>(net,container, PHASING_PLAN, "PHASING_PLAN");
-	//Convert<Phasing_File,Phasing, int>(net,container, PHASING_PLAN, "PHASING_PLAN");
 	Convert<Connect_File,Connect, int>(net,container, CONNECTION, "CONNECTION");
 	Convert<Vehicle_File,Vehicle, int>(net,container, VEHICLE, "VEHICLE");
-	if (net->generate_trip_with_ref)
-		Convert<Trip_File,Trip, int>(net,container, TRIP, "TRIP");
+	Convert<Trip_File,Trip, int>(net,container, TRIP, "TRIP");
 	if (net->add_geo_columns)
 	{
 		cout << "Adding necessary geo columns\n";
@@ -132,7 +129,7 @@ int main(int argc, char* argv[])
 			control_content += control_record;
 			control_content += "\n";
 		}
-		transaction t (db->begin());
+		odb::transaction t (db->begin());
 		shared_ptr<MetaData> meta_data (new MetaData("ControlFile", control_content));
 		db->persist(meta_data);
 		t.commit();
@@ -142,7 +139,7 @@ int main(int argc, char* argv[])
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
 	shared_ptr<MetaData> meta_data (new MetaData("TimeStamp", asctime(timeinfo)));
-	transaction t (db->begin());
+	odb::transaction t (db->begin());
 	db->persist(meta_data);
 	t.commit();
 	cout << "Press any key...\n";

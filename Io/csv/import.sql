@@ -1,10 +1,9 @@
 .separator ","
 DELETE FROM ZoneLandUse;
-.import ZoneLandUse ZoneLandUse
+.import z:/POLARIS/interchange/DemandData/ZoneLandUse ZoneLandUse
 
-.separator ","
 DELETE FROM LocationData;
-.import LocationData LocationData
+.import z:/POLARIS/interchange/DemandData/LocationData LocationData
 --For some reason the UPDATE statement would not wor without sqlite extension being loaded
 SELECT load_extension('c:/opt/polarisdeps/Win32/bin/libspatialite-4.dll');
 UPDATE Zone SET zone_land_use = (SELECT zone FROM ZoneLandUse WHERE ZoneLandUse.zone = Zone.zone);

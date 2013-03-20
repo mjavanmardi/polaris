@@ -2,8 +2,8 @@
 
 void PopulateUseCode(string db_path)
 {
-	auto_ptr<database> db (open_sqlite_database (db_path)); 
-	transaction t (db->begin());
+	auto_ptr<odb::database> db (open_sqlite_database (db_path)); 
+	odb::transaction t (db->begin());
 	shared_ptr<polaris::io::Use_Code> uc (nullptr);
 	uc = make_shared<Use_Code> ( "NONE",		1, 0, "SPECIAL", "", "", "" ); db->persist(uc);
 	uc = make_shared<Use_Code> ( "RESTRICTED",	2, 0, "SPECIAL", "", "", "" ); db->persist(uc);
@@ -26,8 +26,8 @@ void PopulateUseCode(string db_path)
 }
 void PopulateLinkType(string db_path, std::map<string,shared_ptr<Link_Type>> *container)
 {
-	auto_ptr<database> db (open_sqlite_database (db_path)); 
-	transaction t (db->begin());
+	auto_ptr<odb::database> db (open_sqlite_database (db_path)); 
+	odb::transaction t (db->begin());
 	shared_ptr<Link_Type> lt (nullptr);
 	lt = make_shared<Link_Type>("FREEWAY",		10, "ANY|AUTO|TRUCK|BUS|SOV|HOV2|HOV3|HOV4|LIGHTTRUCK|HEAVYTRUCK|NONE|TAXI|RESTRICTED|NONE",				"", "" ); (*container)[lt->getLink_Type()] = lt; db->persist(lt);
 	lt = make_shared<Link_Type>("EXPRESSWAY",	20, "ANY|AUTO|TRUCK|BUS|SOV|HOV2|HOV3|HOV4|LIGHTTRUCK|HEAVYTRUCK|NONE|TAXI|RESTRICTED|NONE",				"XPRESSWAY", "" );  (*container)[lt->getLink_Type()] = lt; db->persist(lt);
@@ -56,9 +56,9 @@ void PopulateLinkType(string db_path, std::map<string,shared_ptr<Link_Type>> *co
 void PopulateAreaType (string db_path, std::map<int,shared_ptr<Area_Type>> *container)
 {
 	
-	auto_ptr<database> db (open_sqlite_database (db_path)); 
-	//connection_ptr c (db->connection ());
-	transaction t (db->begin ());
+	auto_ptr<odb::database> db (open_sqlite_database (db_path)); 
+	//odb::connection_ptr c (db->connection ());
+	odb::transaction t (db->begin ());
 	shared_ptr<Area_Type> at (nullptr);
 	at = make_shared<Area_Type>(1, "AREATYPE1", "DEFAULT");
 	at = make_shared<Area_Type>(1, "AREATYPE1", "DEFAULT"); (*container)[at->getPrimaryKey()] = at; db->persist(at);
@@ -74,8 +74,8 @@ void PopulateAreaType (string db_path, std::map<int,shared_ptr<Area_Type>> *cont
 
 void PopulateDimensionQuantity (string db_path)
 {
-	auto_ptr<database> db (open_sqlite_database (db_path)); 
-	transaction t (db->begin ());
+	auto_ptr<odb::database> db (open_sqlite_database (db_path)); 
+	odb::transaction t (db->begin ());
 	shared_ptr<Dimension> d (nullptr);
 	shared_ptr<Quantity> q (nullptr);
 	table_field tf;

@@ -19,6 +19,7 @@ namespace io
 {
 //Forward declarations.
 //
+class Tags;
 class Node;
 class Zone;
 class ZoneLandUse;
@@ -123,6 +124,19 @@ public:
 	}
 public:
 	#pragma db id
+	std::string key;
+	std::string value;
+};
+
+#pragma db object
+class Tags
+{
+public:
+	Tags() {};
+	#pragma db id auto
+	int id;
+	std::string table;
+	std::string record_id;
 	std::string key;
 	std::string value;
 };
