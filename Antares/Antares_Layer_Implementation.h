@@ -1029,11 +1029,13 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	{
 		Antares_Layer_Implementation* pthis=(Antares_Layer_Implementation*)_this;
 
+		LOCK(_canvas_lock);
 		for(int i=0;i<_num_antares_threads;i++)
 		{
 			pthis->_storage[_iteration + pthis->_storage.period][i].clear();
 			pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].clear();
 		}
+		UNLOCK(_canvas_lock);
 	}
 };
 

@@ -13,6 +13,8 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
 void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Render()
 {
+
+
 	int current_iteration = _iteration - 1;
 
 	if(current_iteration!=_cached_iteration)
@@ -26,7 +28,9 @@ void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Re
 	
 	if(active_page->layer<void*>()!=nullptr)
 	{
+		LOCK(_plot_lock);
 		active_page->Draw_Layer<NULLTYPE>(current_iteration,current_iteration);
+		UNLOCK(_plot_lock);
 	}
 
 	//list< Information_Page<typename MasterType::type_of(information_page),ComponentType>* >::iterator itr;

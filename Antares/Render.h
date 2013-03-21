@@ -55,11 +55,15 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Render(wxPain
 	//---- loop over and draw all layers ----
 
 	list<Antares_Layer_Interface*>::iterator itr;
+	
+	LOCK(_canvas_lock);
 
 	for(itr=_layers.begin();itr!=_layers.end();itr++)
 	{
 		Draw_Layer(current_iteration,current_iteration,(*itr));
 	}
+	
+	UNLOCK(_canvas_lock);
 	
 	//---- flush and display ----
 

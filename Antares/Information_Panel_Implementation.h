@@ -61,6 +61,8 @@ public:
 	member_data(bool,initialized,none,none);
 };
 
+static _lock _plot_lock;
+
 //---------------------------------------------------------
 //	Information_Panel - information initialization
 //---------------------------------------------------------
@@ -68,6 +70,8 @@ public:
 template<typename MasterType,typename ParentType,typename InheritanceList>
 Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Information_Panel_Implementation(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize )
 {
+	UNLOCK(_plot_lock);
+
 	SetBackgroundColour(wxColor(255,255,255));
 
 	//---- initialize the sizer and container notebook ----

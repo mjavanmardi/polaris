@@ -107,8 +107,10 @@ public:
 	list<Antares_Layer_Interface*> _layers;
 	member_pointer(Antares_Layer_Interface,selected_layer,none,none);
 
-	member_data(ANTARES_MODE,interaction_mode,none,none);
+	member_data(ANTARES_MODE,interaction_mode,none,none);	
 };
+
+static _lock _canvas_lock;
 
 //---------------------------------------------------------
 //	Canvas_Implementation - canvas initialization
@@ -117,6 +119,8 @@ public:
 template<typename MasterType,typename ParentType,typename InheritanceList>
 Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementation(wxFrame* parent, int* args) : wxGLCanvas(parent,-1,args,wxDefaultPosition,wxDefaultSize,wxFULL_REPAINT_ON_RESIZE)
 {
+	UNLOCK(_canvas_lock);
+
 	//antares_ptr=((Antares_Implementation<MasterType>*)GetParent());
 
 	_glcontext = new wxGLContext(this);
