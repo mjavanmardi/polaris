@@ -223,8 +223,8 @@ namespace Network_Components
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 
 						
-						link->template uuid<int>(++link_counter);
-						link->template internal_id<int>(link_counter);
+						link->template uuid<int>(link_id_dir.id);
+						link->template internal_id<int>(++link_counter);
 
 						link->template num_lanes<int>(db_itr->getLanes_Ba());
 						

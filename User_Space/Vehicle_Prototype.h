@@ -41,7 +41,7 @@ namespace Vehicle_Components
 	namespace Prototypes
 	{
 
-		prototype struct Vehicle_Prototype
+		prototype struct Vehicle_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 			feature_accessor(simulation_status, none, none);

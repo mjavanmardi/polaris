@@ -63,7 +63,7 @@ namespace RNG_Components
 
 			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)0, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
 			{
-				BaseType::_generator.seed(BaseType::_seed);
+				BaseType::_generator.seed((unsigned long)seed_value/*BaseType::_seed*/);
 				this->template minimum<ComponentType,CallerType, TargetType>(min);
 				this->template maximum<ComponentType,CallerType, TargetType>(max);
 
@@ -97,7 +97,7 @@ namespace RNG_Components
 			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)0, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
 			{
 				//state_check(Is_Positive)(this,_scale);
-				GrandBaseType::_generator.seed(GrandBaseType::_seed);
+				GrandBaseType::_generator.seed((unsigned long)seed_value/* GrandBaseType::_seed*/);
 				this->template location<ComponentType,CallerType, TargetType>(location);
 				this->template scale<ComponentType,CallerType, TargetType>(scale);
 
@@ -170,9 +170,21 @@ namespace GLOBALS
 			{
 				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				rng->Initialize<int>(i);
+				rng->Initialize<int>(std::sin((float)i+1)*(float)INT_MAX);
 			}
 		}
+
+		template <typename TargetType>
+		void Set_Seed(TargetType random_seed)
+		{
+			for (int i=0; i < _num_threads; i++)
+			{
+				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
+				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
+				rng->Initialize<TargetType>((TargetType)(std::sin((float)i+1)*(float)INT_MAX) + random_seed);
+			}
+		}
+
 
 		template <typename ReturnValueType>
 		ReturnValueType Next_Rand()
@@ -190,13 +202,26 @@ namespace GLOBALS
 	implementation struct _Global_Normal_RNG : public Polaris_Component<APPEND_CHILD(_Global_Normal_RNG),MasterType,NULLTYPE>
 	{
 		typedef RNG_Components::Implementations::MT_Normal_Double<NULLTYPE> RNG_type;
+
 		_Global_Normal_RNG()
 		{
 			for (int i=0; i < _num_threads; i++)
 			{
 				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				rng->Initialize<int>(time(NULL)*(i+1));
+				int seed = std::sin((float)i+1)*(float)INT_MAX;
+				rng->Initialize<int>(seed);
+			}
+		}
+
+		template <typename TargetType>
+		void Set_Seed(TargetType random_seed)
+		{
+			for (int i=0; i < _num_threads; i++)
+			{
+				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
+				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
+				rng->Initialize<TargetType>((TargetType)(std::sin((float)i+1)*(float)INT_MAX) + random_seed);
 			}
 		}
 

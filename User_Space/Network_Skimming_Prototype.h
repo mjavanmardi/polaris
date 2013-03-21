@@ -488,6 +488,10 @@ namespace Network_Skimming_Components
 						long dest_link_index = (*(dest_node->template destination_links<links_itf*>()->begin()))->template internal_id<long>();
 						long dest_zone_index = dest->template zone_index<long>();
 						(*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)] = tree->template Get_Tree_Results_For_Destination<typename skimmer_itf::Component_Type::Stored_Time_Type>(dest_link_index);
+
+						//cout << (*activity_locations)[orig_itr->second->loc_index<long>()]->uuid<int>() << ", " << (*activity_locations)[dest_node_index]->uuid<int>() << ", ";
+						//cout << network->links_container<links_itf&>()[dest_link_index]->uuid<int>() << ", ";
+						//cout << (*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]<<endl;
 					}
 				}
 
@@ -501,7 +505,7 @@ namespace Network_Skimming_Components
 
 				ofstream outfile;
 				stringstream filename;
-				filename <<"LOS\\los_file_hour_"<< Simulation_Time.Current_Time<Time_Hours>() << ".xls";
+				filename <<"los_file_hour_"<< Simulation_Time.Current_Time<Time_Hours>() << ".xls";
 				outfile.open(filename.str().c_str(),ios_base::out);
 				
 				outfile << endl <<endl << "---------------------------------------------------";

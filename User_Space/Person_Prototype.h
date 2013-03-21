@@ -105,7 +105,7 @@ namespace Variables
 
 namespace Prototypes
 {
-	prototype struct Person
+	prototype struct Person ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 
@@ -273,7 +273,7 @@ namespace Prototypes
 	};
 
 
-	prototype struct Person_Properties
+	prototype struct Person_Properties ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 
@@ -317,7 +317,7 @@ namespace Prototypes
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
 			// Define interfaces to the container members of the class
-			define_container_and_value_interface(Activity_Plans_List,Activity_Plan,typename get_type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Activity_Plans_List,Activity_Plan,typename get_type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan,ComponentType);
 			define_container_and_value_interface(Movement_Plans_List,Movement_Plan,typename get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 			Activity_Plans_List* activity_plans = this_ptr->Activity_Plans_Container<Activity_Plans_List*>();
 			Movement_Plans_List* movement_plans = this_ptr->Movement_Plans_Container<Movement_Plans_List*>();
@@ -340,7 +340,7 @@ namespace Prototypes
 				// check if activity planning needs to occur, if so do this
 				else if (act_itr != activity_plans->end())
 				{
-					if (activity->planning_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
+					if (activity->Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
 						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING,false,response);
 					else
 						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,false,response);
@@ -369,7 +369,7 @@ namespace Prototypes
 				// check if activity planning needs to occur, if so do this otherwise, goto movement plans
 				if (act_itr != activity_plans->end())
 				{
-					if (activity->planning_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
+					if (activity->Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
 						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING,true,response);
 					else
 						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
@@ -440,7 +440,7 @@ namespace Prototypes
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
-			define_container_and_value_interface(Activity_Plans,Activity_Plan,typename get_type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Activity_Plans,Activity_Plan,typename get_type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Plan,ComponentType);
 			Activity_Plans* activities = this_ptr->Activity_Plans_Container<Activity_Plans*>();
 			typename Activity_Plans::iterator act_itr = activities->begin();
 
@@ -449,8 +449,8 @@ namespace Prototypes
 				Activity_Plan* act = *act_itr;
 
 				// if movement happens in the current planning increment, execute movement
-				if (act->template planning_time<Simulation_Timestep_Increment>() >= Simulation_Time.Current_Time<Simulation_Timestep_Increment>() &&
-					act->template planning_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
+				if (act->template Activity_Planning_Time<Simulation_Timestep_Increment>() >= Simulation_Time.Current_Time<Simulation_Timestep_Increment>() &&
+					act->template Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
 				{
 					// Do activity planning
 					act->template Do_Activity_Planning<NULLTYPE>();	
@@ -461,7 +461,7 @@ namespace Prototypes
 				}
 
 				// remove movements which have already been skipped
-				else if (act->template planning_time<Simulation_Timestep_Increment>() < Simulation_Time.Current_Time<Simulation_Timestep_Increment>())
+				else if (act->template Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Current_Time<Simulation_Timestep_Increment>())
 				{
 					typename Activity_Plans::iterator prev = act_itr++;
 					activities->erase(prev);
@@ -638,7 +638,10 @@ namespace Prototypes
 			}
 			return false;
 		}
-
+		feature_prototype void Write_To_Log(stringstream& s)
+		{
+			this_component()->Write_To_Log<ComponentType,CallerType,TargetType>(s);
+		}
 	
 		// Activity Plans and Movement plans, stored in a hashmap keyed based on next required plan time (updated in the plan class after plan completion)
 		feature_accessor(Activity_Generator,none,none);
@@ -667,7 +670,7 @@ namespace Prototypes
 	};
 
 
-	prototype struct Activity_Generator
+	prototype struct Activity_Generator ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 
@@ -681,7 +684,7 @@ namespace Prototypes
 	};
 
 
-	prototype struct Destination_Choice
+	prototype struct Destination_Choice ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 
