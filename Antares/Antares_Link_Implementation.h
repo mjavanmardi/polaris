@@ -139,6 +139,10 @@ namespace Link_Components
 
 				_link_travel_time_ratio_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_travel_time_ratio_layer),ComponentType>*, string& > >(string("Link Travel Time Ratio"));
 				_link_travel_time_ratio_layer->Initialize<NULLTYPE>(cfg);
+
+				_link_moe_plot=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_moe_plot),ComponentType>*, string& > >(string("Link MOE Plot"));
+				cfg.Configure_Plot();
+				_link_moe_plot->Initialize<NULLTYPE>(cfg);
 			}
 
 			static void initialize_reference_MOEs()
@@ -155,33 +159,6 @@ namespace Link_Components
 				visualization_reference.link_density_ratio = 0.5;
 				visualization_reference.link_travel_time_ratio = 0.5;
 			}
-
-			//feature_implementation void plot_link_speed_moe()
-			//{
-			//	Point_2D<MasterType> submission;
-			//	submission._x=_iteration;
-			//	submission._y=_vehicles_counter;
-
-			//	vehicle_points.push_back(submission);
-
-			//	submission._y=_vehicles_counter/2;
-			//	
-			//	vehicle_points_B.push_back(submission);
-
-			//	Plot_Element element;
-
-			//	element.num_primitives = vehicle_points.size();
-			//	element.points = &vehicle_points.front();
-
-			//	_num_vehicles->Push_Element<Regular_Element>((void*)&element);
-			//	
-
-			//	element.points = &vehicle_points.front();
-			//	
-			//	_num_vehicles_B->Push_Element<Regular_Element>((void*)&element);
-
-			//	_vehicles_counter=0;
-			//}
 
 			//member_component(typename MasterType::graphical_link_moe_group_type,graphical_link_moe_group,none,none);
 			//static member_prototype(Graphical_Link_MOE_Group,graphical_link_moe_group,typename MasterType::graphical_link_moe_group_type,none,none);
@@ -235,6 +212,12 @@ namespace Link_Components
 
 			void push_to_link_density_layer()
 			{
+				Point_2D<MasterType> submission;
+				submission._x = _iteration;
+				submission._y = realtime_link_moe_data.link_density;
+
+				_link_density_cache.push_back(submission);
+
 				int height = (realtime_link_moe_data.link_density / visualization_reference.link_density) * base_height;
 				set_bar_height(height);
 				_link_density_layer->Push_Element<Regular_Element>((void*)&bar);
@@ -288,7 +271,7 @@ namespace Link_Components
 				set_bar_height(height);
 				_link_travel_time_ratio_layer->Push_Element<Regular_Element>((void*)&bar);
 			}
-	
+			
 			static bool submit_attributes(Antares_Link_Implementation* _this,vector<string>& bucket)
 			{
 				// not supported yet
@@ -297,6 +280,23 @@ namespace Link_Components
 
 			static bool fetch_attributes(Antares_Link_Implementation* _this,vector<string>& bucket)
 			{
+				_link_moe_plot->Clear_Accented<NT>();
+
+#pragma pack(push,1)
+				struct Plot_Element
+				{
+					int num_primitives;
+					Point_2D<MasterType>* points;
+				};
+#pragma pack(pop)
+
+				Plot_Element element;
+
+				element.num_primitives = _this->_link_density_cache.size();
+				element.points = &_this->_link_density_cache.front();
+
+				_link_moe_plot->Push_Element<Accented_Element>((void*)&element);
+
 				stringstream s;
 				char str_buf[256];
 				s << _this->_internal_id;
@@ -361,6 +361,10 @@ namespace Link_Components
 			static member_prototype(Antares_Layer,link_out_flow_ratio_layer,typename type_of(MasterType::antares_layer),none,none);
 			static member_prototype(Antares_Layer,link_density_ratio_layer,typename type_of(MasterType::antares_layer),none,none);
 			static member_prototype(Antares_Layer,link_travel_time_ratio_layer,typename type_of(MasterType::antares_layer),none,none);
+
+
+			member_data(vector<Point_2D<MasterType>>,link_density_cache,none,none);
+			static member_prototype(Antares_Layer,link_moe_plot,typename type_of(MasterType::antares_layer),none,none);
 		};
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Antares_Layer<typename type_of(MasterType::antares_layer),Antares_Link_Implementation<MasterType,ParentType,InheritanceList>>* Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::_link_travel_time_layer;
@@ -384,6 +388,10 @@ namespace Link_Components
 		Antares_Layer<typename type_of(MasterType::antares_layer),Antares_Link_Implementation<MasterType,ParentType,InheritanceList>>* Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::_link_density_ratio_layer;
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Antares_Layer<typename type_of(MasterType::antares_layer),Antares_Link_Implementation<MasterType,ParentType,InheritanceList>>* Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::_link_travel_time_ratio_layer;
+		
+		
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		Antares_Layer<typename type_of(MasterType::antares_layer),Antares_Link_Implementation<MasterType,ParentType,InheritanceList>>* Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::_link_moe_plot;
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Link_MOE_Data Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::visualization_reference;

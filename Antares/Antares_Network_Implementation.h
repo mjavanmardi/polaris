@@ -124,21 +124,12 @@ namespace Network_Components
 
 				MasterType::vehicle_type::_num_vehicles_cache.push_back(submission);
 
-				submission._y=MasterType::vehicle_type::_vehicles_counter/2;
-				
-				MasterType::vehicle_type::_num_vehicles_cache_B.push_back(submission);
-
 				Plot_Element element;
 
 				element.num_primitives = MasterType::vehicle_type::_num_vehicles_cache.size();
 				element.points = &MasterType::vehicle_type::_num_vehicles_cache.front();
 
 				MasterType::vehicle_type::_num_vehicles->Push_Element<Regular_Element>((void*)&element);
-				
-
-				element.points = &MasterType::vehicle_type::_num_vehicles_cache_B.front();
-				
-				MasterType::vehicle_type::_num_vehicles_B->Push_Element<Regular_Element>((void*)&element);
 
 				MasterType::vehicle_type::_vehicles_counter=0;
 			}

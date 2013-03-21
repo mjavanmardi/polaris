@@ -169,6 +169,7 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 
 	xmax = max(xmax,1.0);
 
+	ymin *= .9;
 	ymax += 1;
 	ymax *= 1.2;
 

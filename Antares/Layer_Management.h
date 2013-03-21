@@ -77,7 +77,5 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Select_Layer(
 		}
 	}
 
-
-
 	Refresh();
 }

@@ -163,6 +163,7 @@ struct Antares_Layer_Configuration
 
 	void Configure_Lines()
 	{
+		Antares_Layer_Configuration();
 		primitive_type=_LINE;
 		
 		primitive_color=false;
@@ -174,6 +175,7 @@ struct Antares_Layer_Configuration
 	
 	void Configure_Points()
 	{
+		Antares_Layer_Configuration();
 		dynamic_data=true;
 		target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
 
@@ -193,6 +195,7 @@ struct Antares_Layer_Configuration
 
 	void Configure_Static_Points(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
+		Antares_Layer_Configuration();
 		primitive_type=_POINT;
 
 		head_color._r=Color._r;
@@ -205,6 +208,7 @@ struct Antares_Layer_Configuration
 	
 	void Configure_Static_Quads(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
+		Antares_Layer_Configuration();
 		primitive_type=_QUAD;
 
 		head_color._r=Color._r;
@@ -219,6 +223,7 @@ struct Antares_Layer_Configuration
 	
 	void Configure_Dynamic_Quads(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
+		Antares_Layer_Configuration();
 		dynamic_data=true;
 		storage_size=3;
 		storage_period=1;
@@ -235,7 +240,7 @@ struct Antares_Layer_Configuration
 
 	void Configure_Plot()
 	{
-		//storage_size=_num_iterations;
+		Antares_Layer_Configuration();
 		
 		draw=true;
 		dynamic_data=true;

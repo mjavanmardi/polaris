@@ -23,10 +23,8 @@ namespace Vehicle_Components
 		implementation struct Graphical_Vehicle_Implementation:public Polaris_Component<APPEND_CHILD(Graphical_Vehicle_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			static vector<Point_2D<MasterType>> _num_vehicles_cache;
-			static vector<Point_2D<MasterType>> _num_vehicles_cache_B;
 			
 			static member_prototype(Antares_Layer,num_vehicles,typename type_of(MasterType::antares_layer),none,none);
-			static member_prototype(Antares_Layer,num_vehicles_B,typename type_of(MasterType::antares_layer),none,none);
 
 			static volatile member_data(int,vehicles_counter,none,none);
 
@@ -54,26 +52,7 @@ namespace Vehicle_Components
 				pcfg.storage_offset = 5;
 
 				_num_vehicles->Initialize<NULLTYPE>(pcfg);
-
-
-				_num_vehicles_B=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(num_vehicles),Graphical_Vehicle_Implementation>*, string& > >(string("Number of Vehicles Green"));
-				pcfg.head_color._r=0;
-				pcfg.head_color._g=255;
-				_num_vehicles_B->Initialize<NULLTYPE>(pcfg);
 			}
-
-
-			//feature_implementation void accent_num_vehicles()
-			//{
-			//	Plot_Element element;
-
-			//	element.num_primitives = vehicle_points_B.size();
-			//	element.points = &vehicle_points_B.front();
-
-			//	_num_vehicles->Clear_Accented<NT>();
-
-			//	_num_vehicles->Push_Element<Accented_Element>((void*)&element);
-			//}
 
 			
 			member_data(Vehicle_Components::Types::Vehicle_Status_Keys, simulation_status, none, none);
@@ -213,17 +192,10 @@ namespace Vehicle_Components
 		Antares_Layer<typename MasterType::type_of(antares_layer),Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_num_vehicles;
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
-		Antares_Layer<typename MasterType::type_of(antares_layer),Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_num_vehicles_B;
-		
-		template<typename MasterType,typename ParentType,typename InheritanceList>
 		volatile int Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_vehicles_counter;
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		vector<Point_2D<MasterType>> Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_num_vehicles_cache;
-		
-		template<typename MasterType,typename ParentType,typename InheritanceList>
-		vector<Point_2D<MasterType>> Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_num_vehicles_cache_B;
-
 	}
 
 }

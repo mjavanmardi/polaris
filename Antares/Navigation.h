@@ -22,7 +22,10 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Set_Mode(ANTA
 	else
 	{
 		Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+		_selected_layer->Deselect<NULLTYPE>();
 	}
+
+	Refresh();
 }
 
 //---------------------------------------------------------

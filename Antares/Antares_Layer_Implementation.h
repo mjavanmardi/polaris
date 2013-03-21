@@ -904,25 +904,15 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 	feature_implementation void Deselect(requires(check_2(CallerType,typename MasterType::canvas_type,is_same)))
 	{
-		//current_iteration = start_iteration;
-
-		//while(current_iteration <= end_iteration)
-		//{
-		//	vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
-
-		//	for(int i=0;i<_num_antares_threads;i++)
-		//	{
-		//		geometry_by_thread[i].clear();
-		//	}
-
-		//	current_iteration++;
-		//}
+		Clear_Accented<ComponentType,ComponentType,NT>();
 	}
 
 	feature_implementation void Deselect(requires(!check_2(CallerType,typename MasterType::canvas_type,is_same))){static_assert(false,"Caller Not a Canvas Object");}
 
 	feature_implementation void Double_Click(requires(check_2(CallerType,typename MasterType::canvas_type,is_same)))
 	{
+		if(_selected_element==nullptr) return;
+
 		if(_control_dialog == nullptr)
 		{
 			_control_dialog = (control_dialog_interface*)new type_of(control_dialog)(_name);
