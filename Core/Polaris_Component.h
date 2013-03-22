@@ -201,6 +201,20 @@ typename Polaris_Component<InheritanceList,MasterType,ObjectType,NULLTYPE,PageFa
 	(new Polaris_Component<InheritanceList,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::Singleton_Type());
 
 
+template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
+const unsigned int Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::page_factor=PageFactor;
+
+template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
+const int Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::component_index=_component_counter++;
+
+template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
+vector<void*>* const Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::all_components_reference=&_all_components;
+
+template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
+typename Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::Singleton_Type* const 
+	Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::singleton_reference
+	= Add_Component_Singleton<typename Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::Singleton_Type>
+	(new Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::Singleton_Type());
 
 
 

@@ -68,7 +68,7 @@ static _lock _plot_lock;
 //---------------------------------------------------------
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
-Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Information_Panel_Implementation(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize )
+Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Information_Panel_Implementation(wxFrame* parent) : wxPanel(parent,-1,wxDefaultPosition,wxDefaultSize,wxCLIP_CHILDREN )
 {
 	UNLOCK(_plot_lock);
 

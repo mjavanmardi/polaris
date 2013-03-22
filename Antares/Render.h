@@ -12,6 +12,8 @@
 template<typename MasterType,typename ParentType,typename InheritanceList>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Render(wxPaintEvent& event)
 {
+	LOCK(_canvas_lock);
+
 	//---- clear and initialize drawing ----
 
 	int current_iteration = _iteration - 1;
@@ -55,8 +57,6 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Render(wxPain
 	//---- loop over and draw all layers ----
 
 	list<Antares_Layer_Interface*>::iterator itr;
-	
-	LOCK(_canvas_lock);
 
 	for(itr=_layers.begin();itr!=_layers.end();itr++)
 	{

@@ -449,6 +449,8 @@
     <ClInclude Include="Activity_Prototype.h" />
     <ClInclude Include="Demand_Prototype.h" />
     <ClInclude Include="Destination_Choice_Implementation.h" />
+    <ClInclude Include="Incident_Implementations.h" />
+    <ClInclude Include="Incident_Prototype.h" />
     <ClInclude Include="File_Reader.h" />
     <ClInclude Include="File_Writer.h" />
     <ClInclude Include="Intersection_Control_Prototype.h" />
