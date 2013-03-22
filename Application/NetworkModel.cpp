@@ -347,7 +347,7 @@ struct MasterType
 
     typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
 
-    typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
+    //typedef Activity_Components::Implementations::ADAPTS_Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
 
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
 };
