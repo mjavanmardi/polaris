@@ -245,9 +245,21 @@ int main(int argc,char** argv)
 	MasterType::person_destination_choice_type::_B_EMPLOYMENT = 0.0002;
 	MasterType::person_destination_choice_type::_B_POPULATION = 0.00005;
 		
+
 	//==================================================================================================================================
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
+	#ifdef _DEBUG
+	typedef Person_Components::Prototypes::Person<MasterType::person_type> person_itf;
+	typedef Person_Components::Prototypes::Person_Properties<MasterType::person_properties_type> properties_itf;
+	typedef Person_Components::Prototypes::Activity_Generator<MasterType::activity_generator_type> generator_itf;
+	typedef Person_Components::Prototypes::Person_Planner<MasterType::person_planner_type> planner_itf;
+	person_itf* p = (person_itf*)Allocate<MasterType::person_type>();
+	p->network_reference<_Network_Interface*>(network);
+	p->scenario_reference<_Scenario_Interface*>(scenario);	
+	p->Initialize<int>(1);
+	p->Home_Location<int>(0);
+	#else
 	ofstream out;
 	out.open("full_population_chicag.csv",ios_base::out);
 	ofstream marg_out;
@@ -257,7 +269,7 @@ int main(int argc,char** argv)
 	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
 	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
 	// Solver settings - IPF tolerance, Percentage of population to synthesis, maximum ipf and selection iterations
-	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,0.1,100);
+	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,1.0,100);
 
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
@@ -269,6 +281,7 @@ int main(int argc,char** argv)
 	popsyn->network_reference<_Network_Interface*>(network);
 	popsyn->scenario_reference<_Scenario_Interface*>(scenario);
 	popsyn->Initialize<NULLTYPE>();
+	#endif
 	//----------------------------------------------------------------------------------------------------------------------------------
 
 	//==================================================================================================================================

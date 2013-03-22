@@ -301,7 +301,7 @@ namespace Prototypes
 	};
 
 
-	prototype struct Person_Planner
+	prototype struct Person_Planner ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 		 
@@ -317,7 +317,7 @@ namespace Prototypes
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
 			// Define interfaces to the container members of the class
-			define_container_and_value_interface(Activity_Plans_List,Activity_Plan,typename get_type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan,ComponentType);
+			define_container_and_value_interface(Activity_Plans_List,Activity_Plan,typename get_type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 			define_container_and_value_interface(Movement_Plans_List,Movement_Plan,typename get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 			Activity_Plans_List* activity_plans = this_ptr->Activity_Plans_Container<Activity_Plans_List*>();
 			Movement_Plans_List* movement_plans = this_ptr->Movement_Plans_Container<Movement_Plans_List*>();
@@ -435,43 +435,43 @@ namespace Prototypes
 		}
 		declare_feature_event(Activity_Planning_Event)
 		{
-			// Create alias for this to use in conditional
-			typedef Person_Planner<ComponentType, ComponentType> _Planning_Interface;
-			ComponentType* _pthis = (ComponentType*)_this;
-			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
+			//// Create alias for this to use in conditional
+			//typedef Person_Planner<ComponentType, ComponentType> _Planning_Interface;
+			//ComponentType* _pthis = (ComponentType*)_this;
+			//_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
-			define_container_and_value_interface(Activity_Plans,Activity_Plan,typename get_type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Plan,ComponentType);
-			Activity_Plans* activities = this_ptr->Activity_Plans_Container<Activity_Plans*>();
-			typename Activity_Plans::iterator act_itr = activities->begin();
+			//define_container_and_value_interface(Activity_Plans,Activity_Plan,typename get_type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Planner,ComponentType);
+			//Activity_Plans* activities = this_ptr->Activity_Plans_Container<Activity_Plans*>();
+			//typename Activity_Plans::iterator act_itr = activities->begin();
 
-			while (act_itr != activities->end())
-			{
-				Activity_Plan* act = *act_itr;
+			//while (act_itr != activities->end())
+			//{
+			//	Activity_Plan* act = *act_itr;
 
-				// if movement happens in the current planning increment, execute movement
-				if (act->template Activity_Planning_Time<Simulation_Timestep_Increment>() >= Simulation_Time.Current_Time<Simulation_Timestep_Increment>() &&
-					act->template Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
-				{
-					// Do activity planning
-					act->template Do_Activity_Planning<NULLTYPE>();	
+			//	// if movement happens in the current planning increment, execute movement
+			//	if (act->template Activity_Planning_Time<Simulation_Timestep_Increment>() >= Simulation_Time.Current_Time<Simulation_Timestep_Increment>() &&
+			//		act->template Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
+			//	{
+			//		// Do activity planning
+			//		act->template Do_Activity_Planning<NULLTYPE>();	
 	
-					//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
-					typename Activity_Plans::iterator prev = act_itr++;
-					activities->erase(prev);
-				}
+			//		//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
+			//		typename Activity_Plans::iterator prev = act_itr++;
+			//		activities->erase(prev);
+			//	}
 
-				// remove movements which have already been skipped
-				else if (act->template Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Current_Time<Simulation_Timestep_Increment>())
-				{
-					typename Activity_Plans::iterator prev = act_itr++;
-					activities->erase(prev);
-				}
-				// exit if no movements in current timestep
-				else
-				{
-					break;
-				}
-			}
+			//	// remove movements which have already been skipped
+			//	else if (act->template Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Current_Time<Simulation_Timestep_Increment>())
+			//	{
+			//		typename Activity_Plans::iterator prev = act_itr++;
+			//		activities->erase(prev);
+			//	}
+			//	// exit if no movements in current timestep
+			//	else
+			//	{
+			//		break;
+			//	}
+			//}
 		}
 		declare_feature_event(Movement_Planning_Event)
 		{
@@ -498,16 +498,9 @@ namespace Prototypes
 			Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();
 			typename Movement_Plans::iterator move_itr = movements->begin();
 
-
-			if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<" >= "<< Simulation_Time.Current_Time<Simulation_Timestep_Increment>() << " && < " <<Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>())<<endl;
-
-
 			while (move_itr != movements->end())
 			{
 				Movement_Plan* move = *move_itr;
-
-				//if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"MOVE_EVENT:," << parent->uuid<int>() << ","<<move->template departed_time<Simulation_Timestep_Increment>()<<",";
-				//if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<" >= "<< Simulation_Time.Current_Time<Simulation_Timestep_Increment>() << " && < " <<Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>())<<endl;
 
 				// if movement happens in the current planning increment, execute movement
 				if (move->template departed_time<Simulation_Timestep_Increment>() >= Simulation_Time.Current_Time<Simulation_Timestep_Increment>() &&
@@ -517,7 +510,7 @@ namespace Prototypes
 					if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"MOVE_EVENT:," << parent->uuid<int>() << ", PASSED."<<endl;
 				
 					// make sure vehicle is not already being simulated, skip movement if it is
-					if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED)
+					if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
 					{
 						// increment the zone origin/destination counters based on movement plan
 						_Activity_Location_Interface* orig = move->origin<_Activity_Location_Interface*>();
@@ -561,37 +554,11 @@ namespace Prototypes
 					return;
 				}
 			}
-
-			//// Get all movement plans scheduled for current iteration
-			//pair<typename Movement_Plans::iterator, typename Movement_Plans::iterator> range = movements->equal_range(_iteration);
-
-			//// Execute movement plans and remove from schedule
-			//for (typename Movement_Plans::iterator move_itr = range.first; move_itr != range.second; ++move_itr)
-			//{		
-			//	Movement_Plan* move = move_itr->second;
-			//	// make sure vehicle is not already being simulated, skip movement if it is
-			//	if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED)
-			//	{
-			//		vehicle->template movement_plan<Movement_Plan*>(move);
-			//		this_ptr->template Schedule_New_Departure<NULLTYPE>(move->template departed_time<Simulation_Timestep_Increment>());
-
-			//		// increment the zone origin/destination counters based on movement plan
-			//		_Activity_Location_Interface* orig = move->origin<_Activity_Location_Interface*>();
-			//		_Activity_Location_Interface* dest = move->destination<_Activity_Location_Interface*>();
-			//		_Zone_Interface* orig_zone = orig->zone<_Zone_Interface*>();
-			//		_Zone_Interface* dest_zone = dest->zone<_Zone_Interface*>();
-			//		orig_zone->production_count<int&>()++;
-			//		dest_zone->attraction_count<int&>()++;
-			//	}
-	
-			//	//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
-			//	break;
-
-			//}
-			//movements->erase(_iteration);
-			////movements->erase(range.first, range.second);
 		}
+		declare_feature_event(Movement_Event)
+		{
 
+		}
 
 		feature_prototype void Initialize(requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
@@ -617,6 +584,27 @@ namespace Prototypes
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
 
+		feature_prototype bool Schedule_New_Routing(int planning_time)
+		{
+			// schedule routing		
+			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
+			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+
+			Parent_Person_Itf* person_itf = this->Parent_Person<Parent_Person_Itf*>();
+			Routing_Itf* itf= person_itf->template router<Routing_Itf*>();	
+			Vehicle_Itf* vehicle_itf = person_itf->template vehicle<Vehicle_Itf*>();
+
+		
+			// Schedule the routing if the vehicle is not already in the network, otherwise return false
+			if (vehicle_itf->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle_itf->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
+			{
+				if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"SCHEDULE_ROUTER:," << person_itf->uuid<int>() << ","<<departed_time<<endl;
+				itf->template Schedule_Route_Computation<NULLTYPE>(departed_time);
+				return true;
+			}
+			return false;
+		}
 		feature_prototype bool Schedule_New_Departure(int departed_time)
 		{
 			// schedule routing		
@@ -630,7 +618,7 @@ namespace Prototypes
 
 		
 			// Schedule the routing if the vehicle is not already in the network, otherwise return false
-			if (vehicle_itf->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED)
+			if (vehicle_itf->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle_itf->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
 			{
 				if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"SCHEDULE_ROUTER:," << person_itf->uuid<int>() << ","<<departed_time<<endl;
 				itf->template Schedule_Route_Computation<NULLTYPE>(departed_time);
@@ -638,6 +626,7 @@ namespace Prototypes
 			}
 			return false;
 		}
+
 		feature_prototype void Write_To_Log(stringstream& s)
 		{
 			this_component()->Write_To_Log<ComponentType,CallerType,TargetType>(s);

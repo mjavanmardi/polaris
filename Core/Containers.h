@@ -76,7 +76,7 @@ struct Input_Iterator:public IteratorType
 ///============================================================================
 
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
-struct Back_Insertion_Sequence_Prototype
+struct Back_Insertion_Sequence_Prototype ADD_DEBUG_INFO
 {
 	typedef ComponentType Component_Type;\
 	typedef CallerType Caller_Type;\
@@ -140,7 +140,7 @@ struct Back_Insertion_Sequence_Prototype
 ///============================================================================
 
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type>
-struct Random_Access_Sequence_Prototype
+struct Random_Access_Sequence_Prototype ADD_DEBUG_INFO
 {
 	typedef ComponentType Component_Type;
 	typedef CallerType Caller_Type;
@@ -213,7 +213,7 @@ struct Random_Access_Sequence_Prototype
 };
 
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::mapped_type> 
-struct Associative_Container_Prototype : public ComponentType
+struct Associative_Container_Prototype ADD_DEBUG_INFO
 {
 	typedef ComponentType Component_Type;
 	typedef CallerType Caller_Type;
@@ -264,6 +264,10 @@ struct Associative_Container_Prototype : public ComponentType
 
 	void clear(){return ((ComponentType*)this)->clear();}
 
+	void set_empty_key(key_type key){((ComponentType*)this)->set_empty_key(key);}
+
+	void set_deleted_key(key_type key){((ComponentType*)this)->set_deleted_key(key);}
+
 	//key_compare key_comp() const { return ((ComponentType*)this)->key_comp();}
 
 	//value_compare value_comp() const { return ((ComponentType*)this)->value_comp();}
@@ -286,7 +290,7 @@ struct Associative_Container_Prototype : public ComponentType
 ///============================================================================
 
 template<typename ComponentType,typename CallerType=NULLTYPE,typename TargetValueType=typename ComponentType::value_type> 
-struct Multidimensional_Random_Access_Array_Prototype : public ComponentType
+struct Multidimensional_Random_Access_Array_Prototype ADD_DEBUG_INFO
 {
 	typedef ComponentType Component_Type;
 	typedef CallerType Caller_Type;
