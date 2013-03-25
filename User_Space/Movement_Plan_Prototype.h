@@ -12,17 +12,7 @@ namespace Movement_Plan_Components
 	}
 
 	namespace Concepts
-	{
-		concept struct Is_Movement_Plan
-		{
-			check_getter(has_trajectory, trajectory_container);
-			check_getter(has_origin, origin);
-			check_getter(has_destination, destination);
-			check_getter(has_departed_time, departed_time);
-			check_getter(has_arrived_time, arrived_time);
-
-			define_default_check(has_trajectory && has_origin && has_destination && has_departed_time && has_arrived_time);
-		};
+	{	
 		concept struct Is_Movement_Plan_Prototype
 		{
 			check_getter(has_trajectory, Component_Type::trajectory_container);
@@ -32,6 +22,16 @@ namespace Movement_Plan_Components
 			check_getter(has_arrived_time, Component_Type::arrived_time);
 
 			define_default_check(has_trajectory && has_origin && has_destination && has_departed_time && has_arrived_time);
+		};
+		concept struct Is_Movement_Plan
+		{
+			check_getter(has_trajectory, trajectory_container);
+			check_getter(has_origin, origin);
+			check_getter(has_destination, destination);
+			check_getter(has_departed_time, departed_time);
+			check_getter(has_arrived_time, arrived_time);
+			check_concept(is_prototype, Is_Movement_Plan_Prototype);
+			define_default_check(is_prototype || (has_trajectory && has_origin && has_destination && has_departed_time && has_arrived_time));
 		};
 	}
 	
@@ -67,6 +67,7 @@ namespace Movement_Plan_Components
 			feature_accessor(departed_time, none, none);
 			feature_accessor(arrived_time, none, none);
 			feature_accessor(plan, none, none);
+			feature_accessor(valid_trajectory,none,none);
 
 			// overloaded origin and destination, depending on targetType
 			feature_prototype void origin(TargetType activity_location, requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
@@ -128,6 +129,7 @@ namespace Movement_Plan_Components
 			feature_prototype void initialize_trajectory()
 			{
 				current_trajectory_position<int>(-1);
+				valid_trajectory<bool>(false);
 			}
 			
 			feature_prototype void load()

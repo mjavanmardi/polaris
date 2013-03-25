@@ -97,6 +97,8 @@ namespace Movement_Plan_Components
 				((Movement_Plan_Prototype<ComponentType,ComponentType>*)this)->template advance_trajectory<_Trajectory_Unit_Interface*>();
 				_trajectory_container[_current_trajectory_index]->_enter_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
 			}
+
+			member_data(bool, valid_trajectory,none,none);
 		};
 	}
 }

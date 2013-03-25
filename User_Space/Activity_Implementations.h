@@ -62,19 +62,8 @@ namespace Activity_Components
 			member_data(Revision,Start_Time_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			member_data(Revision,Duration_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			member_data(Revision,Involved_Persons_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
-			//member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Location_Planning_Time,none,none);
-			//member_component_feature(Location_Planning_Time, _Location_Planning_Time, Value, Basic_Units::Prototypes::Time_Prototype)
-			//member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Mode_Planning_Time,none,none);
-			//member_component_feature(Mode_Planning_Time, _Mode_Planning_Time, Value, Basic_Units::Prototypes::Time_Prototype)
-			//member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Start_Time_Planning_Time,none,none);
-			//member_component_feature(Start_Time_Planning_Time, _Start_Time_Planning_Time, Value, Basic_Units::Prototypes::Time_Prototype)
-			//member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Duration_Planning_Time,none,none);
-			//member_component_feature(Duration_Planning_Time, _Duration_Planning_Time, Value, Basic_Units::Prototypes::Time_Prototype)
-			//member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Involved_Persons_Planning_Time,none,none);
-			//member_component_feature(Involved_Persons_Planning_Time, _Involved_Persons_Planning_Time, Value, Basic_Units::Prototypes::Time_Prototype)
 
 			// Activity attributes
-
 			member_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype, Location, typename MasterType::activity_location_type, check(ReturnValueType,Activity_Location_Components::Concepts::Is_Activity_Location), check(SetValueType,Activity_Location_Components::Concepts::Is_Activity_Location));
 			member_data(Vehicle_Components::Types::Vehicle_Type_Keys, Mode, none, none);
 			member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Start_Time,none,none);
@@ -83,10 +72,9 @@ namespace Activity_Components
 			member_component_feature(Duration, _Duration, Value, Basic_Units::Prototypes::Time_Prototype)
 			member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Expected_Travel_Time,none,none);
 			member_component_feature(Expected_Travel_Time, _Expected_Travel_Time, Value, Basic_Units::Prototypes::Time_Prototype);
-
 			member_container(vector<typename MasterType::person_type*>, Involved_Persons_Container, none, none);
 
-
+			// Activity methods
 			feature_implementation void Initialize()
 			{
 				this_itf* pthis = (this_itf*)this;
@@ -96,17 +84,17 @@ namespace Activity_Components
 				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 			}
 
-			feature_implementation void Set_Attribute_Planning_Times()
+			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time)
 			{
-				this->Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1;
+				this->Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
 				this->Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 0;
-				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1;
+				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
 				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 1;
-				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1;
+				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
 				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 2;
-				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1;
+				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
 				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 3;
-				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1;
+				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
 				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 4;
 			}
 
@@ -161,13 +149,13 @@ namespace Activity_Components
 				int i=1;
 				if (has_AM_start) i=0;
 			
-			#ifdef _DEBUG
-				this->Start_Time<ComponentType,CallerType,Time_Seconds>(450*(i+1));
-			#else
+			//#ifdef _DEBUG
+			//	this->Start_Time<ComponentType,CallerType,Time_Seconds>(450*(i+1));
+			//#else
 				double t = Normal_RNG.Next_Rand<double>(7.0*(i+1) + 3.0*i, 3.0+i);					
 				Time_Seconds time = Simulation_Time.Future_Time<Basic_Units::Time_Variables::Time_Hours, Basic_Units::Time_Variables::Time_Seconds>(t);
 				this->Start_Time<ComponentType,CallerType,Time_Seconds>(time);
-			#endif
+			//#endif
 			}
 
 			feature_implementation void Involved_Persons_Planning_Event_Handler()
@@ -204,6 +192,7 @@ namespace Activity_Components
 						move->template departed_time<Simulation_Timestep_Increment>(this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>());
 
 						// Add to plans schedule
+						planner->Schedule_New_Routing<_movement_plan_itf*>(_iteration+1, move);
 						planner->template Add_Movement_Plan<_movement_plan_itf*>(move);
 					}
 				}

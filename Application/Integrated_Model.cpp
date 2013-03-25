@@ -249,17 +249,17 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
-	#ifdef _DEBUG
-	typedef Person_Components::Prototypes::Person<MasterType::person_type> person_itf;
-	typedef Person_Components::Prototypes::Person_Properties<MasterType::person_properties_type> properties_itf;
-	typedef Person_Components::Prototypes::Activity_Generator<MasterType::activity_generator_type> generator_itf;
-	typedef Person_Components::Prototypes::Person_Planner<MasterType::person_planner_type> planner_itf;
-	person_itf* p = (person_itf*)Allocate<MasterType::person_type>();
-	p->network_reference<_Network_Interface*>(network);
-	p->scenario_reference<_Scenario_Interface*>(scenario);	
-	p->Initialize<int>(1);
-	p->Home_Location<int>(0);
-	#else
+	//#ifdef _DEBUG
+	//typedef Person_Components::Prototypes::Person<MasterType::person_type> person_itf;
+	//typedef Person_Components::Prototypes::Person_Properties<MasterType::person_properties_type> properties_itf;
+	//typedef Person_Components::Prototypes::Activity_Generator<MasterType::activity_generator_type> generator_itf;
+	//typedef Person_Components::Prototypes::Person_Planner<MasterType::person_planner_type> planner_itf;
+	//person_itf* p = (person_itf*)Allocate<MasterType::person_type>();
+	//p->network_reference<_Network_Interface*>(network);
+	//p->scenario_reference<_Scenario_Interface*>(scenario);	
+	//p->Initialize<int>(1);
+	//p->Home_Location<int>(0);
+	//#else
 	ofstream out;
 	out.open("full_population_chicag.csv",ios_base::out);
 	ofstream marg_out;
@@ -281,7 +281,7 @@ int main(int argc,char** argv)
 	popsyn->network_reference<_Network_Interface*>(network);
 	popsyn->scenario_reference<_Scenario_Interface*>(scenario);
 	popsyn->Initialize<NULLTYPE>();
-	#endif
+	//#endif
 	//----------------------------------------------------------------------------------------------------------------------------------
 
 	//==================================================================================================================================

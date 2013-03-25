@@ -9,6 +9,19 @@ namespace Traveler_Components
 
 	namespace Concepts
 	{
+		concept struct Is_Traveler_Prototype
+		{
+			check_getter(has_router,ComponentType::router);
+			check_getter(has_vehicle,ComponentType::vehicle);
+			define_default_check(has_router && has_vehicle);
+		};
+		concept struct Is_Traveler
+		{
+			check_getter(has_router,router);
+			check_getter(has_vehicle,vehicle);
+			check_concept(is_prototype, Is_Traveler_Prototype);
+			define_default_check(is_prototype || (has_router && has_vehicle));
+		};
 	}
 	
 	namespace Prototypes
@@ -31,7 +44,7 @@ namespace Traveler_Components
 				itf->template Schedule_Route_Computation<NULLTYPE>(departed_time);
 				
 				// other stuff than routing
-				load_event(ComponentType,Departure_Conditional,Set_Departure,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION,NULLTYPE);
+				load_event(ComponentType,Departure_Conditional,Set_Departure,departed_time+1,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION,NULLTYPE);
 			}
 
 			declare_feature_conditional(Departure_Conditional)
@@ -47,7 +60,26 @@ namespace Traveler_Components
 
 			declare_feature_event(Set_Departure)
 			{
+				// Create alias for this to use in conditional
+				typedef Traveler_Prototype<ComponentType, ComponentType> _this_Interface;
+				ComponentType* _pthis = (ComponentType*)_this;
+				_this_Interface* this_ptr=(_this_Interface*)_pthis;
+
 				// Here to add code for setting departure of the traveler other than routing; routing is scheduled in Schedule_New_Departure
+				define_component_interface(Vehicle_Itf, typename get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(movement_itf, typename Vehicle_Itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				define_component_interface(Routing_Itf, typename get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+				define_component_interface(network_itf, typename Routing_Itf::get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+	
+				Vehicle_Itf* vehicle = this_ptr->template vehicle<Vehicle_Itf*>();
+				link_itf* origin_link = vehicle->movement_plan<movement_itf*>()->origin<link_itf*>();
+		
+				// Schedule the routing if the vehicle is not already in the network, otherwise return false
+				if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
+				{
+					origin_link->push_vehicle(vehicle);
+				}
 			}
 		};
 	}

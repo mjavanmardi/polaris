@@ -38,61 +38,6 @@ namespace Demand_Components
 		struct File_Demand{};
 
 	}
-
-	//==================================================================================================================
-	/// Concept checks related to the Demand generation interface
-	//------------------------------------------------------------------------------------------------------------------
-	// commented by Bo.
-	//namespace Concepts
-	//{
-	//	concept Is_Transims
-	//	{
-	//		begin_requirements_list(none);
-	//		requires_typename_state(none,TransimsType,true_type,"Type is not a Transims type");
-	//		end_requirements_list(TransimsType);
-	//	};
-	//	concept Is_Trip_File
-	//	{
-	//		begin_requirements_list(none);
-	//		requires_typename_state(none,TripFile,true_type,"Type is not in a TripFile");
-	//		requires_typed_member(TripFile, filename,char*,"Type does not have a 'filename' member of char* type");
-	//		end_requirements_list(filename);
-	//	};
-	//	concept Is_Control_File
-	//	{
-	//		begin_requirements_list(none);
-	//		requires_typename_state(none,ControlFile,true_type,"Type is not in a ControlFile");
-	//		requires_typed_member(ControlFile, filename, char*,"Type does not have a 'filename' member of char* type");
-	//		end_requirements_list(filename);
-	//	};
-	//	concept Is_CSV_Delimited
-	//	{
-	//		begin_requirements_list(none);
-	//		requires_typename_state(none,CSV_Delimited,true_type,"Type is not CSV_Delimited");
-	//		end_requirements_list(CSV_Delimited);
-	//	};
-	//	concept Is_Tab_Delimited
-	//	{
-	//		begin_requirements_list(none);
-	//		requires_typename_state(none,Tab_Delimited,true_type,"Type is not Tab_Delimited");
-	//		end_requirements_list(Tab_Delimited);
-	//	};
-	//	concept Is_Transims_Control_File
-	//	{
-	//		begin_requirements_list(none);
-	//		requires_concept(none,Is_Transims);
-	//		requires_concept(Is_Transims,Is_Control_File);
-	//		end_requirements_list(Is_Control_File);
-	//	};
-	//	concept Is_Transims_Trip_File
-	//	{
-	//		begin_requirements_list(none);
-	//		requires_concept(none,Is_Transims);
-	//		requires_concept(Is_Transims,Is_Trip_File);
-	//		end_requirements_list(Is_Trip_File);
-	//	};
-
-	//}
 	
 	namespace Prototypes
 	{
@@ -105,7 +50,7 @@ namespace Demand_Components
 			feature_accessor(vehicles_container, none, none);
 			feature_accessor(first_vehicle_departure_time, none, none);
 			feature_accessor(last_vehicle_departure_time, none, none);
-//#ifndef FOR_LINUX_PORTING
+
 			feature_prototype void read_demand_data(typename TargetType::ParamType& network_mapping,
 				requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
@@ -279,7 +224,6 @@ cout << "one demand record read" << endl;
 					}
 				}
 			}
-//#endif
 
 			feature_prototype void read_demand_data(requires(!check_2(TargetType,typename Network_Components::Types::ODB_Network,is_same) && !check_2(TargetType,typename Network_Components::Types::File_Network,is_same)))
 			{
@@ -296,15 +240,15 @@ cout << "one demand record read" << endl;
 				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-#ifndef EXCLUDE_DEMAND
-				typedef Person_Components::Prototypes::Person<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
-#else
+//#ifndef EXCLUDE_DEMAND
+//				typedef Person_Components::Prototypes::Person<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
+//#else
 				typedef Traveler_Components::Prototypes::Traveler_Prototype<typename ComponentType::traveler_type, ComponentType> _Traveler_Interface;
-#endif
+//#endif
 				define_component_interface(_Routing_Interface, typename _Traveler_Interface::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
-#ifndef EXCLUDE_DEMAND
-				define_component_interface(_Planning_Interface, typename _Traveler_Interface::get_type_of(Planning_Faculty), Person_Components::Prototypes::Person_Planner, ComponentType);
-#endif
+//#ifndef EXCLUDE_DEMAND
+//				define_component_interface(_Planning_Interface, typename _Traveler_Interface::get_type_of(Planning_Faculty), Person_Components::Prototypes::Person_Planner, ComponentType);
+//#endif
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename get_type_of(vehicles_container), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				
@@ -319,9 +263,9 @@ cout << "one demand record read" << endl;
 					_Routing_Interface* router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
 					//_Plan_Interface* plan = (_Plan_Interface*)Allocate<typename _Plan_Interface::Component_Type>();
 					_Movement_Plan_Interface* movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
-#ifndef EXCLUDE_DEMAND
-					_Planning_Interface* planner = (_Planning_Interface*)Allocate<_Traveler_Interface::get_type_of(Planning_Faculty)>();
-#endif
+//#ifndef EXCLUDE_DEMAND
+//					_Planning_Interface* planner = (_Planning_Interface*)Allocate<_Traveler_Interface::get_type_of(Planning_Faculty)>();
+//#endif
 
 					vehicle->template uuid<int>(raw_vehicle.get_vehicle_id());
 					vehicle->template internal_id<int>(i);
@@ -332,10 +276,10 @@ cout << "one demand record read" << endl;
 					traveler->template internal_id<int>(i);
 					traveler->template router<_Routing_Interface*>(router);
 					traveler->template vehicle<_Vehicle_Interface*>(vehicle);
-#ifndef EXCLUDE_DEMAND
-					traveler->template Planning_Faculty<_Planning_Interface*>(planner);
-					traveler->template Planning_Faculty<_Planning_Interface*>()->template Parent_Person<_Traveler_Interface*>(traveler);
-#endif
+//#ifndef EXCLUDE_DEMAND
+//					traveler->template Planning_Faculty<_Planning_Interface*>(planner);
+//					traveler->template Planning_Faculty<_Planning_Interface*>()->template Parent_Person<_Traveler_Interface*>(traveler);
+//#endif
 					router->template traveler<_Traveler_Interface*>(traveler);
 					router->template network<_Network_Interface*>(network_reference<_Network_Interface*>());
 
@@ -346,13 +290,15 @@ cout << "one demand record read" << endl;
 					movement_plan->template destination<_Link_Interface*>(network_reference<_Network_Interface*>()->template links_container<_Links_Container_Interface&>().at(raw_vehicle.get_destination_link_index()));
 
 					int departed_time = raw_vehicle.get_departure_time();
-#ifndef EXCLUDE_DEMAND
-					traveler->template Planning_Faculty<_Planning_Interface*>()->template Schedule_New_Departure<NULLTYPE>(departed_time);
-#else
-					traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
-#endif
+//#ifndef EXCLUDE_DEMAND
+//					traveler->template Planning_Faculty<_Planning_Interface*>()->template Schedule_New_Departure<NULLTYPE>(departed_time);
+//#else
 					movement_plan->template departed_time<Time_Seconds>(departed_time);
-
+					router->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
+					
+					traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
+//#endif
+					
 					vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 
 				}
@@ -364,7 +310,6 @@ cout << "one demand record read" << endl;
 				assert_check_2(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType is ill-defined");
 				assert_check_2(TargetType,typename Network_Components::Types::File_Network,is_same,"TargetType should indicate File_Network if you want to read it in from file");
 			}
-
 
 			feature_prototype void write_demand_data(network_models::network_information::demand_data_information::DemandData& demand_data)
 			{
@@ -419,200 +364,6 @@ cout << "one demand record read" << endl;
 
 		};
 	}
-
-#ifdef Advanced
-	//==================================================================================================================
-	/// Demand interfaces namespace
-	/// Usually just one interface here, unless a logical split develops at some point.
-	//------------------------------------------------------------------------------------------------------------------
-	namespace Interfaces
-	{
-		struct Demand_Interface
-		{
-			//==================================================================================================================
-			/// Demand initializer
-			/// Calls the initializer in the connected base, given an input file structure and an iteration time-type structure.
-			//------------------------------------------------------------------------------------------------------------------
-			template<typename ComponentType, typename CallerType, typename TripType, typename InputFileType, typename TimeStructType>
-			void Initialize(InputFileType& input_file_struct, TimeStructType& iteration_step_struct, call_requires(ComponentType, Is_Dispatchable))
-			{
-				cout <<endl<<"GETTING DEMAND FROM TRANSIMS..."<<endl;
-				PTHIS(ComponentType)->template Initialize<Dispatch<ComponentType>,CallerType,TripType,InputFileType,TimeStructType>(input_file_struct,iteration_step_struct);
-				cout <<endl<<"DONE."<<endl<<endl;
-				schedule_event_local(ComponentType,Get_Trips_Conditional,Get_Trips_Event,0,TripType);
-			}
-
-
-			//==================================================================================================================
-			// Interface Event functionality and conditional
-			// Notice the event functionality and conditional are entirely contained in the interface and depend on no other vars
-			//------------------------------------------------------------------------------------------------------------------
-			/// Defines the Get_Trips_Event which is the primary event of the external Demand API
-			declare_feature_event(Get_Trips_Event)
-			{
-				char print;
-				cout <<endl<<"Getting Trips"<<endl;
-				Demand_Interface* demand = pthis;
-				demand->template Get_Current_Trips_From_External<CallerType,TargetType>();
-				demand->template Display_Timestep<CallerType,TargetType>();
-				demand->template Increment_Time<CallerType,TargetType>();
-
-				cout <<endl<<"Print trips to screen ('y' or 'n'): ";
-				cin >> print;
-
-				if (print == 'y' || print == 'Y') demand->template Print_Trips<ComponentType,CallerType,TargetType>();
-
-				demand->template Clear_Trips<ComponentType,CallerType,TargetType>();
-
-			}
-			/// Conditional function used to trigger the event feature - currently check every iteration
-			declare_feature_conditional(Get_Trips_Conditional)
-			{
-				response.result = true;
-				response.next = iteration + 1;			
-			}
-
-
-			//==================================================================================================================
-			// Other Interface functionality
-			//------------------------------------------------------------------------------------------------------------------
-			//  Local functions
-			//------------------------------------------------------------------------------------------------------------------
-			/// The Get_Current_Trips_From_External function provides the link to the external program (Transims)
-			/// Notice the function requires that it is attached to a transims compliant base using a concept check
-			feature void Get_Current_Trips_From_External(call_requirements(requires(ComponentType, Is_Dispatchable) && requires(ComponentType, Concepts::Is_Transims)))
-			{
-				Time_Components::Interfaces::Time_Interface* tstart = timestep_start<ComponentType,CallerType,Time_Components::Components::Time>();
-				Time_Components::Interfaces::Time_Interface* tend = timestep_end<ComponentType,CallerType,Time_Components::Components::Time>();
-				
-				tstart->template Write<Time_Components::Components::Time,CallerType,int>();
-				auto s = tstart->template Convert_Time<Time_Components::Components::Time, CallerType, Time_Components::Data_Structures::Time_DRSeconds>();
-				auto e = tend->template Convert_Time<Time_Components::Components::Time, CallerType, Time_Components::Data_Structures::Time_DRSeconds>();
-
-				Time start = Time((int)s.Time);
-				Time end = Time((int)e.Time);
-
-				vector<Trip_Info*> v;
-				vector<Trip_Info*>::iterator itr;
-
-				Get_Trips(start,end, v);
-
-				int trip_count = 1;
-				
-				for (itr=v.begin(); itr != v.end(); itr++)
-				{
-					this->template push_trip<ComponentType,ComponentType,Trip_Components::Components::Trip>(*itr);
-					trip_count++;
-				}
-				cout <<endl<<endl<<"TIMESTEP "<<iteration<<endl<<"Trip count = "<<this->template Trip_Count<ComponentType,CallerType,int>()<<endl;
-			}
-			/// Time incrementing feature
-			feature void Increment_Time()
-			{
-				auto start = timestep_start<ComponentType,CallerType,Time_Components::Components::Time>();
-				auto end = timestep_end<ComponentType,CallerType,Time_Components::Components::Time>();
-				auto tstep = this->template t_step<ComponentType,CallerType,Time_Components::Data_Structures::Time_Seconds&>();
-
-				start->template Add_Time<Time_Components::Components::Time,CallerType>(tstep);
-				end->template Add_Time<Time_Components::Components::Time,CallerType>(tstep);
-			}
-			/// Display the current timestep information
-			feature void Display_Timestep()
-			{
-				cout<<"Timestep Start:  ";
-				timestep_start<ComponentType,ComponentType,Time_Components::Components::Time>()->template Write<Time_Components::Components::Time,CallerType,int>();
-				cout<<endl<<"Timestep End:  ";
-				timestep_end<ComponentType,ComponentType,Time_Components::Components::Time>()->template Write<Time_Components::Components::Time,CallerType,int>();			
-			}
-			//------------------------------------------------------------------------------------------------------------------
-			//  Implementation function dispatchers
-			//------------------------------------------------------------------------------------------------------------------
-			/// Push a trip returned from external source into the local trip list through a base function call
-			feature void push_trip(Trip_Info* trip, call_requirements(requires(ComponentType,Is_Dispatchable) && requires(TargetType, Trip_Components::Concepts::Is_Trip)))
-			{
-				PTHIS(ComponentType)->template push_trip<Dispatch<ComponentType>,CallerType,TargetType>(trip);
-			}
-			/// Print the current trip list usign base function call
-			feature void Print_Trips(call_requires(ComponentType, Is_Dispatchable))
-			{
-				PTHIS(ComponentType)->template Print_Trips<Dispatch<ComponentType>,CallerType,TargetType>();
-			}
-			/// Get a count of the number of trips returned in current timestep using base function call
-			feature TargetType Trip_Count(call_requires(ComponentType,Is_Dispatchable))
-			{
-				return PTHIS(ComponentType)->template Trip_Count<Dispatch<ComponentType>,CallerType,TargetType>();
-			}
-			/// Clear the current trip list using base function call
-			feature void Clear_Trips(call_requires(ComponentType, Is_Dispatchable))
-			{
-				PTHIS(ComponentType)->template Clear_Trips<Dispatch<ComponentType>,CallerType,TargetType>();
-			}
-
-
-			//==================================================================================================================
-			// Accessor features - notice no types are associated with accessors in the interface
-			//------------------------------------------------------------------------------------------------------------------
-			/// filename accessor
-			feature_accessor(filename);
-			/// Get the timestep length
-			feature_accessor(timestep_length);
-			/// Get a time structure representing the current timestep
-			feature_accessor(t_step);
-			/// Get the trips in the current timestep
-			feature_accessor(current_trips);
-			/// Get some type of interface to the timestep start time
-			feature_accessor_interface(timestep_start);
-			/// Get some type of interface to the timestep end time
-			feature_accessor_interface(timestep_end);
-
-		};
-	}
-
-
-
-	//==================================================================================================================
-	/// Defines useful data structures for base classes which carry tagged semantic information
-	///
-	//------------------------------------------------------------------------------------------------------------------
-	namespace Data_Structures
-	{
-		struct Transims_Control_File_CSV_Struct
-		{
-			typedef Types::ModelTypes::TransimsType TransimsType;
-			typedef Types::FileFormatTypes::CSV_Delimited CSV_Delimited;
-			typedef Types::FileTypes::ControlFile ControlFile;
-			char* filename;
-		};
-		struct Transims_Control_File_TAB_Struct
-		{
-			typedef Types::ModelTypes::TransimsType TransimsType;
-			typedef Types::FileFormatTypes::Tab_Delimited Tab_Delimited;
-			typedef Types::FileTypes::ControlFile ControlFile;
-			char* filename;
-		};
-		struct Transims_Trip_File_CSV_Struct
-		{
-			typedef Types::ModelTypes::TransimsType TransimsType;
-			typedef Types::FileFormatTypes::CSV_Delimited CSV_Delimited;
-			typedef Types::FileTypes::TripFile TripFile;
-			char* filename;
-		};
-		struct Transims_Trip_File_TAB_Struct
-		{
-			typedef Types::ModelTypes::TransimsType TransimsType;
-			typedef Types::FileFormatTypes::Tab_Delimited Tab_Delimited;
-			typedef Types::FileTypes::TripFile TripFile;
-			char* filename;
-		};
-		struct Transims_Trip_File_BIN_Struct
-		{
-			typedef Types::ModelTypes::TransimsType TransimsType;
-			typedef Types::FileFormatTypes::Binary Binary;
-			typedef Types::FileTypes::TripFile TripFile;
-			char* filename;
-		};
-	}
-#endif
 }
 
 using namespace Demand_Components::Prototypes;

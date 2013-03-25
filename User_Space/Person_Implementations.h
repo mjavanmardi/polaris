@@ -14,10 +14,15 @@ namespace Person_Components
 		//==================================================================================
 		/// Person Agent classes
 		//----------------------------------------------------------------------------------
+		implementation struct Person_Mover_Implementation : public Polaris_Component<APPEND_CHILD(Person_Mover_Implementation),MasterType,Execution_Object,ParentType>
+		{
+			member_prototype(Prototypes::Person,Parent_Person,typename MasterType::person_type,none,none);
+			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,Movement,typename MasterType::movement_plan_type,none,none);
+			member_data(bool, Movement_Scheduled, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
+		};
+
 		implementation struct Person_Implementation : public Polaris_Component<APPEND_CHILD(Person_Implementation),MasterType,Execution_Object,ParentType>
 		{
-			
-
 			feature_implementation void Initialize(TargetType id)
 			{	
 				// Set the initial iteration to process
@@ -52,6 +57,11 @@ namespace Person_Components
 				router->template traveler<ComponentType*>(this);
 				router->template network<_Network_Interface*>(this->template network_reference<ComponentType,CallerType,_Network_Interface*>());	
 
+				// Moving faculty
+				Moving_Faculty_interface* move_faculty = (Moving_Faculty_interface*)Allocate<Implementations::Person_Mover_Implementation<MasterType>>();
+				move_faculty->Parent_Person<ComponentType*>(this);
+				this->_Moving_Faculty = move_faculty;
+
 				// Create and Initialize the vehicle
 				define_component_interface(_Vehicle_Interface, type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>(); 	
@@ -59,14 +69,8 @@ namespace Person_Components
 				vehicle->template internal_id<int>(id);
 				vehicle->template traveler<ComponentType*>(this);
 
-				// Seed the RNG with the agent ID
-				/*define_component_interface(rng_itf,type_of(RNG),RNG_Components::Prototypes::RNG_Prototype,ComponentType);
-				rng_itf* rng = this->template RNG<ComponentType,ComponentType,rng_itf*>();		
-				rng->template Initialize<TargetType>((sin((double)id)+1.0) * 1000000.0);*/
-
 				// Add basic traveler properties							
 				this->template uuid<ComponentType,ComponentType,int>(id);
-				//this->template internal_id<ComponentType,ComponentType,int>(id);
 				this->template router<ComponentType,ComponentType,_Routing_Interface*>(router);
 				this->template vehicle<ComponentType,ComponentType,_Vehicle_Interface*>(vehicle);
 			}
@@ -100,8 +104,9 @@ namespace Person_Components
 			}
 			tag_feature_as_available(Initialize);	
 
-			member_component(typename MasterType::vehicle_type,vehicle,none,none/*check_2(ComponentType,CallerType, Is_Same_Entity)*/);
-			member_component(typename MasterType::routing_type,router,none,none/*check_2(ComponentType,CallerType, Is_Same_Entity)*/);
+			member_component(typename MasterType::vehicle_type,vehicle,none,none);
+			member_component(typename MasterType::routing_type,router,none,none);
+			member_prototype(Prototypes::Person_Mover, Moving_Faculty,Implementations::Person_Mover_Implementation<MasterType>, none, none);
 		
 			member_component(typename MasterType::person_planner_type,Planning_Faculty,none,check_2(ComponentType,CallerType, Is_Same_Entity));
 			member_component(typename MasterType::person_properties_type,Properties,none,check_2(ComponentType,CallerType, Is_Same_Entity));
@@ -124,5 +129,7 @@ namespace Person_Components
 			member_component_feature(First_Iteration, _First_Iteration, Value, Basic_Units::Prototypes::Time_Prototype);
 
 		};
+
+
 	}
 }

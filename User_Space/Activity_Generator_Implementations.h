@@ -118,7 +118,10 @@ namespace Person_Components
 					
 					Activity_Plan* activity = (Activity_Plan*)Allocate<typename base_type::type_of(Parent_Planner)::type_of(Activity_Plans_Container)::unqualified_value_type>();
 					activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
-					activity->Initialize<NT>();
+
+					// Activity planning time
+					int plan_time = i+1;
+					activity->Initialize<int>(plan_time);
 					activities->push_back(activity);
 
 					//// Create movement plan and give it an ID

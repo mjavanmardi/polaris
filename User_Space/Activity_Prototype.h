@@ -372,15 +372,15 @@ namespace Activity_Components
 			feature_accessor(Involved_Persons_Container,none,none);
 			feature_accessor(Expected_Travel_Time, check(ReturnValueType,Basic_Units::Concepts::Is_Time_Value), check(SetValueType,Basic_Units::Concepts::Is_Time_Value)); 
 
-			feature_prototype void Initialize()
+			feature_prototype void Initialize(TargetType planning_time)
 			{
 				this_component()->Initialize<ComponentType, ComponentType, TargetType>();
-				this->Set_Attribute_Planning_Times<TargetType>();
+				this->Set_Attribute_Planning_Times<TargetType>(planning_time);
 			}
-			feature_prototype void Set_Attribute_Planning_Times()
+			feature_prototype void Set_Attribute_Planning_Times(TargetType planning_time)
 			{
 				// Call the model to determine the attribute planning times
-				this_component()->Set_Attribute_Planning_Times<ComponentType,CallerType,TargetType>();
+				this_component()->Set_Attribute_Planning_Times<ComponentType,CallerType,TargetType>(planning_time);
 
 				// store for later use
 				Revision& persons = this->Involved_Persons_Planning_Time<Revision&>();

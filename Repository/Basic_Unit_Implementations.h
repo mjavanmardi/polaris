@@ -84,6 +84,11 @@ struct _Simulation_Timer
 		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,Simulation_Timestep_Increment,InputType>>(Additional_Time_Increment);
 		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Simulation_Timestep_Increment>>(current_time + additional_time);
 	}
+	template<typename InputType> Simulation_Timestep_Increment Convert_Time_To_Simulation_Timestep(InputType Time)
+	{
+		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NT,Simulation_Timestep_Increment,InputType>>(Time);
+
+	}
 };
 
 _Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;

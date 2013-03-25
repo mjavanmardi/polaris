@@ -3,6 +3,8 @@
 #include "Link_Prototype.h"
 #include "Polaris_Scenario_Implementation.h"
 #include "Vehicle_Prototype.h"
+#include "Traveler_Prototype.h"
+#include "Person_Prototype.h"
 
 namespace Link_Components
 {
@@ -323,7 +325,7 @@ namespace Link_Components
 
 			}
 
-			feature_implementation void accept_vehicle(TargetType veh,requires(!check_2(CallerType,typename MasterType::movement_type,is_same) && !check_2(CallerType,ComponentType,is_same) && !check_2(CallerType,typename MasterType::routing_type,is_same)))
+			feature_implementation void accept_vehicle(TargetType veh,requires(!check_2(CallerType,typename MasterType::movement_type,is_same) && !check_2(CallerType,ComponentType,is_same) && !check_2(CallerType,typename MasterType::routing_type,is_same) && !check(CallerType,Traveler_Components::Concepts::Is_Traveler) && !check(CallerType,Person_Components::Concepts::Is_Person_Mover)))
 			{
 				assert_check_2(CallerType,typename MasterType::movement_type,is_same,"Invalid CallerType");
 				assert_check_2(CallerType,ComponentType,is_same,"Invalid CallerType");
@@ -332,7 +334,7 @@ namespace Link_Components
 
 
 
-			feature_implementation void accept_vehicle(TargetType veh,requires(check_2(CallerType,typename MasterType::routing_type,is_same)))
+			feature_implementation void accept_vehicle(TargetType veh,requires(check_2(CallerType,typename MasterType::routing_type,is_same) || check(CallerType,Traveler_Components::Concepts::Is_Traveler) || check(CallerType,Person_Components::Concepts::Is_Person_Mover)))
 			{
 				define_container_and_value_interface_unqualified_container(_Link_Origin_Vehicles_Container_Interface, _Vehicle_Interface,type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				_link_origin_cumulative_arrived_vehicles++;

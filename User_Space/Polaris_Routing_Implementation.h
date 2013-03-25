@@ -133,6 +133,22 @@ namespace Routing_Components
 
 		implementation struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			//==================================================================================================
+			// TYPEDEFS AND INTERFACES
+			//--------------------------------------------------------------------------------------------------
+			typedef vector<typename MasterType::routable_link_type*> routable_links_container_type;
+			typedef Polaris_Container<routable_links_container_type> _Links_Container_Type;
+			typedef Random_Access_Sequence_Prototype<_Links_Container_Type, NULLTYPE, void*> _Links_Container_Interface;
+			typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::routable_network_type, NULLTYPE> _Routable_Network_Interface;
+			typedef typename MasterType::link_type regular_link_type;
+			typedef typename MasterType::routable_link_type routable_link_type;
+			typedef typename MasterType::vehicle_type vehicle_type;
+			typedef typename MasterType::routable_network_type routable_network_type;
+			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person, NULLTYPE); 
+			define_component_interface(_Network_Interface, typename MasterType::network_type, Network_Components::Prototypes::Network_Prototype, NULLTYPE);
+			//==================================================================================================
+
+
 			declare_feature_conditional(Compute_Route_Condition)
 			{
 				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
@@ -153,69 +169,46 @@ namespace Routing_Components
 
 			// don't need ifdef here - just change the typedef of MasterType::person_type to traveler_implemenationt in the mastertype definition
 			member_component(typename MasterType::person_type, traveler, none, none);
-			define_component_interface(_Traveler_Interface, typename MasterType::person_type, Person_Components::Prototypes::Person, NULLTYPE); 
+			member_component(typename MasterType::network_type, network, none, none);
+			member_component(typename MasterType::movement_plan_type, movement_plan, none, none);
 
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType vehicle()
+			feature_implementation TargetType vehicle()
 			{
 				return ((_Traveler_Interface*)_traveler)->template vehicle<TargetType>();
 			}
-			
 			tag_getter_as_available(vehicle);
 
-			member_component(typename MasterType::network_type, network, none, none);
-
-			define_component_interface(_Network_Interface, typename MasterType::network_type, Network_Components::Prototypes::Network_Prototype, NULLTYPE);
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType routable_network()
+			feature_implementation TargetType routable_network()
 			{
 				return ((_Network_Interface*)_network)->template routable_network<TargetType>();
-			}
-			
+			}		
 			tag_getter_as_available(routable_network);			
 
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			void routable_origin(TargetType set_value)
+			feature_implementation void routable_origin(TargetType set_value)
 			{
 				_routable_origin = set_value->template internal_id<int>();
 			}
-			tag_setter_as_available(routable_origin);
-
-			typedef vector<typename MasterType::routable_link_type*> routable_links_container_type;
-			typedef Polaris_Container<routable_links_container_type> _Links_Container_Type;
-
-			typedef Random_Access_Sequence_Prototype<_Links_Container_Type, NULLTYPE, void*> _Links_Container_Interface;
-
-			typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::routable_network_type, NULLTYPE> _Routable_Network_Interface;
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType routable_origin()
+			feature_implementation TargetType routable_origin()
 			{
 				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links_container<_Links_Container_Interface&>()[_routable_origin]);
 			}
-			tag_getter_as_available(routable_origin);
-
-			int _routable_origin;
-
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			void routable_destination(TargetType set_value)
+			tag_getter_setter_as_available(routable_origin);
+			
+			feature_implementation void routable_destination(TargetType set_value)
 			{
 				_routable_destination = set_value->template internal_id<int>();
 			}
-			tag_setter_as_available(routable_destination);
-
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType routable_destination()
+			feature_implementation TargetType routable_destination()
 			{
 				return (TargetType)(((_Network_Interface*)_network)->template routable_network<_Routable_Network_Interface*>()->template links_container<_Links_Container_Interface&>()[_routable_destination]);
 			}
-			tag_getter_as_available(routable_destination);
+			tag_getter_setter_as_available(routable_destination);
+			
 
+			int _routable_origin;
 			int _routable_destination;	
 			
-			typedef typename MasterType::link_type regular_link_type;
-			typedef typename MasterType::routable_link_type routable_link_type;
-			typedef typename MasterType::vehicle_type vehicle_type;
-			typedef typename MasterType::routable_network_type routable_network_type;
+
 		};
 
 
