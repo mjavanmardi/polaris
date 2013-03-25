@@ -35,6 +35,7 @@ namespace Vehicle_Components
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Points();
 				cfg.draw=true;
+				cfg.primitive_color=true;
 
 				cfg.attributes_schema = string("ID,Status,Current_Link");
 				
@@ -43,15 +44,15 @@ namespace Vehicle_Components
 
 				_vehicle_points->Initialize<NULLTYPE>(cfg);
 
-				// configure plot layer
-				_num_vehicles=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(num_vehicles),Graphical_Vehicle_Implementation>*, string& > >(string("Number of Vehicles"));
-				Antares_Layer_Configuration pcfg;
+				//// configure plot layer
+				//_num_vehicles=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(num_vehicles),Graphical_Vehicle_Implementation>*, string& > >(string("Number of Vehicles"));
+				//Antares_Layer_Configuration pcfg;
 
-				pcfg.Configure_Plot();
-				pcfg.storage_period = 6;
-				pcfg.storage_offset = 5;
+				//pcfg.Configure_Plot();
+				//pcfg.storage_period = 6;
+				//pcfg.storage_offset = 5;
 
-				_num_vehicles->Initialize<NULLTYPE>(pcfg);
+				//_num_vehicles->Initialize<NULLTYPE>(pcfg);
 			}
 
 			
@@ -104,6 +105,7 @@ namespace Vehicle_Components
 				struct attribute_coordinate
 				{
 					void* ptr;
+					True_Color_RGBA<NT> color;
 					Point_3D<MasterType> vertex;
 				} coordinate;
 #pragma pack(pop)
@@ -115,7 +117,8 @@ namespace Vehicle_Components
 				coordinate.vertex._z=1;
 				
 				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(coordinate.vertex);
-
+				float los = ((MasterType::link_type*)link)->realtime_link_moe_data.link_density / ((MasterType::link_type*)link)->_jam_density;
+				coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
 				_vehicle_points->Push_Element<Regular_Element>(&coordinate);
 
 				pthis->_vehicles_counter++;

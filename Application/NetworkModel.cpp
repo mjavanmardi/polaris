@@ -352,8 +352,6 @@ struct MasterType
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
 };
 
-ostream* stream_ptr;
-
 int main(int argc,char** argv)
 {
 
@@ -397,7 +395,7 @@ int main(int argc,char** argv)
 	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
 	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
 	MasterType::vehicle_type::Initialize_Layer();
-	network->initialize_link_layer<NULLTYPE>();
+	network->initialize_antares_layers<NULLTYPE>();
 	MasterType::link_type::configure_link_moes_layer();
 #endif
 	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);

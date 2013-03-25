@@ -167,9 +167,9 @@ struct Antares_Layer_Configuration
 		primitive_type=_LINE;
 		
 		primitive_color=false;
-		head_color._r=0;
-		head_color._g=125;
-		head_color._b=0;
+		head_color._r=128;
+		head_color._g=128;
+		head_color._b=128;
 		head_color._a=255;
 	}
 	
@@ -185,9 +185,9 @@ struct Antares_Layer_Configuration
 
 		primitive_type=_POINT;
 
-		head_color._r=255;
-		head_color._g=0;
-		head_color._b=0;
+		head_color._r=90;
+		head_color._g=124;
+		head_color._b=194;
 		head_color._a=255;
 		
 		head_size_value=4;

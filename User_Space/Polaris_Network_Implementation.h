@@ -151,9 +151,9 @@ namespace Network_Components
 				network_moe_data.network_avg_link_travel_time = 0.0f;
 				network_moe_data.network_avg_link_travel_time_ratio = 0.0f;
 
-				network_moe_data.num_arrived_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_arrived_vehicles<int>();
-				network_moe_data.num_departed_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int>();
-				network_moe_data.num_loaded_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int>();
+				//network_moe_data.num_arrived_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_arrived_vehicles<int>();
+				//network_moe_data.num_departed_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int>();
+				//network_moe_data.num_loaded_vehicles = ((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int>();
 			}
 
 			feature_implementation void initialize_network_agent()

@@ -30,7 +30,7 @@ namespace Turn_Movement_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Movement_Prototype
+		prototype struct Movement_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -90,7 +90,6 @@ namespace Turn_Movement_Components
 				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 
 				_Vehicle_Interface* veh=(_Vehicle_Interface*)vehicles_container<_Vehicles_Container_Interface&>().front();
-
 				vehicles_container<_Vehicles_Container_Interface&>().pop_front();
 
 				return (TargetType)veh;

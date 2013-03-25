@@ -232,9 +232,9 @@ namespace Network_Components
 			{
 				this_component()->template set_network_bounds<ComponentType,CallerType,TargetType>();
 			}
-			feature_prototype void initialize_link_layer()
+			feature_prototype void initialize_antares_layers()
 			{
-				this_component()->template initialize_link_layer<ComponentType,CallerType,TargetType>();
+				this_component()->template initialize_antares_layers<ComponentType,CallerType,TargetType>();
 			}			
 			
 			feature_prototype void write_network_data(typename TargetType::ParamType data_destination)
