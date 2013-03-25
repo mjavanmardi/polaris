@@ -36,19 +36,33 @@ struct ObjectToSingleton<NULLTYPE,ComponentType>
 	typedef NULLTYPE type;
 };
 
+template<typename ComponentType,typename ParentType>
+struct Entity_Extractor
+{
+	typedef typename ParentType::Entity_Type type;
+};
+
+template<typename ComponentType>
+struct Entity_Extractor<ComponentType,NULLTYPE>
+{
+	typedef ComponentType type;
+};
+
 ///============================================================================
-/// Polaris_Component - adds implementation, with parent
+/// Polaris_Component - adds implementation, without RTTI
 ///============================================================================
 
-template<typename InheritanceList=NULLTYPELIST,typename MasterType=NULLTYPE,typename ObjectType=Data_Object,typename ParentType=NULLTYPE,unsigned int PageFactor=1,typename GroupList=NULLTYPE>
-class Polaris_Component:public Polaris_Component<NULLTYPELIST,NULLTYPE,ObjectType,ParentType,0,NULLTYPE>
+template<typename InheritanceList=NULLTYPELIST,typename MasterType=NULLTYPE,typename ObjectType=Data_Object,typename ParentType=NULLTYPE,bool RTTI=false,unsigned int PageFactor=1,typename GroupList=NULLTYPE>
+class Polaris_Component:public ObjectType
 {
 public:
 #if STATE_CHECKS
 	virtual void State_Check(){};
 #endif
 	static const unsigned int page_factor;
-	
+
+	const int Identify() const{return -1;}
+
 	typedef InheritanceList Inheritance_List;
 	typedef typename TypeAt<InheritanceList,1>::Result Component_Type;
 	typedef Component_Type ComponentType;
@@ -65,15 +79,15 @@ public:
 
 	typedef ParentType Parent_Type;
 
-	typedef typename ParentType::Entity_Type Entity_Type;
+	typedef typename Entity_Extractor<ComponentType,ParentType>::type Entity_Type;
 };
 
 ///============================================================================
-/// Polaris_Component - adds implementation, no parent
+/// Polaris_Component - adds implementation, with RTTI
 ///============================================================================
 
-template<typename InheritanceList,typename MasterType,typename ObjectType,unsigned int PageFactor,typename GroupList>
-class Polaris_Component<InheritanceList,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>:public ObjectType
+template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
+class Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,PageFactor,GroupList>:public ObjectType
 {
 public:
 #if STATE_CHECKS
@@ -81,11 +95,19 @@ public:
 #endif
 	static const unsigned int page_factor;
 	
+	Polaris_Component():_component_index(component_index){}
+
+	const int _component_index;
+
+	const int Identify() const{return _component_index;}
+
 	typedef InheritanceList Inheritance_List;
 	typedef typename TypeAt<InheritanceList,1>::Result Component_Type;
 	typedef Component_Type ComponentType;
 
 	static const int component_index;
+
+
 	typedef typename ObjectToSingleton<ObjectType,Component_Type>::type Singleton_Type;
 	static Singleton_Type* const singleton_reference;
 	static vector<void*>* const all_components_reference;
@@ -94,127 +116,127 @@ public:
 	typedef MasterType Master_Type;
 	
 	typedef typename RemoveDuplicates<TypeList<GroupList,NULLTYPE>>::Result Group_List;
-
-	typedef NULLTYPE Parent_Type;
 	
-	Parent_Type* Parent()
-	{
-		return nullptr;
-	}
+	typedef ParentType Parent_Type;
 
-	typedef Component_Type Entity_Type;
-};
-
-///============================================================================
-/// Polaris_Component - adds object, with parent
-///============================================================================
-
-template<typename ParentType,typename ObjectType>
-class Polaris_Component<NULLTYPELIST,NULLTYPE,ObjectType,ParentType,0,NULLTYPE>:public ObjectType
-{
-public:
-	//ParentType* Parent()
-	//{
-	//	return _parent;
-	//}
-
-	//void Parent(void* parent)
-	//{
-	//	_parent=(ParentType*)parent;
-	//}
-
-	//ParentType* _parent;
+	typedef typename Entity_Extractor<ComponentType,ParentType>::type Entity_Type;
 };
 
 ///============================================================================
 /// Polaris_Component - adds implementation, non allocable variant
 ///============================================================================
 
-template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
-class Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>
-{
-public:
-#if STATE_CHECKS
-	virtual void State_Check(){};
-#endif
-	static const unsigned int page_factor;
+//template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
+//class Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>
+//{
+//public:
+//#if STATE_CHECKS
+//	virtual void State_Check(){};
+//#endif
+//	static const unsigned int page_factor;
+//
+//	typedef InheritanceList Inheritance_List;
+//	typedef typename TypeAt<InheritanceList,1>::Result Component_Type;
+//	typedef Component_Type ComponentType;
+//
+//	static const int component_index;
+//	typedef typename ObjectToSingleton<NULLTYPE,Component_Type>::type Singleton_Type;
+//	static Singleton_Type* const singleton_reference;
+//	static vector<void*>* const all_components_reference;
+//
+//	typedef NULLTYPE Object_Type;
+//	typedef MasterType Master_Type;
+//	
+//	typedef typename RemoveDuplicates<TypeList<GroupList,NULLTYPE>>::Result Group_List;
+//
+//	typedef NULLTYPE Parent_Type;
+//	
+//	Parent_Type* Parent()
+//	{
+//		return nullptr;
+//	}
+//
+//	typedef Component_Type Entity_Type;
+//};
 
+////============================================================================
+//// Polaris_Component - adds object, with identification
+////============================================================================
+//
+//template<typename ObjectType>
+//class Polaris_Component<NULLTYPELIST,NULLTYPE,ObjectType,NULLTYPE,true,0,NULLTYPE>:public ObjectType
+//{
+//public:
+//	Polaris_Component(int component_index)
+//	{
+//		_component_index=component_index;
+//	}
+//
+//	int _component_index;
+//};
+//
+////============================================================================
+//// Polaris_Component - adds object, no identification
+////============================================================================
+//
+//template<typename ObjectType>
+//class Polaris_Component<NULLTYPELIST,NULLTYPE,ObjectType,NULLTYPE,false,0,NULLTYPE>:public ObjectType
+//{
+//public:
+//	Polaris_Component(int component_index){}
+//};
 
-
-	typedef InheritanceList Inheritance_List;
-	typedef typename TypeAt<InheritanceList,1>::Result Component_Type;
-	typedef Component_Type ComponentType;
-
-	static const int component_index;
-	typedef typename ObjectToSingleton<NULLTYPE,Component_Type>::type Singleton_Type;
-	static Singleton_Type* const singleton_reference;
-	static vector<void*>* const all_components_reference;
-
-	typedef NULLTYPE Object_Type;
-	typedef MasterType Master_Type;
-	
-	typedef typename RemoveDuplicates<TypeList<GroupList,NULLTYPE>>::Result Group_List;
-
-	typedef NULLTYPE Parent_Type;
-	
-	Parent_Type* Parent()
-	{
-		return nullptr;
-	}
-
-	typedef Component_Type Entity_Type;
-};
 
 ///============================================================================
 /// Polaris_Component type tracking information
 ///============================================================================
 
-template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
-const unsigned int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,PageFactor,GroupList>::page_factor=PageFactor;
+template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,bool RTTI,unsigned int PageFactor,typename GroupList>
+const unsigned int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI,PageFactor,GroupList>::page_factor=PageFactor;
 
-template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
-const int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,PageFactor,GroupList>::component_index=_component_counter++;
+template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,bool RTTI,unsigned int PageFactor,typename GroupList>
+const int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI,PageFactor,GroupList>::component_index=_component_counter++;
 
-template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
-vector<void*>* const Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,PageFactor,GroupList>::all_components_reference=&_all_components;
+template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,bool RTTI,unsigned int PageFactor,typename GroupList>
+vector<void*>* const Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI,PageFactor,GroupList>::all_components_reference=&_all_components;
 
-template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
-typename Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,PageFactor,GroupList>::Singleton_Type* const 
-	Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,PageFactor,GroupList>::singleton_reference
-	= Add_Component_Singleton<typename Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,PageFactor,GroupList>::Singleton_Type>
-	(new Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,PageFactor,GroupList>::Singleton_Type());
+template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,bool RTTI,unsigned int PageFactor,typename GroupList>
+typename Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI,PageFactor,GroupList>::Singleton_Type* const 
+	Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI,PageFactor,GroupList>::singleton_reference
+	= Add_Component_Singleton<typename Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI,PageFactor,GroupList>::Singleton_Type>
+	(new Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI,PageFactor,GroupList>::Singleton_Type());
 	
 
-template<typename InheritanceList,typename MasterType,typename ObjectType,unsigned int PageFactor,typename GroupList>
-const unsigned int Polaris_Component<InheritanceList,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::page_factor=PageFactor;
+template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
+const unsigned int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,PageFactor,GroupList>::page_factor=PageFactor;
 
-template<typename InheritanceList,typename MasterType,typename ObjectType,unsigned int PageFactor,typename GroupList>
-const int Polaris_Component<InheritanceList,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::component_index=_component_counter++;
+template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
+const int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,PageFactor,GroupList>::component_index=_component_counter++;
 
-template<typename InheritanceList,typename MasterType,typename ObjectType,unsigned int PageFactor,typename GroupList>
-vector<void*>* const Polaris_Component<InheritanceList,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::all_components_reference=&_all_components;
+template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
+vector<void*>* const Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,PageFactor,GroupList>::all_components_reference=&_all_components;
 
-template<typename InheritanceList,typename MasterType,typename ObjectType,unsigned int PageFactor,typename GroupList>
-typename Polaris_Component<InheritanceList,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::Singleton_Type* const 
-	Polaris_Component<InheritanceList,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::singleton_reference
-	= Add_Component_Singleton<typename Polaris_Component<InheritanceList,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::Singleton_Type>
-	(new Polaris_Component<InheritanceList,MasterType,ObjectType,NULLTYPE,PageFactor,GroupList>::Singleton_Type());
+template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int PageFactor,typename GroupList>
+typename Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,PageFactor,GroupList>::Singleton_Type* const 
+	Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,PageFactor,GroupList>::singleton_reference
+	= Add_Component_Singleton<typename Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,PageFactor,GroupList>::Singleton_Type>
+	(new Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,PageFactor,GroupList>::Singleton_Type());
 
 
-template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
-const unsigned int Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::page_factor=PageFactor;
-
-template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
-const int Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::component_index=_component_counter++;
-
-template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
-vector<void*>* const Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::all_components_reference=&_all_components;
-
-template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
-typename Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::Singleton_Type* const 
-	Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::singleton_reference
-	= Add_Component_Singleton<typename Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::Singleton_Type>
-	(new Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::Singleton_Type());
+//template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
+//const unsigned int Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::page_factor=PageFactor;
+//
+//template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
+//const int Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::component_index=_component_counter++;
+//
+//template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
+//vector<void*>* const Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::all_components_reference=&_all_components;
+//
+//template<typename InheritanceList,typename MasterType,unsigned int PageFactor,typename GroupList>
+//typename Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::Singleton_Type* const 
+//	Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::singleton_reference
+//	= Add_Component_Singleton<typename Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::Singleton_Type>
+//	(new Polaris_Component<InheritanceList,MasterType,NULLTYPE,NULLTYPE,PageFactor,GroupList>::Singleton_Type());
 
 
 

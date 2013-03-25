@@ -11,12 +11,13 @@
 #define tag_as_prototype\
 	typedef ComponentType Component_Type;\
 	typedef CallerType Caller_Type;\
-	typedef true_type Is_Prototype;
+	typedef true_type Is_Prototype;\
+	const int Identify() const {return this_component()->Identify()}\
+	feature bool Is_Type() const {return this_component()->Identify() == TargetType::component_index;}
 
 ///============================================================================
 /// implementation - standard declarator for all implementations
 ///============================================================================
-
 
 #define implementation template<typename MasterType,typename ParentType=NULLTYPE,typename InheritanceList=NULLTYPELIST>
 
