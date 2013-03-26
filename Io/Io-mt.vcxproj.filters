@@ -13,6 +13,9 @@
     <ClCompile Include="Demand-odb.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Its-odb.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="database.h">
@@ -39,6 +42,9 @@
     <ClInclude Include="Io.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Its-odb.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="System.h">
@@ -51,6 +57,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="Supply.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Its.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -68,6 +77,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="System-odb.ixx">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Its-odb.ixx">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

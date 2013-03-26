@@ -2,7 +2,7 @@ def add_custom_step(name):
     s = """
     <CustomBuild Include="$name$.h">
       <Message>Running odb compiler on $name$.h</Message>
-      <Command>odb.exe --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name $name$ $name$.h</Command>
+      <Command>c:\\opt\\polarisdeps\\odb-2.2.0-i686-windows\\bin\\odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name $name$ $name$.h</Command>
       <Outputs>$name$-odb.hxx;$name$-odb.ixx;$name$-odb.cxx;%(Outputs)</Outputs>
     </CustomBuild>"""
     return s.replace("$name$", name)
@@ -14,7 +14,7 @@ custom_steps = """<?xml version="1.0" encoding=\"utf-8\"?>
 include_group = "\n  <ItemGroup>\n"
 compile_group = "  <ItemGroup>\n"
 none_group = "  <ItemGroup>\n"
-with open("polaris_io\db-inventory.txt") as fh:
+with open("Io\db-inventory.txt") as fh:
     for line in fh:
         item = line.strip("\n")
         custom_steps += add_custom_step(item)
@@ -26,7 +26,7 @@ include_group += "  </ItemGroup>\n"
 compile_group += "  </ItemGroup>\n"
 none_group += "  </ItemGroup>\n"
 
-with open("io-odb-step.props",'w') as fh:
+with open("odb-step.props",'w') as fh:
     fh.write(custom_steps)
     fh.write(include_group)
     fh.write(compile_group)

@@ -49,6 +49,9 @@ namespace Incident_Components
 
 			//Lane closure properties
 			feature_accessor(lanes,none,none);
+
+
+			
 		};
 
 		prototype struct Incident_Manager:public ComponentType
@@ -69,6 +72,8 @@ namespace Incident_Components
 			{
 				return this_component()->Get_Incidents<ComponentType,CallerType,TargetType>(param1,param2);
 			}
+
+			feature_accessor(db_name,none,none);
 		};
 	}
 }

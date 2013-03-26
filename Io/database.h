@@ -8,6 +8,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning( disable : 4996 )
 
+#define SCHEMA_REVISION "10"
+
 #ifndef DATABASE
 #define DATABASE
 
@@ -25,10 +27,34 @@
 #include <odb/sqlite//exceptions.hxx> 
 #include <sqlite3.h>
 
+#include "Demand-odb.hxx"
+#include "Supply-odb.hxx"
+#include "System-odb.hxx"
+#include "Result-odb.hxx"
+
 #include <iostream>
 #include <fstream>
 
 using namespace std;
+
+//#pragma warning(disable:4099)
+//
+//#ifdef _DEBUG
+//#pragma comment(lib, "odb-sqlite-d-mt.lib")
+//#pragma comment(lib, "sqlite3-d-mt.lib")
+//#pragma comment(lib, "odb-d-mt.lib")
+//#pragma comment(lib, "odb-sqlite-d.lib")
+//#pragma comment(lib, "sqlite3-d.lib")
+//#pragma comment(lib, "odb-d.lib")
+//#else
+//#pragma comment(lib, "odb-sqlite-mt.lib")
+//#pragma comment(lib, "sqlite3-mt.lib")
+//#pragma comment(lib, "odb-mt.lib")
+//#pragma comment(lib, "odb-sqlite.lib")
+//#pragma comment(lib, "sqlite3.lib")
+//#pragma comment(lib, "odb.lib")
+//#endif
+
 
 
 namespace polaris
@@ -45,17 +71,7 @@ namespace io
 		result.push_back("Result");
 		result.push_back("Demand");
 		result.push_back("System");
-//#ifdef _DEBUG
-//		string schema;
-//		result.clear();
-//		std::ifstream inventory_file ("C:/Users/vsokolov/usr/polaris_io/polaris_io/db-inventory.txt");
-//		while (inventory_file.good())
-//		{
-//			getline(inventory_file, schema);
-//			result.push_back(schema);
-//		}
-//		inventory_file.close();
-//#endif
+		result.push_back("Its");
 		assert(result.size() > 0);
 		return result;
 	}
@@ -68,12 +84,10 @@ namespace io
 	{
 		return "ATTACH \'" + make_name(db_name, schema_name) + "\' as " + schema_name;
 	}
-}
-}
-using namespace polaris::io;
-
+}}
 inline sqlite3* open_raw_sqlite_database(const std::string& name)
 {
+	using namespace polaris::io;
 	int ret;
 	//char sql[1024];
 	char *err_msg = NULL;
@@ -82,6 +96,7 @@ inline sqlite3* open_raw_sqlite_database(const std::string& name)
 	if (ret != SQLITE_OK)
 	{
 		fprintf (stderr, "Error: %s\n", err_msg);
+		fprintf (stdout, "Error: %s\n", err_msg);
 		sqlite3_free (err_msg);
 		return NULL;
 	}
@@ -100,15 +115,13 @@ inline sqlite3* open_raw_sqlite_database(const std::string& name)
 
 inline int attach_spatialite(sqlite3* db_handle) 
 {
+	using namespace polaris::io;
 	char sql[2048];
 	//char buff[1024];
 	char *err_msg = NULL;
 	int ret;
 	sqlite3_enable_load_extension (db_handle, 1);
 	strcpy (sql, "SELECT load_extension('libspatialite-4.dll')");
-#ifdef _DEBUG
-	strcpy (sql, "SELECT load_extension('C:\\Users\\vsokolov\\usr\\io_sdk\\x86\\bin\\libspatialite-4.dll')");
-#endif
 	ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);
 	if (ret != SQLITE_OK)
 	{
@@ -116,21 +129,22 @@ inline int attach_spatialite(sqlite3* db_handle)
 		sqlite3_free (err_msg);
 		return ret;
 	}
-    strcpy (sql, "SELECT InitSpatialMetadata()");
-    ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);
-    if (ret != SQLITE_OK)
-    {
+	strcpy (sql, "SELECT InitSpatialMetadata()");
+	ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);
+	if (ret != SQLITE_OK)
+	{
 		fprintf (stderr, "InitSpatialMetadata() error: %s\n", err_msg);
 		sqlite3_free (err_msg);
 		return ret;
-    }
-    fprintf(stderr, "\n\n**** SpatiaLite loaded as an extension ***\n\n");
+	}
+	fprintf(stderr, "\n\n**** SpatiaLite loaded as an extension ***\n\n");
 
 	return ret;
 }
 
 inline sqlite3* open_spatialite_database(const std::string& name )
 {
+	using namespace polaris::io;
 	int ret;
 	char *err_msg = NULL;
 	sqlite3* db_handle;
@@ -143,7 +157,15 @@ inline sqlite3* open_spatialite_database(const std::string& name )
 
 inline auto_ptr<odb::database> open_sqlite_database(const std::string& name)
 {
-	auto_ptr<odb::database> db (new odb::sqlite::database (make_name(name, db_inventory[0]), SQLITE_OPEN_READWRITE));
+	using namespace polaris::io;
+	auto_ptr<odb::database> db (new odb::sqlite::database (make_name(name, db_inventory[0]), SQLITE_OPEN_READWRITE));	
+	odb::transaction t (db->begin());
+	shared_ptr<polaris::io::MetaData> mt = db->find<MetaData>("schema_version");
+	t.commit();
+	if (mt->value != SCHEMA_REVISION)
+	{
+		std::cout << "Schema mismatch. Current schema is " << SCHEMA_REVISION << " and database schema is " << mt->value << ".\n Exiting...\n";
+	}
 	odb::connection_ptr c (db->connection ());
 	c->execute("PRAGMA synchronous = OFF");
 	c->execute("PRAGMA journal_mode = MEMORY");
@@ -167,6 +189,7 @@ inline auto_ptr<odb::database> open_sqlite_database(const std::string& name)
 
 inline auto_ptr<odb::database> open_sqlite_demand_database(const std::string& name)
 {
+	using namespace polaris::io;
 	auto_ptr<odb::database> db (new odb::sqlite::database (make_name(name, db_inventory[2]), SQLITE_OPEN_READWRITE));
 	odb::connection_ptr c (db->connection ());
 	c->execute("PRAGMA synchronous = OFF");
@@ -191,6 +214,7 @@ inline auto_ptr<odb::database> open_sqlite_demand_database(const std::string& na
 
 inline auto_ptr<odb::database> create_sqlite_database(const string& name, string& schema)
 {
+	using namespace polaris::io;
 	try
 	{
 		auto_ptr<odb::database> db (new odb::sqlite::database (make_name(name, schema), SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE));
@@ -222,8 +246,12 @@ inline auto_ptr<odb::database> create_sqlite_database(const string& name, string
 
 inline auto_ptr<odb::database> create_sqlite_database(const string& name)
 {
+	using namespace polaris::io;
 	auto_ptr<odb::database> db = create_sqlite_database(name, db_inventory[0]);
-	auto_ptr<odb::database> temp;
+	shared_ptr<MetaData> mt (new MetaData("schema_version", SCHEMA_REVISION));
+	odb::transaction t (db->begin());
+	db->persist(mt);
+	t.commit();
 	odb::connection_ptr c (db->connection ());
 	if (db_inventory.size()>1)
 	{
@@ -231,7 +259,7 @@ inline auto_ptr<odb::database> create_sqlite_database(const string& name)
 		{
 			try
 			{
-			auto_ptr<odb::database> temp = create_sqlite_database(name, *it);
+				auto_ptr<odb::database> temp = create_sqlite_database(name, *it);
 			}
 			catch (odb::unknown_schema e)
 			{
@@ -243,56 +271,8 @@ inline auto_ptr<odb::database> create_sqlite_database(const string& name)
 	}
 	return db;
 }
-//
-//
-//inline auto_ptr<database> create_database (int& argc, char* argv[])
-//{
-//  if (argc > 1 && argv[1] == string ("--help"))
-//  {
-//    cout << "Usage: " << argv[0] << " [options]" << endl
-//         << "Options:" << endl;
-//
-//#if defined(DATABASE_MYSQL)
-//    odb::mysql::database::print_usage (cout);
-//#elif defined(DATABASE_SQLITE)
-//    odb::sqlite::database::print_usage (cout);
-//#elif defined(DATABASE_PGSQL)
-//    odb::pgsql::database::print_usage (cout);
-//#elif defined(DATABASE_ORACLE)
-//    odb::oracle::database::print_usage (cout);
-//#elif defined(DATABASE_MSSQL)
-//    odb::mssql::database::print_usage (cout);
-//#endif
-//
-//    exit (0);
-//  }
-//
-//#if defined(DATABASE_MYSQL)
-//  auto_ptr<database> db (new odb::mysql::database (argc, argv));
-//#elif defined(DATABASE_SQLITE)
-//  auto_ptr<database> db (
-//    new odb::sqlite::database (
-//      argc, argv, false, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE));
-//	// Create the database schema. Due to bugs in SQLite foreign key
-//	// support for DDL statements, we need to temporarily disable
-//	// foreign keys.
-//	{
-//		odb::connection_ptr c (db->connection ());
-//		c->execute ("PRAGMA foreign_keys=OFF");
-//		transaction t (c->begin ());
-//		schema_catalog::create_schema (*db);
-//		t.commit ();
-//		c->execute ("PRAGMA foreign_keys=ON");
-//	}
-//#elif defined(DATABASE_PGSQL)
-//  auto_ptr<database> db (new odb::pgsql::database (argc, argv));
-//#elif defined(DATABASE_ORACLE)
-//  auto_ptr<database> db (new odb::oracle::database (argc, argv));
-//#elif defined(DATABASE_MSSQL)
-//  auto_ptr<database> db (new odb::mssql::database (argc, argv));
-//#endif
-//
-//  return db;
-//}
+
+
+
 
 #endif // DATABASE_HXX

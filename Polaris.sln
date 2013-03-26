@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Io-mt", "Io\io-mt.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "db_unittest", "db_unittest\db_unittest.vcxproj", "{09D969F6-2F51-4519-A5C3-4E10447C81CC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ItsMockup", "ItsMockup\ItsMockup.vcxproj", "{ADB7745A-DA6F-4895-809D-C821CE67590D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Integrated|Win32 = Debug_Integrated|Win32
@@ -340,6 +342,27 @@ Global
 		{09D969F6-2F51-4519-A5C3-4E10447C81CC}.Release|Win32.ActiveCfg = Release|Win32
 		{09D969F6-2F51-4519-A5C3-4E10447C81CC}.Release|Win32.Build.0 = Release|Win32
 		{09D969F6-2F51-4519-A5C3-4E10447C81CC}.Release|x64.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Debug|Win32.Build.0 = Debug|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Debug|x64.ActiveCfg = Debug|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_Antares|Win32.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_Antares|Win32.Build.0 = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_Antares|x64.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_Integrated_Antares|Win32.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_Integrated_Antares|Win32.Build.0 = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_Integrated_Antares|x64.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_Integrated|Win32.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_Integrated|Win32.Build.0 = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_Integrated|x64.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_NetworkModel_Antares|Win32.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_NetworkModel_Antares|Win32.Build.0 = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_NetworkModel_Antares|x64.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_NetworkModel|Win32.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_NetworkModel|Win32.Build.0 = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release_NetworkModel|x64.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release|Win32.ActiveCfg = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release|Win32.Build.0 = Release|Win32
+		{ADB7745A-DA6F-4895-809D-C821CE67590D}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

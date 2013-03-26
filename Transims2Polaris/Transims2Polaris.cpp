@@ -7,6 +7,8 @@
 #include "Geometry.h"
 #include "Db_File.hpp"
 #include <time.h>
+
+#include "Dummy.h"
 using namespace polaris::io;
 using namespace std;
 
@@ -142,8 +144,7 @@ int main(int argc, char* argv[])
 	odb::transaction t (db->begin());
 	db->persist(meta_data);
 	t.commit();
-	cout << "Press any key...\n";
-	getchar();
+	Dummy(net->path_to_database);
 
 	return 0;
 }

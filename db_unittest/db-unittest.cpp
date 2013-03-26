@@ -1,14 +1,24 @@
 #include <gtest\gtest.h>
 #include <Io\Io.h>
+#include <Io\Geometry.h>
 extern char* db_path;
 
 
 class DBTest : public testing::Test {
 protected:
 	virtual void SetUp() {
-		db = ::open_sqlite_database(::db_path);
+		db = open_sqlite_database(db_path);
 	}
 	auto_ptr<odb::database> db;
+};
+
+
+class SpatiaLiteTest : public testing::Test {
+protected:
+	virtual void SetUp() {
+		db_handle = open_spatialite_database(db_path);
+	}
+	sqlite3* db_handle;
 };
 
 template <typename T>
@@ -24,21 +34,28 @@ protected:
 };
 
 
+
+
 TEST_F(DBTest, OpenFunction){
-	ASSERT_FALSE(db.get() == NULL);
+	EXPECT_FALSE(this->db.get() == NULL);
 }
 
 TEST_F(DBTest, LocationFKLocation_Data){
 	typedef odb::query<polaris::io::Location> query;
 	typedef odb::result<polaris::io::Location> result;
 	odb::transaction t(this->db->begin());
+	std::cout << 1 << "\n";
 	result r(this->db->query<polaris::io::Location>(query::location_data.is_null()));
+	std::cout << 2 << "\n";
 	int count = 0;
+	std::cout << 3 << "\n";
 	for (result::iterator i (r.begin()); i!=r.end(); ++i)
 	{
-		if (i->getLocation_Data() == nullptr)
 			count++;
 	}
+	std::cout << 4 << "\n";
+	t.commit();
+	std::cout << 5 << "\n";
 	ASSERT_EQ(count, 0);
 }
 
@@ -53,6 +70,7 @@ TEST_F(DBTest, ZoneFKZone_Land_Use){
 		if (i->getZone_Land_Use() == nullptr)
 			count++;
 	}
+	t.commit();
 	ASSERT_EQ(count, 0);
 }
 
@@ -67,6 +85,7 @@ TEST_F(DBTest, LinkFKNode_A){
 		if (i->getNode_A() == nullptr)
 			count++;
 	}
+	t.commit();
 	ASSERT_EQ(count, 0);
 }
 TEST_F(DBTest, LinkFKNode_B){
@@ -80,6 +99,7 @@ TEST_F(DBTest, LinkFKNode_B){
 		if (i->getNode_B() == nullptr)
 			count++;
 	}
+	t.commit();
 	ASSERT_EQ(count, 0);
 }
 
@@ -91,4 +111,12 @@ TYPED_TEST(TableTest, IsEmpty) {
 	typename TestFixture::result r(this->db->query<typename TestFixture::TT>(typename TestFixture::query::true_expr));
 	ASSERT_FALSE(r.empty());
 	t.commit();
+}
+
+TEST(SpatialiteT, LinkPoints)
+{
+	using namespace polaris::io;
+	std::map<int, shape_geometry> res;
+	res = GetLinkPoints(::db_path);
+	ASSERT_GE(0, res.size());
 }

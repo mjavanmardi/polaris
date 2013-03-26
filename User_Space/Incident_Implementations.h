@@ -70,6 +70,29 @@ namespace Incident_Components
 
 		implementation struct Incident_Manager_Implementation : public Polaris_Component<APPEND_CHILD(Incident_Manager_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			
+			void ReadDB() 
+			{
+				using polaris::io;
+				//read the initial data from input db
+				auto_ptr<odb::database> db = open_sqlite_database(_db_name);
+				typedef odb::query<Incident> qi; typedef odb::result<Incident> ri;
+				odb::transaction t (db->begin());
+				ri r (db->query<Incident> (qi::true_expr));
+				for (ri::iterator i (r.begin()); i!=r.end(); ++i)
+				{
+					if (i.type == "WEATHER") {
+						Weather_Incident_Interface *wii = Allocate<MasterType::type_of(weather_incident)>();
+						wii->weather_type<typename MasterType::type_of(weather_incident)::type_of(weather_type)>(0);
+						wii->precipitation_rate<typename MasterType::type_of(weather_incident)::type_of(precipitation_rate)>(0);
+						wii->snow_depth<typename MasterType::type_of(weather_incident)::type_of(snow_depth)>(0);
+						_incident_container.push_back((Base_Incident_Interface*)wii);
+					}
+				}
+			}
+			
+			member_data(std::string, db_name, none, none);
+
 			typedef Incident<typename MasterType::type_of(base_incident),ComponentType> Base_Incident_Interface;
 			typedef Incident<typename MasterType::type_of(weather_incident),ComponentType> Weather_Incident_Interface;
 			typedef Incident<typename MasterType::type_of(accident_incident),ComponentType> Accident_Incident_Interface;

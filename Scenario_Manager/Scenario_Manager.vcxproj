@@ -358,6 +358,7 @@
     <ClInclude Include="writer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="json_internalarray.inl" />
     <None Include="json_internalmap.inl" />
     <None Include="json_valueiterator.inl" />

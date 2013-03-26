@@ -117,8 +117,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\..\libio\polaris_io;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\libio\lib\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|Win32'">
@@ -298,6 +298,7 @@
   <ItemGroup>
     <ClInclude Include="adopter_methods.h" />
     <ClInclude Include="convert_methods.h" />
+    <ClInclude Include="Dummy.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="PopulateAdditional.h" />
     <ClInclude Include="transims_network.h" />

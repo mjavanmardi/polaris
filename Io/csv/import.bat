@@ -1,1 +1,1 @@
-sqlite3  z:\POLARIS\interchange\with_zone_data\chicago-Supply.sqlite < import.sql
+sqlite3  z:\POLARIS\interchange\with_its\chicago-Supply.sqlite < import.sql

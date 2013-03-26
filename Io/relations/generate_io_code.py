@@ -112,13 +112,18 @@ public:
             type_name = field.getAttribute("type")
             key = field.getAttribute("key")
             index = field.getAttribute("index")
+            auto = field.getAttribute("auto")
             if reference!="":
                 if contanerSetter!="no":
                     accessors += "\tvoid set%s (const %s& %s_, InputContainer& container) {%s = container.%ss[%s_];}\n"%(name.title(), type_name, name, name, reference, name)                
                 type_name = "shared_ptr<%s>"%reference
             if key!="":
                 if key=="yes":
-                    data_fields += "\t#pragma db id\n"
+                    data_fields += "\t#pragma db id "
+                    if auto=="yes":
+                        data_fields += "auto\n"
+                    else:
+                        data_fields += "\n"
                     accessors += "\tconst %s& getPrimaryKey () const {return %s;}\n"%(type_name, name) 
             if index!="":
                 if index=="yes":
@@ -136,7 +141,7 @@ public:
         content += data_fields
         content += pragmas        
         content += "};\n"
-    content += "#endif"
+    content += "}}\n#endif"
     content = content.replace("$ForwardDeclarations$", ForwardDeclarations)
     out_fn = args.output+"/"+header_file_name + ".h"
     print "Generated ", out_fn
@@ -152,7 +157,7 @@ app = argparse.ArgumentParser(description='Convert an xml file into a c++ code t
 app.add_argument("-s", "--sample", action="store_true", help="Generates a sample xml file")      
 app.add_argument("-f", "--folder", default=".", help="Folder where xml files are located. Current folder by default")
 app.add_argument("-o", "--output", default=".", help="Output directory")
-app.add_argument("-n", "--namespace", default = "pio", help="Namespace for the classes")
+app.add_argument("-n", "--namespace", default = "polaris{ namespace io", help="Namespace for the classes")
 app.add_argument("-i", "--input", nargs='*', help="Specific Fales to be parsed. If not specified, all of the xml files in the folder are processed")
 
 args = app.parse_args()
