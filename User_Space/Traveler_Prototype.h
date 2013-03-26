@@ -44,7 +44,7 @@ namespace Traveler_Components
 				itf->template Schedule_Route_Computation<NULLTYPE>(departed_time);
 				
 				// other stuff than routing
-				load_event(ComponentType,Departure_Conditional,Set_Departure,departed_time+1,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION,NULLTYPE);
+				load_event(ComponentType,Departure_Conditional,Set_Departure,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION,NULLTYPE);
 			}
 
 			declare_feature_conditional(Departure_Conditional)
