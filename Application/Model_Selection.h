@@ -1,5 +1,7 @@
 #pragma once
 
+//#undef IntegratedModelApplication
+//#undef NetworkModelApplication
 //#define EXAMPLE
 //#define IntegratedModelApplication
 //#define NetworkModelApplication
