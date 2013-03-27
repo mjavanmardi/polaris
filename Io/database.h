@@ -113,7 +113,7 @@ inline sqlite3* open_raw_sqlite_database(const std::string& name)
 	return db_handle;
 }
 
-inline int attach_spatialite(sqlite3* db_handle) 
+inline int attach_spatialite(sqlite3* db_handle, bool init) 
 {
 	using namespace polaris::io;
 	char sql[2048];
@@ -129,20 +129,22 @@ inline int attach_spatialite(sqlite3* db_handle)
 		sqlite3_free (err_msg);
 		return ret;
 	}
-	strcpy (sql, "SELECT InitSpatialMetadata()");
-	ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);
-	if (ret != SQLITE_OK)
-	{
-		fprintf (stderr, "InitSpatialMetadata() error: %s\n", err_msg);
-		sqlite3_free (err_msg);
-		return ret;
+	if (init) {
+		strcpy (sql, "SELECT InitSpatialMetadata()");
+		ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);
+		if (ret != SQLITE_OK)
+		{
+			fprintf (stderr, "InitSpatialMetadata() error: %s\n", err_msg);
+			sqlite3_free (err_msg);
+			return ret;
+		}
 	}
-	fprintf(stderr, "\n\n**** SpatiaLite loaded as an extension ***\n\n");
+		//fprintf(stderr, "\n\n**** SpatiaLite loaded as an extension ***\n\n");
 
 	return ret;
 }
 
-inline sqlite3* open_spatialite_database(const std::string& name )
+inline sqlite3* open_spatialite_database(const std::string& name, bool init = true)
 {
 	using namespace polaris::io;
 	int ret;
@@ -150,7 +152,7 @@ inline sqlite3* open_spatialite_database(const std::string& name )
 	sqlite3* db_handle;
 	db_handle = open_raw_sqlite_database(name);
 	assert(db_handle != NULL);
-	ret = attach_spatialite(db_handle);
+	ret = attach_spatialite(db_handle, init);
 	assert(ret == SQLITE_OK);
 	return db_handle;
 }

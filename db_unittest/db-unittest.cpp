@@ -44,18 +44,13 @@ TEST_F(DBTest, LocationFKLocation_Data){
 	typedef odb::query<polaris::io::Location> query;
 	typedef odb::result<polaris::io::Location> result;
 	odb::transaction t(this->db->begin());
-	std::cout << 1 << "\n";
 	result r(this->db->query<polaris::io::Location>(query::location_data.is_null()));
-	std::cout << 2 << "\n";
 	int count = 0;
-	std::cout << 3 << "\n";
 	for (result::iterator i (r.begin()); i!=r.end(); ++i)
 	{
 			count++;
 	}
-	std::cout << 4 << "\n";
 	t.commit();
-	std::cout << 5 << "\n";
 	ASSERT_EQ(count, 0);
 }
 
@@ -118,5 +113,28 @@ TEST(SpatialiteT, LinkPoints)
 	using namespace polaris::io;
 	std::map<int, shape_geometry> res;
 	res = GetLinkPoints(::db_path);
-	ASSERT_GE(0, res.size());
+	ASSERT_EQ(res.size(), 31205);
+}
+
+TEST(SpatialiteT, LinksInsidePoly)
+{
+	using namespace polaris::io;
+	std::vector<int> res;
+	res = GetLinksInsideDepotPolygon(db_path);
+	ASSERT_EQ(res.size(), 275);
+}
+
+TEST(SpatialiteT, LinksInsideLakeCounty)
+{
+	using namespace polaris::io;
+	std::vector<int> res;
+	res = GetLinksInsideCounty(db_path, "Lake");
+	ASSERT_EQ(res.size(), 2126);
+}
+TEST(SpatialiteT, LinksInsideDekalbCounty)
+{
+	using namespace polaris::io;
+	std::vector<int> res;
+	res = GetLinksInsideCounty(db_path, "DeKalb");
+	ASSERT_EQ(res.size(), 332);
 }

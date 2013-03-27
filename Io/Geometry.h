@@ -96,7 +96,7 @@ namespace io
 		char *err_msg = NULL;
 		char sql[2048];
 		sqlite3* db_handle;
-		db_handle = open_spatialite_database(db_name);
+		db_handle = open_spatialite_database(db_name, false);
 		strcpy(sql, "Select LINK, AsBinary(GEO) from LINK WHERE GEO is not NULL");
 		ret = sqlite3_exec(db_handle, sql, shapes_callback, &result, &err_msg);
 		return result;
@@ -109,11 +109,44 @@ namespace io
 		char *err_msg = NULL;
 		char sql[2048];
 		sqlite3* db_handle;
-		db_handle = open_spatialite_database(db_name);
+		db_handle = open_spatialite_database(db_name, false);
 		strcpy(sql, "Select LINK, AsBinary(PointOnSurface(GEO)) from LINK WHERE GEO is not NULL");
 		ret = sqlite3_exec(db_handle, sql, point_callback, &result, &err_msg);
 		return result;
 	}
+
+	static int link_callback(void *links_, int argc, char **argv, char **azColName)
+	{
+		std::vector<int> *links = (std::vector<int>*) links_;
+		int link = atoi(argv[0]);
+		links->push_back(link);
+		return 0;
+	}
+	static std::vector<int> GetLinksInsideDepotPolygon(const std::string& db_name)
+	{
+		std::vector<int> result;
+		int ret;
+		char *err_msg = NULL;
+		char sql[2048];
+		sqlite3* db_handle;
+		db_handle = open_spatialite_database(db_name, false);
+		strcpy(sql, "select Link.Link from Link, DepotPoly where Within(Link.GEO, DepotPoly.Geometry) and Link.TYPE in (\"FREEWAY\", \"EXPRESSWAY\")");
+		ret = sqlite3_exec(db_handle, sql, link_callback, &result, &err_msg);
+		return result;
+	}
+	static std::vector<int> GetLinksInsideCounty(const std::string& db_name, const std::string& county_name)
+	{
+		std::vector<int> result;
+		int ret;
+		char *err_msg = NULL;
+		char sql[2048];
+		sqlite3* db_handle;
+		db_handle = open_spatialite_database(db_name, false);
+		sprintf (sql, "SELECT Link.Link FROM Counties, Link where Counties.Name=\"%s\" and Within(Link.GEO, Counties.\"Geometry\")", county_name.c_str());
+		ret = sqlite3_exec(db_handle, sql, link_callback, &result, &err_msg);
+		return result;
+	}
+	
 }
 }
 #endif

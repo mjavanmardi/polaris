@@ -99,6 +99,31 @@ int main(int argc, char* argv[])
 			}	
 			
 		}
+		//put a OpenShoulder with probability 20%
+		comp_props = db->load<Component_Key>(29);
+		if ( (type == "FREEWAY") && (p < 20) )
+		{
+			inst.reset(new Instance());
+			inst->setComponent(comp_os);
+			inst->setLocation_X(points_it->second.x);
+			inst->setLocation_Y(points_it->second.y);
+			try {
+				db->persist(inst);
+			}
+			catch (odb::object_already_persistent e) {
+				std::cout << "OS Instance object already exists. " << e.what() << "\n";
+			}			
+			inst_vals.reset(new Instance_Value());			
+			inst_vals->setInstatce(inst);
+			inst_vals->setValue("0");	
+			try {
+				db->persist(inst_vals);
+			}
+			catch (odb::object_already_persistent e) {
+				std::cout << "OS Instance Values object already exists. " << e.what() << "\n";
+			}	
+			
+		}
 	}
 	t.commit();
 
