@@ -584,3 +584,77 @@ concept struct Is_Target_Type_Struct
 	define_default_check(check1 && check2 && check3);
 };
 
+prototype struct generic_prototype {tag_as_prototype;};
+implementation struct generic_implementation : Polaris_Component<APPEND_CHILD(generic_implementation),NT,Data_Object,NT,true>{};
+
+//-----------------------------------------------------------------
+// Feature Dispatcher
+//
+// Pass control to a specified feature of a type from a list of types from an anonymous pointer to a feature
+#define define_feature_dispatcher(FEATURE_NAME, DISPATCH_ALIAS)\
+template <class TList> struct DISPATCH_ALIAS;\
+template <>\
+struct DISPATCH_ALIAS<NULLTYPE>\
+{\
+	template<class HeadComponentType, class TargetType>\
+	static inline void Start_Dispatch(void* obj)\
+	{\
+		THROW_EXCEPTION("ERROR: type id: " << ((generic_implementation<NT>*)obj)->Identify() << " not found in typelist");\
+	}\
+};\
+template <class Head, class Tail>\
+struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
+{\
+	define_feature_exists_check(FEATURE_NAME, FEATURE_NAME##_exists)\
+	template<class HeadType_As_Given, typename TargetType>\
+	static inline void Start_Dispatch(void* obj, requires(check(HeadType_As_Given, Is_Polaris_Prototype) || check(HeadType_As_Given, Is_Polaris_Component)))\
+	{\
+		DISPATCH_ALIAS<TypeList<HeadType_As_Given, Tail> >::Dispatch<HeadType_As_Given::Component_Type,HeadType_As_Given, TargetType>(obj);\
+	}\
+	template<class HeadType_As_Given, typename TargetType>\
+	static inline void Start_Dispatch(void* obj, requires(!check(HeadType_As_Given, Is_Polaris_Prototype) && !check(HeadType_As_Given, Is_Polaris_Component)))\
+	{\
+		assert_check(HeadType_As_Given, Is_Polaris_Prototype, "Type is not a valid polaris prototype or component." );\
+	}\
+	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
+	static inline void Dispatch(void* obj, requires(check(HeadType_As_Given, Is_Polaris_Prototype) && check(HeadComponentType,FEATURE_NAME##_exists)))\
+	{\
+		if(((generic_implementation<NT>*)obj)->Identify() == Head::Component_Type::component_index)\
+		{\
+			((Head*)obj)->FEATURE_NAME<TargetType>();\
+		}\
+		else\
+		{\
+			DISPATCH_ALIAS<Tail>::Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
+		}\
+	}\
+	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
+	static inline void Dispatch(void* obj, requires(check(HeadType_As_Given, Is_Polaris_Component) && check(HeadComponentType,FEATURE_NAME##_exists)))\
+	{\
+		if(((generic_implementation<NT>*)obj)->Identify() == Head::Component_Type::component_index)\
+		{\
+			((Head*)obj)->FEATURE_NAME<HeadType_As_Given, HeadType_As_Given, TargetType>();\
+		}\
+		else\
+		{\
+			DISPATCH_ALIAS<Tail>::Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
+		}\
+	}\
+	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
+	static inline void Dispatch(void* obj, requires( (!check(HeadType_As_Given, Is_Polaris_Component) && !check(HeadType_As_Given, Is_Polaris_Prototype))))\
+	{\
+		assert_check(HeadType_As_Given, Is_Polaris_Prototype, "Type is not a valid polaris prototype or component." );\
+	}\
+	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
+	static inline void Dispatch(void* obj, requires( (check(HeadType_As_Given, Is_Polaris_Component) || check(HeadType_As_Given, Is_Polaris_Prototype)) && !check(HeadComponentType,FEATURE_NAME##_exists)))\
+	{\
+		assert_check(HeadComponentType, FEATURE_NAME##_exists, "" #FEATURE_NAME "does not exist.  Make sure to 'tag_feature_as_available' if the feature does exist in the component." );\
+	}\
+};
+
+#define dispatch_to_feature(DISPATCHER_ALIAS, TYPELIST, OBJECT, TARGETTYPE)\
+	DISPATCHER_ALIAS<TYPELIST>::Start_Dispatch<TypeAt<TYPELIST,0>::Result, TARGETTYPE>(OBJECT);
+
+
+
+

@@ -36,6 +36,10 @@ public:
 static bool operator==(const Type_Info& A,const Type_Info& B){return (*A.pInfo_)==(*B.pInfo_);}
 */
 
+
+struct NULLCOMPONENT{typedef NULLTYPE Component_Type;};
+
+
 ///============================================================================
 /// Basic Type Traits
 ///============================================================================
@@ -47,7 +51,7 @@ template<> struct test_condition<true>{typedef true_type type;};
 /// TypeList Definition
 ///============================================================================
 
-template<class T,class U>
+template<class T,class U=NULLTYPE>
 struct TypeList
 {
 	typedef T Head;
@@ -102,6 +106,12 @@ template<class Head, class Tail, unsigned int i>
 struct TypeAt<TypeList<Head, Tail>, i>
 {
 	typedef typename TypeAt<Tail,i-1>::Result Result;
+};
+
+template<>
+struct TypeAt<NULLTYPE,0>
+{
+	typedef NULLCOMPONENT Result;
 };
 
 ///============================================================================
