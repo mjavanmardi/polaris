@@ -138,3 +138,55 @@ TEST(SpatialiteT, LinksInsideDekalbCounty)
 	res = GetLinksInsideCounty(db_path, "DeKalb");
 	ASSERT_EQ(res.size(), 332);
 }
+
+
+TEST(SpatialiteT, GetLinkShapes)
+{
+	using namespace polaris::io;
+	std::map<int, LS> res;
+	res = GetLinkShapes(db_path);
+	ASSERT_EQ(res.size(), 31205);
+}
+TEST(SpatialiteT, GetCountyPolygons)
+{
+	using namespace polaris::io;
+	std::map<std::string, POLY>  res;
+	res = GetCountyPolygons(db_path);
+	ASSERT_EQ(res.size(), 102);
+}
+TEST(SpatialiteT, GetCountyPolygons1)
+{
+	using namespace polaris::io;
+	std::map<std::string, POLY>  res;
+	res = GetCountyPolygons(db_path);
+	POLY pl = res["DeKalb"];
+	EXPECT_NEAR(pl.exterior.coords[0].x, 368759, 2);
+	EXPECT_NEAR(pl.exterior.coords[0].y, 4668052, 2);
+}
+
+TEST(SpatialiteT, GetLinkShapes1)
+{
+	using namespace polaris::io;
+	std::map<int, LS> res;
+	res = GetLinkShapes(db_path);
+	LS pt = res[1];
+	EXPECT_NEAR(pt.coords[0].x, 427146.3855, 0.001);
+	EXPECT_NEAR(pt.coords[1].x, 427390.287021, 0.001);
+}
+
+TEST(SpatialiteT, GetDepotPolygons)
+{
+	using namespace polaris::io;
+	std::map<int, POLY>  res;
+	res = GetDepotPolygons(db_path);
+	ASSERT_EQ(res.size(), 1);
+}
+TEST(SpatialiteT, GetDepotPolygons1)
+{
+	using namespace polaris::io;
+	std::map<int, POLY>  res;
+	res = GetDepotPolygons(db_path);
+	POLY pl = res[1];
+	EXPECT_NEAR(pl.exterior.coords[0].x, 448813, 2);
+	EXPECT_NEAR(pl.exterior.coords[0].y, 4639254, 2);
+}

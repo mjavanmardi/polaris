@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
 
 	rl r (db->query<Link> (ql::true_expr));
 	db->execute("DELETE from Instance;");
+	comp_props = db->load<Component_Key>(46);
 	for (rl::iterator i (r.begin()); i!=r.end(); ++i)
 	{
 		points_it = points.find(i->getLink());
@@ -73,6 +74,16 @@ int main(int argc, char* argv[])
 			catch (odb::object_already_persistent e) {
 				std::cout << "VMS Instance object already exists. " << e.what() << "\n";
 			}
+			inst_vals.reset(new Instance_Value());			
+			inst_vals->setInstatce(inst);
+			inst_vals->setKey(comp_props);
+			inst_vals->setValue("0");	
+			try {
+				db->persist(inst_vals);
+			}
+			catch (odb::object_already_persistent e) {
+				std::cout << "VMS Instance Values object already exists. " << e.what() << "\n";
+			}	
 		}
 		//put a VSS with probability 5%
 		comp_props = db->load<Component_Key>(1);
@@ -90,6 +101,7 @@ int main(int argc, char* argv[])
 			}			
 			inst_vals.reset(new Instance_Value());			
 			inst_vals->setInstatce(inst);
+			inst_vals->setKey(comp_props);
 			inst_vals->setValue("55");	
 			try {
 				db->persist(inst_vals);
@@ -115,6 +127,7 @@ int main(int argc, char* argv[])
 			}			
 			inst_vals.reset(new Instance_Value());			
 			inst_vals->setInstatce(inst);
+			inst_vals->setKey(comp_props);
 			inst_vals->setValue("0");	
 			try {
 				db->persist(inst_vals);

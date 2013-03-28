@@ -590,6 +590,7 @@
   <ItemGroup>
     <ClInclude Include="database.h" />
     <ClInclude Include="Dimensions.h" />
+    <ClInclude Include="endian.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="Io.h" />
   </ItemGroup>

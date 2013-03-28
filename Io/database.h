@@ -166,7 +166,7 @@ inline auto_ptr<odb::database> open_sqlite_database(const std::string& name)
 	t.commit();
 	if (mt->value != SCHEMA_REVISION)
 	{
-		std::cout << "Schema mismatch. Current schema is " << SCHEMA_REVISION << " and database schema is " << mt->value << ".\n Exiting...\n";
+		std::cout << "Schema mismatch. Current schema is " << SCHEMA_REVISION << " and database schema is " << mt->value;
 	}
 	odb::connection_ptr c (db->connection ());
 	c->execute("PRAGMA synchronous = OFF");
