@@ -472,12 +472,14 @@
     <ClInclude Include="Antares_App.h" />
     <ClInclude Include="Antares_Frame.h" />
     <ClInclude Include="Antares_Frame_Implementation.h" />
+    <ClInclude Include="Antares_Incident_Implementation.h" />
     <ClInclude Include="Antares_Includes.h" />
     <ClInclude Include="Antares_Intersection_Implementation.h" />
     <ClInclude Include="Antares_Layer.h" />
     <ClInclude Include="Antares_Layer_Implementation.h" />
     <ClInclude Include="Antares_Link_Implementation.h" />
     <ClInclude Include="Antares_Network_Implementation.h" />
+    <ClInclude Include="Antares_Traffic_Management_Center_Implementation.h" />
     <ClInclude Include="Attributes_Panel.h" />
     <ClInclude Include="Attributes_Panel_Implementation.h" />
     <ClInclude Include="Canvas.h" />

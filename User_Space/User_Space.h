@@ -50,3 +50,10 @@ void* _global_scenario;
 #include "Person_Implementations.h"
 
 
+// ITS COMPONENTS
+
+#include "Advisory_Radio_Implementation.h"
+#include "Variable_Message_Sign_Implementation.h"
+#include "Depot_Implementation.h"
+#include "Link_Control_Implementation.h"
+#include "Traffic_Management_Center_Implementation.h"

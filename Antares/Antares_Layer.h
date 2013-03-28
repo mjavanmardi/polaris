@@ -155,7 +155,7 @@ struct Antares_Layer_Configuration
 
 		head_size_value=1;
 
-		attributes_schema="";
+		//attributes_schema="";
 
 		submission_callback=nullptr;
 		attributes_callback=nullptr;
@@ -286,8 +286,10 @@ struct Antares_Layer_Configuration
 		// 1 x Point_3D<NULLTYPE> primitive_normal;
 	
 
-	string attributes_schema;
-
 	attributes_callback_type submission_callback;
 	attributes_callback_type attributes_callback;
+
+
+	vector<string> attributes_schema;
+	vector<vector<string>> dropdown_schema;
 };

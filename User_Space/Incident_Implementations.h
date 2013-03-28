@@ -70,7 +70,11 @@ namespace Incident_Components
 
 		implementation struct Incident_Manager_Implementation : public Polaris_Component<APPEND_CHILD(Incident_Manager_Implementation),MasterType,Execution_Object,ParentType>
 		{
-			
+			void Initialize()
+			{
+				//Load_Event();
+			}
+
 			void ReadDB() 
 			{
 				using polaris::io;
@@ -131,11 +135,11 @@ namespace Incident_Components
 
 					switch(base_incident->Identify())
 					{
-					case typename MasterType::type_of(weather_incident)::component_index:
+					case MasterType::type_of(weather_incident)::component_index:
 						Weather_Incident_Interface* incident;
 						//Do Weather stuff
 						break;
-					case typename MasterType::type_of(accident_incident)::component_index:
+					case MasterType::type_of(accident_incident)::component_index:
 						Accident_Incident_Interface* incident;
 						//Do Accident stuff
 						break;

@@ -133,12 +133,6 @@
     <ClInclude Include="Variable_Message_Sign_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
-    <ClInclude Include="Polaris_Variable_Message_Sign_Implementation.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
-    <ClInclude Include="Polaris_Traffic_Management_Center_Implementation.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
     <ClInclude Include="Plan_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
@@ -252,6 +246,30 @@
     </ClInclude>
     <ClInclude Include="Incident_Prototype.h">
       <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Link_Control_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Advisory_Radio_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Advisory_Radio_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Variable_Message_Sign_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Traffic_Management_Center_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Link_Control_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Depot_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Depot_Implementation.h">
+      <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

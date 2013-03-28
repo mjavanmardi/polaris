@@ -502,8 +502,11 @@
     <ClInclude Include="Activity_Implementations.h" />
     <ClInclude Include="Activity_Location_Prototype.h" />
     <ClInclude Include="Activity_Prototype.h" />
+    <ClInclude Include="Advisory_Radio_Implementation.h" />
     <ClInclude Include="Demand_Prototype.h" />
+    <ClInclude Include="Depot_Implementation.h" />
     <ClInclude Include="Destination_Choice_Implementation.h" />
+    <ClInclude Include="Advisory_Radio_Prototype.h" />
     <ClInclude Include="Incident_Implementations.h" />
     <ClInclude Include="Incident_Prototype.h" />
     <ClInclude Include="File_Reader.h" />
@@ -512,6 +515,8 @@
     <ClInclude Include="Intersection_Prototype.h" />
     <ClInclude Include="linker.h" />
     <ClInclude Include="Linker_Implementations.h" />
+    <ClInclude Include="Link_Control_Implementation.h" />
+    <ClInclude Include="Link_Control_Prototype.h" />
     <ClInclude Include="Link_Prototype.h" />
     <ClInclude Include="Location_Prototype.h" />
     <ClInclude Include="Movement_Plan_Prototype.h" />
@@ -541,10 +546,9 @@
     <ClInclude Include="Polaris_Routing_Implementation.h" />
     <ClInclude Include="Polaris_Scenario_Implementation.h" />
     <ClInclude Include="Polaris_Sensor_Implementation.h" />
-    <ClInclude Include="Polaris_Traffic_Management_Center_Implementation.h" />
+    <ClInclude Include="Traffic_Management_Center_Implementation.h" />
     <ClInclude Include="Polaris_Traveler_Implementation.h" />
     <ClInclude Include="Polaris_Turn_Movement_Implementation.h" />
-    <ClInclude Include="Polaris_Variable_Message_Sign_Implementation.h" />
     <ClInclude Include="Polaris_Vehicle_Implementation.h" />
     <ClInclude Include="Polaris_Zone_Implementation.h" />
     <ClInclude Include="PopSyn_Implementations.h" />
@@ -561,6 +565,7 @@
     <ClInclude Include="Synthesis_Region_Prototype.h" />
     <ClInclude Include="Synthesis_Zone_Implementations.h" />
     <ClInclude Include="Synthesis_Zone_Prototypes.h" />
+    <ClInclude Include="Depot_Prototype.h" />
     <ClInclude Include="Traffic_Management_Center_Prototype.h" />
     <ClInclude Include="Traveler_Prototype.h" />
     <ClInclude Include="Turn_Movement_Prototype.h" />
@@ -568,6 +573,7 @@
     <ClInclude Include="User_Space_Forward_Declaration.h" />
     <ClInclude Include="User_Space_Includes.h" />
     <ClInclude Include="User_Space_with_odb.h" />
+    <ClInclude Include="Variable_Message_Sign_Implementation.h" />
     <ClInclude Include="Variable_Message_Sign_Prototype.h" />
     <ClInclude Include="Vehicle_Prototype.h" />
     <ClInclude Include="Zone_Prototype.h" />

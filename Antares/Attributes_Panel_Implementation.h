@@ -15,7 +15,7 @@ public:
 	Attributes_Panel_Implementation(wxFrame* parent);
 	virtual ~Attributes_Panel_Implementation(void){};
 
-	feature_implementation void Push_Schema(string& schema);
+	feature_implementation void Push_Schema(vector<string>& attributes_schema);
 	feature_implementation void Push_Attributes(vector<string>& attributes);
 
 	member_pointer(wxListCtrl,attributes_list,none,none);
@@ -71,7 +71,7 @@ Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Attribut
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
-void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Push_Schema(string& schema)
+void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Push_Schema(vector<string>& attributes_schema)
 {
 	for(int i=0;i<20;i++)
 	{
@@ -79,30 +79,43 @@ void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Pus
 		_attributes_list->SetItem(i,1,"");
 	}
 
-	const char* schema_itr = schema.c_str();
-	const char* const schema_end = schema_itr + schema.size();
-
 	int atts_row_counter = 0;
-	string new_token("");
 
-	while( schema_itr != schema_end )
+	vector<string>::iterator itr;
+
+	for(itr=attributes_schema.begin();itr!=attributes_schema.end();itr++,atts_row_counter++)
 	{
-		if((*schema_itr) == ',')
-		{
-			_attributes_list->SetItem(atts_row_counter,0,new_token.c_str());
-			new_token.clear();
-			++atts_row_counter;
-		}
-		else
-		{
-			new_token.push_back((*schema_itr));
-		}
-
-		++schema_itr;		
+		_attributes_list->SetItem( atts_row_counter,0,(*itr).c_str() );
 	}
 
-	_attributes_list->SetItem(atts_row_counter,0,new_token.c_str());
+	//const char* schema_itr = schema.c_str();
+	//const char* const schema_end = schema_itr + schema.size();
+
+	//int atts_row_counter = 0;
+	//string new_token("");
+
+	//while( schema_itr != schema_end )
+	//{
+	//	if((*schema_itr) == ',')
+	//	{
+	//		_attributes_list->SetItem(atts_row_counter,0,new_token.c_str());
+	//		new_token.clear();
+	//		++atts_row_counter;
+	//	}
+	//	else
+	//	{
+	//		new_token.push_back((*schema_itr));
+	//	}
+
+	//	++schema_itr;		
+	//}
+
+	//_attributes_list->SetItem(atts_row_counter,0,new_token.c_str());
 	
+
+
+
+
 	_attributes_list->SetColumnWidth(0,wxLIST_AUTOSIZE);
 	_attributes_list->SetColumnWidth(1,wxLIST_AUTOSIZE);
 

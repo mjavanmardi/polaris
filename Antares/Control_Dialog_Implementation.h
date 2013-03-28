@@ -12,11 +12,10 @@
 implementation class Control_Dialog_Implementation : public Polaris_Component<APPEND_CHILD(Control_Dialog_Implementation),MasterType,NULLTYPE>,public wxDialog
 {
 public:
-
 	Control_Dialog_Implementation(string& name);
 	virtual ~Control_Dialog_Implementation(void){};
 
-	feature_implementation void Push_Schema(string& schema);
+	feature_implementation void Push_Schema(vector<string>& attributes_schema,vector<vector<string>>& dropdown_schema);
 	feature_implementation void Push_Attributes(vector<string>& attributes);
 
 	void OnApply(wxCommandEvent& event);
@@ -30,9 +29,16 @@ public:
 
 	member_pointer(wxBoxSizer,sizer,none,none);
 	member_pointer(wxBoxSizer,button_sizer,none,none);
+	member_pointer(wxBoxSizer,table_sizer,none,none);
+	member_pointer(wxBoxSizer,dropdown_sizer,none,none);
+
+	member_pointer(wxChoice*,dropdown_menus,none,none);
 
 	member_pointer(void,selected_object,none,check_2(CallerType,typename MasterType::type_of(antares_layer),is_same));
 	member_data(attributes_callback_type,submission_callback,none,check_2(CallerType,typename MasterType::type_of(antares_layer),is_same));
+	
+	member_data(int,num_attributes,none,none);
+	member_data(int,num_dropdowns,none,none);
 };
 
 //---------------------------------------------------------
@@ -40,7 +46,24 @@ public:
 //---------------------------------------------------------
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
-Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Dialog_Implementation(string& name) : wxDialog(NULL,-1,"",wxDefaultPosition,wxSize(350,550),wxRESIZE_BORDER|wxCAPTION)
+Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Dialog_Implementation(string& name) : wxDialog(NULL,-1,"",wxDefaultPosition,wxSize(500,550),wxRESIZE_BORDER|wxCAPTION)
+{
+	string title=name;
+
+	title.append("_Control_Dialog");
+
+	SetTitle(title);
+
+	Show(false);
+}
+
+//---------------------------------------------------------
+//	Push_Schema
+//--------------------------------------------------------
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+template<typename ComponentType,typename CallerType,typename TargetType>
+void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Push_Schema(vector<string>& attributes_schema,vector<vector<string>>& dropdown_schema)
 {
 	//|wxSYSTEM_MENU|wxMAXIMIZE_BOX|wxCLOSE_BOX|wxMINIMIZE_BOX
 
@@ -48,10 +71,12 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 	
 	_sizer=new wxBoxSizer(wxVERTICAL);
 	_button_sizer=new wxBoxSizer(wxHORIZONTAL);
+	_table_sizer=new wxBoxSizer(wxHORIZONTAL);
+	_dropdown_sizer=new wxBoxSizer(wxVERTICAL);
 
 	//---- initialize and add the components ----
 
-	_attributes_list=new wxListCtrl(this,wxID_ANY,wxDefaultPosition,wxSize(500,400),wxLC_REPORT|wxLC_HRULES|wxLC_VRULES|wxLC_EDIT_LABELS);
+	_attributes_list=new wxListCtrl(this,wxID_ANY,wxDefaultPosition,wxSize(250,400),wxLC_REPORT|wxLC_HRULES|wxLC_VRULES|wxLC_EDIT_LABELS);
 	
 	wxListItem columns[2];
 
@@ -63,8 +88,12 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 	columns[1].SetText("Attribute");
 	_attributes_list->InsertColumn(1, columns[1]);
 
+	_num_attributes=attributes_schema.size();
+
 	wxListItem atts_rows[20];
-	for(int i=0;i<20;i++)
+
+
+	for(int i=0;i<_num_attributes;i++)
 	{
 		atts_rows[i].SetId(i);
 		_attributes_list->InsertItem(atts_rows[i]);
@@ -72,7 +101,54 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 		_attributes_list->SetItem(i,1,"");
 	}
 	
-	_sizer->Add(_attributes_list,0,wxTOP,10);
+	_table_sizer->Add(_attributes_list,0,wxTOP,10);
+
+	_num_dropdowns = dropdown_schema.size();
+
+
+	if( _num_dropdowns )
+	{
+		wxString choices[20];
+
+		vector<vector<string>>::iterator vitr;
+		vector<string>::iterator itr;
+
+		_dropdown_menus = new wxChoice* [ _num_dropdowns ];
+		
+		int i=0;
+
+		for(vitr=dropdown_schema.begin();vitr!=dropdown_schema.end();vitr++,i++)
+		{
+			int j=0;
+
+			for(itr=(*vitr).begin();itr!=(*vitr).end();itr++,j++)
+			{
+				choices[j] = (*itr);
+			}
+
+			_dropdown_menus[i]=new wxChoice(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,(*vitr).size(),choices );
+			_dropdown_sizer->Add(_dropdown_menus[i],0,wxTOP,10);
+		}
+
+		_table_sizer->Add(_dropdown_sizer,0,wxLEFT,20);
+	}
+	else
+	{
+		_dropdown_menus=nullptr;
+	}
+
+
+
+
+
+	_sizer->Add(_table_sizer);
+
+
+
+
+
+
+
 
 	_ok_button=new wxButton(this,wxID_ANY,"Ok");
 	Connect(_ok_button->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Control_Dialog_Implementation::OnOk));
@@ -94,52 +170,62 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 	_selected_object=nullptr;
 	_submission_callback=nullptr;
 
-	string title=name;
 
-	title.append("_Control_Dialog");
 
-	SetTitle(title);
 
-	Show(false);
-}
 
-//---------------------------------------------------------
-//	Push_Schema
-//--------------------------------------------------------
 
-template<typename MasterType,typename ParentType,typename InheritanceList>
-template<typename ComponentType,typename CallerType,typename TargetType>
-void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Push_Schema(string& schema)
-{
-	for(int i=0;i<20;i++)
+
+
+
+
+
+
+
+
+
+
+	for(int i=0;i<_num_attributes;i++)
 	{
 		_attributes_list->SetItem(i,0,"");
 		_attributes_list->SetItem(i,1,"");
 	}
-
-	const char* schema_itr = schema.c_str();
-	const char* const schema_end = schema_itr + schema.size();
-
+	
 	int atts_row_counter = 0;
-	string new_token("");
 
-	while( schema_itr != schema_end )
+
+	vector<string>::iterator itr;
+
+	for(itr=attributes_schema.begin();itr!=attributes_schema.end();itr++,atts_row_counter++)
 	{
-		if((*schema_itr) == ',')
-		{
-			_attributes_list->SetItem(atts_row_counter,1,new_token.c_str());
-			new_token.clear();
-			++atts_row_counter;
-		}
-		else
-		{
-			new_token.push_back((*schema_itr));
-		}
-
-		++schema_itr;
+		_attributes_list->SetItem( atts_row_counter,1,(*itr).c_str() );
 	}
 
-	_attributes_list->SetItem(atts_row_counter,1,new_token.c_str());
+	//const char* schema_itr = schema.c_str();
+	//const char* const schema_end = schema_itr + schema.size();
+
+	//string new_token("");
+
+	//while( schema_itr != schema_end )
+	//{
+	//	if((*schema_itr) == ',')
+	//	{
+	//		_attributes_list->SetItem(atts_row_counter,1,new_token.c_str());
+	//		new_token.clear();
+	//		++atts_row_counter;
+	//	}
+	//	else
+	//	{
+	//		new_token.push_back((*schema_itr));
+	//	}
+
+	//	++schema_itr;
+	//}
+
+	//_attributes_list->SetItem(atts_row_counter,1,new_token.c_str());
+
+
+
 	
 	_attributes_list->SetColumnWidth(0,wxLIST_AUTOSIZE);
 	_attributes_list->SetColumnWidth(1,wxLIST_AUTOSIZE);
@@ -155,7 +241,7 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
 void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Push_Attributes(vector<string>& attributes)
 {
-	for(int i=0;i<20;i++)
+	for(int i=0;i<_num_attributes;i++)
 	{
 		_attributes_list->SetItem(i,0,"");
 	}
@@ -188,7 +274,7 @@ void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::OnApp
 		wxListItem itr;
 		string text;
 
-		for(int i=0;i<20;i++)
+		for(int i=0;i<_num_attributes;i++)
 		{
 			itr.SetId(i);
 			itr.SetColumn(0);

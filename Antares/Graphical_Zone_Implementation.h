@@ -210,7 +210,14 @@ namespace Zone_Components
 				_zone_centroids=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(zone_centroids),ComponentType>*, string& > >(string("Zones"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Quads(True_Color_RGBA<NULLTYPE>(0,255,100,255),10);
-				cfg.attributes_schema = string("ID,Productions,Attractions,Population,Available");
+
+				cfg.attributes_schema.push_back("ID");
+				cfg.attributes_schema.push_back("Productions");
+				cfg.attributes_schema.push_back("Attractions");
+				cfg.attributes_schema.push_back("Population");
+				cfg.attributes_schema.push_back("Available");
+
+
 				cfg.dynamic_data = true;
 				cfg.storage_period = 300;
 				cfg.target_sub_iteration = Types::ZONE_UPDATE_SUBITERATION+1;

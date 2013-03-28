@@ -162,7 +162,23 @@ namespace Network_Components
 
 				//cfg.head_size_value = 
 				cfg.attributes_callback = (attributes_callback_type)&MasterType::type_of(link)::fetch_attributes;
-				cfg.attributes_schema = string("Id,Type,Travel time,Travel delay,Speed,Density,In-flow rate,Out-flow rate,Travel time ratio,Speed ratio,Density ratio,In-flow ratio,Out-flow ratio");
+				//cfg.attributes_schema = string("Id,Type,Travel time,Travel delay,Speed,Density,In-flow rate,Out-flow rate,Travel time ratio,Speed ratio,Density ratio,In-flow ratio,Out-flow ratio");
+
+				cfg.attributes_schema.push_back("Id");
+				cfg.attributes_schema.push_back("Type");
+				cfg.attributes_schema.push_back("Travel time");
+				cfg.attributes_schema.push_back("Travel delay");
+				cfg.attributes_schema.push_back("Speed");
+				cfg.attributes_schema.push_back("Density");
+				cfg.attributes_schema.push_back("In-flow rate");
+				cfg.attributes_schema.push_back("Out-flow rate");
+				cfg.attributes_schema.push_back("Travel time ratio");
+				cfg.attributes_schema.push_back("Speed ratio");
+				cfg.attributes_schema.push_back("Density ratio");
+				cfg.attributes_schema.push_back("In-flow ratio");
+				cfg.attributes_schema.push_back("Out-flow ratio");
+
+
 				_link_lines->Initialize<NULLTYPE>(cfg);
 				struct Link_Line
 				{

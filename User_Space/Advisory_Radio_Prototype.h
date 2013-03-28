@@ -1,7 +1,7 @@
 #pragma once
 #include "User_Space_Includes.h"
 
-namespace Variable_Message_Sign_Components
+namespace Advisory_Radio_Components
 {
 	namespace Types
 	{
@@ -13,7 +13,7 @@ namespace Variable_Message_Sign_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Variable_Message_Sign:public ComponentType
+		prototype struct Advisory_Radio:public ComponentType
 		{
 			tag_as_prototype;
 
@@ -25,4 +25,4 @@ namespace Variable_Message_Sign_Components
 	}
 }
 
-using namespace Variable_Message_Sign_Components::Prototypes;
+using namespace Advisory_Radio_Components::Prototypes;

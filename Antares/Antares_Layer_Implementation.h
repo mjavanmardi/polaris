@@ -884,7 +884,27 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		_primitive_stride = _vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>) + _primitive_normal*sizeof(Point_3D<MasterType>);
 
-		_attributes_schema=cfg.attributes_schema;
+		vector<string>::iterator itr;
+		
+		vector<vector<string>>::iterator vitr;
+
+		for(itr=cfg.attributes_schema.begin();itr!=cfg.attributes_schema.end();itr++)
+		{
+			_attributes_schema.push_back( *itr );
+		}
+
+		for(vitr=cfg.dropdown_schema.begin();vitr!=cfg.dropdown_schema.end();vitr++)
+		{
+			_dropdown_schema.push_back( vector<string>() );
+
+			vector<string>* ref = &_dropdown_schema.back();
+
+			for(itr=(*vitr).begin();itr!=(*vitr).end();itr++)
+			{
+				ref->push_back( *itr );
+			}
+		}
+
 		_submission_callback=cfg.submission_callback;
 		_attributes_callback=cfg.attributes_callback;
 
@@ -897,7 +917,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 	feature_implementation void Select(requires(check_2(CallerType,typename MasterType::canvas_type,is_same)))
 	{
-		_attributes_panel->Push_Schema<Target_Type<NT,NT,string&>>(_attributes_schema);
+		_attributes_panel->Push_Schema<Target_Type<NT,NT,vector<string>&>>(_attributes_schema);
 	}
 	
 	feature_implementation void Select(requires(!check_2(CallerType,typename MasterType::canvas_type,is_same))){static_assert(false,"Caller Not a Canvas Object");}
@@ -917,7 +937,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		{
 			_control_dialog = (control_dialog_interface*)new type_of(control_dialog)(_name);
 
-			_control_dialog->Push_Schema<Target_Type<NT,NT,string&>>(_attributes_schema);
+			_control_dialog->Push_Schema<Target_Type<NT,NT,vector<string>&,vector<vector<string>>&>>(_attributes_schema,_dropdown_schema);
 
 			if(_submission_callback != nullptr)
 			{
@@ -1003,9 +1023,10 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 	
 	member_data(int,data_stride,none,none);
-
-	member_data(string,attributes_schema,none,none);
 	
+	member_data(vector< string >,attributes_schema,none,none);
+	member_data(vector< vector<string> >,dropdown_schema,none,none);
+
 	member_data(attributes_callback_type,submission_callback,none,none);
 	member_data(attributes_callback_type,attributes_callback,none,none);
 

@@ -37,8 +37,12 @@ namespace Vehicle_Components
 				cfg.draw=true;
 				cfg.primitive_color=true;
 
-				cfg.attributes_schema = string("ID,Status,Current_Link");
+				//cfg.attributes_schema = string("ID,Status,Current_Link");
 				
+				cfg.attributes_schema.push_back("ID");
+				cfg.attributes_schema.push_back("Status");
+				cfg.attributes_schema.push_back("Current_Link");
+
 				cfg.attributes_callback = (attributes_callback_type)&fetch_attributes;
 				cfg.submission_callback = (attributes_callback_type)&submit_attributes;
 

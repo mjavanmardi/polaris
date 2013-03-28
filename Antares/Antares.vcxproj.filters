@@ -140,6 +140,12 @@
     <ClInclude Include="Antares_Link_Implementation.h">
       <Filter>User_Space</Filter>
     </ClInclude>
+    <ClInclude Include="Antares_Incident_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Traffic_Management_Center_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">

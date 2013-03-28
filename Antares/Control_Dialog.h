@@ -14,9 +14,9 @@ prototype struct Control_Dialog
 {
 	tag_as_prototype;
 
-	feature_prototype void Push_Schema(typename TargetType::ParamType schema)
+	feature_prototype void Push_Schema(typename TargetType::ParamType attributes_schema,typename TargetType::Param2Type dropdown_schema)
 	{
-		this_component()->Push_Schema<ComponentType,CallerType,TargetType>(schema);
+		this_component()->Push_Schema<ComponentType,CallerType,TargetType>(attributes_schema,dropdown_schema);
 	}
 
 	feature_prototype void Push_Attributes(typename TargetType::ParamType attributes)
