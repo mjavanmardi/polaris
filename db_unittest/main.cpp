@@ -1,5 +1,5 @@
 #include <iostream>
-#include <gtest\gtest.h>
+#include <gtest/gtest.h>
 
 extern char* db_path; 
 

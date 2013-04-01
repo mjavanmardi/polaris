@@ -24,7 +24,7 @@
 #include <odb/transaction.hxx>
 #include <odb/schema-catalog.hxx>
 #include <odb/sqlite/database.hxx>
-#include <odb/sqlite//exceptions.hxx> 
+#include <odb/sqlite/exceptions.hxx> 
 #include <sqlite3.h>
 
 #include "Demand-odb.hxx"
@@ -121,7 +121,11 @@ inline int attach_spatialite(sqlite3* db_handle, bool init)
 	char *err_msg = NULL;
 	int ret;
 	sqlite3_enable_load_extension (db_handle, 1);
+	#ifdef WINDOWS
 	strcpy (sql, "SELECT load_extension('libspatialite-4.dll')");
+	#else
+	strcpy (sql, "SELECT load_extension('libspatialite.so')");
+	#endif
 	ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);
 	if (ret != SQLITE_OK)
 	{
@@ -176,7 +180,7 @@ inline auto_ptr<odb::database> open_sqlite_database(const std::string& name)
 	{
 		for (vector<string>::iterator it = db_inventory.begin()+1; it != db_inventory.end(); ++it)
 		{
-			test.open(make_name(name, *it));
+		  test.open(make_name(name, *it).c_str());
 
 			if(test.is_open())
 			{

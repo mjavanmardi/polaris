@@ -55,7 +55,7 @@ namespace io
 	template <typename PointType>
 	struct Polygon {
 		LineRing<PointType> exterior;
-		std::vector<LineRing<PointType>> interiors;
+		std::vector<LineRing<PointType> > interiors;
 		Polygon<PointType> *next; //used to implement MultyPolygon as a linked list
 	};
 	template <typename PointType>
@@ -68,9 +68,9 @@ namespace io
 		char *blob; //WKB buffer
 		unsigned long size;
 		unsigned long offset;
-		std::vector<Point<PointType>> points;
-		std::vector<LineString<PointType>> linestrings;
-		std::vector<LineRing<PointType>> LR;
+		std::vector<Point<PointType> > points;
+		std::vector<LineString<PointType> > linestrings;
+		std::vector<LineRing<PointType> > LR;
 	};
 
 	//enum GeomType {Point, LineString, Polygon};

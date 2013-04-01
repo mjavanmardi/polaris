@@ -1,6 +1,6 @@
-#include <gtest\gtest.h>
-#include <Io\Io.h>
-#include <Io\Geometry.h>
+#include <gtest/gtest.h>
+#include <Io/Io.h>
+#include <Io/Geometry.h>
 extern char* db_path;
 
 
@@ -48,7 +48,7 @@ TEST_F(DBTest, LocationFKLocation_Data){
 	int count = 0;
 	for (result::iterator i (r.begin()); i!=r.end(); ++i)
 	{
-			count++;
+	  count++;
 	}
 	t.commit();
 	ASSERT_EQ(count, 0);
@@ -62,8 +62,7 @@ TEST_F(DBTest, ZoneFKZone_Land_Use){
 	int count = 0;
 	for (result::iterator i (r.begin()); i!=r.end(); ++i)
 	{
-		if (i->getZone_Land_Use() == nullptr)
-			count++;
+		count++;
 	}
 	t.commit();
 	ASSERT_EQ(count, 0);
@@ -73,11 +72,11 @@ TEST_F(DBTest, LinkFKNode_A){
 	typedef odb::query<polaris::io::Link> query;
 	typedef odb::result<polaris::io::Link> result;
 	odb::transaction t(this->db->begin());
-	result r(this->db->query<polaris::io::Link>(query::true_expr));
+	result r(this->db->query<polaris::io::Link>(query::node_a.is_null()));
 	int count = 0;
 	for (result::iterator i (r.begin()); i!=r.end(); ++i)
 	{
-		if (i->getNode_A() == nullptr)
+
 			count++;
 	}
 	t.commit();
@@ -87,11 +86,11 @@ TEST_F(DBTest, LinkFKNode_B){
 	typedef odb::query<polaris::io::Link> query;
 	typedef odb::result<polaris::io::Link> result;
 	odb::transaction t(this->db->begin());
-	result r(this->db->query<polaris::io::Link>(query::true_expr));
+	result r(this->db->query<polaris::io::Link>(query::node_b.is_null()));
 	int count = 0;
 	for (result::iterator i (r.begin()); i!=r.end(); ++i)
 	{
-		if (i->getNode_B() == nullptr)
+
 			count++;
 	}
 	t.commit();
@@ -101,12 +100,12 @@ TEST_F(DBTest, LinkFKNode_B){
 typedef ::testing::Types<polaris::io::Link, polaris::io::Node, polaris::io::Zone> MyTypes;
 TYPED_TEST_CASE(TableTest, MyTypes);
 
-TYPED_TEST(TableTest, IsEmpty) {
+/*TYPED_TEST(TableTest, IsEmpty) {
 	odb::transaction t(this->db->begin());
 	typename TestFixture::result r(this->db->query<typename TestFixture::TT>(typename TestFixture::query::true_expr));
 	ASSERT_FALSE(r.empty());
 	t.commit();
-}
+	}*/
 
 TEST(SpatialiteT, LinkPoints)
 {
