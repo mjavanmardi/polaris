@@ -74,6 +74,8 @@ public:
 
 	typedef ObjectType Object_Type;
 	typedef MasterType Master_Type;
+	
+	typedef false_type RTTI_Type;
 
 	typedef typename RemoveDuplicates<TypeList<GroupList,NULLTYPE>>::Result Group_List;
 
@@ -107,6 +109,7 @@ public:
 
 	static const int component_index;
 
+	typedef true_type RTTI_Type;
 
 	typedef typename ObjectToSingleton<ObjectType,Component_Type>::type Singleton_Type;
 	static Singleton_Type* const singleton_reference;
