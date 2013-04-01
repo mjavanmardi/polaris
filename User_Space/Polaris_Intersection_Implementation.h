@@ -587,6 +587,50 @@ namespace Intersection_Components
 					inbound_link->calculate_moe_for_assignment_interval<NULLTYPE>();
 				}
 			}
+			feature_implementation void update_vehicle_locations()
+			{
+				define_container_and_value_interface_unqualified_container(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Inbound_Movements_Container_Interface, _Inbound_Movement_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(inbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Outbound_Movements_Container_Interface, _Outbound_Movement_Interface, typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename _Outbound_Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+				define_component_interface(_Link_Interface, typename _Outbound_Inbound_Movements_Interface::get_type_of(outbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				typedef typename MasterType::outbound_inbound_movements_type _outbound_inbound_movements_component_type;
+				typedef typename MasterType::inbound_outbound_movements_type _inbound_outbound_movements_component_type;
+				typedef typename MasterType::link_type _link_component_type;
+				typedef typename MasterType::turn_movement_type _movement_component_type;				
+
+
+				typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_outbound_movements_itr;
+				for (inbound_outbound_movements_itr=_inbound_outbound_movements.begin();inbound_outbound_movements_itr!=_inbound_outbound_movements.end();inbound_outbound_movements_itr++)
+				{
+					_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
+					_link_component_type* inbound_link_component = ((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->_inbound_link_reference;
+					float link_speed = inbound_link_component->realtime_link_moe_data.link_speed;
+
+					float travel_distance = (link_speed * 5280.0f / 3600.0f) * ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<float>();
+					_Outbound_Movements_Container_Interface& outbound_movements_container = inbound_outbound_movements->template outbound_movements<_Outbound_Movements_Container_Interface&>();
+					typename _Outbound_Movements_Container_Interface::iterator outbound_movement_itr;
+					for (outbound_movement_itr=outbound_movements_container.begin();outbound_movement_itr!=outbound_movements_container.end();outbound_movement_itr++)
+					{
+						((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template calculate_moe_for_simulation_interval_from_inbound_link<NULLTYPE>();
+						//num_vehicles_in_link += int(((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template vehicles_container<_Vehicles_Container_Interface&>().size());
+						typename _Vehicles_Container_Interface::iterator vehicle_itr;
+						_Vehicles_Container_Interface& vehicles = ((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template vehicles_container<_Vehicles_Container_Interface&>();
+
+						for (vehicle_itr=vehicles.begin();vehicle_itr!=vehicles.end();vehicle_itr++)
+						{
+							float current_distance = ((_Vehicle_Interface*)(*vehicle_itr))->template distance_to_stop_bar<float>();
+							float new_distance = max(0.0f,(current_distance - travel_distance));
+							//((_Vehicle_Interface*)(*vehicle_itr))->template distance_to_stop_bar<float>(new_distance); 
+							((_Vehicle_Interface*)(*vehicle_itr))->template local_speed<float>(link_speed);
+						}
+					}
+				}
+			}
 
 			declare_feature_conditional(Newells_Conditional)
 			{

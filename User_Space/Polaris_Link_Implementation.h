@@ -481,6 +481,7 @@ namespace Link_Components
 					_link_origin_cumulative_departed_vehicles++;
 					_link_origin_departed_vehicles++;
 					_link_origin_arrived_vehicles--;
+					vehicle->template distance_to_stop_bar<float>(((_Link_Interface*)this)->template length<float>());
 					((_Link_Interface*)this)->template push_vehicle<_Vehicle_Interface*>(vehicle);
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_departed_vehicles<NULLTYPE>();
 					((_Scenario_Interface*)_global_scenario)->template increase_network_in_network_vehicles<NULLTYPE>();

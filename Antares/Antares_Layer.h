@@ -55,6 +55,11 @@ prototype struct Antares_Layer
 		this_component()->Clear_Accented<ComponentType,CallerType,TargetType>();
 	}
 
+	feature_prototype void Refresh_Selection(int cached_iteration)
+	{
+		this_component()->Refresh_Selection<ComponentType,CallerType,TargetType>(cached_iteration);
+	}
+
 	feature_accessor(list_index,none,none);
 	feature_accessor(name,none,none);
 	
@@ -89,6 +94,11 @@ prototype struct Antares_Layer
 	feature_accessor(data_stride,none,none);
 
 	feature_accessor(attributes_panel,none,none);
+
+	feature_accessor(selected_element,none,none);
+
+	feature_accessor(x_label,none,none);
+	feature_accessor(y_label,none,none);
 };
 
 template<typename ComponentType,typename CallerType,typename TargetType>
@@ -289,7 +299,9 @@ struct Antares_Layer_Configuration
 	attributes_callback_type submission_callback;
 	attributes_callback_type attributes_callback;
 
-
 	vector<string> attributes_schema;
 	vector<vector<string>> dropdown_schema;
+
+	string x_label;
+	string y_label;
 };

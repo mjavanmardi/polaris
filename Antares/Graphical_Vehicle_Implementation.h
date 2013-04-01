@@ -20,21 +20,54 @@ namespace Vehicle_Components
 	
 	namespace Implementations
 	{
+#pragma pack(push,1)
+		struct Vehicle_Attribute_Shape
+		{
+			static const float _vehicle_rear_width;
+			static const float _vehicle_front_width;
+			static const float _vehicle_length;
+			void* ptr;
+			True_Color_RGBA<NT> color;
+			Point_3D<NT> a;
+			Point_3D<NT> b;
+			Point_3D<NT> c;
+			Point_3D<NT> d;
+		};
+#pragma pack(pop)
+		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 7 * 5; // rear width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_front_width = 2 * 5; // front width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_length = 13.5 * 5; // length in feet
+
 		implementation struct Graphical_Vehicle_Implementation:public Polaris_Component<APPEND_CHILD(Graphical_Vehicle_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			Vehicle_Attribute_Shape vehicle_shape;
+
 			static vector<Point_2D<MasterType>> _num_vehicles_cache;
 			
 			static member_prototype(Antares_Layer,num_vehicles,typename type_of(MasterType::antares_layer),none,none);
 
 			static volatile member_data(int,vehicles_counter,none,none);
 
-			
+			member_data(float, distance_to_stop_bar, none, none);
+			member_data(float, local_speed, none, none);
+
 			static void Initialize_Layer()
 			{
-				_vehicle_points=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Graphical_Vehicle_Implementation>*, string& > >(string("Vehicles"));
+				Initialize_Vehicle_Shapes_Layer();
+				Initialize_Vehicle_Points_Layer();
+			}
+
+			static void Initialize_Vehicle_Shapes_Layer()
+			{
+				_vehicle_shapes=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_shapes),Graphical_Vehicle_Implementation>*, string& > >(string("Vehicles (shape)"));
 				Antares_Layer_Configuration cfg;
-				cfg.Configure_Points();
-				cfg.draw=true;
+				cfg.dynamic_data=true;
+				cfg.target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
+				cfg.storage_offset=_iteration;
+				cfg.storage_size=3;
+				cfg.storage_period=1;
+
+				cfg.primitive_type=_QUAD;
 				cfg.primitive_color=true;
 
 				//cfg.attributes_schema = string("ID,Status,Current_Link");
@@ -46,17 +79,26 @@ namespace Vehicle_Components
 				cfg.attributes_callback = (attributes_callback_type)&fetch_attributes;
 				cfg.submission_callback = (attributes_callback_type)&submit_attributes;
 
+				_vehicle_shapes->Initialize<NULLTYPE>(cfg);
+			}
+
+			static void Initialize_Vehicle_Points_Layer()
+			{
+				_vehicle_points=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Graphical_Vehicle_Implementation>*, string& > >(string("Vehicles (point)"));
+				Antares_Layer_Configuration cfg;
+				cfg.Configure_Points();
+				cfg.primitive_color=true;
+
+				//cfg.attributes_schema = string("ID,Status,Current_Link");
+				
+				cfg.attributes_schema.push_back("ID");
+				cfg.attributes_schema.push_back("Status");
+				cfg.attributes_schema.push_back("Current_Link");
+				
+				cfg.attributes_callback = (attributes_callback_type)&fetch_attributes;
+				cfg.submission_callback = (attributes_callback_type)&submit_attributes;
+
 				_vehicle_points->Initialize<NULLTYPE>(cfg);
-
-				//// configure plot layer
-				//_num_vehicles=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(num_vehicles),Graphical_Vehicle_Implementation>*, string& > >(string("Number of Vehicles"));
-				//Antares_Layer_Configuration pcfg;
-
-				//pcfg.Configure_Plot();
-				//pcfg.storage_period = 6;
-				//pcfg.storage_offset = 5;
-
-				//_num_vehicles->Initialize<NULLTYPE>(pcfg);
 			}
 
 			
@@ -102,9 +144,60 @@ namespace Vehicle_Components
 				}
 
 				Intersection_Interface* upstream_intersection=link->upstream_intersection<Intersection_Interface*>();
-				
-				Canvas<typename MasterType::type_of(canvas),Graphical_Vehicle_Implementation>* my_canvas=((Canvas<typename MasterType::type_of(canvas),Graphical_Vehicle_Implementation>*)canvas);
+				Intersection_Interface* downstream_intersection=link->downstream_intersection<Intersection_Interface*>();
 
+				pthis->vehicle_shape.ptr = _this;
+
+
+				float u_x = upstream_intersection->x_position<float>();
+				float u_y = upstream_intersection->y_position<float>();
+				float d_x = downstream_intersection->x_position<float>();
+				float d_y = downstream_intersection->y_position<float>();
+				float sin_alpha = (d_y - u_y) / link->length<float>();
+				float cos_alpha = (d_x - u_x) / link->length<float>();
+
+				float travel_distance = (pthis->_local_speed * 5280.0f / 3600.0f);
+				float current_distance = pthis->_distance_to_stop_bar;
+				float new_distance = max(0.0f,(current_distance - travel_distance));
+				pthis->_distance_to_stop_bar = new_distance; 
+				float distance_from_up = link->length<float>() - pthis->_distance_to_stop_bar;
+				
+				Point_3D<MasterType> vehicle_center;
+
+				vehicle_center._x = u_x + distance_from_up * cos_alpha;
+				vehicle_center._y = u_y + distance_from_up * sin_alpha;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(vehicle_center);
+
+				// display on shape vehicle layer
+				float rear_x = vehicle_center._x - (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * cos_alpha;
+				float rear_y = vehicle_center._y - (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * sin_alpha;
+				float front_x = vehicle_center._x + (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * cos_alpha;
+				float front_y = vehicle_center._y + (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * sin_alpha;
+
+				pthis->vehicle_shape.a._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+				pthis->vehicle_shape.a._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+				pthis->vehicle_shape.a._z = 1;
+				
+				pthis->vehicle_shape.b._x = front_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+				pthis->vehicle_shape.b._y = front_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+				pthis->vehicle_shape.a._z = 1;
+
+				pthis->vehicle_shape.c._x = front_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+				pthis->vehicle_shape.c._y = front_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+				pthis->vehicle_shape.c._z = 1;
+
+				pthis->vehicle_shape.d._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+				pthis->vehicle_shape.d._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+				pthis->vehicle_shape.d._z = 1;
+
+				float los = ((MasterType::link_type*)link)->realtime_link_moe_data.link_density / ((MasterType::link_type*)link)->_jam_density;
+				pthis->vehicle_shape.color = ((MasterType::link_type*)link)->get_color_by_los(los);
+				pthis->vehicle_shape.color._a = 255;
+				_vehicle_shapes->Push_Element<Regular_Element>(&pthis->vehicle_shape);
+
+
+				// display on point vehicle layer
 #pragma pack(push,1)
 				struct attribute_coordinate
 				{
@@ -113,15 +206,10 @@ namespace Vehicle_Components
 					Point_3D<MasterType> vertex;
 				} coordinate;
 #pragma pack(pop)
-
-				coordinate.ptr = _this;
-
-				coordinate.vertex._x=upstream_intersection->x_position<float>();
-				coordinate.vertex._y=upstream_intersection->y_position<float>();
+				coordinate.ptr = _this;				
+				coordinate.vertex._x=vehicle_center._x;//upstream_intersection->x_position<float>();
+				coordinate.vertex._y=vehicle_center._y;//upstream_intersection->y_position<float>();
 				coordinate.vertex._z=1;
-				
-				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(coordinate.vertex);
-				float los = ((MasterType::link_type*)link)->realtime_link_moe_data.link_density / ((MasterType::link_type*)link)->_jam_density;
 				coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
 				_vehicle_points->Push_Element<Regular_Element>(&coordinate);
 
@@ -189,12 +277,16 @@ namespace Vehicle_Components
 				}
 			}
 
+			static member_prototype(Antares_Layer,vehicle_shapes,typename type_of(MasterType::antares_layer),none,none);
 			static member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),none,none);
 		};
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
+		Antares_Layer<typename MasterType::type_of(antares_layer),Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_vehicle_shapes;
+		
+		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Antares_Layer<typename MasterType::type_of(antares_layer),Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_vehicle_points;
-
+		
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Antares_Layer<typename MasterType::type_of(antares_layer),Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Graphical_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_num_vehicles;
 

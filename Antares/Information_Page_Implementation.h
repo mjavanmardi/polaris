@@ -36,7 +36,7 @@ Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Informat
 
 	_sizer = new wxBoxSizer( wxVERTICAL );
 	//wxPLPLOT_BACKEND_GC
-	_plotwindow = new wxPLplotwindow( this, -1, wxDefaultPosition, wxSize(1920,1080), wxWANTS_CHARS, wxPLPLOT_DRAW_TEXT );
+	_plotwindow = new wxPLplotwindow( this, -1, wxDefaultPosition, wxSize(1920,1080), wxWANTS_CHARS, wxPLPLOT_DRAW_TEXT|wxPLPLOT_BACKEND_GC );
 	_plotwindow->SetMaxSize( wxSize(1920,1080) );
 
 	_sizer->Add( _plotwindow, 1, wxEXPAND );
@@ -46,8 +46,10 @@ Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Informat
 	wxPLplotstream* pls = _plotwindow->GetStream();
 
 	pls->adv( 0 );
-	pls->scol0( 0, 255, 255, 255 );
-	pls->scol0( 15, 0, 0, 0 );
+	// background color
+	pls->scol0( 0, 255, 255, 255 ); // white
+	// environment color
+	pls->scol0( 1, 0, 0, 0 ); // black
 
 	_layer=nullptr;
 }

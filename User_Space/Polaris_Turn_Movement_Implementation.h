@@ -265,6 +265,7 @@ namespace Turn_Movement_Components
 						departed_time_position = enter_interval_index;
 					}
 					_cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array[departed_time_position]+=delayed_interval*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+					vehicle->template distance_to_stop_bar<float>(((_Link_Interface*)_outbound_link)->template length<float>());
 					((_Link_Interface*)_outbound_link)->template push_vehicle<_Vehicle_Interface*>(vehicle);
 				}
 			}

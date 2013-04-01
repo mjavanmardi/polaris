@@ -192,6 +192,11 @@ namespace Intersection_Components
 			{
 				this_component()->template calculate_moe_for_assignment_interval<ComponentType,CallerType,TargetType>();
 			}
+			
+			feature_prototype void update_vehicle_locations()
+			{
+				this_component()->template update_vehicle_locations<ComponentType,CallerType,TargetType>();
+			}
 		};
 	}
 }

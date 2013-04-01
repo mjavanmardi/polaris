@@ -176,6 +176,7 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 	pls->col0( 1 );
 	pls->env( xmin, xmax, ymin, ymax, 0, 0 );
 
+	pls->lab( _layer->x_label<string&>().c_str(), _layer->y_label<string&>().c_str(), _layer->name<string&>().c_str() );
 	//pls->col0( 15 );
 	//pls->lab( "Iteration", "Value", _layer->name<string&>().c_str() );
 

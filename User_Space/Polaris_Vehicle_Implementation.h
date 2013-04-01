@@ -26,6 +26,9 @@ namespace Vehicle_Components
 #else
 			member_component(typename MasterType::traveler_type, traveler, none, none);
 #endif
+			member_data(float, distance_to_stop_bar, none, none);
+			member_data(float, local_speed, none, none);
+
 			feature_implementation void load(requires(check_2(TargetType,typename Types::Load_To_Entry_Queue,is_same)))
 			{
 				_simulation_status = Types::Vehicle_Status_Keys::IN_ENTRY_QUEUE;

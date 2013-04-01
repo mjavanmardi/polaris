@@ -855,7 +855,10 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			//_vert_size = sizeof(Point_2D<MasterType>)*1;
 			//_vert_stride = _vert_size*1;
 			//assert(_vert_stride%2==0);
-			
+
+			_x_label = cfg.x_label;
+			_y_label = cfg.y_label;
+
 			_primitive_normal = false;
 			_primitive_color = false;
 			assert(grouped == true);
@@ -881,6 +884,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			assert(false);
 			break;
 		};
+
 
 		_primitive_stride = _vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>) + _primitive_normal*sizeof(Point_3D<MasterType>);
 
@@ -989,6 +993,25 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		//}
 	}
 
+	feature_implementation void Refresh_Selection(int cached_iteration)
+	{
+		if(_selected_element != nullptr)
+		{
+			Clear_Accented<ComponentType,ComponentType,NT>();
+
+			Push_Element<ComponentType,ComponentType,Internal_Element>(_selected_element,cached_iteration);
+
+			if(_attributes_callback != nullptr)
+			{
+				vector<string> bucket;
+
+				_attributes_callback( *((void**)_selected_element), bucket );
+				
+				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
+			}
+		}
+	}
+
 	member_data(bool,dynamic_data,none,none);
 	member_data(int,target_sub_iteration,none,none);
 
@@ -1035,6 +1058,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 	member_pointer(void,selected_element,none,none);
 
+	member_data(string,x_label,none,none);
+	member_data(string,y_label,none,none);
 	// Agent behavior
 
 	declare_feature_conditional(Update_Condition)
@@ -1054,7 +1079,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		for(int i=0;i<_num_antares_threads;i++)
 		{
 			pthis->_storage[_iteration + pthis->_storage.period][i].clear();
-			pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].clear();
+			//pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].clear();
 		}
 		UNLOCK(_canvas_lock);
 	}

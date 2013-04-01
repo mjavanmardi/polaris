@@ -18,7 +18,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Render(wxPain
 
 	int current_iteration = _iteration - 1;
 
-	if(current_iteration!=_cached_iteration)
+	if(current_iteration != _cached_iteration)
 	{
 		_temporal_change=true;
 		_cached_iteration=current_iteration;
@@ -26,6 +26,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Render(wxPain
 		if(current_iteration>=0)
 		{
 			_time_panel->Update_Time<NULLTYPE>(current_iteration);
+		}
+
+		if(_selected_layer != nullptr)
+		{
+			_selected_layer->Refresh_Selection<NT>(_cached_iteration);
 		}
 	}
 

@@ -15,14 +15,17 @@ namespace Link_Components
 			RED_BAR, GREEN_BAR, BLUE_BAR
 		};
 	}
-
+	
 	namespace Concepts
 	{
 	}
 	
 	namespace Implementations
 	{
-
+		enum BARS_IN_COLUMN
+		{
+			FRONT_BAR=0, REAR_BAR, LEFT_SIDE_BAR, RIGHT_SIDE_BAR, TOP_BAR
+		};
 #pragma pack(push,1)
 		struct Link_MOE_Bar
 		{
@@ -33,16 +36,18 @@ namespace Link_Components
 			Point_3D<NT> d;
 		};
 #pragma pack(pop)
+#pragma pack(push,1)
 		struct Link_MOE_Column
 		{
-			int height;
-			Link_MOE_Bar front_bar;
-			Link_MOE_Bar rear_bar;
-			Link_MOE_Bar left_side_bar;
-			Link_MOE_Bar right_side_bar;
-			Link_MOE_Bar top_bar;
+			Link_MOE_Column()
+			{
+				bars=new Link_MOE_Bar[5];
+				num_primitives=5;
+			}
+			int num_primitives;
+			Link_MOE_Bar* bars;
 		};
-
+#pragma pack(pop)
 		implementation struct Antares_Link_Implementation:public Polaris_Link_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Link_Implementation)>
 		{
 			// reference MOE values to determine height of bars
@@ -50,7 +55,7 @@ namespace Link_Components
 			static int base_height;
 			static float _vehicle_length; // average length of a vehicle in feet
 			Link_MOE_Column column;
-			Link_MOE_Column queue_length_column;
+			Link_MOE_Bar queue_length_box;
 			feature_implementation void Initialize()
 			{
 				((Polaris_Link_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Link_Implementation)>*)this)->Initialize<ComponentType,CallerType,TargetType>();
@@ -58,14 +63,13 @@ namespace Link_Components
 				initialize_column();
 			}
 
-			void configure_queue_length_column()
+			void configure_queue_length_box()
 			{
 				define_component_interface(_Intersection_Interface, type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				Point_3D<MasterType> u_node;
 				Point_3D<MasterType> d_node;
 				
-				float column_height = 10.0;
-				float column_depth_down = 20.0;
+				float column_depth_down = 100.0;
 				float column_depth_up = 100.0;
 
 				float u_x = _upstream_intersection->_x_position;
@@ -88,57 +92,20 @@ namespace Link_Components
 				u_node._z = 0.0;
 				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(u_node);
 				
-				// configure front bar
-				queue_length_column.front_bar.a._x = d_node._x;
-				queue_length_column.front_bar.a._y = d_node._y;
-				queue_length_column.front_bar.a._z = 1;
-				queue_length_column.front_bar.b._x = u_node._x;
-				queue_length_column.front_bar.b._y = u_node._y;
-				queue_length_column.front_bar.b._z = 1;
+				queue_length_box.a._x = d_node._x;
+				queue_length_box.a._y = d_node._y;
+				queue_length_box.a._z = 1;
+				queue_length_box.b._x = u_node._x;
+				queue_length_box.b._y = u_node._y;
+				queue_length_box.b._z = 1;
 
-				queue_length_column.front_bar.c._x = queue_length_column.front_bar.b._x;
-				queue_length_column.front_bar.c._y = queue_length_column.front_bar.b._y;
-				queue_length_column.front_bar.c._z = column_height;
-				
-				queue_length_column.front_bar.d._x = queue_length_column.front_bar.a._x;
-				queue_length_column.front_bar.d._y = queue_length_column.front_bar.a._y;
-				queue_length_column.front_bar.d._z = column_height;
+				queue_length_box.c._x = u_node._x - column_depth_up * sin_alpha;
+				queue_length_box.c._y = u_node._y + column_depth_up * cos_alpha;
+				queue_length_box.c._z = 1;
 
-				// configure rear bar
-				queue_length_column.rear_bar.a._x = d_node._x - column_depth_down * sin_alpha;
-				queue_length_column.rear_bar.a._y = d_node._y + column_depth_down * cos_alpha;
-				queue_length_column.rear_bar.a._z = 1;
-
-				queue_length_column.rear_bar.b._x = u_node._x - column_depth_up * sin_alpha;
-				queue_length_column.rear_bar.b._y = u_node._y + column_depth_up * cos_alpha;
-				queue_length_column.rear_bar.b._z = 1;
-
-				queue_length_column.rear_bar.c._x = queue_length_column.rear_bar.b._x;
-				queue_length_column.rear_bar.c._y = queue_length_column.rear_bar.b._y;
-				queue_length_column.rear_bar.c._z = column_height;
-
-				queue_length_column.rear_bar.d._x = queue_length_column.rear_bar.a._x;
-				queue_length_column.rear_bar.d._y = queue_length_column.rear_bar.a._y;
-				queue_length_column.rear_bar.d._z = column_height;
-
-				// configure left side bar
-				queue_length_column.left_side_bar.a = queue_length_column.front_bar.a;
-				queue_length_column.left_side_bar.b = queue_length_column.rear_bar.a;
-				queue_length_column.left_side_bar.c = queue_length_column.rear_bar.d;
-				queue_length_column.left_side_bar.d = queue_length_column.front_bar.d;
-
-				// configure right side bar
-				queue_length_column.right_side_bar.a = queue_length_column.front_bar.b;
-				queue_length_column.right_side_bar.b = queue_length_column.rear_bar.b;
-				queue_length_column.right_side_bar.c = queue_length_column.rear_bar.c;
-				queue_length_column.right_side_bar.d = queue_length_column.front_bar.c;
-
-				// configure top bar
-				queue_length_column.top_bar.a = queue_length_column.front_bar.d;
-				queue_length_column.top_bar.b = queue_length_column.front_bar.c;
-				queue_length_column.top_bar.c = queue_length_column.rear_bar.c;
-				queue_length_column.top_bar.d = queue_length_column.rear_bar.d;
-
+				queue_length_box.d._x = d_node._x - column_depth_down * sin_alpha;
+				queue_length_box.d._y = d_node._y + column_depth_down * cos_alpha;
+				queue_length_box.d._z = 1;
 			}
 
 			void initialize_column()
@@ -170,62 +137,62 @@ namespace Link_Components
 				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(d_node);
 
 				// configure front bar
-				column.front_bar.a._x = u_node._x + column_depth / 2.0 * sin_alpha;
-				column.front_bar.a._y = u_node._y - column_depth / 2.0 * cos_alpha;
-				column.front_bar.a._z = 1;
+				column.bars[FRONT_BAR].a._x = u_node._x + column_depth / 2.0 * sin_alpha;
+				column.bars[FRONT_BAR].a._y = u_node._y - column_depth / 2.0 * cos_alpha;
+				column.bars[FRONT_BAR].a._z = 1;
 
-				column.front_bar.b._x = d_node._x + column_depth / 2.0 * sin_alpha;
-				column.front_bar.b._y = d_node._y - column_depth / 2.0 * cos_alpha;
-				column.front_bar.b._z = 1;
+				column.bars[FRONT_BAR].b._x = d_node._x + column_depth / 2.0 * sin_alpha;
+				column.bars[FRONT_BAR].b._y = d_node._y - column_depth / 2.0 * cos_alpha;
+				column.bars[FRONT_BAR].b._z = 1;
 
-				column.front_bar.c._x = column.front_bar.b._x;
-				column.front_bar.c._y = column.front_bar.b._y;
+				column.bars[FRONT_BAR].c._x = column.bars[FRONT_BAR].b._x;
+				column.bars[FRONT_BAR].c._y = column.bars[FRONT_BAR].b._y;
 				
-				column.front_bar.d._x = column.front_bar.a._x;
-				column.front_bar.d._y = column.front_bar.a._y;
+				column.bars[FRONT_BAR].d._x = column.bars[FRONT_BAR].a._x;
+				column.bars[FRONT_BAR].d._y = column.bars[FRONT_BAR].a._y;
 
 				// configure rear bar
-				column.rear_bar.a._x = u_node._x - column_depth / 2.0 * sin_alpha;
-				column.rear_bar.a._y = u_node._y + column_depth / 2.0 * cos_alpha;
-				column.rear_bar.a._z = 1;
+				column.bars[REAR_BAR].a._x = u_node._x - column_depth / 2.0 * sin_alpha;
+				column.bars[REAR_BAR].a._y = u_node._y + column_depth / 2.0 * cos_alpha;
+				column.bars[REAR_BAR].a._z = 1;
 
-				column.rear_bar.b._x = d_node._x - column_depth / 2.0 * sin_alpha;
-				column.rear_bar.b._y = d_node._y + column_depth / 2.0 * cos_alpha;
-				column.rear_bar.b._z = 1;
+				column.bars[REAR_BAR].b._x = d_node._x - column_depth / 2.0 * sin_alpha;
+				column.bars[REAR_BAR].b._y = d_node._y + column_depth / 2.0 * cos_alpha;
+				column.bars[REAR_BAR].b._z = 1;
 
-				column.rear_bar.c._x = column.rear_bar.b._x;
-				column.rear_bar.c._y = column.rear_bar.b._y;
+				column.bars[REAR_BAR].c._x = column.bars[REAR_BAR].b._x;
+				column.bars[REAR_BAR].c._y = column.bars[REAR_BAR].b._y;
 				
-				column.rear_bar.d._x = column.rear_bar.a._x;
-				column.rear_bar.d._y = column.rear_bar.a._y;
+				column.bars[REAR_BAR].d._x = column.bars[REAR_BAR].a._x;
+				column.bars[REAR_BAR].d._y = column.bars[REAR_BAR].a._y;
 
 				// configure left side bar
-				column.left_side_bar.a = column.front_bar.a;
+				column.bars[LEFT_SIDE_BAR].a = column.bars[FRONT_BAR].a;
 
-				column.left_side_bar.b = column.rear_bar.a;
+				column.bars[LEFT_SIDE_BAR].b = column.bars[REAR_BAR].a;
 
-				column.left_side_bar.c._x = column.left_side_bar.b._x;
-				column.left_side_bar.c._y = column.left_side_bar.b._y;
+				column.bars[LEFT_SIDE_BAR].c._x = column.bars[LEFT_SIDE_BAR].b._x;
+				column.bars[LEFT_SIDE_BAR].c._y = column.bars[LEFT_SIDE_BAR].b._y;
 				
-				column.left_side_bar.d._x = column.left_side_bar.a._x;
-				column.left_side_bar.d._y = column.left_side_bar.a._y;
+				column.bars[LEFT_SIDE_BAR].d._x = column.bars[LEFT_SIDE_BAR].a._x;
+				column.bars[LEFT_SIDE_BAR].d._y = column.bars[LEFT_SIDE_BAR].a._y;
 				
 				// configure right side bar
-				column.right_side_bar.a = column.front_bar.b;
+				column.bars[RIGHT_SIDE_BAR].a = column.bars[FRONT_BAR].b;
 
-				column.right_side_bar.b = column.rear_bar.b;
+				column.bars[RIGHT_SIDE_BAR].b = column.bars[REAR_BAR].b;
 
-				column.right_side_bar.c._x = column.right_side_bar.b._x;
-				column.right_side_bar.c._y = column.right_side_bar.b._y;
+				column.bars[RIGHT_SIDE_BAR].c._x = column.bars[RIGHT_SIDE_BAR].b._x;
+				column.bars[RIGHT_SIDE_BAR].c._y = column.bars[RIGHT_SIDE_BAR].b._y;
 				
-				column.right_side_bar.d._x = column.right_side_bar.a._x;
-				column.right_side_bar.d._y = column.right_side_bar.a._y;
+				column.bars[RIGHT_SIDE_BAR].d._x = column.bars[RIGHT_SIDE_BAR].a._x;
+				column.bars[RIGHT_SIDE_BAR].d._y = column.bars[RIGHT_SIDE_BAR].a._y;
 
 				// configure top bar
-				column.top_bar.a = column.front_bar.a;
-				column.top_bar.b = column.front_bar.b;
-				column.top_bar.c = column.rear_bar.b;
-				column.top_bar.d = column.rear_bar.a;
+				column.bars[TOP_BAR].a = column.bars[FRONT_BAR].a;
+				column.bars[TOP_BAR].b = column.bars[FRONT_BAR].b;
+				column.bars[TOP_BAR].c = column.bars[REAR_BAR].b;
+				column.bars[TOP_BAR].d = column.bars[REAR_BAR].a;
 			}
 
 			static void configure_link_moes_layer()
@@ -244,12 +211,12 @@ namespace Link_Components
 				cfg.storage_offset = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>() - 1;
 				cfg.primitive_color = true;
 				cfg.primitive_normal = true;
+				cfg.grouped = true;
+				cfg.group_color=false;
+				cfg.group_normal=false;
 				
 				_link_travel_time_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_travel_time_layer),ComponentType>*, string& > >(string("Link Travel Time"));
 				_link_travel_time_layer->Initialize<NULLTYPE>(cfg);
-
-				//_link_travel_time_delay_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_travel_time_delay_layer),ComponentType>*, string& > >(string("Link Travel Time Delay"));
-				//_link_travel_time_delay_layer->Initialize<NULLTYPE>(cfg);
 
 				_link_speed_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_speed_layer),ComponentType>*, string& > >(string("Link Speed"));
 				_link_speed_layer->Initialize<NULLTYPE>(cfg);
@@ -257,37 +224,19 @@ namespace Link_Components
 				_link_density_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_density_layer),ComponentType>*, string& > >(string("Link Density"));
 				_link_density_layer->Initialize<NULLTYPE>(cfg);
 
-				//_link_in_flow_rate_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_in_flow_rate_layer),ComponentType>*, string& > >(string("Link In-Flow Rate"));
-				//_link_in_flow_rate_layer->Initialize<NULLTYPE>(cfg);
-
-				//_link_out_flow_rate_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_out_flow_rate_layer),ComponentType>*, string& > >(string("Link Out-Flow Rate"));
-				//_link_out_flow_rate_layer->Initialize<NULLTYPE>(cfg);
-
-
 				_link_travel_time_ratio_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_travel_time_ratio_layer),ComponentType>*, string& > >(string("Link Travel Time Ratio"));
 				_link_travel_time_ratio_layer->Initialize<NULLTYPE>(cfg);
 
 				_link_speed_ratio_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_speed_ratio_layer),ComponentType>*, string& > >(string("Link Speed Ratio"));
 				_link_speed_ratio_layer->Initialize<NULLTYPE>(cfg);
 
-				//_link_in_flow_ratio_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_in_flow_ratio_layer),ComponentType>*, string& > >(string("Link In-Flow Ratio"));
-				//_link_in_flow_ratio_layer->Initialize<NULLTYPE>(cfg);
-
-				//_link_out_flow_ratio_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_out_flow_ratio_layer),ComponentType>*, string& > >(string("Link Out-Flow Ratio"));
-				//_link_out_flow_ratio_layer->Initialize<NULLTYPE>(cfg);
-
 				_link_density_ratio_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_density_ratio_layer),ComponentType>*, string& > >(string("Link Density Ratio"));
 				_link_density_ratio_layer->Initialize<NULLTYPE>(cfg);
 
-				//_link_travel_time_ratio_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_travel_time_ratio_layer),ComponentType>*, string& > >(string("Link Travel Time Ratio"));
-				//_link_travel_time_ratio_layer->Initialize<NULLTYPE>(cfg);
-
+				cfg.grouped = false;
 				_link_queue_length_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_queue_length_layer),ComponentType>*, string& > >(string("Link queue length"));
 				_link_queue_length_layer->Initialize<NULLTYPE>(cfg);
 
-				//_link_moe_plot=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_moe_plot),ComponentType>*, string& > >(string("Link MOE Plot"));
-				//cfg.Configure_Plot();
-				//_link_moe_plot->Initialize<NULLTYPE>(cfg);
 			}
 
 			static void initialize_reference_MOEs()
@@ -305,8 +254,6 @@ namespace Link_Components
 				visualization_reference.link_travel_time_ratio = 0.5;
 			}
 
-			//member_component(typename MasterType::graphical_link_moe_group_type,graphical_link_moe_group,none,none);
-			//static member_prototype(Graphical_Link_MOE_Group,graphical_link_moe_group,typename MasterType::graphical_link_moe_group_type,none,none);
 			feature_implementation void visualize_moe()
 			{
 				Push_To_Link_MOE_Display<ComponentType,CallerType,TargetType>();
@@ -316,14 +263,9 @@ namespace Link_Components
 			feature_implementation void Push_To_Link_MOE_Display()
 			{
 				push_to_link_travel_time_layer();
-				//push_to_link_travel_time_delay_layer();
 				push_to_link_speed_layer();
 				push_to_link_density_layer();
-				//push_to_link_in_flow_rate_layer();
-				//push_to_link_out_flow_rate_layer();
 				push_to_link_speed_ratio_layer();
-				//push_to_link_in_flow_ratio_layer();
-				//push_to_link_out_flow_ratio_layer();
 				push_to_link_density_ratio_layer();
 				push_to_link_travel_time_ratio_layer();
 				push_to_link_queue_length_layer();
@@ -331,31 +273,31 @@ namespace Link_Components
 
 			void set_column_height(int height)
 			{
-				column.front_bar.d._z = height;
-				column.front_bar.c._z = height;
+				column.bars[FRONT_BAR].d._z = height;
+				column.bars[FRONT_BAR].c._z = height;
 
-				column.rear_bar.d._z = height;
-				column.rear_bar.c._z = height;
+				column.bars[REAR_BAR].d._z = height;
+				column.bars[REAR_BAR].c._z = height;
 
-				column.left_side_bar.d._z = height;
-				column.left_side_bar.c._z = height;
+				column.bars[LEFT_SIDE_BAR].d._z = height;
+				column.bars[LEFT_SIDE_BAR].c._z = height;
 
-				column.right_side_bar.d._z = height;
-				column.right_side_bar.c._z = height;
+				column.bars[RIGHT_SIDE_BAR].d._z = height;
+				column.bars[RIGHT_SIDE_BAR].c._z = height;
 
-				column.top_bar.a._z = height;
-				column.top_bar.b._z = height;
-				column.top_bar.c._z = height;
-				column.top_bar.d._z = height;
+				column.bars[TOP_BAR].a._z = height;
+				column.bars[TOP_BAR].b._z = height;
+				column.bars[TOP_BAR].c._z = height;
+				column.bars[TOP_BAR].d._z = height;
 			}
 
 			void set_column_color(True_Color_RGBA<NT> color)
 			{
-				column.front_bar.color = color;
-				column.rear_bar.color = color;
-				column.left_side_bar.color = color;
-				column.right_side_bar.color = color;
-				column.top_bar.color = color;
+				column.bars[FRONT_BAR].color = color;
+				column.bars[REAR_BAR].color = color;
+				column.bars[LEFT_SIDE_BAR].color = color;
+				column.bars[RIGHT_SIDE_BAR].color = color;
+				column.bars[TOP_BAR].color = color;
 			}
 
 			True_Color_RGBA<NT> get_color_by_los(float fraction)
@@ -390,13 +332,6 @@ namespace Link_Components
 				return color;
 			}
 
-#define draw_column(moe_layer)\
-	moe_layer->Push_Element<Regular_Element>((void*)&column.front_bar);\
-	moe_layer->Push_Element<Regular_Element>((void*)&column.rear_bar);\
-	moe_layer->Push_Element<Regular_Element>((void*)&column.left_side_bar);\
-	moe_layer->Push_Element<Regular_Element>((void*)&column.right_side_bar);\
-	moe_layer->Push_Element<Regular_Element>((void*)&column.top_bar);
-
 			void push_to_link_travel_time_layer()
 			{
 				Point_2D<MasterType> submission;
@@ -406,18 +341,15 @@ namespace Link_Components
 				
 				int height = (realtime_link_moe_data.link_travel_time / visualization_reference.link_travel_time) * base_height;
 				set_column_height(height);
-				float los = 1.0f - _link_fftt / (realtime_link_moe_data.link_travel_time * 60.0f);
+				//float los = 1.0f - _link_fftt / (realtime_link_moe_data.link_travel_time * 60.0f);
+				float los = get_link_los();
 				set_column_color(get_color_by_los(los));
-				draw_column(_link_travel_time_layer);
+				_link_travel_time_layer->template Push_Element<Regular_Element>((void*)(&column));
 			}
 
-			void push_to_link_travel_time_delay_layer()
+			float get_link_los()
 			{
-				//int height = (realtime_link_moe_data.link_travel_delay / visualization_reference.link_travel_delay) * base_height;
-				//set_column_height(height);
-				//float los = max(0.0f, 1.0f - _fftt / (realtime_link_moe_data.link_travel_time * 60.0f));
-				//bar.color = get_color_by_los(los);
-				//_link_travel_time_delay_layer->Push_Element<Regular_Element>((void*)&bar);
+				return realtime_link_moe_data.link_density / _jam_density;
 			}
 
 			void push_to_link_speed_layer()
@@ -429,9 +361,10 @@ namespace Link_Components
 
 				int height = (realtime_link_moe_data.link_speed / visualization_reference.link_speed) * base_height;
 				set_column_height(height);
-				float los = 1.0f - realtime_link_moe_data.link_speed / _original_free_flow_speed;
+				//float los = 1.0f - realtime_link_moe_data.link_speed / _original_free_flow_speed;
+				float los = get_link_los();
 				set_column_color(get_color_by_los(los));
-				draw_column(_link_speed_layer)
+				_link_speed_layer->template Push_Element<Regular_Element>((void*)(&column));
 			}
 
 			void push_to_link_density_layer()
@@ -443,23 +376,10 @@ namespace Link_Components
 
 				int height = (realtime_link_moe_data.link_density / visualization_reference.link_density) * base_height;
 				set_column_height(height);
-				float los = realtime_link_moe_data.link_density / _jam_density;
+				//float los = realtime_link_moe_data.link_density / _jam_density;
+				float los = get_link_los();
 				set_column_color(get_color_by_los(los));
-				draw_column(_link_density_layer);
-			}
-
-			void push_to_link_in_flow_rate_layer()
-			{
-				int height = (realtime_link_moe_data.link_in_flow_rate / visualization_reference.link_in_flow_rate) * base_height;
-				set_column_height(height);
-				_link_in_flow_rate_layer->Push_Element<Regular_Element>((void*)&bar);
-			}
-
-			void push_to_link_out_flow_rate_layer()
-			{
-				int height = (realtime_link_moe_data.link_out_flow_rate / visualization_reference.link_out_flow_rate) * base_height;
-				set_column_height(height);
-				_link_out_flow_rate_layer->Push_Element<Regular_Element>((void*)&bar);
+				_link_density_layer->template Push_Element<Regular_Element>((void*)(&column));
 			}
 
 			void push_to_link_speed_ratio_layer()
@@ -471,23 +391,10 @@ namespace Link_Components
 
 				int height = (realtime_link_moe_data.link_speed_ratio / visualization_reference.link_speed_ratio) * base_height;
 				set_column_height(height);
-				float los = 1.0f - realtime_link_moe_data.link_speed / _original_free_flow_speed;
+				//float los = 1.0f - realtime_link_moe_data.link_speed / _original_free_flow_speed;
+				float los = get_link_los();
 				set_column_color(get_color_by_los(los));
-				draw_column(_link_speed_ratio_layer);
-			}
-
-			void push_to_link_in_flow_ratio_layer()
-			{
-				int height = (realtime_link_moe_data.link_in_flow_ratio / visualization_reference.link_in_flow_ratio) * base_height;
-				set_column_height(height);
-				_link_in_flow_ratio_layer->Push_Element<Regular_Element>((void*)&bar);
-			}
-
-			void push_to_link_out_flow_ratio_layer()
-			{
-				int height = (realtime_link_moe_data.link_out_flow_ratio / visualization_reference.link_out_flow_ratio) * base_height;
-				set_column_height(height);
-				_link_out_flow_ratio_layer->Push_Element<Regular_Element>((void*)&bar);
+				_link_speed_ratio_layer->template Push_Element<Regular_Element>((void*)(&column));
 			}
 
 			void push_to_link_density_ratio_layer()
@@ -499,9 +406,10 @@ namespace Link_Components
 
 				int height = (realtime_link_moe_data.link_density_ratio / visualization_reference.link_density_ratio) * base_height;
 				set_column_height(height);
-				float los = realtime_link_moe_data.link_density_ratio;
+				//float los = realtime_link_moe_data.link_density_ratio;
+				float los = get_link_los();
 				set_column_color(get_color_by_los(los));
-				draw_column(_link_density_ratio_layer);
+				_link_density_ratio_layer->template Push_Element<Regular_Element>((void*)(&column));
 			}
 
 			void push_to_link_travel_time_ratio_layer()
@@ -513,9 +421,10 @@ namespace Link_Components
 
 				int height = (realtime_link_moe_data.link_travel_time_ratio / visualization_reference.link_travel_time_ratio) * base_height;
 				set_column_height(height);
-				float los = 1.0f - _link_fftt / (realtime_link_moe_data.link_travel_time * 60.0f);
+				//float los = 1.0f - _link_fftt / (realtime_link_moe_data.link_travel_time * 60.0f);
+				float los = get_link_los();
 				set_column_color(get_color_by_los(los));
-				draw_column(_link_travel_time_ratio_layer);
+				_link_travel_time_ratio_layer->template Push_Element<Regular_Element>((void*)(&column));
 			}
 			
 			void push_to_link_queue_length_layer()
@@ -527,21 +436,14 @@ namespace Link_Components
 
 				if (realtime_link_moe_data.link_queue_length == 0)
 					return;
-				configure_queue_length_column();
-				float los = realtime_link_moe_data.link_density / _jam_density;
+				configure_queue_length_box();
+				//float los = realtime_link_moe_data.link_density / _jam_density;
+				float los = get_link_los();
 				True_Color_RGBA<NT> color = get_color_by_los(los);
 				// set queue length column color
-				queue_length_column.front_bar.color = color;
-				queue_length_column.rear_bar.color = color;
-				queue_length_column.left_side_bar.color = color;
-				queue_length_column.right_side_bar.color = color;
-				queue_length_column.top_bar.color = color;
+				queue_length_box.color = color;
 
-				_link_queue_length_layer->Push_Element<Regular_Element>((void*)&queue_length_column.front_bar);
-				_link_queue_length_layer->Push_Element<Regular_Element>((void*)&queue_length_column.rear_bar);
-				_link_queue_length_layer->Push_Element<Regular_Element>((void*)&queue_length_column.left_side_bar);
-				_link_queue_length_layer->Push_Element<Regular_Element>((void*)&queue_length_column.right_side_bar);
-				_link_queue_length_layer->Push_Element<Regular_Element>((void*)&queue_length_column.top_bar);
+				_link_queue_length_layer->Push_Element<Regular_Element>((void*)&queue_length_box);
 			}
 
 			static bool submit_attributes(Antares_Link_Implementation* _this,vector<string>& bucket)
@@ -555,8 +457,6 @@ namespace Link_Components
 				((typename MasterType::network_type*)_global_network)->_network_avg_link_travel_time_layer->Clear_Accented<NT>();
 				((typename MasterType::network_type*)_global_network)->_network_avg_link_speed_layer->Clear_Accented<NT>();
 				((typename MasterType::network_type*)_global_network)->_network_avg_link_density_layer->Clear_Accented<NT>();
-				//((typename MasterType::network_type*)_global_network)->_network_avg_link_in_volume_layer->Clear_Accented<NT>();
-				//((typename MasterType::network_type*)_global_network)->_network_avg_link_out_volume_layer->Clear_Accented<NT>();
 				((typename MasterType::network_type*)_global_network)->_network_avg_link_travel_time_ratio_layer->Clear_Accented<NT>();
 				((typename MasterType::network_type*)_global_network)->_network_avg_link_speed_ratio_layer->Clear_Accented<NT>();
 				((typename MasterType::network_type*)_global_network)->_network_avg_link_density_ratio_layer->Clear_Accented<NT>();
@@ -640,26 +540,16 @@ namespace Link_Components
 
 				sprintf(str_buf, "%.2f minutes", _this->realtime_link_moe_data.link_travel_time);
 				bucket.push_back(str_buf);
-				//sprintf(str_buf, "%.2f minutes", _this->realtime_link_moe_data.link_travel_delay);
-				//bucket.push_back(str_buf);
 				sprintf(str_buf, "%.2f MPH", _this->realtime_link_moe_data.link_speed);
 				bucket.push_back(str_buf);
 				sprintf(str_buf, "%.2f VPMPL", _this->realtime_link_moe_data.link_density);
 				bucket.push_back(str_buf);
-				//sprintf(str_buf, "%.2f VPHPL", _this->realtime_link_moe_data.link_in_flow_rate);
-				//bucket.push_back(str_buf);
-				//sprintf(str_buf, "%.2f VPHPL", _this->realtime_link_moe_data.link_out_flow_rate);
-				//bucket.push_back(str_buf);
 				sprintf(str_buf, "%.2f", _this->realtime_link_moe_data.link_travel_time_ratio);
 				bucket.push_back(str_buf);
 				sprintf(str_buf, "%.2f", _this->realtime_link_moe_data.link_speed_ratio);
 				bucket.push_back(str_buf);
 				sprintf(str_buf, "%.2f", _this->realtime_link_moe_data.link_density_ratio);
 				bucket.push_back(str_buf);
-				//sprintf(str_buf, "%.2f", _this->realtime_link_moe_data.link_in_flow_ratio);
-				//bucket.push_back(str_buf);
-				//sprintf(str_buf, "%.2f", _this->realtime_link_moe_data.link_out_flow_ratio);
-				//bucket.push_back(str_buf);
 				sprintf(str_buf, "%.2f", _this->realtime_link_moe_data.link_queue_length);
 				bucket.push_back(str_buf);
 				return true;
