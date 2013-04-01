@@ -19,15 +19,14 @@ with open("schema_revision.txt") as fh:
         value = int(line.split("=")[1])
         name = line.split("=")[0]        
         props[name] =  value
-        
+change_flag = False        
 for item in files:
-    # print item
-    # print int(os.stat(item+".h")[ST_MTIME])
-    # print props[item]
     if int(os.stat(item+".h")[ST_MTIME]) > props[item]: 
         props[item] = int(os.stat(item+".h")[ST_MTIME])
         props["revision"]= props["revision"]+1
+        change_flag = True
         break;
+
         
 for item in files:
     props[item] = int(os.stat(item+".h")[ST_MTIME])       
@@ -36,7 +35,8 @@ with open("schema_revision.txt", 'w') as fh:
     for item in files:
         fh.write(item+"="+str(props[item])+"\n")
         
-
+if (not change_flag):
+    sys.exit()
 p = re.compile("(#define\s+SCHEMA_REVISION\s+)(\"\d+\")")
 
 with open("database.h") as fh:
