@@ -491,8 +491,6 @@
     <ClInclude Include="Conductor_Implementation.h" />
     <ClInclude Include="Draw_Layer.h" />
     <ClInclude Include="Draw_Layer_2D.h" />
-    <ClInclude Include="Geometry.h" />
-    <ClInclude Include="Geometry_Implementation.h" />
     <ClInclude Include="Graphical_Vehicle_Implementation.h" />
     <ClInclude Include="Graphical_Zone_Implementation.h" />
     <ClInclude Include="Identify.h" />

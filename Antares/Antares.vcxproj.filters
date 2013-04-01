@@ -56,12 +56,6 @@
     <ClInclude Include="Antares_Frame.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry.h">
-      <Filter>Prototypes</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry_Implementation.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
     <ClInclude Include="Render.h">
       <Filter>Implementations</Filter>
     </ClInclude>

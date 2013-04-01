@@ -18,7 +18,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 	feature_implementation void Push_Element(void* data, int iteration, requires(check_2(TargetType,Regular_Element,is_same)))
 	{
-		const unsigned char* geometry_itr=(const unsigned char*)data;
+		const int* geometry_itr=(const int*)data;
 
 		const bool grouped = _grouped;
 		const bool group_color = _group_color;
@@ -28,73 +28,80 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		const bool primitive_color = _primitive_color;
 		const bool primitive_normal = _primitive_normal;
-		const int primitive_stride = _vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>);
+		const int primitive_stride = (_vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>))/sizeof(int);
 		
-		const int vert_size = _vert_size;
-		const int vert_stride = _vert_stride;
-		const int data_stride = _data_stride;
+		const int vert_size = _vert_size/sizeof(int);
+		const int vert_stride = _vert_stride/sizeof(int);
+		const int data_stride = _data_stride/sizeof(int);
 
 		Point_3D<NT> a;
 		Point_3D<NT> b;
 		Point_3D<NT> c;
 		Point_3D<NT> result;
+		
+		int* const beg_write_itr = (int*)&result;
+		const int* const end_write_itr = (int*)&result + sizeof(Point_3D<NT>)/sizeof(int);
 
-		vector<unsigned char>& storage_reference=_storage[iteration][_thread_id];
+		vector<int> (&geometry_by_thread)[_num_antares_threads] = _storage[iteration];
+
+		vector<int>* const storage_reference=& (geometry_by_thread[_thread_id]);
+
+		//vector<int>& storage_reference=_accent_storage[iteration][_thread_id];
 
 		if(primitive_type == _PLOT)
 		{
 			PLFLT point_value;
-			const unsigned char* end_data_itr = (const unsigned char*) ( ((unsigned char*)&point_value) + sizeof(PLFLT) );
+			const int* end_data_itr = (const int*) ( ((int*)&point_value) + sizeof(PLFLT)/sizeof(int) );
 
-			const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+			const int* const geometry_data_end = geometry_itr + data_stride;
 
 			while( geometry_itr != geometry_data_end )
 			{
-				storage_reference.push_back(*geometry_itr);
+				storage_reference->push_back(*geometry_itr);
 				++geometry_itr;
 			}
 
 			if(group_color)
 			{
-				const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+				const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 				while(geometry_itr!=end_data_itr)
 				{
-					storage_reference.push_back(*geometry_itr);
+					storage_reference->push_back(*geometry_itr);
 					++geometry_itr;
 				}
 			}
 
 			const int num_group_primitives=*((int*)geometry_itr);
 			
-			const unsigned char* end_size_itr = geometry_itr+sizeof(int);
+			const int* end_size_itr = geometry_itr+sizeof(int)/sizeof(int);
 
 			while(geometry_itr!=end_size_itr)
 			{
-				storage_reference.push_back(*geometry_itr);
+				storage_reference->push_back(*geometry_itr);
 				++geometry_itr;
 			}
 
-			geometry_itr=(*((unsigned char**)geometry_itr));
-			const unsigned char* const group_begin = geometry_itr;
-			const unsigned char* const group_end = geometry_itr + sizeof(Point_2D<MasterType>) * num_group_primitives;
+			geometry_itr=(*((int**)geometry_itr));
+			const int* const group_begin = geometry_itr;
+			const int* const group_end = geometry_itr + (sizeof(Point_2D<MasterType>)/sizeof(int)) * num_group_primitives;
 
 			// Collect x points
 			while( geometry_itr != group_end )
 			{
-				const unsigned char* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>);
+				const int* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>)/sizeof(int);
 
 				point_value=(PLFLT)(*((float*)geometry_itr));
 				
-				geometry_itr = (unsigned char*)&point_value;
+				geometry_itr = (int*)&point_value;
 
 				while( geometry_itr!=end_data_itr )
 				{
-					storage_reference.push_back(*geometry_itr);
+					storage_reference->push_back(*geometry_itr);
 					++geometry_itr;
 				}
 
-				geometry_itr = (const unsigned char*)geometry_vert_end;
+				geometry_itr = (const int*)geometry_vert_end;
 			}
 
 			geometry_itr = group_begin;
@@ -102,115 +109,116 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			// Collect y points
 			while( geometry_itr != group_end )
 			{
-				const unsigned char* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>);
+				const int* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>)/sizeof(int);
 
-				geometry_itr += sizeof(Point_2D<MasterType>)/2;
+				geometry_itr += (sizeof(Point_2D<MasterType>)/sizeof(int))/2;
 
 				point_value=(PLFLT)(*((float*)geometry_itr));
 
-				geometry_itr = (unsigned char*)&point_value;
+				geometry_itr = (int*)&point_value;
 
 				while( geometry_itr!=end_data_itr )
 				{
-					storage_reference.push_back(*geometry_itr);
+					storage_reference->push_back(*geometry_itr);
 					++geometry_itr;
 				}
 
-				geometry_itr = (const unsigned char*)geometry_vert_end;
+				geometry_itr = (const int*)geometry_vert_end;
 			}
 		}
 		else
 		{
 			if(grouped)
 			{
-				const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+				const int* const geometry_data_end = geometry_itr + data_stride;
 
 				while( geometry_itr != geometry_data_end )
 				{
-					storage_reference.push_back(*geometry_itr);
+					storage_reference->push_back(*geometry_itr);
 					++geometry_itr;
 				}
 
 				if(group_color)
 				{
-					const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+					const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 					while(geometry_itr!=end_data_itr)
 					{
-						storage_reference.push_back(*geometry_itr);
+						storage_reference->push_back(*geometry_itr);
 						++geometry_itr;
 					}
 				}
 
 				if(group_normal)
 				{
-					const unsigned char* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>);
+					const int* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>)/sizeof(int);
 					
 					while(geometry_itr!=end_data_itr)
 					{
-						storage_reference.push_back(*geometry_itr);
+						storage_reference->push_back(*geometry_itr);
 						++geometry_itr;
 					}
 				}
 
 				const int num_group_primitives=*((int*)geometry_itr);
 				
-				const unsigned char* end_size_itr = geometry_itr+sizeof(int);
+				const int* end_size_itr = geometry_itr+sizeof(int)/sizeof(int);
 
 				while(geometry_itr!=end_size_itr)
 				{
-					storage_reference.push_back(*geometry_itr);
+					storage_reference->push_back(*geometry_itr);
 					++geometry_itr;
 				}
 
-				const unsigned char* const group_end = (*((unsigned char**)geometry_itr)) + primitive_stride * num_group_primitives;
-				geometry_itr=(*((unsigned char**)geometry_itr));
+				const int* const group_end = (*((int**)geometry_itr)) + primitive_stride * num_group_primitives;
+				geometry_itr=(*((int**)geometry_itr));
 
 				while( geometry_itr != group_end )
 				{
 					if(primitive_color)
 					{
-						const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+						const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 						while(geometry_itr!=end_data_itr)
 						{
-							storage_reference.push_back(*geometry_itr);
+							storage_reference->push_back(*geometry_itr);
 							++geometry_itr;
 						}
 					}
 
 					if(primitive_normal)
 					{
-						const unsigned char* read_itr = geometry_itr;
+						const int* read_itr = geometry_itr;
 
 						a = *((Point_3D<NT>*)read_itr);
-						read_itr += sizeof(Point_3D<NT>);
+						read_itr += sizeof(Point_3D<NT>)/sizeof(int);
 						b = *((Point_3D<NT>*)read_itr);						
-						read_itr += sizeof(Point_3D<NT>);
+						read_itr += sizeof(Point_3D<NT>)/sizeof(int);
 						c = *((Point_3D<NT>*)read_itr);
 
 						Compute_Fast_Normal(a,b,c,result);
 
-						const unsigned char* write_itr = (const unsigned char*)&result;
+						//const int* write_itr = (const int*)&result;
+						const int* write_itr = (const int*)beg_write_itr;
 
-						const unsigned char* end_data_itr = write_itr + sizeof(Point_3D<NT>);
+						//const int* end_data_itr = write_itr + sizeof(Point_3D<NT>)/sizeof(int);
 
-						while(write_itr!=end_data_itr)
+						while(write_itr!=end_write_itr)
 						{
-							storage_reference.push_back(*write_itr);
+							storage_reference->push_back(*write_itr);
 							++write_itr;
 						}
 					}
 
-					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+					const int* const geometry_vert_end = geometry_itr + vert_stride;
 
 					while( geometry_itr != geometry_vert_end )
 					{
-						const unsigned char* end_data_itr = geometry_itr + vert_size;
+						const int* end_data_itr = geometry_itr + vert_size;
 
 						while(geometry_itr!=end_data_itr)
 						{
-							storage_reference.push_back(*geometry_itr);
+							storage_reference->push_back(*geometry_itr);
 							++geometry_itr;
 						}
 					}
@@ -218,61 +226,61 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			}
 			else
 			{
-				const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+				const int* const geometry_data_end = geometry_itr + data_stride;
 
 				while( geometry_itr != geometry_data_end )
 				{
-					storage_reference.push_back(*geometry_itr);
+					storage_reference->push_back(*geometry_itr);
 					++geometry_itr;
 				}
 
-				const unsigned char* const group_end = geometry_itr + primitive_stride;
+				const int* const group_end = geometry_itr + primitive_stride;
 
 				while( geometry_itr != group_end )
 				{
 					if(primitive_color)
 					{
-						const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+						const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 						while(geometry_itr!=end_data_itr)
 						{
-							storage_reference.push_back(*geometry_itr);
+							storage_reference->push_back(*geometry_itr);
 							++geometry_itr;
 						}
 					}
 
 					if(primitive_normal)
 					{
-						const unsigned char* read_itr = geometry_itr;
+						const int* read_itr = geometry_itr;
 
 						a = *((Point_3D<NT>*)read_itr);
-						read_itr += sizeof(Point_3D<NT>);
+						read_itr += sizeof(Point_3D<NT>)/sizeof(int);
 						b = *((Point_3D<NT>*)read_itr);						
-						read_itr += sizeof(Point_3D<NT>);
+						read_itr += sizeof(Point_3D<NT>)/sizeof(int);
 						c = *((Point_3D<NT>*)read_itr);
 
 						Compute_Fast_Normal(a,b,c,result);
 
-						const unsigned char* write_itr = (const unsigned char*)&result;
+						const int* write_itr = (const int*)&result;
 
-						const unsigned char* end_data_itr = write_itr + sizeof(Point_3D<NT>);
+						const int* end_data_itr = write_itr + sizeof(Point_3D<NT>)/sizeof(int);
 
 						while(write_itr!=end_data_itr)
 						{
-							storage_reference.push_back(*write_itr);
+							storage_reference->push_back(*write_itr);
 							++write_itr;
 						}
 					}
 
-					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+					const int* const geometry_vert_end = geometry_itr + vert_stride;
 
 					while( geometry_itr != geometry_vert_end )
 					{
-						const unsigned char* end_data_itr = geometry_itr+vert_size;
+						const int* end_data_itr = geometry_itr+vert_size;
 
 						while(geometry_itr!=end_data_itr)
 						{
-							storage_reference.push_back(*geometry_itr);
+							storage_reference->push_back(*geometry_itr);
 							++geometry_itr;
 						}
 					}
@@ -283,7 +291,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 	feature_implementation void Push_Element(void* data, int iteration, requires(check_2(TargetType,Accented_Element,is_same)))
 	{
-		const unsigned char* geometry_itr=(const unsigned char*)data;
+		const int* geometry_itr=(const int*)data;
 
 		const bool grouped = _grouped;
 		const bool group_color = _group_color;
@@ -293,25 +301,25 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		const bool primitive_color = _primitive_color;
 		const bool primitive_normal = _primitive_normal;
-		const int primitive_stride = _vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>);
+		const int primitive_stride = (_vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>))/sizeof(int);
 		
-		const int vert_size = _vert_size;
-		const int vert_stride = _vert_stride;
-		const int data_stride = _data_stride;
+		const int vert_size = _vert_size/sizeof(int);
+		const int vert_stride = _vert_stride/sizeof(int);
+		const int data_stride = _data_stride/sizeof(int);
 
 		Point_3D<NT> a;
 		Point_3D<NT> b;
 		Point_3D<NT> c;
 		Point_3D<NT> result;
 
-		vector<unsigned char>& storage_reference=_accent_storage[iteration][_thread_id];
+		vector<int>& storage_reference=_accent_storage[iteration][_thread_id];
 
 		if(primitive_type == _PLOT)
 		{
 			PLFLT point_value;
-			const unsigned char* end_data_itr = (const unsigned char*) ( ((unsigned char*)&point_value) + sizeof(PLFLT) );
+			const int* end_data_itr = (const int*) ( ((int*)&point_value) + sizeof(PLFLT)/sizeof(int) );
 
-			const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+			const int* const geometry_data_end = geometry_itr + data_stride;
 
 			while( geometry_itr != geometry_data_end )
 			{
@@ -321,7 +329,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 			if(group_color)
 			{
-				const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+				const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 				while(geometry_itr!=end_data_itr)
 				{
@@ -332,7 +340,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 			const int num_group_primitives=*((int*)geometry_itr);
 			
-			const unsigned char* end_size_itr = geometry_itr+sizeof(int);
+			const int* end_size_itr = geometry_itr+sizeof(int);
 
 			while(geometry_itr!=end_size_itr)
 			{
@@ -340,18 +348,18 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 				++geometry_itr;
 			}
 
-			geometry_itr=(*((unsigned char**)geometry_itr));
-			const unsigned char* const group_begin = geometry_itr;
-			const unsigned char* const group_end = geometry_itr + sizeof(Point_2D<MasterType>) * num_group_primitives;
+			geometry_itr=(*((int**)geometry_itr));
+			const int* const group_begin = geometry_itr;
+			const int* const group_end = geometry_itr + sizeof(Point_2D<MasterType>)/sizeof(int) * num_group_primitives;
 
 			// Collect x points
 			while( geometry_itr != group_end )
 			{
-				const unsigned char* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>);
+				const int* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>)/sizeof(int);
 
 				point_value=(PLFLT)(*((float*)geometry_itr));
 				
-				geometry_itr = (unsigned char*)&point_value;
+				geometry_itr = (int*)&point_value;
 
 				while( geometry_itr!=end_data_itr )
 				{
@@ -359,7 +367,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 					++geometry_itr;
 				}
 
-				geometry_itr = (const unsigned char*)geometry_vert_end;
+				geometry_itr = (const int*)geometry_vert_end;
 			}
 
 			geometry_itr = group_begin;
@@ -367,13 +375,13 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			// Collect y points
 			while( geometry_itr != group_end )
 			{
-				const unsigned char* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>);
+				const int* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>)/sizeof(int);
 
-				geometry_itr += sizeof(Point_2D<MasterType>)/2;
+				geometry_itr += (sizeof(Point_2D<MasterType>)/sizeof(int))/2;
 
 				point_value=(PLFLT)(*((float*)geometry_itr));
 
-				geometry_itr = (unsigned char*)&point_value;
+				geometry_itr = (int*)&point_value;
 
 				while( geometry_itr!=end_data_itr )
 				{
@@ -381,14 +389,14 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 					++geometry_itr;
 				}
 
-				geometry_itr = (const unsigned char*)geometry_vert_end;
+				geometry_itr = (const int*)geometry_vert_end;
 			}
 		}
 		else
 		{
 			if(grouped)
 			{
-				const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+				const int* const geometry_data_end = geometry_itr + data_stride;
 
 				while( geometry_itr != geometry_data_end )
 				{
@@ -398,7 +406,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 				if(group_color)
 				{
-					const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+					const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 					while(geometry_itr!=end_data_itr)
 					{
@@ -409,7 +417,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 				if(group_normal)
 				{
-					const unsigned char* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>);
+					const int* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>)/sizeof(int);
 					
 					while(geometry_itr!=end_data_itr)
 					{
@@ -420,7 +428,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 				const int num_group_primitives=*((int*)geometry_itr);
 				
-				const unsigned char* end_size_itr = geometry_itr+sizeof(int);
+				const int* end_size_itr = geometry_itr+sizeof(int)/sizeof(int);
 
 				while(geometry_itr!=end_size_itr)
 				{
@@ -428,14 +436,14 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 					++geometry_itr;
 				}
 
-				const unsigned char* const group_end = (*((unsigned char**)geometry_itr)) + primitive_stride * num_group_primitives;
-				geometry_itr=(*((unsigned char**)geometry_itr));
+				const int* const group_end = (*((int**)geometry_itr)) + primitive_stride * num_group_primitives;
+				geometry_itr=(*((int**)geometry_itr));
 
 				while( geometry_itr != group_end )
 				{
 					if(primitive_color)
 					{
-						const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+						const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 						while(geometry_itr!=end_data_itr)
 						{
@@ -446,19 +454,19 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 					if(primitive_normal)
 					{
-						const unsigned char* read_itr = geometry_itr;
+						const int* read_itr = geometry_itr;
 
 						a = *((Point_3D<NT>*)read_itr);
-						read_itr += sizeof(Point_3D<NT>);
+						read_itr += sizeof(Point_3D<NT>)/sizeof(int);
 						b = *((Point_3D<NT>*)read_itr);						
-						read_itr += sizeof(Point_3D<NT>);
+						read_itr += sizeof(Point_3D<NT>)/sizeof(int);
 						c = *((Point_3D<NT>*)read_itr);
 
 						Compute_Fast_Normal(a,b,c,result);
 
-						const unsigned char* write_itr = (const unsigned char*)&result;
+						const int* write_itr = (const int*)&result;
 
-						const unsigned char* end_data_itr = write_itr + sizeof(Point_3D<NT>);
+						const int* end_data_itr = write_itr + sizeof(Point_3D<NT>)/sizeof(int);
 
 						while(write_itr!=end_data_itr)
 						{
@@ -467,11 +475,11 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 						}
 					}
 
-					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+					const int* const geometry_vert_end = geometry_itr + vert_stride;
 
 					while( geometry_itr != geometry_vert_end )
 					{
-						const unsigned char* end_data_itr = geometry_itr + vert_size;
+						const int* end_data_itr = geometry_itr + vert_size;
 
 						while(geometry_itr!=end_data_itr)
 						{
@@ -483,7 +491,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			}
 			else
 			{
-				const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+				const int* const geometry_data_end = geometry_itr + data_stride;
 
 				while( geometry_itr != geometry_data_end )
 				{
@@ -491,13 +499,13 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 					++geometry_itr;
 				}
 
-				const unsigned char* const group_end = geometry_itr + primitive_stride;
+				const int* const group_end = geometry_itr + primitive_stride;
 
 				while( geometry_itr != group_end )
 				{
 					if(primitive_color)
 					{
-						const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+						const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 						while(geometry_itr!=end_data_itr)
 						{
@@ -508,19 +516,19 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 					if(primitive_normal)
 					{
-						const unsigned char* read_itr = geometry_itr;
+						const int* read_itr = geometry_itr;
 
 						a = *((Point_3D<NT>*)read_itr);
-						read_itr += sizeof(Point_3D<NT>);
+						read_itr += sizeof(Point_3D<NT>)/sizeof(int);
 						b = *((Point_3D<NT>*)read_itr);						
-						read_itr += sizeof(Point_3D<NT>);
+						read_itr += sizeof(Point_3D<NT>)/sizeof(int);
 						c = *((Point_3D<NT>*)read_itr);
 
 						Compute_Fast_Normal(a,b,c,result);
 
-						const unsigned char* write_itr = (const unsigned char*)&result;
+						const int* write_itr = (const int*)&result;
 
-						const unsigned char* end_data_itr = write_itr + sizeof(Point_3D<NT>);
+						const int* end_data_itr = write_itr + sizeof(Point_3D<NT>)/sizeof(int);
 
 						while(write_itr!=end_data_itr)
 						{
@@ -529,11 +537,11 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 						}
 					}
 
-					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+					const int* const geometry_vert_end = geometry_itr + vert_stride;
 
 					while( geometry_itr != geometry_vert_end )
 					{
-						const unsigned char* end_data_itr = geometry_itr+vert_size;
+						const int* end_data_itr = geometry_itr+vert_size;
 
 						while(geometry_itr!=end_data_itr)
 						{
@@ -552,7 +560,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		True_Color_RGBA<MasterType> accent_color;
 		
-		const unsigned char* geometry_itr=(const unsigned char*)data;
+		const int* geometry_itr=(const int*)data;
 
 		const bool grouped = _grouped;
 		const bool group_color = _group_color;
@@ -562,13 +570,13 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		const bool primitive_color = _primitive_color;
 		const bool primitive_normal = _primitive_normal;
-		const int primitive_stride = _primitive_stride;
+		const int primitive_stride = _primitive_stride/sizeof(int);
 		
-		const int vert_size = _vert_size;
-		const int vert_stride = _vert_stride;
-		const int data_stride = _data_stride;
+		const int vert_size = _vert_size/sizeof(int);
+		const int vert_stride = _vert_stride/sizeof(int);
+		const int data_stride = _data_stride/sizeof(int);
 
-		vector<unsigned char>& storage_reference=_accent_storage[iteration][_thread_id];
+		vector<int>& storage_reference=_accent_storage[iteration][_thread_id];
 
 		if(primitive_type == _PLOT)
 		{
@@ -576,9 +584,9 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			exit(0);
 
 			PLFLT point_value;
-			const unsigned char* end_data_itr = (const unsigned char*) ( ((unsigned char*)&point_value) + sizeof(PLFLT) );
+			const int* end_data_itr = (const int*) ( ((int*)&point_value) + sizeof(PLFLT)/sizeof(int) );
 
-			const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+			const int* const geometry_data_end = geometry_itr + data_stride;
 
 			while( geometry_itr != geometry_data_end )
 			{
@@ -588,7 +596,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 			if(group_color)
 			{
-				const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+				const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 				while(geometry_itr!=end_data_itr)
 				{
@@ -599,7 +607,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 			const int num_group_primitives=*((int*)geometry_itr);
 			
-			const unsigned char* end_size_itr = geometry_itr+sizeof(int);
+			const int* end_size_itr = geometry_itr+sizeof(int)/sizeof(int);
 
 			while(geometry_itr!=end_size_itr)
 			{
@@ -607,18 +615,18 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 				++geometry_itr;
 			}
 
-			geometry_itr=(*((unsigned char**)geometry_itr));
-			const unsigned char* const group_begin = geometry_itr;
-			const unsigned char* const group_end = geometry_itr + sizeof(Point_2D<MasterType>) * num_group_primitives;
+			geometry_itr=(*((int**)geometry_itr));
+			const int* const group_begin = geometry_itr;
+			const int* const group_end = geometry_itr + sizeof(Point_2D<MasterType>)/sizeof(int) * num_group_primitives;
 
 			// Collect x points
 			while( geometry_itr != group_end )
 			{
-				const unsigned char* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>);
+				const int* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>)/sizeof(int);
 
 				point_value=(PLFLT)(*((float*)geometry_itr));
 				
-				geometry_itr = (unsigned char*)&point_value;
+				geometry_itr = (int*)&point_value;
 
 				while( geometry_itr!=end_data_itr )
 				{
@@ -626,7 +634,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 					++geometry_itr;
 				}
 
-				geometry_itr = (const unsigned char*)geometry_vert_end;
+				geometry_itr = (const int*)geometry_vert_end;
 			}
 
 			geometry_itr = group_begin;
@@ -634,13 +642,13 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			// Collect y points
 			while( geometry_itr != group_end )
 			{
-				const unsigned char* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>);
+				const int* const geometry_vert_end = geometry_itr + sizeof(Point_2D<MasterType>)/sizeof(int);
 
-				geometry_itr += sizeof(Point_2D<MasterType>)/2;
+				geometry_itr += (sizeof(Point_2D<MasterType>)/sizeof(int))/2;
 
 				point_value=(PLFLT)(*((float*)geometry_itr));
 
-				geometry_itr = (unsigned char*)&point_value;
+				geometry_itr = (int*)&point_value;
 
 				while( geometry_itr!=end_data_itr )
 				{
@@ -648,14 +656,14 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 					++geometry_itr;
 				}
 
-				geometry_itr = (const unsigned char*)geometry_vert_end;
+				geometry_itr = (const int*)geometry_vert_end;
 			}
 		}
 		else
 		{
 			if(grouped)
 			{
-				const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+				const int* const geometry_data_end = geometry_itr + data_stride;
 
 				while( geometry_itr != geometry_data_end )
 				{
@@ -670,8 +678,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 					accent_color._g = 255 - accent_color._g;
 					accent_color._b = 255 - accent_color._b;
 
-					unsigned char* accent_itr = (unsigned char*)&accent_color;
-					const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+					int* accent_itr = (int*)&accent_color;
+					const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 					while(geometry_itr!=end_data_itr)
 					{
@@ -683,7 +691,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 				if(group_normal)
 				{
-					const unsigned char* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>);
+					const int* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>)/sizeof(int);
 					
 					while(geometry_itr!=end_data_itr)
 					{
@@ -694,7 +702,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 				const int num_group_primitives=*((int*)geometry_itr);
 
-				const unsigned char* end_size_itr = geometry_itr+sizeof(int);
+				const int* end_size_itr = geometry_itr+sizeof(int)/sizeof(int);
 
 				while(geometry_itr!=end_size_itr)
 				{
@@ -702,7 +710,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 					++geometry_itr;
 				}
 
-				const unsigned char* const group_end = geometry_itr + primitive_stride * num_group_primitives;
+				const int* const group_end = geometry_itr + primitive_stride * num_group_primitives;
 
 				while( geometry_itr != group_end )
 				{
@@ -713,8 +721,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 						accent_color._g = 255 - accent_color._g;
 						accent_color._b = 255 - accent_color._b;
 
-						unsigned char* accent_itr = (unsigned char*)&accent_color;
-						const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+						int* accent_itr = (int*)&accent_color;
+						const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 						while(geometry_itr!=end_data_itr)
 						{
@@ -726,7 +734,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 					if(primitive_normal)
 					{
-						const unsigned char* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>);
+						const int* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>)/sizeof(int);
 
 						while(geometry_itr!=end_data_itr)
 						{
@@ -735,11 +743,11 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 						}
 					}
 				
-					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+					const int* const geometry_vert_end = geometry_itr + vert_stride;
 
 					while( geometry_itr != geometry_vert_end )
 					{
-						const unsigned char* end_data_itr = geometry_itr+vert_size;
+						const int* end_data_itr = geometry_itr+vert_size;
 
 						while(geometry_itr!=end_data_itr)
 						{
@@ -751,7 +759,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			}
 			else
 			{
-				const unsigned char* const geometry_data_end = geometry_itr + data_stride;
+				const int* const geometry_data_end = geometry_itr + data_stride;
 
 				while( geometry_itr != geometry_data_end )
 				{
@@ -759,7 +767,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 					++geometry_itr;
 				}
 
-				const unsigned char* const group_end = geometry_itr + primitive_stride;
+				const int* const group_end = geometry_itr + primitive_stride;
 
 				while( geometry_itr != group_end )
 				{
@@ -770,8 +778,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 						accent_color._g = 255 - accent_color._g;
 						accent_color._b = 255 - accent_color._b;
 
-						unsigned char* accent_itr = (unsigned char*)&accent_color;
-						const unsigned char* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>);
+						int* accent_itr = (int*)&accent_color;
+						const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
 
 						while(geometry_itr!=end_data_itr)
 						{
@@ -783,7 +791,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 					if(primitive_normal)
 					{
-						const unsigned char* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>);
+						const int* end_data_itr = geometry_itr+sizeof(Point_3D<MasterType>)/sizeof(int);
 
 						while(geometry_itr!=end_data_itr)
 						{
@@ -792,11 +800,11 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 						}
 					}
 
-					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
+					const int* const geometry_vert_end = geometry_itr + vert_stride;
 
 					while( geometry_itr != geometry_vert_end )
 					{
-						const unsigned char* end_data_itr = geometry_itr+vert_size;
+						const int* end_data_itr = geometry_itr+vert_size;
 
 						while(geometry_itr!=end_data_itr)
 						{
@@ -884,7 +892,6 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			assert(false);
 			break;
 		};
-
 
 		_primitive_stride = _vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>) + _primitive_normal*sizeof(Point_3D<MasterType>);
 
@@ -982,7 +989,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		//while(current_iteration < end_iteration)
 		//{
-			vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
+			vector<int> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
 
 			for(int i=0;i<_num_antares_threads;i++)
 			{
@@ -1011,12 +1018,11 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			}
 		}
 	}
-
 	member_data(bool,dynamic_data,none,none);
 	member_data(int,target_sub_iteration,none,none);
 
-	member_data(Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >,storage,none,none);
-	member_data(Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >,accent_storage,none,none);
+	member_data(Dynamic_Multi_Buffer< vector<int>[_num_antares_threads] >,storage,none,none);
+	member_data(Dynamic_Multi_Buffer< vector<int>[_num_antares_threads] >,accent_storage,none,none);
 
 	// Identification values
 	member_data(string,name,none,none);
@@ -1075,11 +1081,17 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	{
 		Antares_Layer_Implementation* pthis=(Antares_Layer_Implementation*)_this;
 
+		int reserve;
 		LOCK(_canvas_lock);
 		for(int i=0;i<_num_antares_threads;i++)
 		{
+			reserve=pthis->_storage[_iteration + pthis->_storage.period][i].size();
 			pthis->_storage[_iteration + pthis->_storage.period][i].clear();
-			//pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].clear();
+			pthis->_storage[_iteration + pthis->_storage.period][i].reserve(reserve);
+
+			reserve=pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].size();
+			pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].clear();
+			pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].reserve(reserve);
 		}
 		UNLOCK(_canvas_lock);
 	}

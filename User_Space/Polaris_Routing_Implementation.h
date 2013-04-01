@@ -131,7 +131,7 @@ namespace Routing_Components
 		};
 
 
-		implementation struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType>
+		implementation struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType,false,2>
 		{
 			//==================================================================================================
 			// TYPEDEFS AND INTERFACES

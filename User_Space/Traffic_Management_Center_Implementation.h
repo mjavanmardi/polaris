@@ -1,5 +1,7 @@
 #pragma once
 #include "Traffic_Management_Center_Prototype.h"
+//#include "Io\Geometry.h"
+#include "Geometry_Implementation.h"
 
 namespace Traffic_Management_Center_Components
 {
@@ -128,10 +130,34 @@ namespace Traffic_Management_Center_Components
 					}
 				}
 
+				
+				//cout << "Reading Polygons" << endl;
 
+				//map<int, POLY>& polys=GetDepotPolygons("chicago");
 
+				//for(map<int, POLY>::iterator itr = polys.begin();itr != polys.end();itr++)
+				//{
+				//	Depot_Interface* its_component = (Depot_Interface*)Allocate< Depot_Interface::ComponentType >();
 
+				//	vector<Point_3D<MasterType>>* area = &its_component->covered_area<vector<Point_3D<MasterType>>&>();
 
+				//	vector<GeoPoint>* coords = &itr->second.exterior.coords;
+
+				//	Point_3D<MasterType> poly_point;
+
+				//	cout << "new polygon:" << endl;
+				//	for(vector<GeoPoint>::iterator pitr = coords->begin(); pitr != coords->end(); pitr++)
+				//	{
+				//		poly_point._x = pitr->x;
+				//		poly_point._y = pitr->y;
+				//		poly_point._z = 1;
+
+				//		cout << poly_point._x << "," << poly_point._y << endl;
+				//		
+
+				//		area->push_back(poly_point);
+				//	}
+				//}
 
 				//result<Component_Key> component_key_result=db->template query<Component_Key>(query<Component_Key>::true_expr);
 

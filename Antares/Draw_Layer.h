@@ -46,7 +46,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 		/*if(!grouped) */glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 	}
 
-	const Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >& storage=layer->storage<Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >&>();
+	const Dynamic_Multi_Buffer< vector<int>[_num_antares_threads] >& storage=layer->storage<Dynamic_Multi_Buffer< vector<int>[_num_antares_threads] >&>();
 
 	//---- draw main layer ----
 
@@ -83,12 +83,12 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	
 	while(current_iteration <= end_iteration)
 	{
-		const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = storage[current_iteration];
+		const vector<int> (&geometry_by_thread)[_num_antares_threads] = storage[current_iteration];
 
 		for(int i=0;i<_num_antares_threads;i++)
 		{
-			const unsigned char* geometry_itr = &geometry_by_thread[i].front();
-			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
+			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
 
 			while(geometry_itr != geometry_end)
 			{
@@ -187,7 +187,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 
 	//---- draw layer accents in the second pass ----
 
-	const Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >& accent_storage=layer->accent_storage<Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >&>();
+	const Dynamic_Multi_Buffer< vector<int>[_num_antares_threads] >& accent_storage=layer->accent_storage<Dynamic_Multi_Buffer< vector<int>[_num_antares_threads] >&>();
 	
 	switch(primitive_type)
 	{
@@ -228,12 +228,12 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	
 	while(current_iteration <= end_iteration)
 	{
-		const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = accent_storage[current_iteration];
+		const vector<int> (&geometry_by_thread)[_num_antares_threads] = accent_storage[current_iteration];
 
 		for(int i=0;i<_num_antares_threads;i++)
 		{
-			const unsigned char* geometry_itr = &geometry_by_thread[i].front();
-			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
+			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
 
 			while(geometry_itr != geometry_end)
 			{

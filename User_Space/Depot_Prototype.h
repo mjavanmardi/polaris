@@ -17,9 +17,8 @@ namespace Depot_Components
 		{
 			tag_as_prototype;
 
-			feature_accessor(x_position, none, none);
-			feature_accessor(y_position, none, none);
-
+			feature_accessor(covered_area, none, none);
+			
 			feature_accessor(active_properties, none, none);
 		};
 	}

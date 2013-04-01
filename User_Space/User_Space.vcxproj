@@ -498,6 +498,8 @@
     <ClCompile Include="User_Space.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Antares\Geometry.h" />
+    <ClInclude Include="..\Antares\Geometry_Implementation.h" />
     <ClInclude Include="Activity_Generator_Implementations.h" />
     <ClInclude Include="Activity_Implementations.h" />
     <ClInclude Include="Activity_Location_Prototype.h" />

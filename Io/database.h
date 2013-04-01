@@ -8,7 +8,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning( disable : 4996 )
 
-#define SCHEMA_REVISION "10"
+#define SCHEMA_REVISION "11"
 
 #ifndef DATABASE
 #define DATABASE

@@ -271,5 +271,11 @@
     <ClInclude Include="Depot_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="..\Antares\Geometry_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Antares\Geometry.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

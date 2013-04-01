@@ -36,12 +36,12 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 		
 		while(current_iteration <= end_iteration)
 		{
-			const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _storage[current_iteration];
+			const vector<int> (&geometry_by_thread)[_num_antares_threads] = _storage[current_iteration];
 
 			for(int i=0;i<_num_antares_threads;i++)
 			{
-				const unsigned char* geometry_itr = &geometry_by_thread[i].front();
-				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+				const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
+				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
 
 				while(geometry_itr != geometry_end)
 				{
@@ -185,12 +185,12 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 		
 		while(current_iteration <= end_iteration)
 		{
-			const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _storage[current_iteration];
+			const vector<int> (&geometry_by_thread)[_num_antares_threads] = _storage[current_iteration];
 
 			for(int i=0;i<_num_antares_threads;i++)
 			{
-				const unsigned char* geometry_itr = &geometry_by_thread[i].front();
-				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+				const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
+				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
 
 				while(geometry_itr != geometry_end)
 				{
@@ -340,14 +340,14 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 		{
 			if(found) break;
 
-			const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _storage[current_iteration];
+			const vector<int> (&geometry_by_thread)[_num_antares_threads] = _storage[current_iteration];
 
 			for(int i=0;i<_num_antares_threads;i++)
 			{
 				if(found) break;
 
-				const unsigned char* geometry_itr = &geometry_by_thread[i].front();
-				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+				const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
+				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
 
 				while(geometry_itr != geometry_end)
 				{
@@ -503,14 +503,14 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 		{
 			if(found) break;
 
-			const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _storage[current_iteration];
+			const vector<int> (&geometry_by_thread)[_num_antares_threads] = _storage[current_iteration];
 
 			for(int i=0;i<_num_antares_threads;i++)
 			{
 				if(found) break;
 
-				const unsigned char* geometry_itr = &geometry_by_thread[i].front();
-				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+				const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
+				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
 
 				while(geometry_itr != geometry_end)
 				{
