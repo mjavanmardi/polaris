@@ -616,7 +616,6 @@ namespace Intersection_Components
 					typename _Outbound_Movements_Container_Interface::iterator outbound_movement_itr;
 					for (outbound_movement_itr=outbound_movements_container.begin();outbound_movement_itr!=outbound_movements_container.end();outbound_movement_itr++)
 					{
-						((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template calculate_moe_for_simulation_interval_from_inbound_link<NULLTYPE>();
 						//num_vehicles_in_link += int(((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template vehicles_container<_Vehicles_Container_Interface&>().size());
 						typename _Vehicles_Container_Interface::iterator vehicle_itr;
 						_Vehicles_Container_Interface& vehicles = ((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template vehicles_container<_Vehicles_Container_Interface&>();

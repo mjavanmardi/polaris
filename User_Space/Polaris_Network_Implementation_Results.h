@@ -468,11 +468,11 @@ namespace Network_Components
 				<< network_moe_data.network_avg_link_in_flow_ratio << ","
 				<< network_moe_data.network_avg_link_out_flow_ratio << ","
 				<< _network_vht << ","
-				<< _network_vmt << ","
-				<< network_moe_data.assignment_calculation_time << ","
-				<< network_moe_data.simulation_calculation_time << ","
-				<< network_moe_data.operation_calculation_time << ","
-				<< network_moe_data.output_calculation_time 
+				<< _network_vmt 
+				//<< network_moe_data.assignment_calculation_time << ","
+				//<< network_moe_data.simulation_calculation_time << ","
+				//<< network_moe_data.operation_calculation_time << ","
+				//<< network_moe_data.output_calculation_time 
 				<< endl;
 
 		}

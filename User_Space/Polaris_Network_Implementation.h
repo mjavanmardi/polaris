@@ -144,6 +144,8 @@ namespace Network_Components
 				network_moe_data.network_avg_link_in_flow_ratio = 0.0f;
 				network_moe_data.network_avg_link_out_flow_rate = 0.0f;
 				network_moe_data.network_avg_link_out_flow_ratio = 0.0f;
+				network_moe_data.network_avg_link_in_volume = 0.0f;
+				network_moe_data.network_avg_link_out_volume = 0.0f;
 				network_moe_data.network_avg_link_queue_length = 0.0f;
 				network_moe_data.network_avg_link_speed = 0.0f;
 				network_moe_data.network_avg_link_speed_ratio = 0.0f;
@@ -222,7 +224,6 @@ namespace Network_Components
 				((typename MasterType::network_type*)_this)->template calculate_moe<NULLTYPE,NULLTYPE,NULLTYPE>();
 				((typename MasterType::network_type*)_this)->template update_vehicle_locations<NULLTYPE,NULLTYPE,NULLTYPE>();
 				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
-				//if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>() && _this_ptr->template scenario_reference<_Scenario_Interface*>()->template network_in_network_vehicles<int>() == 0)
 			}
 
 			feature_implementation void update_vehicle_locations()
@@ -346,7 +347,8 @@ namespace Network_Components
 					network_moe_data.network_avg_link_density += link_component->link_moe_data.link_density;
 					network_moe_data.network_avg_link_in_flow_rate += link_component->link_moe_data.link_in_flow_rate;
 					network_moe_data.network_avg_link_out_flow_rate += link_component->link_moe_data.link_out_flow_rate;
-
+					network_moe_data.network_avg_link_in_volume += link_component->link_moe_data.link_in_volume;
+					network_moe_data.network_avg_link_out_volume += link_component->link_moe_data.link_out_volume;
 					network_moe_data.network_avg_link_density_ratio +=link_component->link_moe_data.link_density_ratio;
 					network_moe_data.network_avg_link_in_flow_ratio += link_component->link_moe_data.link_in_flow_ratio;
 					network_moe_data.network_avg_link_out_flow_ratio += link_component->link_moe_data.link_out_flow_ratio;
@@ -372,6 +374,8 @@ namespace Network_Components
 				network_moe_data.network_avg_link_density /= float(_links_container.size()); 
 				network_moe_data.network_avg_link_in_flow_rate  /= float(_links_container.size()); 
 				network_moe_data.network_avg_link_out_flow_rate  /= float(_links_container.size()); 
+				network_moe_data.network_avg_link_in_volume  /= float(_links_container.size()); 
+				network_moe_data.network_avg_link_out_volume  /= float(_links_container.size()); 
 				network_moe_data.network_avg_link_queue_length  /= float(_links_container.size()); 
 
 				network_moe_data.network_avg_link_travel_time_ratio /= float(_links_container.size());

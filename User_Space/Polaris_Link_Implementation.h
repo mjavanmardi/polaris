@@ -620,7 +620,8 @@ namespace Link_Components
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 
-				link_moe_data.link_in_flow_rate = 
+				link_moe_data.link_in_flow_rate = link_moe_data.link_in_volume * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<float>()) / _num_lanes;
+				
 				link_moe_data.link_queue_length = link_moe_data.link_queue_length / ((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<float>();
 				
 				link_moe_data.link_travel_time = float(_link_fftt / 60.0) + link_moe_data.link_travel_delay;
