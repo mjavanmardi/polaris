@@ -76,6 +76,7 @@ def ParseFile(file_path):
 //
 #include <odb/tr1/memory.hxx>
 using std::tr1::shared_ptr;
+using std::tr1::weak_ptr;
 
 namespace %s {
 //Forward declarations.
@@ -107,35 +108,15 @@ public:
  
         for field in fields:            
             name = field.getAttribute("name")            
-            reference = field.getAttribute("reference")
-            contanerSetter = field.getAttribute("contanerSetter")
-            type_name = field.getAttribute("type")
-            key = field.getAttribute("key")
-            index = field.getAttribute("index")
-            auto = field.getAttribute("auto")
-            if reference!="":
-                if contanerSetter!="no":
-                    accessors += "\tvoid set%s (const %s& %s_, InputContainer& container) {%s = container.%ss[%s_];}\n"%(name.title(), type_name, name, name, reference, name)                
-                type_name = "shared_ptr<%s>"%reference
-            if key!="":
-                if key=="yes":
-                    data_fields += "\t#pragma db id "
-                    if auto=="yes":
-                        data_fields += "auto\n"
-                    else:
-                        data_fields += "\n"
-                    accessors += "\tconst %s& getPrimaryKey () const {return %s;}\n"%(type_name, name) 
-            if index!="":
-                if index=="yes":
-                    data_fields += "\t#pragma db index\n"
-            constructor_1 += "%s %s_, "%(type_name, name)
+            type = field.getAttribute("type")
+            pragma = field.getAttribute("pragma")
+            constructor_1 += "%s %s_, "%(type, name)
             constructor_2 += "%s (%s_), "%(name,name)
-            accessors += "\tconst %s& get%s () const {return %s;}\n"%(type_name,name.title(), name)
-            accessors += "\tvoid set%s (const %s& %s_) {%s = %s_;}\n"%(name.title(), type_name, name, name, name)
-            data_fields += "\t%s %s;\n"%(type_name,name)
-        pragma_items = type.getElementsByTagName("pragma")
-        for item in pragma_items:
-           pragmas += "\t#pragma " + item.getAttribute("text") +"\n"
+            accessors += "\tconst %s& get%s () const {return %s;}\n"%(type,name.title(), name)
+            accessors += "\tvoid set%s (const %s& %s_) {%s = %s_;}\n"%(name.title(), type, name, name, name)
+            if pragma!="":
+                data_fields += "\t#pragma db %s\n"%(pragma)
+            data_fields += "\t%s %s;\n"%(type,name)
         content += constructor_1[:-2] + ")\n\t" + constructor_2[:-2] + "\n\t{\n\t}\n"
         content += accessors
         content += data_fields

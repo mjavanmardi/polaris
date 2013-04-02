@@ -72,6 +72,7 @@ namespace io
 		result.push_back("Demand");
 		result.push_back("System");
 		result.push_back("Its");
+		result.push_back("Network_Event");
 		assert(result.size() > 0);
 		return result;
 	}

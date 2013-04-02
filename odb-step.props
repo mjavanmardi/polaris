@@ -26,6 +26,11 @@
       <Command>c:\opt\polarisdeps\odb-2.2.0-i686-windows\bin\odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name Its Its.h</Command>
       <Outputs>Its-odb.hxx;Its-odb.ixx;Its-odb.cxx;%(Outputs)</Outputs>
     </CustomBuild>
+    <CustomBuild Include="Network_Event.h">
+      <Message>Running odb compiler on Network_Event.h</Message>
+      <Command>c:\opt\polarisdeps\odb-2.2.0-i686-windows\bin\odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name Network_Event Network_Event.h</Command>
+      <Outputs>Network_Event-odb.hxx;Network_Event-odb.ixx;Network_Event-odb.cxx;%(Outputs)</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Supply-odb.hxx" />
@@ -33,6 +38,7 @@
     <ClInclude Include="Demand-odb.hxx" />
     <ClInclude Include="System-odb.hxx" />
     <ClInclude Include="Its-odb.hxx" />
+    <ClInclude Include="Network_Event-odb.hxx" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Supply-odb.cxx" />
@@ -40,6 +46,7 @@
     <ClCompile Include="Demand-odb.cxx" />
     <ClCompile Include="System-odb.cxx" />
     <ClCompile Include="Its-odb.cxx" />
+    <ClCompile Include="Network_Event-odb.cxx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Supply-odb.ixx" />
@@ -47,5 +54,6 @@
     <None Include="Demand-odb.ixx" />
     <None Include="System-odb.ixx" />
     <None Include="Its-odb.ixx" />
+    <None Include="Network_Event-odb.ixx" />
   </ItemGroup>
 </Project>

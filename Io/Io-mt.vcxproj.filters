@@ -48,6 +48,9 @@
     <ClInclude Include="endian.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Network_Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="System.h">

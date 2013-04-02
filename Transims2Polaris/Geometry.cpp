@@ -32,7 +32,7 @@ int AddGeometryCoumn(sqlite3* db_handle, int srid, std::string table, std::strin
 int AddGeometryTables(sqlite3* db_handle, int srid)
 {
 	int ret;
-	ret = attach_spatialite(db_handle);
+	ret = attach_spatialite(db_handle, true);
 	ret = AddGeometryCoumn(db_handle, srid, "LINK", "LINESTRING", "XY");
 	if (ret != SQLITE_OK) goto stop;
 	ret = AddGeometryCoumn(db_handle, srid, "Zone", "POINT", "XY");
