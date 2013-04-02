@@ -45,7 +45,9 @@
     <ClInclude Include="Its-odb.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="endian.h" />
+    <ClInclude Include="endian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="System.h">

@@ -1,1 +1,0 @@
-char* db_path;
