@@ -26,8 +26,8 @@ class Network_Event
 public:
     // Default Constructor
     Network_Event () {}        
-	Network_Event (int id_, std::string name_, std::string icon_, std::vector<weak_ptr<Event_Instance> > instances_)
-	: id (id_), name (name_), icon (icon_), instances (instances_)
+	Network_Event (int id_, std::string name_, std::string icon_, std::vector<weak_ptr<Event_Instance> > instances_, std::vector<shared_ptr<Event_Key> > keys_)
+	: id (id_), name (name_), icon (icon_), instances (instances_), keys (keys_)
 	{
 	}
 	//Accessors
@@ -39,6 +39,8 @@ public:
 	void setIcon (const std::string& icon_) {icon = icon_;}
 	const std::vector<weak_ptr<Event_Instance> >& getInstances () const {return instances;}
 	void setInstances (const std::vector<weak_ptr<Event_Instance> >& instances_) {instances = instances_;}
+	const std::vector<shared_ptr<Event_Key> >& getKeys () const {return keys;}
+	void setKeys (const std::vector<shared_ptr<Event_Key> >& keys_) {keys = keys_;}
 //Data Fields
 private:
 	friend class odb::access;
@@ -48,6 +50,7 @@ private:
 	std::string icon;
 	#pragma db inverse(event)
 	std::vector<weak_ptr<Event_Instance> > instances;
+	std::vector<shared_ptr<Event_Key> > keys;
 };
 
 #pragma db object
@@ -88,7 +91,7 @@ class Event_Instance
 public:
     // Default Constructor
     Event_Instance () {}        
-	Event_Instance (int id_, shared_ptr<Network_Event> event_, std::vector<weak_ptr<Event_Instance_Value> > values_, std::vector<int> links_, float location_x_, float location_y_, std::string reporter_, std::string confedence_level_, std::string note_)
+	Event_Instance (int id_, shared_ptr<Network_Event> event_, std::vector<shared_ptr<Event_Instance_Value> > values_, std::vector<int> links_, float location_x_, float location_y_, std::string reporter_, std::string confedence_level_, std::string note_)
 	: id (id_), event (event_), values (values_), links (links_), location_x (location_x_), location_y (location_y_), reporter (reporter_), confedence_level (confedence_level_), note (note_)
 	{
 	}
@@ -97,8 +100,8 @@ public:
 	void setId (const int& id_) {id = id_;}
 	const shared_ptr<Network_Event>& getEvent () const {return event;}
 	void setEvent (const shared_ptr<Network_Event>& event_) {event = event_;}
-	const std::vector<weak_ptr<Event_Instance_Value> >& getValues () const {return values;}
-	void setValues (const std::vector<weak_ptr<Event_Instance_Value> >& values_) {values = values_;}
+	const std::vector<shared_ptr<Event_Instance_Value> >& getValues () const {return values;}
+	void setValues (const std::vector<shared_ptr<Event_Instance_Value> >& values_) {values = values_;}
 	const std::vector<int>& getLinks () const {return links;}
 	void setLinks (const std::vector<int>& links_) {links = links_;}
 	const float& getLocation_X () const {return location_x;}
@@ -118,8 +121,7 @@ private:
 	int id;
 	#pragma db not_null
 	shared_ptr<Network_Event> event;
-	#pragma db inverse(instance)
-	std::vector<weak_ptr<Event_Instance_Value> > values;
+	std::vector<shared_ptr<Event_Instance_Value> > values;
 	std::vector<int> links;
 	float location_x;
 	float location_y;
@@ -134,28 +136,24 @@ class Event_Instance_Value
 public:
     // Default Constructor
     Event_Instance_Value () {}        
-	Event_Instance_Value (int id_, std::string key_, std::string value_, shared_ptr<Event_Instance> instance_)
-	: id (id_), key (key_), value (value_), instance (instance_)
+	Event_Instance_Value (int id_, shared_ptr<Event_Key> key_, std::string value_)
+	: id (id_), key (key_), value (value_)
 	{
 	}
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const std::string& getKey () const {return key;}
-	void setKey (const std::string& key_) {key = key_;}
+	const shared_ptr<Event_Key>& getKey () const {return key;}
+	void setKey (const shared_ptr<Event_Key>& key_) {key = key_;}
 	const std::string& getValue () const {return value;}
 	void setValue (const std::string& value_) {value = value_;}
-	const shared_ptr<Event_Instance>& getInstance () const {return instance;}
-	void setInstance (const shared_ptr<Event_Instance>& instance_) {instance = instance_;}
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
 	int id;
-	std::string key;
+	shared_ptr<Event_Key> key;
 	std::string value;
-	#pragma db not_null
-	shared_ptr<Event_Instance> instance;
 };
 }}
 #endif

@@ -1,14 +1,15 @@
 <?xml version="1.0" ?>
 <root>
 	<type name="Component" pragma="object">
-		<field name="id" type="int" key="yes"/>
+		<field name="id" type="int" pragma="id"/>
 		<field name="name" type="std::string"/>>
 		<field name="icon" type="std::string"/>
+		<field name="instances" type="std::vector&lt;weak_ptr&lt;Instance&gt; &gt;" pragma="inverse(component)"/>
+		<field name="actions" type="std::vector&lt;weak_ptr&lt;Action&gt; &gt;" pragma="inverse(component)"/>
+		<field name="keys" type="std::vector&lt;shared_ptr&lt;Component_Key&gt; &gt;"/>		
 	</type>
 	<type name="Component_Key" pragma="object">
-		<field key="yes" name="id" type="int"/>
-		<field name="component" reference="Component" contanerSetter="no"/>
-		<field name="key" type="std::string"/>
+		<field pragma="id" name="key" type="std::string"/>>
 		<field name="value_type" type="std::string"/>
 		<field name="value_constraint" type="std::string"/>
 		<field name="is_state" type="bool"/>
@@ -16,8 +17,8 @@
 		<field name="note" type="std::string"/>
 	</type>
 	<type name="Instance" pragma="object">
-		<field key="yes" name="id" type="int" auto="yes"/>
-		<field name="component" reference="Component" contanerSetter="no"/>
+		<field name="id" type="int" pragma="id auto"/>
+		<field name="component" type="shared_ptr&lt;Component&gt;" pragma="not_null"/>
 		<field name="location_link" type="int"/>
 		<field name="location_offset" type="float"/>
 		<field name="location_x" type="float"/>
@@ -25,34 +26,26 @@
 		<field name="owner" type="std::string"/>
 		<field name="operational_status" type="int"/>
 		<field name="schedule" type="std::string"/>
+		<field name="values" type="std::vector&lt;shared_ptr&lt;Instance_Value&gt; &gt;" />		
 	</type>	
 	<type name="Instance_Value" pragma="object">
-		<field key="yes" name="id" type="int" auto="yes"/>
-		<field name="instatce" reference="Instance" contanerSetter="no"/>
-		<field name="key" reference="Component_Key" contanerSetter="no"/>
+		<field name="id" type="int" pragma="id auto"/>
+		<field name="key" type="shared_ptr&lt;Component_Key&gt;"/>
 		<field name="value" type="std::string"/>
 	</type>			
 	<type name="Action" pragma="object">
-		<field key="yes" name="id" type="int"/>
-		<field name="component" reference="Component" contanerSetter="no"/>
+		<field name="id" type="int" pragma="id"/>
+		<field name="component" type="shared_ptr&lt;Component&gt;" pragma="not_null"/>
+		<field name="keys" type="std::vector&lt;shared_ptr&lt;Action_Key&gt; &gt;"/>	
 		<field name="name" type="std::string"/>
 		<field name="note" type="std::string"/>
 	</type>
 	<type name="Action_Key" pragma="object">
-		<field key="yes" name="id" type="int"/>
-		<field name="action" reference="Action" contanerSetter="no"/>
+		<field name="id" type="int" pragma="id"/>
 		<field name="key" type="std::string"/>
 		<field name="value_type" type="std::string"/>
 		<field name="value_constraint" type="std::string"/>
 		<field name="required" type="bool"/>		
 		<field name="note" type="std::string"/>
-	</type>	
-	<type name="Action_Log" pragma="object">
-		<field key="yes" name="id" type="int"/>	
-		<field name="action_id" reference="Action" contanerSetter="no"/>
-		<field name="time_submission" type="int"/>
-		<field name="time_delay" type="int"/>
-		<field name="flag" type="std::string"/>
-		<field name="message" type="std::string"/>
 	</type>		
 </root>

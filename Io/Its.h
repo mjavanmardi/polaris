@@ -9,6 +9,7 @@
 //
 #include <odb/tr1/memory.hxx>
 using std::tr1::shared_ptr;
+using std::tr1::weak_ptr;
 
 namespace polaris{ namespace io {
 //Forward declarations.
@@ -19,7 +20,6 @@ class Instance;
 class Instance_Value;
 class Action;
 class Action_Key;
-class Action_Log;
 
 
 #pragma db object
@@ -28,25 +28,35 @@ class Component
 public:
     // Default Constructor
     Component () {}        
-	Component (int id_, std::string name_, std::string icon_)
-	: id (id_), name (name_), icon (icon_)
+	Component (int id_, std::string name_, std::string icon_, std::vector<weak_ptr<Instance> > instances_, std::vector<weak_ptr<Action> > actions_, std::vector<shared_ptr<Component_Key> > keys_)
+	: id (id_), name (name_), icon (icon_), instances (instances_), actions (actions_), keys (keys_)
 	{
 	}
 	//Accessors
-	const int& getPrimaryKey () const {return id;}
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
 	const std::string& getName () const {return name;}
 	void setName (const std::string& name_) {name = name_;}
 	const std::string& getIcon () const {return icon;}
 	void setIcon (const std::string& icon_) {icon = icon_;}
+	const std::vector<weak_ptr<Instance> >& getInstances () const {return instances;}
+	void setInstances (const std::vector<weak_ptr<Instance> >& instances_) {instances = instances_;}
+	const std::vector<weak_ptr<Action> >& getActions () const {return actions;}
+	void setActions (const std::vector<weak_ptr<Action> >& actions_) {actions = actions_;}
+	const std::vector<shared_ptr<Component_Key> >& getKeys () const {return keys;}
+	void setKeys (const std::vector<shared_ptr<Component_Key> >& keys_) {keys = keys_;}
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id 
+	#pragma db id
 	int id;
 	std::string name;
 	std::string icon;
+	#pragma db inverse(component)
+	std::vector<weak_ptr<Instance> > instances;
+	#pragma db inverse(component)
+	std::vector<weak_ptr<Action> > actions;
+	std::vector<shared_ptr<Component_Key> > keys;
 };
 
 #pragma db object
@@ -55,16 +65,11 @@ class Component_Key
 public:
     // Default Constructor
     Component_Key () {}        
-	Component_Key (int id_, shared_ptr<Component> component_, std::string key_, std::string value_type_, std::string value_constraint_, bool is_state_, bool required_, std::string note_)
-	: id (id_), component (component_), key (key_), value_type (value_type_), value_constraint (value_constraint_), is_state (is_state_), required (required_), note (note_)
+	Component_Key (std::string key_, std::string value_type_, std::string value_constraint_, bool is_state_, bool required_, std::string note_)
+	: key (key_), value_type (value_type_), value_constraint (value_constraint_), is_state (is_state_), required (required_), note (note_)
 	{
 	}
 	//Accessors
-	const int& getPrimaryKey () const {return id;}
-	const int& getId () const {return id;}
-	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Component>& getComponent () const {return component;}
-	void setComponent (const shared_ptr<Component>& component_) {component = component_;}
 	const std::string& getKey () const {return key;}
 	void setKey (const std::string& key_) {key = key_;}
 	const std::string& getValue_Type () const {return value_type;}
@@ -80,9 +85,7 @@ public:
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id 
-	int id;
-	shared_ptr<Component> component;
+	#pragma db id
 	std::string key;
 	std::string value_type;
 	std::string value_constraint;
@@ -97,12 +100,11 @@ class Instance
 public:
     // Default Constructor
     Instance () {}        
-	Instance (int id_, shared_ptr<Component> component_, int location_link_, float location_offset_, float location_x_, float location_y_, std::string owner_, int operational_status_, std::string schedule_)
-	: id (id_), component (component_), location_link (location_link_), location_offset (location_offset_), location_x (location_x_), location_y (location_y_), owner (owner_), operational_status (operational_status_), schedule (schedule_)
+	Instance (int id_, shared_ptr<Component> component_, int location_link_, float location_offset_, float location_x_, float location_y_, std::string owner_, int operational_status_, std::string schedule_, std::vector<shared_ptr<Instance_Value> > values_)
+	: id (id_), component (component_), location_link (location_link_), location_offset (location_offset_), location_x (location_x_), location_y (location_y_), owner (owner_), operational_status (operational_status_), schedule (schedule_), values (values_)
 	{
 	}
 	//Accessors
-	const int& getPrimaryKey () const {return id;}
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
 	const shared_ptr<Component>& getComponent () const {return component;}
@@ -121,11 +123,14 @@ public:
 	void setOperational_Status (const int& operational_status_) {operational_status = operational_status_;}
 	const std::string& getSchedule () const {return schedule;}
 	void setSchedule (const std::string& schedule_) {schedule = schedule_;}
+	const std::vector<shared_ptr<Instance_Value> >& getValues () const {return values;}
+	void setValues (const std::vector<shared_ptr<Instance_Value> >& values_) {values = values_;}
 //Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
 	int id;
+	#pragma db not_null
 	shared_ptr<Component> component;
 	int location_link;
 	float location_offset;
@@ -134,6 +139,7 @@ private:
 	std::string owner;
 	int operational_status;
 	std::string schedule;
+	std::vector<shared_ptr<Instance_Value> > values;
 };
 
 #pragma db object
@@ -142,16 +148,13 @@ class Instance_Value
 public:
     // Default Constructor
     Instance_Value () {}        
-	Instance_Value (int id_, shared_ptr<Instance> instatce_, shared_ptr<Component_Key> key_, std::string value_)
-	: id (id_), instatce (instatce_), key (key_), value (value_)
+	Instance_Value (int id_, shared_ptr<Component_Key> key_, std::string value_)
+	: id (id_), key (key_), value (value_)
 	{
 	}
 	//Accessors
-	const int& getPrimaryKey () const {return id;}
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Instance>& getInstatce () const {return instatce;}
-	void setInstatce (const shared_ptr<Instance>& instatce_) {instatce = instatce_;}
 	const shared_ptr<Component_Key>& getKey () const {return key;}
 	void setKey (const shared_ptr<Component_Key>& key_) {key = key_;}
 	const std::string& getValue () const {return value;}
@@ -161,7 +164,6 @@ private:
 	friend class odb::access;
 	#pragma db id auto
 	int id;
-	shared_ptr<Instance> instatce;
 	shared_ptr<Component_Key> key;
 	std::string value;
 };
@@ -172,16 +174,17 @@ class Action
 public:
     // Default Constructor
     Action () {}        
-	Action (int id_, shared_ptr<Component> component_, std::string name_, std::string note_)
-	: id (id_), component (component_), name (name_), note (note_)
+	Action (int id_, shared_ptr<Component> component_, std::vector<shared_ptr<Action_Key> > keys_, std::string name_, std::string note_)
+	: id (id_), component (component_), keys (keys_), name (name_), note (note_)
 	{
 	}
 	//Accessors
-	const int& getPrimaryKey () const {return id;}
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
 	const shared_ptr<Component>& getComponent () const {return component;}
 	void setComponent (const shared_ptr<Component>& component_) {component = component_;}
+	const std::vector<shared_ptr<Action_Key> >& getKeys () const {return keys;}
+	void setKeys (const std::vector<shared_ptr<Action_Key> >& keys_) {keys = keys_;}
 	const std::string& getName () const {return name;}
 	void setName (const std::string& name_) {name = name_;}
 	const std::string& getNote () const {return note;}
@@ -189,9 +192,11 @@ public:
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id 
+	#pragma db id
 	int id;
+	#pragma db not_null
 	shared_ptr<Component> component;
+	std::vector<shared_ptr<Action_Key> > keys;
 	std::string name;
 	std::string note;
 };
@@ -202,16 +207,13 @@ class Action_Key
 public:
     // Default Constructor
     Action_Key () {}        
-	Action_Key (int id_, shared_ptr<Action> action_, std::string key_, std::string value_type_, std::string value_constraint_, bool required_, std::string note_)
-	: id (id_), action (action_), key (key_), value_type (value_type_), value_constraint (value_constraint_), required (required_), note (note_)
+	Action_Key (int id_, std::string key_, std::string value_type_, std::string value_constraint_, bool required_, std::string note_)
+	: id (id_), key (key_), value_type (value_type_), value_constraint (value_constraint_), required (required_), note (note_)
 	{
 	}
 	//Accessors
-	const int& getPrimaryKey () const {return id;}
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Action>& getAction () const {return action;}
-	void setAction (const shared_ptr<Action>& action_) {action = action_;}
 	const std::string& getKey () const {return key;}
 	void setKey (const std::string& key_) {key = key_;}
 	const std::string& getValue_Type () const {return value_type;}
@@ -225,50 +227,13 @@ public:
 //Data Fields
 private:
 	friend class odb::access;
-	#pragma db id 
+	#pragma db id
 	int id;
-	shared_ptr<Action> action;
 	std::string key;
 	std::string value_type;
 	std::string value_constraint;
 	bool required;
 	std::string note;
-};
-
-#pragma db object
-class Action_Log
-{
-public:
-    // Default Constructor
-    Action_Log () {}        
-	Action_Log (int id_, shared_ptr<Action> action_id_, int time_submission_, int time_delay_, std::string flag_, std::string message_)
-	: id (id_), action_id (action_id_), time_submission (time_submission_), time_delay (time_delay_), flag (flag_), message (message_)
-	{
-	}
-	//Accessors
-	const int& getPrimaryKey () const {return id;}
-	const int& getId () const {return id;}
-	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Action>& getAction_Id () const {return action_id;}
-	void setAction_Id (const shared_ptr<Action>& action_id_) {action_id = action_id_;}
-	const int& getTime_Submission () const {return time_submission;}
-	void setTime_Submission (const int& time_submission_) {time_submission = time_submission_;}
-	const int& getTime_Delay () const {return time_delay;}
-	void setTime_Delay (const int& time_delay_) {time_delay = time_delay_;}
-	const std::string& getFlag () const {return flag;}
-	void setFlag (const std::string& flag_) {flag = flag_;}
-	const std::string& getMessage () const {return message;}
-	void setMessage (const std::string& message_) {message = message_;}
-//Data Fields
-private:
-	friend class odb::access;
-	#pragma db id 
-	int id;
-	shared_ptr<Action> action_id;
-	int time_submission;
-	int time_delay;
-	std::string flag;
-	std::string message;
 };
 }}
 #endif
