@@ -92,7 +92,6 @@ int CfgReader::getParameter( const char *paramName, double *paramValue )
 	{
 		return PARAMETER_TYPE_NOT_MATCH;
 	}
-	
 	*paramValue = value.asDouble();
 	
 	return 0;

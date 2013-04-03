@@ -6,7 +6,7 @@
     <LocalDebuggerCommandArguments>chicago</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel|x64'">
-    <LocalDebuggerWorkingDirectory>..\..\Test_Data\Test_Network</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>..\..\Test_Data\Network_Model</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">
@@ -14,7 +14,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Integrated|x64'">
-    <LocalDebuggerWorkingDirectory>..\..\Test_Data\Test_Network</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>..\..\Test_Data\Chicago_Network</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

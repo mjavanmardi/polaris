@@ -38,7 +38,7 @@ namespace Person_Components
 				// Create and Initialize the Planner faculty and its subcomponents
 				define_component_interface(planner_itf,type_of(Planning_Faculty),Prototypes::Person_Planner,ComponentType);
 				define_component_interface(generator_itf,typename type_of(Planning_Faculty)::type_of(Activity_Generator),Prototypes::Activity_Generator,ComponentType);
-				define_component_interface(destination_choice_itf,typename type_of(Planning_Faculty)::type_of(Destination_Chooser),Prototypes::Destination_Choice,ComponentType);
+				define_component_interface(destination_choice_itf,typename type_of(Planning_Faculty)::type_of(Destination_Chooser),Prototypes::Destination_Chooser,ComponentType);
 				planner_itf* planner = (planner_itf*)Allocate<type_of(Planning_Faculty)>();	
 				planner->template Parent_Person<ComponentType*>(this);
 				planner->template Initialize<NULLTYPE>();

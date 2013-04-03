@@ -66,6 +66,9 @@ namespace Scenario_Components
 			member_data(fstream, out_link_moe_file, none, none);
 			member_data(fstream, out_movement_moe_file, none, none);
 
+			member_data(double, percent_to_synthesize, none,none);
+
+
 			//member_pointer(FILE*, out_network_moe_file, none, none);
 			//member_pointer(FILE*, out_link_moe_file, none, none);
 			//member_pointer(FILE*, out_movement_moe_file, none, none);

@@ -1,21 +1,6 @@
 #pragma once
 #include "Repository_Includes.h"
-
-//==================================================================================================================
-/// EXAMPLE Component namespace -	used to organize similar high level transportation objects, i.e. Traveler, Vehicle,
-///									Link, etc. which may have many different implementations depending on usage
-///
-/// Each component namespace consists of 6 standard sub-namespaces across two files.  The namespaces and files are:
-///
-///	1. [COMPONENT_NAME]_Interfaces.h file:
-///		a.) Types namespace
-///		b.) Concepts namespace
-///		c.) Interfaces namespace
-///		d.) Data Structures namespace
-///
-///	2. [COMPONENT_NAME]_Bases.h file:
-///		e.) Bases namespace
-///		f.) Components namespace
+#include "RNG_Implementations.h"
 ///
 
 
@@ -45,6 +30,13 @@ namespace Choice_Model_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Concepts
 	{
+		concept struct Is_Choice_Option_Prototype
+		{
+			check_feature(has_calculate_utility, Component_Type::Calculate_Utility);
+			check_concept(is_prototype, Is_Polaris_Prototype);
+			define_default_check(has_calculate_utility && is_prototype);
+		};
+
 		/// EXAMPLE Concept: replace CONCEPT_NAME and CHECK below, and add/remove requirements as necessary
 		concept struct Is_Choice_Model
 		{
@@ -80,6 +72,17 @@ namespace Choice_Model_Components
 			check_typename_state(Is_Nested_Logit, Nested_Logit_Model_tag, true_type);
 			define_default_check(Is_Nested_Logit && Valid_Choice_Model);
 		};
+		concept struct Is_Probabilistic_Prototype
+		{
+			check_typename_state(is_probabilistic_choice, Component_Type::Probabilistic_Choice_tag, true_type);
+			define_default_check(is_probabilistic_choice);
+		};
+		concept struct Is_Probabilistic
+		{
+			check_typename_state(is_probabilistic_choice, Probabilistic_Choice_tag, true_type);
+			check_concept(is_prototype, Is_Probabilistic_Prototype);
+			define_default_check(is_prototype || is_probabilistic_choice);
+		};
 	}
 
 
@@ -88,184 +91,129 @@ namespace Choice_Model_Components
 	//------------------------------------------------------------------------------------------------------------------
 	namespace Prototypes
 	{
-		prototype struct Choice_Option_Prototype
+		prototype struct Choice_Model ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
-			/// INTERFACE FUNCTION EXAMPLE - this example dispatched the Initialize function call to the component base
-			feature void Initialize()
+			// use this to call the calculate utility method for types in TList's passed to features
+			define_feature_dispatcher(Calculate_Utility, calculate_utility_dispatcher);
+
+			feature_prototype void Initialize()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Containers::Random_Access_Sequence_Prototype,void*,ComponentType);
+				define_simple_container_interface(utilities_itf,typename get_type_of(choice_utilities),Containers::Random_Access_Sequence_Prototype,float,ComponentType);
+				define_simple_container_interface(probabilities_itf,typename get_type_of(choice_probabilities),Containers::Random_Access_Sequence_Prototype,float,ComponentType);
+				choice_options_itf* options = this->choice_options<choice_options_itf*>();
+				utilities_itf* util = this->choice_utilities<utilities_itf*>();
+				probabilities_itf* prob = this->choice_probabilities<probabilities_itf*>();
+				options->clear();
+				util->clear();
+				prob->clear();
 			}
 
-			feature void Evaluate_Probability(requires(check(ComponentType, Concepts::Choice_Is_Rule_Based)))
+			feature_prototype void Add_Choice_Option(TargetType choice_option, requires(check(TargetType, Concepts::Is_Choice_Option_Prototype) && check_as_given(TargetType,is_pointer)))
 			{
-				// Dispatch to probability rules written in base
-				TargetType prob = this_component()->Evaluate_Probability<ComponentType,CallerType,TargetType>();
-				this->probability<TargetType>(prob);
-			}
+				// Validate that TargetType is in AvailableTypes
+				if (IndexOf<Component_Type::TList,strip_modifiers(TargetType)>::value < 0) THROW_EXCEPTION("ERROR: TargetType is not a member of AvailableTypes TypeList.");
 
-			feature void Evaluate_Utility(call_requirements(requires(ComponentType, Concepts::Choice_Is_Utility_Based)))
+				// Push item into vector as anonymous
+				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Containers::Random_Access_Sequence_Prototype,void*,ComponentType);
+				choice_options_itf* options = this->choice_options<choice_options_itf*>();
+				options->push_back((void*)choice_option);				
+			}
+			feature_prototype void Add_Choice_Option(TargetType choice_option, requires(!check(TargetType, Concepts::Is_Choice_Option_Prototype) || !check_as_given(TargetType,is_pointer)))
 			{
-				TargetType util = this_component()->Evaluate_Utility<ComponentType,CallerType,TargetType>();
-				this->utility<TargetType>(util);
+				assert_sub_check(TargetType,Concepts::Is_Choice_Option_Prototype, has_calculate_utility,  "TargetType does not have Calculate_Utility feature.");
+				assert_sub_check(TargetType,Concepts::Is_Choice_Option_Prototype, is_prototype,  "TargetType is not a valid prototype.");
 			}
-			 
-			feature_accessor(choice_data_interface);
-
-			feature_accessor(utility);
-
-			feature_accessor(probability);
-		};
-
-
-		//------------------------------------------------------------------------------------------------------------------
-		/// RENAME THE Inteface struct below.  This is the inteface to a POLARIS component
-		//------------------------------------------------------------------------------------------------------------------
-		prototype struct Choice_Model_Prototype
-		{
-			tag_as_prototype;
-			define_container_and_value_interface(_choices_interface,_choice_interface,type_of(choice_options),Polaris_Back_Insertion_Sequence_Prototype,Choice_Option_Prototype,ComponentType);
-
-			/// BASIC INITIALIZER
-			feature void Initialize()
-			{
-				return this_component()->Initialize<ComponentType,CallerType,TargetType>();
-			}
-
-			feature void Add_Choice_Option(TargetType new_choice_option_data, call_requires(strip_modifiers(TargetType), Is_Polaris_Component))
-			{
-				_choices_interface* choices = this->choice_options<_choices_interface*>();
-				_choice_interface* choice = (_choice_interface*)Allocate<_choice_interface_type>();
-				choice->choice_data_interface<TargetType>(new_choice_option_data);
-				choices->push_back(choice);
-			}
-			feature void Add_Choice_Option(TargetType new_choice_option_data, call_requires(strip_modifiers(TargetType), !Is_Polaris_Component))
-			{
-				assert_requirements(TargetType,Is_Polaris_Component, "TargetType is not a polaris component.");
-			}
-
-			/// SELECT FROM THE AVAILABLE CHOICES FOR SIMULATION
-			feature Choice_Option_Prototype<TargetType>* Make_Choice(call_requirements(requires(ComponentType, Concepts::Choice_Is_Deterministic)))
-			{	
-				// Local type definition option
-				_choices_interface* choices = this->choice_options<_choices_interface*>();
-				_choice_interface* choice;
-				_choices_interface::iterator itr = choices->begin();
-
-				float cumulative_probability = 0;
-				float rand = this->random_probability_value<float>();
-				
-				for (itr; itr != choices->end(); itr++)
-				{
-					choice = (*itr);
-					cumulative_probability += choice->probability<float>();
-					if (rand < cumulative_probability) return choice;
-				}
-
-			}
-			feature Choice_Option_Prototype<TargetType>* Make_Choice(call_requirements(requires(ComponentType, Concepts::Choice_Is_Probabilistic)))
-			{
-				// Local type definition option
-				_choices_interface* choices = this->choice_options<_choices_interface*>();
-				_choice_interface* choice;
-				_choices_interface::iterator itr = choices->begin();
-
-				float cumulative_probability = 0;
-				float rand = this->random_probability_value<float>();
-				
-				for (itr; itr != choices->end(); itr++)
-				{
-					choice = (*itr);
-					cumulative_probability += choice->probability<float>();
-					if (rand < cumulative_probability) return choice;
-				}
-			}
-			feature Choice_Option_Prototype<TargetType>* Make_Choice(call_requirements(!(requires(ComponentType, Concepts::Choice_Is_Deterministic) || requires(ComponentType, Concepts::Choice_Is_Probabilistic))))
-			{
-				assert_requirements(ComponentType, Concepts::Choice_Is_Deterministic, "ComponentType does not specify if Choice is Deterministic or Probabilistic");
-			}
-			
-				
+						
 			/// EVALUATE THE AVAILABLE CHOICES (i.e. CALCULATE UTILITY, SET PROBABILITIES, ETC.)
-			feature void Evaluate_Choices(call_requirements(
-				requires(ComponentType, Concepts::Is_MNL_Model) &&
-				requires(typename ComponentType::choice_options_type::unqualified_value_type, Concepts::Choice_Is_Utility_Based) &&
-				requires(TargetType, is_arithmetic)))
+			feature_prototype void Evaluate_Choices(requires(check(ComponentType, Concepts::Is_MNL_Model)))
 			{	
-				// Local type definition option
-				_choices_interface* choices = this->choice_options<_choices_interface*>();
-				_choice_interface* choice;
-				_choices_interface::iterator itr = choices->begin();
+				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Containers::Random_Access_Sequence_Prototype,void*,ComponentType);
+				define_simple_container_interface(utilities_itf,typename get_type_of(choice_utilities),Containers::Random_Access_Sequence_Prototype,float,ComponentType);
+				define_simple_container_interface(probabilities_itf,typename get_type_of(choice_probabilities),Containers::Random_Access_Sequence_Prototype,float,ComponentType);
 
-				typename TargetType utility_sum = 0;
+				// Local type definition option
+				choice_options_itf* choices =	this->choice_options<choice_options_itf*>();
+				utilities_itf*		utils =		this->choice_utilities<utilities_itf*>();
+				probabilities_itf*	probs =		this->choice_probabilities<probabilities_itf*>();
+				choice_options_itf::iterator	itr = choices->begin();
+				utilities_itf::iterator			u_itr = utils->begin();
+				generic_prototype<generic_implementation<NT>>* choice;
+
+				float u, p;
+				float utility_sum = 0;
 
 				for (itr; itr!= choices->end(); itr++)
 				{
-					choice = (*itr);
-					choice->Evaluate_Utility<TargetType>();
-					utility_sum = utility_sum + choice->utility<TargetType>();
+					choice = (generic_prototype<generic_implementation<NT>>*)(*itr);
+					//u = choice->Calculate_Utility<float>();
+					u = dispatch_to_feature(calculate_utility_dispatcher,Component_Type::TList,choice,Target_Type<float,float>);
+					utils->push_back(u);
+					utility_sum = utility_sum + exp(u);
 				}
-				for (itr=choices->begin(); itr!= choices->end(); itr++)
+
+				if (utility_sum == 0)THROW_EXCEPTION("ERROR: sum of utility is -infinity, unable to evaluate choices.");
+
+				for (u_itr=utils->begin(); u_itr!= utils->end(); u_itr++)
 				{
-					choice = (*itr);
-					TargetType util = choice->utility<TargetType>();
-					choice->probability<TargetType>(util/utility_sum);
-					cout << endl << "Choice Probability: "<<choice->probability<TargetType>();
+					u = *u_itr;
+					p = exp(u)/utility_sum;
+					probs->push_back(p);
 				}
 
 			}
-			feature void Evaluate_Choices(call_requirements(
-				requires(ComponentType, Concepts::Choice_Is_Rule_Based) &&
-				requires(TargetType, is_arithmetic)))
+			feature_prototype void Evaluate_Choices(requires(!check(ComponentType, Concepts::Is_MNL_Model)))
 			{
+				assert_check(ComponentType, Concepts::Is_MNL_Model, "ComponentType is not an MNL or Rule-based model");
+			}
+			
+			/// SELECT FROM THE AVAILABLE CHOICES FOR SIMULATION
+			feature_prototype TargetType Choose(int& selected_index, requires(check(ComponentType, Concepts::Is_Probabilistic)))
+			{
+				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Containers::Random_Access_Sequence_Prototype,void*,ComponentType);
+				define_simple_container_interface(probabilities_itf,typename get_type_of(choice_probabilities),Containers::Random_Access_Sequence_Prototype,float,ComponentType);
+
 				// Local type definition option
-				_choices_interface* choices = this->choice_options<_choices_interface*>();
-				_choice_interface* choice;
-				_choices_interface::iterator itr = choices->begin();
+				choice_options_itf* choices = this->choice_options<choice_options_itf*>();
+				probabilities_itf* probs = this->choice_probabilities<probabilities_itf*>();
+				probabilities_itf::iterator p_itr = probs->begin(); 
 
-				//typename TargetType::ReturnType utility_sum = 0;
+				float cumulative_probability = 0;
+				
+				float rand = Uniform_RNG.Next_Rand<float>();
 
-				//for (itr; itr!= choices->end(); itr++)
-				//{
-				//	choice = (*itr);
-				//	choice->Evaluate_Utility<typename TargetType::ReturnType>();
-				//	utility_sum = utility_sum + choice->utility<typename TargetType::ReturnType>();
-				//}
-				//for (itr; itr!= choices->end(); itr++)
-				//{
-				//	choice = (*itr);
-				//	typename TargetType::ReturnType util = choice->utility<typename TargetType::ReturnType>();
-				//	choice->probability<typename TargetType::ReturnType>(util/utility_sum);
-				//}
+				int i = 0;
+				for (choice_options_itf::iterator itr = choices->begin(); itr != choices->end(); ++itr, ++p_itr)
+				{
+					cumulative_probability += *p_itr;
+					if (rand < cumulative_probability) 
+					{
+						selected_index = i;
+						return (TargetType)(*itr);
+					}
+					i++;
+				}
 			}
-			feature void Evaluate_Choices(call_requirements(!(
-				(requires(ComponentType, Concepts::Is_MNL_Model) || requires(ComponentType, Concepts::Choice_Is_Rule_Based)) &&
-				requires(TargetType, is_arithmetic))))
+			feature_prototype TargetType Choose(int& selected_index,requires(!check(ComponentType, Concepts::Is_Probabilistic)))
 			{
-				assert_requirements(ComponentType, Concepts::Is_MNL_Model, "ComponentType is not an MNL or Rule-based model");
-				assert_requirements(TargetType, Is_Target_Type_Struct, "TargetType is not a valid Target_Type struct.");
-				assert_requirements_std(typename TargetType::ReturnType,is_arithmetic, "TargetType::ReturnType is not an arithmetic type.");
-				assert_requirements(typename TargetType::ParamType,Is_Polaris_Component,"TargetType::ParamType is not a valid Polaris Component Type.");
+				assert_check(ComponentType, Concepts::Choice_Is_Probabilistic, "ComponentType does not specify if Choice is Deterministic or Probabilistic");
 			}
+		 
+			feature_prototype TargetType Choice_At(int selected_index)
+			{
+				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Containers::Random_Access_Sequence_Prototype,void*,ComponentType);
 
-			 
+				// Local type definition option
+				choice_options_itf* choices = this->choice_options<choice_options_itf*>();
+
+				return (TargetType)choices->at(selected_index);
+			}
 			/// ACCESSORS
-			feature_accessor(chooser);
-			feature_accessor(generator);
-			feature_accessor(choice_options);
-			feature_accessor(random_probability_value);
+			feature_accessor(choice_options,none,none);
+			feature_accessor(choice_utilities,none,none);
+			feature_accessor(choice_probabilities,none,none);
 		};
-
-	}
-
-
-	//==================================================================================================================
-	/// Namespace of useful related data structures for the components
-	//------------------------------------------------------------------------------------------------------------------
-	namespace Data_Structures
-	{
-		typedef float Data_Type;
-		polaris_variable(Name, Data_Type, Type_Trait_1, Type_Trait_2, Type_Trait_3);
 	}
 }

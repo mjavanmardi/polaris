@@ -41,9 +41,12 @@ concept struct Is_Polaris_Component
 	// subchecks which can be used to identify object type
 	check_typename_state(is_data_object,Object_Type, Data_Object);
 	check_typename_state(is_execution_object,Object_Type, Execution_Object);
+	
+	// check to make sure it is not a debug version of prototype (i.e. debug prototypes will satisfy all of the above checks due to inheriting from COmponent_Type
+	check_typename_state(has_prototype_tag,Is_Prototype, true_type);
 
 	// default check when concept is used
-	define_default_check(/*has_this_type && */has_parent_type && has_group_list && has_object_type && has_master_type && (is_data_object || is_execution_object));
+	define_default_check(!has_prototype_tag && has_parent_type && has_group_list && has_object_type && has_master_type && (is_data_object || is_execution_object));
 };
 
 

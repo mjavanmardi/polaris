@@ -27,6 +27,7 @@
 
 #define feature_prototype public: template<typename TargetType>
 #define feature public: template<typename TargetType>
+#define feature_prototype_generic public: template<typename TargetType, typename TList>
 
 ///============================================================================
 /// feature_implementation - standard declarator for all implementation features
@@ -541,6 +542,9 @@ struct member_function_ptr_types<Type,setter_type>
 	typename COMPONENT_TYPE<MasterType, ParentType, InheritanceList>::type_of(FEATURE_NAME)\
 	COMPONENT_TYPE<MasterType, ParentType, InheritanceList>::_##FEATURE_NAME
 
+#define static_array_definition(COMPONENT_TYPE, FEATURE_NAME, ARRAY_TYPE) template<typename MasterType,typename ParentType, typename InheritanceList>\
+	ARRAY_TYPE COMPONENT_TYPE<MasterType, ParentType, InheritanceList>::FEATURE_NAME[]
+
 #define static_member_initialization(COMPONENT_TYPE, FEATURE_NAME, FEATURE_VALUE) template<typename MasterType,typename ParentType, typename InheritanceList>\
 	typename COMPONENT_TYPE<MasterType, ParentType, InheritanceList>::type_of(FEATURE_NAME)\
 	COMPONENT_TYPE<MasterType, ParentType, InheritanceList>::_##FEATURE_NAME = FEATURE_VALUE
@@ -596,8 +600,8 @@ template <class TList> struct DISPATCH_ALIAS;\
 template <>\
 struct DISPATCH_ALIAS<NULLTYPE>\
 {\
-	template<class HeadComponentType, class TargetType>\
-	static inline void Start_Dispatch(void* obj)\
+	template<class HeadComponentType, typename TargetType>\
+	static inline typename TargetType::ReturnType Start_Dispatch(void* obj)\
 	{\
 		THROW_EXCEPTION("ERROR: type id: " << ((generic_implementation<NT>*)obj)->Identify() << " not found in typelist");\
 	}\
@@ -607,53 +611,53 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 {\
 	define_feature_exists_check(FEATURE_NAME, FEATURE_NAME##_exists)\
 	template<class HeadType_As_Given, typename TargetType>\
-	static inline void Start_Dispatch(void* obj, requires(check(HeadType_As_Given, Is_Polaris_Prototype) || check(HeadType_As_Given, Is_Polaris_Component)))\
+	static inline typename TargetType::ReturnType Start_Dispatch(void* obj, requires(check(HeadType_As_Given, Is_Polaris_Prototype) || check(HeadType_As_Given, Is_Polaris_Component)))\
 	{\
-		DISPATCH_ALIAS<TypeList<HeadType_As_Given, Tail> >::Dispatch<HeadType_As_Given::Component_Type,HeadType_As_Given, TargetType>(obj);\
+		return DISPATCH_ALIAS<TypeList<HeadType_As_Given, Tail> >::Dispatch<HeadType_As_Given::Component_Type,HeadType_As_Given, TargetType>(obj);\
 	}\
 	template<class HeadType_As_Given, typename TargetType>\
-	static inline void Start_Dispatch(void* obj, requires(!check(HeadType_As_Given, Is_Polaris_Prototype) && !check(HeadType_As_Given, Is_Polaris_Component)))\
+	static inline typename TargetType::ReturnType Start_Dispatch(void* obj, requires(!check(HeadType_As_Given, Is_Polaris_Prototype) && !check(HeadType_As_Given, Is_Polaris_Component)))\
 	{\
 		assert_check(HeadType_As_Given, Is_Polaris_Prototype, "Type is not a valid polaris prototype or component." );\
 	}\
 	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
-	static inline void Dispatch(void* obj, requires(check(HeadType_As_Given, Is_Polaris_Prototype) && check(HeadComponentType,FEATURE_NAME##_exists)))\
+	static inline typename TargetType::ReturnType Dispatch(void* obj, requires(check(HeadType_As_Given, Is_Polaris_Prototype) && check(HeadComponentType,FEATURE_NAME##_exists)))\
 	{\
 		if(((generic_implementation<NT>*)obj)->Identify() == Head::Component_Type::component_index)\
 		{\
-			((Head*)obj)->FEATURE_NAME<TargetType>();\
+			return (TargetType::ReturnType)((Head*)obj)->FEATURE_NAME<TargetType::ControlType>();\
 		}\
 		else\
 		{\
-			DISPATCH_ALIAS<Tail>::Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
+			return DISPATCH_ALIAS<Tail>::Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
 		}\
 	}\
 	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
-	static inline void Dispatch(void* obj, requires(check(HeadType_As_Given, Is_Polaris_Component) && check(HeadComponentType,FEATURE_NAME##_exists)))\
+	static inline typename TargetType::ReturnType Dispatch(void* obj, requires(check(HeadType_As_Given, Is_Polaris_Component) && check(HeadComponentType,FEATURE_NAME##_exists)))\
 	{\
 		if(((generic_implementation<NT>*)obj)->Identify() == Head::Component_Type::component_index)\
 		{\
-			((Head*)obj)->FEATURE_NAME<HeadType_As_Given, HeadType_As_Given, TargetType>();\
+			return (TargetType::ReturnType)((Head*)obj)->FEATURE_NAME<HeadType_As_Given, HeadType_As_Given, TargetType::ControlType>();\
 		}\
 		else\
 		{\
-			DISPATCH_ALIAS<Tail>::Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
+			return DISPATCH_ALIAS<Tail>::Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
 		}\
 	}\
 	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
-	static inline void Dispatch(void* obj, requires( (!check(HeadType_As_Given, Is_Polaris_Component) && !check(HeadType_As_Given, Is_Polaris_Prototype))))\
+	static inline typename TargetType::ReturnType  Dispatch(void* obj, requires( (!check(HeadType_As_Given, Is_Polaris_Component) && !check(HeadType_As_Given, Is_Polaris_Prototype))))\
 	{\
 		assert_check(HeadType_As_Given, Is_Polaris_Prototype, "Type is not a valid polaris prototype or component." );\
 	}\
 	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
-	static inline void Dispatch(void* obj, requires( (check(HeadType_As_Given, Is_Polaris_Component) || check(HeadType_As_Given, Is_Polaris_Prototype)) && !check(HeadComponentType,FEATURE_NAME##_exists)))\
+	static inline typename TargetType::ReturnType  Dispatch(void* obj, requires( (check(HeadType_As_Given, Is_Polaris_Component) || check(HeadType_As_Given, Is_Polaris_Prototype)) && !check(HeadComponentType,FEATURE_NAME##_exists)))\
 	{\
 		assert_check(HeadComponentType, FEATURE_NAME##_exists, "" #FEATURE_NAME "does not exist.  Make sure to 'tag_feature_as_available' if the feature does exist in the component." );\
 	}\
 };
 
-#define dispatch_to_feature(DISPATCHER_ALIAS, TYPELIST, OBJECT, TARGETTYPE)\
-	DISPATCHER_ALIAS<TYPELIST>::Start_Dispatch<TypeAt<TYPELIST,0>::Result, TARGETTYPE>(OBJECT);
+#define dispatch_to_feature(DISPATCHER_ALIAS, TYPELIST, OBJECT, TARGETTYPE_STRUCT_WITH_CONTROLTYPE_FOR_DISPATCH_TARGET_AND_RETURNTYPE_DEFINED, ...)\
+	DISPATCHER_ALIAS<TYPELIST>::Start_Dispatch<TypeAt<TYPELIST,0>::Result, concat(TARGETTYPE_STRUCT_WITH_CONTROLTYPE_FOR_DISPATCH_TARGET_AND_RETURNTYPE_DEFINED,__VA_ARGS__)>(OBJECT);
 
 
 

@@ -108,9 +108,14 @@ namespace Activity_Components
 						response.next._iteration = this_ptr->Start_Time_Planning_Time<Revision&>()._iteration;
 						response.next._sub_iteration = this_ptr->Start_Time_Planning_Time<Revision&>()._sub_iteration;
 					}
+					else if(this_ptr->Is_Minimum_Plan_Time(this_ptr->Route_Planning_Time<Revision&>())) 
+					{	
+						response.next._iteration = this_ptr->Route_Planning_Time<Revision&>()._iteration;
+						response.next._sub_iteration = this_ptr->Route_Planning_Time<Revision&>()._sub_iteration;
+					}
 					else
 					{
-						response.next._iteration = _iteration;
+						response.next._iteration = _iteration+1;
 						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
@@ -145,9 +150,14 @@ namespace Activity_Components
 						response.next._iteration = this_ptr->Start_Time_Planning_Time<Revision&>()._iteration;
 						response.next._sub_iteration = this_ptr->Start_Time_Planning_Time<Revision&>()._sub_iteration;
 					}
+					else if(this_ptr->Is_Minimum_Plan_Time(this_ptr->Route_Planning_Time<Revision&>())) 
+					{	
+						response.next._iteration = this_ptr->Route_Planning_Time<Revision&>()._iteration;
+						response.next._sub_iteration = this_ptr->Route_Planning_Time<Revision&>()._sub_iteration;
+					}
 					else
 					{
-						response.next._iteration = _iteration;
+						response.next._iteration = _iteration+1;
 						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
@@ -182,9 +192,14 @@ namespace Activity_Components
 						response.next._iteration = this_ptr->Start_Time_Planning_Time<Revision&>()._iteration;
 						response.next._sub_iteration = this_ptr->Start_Time_Planning_Time<Revision&>()._sub_iteration;
 					}
+					else if(this_ptr->Is_Minimum_Plan_Time(this_ptr->Route_Planning_Time<Revision&>())) 
+					{	
+						response.next._iteration = this_ptr->Route_Planning_Time<Revision&>()._iteration;
+						response.next._sub_iteration = this_ptr->Route_Planning_Time<Revision&>()._sub_iteration;
+					}
 					else
 					{
-						response.next._iteration = _iteration;
+						response.next._iteration = _iteration+1;
 						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
@@ -219,9 +234,14 @@ namespace Activity_Components
 						response.next._iteration = this_ptr->Start_Time_Planning_Time<Revision&>()._iteration;
 						response.next._sub_iteration = this_ptr->Start_Time_Planning_Time<Revision&>()._sub_iteration;
 					}
+					else if(this_ptr->Is_Minimum_Plan_Time(this_ptr->Route_Planning_Time<Revision&>())) 
+					{	
+						response.next._iteration = this_ptr->Route_Planning_Time<Revision&>()._iteration;
+						response.next._sub_iteration = this_ptr->Route_Planning_Time<Revision&>()._sub_iteration;
+					}
 					else
 					{
-						response.next._iteration = _iteration;
+						response.next._iteration = _iteration+1;
 						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
@@ -256,9 +276,56 @@ namespace Activity_Components
 						response.next._iteration = this_ptr->Mode_Planning_Time<Revision&>()._iteration;
 						response.next._sub_iteration = this_ptr->Mode_Planning_Time<Revision&>()._sub_iteration;
 					}
+					else if(this_ptr->Is_Minimum_Plan_Time(this_ptr->Route_Planning_Time<Revision&>())) 
+					{	
+						response.next._iteration = this_ptr->Route_Planning_Time<Revision&>()._iteration;
+						response.next._sub_iteration = this_ptr->Route_Planning_Time<Revision&>()._sub_iteration;
+					}
 					else
 					{
-						response.next._iteration = _iteration;
+						response.next._iteration = _iteration+1;
+						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
+					}
+				}
+				//------------------------------------------------------------------------------------------------------------------------------
+				// START_TIME_PLANNING Iteration
+				else if (this_ptr->Is_Current_Iteration(this_ptr->Route_Planning_Time<Revision&>()))
+				{
+					// swap in durtion planning event, and make sure it won't be called again
+					_pthis->Swap_Event((Event)&Activity_Planner::Route_Planning_Event<NULLTYPE>);
+					this_ptr->Route_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->Route_Planning_Time<Revision&>()._sub_iteration = END;
+					response.result = true;
+				
+					// If involved persons to be performed next	
+					if(this_ptr->Is_Minimum_Plan_Time(this_ptr->Duration_Planning_Time<Revision&>())) 
+					{	
+						response.next._iteration = this_ptr->Duration_Planning_Time<Revision&>()._iteration;
+						response.next._sub_iteration = this_ptr->Duration_Planning_Time<Revision&>()._sub_iteration;
+					}
+					else if(this_ptr->Is_Minimum_Plan_Time(this_ptr->Involved_Persons_Planning_Time<Revision&>())) 
+					{	
+						response.next._iteration = this_ptr->Involved_Persons_Planning_Time<Revision&>()._iteration;
+						response.next._sub_iteration = this_ptr->Involved_Persons_Planning_Time<Revision&>()._sub_iteration;
+					}
+					else if(this_ptr->Is_Minimum_Plan_Time(this_ptr->Location_Planning_Time<Revision&>())) 
+					{	
+						response.next._iteration = this_ptr->Location_Planning_Time<Revision&>()._iteration;
+						response.next._sub_iteration = this_ptr->Location_Planning_Time<Revision&>()._sub_iteration;
+					}
+					else if(this_ptr->Is_Minimum_Plan_Time(this_ptr->Mode_Planning_Time<Revision&>())) 
+					{	
+						response.next._iteration = this_ptr->Mode_Planning_Time<Revision&>()._iteration;
+						response.next._sub_iteration = this_ptr->Mode_Planning_Time<Revision&>()._sub_iteration;
+					}
+					else if(this_ptr->Is_Minimum_Plan_Time(this_ptr->Start_Time_Planning_Time<Revision&>())) 
+					{	
+						response.next._iteration = this_ptr->Start_Time_Planning_Time<Revision&>()._iteration;
+						response.next._sub_iteration = this_ptr->Start_Time_Planning_Time<Revision&>()._sub_iteration;
+					}
+					else
+					{
+						response.next._iteration = _iteration+1;
 						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
@@ -326,6 +393,17 @@ namespace Activity_Components
 			{
 				this_component()->Involved_Persons_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
 			}
+			declare_feature_event(Route_Planning_Event)
+			{
+				typedef Activity_Planner<ComponentType, ComponentType> _Activity_Interface;
+				ComponentType* _pthis = (ComponentType*)_this;
+				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
+				this_ptr->Route_Planning_Event_Handler<NT>();
+			}
+			feature_prototype void Route_Planning_Event_Handler()
+			{
+				this_component()->Route_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
+			}
 			declare_feature_event(Add_Activity_To_Schedule_Event)
 			{
 				typedef Activity_Planner<ComponentType, ComponentType> _Activity_Interface;
@@ -351,6 +429,7 @@ namespace Activity_Components
 			feature_accessor(Start_Time_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			feature_accessor(Duration_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			feature_accessor(Involved_Persons_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			feature_accessor(Route_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 
 			// Activity attribute planning properties		
 			feature_accessor(Location_Plan_Horizon, none, none);
@@ -388,6 +467,7 @@ namespace Activity_Components
 				Revision& duration = this->Duration_Planning_Time<Revision&>();
 				Revision& location = this->Location_Planning_Time<Revision&>();
 				Revision& start_time = this->Start_Time_Planning_Time<Revision&>();
+				Revision& route = this->Route_Planning_Time<Revision&>();
 
 				// Load the first event
 				if (Is_Minimum_Plan_Time(persons)) load_event(ComponentType,Activity_Planning_Conditional, Involved_Persons_Planning_Event, persons._iteration, persons._sub_iteration,NT);
@@ -395,6 +475,7 @@ namespace Activity_Components
 				else if (Is_Minimum_Plan_Time(duration)) load_event(ComponentType,Activity_Planning_Conditional, Duration_Planning_Event, duration._iteration, duration._sub_iteration,NT);
 				else if (Is_Minimum_Plan_Time(location)) load_event(ComponentType,Activity_Planning_Conditional, Location_Planning_Event, location._iteration, location._sub_iteration,NT);
 				else if (Is_Minimum_Plan_Time(start_time)) load_event(ComponentType,Activity_Planning_Conditional, Start_Time_Planning_Event, start_time._iteration, start_time._sub_iteration,NT);
+				else if (Is_Minimum_Plan_Time(route)) load_event(ComponentType,Activity_Planning_Conditional, Route_Planning_Event, route._iteration, route._sub_iteration,NT);
 				else {THROW_EXCEPTION("ERROR: Invalid planning times set");}
 			}
 			feature_prototype bool Is_Minimum_Plan_Time(TargetType plan_time, requires(check_2(TargetType, Revision,is_same)))
@@ -405,10 +486,11 @@ namespace Activity_Components
 				Revision& duration = this->Duration_Planning_Time<Revision&>();
 				Revision& location = this->Location_Planning_Time<Revision&>();
 				Revision& start_time = this->Start_Time_Planning_Time<Revision&>();
+				Revision& route = this->Route_Planning_Time<Revision&>();
 
 				if (rev._iteration <= persons._iteration && rev._sub_iteration <= persons._sub_iteration && rev._iteration <= mode._iteration && rev._sub_iteration <= mode._sub_iteration && 
 					rev._iteration <= duration._iteration && rev._sub_iteration <= duration._sub_iteration && rev._iteration <= location._iteration && rev._sub_iteration <= location._sub_iteration && 
-					rev._iteration <= start_time._iteration && rev._sub_iteration <= start_time._sub_iteration && rev._iteration != END)
+					rev._iteration <= start_time._iteration && rev._sub_iteration <= start_time._sub_iteration && rev._iteration <= route._iteration && rev._sub_iteration <= route._sub_iteration&& rev._iteration != END)
 				{
 					return true;
 				}
@@ -419,6 +501,8 @@ namespace Activity_Components
 				return (plan_time._iteration == _iteration && plan_time._sub_iteration == _sub_iteration);
 			}
 		};
+
+
 	}
 }
 

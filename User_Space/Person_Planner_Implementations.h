@@ -29,7 +29,7 @@ namespace Person_Components
 
 			// Pointer to the child classses
 			member_prototype(Prototypes::Activity_Generator, Activity_Generator, typename MasterType::activity_generator_type,none,none);
-			member_prototype(Prototypes::Destination_Choice, Destination_Chooser, typename MasterType::person_destination_choice_type,none,none);
+			member_prototype(Prototypes::Destination_Chooser, Destination_Chooser, typename MasterType::person_destination_chooser_type,none,none);
 
 			// Next Activity Generation Time member - used to schedule the next activity generation
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Generation_Time,none,none);

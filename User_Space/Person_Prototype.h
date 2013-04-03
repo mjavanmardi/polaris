@@ -626,33 +626,6 @@ namespace Prototypes
 		{
 			assert_check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan, "ERROR: TargetType is not a valid movement plan component.");
 		}
-		//feature_prototype bool Schedule_New_Departure(int departed_time)
-		//{
-		//	// schedule routing		
-		//	define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
-		//	define_component_interface(Movement_Faculty_Itf, typename Parent_Person_Itf::get_type_of(Movement_Faculty), Person_Components::Prototypes::Person_Mover, ComponentType);
-		//	define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
-		//	define_component_interface(movement_itf, typename Vehicle_Itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
-		//	define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
-		//	define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
-		//	define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-
-		//	Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
-		//	Movement_Faculty_Itf* itf= person->template Moving_Faculty<Movement_Faculty_Itf*>();	
-		//	Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
-		//	movement_itf* movements = vehicle->movement_plan<movement_itf*>();
-
-
-
-		//	// Schedule the routing if the vehicle is not already in the network, otherwise return false
-		//	//if (movements->valid_trajectory<bool>() && (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK))
-		//	//{
-		//	//	if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"MOVEMENT:," << person->uuid<int>() << ","<<departed_time<<endl;
-		//	//	origin_link->push_vehicle(vehicle);
-		//	//	return true;
-		//	//}
-		//	//return false;
-		//}
 
 		feature_prototype void Write_To_Log(stringstream& s)
 		{
@@ -772,24 +745,34 @@ namespace Prototypes
 	};
 
 
-	prototype struct Destination_Choice ADD_DEBUG_INFO
+	prototype struct Destination_Chooser ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 
 		// accessor to parent class
 		feature_accessor(Parent_Planner,none,none);
 		feature_accessor(choice_set_size,none,none);
-		feature_accessor(choice_model,none,none);
-
-		
+		feature_accessor(choice_model,none,none);	
 
 		feature_prototype TargetType Choose_Destination(TargetType origin, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
 		{
 			return this_component()->Choose_Destination<ComponentType,CallerType,TargetType>(origin);
 		}
-		feature_prototype typename TargetType::ReturnType Calculate_Utility(typename TargetType::ParamType origin, typename TargetType::ParamType destination, requires(check_as_given(typename TargetType::ParamType,is_pointer) && check(typename TargetType::ParamType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+	};
+
+
+	prototype struct Destination_Choice_Option ADD_DEBUG_INFO
+	{
+		tag_as_prototype;
+
+		// accessor to parent class
+		feature_accessor(Parent_Planner,none,none);
+		feature_accessor(origin,none,none);
+		feature_accessor(destination,none,none);
+
+		feature_prototype typename TargetType Calculate_Utility()
 		{
-			return this_component()->Calculate_Utility<ComponentType,CallerType,TargetType>(origin, destination);
+			return this_component()->Calculate_Utility<ComponentType,CallerType,TargetType>();
 		}
 	};
 }

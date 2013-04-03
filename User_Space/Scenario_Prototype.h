@@ -47,7 +47,7 @@ namespace Scenario_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Scenario_Prototype
+		prototype struct Scenario_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -122,6 +122,8 @@ namespace Scenario_Components
 			feature_accessor(output_time_in_seconds, none, none);
 			feature_accessor(condition_time_in_seconds, none, none);
 
+			feature_accessor(percent_to_synthesize, none, none);
+
 			feature_accessor(database_name, none, none);
 
 			feature_accessor(snapshot_period, none, none); 
@@ -194,6 +196,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0);
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
 				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(3600);
+				if (cfgReader.getParameter("percent_to_synthesize", this->percent_to_synthesize<double*>()) != PARAMETER_FOUND) this->percent_to_synthesize<float>(1.0);
 
 				//===============================================
 				// set control parameters
