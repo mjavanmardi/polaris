@@ -27,7 +27,7 @@ namespace Sensor_Components
 				_storage_interval=1;
 				_storage_memory=60*5;
 
-				Load_Register<Fixed_Sensor>(&Sensor<Fixed_Sensor>::Maintenance_Condition<NULLTYPE>,&Sensor<Fixed_Sensor>::Maintenance<NULLTYPE>,0,0);
+				Load_Event<Fixed_Sensor>(&Sensor<Fixed_Sensor>::Maintenance_Condition<NULLTYPE>,&Sensor<Fixed_Sensor>::Maintenance<NULLTYPE>,0,0);
 			}
 
 			member_container(deque<float>,speeds,none,none);
