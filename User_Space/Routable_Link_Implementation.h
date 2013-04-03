@@ -61,7 +61,7 @@ namespace Link_Components
 				_travel_time = ((_Link_Interface*)regular_link)->template travel_time<float>();
 			}
 
-			member_container(vector<typename MasterType::turn_movement_type*>, outbound_turn_movements, none, none);
+			member_container(vector<typename MasterType::routable_movement_type*>, outbound_turn_movements, none, none);
 		};
 		
 	}

@@ -125,6 +125,28 @@ namespace Routing_Components
 					_Regular_Intersection_Interface* regular_downstream_intersection = regular_link->template downstream_intersection<_Regular_Intersection_Interface*>();
 					_Routable_Intersection_Interface* routable_downstream_intersection = intersectionsMap.find(regular_downstream_intersection->template internal_id<int>())->second;
 					routable_link->template downstream_intersection<_Routable_Intersection_Interface*>(routable_downstream_intersection);
+					// construct outbound_movements for link
+					_Routable_Inbound_Outbound_Movements_Container_Interface& inbound_outbound_movements_container = routable_downstream_intersection->template inbound_outbound_movements<_Routable_Inbound_Outbound_Movements_Container_Interface&>();
+					typename _Routable_Inbound_Outbound_Movements_Container_Interface::iterator inbound_itr;
+					for(inbound_itr=inbound_outbound_movements_container.begin(); inbound_itr!=inbound_outbound_movements_container.end(); inbound_itr++)
+					{
+						_Routable_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Routable_Inbound_Outbound_Movements_Interface*)(*inbound_itr);
+						_Routable_Link_Interface* inbound_link = inbound_outbound_movements->template inbound_link_reference<_Routable_Link_Interface*>();
+						int inbound_link_id=inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
+						int current_link_id = routable_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
+						if (inbound_link_id == current_link_id)
+						{
+							// adding outbound_movements
+							_Routable_Movements_Container_Interface& outbound_movements_container = inbound_outbound_movements->template outbound_movements<_Routable_Movements_Container_Interface&>();
+							typename _Routable_Movements_Container_Interface::iterator outbound_itr;
+
+							for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
+							{
+								_Routable_Movement_Interface* outbound_movement = (_Routable_Movement_Interface*)(*outbound_itr);
+								routable_link->outbound_turn_movements<_Routable_Movements_Container_Interface&>().push_back(outbound_movement);
+							}
+						}
+					}
 				}
 				cout << " streams added" << endl;
 			}
