@@ -101,9 +101,6 @@
     <ClInclude Include="Antares_Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphical_Vehicle_Implementation.h">
-      <Filter>User_Space</Filter>
-    </ClInclude>
     <ClInclude Include="Attributes_Panel_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
@@ -138,6 +135,9 @@
       <Filter>User_Space</Filter>
     </ClInclude>
     <ClInclude Include="Antares_Network_Event_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Vehicle_Implementation.h">
       <Filter>User_Space</Filter>
     </ClInclude>
   </ItemGroup>

@@ -555,6 +555,47 @@ namespace Link_Components
 				return true;
 			}
 
+			declare_feature_conditional(Newells_Conditional)
+			{
+				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
+				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
+				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
+				{
+					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Supply_Update<NULLTYPE>);
+					response.result=true;
+					response.next._iteration=_iteration;
+					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION;
+				}
+				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION)
+				{
+					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Link_Moving<NULLTYPE>);
+					response.result=true;
+					response.next._iteration=_iteration;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
+				}
+				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS)
+				{
+					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Visualize_Link_MOE<NULLTYPE>);
+					response.result=true;
+					response.next._iteration=_iteration+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION;
+				}
+				else
+				{
+					assert(false);
+					cout << "Should never reach here in link conditional!" << endl;
+				}
+			}
+
+			
+			declare_feature_event(Visualize_Link_MOE)
+			{
+				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
+				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
+				_this_ptr->template visualize_moe<NULLTYPE>();
+			}
+
 			static member_prototype(Antares_Layer,link_travel_time_layer,typename type_of(MasterType::antares_layer),none,none);
 			static member_prototype(Antares_Layer,link_travel_time_delay_layer,typename type_of(MasterType::antares_layer),none,none);
 			static member_prototype(Antares_Layer,link_speed_layer,typename type_of(MasterType::antares_layer),none,none);

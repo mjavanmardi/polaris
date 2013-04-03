@@ -659,7 +659,7 @@ namespace Link_Components
 			feature_implementation void Initialize()
 			{
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				load_event(ComponentType,Newells_Conditional,Compute_Step_Flow_Supply_Update,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION,NULLTYPE);
+				load_event(ComponentType,ComponentType::Newells_Conditional,Compute_Step_Flow_Supply_Update,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION,NULLTYPE);
 			}
 
 			declare_feature_conditional(Newells_Conditional)
@@ -708,8 +708,5 @@ namespace Link_Components
 				_this_ptr->template network_state_update<NULLTYPE>();
 			}
 		};
-		
-
 	}
-
 }

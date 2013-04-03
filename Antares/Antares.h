@@ -12,7 +12,7 @@
 #include "Antares_Network_Implementation.h"
 #include "Antares_Link_Implementation.h"
 #include "Antares_Intersection_Implementation.h"
-#include "Graphical_Vehicle_Implementation.h"
+#include "Antares_Vehicle_Implementation.h"
 #include "Antares_Layer_Implementation.h"
 #include "Graphical_Zone_Implementation.h"
 #include "Control_Dialog_Implementation.h"

@@ -27,7 +27,7 @@ struct MasterType
 	typedef Antares_Network_Implementation<MasterType> network_type;
 	typedef Antares_Link_Implementation<MasterType> link_type;
 	typedef Antares_Intersection_Implementation<MasterType> intersection_type;
-	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<MasterType> vehicle_type;
+	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<MasterType> vehicle_type;
 #else
 	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
@@ -263,7 +263,7 @@ struct MasterType
 	typedef Antares_Network_Implementation<MasterType> network_type;
 	typedef Antares_Link_Implementation<MasterType> link_type;
 	typedef Antares_Intersection_Implementation<MasterType> intersection_type;
-	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<MasterType> vehicle_type;
+	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<MasterType> vehicle_type;
 #else
 	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
@@ -346,8 +346,6 @@ struct MasterType
     typedef Person_Components::Implementations::TRANSIMS_Person_Properties_Implementation<MasterType,person_type> person_properties_type;
 
     typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
-
-    //typedef Activity_Components::Implementations::ADAPTS_Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
 
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
 };

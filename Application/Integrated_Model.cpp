@@ -28,7 +28,7 @@ struct MasterType
 	typedef Antares_Network_Implementation<M> network_type;
 	typedef Antares_Link_Implementation<M> link_type;
 	//typedef Graphical_Intersection_Implementation<M> graphical_intersection_type;
-	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<M> vehicle_type;	
+	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> vehicle_type;	
 	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
 	//typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;
@@ -81,7 +81,6 @@ struct MasterType
 	typedef Person_Components::Implementations::CTRAMP_Destination_Chooser_Implementation<M,person_type> person_destination_chooser_type;
 	typedef Person_Components::Implementations::CTRAMP_Destination_Choice_Option<M,person_type> person_destination_choice_option_type;
 	//typedef Person_Components::Implementations::Destination_Choice_Model_Implementation<M,person_type> person_destination_choice_model_type;
-
 
 	
 	// POPULATION SYNTHESIS CLASSES
@@ -343,7 +342,7 @@ int main(int argc,char** argv)
 //	typedef Graphical_Network_Implementation<M> graphical_network_type;
 //	typedef Graphical_Link_Implementation<M> graphical_link_type;
 //	typedef Graphical_Intersection_Implementation<M> graphical_intersection_type;
-//	typedef Vehicle_Components::Implementations::Graphical_Vehicle_Implementation<M> vehicle_type;	
+//	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> vehicle_type;	
 //	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
 //	//typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 //	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;

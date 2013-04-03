@@ -173,9 +173,9 @@ namespace Network_Components
 					((typename MasterType::network_type*)_this)->Swap_Event((Event)&Snapshot_Subiteration_Handler<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration;
-					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_COMPUTATION_SUB_ITERATION;
 				}
-				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
+				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_COMPUTATION_SUB_ITERATION)
 				{
 					((typename MasterType::network_type*)_this)->Swap_Event((Event)&End_Iteration_Handler<NULLTYPE>);
 					response.result=true;

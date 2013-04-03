@@ -256,12 +256,12 @@ namespace Network_Components
 			feature_implementation void printResults() 
 			{
 				((Polaris_Network_Implementation<MasterType,ParentType,APPEND_CHILD(Integrated_Polaris_Network_Implementation)>*)this)->printResults<ComponentType,CallerType,TargetType>();
-				typename _Links_Container_Interface::iterator link_itr;
-				for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
-				{
-					_Link_Interface* link = (_Link_Interface*)(*link_itr);
-					link->visualize_moe<NULLTYPE>();
-				}
+				//typename _Links_Container_Interface::iterator link_itr;
+				//for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+				//{
+				//	_Link_Interface* link = (_Link_Interface*)(*link_itr);
+				//	link->visualize_moe<NULLTYPE>();
+				//}
 
 				plot_network_moes();
 			}
