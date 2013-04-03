@@ -41,7 +41,7 @@ public:
 	void setInstances (const std::vector<weak_ptr<Event_Instance> >& instances_) {instances = instances_;}
 	const std::vector<shared_ptr<Event_Key> >& getKeys () const {return keys;}
 	void setKeys (const std::vector<shared_ptr<Event_Key> >& keys_) {keys = keys_;}
-//Data Fields
+	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db id
@@ -74,7 +74,7 @@ public:
 	void setRequired (const bool& required_) {required = required_;}
 	const std::string& getNote () const {return note;}
 	void setNote (const std::string& note_) {note = note_;}
-//Data Fields
+	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db id
@@ -98,8 +98,8 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Network_Event>& getEvent () const {return event;}
-	void setEvent (const shared_ptr<Network_Event>& event_) {event = event_;}
+	const shared_ptr<Network_Event> getEvent () const {return event;}
+	void setEvent (const shared_ptr<Network_Event> event_) {event = event_;}
 	const std::vector<shared_ptr<Event_Instance_Value> >& getValues () const {return values;}
 	void setValues (const std::vector<shared_ptr<Event_Instance_Value> >& values_) {values = values_;}
 	const std::vector<int>& getLinks () const {return links;}
@@ -114,7 +114,7 @@ public:
 	void setConfedence_Level (const std::string& confedence_level_) {confedence_level = confedence_level_;}
 	const std::string& getNote () const {return note;}
 	void setNote (const std::string& note_) {note = note_;}
-//Data Fields
+	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
@@ -143,11 +143,11 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Event_Key>& getKey () const {return key;}
-	void setKey (const shared_ptr<Event_Key>& key_) {key = key_;}
+	const shared_ptr<Event_Key> getKey () const {return key;}
+	void setKey (const shared_ptr<Event_Key> key_) {key = key_;}
 	const std::string& getValue () const {return value;}
 	void setValue (const std::string& value_) {value = value_;}
-//Data Fields
+	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto

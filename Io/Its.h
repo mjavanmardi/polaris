@@ -45,7 +45,7 @@ public:
 	void setActions (const std::vector<weak_ptr<Action> >& actions_) {actions = actions_;}
 	const std::vector<shared_ptr<Component_Key> >& getKeys () const {return keys;}
 	void setKeys (const std::vector<shared_ptr<Component_Key> >& keys_) {keys = keys_;}
-//Data Fields
+	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db id
@@ -82,7 +82,7 @@ public:
 	void setRequired (const bool& required_) {required = required_;}
 	const std::string& getNote () const {return note;}
 	void setNote (const std::string& note_) {note = note_;}
-//Data Fields
+	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db id
@@ -107,8 +107,8 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Component>& getComponent () const {return component;}
-	void setComponent (const shared_ptr<Component>& component_) {component = component_;}
+	const shared_ptr<Component> getComponent () const {return component;}
+	void setComponent (const shared_ptr<Component> component_) {component = component_;}
 	const int& getLocation_Link () const {return location_link;}
 	void setLocation_Link (const int& location_link_) {location_link = location_link_;}
 	const float& getLocation_Offset () const {return location_offset;}
@@ -125,7 +125,7 @@ public:
 	void setSchedule (const std::string& schedule_) {schedule = schedule_;}
 	const std::vector<shared_ptr<Instance_Value> >& getValues () const {return values;}
 	void setValues (const std::vector<shared_ptr<Instance_Value> >& values_) {values = values_;}
-//Data Fields
+	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
@@ -155,11 +155,11 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Component_Key>& getKey () const {return key;}
-	void setKey (const shared_ptr<Component_Key>& key_) {key = key_;}
+	const shared_ptr<Component_Key> getKey () const {return key;}
+	void setKey (const shared_ptr<Component_Key> key_) {key = key_;}
 	const std::string& getValue () const {return value;}
 	void setValue (const std::string& value_) {value = value_;}
-//Data Fields
+	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db id auto
@@ -181,15 +181,15 @@ public:
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
-	const shared_ptr<Component>& getComponent () const {return component;}
-	void setComponent (const shared_ptr<Component>& component_) {component = component_;}
+	const shared_ptr<Component> getComponent () const {return component;}
+	void setComponent (const shared_ptr<Component> component_) {component = component_;}
 	const std::vector<shared_ptr<Action_Key> >& getKeys () const {return keys;}
 	void setKeys (const std::vector<shared_ptr<Action_Key> >& keys_) {keys = keys_;}
 	const std::string& getName () const {return name;}
 	void setName (const std::string& name_) {name = name_;}
 	const std::string& getNote () const {return note;}
 	void setNote (const std::string& note_) {note = note_;}
-//Data Fields
+	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db id
@@ -224,7 +224,7 @@ public:
 	void setRequired (const bool& required_) {required = required_;}
 	const std::string& getNote () const {return note;}
 	void setNote (const std::string& note_) {note = note_;}
-//Data Fields
+	//Data Fields
 private:
 	friend class odb::access;
 	#pragma db id

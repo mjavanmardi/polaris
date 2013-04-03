@@ -3,6 +3,7 @@ import argparse
 import sys
 import glob 
 from os import path
+import re
 
 def GenerateSample():
     doc = Document()
@@ -16,20 +17,19 @@ def GenerateSample():
     field = doc.createElement("field")
     type.appendChild(field)
     field.setAttribute("name", "person_id")
-    field.setAttribute("key", "yes")
+    field.setAttribute("pragma", "id")
 
     field = doc.createElement("field")
     type.appendChild(field)
     field.setAttribute("name", "household")
    
-    field.setAttribute("reference", "Household")
+    field.setAttribute("type", "shared_ptr<Household>")
 
     field = doc.createElement("field")
     type.appendChild(field)
     field.setAttribute("name", "income")
     field.setAttribute("type", "float")
-    field.setAttribute("index", "yes")
-    field.setAttribute("unit", "USD")
+    field.setAttribute("pragma", "index")
 
     field = doc.createElement("field")
     type.appendChild(field)
@@ -43,7 +43,7 @@ def GenerateSample():
     field = doc.createElement("field")
     type.appendChild(field)
     field.setAttribute("name", "first_name")
-    field.setAttribute("type", "string")
+    field.setAttribute("type", "std::string")
     
     field = doc.createElement("field")
     type.appendChild(field)
@@ -56,7 +56,8 @@ def GenerateSample():
     xml_fh.close()
     
 
-    
+p_ptr = re.compile("\A\s*\w+(\_ptr|\s*\*)")    
+ 
 def ParseFile(file_path):
     if not path.isfile(file_path):
         "File %s does not exist"%file_path
@@ -103,17 +104,22 @@ public:
         constructor_1 = "\t%s ("%t_name
         constructor_2 = ": "
         accessors = "\t//Accessors\n"
-        data_fields = "//Data Fields\nprivate:\n\tfriend class odb::access;\n"
+        data_fields = "\t//Data Fields\nprivate:\n\tfriend class odb::access;\n"
         pragmas = ""
  
         for field in fields:            
             name = field.getAttribute("name")            
             type = field.getAttribute("type")
             pragma = field.getAttribute("pragma")
+            
+            if p_ptr.search(type) is not None:
+                accessor_type = type
+            else:
+                accessor_type = type + "&"
             constructor_1 += "%s %s_, "%(type, name)
             constructor_2 += "%s (%s_), "%(name,name)
-            accessors += "\tconst %s& get%s () const {return %s;}\n"%(type,name.title(), name)
-            accessors += "\tvoid set%s (const %s& %s_) {%s = %s_;}\n"%(name.title(), type, name, name, name)
+            accessors += "\tconst %s get%s () const {return %s;}\n"%(accessor_type,name.title(), name)
+            accessors += "\tvoid set%s (const %s %s_) {%s = %s_;}\n"%(name.title(), accessor_type, name, name, name)
             if pragma!="":
                 data_fields += "\t#pragma db %s\n"%(pragma)
             data_fields += "\t%s %s;\n"%(type,name)
@@ -133,26 +139,26 @@ public:
     
     
     
+if __name__ == "__main__":
+    app = argparse.ArgumentParser(description='Convert an xml file into a c++ code that is compatible with ODB')
+    app.add_argument("-s", "--sample", action="store_true", help="Generates a sample xml file")      
+    app.add_argument("-f", "--folder", default=".", help="Folder where xml files are located. Current folder by default")
+    app.add_argument("-o", "--output", default=".", help="Output directory")
+    app.add_argument("-n", "--namespace", default = "polaris{ namespace io", help="Namespace for the classes")
+    app.add_argument("-i", "--input", nargs='*', help="Specific Fales to be parsed. If not specified, all of the xml files in the folder are processed")
 
-app = argparse.ArgumentParser(description='Convert an xml file into a c++ code that is compatible with ODB')
-app.add_argument("-s", "--sample", action="store_true", help="Generates a sample xml file")      
-app.add_argument("-f", "--folder", default=".", help="Folder where xml files are located. Current folder by default")
-app.add_argument("-o", "--output", default=".", help="Output directory")
-app.add_argument("-n", "--namespace", default = "polaris{ namespace io", help="Namespace for the classes")
-app.add_argument("-i", "--input", nargs='*', help="Specific Fales to be parsed. If not specified, all of the xml files in the folder are processed")
+    args = app.parse_args()
 
-args = app.parse_args()
+    if  args.sample:
+        GenerateSample()
+        print "A sample file %s was generated"%"population.xml"
+        sys.exit()
+    if args.input is not None:
+        for item in args.input:
+            files.append(args.folder+"/item")
+    else:
+        files = glob.glob('%s/*.xml'%str(args.folder))
 
-if  args.sample:
-    GenerateSample()
-    print "A sample file %s was generated"%"population.xml"
-    sys.exit()
-if args.input is not None:
-    for item in args.input:
-        files.append(args.folder+"/item")
-else:
-    files = glob.glob('%s/*.xml'%str(args.folder))
-
-for file in files:
-    ParseFile(file)
+    for file in files:
+        ParseFile(file)
     

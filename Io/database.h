@@ -101,14 +101,25 @@ inline sqlite3* open_raw_sqlite_database(const std::string& name)
 		sqlite3_free (err_msg);
 		return NULL;
 	}
-	for (vector<string>::iterator it = db_inventory.begin()+1; it != db_inventory.end(); ++it)
+	ifstream test;
+	if (db_inventory.size()>1)
 	{
-		ret = sqlite3_exec (db_handle, make_attach_string(name, *it).c_str(), NULL, NULL, &err_msg);
-		if (ret != SQLITE_OK)
+		for (vector<string>::iterator it = db_inventory.begin()+1; it != db_inventory.end(); ++it)
 		{
-			fprintf (stderr, "Error: %s\n", err_msg);
-			sqlite3_free (err_msg);
-			return NULL;
+			test.open(make_name(name, *it).c_str());
+
+			if(test.is_open())
+			{
+				ret = sqlite3_exec (db_handle, make_attach_string(name, *it).c_str(), NULL, NULL, &err_msg);
+				if (ret != SQLITE_OK)
+				{
+					fprintf (stderr, "Error: %s\n", err_msg);
+					sqlite3_free (err_msg);
+					return NULL;
+				}
+			}
+			test.close();
+			
 		}
 	}
 	return db_handle;
@@ -166,13 +177,13 @@ inline auto_ptr<odb::database> open_sqlite_database(const std::string& name)
 {
 	using namespace polaris::io;
 	auto_ptr<odb::database> db (new odb::sqlite::database (make_name(name, db_inventory[0]), SQLITE_OPEN_READWRITE));	
-	odb::transaction t (db->begin());
-	shared_ptr<polaris::io::MetaData> mt = db->find<MetaData>("schema_version");
-	t.commit();
-	if (mt->value != SCHEMA_REVISION)
-	{
-		std::cout << "Schema mismatch. Current schema is " << SCHEMA_REVISION << " and database schema is " << mt->value << "\n";
-	}
+	//odb::transaction t (db->begin());
+	//shared_ptr<polaris::io::MetaData> mt = db->find<MetaData>("schema_version");
+	//t.commit();
+	//if (mt->value != SCHEMA_REVISION)
+	//{
+	//	std::cout << "Schema mismatch. Current schema is " << SCHEMA_REVISION << " and database schema is " << mt->value << "\n";
+	//}
 	odb::connection_ptr c (db->connection ());
 	c->execute("PRAGMA synchronous = OFF");
 	c->execute("PRAGMA journal_mode = MEMORY");
@@ -181,14 +192,13 @@ inline auto_ptr<odb::database> open_sqlite_database(const std::string& name)
 	{
 		for (vector<string>::iterator it = db_inventory.begin()+1; it != db_inventory.end(); ++it)
 		{
-		  test.open(make_name(name, *it).c_str());
-
+			test.open(make_name(name, *it).c_str());
 			if(test.is_open())
 			{
 				test.close();
 				c->execute(make_attach_string(name,*it));
 			}
-			
+			test.close();			
 		}
 	}
 	return db;
