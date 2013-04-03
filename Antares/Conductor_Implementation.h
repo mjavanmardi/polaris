@@ -17,7 +17,7 @@ public:
 
 	feature_implementation void Initialize()
 	{
-		Load_Register<Conductor_Implementation>(&advance_simulation_condition<NULLTYPE>,&advance_simulation<NULLTYPE>,0,Scenario_Components::Types::END_OF_ITERATION+1);
+		Load_Event<Conductor_Implementation>(&advance_simulation_condition<NULLTYPE>,&advance_simulation<NULLTYPE>,0,Scenario_Components::Types::END_OF_ITERATION+1);
 		_pause=true;
 	}
 

@@ -40,7 +40,7 @@ struct Execution_Object
 	}
 	
 	template<typename ComponentType>
-	void Load_Register(Conditional conditional,Event p_event,int start_iteration,int start_sub_iteration);
+	void Load_Event(Conditional conditional,Event p_event,int start_iteration,int start_sub_iteration);
 	
 	template<typename DataType=NULLTYPE>
 	struct Conditional_Holder

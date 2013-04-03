@@ -340,7 +340,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 			const int num_group_primitives=*((int*)geometry_itr);
 			
-			const int* end_size_itr = geometry_itr+sizeof(int);
+			const int* end_size_itr = geometry_itr+sizeof(int)/sizeof(int);
 
 			while(geometry_itr!=end_size_itr)
 			{
@@ -831,7 +831,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		if(_dynamic_data)
 		{
-			Load_Register<Antares_Layer_Implementation>(&Update_Condition<NULLTYPE>, &Update<NULLTYPE>, _iteration + 1 ,_target_sub_iteration);
+			Load_Event<Antares_Layer_Implementation>(&Update_Condition<NULLTYPE>, &Update<NULLTYPE>, _iteration + 1 ,_target_sub_iteration);
 		}
 
 		_storage.Initialize(cfg.storage_offset, cfg.storage_period, cfg.storage_size);

@@ -59,6 +59,10 @@ struct TypeList
 };
 
 #define TYPELIST_1(T1) TypeList<T1,NULLTYPE>
+#define TYPELIST_2(T1,T2) TypeList<T1,TYPELIST_1(T2)>
+#define TYPELIST_3(T1,T2,T3) TypeList<T1,TYPELIST_2(T2,T3)>
+#define TYPELIST_4(T1,T2,T3,T4) TypeList<T1,TYPELIST_3(T2,T3,T4)>
+
 #define NULLTYPELIST TypeList<NULLTYPE,NULLTYPE>
 #define APPEND_CHILD(IMPLEMENTATION) typename Append<InheritanceList,IMPLEMENTATION<MasterType,ParentType>>::Result
 
@@ -192,3 +196,4 @@ struct IsTrue<TypeList<Head,Tail>,0>{static const bool value=Head::value;};
 
 template<class Head,class Tail,unsigned int i>
 struct IsTrue<TypeList<Head,Tail>,i>{static const bool value=Head::value && IsTrue<Tail,i-1>::value;};
+

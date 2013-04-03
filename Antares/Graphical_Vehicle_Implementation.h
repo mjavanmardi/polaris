@@ -227,7 +227,7 @@ namespace Vehicle_Components
 				_simulation_status =  Types::Vehicle_Status_Keys::IN_NETWORK;
 				((_Movement_Plan_Interface*)_movement_plan)->template initialize_trajectory<NULLTYPE>();
 
-				Load_Register<Graphical_Vehicle_Implementation>(&compute_vehicle_position_condition<NULLTYPE>,&compute_vehicle_position<NULLTYPE>,_iteration+1,Scenario_Components::Types::END_OF_ITERATION);
+				Load_Event<Graphical_Vehicle_Implementation>(&compute_vehicle_position_condition<NULLTYPE>,&compute_vehicle_position<NULLTYPE>,_iteration+1,Scenario_Components::Types::END_OF_ITERATION);
 			}
 
 			feature_implementation void load(requires(!check_2(TargetType,Types::Load_To_Origin_Link,is_same) && !check_2(TargetType,Types::Load_To_Entry_Queue,is_same)))

@@ -10,7 +10,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">
-    <LocalDebuggerWorkingDirectory>..\..\Test_Data\Test_Network</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>..\Test_Data\Test_Network</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Integrated|x64'">

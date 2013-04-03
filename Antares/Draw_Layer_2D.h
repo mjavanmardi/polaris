@@ -40,7 +40,7 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 
 	const int data_stride=_layer->data_stride<int>();
 	
-	const Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >& storage=_layer->storage<Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >&>();
+	const Dynamic_Multi_Buffer< vector<int>[_num_antares_threads] >& storage=_layer->storage<Dynamic_Multi_Buffer< vector<int>[_num_antares_threads] >&>();
 
 	//---- determine bounds for main layer ----
 
@@ -50,12 +50,12 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 
 	while(current_iteration <= end_iteration)
 	{
-		const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = storage[current_iteration];
+		const vector<int> (&geometry_by_thread)[_num_antares_threads] = storage[current_iteration];
 
 		for(int i=0;i<_num_antares_threads;i++)
 		{
-			const unsigned char* geometry_itr = &geometry_by_thread[i].front();
-			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
+			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
 
 			while(geometry_itr != geometry_end)
 			{
@@ -101,7 +101,7 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 		current_iteration++;
 	}
 
-	const Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >& accent_storage=_layer->accent_storage<Dynamic_Multi_Buffer< vector<unsigned char>[_num_antares_threads] >&>();
+	const Dynamic_Multi_Buffer< vector<int>[_num_antares_threads] >& accent_storage=_layer->accent_storage<Dynamic_Multi_Buffer< vector<int>[_num_antares_threads] >&>();
 
 	//---- determine bounds for accents ----
 
@@ -109,12 +109,12 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 	
 	while(current_iteration <= end_iteration)
 	{
-		const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = accent_storage[current_iteration];
+		const vector<int> (&geometry_by_thread)[_num_antares_threads] = accent_storage[current_iteration];
 
 		for(int i=0;i<_num_antares_threads;i++)
 		{
-			const unsigned char* geometry_itr = &geometry_by_thread[i].front();
-			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
+			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
 
 			while(geometry_itr != geometry_end)
 			{
@@ -191,12 +191,12 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 
 	while(current_iteration <= end_iteration)
 	{
-		const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = storage[current_iteration];
+		const vector<int> (&geometry_by_thread)[_num_antares_threads] = storage[current_iteration];
 
 		for(int i=0;i<_num_antares_threads;i++)
 		{
-			const unsigned char* geometry_itr = &geometry_by_thread[i].front();
-			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
+			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
 
 			while(geometry_itr != geometry_end)
 			{
@@ -234,12 +234,12 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 
 	while(current_iteration <= end_iteration)
 	{
-		const vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = accent_storage[current_iteration];
+		const vector<int> (&geometry_by_thread)[_num_antares_threads] = accent_storage[current_iteration];
 
 		for(int i=0;i<_num_antares_threads;i++)
 		{
-			const unsigned char* geometry_itr = &geometry_by_thread[i].front();
-			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size();
+			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
+			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
 
 			while(geometry_itr != geometry_end)
 			{

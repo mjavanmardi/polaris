@@ -12,7 +12,7 @@ implementation struct Test:public Polaris_Component<APPEND_CHILD(Test),MasterTyp
 public:
 	void Initialize()
 	{
-		Load_Register<Test>(&When_Do_Stuff<NULLTYPE>,&Do_Stuff<NULLTYPE>,0,0);
+		Load_Event<Test>(&When_Do_Stuff<NULLTYPE>,&Do_Stuff<NULLTYPE>,0,0);
 		x=0;
 	}
 
@@ -94,7 +94,7 @@ implementation struct Test:public Polaris_Component_Class<Test,MasterType,Execut
 public:
 	void Initialize()
 	{
-		Load_Register<Test>(&When_Do_Stuff<NULLTYPE>,&Do_Stuff<NULLTYPE>,0,0);
+		Load_Event<Test>(&When_Do_Stuff<NULLTYPE>,&Do_Stuff<NULLTYPE>,0,0);
 	}
 
 	declare_feature_conditional(When_Do_Stuff)

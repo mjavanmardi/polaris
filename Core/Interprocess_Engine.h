@@ -16,7 +16,7 @@ struct Communication_Object
 	}
 	
 	template<typename ComponentType>
-	void Load_Register(Communication_Handler communication_handler)
+	void Load_Event(Communication_Handler communication_handler)
 	{
 		communication_handler_register=communication_handler;
 	}
