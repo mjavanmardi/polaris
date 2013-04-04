@@ -345,6 +345,33 @@ namespace io
 		return result;
 	}
 
+	static std::map<int, shape_geometry> GetCountyPoint(const string& db_name, const string& county_name)
+	{
+		std::map<int, shape_geometry> result;
+		int ret;
+		char *err_msg = NULL;
+		char sql[2048];
+		sqlite3* db_handle;
+		db_handle = open_spatialite_database(db_name, false);
+		sprintf (sql, "Select PK_UID, AsBinary(PointOnSurface(Geometry)) from Counties WHERE Name=\"%s\"", county_name.c_str());
+		ret = sqlite3_exec(db_handle, sql, point_callback, &result, &err_msg);
+		return result;
+	}
+
+
+	static std::map<int, shape_geometry> GetLinkPoint(const string& db_name, const int& link_id)
+	{
+		std::map<int, shape_geometry> result;
+		int ret;
+		char *err_msg = NULL;
+		char sql[2048];
+		sqlite3* db_handle;
+		db_handle = open_spatialite_database(db_name, false);
+		sprintf (sql, "Select Link, AsBinary(PointOnSurface(GEO)) from Link WHERE link=\"%d\"",link_id);
+		ret = sqlite3_exec(db_handle, sql, point_callback, &result, &err_msg);
+		return result;
+	}
+
 	static int link_callback(void *links_, int argc, char **argv, char **azColName)
 	{
 		std::vector<int> *links = (std::vector<int>*) links_;
@@ -372,10 +399,23 @@ namespace io
 		char sql[2048];
 		sqlite3* db_handle;
 		db_handle = open_spatialite_database(db_name, false);
-		sprintf (sql, "SELECT Link.Link FROM Counties, Link where Counties.Name=\"%s\" and Within(Link.GEO, Counties.\"Geometry\")", county_name.c_str());
+		sprintf (sql, "SELECT Link.Link FROM Counties, Link where Counties.Name=\"%s\" and MbrWithin(Link.GEO, Counties.\"Geometry\")", county_name.c_str());
 		ret = sqlite3_exec(db_handle, sql, link_callback, &result, &err_msg);
 		return result;
 	}
+	static std::vector<int> GetLinksInsideZip(const std::string& db_name, const std::string& zip)
+	{
+		std::vector<int> result;
+		int ret;
+		char *err_msg = NULL;
+		char sql[2048];
+		sqlite3* db_handle;
+		db_handle = open_spatialite_database(db_name, false);
+		sprintf (sql, "SELECT Link.Link FROM Zip, Link where Zip.ZCTA5CE=\"%s\" and MbrWithin(Link.GEO, Zip.Geometry)", zip.c_str());
+		ret = sqlite3_exec(db_handle, sql, link_callback, &result, &err_msg);
+		return result;
+	}
+
 
 	static std::map<std::string, POLY> GetCountyPolygons(const std::string& db_name)
 	{

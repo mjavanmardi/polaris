@@ -130,14 +130,23 @@ TEST(SpatialiteT, LinksInsideLakeCounty)
 	using namespace polaris::io;
 	std::vector<int> res;
 	res = GetLinksInsideCounty(db_path, "Lake");
-	ASSERT_EQ(res.size(), 2126);
+	ASSERT_EQ(res.size(), 224);
 }
+
+TEST(SpatialiteT, GetLinksInsideZip)
+{
+	using namespace polaris::io;
+	std::vector<int> res;
+	res = GetLinksInsideZip(db_path, "60490");
+	ASSERT_EQ(res.size(), 28);
+}
+
 TEST(SpatialiteT, LinksInsideDekalbCounty)
 {
 	using namespace polaris::io;
 	std::vector<int> res;
 	res = GetLinksInsideCounty(db_path, "DeKalb");
-	ASSERT_EQ(res.size(), 332);
+	ASSERT_EQ(res.size(), 400);
 }
 
 

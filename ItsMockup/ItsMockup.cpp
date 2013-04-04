@@ -3,6 +3,7 @@
 
 #include "Component.h"
 #include "Instance.h"
+#include "PopulateEvent.h"
 
 //#ifdef _DEBUG
 //#pragma comment(lib, "odb-sqlite-d-mt.lib")
@@ -40,4 +41,6 @@ int main(int argc, char* argv[])
 	else test_fh.close();
 	PopulateComponent(argv[1]);
 	PopulateInstance(argv[1]);
+	PopulateEvent(argv[1]);
+	return 0;
 }
