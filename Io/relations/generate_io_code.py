@@ -56,7 +56,38 @@ def GenerateSample():
     xml_fh.close()
     
 
-p_ptr = re.compile("\A\s*\w+(\_ptr|\s*\*)")    
+def my_singularize(word):
+    """Return the singular form of a word
+ 
+    &gt;&gt;&gt; singularize('rabbits')
+    'rabbit'
+    &gt;&gt;&gt; singularize('potatoes')
+    'potato'
+    &gt;&gt;&gt; singularize('leaves')
+    'leaf'
+    &gt;&gt;&gt; singularize('knives')
+    'knife'
+    &gt;&gt;&gt; singularize('spies')
+    'spy'
+    """
+    sing_rules = [lambda w: w[-3:] == 'ies' and w[:-3] + 'y',
+                  lambda w: w[-4:] == 'ives' and w[:-4] + 'ife',
+                  lambda w: w[-3:] == 'ves' and w[:-3] + 'f',
+                  lambda w: w[-2:] == 'es' and w[:-2],
+                  lambda w: w[-1:] == 's' and w[:-1],
+                  lambda w: w,
+                  ]
+    word = word.strip()
+    singleword = [f(word) for f in sing_rules if f(word) is not False][0]
+    return singleword
+
+    
+p_ptr1 = re.compile("\w+(\_ptr|\s*\*)") 
+p_ptr = re.compile("\A\s*\w+(\_ptr|\s*\*)") 
+# p_container = re.compile("\A\s*(std::)?(vector|set|map)\s*<")   
+p_container = re.compile("\A\s*(std::)?(vector|set)\s*\<(\s*.+\s*)\>")   
+ 
+ 
  
 def ParseFile(file_path):
     if not path.isfile(file_path):
@@ -87,11 +118,11 @@ $ForwardDeclarations$
     doc = parse(file_path)
     types = doc.getElementsByTagName("type")
     ForwardDeclarations = ""
-    for type in types:
-        t_name = type.getAttribute("name")
+    for obj_type in types:
+        t_name = obj_type.getAttribute("name")
         ForwardDeclarations += "class %s;\n"%t_name
-        pragma = type.getAttribute("pragma")
-        fields = type.getElementsByTagName("field")
+        pragma = obj_type.getAttribute("pragma")
+        fields = obj_type.getElementsByTagName("field")
         content += """
 #pragma db %s
 class %s
@@ -103,6 +134,9 @@ public:
     
         constructor_1 = "\t%s ("%t_name
         constructor_2 = ": "
+        constructor_3 = "\t%s ("%t_name
+        constructor_4 = ": "   
+        include_constractor_2 = False         
         accessors = "\t//Accessors\n"
         data_fields = "\t//Data Fields\nprivate:\n\tfriend class odb::access;\n"
         pragmas = ""
@@ -110,20 +144,32 @@ public:
         for field in fields:            
             name = field.getAttribute("name")            
             type = field.getAttribute("type")
-            pragma = field.getAttribute("pragma")
-            
-            if p_ptr.search(type) is not None:
+            pragma = field.getAttribute("pragma")   
+            pointer_type = (p_ptr.search(type) is not None)
+            has_pointer = (p_ptr1.search(type) is not None)
+            container_type = (p_container.search(type) is not None)            
+            if pointer_type:
                 accessor_type = type
             else:
                 accessor_type = type + "&"
             constructor_1 += "%s %s_, "%(type, name)
             constructor_2 += "%s (%s_), "%(name,name)
+            if has_pointer:
+                include_constractor_2 = True
+            else:
+                constructor_3 += "%s %s_, "%(type, name)
+                constructor_4 += "%s (%s_), "%(name,name)            
             accessors += "\tconst %s get%s () const {return %s;}\n"%(accessor_type,name.title(), name)
             accessors += "\tvoid set%s (const %s %s_) {%s = %s_;}\n"%(name.title(), accessor_type, name, name, name)
+            if container_type:
+                m = p_container.search(type)
+                accessors += "\tvoid set%s (const %s %s_) {%s.push_back(%s_);}\n"%(my_singularize(name).title(), m.group(3), name, name, name)
             if pragma!="":
                 data_fields += "\t#pragma db %s\n"%(pragma)
             data_fields += "\t%s %s;\n"%(type,name)
         content += constructor_1[:-2] + ")\n\t" + constructor_2[:-2] + "\n\t{\n\t}\n"
+        if include_constractor_2:
+            content += constructor_3[:-2] + ")\n\t" + constructor_4[:-2] + "\n\t{\n\t}\n"
         content += accessors
         content += data_fields
         content += pragmas        

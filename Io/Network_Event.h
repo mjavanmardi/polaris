@@ -30,6 +30,10 @@ public:
 	: id (id_), name (name_), icon (icon_), instances (instances_), keys (keys_)
 	{
 	}
+	Network_Event (int id_, std::string name_, std::string icon_)
+	: id (id_), name (name_), icon (icon_)
+	{
+	}
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
@@ -39,8 +43,10 @@ public:
 	void setIcon (const std::string& icon_) {icon = icon_;}
 	const std::vector<weak_ptr<Event_Instance> >& getInstances () const {return instances;}
 	void setInstances (const std::vector<weak_ptr<Event_Instance> >& instances_) {instances = instances_;}
+	void setInstanc (const weak_ptr<Event_Instance>  instances_) {instances.push_back(instances_);}
 	const std::vector<shared_ptr<Event_Key> >& getKeys () const {return keys;}
 	void setKeys (const std::vector<shared_ptr<Event_Key> >& keys_) {keys = keys_;}
+	void setKey (const shared_ptr<Event_Key>  keys_) {keys.push_back(keys_);}
 	//Data Fields
 private:
 	friend class odb::access;
@@ -95,6 +101,10 @@ public:
 	: id (id_), event (event_), values (values_), links (links_), location_x (location_x_), location_y (location_y_), reporter (reporter_), confedence_level (confedence_level_), note (note_)
 	{
 	}
+	Event_Instance (int id_, std::vector<int> links_, float location_x_, float location_y_, std::string reporter_, std::string confedence_level_, std::string note_)
+	: id (id_), links (links_), location_x (location_x_), location_y (location_y_), reporter (reporter_), confedence_level (confedence_level_), note (note_)
+	{
+	}
 	//Accessors
 	const int& getId () const {return id;}
 	void setId (const int& id_) {id = id_;}
@@ -102,8 +112,10 @@ public:
 	void setEvent (const shared_ptr<Network_Event> event_) {event = event_;}
 	const std::vector<shared_ptr<Event_Instance_Value> >& getValues () const {return values;}
 	void setValues (const std::vector<shared_ptr<Event_Instance_Value> >& values_) {values = values_;}
+	void setValu (const shared_ptr<Event_Instance_Value>  values_) {values.push_back(values_);}
 	const std::vector<int>& getLinks () const {return links;}
 	void setLinks (const std::vector<int>& links_) {links = links_;}
+	void setLink (const int links_) {links.push_back(links_);}
 	const float& getLocation_X () const {return location_x;}
 	void setLocation_X (const float& location_x_) {location_x = location_x_;}
 	const float& getLocation_Y () const {return location_y;}
@@ -138,6 +150,10 @@ public:
     Event_Instance_Value () {}        
 	Event_Instance_Value (int id_, shared_ptr<Event_Key> key_, std::string value_)
 	: id (id_), key (key_), value (value_)
+	{
+	}
+	Event_Instance_Value (int id_, std::string value_)
+	: id (id_), value (value_)
 	{
 	}
 	//Accessors

@@ -34,15 +34,14 @@
 		<field name="value" type="std::string"/>
 	</type>			
 	<type name="Action" pragma="object">
-		<field name="id" type="int" pragma="id"/>
+		<field name="id" type="int" pragma="auto id"/>
 		<field name="component" type="shared_ptr&lt;Component&gt;" pragma="not_null"/>
 		<field name="keys" type="std::vector&lt;shared_ptr&lt;Action_Key&gt; &gt;"/>	
 		<field name="name" type="std::string"/>
 		<field name="note" type="std::string"/>
 	</type>
 	<type name="Action_Key" pragma="object">
-		<field name="id" type="int" pragma="id"/>
-		<field name="key" type="std::string"/>
+		<field name="key" type="std::string" pragma="id"/>
 		<field name="value_type" type="std::string"/>
 		<field name="value_constraint" type="std::string"/>
 		<field name="required" type="bool"/>		
