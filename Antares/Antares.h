@@ -17,6 +17,7 @@
 #include "Graphical_Zone_Implementation.h"
 #include "Control_Dialog_Implementation.h"
 #include "Antares_Traffic_Management_Center_Implementation.h"
+#include "Antares_Network_Event_Implementation.h"
 
 #include "Navigation.h"
 #include "Render.h"

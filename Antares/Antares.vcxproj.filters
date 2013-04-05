@@ -145,8 +145,5 @@
     <ClCompile Include="Antares.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="glew.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

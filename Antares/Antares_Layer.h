@@ -162,6 +162,8 @@ struct Antares_Layer_Configuration
 		head_normal._z=1;
 		
 		grouped=false;
+		group_color=false;
+		group_normal=false;
 
 		head_size_value=1;
 

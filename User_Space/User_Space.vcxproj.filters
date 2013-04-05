@@ -241,12 +241,6 @@
     <ClInclude Include="Destination_Choice_Implementation.h">
       <Filter>Implementations\Person Components</Filter>
     </ClInclude>
-    <ClInclude Include="Incident_Implementations.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
-    <ClInclude Include="Incident_Prototype.h">
-      <Filter>Prototypes</Filter>
-    </ClInclude>
     <ClInclude Include="Link_Control_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
@@ -275,6 +269,12 @@
       <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="..\Antares\Geometry.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Network_Event_Implementations.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Network_Event_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
   </ItemGroup>
