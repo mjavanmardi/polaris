@@ -23,6 +23,8 @@
 		<field name="location_offset" type="float"/>
 		<field name="location_x" type="float"/>
 		<field name="location_y" type="float"/>
+		<field name="location_node" type="int"/>
+		<field name="location_side_offset" type="float"/>
 		<field name="owner" type="std::string"/>
 		<field name="operational_status" type="int"/>
 		<field name="schedule" type="std::string"/>

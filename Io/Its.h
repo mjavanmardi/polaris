@@ -26,8 +26,8 @@ class Action_Key;
 class Component
 {
 public:
-	// Default Constructor
-	Component () {}        
+    // Default Constructor
+    Component () {}        
 	Component (int id_, std::string name_, std::string icon_, std::vector<weak_ptr<Instance> > instances_, std::vector<weak_ptr<Action> > actions_, std::vector<shared_ptr<Component_Key> > keys_)
 	: id (id_), name (name_), icon (icon_), instances (instances_), actions (actions_), keys (keys_)
 	{
@@ -70,8 +70,8 @@ private:
 class Component_Key
 {
 public:
-	// Default Constructor
-	Component_Key () {}        
+    // Default Constructor
+    Component_Key () {}        
 	Component_Key (std::string key_, std::string value_type_, std::string value_constraint_, bool is_state_, bool required_, std::string note_)
 	: key (key_), value_type (value_type_), value_constraint (value_constraint_), is_state (is_state_), required (required_), note (note_)
 	{
@@ -105,14 +105,14 @@ private:
 class Instance
 {
 public:
-	// Default Constructor
-	Instance () {}        
-	Instance (int id_, shared_ptr<Component> component_, int location_link_, float location_offset_, float location_x_, float location_y_, std::string owner_, int operational_status_, std::string schedule_, std::vector<shared_ptr<Instance_Value> > values_)
-	: id (id_), component (component_), location_link (location_link_), location_offset (location_offset_), location_x (location_x_), location_y (location_y_), owner (owner_), operational_status (operational_status_), schedule (schedule_), values (values_)
+    // Default Constructor
+    Instance () {}        
+	Instance (int id_, shared_ptr<Component> component_, int location_link_, float location_offset_, float location_x_, float location_y_, int location_node_, float location_side_offset_, std::string owner_, int operational_status_, std::string schedule_, std::vector<shared_ptr<Instance_Value> > values_)
+	: id (id_), component (component_), location_link (location_link_), location_offset (location_offset_), location_x (location_x_), location_y (location_y_), location_node (location_node_), location_side_offset (location_side_offset_), owner (owner_), operational_status (operational_status_), schedule (schedule_), values (values_)
 	{
 	}
-	Instance (int id_, int location_link_, float location_offset_, float location_x_, float location_y_, std::string owner_, int operational_status_, std::string schedule_)
-	: id (id_), location_link (location_link_), location_offset (location_offset_), location_x (location_x_), location_y (location_y_), owner (owner_), operational_status (operational_status_), schedule (schedule_)
+	Instance (int id_, int location_link_, float location_offset_, float location_x_, float location_y_, int location_node_, float location_side_offset_, std::string owner_, int operational_status_, std::string schedule_)
+	: id (id_), location_link (location_link_), location_offset (location_offset_), location_x (location_x_), location_y (location_y_), location_node (location_node_), location_side_offset (location_side_offset_), owner (owner_), operational_status (operational_status_), schedule (schedule_)
 	{
 	}
 	//Accessors
@@ -128,6 +128,10 @@ public:
 	void setLocation_X (const float& location_x_) {location_x = location_x_;}
 	const float& getLocation_Y () const {return location_y;}
 	void setLocation_Y (const float& location_y_) {location_y = location_y_;}
+	const int& getLocation_Node () const {return location_node;}
+	void setLocation_Node (const int& location_node_) {location_node = location_node_;}
+	const float& getLocation_Side_Offset () const {return location_side_offset;}
+	void setLocation_Side_Offset (const float& location_side_offset_) {location_side_offset = location_side_offset_;}
 	const std::string& getOwner () const {return owner;}
 	void setOwner (const std::string& owner_) {owner = owner_;}
 	const int& getOperational_Status () const {return operational_status;}
@@ -148,6 +152,8 @@ private:
 	float location_offset;
 	float location_x;
 	float location_y;
+	int location_node;
+	float location_side_offset;
 	std::string owner;
 	int operational_status;
 	std::string schedule;
@@ -158,8 +164,8 @@ private:
 class Instance_Value
 {
 public:
-	// Default Constructor
-	Instance_Value () {}        
+    // Default Constructor
+    Instance_Value () {}        
 	Instance_Value (int id_, shared_ptr<Component_Key> key_, std::string value_)
 	: id (id_), key (key_), value (value_)
 	{
@@ -188,8 +194,8 @@ private:
 class Action
 {
 public:
-	// Default Constructor
-	Action () {}        
+    // Default Constructor
+    Action () {}        
 	Action (int id_, shared_ptr<Component> component_, std::vector<shared_ptr<Action_Key> > keys_, std::string name_, std::string note_)
 	: id (id_), component (component_), keys (keys_), name (name_), note (note_)
 	{
@@ -226,8 +232,8 @@ private:
 class Action_Key
 {
 public:
-	// Default Constructor
-	Action_Key () {}        
+    // Default Constructor
+    Action_Key () {}        
 	Action_Key (std::string key_, std::string value_type_, std::string value_constraint_, bool required_, std::string note_)
 	: key (key_), value_type (value_type_), value_constraint (value_constraint_), required (required_), note (note_)
 	{

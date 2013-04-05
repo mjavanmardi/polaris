@@ -97,12 +97,12 @@ class Event_Instance
 public:
     // Default Constructor
     Event_Instance () {}        
-	Event_Instance (int id_, shared_ptr<Network_Event> event_, std::vector<shared_ptr<Event_Instance_Value> > values_, std::vector<int> links_, float location_x_, float location_y_, std::string reporter_, std::string confedence_level_, int time_detected_, int expected_duraition_, bool expired_, int start_time_, int end_time_, std::string note_)
-	: id (id_), event (event_), values (values_), links (links_), location_x (location_x_), location_y (location_y_), reporter (reporter_), confedence_level (confedence_level_), time_detected (time_detected_), expected_duraition (expected_duraition_), expired (expired_), start_time (start_time_), end_time (end_time_), note (note_)
+	Event_Instance (int id_, shared_ptr<Network_Event> event_, std::vector<shared_ptr<Event_Instance_Value> > values_, std::vector<int> links_, float location_x_, float location_y_, std::string reporter_, std::string confidence_level_, int time_detected_, int expected_duraition_, bool expired_, int start_time_, int end_time_, std::string note_)
+	: id (id_), event (event_), values (values_), links (links_), location_x (location_x_), location_y (location_y_), reporter (reporter_), confidence_level (confidence_level_), time_detected (time_detected_), expected_duraition (expected_duraition_), expired (expired_), start_time (start_time_), end_time (end_time_), note (note_)
 	{
 	}
-	Event_Instance (int id_, std::vector<int> links_, float location_x_, float location_y_, std::string reporter_, std::string confedence_level_, int time_detected_, int expected_duraition_, bool expired_, int start_time_, int end_time_, std::string note_)
-	: id (id_), links (links_), location_x (location_x_), location_y (location_y_), reporter (reporter_), confedence_level (confedence_level_), time_detected (time_detected_), expected_duraition (expected_duraition_), expired (expired_), start_time (start_time_), end_time (end_time_), note (note_)
+	Event_Instance (int id_, std::vector<int> links_, float location_x_, float location_y_, std::string reporter_, std::string confidence_level_, int time_detected_, int expected_duraition_, bool expired_, int start_time_, int end_time_, std::string note_)
+	: id (id_), links (links_), location_x (location_x_), location_y (location_y_), reporter (reporter_), confidence_level (confidence_level_), time_detected (time_detected_), expected_duraition (expected_duraition_), expired (expired_), start_time (start_time_), end_time (end_time_), note (note_)
 	{
 	}
 	//Accessors
@@ -122,8 +122,8 @@ public:
 	void setLocation_Y (const float& location_y_) {location_y = location_y_;}
 	const std::string& getReporter () const {return reporter;}
 	void setReporter (const std::string& reporter_) {reporter = reporter_;}
-	const std::string& getConfedence_Level () const {return confedence_level;}
-	void setConfedence_Level (const std::string& confedence_level_) {confedence_level = confedence_level_;}
+	const std::string& getConfidence_Level () const {return confidence_level;}
+	void setConfidence_Level (const std::string& confidence_level_) {confidence_level = confidence_level_;}
 	const int& getTime_Detected () const {return time_detected;}
 	void setTime_Detected (const int& time_detected_) {time_detected = time_detected_;}
 	const int& getExpected_Duraition () const {return expected_duraition;}
@@ -148,7 +148,7 @@ private:
 	float location_x;
 	float location_y;
 	std::string reporter;
-	std::string confedence_level;
+	std::string confidence_level;
 	int time_detected;
 	int expected_duraition;
 	bool expired;

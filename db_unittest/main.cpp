@@ -56,6 +56,42 @@ TEST_F(DBTest, LocationFKLocation_Data){
 	ASSERT_EQ(count, 0);
 }
 
+TEST_F(DBTest, EventgetInstances)
+{
+	using namespace polaris::io;
+	typedef odb::query<Network_Event> query;
+	typedef odb::result<Network_Event> result;
+	odb::session s;
+	odb::transaction t(this->db->begin());
+	result r(this->db->query<Network_Event>(query::true_expr));
+	int count=0;
+	for (result::iterator i (r.begin()); i!=r.end(); ++i)
+	{
+		count++;
+		const vector<weak_ptr<Event_Instance> >& instances = i->getInstances();
+	}
+	t.commit();
+	ASSERT_EQ(count, 5);
+}
+
+TEST_F(DBTest, Event_Instance_Value)
+{
+	using namespace polaris::io;
+	typedef odb::query<Event_Instance_Value> query;
+	typedef odb::result<Event_Instance_Value> result;
+	//odb::session s;
+	odb::transaction t(this->db->begin());
+	result r(this->db->query<Event_Instance_Value>(query::true_expr));
+	int count=0;
+	for (result::iterator i (r.begin()); i!=r.end(); ++i)
+	{
+		count++;
+		const vector<weak_ptr<Event_Instance> >& instances = i->getInstances();
+	}
+	t.commit();
+	ASSERT_EQ(count, 5);
+}
+
 TEST_F(DBTest, ZoneFKZone_Land_Use){
 	typedef odb::query<polaris::io::Zone> query;
 	typedef odb::result<polaris::io::Zone> result;
@@ -130,7 +166,7 @@ TEST(SpatialiteT, LinksInsideLakeCounty)
 	using namespace polaris::io;
 	std::vector<int> res;
 	res = GetLinksInsideCounty(db_path, "Lake");
-	ASSERT_EQ(res.size(), 224);
+	ASSERT_EQ(res.size(), 2224);
 }
 
 TEST(SpatialiteT, GetLinksInsideZip)

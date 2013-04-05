@@ -9,7 +9,7 @@ echo Cleaning the solution
 msbuild /t:clean > Clean.log 2>Clean.err
 for %%x in (Release_NetworkModel, Release_NetworkModel_Antares, Release_Integrated, Release_Integrated_Antares) do (
    echo Building %%x
-   msbuild /p:configuration=%%x /p:platform=x64 > %%x.log
+   msbuild /m:6 /p:configuration=%%x /p:platform=x64 > %%x.log
 	IF ERRORLEVEL 1 (
 		ECHO error level is 1 or more
 		ECHO see %%x.log for details

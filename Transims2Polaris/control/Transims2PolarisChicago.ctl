@@ -22,8 +22,8 @@ LANE_USE_FILE			z:/POLARIS/interchange/Run4_1/network/Lane_Use
 #######CONTROL##############
 SIGN_FILE		        z:/POLARIS/interchange/Run4_1/intcontrol/Sign
 SIGNAL_FILE		        z:/POLARIS/interchange/Run4_1/intcontrol/Signal
-#TIMING_PLAN_FILE    	z:/POLARIS/interchange/Run4_1/intcontrol/timing_plan
-#PHASING_PLAN_FILE   	z:/POLARIS/interchange/Run4_1/intcontrol/phasing_plan
+TIMING_PLAN_FILE    	z:/POLARIS/interchange/Run4_1/intcontrol/timing_plan
+PHASING_PLAN_FILE   	z:/POLARIS/interchange/Run4_1/intcontrol/phasing_plan
 
 #######OUTPUT##############
 NEW_SQLITE_DATABASE     z:/POLARIS/interchange/with_its/chicago
