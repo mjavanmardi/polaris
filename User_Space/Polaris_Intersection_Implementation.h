@@ -673,19 +673,19 @@ namespace Intersection_Components
 			{
 				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
-
+//cout << "ok20 at " << _this_ptr->internal_id<int>() << endl;
 				//step 2: turn vehicles updating based on node control and link management, inbound link demand, and outbound link supply
 				_this_ptr->template turn_movement_capacity_update<NULLTYPE>(); 
-
+//cout << "ok21 at " << _this_ptr->internal_id<int>() << endl;
 				//step 3: allocate link supply to inbound turn movements according to a given merging policy
 				_this_ptr->template turn_movement_supply_allocation<NULLTYPE>();
-
+//cout << "ok22 at " << _this_ptr->internal_id<int>() << endl;
 				//step 4: determine turn movement flow rate based on demand, capacity, and supply
 				_this_ptr->template turn_movement_flow_calculation<NULLTYPE>();
-
+//cout << "ok23 at " << _this_ptr->internal_id<int>() << endl;
 				//step 5: node transfer
 				_this_ptr->template node_transfer<NULLTYPE>();
-
+//cout << "ok24 at " << _this_ptr->internal_id<int>() << endl;
 				////step 6: origin link loading
 				//_this_ptr->template origin_link_loading<NULLTYPE>();
 
@@ -695,17 +695,25 @@ namespace Intersection_Components
 			{
 				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+
+//cout << "ok30 at " << _this_ptr->internal_id<int>() << endl;
+//if (_this_ptr->internal_id<int>() == 8)
+//{
+//	cout << "here" << endl;
+//}
 				//step 6: origin link loading
 				_this_ptr->template origin_link_loading<NULLTYPE>();
-
+//cout << "ok31 at " << _this_ptr->internal_id<int>() << endl;
 			}
 
 			declare_feature_event(Network_State_Update)
 			{
 				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+//cout << "ok40 at " << _this_ptr->internal_id<int>() << endl;
 				//step 9: intersection network state update
 				_this_ptr->template network_state_update<NULLTYPE>();
+//cout << "ok41 at " << _this_ptr->internal_id<int>() << endl;
 			}
 		};
 	}

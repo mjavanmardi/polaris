@@ -194,6 +194,11 @@ namespace Link_Components
 
 			float _travel_time;
 
+			Polaris_Link_Implementation()
+			{
+				UNLOCK(_link_lock);
+			}
+
 			// update link supply
 			feature_implementation void link_supply_update()
 			{
@@ -503,6 +508,7 @@ namespace Link_Components
 					_link_origin_arrived_vehicles++;
 					_link_origin_loaded_vehicles++;
 					_link_origin_cumulative_arrived_vehicles++;
+//cout << "scenario pointer = " << _global_scenario << endl;
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_loaded_vehicles<NULLTYPE>();
 				}
 			}
@@ -690,22 +696,31 @@ namespace Link_Components
 
 			declare_feature_event(Compute_Step_Flow_Supply_Update)
 			{
+
 				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
+//cout << "ok10 at " << _this_ptr->internal_id<int>() << endl;
 				//step 1: link supply update based on a given traffic flow model
 				_this_ptr->template link_supply_update<NULLTYPE>();
+//cout << "ok11 at " << _this_ptr->internal_id<int>() << endl;
 			}
 
 			declare_feature_event(Compute_Step_Flow_Link_Moving)
 			{
+
 				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
-
+if (_this_ptr->internal_id<int>() == 168)
+{
+	cout << "here" << endl;
+}
+//cout << "ok1 at " << _this_ptr->internal_id<int>() << endl;
 				//step 7: link moving -- no link moving in Newell's simplified model -- it can be used to determine turn bay curve
 				_this_ptr->template link_moving<NULLTYPE>();
-
+//cout << "ok2 at " << _this_ptr->internal_id<int>() << endl;
 				//step 8: link network state update
 				_this_ptr->template network_state_update<NULLTYPE>();
+//cout << "ok3 at " << _this_ptr->internal_id<int>() << endl;
 			}
 		};
 	}

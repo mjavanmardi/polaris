@@ -101,6 +101,10 @@ namespace Turn_Movement_Components
 
 			vector<struct Movement_MOE_Data> td_movement_moe_data_array;
 
+			Polaris_Movement_Implementation()
+			{
+				UNLOCK(_mvmt_lock);
+			}
 
 			feature_implementation void update_capacity(Intersection_Components::Types::Intersection_Type_Keys intersection_type)
 			{
