@@ -91,4 +91,4 @@ struct _Simulation_Timer
 	}
 };
 
-_Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;
+static _Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;

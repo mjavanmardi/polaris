@@ -277,7 +277,7 @@ void demand_data_information::read_demand_data_transims(ScenarioData& scenario_d
 void demand_data_information::read_demand_data_two_links(ScenarioData& scenario_data,DemandData& demand_data,NetworkData &network_data)
 {
 	
-	RngStream g1("Demand");
+	RngStream g1;
 	g1.SetSeed(1);
 	int vehilce_index = -1;
 	//sort demand by departure time
@@ -386,7 +386,7 @@ void demand_data_information::read_demand_data(ScenarioData& scenario_data,Deman
 {
 	float freeway_demand_rate = 1800.0;
 	float ramp_demand_rate = 900.0;
-	RngStream g1("Demand");
+	RngStream g1;
 	g1.SetSeed(1);
 	int vehilce_index = -1;
 	//sort demand by departure time
@@ -561,7 +561,7 @@ void demand_data_information::read_demand_data(ScenarioData& scenario_data,Deman
 
 void demand_data_information::read_demand_od(string input_dir_name,ScenarioData& scenario_data,DemandData& demand_data,NetworkData &network_data)
 {
-	RngStream rng_demand("Demand");
+	RngStream rng_demand;
 	rng_demand.SetSeed(scenario_data.iseed);
 	float r1;
 
@@ -877,7 +877,7 @@ int demand_data_information::destination_link_choice_model(int destination_activ
 
 void demand_data_information::read_vehicle_dat_dsp(string input_dir_name,ScenarioData& scenario_data,DemandData& demand_data,NetworkData &network_data)
 {
-	RngStream rng_demand("Demand");
+	RngStream rng_demand;
 	rng_demand.SetSeed(scenario_data.iseed);
 	float r1;
 

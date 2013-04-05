@@ -20,7 +20,9 @@
 #include <iterator>
 
 //random number
-#include "RngStream.h"
+#include "..\Repository\RngStream.h"
+
+using namespace RNG_Components;
 
 //algorithms
 #include <math.h>

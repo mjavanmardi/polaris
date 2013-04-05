@@ -8,14 +8,14 @@
 namespace network_models
 {
 
-	void initialization
+	static void initialization
 			(ScenarioData& scenario_data, NetworkData& network_data, DemandData& demand_data, OperationData& operation_data)
 	{
 		network_models::network_information::scenario_data_information::scenario_data_initialization(scenario_data);
 		network_models::network_information::network_data_information::network_data_initialization(network_data);
 		network_models::network_information::operation_data_information::opearation_data_initialization(operation_data);
 	};
-	void read_data
+	static void read_data
 		(ScenarioData& scenario_data, NetworkData& network_data, DemandData& demand_data, OperationData& operation_data)
 	{
 		string input_dir_name = scenario_data.input_dir_name;

@@ -197,7 +197,7 @@ namespace GLOBALS
 	private:
 		 RNG_type thread_rng[_num_threads];
 	};
-	_Global_RNG<NULLTYPE> Uniform_RNG;
+	static _Global_RNG<NULLTYPE> Uniform_RNG;
 
 	implementation struct _Global_Normal_RNG : public Polaris_Component<APPEND_CHILD(_Global_Normal_RNG),MasterType,NULLTYPE>
 	{
@@ -237,7 +237,7 @@ namespace GLOBALS
 		 RNG_type thread_rng[_num_threads];
 	};
 
-	_Global_Normal_RNG<NULLTYPE> Normal_RNG;
+	static _Global_Normal_RNG<NULLTYPE> Normal_RNG;
 }
 
 using namespace GLOBALS;
