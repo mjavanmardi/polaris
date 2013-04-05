@@ -7,3 +7,4 @@ call import.bat
 cd /d z:\POLARIS\ITS
 call populate_db.bat
 cd /d %origin%
+Release\ItsMockup.exe z:\POLARIS\interchange\with_its\chicago

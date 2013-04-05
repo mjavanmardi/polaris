@@ -16,6 +16,9 @@ void PopulateInstance(std::string db_path)
 	typedef odb::query<Component> qc; typedef odb::result<Component> rc;
 	odb::transaction t (db->begin());
 	odb::session s;
+	db->execute("delete from Instance;");
+	db->execute("delete from Instance_values;");
+	db->execute("delete from Instance_Value;");
 	//try
 	//{
 		shared_ptr<Component> comp_vss = db->load<Component>(1);
@@ -54,14 +57,6 @@ void PopulateInstance(std::string db_path)
 			inst->setComponent(comp_vms);
 			inst->setLocation_X(points_it->second.x);
 			inst->setLocation_Y(points_it->second.y);
-			try 
-			{
-				db->persist(inst);
-			}
-			catch (odb::object_already_persistent e) 
-			{
-				std::cout << "VMS Instance object already exists. " << e.what() << "\n";
-			}
 			inst_val.reset(new Instance_Value());			
 			inst_val->setKey(comp_key);
 			inst_val->setValue("-1");	
@@ -74,6 +69,14 @@ void PopulateInstance(std::string db_path)
 			}
 			comp_vms->setInstanc(inst);
 			inst->setValu(inst_val);
+			try 
+			{
+				db->persist(inst);
+			}
+			catch (odb::object_already_persistent e) 
+			{
+				std::cout << "VMS Instance object already exists. " << e.what() << "\n";
+			}
 		}
 		//put a VSS with probability 5%
 		comp_key = db->load<Component_Key>("CurrentSpeed");
@@ -100,6 +103,13 @@ void PopulateInstance(std::string db_path)
 			}	
 			comp_vss->setInstanc(inst);
 			inst->setValu(inst_val);
+			try {
+				db->persist(inst);
+			}
+			catch (odb::object_already_persistent e) {
+				std::cout << "VSS Instance object already exists. " << e.what() << "\n";
+			}
+
 			
 		}
 		//put a OpenShoulder with probability 20%
@@ -110,13 +120,7 @@ void PopulateInstance(std::string db_path)
 			inst->setComponent(comp_os);
 			inst->setLocation_X(points_it->second.x);
 			inst->setLocation_Y(points_it->second.y);
-			try {
-				db->persist(inst);
-			}
-			catch (odb::object_already_persistent e) {
-				std::cout << "OS Instance object already exists. " << e.what() << "\n";
-
-			}			
+			
 			inst_val.reset(new Instance_Value());			
 			inst_val->setKey(comp_key);
 			inst_val->setValue("0");	
@@ -128,6 +132,13 @@ void PopulateInstance(std::string db_path)
 			}	
 			comp_os->setInstanc(inst);
 			inst->setValu(inst_val);
+			try {
+				db->persist(inst);
+			}
+			catch (odb::object_already_persistent e) {
+				std::cout << "OS Instance object already exists. " << e.what() << "\n";
+
+			}
 			
 			
 		}

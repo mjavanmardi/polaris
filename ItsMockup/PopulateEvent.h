@@ -31,7 +31,7 @@ void PopulateEvent(std::string db_path)
 		
 
 		evnt_key.reset(new Event_Key("type", "string", "rain|snow|fog|high_temperature", true, ""));instance->setEvent(evnt);  db->persist(evnt_key); evnt->setKey(evnt_key);
-		value.reset(new Event_Instance_Value(0, "snow"));   value->setKey(evnt_key); instance->setValu(value); db->persist(value);db->persist(instance);
+		value.reset(new Event_Instance_Value(0, "snow"));   value->setKey(evnt_key); instance->setValu(value); db->persist(value);
 
 		evnt_key.reset(new Event_Key("precipm", "int", "0..1000", false, "")); db->persist(evnt_key); evnt->setKey(evnt_key);
 		evnt_key.reset(new Event_Key("snowdepthm", "int", "0..1000", false, "")); db->persist(evnt_key); evnt->setKey(evnt_key);
@@ -44,6 +44,7 @@ void PopulateEvent(std::string db_path)
 		evnt_key.reset(new Event_Key("zip", "int", "0..99999", false, "")); db->persist(evnt_key); evnt->setKey(evnt_key);
 		evnt_key.reset(new Event_Key("county", "string", "", false, "Name of the county")); db->persist(evnt_key); evnt->setKey(evnt_key);
 		value.reset(new Event_Instance_Value(0, "Lake"));   value->setKey(evnt_key); instance->setValu(value); instance->setValu(value); db->persist(value);
+		db->persist(instance);
 		db->persist(evnt);
 		
 		
