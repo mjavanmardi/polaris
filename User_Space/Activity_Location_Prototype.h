@@ -5,6 +5,21 @@ namespace Activity_Location_Components
 {
 	namespace Types
 	{
+		enum LAND_USE
+		{
+			LU_ALL,
+			LU_BUSINESS,
+			LU_CIVIC_RELIGIOUS,
+			LU_CULTURAL,
+			LU_EDUCATION,
+			LU_INDUSTRIAL,
+			LU_SHOPPING,
+			LU_MEDICAL,
+			LU_MIXED_USE,
+			LU_NONE,
+			LU_RESIDENTIAL
+		};
+
 	}
 
 	namespace Concepts
@@ -46,6 +61,7 @@ namespace Activity_Location_Components
 			feature_accessor(census_zone_id, none, none);
 			feature_accessor(uuid, none, none);
 			feature_accessor(internal_id, none, none);
+			feature_accessor(land_use_type, none, none);
 		};
 	}
 }

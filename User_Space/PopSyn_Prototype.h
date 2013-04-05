@@ -228,8 +228,10 @@ namespace PopSyn
 					typename sample_type::Weight_type weight;
 					fr.Get_Data<typename sample_type::ID_type>(sample_id,linker.sample_id_col);
 					fr.Get_Data<typename sample_type::Weight_type>(weight, linker.sample_weight_col);
-					typename sample_type::Characteristics_type data;
-					fr.Get_Data<typename sample_type::Characteristics_type::unqualified_value_type>(data,linker.get_pums_data_cols());
+					//typename sample_type::Characteristics_type data;
+					vector<double> data;
+					//fr.Get_Data<typename sample_type::Characteristics_type::unqualified_value_type>(data,linker.get_pums_data_cols());
+					fr.Get_Data<double>(data,linker.get_pums_data_cols());
 
 					pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>();
 					p->ID(sample_id);

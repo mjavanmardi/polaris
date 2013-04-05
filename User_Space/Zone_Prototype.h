@@ -57,6 +57,12 @@ namespace Zone_Components
 
 			feature_accessor(origin_activity_locations, none, none);
 			feature_accessor(destination_activity_locations, none, none);
+
+			feature_accessor(home_locations, none, none);
+			feature_accessor(work_locations, none, none);
+			feature_accessor(discretionary_locations, none, none);
+			feature_accessor(school_locations, none, none);
+
 			feature_accessor(origin_activity_location_choice_cdfs, none, none);
 			feature_accessor(destination_activity_location_choice_cdfs, none, none);
 			feature_accessor(uuid, none, none);
@@ -64,7 +70,16 @@ namespace Zone_Components
 			feature_accessor(X,none, none);
 			feature_accessor(Y,none, none);
 			feature_accessor(population,none, none);
+			feature_accessor(households,none, none);
+			feature_accessor(group_quarters_population,none, none);
 			feature_accessor(employment,none, none);
+			feature_accessor(retail_employment,none, none);
+
+			feature_accessor(total_area, none, none);
+			feature_accessor(low_density_residential_area, none, none);
+			feature_accessor(high_density_residential_area, none, none);
+			feature_accessor(commercial_area, none, none);
+			feature_accessor(industrial_area, none, none);
 
 			feature_accessor(zone_is_available,none,none);
 			feature_accessor(graphical_zone_group,none,none);

@@ -31,6 +31,8 @@ namespace Activity_Location_Components
 
 			member_data(long long, census_zone_id, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
 
+			member_data(Types::LAND_USE, land_use_type, none, none);
+
 		};
 	}
 

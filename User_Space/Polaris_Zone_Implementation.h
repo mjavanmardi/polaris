@@ -60,7 +60,18 @@ namespace Zone_Components
 			member_data(double, X, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(double, Y, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, population, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, households, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, group_quarters_population, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, employment, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, retail_employment, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+
+			member_component_and_feature_accessor(total_area, Value,Basic_Units::Prototypes::Area_Prototype, Basic_Units::Implementations::Area_Implementation<NT>);
+			member_component_and_feature_accessor(low_density_residential_area, Value,Basic_Units::Prototypes::Area_Prototype, Basic_Units::Implementations::Area_Implementation<NT>);
+			member_component_and_feature_accessor(high_density_residential_area, Value,Basic_Units::Prototypes::Area_Prototype, Basic_Units::Implementations::Area_Implementation<NT>);
+			member_component_and_feature_accessor(commercial_area, Value,Basic_Units::Prototypes::Area_Prototype, Basic_Units::Implementations::Area_Implementation<NT>);
+			member_component_and_feature_accessor(industrial_area, Value,Basic_Units::Prototypes::Area_Prototype, Basic_Units::Implementations::Area_Implementation<NT>);
+
+
 
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Update_Increment,none,none);
 			member_component_feature(update_increment, _Update_Increment, Value, Basic_Units::Prototypes::Time_Prototype);
@@ -101,6 +112,11 @@ namespace Zone_Components
 			member_container(vector<float>, origin_activity_location_choice_cdfs, none, none);
 
 			member_container(vector<float>, destination_activity_location_choice_cdfs, none, none);
+
+			member_container(vector<typename MasterType::activity_location_type*>, home_locations, none, none);
+			member_container(vector<typename MasterType::activity_location_type*>, work_locations, none, none);
+			member_container(vector<typename MasterType::activity_location_type*>, discretionary_locations, none, none);
+			member_container(vector<typename MasterType::activity_location_type*>, school_locations, none, none);
 
 		};
 	}

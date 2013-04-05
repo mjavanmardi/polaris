@@ -100,11 +100,10 @@ namespace PopSyn
 			OWN_CHILDREN_NONE
 		};
 		// JWTR
-		enum JOURNEY_TO_WORK_VEHICLE_OCCUPANCY
+		enum JOURNEY_TO_WORK_MODE
 		{
-
+			WORKMODE_NA, WORKMODE_AUTOMOBILE,WORKMODE_BUS, WORKMODE_STREETCAR,WORKMODE_SUBWAY,WORKMODE_RAILROAD,WORKMODE_FERRY,WORKMODE_TAXI,WORKMODE_MOTORCYCLE,WORKMODE_BICYCLE,WORKMODE_WALK,WORKMODE_WORK_AT_HOME,WORKMODE_OTHER
 		};
-
 		// INDP - Industry
 		enum EMPLOYMENT_INDUSTRY
 		{
@@ -407,9 +406,12 @@ namespace PopSyn
 			feature_accessor(Employment_Status,none,none);
 			feature_accessor(Employment_Industry,none,none);	
 			feature_accessor(Journey_To_Work_Arrival_Time,none,none);
-			feature_accessor(Journey_To_Work_Departure_Time,none,none);
 			feature_accessor(Income,none,none);
 
+			feature_prototype void Characteristics(vector<TargetType>& data)
+			{
+				this_component()->Characteristics<ComponentType,CallerType,TargetType>(data);
+			}
 			feature_prototype void Initialize(TargetType object_to_copy/*, requires(check_2(TargetType,This_Type,is_same))*/)
 			{
 				uint i = object_to_copy.ID<typename get_type_of(ID)>();

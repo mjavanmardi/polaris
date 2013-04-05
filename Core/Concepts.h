@@ -162,9 +162,14 @@ static const int success=sizeof(small_type);
 
 #define CALL_CHECK_PARAMS_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2) TYPE_TO_TEST_1,TYPE_TO_TEST_2
 
-#define requires(...) char(*)[__VA_ARGS__ && True_Concept<TargetType>::value]=NULL
-#define requires_getter(...) char(*)[__VA_ARGS__ && True_Concept<ReturnValueType>::value]=NULL
-#define requires_setter(...) char(*)[__VA_ARGS__ && True_Concept<SetValueType>::value]=NULL
+//#define requires(...) char(*)[__VA_ARGS__ && True_Concept<TargetType>::value]=NULL
+//#define requires_getter(...) char(*)[__VA_ARGS__ && True_Concept<ReturnValueType>::value]=NULL
+//#define requires_setter(...) char(*)[__VA_ARGS__ && True_Concept<SetValueType>::value]=NULL
+
+#define requires(...) typename enable_if<__VA_ARGS__ && True_Concept<TargetType>::value,void*>::type* = 0
+#define requires_getter(...) typename enable_if<__VA_ARGS__ && True_Concept<ReturnValueType>::value,void*>::type* = 0
+#define requires_setter(...) typename enable_if<__VA_ARGS__ && True_Concept<SetValueType>::value,void*>::type* = 0
+
 #define check(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<strip_modifiers(TYPE_TO_TEST)>::value
 #define check_as_given(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<TYPE_TO_TEST>::value
 #define check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<CALL_CHECK_PARAMS_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value

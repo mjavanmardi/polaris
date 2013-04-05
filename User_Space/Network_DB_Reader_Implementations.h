@@ -502,6 +502,15 @@ namespace Network_Components
 						zone = zone_itr->second;
 						zone->template population<int>(db_itr->getPop_Per());
 						zone->template employment<int>(db_itr->getEmp_Tot());
+						zone->template total_area<Square_Feet>(db_itr->getArea ());  
+						zone->template low_density_residential_area<Square_Feet>(db_itr->getArea_Res_Low ());
+						zone->template high_density_residential_area<Square_Feet>(db_itr->getArea_Res_Hi ());  
+						zone->template commercial_area<Square_Feet>(db_itr->getArea_Comm ());  
+						zone->template industrial_area<Square_Feet>(db_itr->getArea_Ind () ); 
+						zone->template households<int>(db_itr->getPop_Hh ()  );
+						zone->template group_quarters_population<int>(db_itr->getPop_Gq ()  );
+						zone->template retail_employment<int>(db_itr->getEmp_Ret ()  );
+
 					}
 				}
 			}
@@ -575,11 +584,59 @@ namespace Network_Components
 						shared_ptr<LocationData> data_ptr = db_itr->getLocation_Data();
 						if (data_ptr == nullptr) continue;
 						activity_location->template census_zone_id<long long>(data_ptr->getCensus_Zone());
+						// set the location land use code
+						const char* land_use = data_ptr->getLand_Use().c_str();
+						Activity_Location_Components::Types::LAND_USE code;
+						if (land_use ="ALL") code=Activity_Location_Components::Types::LU_ALL;
+						else if (land_use ="BUSINESS") code=Activity_Location_Components::Types::LU_BUSINESS;
+						else if (land_use ="CIVIC") code=Activity_Location_Components::Types::LU_CIVIC_RELIGIOUS;
+						else if (land_use ="CULTURE") code=Activity_Location_Components::Types::LU_CULTURAL;
+						else if (land_use ="EDUCATION") code=Activity_Location_Components::Types::LU_EDUCATION;
+						else if (land_use ="INDUSTRY") code=Activity_Location_Components::Types::LU_INDUSTRIAL;
+						else if (land_use ="MAJ_SHOP") code=Activity_Location_Components::Types::LU_SHOPPING;
+						else if (land_use ="MEDICAL") code=Activity_Location_Components::Types::LU_MEDICAL;
+						else if (land_use ="MIX") code=Activity_Location_Components::Types::LU_MIXED_USE;
+						else if (land_use ="NONE") code=Activity_Location_Components::Types::LU_NONE;
+						else if (land_use ="RES") code=Activity_Location_Components::Types::LU_RESIDENTIAL;
+						else code=Activity_Location_Components::Types::LU_NONE;
+						activity_location->land_use_type(code);
 
-
+						// add to the zone list
 						zone->template origin_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 						zone->template destination_activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+
+						// add to zone land use type sublists
+						if (land_use == "ALL")
+						{
+							zone->template home_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							zone->template work_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							zone->template school_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						}
+						if (land_use == "MIX")
+						{
+							zone->template home_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							zone->template work_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						}
+						if (land_use == "BUSINESS" || land_use == "CIVIC" || land_use == "INDUSTRY" || land_use == "MAJ_SHOP" || land_use == "MEDICAL")
+						{
+							zone->template work_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						}
+						if (land_use == "CULTURE" || land_use == "CIVIC" || land_use == "MAJ_SHOP" || land_use == "MEDICAL")
+						{
+							zone->template discretionary_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						}
+						if (land_use == "RES")
+						{
+							zone->template home_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						}
+						if (land_use == "EDUCATION")
+						{
+							zone->template school_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+						}
 			
+						// Push to main network container
 						activity_locations_container.push_back(activity_location);
 						++counter;
 					}
