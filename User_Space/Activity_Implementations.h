@@ -95,6 +95,7 @@ namespace Activity_Components
 				pthis->Start_Time<Time_Seconds>(END);
 				pthis->Location<_activity_location_itf*>(nullptr);
 				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				UNLOCK(this->_update_lock);
 			}
 
 			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time)
