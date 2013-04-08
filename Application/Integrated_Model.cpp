@@ -1,9 +1,8 @@
-#include "Polaris_PCH.h"
+
 
 #include "Model_Selection.h"
-
-
 #ifdef IntegratedModelApplication
+//#include "Polaris_PCH.h"
 #ifdef DBIO
 #define WINDOWS
 #include "Application_Includes.h"
