@@ -188,6 +188,10 @@ namespace Network_Components
 			feature_accessor(information_panel, none, none);
 			feature_accessor(input_offset, none, none);
 
+			//==================================================================================================================
+			/// db-io network
+			//------------------------------------------------------------------------------------------------------------------
+			feature_accessor(db_id_to_links_map, none, none);
 
 			feature_prototype void push_vehicle_coordinates(void)
 			{

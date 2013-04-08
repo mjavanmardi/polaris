@@ -83,6 +83,9 @@ namespace Network_Components
 			member_data(long,start_cpu_time_in_seconds,none,none);
 
 			member_container(vector<typename MasterType::routable_network_type*>, network_snapshot_container, none, none);
+
+			typedef unordered_map<int,vector<typename MasterType::link_type*>> id_to_links_map_type;
+			member_data(id_to_links_map_type, db_id_to_links_map, none, none);
 			
 			struct MOE_Data network_moe_data;
 

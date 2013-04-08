@@ -125,6 +125,7 @@ namespace Network_Components
 				typename type_of(network_reference)::type_of(links_container)& links_container_monitor=(typename type_of(network_reference)::type_of(links_container)&)(*links_container_ptr);				
 				/*typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();*/				
+				typedef unordered_map<int,vector<typename MasterType::link_type*>> id_to_links_type;
 
 				Types::Link_ID_Dir link_id_dir;
 				
@@ -140,7 +141,7 @@ namespace Network_Components
 				cout << "Reading Links" << endl;
 				
 				int link_counter=-1;
-
+				 
 				for(result<Link>::iterator db_itr = link_result.begin (); db_itr != link_result.end (); ++db_itr)
 				{
 					counter++;
@@ -208,6 +209,20 @@ namespace Network_Components
 						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
 
 						links_container_ptr->push_back(link);
+						
+						id_to_links_type::iterator links_itr;
+						id_to_links_type& id_to_links_map = _network_reference->db_id_to_links_map<id_to_links_type&>();
+						links_itr = id_to_links_map.find(link_id_dir.id);
+						if (links_itr != id_to_links_map.end())
+						{
+							links_itr->second.push_back((typename MasterType::link_type*)link);
+						}
+						else
+						{
+							vector<typename MasterType::link_type*> links_vector;
+							links_vector.push_back((typename MasterType::link_type*)link);
+							id_to_links_map.insert(std::make_pair<int,vector<typename MasterType::link_type*>>(link_id_dir.id, links_vector));
+						}
 					}
 
 					if(db_itr->getLanes_Ba()>0)
@@ -270,6 +285,20 @@ namespace Network_Components
 						link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
 
 						links_container_ptr->push_back(link);
+
+						id_to_links_type::iterator links_itr;
+						id_to_links_type& id_to_links_map = _network_reference->db_id_to_links_map<id_to_links_type&>();
+						links_itr = id_to_links_map.find(link_id_dir.id);
+						if (links_itr != id_to_links_map.end())
+						{
+							links_itr->second.push_back((typename MasterType::link_type*)link);
+						}
+						else
+						{
+							vector<typename MasterType::link_type*> links_vector;
+							links_vector.push_back((typename MasterType::link_type*)link);
+							id_to_links_map.insert(std::make_pair<int,vector<typename MasterType::link_type*>>(link_id_dir.id, links_vector));
+						}
 					}
 				}
 			}
