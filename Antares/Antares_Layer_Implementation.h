@@ -38,7 +38,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		Point_3D<NT> b;
 		Point_3D<NT> c;
 		Point_3D<NT> result;
-		
+
 		int* const beg_write_itr = (int*)&result;
 		const int* const end_write_itr = (int*)&result + sizeof(Point_3D<NT>)/sizeof(int);
 
@@ -161,7 +161,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 				}
 
 				const int num_group_primitives=*((int*)geometry_itr);
-				
+
 				const int* end_size_itr = geometry_itr+sizeof(int)/sizeof(int);
 
 				while(geometry_itr!=end_size_itr)

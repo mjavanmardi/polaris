@@ -50,7 +50,7 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 {
 	string title=name;
 
-	title.append("_Control_Dialog");
+	title.append("_Configuration_Dialog");
 
 	SetTitle(title);
 

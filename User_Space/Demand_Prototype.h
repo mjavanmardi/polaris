@@ -129,7 +129,6 @@ namespace Demand_Components
 
 				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
-cout << "one demand record read" << endl;
 					if (++counter % 10000 == 0)
 					{
 						cout << counter << " trips processed" << endl;

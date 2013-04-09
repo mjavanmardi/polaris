@@ -118,6 +118,8 @@ namespace Scenario_Components
 			feature_accessor(out_realtime_link_moe_file, none, none);
 			feature_accessor(out_realtime_movement_moe_file, none, none);
 
+			feature_accessor(reference_realtime_network_moe_file, none, none);
+
 			feature_accessor(assignment_time_in_seconds, none, none);
 			feature_accessor(simulation_time_in_seconds, none, none);
 			feature_accessor(operation_time_in_seconds, none, none);
@@ -193,9 +195,9 @@ namespace Scenario_Components
 
 				//===============================================
 				// set control parameters
-				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(0);
+				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(0.0);
 				if (cfgReader.getParameter("num_threads", num_threads<int*>())!= PARAMETER_FOUND) num_threads<int>(1);
-				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0);
+				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0.0);
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
 				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(3600);
 				if (cfgReader.getParameter("percent_to_synthesize", this->percent_to_synthesize<double*>()) != PARAMETER_FOUND) this->percent_to_synthesize<float>(1.0);
@@ -242,7 +244,9 @@ namespace Scenario_Components
 			    output_time_in_seconds<double>(0.0);
 				
 				output_dir_name<string&>() = "";
+				input_dir_name<string&>() = "";
 				open_output_files<NULLTYPE>();
+				open_input_files<NULLTYPE>();
 			}
 
 			feature_prototype void read_scenario_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data)
@@ -271,6 +275,7 @@ namespace Scenario_Components
 
 				output_dir_name<string&>() = "";
 				open_output_files<NULLTYPE>();
+				open_input_files<NULLTYPE>();
 
 				network_cumulative_loaded_vehicles<int>(0.0);
 				network_cumulative_departed_vehicles<int>(0.0);
@@ -532,7 +537,7 @@ namespace Scenario_Components
 				//network
 				string out_realtime_network_moe_file_name = output_dir_name<string&>() + "realtime_moe_network.csv";
 				out_realtime_network_moe_file<fstream&>().open(out_realtime_network_moe_file_name, fstream::out);
-				out_realtime_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio\n";
+				out_realtime_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_queue_length,network_vmt,network_vht,network_cumulative_loaded_vehicles,network_cumulative_departed_vehicles,network_in_network_vehicles,network_cumulative_arrived_vehicles\n";
 
 				//link
 				string out_realtime_link_moe_file_name = output_dir_name<string&>() + "realtime_moe_link.csv";
@@ -561,27 +566,23 @@ namespace Scenario_Components
 				out_movement_moe_file<fstream&>().open(out_movement_moe_file_name, fstream::out);
 				out_movement_moe_file<fstream&>() << "clock,time,turn_movement,inbound_link,outbound_link,node,turn_penalty_in_min,turn_penalty_sd_in_min,inbound_link_turn_time_in_min,outbound_link_turn_time_in_min,movement_flow_rate_in_vphpl\n";
 
-				//				//moe
-				//FILE* fp;
-				////network
-				//string out_network_moe_file_name = output_dir_name<string&>() + "moe_network.csv";
-				//fopen_s(&fp, out_network_moe_file_name.c_str(), "w" );
-				//out_network_moe_file<FILE*>(fp);
-				//fprintf(out_network_moe_file<FILE*>(),"clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time,avg_link_speed,avg_link_density,avg_link_in_flow_rate,avg_link_out_flow_rate,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,assignment_calculation_time,simulation_calculation_time,operation_calculation_time,output_calculation_time\n");
-
-				////link
-				//string out_link_moe_file_name = output_dir_name<string&>() + "moe_link.csv";
-				//fopen_s(&fp, out_link_moe_file_name.c_str(), "w" );
-				//out_link_moe_file<FILE*>(fp);
-				//fprintf(out_link_moe_file<FILE*>(),"clock,time,link,unode,dnode,link_type,travel_time,travel_time_sd,travel_delay,travel_delay_sd,queue_length,speed,density,in_flow_rate,out_flow_rate,travel_time_ratio,speed_ratio,density_ratio,in_flow_ratio,out_flow_ratio\n");
-
-				////movement
-				//string out_movement_moe_file_name = output_dir_name<string&>() + "moe_movement.csv";
-				//fopen_s(&fp, out_movement_moe_file_name.c_str(), "w" );
-				//out_movement_moe_file<FILE*>(fp);
-				//fprintf(out_movement_moe_file<FILE*>(),"clock,time,movement,inbound_link,outbound_link,node,turn_penalty,turn_penalty_sd,inbound_link_turn_time,outbound_link_turn_time,movement_flow_rate\n");
-
 			};
+
+			feature_prototype void open_input_files()
+			{
+				//reference network moe file
+				string reference_realtime_network_moe_file_name = input_dir_name<string&>() + "realtime_moe_network_to_compare.csv";
+				reference_realtime_network_moe_file<fstream&>().open(reference_realtime_network_moe_file_name, fstream::in);
+				if (!reference_realtime_network_moe_file<fstream&>().is_open())
+				{
+					cout << "Cannot open reference network moe file. There will be no hisotorical side-by-side plotting in Antares." << endl;
+				}
+			}
+
+			feature_prototype void close_files()
+			{
+				close_output_files<NULLTYPE>();
+			}
 
 			feature_prototype void close_output_files()
 			{
@@ -599,11 +600,12 @@ namespace Scenario_Components
 				out_link_moe_file<fstream&>().close();
 				out_movement_moe_file<fstream&>().close();
 				out_network_moe_file<fstream&>().close();
-
-				//fclose(out_link_moe_file<FILE*>());
-				//fclose(out_movement_moe_file<FILE*>());
-				//fclose(out_network_moe_file<FILE*>());
 			};
+
+			feature_prototype void close_input_files()
+			{
+			}
+
 
 			feature_prototype void increase_network_cumulative_loaded_vehicles()
 			{

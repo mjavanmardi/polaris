@@ -180,8 +180,10 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 	//pls->col0( 15 );
 	//pls->lab( "Iteration", "Value", _layer->name<string&>().c_str() );
 
-	pls->scol0( 3, head_color._r, head_color._g, head_color._b );
-	pls->col0( 3 );
+	int color_counter=3;
+
+	pls->scol0( color_counter, head_color._r, head_color._g, head_color._b );
+	pls->col0( color_counter );
 
 	pls->width( 2 );
 
@@ -204,7 +206,11 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 
 				if(group_color)
 				{
-					glColor4ubv((GLubyte*)geometry_itr);
+					True_Color_RGBA<MasterType>* color = (True_Color_RGBA<MasterType>*)geometry_itr;
+
+					pls->scol0( ++color_counter, color->_r, color->_g, color->_b );
+					pls->col0( color_counter );
+
 					geometry_itr += sizeof(True_Color_RGBA<MasterType>);
 				}
 
@@ -225,8 +231,8 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 		current_iteration++;
 	}
 
-	pls->scol0( 4, 255-head_color._r, 255-head_color._g, 255-head_color._b );
-	pls->col0( 4 );
+	pls->scol0( ++color_counter, 255-head_color._r, 255-head_color._g, 255-head_color._b );
+	pls->col0( color_counter );
 
 	current_iteration=start_iteration;
 
@@ -247,7 +253,11 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 
 				if(group_color)
 				{
-					glColor4ubv((GLubyte*)geometry_itr);
+					True_Color_RGBA<MasterType>* color = (True_Color_RGBA<MasterType>*)geometry_itr;
+
+					pls->scol0( ++color_counter, 255-color->_r, 255-color->_g, 255-color->_b );
+					pls->col0( color_counter );
+
 					geometry_itr += sizeof(True_Color_RGBA<MasterType>);
 				}
 

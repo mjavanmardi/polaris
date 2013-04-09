@@ -162,8 +162,6 @@ struct Antares_Layer_Configuration
 		head_normal._z=1;
 		
 		grouped=false;
-		group_color=false;
-		group_normal=false;
 
 		head_size_value=1;
 
@@ -233,6 +231,15 @@ struct Antares_Layer_Configuration
 		group_normal=false;
 	}
 	
+	void Configure_Static_Polygons()
+	{
+		Antares_Layer_Configuration();
+		primitive_type = _POLYGON;
+		grouped = true;
+		group_color=true;
+		group_normal=false;
+	}
+
 	void Configure_Dynamic_Quads(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
 		Antares_Layer_Configuration();

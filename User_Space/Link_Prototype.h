@@ -153,6 +153,9 @@ namespace Link_Components
 			feature_accessor(link_num_vehicles_in_queue, none, none);
 			feature_accessor(original_free_flow_speed, none, none);
 
+			//visualized link
+			feature_accessor(displayed_line, none, none);
+
 			feature_prototype void push_vehicle(TargetType vehicle)
 			{
 				accept_vehicle<TargetType>(vehicle);
@@ -222,7 +225,11 @@ namespace Link_Components
 			{
 				this_component()->template visualize_moe<ComponentType,CallerType,TargetType>();
 			}
-
+			
+			feature_prototype void configure_displayed_line()
+			{
+				this_component()->template configure_displayed_line<ComponentType,CallerType,TargetType>();
+			}
 		};
 	}
 }

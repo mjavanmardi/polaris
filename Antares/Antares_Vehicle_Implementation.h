@@ -34,9 +34,9 @@ namespace Vehicle_Components
 			Point_3D<NT> d;
 		};
 #pragma pack(pop)
-		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 7 * 5; // rear width in feet
-		const float Vehicle_Attribute_Shape::_vehicle_front_width = 2 * 5; // front width in feet
-		const float Vehicle_Attribute_Shape::_vehicle_length = 13.5 * 5; // length in feet
+		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 7 * 3; // rear width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_front_width = 2 * 3; // front width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_length = 13.5 * 3; // length in feet
 
 		implementation struct Antares_Vehicle_Implementation:public Polaris_Vehicle_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Vehicle_Implementation)>
 		{
@@ -126,33 +126,33 @@ namespace Vehicle_Components
 				{
 					cout << "verified!" << endl;
 					return;
-				}
+				} 
 
-				Intersection_Interface* upstream_intersection=link->template upstream_intersection<Intersection_Interface*>();
-				Intersection_Interface* downstream_intersection=link->template downstream_intersection<Intersection_Interface*>();
+				Link_Line<MasterType>& link_line = link->template displayed_line<Link_Line<MasterType>&>();
 
 				pthis->vehicle_shape.ptr = _this;
 
 
-				float u_x = upstream_intersection->x_position<float>();
-				float u_y = upstream_intersection->y_position<float>();
-				float d_x = downstream_intersection->x_position<float>();
-				float d_y = downstream_intersection->y_position<float>();
-				float sin_alpha = (d_y - u_y) / link->length<float>();
-				float cos_alpha = (d_x - u_x) / link->length<float>();
+				float u_x = link_line.up_node._x;
+				float u_y = link_line.up_node._y;
+				float d_x = link_line.down_node._x;
+				float d_y = link_line.down_node._y;
+				float distance = sqrt((u_x - d_x) * (u_x - d_x) + (u_y - d_y) * (u_y - d_y));
+				float sin_alpha = (d_y - u_y) / distance;
+				float cos_alpha = (d_x - u_x) / distance;
 
 				float travel_distance = (pthis->_local_speed * 5280.0f / 3600.0f);
 				float current_distance = pthis->_distance_to_stop_bar;
 				float new_distance = max(0.0f,(current_distance - travel_distance));
 				pthis->_distance_to_stop_bar = new_distance; 
-				float distance_from_up = link->length<float>() - pthis->_distance_to_stop_bar;
-				
+				//float distance_from_up = link->length<float>() - pthis->_distance_to_stop_bar;
+				float distance_from_up = distance - pthis->_distance_to_stop_bar * (distance / link->length<float>());
 				Point_3D<MasterType> vehicle_center;
 
 				vehicle_center._x = u_x + distance_from_up * cos_alpha;
 				vehicle_center._y = u_y + distance_from_up * sin_alpha;
 
-				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(vehicle_center);
+				// Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(vehicle_center);
 
 				// display on shape vehicle layer
 				float rear_x = vehicle_center._x - (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * cos_alpha;

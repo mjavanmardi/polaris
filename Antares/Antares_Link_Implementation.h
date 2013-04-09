@@ -48,12 +48,21 @@ namespace Link_Components
 			Link_MOE_Bar* bars;
 		};
 #pragma pack(pop)
+		template<typename MasterType>
+		struct Link_Line
+		{
+			void* data;
+			True_Color_RGBA<NT> color;
+			Point_3D<MasterType> up_node;
+			Point_3D<MasterType> down_node;
+		};
 		implementation struct Antares_Link_Implementation:public Polaris_Link_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Link_Implementation)>
 		{
 			// reference MOE values to determine height of bars
 			static Link_MOE_Data visualization_reference;			
 			static int base_height;
 			static float _vehicle_length; // average length of a vehicle in feet
+			static float _link_shift;
 			Link_MOE_Column column;
 			Link_MOE_Bar queue_length_box;
 			feature_implementation void Initialize()
@@ -72,25 +81,25 @@ namespace Link_Components
 				float column_depth_down = 100.0;
 				float column_depth_up = 100.0;
 
-				float u_x = _upstream_intersection->_x_position;
-				float u_y = _upstream_intersection->_y_position;
-				float d_x = _downstream_intersection->_x_position;
-				float d_y = _downstream_intersection->_y_position;
-
-				float sin_alpha = (u_y - d_y) / _length;
-				float cos_alpha = (u_x - d_x) / _length;
+				float u_x = _displayed_line.up_node._x;
+				float u_y = _displayed_line.up_node._y;
+				float d_x = _displayed_line.down_node._x;
+				float d_y = _displayed_line.down_node._y;
+				float distance = sqrt((u_x - d_x) * (u_x - d_x) + (u_y - d_y) * (u_y - d_y));
+				float sin_alpha = (d_y - u_y) / distance;
+				float cos_alpha = (d_x - u_x) / distance;
 
 				float physical_queue_length = realtime_link_moe_data.link_queue_length * _vehicle_length;
 
 				d_node._x = d_x ;
 				d_node._y = d_y;
 				d_node._z = 0.0;
-				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(d_node);
+				//Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(d_node);
 
 				u_node._x = d_x + physical_queue_length * cos_alpha;
 				u_node._y = d_y + physical_queue_length * sin_alpha;
 				u_node._z = 0.0;
-				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(u_node);
+				//Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(u_node);
 				
 				queue_length_box.a._x = d_node._x;
 				queue_length_box.a._y = d_node._y;
@@ -114,27 +123,27 @@ namespace Link_Components
 				Point_3D<MasterType> u_node;
 				Point_3D<MasterType> d_node;
 			
-				float u_x = _upstream_intersection->_x_position;
-				float u_y = _upstream_intersection->_y_position;
-				float d_x = _downstream_intersection->_x_position;
-				float d_y = _downstream_intersection->_y_position;
+				float u_x = _displayed_line.up_node._x;
+				float u_y = _displayed_line.up_node._y;
+				float d_x = _displayed_line.down_node._x;
+				float d_y = _displayed_line.down_node._y;
 				float c_x = (u_x + d_x) / 2.0f;
 				float c_y = (u_y + d_y) / 2.0f;
 				float column_width = 100.0;
-				float column_depth = 40.0;
-				
-				float sin_alpha = (d_y - u_y) / _length;
-				float cos_alpha = (d_x - u_x) / _length;
+				float column_depth = 30.0;
+				float distance = sqrt((u_x - d_x) * (u_x - d_x) + (u_y - d_y) * (u_y - d_y));
+				float sin_alpha = (d_y - u_y) / distance;
+				float cos_alpha = (d_x - u_x) / distance;
 
 				u_node._x = c_x - (c_x - u_x) * (column_width / (0.5 * _length));
 				u_node._y = c_y - (c_y - u_y) * (column_width / (0.5 * _length));
 				u_node._z=0;
-				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(u_node);
+				//Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(u_node);
 
 				d_node._x = c_x - (c_x - d_x) * (column_width / (0.5 * _length));
 				d_node._y = c_y - (c_y - d_y) * (column_width / (0.5 * _length));
 				d_node._z=0;
-				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(d_node);
+				//Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(d_node);
 
 				// configure front bar
 				column.bars[FRONT_BAR].a._x = u_node._x + column_depth / 2.0 * sin_alpha;
@@ -464,12 +473,16 @@ namespace Link_Components
 #pragma pack(push,1)
 				struct Plot_Element
 				{
+					True_Color_RGBA<NT> color;
 					int num_primitives;
 					Point_2D<MasterType>* points;
 				};
 #pragma pack(pop)
 				Plot_Element element;
-
+				element.color._r = 255;
+				element.color._g = 0;
+				element.color._b = 0;
+				element.color._a = 255;
 				// plot link_travel_time
 				element.num_primitives = _link_travel_time_cache.size();
 				element.points = &_link_travel_time_cache.front();
@@ -537,7 +550,12 @@ namespace Link_Components
 					bucket.push_back("NON_RECOGNIZED");
 					break;
 				}
-
+				sprintf(str_buf, "%.0f feet", _this->_length);
+				bucket.push_back(str_buf);
+				sprintf(str_buf, "%d", _this->_num_lanes);
+				bucket.push_back(str_buf);
+				sprintf(str_buf, "%.0f MPH", _this->_free_flow_speed);
+				bucket.push_back(str_buf);
 				sprintf(str_buf, "%.2f minutes", _this->realtime_link_moe_data.link_travel_time);
 				bucket.push_back(str_buf);
 				sprintf(str_buf, "%.2f MPH", _this->realtime_link_moe_data.link_speed);
@@ -553,6 +571,59 @@ namespace Link_Components
 				sprintf(str_buf, "%.2f", _this->realtime_link_moe_data.link_queue_length);
 				bucket.push_back(str_buf);
 				return true;
+			}
+
+			feature_implementation void configure_displayed_line()
+			{
+				_displayed_line.color = get_color_by_type(_link_type);
+				_displayed_line.data = (void*)(this);
+
+				float u_x = _upstream_intersection->_x_position;
+				float u_y = _upstream_intersection->_y_position;
+				float d_x = _downstream_intersection->_x_position;
+				float d_y = _downstream_intersection->_y_position;
+				float distance = sqrt((u_x - d_x) * (u_x - d_x) + (u_y - d_y) * (u_y - d_y));
+				float sin_alpha = (d_y - u_y) / distance;
+				float cos_alpha = (d_x - u_x) / distance;
+
+				_displayed_line.up_node._x = u_x + _link_shift * sin_alpha;
+				_displayed_line.up_node._y = u_y - _link_shift * cos_alpha;
+				_displayed_line.up_node._z = 0;
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(_displayed_line.up_node);
+				
+				_displayed_line.down_node._x = d_x + _link_shift * sin_alpha;
+				_displayed_line.down_node._y = d_y - _link_shift * cos_alpha;
+				_displayed_line.down_node._z = 0;
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(_displayed_line.down_node);
+			}
+
+			True_Color_RGBA<NT> get_color_by_type(int link_type)
+			{
+				True_Color_RGBA<NT> color;
+				switch(link_type)
+				{
+				case Link_Components::Types::Link_Type_Keys::FREEWAY:
+				case Link_Components::Types::Link_Type_Keys::ON_RAMP:
+				case Link_Components::Types::Link_Type_Keys::OFF_RAMP:
+				case Link_Components::Types::Link_Type_Keys::EXPRESSWAY:
+					color._r = 0;
+					color._g = 255;
+					color._b = 255;
+					color._a = 255;
+					return color;
+				case Link_Components::Types::Link_Type_Keys::ARTERIAL:
+					color._r = 128;
+					color._g = 128;
+					color._b = 128;
+					color._a = 255;
+					return color;
+				default:
+					color._r = 128;
+					color._g = 128;
+					color._b = 128;
+					color._a = 255;
+					return color;
+				}
 			}
 
 			declare_feature_conditional(Newells_Conditional)
@@ -617,6 +688,8 @@ namespace Link_Components
 			member_data(vector<Point_2D<MasterType>>,link_density_ratio_cache,none,none);
 			member_data(vector<Point_2D<MasterType>>,link_queue_length_cache,none,none);
 
+			member_data(Link_Line<MasterType>, displayed_line, none, none);
+
 			static member_prototype(Antares_Layer,link_moe_plot,typename type_of(MasterType::antares_layer),none,none);
 		};
 		template<typename MasterType,typename ParentType,typename InheritanceList>
@@ -654,6 +727,8 @@ namespace Link_Components
 		int Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::base_height = 100;
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		float Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::_vehicle_length = 13.5;
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		float Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::_link_shift = 20;
 	}
 }
 

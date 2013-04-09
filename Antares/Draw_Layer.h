@@ -80,7 +80,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	}
 
 	int current_iteration=start_iteration;
-	
+
 	while(current_iteration <= end_iteration)
 	{
 		const vector<int> (&geometry_by_thread)[_num_antares_threads] = storage[current_iteration];
@@ -116,6 +116,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 					}
 
 					const int num_group_primitives=*((int*)geometry_itr);
+
 					geometry_itr += sizeof(int);
 
 					const unsigned char* const group_end = geometry_itr + primitive_stride * num_group_primitives;

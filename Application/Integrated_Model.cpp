@@ -28,6 +28,7 @@ struct MasterType
 
 	typedef Antares_Network_Implementation<M> network_type;
 	typedef Antares_Link_Implementation<M> link_type;
+	typedef Antares_Intersection_Implementation<MasterType> intersection_type;
 	//typedef Graphical_Intersection_Implementation<M> graphical_intersection_type;
 	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> vehicle_type;	
 	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
@@ -36,6 +37,7 @@ struct MasterType
 #else
 	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<M> network_type;
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<M> link_type;
+	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<M> vehicle_type;
 	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 #endif
@@ -44,7 +46,6 @@ struct MasterType
 	// Network Types
 	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<M> scenario_type;
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<M> network_db_reader_type;
-	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<M> intersection_type;
 	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<M> movement_type;
 
 	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<M> turn_movement_type;

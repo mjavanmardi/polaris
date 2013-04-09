@@ -44,7 +44,6 @@ namespace Network_Components
 			float network_avg_link_out_flow_ratio;
 			float network_avg_link_density_ratio;
 			float network_avg_link_travel_time_ratio;
-
 		};
 
 		implementation struct Polaris_Network_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>
@@ -220,7 +219,7 @@ namespace Network_Components
 				_Network_Interface* _this_ptr = (_Network_Interface*)_this;
 				if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>())
 				{
-					_this_ptr->template scenario_reference<_Scenario_Interface*>()->template close_output_files<NULLTYPE>();
+					_this_ptr->template scenario_reference<_Scenario_Interface*>()->template close_files<NULLTYPE>();
 					exit(0);
 				}
 
@@ -252,7 +251,7 @@ namespace Network_Components
 				}
 				
 				calculate_realtime_network_moe();
-				//output_moe_for_simulation_interval<ComponentType, CallerType, TargetType>();
+				output_moe_for_simulation_interval<ComponentType, CallerType, TargetType>();
 
 				if (((((_Network_Interface*)this)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{
