@@ -177,15 +177,14 @@ namespace Network_Skimming_Components
 				skim_table_itf* skim_table = (skim_table_itf*)Allocate<typename type_of(skims_by_time_container)::unqualified_value_type>();
 				skim_table->template network_reference<network_itf*>(network);
 				skim_table->template skim_reference<skimmer_itf*>(skim);
-				skim_table->template start_time<Simulation_Timestep_Increment>(0);
+				skim_table->template start_time<Simulation_Timestep_Increment>(0.0f);
 				skim_table->template end_time<Simulation_Timestep_Increment>(END);
+
 				skim_table->template Initialize<NULLTYPE>();
 
 				// add time period skim tables to the container
 				skim_tables_itf* skim_tables = this->template skims_by_time_container<ComponentType,CallerType,skim_tables_itf*>();
 				skim_tables->push_back(skim_table);
-
-
 			}
 
 			feature_implementation typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator)
@@ -239,7 +238,7 @@ namespace Network_Skimming_Components
 				typedef Prototypes::Network_Skimming_Prototype<ComponentType,ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
 				pthis->template update_increment<Time_Hours>(1);
-				pthis->template scheduled_update_time<Simulation_Timestep_Increment>(0);
+				pthis->template scheduled_update_time<Simulation_Timestep_Increment>(0.0);
 				pthis->template nodes_per_zone<long>(1);
 
 				// add the available modes for the current model

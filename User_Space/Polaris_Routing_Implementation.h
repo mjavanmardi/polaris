@@ -243,7 +243,7 @@ namespace Routing_Components
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
 				if(_sub_iteration == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
 				{
-					if (_iteration >= _this_ptr->start_time<Simulation_Timestep_Increment>() && _iteration < _this_ptr->end_time<Simulation_Timestep_Increment>())
+					if (_iteration >= (int)_this_ptr->start_time<Simulation_Timestep_Increment>() && _iteration < (int)_this_ptr->end_time<Simulation_Timestep_Increment>())
 					{
 						response.result=true;
 						response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());

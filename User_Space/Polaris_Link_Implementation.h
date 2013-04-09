@@ -712,7 +712,7 @@ namespace Link_Components
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
 if (_this_ptr->internal_id<int>() == 168)
 {
-	cout << "here" << endl;
+	//cout << "here" << endl;
 }
 //cout << "ok1 at " << _this_ptr->internal_id<int>() << endl;
 				//step 7: link moving -- no link moving in Newell's simplified model -- it can be used to determine turn bay curve

@@ -296,6 +296,10 @@ namespace Prototypes
 		{
 			assert_check(TargetType, is_integral, "Error, work location can only be set by passing an integral index from network::activity_locations_container");
 		}
+		feature_prototype void Choose_Work_Location()
+		{
+			this_component()->Choose_Work_Location<ComponentType,CallerType,TargetType>();
+		}
 	};
 
 

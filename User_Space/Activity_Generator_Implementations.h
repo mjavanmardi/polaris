@@ -121,7 +121,7 @@ namespace Person_Components
 
 					// Activity planning time
 					int plan_time = i+1;
-					activity->Initialize<int>(plan_time);
+					activity->Initialize<Target_Type<NT,NT, Activity_Components::Types::ACTIVITY_TYPES, int> >(Activity_Components::Types::OTHER_ACTIVITY, plan_time);
 					activities->push_back(activity);
 
 					//// Create movement plan and give it an ID
@@ -169,92 +169,5 @@ namespace Person_Components
 			tag_feature_as_available(Activity_Generation);
 
 		};
-	
-		implementation struct TEST_Activity_Generator_Implementation : public General_Activity_Generator_Implementation<MasterType, ParentType, APPEND_CHILD(TEST_Activity_Generator_Implementation)>
-		{
-			// IMPLEMENTATION TYPEDEFS AND INTERFACES
-			typedef General_Activity_Generator_Implementation<MasterType, ParentType, APPEND_CHILD(TEST_Activity_Generator_Implementation)> base_type;
-			typedef base_type base;
-			typedef Prototypes::Activity_Generator<base_type,base_type> base_itf;
-			
-			int _origin_id, _destination_id, _departure_time;
-
-			// Interface definitions
-			define_component_interface(_Destination_Choice_Itf, typename type_of(Parent_Planner)::type_of(Destination_Chooser), Prototypes::Destination_Chooser, ComponentType);
-			define_component_interface(person_itf,typename base_type::type_of(Parent_Planner)::type_of(Parent_Person), Prototypes::Person,ComponentType);
-			define_component_interface(_Scenario_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-			define_component_interface(_Network_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
-			define_component_interface(_Skim_Interface, typename _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
-			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
-			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan, typename type_of(Parent_Planner)::type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
-			define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-
-			feature_implementation void Initialize(int origin_id, int destination_id, int departure_time, requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
-			{	
-				_origin_id=origin_id; _destination_id=destination_id; _departure_time=departure_time;
-			}
-			feature_implementation void Initialize(int origin_id, int destination_id, int departure_time, requires(check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
-			{	
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Initialize_Defined, "The specified ParentType is not a valid Person type.");
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Properties_Defined, "The specified ParentType does not have the required Properties member defined.");
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Planner_Defined, "The specified ParentType does not have the required Planner member defined.");
-			}
-			tag_feature_as_available(Initialize);
-
-			feature_implementation void Activity_Generation()
-			{
-				person_itf* _Parent_Person = base_type::_Parent_Planner->Parent_Person<person_itf*>();
-
-				
-				// get references to the plan containers
-				Activity_Plans* activities = typename base_type::_Parent_Planner->template Activity_Plans_Container<Activity_Plans*>();
-				Movement_Plans* movements = typename base_type::_Parent_Planner->template Movement_Plans_Container<Movement_Plans*>();	
-
-				// external knowledge references
-				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				_Activity_Locations_Container_Interface* locations = network->activity_locations_container<_Activity_Locations_Container_Interface*>();
-				_Scenario_Interface* scenario = _Parent_Person->template scenario_reference<_Scenario_Interface*>();
-				_Activity_Location_Interface *orig, *dest;
-				orig = nullptr; dest = nullptr;
-
-				// Generate average of 2 activities per day
-				Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Parent_Planner)::type_of(Movement_Plans_Container)::unqualified_value_type>();
-				move->template initialize_trajectory<NULLTYPE>();
-
-				// Get the origin and destination locations
-				for (int i =0; i < locations->size(); i++)
-				{
-					if (locations->at(i)->uuid<int>() == _origin_id) orig = locations->at(i);
-					if (locations->at(i)->uuid<int>() == _destination_id) dest = locations->at(i);
-				}
-
-				// check that origin and destination are valid
-				if (orig != nullptr && dest != nullptr) 
-				{
-					// If the trip is valid, assign to a movement plan and add to the schedule
-					if (orig->internal_id<int>() != dest->internal_id<int>())
-					{
-						// add attributes to plan
-						move->template origin<_Activity_Location_Interface*>(orig);
-						move->template destination<_Activity_Location_Interface*>(dest);
-						move->template origin<_Link_Interface*>(orig->origin_links<_Links_Container_Interface&>().at(0));
-						move->template destination<_Link_Interface*>(dest->origin_links<_Links_Container_Interface&>().at(0));
-						move->template departed_time<Basic_Units::Time_Variables::Time_Seconds>(_departure_time);
-
-						// Add to plans schedule
-						_Parent_Planner->template Add_Movement_Plan<Movement_Plan*>(move);
-					}
-				}
-				else
-				{
-					THROW_EXCEPTION("error: origin id=" << _origin_id <<" or destination id="<<_destination_id<<", was not found.");
-				}
-			}
-			tag_feature_as_available(Activity_Generation);
-
-		};
-
 	}
 }

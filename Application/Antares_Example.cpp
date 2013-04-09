@@ -1,7 +1,5 @@
-#include "Model_Selection.h"
-
 #ifdef ANTARES_EXAMPLE
-
+#include "Model_Selection.h"
 #include "Application_Includes.h"
 
 struct MasterType

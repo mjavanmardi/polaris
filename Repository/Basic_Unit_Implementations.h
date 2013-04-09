@@ -31,6 +31,10 @@ namespace Basic_Units
 		/// Basic Time base clase and Time Horizon Classes.
 		implementation struct Time_Implementation : public Polaris_Component<APPEND_CHILD(Time_Implementation),MasterType,NULLTYPE>
 		{
+			Time_Implementation()
+			{
+				this->_Value = 0;
+			}
 			typedef true_type Time_tag;
 			typedef true_type Seconds_tag;
 			member_data(Value_Type,Value,none,none);

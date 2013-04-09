@@ -114,7 +114,7 @@ namespace PopSyn
 				// CREATE RNG for later use
 				define_component_interface(Rand_Interface,typename ComponentType::Master_Type::RNG,RNG_Prototype,NULLTYPE);
 				Rand_Interface* rand = (Rand_Interface*)Allocate<typename ComponentType::Master_Type::RNG>();
-				rand->Initialize<double>(0);
+				rand->Initialize<double>(0.0);
 
 				// IPF Solver Settings
 				define_component_interface(solver_itf,typename get_type_of(Solution_Settings),PopSyn::Prototypes::Solver_Settings_Prototype,ComponentType);

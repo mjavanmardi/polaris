@@ -88,14 +88,15 @@ namespace Activity_Components
 			member_container(vector<typename MasterType::person_type*>, Involved_Persons_Container, none, none);
 
 			// Activity methods
-			feature_implementation void Initialize()
+			feature_implementation void Initialize(TargetType activity_type)
 			{
+				UNLOCK(this->_update_lock);
 				this_itf* pthis = (this_itf*)this;
+				pthis->Activity_Type<TargetType>(activity_type);
 				pthis->Duration<Time_Seconds>(END);
 				pthis->Start_Time<Time_Seconds>(END);
 				pthis->Location<_activity_location_itf*>(nullptr);
 				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				UNLOCK(this->_update_lock);
 			}
 
 			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time)
@@ -213,6 +214,7 @@ namespace Activity_Components
 				// Create movement plan and give it an ID
 				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename type_of(Parent_Planner)::type_of(Movement_Plans_Container)::unqualified_value_type>();
 				move->template initialize_trajectory<NULLTYPE>();
+				move->template activity_reference<ComponentType*>(this);
 
 				// Get the origin and destination locations
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();

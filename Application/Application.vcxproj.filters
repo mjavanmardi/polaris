@@ -28,9 +28,6 @@
     <ClCompile Include="NetworkModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PopSyn_Example.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine_Tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

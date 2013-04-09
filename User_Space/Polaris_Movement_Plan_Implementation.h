@@ -67,15 +67,15 @@ namespace Movement_Plan_Components
 
 			member_component(typename MasterType::link_type, origin, none, none);
 			member_component(typename MasterType::link_type, destination, none, none);
-#ifndef FOR_LINUX_PORTING
+//#ifndef FOR_LINUX_PORTING
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_departed_time,none,none);
 			member_component_feature(departed_time, _departed_time, Value, Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_arrived_time,none,none);
 			member_component_feature(arrived_time, _arrived_time, Value, Basic_Units::Prototypes::Time_Prototype);
-#else
-			member_data(int,departed_time,none,none);
-			member_data(int,arrived_time,none,none);
-#endif
+//#else
+//			member_data(int,departed_time,none,none);
+//			member_data(int,arrived_time,none,none);
+//#endif
 			member_component(typename MasterType::plan_type, plan, none, none);
 			feature_implementation void arrive_to_destination()
 			{
@@ -99,6 +99,11 @@ namespace Movement_Plan_Components
 			}
 
 			member_data(bool, valid_trajectory,none,none);
+		};
+
+		implementation struct Polaris_Integrated_Movement_Plan_Implementation : public Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)>
+		{
+			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_plan_type,none,none);
 		};
 	}
 }

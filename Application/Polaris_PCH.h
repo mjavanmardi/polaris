@@ -1,3 +1,4 @@
+#pragma once
 #ifdef ANTARES
 #include "gl\glew.h"
 #include "wx\glcanvas.h"

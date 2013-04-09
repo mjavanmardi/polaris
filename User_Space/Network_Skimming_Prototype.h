@@ -371,6 +371,9 @@ namespace Network_Skimming_Components
 			//---------------------------------------------
 			feature_prototype void Initialize()
 			{
+				//cout << endl << "Initializing skim table at iteration - " << _iteration;
+
+
 				// call implementation initializer
 				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 
@@ -428,7 +431,6 @@ namespace Network_Skimming_Components
 
 					pair<long,tree_builder_itf*> item = pair<long,tree_builder_itf*>(orig,tree_builder);
 					tree_list->insert(item);
-					//tree_list->insert(pair<long,tree_builder_itf*>(orig,tree_builder));
 				}
 			}			
 

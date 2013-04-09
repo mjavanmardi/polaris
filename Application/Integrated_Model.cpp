@@ -1,20 +1,24 @@
-
-
+#include "Polaris_PCH.h"
 #include "Model_Selection.h"
+
 #ifdef IntegratedModelApplication
-//#include "Polaris_PCH.h"
+
+
+// SET THE DEBUG VERSION TO SIMULATE ONLY ONE AGENT
+#ifdef _DEBUG
+#define DEBUG_1
+#endif
+
 #ifdef DBIO
 #define WINDOWS
 #include "Application_Includes.h"
-#include "../File_IO/network_models.h"
-
 
 
 struct MasterType
 {
 	typedef MasterType M;
 
-#ifdef ANTARES
+	#ifdef ANTARES
 	typedef Conductor_Implementation<M> conductor_type;
 	typedef Control_Panel_Implementation<M> control_panel_type;
 	typedef Time_Panel_Implementation<M> time_panel_type;
@@ -34,13 +38,13 @@ struct MasterType
 	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
 	//typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;
-#else
+	#else
 	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<M> network_type;
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<M> link_type;
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<M> vehicle_type;
 	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
-#endif
+	#endif
 
 	//==============================================================================================
 	// Network Types
@@ -68,7 +72,7 @@ struct MasterType
 	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation<M> phase_movement_type;
 	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<M> approach_type;
 	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<M> plan_type;
-	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<M> movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Polaris_Integrated_Movement_Plan_Implementation<M> movement_plan_type;
 	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<M> trajectory_unit_type;
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
 	
@@ -92,14 +96,10 @@ struct MasterType
 	typedef PopSyn::Implementations::ADAPTS_Population_Unit_Implementation<M> pop_unit;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<M> popsyn_solver;
 };
-
-
 ostream* stream_ptr;
 
 int main(int argc,char** argv)
 {
-
-
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -215,6 +215,7 @@ int main(int argc,char** argv)
 	GLOBALS::Normal_RNG.Set_Seed<int>(100);
 	GLOBALS::Uniform_RNG.Set_Seed<int>(200);
 
+
 	//==================================================================================================================================
 	// Set up graphical display
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -254,7 +255,7 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
-	#ifdef _DEBUG
+	#ifdef DEBUG_1
 	typedef Person_Components::Prototypes::Person<MasterType::person_type> person_itf;
 	typedef Person_Components::Prototypes::Person_Properties<MasterType::person_properties_type> properties_itf;
 	typedef Person_Components::Prototypes::Activity_Generator<MasterType::activity_generator_type> generator_itf;
@@ -263,7 +264,7 @@ int main(int argc,char** argv)
 	p->network_reference<_Network_Interface*>(network);
 	p->scenario_reference<_Scenario_Interface*>(scenario);	
 	p->Initialize<int>(1);
-	p->Home_Location<int>(0);
+	p->Home_Location<int>(0.0);
 
 	#else
 	ofstream out;
@@ -289,7 +290,7 @@ int main(int argc,char** argv)
 	popsyn->Initialize<NULLTYPE>();
 	#endif
 	//----------------------------------------------------------------------------------------------------------------------------------
-
+	cout << "test";
 	//==================================================================================================================================
 	// Logging of activity generation / scheduling outputs
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -304,6 +305,11 @@ int main(int argc,char** argv)
 	}
 	//----------------------------------------------------------------------------------------------------------------------------------
 	
+
+
+	//==================================================================================================================================
+	// Start Simulation
+	//----------------------------------------------------------------------------------------------------------------------------------
 	try
 	{
 	START();
@@ -353,7 +359,8 @@ int main(int argc,char** argv)
 //	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 //#endif
 //
-//	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<M> network_db_reader_type;
+//	//typedef Network_Components::Implementations::Network_DB_Reader_Implementation<M> network_db_reader_type;
+//	typedef true_type network_db_reader_type;
 //
 //	//==============================================================================================
 //	// Network Types
@@ -375,7 +382,7 @@ int main(int argc,char** argv)
 //	typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<M> routable_inbound_outbound_movements_type;
 //	typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<M> routable_outbound_inbound_movements_type;
 //	typedef Intersection_Components::Implementations::Routable_Movement_Implementation<M> routable_movement_type;
-//	typedef Operation_Components::Implementations::Polaris_Operation_Implementation<M> operation_type;
+//	//typedef Operation_Components::Implementations::Polaris_Operation_Implementation<M> operation_type;
 //	typedef Intersection_Control_Components::Implementations::Polaris_Intersection_Control_Implementation<M> intersection_control_type;
 //	typedef Intersection_Control_Components::Implementations::Polaris_Control_Plan_Implementation<M> control_plan_type;
 //	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Implementation<M> phase_type;
@@ -392,7 +399,10 @@ int main(int argc,char** argv)
 //	typedef Person_Components::Implementations::CTRAMP_Activity_Generator_Implementation<M, person_type> activity_generator_type;
 //	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<M,person_type> person_properties_type;
 //	typedef RNG_Components::Implementations::RngStream_Implementation<M> RNG;
-//	typedef Activity_Components::Implementations::Activity_Plan_Implementation<M,person_type> activity_plan_type;
+//	typedef Activity_Components::Implementations::ADAPTS_Activity_Plan_Implementation<M,person_type> activity_plan_type;
+//	// destination choice types
+//	typedef Person_Components::Implementations::CTRAMP_Destination_Chooser_Implementation<M,person_type> person_destination_chooser_type;
+//	typedef Person_Components::Implementations::CTRAMP_Destination_Choice_Option<M,person_type> person_destination_choice_option_type;
 //
 //	
 //	// POPULATION SYNTHESIS CLASSES
@@ -464,10 +474,10 @@ int main(int argc,char** argv)
 //	//network->write_network_data<NULLTYPE>(network_data_for_output);
 //
 //
-//	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-//	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
-//	operation->network_reference<_Network_Interface*>(network);
-//	operation->read_operation_data<Operation_Components::Types::File_Operation>(scenario_data, network_data, operation_data);
+//	//define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
+//	//_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
+//	//operation->network_reference<_Network_Interface*>(network);
+//	//operation->read_operation_data<Operation_Components::Types::File_Operation>(scenario_data, network_data, operation_data);
 //	//operation->write_operation_data<NULLTYPE>(network_data_for_output, operation_data_for_output);
 //	
 //	//output data
