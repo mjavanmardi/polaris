@@ -300,6 +300,10 @@ namespace Prototypes
 		{
 			this_component()->Choose_Work_Location<ComponentType,CallerType,TargetType>();
 		}
+		feature_prototype void Choose_School_Location()
+		{
+			this_component()->Choose_Work_Location<ComponentType,CallerType,TargetType>();
+		}
 	};
 
 

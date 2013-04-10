@@ -14,9 +14,6 @@
     <ClInclude Include="Application_Includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Model_Selection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Polaris_PCH.h">
       <Filter>Header Files</Filter>
     </ClInclude>

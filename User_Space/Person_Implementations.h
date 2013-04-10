@@ -23,6 +23,38 @@ namespace Person_Components
 
 		implementation struct Person_Implementation : public Polaris_Component<APPEND_CHILD(Person_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			//=======================================================================================================================================================================
+			// DATA MEMBERS
+			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			member_prototype(Vehicle_Components::Prototypes::Vehicle_Prototype, vehicle,typename MasterType::vehicle_type,none,none);
+			member_prototype(Routing_Components::Prototypes::Routing_Prototype, router,typename MasterType::routing_type,none,none);
+			member_prototype(Prototypes::Person_Mover, Moving_Faculty,Implementations::Person_Mover_Implementation<MasterType>, none, none);
+		
+			member_prototype(Prototypes::Person_Planner, Planning_Faculty, typename MasterType::person_planner_type,none,check_2(ComponentType,CallerType, Is_Same_Entity));
+			member_prototype(Prototypes::Person_Properties, Properties, typename MasterType::person_properties_type,none,check_2(ComponentType,CallerType, Is_Same_Entity));
+			member_prototype(PopSyn::Prototypes::Population_Unit_Prototype,Static_Properties,typename MasterType::pop_unit,none,none);
+
+			member_prototype(Scenario_Components::Prototypes::Scenario_Prototype, scenario_reference, typename MasterType::scenario_type, none, none);
+			member_prototype(Network_Components::Prototypes::Network_Prototype, network_reference, typename MasterType::network_type, none, none);
+
+			// Agent ID
+			member_data(long,uuid,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+
+			// First iteration  - sets the next iteration after all planning is completed
+			member_component_and_feature_accessor(First_Iteration, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
+
+
+			//=======================================================================================================================================================================
+			// INTERFACE DEFINITIONS
+			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			define_component_interface(generator_itf,typename type_of(Planning_Faculty)::type_of(Activity_Generator),Prototypes::Activity_Generator,ComponentType);
+			define_component_interface(destination_choice_itf,typename type_of(Planning_Faculty)::type_of(Destination_Chooser),Prototypes::Destination_Chooser,ComponentType);
+			define_container_and_value_interface(zones_container_interface, zone_interface, typename network_reference_interface::get_type_of(zones_container),Containers::Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+			define_container_and_value_interface(locations_container_interface, location_interface, typename network_reference_interface::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+
+			//=======================================================================================================================================================================
+			// FEATURES
+			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			feature_implementation void Initialize(TargetType id)
 			{	
 				// Set the initial iteration to process
@@ -64,30 +96,12 @@ namespace Person_Components
 			}
 			tag_feature_as_available(Initialize);	
 
-			member_prototype(Vehicle_Components::Prototypes::Vehicle_Prototype, vehicle,typename MasterType::vehicle_type,none,none);
-			member_prototype(Routing_Components::Prototypes::Routing_Prototype, router,typename MasterType::routing_type,none,none);
-			member_prototype(Prototypes::Person_Mover, Moving_Faculty,Implementations::Person_Mover_Implementation<MasterType>, none, none);
-		
-			member_prototype(Prototypes::Person_Planner, Planning_Faculty, typename MasterType::person_planner_type,none,check_2(ComponentType,CallerType, Is_Same_Entity));
-			member_prototype(Prototypes::Person_Properties, Properties, typename MasterType::person_properties_type,none,check_2(ComponentType,CallerType, Is_Same_Entity));
-			member_prototype(PopSyn::Prototypes::Population_Unit_Prototype,Static_Properties,typename MasterType::pop_unit,none,none);
-
-			member_prototype(Scenario_Components::Prototypes::Scenario_Prototype, scenario_reference, typename MasterType::scenario_type, none, none);
-			member_prototype(Network_Components::Prototypes::Network_Prototype, network_reference, typename MasterType::network_type, none, none);
-
-			// Agent ID
-			member_data(long,uuid,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
-
-			// First iteration  - sets the next iteration after all planning is completed
-			member_component_and_feature_accessor(First_Iteration, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
-
 			feature_implementation TargetType Choose_Work_Location()
 			{
-
+				Time_Minutes ttime = _Static_Properties->Journey_To_Work_Travel_Time<Time_Minutes>();
 			}
+			tag_feature_as_available(Choose_Work_Location);
 
-			define_component_interface(generator_itf,typename type_of(Planning_Faculty)::type_of(Activity_Generator),Prototypes::Activity_Generator,ComponentType);
-			define_component_interface(destination_choice_itf,typename type_of(Planning_Faculty)::type_of(Destination_Chooser),Prototypes::Destination_Chooser,ComponentType);
 		};
 
 

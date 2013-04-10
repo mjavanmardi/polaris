@@ -1,7 +1,4 @@
 #include "Polaris_PCH.h"
-#include "Model_Selection.h"
-
-#ifdef IntegratedModelApplication
 
 
 // SET THE DEBUG VERSION TO SIMULATE ONLY ONE AGENT
@@ -32,16 +29,14 @@ struct MasterType
 
 	typedef Antares_Network_Implementation<M> network_type;
 	typedef Antares_Link_Implementation<M> link_type;
-	typedef Antares_Intersection_Implementation<MasterType> intersection_type;
-	//typedef Graphical_Intersection_Implementation<M> graphical_intersection_type;
 	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> vehicle_type;	
 	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
-	//typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
+	typedef Antares_Intersection_Implementation<M> intersection_type;
 	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;
 	#else
 	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<M> network_type;
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<M> link_type;
-	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
+	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<M> intersection_type;
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<M> vehicle_type;
 	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 	#endif
@@ -631,4 +626,3 @@ int main(int argc,char** argv)
 //}
 //#endif
 
-#endif
