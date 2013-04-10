@@ -12,11 +12,16 @@ namespace network_models
 		{
 			enum Link_Type_Keys
 			{
-				FREEWAY=0,
-				ON_RAMP,
-				OFF_RAMP,
-				EXPRESSWAY,
-				ARTERIAL,
+				FREEWAY=0,		//e.g. I-94
+				ON_RAMP,		//
+				OFF_RAMP,		//
+				EXPRESSWAY,		//e.g. Lakeshore drive
+				ARTERIAL,		//e.g. Michigan Ave
+				LIGHT_RAILWAY,		//
+				HEAVY_RAILWAY,		//
+				WALKWAY,		//
+				BIKEWAY,		//
+				WATERWAY,		//
 			};
 			struct LinkData
 			{

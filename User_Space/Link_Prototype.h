@@ -12,6 +12,11 @@ namespace Link_Components
 			OFF_RAMP,
 			EXPRESSWAY,
 			ARTERIAL,
+			LIGHT_RAILWAY,
+			HEAVY_RAILWAY,
+			WALKWAY,
+			BIKEWAY,
+			WATERWAY,
 		};
 	}
 
@@ -225,7 +230,7 @@ namespace Link_Components
 			{
 				this_component()->template visualize_moe<ComponentType,CallerType,TargetType>();
 			}
-			
+
 			feature_prototype void configure_displayed_line()
 			{
 				this_component()->template configure_displayed_line<ComponentType,CallerType,TargetType>();

@@ -19,6 +19,7 @@ namespace network_models
 				double x;
 				double y;
 				int population;
+				int employment;
 
 				//topology
 				int num_origin_activity_locations;

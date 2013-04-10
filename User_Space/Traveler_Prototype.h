@@ -74,7 +74,11 @@ namespace Traveler_Components
 	
 				Vehicle_Itf* vehicle = this_ptr->template vehicle<Vehicle_Itf*>();
 				link_itf* origin_link = vehicle->movement_plan<movement_itf*>()->origin<link_itf*>();
-		
+				
+				if (!vehicle->movement_plan<movement_itf*>()->valid_trajectory<bool>())
+				{
+					return;
+				}
 				// Schedule the routing if the vehicle is not already in the network, otherwise return false
 				if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
 				{

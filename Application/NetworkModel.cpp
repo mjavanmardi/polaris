@@ -1,14 +1,9 @@
 #include "Polaris_PCH.h"
-
 #include "Model_Selection.h"
 #define EXCLUDE_DEMAND
 #ifdef NetworkModelApplication
-//#include "Polaris_PCH.h"
 #define FOR_LINUX_PORTING
-
-
-
-//#define DBIO
+#define DBIO
 #ifdef DBIO
 
 #include "Application_Includes.h"
@@ -117,9 +112,30 @@ struct MasterType
 
     typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
 
-    typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
-
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
+
+	typedef Link_Control_Components::Implementations::Lane_Link_Control<MasterType> link_control_type;
+	typedef Depot_Components::Implementations::Tow_Truck_Depot<MasterType> depot_type;
+	typedef Advisory_Radio_Components::Implementations::Highway_Advisory_Radio<MasterType> advisory_radio_type;
+	typedef Variable_Message_Sign_Components::Implementations::Variable_Word_Sign<MasterType> variable_message_sign_type;
+#ifdef ANTARES
+	typedef Traffic_Management_Center_Components::Implementations::Antares_TMC<MasterType> traffic_management_center_type;
+	typedef Network_Event_Components::Implementations::Antares_Weather_Network_Event<MasterType> weather_network_event_type;
+	typedef Network_Event_Components::Implementations::Antares_Accident_Network_Event<MasterType> accident_network_event_type;
+	typedef Network_Event_Components::Implementations::Antares_Congestion_Network_Event<MasterType> congestion_network_event_type;
+	typedef Network_Event_Components::Implementations::Antares_Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
+#else
+	typedef Traffic_Management_Center_Components::Implementations::Simple_TMC<MasterType> traffic_management_center_type;
+	typedef Network_Event_Components::Implementations::Weather_Network_Event<MasterType> weather_network_event_type;
+	typedef Network_Event_Components::Implementations::Accident_Network_Event<MasterType> accident_network_event_type;
+	typedef Network_Event_Components::Implementations::Congestion_Network_Event<MasterType> congestion_network_event_type;
+	typedef Network_Event_Components::Implementations::Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
+#endif
+
+	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
+	typedef TYPELIST_4(weather_network_event_type,accident_network_event_type,congestion_network_event_type,lane_closure_network_event_type) network_event_types;
+
+	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
 };
 
 ostream* stream_ptr;
@@ -163,17 +179,17 @@ int main()
 	////data input
 	cout << "reading scenario data..." <<endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>();
-	cout << "converting scenario data..." << endl;
-	scenario->write_scenario_data<NULLTYPE>(scenario_data_for_output);
-	network_models::network_information::scenario_data_information::write_scenario_data(scenario_data_for_output);
-	cout<<"writing scenario data..."<<endl;
-	network_models::network_information::scenario_data_information::write_scenario_data(scenario_data_for_output);	
+//	cout << "converting scenario data..." << endl;
+//	scenario->write_scenario_data<NULLTYPE>(scenario_data_for_output);
+//	network_models::network_information::scenario_data_information::write_scenario_data(scenario_data_for_output);
+//	cout<<"writing scenario data..."<<endl;
+//	network_models::network_information::scenario_data_information::write_scenario_data(scenario_data_for_output);	
 
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
-	cout << "converting network data..." << endl;
-	network->write_network_data<Target_Type<NULLTYPE,NULLTYPE,network_models::network_information::network_data_information::NetworkData&>>(network_data_for_output);
-	network_models::network_information::network_data_information::write_network_data("", network_data_for_output);
+//	cout << "converting network data..." << endl;
+//	network->write_network_data<Target_Type<NULLTYPE,NULLTYPE,network_models::network_information::network_data_information::NetworkData&>>(network_data_for_output);
+//	network_models::network_information::network_data_information::write_network_data("", network_data_for_output);
 	//cout<<"writing network data..."<<endl;
 	//network_models::network_information::network_data_information::write_network_data(output_dir_name,network_data_for_output);
 
@@ -187,10 +203,10 @@ int main()
 	demand->network_reference<_Network_Interface*>(network);
 	cout << "reading demand data..." <<endl;
 	demand->read_demand_data<Net_IO_Type>(network_io_maps);
-	cout << "converting demand data..." << endl;
-	demand->write_demand_data<NULLTYPE>(demand_data_for_output);
-	cout<<"writing demand data..."<<endl;
-	network_models::network_information::demand_data_information::write_demand_vehicle(output_dir_name,scenario_data_for_output,demand_data_for_output,network_data_for_output);
+//	cout << "converting demand data..." << endl;
+//	demand->write_demand_data<NULLTYPE>(demand_data_for_output);
+//	cout<<"writing demand data..."<<endl;
+//	network_models::network_information::demand_data_information::write_demand_vehicle(output_dir_name,scenario_data_for_output,demand_data_for_output,network_data_for_output);
 
 
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
@@ -200,10 +216,10 @@ int main()
 		cout <<"reading operation data..." << endl;
 		operation->read_operation_data<Net_IO_Type>(network_io_maps);
 	}
-	cout <<"converting operation data..." << endl;
-	operation->write_operation_data<NULLTYPE>(network_data_for_output, operation_data_for_output);
-	cout<<"writing operation data..."<<endl;
-	network_models::network_information::operation_data_information::write_operation_data(output_dir_name,scenario_data_for_output,operation_data_for_output,network_data_for_output);
+//	cout <<"converting operation data..." << endl;
+//	operation->write_operation_data<NULLTYPE>(network_data_for_output, operation_data_for_output);
+//	cout<<"writing operation data..."<<endl;
+//	network_models::network_information::operation_data_information::write_operation_data(output_dir_name,scenario_data_for_output,operation_data_for_output,network_data_for_output);
 
 	//network_models::write_data("",scenario_data_for_output,demand_data_for_output,network_data_for_output, operation_data_for_output);
 
@@ -240,13 +256,9 @@ int main()
 	system("PAUSE");
 #endif
 }
-#endif
 
-
-
-
-#define FILE_IO
-#ifdef FILE_IO
+// if not defined DB_IO then FILE_IO
+#else
 
 #include "Application_Includes.h"
 #include "../User_Space/Polaris_Operation_Implementation.h"
@@ -417,6 +429,7 @@ int main(int argc,char** argv)
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 	network->read_network_data<Net_IO_Type>(network_data);
 
+
 	//network->write_network_data<NULLTYPE>(network_data_for_output);
 #ifdef ANTARES
 	network->set_network_bounds<NULLTYPE>();
@@ -440,11 +453,12 @@ int main(int argc,char** argv)
 
 	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
 	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
-
+	
 	demand->scenario_reference<_Scenario_Interface*>(scenario);
 	demand->network_reference<_Network_Interface*>(network);
 	demand->read_demand_data<Network_Components::Types::File_Network>(scenario_data, network_data, demand_data);
 	//demand->write_demand_data<NULLTYPE>(demand_data_for_output);
+
 
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
 	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
@@ -455,11 +469,9 @@ int main(int argc,char** argv)
 	//output data
 	//network_models::write_data("",scenario_data_for_output,demand_data_for_output,network_data_for_output, operation_data);
 
+
 	network->simulation_initialize<NULLTYPE>();
 	
-
-
-
 	cout << "world started..." << endl;
 	////initialize network agents
 	
@@ -490,7 +502,4 @@ int main(int argc,char** argv)
 	system("PAUSE");
 }
 #endif
-
-
-
 #endif

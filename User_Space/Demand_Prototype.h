@@ -129,6 +129,7 @@ namespace Demand_Components
 
 				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
+
 					if (++counter % 10000 == 0)
 					{
 						cout << counter << " trips processed" << endl;
@@ -192,6 +193,11 @@ namespace Demand_Components
 //					plan = (_Plan_Interface*)Allocate<typename _Plan_Interface::Component_Type>();
 					movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
 
+					vehicle->template uuid<int>(traveler_id_counter);
+					vehicle->template internal_id<int>(traveler_id_counter);
+					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
+					vehicle->template traveler<_Traveler_Interface*>(traveler);
+
 					traveler->template uuid<int>(++traveler_id_counter);
 					traveler->template internal_id<int>(traveler_id_counter);
 					traveler->template router<_Routing_Interface*>(router);
@@ -201,17 +207,16 @@ namespace Demand_Components
 					router->template traveler<_Traveler_Interface*>(traveler);
 					router->template network<_Network_Interface*>(network);
 
-					vehicle->template uuid<int>(traveler_id_counter);
-					vehicle->template internal_id<int>(traveler_id_counter);
-					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
+
 
 //					plan->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 //					plan->template traveler<_Traveler_Interface*>(traveler);
 
 					movement_plan->template origin<_Link_Interface*>(origin_link);
 					movement_plan->template destination<_Link_Interface*>(destination_link);
-					movement_plan->template departed_time<int>(departed_time);
+					movement_plan->template departed_time<Time_Seconds>(departed_time);
 //					movement_plan->template plan<_Plan_Interface*>(plan);
+					router->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 
 					traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
 

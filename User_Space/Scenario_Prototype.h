@@ -644,14 +644,14 @@ namespace Scenario_Components
 			feature_prototype float meterToFoot(float meterValue)
 			{
 				// 1 meter = 3.28084 feet
-				return meterValue * 3.28084;
+				return 3.28084 * meterValue;
 			}
 
 			// convert from meters per second to miles per hour
 			feature_prototype float mepsToMiph(float mepsValue)
 			{
 				// 1 meter = 0.000621371 mile
-				return mepsValue * 0.000621371 * 3600;
+				return (3.28084 * mepsValue * 3600.0 / 5280.0);
 			}
 
 		};

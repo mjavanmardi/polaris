@@ -74,24 +74,20 @@ namespace Routing_Components
 
 			feature_prototype void Evaluate_Condition(Conditional_Response& response, requires(check(TargetType,Concepts::Is_One_To_One_Router)))
 			{
-				cout << endl << "Single router conditional..." << _iteration << "." << _sub_iteration;
 				response.result=true;
 				response.next._iteration=END;
 				response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION;
 			}
 			feature_prototype void Evaluate_Condition(Conditional_Response& response, requires(check(TargetType,Concepts::Is_One_To_All_Router)))
 			{
-				cout << endl << "Tree router conditional..." << _iteration << "." << _sub_iteration;
 				if (_iteration >= _this_ptr->start_time<Simulation_Timestep_Increment>() && _iteration < _this_ptr->end_time<Simulation_Timestep_Increment>())
 				{
-					cout << endl << "Router tree builder conditional true at " << _iteration << "." << _sub_iteration;
 					response.result=true;
 					response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
 					response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
 				}
 				else
 				{
-					cout << endl << "Router tree builder conditional false at " << _iteration << "." << _sub_iteration;
 					response.result=false;
 					response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
 					response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
@@ -108,7 +104,7 @@ namespace Routing_Components
 				assert_sub_check(TargetType,Concepts::Is_One_To_One_Router,has_vehicle, "ControlType has no vehicle");
 			}
 
-			feature_prototype float one_to_one_link_based_least_time_path_a_star()
+			feature_prototype bool one_to_one_link_based_least_time_path_a_star()
 			{
 
 				define_component_interface(_Routable_Network_Interface, typename get_type_of(routable_network), Network_Components::Prototypes::Network_Prototype, ComponentType);
@@ -260,7 +256,6 @@ namespace Routing_Components
 
 				if (destination_link_ptr->template label_pointer<_Routable_Link_Interface*>() == destination_link_ptr)
 				{
-					//return -1.0;
 					return false;
 				}
 				else
@@ -435,7 +430,6 @@ namespace Routing_Components
 
 				define_component_interface(_Regular_Network_Interface, typename get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, typename _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-
 				load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Tree,departed_time,Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING,NULLTYPE);
 			}
 
@@ -475,10 +469,11 @@ namespace Routing_Components
 				_this_ptr->template routable_origin<_Regular_Link_Interface*>(origin_link);
 				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
 
-				float pathFound = _this_ptr->template one_to_one_link_based_least_time_path_a_star<NULLTYPE>();
+				bool pathFound = _this_ptr->template one_to_one_link_based_least_time_path_a_star<NULLTYPE>();
 
 				if (pathFound)
-				{			
+				{	
+
 					mp->valid_trajectory<bool>(true);
 					_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
 
@@ -497,7 +492,6 @@ namespace Routing_Components
 
 			declare_feature_event(Compute_Tree)
 			{
-				
 				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
 				//typedef Link_Components::Prototypes::Link_Prototype<typename ComponentType::routable_link_type, ComponentType> _Routable_Link_Interface;
 				
@@ -514,9 +508,6 @@ namespace Routing_Components
 				// reference to store travel times
 				define_simple_container_interface(travel_times_itf, typename get_type_of(travel_times_to_link_container),Containers::Random_Access_Sequence_Prototype, typename get_type_of(travel_times_to_link_container)::unqualified_value_type,CallerType);
 				travel_times_itf* travel_times = _this_ptr->travel_times_to_link_container<travel_times_itf*>();
-
-				//cout << endl << "Building Tree for origin link ..." << _this_ptr->routable_origin<_Routable_Link_Interface*>()->uuid<int>();
-
 
 				// reference to links in tree
 				//define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Routable_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);

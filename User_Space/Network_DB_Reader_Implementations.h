@@ -141,7 +141,7 @@ namespace Network_Components
 				cout << "Reading Links" << endl;
 				
 				int link_counter=-1;
-				 
+
 				for(result<Link>::iterator db_itr = link_result.begin (); db_itr != link_result.end (); ++db_itr)
 				{
 					counter++;
@@ -163,7 +163,8 @@ namespace Network_Components
 
 											
 						link->template internal_id<int>(++link_counter);
-						link->template uuid<int>(link_id_dir.id /*link_counter*/);
+						link->template uuid<int>(link->template internal_id<int>());
+						//link->template uuid<int>(link_id_dir.id /*link_counter*/);
 
 						link->template num_lanes<int>(db_itr->getLanes_Ab());
 						
@@ -191,12 +192,32 @@ namespace Network_Components
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ON_RAMP);
 						}
+						else if(facility_type=="WALKWAY")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALKWAY);
+						}
+						else if(facility_type=="BIKEWAY")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::BIKEWAY);
+						}
+						else if(facility_type=="FERRY")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WATERWAY);
+						}
+						else if(facility_type=="LIGHTRAIL")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::LIGHT_RAILWAY);
+						}
+						else if(facility_type=="HEAVYRAIL")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::HEAVY_RAILWAY);
+						}
 						else
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
 						}
 
-						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()) + 10.0);
+						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()));
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
@@ -238,8 +259,9 @@ namespace Network_Components
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 
 						
-						link->template uuid<int>(link_id_dir.id);
+						//link->template uuid<int>(link_id_dir.id);
 						link->template internal_id<int>(++link_counter);
+						link->template uuid<int>(link->template internal_id<int>());
 
 						link->template num_lanes<int>(db_itr->getLanes_Ba());
 						
@@ -267,12 +289,32 @@ namespace Network_Components
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ON_RAMP);
 						}
+						else if(facility_type=="WALKWAY")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WALKWAY);
+						}
+						else if(facility_type=="BIKEWAY")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::BIKEWAY);
+						}
+						else if(facility_type=="FERRY")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::WATERWAY);
+						}
+						else if(facility_type=="LIGHTRAIL")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::LIGHT_RAILWAY);
+						}
+						else if(facility_type=="HEAVYRAIL")
+						{
+							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::HEAVY_RAILWAY);
+						}
 						else
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::ARTERIAL);
 						}
 
-						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()) + 10.0);
+						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()));
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
@@ -322,49 +364,65 @@ namespace Network_Components
 				int counter=-1;
 
 				cout << "Reading Connections" << endl;
-				_Link_Interface* link;
+
 				for(result<Connect>::iterator db_itr = connect_result.begin (); db_itr != connect_result.end (); ++db_itr)
 				{
 
 					if(counter%10000==0) cout << "\t" << counter << endl;
 
-					turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+					_Link_Interface* inbound_link;
+					_Link_Interface* outbound_link;
 
 					link_id_dir.id=db_itr->getLink()->getLink();
 					link_id_dir.dir=db_itr->getDir();
-					
+					inbound_link = (_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 					assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
+
+					int target_intersection_id=access(_Intersection_Interface,inbound_link->template downstream_intersection).internal_id<int>();
 					
-					counter++;
-					link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
-
-					turn_movement->template inbound_link<_Link_Interface*>(link);
-
-					int target_intersection_id=access(_Intersection_Interface,link->template downstream_intersection).internal_id<int>();
-
-
 					link_id_dir.id=db_itr->getTo_Link()->getLink();
 					link_id_dir.dir=0;
-
 					if(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
 					{
-						link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
+						outbound_link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 
-						if(access(_Intersection_Interface,link->template upstream_intersection).internal_id<int>()!=target_intersection_id)
+						if(access(_Intersection_Interface,outbound_link->template upstream_intersection).internal_id<int>()!=target_intersection_id)
 						{
 							link_id_dir.dir=1;
 							assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
-							link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
+							outbound_link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 						}
 					}
 					else
 					{
 						link_id_dir.dir=1;
 						assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
-						link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
+						outbound_link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 					}
 
-					turn_movement->template outbound_link<_Link_Interface*>(link);
+					if ((inbound_link->link_type<int>() != FREEWAY && 
+						inbound_link->link_type<int>() != ON_RAMP &&
+						inbound_link->link_type<int>() != OFF_RAMP &&
+						inbound_link->link_type<int>() != EXPRESSWAY &&
+						inbound_link->link_type<int>() != ARTERIAL) || 
+						(outbound_link->link_type<int>() != FREEWAY && 
+						outbound_link->link_type<int>() != ON_RAMP &&
+						outbound_link->link_type<int>() != OFF_RAMP &&
+						outbound_link->link_type<int>() != EXPRESSWAY &&
+						outbound_link->link_type<int>() != ARTERIAL))
+					{
+						continue;
+					}
+					
+					counter++;
+					//link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
+
+
+
+					turn_movement = (_Turn_Movement_Interface*)Allocate<typename _Turn_Movement_Interface::Component_Type>();
+					turn_movement->template inbound_link<_Link_Interface*>(inbound_link);
+
+					turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
 
 					turn_movement->template uuid<int>(db_itr->getConn());
 					turn_movement->template internal_id<int>(counter);

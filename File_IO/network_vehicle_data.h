@@ -114,6 +114,9 @@ namespace network_models
 				Route_Choice_Use_Class_Keys route_choice_user_class;
 				Vehicle_Type_Keys vehicle_type;
 				
+				int trip_purpose;
+				int trip_type;
+
 				//vector<int> traveler_index_array;
 
 			public:	

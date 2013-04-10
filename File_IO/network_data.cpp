@@ -33,6 +33,11 @@ void network_data_information::network_data_initialization(NetworkData& network_
 	network_data.link_type_int_string_map.insert(make_pair(OFF_RAMP,"OFF_RAMP"));
 	network_data.link_type_int_string_map.insert(make_pair(EXPRESSWAY,"EXPRESSWAY"));
 	network_data.link_type_int_string_map.insert(make_pair(ARTERIAL,"ARTERIAL"));
+	network_data.link_type_int_string_map.insert(make_pair(LIGHT_RAILWAY,"LIGHT_RAILWAY"));
+	network_data.link_type_int_string_map.insert(make_pair(HEAVY_RAILWAY,"HEAVY_RAILWAY"));
+	network_data.link_type_int_string_map.insert(make_pair(WALKWAY,"WALKWAY"));
+	network_data.link_type_int_string_map.insert(make_pair(BIKEWAY,"BIKEWAY"));
+	network_data.link_type_int_string_map.insert(make_pair(WATERWAY,"WATERWAY"));
 
 	network_data.link_type_string_int_map.clear();
 	network_data.link_type_string_int_map.insert(make_pair("FREEWAY",FREEWAY));
@@ -40,6 +45,11 @@ void network_data_information::network_data_initialization(NetworkData& network_
 	network_data.link_type_string_int_map.insert(make_pair("OFF_RAMP",OFF_RAMP));
 	network_data.link_type_string_int_map.insert(make_pair("EXPRESSWAY",EXPRESSWAY));
 	network_data.link_type_string_int_map.insert(make_pair("ARTERIAL",ARTERIAL));
+	network_data.link_type_string_int_map.insert(make_pair("LIGHT_RAILWAY",LIGHT_RAILWAY));
+	network_data.link_type_string_int_map.insert(make_pair("HEAVY_RAILWAY",HEAVY_RAILWAY));
+	network_data.link_type_string_int_map.insert(make_pair("WALKWAY",WALKWAY));
+	network_data.link_type_string_int_map.insert(make_pair("BIKEWAY",BIKEWAY));
+	network_data.link_type_string_int_map.insert(make_pair("WATERWAY",WATERWAY));
 
 	network_data.turn_movement_type_int_string_map.clear();
 	network_data.turn_movement_type_int_string_map.insert(make_pair(LEFT_TURN,"LEFT_TURN"));
@@ -167,7 +177,8 @@ void network_data_information::write_link(string output_dir_name, NetworkData& n
 			<< network_data.link_data_array[i].num_left_turn_bays<< "	"
 			<< network_data.link_data_array[i].num_right_turn_bays<< "	"
 			<< network_data.link_data_array[i].left_turn_bay_length<< "	"
-			<< network_data.link_data_array[i].right_turn_bay_length;
+			<< network_data.link_data_array[i].right_turn_bay_length<< "	"
+			<< network_data.link_data_array[i].original_free_flow_speed;
 
 		if (i<network_data.network_link_size-1)
 		{
@@ -231,7 +242,11 @@ void network_data_information::write_zone(string output_dir_name, NetworkData& n
 	{
 															
 		file 
-			<< "zone" 
+			<< "zone"  <<  "	"
+			<< "x" <<  "	"
+			<< "y" <<  "	"
+			<< "population" <<  "	"
+			<< "employment"
 			<<endl;
 	}
 	else
@@ -244,7 +259,11 @@ void network_data_information::write_zone(string output_dir_name, NetworkData& n
 	for (int i=0;i<network_data.network_zone_size;i++)
 	{
 		file
-			<< network_data.zone_data_array[i].uuid;
+			<< network_data.zone_data_array[i].uuid <<  "	"
+			<< network_data.zone_data_array[i].x <<  "	"
+			<< network_data.zone_data_array[i].y <<  "	"
+			<< network_data.zone_data_array[i].population <<  "	"
+			<< network_data.zone_data_array[i].employment;
 		
 		if (i<network_data.network_zone_size-1)
 		{
@@ -268,7 +287,8 @@ void network_data_information::write_activity_location(string output_dir_name, N
 			<< "activity_location" << "	"
 			<< "zone" << "	"
 			<< "num_origin_links" << "	"
-			<< "num_destination_links"
+			<< "num_destination_links" << "	"
+			<< "census_zone"
 			<<endl;
 	}
 	else
@@ -284,7 +304,8 @@ void network_data_information::write_activity_location(string output_dir_name, N
 			<< network_data.activity_location_data_array[i].uuid << "	"
 			<< network_data.zone_data_array[network_data.activity_location_data_array[i].zone_index].uuid << "	"
 			<< network_data.activity_location_data_array[i].num_origin_links << "	"
-			<< network_data.activity_location_data_array[i].num_destination_links
+			<< network_data.activity_location_data_array[i].num_destination_links << "	"
+			<< network_data.activity_location_data_array[i].census_zone_index
 			<< endl;
 		
 		if (network_data.activity_location_data_array[i].num_origin_links>0)
@@ -985,7 +1006,7 @@ void network_data_information::read_node(string input_dir_name, NetworkData& net
 	input_file.close();
 };
 
-void network_data_information::read_link(string input_dir_name, NetworkData& network_data, ScenarioData& scenario_data)
+void network_data_information::read_multimodal_link(string input_dir_name, NetworkData& network_data, ScenarioData& scenario_data)
 {
 	string filename = input_dir_name + "link";
 	string line;
@@ -1045,12 +1066,26 @@ void network_data_information::read_link(string input_dir_name, NetworkData& net
 				if (scenario_data.input_speed_unit == SPEED_IN_METERS_PER_SECOND)
 				{
 					link_data.free_flow_speed = convert_meters_per_second_to_miles_per_hour<float>(stof(tokens[4]));
-					link_data.original_free_flow_speed = convert_meters_per_second_to_miles_per_hour<float>(stof(tokens[12]));
+					if (tokens.size()>12)
+					{
+						link_data.original_free_flow_speed = convert_meters_per_second_to_miles_per_hour<float>(stof(tokens[12]));
+					}
+					else
+					{
+						link_data.original_free_flow_speed = link_data.free_flow_speed;
+					}
 				}
 				else
 				{
 					link_data.free_flow_speed = stof(tokens[4]);
-					link_data.original_free_flow_speed = stof(tokens[12]);
+					if (tokens.size()>12)
+					{
+						link_data.original_free_flow_speed = stof(tokens[12]);
+					}
+					else
+					{
+						link_data.original_free_flow_speed = link_data.free_flow_speed;
+					}
 				}
 
 				//link_data.length = stof(tokens[3]);
@@ -1104,7 +1139,260 @@ void network_data_information::read_link(string input_dir_name, NetworkData& net
 	}
 };
 
+void network_data_information::read_link(string input_dir_name, NetworkData& network_data, ScenarioData& scenario_data)
+{
+	string filename = input_dir_name + "link";
+	string line;
+	ifstream input_file(filename);
+	
+	//initialization
+	network_data.link_data_array.clear();
+	network_data.link_id_index_map.clear();
+
+	//read file
+	int link_index = -1;
+	if (input_file.is_open())
+	{
+		int iline = 0;
+		LinkData link_data;
+		vector<string> tokens;
+		int token_size =0;
+		while (input_file.good())
+		{
+			getline(input_file,line);
+			iline = iline + 1;
+			if(iline >= 2) // skip the first line
+			{
+				//0 - uuid
+				//1 - unode
+				//2 - dnode
+				//3 - length
+				//4 - free_flow_speed
+				//5 - maximum_flow_rate
+				//6 - link type
+				//7 - num_lanes
+				//8 - num_left_turn_bays
+				//9 - num_right_turn_bays
+				//10 - left_turn_bay_length
+				//11 - right_turn_bay_length
+				//12 - original_free_flow_speed
+
+				string link_type_string;
+				int unode_id;
+				int dnode_id;
+				//token_size = 13;
+				//string_split(tokens, line, token_size);
+				string_split(tokens, line);
+
+				link_data.link_type = network_data.link_type_string_int_map[tokens[6]];
+
+				if (link_data.link_type == FREEWAY || 
+					link_data.link_type == ON_RAMP || 
+					link_data.link_type == OFF_RAMP || 
+					link_data.link_type == EXPRESSWAY || 
+					link_data.link_type == ARTERIAL)
+				{
+
+					link_data.uuid = stoi(tokens[0]);
+					unode_id = stoi(tokens[1]);
+					dnode_id = stoi(tokens[2]);
+
+					if (scenario_data.input_length_unit == LENGTH_IN_METER)
+					{
+						link_data.length = convert_meter_to_foot<float>(stof(tokens[3]));
+					}
+					else
+					{
+						link_data.length = stof(tokens[3]);
+					}
+				
+					if (scenario_data.input_speed_unit == SPEED_IN_METERS_PER_SECOND)
+					{
+						link_data.free_flow_speed = convert_meters_per_second_to_miles_per_hour<float>(stof(tokens[4]));
+						link_data.original_free_flow_speed = link_data.free_flow_speed;
+						if (int(tokens.size())>12)
+						{
+							link_data.original_free_flow_speed = convert_meters_per_second_to_miles_per_hour<float>(stof(tokens[12]));
+						}
+					}
+					else
+					{
+						link_data.free_flow_speed = stof(tokens[4]);
+						link_data.original_free_flow_speed = link_data.free_flow_speed;
+						if (int(tokens.size())>12)
+						{
+							link_data.original_free_flow_speed = stof(tokens[12]);
+						}
+					}
+
+					//link_data.length = stof(tokens[3]);
+					//link_data.free_flow_speed = stof(tokens[4]);
+				
+				
+					link_data.maximum_flow_rate = stof(tokens[5]);
+				
+					link_data.num_lanes = stoi(tokens[7]);
+					link_data.num_left_turn_bays = stoi(tokens[8]);
+					link_data.num_right_turn_bays = stoi(tokens[9]);
+					link_data.left_turn_bay_length = stof(tokens[10]);
+					link_data.right_turn_bay_length = stof(tokens[11]);
+
+					link_data.unode_index = network_data.node_id_index_map[unode_id];
+					link_data.dnode_index = network_data.node_id_index_map[dnode_id];
+					link_index = link_index + 1;
+					link_data.link_index = link_index;
+				
+					link_data.backward_wave_speed = 12.0;
+					link_data.jam_density = 220;
+
+					network_data.link_data_array.push_back(link_data);
+
+					network_data.link_id_index_map.insert(make_pair(link_data.uuid,link_index));
+					int iii = network_data.link_id_index_map[link_data.uuid];
+					int map_size = (int) network_data.link_id_index_map.size();
+					network_data.node_data_array[link_data.unode_index].outbound_link_index_array.push_back(link_index);
+					network_data.node_data_array[link_data.dnode_index].inbound_link_index_array.push_back(link_index);
+				}
+			}
+		}
+		network_data.network_link_size = int(network_data.link_data_array.size());
+	}
+	else
+	{
+		cout << "file " << filename << "cannot be opened!" << endl;
+	}
+	input_file.close();
+
+	//node
+	for (int i=0;i<network_data.network_node_size;i++)
+	{
+		//outbound link size
+		network_data.node_data_array[i].outbound_link_size = (int) network_data.node_data_array[i].outbound_link_index_array.size();
+
+		//inbound link size
+		network_data.node_data_array[i].inbound_link_size = (int) network_data.node_data_array[i].inbound_link_index_array.size();
+	}
+};
+
 void network_data_information::read_turn_movement(string input_dir_name, NetworkData& network_data)
+{
+	string filename = input_dir_name + "turn_movement";
+	string line;
+	ifstream input_file(filename);
+	
+	//initialization
+
+	int turn_movement_index = -1;
+	network_data.turn_movement_data_array.clear();
+	network_data.turn_movement_id_index_map.clear();
+
+	//for (int link_index=0;link_index<network_data.network_link_size;link_index++)
+	//{
+	//	int dnode_index = network_data.link_data_array[link_index].dnode_index;
+	//	for (int outbound_link=0;outbound_link<network_data.node_data_array[dnode_index].outbound_link_size;outbound_link++)
+	//	{
+	//		int outbound_link_index = network_data.node_data_array[dnode_index].outbound_link_index_array[outbound_link];
+	//		turn_movement_index++;
+	//		TurnMovementData turn_movement_data;
+	//		turn_movement_data.turn_movement_index = turn_movement_index;
+	//		turn_movement_data.uuid = turn_movement_index + 1;
+	//		turn_movement_data.inbound_link_index = link_index;
+	//		turn_movement_data.outbound_link_index = outbound_link_index;
+	//		if (network_data.link_data_array[turn_movement_data.inbound_link_index].unode_index == 
+	//			network_data.link_data_array[turn_movement_data.outbound_link_index].dnode_index)
+	//		{
+	//			turn_movement_data.turn_movement_type = U_TURN;
+	//			//turn_movement_data.turn_movement_rule = PROHIBITED;
+	//			turn_movement_data.turn_movement_rule = ALLOWED;
+	//		}
+	//		else
+	//		{
+	//			turn_movement_data.turn_movement_type = THROUGH_TURN;
+	//			turn_movement_data.turn_movement_rule = ALLOWED;
+	//		}
+	//		network_data.turn_movement_data_array.push_back(turn_movement_data);
+	//		network_data.turn_movement_id_index_map.insert(make_pair(turn_movement_data.uuid,turn_movement_index));
+	//		network_data.link_turn_movement_map.insert(make_pair(make_pair(link_index,outbound_link_index),turn_movement_index));
+	//		
+	//		network_data.link_data_array[link_index].outbound_turn_movement_index_array.push_back(turn_movement_index);
+	//		network_data.link_data_array[outbound_link_index].inbound_turn_movement_index_array.push_back(turn_movement_index);
+	//	}
+	//}
+	//network_data.network_turn_movement_size = (int) network_data.turn_movement_data_array.size();
+
+	//node
+	//for (int i=0;i<network_data.network_link_size;i++)
+	//{
+	//	//outbound link size
+	//	network_data.link_data_array[i].outbound_turn_movement_size = (int) network_data.link_data_array[i].outbound_turn_movement_index_array.size();
+
+	//	//inbound link size
+	//	network_data.link_data_array[i].inbound_turn_movement_size = (int) network_data.link_data_array[i].inbound_turn_movement_index_array.size();
+	//}
+
+	//read file
+	if (input_file.is_open())
+	{
+		int iline = 0;
+		vector<string> tokens;
+		int token_size =0;
+
+		while (input_file.good())
+		{
+			getline(input_file,line);
+			iline = iline + 1;
+			if(iline >= 2) // skip the first line
+			{
+				token_size = 5;
+				string_split(tokens, line, token_size);
+
+				int turn_movement_uuid = stoi(tokens[0]);
+				int inbound_link_id = stoi(tokens[1]);
+				int outbound_link_id = stoi(tokens[2]);
+				int inbound_link_index = network_data.link_id_index_map[inbound_link_id];
+				int outbound_link_index = network_data.link_id_index_map[outbound_link_id];
+
+				turn_movement_index++;
+
+				TurnMovementData turn_movement_data;
+				turn_movement_data.turn_movement_index = turn_movement_index;
+				turn_movement_data.uuid = turn_movement_index + 1;
+				turn_movement_data.inbound_link_index = inbound_link_index;
+				turn_movement_data.outbound_link_index = outbound_link_index;
+				turn_movement_data.turn_movement_type = network_data.turn_movement_type_string_int_map[tokens[3]];
+				turn_movement_data.turn_movement_rule = network_data.turn_movement_rule_string_int_map[tokens[4]];
+
+				network_data.turn_movement_data_array.push_back(turn_movement_data);
+
+				network_data.turn_movement_id_index_map.insert(make_pair(turn_movement_data.uuid,turn_movement_index));
+				network_data.link_turn_movement_map.insert(make_pair(make_pair(inbound_link_index,outbound_link_index),turn_movement_index));
+			
+				network_data.link_data_array[inbound_link_index].outbound_turn_movement_index_array.push_back(turn_movement_index);
+				network_data.link_data_array[outbound_link_index].inbound_turn_movement_index_array.push_back(turn_movement_index);
+			}
+		}
+
+		network_data.network_turn_movement_size = (int) network_data.turn_movement_data_array.size();
+
+		//link
+		for (int i=0;i<network_data.network_link_size;i++)
+		{
+			//outbound link size
+			network_data.link_data_array[i].outbound_turn_movement_size = (int) network_data.link_data_array[i].outbound_turn_movement_index_array.size();
+
+			//inbound link size
+			network_data.link_data_array[i].inbound_turn_movement_size = (int) network_data.link_data_array[i].inbound_turn_movement_index_array.size();
+		}
+
+	}
+	else
+	{
+		cout << "file " << filename << "cannot be opened!" << endl;
+	}
+	input_file.close();
+};
+
+void network_data_information::read_and_construct_turn_movement(string input_dir_name, NetworkData& network_data)
 {
 	string filename = input_dir_name + "turn_movement";
 	string line;
@@ -1226,9 +1514,14 @@ void network_data_information::read_zone(string input_dir_name, NetworkData& net
 				token_size = 1;
 				string_split(tokens, line);
 				zone_data.uuid = stoi(tokens[0]);
-				zone_data.x = stoi(tokens[1]);
-				zone_data.y = stoi(tokens[2]);
-				zone_data.population = stoi(tokens[3]);
+
+				if (tokens.size() > 1)
+				{
+					zone_data.x = stoi(tokens[1]);
+					zone_data.y = stoi(tokens[2]);
+					zone_data.population = stoi(tokens[3]);
+					zone_data.employment = stoi(tokens[4]);
+				}
 
 				zone_index = zone_index + 1;
 				zone_data.zone_index = zone_index;
@@ -1284,7 +1577,11 @@ void network_data_information::read_activity_location(string input_dir_name, Net
 					zone_id = stoi(tokens[1]);
 					activity_location_data.num_origin_links = stoi(tokens[2]);
 					activity_location_data.num_destination_links = stoi(tokens[3]);
-
+					
+					if (tokens.size()>4)
+					{
+						activity_location_data.census_zone_index = stoi(tokens[4]);
+					}
 					activity_location_data.zone_index = zone_id;//network_data.zone_id_index_map[zone_id];
 				}
 				

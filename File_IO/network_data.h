@@ -124,8 +124,10 @@ namespace network_models
 			
 			//input from file
 			void read_node(string input_dir_name, NetworkData& network_data);
+			void read_multimodal_link(string input_dir_name, NetworkData& network_data, ScenarioData& scenario_data);
 			void read_link(string input_dir_name, NetworkData& network_data, ScenarioData& scenario_data);
 			void read_turn_movement(string input_dir_name, NetworkData& network_data);
+			void read_and_construct_turn_movement(string input_dir_name, NetworkData& network_data);
 			void read_zone(string input_dir_name, NetworkData& network_data);
 			void read_activity_location(string input_dir_name, NetworkData& network_data);
 			void read_network_data(string input_dir_name, NetworkData& network_data, ScenarioData& scenario_data);

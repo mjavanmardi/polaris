@@ -189,6 +189,7 @@ namespace Network_Components
 				activity_location_data.uuid = activity_location->template uuid<int>();
 				activity_location_data.activity_location_index = activity_location->template internal_id<int>();
 				activity_location_data.zone_index = activity_location->template zone<_Zone_Interface*>()-> template internal_id<int>();
+				activity_location_data.census_zone_index = activity_location->template census_zone_id<long long>();
 				network_data.activity_location_data_array.push_back(activity_location_data);
 			}
 			network_data.network_activity_location_size = (int)network_data.activity_location_data_array.size();
@@ -230,6 +231,10 @@ namespace Network_Components
 
 				zone_data.uuid = zone->template uuid<int>();
 				zone_data.zone_index = zone->template internal_id<int>();
+				zone_data.x = zone->template X<float>();
+				zone_data.y = zone->template Y<float>();
+				zone_data.population = zone->template population<int>();
+				zone_data.employment = zone->template employment<int>();
 				network_data.zone_data_array.push_back(zone_data);
 			}
 			network_data.network_zone_size = (int)network_data.zone_data_array.size();
