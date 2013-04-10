@@ -662,3 +662,32 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 
 
 
+
+#define define_static_typelist_loop(FEATURE_NAME, DISPATCH_ALIAS)\
+	template <class TList> struct DISPATCH_ALIAS;\
+	template <>\
+	struct DISPATCH_ALIAS<NULLTYPE>\
+	{\
+		template<class HeadComponentType, typename TargetType>\
+		static inline void Start_Dispatch(void* obj)\
+		{\
+		}\
+	};\
+	template <class Head, class Tail>\
+	struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
+	{\
+		template<class HeadType_As_Given, typename TargetType>\
+		static inline void Start_Dispatch(void* obj)\
+		{\
+			DISPATCH_ALIAS<TypeList<HeadType_As_Given, Tail> >::Dispatch<HeadType_As_Given::Component_Type,HeadType_As_Given, TargetType>(obj);\
+		}\
+		template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
+		static inline void Dispatch(void* obj)\
+		{\
+			Head::FEATURE_NAME<HeadType_As_Given, HeadType_As_Given, NT>(obj);\
+			DISPATCH_ALIAS<Tail>::Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
+		}\
+	};
+
+#define execute_static_typelist_loop(DISPATCHER_ALIAS, TYPELIST, OBJECT_PTR)\
+		DISPATCHER_ALIAS<TYPELIST>::Start_Dispatch<TypeAt<TYPELIST,0>::Result, NT>(OBJECT_PTR);

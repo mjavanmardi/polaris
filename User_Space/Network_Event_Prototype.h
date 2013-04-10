@@ -27,6 +27,11 @@ namespace Network_Event_Components
 			{
 				this_component()->Setup<ComponentType,CallerType,TargetType>(configuration);
 			}
+			
+			feature static void Setup_Type(TargetType configuration)
+			{
+				ComponentType::Setup_Type<ComponentType,CallerType,TargetType>(configuration);
+			}
 
 			feature_accessor(network_event_type,none,none);
 			feature_accessor(affected_links,none,none);
@@ -35,6 +40,7 @@ namespace Network_Event_Components
 			feature_accessor(expected_duration,none,none);
 			feature_accessor(expired,none,none);
 			feature_accessor(end_time,none,none);
+			feature_accessor(active,none,none);
 
 			//Weather properties
 			feature_accessor(weather_type,none,none);
@@ -73,9 +79,9 @@ namespace Network_Event_Components
 				this_component()->Accept_Network_Event<ComponentType,CallerType,TargetType>(network_event);
 			}
 			
-			feature void Erase_Network_Event(Network_Event<TargetType,NT>* network_event)
+			feature void Remove_Network_Event(Network_Event<TargetType,NT>* network_event)
 			{
-				this_component()->Erase_Network_Event<ComponentType,CallerType,TargetType>(network_event);
+				this_component()->Remove_Network_Event<ComponentType,CallerType,TargetType>(network_event);
 			}
 
 			feature void Get_Network_Events(int link,vector< Network_Event<TargetType,NT>* >& container)

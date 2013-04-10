@@ -49,7 +49,6 @@ void* _global_scenario;
 #include "Person_Properties_Implementations.h"
 #include "Person_Implementations.h"
 
-
 // ITS COMPONENTS
 
 #include "Geometry_Implementation.h"
@@ -58,3 +57,7 @@ void* _global_scenario;
 #include "Depot_Implementation.h"
 #include "Link_Control_Implementation.h"
 #include "Traffic_Management_Center_Implementation.h"
+
+// NETWORK_EVENT COMPONENTS
+
+#include "Network_Event_Implementations.h"

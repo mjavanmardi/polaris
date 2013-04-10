@@ -1,5 +1,6 @@
 #pragma once
 #include "Network_Prototype.h"
+#include "Network_Event_Prototype.h"
 
 namespace Network_Components
 {
@@ -569,7 +570,12 @@ namespace Network_Components
 			/// output moe
 			//------------------------------------------------------------------------------------------------------------------			
 			feature_implementation void output_moe_for_simulation_interval();
-			feature_implementation void output_moe_for_assignment_interval(); 
+			feature_implementation void output_moe_for_assignment_interval();
+
+			//==================================================================================================================
+			/// network events
+			//------------------------------------------------------------------------------------------------------------------
+			member_prototype(Network_Event_Manager, network_event_manager, typename MasterType::network_event_manager_type, none, none);
 		};
 
 		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Network_Implementation<MasterType,ParentType,APPEND_CHILD(Integrated_Polaris_Network_Implementation)>

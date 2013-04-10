@@ -175,14 +175,30 @@ struct Antares_Layer_Configuration
 	{
 		Antares_Layer_Configuration();
 		primitive_type=_LINE;
-		
-		primitive_color=false;
+
 		head_color._r=128;
 		head_color._g=128;
 		head_color._b=128;
 		head_color._a=255;
 	}
 	
+	void Configure_Dynamic_Lines()
+	{
+		Antares_Layer_Configuration();
+		dynamic_data=true;
+		storage_size=3;
+		storage_period=1;
+
+		target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
+
+		primitive_type=_LINE;
+
+		head_color._r=128;
+		head_color._g=128;
+		head_color._b=128;
+		head_color._a=255;
+	}
+
 	void Configure_Points()
 	{
 		Antares_Layer_Configuration();

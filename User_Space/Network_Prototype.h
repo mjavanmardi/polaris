@@ -192,6 +192,10 @@ namespace Network_Components
 			/// db-io network
 			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(db_id_to_links_map, none, none);
+			//==================================================================================================================
+			/// network events
+			//------------------------------------------------------------------------------------------------------------------
+			feature_accessor(network_event_manager, none, none);
 
 			feature_prototype void push_vehicle_coordinates(void)
 			{

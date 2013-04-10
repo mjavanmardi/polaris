@@ -120,7 +120,6 @@ struct MasterType
     typedef Activity_Components::Implementations::Activity_Plan_Implementation<MasterType,person_type> activity_plan_type;
 
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
-
 };
 
 ostream* stream_ptr;
@@ -357,6 +356,29 @@ struct MasterType
     typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
 
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
+
+	typedef Link_Control_Components::Implementations::Lane_Link_Control<MasterType> link_control_type;
+	typedef Depot_Components::Implementations::Tow_Truck_Depot<MasterType> depot_type;
+	typedef Advisory_Radio_Components::Implementations::Highway_Advisory_Radio<MasterType> advisory_radio_type;
+	typedef Variable_Message_Sign_Components::Implementations::Variable_Word_Sign<MasterType> variable_message_sign_type;
+#ifdef ANTARES
+	typedef Traffic_Management_Center_Components::Implementations::Antares_TMC<MasterType> traffic_management_center_type;
+	typedef Network_Event_Components::Implementations::Antares_Weather_Network_Event<MasterType> weather_network_event_type;
+	typedef Network_Event_Components::Implementations::Antares_Accident_Network_Event<MasterType> accident_network_event_type;
+	typedef Network_Event_Components::Implementations::Antares_Congestion_Network_Event<MasterType> congestion_network_event_type;
+	typedef Network_Event_Components::Implementations::Antares_Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
+#else
+	typedef Traffic_Management_Center_Components::Implementations::Simple_TMC<MasterType> traffic_management_center_type;
+	typedef Network_Event_Components::Implementations::Weather_Network_Event<MasterType> weather_network_event_type;
+	typedef Network_Event_Components::Implementations::Accident_Network_Event<MasterType> accident_network_event_type;
+	typedef Network_Event_Components::Implementations::Congestion_Network_Event<MasterType> congestion_network_event_type;
+	typedef Network_Event_Components::Implementations::Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
+#endif
+
+	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
+	typedef TYPELIST_4(weather_network_event_type,accident_network_event_type,congestion_network_event_type,lane_closure_network_event_type) network_event_types;
+
+	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
 };
 
 int main(int argc,char** argv)
@@ -395,7 +417,6 @@ int main(int argc,char** argv)
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 	network->read_network_data<Net_IO_Type>(network_data);
 
-
 	//network->write_network_data<NULLTYPE>(network_data_for_output);
 #ifdef ANTARES
 	network->set_network_bounds<NULLTYPE>();
@@ -405,14 +426,25 @@ int main(int argc,char** argv)
 	network->initialize_antares_layers<NULLTYPE>();
 	MasterType::link_type::configure_link_moes_layer();
 #endif
+	//Network_Event<MasterType::network_event_manager_type>* net_event_manager=(Network_Event<MasterType::network_event_manager_type>*)Allocate<MasterType::network_event_manager_type>();
+
+	//network->network_event_manager<MasterType::network_event_manager_type*>( (MasterType::network_event_manager_type*)net_event_manager );
+
+	//net_event_manager->Initialize<NT>();
+
+	//typedef Traffic_Management_Center<MasterType::traffic_management_center_type,NT> TMC_Interface;
+
+	//TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+	//tmc->scenario_reference<_Scenario_Interface*>(scenario);
+	//tmc->Initialize<NT>();
+
 	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
 	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
-	
+
 	demand->scenario_reference<_Scenario_Interface*>(scenario);
 	demand->network_reference<_Network_Interface*>(network);
 	demand->read_demand_data<Network_Components::Types::File_Network>(scenario_data, network_data, demand_data);
 	//demand->write_demand_data<NULLTYPE>(demand_data_for_output);
-
 
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
 	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
@@ -423,9 +455,11 @@ int main(int argc,char** argv)
 	//output data
 	//network_models::write_data("",scenario_data_for_output,demand_data_for_output,network_data_for_output, operation_data);
 
-
 	network->simulation_initialize<NULLTYPE>();
 	
+
+
+
 	cout << "world started..." << endl;
 	////initialize network agents
 	

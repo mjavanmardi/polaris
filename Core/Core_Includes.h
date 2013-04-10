@@ -84,6 +84,8 @@ typedef NULLTYPE NT;
 
 template<typename A> struct NULLTEMPLATE{};
 template<typename A,typename B> struct NULLTEMPLATE_2{};
+template<typename A,typename B,typename C> struct NULLTEMPLATE_3{};
+template<typename A,typename B,typename C,typename D> struct NULLTEMPLATE_4{};
 
 typedef char Page[_Page_Size];
 
