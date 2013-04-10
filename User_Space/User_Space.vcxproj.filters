@@ -265,9 +265,6 @@
     <ClInclude Include="Depot_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
-    <ClInclude Include="..\Antares\Geometry_Implementation.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
     <ClInclude Include="..\Antares\Geometry.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
@@ -276,6 +273,9 @@
     </ClInclude>
     <ClInclude Include="Network_Event_Prototype.h">
       <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry_Implementation.h">
+      <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

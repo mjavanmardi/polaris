@@ -1,5 +1,6 @@
 #pragma once
 #include "Network_Prototype.h"
+#include "Traffic_Management_Center_Prototype.h"
 #include "Network_Event_Prototype.h"
 
 namespace Network_Components
@@ -576,6 +577,11 @@ namespace Network_Components
 			/// network events
 			//------------------------------------------------------------------------------------------------------------------
 			member_prototype(Network_Event_Manager, network_event_manager, typename MasterType::network_event_manager_type, none, none);
+
+			//==================================================================================================================
+			/// traffic management center
+			//------------------------------------------------------------------------------------------------------------------
+			member_prototype(Traffic_Management_Center, traffic_management_center, typename type_of(MasterType::traffic_management_center), none, none);
 		};
 
 		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Network_Implementation<MasterType,ParentType,APPEND_CHILD(Integrated_Polaris_Network_Implementation)>

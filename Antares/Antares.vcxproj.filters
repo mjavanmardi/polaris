@@ -140,6 +140,18 @@
     <ClInclude Include="Antares_Vehicle_Implementation.h">
       <Filter>User_Space</Filter>
     </ClInclude>
+    <ClInclude Include="Antares_Link_Control_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Depot_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Variable_Message_Sign_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
+    <ClInclude Include="Antares_Advisory_Radio_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">

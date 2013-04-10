@@ -16,6 +16,16 @@ namespace Variable_Message_Sign_Components
 		prototype struct Variable_Message_Sign:public ComponentType
 		{
 			tag_as_prototype;
+			
+			feature static void Setup_Type(TargetType configuration)
+			{
+				ComponentType::Setup_Type<ComponentType,CallerType,TargetType>(configuration);
+			}
+
+			feature void Setup(TargetType configuration)
+			{
+				ComponentType::Setup<ComponentType,CallerType,TargetType>(configuration);
+			}
 
 			feature_accessor(x_position, none, none);
 			feature_accessor(y_position, none, none);

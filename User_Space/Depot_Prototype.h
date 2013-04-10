@@ -16,6 +16,16 @@ namespace Depot_Components
 		prototype struct Depot:public ComponentType
 		{
 			tag_as_prototype;
+			
+			feature static void Setup_Type(TargetType configuration)
+			{
+				ComponentType::Setup_Type<ComponentType,CallerType,TargetType>(configuration);
+			}
+			
+			feature void Setup(TargetType configuration)
+			{
+				ComponentType::Setup<ComponentType,CallerType,TargetType>(configuration);
+			}
 
 			feature_accessor(covered_area, none, none);
 			

@@ -15,194 +15,193 @@ namespace Traffic_Management_Center_Components
 	
 	namespace Implementations
 	{
+		//implementation struct Antares_TMC:public Simple_TMC<MasterType,ParentType,APPEND_CHILD(Antares_TMC)>
+		//{
+		//	typedef Simple_TMC<MasterType,ParentType,APPEND_CHILD(Antares_TMC)> Parent;
 
-		implementation struct Antares_TMC:public Simple_TMC<MasterType,ParentType,APPEND_CHILD(Antares_TMC)>
-		{
-			typedef Simple_TMC<MasterType,ParentType,APPEND_CHILD(Antares_TMC)> Parent;
+		//	feature_implementation void Setup_Link_Controls()
+		//	{
+		//		_link_control_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(link_control_layer),ComponentType>*, string& > >(string("Link Controls"));
 
-			feature_implementation void Setup_Link_Controls()
-			{
-				_link_control_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(link_control_layer),ComponentType>*, string& > >(string("Link Controls"));
+		//		Antares_Layer_Configuration cfg;
+		//		True_Color_RGBA<NT> head_color;
+		//		
+		//		head_color._r = 255;
+		//		head_color._g = 0;
+		//		head_color._b = 255;
+		//		head_color._a = 255;
 
-				Antares_Layer_Configuration cfg;
-				True_Color_RGBA<NT> head_color;
-				
-				head_color._r = 255;
-				head_color._g = 0;
-				head_color._b = 255;
-				head_color._a = 255;
+		//		cfg.Configure_Static_Points(head_color,8);
+		//		cfg.draw=true;
+		//		
+		//		vector<string>* dropdown;
 
-				cfg.Configure_Static_Points(head_color,8);
-				cfg.draw=true;
-				
-				vector<string>* dropdown;
+		//		cfg.dropdown_schema.push_back(vector<string>());
+		//		dropdown=&cfg.dropdown_schema.back();
+		//		dropdown->push_back("Close Lane");
+		//		dropdown->push_back("Open Lane");
 
-				cfg.dropdown_schema.push_back(vector<string>());
-				dropdown=&cfg.dropdown_schema.back();
-				dropdown->push_back("Close Lane");
-				dropdown->push_back("Open Lane");
+		//		vector<string>::iterator sitr;
 
-				vector<string>::iterator sitr;
-
-				for(sitr = _link_control_keys.begin(); sitr != _link_control_keys.end(); sitr++)
-				{
-					cfg.attributes_schema.push_back( *sitr );
-				}
-
-
-				_link_control_layer->Initialize<NT>(cfg);
-
-				vector<Link_Control_Interface*>::iterator itr;
-				
-				Point_3D<MasterType> element;
-
-				for(itr=_link_controls.begin();itr!=_link_controls.end();itr++)
-				{
-
-					element._x = (*itr)->x_position<float>();
-					element._y = (*itr)->y_position<float>();
-					element._z = 1;
-
-					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(element);
-
-					_link_control_layer->Push_Element<Regular_Element>(&element);
-				}
-			}
-
-			//feature_implementation void Setup_Advisory_Radios()
-			//{
-			//	_advisory_radio_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(advisory_radio_layer),ComponentType>*, string& > >(string("Advisory Radios"));
-
-			//	Antares_Layer_Configuration cfg;
-			//	True_Color_RGBA<NT> head_color;
-			//	
-			//	head_color._r = 255;
-			//	head_color._g = 255;
-			//	head_color._b = 0;
-			//	head_color._a = 255;
-
-			//	cfg.Configure_Static_Points(head_color,8);
-			//	cfg.draw=true;
-			//	_advisory_radio_layer->Initialize<NT>(cfg);
-
-			//	vector<Advisory_Radio_Interface*>::iterator itr;
-
-			//	for(itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
-			//	{
-			//		Point_3D<MasterType> element;
-
-			//		element._x = (*itr)->x_position<float>();
-			//		element._y = (*itr)->y_position<float>();
-			//		element._z = 1;
-
-			//		Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(element);
-
-			//		_advisory_radio_layer->Push_Element<Regular_Element>(&element);
-			//	}
-			//}
-
-			feature_implementation void Setup_Variable_Message_Signs()
-			{
-				_variable_message_sign_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(variable_message_sign_layer),ComponentType>*, string& > >(string("Variable Message Signs"));
-
-				Antares_Layer_Configuration cfg;
-				True_Color_RGBA<NT> head_color;
-				
-				head_color._r = 0;
-				head_color._g = 255;
-				head_color._b = 255;
-				head_color._a = 255;
-
-				cfg.Configure_Static_Points(head_color,8);
-				cfg.draw=true;
-				
-				vector<string>* dropdown;
-
-				cfg.dropdown_schema.push_back(vector<string>());
-				dropdown=&cfg.dropdown_schema.back();
-				dropdown->push_back("Congestion: I-55");
-				dropdown->push_back("Congestion: I-90");
-				
-				cfg.dropdown_schema.push_back(vector<string>());
-				dropdown=&cfg.dropdown_schema.back();
-				dropdown->push_back("Inident: Godzilla Attack");
-				dropdown->push_back("Inident: Alien Contact");
-				dropdown->push_back("Inident: Killer Robots");
-
-				vector<string>::iterator sitr;
-
-				for(sitr = _variable_message_sign_keys.begin(); sitr != _variable_message_sign_keys.end(); sitr++)
-				{
-					cfg.attributes_schema.push_back( *sitr );
-				}
+		//		for(sitr = _link_control_keys.begin(); sitr != _link_control_keys.end(); sitr++)
+		//		{
+		//			cfg.attributes_schema.push_back( *sitr );
+		//		}
 
 
-				_variable_message_sign_layer->Initialize<NT>(cfg);
+		//		_link_control_layer->Initialize<NT>(cfg);
+
+		//		vector<Link_Control_Interface*>::iterator itr;
+		//		
+		//		Point_3D<MasterType> element;
+
+		//		for(itr=_link_controls.begin();itr!=_link_controls.end();itr++)
+		//		{
+
+		//			element._x = (*itr)->x_position<float>();
+		//			element._y = (*itr)->y_position<float>();
+		//			element._z = 1;
+
+		//			Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(element);
+
+		//			_link_control_layer->Push_Element<Regular_Element>(&element);
+		//		}
+		//	}
+
+		//	//feature_implementation void Setup_Advisory_Radios()
+		//	//{
+		//	//	_advisory_radio_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(advisory_radio_layer),ComponentType>*, string& > >(string("Advisory Radios"));
+
+		//	//	Antares_Layer_Configuration cfg;
+		//	//	True_Color_RGBA<NT> head_color;
+		//	//	
+		//	//	head_color._r = 255;
+		//	//	head_color._g = 255;
+		//	//	head_color._b = 0;
+		//	//	head_color._a = 255;
+
+		//	//	cfg.Configure_Static_Points(head_color,8);
+		//	//	cfg.draw=true;
+		//	//	_advisory_radio_layer->Initialize<NT>(cfg);
+
+		//	//	vector<Advisory_Radio_Interface*>::iterator itr;
+
+		//	//	for(itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
+		//	//	{
+		//	//		Point_3D<MasterType> element;
+
+		//	//		element._x = (*itr)->x_position<float>();
+		//	//		element._y = (*itr)->y_position<float>();
+		//	//		element._z = 1;
+
+		//	//		Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(element);
+
+		//	//		_advisory_radio_layer->Push_Element<Regular_Element>(&element);
+		//	//	}
+		//	//}
+
+		//	feature_implementation void Setup_Variable_Message_Signs()
+		//	{
+		//		_variable_message_sign_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(variable_message_sign_layer),ComponentType>*, string& > >(string("Variable Message Signs"));
+
+		//		Antares_Layer_Configuration cfg;
+		//		True_Color_RGBA<NT> head_color;
+		//		
+		//		head_color._r = 0;
+		//		head_color._g = 255;
+		//		head_color._b = 255;
+		//		head_color._a = 255;
+
+		//		cfg.Configure_Static_Points(head_color,8);
+		//		cfg.draw=true;
+		//		
+		//		vector<string>* dropdown;
+
+		//		cfg.dropdown_schema.push_back(vector<string>());
+		//		dropdown=&cfg.dropdown_schema.back();
+		//		dropdown->push_back("Congestion: I-55");
+		//		dropdown->push_back("Congestion: I-90");
+		//		
+		//		cfg.dropdown_schema.push_back(vector<string>());
+		//		dropdown=&cfg.dropdown_schema.back();
+		//		dropdown->push_back("Inident: Godzilla Attack");
+		//		dropdown->push_back("Inident: Alien Contact");
+		//		dropdown->push_back("Inident: Killer Robots");
+
+		//		vector<string>::iterator sitr;
+
+		//		for(sitr = _variable_message_sign_keys.begin(); sitr != _variable_message_sign_keys.end(); sitr++)
+		//		{
+		//			cfg.attributes_schema.push_back( *sitr );
+		//		}
 
 
-				vector<Variable_Message_Sign_Interface*>::iterator itr;
-				
-				Point_3D<MasterType> element;
+		//		_variable_message_sign_layer->Initialize<NT>(cfg);
 
-				for(itr=_variable_message_signs.begin();itr!=_variable_message_signs.end();itr++)
-				{
-					element._x = (*itr)->x_position<float>();
-					element._y = (*itr)->y_position<float>();
-					element._z = 1;
 
-					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(element);
+		//		vector<Variable_Message_Sign_Interface*>::iterator itr;
+		//		
+		//		Point_3D<MasterType> element;
 
-					_variable_message_sign_layer->Push_Element<Regular_Element>(&element);
-				}
-			}
+		//		for(itr=_variable_message_signs.begin();itr!=_variable_message_signs.end();itr++)
+		//		{
+		//			element._x = (*itr)->x_position<float>();
+		//			element._y = (*itr)->y_position<float>();
+		//			element._z = 1;
 
-			//feature_implementation void Setup_Depots()
-			//{
-			//	_depot_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(depot_layer),ComponentType>*, string& > >(string("Tow Truck Depots"));
+		//			Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(element);
 
-			//	Antares_Layer_Configuration cfg;
-			//	True_Color_RGBA<NT> head_color;
-			//	
-			//	head_color._r = 0;
-			//	head_color._g = 0;
-			//	head_color._b = 0;
-			//	head_color._a = 255;
+		//			_variable_message_sign_layer->Push_Element<Regular_Element>(&element);
+		//		}
+		//	}
 
-			//	cfg.Configure_Static_Points(head_color,8);
-			//	cfg.draw=true;
-			//	_depot_layer->Initialize<NT>(cfg);
+		//	//feature_implementation void Setup_Depots()
+		//	//{
+		//	//	_depot_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(depot_layer),ComponentType>*, string& > >(string("Tow Truck Depots"));
 
-			//	vector<Depot_Interface*>::iterator itr;
+		//	//	Antares_Layer_Configuration cfg;
+		//	//	True_Color_RGBA<NT> head_color;
+		//	//	
+		//	//	head_color._r = 0;
+		//	//	head_color._g = 0;
+		//	//	head_color._b = 0;
+		//	//	head_color._a = 255;
 
-			//	for(itr=_depots.begin();itr!=_depots.end();itr++)
-			//	{
-			//		Point_3D<MasterType> element;
+		//	//	cfg.Configure_Static_Points(head_color,8);
+		//	//	cfg.draw=true;
+		//	//	_depot_layer->Initialize<NT>(cfg);
 
-			//		element._x = (*itr)->x_position<float>();
-			//		element._y = (*itr)->y_position<float>();
-			//		element._z = 1;
+		//	//	vector<Depot_Interface*>::iterator itr;
 
-			//		Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(element);
+		//	//	for(itr=_depots.begin();itr!=_depots.end();itr++)
+		//	//	{
+		//	//		Point_3D<MasterType> element;
 
-			//		_depot_layer->Push_Element<Regular_Element>(&element);
-			//	}
-			//}
+		//	//		element._x = (*itr)->x_position<float>();
+		//	//		element._y = (*itr)->y_position<float>();
+		//	//		element._z = 1;
 
-			feature_implementation void Initialize()
-			{
-				Parent::Initialize<ComponentType,CallerType,TargetType>();
-				
-				Setup_Link_Controls<ComponentType,ComponentType,NT>();
-				//Setup_Advisory_Radios<ComponentType,ComponentType,NT>();
-				Setup_Variable_Message_Signs<ComponentType,ComponentType,NT>();
-				//Setup_Depots<ComponentType,ComponentType,NT>();
-			}
+		//	//		Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(element);
 
-			member_prototype(Antares_Layer,link_control_layer,typename type_of(MasterType::antares_layer),none,none);
-			member_prototype(Antares_Layer,advisory_radio_layer,typename type_of(MasterType::antares_layer),none,none);
-			member_prototype(Antares_Layer,variable_message_sign_layer,typename type_of(MasterType::antares_layer),none,none);
-			member_prototype(Antares_Layer,depot_layer,typename type_of(MasterType::antares_layer),none,none);
-		};
+		//	//		_depot_layer->Push_Element<Regular_Element>(&element);
+		//	//	}
+		//	//}
+
+		//	feature_implementation void Initialize()
+		//	{
+		//		Parent::Initialize<ComponentType,CallerType,TargetType>();
+		//		
+		//		Setup_Link_Controls<ComponentType,ComponentType,NT>();
+		//		//Setup_Advisory_Radios<ComponentType,ComponentType,NT>();
+		//		Setup_Variable_Message_Signs<ComponentType,ComponentType,NT>();
+		//		//Setup_Depots<ComponentType,ComponentType,NT>();
+		//	}
+
+		//	member_prototype(Antares_Layer,link_control_layer,typename type_of(MasterType::antares_layer),none,none);
+		//	member_prototype(Antares_Layer,advisory_radio_layer,typename type_of(MasterType::antares_layer),none,none);
+		//	member_prototype(Antares_Layer,variable_message_sign_layer,typename type_of(MasterType::antares_layer),none,none);
+		//	member_prototype(Antares_Layer,depot_layer,typename type_of(MasterType::antares_layer),none,none);
+		//};
 	}
 
 }

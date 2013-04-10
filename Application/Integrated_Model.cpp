@@ -93,29 +93,34 @@ struct MasterType
 
 
 
-
-
-
-	typedef Link_Control_Components::Implementations::Lane_Link_Control<MasterType> link_control_type;
-	typedef Depot_Components::Implementations::Tow_Truck_Depot<MasterType> depot_type;
-	typedef Advisory_Radio_Components::Implementations::Highway_Advisory_Radio<MasterType> advisory_radio_type;
-	typedef Variable_Message_Sign_Components::Implementations::Variable_Word_Sign<MasterType> variable_message_sign_type;
+	typedef Traffic_Management_Center_Components::Implementations::Simple_TMC<MasterType> traffic_management_center_type;
 #ifdef ANTARES
-	typedef Traffic_Management_Center_Components::Implementations::Antares_TMC<MasterType> traffic_management_center_type;
 	typedef Network_Event_Components::Implementations::Antares_Weather_Network_Event<MasterType> weather_network_event_type;
 	typedef Network_Event_Components::Implementations::Antares_Accident_Network_Event<MasterType> accident_network_event_type;
 	typedef Network_Event_Components::Implementations::Antares_Congestion_Network_Event<MasterType> congestion_network_event_type;
 	typedef Network_Event_Components::Implementations::Antares_Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
+
+	typedef Link_Control_Components::Implementations::Antares_Lane_Link_Control<MasterType> link_control_type;
+	typedef Depot_Components::Implementations::Antares_Tow_Truck_Depot<MasterType> depot_type;
+	typedef Advisory_Radio_Components::Implementations::Antares_Highway_Advisory_Radio<MasterType> advisory_radio_type;
+	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Word_Sign<MasterType> variable_word_sign_type;
+	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Speed_Sign<MasterType> variable_speed_sign_type;
 #else
-	typedef Traffic_Management_Center_Components::Implementations::Simple_TMC<MasterType> traffic_management_center_type;
 	typedef Network_Event_Components::Implementations::Weather_Network_Event<MasterType> weather_network_event_type;
 	typedef Network_Event_Components::Implementations::Accident_Network_Event<MasterType> accident_network_event_type;
 	typedef Network_Event_Components::Implementations::Congestion_Network_Event<MasterType> congestion_network_event_type;
 	typedef Network_Event_Components::Implementations::Lane_Closure_Network_Event<MasterType> lane_closure_network_event_type;
+
+	typedef Link_Control_Components::Implementations::Lane_Link_Control<MasterType> link_control_type;
+	typedef Depot_Components::Implementations::Tow_Truck_Depot<MasterType> depot_type;
+	typedef Advisory_Radio_Components::Implementations::Highway_Advisory_Radio<MasterType> advisory_radio_type;
+	typedef Variable_Message_Sign_Components::Implementations::Variable_Word_Sign<MasterType> variable_word_sign_type;
+	typedef Variable_Message_Sign_Components::Implementations::Variable_Speed_Sign<MasterType> variable_speed_sign_type;
 #endif
 
 	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
 	typedef TYPELIST_4(weather_network_event_type,accident_network_event_type,congestion_network_event_type,lane_closure_network_event_type) network_event_types;
+	typedef TYPELIST_5(link_control_type,depot_type,advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
 };
@@ -194,6 +199,14 @@ int main(int argc,char** argv)
 	//network->network_event_manager<MasterType::network_event_manager_type*>( (MasterType::network_event_manager_type*)net_event_manager );
 
 	//net_event_manager->Initialize<NT>();
+	
+	//typedef Traffic_Management_Center<MasterType::traffic_management_center_type,NT> TMC_Interface;
+	//TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+
+	//network->traffic_management_center<MasterType::traffic_management_center_type*>(tmc);
+
+	//tmc->scenario_reference<_Scenario_Interface*>(scenario);
+	//tmc->Initialize<NT>();
 
 	cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
