@@ -202,20 +202,15 @@ namespace Demand_Components
 					traveler->template internal_id<int>(traveler_id_counter);
 					traveler->template router<_Routing_Interface*>(router);
 					traveler->template vehicle<_Vehicle_Interface*>(vehicle);
-//					traveler->template plan<_Plan_Interface*>(plan);
 
 					router->template traveler<_Traveler_Interface*>(traveler);
 					router->template network<_Network_Interface*>(network);
 
-
-
-//					plan->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
-//					plan->template traveler<_Traveler_Interface*>(traveler);
-
 					movement_plan->template origin<_Link_Interface*>(origin_link);
 					movement_plan->template destination<_Link_Interface*>(destination_link);
 					movement_plan->template departed_time<Time_Seconds>(departed_time);
-//					movement_plan->template plan<_Plan_Interface*>(plan);
+					movement_plan->template initialize_trajectory<NULLTYPE>();
+
 					router->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 
 					traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
@@ -285,6 +280,8 @@ namespace Demand_Components
 					int departed_time = raw_vehicle.get_departure_time();
 
 					movement_plan->template departed_time<Time_Seconds>(departed_time);
+					movement_plan->template initialize_trajectory<NULLTYPE>();
+
 					router->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 					
 					traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
