@@ -548,6 +548,7 @@
     <ClInclude Include="Polaris_Demand_Implementation.h" />
     <ClInclude Include="Polaris_Intersection_Control_Implementation.h" />
     <ClInclude Include="Polaris_Intersection_Implementation.h" />
+    <ClInclude Include="Polaris_Link_Event_Handler_Implementation.h" />
     <ClInclude Include="Polaris_Link_Implementation.h" />
     <ClInclude Include="Polaris_Movement_Plan_Implementation.h" />
     <ClInclude Include="Polaris_Network_Implementation.h" />

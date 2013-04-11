@@ -45,6 +45,8 @@ namespace Network_Event_Components
 			//Weather properties
 			feature_accessor(weather_type,none,none);
 			feature_accessor(precipitation_rate,none,none);
+			feature_accessor(precipitation_depth,none,none);
+			feature_accessor(wind_speed,none,none);
 			feature_accessor(snow_depth,none,none);
 			feature_accessor(visibility,none,none);
 			feature_accessor(temperature,none,none);

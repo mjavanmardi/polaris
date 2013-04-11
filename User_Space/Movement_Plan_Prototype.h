@@ -103,6 +103,22 @@ namespace Movement_Plan_Components
 			{
 				return this_component()->destination<ComponentType,CallerType,TargetType>();
 			}
+			feature_prototype void origin(TargetType zone, requires(check(TargetType,Zone_Components::Concepts::Is_Zone)))
+			{
+				this_component()->origin_zone<ComponentType,CallerType,TargetType>(zone);
+			}
+			feature_prototype TargetType origin(requires(check(TargetType,Zone_Components::Concepts::Is_Zone)))
+			{
+				return this_component()->origin_zone<ComponentType,CallerType,TargetType>();
+			}
+			feature_prototype void destination(TargetType link, requires(check(TargetType,Zone_Components::Concepts::Is_Zone)))
+			{
+				this_component()->destination_zone<ComponentType,CallerType,TargetType>(link);
+			}
+			feature_prototype TargetType destination(requires(check(TargetType,Zone_Components::Concepts::Is_Zone)))
+			{
+				return this_component()->destination_zone<ComponentType,CallerType,TargetType>();
+			}
 
 
 			feature_prototype void set_trajectory(TargetType& path_container)

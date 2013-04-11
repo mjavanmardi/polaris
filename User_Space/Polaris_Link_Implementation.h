@@ -60,6 +60,8 @@ namespace Link_Components
 			member_data(float, length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, speed_limit, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
+			member_container(vector<typename MasterType::activity_location_type*>, activity_locations, none, none);
+
 			member_data(Link_Components::Types::Link_Type_Keys, link_type, none, none);
 			
 			member_data(int, num_left_turn_bays, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -111,6 +113,7 @@ namespace Link_Components
 			member_data(float, jam_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, critical_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, original_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, original_maximum_flow_rate, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
@@ -171,6 +174,8 @@ namespace Link_Components
 			struct Link_MOE_Data realtime_link_moe_data;
 
 			vector<struct Link_MOE_Data> td_link_moe_data_array;
+
+			member_data(bool, event_affected, none, none);
 
 		//==================================================================================================================
 		/// travel_time
@@ -572,6 +577,8 @@ namespace Link_Components
 
 				td_link_moe_data_array.clear();
 				initialize_moe();
+
+				_event_affected = false;
 			}
 
 			void initialize_moe()
@@ -665,7 +672,7 @@ namespace Link_Components
 			feature_implementation void Initialize()
 			{
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				load_event(ComponentType,ComponentType::Newells_Conditional,Compute_Step_Flow_Supply_Update,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION,NULLTYPE);
+				load_event(ComponentType,ComponentType::Newells_Conditional,Update_Events,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION,NULLTYPE);
 			}
 
 			declare_feature_conditional(Newells_Conditional)
@@ -673,7 +680,14 @@ namespace Link_Components
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
-				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
+				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION)
+				{
+					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Update_Events<NULLTYPE>);
+					response.result=true;
+					response.next._iteration=_iteration;
+					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION;
+				}
+				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
 				{
 					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Supply_Update<NULLTYPE>);
 					response.result=true;
@@ -694,15 +708,50 @@ namespace Link_Components
 				}
 			}
 
+			declare_feature_event(Update_Events)
+			{
+				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
+				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
+				//_this_ptr->template handle_events<NT>();
+			}
+
+			feature_implementation void handle_events()
+			{
+				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
+				define_component_interface(_Network_Event_Manager_Interface, _Network_Interface::get_type_of(network_event_manager), Network_Event_Components::Prototypes::Network_Event_Manager, ComponentType);
+				typedef Network_Event<typename MasterType::weather_network_event_type> _Weather_Event_Interface;
+				vector<_Weather_Event_Interface*> weather_events;
+
+				_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
+				network_event_manager->template Get_Network_Events<typename MasterType::weather_network_event_type>(_internal_id, weather_events);
+				
+				// We (reasonably) assume that there is at most one weather condition affecting a link at any point in time
+				if (weather_events.size() != 0)
+				{
+					process_weather_event<ComponentType,CallerType,_Weather_Event_Interface*>(weather_events[0]);
+					_event_affected = true;
+				} 
+				else if (_event_affected)
+				{
+					revert_features<ComponentType,CallerType,TargetType>();
+					_event_affected = false;
+				} 
+			}
+
+			feature_implementation void revert_features()
+			{
+				_free_flow_speed = _original_free_flow_speed;
+				_maximum_flow_rate = _original_maximum_flow_rate;
+				_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
+			}
+
 			declare_feature_event(Compute_Step_Flow_Supply_Update)
 			{
 
 				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
-//cout << "ok10 at " << _this_ptr->internal_id<int>() << endl;
 				//step 1: link supply update based on a given traffic flow model
 				_this_ptr->template link_supply_update<NULLTYPE>();
-//cout << "ok11 at " << _this_ptr->internal_id<int>() << endl;
 			}
 
 			declare_feature_event(Compute_Step_Flow_Link_Moving)
@@ -710,18 +759,17 @@ namespace Link_Components
 
 				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
-if (_this_ptr->internal_id<int>() == 168)
-{
-	//cout << "here" << endl;
-}
-//cout << "ok1 at " << _this_ptr->internal_id<int>() << endl;
 				//step 7: link moving -- no link moving in Newell's simplified model -- it can be used to determine turn bay curve
 				_this_ptr->template link_moving<NULLTYPE>();
-//cout << "ok2 at " << _this_ptr->internal_id<int>() << endl;
 				//step 8: link network state update
 				_this_ptr->template network_state_update<NULLTYPE>();
-//cout << "ok3 at " << _this_ptr->internal_id<int>() << endl;
 			}
+
+			feature_implementation void process_weather_event(TargetType weather_event);
+			feature_implementation float find_free_flow_speed_reduction_rate(int weather_index);
+			feature_implementation int get_weather_index(TargetType weather_event);
+			static float link_capacity_reduction_factors[18];
+			static float link_free_flow_speed_reduction_factors[18][5];
 		};
 	}
 }

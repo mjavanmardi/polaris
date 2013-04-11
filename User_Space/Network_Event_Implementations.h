@@ -10,7 +10,13 @@ namespace Network_Event_Components
 	{
 		enum WEATHER_TYPE
 		{
-			SNOW
+			CLEAR_DRY_PAVEMENT = 0,
+			CLEAR_WET_PAVEMENT,
+			RAIN,
+			SNOW,
+			TEMP,
+			WIND,
+			VISIBILITY
 		};
 	}
 
@@ -174,6 +180,8 @@ namespace Network_Event_Components
 			member_data(float,precipitation_depth,none,none);
 			member_data(int,visibility,none,none);
 			member_data(string,county,none,none);
+			member_data(float,temperature,none,none);
+			member_data(float,wind_speed,none,none);
 		};
 		
 		implementation struct Accident_Network_Event : public Base_Network_Event<MasterType,NT,APPEND_CHILD(Accident_Network_Event)>
@@ -367,21 +375,21 @@ namespace Network_Event_Components
 			}
 
 			//weather events are open to anyone, all others are only open to TMC
-			feature_implementation void Get_Network_Events(int link_id,vector< Network_Event<TargetType,NT>* >& container,requires(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(CallerType,typename type_of(MasterType::traffic_management_center),is_same)))
+			feature_implementation void Get_Network_Events(int link_id,vector< Network_Event<TargetType,NT>* >& container/*,requires(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(CallerType,typename type_of(MasterType::traffic_management_center),is_same))*/)
 			{
-				list<Network_Event<typename TargetType::ControlType,NT>*>* events_of_type = (list<Network_Event<typename TargetType::ControlType,NT>*>*) & (_network_event_container[TargetType::ControlType::component_index]);
+				list<Network_Event<typename TargetType,NT>*>* events_of_type = (list<Network_Event<typename TargetType,NT>*>*) & (_network_event_container[TargetType::component_index]);
 
-				for(list< Network_Event<typename TargetType::ControlType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+				for(list< Network_Event<typename TargetType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
-					Network_Event<typename TargetType::ControlType,NT>* network_event=*itr;
+					Network_Event<typename TargetType,NT>* network_event=*itr;
 
 					if(network_event->active<bool>())
 					{
-						vector<int>* affected_links = network_event->affected_links<vector<int>*>();
+						vector<Link_Interface*>* affected_links = network_event->affected_links<vector<Link_Interface*>*>();
 
-						for(vector<int>::iterator vitr = affected_links->begin();vitr != affected_links->end();vitr++)
+						for(vector<Link_Interface*>::iterator vitr = affected_links->begin();vitr != affected_links->end();vitr++)
 						{
-							if(*vitr == link_id)
+							if((*vitr)->internal_id<int>() == link_id)
 							{
 								container.push_back( *itr );
 								break;
@@ -391,10 +399,10 @@ namespace Network_Event_Components
 				}
 			}
 			
-			feature_implementation void Get_Network_Events(int link_id,vector< Network_Event<TargetType,NT>* >& container,requires(!(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(CallerType,typename type_of(MasterType::traffic_management_center),is_same))))
-			{
-				static_assert(false,"Non-TMC are only allowed to withdraw weather events!");
-			}
+			//feature_implementation void Get_Network_Events(int link_id,vector< Network_Event<TargetType,NT>* >& container,requires(!(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(CallerType,typename type_of(MasterType::traffic_management_center),is_same))))
+			//{
+			//	static_assert(false,"Non-TMC are only allowed to withdraw weather events!");
+			//}
 
 			feature_implementation void Create_Network_Event(Network_Event<TargetType,CallerType>* network_event)
 			{
@@ -415,6 +423,8 @@ namespace Network_Event_Components
 					}
 				}
 			}
+			
+			typedef Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
 
 			member_data( concat(hash_map< int, list<Base_Network_Event_Interface*> >), network_event_container, none ,none);
 		};

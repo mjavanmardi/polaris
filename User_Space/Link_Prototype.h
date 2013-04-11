@@ -63,6 +63,7 @@ namespace Link_Components
 			feature_accessor(downstream_intersection, none, none);
 			feature_accessor(length, none, none);
 			feature_accessor(link_type, none, none);
+			feature_accessor(activity_locations, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
@@ -157,6 +158,10 @@ namespace Link_Components
 			feature_accessor(critical_density, none, none);
 			feature_accessor(link_num_vehicles_in_queue, none, none);
 			feature_accessor(original_free_flow_speed, none, none);
+			feature_accessor(original_maximum_flow_rate, none, none);
+			
+			// event-aware link
+			feature_accessor(event_affected, none, none);
 
 			//visualized link
 			feature_accessor(displayed_line, none, none);
@@ -234,6 +239,11 @@ namespace Link_Components
 			feature_prototype void configure_displayed_line()
 			{
 				this_component()->template configure_displayed_line<ComponentType,CallerType,TargetType>();
+			}
+			
+			feature_prototype void handle_events()
+			{
+				this_component()->template handle_events<ComponentType,CallerType,TargetType>();
 			}
 		};
 	}

@@ -222,7 +222,7 @@ namespace Network_Components
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
 						link->template original_free_flow_speed<float>(link->template free_flow_speed<float>());
-
+						link->template original_maximum_flow_rate<float>(maximum_flow_rate);
 
 						_network_reference->max_free_flow_speed<float>(max(_network_reference->max_free_flow_speed<float>(),link->template free_flow_speed<float>()));
 
@@ -318,8 +318,8 @@ namespace Network_Components
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
-
-
+						link->template original_free_flow_speed<float>(link->template free_flow_speed<float>());
+						link->template original_maximum_flow_rate<float>(maximum_flow_rate);
 
 						_network_reference->max_free_flow_speed<float>(max(_network_reference->max_free_flow_speed<float>(),link->template free_flow_speed<float>()));
 
@@ -618,6 +618,7 @@ namespace Network_Components
 				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, typename type_of(network_reference)::type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, typename type_of(network_reference)::type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 				define_container_and_value_interface_unqualified_container(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename type_of(network_reference)::type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+
 				_Activity_Locations_Container_Interface& activity_locations_container = _network_reference->activity_locations_container<_Activity_Locations_Container_Interface&>();
 
 				activity_locations_container.clear();
@@ -661,7 +662,8 @@ namespace Network_Components
 						link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 
 						activity_location->template origin_links<_Links_Container_Interface&>().push_back(link);
-				
+						link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
+
 						activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
 				
 						activity_location->template zone<_Zone_Interface*>(zone);

@@ -193,12 +193,12 @@ namespace Demand_Components
 //					plan = (_Plan_Interface*)Allocate<typename _Plan_Interface::Component_Type>();
 					movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
 
-					vehicle->template uuid<int>(traveler_id_counter);
+					vehicle->template uuid<int>(++traveler_id_counter);
 					vehicle->template internal_id<int>(traveler_id_counter);
 					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 					vehicle->template traveler<_Traveler_Interface*>(traveler);
 
-					traveler->template uuid<int>(++traveler_id_counter);
+					traveler->template uuid<int>(traveler_id_counter);
 					traveler->template internal_id<int>(traveler_id_counter);
 					traveler->template router<_Routing_Interface*>(router);
 					traveler->template vehicle<_Vehicle_Interface*>(vehicle);
@@ -208,6 +208,17 @@ namespace Demand_Components
 
 					movement_plan->template origin<_Link_Interface*>(origin_link);
 					movement_plan->template destination<_Link_Interface*>(destination_link);
+
+					_Activity_Location_Interface* origin_location = origin_link->template activity_locations<_Activity_Locations_Container_Interface&>()[0];
+					_Activity_Location_Interface* destination_location = destination_link->template activity_locations<_Activity_Locations_Container_Interface&>()[0];
+					movement_plan->template origin<_Activity_Location_Interface*>(origin_location);
+					movement_plan->template destination<_Activity_Location_Interface*>(destination_location);
+
+					_Zone_Interface* origin_zone = origin_location->template zone<_Zone_Interface*>();
+					_Zone_Interface* destination_zone = destination_location->template zone<_Zone_Interface*>();
+					movement_plan->template origin<_Zone_Interface*>(origin_zone);
+					movement_plan->template destination<_Zone_Interface*>(destination_zone);
+
 					movement_plan->template departed_time<Time_Seconds>(departed_time);
 					movement_plan->template initialize_trajectory<NULLTYPE>();
 
@@ -333,17 +344,17 @@ namespace Demand_Components
 
 					vehicle_data.set_origin_link_index(movement_plan->template origin<_Link_Interface*>()->template internal_id<int>());
 					vehicle_data.set_destination_link_index(movement_plan->template destination<_Link_Interface*>()->template internal_id<int>());
-					vehicle_data.set_origin_activity_location_index(0);
-					vehicle_data.set_destination_activity_location_index(0);
-					vehicle_data.set_origin_zone_index(0);
-					vehicle_data.set_destination_zone_index(0);
+					vehicle_data.set_origin_activity_location_index(movement_plan->template origin<_Activity_Location_Interface*>()->template internal_id<int>());
+					vehicle_data.set_destination_activity_location_index(movement_plan->template destination<_Activity_Location_Interface*>()->template internal_id<int>());
+					vehicle_data.set_origin_zone_index(movement_plan->template origin<_Zone_Interface*>()->template internal_id<int>());
+					vehicle_data.set_destination_zone_index(movement_plan->template destination<_Zone_Interface*>()->template internal_id<int>());
 
-					vehicle_data.set_departure_time(movement_plan->template departed_time<int>());
-					vehicle_data.set_departure_simulation_interval_index(movement_plan->template departed_time<int>() / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
-					vehicle_data.set_departure_assignment_interval_index(movement_plan->template departed_time<int>() / ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>());
+					vehicle_data.set_departure_time(movement_plan->template departed_time<Time_Seconds>());
+					vehicle_data.set_departure_simulation_interval_index(movement_plan->template departed_time<Time_Seconds>() / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>());
+					vehicle_data.set_departure_assignment_interval_index(movement_plan->template departed_time<Time_Seconds>() / ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>());
 
 					demand_data.vehilce_data_array.push_back(vehicle_data);
-					demand_data.time_dependent_vehicle_index_array[movement_plan->template departed_time<int>()].push_back(vehicle_data.get_vehicle_index());
+					demand_data.time_dependent_vehicle_index_array[movement_plan->template departed_time<Time_Seconds>()].push_back(vehicle_data.get_vehicle_index());
 
 				}
 				demand_data.demand_vehicle_size = (int)demand_data.vehilce_data_array.size();

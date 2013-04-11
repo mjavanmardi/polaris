@@ -277,5 +277,8 @@
     <ClInclude Include="Geometry_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Polaris_Link_Event_Handler_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

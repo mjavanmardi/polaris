@@ -65,6 +65,9 @@ namespace Movement_Plan_Components
 			member_component(typename MasterType::activity_location_type, origin_location, none, none);
 			member_component(typename MasterType::activity_location_type, destination_location, none, none);
 
+			member_component(typename MasterType::zone_type, origin_zone, none, none);
+			member_component(typename MasterType::zone_type, destination_zone, none, none);
+
 			member_component(typename MasterType::link_type, origin, none, none);
 			member_component(typename MasterType::link_type, destination, none, none);
 //#ifndef FOR_LINUX_PORTING

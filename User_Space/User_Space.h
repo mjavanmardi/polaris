@@ -22,7 +22,7 @@ void* _global_scenario;
 #include "Polaris_Movement_Plan_Implementation.h"
 #include "Polaris_Turn_Movement_Implementation.h"
 
-
+#include "Polaris_Link_Event_Handler_Implementation.h"
 #include "Polaris_Network_Implementation_Input_File.h"
 #include "Polaris_Network_Implementation_Output_File.h"
 #include "Polaris_Network_Implementation_Results.h"

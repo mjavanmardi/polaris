@@ -14,7 +14,7 @@ namespace Network_Components
 	{
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_network_data(network_models::network_information::network_data_information::NetworkData& network_data)
 		{
-			read_intersection_data<ComponentType,CallerType,TargetType>(network_data);
+			read_intersection_data<ComponentType,CallerType,TargetType>(network_data); 
 			read_link_data<ComponentType,CallerType,TargetType>(network_data);
 			read_turn_movement_data<ComponentType,CallerType,TargetType>(network_data);
 			read_activity_location_data<ComponentType,CallerType,TargetType>(network_data);
