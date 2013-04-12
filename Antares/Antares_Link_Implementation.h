@@ -631,7 +631,14 @@ namespace Link_Components
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
-				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
+				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION)
+				{
+					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Update_Events<NULLTYPE>);
+					response.result=true;
+					response.next._iteration=_iteration;
+					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION;
+				}
+				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
 				{
 					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Supply_Update<NULLTYPE>);
 					response.result=true;
@@ -655,7 +662,7 @@ namespace Link_Components
 				else
 				{
 					assert(false);
-					cout << "Should never reach here in link conditional!" << endl;
+					cout << "Should never reach here in Antares link conditional!" << endl;
 				}
 			}
 

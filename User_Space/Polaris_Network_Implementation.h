@@ -263,7 +263,10 @@ namespace Network_Components
 					}
 					update_moe_for_assignment_interval_with_links();
 					update_moe_for_assignment_interval();
-					output_moe_for_assignment_interval<ComponentType, CallerType, TargetType>();
+					if (((_Scenario_Interface*)_global_scenario)->template output_moe_for_assignment_interval<bool>())
+					{		
+						output_moe_for_assignment_interval<ComponentType, CallerType, TargetType>();
+					}
 					reset_moe_for_assignment_interval();
 				}
 			}
@@ -508,21 +511,37 @@ namespace Network_Components
 				printf("%s, ", convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str());
 				printf("loaded=%7d, departed=%7d, arrived=%7d, in_network=%7d, VMT=%7f, VHT=%7f\n",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>(),_network_vmt, _network_vht);
 
-				//write_node_control_state<NULLTYPE>();
-				//write_vehicle_trajectory<NULLTYPE>();
-				//write_network_link_flow<NULLTYPE>();
-				//write_network_link_turn_time<ComponentType,CallerType,TargetType>();
-				write_output_summary<ComponentType,CallerType,TargetType>();
+				if (((_Scenario_Interface*)_global_scenario)->template write_node_control_state<bool>())
+				{
+					write_node_control_state<ComponentType,CallerType,TargetType>();
+				}
+				if (((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
+				{
+					write_vehicle_trajectory<ComponentType,CallerType,TargetType>();
+				}
+				if (((_Scenario_Interface*)_global_scenario)->template write_network_link_flow<bool>())
+				{
+					write_network_link_flow<ComponentType,CallerType,TargetType>();
+				}
+				if (((_Scenario_Interface*)_global_scenario)->template write_network_link_turn_time<bool>())
+				{
+					write_network_link_turn_time<ComponentType,CallerType,TargetType>();
+				}
+				if (((_Scenario_Interface*)_global_scenario)->template write_output_summary<bool>())
+				{
+					write_output_summary<ComponentType,CallerType,TargetType>();
+				}
 			}
+
+			
+			feature_implementation void write_node_control_state();
 
 			feature_implementation void write_vehicle_trajectory();
 
 			feature_implementation void write_network_link_flow();
 
 			feature_implementation void write_network_link_turn_time();
-
-			feature_implementation void write_node_control_state();
-
+			
 			feature_implementation void write_output_summary();
 
 			//==================================================================================================================

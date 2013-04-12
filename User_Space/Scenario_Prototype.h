@@ -71,7 +71,6 @@ namespace Scenario_Components
 			feature_accessor(num_simulation_intervals_per_assignment_interval, none, none);
 
 			feature_accessor(assignment_mode, none, none);
-			feature_accessor(num_threads, none, none);
 			feature_accessor(iseed, none, none);
 						
 			feature_accessor(demand_od_flag, none, none);
@@ -131,7 +130,24 @@ namespace Scenario_Components
 
 			feature_accessor(database_name, none, none);
 
-			feature_accessor(snapshot_period, none, none); 
+			feature_accessor(snapshot_period, none, none);
+
+			//===============================================
+			// i/o parameters
+			//===============================================
+			feature_accessor(num_threads, none, none);
+			feature_accessor(write_db_input_to_files, none, none); // to control whether database input is written to files
+			feature_accessor(run_simulation_for_db_input, none, none); // to control whether to run simulation for database input
+
+			feature_accessor(write_node_control_state, none, none);
+			feature_accessor(write_vehicle_trajectory, none, none);
+			feature_accessor(write_network_link_flow, none, none);
+			feature_accessor(write_network_link_turn_time, none, none);
+			feature_accessor(write_output_summary, none, none);
+			feature_accessor(output_moe_for_assignment_interval, none, none);
+			feature_accessor(output_link_moe_for_simulation_interval, none, none);
+			feature_accessor(output_turn_movement_moe_for_simulation_interval, none, none);
+			feature_accessor(output_network_moe_for_simulation_interval, none, none);
 
 			feature_prototype void read_scenario_data()
 			{
@@ -197,7 +213,6 @@ namespace Scenario_Components
 				//===============================================
 				// set control parameters
 				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(0.0);
-				if (cfgReader.getParameter("num_threads", num_threads<int*>())!= PARAMETER_FOUND) num_threads<int>(1);
 				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0.0);
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
 				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(3600);
@@ -243,7 +258,21 @@ namespace Scenario_Components
 			    simulation_time_in_seconds<double>(0.0);
 			    operation_time_in_seconds<double>(0.0);
 			    output_time_in_seconds<double>(0.0);
-				
+
+				// set I/O parameters
+				if (cfgReader.getParameter("num_threads", num_threads<int*>())!= PARAMETER_FOUND) num_threads<int>(1);
+				if (cfgReader.getParameter("write_db_input_to_files", write_db_input_to_files<bool*>())!= PARAMETER_FOUND) write_db_input_to_files<bool>(false);
+				if (cfgReader.getParameter("run_simulation_for_db_input", run_simulation_for_db_input<bool*>())!= PARAMETER_FOUND) run_simulation_for_db_input<bool>(true);
+				if (cfgReader.getParameter("write_node_control_state", write_node_control_state<bool*>())!= PARAMETER_FOUND) write_node_control_state<bool>(false);
+				if (cfgReader.getParameter("write_vehicle_trajectory", write_vehicle_trajectory<bool*>())!= PARAMETER_FOUND) write_vehicle_trajectory<bool>(false);
+				if (cfgReader.getParameter("write_network_link_flow", write_network_link_flow<bool*>())!= PARAMETER_FOUND) write_network_link_flow<bool>(false);
+				if (cfgReader.getParameter("write_network_link_turn_time", write_network_link_turn_time<bool*>())!= PARAMETER_FOUND) write_network_link_turn_time<bool>(false);
+				if (cfgReader.getParameter("write_output_summary", write_output_summary<bool*>())!= PARAMETER_FOUND) write_output_summary<bool>(true);
+				if (cfgReader.getParameter("output_moe_for_assignment_interval", output_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_moe_for_assignment_interval<bool>(true);
+				if (cfgReader.getParameter("output_link_moe_for_simulation_interval", output_link_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_simulation_interval<bool>(false);
+				if (cfgReader.getParameter("output_turn_movement_moe_for_simulation_interval", output_turn_movement_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_simulation_interval<bool>(false);
+				if (cfgReader.getParameter("output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_simulation_interval<bool>(false);
+
 				output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
 				open_output_files<NULLTYPE>();

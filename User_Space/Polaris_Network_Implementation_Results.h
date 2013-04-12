@@ -51,8 +51,8 @@ namespace Network_Components
 						int destination_link_index = movement_plan->template destination<_Link_Interface*>()->template uuid<int>();
 						int num_links = (int)movement_plan->template trajectory_container<_Trajecotry_Container_Interface&>().size();
 
-						int departure_time = movement_plan->template departed_time<int>();
-						int arrival_time = movement_plan->template arrived_time<int>();
+						int departure_time = movement_plan->template departed_time<Time_Seconds>();
+						int arrival_time = movement_plan->template arrived_time<Time_Seconds>();
 						float travel_time = float ((arrival_time - departure_time)/60.0f);
 
 							
@@ -126,7 +126,7 @@ namespace Network_Components
 				int link_bwtt_cached_simulation_interval_size = int(ceil(float(bwtt/((float)simulation_interval_length))));
 					
 				network_link_flow_file
-					<< convert_seconds_to_hhmmss(simulation_interval_index) <<  ","
+					<< convert_seconds_to_hhmmss(((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()) <<  ","
 					<< link->template internal_id<int>() <<  ","
 					<< link_fftt_cached_simulation_interval_size <<  ","
 					<< link_bwtt_cached_simulation_interval_size <<  ","
@@ -168,7 +168,7 @@ namespace Network_Components
 					
 					
 				network_link_turn_time_file
-					<< convert_seconds_to_hhmmss(current_starting_time) <<  ","
+					<< convert_seconds_to_hhmmss(((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()) <<  ","
 					<< current_starting_time << ","
 					<< movement->template inbound_link<_Link_Interface*>()->template downstream_intersection<_Intersection_Interface*>()->template uuid<int>() << ","
 					<< movement->template uuid<int>() <<  ","
@@ -216,9 +216,9 @@ namespace Network_Components
 			_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
 			fstream& network_node_control_state_file = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>()->template network_node_control_state_file<fstream&>();
-			for (int i = 0; i < (int)intersections_container<_Intersections_Container_Interface&>().size(); i++)
+			for (int i = 0; i < (int)_intersections_container.size(); i++)
 			{
-				_Intersection_Interface* intersection = intersections_container<_Intersections_Container_Interface&>()[i];
+				_Intersection_Interface* intersection = (_Intersection_Interface*)_intersections_container[i];
 				_Intersection_Control_Interface* intersection_control = intersection->template intersection_control<_Intersection_Control_Interface*>();
 				_Control_Plan_Interface* current_control_plan = intersection_control->template current_control_plan<_Control_Plan_Interface*>();
 				int starting_time = current_control_plan->template starting_time<int>();
@@ -226,9 +226,9 @@ namespace Network_Components
 				Intersection_Components::Types::Intersection_Type_Keys control_type = current_control_plan->template control_type<Intersection_Components::Types::Intersection_Type_Keys>();
 
 				network_node_control_state_file
-					<< convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval<int>()) <<  ","
+					<< convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()) <<  ","
 					<< _this_ptr->template current_simulation_interval_index<int>() <<  ","
-					<< _this_ptr->template current_simulation_time<int>() <<  ","
+					<< _this_ptr->template start_of_current_simulation_interval_relative<int>() <<  ","
 					<< intersection->template uuid<int>() <<  ","
 					<< current_control_plan->template control_plan_index<int>() <<  ","
 					<< current_control_plan->template control_type<int>() <<  ","
@@ -316,70 +316,80 @@ namespace Network_Components
 			typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
 			int time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
-			// output link moe
-			typedef typename MasterType::link_type _link_component_type;
-			typename _Links_Container_Interface::iterator link_itr;
-			for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
-			{
-				_link_component_type* link = (_link_component_type*)(*link_itr);
-				((_Scenario_Interface*)_global_scenario)->template out_realtime_link_moe_file<fstream&>()
+			if (((_Scenario_Interface*)_global_scenario)->template output_link_moe_for_simulation_interval<bool>())
+			{	
+				// output link moe
+				typedef typename MasterType::link_type _link_component_type;
+				typename _Links_Container_Interface::iterator link_itr;
+				for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+				{
+					_link_component_type* link = (_link_component_type*)(*link_itr);
+					((_Scenario_Interface*)_global_scenario)->template out_realtime_link_moe_file<fstream&>()
+						<< convert_seconds_to_hhmmss(time).c_str() << ","
+						<< time << ","
+						<< link->_uuid << ","
+						<< link->_upstream_intersection->_uuid << ","
+						<< link->_downstream_intersection->_uuid << ","
+						<< link->_link_type << ","	
+						<< link->realtime_link_moe_data.link_travel_time << ","
+						<< link->realtime_link_moe_data.link_travel_delay << ","
+						<< link->realtime_link_moe_data.link_queue_length << ","
+						<< link->realtime_link_moe_data.link_speed << ","
+						<< link->realtime_link_moe_data.link_density << ","
+						<< link->realtime_link_moe_data.link_in_volume << ","
+						<< link->realtime_link_moe_data.link_out_volume << ","
+						<< link->realtime_link_moe_data.link_travel_time_ratio << ","
+						<< link->realtime_link_moe_data.link_speed_ratio << ","
+						<< link->realtime_link_moe_data.link_density_ratio << ","
+						<< endl;
+
+				}
+			}
+
+			if (((_Scenario_Interface*)_global_scenario)->template output_turn_movement_moe_for_simulation_interval<bool>())
+			{	
+				// output turn movement moe
+				typedef typename MasterType::turn_movement_type _movement_component_type;
+				typename _Turn_Movements_Container_Interface::iterator movement_itr;
+				for(movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
+				{
+					_movement_component_type* movement = (_movement_component_type*)(*movement_itr);
+					((_Scenario_Interface*)_global_scenario)->template out_realtime_movement_moe_file<fstream&>() 
+						<< convert_seconds_to_hhmmss(time).c_str() << ","
+						<< time << ","
+						<< movement->_uuid << ","
+						<< movement->_inbound_link->_uuid << ","
+						<< movement->_outbound_link->_uuid << ","
+						<< movement->_inbound_link->_downstream_intersection->_uuid << ","
+						<< movement->realtime_movement_moe_data.turn_penalty << ","
+						<< movement->realtime_movement_moe_data.inbound_link_turn_time << ","
+						<< movement->realtime_movement_moe_data.outbound_link_turn_time << ","
+						<< movement->realtime_movement_moe_data.movement_flow_rate
+						<<endl;
+
+				}
+			}
+
+			if (((_Scenario_Interface*)_global_scenario)->template output_network_moe_for_simulation_interval<bool>())
+			{	
+				// output network moe
+
+				((_Scenario_Interface*)_global_scenario)->template out_realtime_network_moe_file<fstream&>()
 					<< convert_seconds_to_hhmmss(time).c_str() << ","
 					<< time << ","
-					<< link->_uuid << ","
-					<< link->_upstream_intersection->_uuid << ","
-					<< link->_downstream_intersection->_uuid << ","
-					<< link->_link_type << ","	
-					<< link->realtime_link_moe_data.link_travel_time << ","
-					<< link->realtime_link_moe_data.link_travel_delay << ","
-					<< link->realtime_link_moe_data.link_queue_length << ","
-					<< link->realtime_link_moe_data.link_speed << ","
-					<< link->realtime_link_moe_data.link_density << ","
-					<< link->realtime_link_moe_data.link_in_volume << ","
-					<< link->realtime_link_moe_data.link_out_volume << ","
-					<< link->realtime_link_moe_data.link_travel_time_ratio << ","
-					<< link->realtime_link_moe_data.link_speed_ratio << ","
-					<< link->realtime_link_moe_data.link_density_ratio << ","
+					<< realtime_network_moe_data.num_loaded_vehicles << ","
+					<< realtime_network_moe_data.num_departed_vehicles << ","
+					<< realtime_network_moe_data.num_arrived_vehicles << ","
+					<< realtime_network_moe_data.network_avg_link_travel_time << ","
+					<< realtime_network_moe_data.network_avg_link_speed << ","
+					<< realtime_network_moe_data.network_avg_link_density << ","
+					<< realtime_network_moe_data.network_avg_link_in_volume << ","
+					<< realtime_network_moe_data.network_avg_link_out_volume << ","
+					<< realtime_network_moe_data.network_avg_link_travel_time_ratio << ","
+					<< realtime_network_moe_data.network_avg_link_speed_ratio << ","
+					<< realtime_network_moe_data.network_avg_link_density_ratio << ","
 					<< endl;
-
 			}
-			// output turn movement moe
-			typedef typename MasterType::turn_movement_type _movement_component_type;
-			typename _Turn_Movements_Container_Interface::iterator movement_itr;
-			for(movement_itr = _turn_movements_container.begin(); movement_itr != _turn_movements_container.end(); movement_itr++)
-			{
-				_movement_component_type* movement = (_movement_component_type*)(*movement_itr);
-				((_Scenario_Interface*)_global_scenario)->template out_realtime_movement_moe_file<fstream&>() 
-					<< convert_seconds_to_hhmmss(time).c_str() << ","
-					<< time << ","
-					<< movement->_uuid << ","
-					<< movement->_inbound_link->_uuid << ","
-					<< movement->_outbound_link->_uuid << ","
-					<< movement->_inbound_link->_downstream_intersection->_uuid << ","
-					<< movement->realtime_movement_moe_data.turn_penalty << ","
-					<< movement->realtime_movement_moe_data.inbound_link_turn_time << ","
-					<< movement->realtime_movement_moe_data.outbound_link_turn_time << ","
-					<< movement->realtime_movement_moe_data.movement_flow_rate
-					<<endl;
-
-			}
-			// output network moe
-
-			((_Scenario_Interface*)_global_scenario)->template out_realtime_network_moe_file<fstream&>()
-				<< convert_seconds_to_hhmmss(time).c_str() << ","
-				<< time << ","
-				<< realtime_network_moe_data.num_loaded_vehicles << ","
-				<< realtime_network_moe_data.num_departed_vehicles << ","
-				<< realtime_network_moe_data.num_arrived_vehicles << ","
-				<< realtime_network_moe_data.network_avg_link_travel_time << ","
-				<< realtime_network_moe_data.network_avg_link_speed << ","
-				<< realtime_network_moe_data.network_avg_link_density << ","
-				<< realtime_network_moe_data.network_avg_link_in_volume << ","
-				<< realtime_network_moe_data.network_avg_link_out_volume << ","
-				<< realtime_network_moe_data.network_avg_link_travel_time_ratio << ","
-				<< realtime_network_moe_data.network_avg_link_speed_ratio << ","
-				<< realtime_network_moe_data.network_avg_link_density_ratio << ","
-				<< endl;
-
 		}
 
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::output_moe_for_assignment_interval()

@@ -69,11 +69,6 @@ namespace Scenario_Components
 
 			member_data(double, percent_to_synthesize, none,none);
 
-
-			//member_pointer(FILE*, out_network_moe_file, none, none);
-			//member_pointer(FILE*, out_link_moe_file, none, none);
-			//member_pointer(FILE*, out_movement_moe_file, none, none);
-
 			member_data(ofstream, output_writer, none, none);
 
 			member_data(_lock, statistics_update_lock, none, none);
@@ -84,6 +79,19 @@ namespace Scenario_Components
 			member_data(int, network_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_data(int, snapshot_period, none, none); // in second
+
+			member_data(bool, write_db_input_to_files, none, none); // to control whether database input is written to files
+			member_data(bool, run_simulation_for_db_input, none, none); // to control whether to run simulation for database input
+			
+			member_data(bool, write_node_control_state, none, none);
+			member_data(bool, write_vehicle_trajectory, none, none);
+			member_data(bool, write_network_link_flow, none, none);
+			member_data(bool, write_network_link_turn_time, none, none);
+			member_data(bool, write_output_summary, none, none);
+			member_data(bool, output_moe_for_assignment_interval, none, none);
+			member_data(bool, output_link_moe_for_simulation_interval, none, none);
+			member_data(bool, output_turn_movement_moe_for_simulation_interval, none, none);
+			member_data(bool, output_network_moe_for_simulation_interval, none, none);
 			
 			Polaris_Scenario_Implementation()
 			{
