@@ -140,6 +140,8 @@ namespace Network_Event_Components
 				if( _iteration >= pthis->_end_time || _iteration < pthis->_start_time )
 				{
 					pthis->_active = false;
+
+					pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
 				}
 				else
 				{
