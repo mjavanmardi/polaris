@@ -1,11 +1,13 @@
 #pragma once
 #include "Network_Event_Prototype.h"
+#include "Link_Prototype.h"
 
 define_static_typelist_loop(Initialize_Type,Initialize_List);
 //define_feature_dispatcher(Initialize,Initialize_Object);
 
 namespace Network_Event_Components
 {
+
 	namespace Types
 	{
 		enum WEATHER_TYPE
@@ -28,6 +30,8 @@ namespace Network_Event_Components
 	{
 		implementation struct Base_Network_Event : public Polaris_Component<APPEND_CHILD(Base_Network_Event),MasterType,Execution_Object,ParentType,true>
 		{
+			typedef Link_Components::Prototypes::Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
+
 			feature_implementation static void Initialize_Type(void* net_event_manager)
 			{
 				_network_event_manager = (network_event_manager_interface*)net_event_manager;
@@ -39,6 +43,11 @@ namespace Network_Event_Components
 				{
 					_event_keys.push_back( (*itr)->getKey() );
 				}
+			}
+			
+			feature_implementation static void Accept_Subscriber(TargetType callback,int subscriber)
+			{
+				_callbacks_by_component_index[subscriber]=callback;
 			}
 
 			feature_implementation void Initialize()
@@ -109,6 +118,21 @@ namespace Network_Event_Components
 				response.result = true;
 			}
 
+			feature_implementation void Notify_Subscribers()
+			{
+				int subscriber = Link_Interface::Component_Type::component_index;
+
+				if(_callbacks_by_component_index.count(subscriber))
+				{
+					typename Network_Event_Callback<ComponentType>::type callback=_callbacks_by_component_index[Link_Interface::Component_Type::component_index];
+
+					for(vector<Link_Interface*>::iterator itr=_affected_links.begin();itr!=_affected_links.end();itr++)
+					{
+						(*callback)( (void*)(*itr), (Network_Event<ComponentType,NT>*)this );
+					}
+				}
+			}
+
 			declare_feature_event_implementation(Incident_Event)
 			{
 				ComponentType* pthis = (ComponentType*)_this;
@@ -120,20 +144,27 @@ namespace Network_Event_Components
 				else
 				{
 					pthis->_active = true;
+
+					pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
 				}
 			}
 
-			typedef Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
+
 			member_data(vector<Link_Interface*>,affected_links,none,none);
 			member_data(int,start_time,none,none);
 			member_data(int,end_time,none,none);
 			member_data(bool,active,none,none);
 			static member_data(vector<string>,event_keys,none,none);
 			static member_prototype(Network_Event_Manager,network_event_manager,typename type_of(MasterType::network_event_manager),none,none);
+			
+			static member_data(concat(hash_map<int,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_index,none,none);
 		};
 		
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		vector<string> Base_Network_Event<MasterType,ParentType,InheritanceList>::_event_keys;
+		
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		hash_map<int,typename Network_Event_Callback<typename Base_Network_Event<MasterType,ParentType,InheritanceList>::ComponentType>::type> Base_Network_Event<MasterType,ParentType,InheritanceList>::_callbacks_by_component_index;
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Network_Event_Manager<typename type_of(MasterType::network_event_manager),typename Base_Network_Event<MasterType,ParentType,InheritanceList>::ComponentType>* Base_Network_Event<MasterType,ParentType,InheritanceList>::_network_event_manager;
@@ -300,6 +331,11 @@ namespace Network_Event_Components
 			typedef Network_Event<typename MasterType::type_of(accident_network_event),ComponentType> Accident_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::type_of(congestion_network_event),ComponentType> Congestion_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::type_of(lane_closure_network_event),ComponentType> Lane_Closure_Network_Event_Interface;
+			
+			feature_implementation void Push_Subscriber(typename Network_Event_Callback<TargetType>::type callback)
+			{
+				Network_Event<TargetType,ComponentType>::Push_Subscriber<typename Network_Event_Callback<TargetType>::type>(callback,CallerType::component_index);
+			}
 
 			feature_implementation void Initialize()
 			{
@@ -429,4 +465,5 @@ namespace Network_Event_Components
 			member_data( concat(hash_map< int, list<Base_Network_Event_Interface*> >), network_event_container, none ,none);
 		};
 	}
+
 }

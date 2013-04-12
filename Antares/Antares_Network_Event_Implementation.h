@@ -100,6 +100,11 @@ namespace Network_Event_Components
 				ComponentType* pthis = (ComponentType*)_this;
 
 				InheritanceTemplate<MasterType,ParentType,APPEND_CHILD(Base_Antares_Network_Event)>::Incident_Event<ComponentType,ComponentType,NT>(_this);
+				
+				if( _iteration == pthis->_start_time )
+				{
+					pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
+				}
 
 				if(pthis->_active)
 				{

@@ -4,14 +4,17 @@
 
 namespace Network_Event_Components
 {
-	namespace Types
-	{
-	}
+
 
 	namespace Concepts
 	{
 	}
 	
+	namespace Types
+	{
+
+	}
+
 	namespace Prototypes
 	{
 		prototype struct Network_Event:public ComponentType
@@ -31,6 +34,11 @@ namespace Network_Event_Components
 			feature static void Setup_Type(TargetType configuration)
 			{
 				ComponentType::Setup_Type<ComponentType,CallerType,TargetType>(configuration);
+			}
+			
+			feature static void Push_Subscriber(TargetType callback,int subscriber)
+			{
+				ComponentType::Accept_Subscriber<ComponentType,CallerType,TargetType>(callback,subscriber);
 			}
 
 			feature_accessor(network_event_type,none,none);
@@ -66,6 +74,12 @@ namespace Network_Event_Components
 			//Lane closure properties
 			//feature_accessor(lanes,none,none);
 		};
+		
+		template<typename EventType>
+		struct Network_Event_Callback
+		{
+			typedef void (*type)(void*,Prototypes::Network_Event<EventType,NT>*);
+		};
 
 		prototype struct Network_Event_Manager:public ComponentType
 		{
@@ -88,7 +102,12 @@ namespace Network_Event_Components
 
 			feature void Get_Network_Events(int link,vector< Network_Event<TargetType,NT>* >& container)
 			{
-				return this_component()->Get_Network_Events<ComponentType,CallerType,TargetType>(link,container);
+				this_component()->Get_Network_Events<ComponentType,CallerType,TargetType>(link,container);
+			}
+			
+			feature void Push_Subscriber(typename Network_Event_Callback<TargetType>::type callback)
+			{
+				this_component()->Push_Subscriber<ComponentType,CallerType,TargetType>(callback);
 			}
 
 			feature_accessor(db_name,none,none);
