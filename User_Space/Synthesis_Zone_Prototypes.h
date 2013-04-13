@@ -1,7 +1,7 @@
 #pragma once
 
 #include "User_Space_Includes.h"
-#include "Population_Unit_Implementations.h"
+//#include "Population_Unit_Implementations.h"
 
 
 using namespace std;
@@ -190,7 +190,7 @@ namespace PopSyn
 				mway_itf& mway = this->Target_Joint_Distribution<mway_itf&>();
 
 				// Get pointers to the regional and zonal household samples
-				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
+				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, Person_Components::Prototypes::Person_Properties ,NULLTYPE);
 				sample_itf* sample = Region_Sample_Ptr;
 				sample_itf* zone_sample = this->Sample_Data<sample_itf*>();
 				
@@ -234,7 +234,7 @@ namespace PopSyn
 								int size = sizeof(typename sample_itf::Component_Type);
 								num_generated += (int)(1.0f / settings.template Percentage_to_synthesize<float>());
 
-								// create the actual person agent
+								// create the actual person agent from the census static properties and add to the zones created person agent list
 								this->Create_Person<pop_unit_itf*>(stored_pop_unit);
 
 								num_created += (int)(1.0f / settings.template Percentage_to_synthesize<float>());
@@ -285,7 +285,7 @@ namespace PopSyn
 				define_component_interface(_Network_Interface,typename ComponentType::Master_Type::network_type,Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_component_interface(_Scenario_Interface,typename ComponentType::Master_Type::scenario_type,Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
 				define_container_and_value_interface(persons_itf, person_itf, typename get_type_of(Synthetic_Persons_Container), Containers::Random_Access_Sequence_Prototype, Person_Components::Prototypes::Person, NULLTYPE);
-				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);
+				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, Person_Components::Prototypes::Person_Properties ,NULLTYPE);
 				persons_itf* person_container = (persons_itf*)this->Synthetic_Persons_Container<persons_itf*>();
 
 				person_itf* person=(person_itf*)Allocate<typename get_type_of(Synthetic_Persons_Container)::unqualified_value_type>();

@@ -64,6 +64,7 @@ namespace Zone_Components
 			member_data(int, group_quarters_population, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, employment, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, retail_employment, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, simulated_employment, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_component_and_feature_accessor(total_area, Value,Basic_Units::Prototypes::Area_Prototype, Basic_Units::Implementations::Area_Implementation<NT>);
 			member_component_and_feature_accessor(low_density_residential_area, Value,Basic_Units::Prototypes::Area_Prototype, Basic_Units::Implementations::Area_Implementation<NT>);

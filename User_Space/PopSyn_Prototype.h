@@ -139,7 +139,7 @@ namespace PopSyn
 
 				define_container_and_value_interface_unqualified_container(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
 				define_container_and_value_interface_unqualified_container(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
-				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,Person_Components::Prototypes::Person_Properties,ComponentType);
 				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
 				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
 	
@@ -228,9 +228,7 @@ namespace PopSyn
 					typename sample_type::Weight_type weight;
 					fr.Get_Data<typename sample_type::ID_type>(sample_id,linker.sample_id_col);
 					fr.Get_Data<typename sample_type::Weight_type>(weight, linker.sample_weight_col);
-					//typename sample_type::Characteristics_type data;
 					vector<double> data;
-					//fr.Get_Data<typename sample_type::Characteristics_type::unqualified_value_type>(data,linker.get_pums_data_cols());
 					fr.Get_Data<double>(data,linker.get_pums_data_cols());
 
 					pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>();
@@ -413,7 +411,7 @@ namespace PopSyn
 				// Interface defines for sub_objects
 				define_container_and_value_interface_unqualified_container(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
 				define_container_and_value_interface_unqualified_container(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
-				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,Person_Components::Prototypes::Person_Properties,ComponentType);
 				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
 				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
 				define_container_and_value_interface_unqualified_container(persons_collection_itf, person_itf,person_collection_type,Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person,ComponentType);
@@ -431,6 +429,11 @@ namespace PopSyn
 
 				// initialize all of the synthesized individuals and assign unique ids
 				long uuid = 0; // globally unique person id
+
+				int counter = 0;
+
+				cout << endl << endl;
+
 				// Loop through all regions
 				for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 				{
@@ -446,6 +449,8 @@ namespace PopSyn
 						persons_collection_itf* persons = zone->template Synthetic_Persons_Container<persons_collection_itf*>();
 						for (p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
 						{
+							// update synthesizing persons counter
+							if (counter % 10000 == 0) cout << '\r' << "Initializing Agents: " << counter;
 							person_itf* person = *p_itr;
 
 							// initialize the person - allocates all person subcomponents
@@ -472,9 +477,26 @@ namespace PopSyn
 							_Zone_Interface* pzone = person->Home_Location<_Zone_Interface*>();
 							pzone->population<int&>()++;
 
-							//sample_out <<","<<pzone->uuid<int>()<<endl;
+							// Assign workers to a work location
+							pop_unit_itf* properties = person->Static_Properties<pop_unit_itf*>();
+							if (properties->Employment_Status<Person_Components::Types::EMPLOYMENT_STATUS>() == Person_Components::Types::EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK) 
+							{
+								person->Choose_Work_Location<NT>();
 
+								sample_out <<endl <<"WORK,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->Work_Location<_Zone_Interface*>()->uuid<int>();
+								sample_out <<"," << properties->Journey_To_Work_Travel_Time<Time_Minutes>() <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->Work_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
+							}
+
+							if (properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
+							{
+								person->Choose_School_Location<NT>();
+								sample_out <<endl <<"SCHOOL,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->School_Location<_Zone_Interface*>()->uuid<int>();
+								sample_out <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->School_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
+
+							}
 							++uuid;
+
+							++counter;
 						}
 					}
 				}
@@ -482,7 +504,7 @@ namespace PopSyn
 
 
 				// Handle file output if needed
-				if (pthis->write_output_flag<bool>() == true)
+				if (pthis->write_marginal_output_flag<bool>() == true || pthis->write_full_output_flag<bool>() == true)
 				{
 
 					Counter timer;
@@ -495,20 +517,27 @@ namespace PopSyn
 						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 						{
 							zone_itf* zone = z_itr->second;
-							marg_out <<endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
-							zone->template Target_Joint_Distribution<joint_itf*>()->write(marg_out);
-							marg_out <<endl;
-							zone->template Target_Marginal_Distribution<marginal_itf*>()->write(marg_out);
-							marg_out <<endl;
 
-							sample_data_itf* sample = zone->template Sample_Data<sample_data_itf*>();
-						
-							sample_out << endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
-							for (typename sample_data_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
+							// write the marginal results
+							if (pthis->write_marginal_output_flag<bool>() == true )
 							{
-								sample_out << endl << "ID: " << s_itr->second->template ID<uint>() << ",  weight: "<<s_itr->second->template Weight<float>() <<", index: "<<s_itr->second->template Index<uint>();
+								marg_out <<endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
+								zone->template Target_Joint_Distribution<joint_itf*>()->write(marg_out);
+								marg_out <<endl;
+								zone->template Target_Marginal_Distribution<marginal_itf*>()->write(marg_out);
+								marg_out <<endl;
 							}
 
+							// write teh full population results
+							if (pthis->write_full_output_flag<bool>() == true)
+							{
+								sample_data_itf* sample = zone->template Sample_Data<sample_data_itf*>();					
+								sample_out << endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
+								for (typename sample_data_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
+								{
+									sample_out << endl << "ID: " << s_itr->second->template ID<uint>() << ",  weight: "<<s_itr->second->template Weight<float>() <<", index: "<<s_itr->second->template Index<uint>();
+								}
+							}
 						}
 					}
 
@@ -523,7 +552,8 @@ namespace PopSyn
 			feature_accessor(scenario_reference, none, none);
 			feature_accessor(network_reference, check(ReturnValueType,Network_Components::Concepts::Is_Transportation_Network), check(SetValueType,Network_Components::Concepts::Is_Transportation_Network));
 			feature_accessor(timer,none,none);
-			feature_accessor(write_output_flag,none,none);
+			feature_accessor(write_marginal_output_flag,none,none);
+			feature_accessor(write_full_output_flag,none,none);
 
 			//----------------------------------------------------------------
 			// Optional Features - used for specific solution types

@@ -21,7 +21,7 @@ namespace Person_Components
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan, typename type_of(Parent_Planner)::type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan, typename type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 			define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 		
 		};
@@ -75,13 +75,17 @@ namespace Person_Components
 			define_component_interface(_planner_itf,typename type_of(Parent_Planner),Prototypes::Person_Planner,ComponentType);
 			define_component_interface(_Destination_Choice_Itf, typename type_of(Parent_Planner)::type_of(Destination_Chooser), Prototypes::Destination_Chooser, ComponentType);
 			define_component_interface(person_itf,typename base_type::type_of(Parent_Planner)::type_of(Parent_Person), Prototypes::Person,ComponentType);
+			define_component_interface(_static_properties_itf,typename base_type::type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Static_Properties), Prototypes::Person_Properties,ComponentType);
+			define_component_interface(_properties_itf,typename base_type::type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Properties), Prototypes::Person_Properties,ComponentType);
 			define_component_interface(_Scenario_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 			define_component_interface(_Network_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
 			define_component_interface(_Skim_Interface, typename _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan, typename type_of(Parent_Planner)::type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface_unqualified_container(Activities, Activity, typename type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::routine_activity_plan_type,ComponentType> Routine_Activity_Plan;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type,ComponentType> Activity_Plan;
 			define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
@@ -97,74 +101,71 @@ namespace Person_Components
 
 			feature_implementation void Activity_Generation()
 			{
+				
 				person_itf* _Parent_Person = base_type::_Parent_Planner->Parent_Person<person_itf*>();
-
+				_static_properties_itf* static_properties = _Parent_Person->Static_Properties<_static_properties_itf*>();
+				_properties_itf* properties = _Parent_Person->Properties<_properties_itf*>();
 				_Destination_Choice_Itf* destination_chooser = base_type::_Parent_Planner->Destination_Chooser<_Destination_Choice_Itf*>();
 				
 				// get references to the plan containers
-				Activity_Plans* activities = typename base_type::_Parent_Planner->template Activity_Plans_Container<Activity_Plans*>();
+				Activities* activities = typename base_type::_Parent_Planner->template Activity_Container<Activities*>();
 				Movement_Plans* movements = typename base_type::_Parent_Planner->template Movement_Plans_Container<Movement_Plans*>();	
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
 				_Scenario_Interface* scenario = _Parent_Person->template scenario_reference<_Scenario_Interface*>();
-				//_Activity_Location_Interface *orig, *dest;
+
+				int act_count = 1;
 				
-				// Generate average of 2 activities per day
-				int num_activities = 2;
-				for (int i = 0; i < num_activities; i++)
+
+				//=========================================================================================================================
+				// Generate work activity
+				EMPLOYMENT_STATUS work_status = static_properties->Employment_Status<EMPLOYMENT_STATUS>();
+				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
 				{
-					//Movement_Plan* a;
-					
-					Activity_Plan* activity = (Activity_Plan*)Allocate<typename base_type::type_of(Parent_Planner)::type_of(Activity_Plans_Container)::unqualified_value_type>();
+					Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
 					activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
-
+					
 					// Activity planning time
-					int plan_time = i+1;
-					activity->Initialize<Target_Type<NT,NT, Activity_Components::Types::ACTIVITY_TYPES, int> >(Activity_Components::Types::OTHER_ACTIVITY, plan_time);
-					activities->push_back(activity);
-
-					//// Create movement plan and give it an ID
-					//Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Parent_Planner)::type_of(Movement_Plans_Container)::unqualified_value_type>();
-					//move->template initialize_trajectory<NULLTYPE>();
-
-					//// Get the origin and destination locations
-					//orig = _Parent_Person->Home_Location<_Activity_Location_Interface*>();
-					//dest = destination_chooser->Choose_Destination<_Activity_Location_Interface*>(orig);
-
-
-					//// check that origin and destination are valid
-					//if (orig != nullptr && dest != nullptr) 
-					//{
-					//	// If the trip is valid, assign to a movement plan and add to the schedule
-					//	if (orig->internal_id<int>() != dest->internal_id<int>())
-					//	{
-					//		// Get the departure time from current time, in minutes, normally distributed around 7AM and 5pm
-					//		double t = Normal_RNG.Next_Rand<double>(7.0*(i+1) + 3.0*i, 3.0+i);					
-					//		Basic_Units::Time_Variables::Time_Seconds time = Simulation_Time.Future_Time<Basic_Units::Time_Variables::Time_Hours, Basic_Units::Time_Variables::Time_Seconds>(t);
-
-					//		// add attributes to plan
-					//		move->template origin<_Activity_Location_Interface*>(orig);
-					//		move->template destination<_Activity_Location_Interface*>(dest);
-					//		move->template origin<_Link_Interface*>(orig->origin_links<_Links_Container_Interface&>().at(0));
-					//		move->template destination<_Link_Interface*>(dest->origin_links<_Links_Container_Interface&>().at(0));
-					//		move->template departed_time<Basic_Units::Time_Variables::Time_Seconds>(time);
-
-					//		// Add to plans schedule
-					//		_Parent_Planner->template Add_Movement_Plan<Movement_Plan*>(move);
-					//	}
-					//}
-					//else
-					//{
-					//	//----------------------------------------------------------------
-					//	// Print to log file
-					//	stringstream s;
-					//	s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< _Parent_Person->template uuid<int>();
-					//	s << "," <<orig << ", " <<dest<<endl;
-					//	_Parent_Planner->Write_To_Log<NT>(s);
-					//	//----------------------------------------------------------------
-					//}
+					Simulation_Timestep_Increment plan_time = _iteration + act_count;
+					activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY, plan_time);
+					activities->push_back((Activity*)activity);
+					act_count++;
 				}
+				//-------------------------------------------------------------------------------------------------------------------------
+
+
+				//=========================================================================================================================
+				// Generate school activity
+				Person_Components::Types::SCHOOL_ENROLLMENT sch_status = static_properties->School_Enrollment<SCHOOL_ENROLLMENT>();
+				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
+				{
+					Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
+					activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
+					
+					// Activity planning time
+					Simulation_Timestep_Increment plan_time = _iteration + act_count;
+					activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(ACTIVITY_TYPES::SCHOOL_ACTIVITY, plan_time);
+					activities->push_back((Activity*)activity);
+					act_count++;
+				}
+				//-------------------------------------------------------------------------------------------------------------------------
+
+
+				//=========================================================================================================================
+				// Generate other activities
+				int num_activities = 2;
+				for (int i = act_count; i < act_count + num_activities; i++)
+				{
+					Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+					activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
+					
+					// Activity planning time
+					Simulation_Timestep_Increment plan_time = _iteration + i;
+					activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(ACTIVITY_TYPES::OTHER_ACTIVITY, plan_time);
+					activities->push_back((Activity*)activity);
+				}
+				act_count = act_count + num_activities;
 			}
 			tag_feature_as_available(Activity_Generation);
 

@@ -36,12 +36,23 @@ namespace Basic_Units
 
 namespace Time_Variables
 {
-	typedef double time_data_type;
-	polaris_variable(Time_DRSeconds,time_data_type,Time_tag,DRSeconds_tag);
-	polaris_variable(Time_Seconds,time_data_type,Time_tag,Seconds_tag);
-	polaris_variable(Time_Minutes,time_data_type,Time_tag,Minutes_tag);
-	polaris_variable(Time_Hours,time_data_type,Time_tag,Hours_tag);
-	polaris_variable(Time_Days,time_data_type,Time_tag,Days_tag);
+	polaris_variable(Time_DRSeconds,double,Time_tag,DRSeconds_tag);
+	polaris_variable(Time_Seconds,double,Time_tag,Seconds_tag);
+	polaris_variable(Time_Minutes,double,Time_tag,Minutes_tag);
+	polaris_variable(Time_Hours,double,Time_tag,Hours_tag);
+	polaris_variable(Time_Days,double,Time_tag,Days_tag);
+
+	polaris_variable(Time_DRSeconds_Float,float,Time_tag,DRSeconds_tag);
+	polaris_variable(Time_Seconds_Float,float,Time_tag,Seconds_tag);
+	polaris_variable(Time_Minutes_Float,float,Time_tag,Minutes_tag);
+	polaris_variable(Time_Hours_Float,float,Time_tag,Hours_tag);
+	polaris_variable(Time_Days_Float,float,Time_tag,Days_tag);
+
+	polaris_variable(Time_DRSeconds_Short,short,Time_tag,DRSeconds_tag);
+	polaris_variable(Time_Seconds_Short,short,Time_tag,Seconds_tag);
+	polaris_variable(Time_Minutes_Short,short,Time_tag,Minutes_tag);
+	polaris_variable(Time_Hours_Short,short,Time_tag,Hours_tag);
+	polaris_variable(Time_Days_Short,short,Time_tag,Days_tag);
 }
 
 namespace Length_Variables

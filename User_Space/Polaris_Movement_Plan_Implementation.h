@@ -106,7 +106,7 @@ namespace Movement_Plan_Components
 
 		implementation struct Polaris_Integrated_Movement_Plan_Implementation : public Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)>
 		{
-			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_plan_type,none,none);
+			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_type,none,none);
 		};
 	}
 }

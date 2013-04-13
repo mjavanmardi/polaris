@@ -63,15 +63,15 @@ namespace PopSyn
 				define_container_and_value_interface(zones_itf,zone_itf,typename get_type_of(Synthesis_Zone_Collection),Containers::Associative_Container_Prototype,Synthesis_Zone_Prototype,NULLTYPE);	
 				define_simple_container_interface(mway_itf, typename get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
 				define_simple_container_interface(marg_itf, typename get_type_of(Target_Marginal_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);		
-				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, PopSyn::Prototypes::Population_Unit_Prototype ,NULLTYPE);			
+				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, Person_Components::Prototypes::Person_Properties ,NULLTYPE);			
 				#pragma endregion
 				//==========================================================
 				// Get the references to the collections from the region
-				solution_settings_itf& settings = this->template Solver_Settings<solution_settings_itf&>();	/* Get Solution settings		*/
-				zones_itf& zones_collection		= this->template Synthesis_Zone_Collection<zones_itf&>();	/* Zones Collection				*/
-				mway_itf& mway					= base_itf->template Target_Joint_Distribution<mway_itf&>();			/* Joint Distribution			*/
+				solution_settings_itf& settings = this->template Solver_Settings<solution_settings_itf&>();			/* Get Solution settings		*/
+				zones_itf& zones_collection		= this->template Synthesis_Zone_Collection<zones_itf&>();			/* Zones Collection				*/
+				mway_itf& mway					= base_itf->template Target_Joint_Distribution<mway_itf&>();		/* Joint Distribution			*/
 				marg_itf& marg					= base_itf->template Target_Marginal_Distribution<marg_itf&>();		/* Marginal Distribution		*/
-				sample_itf* sample				= base_itf->template Sample_Data<sample_itf*>();						/* Population Sample Collection	*/
+				sample_itf* sample				= base_itf->template Sample_Data<sample_itf*>();					/* Population Sample Collection	*/
 
 				//======================================================================
 				// MAIN SYNTHESIS ROUTINE. 

@@ -187,9 +187,6 @@
     <ClInclude Include="Linker_Implementations.h">
       <Filter>Implementations\PopSyn</Filter>
     </ClInclude>
-    <ClInclude Include="Population_Unit_Implementations.h">
-      <Filter>Implementations\PopSyn</Filter>
-    </ClInclude>
     <ClInclude Include="File_Reader.h">
       <Filter>Prototypes\PopSyn</Filter>
     </ClInclude>
@@ -200,9 +197,6 @@
       <Filter>Prototypes\PopSyn</Filter>
     </ClInclude>
     <ClInclude Include="PopSyn_Prototype.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="Population_Unit_Prototype.h">
       <Filter>Prototypes\PopSyn</Filter>
     </ClInclude>
     <ClInclude Include="Synthesis_Region_Prototype.h">
@@ -274,11 +268,8 @@
     <ClInclude Include="Network_Event_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry_Implementation.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
-    <ClInclude Include="Polaris_Link_Event_Handler_Implementation.h">
-      <Filter>Implementations</Filter>
+    <ClInclude Include="Person_Properties_Prototype.h">
+      <Filter>Prototypes\Person Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -221,11 +221,11 @@ namespace Network_Components
 			/// demand compatible network
 			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(skimming_faculty, none, none);
-			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
+			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
 			{
 				define_component_interface(_skim_interface,typename get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 				_skim_interface* skim = this->skimming_faculty<_skim_interface*>();
-				return skim->Get_LOS<TargetType>(Origin, Destination, Mode_Indicator);
+				return skim->Get_LOS<TargetType>(Origin_ID, Destination_ID, Mode_Indicator);
 			}
 			//------------------------------------------------------------------------------------------------------------------
 

@@ -74,6 +74,7 @@ namespace Zone_Components
 			feature_accessor(group_quarters_population,none, none);
 			feature_accessor(employment,none, none);
 			feature_accessor(retail_employment,none, none);
+			feature_accessor(simulated_employment,none,none);
 
 			feature_accessor(total_area, none, none);
 			feature_accessor(low_density_residential_area, none, none);

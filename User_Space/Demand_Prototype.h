@@ -284,7 +284,7 @@ namespace Demand_Components
 
 					int f = raw_vehicle.get_origin_link_index();
 					int size = (int)network_reference<_Network_Interface*>()->template links_container<_Links_Container_Interface&>().size();
-										
+								
 					movement_plan->template origin<_Link_Interface*>(network_reference<_Network_Interface*>()->template links_container<_Links_Container_Interface&>().at(raw_vehicle.get_origin_link_index()));
 					movement_plan->template destination<_Link_Interface*>(network_reference<_Network_Interface*>()->template links_container<_Links_Container_Interface&>().at(raw_vehicle.get_destination_link_index()));
 

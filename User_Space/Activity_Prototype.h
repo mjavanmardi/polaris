@@ -288,7 +288,7 @@ namespace Activity_Components
 					}
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
-				// START_TIME_PLANNING Iteration
+				// ROUTE_PLANNING Iteration
 				else if (this_ptr->Is_Current_Iteration(this_ptr->Route_Planning_Time<Revision&>()))
 				{
 					// swap in durtion planning event, and make sure it won't be called again
@@ -481,7 +481,16 @@ namespace Activity_Components
 				else if (Is_Minimum_Plan_Time(location)) load_event(ComponentType,Activity_Planning_Conditional, Location_Planning_Event, location._iteration, location._sub_iteration,NT);
 				else if (Is_Minimum_Plan_Time(start_time)) load_event(ComponentType,Activity_Planning_Conditional, Start_Time_Planning_Event, start_time._iteration, start_time._sub_iteration,NT);
 				else if (Is_Minimum_Plan_Time(route)) load_event(ComponentType,Activity_Planning_Conditional, Route_Planning_Event, route._iteration, route._sub_iteration,NT);
-				else {THROW_EXCEPTION("ERROR: Invalid planning times set");}
+				else 
+				{
+					stringstream err;
+					err << "ERROR: Invalid planning times set: ";
+					err << endl << "Duration: "<<duration._iteration <<","<<duration._sub_iteration;
+					err << endl << "Start: "<<start_time._iteration <<","<<start_time._sub_iteration;
+					err << endl << "Location: "<<location._iteration <<","<<location._sub_iteration; 
+					err << endl << "Route: "<<route._iteration <<","<<route._sub_iteration; 
+					THROW_EXCEPTION(err);
+				}
 			}
 			feature_prototype bool Is_Minimum_Plan_Time(TargetType plan_time, requires(check_2(TargetType, Revision,is_same)))
 			{
@@ -512,3 +521,4 @@ namespace Activity_Components
 }
 
 using namespace Activity_Components::Prototypes;
+using namespace Activity_Components::Types;

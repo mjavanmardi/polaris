@@ -15,29 +15,23 @@ namespace Activity_Components
 	
 	namespace Implementations
 	{
-		implementation struct ADAPTS_Activity_Plan_Implementation : public Polaris_Component<APPEND_CHILD(ADAPTS_Activity_Plan_Implementation),MasterType,Execution_Object,ParentType>
+		//=======================================================================
+		// Activity Classes
+		//-----------------------------------------------------------------------
+		implementation struct Basic_Activity_Plan_Implementation : public Polaris_Component<APPEND_CHILD(Basic_Activity_Plan_Implementation),MasterType,Execution_Object,ParentType>
 		{
-			//=================================================================
-			// progress counters
-			static int Location_Planning_Counter[_num_threads];
-			static member_data(int, Location_Planning_Count,none,none);
-			static int Route_Planning_Counter[_num_threads];
-			static member_data(int, Route_Planning_Count,none,none);
-			static int Scheduling_Counter[_num_threads];
-			static member_data(int, Scheduling_Count,none,none);
-			member_data(_lock, update_lock, none, none);
-
 			//=================================================================
 			// Pointer back to planner
 			member_prototype(Person_Components::Prototypes::Person_Planner, Parent_Planner, typename MasterType::person_planner_type, none, none);
 			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type,none,none);
-			
+
+
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 			// Interfaces
 			typedef Prototypes::Activity_Planner<ComponentType,ComponentType> this_itf;
 			define_component_interface(_properties_itf, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
-			define_component_interface(_planning_itf,typename get_type_of(Parent_Planner),Person_Components::Prototypes::Person_Planner,ComponentType);
+			define_component_interface(_planning_itf,typename type_of(Parent_Planner),Person_Components::Prototypes::Person_Planner,ComponentType);
 			define_component_interface(_person_itf,typename _planning_itf::get_type_of(Parent_Person),Person_Components::Prototypes::Person,ComponentType);
 			define_component_interface(_dest_choice_itf,typename _planning_itf::get_type_of(Destination_Chooser),Person_Components::Prototypes::Destination_Chooser,ComponentType);
 			define_component_interface(_scenario_itf, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
@@ -46,29 +40,36 @@ namespace Activity_Components
 			define_container_and_value_interface(_activity_locations_container_itf, _activity_location_itf, typename _network_itf::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_links_container_itf, _link_itf, typename _activity_location_itf::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_zones_container_itf, _zone_itf, typename _network_itf::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface_unqualified_container(_activity_plans_container_itf,_activity_plan_itf, typename type_of(Parent_Planner)::type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface_unqualified_container(_activity_plans_container_itf,_activity_plan_itf, typename type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 			define_container_and_value_interface_unqualified_container(_movement_plans_container_itf,_movement_plan_itf, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 
+
+			////=================================================================
+			//// progress counters
+			//static int Location_Planning_Counter[_num_threads];
+			//static member_data(int, Location_Planning_Count,none,none);
+			//static int Route_Planning_Counter[_num_threads];
+			//static member_data(int, Route_Planning_Count,none,none);
+			//static int Scheduling_Counter[_num_threads];
+			//static member_data(int, Scheduling_Count,none,none);
+			//member_data(_lock, update_lock, none, none);
+
+		
 			// Fundamental activity properties
 			member_data(int, Activity_Plan_ID, check(ReturnValueType,is_arithmetic), check(SetValueType,is_arithmetic));
 			member_data(Types::ACTIVITY_TYPES, Activity_Type,none,none);
-			member_data(Types::PLAN_HORIZON_VALUES, Activity_Plan_Horizon,none,none);
-			member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Activity_Planning_Time,none,none);
-			member_component_feature(Activity_Planning_Time, _Activity_Planning_Time, Value, Basic_Units::Prototypes::Time_Prototype)
 
-			// Activity attribute planning properties		
-			member_data(Types::PLAN_HORIZON_VALUES, Location_Plan_Horizon, none, none);
-			member_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, none, none);
-			member_data(Types::PLAN_HORIZON_VALUES, Mode_Plan_Horizon, none, none);
-			member_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, none, none);
-			member_data(Types::PLAN_HORIZON_VALUES, Start_Time_Plan_Horizon,none,none);
-			member_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility,none,none);
-			member_data(Types::PLAN_HORIZON_VALUES, Duration_Plan_Horizon,none,none);
-			member_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility,none,none);
-			member_data(Types::PLAN_HORIZON_VALUES, Involved_Persons_Plan_Horizon,none,none);
-			member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);
+			// Activity attributes
+			member_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype, Location, typename MasterType::activity_location_type, check(ReturnValueType,Activity_Location_Components::Concepts::Is_Activity_Location), check(SetValueType,Activity_Location_Components::Concepts::Is_Activity_Location));
+			member_data(Vehicle_Components::Types::Vehicle_Type_Keys, Mode, none, none);
+			member_component_and_feature_accessor(Start_Time, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>)
+			member_component_and_feature_accessor(Duration, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>)
+			member_component_feature(Expected_Travel_Time, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
+			member_container(vector<typename MasterType::person_type*>, Involved_Persons_Container, none, none);
+
+			// Planning event time members
 			member_data(Revision,Location_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			member_data(Revision,Mode_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			member_data(Revision,Start_Time_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
@@ -76,18 +77,7 @@ namespace Activity_Components
 			member_data(Revision,Involved_Persons_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			member_data(Revision,Route_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 
-			// Activity attributes
-			member_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype, Location, typename MasterType::activity_location_type, check(ReturnValueType,Activity_Location_Components::Concepts::Is_Activity_Location), check(SetValueType,Activity_Location_Components::Concepts::Is_Activity_Location));
-			member_data(Vehicle_Components::Types::Vehicle_Type_Keys, Mode, none, none);
-			member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Start_Time,none,none);
-			member_component_feature(Start_Time, _Start_Time, Value, Basic_Units::Prototypes::Time_Prototype)
-			member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Duration,none,none);
-			member_component_feature(Duration, _Duration, Value, Basic_Units::Prototypes::Time_Prototype)
-			member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Expected_Travel_Time,none,none);
-			member_component_feature(Expected_Travel_Time, _Expected_Travel_Time, Value, Basic_Units::Prototypes::Time_Prototype);
-			member_container(vector<typename MasterType::person_type*>, Involved_Persons_Container, none, none);
-
-			// Activity methods
+			// Basic Activity Events - Plan route and add to schedule
 			feature_implementation void Initialize(TargetType activity_type)
 			{
 				UNLOCK(this->_update_lock);
@@ -98,123 +88,78 @@ namespace Activity_Components
 				pthis->Location<_activity_location_itf*>(nullptr);
 				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 			}
+			tag_feature_as_available(Initialize);
 
-			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time)
+			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time, requires(check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
-				this->Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
+				this->Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = END;
 				this->Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 0;
-				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
-				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 1;
-				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
-				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 2;
-				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
-				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 3;
-				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
-				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 4;
-				this->Route_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1 + planning_time;
+				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = END;
+				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 0;
+				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = END;
+				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 0;
+				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = END;
+				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 0;
+				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = END;
+				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 0;
+				this->Route_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = std::min(_iteration+1, (int)planning_time);
 				this->Route_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 5;
 			}
+			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time, requires(!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
+			{
+				assert_check_2(TargetType, Simulation_Timestep_Increment, is_same, "Error: planning_time must be passed as a Simulation_Timestep_Increment type when using this function.");
+			}
+			tag_feature_as_available(Set_Attribute_Planning_Times);
 
-			feature_implementation void Location_Planning_Event_Handler()
+			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
 			{
 				// updates for counters
-				this->Location_Planning_Counter[_thread_id]++;
-				if (this->Location_Planning_Counter[_thread_id] % 10000 == 0)  
-				{
-					LOCK(this->_update_lock);
-					this->_Location_Planning_Count+=10000;
-					cout << '\r' << "Location Planning: " << this->_Location_Planning_Count << "                                 ";
-					UNLOCK(this->_update_lock);
-				}
-
+				//this->Scheduling_Counter[_thread_id]++;
+				//if (this->Scheduling_Counter[_thread_id] % 10000 == 0)  
+				//{
+				//	LOCK(this->_update_lock);
+				//	this->_Scheduling_Count+=10000;
+				//	cout << '\r' << "Scheduling: " <<  this->_Scheduling_Count << "                                 ";
+				//	UNLOCK(this->_update_lock);
+				//}
 
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
-				_person_itf* person = planner->Parent_Person<_person_itf*>();
-				_dest_choice_itf* dest_chooser = planner->Destination_Chooser<_dest_choice_itf*>();
+				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
+				
 
-				_activity_location_itf* orig = person->Home_Location<_activity_location_itf*>();
-
-				//cout << endl << "schedule location origin: "<<orig->uuid<int>();
-
-				_activity_location_itf* dest = dest_chooser->Choose_Destination<_activity_location_itf*>(orig);
-
-				// check that origin and destination are valid
-				if (orig != nullptr && dest != nullptr) 
+				// Assign the movement plan to the persons activity schedule
+				if (move->valid_trajectory<bool>())
 				{
-					this->Location<ComponentType,CallerType,_activity_location_itf*>(dest);
+					planner->template Add_Movement_Plan<_movement_plan_itf*>(move);
 				}
 				else
 				{
 					//----------------------------------------------------------------
 					// Print to log file
 					stringstream s;
-					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
-					s << "," <<orig << ", " <<dest<<endl;
+					s <<"ACTIVITY NOT SCHEDULED, no valid route found from origin to destination: "<< person->template uuid<int>();
+					s << "," <<move->template origin<_activity_location_itf*>()->uuid<int>() << ", " <<move->template destination<_activity_location_itf*>()->uuid<int>()<<endl;
 					planner->Write_To_Log<NT>(s);
-					//----------------------------------------------------------------
 				}
 			}
-
-			feature_implementation void Mode_Planning_Event_Handler()
-			{
-				
-			}
-
-			feature_implementation void Duration_Planning_Event_Handler()
-			{
-				
-			}
-
-			feature_implementation void Start_Time_Planning_Event_Handler()
-			{
-				// see if there is already an activity in the morning
-				_activity_plans_container_itf* plans = _Parent_Planner->Activity_Plans_Container<_activity_plans_container_itf*>();
-
-				_activity_plans_container_itf::iterator plan_itr = plans->begin();
-				bool has_AM_start = true;
-				for (;plan_itr != plans->end(); ++plan_itr)
-				{
-					_activity_plan_itf* act = *plan_itr;
-					if (act->Start_Time<Time_Hours>() < 12.0) has_AM_start = false;
-				}
-
-				int i=1;
-				if (has_AM_start) i=0;
-			
-				double t = Normal_RNG.Next_Rand<double>(7.0*(i+1) + 3.0*i, 3.0+i);		
-
-				Time_Seconds time = Simulation_Time.Future_Time<Time_Hours, Time_Seconds>(t);
-				Time_Seconds time_min = Simulation_Time.Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->Planning_Time_Increment<Time_Seconds>());
-				this->Start_Time<ComponentType,CallerType,Time_Seconds>(std::max<int>(time.Value,time_min.Value));
-
-				// start routing on the planning timestep prior to departure 
-				int start_minutes = this->Start_Time<ComponentType,CallerType,Time_Minutes>();
-				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes) - _Parent_Planner->Planning_Time_Increment<Simulation_Timestep_Increment>(),_iteration);
-				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
-			}
-
-			feature_implementation void Involved_Persons_Planning_Event_Handler()
-			{
-				
-			}
-
 			feature_implementation void Route_Planning_Event_Handler()
 			{
-				// updates for counters
-				this->Route_Planning_Counter[_thread_id]++;
-				if (this->Route_Planning_Counter[_thread_id] % 10000 == 0)  
-				{
-					LOCK(this->_update_lock);
-					this->_Route_Planning_Count+=10000;
-					cout << '\r' << "Route Planning: " <<  this->_Route_Planning_Count<< "                                 ";
-					UNLOCK(this->_update_lock);
-				}
+				//// updates for counters
+				//this->Route_Planning_Counter[_thread_id]++;
+				//if (this->Route_Planning_Counter[_thread_id] % 10000 == 0)  
+				//{
+				//	LOCK(this->_update_lock);
+				//	this->_Route_Planning_Count+=10000;
+				//	cout << '\r' << "Route Planning: " <<  this->_Route_Planning_Count<< "                                 ";
+				//	UNLOCK(this->_update_lock);
+				//}
 
 
 				// Create movement plan and give it an ID
 				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename type_of(Parent_Planner)::type_of(Movement_Plans_Container)::unqualified_value_type>();
 				move->template initialize_trajectory<NULLTYPE>();
-				move->template activity_reference<ComponentType*>(this);
+				move->template activity_reference<ComponentType*>((ComponentType*)this);
 
 				// Get the origin and destination locations
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
@@ -260,39 +205,169 @@ namespace Activity_Components
 					//----------------------------------------------------------------
 				}
 			}
+		};
 
-			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
+
+
+		// Specialization for ADAPTS-style activities with plan horizon info and more detailed set_plan_times function
+		implementation struct ADAPTS_Activity_Plan_Implementation : public Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_Activity_Plan_Implementation)>
+		{
+			typedef Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_Activity_Plan_Implementation)> base_type;
+			typedef Prototypes::Activity_Planner<base_type> base_itf;
+
+			//================================================================================================================================================================================================
+			//================================================================================================================================================================================================
+			// Interfaces
+			typedef Prototypes::Activity_Planner<ComponentType,ComponentType> this_itf;
+			define_component_interface(_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
+			define_component_interface(_planning_itf,typename get_type_of(base_type::Parent_Planner),Person_Components::Prototypes::Person_Planner,ComponentType);
+			define_component_interface(_person_itf,typename _planning_itf::get_type_of(Parent_Person),Person_Components::Prototypes::Person,ComponentType);
+			define_component_interface(_dest_choice_itf,typename _planning_itf::get_type_of(Destination_Chooser),Person_Components::Prototypes::Destination_Chooser,ComponentType);
+			define_component_interface(_scenario_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+			define_component_interface(_network_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
+			define_component_interface(_skim_itf, typename _network_itf::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
+			define_container_and_value_interface(_activity_locations_container_itf, _activity_location_itf, typename _network_itf::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			define_container_and_value_interface(_links_container_itf, _link_itf, typename _activity_location_itf::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface(_zones_container_itf, _zone_itf, typename _network_itf::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_activity_plans_container_itf,_activity_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface_unqualified_container(_movement_plans_container_itf,_movement_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			//================================================================================================================================================================================================
+			//================================================================================================================================================================================================
+		
+			member_data_component(Basic_Units::Implementations::Time_Implementation<NT>,_Activity_Planning_Time,none,none);
+			member_component_feature(Activity_Planning_Time, _Activity_Planning_Time, Value, Basic_Units::Prototypes::Time_Prototype)
+
+			// Activity attribute planning properties		
+			member_data(Types::PLAN_HORIZON_VALUES, Activity_Plan_Horizon,none,none);
+			member_data(Types::PLAN_HORIZON_VALUES, Location_Plan_Horizon, none, none);
+			member_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, none, none);
+			member_data(Types::PLAN_HORIZON_VALUES, Mode_Plan_Horizon, none, none);
+			member_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, none, none);
+			member_data(Types::PLAN_HORIZON_VALUES, Start_Time_Plan_Horizon,none,none);
+			member_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility,none,none);
+			member_data(Types::PLAN_HORIZON_VALUES, Duration_Plan_Horizon,none,none);
+			member_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility,none,none);
+			member_data(Types::PLAN_HORIZON_VALUES, Involved_Persons_Plan_Horizon,none,none);
+			member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);
+
+			// Activity methods
+			feature_implementation void Initialize(TargetType activity_type)
+			{
+				//UNLOCK(this->_update_lock);
+				this_itf* pthis = (this_itf*)this;
+				pthis->Activity_Type<TargetType>(activity_type);
+				pthis->Duration<Time_Seconds>(END);
+				pthis->Start_Time<Time_Seconds>(END);
+				pthis->Location<_activity_location_itf*>(nullptr);
+				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+			}
+
+			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time, requires(check_2(TargetType, Simulation_Timestep_Increment, is_same)))
+			{
+				base_itf* base_this = (base_itf*)this;
+
+				this->Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 0;
+				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 1;
+				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1,(int)planning_time);
+				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 2;
+				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 3;
+				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 4;
+				this->Route_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Route_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 5;
+			}
+			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time, requires(!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
+			{
+				assert_check_2(TargetType, Simulation_Timestep_Increment, is_same, "Error: planning_time must be passed as a Simulation_Timestep_Increment type when using this function.");
+			}
+			tag_feature_as_available(Set_Attribute_Planning_Times);
+
+			feature_implementation void Location_Planning_Event_Handler()
 			{
 				// updates for counters
-				this->Scheduling_Counter[_thread_id]++;
-				if (this->Scheduling_Counter[_thread_id] % 10000 == 0)  
-				{
-					LOCK(this->_update_lock);
-					this->_Scheduling_Count+=10000;
-					cout << '\r' << "Scheduling: " <<  this->_Scheduling_Count << "                                 ";
-					UNLOCK(this->_update_lock);
-				}
+				//this->Location_Planning_Counter[_thread_id]++;
+				//if (this->Location_Planning_Counter[_thread_id] % 10000 == 0)  
+				//{
+				//	//LOCK(this->_update_lock);
+				//	this->_Location_Planning_Count+=10000;
+				//	cout << '\r' << "Location Planning: " << this->_Location_Planning_Count << "                                 ";
+				//	UNLOCK(this->_update_lock);
+				//}
+
 
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
-				_person_itf* person = planner->template Parent_Person<_person_itf*>();
-				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
-				
+				_person_itf* person = planner->Parent_Person<_person_itf*>();
+				_dest_choice_itf* dest_chooser = planner->Destination_Chooser<_dest_choice_itf*>();
 
-				// Assign the movement plan to the persons activity schedule
-				if (move->valid_trajectory<bool>())
+				_activity_location_itf* orig = person->Home_Location<_activity_location_itf*>();
+
+				//cout << endl << "schedule location origin: "<<orig->uuid<int>();
+
+				_activity_location_itf* dest = dest_chooser->Choose_Destination<_activity_location_itf*>(orig);
+
+				// check that origin and destination are valid
+				if (orig != nullptr && dest != nullptr) 
 				{
-					planner->template Add_Movement_Plan<_movement_plan_itf*>(move);
+					this->Location<ComponentType,CallerType,_activity_location_itf*>(dest);
 				}
 				else
 				{
 					//----------------------------------------------------------------
 					// Print to log file
 					stringstream s;
-					s <<"ACTIVITY NOT SCHEDULED, no valid route found from origin to destination: "<< person->template uuid<int>();
-					s << "," <<move->template origin<_activity_location_itf*>()->uuid<int>() << ", " <<move->template destination<_activity_location_itf*>()->uuid<int>()<<endl;
+					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
+					s << "," <<orig << ", " <<dest<<endl;
 					planner->Write_To_Log<NT>(s);
+					//----------------------------------------------------------------
 				}
 			}
+
+			feature_implementation void Mode_Planning_Event_Handler()
+			{
+				
+			}
+
+			feature_implementation void Duration_Planning_Event_Handler()
+			{
+				
+			}
+
+			feature_implementation void Start_Time_Planning_Event_Handler()
+			{
+				// see if there is already an activity in the morning
+				_activity_plans_container_itf* plans = _Parent_Planner->Activity_Container<_activity_plans_container_itf*>();
+
+				_activity_plans_container_itf::iterator plan_itr = plans->begin();
+				bool has_AM_start = true;
+				for (;plan_itr != plans->end(); ++plan_itr)
+				{
+					_activity_plan_itf* act = *plan_itr;
+					if (act->Start_Time<Time_Hours>() < 12.0) has_AM_start = false;
+				}
+
+				int i=1;
+				if (has_AM_start) i=0;
+			
+				double t = Normal_RNG.Next_Rand<double>(7.0*(i+1) + 3.0*i, 3.0+i);		
+
+				Time_Seconds time = Simulation_Time.Future_Time<Time_Hours, Time_Seconds>(t);
+				Time_Seconds time_min = Simulation_Time.Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->Planning_Time_Increment<Time_Seconds>());
+				this->Start_Time<ComponentType,CallerType,Time_Seconds>(std::max<int>(time.Value,time_min.Value));
+
+				// start routing on the planning timestep prior to departure 
+				int start_minutes = this->Start_Time<ComponentType,CallerType,Time_Minutes>();
+				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes) - _Parent_Planner->Planning_Time_Increment<Simulation_Timestep_Increment>(),_iteration);
+				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
+			}
+
+			feature_implementation void Involved_Persons_Planning_Event_Handler()
+			{
+				
+			}
+
 			//feature_implementation void Set_Attribute_Planning_Times()
 			//{
 			//	//Create local variables
@@ -488,11 +563,260 @@ namespace Activity_Components
 			//	}
 			//}
 		};
-		static_array_definition(ADAPTS_Activity_Plan_Implementation, Location_Planning_Counter, int);
-		static_array_definition(ADAPTS_Activity_Plan_Implementation, Route_Planning_Counter, int);
-		static_array_definition(ADAPTS_Activity_Plan_Implementation, Scheduling_Counter, int);
-		static_member_initialization(ADAPTS_Activity_Plan_Implementation, Location_Planning_Count, 0);
-		static_member_initialization(ADAPTS_Activity_Plan_Implementation, Route_Planning_Count, 0);
-		static_member_initialization(ADAPTS_Activity_Plan_Implementation, Scheduling_Count, 0);
+		
+
+
+		// Specialization for ADAPTS-style routine activities
+		implementation struct ADAPTS_Routine_Activity_Plan_Implementation : public Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_Routine_Activity_Plan_Implementation)>
+		{
+			typedef Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_Routine_Activity_Plan_Implementation)> base_type;
+			typedef Prototypes::Activity_Planner<ComponentType,ComponentType> this_itf;
+		
+			//================================================================================================================================================================================================
+			//================================================================================================================================================================================================
+			// Interfaces
+			define_component_interface(_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
+			define_component_interface(_static_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Static_Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
+			define_component_interface(_planning_itf,typename type_of(base_type::Parent_Planner),Person_Components::Prototypes::Person_Planner,ComponentType);
+			define_component_interface(_person_itf,typename _planning_itf::get_type_of(Parent_Person),Person_Components::Prototypes::Person,ComponentType);
+			define_component_interface(_dest_choice_itf,typename _planning_itf::get_type_of(Destination_Chooser),Person_Components::Prototypes::Destination_Chooser,ComponentType);
+			define_component_interface(_scenario_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+			define_component_interface(_network_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
+			define_component_interface(_skim_itf, typename _network_itf::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
+			define_container_and_value_interface(_activity_locations_container_itf, _activity_location_itf, typename _network_itf::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			define_container_and_value_interface(_links_container_itf, _link_itf, typename _activity_location_itf::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface(_zones_container_itf, _zone_itf, typename _network_itf::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+			define_container_and_value_interface_unqualified_container(_activity_plans_container_itf,_activity_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface_unqualified_container(_movement_plans_container_itf,_movement_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			//================================================================================================================================================================================================
+			//================================================================================================================================================================================================
+
+			// Fundamental activity properties
+			feature_implementation Types::PLAN_HORIZON_VALUES Activity_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Activity_Plan_Horizon);
+
+			// Activity attribute planning properties
+			feature_implementation Types::PLAN_HORIZON_VALUES Location_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Location_Plan_Horizon);
+			feature_implementation Types::PLAN_HORIZON_VALUES Mode_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Mode_Plan_Horizon);
+			feature_implementation Types::PLAN_HORIZON_VALUES Start_Time_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Start_Time_Plan_Horizon);
+			feature_implementation Types::PLAN_HORIZON_VALUES Duration_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Duration_Plan_Horizon);
+			feature_implementation Types::PLAN_HORIZON_VALUES Involved_Persons_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Involved_Persons_Plan_Horizon);
+			member_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, none, none);
+			member_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, none, none);
+			member_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility,none,none);
+			member_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility,none,none);
+			member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);
+
+
+			// Activity methods
+			feature_implementation void Initialize(TargetType activity_type)
+			{
+				//UNLOCK(this->_update_lock);
+				this_itf* pthis = (this_itf*)this;
+				pthis->Activity_Type<TargetType>(activity_type);
+				pthis->Duration<Time_Seconds>(END);
+				pthis->Start_Time<Time_Seconds>(END);
+				pthis->Location<_activity_location_itf*>(nullptr);
+				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+			}
+
+			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time, requires(check_2(TargetType, Simulation_Timestep_Increment, is_same)))
+			{
+				base_type* base_this = (base_type*)this;
+
+				this->Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 0;
+				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Duration_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 1;
+				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Location_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 2;
+				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Mode_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 3;
+				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 4;
+				this->Route_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
+				this->Route_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 5;
+			}
+			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time, requires(!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
+			{
+				assert_check_2(TargetType, Simulation_Timestep_Increment, is_same, "Error: planning_time must be passed as a Simulation_Timestep_Increment type when using this function.");
+			}
+			tag_feature_as_available(Set_Attribute_Planning_Times);
+
+			feature_implementation void Location_Planning_Event_Handler()
+			{
+				this_itf* pthis = (this_itf*)this;
+				base_type* base_this = (base_type*)this;
+				_person_itf* person = base_this->_Parent_Planner->Parent_Person<_person_itf*>();
+				_activity_location_itf* orig = person->Home_Location<_activity_location_itf*>();
+
+				// Select the location based on the activity type
+				_activity_location_itf* dest;		
+				if (pthis->Activity_Type<Types::ACTIVITY_TYPES>() == Types::AT_HOME_ACTIVITY)
+				{
+					dest = person->Home_Location<_activity_location_itf*>();
+				}
+				else if (pthis->Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+				{
+					dest = person->Work_Location<_activity_location_itf*>();
+				}
+				else if (pthis->Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+				{
+					dest = person->School_Location<_activity_location_itf*>();
+				}
+				else if (pthis->Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY)
+				{
+					dest = person->Home_Location<_activity_location_itf*>();
+				}
+				else
+				{
+					//----------------------------------------------------------------
+					// Print to log file
+					stringstream s;
+					s <<"ACTIVITY NOT GENERATED, only work, home, school and work at home activities can be routine at this point: "<< person->template uuid<int>();
+					s << "," <<orig << ", " <<dest<<endl;
+					base_this->_Parent_Planner->Write_To_Log<NT>(s);
+					//----------------------------------------------------------------
+					return;
+				}
+
+				// check that origin and destination are valid
+				if (orig != nullptr && dest != nullptr) 
+				{
+					this->Location<ComponentType,CallerType,_activity_location_itf*>(dest);
+				}
+				else
+				{
+					//----------------------------------------------------------------
+					// Print to log file
+					stringstream s;
+					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
+					s << "," <<orig << ", " <<dest<<endl;
+					base_this->_Parent_Planner->Write_To_Log<NT>(s);
+					//----------------------------------------------------------------
+				}
+			}
+
+			feature_implementation void Mode_Planning_Event_Handler()
+			{
+				this_itf* pthis = (this_itf*)this;
+				pthis->Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SOV);
+			}
+
+			feature_implementation void Duration_Planning_Event_Handler()
+			{
+				this_itf* pthis = (this_itf*)this;
+				base_type* bthis = (base_type*)this;
+
+				_person_itf* person = bthis->_Parent_Planner->Parent_Person<_person_itf*>();
+				_static_properties_itf* static_properties = person->Static_Properties<_static_properties_itf*>();
+
+				Time_Minutes work_duration = static_properties->Work_Hours<Time_Minutes>()/5.0;
+				pthis->Duration<Time_Minutes>(work_duration);
+			}
+
+			feature_implementation void Start_Time_Planning_Event_Handler()
+			{
+				this_itf* pthis = (this_itf*)this;
+				base_type* bthis = (base_type*)this;
+
+				_person_itf* person = bthis->_Parent_Planner->Parent_Person<_person_itf*>();
+				_static_properties_itf* static_properties = person->Static_Properties<_static_properties_itf*>();
+
+				ACTIVITY_TYPES act_type = pthis->Activity_Type<ACTIVITY_TYPES>();
+
+				// School Activity start time (randomly between 7 and 9AM)
+				if (act_type == ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+				{
+					Time_Seconds start_school = (7.0 + Uniform_RNG.Next_Rand<float>() * 2.0) * 60.0 * 60.0;
+					Time_Seconds start_min = Simulation_Time.Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->Planning_Time_Increment<Time_Seconds>());
+					pthis->Start_Time<Time_Seconds>(std::max<int>(start_school.Value,start_min.Value));
+				}
+
+				// Work activity start time, based on census data
+				else
+				{
+					Time_Seconds start_work = static_properties->Journey_To_Work_Arrival_Time<Time_Seconds>();
+					start_work = start_work + Uniform_RNG.Next_Rand<float>() * 5.0 * 60.0; // add random uniform time between 0 and 5 minutes since ACS start is rounded to 5 min
+					Time_Seconds start_min = Simulation_Time.Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->Planning_Time_Increment<Time_Seconds>());
+					pthis->Start_Time<Time_Seconds>(std::max<int>(start_work.Value,start_min.Value));
+				}
+
+				// start routing on the planning timestep prior to departure 
+				int start_minutes = this->Start_Time<ComponentType,CallerType,Time_Minutes>();
+				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes) - _Parent_Planner->Planning_Time_Increment<Simulation_Timestep_Increment>(),_iteration);
+				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
+			}
+
+			feature_implementation void Involved_Persons_Planning_Event_Handler()
+			{
+				
+			}
+
+		};
+
+
+
+		// Stripped down activity record with minimal memory usage (used for storing and printing completed activities)
+		implementation struct Activity_Record : public Polaris_Component<APPEND_CHILD(ADAPTS_Activity_Plan_Implementation), MasterType, Data_Object, ParentType>
+		{
+			feature_implementation void Initialize(TargetType object,requires(check(TargetType, Concepts::Is_Activity_Plan_Prototype)))
+			{
+				typedef Activity_Location_Components::Prototypes::Activity_Location_Prototype<MasterType::activity_location_type> location_itf;
+				typedef Zone_Components::Prototypes::Zone_Prototype<MasterType::zone_type> zone_itf;
+				typedef Prototypes::Activity_Planner<TargetType::Component_Type, TargetType::Caller_Type> object_itf;
+				object_itf* obj = (object_itf*)object;
+
+				this->Activity_Plan_ID<char>(obj->Activity_Plan_ID<char>());
+				this->Activity_Type<char>((char)obj->Activity_Type<Types::ACTIVITY_TYPES>());
+				this->Location<int>(obj->Location<location_itf*>()->zone<zone_itf*>()->uuid<int>());
+				this->Duration<Time_Minutes_Short>(obj->Duration<Time_Minutes_Short>());
+				this->Start_Time<Time_Minutes_Short>(obj->Start_Time<Time_Minutes_Short>());
+				this->Travel_Time<Time_Minutes_Short>(obj->Travel_Time<Time_Minutes_Short>());
+			}
+
+			// Fundamental activity properties
+			member_data(char, Activity_Plan_ID, check(ReturnValueType,is_arithmetic), check(SetValueType,is_arithmetic));
+			member_data(char, Activity_Type,none,none);
+			member_data(int, Location, none,none);
+			member_data(Time_Minutes_Short, Start_Time, check_2(ReturnValueType,Time_Minutes_Short, is_same),check_2(SetValueType,Time_Minutes_Short, is_same));
+			member_data(Time_Minutes_Short, Duration, check_2(ReturnValueType,Time_Minutes_Short, is_same),check_2(SetValueType,Time_Minutes_Short, is_same));
+			member_data(Time_Minutes_Short, Travel_Time, check_2(ReturnValueType,Time_Minutes_Short, is_same),check_2(SetValueType,Time_Minutes_Short, is_same));
+		};
+
+
+
+		//=======================================================================
+		// Static activity plan member initialization
+		//-----------------------------------------------------------------------
+		//static_array_definition(Basic_Activity_Plan_Implementation, Location_Planning_Counter, int);
+		//static_array_definition(Basic_Activity_Plan_Implementation, Route_Planning_Counter, int);
+		//static_array_definition(Basic_Activity_Plan_Implementation, Scheduling_Counter, int);
+		//static_member_initialization(Basic_Activity_Plan_Implementation, Location_Planning_Count, 0);
+		//static_member_initialization(Basic_Activity_Plan_Implementation, Route_Planning_Count, 0);
+		//static_member_initialization(Basic_Activity_Plan_Implementation, Scheduling_Count, 0);
 	}
 }

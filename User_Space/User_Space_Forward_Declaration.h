@@ -148,13 +148,6 @@ namespace Person_Components {
 	}
 };
 
-namespace Person_Components {
-	namespace Prototypes
-	{
-		
-	}
-};
-
 namespace Plan_Components {
 	namespace Prototypes
 	{

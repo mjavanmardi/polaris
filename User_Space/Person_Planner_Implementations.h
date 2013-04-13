@@ -4,7 +4,7 @@
 #include "Movement_Plan_Prototype.h"
 #include "Network_Skimming_Prototype.h"
 #include "Activity_Prototype.h"
-#include "Population_Unit_Implementations.h"
+//#include "Population_Unit_Implementations.h"
 #include "Person_Implementations.h"
 
 
@@ -41,7 +41,7 @@ namespace Person_Components
 			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Generation_Time_Increment,none,none);
 			member_component_feature(Generation_Time_Increment, _Generation_Time_Increment, Value, Basic_Units::Prototypes::Time_Prototype);
 			//Containers for activity planning events and movement planning events
-			member_container(list<typename MasterType::activity_plan_type*>,Activity_Plans_Container,none,none);
+			member_container(list<typename MasterType::activity_type*>,Activity_Container,none,none);
 			member_container(list<typename MasterType::movement_plan_type*>,Movement_Plans_Container,none,none);
 
 
@@ -52,7 +52,7 @@ namespace Person_Components
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan, type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan, type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 			define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan, type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 		
 
@@ -148,6 +148,8 @@ namespace Person_Components
 		template<typename MasterType, typename ParentType, typename InheritanceList> ofstream General_Person_Planner_Implementation<MasterType, ParentType, InheritanceList>::logs[_num_threads];
 		static_member_definition(General_Person_Planner_Implementation,write_activity_files);
 
+
+
 		implementation struct ADAPTS_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(ADAPTS_Person_Planner_Implementation)>
 		{
 			typedef General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(ADAPTS_Person_Planner_Implementation)> base_type;
@@ -193,6 +195,8 @@ namespace Person_Components
 			tag_feature_as_available(Activity_Generation);
 		};
 
+
+
 		implementation struct CTRAMP_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(CTRAMP_Person_Planner_Implementation)>
 		{
 			// IMPLEMENTATION TYPEDEFS AND INTERFACES
@@ -215,38 +219,5 @@ namespace Person_Components
 
 		};
 		
-		implementation struct TRANSIMS_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(TRANSIMS_Person_Planner_Implementation)>
-		{
-			typedef General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(TRANSIMS_Person_Planner_Implementation)> base_type;
-
-			feature_implementation void Initialize(TargetType trip, requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
-			{	
-				// Set the event schedule parameters
-				base_type::template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
-				base_type::template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
-				base_type::template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(END);
-
-				// Create alias for this to use in conditional
-				typedef Prototypes::Person_Planner<ComponentType, ComponentType> _Planning_Interface;
-				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
-
-				// Add the trip input parameter to the movement schedule
-				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();
-				Movement_Plan* move = (Movement_Plan*)trip;
-				this->template Add_Movement_Plan<ComponentType,CallerType,Movement_Plan*>(move);
-			
-			} 
-			feature_implementation void Initialize(TargetType trip, requires(check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
-			{	
-				assert_check(typename ComponentType::Parent_Type,Concepts::Is_Person, "The specified ParentType is not a valid Person type.");
-			}
-			feature_implementation void Initialize()
-			{	
-				//static_assert(false, "\n\n\n[--------- Error, a TRANSIMS Planner Initialization must be called with an input trip parameter. ---------]\n\n");
-			}
-			tag_feature_as_available(Initialize);
-		};
-
 	}
 }

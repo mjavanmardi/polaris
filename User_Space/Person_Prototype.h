@@ -7,7 +7,7 @@
 #include "Zone_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "Network_Skimming_Prototype.h"
-#include "Population_Unit_Prototype.h"
+#include "Person_Properties_Prototype.h"
 
 
 namespace Person_Components
@@ -83,50 +83,6 @@ namespace Types
 		ACTIVITY_PLANNING=2,
 		MOVEMENT_PLANNING=3,
 	};
-
-	namespace Census_Person_Characteristics
-	{
-
-	enum GENDER
-	{
-		NONE,MALE=1,FEMALE
-	};
-	enum RACE
-	{
-		WHITE=1,BLACK,INDIAN,ASIAN,PACIFIC_ISLANDER,OTHER_RACE,TWO_OR_MORE_RACES,HISPANIC
-	};
-	enum WORKER_CLASS
-	{
-		EMPLOYEE_PRIVATE=1,EMPLOYEE_NON_PROFIT,LOCAL,STATE,FEDERAL,SELF_EMPLOYED,SELF_EMPLOYED_INCORPORATED,FAMILY_BUSINESS_UNPAID,UNEMPLOYED
-	};
-	enum WORK_TRAVEL_MODE
-	{
-		CAR=1,BUS,STREETCAR,SUBWAY,RAILROAD,FERRY,TAXI,MOTORCYCLE,BIKE,WALK,WORK_AT_HOME,OTHER
-	};
-	enum MARITAL_STATUS
-	{
-		MARRIED=1,WIDOWED,DIVORCED,SEPARATED,NEVER_MARRIED
-	};
-	enum HH_RELATIONSHIP
-	{
-		REFERENCE_PERSON,SPOUSE,CHILD,ADOPTED_CHILD,STEPCHILD,SIBLING,PARENT,GRANDCHILD,PARENT_IN_LAW,CHILD_IN_LAW,OTHER_RELATIVE,BOARDER,ROOMATE,PARTNER,FOSTER_CHILD,OTHER_UNRELATED,GQ_INSTITUTIONAL,GQ_NONINSTITUTIONAL
-	};
-	enum SCHOOL_ATTENDANCE
-	{
-		NO,YES_PUBLIC,YES_PRIVATE
-	};
-	enum SCHOOL_GRADE
-	{
-		NO_SCHOOL,PRESCHOOL,KINDERGARTEN,GRADE_1,GRADE_2,GRADE_3,GRADE_4,GRADE_5,GRADE_6,GRADE_7,GRADE_8,GRADE_9,GRADE_10,GRADE_11,GRADE_12,UNDERGRADUATE,GRADUATE_SCHOOL
-	};
-	enum EDUCATIONAL_ATTAINMENT
-	{
-		EDUC_NA,EDUC_NONE,EDUC_PRESCHOOL,EDUC_KINDERGARTEN,EDUC_GRADE_1,EDUC_GRADE_2,EDUC_GRADE_3,EDUC_GRADE_4,EDUC_GRADE_5,EDUC_GRADE_6,EDUC_GRADE_7,EDUC_GRADE_8,EDUC_GRADE_9,EDUC_GRADE_10,EDUC_GRADE_11,EDUC_GRADE_12_NO_DIPLOMA,
-		EDUC_HIGH_SCHOOL_DIPLOMA,EDUC_GED,EDUC_SOME_COLLEGE_UNDER_1YR,EDUC_SOME_COLLEGE_OVER_1YR,EDUC_ASSOCIATE_DEGREE,EDUC_BACHELOR_DEGREE,EDUC_MASTERS_DEGREE,EDUC_PROFESSIONAL_DEGREE,EDUC_DOCTORATE
-	};
-
-
-	}
 }
 
 namespace Prototypes
@@ -209,11 +165,11 @@ namespace Prototypes
 			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
 			define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 			define_container_and_value_interface(activity_locations_container_itf, activity_location_itf, typename network_itf::get_type_of(activity_locations_container), Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-			//define_container_and_value_interface(zone_container_itf, zone_itf, typename network_itf::get_type_of(zones_container), Containers::Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
-			//zone_container_itf* zones = network->template zones_container<zone_container_itf*>();
+
 			int loc_id = properties->template home_location_id<int>();
 			activity_location_itf* loc = (*locations)[loc_id];	
 			return loc->zone<TargetType>();
@@ -244,6 +200,7 @@ namespace Prototypes
 		{
 			assert_check(TargetType, is_integral, "Error, Home_Location can only be set by passing an integral index from network::activity_locations_container");
 		}
+		
 		feature_prototype TargetType Work_Location(requires(check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location) && check_as_given(TargetType,is_pointer)))
 		{
 			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
@@ -253,30 +210,40 @@ namespace Prototypes
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
 
-			int loc_id = properties->home_location_id<TargetType>();
-			return (TargetType)(*locations[loc_id]);						
+			int loc_id = properties->work_location_id<int>();
+			if (loc_id < 0)
+			{
+				THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid work location.  Should not be requesting this.");
+				return nullptr;
+			}
+			return (TargetType)(*locations)[loc_id];						
 		}
 		feature_prototype TargetType Work_Location(requires(check(TargetType, Zone_Components::Concepts::Is_Zone) && check_as_given(TargetType,is_pointer)))
 		{
 			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
 			define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 			define_container_and_value_interface(activity_locations_container_itf, activity_location_itf, typename network_itf::get_type_of(activity_locations_container), Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-			define_container_and_value_interface(zone_container_itf, zone_itf, typename network_itf::get_type_of(zones_container), Containers::Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+			
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
-			zone_container_itf* zones = network->template zones_container<zone_container_itf*>();
-			int loc_id = properties->template work_location_id<TargetType>();
-			activity_location_itf* loc = locations[loc_id];	
-			return loc->zone<zone_itf*>();
+
+			int loc_id = properties->template work_location_id<int>();
+			if (loc_id < 0)
+			{
+				THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid work location.  Should not be requesting this.");
+				return nullptr;
+			}
+			activity_location_itf* loc = (*locations)[loc_id];	
+			return loc->zone<TargetType>();
 		}
 		feature_prototype TargetType Work_Location(requires(check(TargetType, is_integral)))
 		{
 			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
 			properties_itf* properties = this->Properties<properties_itf*>();
-			return properties->home_location_id<TargetType>();
+			return properties->work_location_id<TargetType>();
 		}
-		feature_prototype TargetType Work_Location(requires(check(TargetType, !is_integral) && ( check(TargetType,!Activity_Location_Components::Concepts::Is_Activity_Location) || check_as_given(TargetType,!is_pointer) ) ) )
+		feature_prototype TargetType Work_Location(requires(check(TargetType, !is_integral) && ( (check(TargetType,!Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,!Zone_Components::Concepts::Is_Zone) ) || check_as_given(TargetType,!is_pointer) ) ) )
 		{
 			assert_check(TargetType,is_integral,"Error, Home_Location can only be requested as an Integral type - which returns location index, or as an Activity_Location refernence type, which returns the actual location.");
 		}
@@ -289,50 +256,125 @@ namespace Prototypes
 			network_itf* network = this->network_reference<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
 
-			if (location_index < 0 || location_index >= locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.");
-			properties->home_location_id<TargetType>(location_index);
+			if (location_index < -1 || location_index >= (signed int)locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.");
+			properties->work_location_id<TargetType>(location_index);
 		}
 		feature_prototype void Work_Location(TargetType location_index, requires(check(TargetType, !is_integral)))
 		{
 			assert_check(TargetType, is_integral, "Error, work location can only be set by passing an integral index from network::activity_locations_container");
 		}
-		feature_prototype void Choose_Work_Location()
+
+		feature_prototype TargetType School_Location(requires(check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location) && check_as_given(TargetType,is_pointer)))
+		{
+			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
+			define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+			define_container_and_value_interface(activity_locations_container_itf, activity_location_itf, typename network_itf::get_type_of(activity_locations_container), Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+			properties_itf* properties = this->Properties<properties_itf*>();
+			network_itf* network = this->network_reference<network_itf*>();
+			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
+
+			int loc_id = properties->school_location_id<int>();
+			if (loc_id < 0)
+			{
+				THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid school location.  Should not be requesting this.");
+				return nullptr;
+			}
+			return (TargetType)(*locations)[loc_id];						
+		}
+		feature_prototype TargetType School_Location(requires(check(TargetType, Zone_Components::Concepts::Is_Zone) && check_as_given(TargetType,is_pointer)))
+		{
+			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
+			define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+			define_container_and_value_interface(activity_locations_container_itf, activity_location_itf, typename network_itf::get_type_of(activity_locations_container), Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+			
+			properties_itf* properties = this->Properties<properties_itf*>();
+			network_itf* network = this->network_reference<network_itf*>();
+			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
+
+			int loc_id = properties->template school_location_id<int>();
+			if (loc_id < 0)
+			{
+				THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid school location.  Should not be requesting this.");
+				return nullptr;
+			}
+			activity_location_itf* loc = (*locations)[loc_id];	
+			return loc->zone<TargetType>();
+		}
+		feature_prototype TargetType School_Location(requires(check(TargetType, is_integral)))
+		{
+			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
+			properties_itf* properties = this->Properties<properties_itf*>();
+			return properties->school_location_id<TargetType>();
+		}
+		feature_prototype TargetType School_Location(requires(check(TargetType, !is_integral) && ( (check(TargetType,!Activity_Location_Components::Concepts::Is_Activity_Location) && check(TargetType,!Zone_Components::Concepts::Is_Zone) ) || check_as_given(TargetType,!is_pointer) ) ) )
+		{
+			assert_check(TargetType,is_integral,"Error, School_Location can only be requested as an Integral type - which returns location index, or as an Activity_Location refernence type, which returns the actual location.");
+		}
+		feature_prototype void School_Location(TargetType location_index, requires(check(TargetType, is_integral)))
+		{
+			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
+			define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+			define_container_and_value_interface(activity_locations_container_itf, activity_location_itf, typename network_itf::get_type_of(activity_locations_container), Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+			properties_itf* properties = this->Properties<properties_itf*>();
+			network_itf* network = this->network_reference<network_itf*>();
+			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
+
+			if (location_index < -1 || location_index >= (signed int)locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.");
+			properties->school_location_id<TargetType>(location_index);
+		}
+		feature_prototype void School_Location(TargetType location_index, requires(check(TargetType, !is_integral)))
+		{
+			assert_check(TargetType, is_integral, "Error, work location can only be set by passing an integral index from network::activity_locations_container");
+		}
+		
+		define_feature_exists_check(Choose_Work_Location, has_Choose_Work_Location);
+		feature_prototype void Choose_Work_Location(requires(check(ComponentType,has_Choose_Work_Location)))
 		{
 			this_component()->Choose_Work_Location<ComponentType,CallerType,TargetType>();
 		}
-		feature_prototype void Choose_School_Location()
+		feature_prototype void Choose_Work_Location(requires(!check(ComponentType,has_Choose_Work_Location)))
 		{
-			this_component()->Choose_Work_Location<ComponentType,CallerType,TargetType>();
+			assert_check(ComponentType,has_Choose_Work_Location,"ComponentType does not have Choose_Work_Location feature.");
+		}
+
+		define_feature_exists_check(Choose_School_Location, has_Choose_School_Location);
+		feature_prototype void Choose_School_Location(requires(check(ComponentType,has_Choose_School_Location)))
+		{
+			this_component()->Choose_School_Location<ComponentType,CallerType,TargetType>();
+		}
+		feature_prototype void Choose_School_Location(requires(!check(ComponentType,has_Choose_School_Location)))
+		{
+			assert_check(ComponentType,has_Choose_School_Location,"ComponentType does not have Choose_School_Location feature.");
 		}
 	};
 
 
-	prototype struct Person_Properties ADD_DEBUG_INFO
-	{
-		tag_as_prototype;
+	//prototype struct Person_Properties ADD_DEBUG_INFO
+	//{
+	//	tag_as_prototype;
 
-		// Initializer
-		define_feature_exists_check(Initialize,Has_Initialize);
-		feature_prototype void Initialize(requires(check(ComponentType,Has_Initialize)))
-		{
-			this_component()->Initialize<ComponentType,CallerType, TargetType>();
-		}
-		feature_prototype void Initialize(requires(!check(ComponentType,Has_Initialize)))
-		{
-			assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-		}
+	//	// Initializer
+		//define_feature_exists_check(Initialize,Has_Initialize);
+		//feature_prototype void Initialize(requires(check(ComponentType,Has_Initialize)))
+		//{
+		//	this_component()->Initialize<ComponentType,CallerType, TargetType>();
+		//}
+		//feature_prototype void Initialize(requires(!check(ComponentType,Has_Initialize)))
+		//{
+		//	assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+		//}
 
-		feature_accessor(home_location_id,none,none);
-		feature_accessor(work_location_id,none,none);
-		feature_accessor(My_Length,none,none);
-		feature_accessor(My_Area,none,none);
-		feature_accessor(My_Time,none,none);
-		feature_accessor(My_Speed,none,none);
-		feature_accessor(HH_Income,none,none);
+	//	feature_accessor(home_location_id,none,none);
+	//	feature_accessor(work_location_id,none,none);
+	//	feature_accessor(My_Length,none,none);
+	//	feature_accessor(My_Area,none,none);
+	//	feature_accessor(My_Time,none,none);
+	//	feature_accessor(My_Speed,none,none);
+	//	feature_accessor(HH_Income,none,none);
 
-		// accessor to parent class
-		feature_accessor(Parent_Person,none,none);
-	};
+	//	// accessor to parent class
+	//	feature_accessor(Parent_Person,none,none);
+	//};
 
 
 	prototype struct Person_Planner ADD_DEBUG_INFO
@@ -351,15 +393,10 @@ namespace Prototypes
 			_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
 			// Define interfaces to the container members of the class
-			define_container_and_value_interface(Activity_Plans_List,Activity_Plan,typename get_type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 			define_container_and_value_interface(Movement_Plans_List,Movement_Plan,typename get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-			Activity_Plans_List* activity_plans = this_ptr->Activity_Plans_Container<Activity_Plans_List*>();
 			Movement_Plans_List* movement_plans = this_ptr->Movement_Plans_Container<Movement_Plans_List*>();
-			typename Activity_Plans_List::iterator act_itr = activity_plans->begin();
 			typename Movement_Plans_List::iterator move_itr = movement_plans->begin();
-			Activity_Plan* activity;
 			Movement_Plan* movement;			
-			if (act_itr != activity_plans->end()) activity = *act_itr;
 			if (move_itr != movement_plans->end()) movement = *move_itr;
 
 			//------------------------------------------------------------------------------------------------------------------------------
@@ -371,15 +408,6 @@ namespace Prototypes
 				{	
 					this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,false,response);
 				}
-				// check if activity planning needs to occur, if so do this
-				else if (act_itr != activity_plans->end())
-				{
-					if (activity->Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
-						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING,false,response);
-					else
-						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,false,response);
-				}
-				// check if movement planning needs to occur, if so do this
 				else if (move_itr != movement_plans->end())
 				{
 					if (movement->departed_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
@@ -399,27 +427,6 @@ namespace Prototypes
 			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
 			{
 				_pthis->Swap_Event((Event)&Person_Planner::Activity_Generation_Event<NULLTYPE>);
-
-				// check if activity planning needs to occur, if so do this otherwise, goto movement plans
-				if (act_itr != activity_plans->end())
-				{
-					if (activity->Activity_Planning_Time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
-						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING,true,response);
-					else
-						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
-				}
-				// check if movement planning needs to occur, if so do this
-				else
-				{
-					this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
-				}
-			}
-
-			//------------------------------------------------------------------------------------------------------------------------------
-			// ACTIVITY PLANNING SUBITERATION Planning sub_iteration, swap in the activity-planning event and set up future sub_iteration schedule
-			else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_PLANNING)
-			{
-				_pthis->Swap_Event((Event)&Person_Planner::Activity_Planning_Event<NULLTYPE>);
 				this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
 			}
 
@@ -643,7 +650,7 @@ namespace Prototypes
 		// Activity Plans and Movement plans, stored in a hashmap keyed based on next required plan time (updated in the plan class after plan completion)
 		feature_accessor(Activity_Generator,none,none);
 		feature_accessor(Destination_Chooser,none,none);
-		feature_accessor(Activity_Plans_Container,none,none);
+		feature_accessor(Activity_Container,none,none);
 		feature_accessor(Movement_Plans_Container,none,none);
 		feature_accessor(Schedule_Container,none,none);	
 		feature_accessor(current_movement_plan,none,none);

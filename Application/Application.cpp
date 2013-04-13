@@ -68,8 +68,6 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >
 
 
 
-
-
 struct tester0
 {
 	void Print_Type_ID(){cout<<"typeid";}
@@ -81,13 +79,22 @@ prototype struct tester1
 	tag_as_prototype;
 	feature_accessor(my_id,none,none);
 	feature_prototype int Print_Type_ID(){cout<<"Prototype 1 called: ";return this_component()->Print_Type_ID<ComponentType,CallerType,TargetType>();}
-	feature_prototype float Calculate_Utility(){return this_component()->Calculate_Utility<ComponentType,CallerType,TargetType>();}
+
+	feature_prototype float Calculate_Utility(requires(check(ComponentType,has_Calculate_Utility)))
+	{
+		return this_component()->Calculate_Utility<ComponentType,CallerType,TargetType>();
+	}
+	feature_prototype float Calculate_Utility(requires(!check(ComponentType,has_Calculate_Utility)))
+	{
+		assert_check(ComponentType,has_Calculate_Utility,"Error, the component type does not have Calculate_Utility defined.");
+	}
+	
 };
 implementation struct tester1_imp : public Polaris_Component<APPEND_CHILD(tester1_imp),NT,Data_Object,NT,true>
 {
 	member_data(int, my_id,none,none);
 	feature_implementation int Print_Type_ID(){ cout << "tester1: component_index="<< this->component_index<< ", id="<<_my_id << endl ; return _my_id;} tag_feature_as_available(Print_Type_ID);
-	feature_implementation float Calculate_Utility(){return _my_id;} tag_feature_as_available(Calculate_Utility);
+	//feature_implementation float Calculate_Utility(){return _my_id;} tag_feature_as_available(Calculate_Utility);
 };
 
 prototype struct tester2
@@ -191,12 +198,15 @@ int main()
 	typedef TypeList<test1_type,TypeList<test2_type, TypeList<test3_type> > > Holder_3_List;
 	
 
-	cout << "Do Stuff " << endl;
+	//cout << "Do Stuff " << endl;
 
-	Time_Prototype<Time_Implementation<NT>>* time = (Time_Prototype<Time_Implementation<NT>>*)(new Time_Implementation<NT>());
-	time->Value<Time_Seconds>(2);
+	//Time_Prototype<Time_Implementation<NT>>* time = (Time_Prototype<Time_Implementation<NT>>*)(new Time_Implementation<NT>());
+	//time->Value<Time_Seconds>(2);
 
-	cout << endl << time->Value<Time_Minutes>();
+	//cout << endl << time->Value<Time_Minutes>();
+
+	test1_type* t = (test1_type*)Allocate<MasterType::tester1_type>();
+	t->Calculate_Utility<NT>();
 
 
 	char pause;	cin >> pause;
