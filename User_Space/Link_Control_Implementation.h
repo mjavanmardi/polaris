@@ -11,11 +11,7 @@ namespace Link_Control_Components
 	{
 		implementation struct Lane_Link_Control:public Polaris_Component<APPEND_CHILD(Lane_Link_Control),MasterType,Data_Object>
 		{
-			feature_implementation static void Initialize_Type(void* obj)
-			{
-			}
-
-			feature_implementation static void Setup_Type(const vector<shared_ptr<polaris::io::Component_Key>>& keys)
+			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Component_Key>>& keys)
 			{
 				for(vector<shared_ptr<polaris::io::Component_Key>>::const_iterator itr=keys.begin();itr!=keys.end();itr++)
 				{
@@ -23,12 +19,15 @@ namespace Link_Control_Components
 				}
 			}
 			
-			feature_implementation void Setup(weak_ptr<polaris::io::Instance>& instance)
+			feature_implementation void Initialize(weak_ptr<polaris::io::Instance>& instance)
 			{
 				using namespace polaris::io;
 				
 				_x_position = instance.lock()->getLocation_X();
 				_y_position = instance.lock()->getLocation_Y();
+
+				typename type_of(MasterType::network)::type_of(links_container)& net_links=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->links_container<typename type_of(MasterType::network)::type_of(links_container)&>();
+				_covered_link = (covered_link_interface*)(net_links[rand()%net_links.size()]);
 			}
 
 			member_data(float, x_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));

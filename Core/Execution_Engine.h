@@ -21,6 +21,10 @@ public:
 
 		ex_threads_counter_begin=0;
 		ex_threads_counter_end=0;
+
+#ifdef WITH_WAIT
+		ex_threads_finished_event = CreateEvent(NULL,TRUE,FALSE,NULL);
+#endif
 	}
 
 	void Activate_Type(Typed_Execution_Pages<>* ptr)
@@ -120,12 +124,18 @@ public:
 
 				//_sub_iteration++;
 				_sub_iteration = ex_next_revision._sub_iteration;
-
+#ifdef WITH_WAIT
+				SetEvent(ex_threads_finished_event);
+#endif
 				ex_threads_counter_begin=0;
 			}
 			else
 			{
+#ifdef WITH_WAIT
+				WaitForSingleObject(ex_threads_finished_event,INFINITE);
+#else
 				while(AtomicCompareExchange(&ex_threads_counter_begin,0,0)) SLEEP(0);
+#endif
 			}
 			
 			this_revision._sub_iteration = _sub_iteration;
@@ -139,6 +149,9 @@ public:
 
 				if(AtomicIncrement(&ex_threads_counter_end) == _num_threads)
 				{
+#ifdef WITH_WAIT
+					ResetEvent(ex_threads_finished_event);
+#endif
 					ex_threads_counter_end=0;
 				}
 				else
@@ -158,4 +171,8 @@ public:
 
 	volatile unsigned int ex_threads_counter_begin;
 	volatile unsigned int ex_threads_counter_end;
+
+#ifdef WITH_WAIT
+	HANDLE ex_threads_finished_event;
+#endif
 };

@@ -32,7 +32,9 @@ public:
 	
 		// no threads running
 		threads_running_counter=0;
-
+#ifdef WITH_WAIT
+		threads_finished_event = CreateEvent(NULL,FALSE,FALSE,NULL);
+#endif
 		for(int i=0;i<_num_threads;i++)
 		{
 			packages[i].id=i;
@@ -58,8 +60,11 @@ public:
 		{
 			// wait until all threads have entered the finished queue
 
+#ifdef WITH_WAIT
+			WaitForSingleObject(threads_finished_event,INFINITE);
+#else
 			while(threads_finished_counter!=_num_threads) SLEEP(0);
-			
+#endif
 			// can safely say no threads are running at this point
 			threads_running_counter=0;
 
@@ -83,13 +88,20 @@ public:
 			}
 			else
 			{
+#ifdef WITH_WAIT
+				ResetEvent(execution_root_ptr->ex_threads_finished_event);
+#endif
 				// instruct threads to leave the finished queue
 				threads_finished_counter=0;
 			}
 		}
 	}
-	
+
 	volatile unsigned int run;
+
+#ifdef WITH_WAIT	
+	HANDLE threads_finished_event;
+#endif
 
 	volatile unsigned int threads_finished_counter;
 	volatile unsigned int threads_running_counter;
@@ -134,17 +146,22 @@ static void* Thread_Loop(void* package_ptr)
 	
 	while(world->run)
 	{
-
-
 		exe->Process();
 
 #ifdef INTERPROCESS
 		interprocess_root_ptr->Exchange();
 #endif
 
+#ifdef WITH_WAIT
 		// let the world know that this thread is finished
+		if(AtomicIncrement(&world->threads_finished_counter) == _num_threads)
+		{
+			SetEvent(world->threads_finished_event);
+		}
+#else
 		AtomicIncrement(&world->threads_finished_counter);
-		
+#endif
+
 		// enter the finished queue
 		while(world->threads_finished_counter!=0) SLEEP(0);
 
@@ -153,8 +170,6 @@ static void* Thread_Loop(void* package_ptr)
 
 		// thread waits until all threads have left the finished queue to begin actual operation
 		while(world->threads_running_counter!=_num_threads) SLEEP(0);
-
-
 	}
 
 	// let the world know that this thread is completely finished

@@ -12,11 +12,7 @@ namespace Depot_Components
 	{
 		implementation struct Tow_Truck_Depot:public Polaris_Component<APPEND_CHILD(Tow_Truck_Depot),MasterType,Data_Object>
 		{
-			feature_implementation static void Initialize_Type(void* obj)
-			{
-			}
-
-			feature_implementation static void Setup_Type(const vector<shared_ptr<polaris::io::Component_Key>>& keys)
+			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Component_Key>>& keys)
 			{
 				for(vector<shared_ptr<polaris::io::Component_Key>>::const_iterator itr=keys.begin();itr!=keys.end();itr++)
 				{
@@ -24,12 +20,28 @@ namespace Depot_Components
 				}
 			}
 			
-			feature_implementation void Setup(weak_ptr<polaris::io::Instance>& instance)
+			feature_implementation void Initialize(vector<int>& db_covered_links)
 			{
 				using namespace polaris::io;
-				
-				_x_position = instance.lock()->getLocation_X();
-				_y_position = instance.lock()->getLocation_Y();
+
+				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+
+				for(vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
+				{
+					int link = *itr;
+
+					if(db_map.count(link))
+					{
+						vector<typename MasterType::link_type*>& links=db_map[link];
+
+						vector<typename type_of(MasterType::link)*>::iterator vitr;
+
+						for(vitr=links.begin();vitr!=links.end();vitr++)
+						{
+							_covered_links.push_back( (Link_Interface*)(*vitr) );
+						}
+					}
+				}
 			}
 
 			member_data(float, x_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));

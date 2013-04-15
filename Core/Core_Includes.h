@@ -47,12 +47,15 @@
 using namespace std;
 
 
+
 #ifdef WINDOWS
 #include <intrin.h>
 #define AtomicExchange(TARGET,VALUE) _InterlockedExchange(TARGET,VALUE)
 #define AtomicIncrement(TARGET) _InterlockedIncrement(TARGET)
 #define AtomicDecrement(TARGET) _InterlockedIncrement(TARGET)
 #define AtomicCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE) _InterlockedCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE)
+#define WITH_WAIT
+
 #else
 static const int inc_val=1;
 

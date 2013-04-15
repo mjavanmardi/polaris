@@ -21,19 +21,19 @@ namespace Network_Event_Components
 		{
 			tag_as_prototype;
 			
-			feature void Initialize()
+			feature void Start()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->Start<ComponentType,CallerType,TargetType>();
 			}
 			
-			feature void Setup(TargetType configuration)
+			feature void Initialize(TargetType configuration)
 			{
-				this_component()->Setup<ComponentType,CallerType,TargetType>(configuration);
+				this_component()->Initialize<ComponentType,CallerType,TargetType>(configuration);
 			}
 			
-			feature static void Setup_Type(TargetType configuration)
+			feature static void Initialize_Type(TargetType configuration)
 			{
-				ComponentType::Setup_Type<ComponentType,CallerType,TargetType>(configuration);
+				ComponentType::Initialize_Type<ComponentType,CallerType,TargetType>(configuration);
 			}
 			
 			feature static void Push_Subscriber(TargetType callback,int subscriber)
@@ -110,7 +110,7 @@ namespace Network_Event_Components
 				this_component()->Push_Subscriber<ComponentType,CallerType,TargetType>(callback);
 			}
 
-			feature_accessor(db_name,none,none);
+			feature_accessor(scenario_reference,none,none);
 		};
 	}
 }

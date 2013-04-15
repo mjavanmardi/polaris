@@ -25,9 +25,9 @@ namespace Network_Event_Components
 		{
 			typedef typename InheritanceTemplate<MasterType,NT,APPEND_CHILD(Base_Antares_Network_Event)>::ComponentType ComponentType;
 
-			feature_implementation static void Initialize_Type(void* obj,string& name)
+			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys,string& name)
 			{
-				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Base_Antares_Network_Event)>::Initialize_Type<ComponentType,CallerType,NT>(obj);
+				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Base_Antares_Network_Event)>::Initialize_Type<ComponentType,CallerType,NT>(keys);
 
 				_event_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(event_layer),ComponentType>*, string& > >(name);
 
@@ -67,9 +67,9 @@ namespace Network_Event_Components
 			};
 #pragma pack(pop)
 
-			feature_implementation void Setup(weak_ptr<polaris::io::Event_Instance>& instance)
+			feature_implementation void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
 			{
-				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Base_Antares_Network_Event)>::Setup<ComponentType,ComponentType,weak_ptr<polaris::io::Event_Instance>& >(instance);
+				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Base_Antares_Network_Event)>::Initialize<ComponentType,ComponentType,weak_ptr<polaris::io::Event_Instance>& >(instance);
 			}
 			
 			declare_feature_conditional_implementation(Incident_Conditional)
@@ -152,33 +152,33 @@ namespace Network_Event_Components
 
 		implementation struct Antares_Weather_Network_Event : public Base_Antares_Network_Event<MasterType,NT,APPEND_CHILD(Antares_Weather_Network_Event),Weather_Network_Event>
 		{
-			feature_implementation static void Initialize_Type(void* obj)
+			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
-				Base_Antares_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj,string("Weather_Events"));
+				Base_Antares_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(keys,string("Weather_Events"));
 			}
 		};
 		
 		implementation struct Antares_Accident_Network_Event : public Base_Antares_Network_Event<MasterType,NT,APPEND_CHILD(Antares_Accident_Network_Event),Weather_Network_Event>
 		{
-			feature_implementation static void Initialize_Type(void* obj)
+			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
-				Base_Antares_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj,string("Accident_Events"));
+				Base_Antares_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(keys,string("Accident_Events"));
 			}
 		};
 
 		implementation struct Antares_Congestion_Network_Event : public Base_Antares_Network_Event<MasterType,NT,APPEND_CHILD(Antares_Congestion_Network_Event),Weather_Network_Event>
 		{
-			feature_implementation static void Initialize_Type(void* obj)
+			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
-				Base_Antares_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj,string("Congestion_Events"));
+				Base_Antares_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(keys,string("Congestion_Events"));
 			}
 		};
 
 		implementation struct Antares_Lane_Closure_Network_Event : public Base_Antares_Network_Event<MasterType,NT,APPEND_CHILD(Antares_Lane_Closure_Network_Event),Weather_Network_Event>
 		{
-			feature_implementation static void Initialize_Type(void* obj)
+			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
-				Base_Antares_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj,string("Lane_Closure_Events"));
+				Base_Antares_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(keys,string("Lane_Closure_Events"));
 			}
 		};
 	}

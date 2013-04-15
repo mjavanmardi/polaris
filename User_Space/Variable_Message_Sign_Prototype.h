@@ -17,14 +17,14 @@ namespace Variable_Message_Sign_Components
 		{
 			tag_as_prototype;
 			
-			feature static void Setup_Type(TargetType configuration)
+			feature static void Initialize_Type(TargetType configuration)
 			{
-				ComponentType::Setup_Type<ComponentType,CallerType,TargetType>(configuration);
+				ComponentType::Initialize_Type<ComponentType,CallerType,TargetType>(configuration);
 			}
 
-			feature void Setup(TargetType configuration)
+			feature void Initialize(TargetType configuration)
 			{
-				ComponentType::Setup<ComponentType,CallerType,TargetType>(configuration);
+				ComponentType::Initialize<ComponentType,CallerType,TargetType>(configuration);
 			}
 
 			feature_accessor(x_position, none, none);

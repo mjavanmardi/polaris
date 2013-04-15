@@ -200,17 +200,6 @@ void run_with_input_from_db()
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
 
-	//Network_Event<MasterType::network_event_manager_type>* net_event_manager=(Network_Event<MasterType::network_event_manager_type>*)Allocate<MasterType::network_event_manager_type>();
-
-	//network->network_event_manager<MasterType::network_event_manager_type*>( (MasterType::network_event_manager_type*)net_event_manager );
-
-	//net_event_manager->Initialize<NT>();
-
-	//typedef Traffic_Management_Center<MasterType::traffic_management_center_type,NT> TMC_Interface;
-
-	//TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
-	//tmc->scenario_reference<_Scenario_Interface*>(scenario);
-	//tmc->Initialize<NT>();
 
 	//cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
@@ -265,6 +254,18 @@ void run_with_input_from_db()
 	network->initialize_antares_layers<NULLTYPE>();
 	MasterType::link_type::configure_link_moes_layer();
 #endif
+		//Network_Event_Manager<MasterType::network_event_manager_type>* net_event_manager=(Network_Event_Manager<MasterType::network_event_manager_type>*)Allocate<MasterType::network_event_manager_type>();
+	
+		//network->network_event_manager<MasterType::network_event_manager_type*>( (MasterType::network_event_manager_type*)net_event_manager );
+		//net_event_manager->scenario_reference<_Scenario_Interface*>(scenario);
+		//net_event_manager->Initialize<NT>();
+
+		//typedef Traffic_Management_Center<MasterType::traffic_management_center_type,NT> TMC_Interface;
+
+		//TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+		//tmc->scenario_reference<_Scenario_Interface*>(scenario);
+		//tmc->Initialize<NT>();
+
 		////initialize network agents
 		cout << "initializing link agents..." <<endl;
 		define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Prototype, NULLTYPE);
@@ -324,19 +325,6 @@ void run_with_input_from_files()
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 	network->read_network_data<Net_IO_Type>(network_data);
 
-
-	//Network_Event<MasterType::network_event_manager_type>* net_event_manager=(Network_Event<MasterType::network_event_manager_type>*)Allocate<MasterType::network_event_manager_type>();
-
-	//network->network_event_manager<MasterType::network_event_manager_type*>( (MasterType::network_event_manager_type*)net_event_manager );
-
-	//net_event_manager->Initialize<NT>();
-
-	//typedef Traffic_Management_Center<MasterType::traffic_management_center_type,NT> TMC_Interface;
-
-	//TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
-	//tmc->scenario_reference<_Scenario_Interface*>(scenario);
-	//tmc->Initialize<NT>();
-
 	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
 	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
 	
@@ -359,6 +347,19 @@ void run_with_input_from_files()
 	network->initialize_antares_layers<NULLTYPE>();
 	MasterType::link_type::configure_link_moes_layer();
 #endif
+
+	//Network_Event<MasterType::network_event_manager_type>* net_event_manager=(Network_Event<MasterType::network_event_manager_type>*)Allocate<MasterType::network_event_manager_type>();
+
+	//network->network_event_manager<MasterType::network_event_manager_type*>( (MasterType::network_event_manager_type*)net_event_manager );
+
+	//net_event_manager->Initialize<NT>();
+
+	//typedef Traffic_Management_Center<MasterType::traffic_management_center_type,NT> TMC_Interface;
+
+	//TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+	//tmc->scenario_reference<_Scenario_Interface*>(scenario);
+	//tmc->Initialize<NT>();
+
 
 	cout << "world started..." << endl;
 	////initialize network agents
