@@ -30,6 +30,16 @@ namespace Variable_Message_Sign_Components
 			feature_accessor(x_position, none, none);
 			feature_accessor(y_position, none, none);
 
+			feature void Get_Messages(vector<Network_Event<TargetType,ComponentType>*>& bucket)
+			{
+				return this_component()->Get_Messages<ComponentType,CallerType,TargetType>(bucket);
+			}
+
+			feature TargetType Get_Single_Message()
+			{
+				return this_component()->Get_Single_Message<ComponentType,CallerType,TargetType>();
+			}
+
 			feature_accessor(active_properties, none, none);
 		};
 	}

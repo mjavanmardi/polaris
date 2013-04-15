@@ -1,5 +1,6 @@
 #pragma once
 #include "User_Space_Includes.h"
+#include "Network_Event_Prototype.h"
 
 namespace Advisory_Radio_Components
 {
@@ -25,6 +26,11 @@ namespace Advisory_Radio_Components
 			feature void Initialize(TargetType configuration)
 			{
 				ComponentType::Initialize<ComponentType,CallerType,TargetType>(configuration);
+			}
+			
+			feature void Get_Messages(vector<Network_Event<TargetType,ComponentType>*>& bucket)
+			{
+				this_component()->Get_Messages<ComponentType,CallerType,TargetType>(vector<Network_Event<TargetType,ComponentType>*>& bucket);
 			}
 
 			feature_accessor(x_position, none, none);

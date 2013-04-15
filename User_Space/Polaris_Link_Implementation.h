@@ -5,6 +5,10 @@
 #include "Vehicle_Prototype.h"
 #include "Traveler_Prototype.h"
 #include "Person_Prototype.h"
+#include "Advisory_Radio_Prototype.h"
+#include "Depot_Prototype.h"
+#include "Link_Control_Prototype.h"
+#include "Variable_Message_Sign_Prototype.h"
 
 namespace Link_Components
 {
@@ -176,6 +180,11 @@ namespace Link_Components
 			vector<struct Link_MOE_Data> td_link_moe_data_array;
 
 			member_data(bool, event_affected, none, none);
+
+			member_prototype(Advisory_Radio, advisory_radio, typename MasterType::advisory_radio_type, none, none);
+			member_prototype(Depot, depot, typename MasterType::depot_type, none, none);
+			member_prototype(Variable_Message_Sign, variable_word_sign, typename MasterType::variable_word_sign_type, none, none);
+			member_prototype(Variable_Message_Sign, variable_speed_sign, typename MasterType::variable_speed_sign_type, none, none);
 
 		//==================================================================================================================
 		/// travel_time
@@ -579,6 +588,10 @@ namespace Link_Components
 				initialize_moe();
 
 				_event_affected = false;
+				_advisory_radio = nullptr;
+				_depot = nullptr;
+				_variable_word_sign = nullptr;
+				_variable_speed_sign = nullptr;
 			}
 
 			void initialize_moe()

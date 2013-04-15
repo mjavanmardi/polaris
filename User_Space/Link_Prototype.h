@@ -162,6 +162,10 @@ namespace Link_Components
 			
 			// event-aware link
 			feature_accessor(event_affected, none, none);
+			feature_accessor(advisory_radio, none, none);
+			feature_accessor(depot, none, none);
+			feature_accessor(variable_word_sign, none, none);
+			feature_accessor(variable_speed_sign, none, none);
 
 			//visualized link
 			feature_accessor(displayed_line, none, none);
