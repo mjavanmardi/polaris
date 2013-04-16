@@ -451,12 +451,12 @@ namespace Activity_Components
 			feature_accessor(Involved_Persons_Container,none,none);
 			feature_accessor(Expected_Travel_Time, check(ReturnValueType,Basic_Units::Concepts::Is_Time_Value), check(SetValueType,Basic_Units::Concepts::Is_Time_Value)); 
 
-			feature_prototype void Initialize(typename TargetType::ParamType activity_type, typename TargetType::Param2Type planning_time, requires(check(TargetType,Is_Target_Type_Struct) && check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same)))
+			feature_prototype void Initialize(typename TargetType::ParamType act_type, typename TargetType::Param2Type planning_time, requires(check(TargetType,Is_Target_Type_Struct) && check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same)))
 			{
-				this_component()->Initialize<ComponentType, ComponentType, typename TargetType::ParamType>(activity_type);
+				this_component()->Initialize<ComponentType, ComponentType, typename TargetType::ParamType>(act_type);
 				this->Set_Attribute_Planning_Times<typename TargetType::Param2Type>(planning_time);
 			}
-			feature_prototype void Initialize(typename TargetType::ParamType activity_type, typename TargetType::Param2Type planning_time, requires(!check(TargetType,Is_Target_Type_Struct) || !check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same)))
+			feature_prototype void Initialize(typename TargetType::ParamType act_type, typename TargetType::Param2Type planning_time, requires(!check(TargetType,Is_Target_Type_Struct) || !check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same)))
 			{
 				assert_check(TargetType,Is_Target_Type_Struct, "The TargetType for Activity.Initialize must be a Target_Type struct.");
 				assert_check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same, "TargetType::ParamType must be an ActivityType enumerator");

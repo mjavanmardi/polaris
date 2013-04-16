@@ -320,33 +320,31 @@ int main(int argc,char** argv)
 	p->Initialize<int>(1);
 	p->Static_Properties<pop_unit_itf*>(data);
 	p->Home_Location<int>(65);
-	//p->Choose_Work_Location<NT>();
 	p->Work_Location<int>(256);
 
 	#else
-	ofstream out, marg_out, popsyn_log;
-	out.open("full_population_chicag.csv",ios_base::out);
-	popsyn_log.open("popsyn_log.csv",ios_base::out);
-	marg_out.open("marginals_and_distributions_chicago.csv",ios_base::out);
+	//ofstream out, marg_out, popsyn_log;
+	//out.open("full_population.csv",ios_base::out);
+	//popsyn_log.open("popsyn_log.csv",ios_base::out);
+	//marg_out.open("marginals_and_distributions.csv",ios_base::out);
 
-	// IPF Solver Settings
-	define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
-	solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
-	// Solver settings - IPF tolerance, Percentage of population to synthesis, maximum ipf and selection iterations
-	solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(0.05,scenario->percent_to_synthesize<float>(),100);
+	//// IPF Solver Settings
+	//define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
+	//solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
+	//solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(scenario->ipf_tolerance<float>(),scenario->percent_to_synthesize<float>(),scenario->maximum_iterations<int>());
 
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
-	popsyn->write_marginal_output_flag<bool>(true);
-	popsyn->write_full_output_flag<bool>(false);
-	popsyn->linker_file_path<string>(string("linker_file.txt"));
-	popsyn->Solution_Settings<solver_itf*>(solver);
-	popsyn->Output_Stream<ostream&>(out);
-	popsyn->Log_File<ostream&>(popsyn_log);
-	popsyn->Marginal_Output_Stream<ostream&>(marg_out);
-	popsyn->network_reference<_Network_Interface*>(network);
-	popsyn->scenario_reference<_Scenario_Interface*>(scenario);
-	popsyn->Initialize<NULLTYPE>();
+	//popsyn->write_marginal_output_flag<bool>(scenario->write_marginal_output<bool>());
+	//popsyn->write_full_output_flag<bool>(scenario->write_full_output<bool>());
+	//popsyn->linker_file_path<string>(string("linker_file.txt"));
+	//popsyn->Solution_Settings<solver_itf*>(solver);
+	////popsyn->Output_Stream<ostream&>(out);
+	////popsyn->Log_File<ostream&>(popsyn_log);
+	////popsyn->Marginal_Output_Stream<ostream&>(marg_out);
+	//popsyn->network_reference<_Network_Interface*>(network);
+	//popsyn->scenario_reference<_Scenario_Interface*>(scenario);
+	popsyn->Initialize<Target_Type<NT,NT,_Network_Interface*, _Scenario_Interface*> >(network,scenario);
 	#endif
 	//----------------------------------------------------------------------------------------------------------------------------------
 

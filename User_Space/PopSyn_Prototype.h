@@ -2,8 +2,8 @@
 
 #include "User_Space_Includes.h"
 #include "Synthesis_Region_Implementation.h"
-
-
+#include "Network_Prototype.h"
+#include "Scenario_Prototype.h"
 
 namespace PopSyn
 {
@@ -41,14 +41,40 @@ namespace PopSyn
 
 			//----------------------------------------------------------------
 			// Schedules the first event from above
-			feature_prototype void Initialize()
+			feature_prototype void Initialize(typename TargetType::ParamType network, typename TargetType::Param2Type scenario, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType, Network_Components::Concepts::Is_Transportation_Network) && check(typename TargetType::Param2Type, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data)))
 			{
+				// Allocate IPF Solver and get Settings from scenario reference
+				define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
+				solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
+				solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(scenario->ipf_tolerance<double>(),scenario->percent_to_synthesize<double>(),scenario->maximum_iterations<int>());
+
+				// get output control params from scenario
+				this->write_marginal_output_flag<bool>(scenario->write_marginal_output<bool>());
+				this->write_full_output_flag<bool>(scenario->write_full_output<bool>());
+				this->linker_file_path<string>(scenario->popsyn_control_file_name<string>());
+
+				// set up output files
+				this->Output_Stream<ofstream&>().open("full_population.csv",ios_base::out);
+				this->Log_File<ofstream&>().open("popsyn_log.csv",ios_base::out);
+				this->Marginal_Output_Stream<ofstream&>().open("marginals_and_distributions.csv",ios_base::out);
+
+				// Add references to other objects to the population synthesizer
+				this->Solution_Settings<solver_itf*>(solver);
+				this->network_reference<TargetType::ParamType>(network);
+				this->scenario_reference<TargetType::Param2Type>(scenario);
+		
+
 				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 
 				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::INITIALIZE,NULLTYPE);
-				//load_event(ComponentType,Start_Main_Timer_Conditional,Start_Main_Timer,4,NULLTYPE);
 			}
-
+			feature_prototype void Initialize(typename TargetType::ParamType network, typename TargetType::Param2Type scenario, requires(!check(TargetType,Is_Target_Type_Struct) || !check(typename TargetType::ParamType, Network_Components::Concepts::Is_Transportation_Network) || !check(typename TargetType::Param2Type, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data)))
+			{
+				assert_check(TargetType, Is_Target_Type_Struct,"Error, the TargetType must be passed as a Target_Type struct to this function.");
+				assert_check(typename TargetType::ParamType, Network_Components::Concepts::Is_Trasportation_Network, "Error, the specified TargetType ParamType is not a valid Transportation network.");
+				assert_check(typename TargetType::Param2Type, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data, "Error, the specified TargetType Param2Type is not a valid Scenario reference.");
+			}
+			
 			//----------------------------------------------------------------
 			// Main analysis loop events, used to separate operations into different timesteps
 			//----------------------------------------------------------------
@@ -105,7 +131,7 @@ namespace PopSyn
 				int ndim, ans;
 				Linker linker = Linker();
 				File_IO::File_Writer fw, fw_sample;
-				ostream& out = this->Output_Stream<ostream&>();
+				ofstream& out = this->Output_Stream<ofstream&>();
 
 
 				//===============================================================================================================
@@ -284,8 +310,7 @@ namespace PopSyn
 					zone->parent_reference(region);
 
 					zone->ID(ID);
-					solver_itf* zone_solver = (solver_itf*)Allocate<typename get_type_of(Solution_Settings)>(); // ALLOCATION_TEST
-					//solver = (solver_itf*)(new MasterType::IPF_Solver_Settings());
+					solver_itf* zone_solver = (solver_itf*)Allocate<typename get_type_of(Solution_Settings)>(); 
 
 					zone_solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(solver->template Tolerance<double>(),solver->template Percentage_to_synthesize<double>(), solver->template Iterations<int>());
 					zone->template Solver_Settings<solver_itf*>(zone_solver);
@@ -310,7 +335,6 @@ namespace PopSyn
 
 					}
 					pair<typename zone_type::ID_type,zone_itf*> item = pair<typename zone_type::ID_type,zone_itf*>(ID,zone);
-					//region->template Synthesis_Zone_Collection<zones_itf*>()->insert(pair<typename zone_type::ID_type,zone_itf*>(ID,zone));
 					region->template Synthesis_Zone_Collection<zones_itf*>()->insert(item);
 				}
 				zone_fr.Close();
@@ -392,9 +416,9 @@ namespace PopSyn
 			declare_feature_event(Output_Popsyn_Event)
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
-				ostream& popsyn_log = pthis->Log_File<ostream&>();
-				ostream& sample_out = pthis->Output_Stream<ostream&>();
-				ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
+				ofstream& sample_out = pthis->Output_Stream<ofstream&>();
+				ofstream& marg_out = pthis->Marginal_Output_Stream<ofstream&>();
+				ofstream& popsyn_log = pthis->Log_File<ofstream&>();
 
 				//---------------------------------------------------------------------------------------------
 				// Type defines for sub_objects
@@ -416,13 +440,15 @@ namespace PopSyn
 				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
 				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
 				define_container_and_value_interface_unqualified_container(persons_collection_itf, person_itf,person_collection_type,Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person,ComponentType);
-				define_simple_container_interface(activity_location_ids_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);
-				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
+				define_simple_container_interface(activity_location_ids_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);				
 				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_container_and_value_interface(activity_locations_itf, activity_location_itf,typename network_itf::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 				define_container_and_value_interface(_Zone_Container_Interface, _Zone_Interface,typename network_itf::get_type_of(zones_container),Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+				
+				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
 				network_itf* network = pthis->network_reference<network_itf*>();
 				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
+				
 
 				typename regions_itf::iterator r_itr;
 				typename zones_itf::iterator z_itr;
@@ -479,23 +505,16 @@ namespace PopSyn
 							if (properties->Employment_Status<Person_Components::Types::EMPLOYMENT_STATUS>() == Person_Components::Types::EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK) 
 							{
 								person->Choose_Work_Location<NT>();
+
 								popsyn_log <<endl <<"WORK,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->Work_Location<_Zone_Interface*>()->uuid<int>();
 								popsyn_log <<"," << properties->Journey_To_Work_Travel_Time<Time_Minutes>() <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->Work_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
-							}
-							else
-							{
-								popsyn_log << endl <<"DOES NOT WORK,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>()<<",,,";
 							}
 
 							if (properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
 							{
 								person->Choose_School_Location<NT>();
-								popsyn_log <<", SCHOOL,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->School_Location<_Zone_Interface*>()->uuid<int>();
+								popsyn_log <<endl <<"SCHOOL,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->School_Location<_Zone_Interface*>()->uuid<int>();
 								popsyn_log <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->School_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
-							}
-							else
-							{
-								popsyn_log << ", DOES NOT ATTEND SCHOOL,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>()<<",,";
 							}
 							++uuid;
 
@@ -531,14 +550,16 @@ namespace PopSyn
 								marg_out <<endl;
 							}
 
-							// write teh full population results
+							// write th full population results
 							if (pthis->write_full_output_flag<bool>() == true)
 							{
-								sample_data_itf* sample = zone->template Sample_Data<sample_data_itf*>();					
-								sample_out << endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
-								for (typename sample_data_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
+								persons_collection_itf* sample = zone->template Synthetic_Persons_Container<persons_collection_itf*>();	
+								person_itf* person;
+								for (typename persons_collection_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
 								{
-									sample_out << endl << "ID: " << s_itr->second->template ID<uint>() << ",  weight: "<<s_itr->second->template Weight<float>() <<", index: "<<s_itr->second->template Index<uint>();
+									person = *s_itr;
+									pop_unit_itf* p = person->Static_Properties<pop_unit_itf*>();
+									sample_out << "ZONE_ID: "<<zone->template ID<long long int>() << endl << "ID: " << person->template uuid<uint>() << ",  weight: "<<p->template Weight<float>() <<", index: "<<p->template Index<uint>() << ", Gender: "<<p->Gender<GENDER>();
 								}
 							}
 						}
@@ -546,9 +567,9 @@ namespace PopSyn
 
 					cout <<endl<<"File I/O Runtime: "<<timer.Stop();
 				}
-				popsyn_log.flush();
-				sample_out.flush();
-				marg_out.flush();
+				sample_out.close();
+				marg_out.close();
+				popsyn_log.close();
 			}
 			
 			//----------------------------------------------------------------
@@ -567,9 +588,9 @@ namespace PopSyn
 			
 			//----------------------------------------------------------------
 			// Output features - optional, used to write intermediate and final results
-			feature_accessor(Log_File,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
-			feature_accessor(Output_Stream,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
-			feature_accessor(Marginal_Output_Stream,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
+			feature_accessor(Output_Stream,check_2(strip_modifiers(ReturnValueType),ofstream, is_same), check_2(strip_modifiers(SetValueType),ofstream, is_same));
+			feature_accessor(Marginal_Output_Stream,check_2(strip_modifiers(ReturnValueType),ofstream, is_same), check_2(strip_modifiers(SetValueType),ofstream, is_same));
+			feature_accessor(Log_File,check_2(strip_modifiers(ReturnValueType),ofstream, is_same), check_2(strip_modifiers(SetValueType),ofstream, is_same));
 		};
 	}
 }

@@ -178,19 +178,20 @@ namespace Person_Components
 				typedef Prototypes::Person_Planner<ComponentType, ComponentType> _Planning_Interface;
 				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
 
+				static_assert(false,"Do not use");
 				// Generate average of 4 activities per day
 
-				define_container_and_value_interface(Activity_Plans,Activity_Plan,typename base_type::type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
-				Activity_Plan* act = (Activity_Plan*)Allocate<typename base_type::type_of(Activity_Plans_Container)::unqualified_value_type>();
-				act->template Activity_Plan_ID<long>(_iteration);
-				Activity_Plans* activities = this_ptr->template Activity_Plans_Container<Activity_Plans*>();
-				activities->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(15),act);
+				//define_container_and_value_interface(Activity_Plans,Activity_Plan,typename base_type::type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
+				//Activity_Plan* act = (Activity_Plan*)Allocate<typename base_type::type_of(Activity_Plans_Container)::unqualified_value_type>();
+				//act->template Activity_Plan_ID<long>(_iteration);
+				//Activity_Plans* activities = this_ptr->template Activity_Plans_Container<Activity_Plans*>();
+				//activities->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(15),act);
 
-				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-				Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Movement_Plans_Container)::unqualified_value_type>();
-				move->template Movement_Plan_ID<long>(_iteration);
-				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();
-				movements->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(30),move);
+				//define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				//Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Movement_Plans_Container)::unqualified_value_type>();
+				//move->template Movement_Plan_ID<long>(_iteration);
+				//Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();
+				//movements->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(30),move);
 			}
 			tag_feature_as_available(Activity_Generation);
 		};

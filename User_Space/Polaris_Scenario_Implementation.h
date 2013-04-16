@@ -66,8 +66,15 @@ namespace Scenario_Components
 			member_data(fstream, out_link_moe_file, none, none);
 			member_data(fstream, out_movement_moe_file, none, none);
 			member_data(fstream, reference_realtime_network_moe_file, none, none);
-
+			
+			// PopSyn members
 			member_data(double, percent_to_synthesize, none,none);
+			member_data(double, ipf_tolerance, none,none);
+			member_data(int, marginal_tolerance, none,none);
+			member_data(int, maximum_iterations, none,none);
+			member_data(bool, write_marginal_output,none,none);
+			member_data(bool, write_full_output,none,none);
+			member_data(string, popsyn_control_file_name,none,none);
 
 			member_data(ofstream, output_writer, none, none);
 

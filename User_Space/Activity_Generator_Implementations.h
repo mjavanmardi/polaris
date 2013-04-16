@@ -48,6 +48,7 @@ namespace Person_Components
 				// Create alias for this to use in conditional
 
 				// Generate average of 4 activities per day
+				static_assert(false,"Do not use");
 
 				define_container_and_value_interface(Activity_Plans,Activity_Plan,typename base_type::type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
 				Activity_Plan* act = (Activity_Plan*)Allocate<typename base_type::type_of(Activity_Plans_Container)::unqualified_value_type>();

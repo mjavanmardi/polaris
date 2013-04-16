@@ -211,15 +211,22 @@ namespace PopSyn
 					// get the current key (i.e. index into mway)
 					typename sample_itf::key_type index = itr->first;
 					double num_required = mway[index];
-				
-					// grab all sample units which link to this cell
+									
+					//----------------------------------------------------------------------------------
+					//get the cumulative weight of all items corresponding to current index
 					pair<typename sample_itf::iterator,typename sample_itf::iterator> range = sample->equal_range(index);
-
-					stored_pop_unit = range.first->second;
-					double cumulative_weight = 1;
+					double cumulative_weight = 0;
+					while (range.first != range.second)
+					{
+						double w = range.first->second->template Weight<double>();
+						cumulative_weight += w;
+						++range.first;
+					}
 
 					//----------------------------------------------------------------------------------
-					// make num_required attempts to add each unit in the range
+					// grab all sample units which link to this cell and make num_required attempts to add each unit in the range
+					range = sample->equal_range(index);
+					stored_pop_unit = range.first->second;
 					while (range.first != range.second)
 					{
 						int num_generated=0;
@@ -250,7 +257,7 @@ namespace PopSyn
 
 					//----------------------------------------------------------------------------------
 					// add a copy of the last unit until num_required < 1
-					while (num_required > 1.0)
+					while (num_required > 1.0 / settings.template Percentage_to_synthesize<float>())
 					{
 						// create the actual person agent
 						this->Create_Person<pop_unit_itf*>(stored_pop_unit);
@@ -260,7 +267,7 @@ namespace PopSyn
 
 					//----------------------------------------------------------------------------------
 					// if a fractional num_required is left, add another unit with probability of num_required
-					if (num_required > 0.0 && rand.template Next_Rand<double>() < num_required)
+					if (num_required > 0.0 && rand.template Next_Rand<double>() < num_required * settings.template Percentage_to_synthesize<float>())
 					{
 						// create the actual person agent
 						this->Create_Person<pop_unit_itf*>(stored_pop_unit);

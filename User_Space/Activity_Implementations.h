@@ -45,17 +45,6 @@ namespace Activity_Components
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 
-
-			////=================================================================
-			//// progress counters
-			//static int Location_Planning_Counter[_num_threads];
-			//static member_data(int, Location_Planning_Count,none,none);
-			//static int Route_Planning_Counter[_num_threads];
-			//static member_data(int, Route_Planning_Count,none,none);
-			//static int Scheduling_Counter[_num_threads];
-			//static member_data(int, Scheduling_Count,none,none);
-			//member_data(_lock, update_lock, none, none);
-
 		
 			// Fundamental activity properties
 			member_data(int, Activity_Plan_ID, check(ReturnValueType,is_arithmetic), check(SetValueType,is_arithmetic));
@@ -78,11 +67,11 @@ namespace Activity_Components
 			member_data(Revision,Route_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 
 			// Basic Activity Events - Plan route and add to schedule
-			feature_implementation void Initialize(TargetType activity_type)
+			feature_implementation void Initialize(TargetType act_type)
 			{
 				UNLOCK(this->_update_lock);
 				this_itf* pthis = (this_itf*)this;
-				pthis->Activity_Type<TargetType>(activity_type);
+				pthis->Activity_Type<TargetType>(act_type);
 				pthis->Duration<Time_Seconds>(END);
 				pthis->Start_Time<Time_Seconds>(END);
 				pthis->Location<_activity_location_itf*>(nullptr);
@@ -251,11 +240,11 @@ namespace Activity_Components
 			member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);
 
 			// Activity methods
-			feature_implementation void Initialize(TargetType activity_type)
+			feature_implementation void Initialize(TargetType act_type)
 			{
 				//UNLOCK(this->_update_lock);
 				this_itf* pthis = (this_itf*)this;
-				pthis->Activity_Type<TargetType>(activity_type);
+				pthis->Activity_Type<TargetType>(act_type);
 				pthis->Duration<Time_Seconds>(END);
 				pthis->Start_Time<Time_Seconds>(END);
 				pthis->Location<_activity_location_itf*>(nullptr);
@@ -632,11 +621,11 @@ namespace Activity_Components
 
 
 			// Activity methods
-			feature_implementation void Initialize(TargetType activity_type)
+			feature_implementation void Initialize(TargetType act_type)
 			{
 				//UNLOCK(this->_update_lock);
 				this_itf* pthis = (this_itf*)this;
-				pthis->Activity_Type<TargetType>(activity_type);
+				pthis->Activity_Type<TargetType>(act_type);
 				pthis->Duration<Time_Seconds>(END);
 				pthis->Start_Time<Time_Seconds>(END);
 				pthis->Location<_activity_location_itf*>(nullptr);
@@ -781,7 +770,7 @@ namespace Activity_Components
 
 
 		// Stripped down activity record with minimal memory usage (used for storing and printing completed activities)
-		implementation struct Activity_Record : public Polaris_Component<APPEND_CHILD(ADAPTS_Activity_Plan_Implementation), MasterType, Data_Object, ParentType>
+		implementation struct Activity_Record : public Polaris_Component<APPEND_CHILD(Activity_Record), MasterType, Data_Object, ParentType>
 		{
 			feature_implementation void Initialize(TargetType object,requires(check(TargetType, Concepts::Is_Activity_Plan_Prototype)))
 			{

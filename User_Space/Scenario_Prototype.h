@@ -46,6 +46,27 @@ namespace Scenario_Components
 
 	namespace Concepts
 	{
+		concept struct Has_Popsyn_Configuration_Data
+		{
+			check_getter(has_percent_to_synthesize_p, Component_Type::percent_to_synthesize);
+			check_getter(has_ipf_tolerance_p, Component_Type::ipf_tolerance);
+			check_getter(has_marginal_tolerance_p, Component_Type::marginal_tolerance);
+			check_getter(has_maximum_iterations_p, Component_Type::maximum_iterations);
+			check_getter(has_write_marginal_output_p, Component_Type::write_marginal_output);
+			check_getter(has_write_full_output_p, Component_Type::write_full_output);
+			check_getter(has_popsyn_control_file_name_p, Component_Type::popsyn_control_file_name);
+
+			check_getter(has_percent_to_synthesize, percent_to_synthesize);
+			check_getter(has_ipf_tolerance, ipf_tolerance);
+			check_getter(has_marginal_tolerance, marginal_tolerance);
+			check_getter(has_maximum_iterations, maximum_iterations);
+			check_getter(has_write_marginal_output,write_marginal_output);
+			check_getter(has_write_full_output,write_full_output);
+			check_getter(has_popsyn_control_file_name,popsyn_control_file_name);
+			define_sub_check(Has_Popsyn_Configuration_Data_Prototype, has_percent_to_synthesize_p && has_ipf_tolerance_p && has_marginal_tolerance_p && has_maximum_iterations_p && has_write_marginal_output_p && has_write_full_output_p && has_popsyn_control_file_name_p);
+			define_sub_check(Has_Popsyn_Configuration_Data_Component, has_percent_to_synthesize && has_ipf_tolerance && has_marginal_tolerance && has_maximum_iterations && has_write_marginal_output && has_write_full_output && has_popsyn_control_file_name);
+			define_default_check(Has_Popsyn_Configuration_Data_Prototype || Has_Popsyn_Configuration_Data_Component);
+		};
 	}
 	
 	namespace Prototypes
@@ -126,7 +147,17 @@ namespace Scenario_Components
 			feature_accessor(output_time_in_seconds, none, none);
 			feature_accessor(condition_time_in_seconds, none, none);
 
+			//===============================================
+			// Popsyn parameters
+			//-----------------------------------------------
 			feature_accessor(percent_to_synthesize, none, none);
+			feature_accessor(ipf_tolerance, none,none);
+			feature_accessor(marginal_tolerance, none,none);
+			feature_accessor(maximum_iterations, none,none);
+			feature_accessor(write_marginal_output,none,none);
+			feature_accessor(write_full_output,none,none);
+			feature_accessor(popsyn_control_file_name,none,none);
+
 
 			feature_accessor(database_name, none, none);
 
@@ -218,7 +249,17 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0.0);
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
 				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(3600);
-				if (cfgReader.getParameter("percent_to_synthesize", this->percent_to_synthesize<double*>()) != PARAMETER_FOUND) this->percent_to_synthesize<float>(1.0);
+
+				//=======================================================================================================================================================
+				// PopSyn parameters
+				if (cfgReader.getParameter("percent_to_synthesize", this->percent_to_synthesize<double*>()) != PARAMETER_FOUND) this->percent_to_synthesize<double>(1.0);
+				if (cfgReader.getParameter("ipf_tolerance", this->ipf_tolerance<double*>()) != PARAMETER_FOUND) this->ipf_tolerance<double>(0.01);
+				if (cfgReader.getParameter("marginal_tolerance", this->marginal_tolerance<int*>()) != PARAMETER_FOUND) this->marginal_tolerance<int>(5);
+				if (cfgReader.getParameter("maximum_iterations", this->maximum_iterations<int*>()) != PARAMETER_FOUND) this->maximum_iterations<int>(100);
+				if (cfgReader.getParameter("write_marginal_output", this->write_marginal_output<bool*>()) != PARAMETER_FOUND) this->write_marginal_output<bool>(false);
+				if (cfgReader.getParameter("write_full_output", this->write_full_output<bool*>()) != PARAMETER_FOUND) this->write_full_output<bool>(false);
+				string popsyn_control_string;
+				if (cfgReader.getParameter("popsyn_control_file", this->popsyn_control_file_name<string*>()) != PARAMETER_FOUND) this->popsyn_control_file_name<string>((string)"popsyn_control_file.txt");
 
 				//===============================================
 				// set control parameters
