@@ -79,6 +79,8 @@ public:
 		mem_lock=0; // unlock the mem
 	}
 
+	_lock mem_lock;
+
 	Memory_Page* pages;
 	Memory_Page* first_free_page;
 	Memory_Page* end_page;
