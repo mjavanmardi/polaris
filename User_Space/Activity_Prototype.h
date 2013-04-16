@@ -489,7 +489,7 @@ namespace Activity_Components
 					err << endl << "Start: "<<start_time._iteration <<","<<start_time._sub_iteration;
 					err << endl << "Location: "<<location._iteration <<","<<location._sub_iteration; 
 					err << endl << "Route: "<<route._iteration <<","<<route._sub_iteration; 
-					THROW_EXCEPTION(err);
+					THROW_WARNING(err);
 				}
 			}
 			feature_prototype bool Is_Minimum_Plan_Time(TargetType plan_time, requires(check_2(TargetType, Revision,is_same)))

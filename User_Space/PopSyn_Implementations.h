@@ -18,6 +18,7 @@ namespace PopSyn
 			member_data(bool, write_full_output_flag,check(ReturnValueType,is_integral),check(SetValueType,is_integral));
 
 			member_data(string, linker_file_path, none,none);
+			member_pointer(ostream,Log_File,none,none);
 			member_pointer(ostream,Output_Stream,none,none);
 			member_pointer(ostream,Marginal_Output_Stream,none,none);
 

@@ -596,6 +596,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel_Antares|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated_Single_Agent|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Application.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel|x64'">NotUsing</PrecompiledHeader>
@@ -622,6 +623,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel_Antares|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated_Single_Agent|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Integrated_Model.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">NotUsing</PrecompiledHeader>
@@ -653,6 +655,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel_Antares|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="NetworkModel.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel|x64'">NotUsing</PrecompiledHeader>
@@ -686,6 +689,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated_Single_Agent|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Polaris_PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel|x64'">NotUsing</PrecompiledHeader>
@@ -725,6 +729,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel_Antares|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated_Single_Agent|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Sensor_Model.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -734,6 +739,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel_Antares|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated_Single_Agent|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

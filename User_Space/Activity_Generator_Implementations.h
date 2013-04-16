@@ -154,9 +154,10 @@ namespace Person_Components
 
 				//=========================================================================================================================
 				// Generate other activities
-				int num_activities = 2;
+				int num_activities = 1;
 				for (int i = act_count; i < act_count + num_activities; i++)
 				{
+					//cout << endl << "Allocating regular activity.";
 					Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
 					activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
 					

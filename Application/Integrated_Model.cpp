@@ -324,9 +324,9 @@ int main(int argc,char** argv)
 	p->Work_Location<int>(256);
 
 	#else
-	ofstream out;
+	ofstream out, marg_out, popsyn_log;
 	out.open("full_population_chicag.csv",ios_base::out);
-	ofstream marg_out;
+	popsyn_log.open("popsyn_log.csv",ios_base::out);
 	marg_out.open("marginals_and_distributions_chicago.csv",ios_base::out);
 
 	// IPF Solver Settings
@@ -342,6 +342,7 @@ int main(int argc,char** argv)
 	popsyn->linker_file_path<string>(string("linker_file.txt"));
 	popsyn->Solution_Settings<solver_itf*>(solver);
 	popsyn->Output_Stream<ostream&>(out);
+	popsyn->Log_File<ostream&>(popsyn_log);
 	popsyn->Marginal_Output_Stream<ostream&>(marg_out);
 	popsyn->network_reference<_Network_Interface*>(network);
 	popsyn->scenario_reference<_Scenario_Interface*>(scenario);

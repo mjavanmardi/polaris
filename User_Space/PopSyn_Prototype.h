@@ -392,6 +392,7 @@ namespace PopSyn
 			declare_feature_event(Output_Popsyn_Event)
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
+				ostream& popsyn_log = pthis->Log_File<ostream&>();
 				ostream& sample_out = pthis->Output_Stream<ostream&>();
 				ostream& marg_out = pthis->Marginal_Output_Stream<ostream&>();
 
@@ -462,15 +463,11 @@ namespace PopSyn
 							{
 								home_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * activity_locations->size());
 								person->Home_Location<int>(home_loc_index);
-
-								//sample_out << zone->ID<long long>() << ","<<activity_locations->at(home_loc_index)->uuid<int>();
 							}
 							else
 							{
 								home_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * loc_indices->size());
 								person->Home_Location<int>(loc_indices->at(home_loc_index));
-
-								//sample_out << zone->ID<long long>() << ","<<activity_locations->at(loc_indices->at(home_loc_index))->uuid<int>();
 							}
 
 							// get the polaris zone of the synthesized person and increment its population counter;
@@ -482,17 +479,23 @@ namespace PopSyn
 							if (properties->Employment_Status<Person_Components::Types::EMPLOYMENT_STATUS>() == Person_Components::Types::EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK) 
 							{
 								person->Choose_Work_Location<NT>();
-
-								sample_out <<endl <<"WORK,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->Work_Location<_Zone_Interface*>()->uuid<int>();
-								sample_out <<"," << properties->Journey_To_Work_Travel_Time<Time_Minutes>() <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->Work_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
+								popsyn_log <<endl <<"WORK,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->Work_Location<_Zone_Interface*>()->uuid<int>();
+								popsyn_log <<"," << properties->Journey_To_Work_Travel_Time<Time_Minutes>() <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->Work_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
+							}
+							else
+							{
+								popsyn_log << endl <<"DOES NOT WORK,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>()<<",,,";
 							}
 
 							if (properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
 							{
 								person->Choose_School_Location<NT>();
-								sample_out <<endl <<"SCHOOL,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->School_Location<_Zone_Interface*>()->uuid<int>();
-								sample_out <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->School_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
-
+								popsyn_log <<", SCHOOL,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->School_Location<_Zone_Interface*>()->uuid<int>();
+								popsyn_log <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->School_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
+							}
+							else
+							{
+								popsyn_log << ", DOES NOT ATTEND SCHOOL,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>()<<",,";
 							}
 							++uuid;
 
@@ -543,6 +546,9 @@ namespace PopSyn
 
 					cout <<endl<<"File I/O Runtime: "<<timer.Stop();
 				}
+				popsyn_log.flush();
+				sample_out.flush();
+				marg_out.flush();
 			}
 			
 			//----------------------------------------------------------------
@@ -561,6 +567,7 @@ namespace PopSyn
 			
 			//----------------------------------------------------------------
 			// Output features - optional, used to write intermediate and final results
+			feature_accessor(Log_File,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
 			feature_accessor(Output_Stream,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
 			feature_accessor(Marginal_Output_Stream,check_2(strip_modifiers(ReturnValueType),ostream, is_same), check_2(strip_modifiers(SetValueType),ostream, is_same));
 		};

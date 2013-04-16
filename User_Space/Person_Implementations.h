@@ -244,7 +244,7 @@ namespace Person_Components
 							Time_Minutes t = _network_reference->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(orig->uuid<int>(),zone->uuid<int>(), Vehicle_Components::Types::SOV);
 							if (t < time_range_to_search && zone->school_locations<locations_container_interface*>()->size() > 0)
 							{
-								school_locations += zone->school_locations<locations_container_interface*>()->size();
+								school_locations += (int)zone->school_locations<locations_container_interface*>()->size();
 								temp_zones.push_back(zone);
 							}
 						}
@@ -298,8 +298,13 @@ namespace Person_Components
 				}
 			}
 			tag_feature_as_available(Choose_School_Location);
-		};
 
+			feature_implementation void arrive_at_destination()
+			{
+
+			}
+			tag_feature_as_available(arrive_at_destination);
+		};
 
 	}
 }
