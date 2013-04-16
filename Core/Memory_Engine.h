@@ -18,6 +18,7 @@ public:
 
 	Memory_Root()
 	{
+		mem_lock=0;
 #ifdef WINDOWS
 		pages=(Memory_Page*)VirtualAlloc(nullptr,_Page_Size*_Max_Pages,MEM_COMMIT,PAGE_READWRITE);
 #else
@@ -37,17 +38,23 @@ public:
 	
 	Page* Allocate()
 	{
+		while(AtomicExchange(&mem_lock,1)) SLEEP(0); // lock the mem
+
 		Page* return_val=&first_free_page->page;
 		
 		first_free_page=first_free_page->next_free_page;
 		
 		assert(first_free_page!=end_page);
 
+		mem_lock=0; // unlock the mem
+
 		return return_val;
 	}
 
 	void Free(Page* page)
 	{
+		while(AtomicExchange(&mem_lock,1)) SLEEP(0); // lock the mem
+
 		Memory_Page* current_page=first_free_page;
 
 		if((Memory_Page*)page<first_free_page)
@@ -68,6 +75,8 @@ public:
 
 			current_page->next_free_page=((Memory_Page*)page);
 		}
+
+		mem_lock=0; // unlock the mem
 	}
 
 	Memory_Page* pages;
