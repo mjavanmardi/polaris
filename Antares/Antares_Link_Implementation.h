@@ -554,6 +554,10 @@ namespace Link_Components
 				bucket.push_back(str_buf);
 				sprintf(str_buf, "%d", _this->_num_lanes);
 				bucket.push_back(str_buf);
+				sprintf(str_buf, "%d", _this->_upstream_intersection->_internal_id);
+				bucket.push_back(str_buf);
+				sprintf(str_buf, "%d", _this->_downstream_intersection->_internal_id);
+				bucket.push_back(str_buf);
 				sprintf(str_buf, "%.0f MPH", _this->_free_flow_speed);
 				bucket.push_back(str_buf);
 				sprintf(str_buf, "%.2f minutes", _this->realtime_link_moe_data.link_travel_time);
@@ -657,7 +661,7 @@ namespace Link_Components
 					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Visualize_Link_MOE<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION;
 				}
 				else
 				{

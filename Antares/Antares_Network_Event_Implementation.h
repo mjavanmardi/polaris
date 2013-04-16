@@ -158,7 +158,7 @@ namespace Network_Event_Components
 			}
 		};
 		
-		implementation struct Antares_Accident_Network_Event : public Base_Antares_Network_Event<MasterType,NT,APPEND_CHILD(Antares_Accident_Network_Event),Weather_Network_Event>
+		implementation struct Antares_Accident_Network_Event : public Base_Antares_Network_Event<MasterType,NT,APPEND_CHILD(Antares_Accident_Network_Event),Accident_Network_Event>
 		{
 			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
@@ -166,7 +166,7 @@ namespace Network_Event_Components
 			}
 		};
 
-		implementation struct Antares_Congestion_Network_Event : public Base_Antares_Network_Event<MasterType,NT,APPEND_CHILD(Antares_Congestion_Network_Event),Weather_Network_Event>
+		implementation struct Antares_Congestion_Network_Event : public Base_Antares_Network_Event<MasterType,NT,APPEND_CHILD(Antares_Congestion_Network_Event),Congestion_Network_Event>
 		{
 			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
@@ -174,7 +174,7 @@ namespace Network_Event_Components
 			}
 		};
 
-		implementation struct Antares_Lane_Closure_Network_Event : public Base_Antares_Network_Event<MasterType,NT,APPEND_CHILD(Antares_Lane_Closure_Network_Event),Weather_Network_Event>
+		implementation struct Antares_Lane_Closure_Network_Event : public Base_Antares_Network_Event<MasterType,NT,APPEND_CHILD(Antares_Lane_Closure_Network_Event),Lane_Closure_Network_Event>
 		{
 			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{

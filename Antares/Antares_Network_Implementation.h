@@ -288,6 +288,8 @@ namespace Network_Components
 				cfg.attributes_schema.push_back("Type");
 				cfg.attributes_schema.push_back("Length");
 				cfg.attributes_schema.push_back("Number of lanes");
+				cfg.attributes_schema.push_back("Upstream node");
+				cfg.attributes_schema.push_back("Downstream node");
 				cfg.attributes_schema.push_back("Free-flow speed");
 				cfg.attributes_schema.push_back("Travel time");
 				cfg.attributes_schema.push_back("Speed");

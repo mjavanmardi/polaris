@@ -34,9 +34,9 @@ namespace Vehicle_Components
 			Point_3D<NT> d;
 		};
 #pragma pack(pop)
-		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 7 * 3; // rear width in feet
-		const float Vehicle_Attribute_Shape::_vehicle_front_width = 2 * 3; // front width in feet
-		const float Vehicle_Attribute_Shape::_vehicle_length = 13.5 * 3; // length in feet
+		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 7 * 6; // rear width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_front_width = 2 * 6; // front width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_length = 13.5 * 6; // length in feet
 
 		implementation struct Antares_Vehicle_Implementation:public Polaris_Vehicle_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Vehicle_Implementation)>
 		{
@@ -48,10 +48,15 @@ namespace Vehicle_Components
 
 			static volatile member_data(int,vehicles_counter,none,none);
 
+			static member_data(typename MasterType::vehicle_type*, route_displayed_vehicle, none, none);
+
+			bool route_being_displayed;
+
 			static void Initialize_Layer()
 			{
 				Initialize_Vehicle_Shapes_Layer();
 				Initialize_Vehicle_Points_Layer();
+				Initialize_Vehicle_Routes_Layer();
 			}
 
 			static void Initialize_Vehicle_Shapes_Layer()
@@ -96,6 +101,17 @@ namespace Vehicle_Components
 				cfg.submission_callback = (attributes_callback_type)&submit_attributes;
 
 				_vehicle_points->Initialize<NULLTYPE>(cfg);
+			}
+			
+			static void Initialize_Vehicle_Routes_Layer()
+			{
+				_routes_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(routes_layer),Antares_Vehicle_Implementation>*, string& > >(string("Routes"));
+				Antares_Layer_Configuration cfg;
+				cfg.primitive_color = true;
+				cfg.primitive_type = _LINE;
+				cfg.head_size_value = 2;
+				_routes_layer->Initialize<NULLTYPE>(cfg); 
+				_route_displayed_vehicle = nullptr;
 			}
 
 			define_component_interface(Link_Interface,typename type_of(MasterType::link),Link_Prototype,Antares_Vehicle_Implementation);
@@ -209,6 +225,7 @@ namespace Vehicle_Components
 
 			feature_implementation void load_register()
 			{
+				route_being_displayed = false;
 				Load_Event<Antares_Vehicle_Implementation>(&compute_vehicle_position_condition<NULLTYPE>,&compute_vehicle_position<NULLTYPE>,_iteration+1,Scenario_Components::Types::END_OF_ITERATION);
 			}
 
@@ -224,10 +241,60 @@ namespace Vehicle_Components
 				
 				bucket.push_back(string("IN_NETWORK"));
 				
-				s << ((_Movement_Plan_Interface*)_this->_movement_plan)->template current_link<Link_Prototype<typename MasterType::type_of(link)>*>()->uuid<int>();
+				s << ((_Movement_Plan_Interface*)_this->_movement_plan)->template current_link<Link_Prototype<typename MasterType::type_of(link)>*>()->internal_id<int>();
 				bucket.push_back(s.str());
 
+				if (!_this->route_being_displayed)
+				{
+					_this->display_route<typename MasterType::vehicle_type,NT,NT>();
+					_this->route_being_displayed = true;
+					if (_route_displayed_vehicle != nullptr)
+					{
+						_route_displayed_vehicle->route_being_displayed = false;
+					}
+					_route_displayed_vehicle = _this;
+				}
 				return true;
+			}
+
+			feature_implementation void display_route()
+			{
+				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_component_interface(_Link_In_Trajectory_Interface, _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_component_interface(_Intersection_Interface, _Link_In_Trajectory_Interface::get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				_routes_layer->Clear_Accented<NT>();
+#pragma pack(push,1)
+				struct Link_Line
+				{
+					True_Color_RGBA<NT> color;
+					Point_3D<MasterType> up_node;
+					Point_3D<MasterType> down_node;
+				} link_line;
+#pragma pack(pop)
+				typename _Trajectory_Container_Interface::iterator itr;
+				for(itr = _movement_plan->_trajectory_container.begin(); itr != _movement_plan->_trajectory_container.end(); itr++)
+				{
+					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)(*itr);
+					_Link_In_Trajectory_Interface* link = vehicle_trajectory_data->template link<_Link_In_Trajectory_Interface*>();
+					
+					link_line.up_node._x = link->template upstream_intersection<_Intersection_Interface*>()->template x_position<float>();
+					link_line.up_node._y = link->template upstream_intersection<_Intersection_Interface*>()->template y_position<float>();
+					link_line.up_node._z = link->template upstream_intersection<_Intersection_Interface*>()->template z_position<float>();
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(link_line.up_node);
+
+					link_line.down_node._x = link->template downstream_intersection<_Intersection_Interface*>()->template x_position<float>();
+					link_line.down_node._y = link->template downstream_intersection<_Intersection_Interface*>()->template y_position<float>();
+					link_line.down_node._z = link->template downstream_intersection<_Intersection_Interface*>()->template z_position<float>();
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(link_line.down_node);
+					
+					link_line.color._r = 0;
+					link_line.color._g = 0;
+					link_line.color._b = 255;
+					link_line.color._a = 128;
+					_routes_layer->template Push_Element<Accented_Element>((void*)(&link_line));
+				}
+				
 			}
 			
 			static bool submit_attributes(Antares_Vehicle_Implementation* _this,vector<string>& bucket)
@@ -250,6 +317,8 @@ namespace Vehicle_Components
 
 			static member_prototype(Antares_Layer,vehicle_shapes,typename type_of(MasterType::antares_layer),none,none);
 			static member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),none,none);
+			static member_prototype(Antares_Layer,routes_layer,typename type_of(MasterType::antares_layer),none,none);
+
 		};
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
@@ -257,7 +326,10 @@ namespace Vehicle_Components
 		
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Antares_Layer<typename MasterType::type_of(antares_layer),Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_vehicle_points;
-		
+
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		Antares_Layer<typename MasterType::type_of(antares_layer),Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_routes_layer;
+
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Antares_Layer<typename MasterType::type_of(antares_layer),Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_num_vehicles;
 
@@ -266,6 +338,9 @@ namespace Vehicle_Components
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		vector<Point_2D<MasterType>> Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_num_vehicles_cache;
+
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		typename MasterType::vehicle_type* Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_route_displayed_vehicle;
 	}
 
 }

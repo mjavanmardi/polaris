@@ -149,6 +149,8 @@ namespace Scenario_Components
 			feature_accessor(output_turn_movement_moe_for_simulation_interval, none, none);
 			feature_accessor(output_network_moe_for_simulation_interval, none, none);
 
+			feature_accessor(use_event_manager, none, none);
+
 			feature_prototype void read_scenario_data()
 			{
 				CfgReader cfgReader;
@@ -272,6 +274,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("output_link_moe_for_simulation_interval", output_link_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_simulation_interval<bool>(false);
 				if (cfgReader.getParameter("output_turn_movement_moe_for_simulation_interval", output_turn_movement_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_simulation_interval<bool>(false);
 				if (cfgReader.getParameter("output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_simulation_interval<bool>(false);
+				
+				if (cfgReader.getParameter("use_event_manager", use_event_manager<bool*>())!= PARAMETER_FOUND) use_event_manager<bool>(false);
 
 				output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
@@ -605,7 +609,7 @@ namespace Scenario_Components
 				reference_realtime_network_moe_file<fstream&>().open(reference_realtime_network_moe_file_name, fstream::in);
 				if (!reference_realtime_network_moe_file<fstream&>().is_open())
 				{
-					cout << "Cannot open reference network moe file. There will be no hisotorical side-by-side plotting in Antares." << endl;
+					cout << "Reference network MOE file not found. There will be no hisotorical side-by-side plotting in Antares." << endl;
 				}
 			}
 

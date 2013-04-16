@@ -5,10 +5,12 @@
 #include "Vehicle_Prototype.h"
 #include "Traveler_Prototype.h"
 #include "Person_Prototype.h"
+#include "Network_Event_Prototype.h"
 #include "Advisory_Radio_Prototype.h"
 #include "Depot_Prototype.h"
 #include "Link_Control_Prototype.h"
 #include "Variable_Message_Sign_Prototype.h"
+
 
 namespace Link_Components
 {
@@ -179,13 +181,15 @@ namespace Link_Components
 
 			vector<struct Link_MOE_Data> td_link_moe_data_array;
 
-			member_data(bool, event_affected, none, none);
+			member_data(bool, weather_event_to_process, none, none);
+			member_component(typename MasterType::weather_network_event_type, current_weather_event, none, none);
+			member_data(bool, accident_event_to_process, none, none);
+			member_component(typename MasterType::accident_network_event_type, current_accident_event, none, none);
 
 			member_prototype(Advisory_Radio, advisory_radio, typename MasterType::advisory_radio_type, none, none);
 			member_prototype(Depot, depot, typename MasterType::depot_type, none, none);
 			member_prototype(Variable_Message_Sign, variable_word_sign, typename MasterType::variable_word_sign_type, none, none);
 			member_prototype(Variable_Message_Sign, variable_speed_sign, typename MasterType::variable_speed_sign_type, none, none);
-
 		//==================================================================================================================
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------
@@ -587,11 +591,15 @@ namespace Link_Components
 				td_link_moe_data_array.clear();
 				initialize_moe();
 
-				_event_affected = false;
+				_weather_event_to_process = false;
+				_current_weather_event = nullptr;
+				_accident_event_to_process = false;
+				_current_accident_event = nullptr;
 				_advisory_radio = nullptr;
 				_depot = nullptr;
 				_variable_word_sign = nullptr;
 				_variable_speed_sign = nullptr;
+
 			}
 
 			void initialize_moe()
@@ -712,7 +720,7 @@ namespace Link_Components
 					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Link_Moving<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION;
 				}
 				else
 				{
@@ -725,30 +733,68 @@ namespace Link_Components
 			{
 				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
-				//_this_ptr->template handle_events<NT>();
+				_this_ptr->template handle_events<NT>();
 			}
 
+			static void Weather_Event_Notification(void* link, Network_Event<type_of(typename MasterType::weather_network_event),NT>* net_event)
+			{
+				typedef typename MasterType::link_type _Link_Component;
+				((_Link_Component*)link)->record_weather_event(net_event);
+			}
+
+			static void Accident_Event_Notification(void* link, Network_Event<type_of(typename MasterType::accident_network_event),NT>* net_event)
+			{
+				typedef typename MasterType::link_type _Link_Component;
+				((_Link_Component*)link)->record_accident_event(net_event);
+			}
+
+			void record_weather_event(Network_Event<type_of(typename MasterType::weather_network_event),NT>* net_event)
+			{
+				_weather_event_to_process = true;
+				_current_weather_event = (typename MasterType::weather_network_event_type*)net_event; 
+			}
+				
+			void record_accident_event(Network_Event<type_of(typename MasterType::accident_network_event),NT>* net_event)
+			{
+				_accident_event_to_process = true;
+				_current_accident_event = (typename MasterType::accident_network_event_type*)net_event; 
+			}
+			
 			feature_implementation void handle_events()
 			{
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
-				define_component_interface(_Network_Event_Manager_Interface, _Network_Interface::get_type_of(network_event_manager), Network_Event_Components::Prototypes::Network_Event_Manager, ComponentType);
-				typedef Network_Event<typename MasterType::weather_network_event_type> _Weather_Event_Interface;
-				vector<_Weather_Event_Interface*> weather_events;
+				int time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
 
-				_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
-				network_event_manager->template Get_Network_Events<typename MasterType::weather_network_event_type>(_internal_id, weather_events);
+				if (!_weather_event_to_process && !_accident_event_to_process)
+				{
+					return;
+				}
+				revert_features<ComponentType,CallerType,TargetType>();
+				if (_weather_event_to_process)
+				{
+					_weather_event_to_process = false;
+					if (_current_weather_event->_active)
+					{
+						process_weather_event<ComponentType,CallerType,typename MasterType::weather_network_event_type*>();
+					}
+					else
+					{
+						_current_weather_event = NULL;
+					}
+				}
 				
-				// We (reasonably) assume that there is at most one weather condition affecting a link at any point in time
-				if (weather_events.size() != 0)
+				if (_accident_event_to_process)
 				{
-					process_weather_event<ComponentType,CallerType,_Weather_Event_Interface*>(weather_events[0]);
-					_event_affected = true;
-				} 
-				else if (_event_affected)
-				{
-					revert_features<ComponentType,CallerType,TargetType>();
-					_event_affected = false;
-				} 
+					_accident_event_to_process = false;
+					if (_current_accident_event->_active)
+					{
+						process_accident_event<ComponentType,CallerType,typename MasterType::accident_network_event_type*>();
+					}
+					else
+					{
+						_current_accident_event = NULL;
+					}
+				}
 			}
 
 			feature_implementation void revert_features()
@@ -777,10 +823,23 @@ namespace Link_Components
 				//step 8: link network state update
 				_this_ptr->template network_state_update<NULLTYPE>();
 			}
+			
+			static void subscribe_events()
+			{
+				// event subscription
+				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
+				define_component_interface(_Network_Event_Manager_Interface, _Network_Interface::get_type_of(network_event_manager), Network_Event_Components::Prototypes::Network_Event_Manager, ComponentType);
 
-			feature_implementation void process_weather_event(TargetType weather_event);
+				_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
+				network_event_manager->template Push_Subscriber<MasterType::weather_network_event_type>(&Weather_Event_Notification);
+				network_event_manager->template Push_Subscriber<MasterType::accident_network_event_type>(&Accident_Event_Notification);
+			}
+
+			feature_implementation void process_weather_event();
 			feature_implementation float find_free_flow_speed_reduction_rate(int weather_index);
 			feature_implementation int get_weather_index(TargetType weather_event);
+			feature_implementation void process_accident_event();
+			
 			static float link_capacity_reduction_factors[18];
 			static float link_free_flow_speed_reduction_factors[18][5];
 		};

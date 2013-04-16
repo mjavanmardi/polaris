@@ -92,6 +92,8 @@ namespace Scenario_Components
 			member_data(bool, output_link_moe_for_simulation_interval, none, none);
 			member_data(bool, output_turn_movement_moe_for_simulation_interval, none, none);
 			member_data(bool, output_network_moe_for_simulation_interval, none, none);
+
+			member_data(bool, use_event_manager, none, none);
 			
 			Polaris_Scenario_Implementation()
 			{

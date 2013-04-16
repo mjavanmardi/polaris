@@ -59,15 +59,29 @@ namespace Link_Components
 				{0.95, 0.94, 0.93, 0.92, 0.91},
 				{0.95, 0.94, 0.93, 0.92, 0.91}
 			};
-		
-		feature_implementation_definition void Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::process_weather_event(TargetType weather_event)
+
+		feature_implementation_definition void Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::process_accident_event()
 		{
-			typedef Network_Event<typename MasterType::weather_network_event_type> _Weather_Event_Interface;
-			cout << "weather_type = " << ((_Weather_Event_Interface*)weather_event)->template weather_type<int>();
+			typedef Network_Event<typename MasterType::accident_network_event_type> _Accident_Event_Interface;
+			cout << "accident " << _current_accident_event->_accident_type << " being processed" << endl;
+			float capacity_reduction_rate;
+			float free_flow_speed_reduction_rate;
+						
+			capacity_reduction_rate = 0.3;
+			_maximum_flow_rate *= capacity_reduction_rate;
+			
+			free_flow_speed_reduction_rate = 0.3;
+			_free_flow_speed *= free_flow_speed_reduction_rate;
+			
+			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
+		}
+
+		feature_implementation_definition void Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::process_weather_event()
+		{
 			float capacity_reduction_rate;
 			float free_flow_speed_reduction_rate;
 			
-			int weather_index = get_weather_index<ComponentType,CallerType,TargetType>(weather_event);
+			int weather_index = get_weather_index<ComponentType,CallerType,TargetType>(_current_weather_event);
 			
 			capacity_reduction_rate = link_capacity_reduction_factors[weather_index];
 			_maximum_flow_rate *= capacity_reduction_rate;
