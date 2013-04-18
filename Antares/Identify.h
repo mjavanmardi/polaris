@@ -11,8 +11,9 @@
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
-bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identify(const Point_3D<MasterType>& point, int start_iteration, int end_iteration)
+bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identify_One(const Point_3D<MasterType>& point, int start_iteration, int end_iteration,ANTARES_SELECTION_MODE mode)
 {
+	unsigned char* best_element = nullptr;
 
 	if(_primitive_type==_POINT)
 	{
@@ -28,9 +29,6 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 		const int data_stride = _data_stride;
 
 		float best_dist = FLT_MAX;
-		unsigned char* best_element = nullptr;
-
-		
 
 		int current_iteration=start_iteration;
 		
@@ -131,39 +129,6 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 			current_iteration++;
 		}
 
-		if(best_element!=nullptr && (void*)best_element!=_selected_element)
-		{
-			Clear_Accented<ComponentType,CallerType,NT>();
-
-			//current_iteration = start_iteration;
-
-			//while(current_iteration <= end_iteration)
-			//{
-			//	vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
-
-			//	for(int i=0;i<_num_antares_threads;i++)
-			//	{
-			//		geometry_by_thread[i].clear();
-			//	}
-
-			//	current_iteration++;
-			//}
-
-			Push_Element<ComponentType,CallerType,Internal_Element>(best_element,start_iteration);
-			
-			_selected_element = (void*)best_element;
-
-			if(_attributes_callback != nullptr)
-			{
-				vector<string> bucket;
-
-				_attributes_callback( *((void**)best_element), bucket );
-				
-				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
-			}
-
-			return true;
-		}
 	}
 	else if(_primitive_type==_LINE)
 	{
@@ -179,7 +144,6 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 		const int data_stride = _data_stride;
 		
 		float best_dist = FLT_MAX;
-		unsigned char* best_element = nullptr;
 
 		int current_iteration=start_iteration;
 		
@@ -281,40 +245,6 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 
 			current_iteration++;
 		}
-
-		if(best_element!=nullptr && (void*)best_element!=_selected_element)
-		{
-			Clear_Accented<ComponentType,CallerType,NT>();
-
-			//current_iteration = start_iteration;
-
-			//while(current_iteration <= end_iteration)
-			//{
-			//	vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
-
-			//	for(int i=0;i<_num_antares_threads;i++)
-			//	{
-			//		geometry_by_thread[i].clear();
-			//	}
-
-			//	current_iteration++;
-			//}
-
-			Push_Element<ComponentType,CallerType,Internal_Element>(best_element,start_iteration);
-			
-			_selected_element = (void*)best_element;
-
-			if(_attributes_callback != nullptr)
-			{
-				vector<string> bucket;
-
-				_attributes_callback( *((void**)best_element), bucket );
-
-				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
-			}
-
-			return true;
-		}
 	}
 	else if(_primitive_type==_QUAD)
 	{
@@ -329,7 +259,6 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 		const int vert_stride = _vert_stride;
 		const int data_stride = _data_stride;
 
-		unsigned char* best_element = nullptr;
 		bool found=false;
 		
 		vector<Point_3D<MasterType>> polygon;
@@ -444,40 +373,6 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 
 			current_iteration++;
 		}
-
-		if(best_element!=nullptr && (void*)best_element!=_selected_element)
-		{
-			Clear_Accented<ComponentType,CallerType,NT>();
-
-			//current_iteration = start_iteration;
-
-			//while(current_iteration <= end_iteration)
-			//{
-			//	vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
-
-			//	for(int i=0;i<_num_antares_threads;i++)
-			//	{
-			//		geometry_by_thread[i].clear();
-			//	}
-
-			//	current_iteration++;
-			//}
-
-			Push_Element<ComponentType,CallerType,Internal_Element>(best_element,start_iteration);
-			
-			_selected_element = (void*)best_element;
-
-			if(_attributes_callback != nullptr)
-			{
-				vector<string> bucket;
-
-				_attributes_callback( *((void**)best_element), bucket );
-				
-				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
-			}
-
-			return true;
-		}
 	}
 	else if(_primitive_type==_POLYGON)
 	{
@@ -492,7 +387,6 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 		const int vert_stride = _vert_stride;
 		const int data_stride = _data_stride;
 
-		unsigned char* best_element = nullptr;
 		bool found=false;
 		
 		vector<Point_3D<MasterType>> polygon;
@@ -574,41 +468,73 @@ bool Antares_Layer_Implementation<MasterType,ParentType,InheritanceList>::Identi
 
 			current_iteration++;
 		}
-
-		if(best_element!=nullptr && (void*)best_element!=_selected_element)
-		{
-			Clear_Accented<ComponentType,CallerType,NT>();
-
-			//current_iteration = start_iteration;
-
-			//while(current_iteration <= end_iteration)
-			//{
-			//	vector<unsigned char> (&geometry_by_thread)[_num_antares_threads] = _accent_storage[current_iteration];
-
-			//	for(int i=0;i<_num_antares_threads;i++)
-			//	{
-			//		geometry_by_thread[i].clear();
-			//	}
-
-			//	current_iteration++;
-			//}
-
-			Push_Element<ComponentType,CallerType,Internal_Element>(best_element,start_iteration);
-			
-			_selected_element = (void*)best_element;
-
-			if(_attributes_callback != nullptr)
-			{
-				vector<string> bucket;
-
-				_attributes_callback( *((void**)best_element), bucket );
-
-				_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<string>&>>(bucket);
-			}
-
-			return true;
-		}
 	}
 
-	return false;
+	if(best_element!=nullptr/* && (void*)best_element!=_selected_element*/)
+	{
+		if(mode==ALT_DOWN)
+		{
+			for(list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++)
+			{
+				if((*itr) == *((void**)best_element))
+				{
+					return false;
+				}
+			}
+
+			_deselected_elements.clear();
+			for(list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++){ _deselected_elements.push_back( *itr ); }
+
+			_added_elements.clear();
+			_added_elements.push_back(*((void**)best_element));
+
+			_selected_elements.clear();
+			_selected_elements.push_back(*((void**)best_element));
+
+			if(_selection_callback != nullptr)
+			{
+				vector<pair<string,string>> bucket;
+
+				_selection_callback( _deselected_elements, _added_elements, _selected_elements, bucket );
+				
+				_attributes_panel->Push_Attributes< Target_Type< NT, NT, vector<pair<string,string>>& > >(bucket);
+			}
+		}
+		else if(mode==CTRL_DOWN)
+		{
+			_deselected_elements.clear();
+			_added_elements.clear();
+
+			for(list<void*>::iterator itr=_selected_elements.begin();itr!=_selected_elements.end();itr++)
+			{
+				if((*itr) == *((void**)best_element))
+				{
+					_deselected_elements.push_back( *itr );
+					_selected_elements.erase(itr);
+					break;
+				}
+			}
+			
+			if(!_deselected_elements.size())
+			{
+				_added_elements.push_back( *((void**)best_element) );
+				_selected_elements.push_back( *((void**)best_element) );
+			}
+
+			if(_selection_callback != nullptr)
+			{
+				vector<pair<string,string>> bucket;
+
+				_selection_callback( _deselected_elements, _added_elements, _selected_elements, bucket );
+
+				_attributes_panel->Push_Attributes< Target_Type< NT, NT, vector<pair<string,string>>& > >(bucket);
+			}
+		}
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

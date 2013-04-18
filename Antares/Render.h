@@ -28,10 +28,10 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Render(wxPain
 			_time_panel->Update_Time<NULLTYPE>(current_iteration);
 		}
 
-		if(_selected_layer != nullptr)
-		{
-			_selected_layer->Refresh_Selection<NT>(_cached_iteration);
-		}
+		//if(_selected_layer != nullptr)
+		//{
+		//	_selected_layer->Refresh_Selection<NT>();
+		//}
 	}
 
 	wxGLCanvas::SetCurrent(*_glcontext);

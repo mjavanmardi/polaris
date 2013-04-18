@@ -9,24 +9,24 @@
 //	Set_Mode - handles mode change requests
 //---------------------------------------------------------
 
-template<typename MasterType,typename ParentType,typename InheritanceList>
-template<typename ComponentType,typename CallerType,typename TargetType>
-void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Set_Mode(ANTARES_MODE mode)
-{
-	_interaction_mode=mode;
-
-	if(mode==IDENTIFY)
-	{
-		Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
-	}
-	else
-	{
-		Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
-		_selected_layer->Deselect<NULLTYPE>();
-	}
-
-	Refresh();
-}
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//template<typename ComponentType,typename CallerType,typename TargetType>
+//void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Set_Mode(ANTARES_MODE mode)
+//{
+//	_interaction_mode=mode;
+//
+//	if(mode==IDENTIFY)
+//	{
+//		Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+//	}
+//	else
+//	{
+//		Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+//		_selected_layer->Deselect<NULLTYPE>();
+//	}
+//
+//	Refresh();
+//}
 
 //---------------------------------------------------------
 //	OnResize - handles when canvas is resized
@@ -43,13 +43,58 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnResize(wxSi
 }
 
 //---------------------------------------------------------
+//	OnKeyDown - initialize one of several modes
+//---------------------------------------------------------
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnKeyDown(wxKeyEvent& event)
+{
+	if(event.GetModifiers() == wxMOD_ALT)
+	{
+		if(_selected_layer != nullptr) _selected_layer->Deselect_All<NULLTYPE>();
+		_alt_down=true;
+		Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+		Connect(wxEVT_KEY_UP,wxKeyEventHandler(Canvas_Implementation::OnKeyUp));
+	}
+	else if(event.GetModifiers() == wxMOD_CONTROL)
+	{
+		_ctrl_down=true;
+		//Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+		Connect(wxEVT_KEY_UP,wxKeyEventHandler(Canvas_Implementation::OnKeyUp));
+	}
+}
+
+//---------------------------------------------------------
+//	OnKeyUp - terminate one of several modes
+//---------------------------------------------------------
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnKeyUp(wxKeyEvent& event)
+{
+	if(_alt_down)
+	{
+		_alt_down=false;
+		Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+		if(_selected_layer != nullptr) _selected_layer->Deselect_All<NULLTYPE>();
+		Refresh();
+	}
+	else if(_ctrl_down)
+	{
+		_ctrl_down=false;
+		//Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+		//if(_selected_layer != nullptr) _selected_layer->Deselect_All<NULLTYPE>();
+		Refresh();
+	}
+}
+
+//---------------------------------------------------------
 //	OnLeftDown - initialize panning procedure or selection
 //---------------------------------------------------------
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeftDown(wxMouseEvent& event)
 {
-	_left_down=true;
+	//_left_down=true;
 
 	SetFocus();
 
@@ -70,7 +115,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeftDown(wx
 
 	winX = (double)x_pos;
 	winY = (double)viewport[3] - (double)y_pos;
-		
+	
 	double tangent=tan((2.0*_scale)/2.0*(3.14159265/180.0));
 	double near_height=_near_plane*tangent;
 	//double near_width=_far_plane*(_panel_width/_panel_height);
@@ -92,6 +137,21 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeftDown(wx
 
 	_x_start_utm=(float)posX;
 	_y_start_utm=(float)posY;
+	
+	
+	if(_selected_layer != nullptr && _ctrl_down)
+	{
+		Point_3D<MasterType> location;
+		location._x=(float)posX;
+		location._y=(float)posY;
+		location._z=(float)posZ;
+
+		if(_selected_layer->Identify_One<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(location,_cached_iteration,_cached_iteration,ANTARES_SELECTION_MODE::CTRL_DOWN))
+		{
+			Refresh();
+			_information_panel->Render<NT>();
+		}
+	}
 
 	Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
 }
@@ -112,8 +172,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 	GLdouble posX, posY, posZ;
 
 	//---- load the current opengl matrices ----
-		
-	if(!_left_down)
+	
+	if(!event.LeftIsDown())
 	{
 		glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 		glGetDoublev(GL_PROJECTION_MATRIX, projection);
@@ -150,7 +210,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-	if(_left_down)
+	if(event.LeftIsDown())
 	{
 		//---- change the "world" translation by the amount moved ----
 
@@ -168,14 +228,14 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 	}
 	else
 	{
-		Point_3D<MasterType> location;
-		location._x=(float)posX;
-		location._y=(float)posY;
-		location._z=(float)posZ;
-
-		if(_selected_layer != nullptr)
+		if(_selected_layer != nullptr && _alt_down)
 		{
-			if(_selected_layer->Identify<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(location,_cached_iteration,_cached_iteration))
+			Point_3D<MasterType> location;
+			location._x=(float)posX;
+			location._y=(float)posY;
+			location._z=(float)posZ;
+
+			if(_selected_layer->Identify_One<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(location,_cached_iteration,_cached_iteration,ANTARES_SELECTION_MODE::ALT_DOWN))
 			{
 				Refresh();
 				_information_panel->Render<NT>();
@@ -191,7 +251,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 template<typename MasterType,typename ParentType,typename InheritanceList>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeftUp(wxMouseEvent& event)
 {
-	_left_down=false;
+	//_left_down=false;
 
 	Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
 }
@@ -203,7 +263,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeftUp(wxMo
 template<typename MasterType,typename ParentType,typename InheritanceList>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnRightDown(wxMouseEvent& event)
 {
-	_right_down=true;
+	//_right_down=true;
 
 	SetFocus();
 
@@ -260,7 +320,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnRotationMot
 template<typename MasterType,typename ParentType,typename InheritanceList>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnRightUp(wxMouseEvent& event)
 {
-	_right_down=false;
+	//_right_down=false;
 	Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnRotationMotion));
 }
 
@@ -296,8 +356,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnWheel(wxMou
 template<typename MasterType,typename ParentType,typename InheritanceList>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeave(wxMouseEvent& event)
 {
-	_left_down=false;
-	_right_down=false;
+	//_left_down=false;
+	//_right_down=false;
 
 	Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
 	Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnRotationMotion));
@@ -310,10 +370,10 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeave(wxMou
 template<typename MasterType,typename ParentType,typename InheritanceList>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnEnter(wxMouseEvent& event)
 {
-	if(_interaction_mode == IDENTIFY)
-	{
-		Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
-	}
+	//if(_interaction_mode == IDENTIFY)
+	//{
+	//	Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+	//}
 }
 
 //---------------------------------------------------------
@@ -323,11 +383,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnEnter(wxMou
 template<typename MasterType,typename ParentType,typename InheritanceList>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnDClick(wxMouseEvent& event)
 {
-	if(_interaction_mode == IDENTIFY)
-	{
+	//if(_interaction_mode == IDENTIFY)
+	//{
 		if(_selected_layer != nullptr)
 		{
 			_selected_layer->Double_Click<NULLTYPE>();
 		}
-	}
+	//}
 }

@@ -6,6 +6,7 @@
 #include "Antares_Includes.h"
 #include "Control_Dialog.h"
 
+
 struct Antares_Layer_Configuration;
 
 //---------------------------------------------------------
@@ -15,6 +16,8 @@ struct Antares_Layer_Configuration;
 struct Accented_Element{};
 struct Regular_Element{};
 struct Internal_Element{};
+
+enum ANTARES_SELECTION_MODE {ALT_DOWN,CTRL_DOWN,};
 
 prototype struct Antares_Layer
 {
@@ -30,9 +33,9 @@ prototype struct Antares_Layer
 		this_component()->Initialize<ComponentType,CallerType,TargetType>(cfg);
 	}
 	
-	feature_prototype bool Identify(typename TargetType::ParamType point, int start_iteration, int end_iteration)
+	feature_prototype bool Identify_One(typename TargetType::ParamType point, int start_iteration, int end_iteration, ANTARES_SELECTION_MODE mode)
 	{
-		return this_component()->Identify<ComponentType,CallerType,TargetType>(point,start_iteration,end_iteration);
+		return this_component()->Identify_One<ComponentType,CallerType,TargetType>(point,start_iteration,end_iteration,mode);
 	}
 	
 	feature_prototype void Select()
@@ -40,9 +43,9 @@ prototype struct Antares_Layer
 		this_component()->Select<ComponentType,CallerType,TargetType>();
 	}
 	
-	feature_prototype void Deselect()
+	feature_prototype void Deselect_All()
 	{
-		this_component()->Deselect<ComponentType,CallerType,TargetType>();
+		this_component()->Deselect_All<ComponentType,CallerType,TargetType>();
 	}
 	
 	feature_prototype void Double_Click()
@@ -55,9 +58,9 @@ prototype struct Antares_Layer
 		this_component()->Clear_Accented<ComponentType,CallerType,TargetType>();
 	}
 
-	feature_prototype void Refresh_Selection(int cached_iteration)
+	feature_prototype void Refresh_Selection()
 	{
-		this_component()->Refresh_Selection<ComponentType,CallerType,TargetType>(cached_iteration);
+		this_component()->Refresh_Selection<ComponentType,CallerType,TargetType>();
 	}
 
 	feature_accessor(list_index,none,none);
@@ -87,15 +90,15 @@ prototype struct Antares_Layer
 	feature_accessor(vert_stride,none,none);	
 	feature_accessor(vert_size,none,none);	
 	
-	feature_accessor(attributes_schema,none,none);
-	feature_accessor(attributes_callback,none,none);
-	feature_accessor(submission_callback,none,none);
+	//feature_accessor(attributes_schema,none,none);
+	//feature_accessor(selection_callback,none,none);
+	//feature_accessor(submission_callback,none,none);
 
 	feature_accessor(data_stride,none,none);
 
 	feature_accessor(attributes_panel,none,none);
 
-	feature_accessor(selected_element,none,none);
+	feature_accessor(selected_elements,none,none);
 
 	feature_accessor(x_label,none,none);
 	feature_accessor(y_label,none,none);
@@ -144,7 +147,6 @@ struct Antares_Layer_Configuration
 	{
 		draw=false;
 		dynamic_data=false;
-		target_sub_iteration=-1;
 
 		storage_offset=_iteration;
 		storage_size=1;
@@ -165,10 +167,9 @@ struct Antares_Layer_Configuration
 
 		head_size_value=1;
 
-		//attributes_schema="";
-
 		submission_callback=nullptr;
-		attributes_callback=nullptr;
+		selection_callback=nullptr;
+		double_click_callback=nullptr;
 	}
 
 	void Configure_Lines()
@@ -189,8 +190,6 @@ struct Antares_Layer_Configuration
 		storage_size=3;
 		storage_period=1;
 
-		target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
-
 		primitive_type=_LINE;
 
 		head_color._r=128;
@@ -203,7 +202,6 @@ struct Antares_Layer_Configuration
 	{
 		Antares_Layer_Configuration();
 		dynamic_data=true;
-		target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
 
 		storage_offset=_iteration;
 		storage_size=3;
@@ -263,8 +261,6 @@ struct Antares_Layer_Configuration
 		storage_size=3;
 		storage_period=1;
 
-		target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
-
 		primitive_type=_QUAD;
 
 		head_color._r=Color._r;
@@ -279,7 +275,6 @@ struct Antares_Layer_Configuration
 		
 		draw=true;
 		dynamic_data=true;
-		target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
 
 		storage_size=3;
 		storage_period=1;
@@ -321,11 +316,9 @@ struct Antares_Layer_Configuration
 		// 1 x Point_3D<NULLTYPE> primitive_normal;
 	
 
-	attributes_callback_type submission_callback;
-	attributes_callback_type attributes_callback;
-
-	vector<string> attributes_schema;
-	vector<vector<string>> dropdown_schema;
+	submission_callback_type submission_callback;
+	selection_callback_type selection_callback;
+	double_click_callback_type double_click_callback;
 
 	string x_label;
 	string y_label;

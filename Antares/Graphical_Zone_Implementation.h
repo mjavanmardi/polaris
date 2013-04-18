@@ -226,8 +226,8 @@ namespace Zone_Components
 				cfg.primitive_color = true;
 				cfg.primitive_normal = true;
 
-				cfg.attributes_callback = (attributes_callback_type)&Graphical_Zone_Implementation<MasterType>::fetch_attributes;
-				cfg.submission_callback = (attributes_callback_type)&Graphical_Zone_Implementation<MasterType>::submit_attributes;
+				cfg.selection_callback = (selection_callback_type)&Graphical_Zone_Implementation<MasterType>::fetch_attributes;
+				cfg.submission_callback = (selection_callback_type)&Graphical_Zone_Implementation<MasterType>::submit_attributes;
 				_zone_centroids->Initialize<NULLTYPE>(cfg);
 			}
 

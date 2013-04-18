@@ -15,8 +15,8 @@ public:
 	Attributes_Panel_Implementation(wxFrame* parent);
 	virtual ~Attributes_Panel_Implementation(void){};
 
-	feature_implementation void Push_Schema(vector<string>& attributes_schema);
-	feature_implementation void Push_Attributes(vector<string>& attributes);
+	//feature_implementation void Push_Schema(vector<string>& attributes_schema);
+	feature_implementation void Push_Attributes(vector<pair<string,string>>& attributes);
 
 	member_pointer(wxListCtrl,attributes_list,none,none);
 
@@ -69,9 +69,67 @@ Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Attribut
 //	Push_Schema
 //--------------------------------------------------------
 
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//template<typename ComponentType,typename CallerType,typename TargetType>
+//void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Push_Schema(vector<string>& attributes_schema)
+//{
+//	for(int i=0;i<20;i++)
+//	{
+//		_attributes_list->SetItem(i,0,"");
+//		_attributes_list->SetItem(i,1,"");
+//	}
+//
+//	int atts_row_counter = 0;
+//
+//	vector<string>::iterator itr;
+//
+//	for(itr=attributes_schema.begin();itr!=attributes_schema.end();itr++,atts_row_counter++)
+//	{
+//		_attributes_list->SetItem( atts_row_counter,0,(*itr).c_str() );
+//	}
+//
+//	//const char* schema_itr = schema.c_str();
+//	//const char* const schema_end = schema_itr + schema.size();
+//
+//	//int atts_row_counter = 0;
+//	//string new_token("");
+//
+//	//while( schema_itr != schema_end )
+//	//{
+//	//	if((*schema_itr) == ',')
+//	//	{
+//	//		_attributes_list->SetItem(atts_row_counter,0,new_token.c_str());
+//	//		new_token.clear();
+//	//		++atts_row_counter;
+//	//	}
+//	//	else
+//	//	{
+//	//		new_token.push_back((*schema_itr));
+//	//	}
+//
+//	//	++schema_itr;		
+//	//}
+//
+//	//_attributes_list->SetItem(atts_row_counter,0,new_token.c_str());
+//	
+//
+//
+//
+//
+//	_attributes_list->SetColumnWidth(0,wxLIST_AUTOSIZE);
+//	_attributes_list->SetColumnWidth(1,wxLIST_AUTOSIZE);
+//
+//	Refresh();
+//}
+
+
+//---------------------------------------------------------
+//	Push_Attributes
+//--------------------------------------------------------
+
 template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
-void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Push_Schema(vector<string>& attributes_schema)
+void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Push_Attributes(vector<pair<string,string>>& attributes)
 {
 	for(int i=0;i<20;i++)
 	{
@@ -81,68 +139,14 @@ void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Pus
 
 	int atts_row_counter = 0;
 
-	vector<string>::iterator itr;
-
-	for(itr=attributes_schema.begin();itr!=attributes_schema.end();itr++,atts_row_counter++)
-	{
-		_attributes_list->SetItem( atts_row_counter,0,(*itr).c_str() );
-	}
-
-	//const char* schema_itr = schema.c_str();
-	//const char* const schema_end = schema_itr + schema.size();
-
-	//int atts_row_counter = 0;
-	//string new_token("");
-
-	//while( schema_itr != schema_end )
-	//{
-	//	if((*schema_itr) == ',')
-	//	{
-	//		_attributes_list->SetItem(atts_row_counter,0,new_token.c_str());
-	//		new_token.clear();
-	//		++atts_row_counter;
-	//	}
-	//	else
-	//	{
-	//		new_token.push_back((*schema_itr));
-	//	}
-
-	//	++schema_itr;		
-	//}
-
-	//_attributes_list->SetItem(atts_row_counter,0,new_token.c_str());
-	
-
-
-
-
-	_attributes_list->SetColumnWidth(0,wxLIST_AUTOSIZE);
-	_attributes_list->SetColumnWidth(1,wxLIST_AUTOSIZE);
-
-	Refresh();
-}
-
-
-//---------------------------------------------------------
-//	Push_Attributes
-//--------------------------------------------------------
-
-template<typename MasterType,typename ParentType,typename InheritanceList>
-template<typename ComponentType,typename CallerType,typename TargetType>
-void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Push_Attributes(vector<string>& attributes)
-{
-	for(int i=0;i<20;i++)
-	{
-		_attributes_list->SetItem(i,1,"");
-	}
-
-	int atts_row_counter = 0;
-
-	vector<string>::iterator itr;
+	vector<pair<string,string>>::iterator itr;
 
 	for(itr=attributes.begin();itr!=attributes.end();itr++,atts_row_counter++)
 	{
-		_attributes_list->SetItem(atts_row_counter,1,(*itr).c_str());
+		if(atts_row_counter == 20) break;
+
+		_attributes_list->SetItem(atts_row_counter,0,itr->first);
+		_attributes_list->SetItem(atts_row_counter,1,itr->second);
 	}
 	
 	_attributes_list->SetColumnWidth(0,wxLIST_AUTOSIZE);

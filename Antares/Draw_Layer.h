@@ -193,11 +193,13 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	switch(primitive_type)
 	{
 	case _POINT:
-		glPointSize( ceil(5.0f*(float)head_size_value) );
+		//glPointSize( ceil(5.0f*(float)head_size_value) );
+		glPointSize( head_size_value );
 		glBegin(GL_POINTS);
 		break;
 	case _LINE:
-		glLineWidth( ceil(5.0f*(float)head_size_value) );
+		//glLineWidth( ceil(5.0f*(float)head_size_value) );
+		glLineWidth( head_size_value );
 		glBegin(GL_LINES);
 		break;
 	case _TRIANGLE:

@@ -10,8 +10,6 @@
 //	Canvas - canvas class definition
 //---------------------------------------------------------
 
-enum ANTARES_MODE {NO_MODE,NAVIGATE,IDENTIFY};
-
 prototype struct Canvas
 {
 	tag_as_prototype;
@@ -26,10 +24,10 @@ prototype struct Canvas
 		this_component()->Refresh();
 	}
 	
-	feature_prototype void Set_Mode(ANTARES_MODE mode)
-	{
-		this_component()->Set_Mode<ComponentType,CallerType,TargetType>(mode);
-	}
+	//feature_prototype void Set_Mode(ANTARES_MODE mode)
+	//{
+	//	this_component()->Set_Mode<ComponentType,CallerType,TargetType>(mode);
+	//}
 
 	feature_prototype typename TargetType::ReturnType Select_Layer(typename TargetType::ParamType name)
 	{

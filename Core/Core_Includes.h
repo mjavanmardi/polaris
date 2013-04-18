@@ -154,7 +154,9 @@ static void False_Condition(void*,Conditional_Response& resp)
 	resp.next=END;
 }
 
-typedef bool (*attributes_callback_type)(void*,vector<string>&);
+typedef void (*selection_callback_type)(const list<void*>&,const list<void*>&,const list<void*>&,vector<pair<string,string>>&);
+typedef void (*double_click_callback_type)(const list<void*>&,vector<pair<string,string>>&,vector<vector<string>>&);
+typedef bool (*submission_callback_type)(const list<void*>&,const vector<string>&,const vector<string>&);
 
 #define typedef_template(TYPEDEF_NAME,TEMPLATE_NAME) template<typename T> struct TYPEDEF_NAME{typedef TEMPLATE_NAME<T> Type;}
 

@@ -30,7 +30,7 @@ public:
 	feature_implementation Antares_Layer_Interface* Allocate_New_Layer(string& name);
 	feature_implementation void Toggle_Layer(int identifier,bool checked);
 	feature_implementation void Select_Layer(int identifier);
-	feature_implementation void Set_Mode(ANTARES_MODE mode);
+	//feature_implementation void Set_Mode(ANTARES_MODE mode);
 
 	void Draw_Layer(int start_iteration, int end_iteration, Antares_Layer_Interface* layer);
 	
@@ -43,7 +43,9 @@ public:
     void OnLeftUp(wxMouseEvent& event);
     void OnRightDown(wxMouseEvent& event);
     void OnRightUp(wxMouseEvent& event);
-    void OnMotion(wxMouseEvent& event);
+	void OnKeyDown(wxKeyEvent& event);
+	void OnKeyUp(wxKeyEvent& event);
+	void OnMotion(wxMouseEvent& event);
     void OnRotationMotion(wxMouseEvent& event);
     void OnWheel(wxMouseEvent& event);
 	void OnLeave(wxMouseEvent& event);
@@ -81,9 +83,13 @@ public:
 	member_data(bool,spatial_change,none,none);
 	member_data(bool,temporal_change,none,none);
 
-	member_data(bool,left_down,none,none);
-	member_data(bool,right_down,none,none);
-
+	//member_data(bool,left_down,none,none);
+	//member_data(bool,right_down,none,none);
+	
+	member_data(bool,alt_down,none,none);
+	member_data(bool,shift_down,none,none);
+	member_data(bool,ctrl_down,none,none);
+	
 	member_data(float,x_start_utm,none,none);
 	member_data(float,y_start_utm,none,none);
 
@@ -107,7 +113,7 @@ public:
 	list<Antares_Layer_Interface*> _layers;
 	member_pointer(Antares_Layer_Interface,selected_layer,none,none);
 
-	member_data(ANTARES_MODE,interaction_mode,none,none);	
+	//member_data(ANTARES_MODE,interaction_mode,none,none);	
 };
 
 static _lock _canvas_lock;
@@ -117,7 +123,7 @@ static _lock _canvas_lock;
 //---------------------------------------------------------
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
-Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementation(wxFrame* parent, int* args) : wxGLCanvas(parent,-1,args,wxDefaultPosition,wxDefaultSize,wxFULL_REPAINT_ON_RESIZE)
+Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementation(wxFrame* parent, int* args) : wxGLCanvas(parent,-1,args,wxDefaultPosition,wxDefaultSize,wxFULL_REPAINT_ON_RESIZE|wxWANTS_CHARS)
 {
 	UNLOCK(_canvas_lock);
 
@@ -131,6 +137,8 @@ Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementat
 
 	Connect(wxEVT_SIZE,wxSizeEventHandler(Canvas_Implementation::OnResize));
 	Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(Canvas_Implementation::OnLeftDown));
+	Connect(wxEVT_KEY_DOWN,wxKeyEventHandler(Canvas_Implementation::OnKeyDown));
+	Connect(wxEVT_KEY_UP,wxKeyEventHandler(Canvas_Implementation::OnKeyUp));
 	Connect(wxEVT_LEFT_UP,wxMouseEventHandler(Canvas_Implementation::OnLeftUp));
 	Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(Canvas_Implementation::OnRightDown));
 	Connect(wxEVT_RIGHT_UP,wxMouseEventHandler(Canvas_Implementation::OnRightUp));
@@ -141,13 +149,14 @@ Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementat
 
 	//---- navigation ----
 	
-	_left_down=_right_down=false;
+	//_left_down=_right_down=false;
+	_alt_down=_shift_down=_ctrl_down=false;
 	_x_translation=_y_translation=0;
 	_x_rotation=_z_rotation=0;
 	_x_start_utm=_y_start_utm=0;
 	_x_start_win=_y_start_win=0;
 	_scale=5;
-	_interaction_mode=NAVIGATE;
+	//_interaction_mode=NAVIGATE;
 
 	//---- visibility ----
 

@@ -38,10 +38,10 @@ namespace Network_Event_Components
 				cfg.head_size_value=4;
 				cfg.storage_period=1;
 				
-				for(vector<string>::iterator itr=ComponentType::_event_keys.begin();itr!=ComponentType::_event_keys.end();itr++)
-				{
-					cfg.attributes_schema.push_back(*itr);
-				}
+				//for(vector<string>::iterator itr=ComponentType::_event_keys.begin();itr!=ComponentType::_event_keys.end();itr++)
+				//{
+				//	cfg.attributes_schema.push_back(*itr);
+				//}
 
 				cfg.head_color._r = 0;
 				cfg.head_color._g = 0;

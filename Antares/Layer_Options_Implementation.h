@@ -16,15 +16,15 @@ implementation struct Layer_Options_Implementation:public Polaris_Component<APPE
 
 	void OnSelectLayer(wxCommandEvent& event);
 	void OnToggleLayer(wxCommandEvent& event);
-	void OnNavigate(wxCommandEvent& event);
-    void OnIdentify(wxCommandEvent& event);
+	//void OnNavigate(wxCommandEvent& event);
+	//void OnIdentify(wxCommandEvent& event);
 
-	member_pointer(wxBitmapToggleButton,navigate,none,none);
-	member_pointer(wxBitmapToggleButton,identify,none,none);
+	//member_pointer(wxBitmapToggleButton,navigate,none,none);
+	//member_pointer(wxBitmapToggleButton,identify,none,none);
 
-	member_data(wxBitmap,navigate_bitmap,none,none);
-	member_data(wxBitmap,identify_bitmap,none,none);
-	member_pointer(wxBoxSizer,button_sizer,none,none);
+	//member_data(wxBitmap,navigate_bitmap,none,none);
+	//member_data(wxBitmap,identify_bitmap,none,none);
+	//member_pointer(wxBoxSizer,button_sizer,none,none);
 
 	member_pointer(wxCheckListBox,layers,none,none);
 
@@ -45,26 +45,26 @@ Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::Layer_Optio
 	//---- initialize the sizers ----
 	
 	_sizer=new wxBoxSizer(wxVERTICAL);
-	_button_sizer= new wxBoxSizer(wxHORIZONTAL);
+	//_button_sizer= new wxBoxSizer(wxHORIZONTAL);
 
 	//---- initialize and add the components ----
 	
-	_navigate_bitmap=wxBitmap("Navigate.png",wxBITMAP_TYPE_PNG);
-	_navigate=new wxBitmapToggleButton(this,wxID_ANY,_navigate_bitmap,wxDefaultPosition,wxSize(50,50));
-	_button_sizer->Add(_navigate);
-	_navigate->SetToolTip("Toggle Navigate");
-	_navigate->SetValue(true);
-	Connect(_navigate->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Layer_Options_Implementation::OnNavigate));
-	
+	//_navigate_bitmap=wxBitmap("Navigate.png",wxBITMAP_TYPE_PNG);
+	//_navigate=new wxBitmapToggleButton(this,wxID_ANY,_navigate_bitmap,wxDefaultPosition,wxSize(50,50));
+	//_button_sizer->Add(_navigate);
+	//_navigate->SetToolTip("Toggle Navigate");
+	//_navigate->SetValue(true);
+	//Connect(_navigate->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Layer_Options_Implementation::OnNavigate));
+	//
 
-	_identify_bitmap=wxBitmap("Identify.png",wxBITMAP_TYPE_PNG);
-	_identify=new wxBitmapToggleButton(this,wxID_ANY,_identify_bitmap,wxDefaultPosition,wxSize(50,50));
-	_button_sizer->Add(_identify,0,wxLEFT,10);
-	_identify->SetToolTip("Toggle Identify");
-	_identify->SetValue(false);
-	Connect(_identify->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Layer_Options_Implementation::OnIdentify));
+	//_identify_bitmap=wxBitmap("Identify.png",wxBITMAP_TYPE_PNG);
+	//_identify=new wxBitmapToggleButton(this,wxID_ANY,_identify_bitmap,wxDefaultPosition,wxSize(50,50));
+	//_button_sizer->Add(_identify,0,wxLEFT,10);
+	//_identify->SetToolTip("Toggle Identify");
+	//_identify->SetValue(false);
+	//Connect(_identify->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Layer_Options_Implementation::OnIdentify));
 
-	_sizer->Add(_button_sizer,0,wxLEFT|wxTOP|wxBOTTOM,10);
+	//_sizer->Add(_button_sizer,0,wxLEFT|wxTOP|wxBOTTOM,10);
 
 	_layers=new wxCheckListBox(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,0,NULL,wxLB_SINGLE|wxLB_NEEDED_SB);
 	Connect(_layers->GetId(),wxEVT_COMMAND_LISTBOX_SELECTED,wxCommandEventHandler(Layer_Options_Implementation::OnSelectLayer));
@@ -94,29 +94,29 @@ void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::Alloca
 	Refresh();
 }
 
-//---------------------------------------------------------
-//	OnNavigate - navigate button pressed
-//---------------------------------------------------------
-
-template<typename MasterType,typename ParentType,typename InheritanceList>
-void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::OnNavigate(wxCommandEvent& event)
-{
-	_canvas->Set_Mode<NULLTYPE>(NAVIGATE);
-	
-	_identify->SetValue(false);
-}
-
-//---------------------------------------------------------
-//	OnIdentify - identify button pressed
-//---------------------------------------------------------
-
-template<typename MasterType,typename ParentType,typename InheritanceList>
-void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::OnIdentify(wxCommandEvent& event)
-{
-	_canvas->Set_Mode<NULLTYPE>(IDENTIFY);
-
-	_navigate->SetValue(false);
-}
+////---------------------------------------------------------
+////	OnNavigate - navigate button pressed
+////---------------------------------------------------------
+//
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::OnNavigate(wxCommandEvent& event)
+//{
+//	_canvas->Set_Mode<NULLTYPE>(NAVIGATE);
+//	
+//	_identify->SetValue(false);
+//}
+//
+////---------------------------------------------------------
+////	OnIdentify - identify button pressed
+////---------------------------------------------------------
+//
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::OnIdentify(wxCommandEvent& event)
+//{
+//	_canvas->Set_Mode<NULLTYPE>(IDENTIFY);
+//
+//	_navigate->SetValue(false);
+//}
 
 //---------------------------------------------------------
 //	OnSelectLayer - layer selected

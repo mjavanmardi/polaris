@@ -13,6 +13,8 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
 typename Canvas_Implementation<MasterType,ParentType,InheritanceList>::Antares_Layer_Interface* Canvas_Implementation<MasterType,ParentType,InheritanceList>::Allocate_New_Layer(string& name)
 {
+	SetFocus();
+
 	Antares_Layer_Interface* new_layer=(Antares_Layer_Interface*)Allocate<typename type_of(MasterType::antares_layer)>();
 
 	_layers.push_back(new_layer);
@@ -35,6 +37,8 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Toggle_Layer(int identifier,bool checked)
 {
+	SetFocus();
+
 	int counter=0;
 
 	list<Antares_Layer_Interface*>::iterator itr;
@@ -59,6 +63,8 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
 void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Select_Layer(int identifier)
 {
+	SetFocus();
+
 	int counter=0;
 
 	list<Antares_Layer_Interface*>::iterator itr;
@@ -67,7 +73,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Select_Layer(
 	{
 		if(counter==identifier)
 		{
-			if(_selected_layer != nullptr) _selected_layer->Deselect<NULLTYPE>();
+			if(_selected_layer != nullptr) _selected_layer->Deselect_All<NULLTYPE>();
 
 			_selected_layer=(*itr);
 

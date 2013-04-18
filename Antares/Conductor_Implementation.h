@@ -17,7 +17,7 @@ public:
 
 	feature_implementation void Initialize()
 	{
-		Load_Event<Conductor_Implementation>(&advance_simulation_condition<NULLTYPE>,&advance_simulation<NULLTYPE>,0,Scenario_Components::Types::END_OF_ITERATION+1);
+		Load_Event<Conductor_Implementation>(&advance_simulation_condition<NULLTYPE>,&advance_simulation<NULLTYPE>,0,Scenario_Components::Types::END_OF_ITERATION+2);
 		_pause=true;
 	}
 
@@ -25,7 +25,7 @@ public:
 	{
 		response.result=true;
 		response.next._iteration=_iteration+1;
-		response.next._sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
+		response.next._sub_iteration=Scenario_Components::Types::END_OF_ITERATION+2;
 	}
 
 	declare_feature_event(advance_simulation)
