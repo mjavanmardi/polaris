@@ -211,11 +211,11 @@ namespace Zone_Components
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Quads(True_Color_RGBA<NULLTYPE>(0,255,100,255),10);
 
-				cfg.attributes_schema.push_back("ID");
-				cfg.attributes_schema.push_back("Productions");
-				cfg.attributes_schema.push_back("Attractions");
-				cfg.attributes_schema.push_back("Population");
-				cfg.attributes_schema.push_back("Available");
+				//cfg.attributes_schema.push_back("ID");
+				//cfg.attributes_schema.push_back("Productions");
+				//cfg.attributes_schema.push_back("Attractions");
+				//cfg.attributes_schema.push_back("Population");
+				//cfg.attributes_schema.push_back("Available");
 
 
 				cfg.dynamic_data = true;
@@ -226,8 +226,10 @@ namespace Zone_Components
 				cfg.primitive_color = true;
 				cfg.primitive_normal = true;
 
-				cfg.selection_callback = (selection_callback_type)&Graphical_Zone_Implementation<MasterType>::fetch_attributes;
-				cfg.submission_callback = (selection_callback_type)&Graphical_Zone_Implementation<MasterType>::submit_attributes;
+				cfg.selection_callback = (selection_callback_type)&Graphical_Zone_Implementation<MasterType>::on_select;
+
+				//cfg.selection_callback = (selection_callback_type)&Graphical_Zone_Implementation<MasterType>::fetch_attributes;
+				//cfg.submission_callback = (selection_callback_type)&Graphical_Zone_Implementation<MasterType>::submit_attributes;
 				_zone_centroids->Initialize<NULLTYPE>(cfg);
 			}
 
@@ -283,6 +285,11 @@ namespace Zone_Components
 				_attraction_count_buffer = att_height;
 
 				_graphical_zone_group->push_zone_information<Target_Type<NULLTYPE,NULLTYPE,Point_3D<MasterType>&, int> >(coordinate, this, prod_height*100, att_height*100);
+			}
+			
+			static void on_select(const list<void*>& removed,const list<void*>& added,const list<void*>& selected,vector<pair<string,string>>& bucket)
+			{
+
 			}
 
 			static bool fetch_attributes(Graphical_Zone_Implementation* _this,vector<string>& bucket)

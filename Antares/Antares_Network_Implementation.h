@@ -280,24 +280,25 @@ namespace Network_Components
 				cfg.draw=true;
 				cfg.primitive_color=true;
 
+				cfg.selection_callback = &MasterType::type_of(link)::on_select;
 				//cfg.head_size_value = 
-				cfg.attributes_callback = (attributes_callback_type)&MasterType::type_of(link)::fetch_attributes;
+				//cfg.attributes_callback = (attributes_callback_type)&MasterType::type_of(link)::fetch_attributes;
 				//cfg.attributes_schema = string("Id,Type,Travel time,Travel delay,Speed,Density,In-flow rate,Out-flow rate,Travel time ratio,Speed ratio,Density ratio,In-flow ratio,Out-flow ratio");
 
-				cfg.attributes_schema.push_back("Id");
-				cfg.attributes_schema.push_back("Type");
-				cfg.attributes_schema.push_back("Length");
-				cfg.attributes_schema.push_back("Number of lanes");
-				cfg.attributes_schema.push_back("Upstream node");
-				cfg.attributes_schema.push_back("Downstream node");
-				cfg.attributes_schema.push_back("Free-flow speed");
-				cfg.attributes_schema.push_back("Travel time");
-				cfg.attributes_schema.push_back("Speed");
-				cfg.attributes_schema.push_back("Density");
-				cfg.attributes_schema.push_back("Travel time ratio");
-				cfg.attributes_schema.push_back("Speed ratio");
-				cfg.attributes_schema.push_back("Density ratio");
-				cfg.attributes_schema.push_back("Queue length");
+				//cfg.attributes_schema.push_back("Id");
+				//cfg.attributes_schema.push_back("Type");
+				//cfg.attributes_schema.push_back("Length");
+				//cfg.attributes_schema.push_back("Number of lanes");
+				//cfg.attributes_schema.push_back("Upstream node");
+				//cfg.attributes_schema.push_back("Downstream node");
+				//cfg.attributes_schema.push_back("Free-flow speed");
+				//cfg.attributes_schema.push_back("Travel time");
+				//cfg.attributes_schema.push_back("Speed");
+				//cfg.attributes_schema.push_back("Density");
+				//cfg.attributes_schema.push_back("Travel time ratio");
+				//cfg.attributes_schema.push_back("Speed ratio");
+				//cfg.attributes_schema.push_back("Density ratio");
+				//cfg.attributes_schema.push_back("Queue length");
 
 
 				_link_lines->Initialize<NULLTYPE>(cfg);
@@ -314,17 +315,17 @@ namespace Network_Components
 
 			feature_implementation void initialize_intersection_map_layers()
 			{
-
 				_intersection_polygons=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(intersection_polygons),Antares_Network_Implementation>*, string& > >(string("Intersections"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Polygons();
 				cfg.draw=true;
 
-				cfg.attributes_callback = (attributes_callback_type)&MasterType::type_of(intersection)::fetch_attributes;
+				cfg.selection_callback = &MasterType::type_of(intersection)::on_select;
+				//cfg.attributes_callback = (attributes_callback_type)&MasterType::type_of(intersection)::fetch_attributes;
 				//cfg.attributes_schema = string("Id,Type,Travel time,Travel delay,Speed,Density,In-flow rate,Out-flow rate,Travel time ratio,Speed ratio,Density ratio,In-flow ratio,Out-flow ratio");
 
-				cfg.attributes_schema.push_back("Id");
-				cfg.attributes_schema.push_back("Type");
+				//cfg.attributes_schema.push_back("Id");
+				//cfg.attributes_schema.push_back("Type");
 				
 				_intersection_polygons->Initialize<NULLTYPE>(cfg);
 

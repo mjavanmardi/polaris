@@ -72,14 +72,9 @@ namespace Vehicle_Components
 				cfg.primitive_type=_QUAD;
 				cfg.primitive_color=true;
 
-				//cfg.attributes_schema = string("ID,Status,Current_Link");
-				
-				cfg.attributes_schema.push_back("ID");
-				cfg.attributes_schema.push_back("Status");
-				cfg.attributes_schema.push_back("Current_Link");
-
-				cfg.attributes_callback = (attributes_callback_type)&fetch_attributes;
-				cfg.submission_callback = (attributes_callback_type)&submit_attributes;
+				cfg.selection_callback = &on_select;
+				//cfg.attributes_callback = (attributes_callback_type)&fetch_attributes;
+				//cfg.submission_callback = (attributes_callback_type)&submit_attributes;
 
 				_vehicle_shapes->Initialize<NULLTYPE>(cfg);
 			}
@@ -93,12 +88,13 @@ namespace Vehicle_Components
 
 				//cfg.attributes_schema = string("ID,Status,Current_Link");
 				
-				cfg.attributes_schema.push_back("ID");
-				cfg.attributes_schema.push_back("Status");
-				cfg.attributes_schema.push_back("Current_Link");
+				//cfg.attributes_schema.push_back("ID");
+				//cfg.attributes_schema.push_back("Status");
+				//cfg.attributes_schema.push_back("Current_Link");
 				
-				cfg.attributes_callback = (attributes_callback_type)&fetch_attributes;
-				cfg.submission_callback = (attributes_callback_type)&submit_attributes;
+				cfg.selection_callback = &on_select;
+				//cfg.attributes_callback = (attributes_callback_type)&fetch_attributes;
+				//cfg.submission_callback = (attributes_callback_type)&submit_attributes;
 
 				_vehicle_points->Initialize<NULLTYPE>(cfg);
 			}
@@ -227,6 +223,11 @@ namespace Vehicle_Components
 			{
 				route_being_displayed = false;
 				Load_Event<Antares_Vehicle_Implementation>(&compute_vehicle_position_condition<NULLTYPE>,&compute_vehicle_position<NULLTYPE>,_iteration+1,Scenario_Components::Types::END_OF_ITERATION);
+			}
+
+			static void on_select(const list<void*>& removed,const list<void*>& added,const list<void*>& selected,vector<pair<string,string>>& bucket)
+			{
+
 			}
 
 			static bool fetch_attributes(Antares_Vehicle_Implementation* _this,vector<string>& bucket)

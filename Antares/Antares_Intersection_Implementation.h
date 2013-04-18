@@ -20,6 +20,11 @@ namespace Intersection_Components
 	{
 		implementation struct Antares_Intersection_Implementation:public Polaris_Intersection_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Intersection_Implementation)>
 		{
+			static void on_select(const list<void*>& removed,const list<void*>& added,const list<void*>& selected,vector<pair<string,string>>& bucket)
+			{
+
+			}
+
 			static bool fetch_attributes(Antares_Intersection_Implementation* _this,vector<string>& bucket)
 			{
 				stringstream s;

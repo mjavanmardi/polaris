@@ -518,6 +518,11 @@ namespace Link_Components
 				element.points = &_link_queue_length_cache.front();
 				((typename MasterType::network_type*)_global_network)->_network_avg_link_queue_length_layer->Push_Element<Accented_Element>((void*)&element);
 			}
+			
+			static void on_select(const list<void*>& removed,const list<void*>& added,const list<void*>& selected,vector<pair<string,string>>& bucket)
+			{
+
+			}
 
 			static bool fetch_attributes(Antares_Link_Implementation* _this,vector<string>& bucket)
 			{
