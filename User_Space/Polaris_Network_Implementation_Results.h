@@ -300,6 +300,7 @@ namespace Network_Components
                     << scenario->template network_cumulative_departed_vehicles<int>() << ","
                     << scenario->template network_cumulative_arrived_vehicles<int>() << ","
                     << scenario->template network_in_network_vehicles<int>() << ","
+					<< scenario->template network_cumulative_switched_decisions<int>() << ","
 					<< _network_vmt << ","
 					<< _network_vht << ","
                     << convert_seconds_to_hhmmss(elapsed_time).c_str() << ","

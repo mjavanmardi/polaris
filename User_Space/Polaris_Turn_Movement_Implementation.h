@@ -47,7 +47,7 @@ namespace Turn_Movement_Components
 			member_data(float, minimum_merge_rate, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_container(vector<typename MasterType::routable_movement_type*>, replicas_container, none, none);
-
+			member_container(vector<typename MasterType::routable_movement_type*>, realtime_replicas_container, none, none);
 
 			//==================================================================================================================
 			/// forward_link_turn_travel_time
@@ -72,6 +72,21 @@ namespace Turn_Movement_Components
 			tag_setter_as_available(forward_link_turn_travel_time);
 
 			float _forward_link_turn_travel_time;
+
+
+			template<typename ComponentType,typename CallerType, typename TargetType>
+			void realtime_forward_link_turn_travel_time(TargetType set_value)
+			{
+				//_forward_link_turn_travel_time = (float)set_value;
+				// update replicas
+				typename _Replicas_Container_Interface::iterator replica_itr;
+				for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
+				{
+					_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
+					replica->template forward_link_turn_travel_time<float>(set_value);
+				}
+			}
+			tag_setter_as_available(realtime_forward_link_turn_travel_time);
 
 			member_container(vector<float>, cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, none, none);
 			member_container(vector<float>, cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array, none, none);
@@ -297,6 +312,8 @@ namespace Turn_Movement_Components
 				_cached_turn_movement_cumulative_shifted_arrived_vehicles_array[t_plus_fftt] = _turn_movement_cumulative_arrived_vehicles;
 
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay] = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
+
+				realtime_forward_link_turn_travel_time<ComponentType,CallerType,float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 
 				if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{	

@@ -65,6 +65,7 @@ namespace Routing_Components
 			feature_accessor(vehicle, none, none);
 			feature_accessor(movement_plan, none, none);
 			feature_accessor(routable_network, none, none);
+			feature_accessor(realtime_routable_network, none, none);
 			feature_accessor(routable_origin, none, none);
 			feature_accessor(routable_destination, none, none);
 			feature_accessor(update_increment,none,none);
@@ -104,7 +105,7 @@ namespace Routing_Components
 				assert_sub_check(TargetType,Concepts::Is_One_To_One_Router,has_vehicle, "ControlType has no vehicle");
 			}
 
-			feature_prototype bool one_to_one_link_based_least_time_path_a_star()
+			feature_prototype bool one_to_one_link_based_least_time_path_a_star(TargetType routable_net)
 			{
 
 				define_component_interface(_Routable_Network_Interface, typename get_type_of(routable_network), Network_Components::Prototypes::Network_Prototype, ComponentType);
@@ -117,7 +118,7 @@ namespace Routing_Components
 				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typedef typename _Routable_Network_Interface::get_type_of(scan_list) ScanListType;
 
-				_Routable_Network_Interface* routable_net=routable_network<_Routable_Network_Interface*>();
+				//_Routable_Network_Interface* routable_net=routable_network<_Routable_Network_Interface*>();
 				routable_net->template reset_routable_network<NULLTYPE>();
 				
 				//RoutableNetworkInterface* routable_network=routable_network<RoutableNetworkInterface*>();
@@ -261,7 +262,8 @@ namespace Routing_Components
 				else
 				{
 
-					_Reversed_Path_Container_Interface& reversed_path_container=routable_network<_Routable_Network_Interface*>()->template reversed_path_container<_Reversed_Path_Container_Interface&>();
+					//_Reversed_Path_Container_Interface& reversed_path_container=routable_network<_Routable_Network_Interface*>()->template reversed_path_container<_Reversed_Path_Container_Interface&>();
+					_Reversed_Path_Container_Interface& reversed_path_container=routable_net->template reversed_path_container<_Reversed_Path_Container_Interface&>();
 
 					current_link=routable_destination<_Routable_Link_Interface*>();
 				
@@ -469,13 +471,15 @@ namespace Routing_Components
 				_this_ptr->template routable_origin<_Regular_Link_Interface*>(origin_link);
 				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
 
-				bool pathFound = _this_ptr->template one_to_one_link_based_least_time_path_a_star<NULLTYPE>();
+				_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
+
+				bool pathFound = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
 
 				if (pathFound)
 				{	
 
 					mp->valid_trajectory<bool>(true);
-					_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
+					
 
 					// print out and break when scheduling departure for veh_id 101319
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)

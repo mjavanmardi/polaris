@@ -100,6 +100,7 @@ namespace Link_Components
 			feature_accessor(reset_list_status, none, none);
 			feature_accessor(network_link_reference, none, none);
 			feature_accessor(replicas_container, none, none);
+			feature_accessor(realtime_replicas_container, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================

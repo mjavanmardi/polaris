@@ -84,6 +84,7 @@ namespace Scenario_Components
 			member_data(int, network_cumulative_departed_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, network_in_network_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, network_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, network_cumulative_switched_decisions, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_data(int, snapshot_period, none, none); // in second
 
@@ -135,6 +136,13 @@ namespace Scenario_Components
 				UNLOCK(_statistics_update_lock);			
 			}
 			
+			feature_implementation void increase_network_cumulative_switched_decisions()
+			{
+				LOCK(_statistics_update_lock);
+				_network_cumulative_switched_decisions++;
+				UNLOCK(_statistics_update_lock);			
+			}
+
 			feature_implementation void decrease_network_in_network_vehicles()
 			{
 				LOCK(_statistics_update_lock);

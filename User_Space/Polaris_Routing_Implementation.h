@@ -206,6 +206,13 @@ namespace Routing_Components
 			}		
 			tag_getter_as_available(routable_network);			
 
+
+			feature_implementation TargetType realtime_routable_network()
+			{
+				return ((_Network_Interface*)_network)->template realtime_routable_network<TargetType>();
+			}		
+			tag_getter_as_available(realtime_routable_network);			
+
 			feature_implementation void routable_origin(TargetType set_value)
 			{
 				_routable_origin = set_value->template internal_id<int>();

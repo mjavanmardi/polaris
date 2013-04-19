@@ -109,6 +109,7 @@ namespace Scenario_Components
 			feature_accessor(network_cumulative_departed_vehicles, none, none);
 			feature_accessor(network_in_network_vehicles, none, none);
 			feature_accessor(network_cumulative_arrived_vehicles, none, none);
+			feature_accessor(network_cumulative_switched_decisions, none, none);
 
 			feature_accessor(input_dir_name, none, none);
 			feature_accessor(output_dir_name, none, none);
@@ -157,7 +158,6 @@ namespace Scenario_Components
 			feature_accessor(write_marginal_output,none,none);
 			feature_accessor(write_full_output,none,none);
 			feature_accessor(popsyn_control_file_name,none,none);
-
 
 			feature_accessor(database_name, none, none);
 
@@ -296,6 +296,7 @@ namespace Scenario_Components
 				network_cumulative_departed_vehicles<int>(0.0);
 				network_in_network_vehicles<int>(0.0);
 				network_cumulative_arrived_vehicles<int>(0.0);
+				network_cumulative_switched_decisions<int>(0.0);
 
 				assignment_time_in_seconds<double>(0.0);
 			    simulation_time_in_seconds<double>(0.0);
@@ -356,6 +357,7 @@ namespace Scenario_Components
 				network_cumulative_departed_vehicles<int>(0.0);
 				network_in_network_vehicles<int>(0.0);
 				network_cumulative_arrived_vehicles<int>(0.0);
+				network_cumulative_switched_decisions<int>(0.0);
 
 				assignment_time_in_seconds<double>(0.0);
 			    simulation_time_in_seconds<double>(0.0);
@@ -558,6 +560,7 @@ namespace Scenario_Components
 						<< "departed" << ","
 						<< "arrived"  << ","
 						<< "in_network" << ","
+						<< "switched" << ","
 						//<< "assignment_time_in_seconds" << ","
 						//<< "simulation_time_in_seconds" << ","
 						//<< "operation_time_in_seconds" << ","
@@ -700,6 +703,11 @@ namespace Scenario_Components
 			feature_prototype void decrease_network_in_network_vehicles()
 			{
 				this_component()->template decrease_network_in_network_vehicles<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void increase_network_cumulative_switched_decisions()
+			{
+				this_component()->template increase_network_cumulative_switched_decisions<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void increase_network_cumulative_arrived_vehicles()

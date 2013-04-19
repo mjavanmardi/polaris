@@ -82,6 +82,7 @@ namespace Movement_Plan_Components
 			member_component(typename MasterType::plan_type, plan, none, none);
 			feature_implementation void arrive_to_destination()
 			{
+
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 				_trajectory_container[_current_trajectory_index]->_delayed_time = 0.0;
 				this->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>( ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() );
@@ -89,6 +90,7 @@ namespace Movement_Plan_Components
 
 			feature_implementation void transfer_to_next_link(int delayed_time)
 			{
+
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 				typedef Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype<typename MasterType::trajectory_unit_type,ComponentType> _Trajectory_Unit_Interface;
 
@@ -106,7 +108,7 @@ namespace Movement_Plan_Components
 
 		implementation struct Polaris_Integrated_Movement_Plan_Implementation : public Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)>
 		{
-			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_type,none,none);
+			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_plan_type,none,none);
 		};
 	}
 }

@@ -161,7 +161,9 @@ namespace Network_Components
 			/// routable network
 			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(routable_network, none, none);
+			feature_accessor(realtime_routable_network, none, none);
 			feature_accessor(routable_networks_container, none, none);
+			feature_accessor(realtime_routable_networks_container, none, none);
 			feature_accessor(scan_list, none, none);
 			feature_accessor(reversed_path_container, none, none);
 			feature_accessor(reset_links, none, none);

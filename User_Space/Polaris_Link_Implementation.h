@@ -160,6 +160,7 @@ namespace Link_Components
 		/// Replicas Container
 		//------------------------------------------------------------------------------------------------------------------
 			member_container(vector<typename MasterType::routable_link_type*>, replicas_container, none, none);
+			member_container(vector<typename MasterType::routable_link_type*>, realtime_replicas_container, none, none);
 
 		//==================================================================================================================
 		/// Replicas Containers
@@ -211,6 +212,20 @@ namespace Link_Components
 			tag_setter_as_available(travel_time);
 
 			float _travel_time;
+
+			template<typename ComponentType, typename CallerType, typename TargetType>
+			void realtime_travel_time(TargetType set_value)
+			{
+				//_travel_time = (float)set_value;
+				// update replicas
+				typename replicas_container_type::iterator replica_itr;
+				for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
+				{
+					replica_interface* replica = (replica_interface*)(*replica_itr);
+					replica->template travel_time<float>(set_value);
+				}
+			}
+			tag_setter_as_available(realtime_travel_time);
 
 			Polaris_Link_Implementation()
 			{
@@ -401,6 +416,8 @@ namespace Link_Components
 					THROW_EXCEPTION("Error, empty trajectory for vehicle " << vehicle->uuid<int>());
 				}
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
+
+				//vehicle->template enroute_switching<NULLTYPE>();
 
 				if(_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
 				{

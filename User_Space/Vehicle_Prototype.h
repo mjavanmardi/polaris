@@ -41,6 +41,13 @@ namespace Vehicle_Components
 	namespace Prototypes
 	{
 
+		prototype struct Switch_Decision_Data_Prototype ADD_DEBUG_INFO
+		{
+			tag_as_prototype;
+			feature_accessor(switch_decision_index, none, none);
+			feature_accessor(route_links_container, none, none);
+		};
+
 		prototype struct Vehicle_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
@@ -69,6 +76,11 @@ namespace Vehicle_Components
 				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				this_component()->template unload<ComponentType,CallerType, TargetType>();
 				movement_plan<_Movement_Plan_Interface*>()->template arrive_to_destination<NULLTYPE>();
+			}
+			
+			feature_prototype void enroute_switching()
+			{
+				this_component()->template enroute_switching<ComponentType,CallerType, TargetType>();
 			}
 		};
 	}

@@ -55,6 +55,7 @@ struct MasterType
 	typedef Link_Components::Implementations::Routable_Link_Implementation<M> routable_link_type;
 	typedef Activity_Location_Components::Implementations::Polaris_Activity_Location_Implementation<M> activity_location_type;
 	typedef Traveler_Components::Implementations::Polaris_Traveler_Implementation<M> traveler_type;
+	typedef Vehicle_Components::Implementations::Polaris_Switch_Decision_Data_Implementation<MasterType> switch_decision_data_type;
 	typedef Intersection_Components::Implementations::Polaris_Inbound_Outbound_Movements_Implementation<M> inbound_outbound_movements_type;
 	typedef Intersection_Components::Implementations::Polaris_Outbound_Inbound_Movements_Implementation<M> outbound_inbound_movements_type;
 	typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<M> routable_inbound_outbound_movements_type;

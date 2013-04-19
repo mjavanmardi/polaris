@@ -60,8 +60,13 @@ namespace Network_Components
 
 			member_container(vector<typename MasterType::routable_network_type*>, routable_networks_container, none, none);
 
+			member_container(vector<typename MasterType::routable_network_type*>, realtime_routable_networks_container, none, none);
+
 			template<typename ComponentType, typename CallerType, typename TargetType>
 			TargetType routable_network(){return (TargetType)(_routable_networks_container[_thread_id]);}tag_getter_as_available(routable_network);
+
+			template<typename ComponentType, typename CallerType, typename TargetType>
+			TargetType realtime_routable_network(){return (TargetType)(_realtime_routable_networks_container[_thread_id]);}tag_getter_as_available(realtime_routable_network);
 
 			member_container(vector<typename MasterType::turn_movement_type*>, turn_movements_container, none, none);
 
@@ -117,6 +122,8 @@ namespace Network_Components
 				initialize_intersections<ComponentType,CallerType,TargetType>();
 				construct_network_cost<ComponentType,CallerType,TargetType>();
 				construct_routable_network<ComponentType,CallerType,TargetType>();
+				//construct_realtime_routable_network<ComponentType,CallerType,TargetType>();
+
 				td_network_moe_data_array.clear();
 				_network_vht = 0.0;
 				_network_vmt = 0.0;
@@ -495,6 +502,19 @@ namespace Network_Components
 					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
 					routable_network->template read_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
 					_routable_networks_container.push_back((typename MasterType::routable_network_type*)routable_network);
+				}
+			}
+
+			feature_implementation void construct_realtime_routable_network()
+			{
+				typedef Network_Prototype<typename MasterType::network_type> _Regular_Network_Interface;
+				typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Regular_Network,_Regular_Network_Interface*> Net_IO_Type;
+				define_container_and_value_interface_unqualified_container(_Routable_Networks_Container_Interface, _Routable_Network_Interface, type_of(routable_networks_container), Random_Access_Sequence_Prototype, Network_Components::Prototypes::Network_Prototype, ComponentType);
+				for(int i=0;i<_num_threads;i++)
+				{
+					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
+					routable_network->template read_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
+					_realtime_routable_networks_container.push_back((typename MasterType::routable_network_type*)routable_network);
 				}
 			}
 

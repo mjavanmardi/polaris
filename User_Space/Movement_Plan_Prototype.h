@@ -136,6 +136,25 @@ namespace Movement_Plan_Components
 				}
 			}
 
+			feature_prototype void update_trajectory(TargetType& path_container)
+			{
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, typename _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				
+				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
+				
+				//erase 
+				trajectory.erase(trajectory.begin() + current_trajectory_position<int&>() + 1,trajectory.end());
+				
+				typename TargetType::reverse_iterator itr;
+				for(itr = path_container.rbegin() + 1; itr != path_container.rend(); itr++)
+				{
+					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
+					vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::unqualified_value_type*>((typename TargetType::Component_Type::unqualified_value_type*)*itr);
+					trajectory.push_back(vehicle_trajectory_data);
+				}
+			}
+
 			feature_prototype void advance_trajectory()
 			{
 				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
