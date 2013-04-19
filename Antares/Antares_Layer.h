@@ -157,7 +157,12 @@ struct Antares_Layer_Configuration
 		head_color._g=0;
 		head_color._b=0;
 		head_color._a=255;
-		
+
+		//head_accent_color._r=255;
+		//head_accent_color._g=255;
+		//head_accent_color._b=255;
+		//head_accent_color._a=255;
+
 		primitive_normal=false;
 		head_normal._x=0;
 		head_normal._y=0;
@@ -300,6 +305,7 @@ struct Antares_Layer_Configuration
 
 	True_Color_RGBA<NULLTYPE> head_color;
 	Point_3D<NULLTYPE> head_normal;
+	//True_Color_RGBA<NULLTYPE> head_accent_color;
 	int head_size_value;
 
 

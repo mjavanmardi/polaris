@@ -49,6 +49,7 @@ namespace Network_Event_Components
 			feature_accessor(expired,none,none);
 			feature_accessor(end_time,none,none);
 			feature_accessor(active,none,none);
+			feature_accessor(notes,none,none);
 
 			//Weather properties
 			feature_accessor(weather_type,none,none);
@@ -90,27 +91,30 @@ namespace Network_Event_Components
 				this_component()->Initialize<ComponentType,CallerType,TargetType>();
 			}
 
-			feature void Push_Network_Event(Network_Event<TargetType,NT>* network_event)
+			feature void Push_Network_Event(Network_Event<TargetType>* network_event)
 			{
 				this_component()->Accept_Network_Event<ComponentType,CallerType,TargetType>(network_event);
 			}
 			
-			feature void Remove_Network_Event(Network_Event<TargetType,NT>* network_event)
+			feature void Remove_Network_Event(Network_Event<TargetType>* network_event)
 			{
 				this_component()->Remove_Network_Event<ComponentType,CallerType,TargetType>(network_event);
 			}
 
-			feature void Get_Network_Events(int link,vector< Network_Event<TargetType,NT>* >& container)
+			feature void Get_Network_Events(int link,vector< Network_Event<TargetType,CallerType>* >& container)
 			{
 				this_component()->Get_Network_Events<ComponentType,CallerType,TargetType>(link,container);
 			}
 			
+			feature void Get_Network_Events(vector< Network_Event<TargetType,CallerType>* >& container)
+			{
+				this_component()->Get_Network_Events<ComponentType,CallerType,TargetType>(container);
+			}
+
 			feature void Push_Subscriber(typename Network_Event_Callback<TargetType>::type callback)
 			{
 				this_component()->Push_Subscriber<ComponentType,CallerType,TargetType>(callback);
 			}
-
-			feature_accessor(scenario_reference,none,none);
 		};
 	}
 }

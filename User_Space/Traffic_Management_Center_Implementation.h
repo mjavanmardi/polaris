@@ -1,6 +1,6 @@
 #pragma once
 #include "Traffic_Management_Center_Prototype.h"
-//#include "Io\Geometry.h"
+#include "Io\Geometry.h"
 #include "Geometry_Implementation.h"
 
 
@@ -14,17 +14,58 @@ namespace Traffic_Management_Center_Components
 	{
 		implementation struct Simple_TMC:public Polaris_Component<APPEND_CHILD(Simple_TMC),MasterType,Execution_Object>
 		{
-			typedef Variable_Message_Sign<typename MasterType::type_of(variable_speed_sign),Simple_TMC> Variable_Speed_Sign_Interface;
-			typedef Variable_Message_Sign<typename MasterType::type_of(variable_word_sign),Simple_TMC> Variable_Word_Sign_Interface;
+			typedef Network_Event<typename MasterType::type_of(base_network_event),ComponentType> Base_Network_Event_Interface;
+
+			typedef Advisory_ITS<typename MasterType::type_of(variable_speed_sign),Simple_TMC> Variable_Speed_Sign_Interface;
+			typedef Advisory_ITS<typename MasterType::type_of(variable_word_sign),Simple_TMC> Variable_Word_Sign_Interface;
+			typedef Advisory_ITS<typename MasterType::type_of(advisory_radio),Simple_TMC> Advisory_Radio_Interface;
+
 			typedef Depot<typename MasterType::type_of(depot),Simple_TMC> Depot_Interface;
-			typedef Advisory_Radio<typename MasterType::type_of(advisory_radio),Simple_TMC> Advisory_Radio_Interface;
 			typedef Link_Control<typename MasterType::type_of(link_control),Simple_TMC> Link_Control_Interface;
 
-			member_prototype(Scenario_Components::Prototypes::Scenario_Prototype, scenario_reference, typename MasterType::scenario_type, none, none);
+			member_prototype(Network_Event_Manager, network_event_manager, typename MasterType::network_event_manager_type, none, none);
+
+			declare_feature_conditional_implementation(TMC_Conditional)
+			{
+				response.next._iteration = _iteration + 10;
+				response.next._sub_iteration = 0;
+
+				response.result = true;
+			}
+
+			declare_feature_event_implementation(TMC_Event)
+			{
+				ComponentType* pthis = (ComponentType*)_this;
+
+				pthis->Load_New_Events<ComponentType,ComponentType,NT>();
+			}
+
+			feature_implementation void Load_New_Events()
+			{
+				vector<Base_Network_Event_Interface*> current_events;
+				_network_event_manager->Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
+
+				for(vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
+				{
+					(*itr)->Push_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+				}
+
+				for(vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
+				{
+					(*itr)->Push_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+				}
+
+				for(vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
+				{
+					(*itr)->Push_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+				}
+			}
 
 			feature_implementation void Initialize()
 			{
 				this_component()->Read_Database<ComponentType,CallerType,TargetType>();
+
+				Load_Event<ComponentType>(&ComponentType::TMC_Conditional<ComponentType,NT,NT>,&ComponentType::TMC_Event<ComponentType,NT,NT>, 0, 0);
 			}
 
 			feature_implementation void Read_Database()
@@ -33,7 +74,7 @@ namespace Traffic_Management_Center_Components
 				using namespace polaris::io;
 				
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
-				string db_name(_scenario_reference->template database_name<string&>());
+				string db_name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
 
 				auto_ptr<database> db (open_sqlite_database (db_name));
 				
@@ -43,7 +84,7 @@ namespace Traffic_Management_Center_Components
 
 				result<Component> component_result=db->template query<Component>(query<Component>::true_expr);
 
-				cout << "Reading Components" << endl;
+				cout << "Reading Components: " << db_name << endl;
 
 				for(result<Component>::iterator db_itr = component_result.begin (); db_itr != component_result.end (); ++db_itr)
 				{
@@ -121,11 +162,12 @@ namespace Traffic_Management_Center_Components
 				cout << "Done Reading" << endl;
 			}
 
-			member_data(vector<Link_Control_Interface*>,link_controls,none,none);
-			member_data(vector<Advisory_Radio_Interface*>,advisory_radios,none,none);
-			member_data(vector<Depot_Interface*>,depots,none,none);
 			member_data(vector<Variable_Word_Sign_Interface*>,variable_word_signs,none,none);
 			member_data(vector<Variable_Speed_Sign_Interface*>,variable_speed_signs,none,none);
+			member_data(vector<Advisory_Radio_Interface*>,advisory_radios,none,none);
+			
+			member_data(vector<Depot_Interface*>,depots,none,none);
+			member_data(vector<Link_Control_Interface*>,link_controls,none,none);
 		};
 	}
 }

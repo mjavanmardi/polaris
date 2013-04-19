@@ -39,6 +39,7 @@ namespace Depot_Components
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
 							_covered_links.push_back( (Link_Interface*)(*vitr) );
+							((Link_Interface*)(*vitr))->depot< typename type_of(MasterType::depot)* >( (ComponentType*)this );
 						}
 					}
 				}

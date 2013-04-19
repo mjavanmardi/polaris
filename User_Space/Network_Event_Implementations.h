@@ -70,8 +70,10 @@ namespace Network_Event_Components
 				_start_time = instance.lock()->getStart_Time();
 				_end_time = instance.lock()->getEnd_Time();
 
-				//_start_time = 80;
-				//_end_time = 200;
+				_notes = instance.lock()->getNote();
+
+				_start_time = 80 + rand()%20;
+				_end_time = 200;
 
 				const vector<int>& links=instance.lock()->getLinks();
 
@@ -146,11 +148,12 @@ namespace Network_Event_Components
 				}
 			}
 
-
 			member_data(vector<Link_Interface*>,affected_links,none,none);
 			member_data(int,start_time,none,none);
 			member_data(int,end_time,none,none);
 			member_data(bool,active,none,none);
+			member_data(string,notes,none,none);
+
 			static member_data(vector<string>,event_keys,none,none);
 			static member_prototype(Network_Event_Manager,network_event_manager,typename type_of(MasterType::network_event_manager),none,none);
 			
@@ -346,7 +349,7 @@ namespace Network_Event_Components
 				using namespace polaris;
 
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
-				string name(_scenario_reference->template database_name<string&>());
+				string name( ((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
 
 				auto_ptr<database> db (open_sqlite_database (name));
 
@@ -410,7 +413,6 @@ namespace Network_Event_Components
 				}
 			}
 
-			//weather events are open to anyone, all others are only open to TMC
 			feature_implementation void Get_Network_Events(int link_id,vector< Network_Event<TargetType,NT>* >& container/*,requires(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(CallerType,typename type_of(MasterType::traffic_management_center),is_same))*/)
 			{
 				list<Network_Event<typename TargetType,NT>*>* events_of_type = (list<Network_Event<typename TargetType,NT>*>*) & (_network_event_container[TargetType::component_index]);
@@ -434,7 +436,40 @@ namespace Network_Event_Components
 					}
 				}
 			}
+
+			feature_implementation void Get_Network_Events( vector< Network_Event<TargetType,NT>* >& container, requires(!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
+			{
+				list<Network_Event<typename TargetType,NT>*>* events_of_type = (list<Network_Event<typename TargetType,NT>*>*) & (_network_event_container[TargetType::component_index]);
+
+				for(list< Network_Event<typename TargetType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+				{
+					Network_Event<typename TargetType,NT>* network_event=*itr;
+
+					if(network_event->active<bool>())
+					{
+						container.push_back( *itr );
+					}
+				}
+			}
 			
+			feature_implementation void Get_Network_Events( vector< Network_Event<TargetType,CallerType>* >& container, requires(check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
+			{
+				for(hash_map< int, list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
+				{
+					list< Base_Network_Event_Interface* >* events_of_type=&h_itr->second;
+
+					for(list< Base_Network_Event_Interface* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+					{
+						Base_Network_Event_Interface* network_event=*itr;
+
+						if(network_event->active<bool>())
+						{
+							container.push_back( (Network_Event<typename MasterType::type_of(base_network_event),CallerType>*) *itr );
+						}
+					}
+				}
+			}
+
 			//feature_implementation void Get_Network_Events(int link_id,vector< Network_Event<TargetType,NT>* >& container,requires(!(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(CallerType,typename type_of(MasterType::traffic_management_center),is_same))))
 			//{
 			//	static_assert(false,"Non-TMC are only allowed to withdraw weather events!");
@@ -462,7 +497,6 @@ namespace Network_Event_Components
 			
 			typedef Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
 
-			member_prototype(Scenario_Components::Prototypes::Scenario_Prototype, scenario_reference, typename MasterType::scenario_type, none, none);
 			member_data( concat(hash_map< int, list<Base_Network_Event_Interface*> >), network_event_container, none ,none);
 		};
 	}

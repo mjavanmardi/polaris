@@ -6,10 +6,9 @@
 #include "Traveler_Prototype.h"
 #include "Person_Prototype.h"
 #include "Network_Event_Prototype.h"
-#include "Advisory_Radio_Prototype.h"
 #include "Depot_Prototype.h"
 #include "Link_Control_Prototype.h"
-#include "Variable_Message_Sign_Prototype.h"
+#include "Advisory_ITS_Prototype.h"
 
 
 namespace Link_Components
@@ -187,10 +186,10 @@ namespace Link_Components
 			member_data(bool, accident_event_to_process, none, none);
 			member_component(typename MasterType::accident_network_event_type, current_accident_event, none, none);
 
-			member_prototype(Advisory_Radio, advisory_radio, typename MasterType::advisory_radio_type, none, none);
+			member_prototype(Advisory_ITS, advisory_radio, typename MasterType::advisory_radio_type, none, none);
 			member_prototype(Depot, depot, typename MasterType::depot_type, none, none);
-			member_prototype(Variable_Message_Sign, variable_word_sign, typename MasterType::variable_word_sign_type, none, none);
-			member_prototype(Variable_Message_Sign, variable_speed_sign, typename MasterType::variable_speed_sign_type, none, none);
+			member_prototype(Advisory_ITS, variable_word_sign, typename MasterType::variable_word_sign_type, none, none);
+			member_prototype(Advisory_ITS, variable_speed_sign, typename MasterType::variable_speed_sign_type, none, none);
 		//==================================================================================================================
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------

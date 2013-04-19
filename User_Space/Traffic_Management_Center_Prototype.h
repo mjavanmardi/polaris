@@ -21,8 +21,8 @@ namespace Traffic_Management_Center_Components
 		{
 			tag_as_prototype;
 
-			feature_accessor(scenario_reference,none,none);
-			
+			feature_accessor(network_event_manager,none,none);
+
 			feature void Initialize()
 			{
 				this_component()->Initialize<ComponentType,CallerType,TargetType>();

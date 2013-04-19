@@ -39,8 +39,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		_head_color=*((True_Color_RGBA<MasterType>*)&cfg.head_color);
 		_head_normal=*((Point_3D<MasterType>*)&cfg.head_normal);
 		_head_size_value=cfg.head_size_value;
-		
-		
+		//_head_accent_color=*((True_Color_RGBA<MasterType>*)&cfg.head_accent_color);
+
 		_primitive_color=cfg.primitive_color;
 		_primitive_normal=cfg.primitive_normal;
 		
@@ -770,7 +770,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	member_data(True_Color_RGBA<MasterType>,head_color,none,none);
 	member_data(Point_3D<MasterType>,head_normal,none,none);
 	member_data(int,head_size_value,none,none);
-	
+	//member_data(True_Color_RGBA<MasterType>,head_accent_color,none,none);
+
 	member_data(bool,grouped,none,none);
 	member_data(bool,group_color,none,none);
 	member_data(bool,group_normal,none,none);

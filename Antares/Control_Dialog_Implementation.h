@@ -62,46 +62,51 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 	_button_sizer=new wxBoxSizer(wxHORIZONTAL);
 	_table_sizer=new wxBoxSizer(wxHORIZONTAL);
 	
-
-	_attributes_list=new wxListCtrl(this,wxID_ANY,wxDefaultPosition,wxSize(250,400),wxLC_REPORT|wxLC_HRULES|wxLC_VRULES|wxLC_EDIT_LABELS);
-
-	wxListItem columns[2];
-
-	columns[0].SetId(0);
-	columns[0].SetText("Value");
-	_attributes_list->InsertColumn(0, columns[0]);
-
-	columns[1].SetId(1);
-	columns[1].SetText("Attribute");
-	_attributes_list->InsertColumn(1, columns[1]);
-
-
 	_num_attributes=attributes.size();
 
-	wxListItem atts_rows[30];
-
-	for(int i=0;i<_num_attributes;i++)
+	if(_num_attributes)
 	{
-		atts_rows[i].SetId(i);
-		_attributes_list->InsertItem(atts_rows[i]);
-		_attributes_list->SetItem(i,0,"");
-		_attributes_list->SetItem(i,1,"");
-	}
+		_attributes_list=new wxListCtrl(this,wxID_ANY,wxDefaultPosition,wxSize(250,400),wxLC_REPORT|wxLC_HRULES|wxLC_VRULES|wxLC_EDIT_LABELS);
 
-	int atts_row_counter = 0;
+		wxListItem columns[2];
 
-	for(vector<pair<string,string>>::iterator itr=attributes.begin();itr!=attributes.end();itr++,atts_row_counter++)
-	{
-		if(atts_row_counter == 30) break;
+		columns[0].SetId(0);
+		columns[0].SetText("Value");
+		_attributes_list->InsertColumn(0, columns[0]);
 
-		_attributes_list->SetItem(atts_row_counter,0,itr->first);
-		_attributes_list->SetItem(atts_row_counter,1,itr->second);
-	}
+		columns[1].SetId(1);
+		columns[1].SetText("Attribute");
+		_attributes_list->InsertColumn(1, columns[1]);
+
+		wxListItem atts_rows[30];
+
+		for(int i=0;i<_num_attributes;i++)
+		{
+			atts_rows[i].SetId(i);
+			_attributes_list->InsertItem(atts_rows[i]);
+			_attributes_list->SetItem(i,0,"");
+			_attributes_list->SetItem(i,1,"");
+		}
+
+		int atts_row_counter = 0;
+
+		for(vector<pair<string,string>>::iterator itr=attributes.begin();itr!=attributes.end();itr++,atts_row_counter++)
+		{
+			if(atts_row_counter == 30) exit(0);
+
+			_attributes_list->SetItem(atts_row_counter,0,itr->first);
+			_attributes_list->SetItem(atts_row_counter,1,itr->second);
+		}
 	
-	_attributes_list->SetColumnWidth(0,wxLIST_AUTOSIZE);
-	_attributes_list->SetColumnWidth(1,wxLIST_AUTOSIZE);
+		_attributes_list->SetColumnWidth(0,wxLIST_AUTOSIZE);
+		_attributes_list->SetColumnWidth(1,wxLIST_AUTOSIZE);
 
-	_table_sizer->Add(_attributes_list,0,wxTOP,10);
+		_table_sizer->Add(_attributes_list,0,wxTOP|wxLEFT,10);
+	}
+	else
+	{
+		_attributes_list=nullptr;
+	}
 
 	_num_dropdowns = dropdown_schema.size();
 
@@ -131,7 +136,14 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 			_dropdown_sizer->Add(_dropdown_menus[i],0,wxTOP,10);
 		}
 
-		_table_sizer->Add(_dropdown_sizer,0,wxLEFT,20);
+		if(_attributes_list == nullptr)
+		{
+			_table_sizer->Add(_dropdown_sizer,0,wxTOP|wxLEFT,10);
+		}
+		else
+		{
+			_table_sizer->Add(_dropdown_sizer,0,wxLEFT,20);
+		}
 	}
 	else
 	{
@@ -245,12 +257,6 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 //	_sizer->Add(_table_sizer);
 //
 //
-//
-//
-//
-//
-//
-//
 //	_ok_button=new wxButton(this,wxID_ANY,"Ok");
 //	Connect(_ok_button->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Control_Dialog_Implementation::OnOk));
 //	_button_sizer->Add(_ok_button,0,wxLEFT,10);
@@ -271,20 +277,7 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 //	_selected_object=nullptr;
 //	_submission_callback=nullptr;
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
 //
 //	for(int i=0;i<_num_attributes;i++)
 //	{

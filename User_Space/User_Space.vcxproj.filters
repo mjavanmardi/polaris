@@ -130,9 +130,6 @@
     <ClInclude Include="Traffic_Management_Center_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
-    <ClInclude Include="Variable_Message_Sign_Prototype.h">
-      <Filter>Prototypes</Filter>
-    </ClInclude>
     <ClInclude Include="Plan_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
@@ -238,9 +235,6 @@
     <ClInclude Include="Link_Control_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
-    <ClInclude Include="Advisory_Radio_Prototype.h">
-      <Filter>Prototypes</Filter>
-    </ClInclude>
     <ClInclude Include="Advisory_Radio_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
@@ -276,6 +270,12 @@
     </ClInclude>
     <ClInclude Include="Polaris_Link_Event_Handler_Implementation.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Advisory_ITS_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Advisory_ITS_Implementation.h">
+      <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

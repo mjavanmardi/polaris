@@ -151,7 +151,7 @@ namespace Link_Components
 			feature_accessor(link_origin_vehicle_current_position, none, none);
 			feature_accessor(link_origin_vehicle_array, none, none);
 			feature_accessor(link_origin_vehicle_queue, none, none);
-		
+			
 			feature_accessor(maximum_flow_rate, none, none);
 			feature_accessor(free_flow_speed, none, none);
 			feature_accessor(backward_wave_speed, none, none);

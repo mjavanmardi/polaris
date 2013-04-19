@@ -632,11 +632,12 @@
     <ClInclude Include="Activity_Implementations.h" />
     <ClInclude Include="Activity_Location_Prototype.h" />
     <ClInclude Include="Activity_Prototype.h" />
+    <ClInclude Include="Advisory_ITS_Implementation.h" />
+    <ClInclude Include="Advisory_ITS_Prototype.h" />
     <ClInclude Include="Advisory_Radio_Implementation.h" />
     <ClInclude Include="Demand_Prototype.h" />
     <ClInclude Include="Depot_Implementation.h" />
     <ClInclude Include="Destination_Choice_Implementation.h" />
-    <ClInclude Include="Advisory_Radio_Prototype.h" />
     <ClInclude Include="Geometry_Implementation.h" />
     <ClInclude Include="Network_Event_Implementations.h" />
     <ClInclude Include="Network_Event_Prototype.h" />
@@ -705,7 +706,6 @@
     <ClInclude Include="User_Space_Includes.h" />
     <ClInclude Include="User_Space_with_odb.h" />
     <ClInclude Include="Variable_Message_Sign_Implementation.h" />
-    <ClInclude Include="Variable_Message_Sign_Prototype.h" />
     <ClInclude Include="Vehicle_Prototype.h" />
     <ClInclude Include="Zone_Prototype.h" />
   </ItemGroup>

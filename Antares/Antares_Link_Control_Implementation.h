@@ -37,10 +37,10 @@ namespace Link_Control_Components
 				//cfg.group_color=true;
 				cfg.head_size_value=4;
 				
-				for(vector<string>::iterator itr=ComponentType::_component_keys.begin();itr!=ComponentType::_component_keys.end();itr++)
-				{
-					cfg.attributes_schema.push_back(*itr);
-				}
+				//for(vector<string>::iterator itr=ComponentType::_component_keys.begin();itr!=ComponentType::_component_keys.end();itr++)
+				//{
+				//	cfg.attributes_schema.push_back(*itr);
+				//}
 
 				cfg.head_color._r = 0;
 				cfg.head_color._g = 0;
