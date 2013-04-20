@@ -19,4 +19,9 @@ prototype struct Layer_Options
 	{
 		return (TargetType::ReturnType)this_component()->Allocate_New_Layer<ComponentType,CallerType,TargetType>(name);
 	}
+
+	feature_prototype void Toggle_Named_Layer(string& name,bool check_state)
+	{
+		this_component()->Toggle_Named_Layer<ComponentType,CallerType,TargetType>(name,check_state);
+	}
 };

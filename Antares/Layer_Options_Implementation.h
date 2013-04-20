@@ -31,6 +31,7 @@ implementation struct Layer_Options_Implementation:public Polaris_Component<APPE
 	member_pointer(wxBoxSizer,sizer,none,none);
 	
 	feature_implementation void Allocate_New_Layer(string& name);
+	feature_implementation void Toggle_Named_Layer(string& name,bool check_state);
 
 	member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),none,none);
 };
@@ -80,6 +81,30 @@ Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::Layer_Optio
 }
 
 //---------------------------------------------------------
+//	Toggle_Named_Layer - toggle a layer by name
+//---------------------------------------------------------
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+template<typename ComponentType,typename CallerType,typename TargetType>
+void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::Toggle_Named_Layer(string& name,bool check_state)
+{
+	int num_layers = _layers->GetCount();
+
+	for(int i=0;i<num_layers;i++)
+	{
+		string layer_name=_layers->GetString(i);
+
+		if(layer_name == name)
+		{
+			_layers->Check(i,check_state);
+			break;
+		}
+	}
+
+	Refresh();
+}
+
+//---------------------------------------------------------
 //	Allocate_New_Layer - handle request to add a layer
 //---------------------------------------------------------
 
@@ -88,8 +113,6 @@ template<typename ComponentType,typename CallerType,typename TargetType>
 void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::Allocate_New_Layer(string& name)
 {
 	int layer_id=_layers->Append(name);
-
-	_layers->Check(layer_id,false);
 
 	Refresh();
 }

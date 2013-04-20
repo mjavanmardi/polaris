@@ -362,39 +362,50 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 template<typename MasterType,typename ParentType,typename InheritanceList>
 void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::OnApply(wxCommandEvent& event)
 {
-	//if(_selected_object!=nullptr && _submission_callback!=nullptr)
-	//{
-	//	vector<string> new_attributes;
-	//	wxListItem itr;
-	//	string text;
+	vector<string> attributes_update;
+	string text;
 
-	//	for(int i=0;i<_num_attributes;i++)
-	//	{
-	//		itr.SetId(i);
-	//		itr.SetColumn(0);
-	//		itr.SetMask(wxLIST_MASK_TEXT);
+	if(_num_attributes)
+	{
+		wxListItem itr;
 
-	//		_attributes_list->GetItem(itr);
-	//		text=itr.GetText();
 
-	//		if(text=="") break;
-	//		else new_attributes.push_back(text);
-	//	}
+		for(int i=0;i<_num_attributes;i++)
+		{
+			itr.SetId(i);
+			itr.SetColumn(0);
+			itr.SetMask(wxLIST_MASK_TEXT);
 
-	//	if(_submission_callback(_selected_object,new_attributes))
-	//	{
-	//		_apply_button->SetBackgroundColour(wxColour(75,200,75));
-	//	}
-	//	else
-	//	{
-	//		_apply_button->SetBackgroundColour(wxColour(200,75,75));
-	//	}
-	//	
-	//	_attributes_list->SetColumnWidth(0,wxLIST_AUTOSIZE);
-	//	_attributes_list->SetColumnWidth(1,wxLIST_AUTOSIZE);
+			_attributes_list->GetItem(itr);
+			text=itr.GetText();
 
-	//	Refresh();
-	//}
+			if(text=="") break;
+			else attributes_update.push_back(text);
+		}
+	}
+		
+	vector<string> dropdowns_update;
+
+	if(_num_dropdowns)
+	{
+		for(int i=0;i<_num_dropdowns;i++)
+		{
+			text=_dropdown_menus[i]->GetStringSelection();
+
+			dropdowns_update.push_back(text);
+		}
+	}
+
+	if(_submission_callback(_selected_elements,attributes_update,dropdowns_update))
+	{
+		_apply_button->SetBackgroundColour(wxColour(75,200,75));
+	}
+	else
+	{
+		_apply_button->SetBackgroundColour(wxColour(200,75,75));
+	}
+
+	Refresh();
 }
 
 //---------------------------------------------------------

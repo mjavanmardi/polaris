@@ -5,6 +5,7 @@
 #pragma once
 #include "Antares_Includes.h"
 #include "User_Space\Variable_Message_Sign_Prototype.h"
+#include "Antares_Advisory_ITS_Implementation.h"
 
 namespace Variable_Message_Sign_Components
 {
@@ -21,32 +22,9 @@ namespace Variable_Message_Sign_Components
 	namespace Implementations
 	{
 		template<typename MasterType,typename ParentType=NULLTYPE,typename InheritanceList=NULLTYPELIST,template<class,class,class> class InheritanceTemplate=NULLTEMPLATE_3>
-		struct Antares_Variable_Message_Sign : public InheritanceTemplate<MasterType,ParentType,APPEND_CHILD(Antares_Variable_Message_Sign)>
+		struct Antares_Variable_Message_Sign : public Advisory_ITS_Components::Implementations::Antares_Advisory_ITS<MasterType,ParentType,APPEND_CHILD(Antares_Variable_Message_Sign),InheritanceTemplate>
 		{
-			typedef typename InheritanceTemplate<MasterType,NT,APPEND_CHILD(Antares_Variable_Message_Sign)>::ComponentType ComponentType;
-
-			static void on_select(const list<void*>& removed,const list<void*>& added,const list<void*>& selected,vector<pair<string,string>>& bucket)
-			{
-				if(removed.size())
-				{
-					_its_component_layer->Clear_Accented<NT>();
-
-					if(selected.size())
-					{
-						for(list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
-						{
-							((ComponentType*)*itr)->Accent_Self<ComponentType,ComponentType,NT>();
-						}
-					}
-				}
-				else if(added.size())
-				{
-					for(list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
-					{
-						((ComponentType*)*itr)->Accent_Self<ComponentType,ComponentType,NT>();
-					}
-				}
-			}
+			typedef typename Antares_Advisory_ITS::ComponentType ComponentType;
 
 			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Component_Key>>& keys,string& name)
 			{
@@ -57,14 +35,10 @@ namespace Variable_Message_Sign_Components
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Lines();
 				cfg.grouped=true;
-				//cfg.group_color=true;
 				cfg.head_size_value=4;
 				cfg.selection_callback=&on_select;
-
-				//for(vector<string>::iterator itr=ComponentType::_component_keys.begin();itr!=ComponentType::_component_keys.end();itr++)
-				//{
-				//	cfg.attributes_schema.push_back(*itr);
-				//}
+				cfg.double_click_callback=&on_double_click;
+				cfg.submission_callback=&on_submit;
 
 				cfg.head_color._r = 0;
 				cfg.head_color._g = 0;
@@ -73,23 +47,6 @@ namespace Variable_Message_Sign_Components
 
 				_its_component_layer->Initialize<NULLTYPE>(cfg);
 			}
-
-#pragma pack(push,1)
-			struct Link_Line_Segment
-			{
-				Point_3D<MasterType> a;
-				Point_3D<MasterType> b;
-			};
-#pragma pack(pop)
-
-#pragma pack(push,1)
-			struct Link_Line_Group
-			{
-				void* object;
-				int num_primitives;
-				Link_Line_Segment* segments;
-			};
-#pragma pack(pop)
 
 			feature_implementation void Accent_Self()
 			{
@@ -126,7 +83,7 @@ namespace Variable_Message_Sign_Components
 
 			feature_implementation void Initialize(weak_ptr<polaris::io::Instance>& instance)
 			{
-				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Antares_Variable_Message_Sign)>::Initialize<ComponentType,CallerType,NT>(instance);
+				Antares_Advisory_ITS::Initialize<ComponentType,CallerType,NT>(instance);
 
 				vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr;
 
@@ -162,11 +119,7 @@ namespace Variable_Message_Sign_Components
 				_its_component_layer->Push_Element<Regular_Element>(&group);
 			}
 
-			static member_prototype(Antares_Layer,its_component_layer,typename type_of(MasterType::antares_layer),none,none);
 		};
-		
-		template<typename MasterType,typename ParentType,typename InheritanceList,template<class,class,class> class InheritanceTemplate>
-		Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Variable_Message_Sign<MasterType,ParentType,InheritanceList,InheritanceTemplate>::ComponentType>* Antares_Variable_Message_Sign<MasterType,ParentType,InheritanceList,InheritanceTemplate>::_its_component_layer;
 
 		implementation struct Antares_Variable_Speed_Sign : public Antares_Variable_Message_Sign<MasterType,NT,APPEND_CHILD(Antares_Variable_Speed_Sign),Variable_Speed_Sign>
 		{

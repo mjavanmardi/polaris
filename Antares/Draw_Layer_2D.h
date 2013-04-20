@@ -167,7 +167,13 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 	//pls->scol0( 0, 255, 255, 255 );
 	//pls->scol0( 15, 0, 0, 0 );
 
-	xmax = max(xmax,1.0);
+
+	if(xmax == -FLT_MAX) xmax=1;
+	if(xmin == FLT_MAX) xmin=0;
+	if(ymax == -FLT_MAX) ymax=1;
+	if(ymin == FLT_MAX) ymin=0;
+
+	if(xmin == xmax) ++xmax;
 
 	ymin *= .9;
 	ymax += 1;

@@ -24,6 +24,29 @@ namespace Network_Event_Components
 		struct Base_Antares_Network_Event : public InheritanceTemplate<MasterType,ParentType,APPEND_CHILD(Base_Antares_Network_Event)>
 		{
 			typedef typename InheritanceTemplate<MasterType,NT,APPEND_CHILD(Base_Antares_Network_Event)>::ComponentType ComponentType;
+			
+			static void on_select(const list<void*>& removed,const list<void*>& added,const list<void*>& selected,vector<pair<string,string>>& bucket)
+			{
+				if(removed.size())
+				{
+					_event_layer->Clear_Accented<NT>();
+
+					if(selected.size())
+					{
+						for(list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						{
+							((ComponentType*)*itr)->Accent_Self<ComponentType,ComponentType,NT>();
+						}
+					}
+				}
+				else if(added.size())
+				{
+					for(list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					{
+						((ComponentType*)*itr)->Accent_Self<ComponentType,ComponentType,NT>();
+					}
+				}
+			}
 
 			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys,string& name)
 			{
@@ -34,14 +57,9 @@ namespace Network_Event_Components
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Dynamic_Lines();
 				cfg.grouped=true;
-				//cfg.group_color=true;
 				cfg.head_size_value=4;
 				cfg.storage_period=1;
-				
-				//for(vector<string>::iterator itr=ComponentType::_event_keys.begin();itr!=ComponentType::_event_keys.end();itr++)
-				//{
-				//	cfg.attributes_schema.push_back(*itr);
-				//}
+				cfg.selection_callback=&on_select;
 
 				cfg.head_color._r = 0;
 				cfg.head_color._g = 0;
@@ -62,10 +80,56 @@ namespace Network_Event_Components
 #pragma pack(push,1)
 			struct Link_Line_Group
 			{
+				void* object;
 				int num_primitives;
 				Link_Line_Segment* segments;
 			};
 #pragma pack(pop)
+
+			feature_implementation void Accent_Self()
+			{
+				if(_active)
+				{
+					vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr;
+
+					Link_Line_Segment* segments = new Link_Line_Segment[ _affected_links.size() ];
+					
+					Link_Line_Group group;
+					group.num_primitives = _affected_links.size();
+					group.segments = segments;
+
+					Link_Line_Segment* current_segment = group.segments;
+
+					for(itr = _affected_links.begin(); itr != _affected_links.end(); itr++)
+					{
+						Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
+						
+						Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
+						
+						intersection = link->upstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+						
+						current_segment->a._x = intersection->x_position<float>();
+						current_segment->a._y = intersection->y_position<float>();
+						current_segment->a._z = 2;
+
+						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+
+						intersection = link->downstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+
+						current_segment->b._x = intersection->x_position<float>();
+						current_segment->b._y = intersection->y_position<float>();
+						current_segment->b._z = 2;
+
+						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+
+						++current_segment;
+					}
+					
+					_event_layer->Push_Element<Accented_Element>(&group);
+
+					delete[] segments;
+				}
+			}
 
 			feature_implementation void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
 			{
@@ -110,6 +174,7 @@ namespace Network_Event_Components
 					Link_Line_Group group;
 					group.num_primitives = pthis->_affected_links.size();
 					group.segments = segments;
+					group.object = pthis;
 
 					Link_Line_Segment* current_segment = group.segments;
 

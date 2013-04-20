@@ -152,6 +152,9 @@
     <ClInclude Include="Antares_Advisory_Radio_Implementation.h">
       <Filter>User_Space</Filter>
     </ClInclude>
+    <ClInclude Include="Antares_Advisory_ITS_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">

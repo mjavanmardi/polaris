@@ -23,6 +23,7 @@ typename Canvas_Implementation<MasterType,ParentType,InheritanceList>::Antares_L
 
 	new_layer->name<string&>(name);
 	new_layer->attributes_panel<attributes_panel_interface*>(_attributes_panel);
+	new_layer->layer_options<layer_options_interface*>(_layer_options);
 
 	_layer_options->Allocate_New_Layer<Target_Type<NULLTYPE,void,string&>>(name);
 

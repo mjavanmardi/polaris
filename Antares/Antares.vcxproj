@@ -584,6 +584,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Antares.h" />
+    <ClInclude Include="Antares_Advisory_ITS_Implementation.h" />
     <ClInclude Include="Antares_Advisory_Radio_Implementation.h" />
     <ClInclude Include="Antares_App.h" />
     <ClInclude Include="Antares_Depot_Implementation.h" />

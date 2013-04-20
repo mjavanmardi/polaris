@@ -14,6 +14,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	Antares_Layer_Implementation()
 	{
 		_draw=false;
+		_layer_options=nullptr;
+		_attributes_panel=nullptr;
 	}
 
 	feature_implementation void Initialize(Antares_Layer_Configuration& cfg)
@@ -26,10 +28,9 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		_storage.Initialize(cfg.storage_offset, cfg.storage_period, cfg.storage_size);
 		_accent_storage.Initialize(cfg.storage_offset, cfg.storage_period, 1);
 
-
 		_draw=cfg.draw;
-
 		_primitive_type=cfg.primitive_type;
+
 
 		_grouped=cfg.grouped;
 			_group_color=cfg.group_color;
@@ -50,10 +51,6 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		switch(_primitive_type)
 		{
 		case _PLOT:
-			//_vert_size = sizeof(Point_2D<MasterType>)*1;
-			//_vert_stride = _vert_size*1;
-			//assert(_vert_stride%2==0);
-
 			_x_label = cfg.x_label;
 			_y_label = cfg.y_label;
 
@@ -63,18 +60,23 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			break;
 		case _POINT:
 			_vert_stride = _vert_size*1;
+			_layer_options->Toggle_Named_Layer<NT>(_name,_draw);
 			break;
 		case _LINE:
 			_vert_stride = _vert_size*2;
+			_layer_options->Toggle_Named_Layer<NT>(_name,_draw);
 			break;
 		case _TRIANGLE:
 			_vert_stride = _vert_size*3;
+			_layer_options->Toggle_Named_Layer<NT>(_name,_draw);
 			break;
 		case _QUAD:
 			_vert_stride = _vert_size*4;
+			_layer_options->Toggle_Named_Layer<NT>(_name,_draw);
 			break;
 		case _POLYGON:
 			_vert_stride = _vert_size*1;
+			_layer_options->Toggle_Named_Layer<NT>(_name,_draw);
 			_poly = true;
 			assert(grouped == true);
 			break;
@@ -648,7 +650,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	
 	feature_implementation void Select(requires(!check_2(CallerType,typename MasterType::canvas_type,is_same))){static_assert(false,"Caller Not a Canvas Object");}
 
-	feature_implementation void Deselect_All(requires(check_2(CallerType,typename MasterType::canvas_type,is_same)))
+	feature_implementation void Deselect_All(requires(check_2(CallerType,typename MasterType::canvas_type,is_same) || check_2(CallerType,ComponentType,is_same)))
 	{
 		if( _selection_callback != nullptr)
 		{
@@ -671,7 +673,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		_selected_elements.clear();
 	}
 
-	feature_implementation void Deselect_All(requires(!check_2(CallerType,typename MasterType::canvas_type,is_same))){static_assert(false,"Caller Not a Canvas Object");}
+	feature_implementation void Deselect_All( requires(!check_2(CallerType,typename MasterType::canvas_type,is_same) && !check_2(CallerType,ComponentType,is_same)) ){static_assert(false,"Caller Not a Canvas Object");}
 
 	feature_implementation void Double_Click(requires(check_2(CallerType,typename MasterType::canvas_type,is_same)))
 	{
@@ -682,11 +684,15 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 			(*_double_click_callback)(_selected_elements,dialog_key_value,dialog_dropdown);
 
+			if(_control_dialog != nullptr)
+			{
+				delete _control_dialog;
+				_control_dialog = nullptr;
+			}
+
 			_control_dialog = (control_dialog_interface*)new type_of(control_dialog)(_name,_selected_elements,dialog_key_value,dialog_dropdown,_submission_callback);
 
 			_control_dialog->ShowModal<NULLTYPE>();
-
-			delete _control_dialog;
 		}
 
 		//if( _selected_elements.size()==0 ) return;
@@ -749,6 +755,10 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			
 			_attributes_panel->Push_Attributes<Target_Type<NT,NT,vector<pair<string,string>>&>>(bucket);
 		}
+		else
+		{
+			Deselect_All<ComponentType,ComponentType,NT>();
+		}
 	}
 	
 	member_data(bool,dynamic_data,none,none);
@@ -791,6 +801,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	member_data(selection_callback_type,selection_callback,none,none);
 	member_data(double_click_callback_type,double_click_callback,none,none);
 
+	member_prototype(Layer_Options,layer_options,typename MasterType::type_of(layer_options),none,none);
 	member_prototype(Attributes_Panel,attributes_panel,typename MasterType::type_of(attributes_panel),none,none);
 	member_prototype(Control_Dialog,control_dialog,typename MasterType::type_of(control_dialog),none,none);
 

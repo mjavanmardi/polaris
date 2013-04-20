@@ -97,6 +97,7 @@ prototype struct Antares_Layer
 	feature_accessor(data_stride,none,none);
 
 	feature_accessor(attributes_panel,none,none);
+	feature_accessor(layer_options,none,none);
 
 	feature_accessor(selected_elements,none,none);
 

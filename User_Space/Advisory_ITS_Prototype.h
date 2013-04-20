@@ -32,9 +32,9 @@ namespace Advisory_ITS_Components
 				this_component()->Accept_Network_Events<ComponentType,CallerType,TargetType>(network_events);
 			}
 
-			feature void Get_Messages(vector<Network_Event<TargetType>*>& bucket)
+			feature void Get_Displayed_Messages(vector<Network_Event<TargetType>*>& bucket)
 			{
-				return this_component()->Get_Messages<ComponentType,CallerType,TargetType>(bucket);
+				return this_component()->Get_Displayed_Messages<ComponentType,CallerType,TargetType>(bucket);
 			}
 		};
 	}
