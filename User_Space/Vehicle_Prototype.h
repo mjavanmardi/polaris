@@ -22,6 +22,12 @@ namespace Vehicle_Components
 			SYSTEM_OPTIMAL,
 		};
 		
+		enum Enroute_Information_Keys
+		{
+			NO_REALTIME_INFORMATION = 0,
+			WITH_REALTIME_INFORMATION,
+		};
+
 		enum Vehicle_Status_Keys
 		{
 			UNLOADED=0,
@@ -60,6 +66,14 @@ namespace Vehicle_Components
 			feature_accessor(distance_to_stop_bar, none, none);
 			feature_accessor(local_speed, none, none);
 			
+			//enroute swtiching
+			feature_accessor(rng_stream, none, none);
+			feature_accessor(enroute_information_type, none, none);
+			feature_accessor(information_compliance_rate, none, none);
+			feature_accessor(relative_indifference_bound_route_choice, none, none);
+			feature_accessor(minimum_travel_time_saving, none, none);
+
+
 			feature_prototype void advance()
 			{
 				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);

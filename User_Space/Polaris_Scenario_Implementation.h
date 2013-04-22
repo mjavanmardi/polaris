@@ -103,6 +103,15 @@ namespace Scenario_Components
 
 			member_data(bool, use_event_manager, none, none);
 			
+			/// enroute switching parameters
+			member_data(double, realtime_informed_vehicle_market_share, none, none);
+			member_data(double, information_compliance_rate_mean, none, none);
+			member_data(double, information_compliance_rate_standard_deviation, none, none);
+			member_data(double, relative_indifference_bound_route_choice_mean, none, none);
+			member_data(double, relative_indifference_bound_route_choice_standard_deviation, none, none);
+			member_data(double, minimum_travel_time_saving_mean, none, none);
+			member_data(double, minimum_travel_time_saving_standard_deviation, none, none);
+
 			Polaris_Scenario_Implementation()
 			{
 				UNLOCK(_statistics_update_lock);

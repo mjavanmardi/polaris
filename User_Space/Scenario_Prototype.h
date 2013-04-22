@@ -182,6 +182,15 @@ namespace Scenario_Components
 
 			feature_accessor(use_event_manager, none, none);
 
+			/// enroute switching parameters
+			feature_accessor(realtime_informed_vehicle_market_share, none, none);
+			feature_accessor(information_compliance_rate_mean, none, none);
+			feature_accessor(information_compliance_rate_standard_deviation, none, none);
+			feature_accessor(relative_indifference_bound_route_choice_mean, none, none);
+			feature_accessor(relative_indifference_bound_route_choice_standard_deviation, none, none);
+			feature_accessor(minimum_travel_time_saving_mean, none, none);
+			feature_accessor(minimum_travel_time_saving_standard_deviation, none, none);
+
 			feature_prototype void read_scenario_data()
 			{
 				CfgReader cfgReader;
@@ -323,6 +332,15 @@ namespace Scenario_Components
 				input_dir_name<string&>() = "";
 				open_output_files<NULLTYPE>();
 				open_input_files<NULLTYPE>();
+
+				///enroute switching
+				realtime_informed_vehicle_market_share<double>(0.5);
+				information_compliance_rate_mean<double>(0.5);
+				information_compliance_rate_standard_deviation<double>(0.5);
+				relative_indifference_bound_route_choice_mean<double>(0.1);
+				relative_indifference_bound_route_choice_standard_deviation<double>(0.1);
+				minimum_travel_time_saving_mean<double>(1.0);	// in minutes
+				minimum_travel_time_saving_standard_deviation<double>(1.0);	// in minutes
 			}
 
 			feature_prototype void read_scenario_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data)
@@ -365,6 +383,16 @@ namespace Scenario_Components
 			    output_time_in_seconds<double>(0.0);
 
 				snapshot_period<int>(300);
+				
+				///enroute swtiching
+				realtime_informed_vehicle_market_share<double>(0.5);
+				information_compliance_rate_mean<double>(0.5);
+				information_compliance_rate_standard_deviation<double>(0.5);
+				relative_indifference_bound_route_choice_mean<double>(0.1);
+				relative_indifference_bound_route_choice_standard_deviation<double>(0.1);
+				minimum_travel_time_saving_mean<double>(1.0);	// in minutes
+				minimum_travel_time_saving_standard_deviation<double>(1.0);	// in minutes
+
 			}
 
 			feature_prototype void write_scenario_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data)

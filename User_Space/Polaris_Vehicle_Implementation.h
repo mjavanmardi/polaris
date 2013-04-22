@@ -37,6 +37,11 @@ namespace Vehicle_Components
 			member_data(float, local_speed, none, none);
 
 			member_container(vector<typename MasterType::switch_decision_data_type*>, switch_decisions_container, none, none);
+			member_data(RNG_Components::RngStream, rng_stream, none, none);
+			member_data(Vehicle_Components::Types::Enroute_Information_Keys, enroute_information_type, none, none);
+			member_data(double, information_compliance_rate, none, none);
+			member_data(double, relative_indifference_bound_route_choice, none, none);
+			member_data(double, minimum_travel_time_saving, none, none);
 
 			feature_implementation void load(requires(check_2(TargetType,typename Types::Load_To_Entry_Queue,is_same)))
 			{

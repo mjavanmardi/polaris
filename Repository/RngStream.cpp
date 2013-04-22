@@ -48,6 +48,25 @@ namespace RNG_Components
 		}
 	}
 
+	double RngStream::triangular_random_variate(double u, double a, double b, double mean)
+	{
+		if (mean == 0.0) return 0.0;
+
+		double x = 0.0;
+		double c = 3.0*mean - a - b;
+		double fc = (c - a) / (b - a);
+	
+		if (u < fc)
+		{
+			x = a + sqrt(u*(b - a)*(c - a));
+		}
+		else
+		{
+			x = b - sqrt((1 - u)*(b - a)*(b - c));
+		}
+
+		return x;
+	}
 
 	//*************************************************************************
 	// Public members of the class start here

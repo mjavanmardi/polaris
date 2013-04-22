@@ -392,6 +392,8 @@ namespace Link_Components
 				define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
 				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, typename _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				
+				define_container_and_value_interface_unqualified_container(_Movements_Container_Interface, _Movement_Interface, type_of(outbound_turn_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				typedef Link_Prototype<ComponentType, ComponentType> _Link_Interface;
 				
@@ -416,7 +418,26 @@ namespace Link_Components
 				}
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
-				//vehicle->template enroute_switching<NULLTYPE>();
+				///enroute switching
+				int outbound_turn_movement_size = (int)_outbound_turn_movements.size();
+				if (outbound_turn_movement_size>1)
+				{
+					if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION) 
+					{///case 1: with realtime information
+						double r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+						if (r1 <= vehicle->template information_compliance_rate<double>())
+						{
+							vehicle->template enroute_switching<NULLTYPE>();
+						}
+					}
+					else
+					{///case 2: no realtime information
+					
+						/// case 2.1: VMS
+						/// case 2.2: HAR
+						/// case 2.3: Accident
+					}
+				}
 
 				if(_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
 				{

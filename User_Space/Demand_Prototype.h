@@ -197,6 +197,42 @@ namespace Demand_Components
 					vehicle->template internal_id<int>(traveler_id_counter);
 					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 					vehicle->template traveler<_Traveler_Interface*>(traveler);
+					
+					///
+					unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+traveler_id_counter+1;
+					vehicle->template rng_stream<RNG_Components::RngStream&>().SetSeed(seed);
+					double r1;
+					///information capability
+					r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+					if (r1 <= ((_Scenario_Interface*)_global_scenario)->template realtime_informed_vehicle_market_share<double>())
+					{
+						vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>(Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION);
+					}
+					else
+					{
+						vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>(Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION);
+					}
+
+					/// information compliance rate
+					r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+					vehicle->template information_compliance_rate<double>(r1);
+
+					///rib
+					r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+					double mean = ((_Scenario_Interface*)_global_scenario)->template relative_indifference_bound_route_choice_mean<double>();
+					double a = 0.0;
+					double b = 2.0*mean;
+					double rib = vehicle->template rng_stream<RNG_Components::RngStream&>().triangular_random_variate(r1,a,b,mean);
+					vehicle->template relative_indifference_bound_route_choice<double>(rib);
+
+					///mtts
+					r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+					mean = ((_Scenario_Interface*)_global_scenario)->template minimum_travel_time_saving_mean<double>();
+					a = 0.5 * mean;
+					b = a + 2.0*mean;
+					double mtts = vehicle->template rng_stream<RNG_Components::RngStream&>().triangular_random_variate(r1,a,b,mean);
+					vehicle->template minimum_travel_time_saving<double>(mtts);
+					///
 
 					traveler->template uuid<int>(traveler_id_counter);
 					traveler->template internal_id<int>(traveler_id_counter);
@@ -273,6 +309,42 @@ namespace Demand_Components
 					vehicle->template internal_id<int>(i);
 					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 					vehicle->template traveler<_Traveler_Interface*>(traveler);
+
+					///
+					unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+i+1;
+					vehicle->template rng_stream<RNG_Components::RngStream&>().SetSeed(seed);
+					double r1;
+					///information capability
+					r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+					if (r1 <= ((_Scenario_Interface*)_global_scenario)->template realtime_informed_vehicle_market_share<double>())
+					{
+						vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>(Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION);
+					}
+					else
+					{
+						vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>(Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION);
+					}
+
+					/// information compliance rate
+					r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+					vehicle->template information_compliance_rate<double>(r1);
+
+					///rib
+					r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+					double mean = ((_Scenario_Interface*)_global_scenario)->template relative_indifference_bound_route_choice_mean<double>();
+					double a = 0.0;
+					double b = 2.0*mean;
+					double rib = vehicle->template rng_stream<RNG_Components::RngStream&>().triangular_random_variate(r1,a,b,mean);
+					vehicle->template relative_indifference_bound_route_choice<double>(rib);
+
+					///mtts
+					r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+					mean = ((_Scenario_Interface*)_global_scenario)->template minimum_travel_time_saving_mean<double>();
+					a = 0.5 * mean;
+					b = a + 2.0*mean;
+					double mtts = vehicle->template rng_stream<RNG_Components::RngStream&>().triangular_random_variate(r1,a,b,mean);
+					vehicle->template minimum_travel_time_saving<double>(mtts);
+					///
 
 					traveler->template uuid<int>(raw_vehicle.get_vehicle_id());
 					traveler->template internal_id<int>(i);

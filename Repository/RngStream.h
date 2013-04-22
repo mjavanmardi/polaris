@@ -47,6 +47,7 @@ namespace RNG_Components
 
 	double RandU01 ();
 
+	double triangular_random_variate(double u, double a, double b, double mean);
 
 	int RandInt (int i, int j);
 
