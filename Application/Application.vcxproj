@@ -645,7 +645,7 @@
       </PrecompiledHeaderOutputFile>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AssemblerOutput>NoListing</AssemblerOutput>
-      <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm200 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>

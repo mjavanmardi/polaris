@@ -21,10 +21,15 @@ namespace Link_Control_Components
 			{
 				ComponentType::Initialize_Type<ComponentType,CallerType,TargetType>(configuration);
 			}
-			
+
+			feature static void Initialize_Type()
+			{
+				ComponentType::Initialize_Type<ComponentType,CallerType,TargetType>();
+			}	
+
 			feature void Initialize(TargetType configuration)
 			{
-				ComponentType::Initialize<ComponentType,CallerType,TargetType>(configuration);
+				this_component()->Initialize<ComponentType,CallerType,TargetType>(configuration);
 			}
 
 			feature_accessor(x_position, none, none);

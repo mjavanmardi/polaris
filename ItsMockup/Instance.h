@@ -16,9 +16,6 @@ void PopulateInstance(std::string db_path)
 	typedef odb::query<Component> qc; typedef odb::result<Component> rc;
 	odb::transaction t (db->begin());
 	odb::session s;
-	db->execute("delete from Instance;");
-	db->execute("delete from Instance_values;");
-	db->execute("delete from Instance_Value;");
 	//try
 	//{
 		shared_ptr<Component> comp_vss = db->load<Component>(1);
@@ -35,14 +32,37 @@ void PopulateInstance(std::string db_path)
 	//}
 	string type;
 	int p;
-	shared_ptr<polaris::io::Instance> inst(nullptr);
-	polaris::io::Instance inst_temp;
-	shared_ptr<polaris::io::Instance_Value> inst_val (nullptr);
-	shared_ptr<polaris::io::Component_Key> comp_key (nullptr);
 
 	rl r (db->query<Link> (ql::true_expr));
-	db->execute("DELETE from Instance;");
-	comp_key = db->load<Component_Key>("CurrentEvent");
+	db->execute("DELETE from VSS;");
+	db->execute("DELETE from VMS;");
+	db->execute("DELETE from HAR;");
+	db->execute("DELETE from Depot;");
+	db->execute("DELETE from OpenShoulder;");
+
+	shared_ptr<VMS>				vms (nullptr);
+	shared_ptr<VSS>				vss (nullptr);
+	shared_ptr<HAR>				har (nullptr);
+	shared_ptr<Depot>			depot (nullptr);
+	shared_ptr<OpenShoulder>    os (nullptr);
+	shared_ptr<LinkList>		link_set (nullptr);
+
+	har.reset(new HAR(1,5817, 0,1000, 20, 0));
+	har->setComponent(comp_har);
+	link_set.reset(new LinkList());
+	link_set->setLinks(GetLinksInsideCounty(db_path, "Lake"));
+	db->persist(link_set);
+	har->setLinks(link_set);
+	db->persist(har);
+
+	depot.reset(new Depot(0, 16277, 0, 100, 10, 500, 500));
+	depot->setComponent(comp_ttd);
+	link_set.reset(new LinkList());
+	link_set->setLinks(GetLinksInsideDepotPolygon(db_path));
+	db->persist(link_set);
+	depot->setLinks(link_set);
+	db->persist(depot);
+
 	for (rl::iterator i (r.begin()); i!=r.end(); ++i)
 	{
 		points_it = points.find(i->getLink());
@@ -53,25 +73,21 @@ void PopulateInstance(std::string db_path)
 		//put a VMS with probability 10%
 		if ( (type == "FREEWAY" || type == "EXPRESSWAY" ) && (p < 10) )
 		{
-			inst.reset(new Instance());
-			inst->setComponent(comp_vms);
-			inst->setLocation_X(points_it->second.x);
-			inst->setLocation_Y(points_it->second.y);
-			inst_val.reset(new Instance_Value());			
-			inst_val->setKey(comp_key);
-			inst_val->setValue("-1");	
+			vms.reset(new VMS());
+			vms->setComponent(comp_vms);
+			if (i->getLanes_Ab() == 0 && i->getLanes_Ba() == 0)
+				continue;
+			if (i->getLanes_Ab() > 0) 
+				vms->setDir(0);
+			else
+				vms->setDir(1);
+			vms->setLink(i->getLink());
+			vms->setOffset(i->getLength()/2);
+			vms->setSetback(20);
+			vms->setInitial_Event(0);
 			try 
 			{
-				db->persist(inst_val);
-			}
-			catch (odb::object_already_persistent e) {
-				std::cout << "VMS Instance Values object already exists. " << e.what() << "\n";
-			}
-			comp_vms->setInstanc(inst);
-			inst->setValu(inst_val);
-			try 
-			{
-				db->persist(inst);
+				db->persist(vms);
 			}
 			catch (odb::object_already_persistent e) 
 			{
@@ -79,32 +95,22 @@ void PopulateInstance(std::string db_path)
 			}
 		}
 		//put a VSS with probability 5%
-		comp_key = db->load<Component_Key>("CurrentSpeed");
 		if ( (type == "FREEWAY" || type == "EXPRESSWAY" ) && (p > 95) )
 		{
-			inst.reset(new Instance());
-			inst->setComponent(comp_vss);
-			inst->setLocation_X(points_it->second.x);
-			inst->setLocation_Y(points_it->second.y);
+			vss.reset(new VSS());
+			vss->setComponent(comp_vss);
+			if (i->getLanes_Ab() == 0 && i->getLanes_Ba() == 0)
+				continue;
+			if (i->getLanes_Ab() > 0) 
+				vss->setDir(0);
+			else
+				vss->setDir(1);
+			vss->setLink(i->getLink());
+			vss->setOffset(i->getLength()/2);
+			vss->setSetback(20);
+			vss->setInitial_Speed(55);
 			try {
-				db->persist(inst);
-			}
-			catch (odb::object_already_persistent e) {
-				std::cout << "VSS Instance object already exists. " << e.what() << "\n";
-			}			
-			inst_val.reset(new Instance_Value());			
-			inst_val->setKey(comp_key);
-			inst_val->setValue("55");	
-			try {
-				db->persist(inst_val);
-			}
-			catch (odb::object_already_persistent e) {
-				std::cout << "VSS Instance Values object already exists. " << e.what() << "\n";
-			}	
-			comp_vss->setInstanc(inst);
-			inst->setValu(inst_val);
-			try {
-				db->persist(inst);
+				db->persist(vss);
 			}
 			catch (odb::object_already_persistent e) {
 				std::cout << "VSS Instance object already exists. " << e.what() << "\n";
@@ -113,36 +119,29 @@ void PopulateInstance(std::string db_path)
 			
 		}
 		//put a OpenShoulder with probability 20%
-		comp_key = db->load<Component_Key>("Open");
 		if ( (type == "FREEWAY") && (p < 20) )
 		{
-			inst.reset(new Instance());
-			inst->setComponent(comp_os);
-			inst->setLocation_X(points_it->second.x);
-			inst->setLocation_Y(points_it->second.y);
-			
-			inst_val.reset(new Instance_Value());			
-			inst_val->setKey(comp_key);
-			inst_val->setValue("0");	
+			os.reset(new OpenShoulder());
+			os->setComponent(comp_os);
+			link_set.reset(new LinkList());
+			link_set->setLink(i->getLink());
+			db->persist(link_set);
+			os->setLinks(link_set);
 			try {
-				db->persist(inst_val);
+				db->persist(os);
 			}
 			catch (odb::object_already_persistent e) {
 				std::cout << "OS Instance Values object already exists. " << e.what() << "\n";
 			}	
-			comp_os->setInstanc(inst);
-			inst->setValu(inst_val);
-			try {
-				db->persist(inst);
-			}
-			catch (odb::object_already_persistent e) {
-				std::cout << "OS Instance object already exists. " << e.what() << "\n";
-
-			}
 			
 			
 		}
 	}
-
-	t.commit();
+	try {
+		t.commit();
+	}
+	catch (odb::database_exception& e) {
+		std::cout << "Commit failed. " << e.what() << "\n";
+	}
+	
 }

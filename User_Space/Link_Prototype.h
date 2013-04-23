@@ -168,6 +168,11 @@ namespace Link_Components
 			feature_accessor(depot, none, none);
 			feature_accessor(variable_word_sign, none, none);
 			feature_accessor(variable_speed_sign, none, none);
+			
+			feature_prototype void Push_ITS(TargetType its)
+			{
+				this_component()->template Accept_ITS<ComponentType,CallerType,TargetType>(its);
+			}
 
 			//visualized link
 			feature_accessor(displayed_line, none, none);

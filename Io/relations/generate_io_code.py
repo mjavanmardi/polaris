@@ -121,16 +121,18 @@ $ForwardDeclarations$
     for obj_type in types:
         t_name = obj_type.getAttribute("name")
         ForwardDeclarations += "class %s;\n"%t_name
+        prologue = obj_type.getAttribute("prologue")
         pragma = obj_type.getAttribute("pragma")
         fields = obj_type.getElementsByTagName("field")
         content += """
+%s
 #pragma db %s
 class %s
 {
 public:
     // Default Constructor
     %s () {}        
-"""%(pragma, t_name, t_name)
+"""%(prologue, pragma, t_name, t_name)
     
         constructor_1 = "\t%s ("%t_name
         constructor_2 = ": "

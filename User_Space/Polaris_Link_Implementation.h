@@ -865,6 +865,26 @@ namespace Link_Components
 				_this_ptr->template network_state_update<NULLTYPE>();
 			}
 			
+			feature_implementation void Accept_ITS( typename type_of(MasterType::variable_speed_sign)* vss)
+			{
+				_variable_speed_sign = (variable_speed_sign_interface*)vss;
+			}
+			
+			feature_implementation void Accept_ITS( typename type_of(MasterType::variable_word_sign)* vws)
+			{
+				_variable_word_sign = (variable_word_sign_interface*)vws;
+			}
+			
+			feature_implementation void Accept_ITS( typename type_of(MasterType::advisory_radio)* har)
+			{
+				_advisory_radio = (advisory_radio_interface*)har;
+			}
+
+			feature_implementation void Accept_ITS( typename type_of(MasterType::depot)* depot)
+			{
+				_depot = (depot_interface*)depot;
+			}
+
 			static void subscribe_events()
 			{
 				// event subscription

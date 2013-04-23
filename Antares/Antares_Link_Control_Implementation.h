@@ -25,22 +25,17 @@ namespace Link_Control_Components
 		{
 			typedef typename InheritanceTemplate<MasterType,NT,APPEND_CHILD(Antares_Link_Control)>::ComponentType ComponentType;
 			
-			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Component_Key>>& keys,string& name)
+			feature_implementation static void Initialize_Type(string& name)
 			{
-				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Antares_Link_Control)>::Initialize_Type<ComponentType,CallerType,NT>(keys);
+				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Antares_Link_Control)>::Initialize_Type<ComponentType,CallerType,NT>();
 
 				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(name);
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Lines();
 				cfg.grouped=true;
-				//cfg.group_color=true;
 				cfg.head_size_value=4;
-				
-				//for(vector<string>::iterator itr=ComponentType::_component_keys.begin();itr!=ComponentType::_component_keys.end();itr++)
-				//{
-				//	cfg.attributes_schema.push_back(*itr);
-				//}
+				cfg.head_accent_size_value=6;
 
 				cfg.head_color._r = 0;
 				cfg.head_color._g = 0;
@@ -66,9 +61,9 @@ namespace Link_Control_Components
 			};
 #pragma pack(pop)
 
-			feature_implementation void Initialize(weak_ptr<polaris::io::Instance>& instance)
+			feature_implementation void Initialize(TargetType configuration)
 			{
-				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Antares_Link_Control)>::Initialize<ComponentType,CallerType,NT>(instance);
+				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Antares_Link_Control)>::Initialize<ComponentType,CallerType,TargetType>(configuration);
 
 				vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr;
 
@@ -80,7 +75,7 @@ namespace Link_Control_Components
 
 				Link_Line_Segment* current_segment = group.segments;
 
-				Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)_covered_link;
+				Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)_covered_links.front();
 				
 				Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
 				
@@ -111,9 +106,9 @@ namespace Link_Control_Components
 
 		implementation struct Antares_Lane_Link_Control : public Antares_Link_Control<MasterType,NT,APPEND_CHILD(Antares_Lane_Link_Control),Lane_Link_Control>
 		{
-			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Component_Key>>& keys)
+			feature_implementation static void Initialize_Type()
 			{
-				Antares_Link_Control::Initialize_Type<ComponentType,CallerType,NT>(keys,string("Lane_Link_Controls"));
+				Antares_Link_Control::Initialize_Type<ComponentType,CallerType,NT>(string("Lane_Link_Controls"));
 			}
 		};
 	}

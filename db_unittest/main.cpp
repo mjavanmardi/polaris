@@ -68,29 +68,11 @@ TEST_F(DBTest, EventgetInstances)
 	for (result::iterator i (r.begin()); i!=r.end(); ++i)
 	{
 		count++;
-		const vector<weak_ptr<Event_Instance> >& instances = i->getInstances();
 	}
 	t.commit();
 	ASSERT_EQ(count, 5);
 }
 
-TEST_F(DBTest, Event_Instance_Value)
-{
-	using namespace polaris::io;
-	typedef odb::query<Event_Instance_Value> query;
-	typedef odb::result<Event_Instance_Value> result;
-	//odb::session s;
-	odb::transaction t(this->db->begin());
-	result r(this->db->query<Event_Instance_Value>(query::true_expr));
-	int count=0;
-	for (result::iterator i (r.begin()); i!=r.end(); ++i)
-	{
-		count++;
-		const vector<weak_ptr<Event_Instance> >& instances = i->getInstances();
-	}
-	t.commit();
-	ASSERT_EQ(count, 5);
-}
 
 TEST_F(DBTest, ZoneFKZone_Land_Use){
 	typedef odb::query<polaris::io::Zone> query;

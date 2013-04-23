@@ -17,16 +17,6 @@ namespace Advisory_ITS_Components
 		struct Antares_Advisory_ITS : public InheritanceTemplate<MasterType,ParentType,APPEND_CHILD(Antares_Advisory_ITS)>
 		{
 			typedef typename InheritanceTemplate<MasterType,ParentType,APPEND_CHILD(Antares_Advisory_ITS)>::ComponentType ComponentType;
-			
-			feature_implementation void Accept_Network_Events(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
-			{
-				_current_events.clear();
-
-				for(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
-				{
-					_current_events.push_back( *itr );
-				}
-			}
 
 #pragma pack(push,1)
 			struct Link_Line_Segment
@@ -44,6 +34,62 @@ namespace Advisory_ITS_Components
 				Link_Line_Segment* segments;
 			};
 #pragma pack(pop)
+
+			feature_implementation void Initialize(TargetType configuration)
+			{
+				InheritanceTemplate<MasterType,ParentType,APPEND_CHILD(Antares_Advisory_ITS)>::Initialize<ComponentType,CallerType,TargetType>(configuration);
+
+				if(_covered_links.size())
+				{
+					Link_Line_Segment* segments = new Link_Line_Segment[ _covered_links.size() ];
+					
+					Link_Line_Group group;
+					group.num_primitives = _covered_links.size();
+					group.segments = segments;
+					group.object = (void*)((ComponentType*)this);
+
+					Link_Line_Segment* current_segment = group.segments;
+
+					for(vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+					{
+						Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
+						
+						Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
+						
+						intersection = link->upstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+						
+						current_segment->a._x = intersection->x_position<float>();
+						current_segment->a._y = intersection->y_position<float>();
+						current_segment->a._z = 2;
+
+						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+
+						intersection = link->downstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+
+						current_segment->b._x = intersection->x_position<float>();
+						current_segment->b._y = intersection->y_position<float>();
+						current_segment->b._z = 2;
+
+						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+
+						++current_segment;
+					}
+					
+					_its_component_layer->Push_Element<Regular_Element>(&group);
+
+					delete[] segments;
+				}
+			}
+
+			feature_implementation void Accept_Network_Events(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
+			{
+				_current_events.clear();
+
+				for(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
+				{
+					_current_events.push_back( *itr );
+				}
+			}
 
 			static bool on_submit(const list<void*>& selected,const vector<string>& attribute_choices,const vector<string>& dropdown_choices)
 			{
@@ -96,6 +142,46 @@ namespace Advisory_ITS_Components
 						((ComponentType*)*itr)->Accent_Self<ComponentType,ComponentType,NT>();
 					}
 				}
+			}
+
+			feature_implementation void Accent_Self()
+			{
+				Link_Line_Segment* segments = new Link_Line_Segment[ _covered_links.size() ];
+					
+				Link_Line_Group group;
+				group.num_primitives = _covered_links.size();
+				group.segments = segments;
+
+				Link_Line_Segment* current_segment = group.segments;
+
+				for(vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+				{
+					Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
+					
+					Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
+					
+					intersection = link->upstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+					
+					current_segment->a._x = intersection->x_position<float>();
+					current_segment->a._y = intersection->y_position<float>();
+					current_segment->a._z = 2;
+
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+
+					intersection = link->downstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+
+					current_segment->b._x = intersection->x_position<float>();
+					current_segment->b._y = intersection->y_position<float>();
+					current_segment->b._z = 2;
+
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+
+					++current_segment;
+				}
+				
+				_its_component_layer->Push_Element<Accented_Element>(&group);
+
+				delete[] segments;
 			}
 
 			static member_prototype(Antares_Layer,its_component_layer,typename type_of(MasterType::antares_layer),none,none);

@@ -21,6 +21,11 @@ namespace Advisory_ITS_Components
 			{
 				ComponentType::Initialize_Type<ComponentType,CallerType,TargetType>(configuration);
 			}
+			
+			feature static void Initialize_Type()
+			{
+				ComponentType::Initialize_Type<ComponentType,CallerType,TargetType>();
+			}
 
 			feature void Initialize(TargetType configuration)
 			{

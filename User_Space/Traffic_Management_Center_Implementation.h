@@ -1,6 +1,6 @@
 #pragma once
 #include "Traffic_Management_Center_Prototype.h"
-#include "Io\Geometry.h"
+//#include "Io\Geometry.h"
 #include "Geometry_Implementation.h"
 
 
@@ -82,84 +82,158 @@ namespace Traffic_Management_Center_Components
 
 				transaction t(db->begin());
 
-				result<Component> component_result=db->template query<Component>(query<Component>::true_expr);
+				cout << "Reading Components" << endl;
 
-				cout << "Reading Components: " << db_name << endl;
+				
+				cout << "VSS" << endl;
 
-				for(result<Component>::iterator db_itr = component_result.begin (); db_itr != component_result.end (); ++db_itr)
+				result<VSS> vss_component_result=db->template query<VSS>(query<VSS>::true_expr);
+				
+				Variable_Speed_Sign_Interface::Initialize_Type<NT>();
+
+				for(result<VSS>::iterator db_itr = vss_component_result.begin (); db_itr != vss_component_result.end (); ++db_itr)
 				{
-					const string& name = db_itr->getName();
+					Variable_Speed_Sign_Interface* its_component = (Variable_Speed_Sign_Interface*)Allocate<Variable_Speed_Sign_Interface::ComponentType>();
+					its_component->Initialize< VSS& >( *db_itr );
+					_variable_speed_signs.push_back(its_component);				
+				}
+				
 
-					cout << name << endl;
+				cout << "VWS" << endl;
 
-					if(name == "Variable Speed Sign")
-					{
-						Variable_Speed_Sign_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
-					}
-					else if(name == "Variable Message Sign")
-					{
-						Variable_Word_Sign_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
-					}
-					else if(name == "Tow Truck Depot")
-					{
-						Depot_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
+				result<VMS> vws_component_result=db->template query<VMS>(query<VMS>::true_expr);
 
-						Depot_Interface* its_component = (Depot_Interface*)Allocate<Depot_Interface::ComponentType>();											
-						vector<int>& covered_links = GetLinksInsideDepotPolygon(db_name);
-						its_component->Initialize< vector<int>& >(covered_links);
-						_depots.push_back(its_component);
-					}
-					else if(name == "HAR")
-					{
-						Advisory_Radio_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
+				Variable_Word_Sign_Interface::Initialize_Type<NT>();
 
-						map<string, POLY>& har_locations = GetCountyPolygons(db_name);
+				for(result<VMS>::iterator db_itr = vws_component_result.begin (); db_itr != vws_component_result.end (); ++db_itr)
+				{
+					Variable_Word_Sign_Interface* its_component = (Variable_Word_Sign_Interface*)Allocate<Variable_Word_Sign_Interface::ComponentType>();
+					its_component->Initialize< VMS& >( *db_itr );
+					_variable_word_signs.push_back(its_component);				
+				}
 
-						for(map<string, POLY>::iterator itr = har_locations.begin(); itr!= har_locations.end(); itr++)
-						{
-							vector<int>& covered_links = GetLinksInsideCounty(db_name,itr->first);
 
-							if(covered_links.size() > 0)
-							{
-								Advisory_Radio_Interface* its_component = (Advisory_Radio_Interface*)Allocate<Advisory_Radio_Interface::ComponentType>();
-								its_component->Initialize< vector<int>& >(covered_links);
-								_advisory_radios.push_back(its_component);
-							}
-						}
-					}
-					else if(name == "Open Shoulder")
-					{
-						Link_Control_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
-					}
-					
-					const vector<weak_ptr<Instance> >& instances = db_itr->getInstances();
+				cout << "HAR" << endl;
 
-					for(vector<weak_ptr<Instance>>::const_iterator vitr=instances.begin();vitr!=instances.end();vitr++)
-					{
-						weak_ptr<Instance> _ptr=*vitr;
+				result<HAR> har_component_result=db->template query<HAR>(query<HAR>::true_expr);
 
-						if(name == "Variable Speed Sign")
-						{
-							Variable_Speed_Sign_Interface* its_component = (Variable_Speed_Sign_Interface*)Allocate<Variable_Speed_Sign_Interface::ComponentType>();
-							its_component->Initialize< weak_ptr<Instance>& >(_ptr);
-							_variable_speed_signs.push_back(its_component);
-						}
-						else if(name == "Variable Message Sign")
-						{
-							Variable_Word_Sign_Interface* its_component = (Variable_Word_Sign_Interface*)Allocate<Variable_Word_Sign_Interface::ComponentType>();
-							its_component->Initialize< weak_ptr<Instance>& >(_ptr);
-							_variable_word_signs.push_back(its_component);
-						}
-						else if(name == "Open Shoulder")
-						{
-							Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<Link_Control_Interface::ComponentType>();
-							its_component->Initialize< weak_ptr<Instance>& >(_ptr);
-							_link_controls.push_back(its_component);
-						}
-					}
+				Advisory_Radio_Interface::Initialize_Type<NT>();
+
+				for(result<HAR>::iterator db_itr = har_component_result.begin (); db_itr != har_component_result.end (); ++db_itr)
+				{
+					Advisory_Radio_Interface* its_component = (Advisory_Radio_Interface*)Allocate<Advisory_Radio_Interface::ComponentType>();
+					its_component->Initialize< HAR& >( *db_itr );
+					_advisory_radios.push_back(its_component);				
+				}
+
+
+				cout << "Depot" << endl;
+
+				result<polaris::io::Depot> depot_component_result=db->template query<polaris::io::Depot>(query<polaris::io::Depot>::true_expr);
+
+				Depot_Interface::Initialize_Type<NT>();
+
+				for(result<polaris::io::Depot>::iterator db_itr = depot_component_result.begin (); db_itr != depot_component_result.end (); ++db_itr)
+				{
+					Depot_Interface* its_component = (Depot_Interface*)Allocate<Depot_Interface::ComponentType>();
+					its_component->Initialize< polaris::io::Depot& >( *db_itr );
+					_depots.push_back(its_component);				
+				}
+
+
+				cout << "Link Control" << endl;
+
+				result<OpenShoulder> link_control_component_result=db->template query<OpenShoulder>(query<OpenShoulder>::true_expr);
+
+				Link_Control_Interface::Initialize_Type<NT>();
+
+				for(result<OpenShoulder>::iterator db_itr = link_control_component_result.begin (); db_itr != link_control_component_result.end (); ++db_itr)
+				{
+					Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<Link_Control_Interface::ComponentType>();
+					its_component->Initialize< OpenShoulder& >( *db_itr );
+					_link_controls.push_back(its_component);				
 				}
 
 				cout << "Done Reading" << endl;
+
+				//result<Component> component_result=db->template query<Component>(query<Component>::true_expr);
+
+				//cout << "Reading Components: " << db_name << endl;
+
+				//for(result<Component>::iterator db_itr = component_result.begin (); db_itr != component_result.end (); ++db_itr)
+				//{
+				//	const string& name = db_itr->getName();
+
+				//	cout << name << endl;
+
+				//	if(name == "Variable Speed Sign")
+				//	{
+				//		Variable_Speed_Sign_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
+				//	}
+				//	else if(name == "Variable Message Sign")
+				//	{
+				//		Variable_Word_Sign_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
+				//	}
+				//	else if(name == "Tow Truck Depot")
+				//	{
+				//		Depot_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
+
+				//		Depot_Interface* its_component = (Depot_Interface*)Allocate<Depot_Interface::ComponentType>();											
+				//		vector<int>& covered_links = GetLinksInsideDepotPolygon(db_name);
+				//		its_component->Initialize< vector<int>& >(covered_links);
+				//		_depots.push_back(its_component);
+				//	}
+				//	else if(name == "HAR")
+				//	{
+				//		Advisory_Radio_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
+
+				//		map<string, POLY>& har_locations = GetCountyPolygons(db_name);
+
+				//		for(map<string, POLY>::iterator itr = har_locations.begin(); itr!= har_locations.end(); itr++)
+				//		{
+				//			vector<int>& covered_links = GetLinksInsideCounty(db_name,itr->first);
+
+				//			if(covered_links.size() > 0)
+				//			{
+				//				Advisory_Radio_Interface* its_component = (Advisory_Radio_Interface*)Allocate<Advisory_Radio_Interface::ComponentType>();
+				//				its_component->Initialize< vector<int>& >(covered_links);
+				//				_advisory_radios.push_back(its_component);
+				//			}
+				//		}
+				//	}
+				//	else if(name == "Open Shoulder")
+				//	{
+				//		Link_Control_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
+				//	}
+				//	
+				//	const vector<weak_ptr<Instance> >& instances = db_itr->getInstances();
+
+				//	for(vector<weak_ptr<Instance>>::const_iterator vitr=instances.begin();vitr!=instances.end();vitr++)
+				//	{
+				//		weak_ptr<Instance> _ptr=*vitr;
+
+				//		if(name == "Variable Speed Sign")
+				//		{
+				//			Variable_Speed_Sign_Interface* its_component = (Variable_Speed_Sign_Interface*)Allocate<Variable_Speed_Sign_Interface::ComponentType>();
+				//			its_component->Initialize< weak_ptr<Instance>& >(_ptr);
+				//			_variable_speed_signs.push_back(its_component);
+				//		}
+				//		else if(name == "Variable Message Sign")
+				//		{
+				//			Variable_Word_Sign_Interface* its_component = (Variable_Word_Sign_Interface*)Allocate<Variable_Word_Sign_Interface::ComponentType>();
+				//			its_component->Initialize< weak_ptr<Instance>& >(_ptr);
+				//			_variable_word_signs.push_back(its_component);
+				//		}
+				//		else if(name == "Open Shoulder")
+				//		{
+				//			Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<Link_Control_Interface::ComponentType>();
+				//			its_component->Initialize< weak_ptr<Instance>& >(_ptr);
+				//			_link_controls.push_back(its_component);
+				//		}
+				//	}
+				//}
+
+				
 			}
 
 			member_data(vector<Variable_Word_Sign_Interface*>,variable_word_signs,none,none);
