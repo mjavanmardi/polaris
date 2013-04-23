@@ -17,7 +17,7 @@ struct Accented_Element{};
 struct Regular_Element{};
 struct Internal_Element{};
 
-enum ANTARES_SELECTION_MODE {ALT_DOWN,CTRL_DOWN,};
+enum ANTARES_SELECTION_MODE {ALT_DOWN,CTRL_DOWN};
 
 prototype struct Antares_Layer
 {
@@ -75,6 +75,8 @@ prototype struct Antares_Layer
 
 	feature_accessor(primitive_type,none,none);
 	feature_accessor(head_size_value,none,none);
+	feature_accessor(head_accent_size_value,none,none);
+
 	feature_accessor(head_normal,none,none);	
 	
 	
@@ -146,12 +148,17 @@ struct Antares_Layer_Configuration
 	// Default Configuration
 	Antares_Layer_Configuration()
 	{
+		Configure_Default();
+	}
+
+	void Configure_Default()
+	{
 		draw=false;
 		dynamic_data=false;
 
 		storage_offset=_iteration;
 		storage_size=1;
-		storage_period=1;
+		storage_period=END;
 		
 		primitive_color=false;
 		head_color._r=0;
@@ -170,8 +177,11 @@ struct Antares_Layer_Configuration
 		head_normal._z=1;
 		
 		grouped=false;
+		group_color=false;
+		group_normal=false;
 
 		head_size_value=1;
+		head_accent_size_value=1;
 
 		submission_callback=nullptr;
 		selection_callback=nullptr;
@@ -180,7 +190,7 @@ struct Antares_Layer_Configuration
 
 	void Configure_Lines()
 	{
-		Antares_Layer_Configuration();
+		Configure_Default();
 		primitive_type=_LINE;
 
 		head_color._r=128;
@@ -191,7 +201,7 @@ struct Antares_Layer_Configuration
 	
 	void Configure_Dynamic_Lines()
 	{
-		Antares_Layer_Configuration();
+		Configure_Default();
 		dynamic_data=true;
 		storage_size=3;
 		storage_period=1;
@@ -206,7 +216,7 @@ struct Antares_Layer_Configuration
 
 	void Configure_Points()
 	{
-		Antares_Layer_Configuration();
+		Configure_Default();
 		dynamic_data=true;
 
 		storage_offset=_iteration;
@@ -225,7 +235,7 @@ struct Antares_Layer_Configuration
 
 	void Configure_Static_Points(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
-		Antares_Layer_Configuration();
+		Configure_Default();
 		primitive_type=_POINT;
 
 		head_color._r=Color._r;
@@ -238,7 +248,7 @@ struct Antares_Layer_Configuration
 	
 	void Configure_Static_Quads(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
-		Antares_Layer_Configuration();
+		Configure_Default();
 		primitive_type=_QUAD;
 
 		head_color._r=Color._r;
@@ -253,7 +263,7 @@ struct Antares_Layer_Configuration
 	
 	void Configure_Static_Polygons()
 	{
-		Antares_Layer_Configuration();
+		Configure_Default();
 		primitive_type = _POLYGON;
 		grouped = true;
 		group_color=true;
@@ -262,7 +272,7 @@ struct Antares_Layer_Configuration
 
 	void Configure_Dynamic_Quads(True_Color_RGBA<NULLTYPE>& Color, int size)
 	{
-		Antares_Layer_Configuration();
+		Configure_Default();
 		dynamic_data=true;
 		storage_size=3;
 		storage_period=1;
@@ -277,7 +287,7 @@ struct Antares_Layer_Configuration
 
 	void Configure_Plot()
 	{
-		Antares_Layer_Configuration();
+		Configure_Default();
 		
 		draw=true;
 		dynamic_data=true;
@@ -308,7 +318,7 @@ struct Antares_Layer_Configuration
 	Point_3D<NULLTYPE> head_normal;
 	//True_Color_RGBA<NULLTYPE> head_accent_color;
 	int head_size_value;
-
+	int head_accent_size_value;
 
 	bool grouped;
 		bool group_color;

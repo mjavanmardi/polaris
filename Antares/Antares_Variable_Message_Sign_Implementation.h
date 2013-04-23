@@ -115,7 +115,7 @@ namespace Variable_Message_Sign_Components
 				current_segment->b._z = 2;
 
 				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
-				
+
 				_its_component_layer->Push_Element<Regular_Element>(&group);
 			}
 

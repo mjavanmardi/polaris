@@ -521,7 +521,157 @@ namespace Link_Components
 			
 			static void on_select(const list<void*>& removed,const list<void*>& added,const list<void*>& selected,vector<pair<string,string>>& bucket)
 			{
+				if(removed.size())
+				{
+					((type_of(MasterType::network)*) _global_network)->_link_lines->Clear_Accented<NT>();
 
+					if(selected.size())
+					{
+						for(list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
+						{
+							((ComponentType*)*itr)->Accent_Self<ComponentType,ComponentType,NT>();
+						}
+					}
+				}
+				else if(added.size())
+				{
+					for(list<void*>::const_iterator itr=added.begin();itr!=added.end();itr++)
+					{
+						((ComponentType*)*itr)->Accent_Self<ComponentType,ComponentType,NT>();
+					}
+				}
+
+				if(selected.size())
+				{
+					((ComponentType*) (selected.back()))->Display_Attributes<ComponentType,ComponentType,NT>(bucket);
+				}
+			}
+
+			feature_implementation void Accent_Self()
+			{
+				Link_Line<MasterType> accented_line;
+
+				accented_line.data = _displayed_line.data;
+				accented_line.color._r = 255;
+				accented_line.color._g = 128;
+				accented_line.color._b = 0;
+				accented_line.up_node = _displayed_line.up_node;
+				accented_line.down_node = _displayed_line.down_node;
+
+				((type_of(MasterType::network)*) _global_network)->_link_lines->Push_Element<Accented_Element>(&accented_line);
+			}
+			
+			feature_implementation void Display_Attributes(vector<pair<string,string>>& bucket)
+			{
+				plot_link_moe();
+
+				stringstream s;
+				char str_buf[128];
+
+				pair<string,string> key_value_pair;
+				
+				key_value_pair.first="Id";
+				s << _internal_id;
+				key_value_pair.second=s.str();
+				s.str("");				
+				bucket.push_back(key_value_pair);
+				
+
+				key_value_pair.first="Type";
+				switch(_link_type)
+				{
+				case Types::Link_Type_Keys::ARTERIAL:
+					key_value_pair.second="ARTERIAL";
+					break;
+				case Types::Link_Type_Keys::EXPRESSWAY:
+					key_value_pair.second="EXPRESSWAY";
+					break;
+				case Types::Link_Type_Keys::FREEWAY:
+					key_value_pair.second="FREEWAY";
+					break;
+				case Types::Link_Type_Keys::OFF_RAMP:
+					key_value_pair.second="OFF_RAMP";
+					break;
+				case Types::Link_Type_Keys::ON_RAMP:
+					key_value_pair.second="ON_RAMP";
+					break;
+				default:
+					key_value_pair.second="NON_RECOGNIZED";
+					break;
+				}
+				bucket.push_back(key_value_pair);
+				
+				key_value_pair.first="Length";
+				sprintf(str_buf, "%.0f feet", _length);
+				key_value_pair.second=str_buf;
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+				
+				key_value_pair.first="Number of lanes";
+				sprintf(str_buf, "%d", _num_lanes);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+				
+				key_value_pair.first="Upstream node";
+				sprintf(str_buf, "%d", _upstream_intersection->_internal_id);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+				
+				key_value_pair.first="Downstream node";
+				sprintf(str_buf, "%d", _downstream_intersection->_internal_id);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="Free-flow speed";
+				sprintf(str_buf, "%.0f MPH", _free_flow_speed);
+				key_value_pair.second=str_buf;
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="Travel time";
+				sprintf(str_buf, "%.2f minutes", realtime_link_moe_data.link_travel_time);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="Speed";
+				sprintf(str_buf, "%.2f MPH", realtime_link_moe_data.link_speed);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="Density";
+				sprintf(str_buf, "%.2f VPMPL", realtime_link_moe_data.link_density);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="Travel time ratio";
+				sprintf(str_buf, "%.2f", realtime_link_moe_data.link_travel_time_ratio);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="Speed ratio";
+				sprintf(str_buf, "%.2f", realtime_link_moe_data.link_speed_ratio);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="Density ratio";
+				sprintf(str_buf, "%.2f", realtime_link_moe_data.link_density_ratio);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="Queue length";
+				sprintf(str_buf, "%.2f", realtime_link_moe_data.link_queue_length);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
 			}
 
 			static bool fetch_attributes(Antares_Link_Implementation* _this,vector<string>& bucket)
@@ -674,7 +824,6 @@ namespace Link_Components
 					cout << "Should never reach here in Antares link conditional!" << endl;
 				}
 			}
-
 			
 			declare_feature_event(Visualize_Link_MOE)
 			{

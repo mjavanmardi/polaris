@@ -149,7 +149,7 @@ namespace Depot_Components
 				for(itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 				{
 					Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
-						
+					
 					Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
 						
 					intersection = link->upstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();

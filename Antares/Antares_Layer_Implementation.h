@@ -37,9 +37,19 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			_group_normal=cfg.group_normal;
 
 
-		_head_color=*((True_Color_RGBA<MasterType>*)&cfg.head_color);
-		_head_normal=*((Point_3D<MasterType>*)&cfg.head_normal);
+		_head_color._r = cfg.head_color._r;
+		_head_color._g = cfg.head_color._g;
+		_head_color._b = cfg.head_color._b;
+		_head_color._a = cfg.head_color._a;
+		
+		_head_normal._x = cfg.head_normal._x;
+		_head_normal._y = cfg.head_normal._y;
+		_head_normal._z = cfg.head_normal._z;
+		
 		_head_size_value=cfg.head_size_value;
+		
+		_head_accent_size_value=cfg.head_accent_size_value;
+
 		//_head_accent_color=*((True_Color_RGBA<MasterType>*)&cfg.head_accent_color);
 
 		_primitive_color=cfg.primitive_color;
@@ -757,7 +767,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		}
 		else
 		{
-			Deselect_All<ComponentType,ComponentType,NT>();
+			//Deselect_All<ComponentType,ComponentType,NT>();
 		}
 	}
 	
@@ -780,6 +790,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	member_data(True_Color_RGBA<MasterType>,head_color,none,none);
 	member_data(Point_3D<MasterType>,head_normal,none,none);
 	member_data(int,head_size_value,none,none);
+	member_data(int,head_accent_size_value,none,none);
 	//member_data(True_Color_RGBA<MasterType>,head_accent_color,none,none);
 
 	member_data(bool,grouped,none,none);
@@ -836,9 +847,9 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 				pthis->_storage[_iteration + pthis->_storage.period][i].clear();
 				pthis->_storage[_iteration + pthis->_storage.period][i].reserve(reserve);
 
-				reserve=pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].size();
-				pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].clear();
-				pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].reserve(reserve);
+				//reserve=pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].size();
+				//pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].clear();
+				//pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].reserve(reserve);
 			}
 			UNLOCK(_canvas_lock);
 		}

@@ -121,7 +121,7 @@ namespace Network_Event_Components
 
 				if(_callbacks_by_component_index.count(subscriber))
 				{
-					typename Network_Event_Callback<ComponentType>::type callback=_callbacks_by_component_index[Link_Interface::Component_Type::component_index];
+					typename Network_Event_Callback<ComponentType>::type callback=_callbacks_by_component_index[subscriber];
 
 					for(vector<Link_Interface*>::iterator itr=_affected_links.begin();itr!=_affected_links.end();itr++)
 					{

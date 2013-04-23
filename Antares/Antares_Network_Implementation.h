@@ -272,7 +272,6 @@ namespace Network_Components
 
 			feature_implementation void initialize_link_map_layers()
 			{
-				
 				_link_lines=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_lines),Antares_Network_Implementation>*, string& > >(string("Links"));
 
 				Antares_Layer_Configuration cfg;
@@ -281,6 +280,8 @@ namespace Network_Components
 				cfg.primitive_color=true;
 
 				cfg.selection_callback = &MasterType::type_of(link)::on_select;
+				cfg.head_accent_size_value = 3;
+				
 				//cfg.head_size_value = 
 				//cfg.attributes_callback = (attributes_callback_type)&MasterType::type_of(link)::fetch_attributes;
 				//cfg.attributes_schema = string("Id,Type,Travel time,Travel delay,Speed,Density,In-flow rate,Out-flow rate,Travel time ratio,Speed ratio,Density ratio,In-flow ratio,Out-flow ratio");

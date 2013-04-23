@@ -4,15 +4,12 @@
 
 namespace Network_Event_Components
 {
-
-
 	namespace Concepts
 	{
 	}
 	
 	namespace Types
 	{
-
 	}
 
 	namespace Prototypes
@@ -41,6 +38,7 @@ namespace Network_Event_Components
 				ComponentType::Accept_Subscriber<ComponentType,CallerType,TargetType>(callback,subscriber);
 			}
 
+			//Basic properties
 			feature_accessor(network_event_type,none,none);
 			feature_accessor(affected_links,none,none);
 			feature_accessor(time_detected,none,none);

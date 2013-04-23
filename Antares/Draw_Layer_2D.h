@@ -160,14 +160,6 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 		current_iteration++;
 	}
 
-	wxPLplotstream* pls = _plotwindow->GetStream();
-	//wxPLplotstream* pls = GetStream();
-
-	//pls->adv( 0 );
-	//pls->scol0( 0, 255, 255, 255 );
-	//pls->scol0( 15, 0, 0, 0 );
-
-
 	if(xmax == -FLT_MAX) xmax=1;
 	if(xmin == FLT_MAX) xmin=0;
 	if(ymax == -FLT_MAX) ymax=1;
@@ -178,13 +170,17 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 	ymin *= .9;
 	ymax += 1;
 	ymax *= 1.2;
+	
+	wxPLplotstream* pls = _plotwindow->GetStream();
+
+	pls->adv( 0 );
+	//pls->scol0( 0, 255, 255, 255 );
+	//pls->scol0( 15, 0, 0, 0 );
 
 	pls->col0( 1 );
 	pls->env( xmin, xmax, ymin, ymax, 0, 0 );
 
 	pls->lab( _layer->x_label<string&>().c_str(), _layer->y_label<string&>().c_str(), _layer->name<string&>().c_str() );
-	//pls->col0( 15 );
-	//pls->lab( "Iteration", "Value", _layer->name<string&>().c_str() );
 
 	int color_counter=3;
 

@@ -23,6 +23,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	const Point_3D<MasterType> head_normal=layer->head_normal<Point_3D<MasterType>>();
 	const int head_size_value=layer->head_size_value<int>();
 	
+	const int head_accent_size_value=layer->head_accent_size_value<int>();
+
 	const bool grouped=layer->grouped<bool>();
 	const bool group_color=layer->group_color<bool>();
 	const bool group_normal=layer->group_normal<bool>();
@@ -194,12 +196,12 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	{
 	case _POINT:
 		//glPointSize( ceil(5.0f*(float)head_size_value) );
-		glPointSize( head_size_value );
+		glPointSize( head_accent_size_value );
 		glBegin(GL_POINTS);
 		break;
 	case _LINE:
 		//glLineWidth( ceil(5.0f*(float)head_size_value) );
-		glLineWidth( head_size_value );
+		glLineWidth( head_accent_size_value );
 		glBegin(GL_LINES);
 		break;
 	case _TRIANGLE:
