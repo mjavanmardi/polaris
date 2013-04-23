@@ -54,6 +54,7 @@ namespace Turn_Movement_Components
 
 			// routable movement
 			feature_accessor(replicas_container, none, none);
+			feature_accessor(realtime_replicas_container, none, none);
 			feature_accessor(turn_travel_penalty, none, none);
 			feature_accessor(forward_link_turn_travel_time, none, none);
 

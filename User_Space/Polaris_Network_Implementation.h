@@ -107,6 +107,19 @@ namespace Network_Components
 			member_data(time_to_snapshot_map_type, network_snapshots, none, none);
 			member_data(vector<int>, snapshot_times, none, none);
 
+			typedef struct {
+				int a; 
+				int b;
+			} long_struct;
+			
+			typedef union {
+				long_struct c_struct;
+				long c_value;
+			} long_hash_key_type;
+
+			typedef unordered_map<long,typename MasterType::turn_movement_type*> link_turn_movement_map_type;
+			member_data(link_turn_movement_map_type, link_turn_movement_map, none, none);
+
 			feature_implementation void initialize_intersection_control()
 			{
 				define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
@@ -720,6 +733,11 @@ namespace Network_Components
 					
 					mvmt_itf->template turn_travel_penalty<float>(turn_travel_penalty);
 					mvmt_itf->template forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
+					for (int j = 0; j < (int)mvmt_itf->template replicas_container<_Turn_Movements_Container_Interface&>().size(); j++)
+					{
+						_Turn_Movement_Interface* replica = (_Turn_Movement_Interface*)mvmt_itf->template replicas_container<_Turn_Movements_Container_Interface&>()[j];
+						replica->template forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
+					}
 				}
 			}
 

@@ -177,6 +177,7 @@ namespace Network_Components
 			feature_accessor(network_vmt, none, none);
 			feature_accessor(network_vht, none, none);
 			feature_accessor(network_snapshot_container, none, none);
+			feature_accessor(link_turn_movement_map, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 

@@ -115,9 +115,13 @@ namespace Vehicle_Components
 
 				_Routing_Interface* router = traveler<ComponentType,CallerType,_Traveler_Interface*>()->template router<_Routing_Interface*>();
 
-				//define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Routable_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename MasterType::routable_network_type::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Regular_Link_Interface::get_type_of(realtime_replicas_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface2, typename MasterType::routable_network_type::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Regular_Network_Interface;
+				define_container_and_value_interface(_Regular_Movements_Container_Interface, _Regular_Movement_Interface, typename _Regular_Network_Interface::get_type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, typename _Regular_Movement_Interface::get_type_of(realtime_replicas_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Regular_Links_Container_Interface, _Regular_Link_Interface3, typename _Regular_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
 				///en-route switching
 				//cout<< "enroute switching..." <<endl;
@@ -125,6 +129,48 @@ namespace Vehicle_Components
 				_Regular_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Regular_Link_Interface*>();
 				_Regular_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Regular_Link_Interface*>();
 				
+				///calculate travel time of current route
+				float current_route_time_to_destination = 0.0f; 
+				int current_route_link_sum_to_destination = 0;
+
+				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
+				_Trajectory_Container_Interface::iterator itr;
+
+				for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
+				{
+					_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
+					_Regular_Link_Interface* route_link = trajectory_unit->template link<_Regular_Link_Interface*>();
+					_Routable_Link_Interface* routable_link;
+					//routable_link = (_Routable_Link_Interface*)(route_link->template realtime_replicas_container<_Regular_Links_Container_Interface&>()[_thread_id]); 
+					routable_link = (_Routable_Link_Interface*)(route_link->template replicas_container<_Regular_Links_Container_Interface&>()[_thread_id]); 
+					float link_travel_time = routable_link->template travel_time<float>();
+
+					current_route_link_sum_to_destination += route_link-> template internal_id<int>();
+					current_route_time_to_destination += link_travel_time;
+					if (itr < trajectory.end() - 1)
+					{
+						_Trajectory_Unit_Interface* next_trajectory_unit = (_Trajectory_Unit_Interface*)(*(itr+1));
+						_Regular_Link_Interface* next_route_link = next_trajectory_unit->template link<_Regular_Link_Interface*>();
+
+						_Routable_Link_Interface* next_routable_link;
+						//next_routable_link = (_Routable_Link_Interface*)(next_route_link->template realtime_replicas_container<_Regular_Links_Container_Interface&>()[_thread_id]); 
+						next_routable_link = (_Routable_Link_Interface*)(next_route_link->template replicas_container<_Regular_Links_Container_Interface&>()[_thread_id]); 
+
+						int inbound_link_id = route_link->template internal_id<int>();
+						int outbound_link_id = next_route_link->template internal_id<int>();
+						typename MasterType::network_type::long_hash_key_type long_hash_key;
+						long_hash_key.c_struct.a = inbound_link_id;
+						long_hash_key.c_struct.b = outbound_link_id;
+						typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+						_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.c_value];
+						//_Routable_Movement_Interface* routable_movement = (_Routable_Movement_Interface*)regular_movement->template realtime_replicas_container<_Regular_Movements_Container_Interface&>()[_thread_id]; 
+						_Routable_Movement_Interface* routable_movement = (_Routable_Movement_Interface*)regular_movement->template replicas_container<_Regular_Movements_Container_Interface&>()[_thread_id]; 
+						float turn_penalty = routable_movement->template forward_link_turn_travel_time<float>();
+						current_route_time_to_destination += turn_penalty;
+					}
+				}
+				
+				///calcualte travel time of the best route
 				router->template routable_origin<_Regular_Link_Interface*>(origin_link);
 				router->template routable_destination<_Regular_Link_Interface*>(destination_link);
 
@@ -132,26 +178,44 @@ namespace Vehicle_Components
 				_Routable_Network_Interface* routable_network_ptr = router->template routable_network<_Routable_Network_Interface*>();
 
 				bool pathFound = router->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
-
+				
 				///find a new route using shortest path algorithm
 				if (pathFound)
 				{	
-					((_Movement_Plan_Interface*)_movement_plan)->template valid_trajectory<bool>(true);
-					
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
 					{
 						THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
 						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->uuid<int>() << " and destination link uuid " << destination_link->uuid<int>());
 					}
 					
-					//cout<< "before change: current link " <<((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()  <<endl;
-					//cout<< "before change: current path size " <<((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>().size() <<endl;
-					
-					update_enroute_switch_decisions<ComponentType, CallerType, TargetType>();
+					int best_route_link_sum = 0;
+					_Reversed_Path_Container_Interface::iterator itr;
+					for(itr = routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin(); itr != routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().end(); itr++)
+					{
+						_Regular_Link_Interface* link = (_Regular_Link_Interface*)(*itr);
+						best_route_link_sum += link->template internal_id<int>();
+					}
+					_Regular_Link_Interface* regular_destination_link = (_Regular_Link_Interface*)(*(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin()));
+					//_Routable_Link_Interface* routable_destination_link = (_Routable_Link_Interface*)(regular_destination_link->template realtime_replicas_container<_Regular_Links_Container_Interface&>()[_thread_id]);
+					_Routable_Link_Interface* routable_destination_link = (_Routable_Link_Interface*)(regular_destination_link->template replicas_container<_Regular_Links_Container_Interface&>()[_thread_id]);
+					float best_route_time_to_destination = routable_destination_link->template label_cost<float>();
 
-					((_Movement_Plan_Interface*)_movement_plan)->template update_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
-					
-					//cout<< "after change : current path size " <<((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>().size() <<endl;
+					if (best_route_link_sum != current_route_link_sum_to_destination)
+					{
+
+						//((_Movement_Plan_Interface*)_movement_plan)->template valid_trajectory<bool>(true);
+
+						//cout<< "before change: current link " <<((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()  <<endl;
+						//cout<< "before change: current path size " <<((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>().size() <<endl;
+						
+						if (best_route_time_to_destination < current_route_time_to_destination*(1.0 - _relative_indifference_bound_route_choice) &&
+							best_route_time_to_destination < (current_route_time_to_destination - _minimum_travel_time_saving))
+						{
+							update_enroute_switch_decisions<ComponentType, CallerType, TargetType>();
+							((_Movement_Plan_Interface*)_movement_plan)->template update_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
+						}
+						//cout<< "after change : current path size " <<((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>().size() <<endl;
+					}
 				}
 			}
 

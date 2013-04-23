@@ -94,6 +94,13 @@ namespace Network_Components
 				turn_movement->template movement_rule<int>(raw_turn_movement.turn_movement_rule);
 				turn_movement->template uuid<int>(raw_turn_movement.uuid);
 				turn_movement->template internal_id<int>(i);
+				int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template internal_id<int>();
+				int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template internal_id<int>();
+				typename MasterType::network_type::long_hash_key_type long_hash_key;
+				long_hash_key.c_struct.a = inbound_link_id;
+				long_hash_key.c_struct.b = outbound_link_id;
+				_link_turn_movement_map.insert(make_pair<long,typename MasterType::turn_movement_type*>(long_hash_key.c_value, (typename MasterType::turn_movement_type*)turn_movement));
+
 				//// assign the detector
 				//turn_movement_1->template detector<Detector_Interface*>(lane->template Detector_Thru<Detector_Interface*>());
 				turn_movements_container<ComponentType,CallerType,_Turn_Movements_Container_Interface&>().push_back(turn_movement);

@@ -355,6 +355,7 @@ namespace Network_Components
 				define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, typename type_of(network_reference)::type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, typename type_of(network_reference)::type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface_unqualified_container(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, typename type_of(network_reference)::type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+
 				_Turn_Movement_Interface* turn_movement;
 				typename type_of(network_reference)::type_of(turn_movements_container)& turn_movements_monitor=_network_reference->turn_movements_container<typename type_of(network_reference)::type_of(turn_movements_container)&>();
 				_Turn_Movements_Container_Interface& turn_movements_container = _network_reference->turn_movements_container<_Turn_Movements_Container_Interface&>();
@@ -453,6 +454,14 @@ namespace Network_Components
 
 					
 					turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
+					int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template internal_id<int>();
+					int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template internal_id<int>();
+					typename MasterType::network_type::long_hash_key_type long_hash_key;
+					long_hash_key.c_struct.a = inbound_link_id;
+					long_hash_key.c_struct.b = outbound_link_id;
+
+					MasterType::network_type::link_turn_movement_map_type& link_turn_movement_map = _network_reference->link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+					link_turn_movement_map.insert(make_pair<long,typename MasterType::turn_movement_type*>(long_hash_key.c_value, (typename MasterType::turn_movement_type*)turn_movement));
 
 
 					turn_movements_container.push_back(turn_movement);
