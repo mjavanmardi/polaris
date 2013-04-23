@@ -170,10 +170,10 @@ namespace Vehicle_Components
 				//_Routable_Network_Interface* routable_network_ptr = router->template realtime_routable_network<_Routable_Network_Interface*>();
 				_Routable_Network_Interface* routable_network_ptr = router->template routable_network<_Routable_Network_Interface*>();
 
-				bool pathFound = router->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
+				float routed_travel_time = router->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
 				
 				///find a new route using shortest path algorithm
-				if (pathFound)
+				if (routed_travel_time >= 0.0)
 				{	
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
 					{

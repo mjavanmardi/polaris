@@ -80,6 +80,8 @@ namespace Movement_Plan_Components
 //			member_data(int,arrived_time,none,none);
 //#endif
 			member_component(typename MasterType::plan_type, plan, none, none);
+			member_data(float, routed_travel_time, none, none);
+
 			feature_implementation void arrive_to_destination()
 			{
 

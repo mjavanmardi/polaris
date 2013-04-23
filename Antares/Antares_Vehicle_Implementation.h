@@ -452,6 +452,9 @@ namespace Vehicle_Components
 				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 				define_component_interface(_Link_In_Trajectory_Interface, _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_component_interface(_Intersection_Interface, _Link_In_Trajectory_Interface::get_type_of(upstream_intersection), Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Switch_Decision_Data_Container_Interface, _Switch_Decision_Data_Interface, typename type_of(switch_decisions_container), Random_Access_Sequence_Prototype, Switch_Decision_Data_Prototype, ComponentType);
+				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Switch_Decision_Data_Interface::get_type_of(route_links_container), Random_Access_Sequence_Prototype, Link_Prototype, ComponentType);
+
 				//_routes_layer->Clear_Accented<NT>();
 
 #pragma pack(push,1)
@@ -462,7 +465,6 @@ namespace Vehicle_Components
 					Point_3D<MasterType> down_node;
 				} link_line;
 #pragma pack(pop)
-
 				for(typename _Trajectory_Container_Interface::iterator itr = _movement_plan->_trajectory_container.begin(); itr != _movement_plan->_trajectory_container.end(); itr++)
 				{
 					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)(*itr);
@@ -485,6 +487,36 @@ namespace Vehicle_Components
 					link_line.color._a = 128;
 					_routes_layer->template Push_Element<Accented_Element>(&link_line);
 				}
+
+				_Switch_Decision_Data_Container_Interface::reverse_iterator switch_decision_data_itr;
+				for (switch_decision_data_itr = _switch_decisions_container.rbegin(); switch_decision_data_itr != _switch_decisions_container.rend(); switch_decision_data_itr++)
+				{
+					_Switch_Decision_Data_Interface* switch_decision_data = (_Switch_Decision_Data_Interface*)(*switch_decision_data_itr);
+					_Links_Container_Interface* links_container = switch_decision_data->template route_links_container<_Links_Container_Interface*>();
+					_Links_Container_Interface::iterator link_itr;
+					
+					for (link_itr = links_container->begin() + 1; link_itr != links_container->end() - 1; link_itr++)
+					{
+						_Link_Interface* link = (_Link_Interface*)(*link_itr);
+						link_line.up_node._x = link->template upstream_intersection<_Intersection_Interface*>()->template x_position<float>();
+						link_line.up_node._y = link->template upstream_intersection<_Intersection_Interface*>()->template y_position<float>();
+						link_line.up_node._z = link->template upstream_intersection<_Intersection_Interface*>()->template z_position<float>();
+
+						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(link_line.up_node);
+
+						link_line.down_node._x = link->template downstream_intersection<_Intersection_Interface*>()->template x_position<float>();
+						link_line.down_node._y = link->template downstream_intersection<_Intersection_Interface*>()->template y_position<float>();
+						link_line.down_node._z = link->template downstream_intersection<_Intersection_Interface*>()->template z_position<float>();
+						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(link_line.down_node);
+					
+						link_line.color._r = 0;
+						link_line.color._g = 0;
+						link_line.color._b = max(0, link_line.color._b - 50);
+						link_line.color._a = 128;
+						_routes_layer->template Push_Element<Accented_Element>(&link_line);
+					}
+				}
+
 			}
 			
 			//static bool submit_attributes(Antares_Vehicle_Implementation* _this,vector<string>& bucket)

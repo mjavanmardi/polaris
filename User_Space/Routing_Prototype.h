@@ -108,7 +108,7 @@ namespace Routing_Components
 				assert_sub_check(TargetType,Concepts::Is_One_To_One_Router,has_vehicle, "ControlType has no vehicle");
 			}
 
-			feature_prototype bool one_to_one_link_based_least_time_path_a_star(TargetType routable_net)
+			feature_prototype float one_to_one_link_based_least_time_path_a_star(TargetType routable_net)
 			{
 
 				define_component_interface(_Routable_Network_Interface, typename get_type_of(routable_network), Network_Components::Prototypes::Network_Prototype, ComponentType);
@@ -141,7 +141,7 @@ namespace Routing_Components
 				if (origin_link_ptr != destination_link_ptr && outbound_turn_movement_size == 0)
 				{
 					THROW_WARNING("Origin link 'index="<<net_origin_link->internal_id<int>() <<" id="<<net_origin_link->uuid<int>()<<"' has no outbound turn movements, trip not able to be routed.");
-					return false;
+					return -1.0;
 				}
 
 				float next_cost,new_cost;
@@ -179,7 +179,7 @@ namespace Routing_Components
 				}
 				else
 				{
-					return false;
+					return -1.0;
 				}
 
 				current_link->template label_pointer<_Routable_Link_Interface*>(current_link);
@@ -260,7 +260,7 @@ namespace Routing_Components
 				}
 				if (destination_link_ptr->template label_pointer<_Routable_Link_Interface*>() == destination_link_ptr)
 				{
-					return false;
+					return -1.0;
 				}
 				else
 				{
@@ -284,7 +284,7 @@ namespace Routing_Components
 						
 					}
 
-					return true;
+					return destination_link_ptr->template label_cost<float>(); 
 				}
 
 			};
@@ -477,13 +477,13 @@ namespace Routing_Components
 				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
 				
 				_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
-				bool pathFound = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
+				float routed_travel_time = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
 
-				if (pathFound)
+				if (routed_travel_time >= 0.0)
 				{	
 
-					mp->valid_trajectory<bool>(true);
-
+					mp->template valid_trajectory<bool>(true);
+					mp->template routed_travel_time<float>(routed_travel_time);
 					// print out and break when scheduling departure for veh_id 101319
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
 					{
@@ -583,13 +583,13 @@ namespace Routing_Components
 				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
 				
 				_Routable_Network_Interface* routable_network_ptr=((_Regular_Network_Interface*)_global_network)->template get_routable_network_from_snapshots<_Routable_Network_Interface*>(_this_ptr->template departure_time<int>());
-				bool pathFound = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
+				float routed_travel_time = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
 				
-				if (pathFound)
+				if (routed_travel_time >= 0.0)
 				{	
 
-					mp->valid_trajectory<bool>(true);
-
+					mp->template valid_trajectory<bool>(true);
+					mp->template routed_travel_time<float>(routed_travel_time);
 					// print out and break when scheduling departure for veh_id 101319
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
 					{
