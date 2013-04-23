@@ -213,18 +213,22 @@ namespace Link_Components
 			float _travel_time;
 
 			template<typename ComponentType, typename CallerType, typename TargetType>
+			TargetType realtime_travel_time(){return (TargetType)(_realtime_travel_time);} tag_getter_as_available(realtime_travel_time);
+			template<typename ComponentType, typename CallerType, typename TargetType>
 			void realtime_travel_time(TargetType set_value)
 			{
-				//_travel_time = (float)set_value;
+				_realtime_travel_time = (float)set_value;
 				// update replicas
 				typename replicas_container_type::iterator replica_itr;
 				for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
 				{
 					replica_interface* replica = (replica_interface*)(*replica_itr);
-					replica->template travel_time<float>(set_value);
+					replica->template travel_time<float>(_realtime_travel_time);
 				}
 			}
 			tag_setter_as_available(realtime_travel_time);
+
+			float _realtime_travel_time;
 
 			Polaris_Link_Implementation()
 			{

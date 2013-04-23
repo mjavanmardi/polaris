@@ -74,20 +74,23 @@ namespace Turn_Movement_Components
 
 			float _forward_link_turn_travel_time;
 
-
+			template<typename ComponentType,typename CallerType, typename TargetType>
+			TargetType realtime_forward_link_turn_travel_time(){return (TargetType)(_realtime_forward_link_turn_travel_time);} tag_getter_as_available(realtime_forward_link_turn_travel_time);
 			template<typename ComponentType,typename CallerType, typename TargetType>
 			void realtime_forward_link_turn_travel_time(TargetType set_value)
 			{
-				//_forward_link_turn_travel_time = (float)set_value;
+				_realtime_forward_link_turn_travel_time = (float)set_value;
 				// update replicas
 				typename _Replicas_Container_Interface::iterator replica_itr;
 				for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
 				{
 					_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-					replica->template forward_link_turn_travel_time<float>(set_value);
+					replica->template forward_link_turn_travel_time<float>(_realtime_forward_link_turn_travel_time);
 				}
 			}
 			tag_setter_as_available(realtime_forward_link_turn_travel_time);
+
+			float _realtime_forward_link_turn_travel_time;
 
 			member_container(vector<float>, cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array, none, none);
 			member_container(vector<float>, cached_inbound_link_departed_time_based_experienced_link_turn_travel_delay_array, none, none);

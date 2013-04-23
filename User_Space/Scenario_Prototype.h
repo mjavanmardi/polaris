@@ -347,7 +347,7 @@ namespace Scenario_Components
 
 				///enroute switching
 				realtime_informed_vehicle_market_share<double>(0.5);
-				information_compliance_rate_mean<double>(0.5);
+				information_compliance_rate_mean<double>(1.0);
 				information_compliance_rate_standard_deviation<double>(0.5);
 				relative_indifference_bound_route_choice_mean<double>(0.1);
 				relative_indifference_bound_route_choice_standard_deviation<double>(0.1);

@@ -236,7 +236,10 @@ namespace Network_Components
 			{
 				this_component()->template read_network_data<ComponentType,CallerType,TargetType>(data_source);
 			}
-
+			feature_prototype void read_realtime_network_data(typename TargetType::ParamType data_source, requires(check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) || check_2(typename TargetType::NetIOType,Types::File_Network,is_same) || check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
+			{
+				this_component()->template read_realtime_network_data<ComponentType,CallerType,TargetType>(data_source);
+			}
 			feature_prototype void read_network_data(requires(!check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) && !check_2(typename TargetType::NetIOType,Types::File_Network,is_same) && !check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
 			{
 				//assert_check(false,"TargetType::NetIOType is not supported");

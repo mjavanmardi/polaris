@@ -327,6 +327,7 @@ namespace Demand_Components
 
 					/// information compliance rate
 					r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+					//r1 = 1.0;
 					vehicle->template information_compliance_rate<double>(r1);
 
 					///rib

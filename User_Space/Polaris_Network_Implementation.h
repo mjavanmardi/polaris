@@ -144,6 +144,7 @@ namespace Network_Components
 				initialize_intersections<ComponentType,CallerType,TargetType>();
 				construct_network_cost<ComponentType,CallerType,TargetType>();
 				construct_routable_network<ComponentType,CallerType,TargetType>();
+				construct_realtime_routable_network<ComponentType,CallerType,TargetType>();
 				if (((_Scenario_Interface*)_global_scenario)->template read_network_snapshots<bool>())
 				{
 					read_snapshots();
@@ -750,7 +751,7 @@ namespace Network_Components
 				for(int i=0;i<_num_threads;i++)
 				{
 					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
-					routable_network->template read_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
+					routable_network->template read_realtime_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
 					_routable_networks_container.push_back((typename MasterType::routable_network_type*)routable_network);
 				}
 			}

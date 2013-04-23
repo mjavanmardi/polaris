@@ -198,7 +198,30 @@ namespace Vehicle_Components
 				coordinate.vertex._x=vehicle_center._x;//upstream_intersection->x_position<float>();
 				coordinate.vertex._y=vehicle_center._y;//upstream_intersection->y_position<float>();
 				coordinate.vertex._z=1;
-				coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
+				//coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
+				//
+				int num_switch_decisions = (int)pthis->_switch_decisions_container.size();
+				if (num_switch_decisions > 0)
+				{
+					if (num_switch_decisions == 1)
+					{
+						coordinate.color._r = 191;
+						coordinate.color._g = 0;
+						coordinate.color._b = 255;
+					}
+					else
+					{
+						coordinate.color._r = 102;
+						coordinate.color._g = 0;
+						coordinate.color._b = 153;
+					}
+				}
+				else
+				{
+					coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
+				}
+
+
 				_vehicle_points->Push_Element<Regular_Element>(&coordinate);
 
 				pthis->_vehicles_counter++;

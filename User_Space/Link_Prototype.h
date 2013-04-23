@@ -72,6 +72,7 @@ namespace Link_Components
 			feature_accessor(speed_limit, none, none);
 			feature_accessor(num_lanes, none, none);
 			feature_accessor(travel_time, none, none);
+			feature_accessor(realtime_travel_time, none, none);
 			feature_accessor(inbound_turn_movements, none, none);
 			feature_accessor(outbound_turn_movements, none, none);
 			feature_accessor(num_left_turn_bays, none, none);
@@ -214,6 +215,11 @@ namespace Link_Components
 			feature_prototype void construct_routable_from_regular(TargetType regular_link)
 			{
 				this_component()->template construct_routable_from_regular<ComponentType,CallerType,TargetType>(regular_link);
+			}
+
+			feature_prototype void construct_realtime_routable_from_regular(TargetType regular_link)
+			{
+				this_component()->template construct_realtime_routable_from_regular<ComponentType,CallerType,TargetType>(regular_link);
 			}
 
 			feature_prototype void initialize_features(TargetType param)

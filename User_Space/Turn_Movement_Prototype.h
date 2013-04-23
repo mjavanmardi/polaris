@@ -57,6 +57,7 @@ namespace Turn_Movement_Components
 			feature_accessor(realtime_replicas_container, none, none);
 			feature_accessor(turn_travel_penalty, none, none);
 			feature_accessor(forward_link_turn_travel_time, none, none);
+			feature_accessor(realtime_forward_link_turn_travel_time, none, none);
 
 			// simulation movement
 			feature_accessor(movement_capacity, none, none);

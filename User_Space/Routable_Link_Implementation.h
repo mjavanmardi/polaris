@@ -61,6 +61,21 @@ namespace Link_Components
 				_travel_time = ((_Link_Interface*)regular_link)->template travel_time<float>();
 			}
 
+			feature_implementation void construct_realtime_routable_from_regular(TargetType regular_link)
+			{
+				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;	
+				_network_link_reference = (typename MasterType::link_type*)regular_link;
+				_f_cost = 0.0;
+				_h_cost = 0.0;
+				_label_pointer = this;
+				_label_cost = INFINITY_FLOAT;
+				_reset_list_status = false;
+				_scan_list_status = Network_Components::Types::UNSCANNED;
+				_uuid = ((_Link_Interface*)regular_link)->template uuid<int>();
+				_internal_id = ((_Link_Interface*)regular_link)->template internal_id<int>();
+				_travel_time = ((_Link_Interface*)regular_link)->template realtime_travel_time<float>();
+			}
+
 			member_container(vector<typename MasterType::routable_movement_type*>, outbound_turn_movements, none, none);
 		};
 		
