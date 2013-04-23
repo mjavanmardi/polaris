@@ -183,6 +183,11 @@ namespace Intersection_Components
 				this_component()->template construct_routable_from_regular<ComponentType,CallerType,TargetType>(regular_intersection_param, linksMap_param);
 			}
 
+			feature_prototype void set_forward_link_turn_travel_time(typename TargetType::ParamType movement_travel_time_map)
+			{
+				this_component()->template set_forward_link_turn_travel_time<ComponentType,CallerType,TargetType>(movement_travel_time_map);
+			}
+
 			feature_prototype void calculate_moe_for_simulation_interval()
 			{
 				this_component()->template calculate_moe_for_simulation_interval<ComponentType,CallerType,TargetType>();

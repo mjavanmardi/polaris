@@ -19,6 +19,7 @@ namespace Intersection_Components
 
 		implementation struct Routable_Movement_Implementation:public Polaris_Component<APPEND_CHILD(Routable_Movement_Implementation),MasterType,Data_Object,ParentType>
 		{
+			member_data(int, uuid, none, none);
 			member_data(float, forward_link_turn_travel_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_component(typename MasterType::routable_link_type, inbound_link, none, none);
 			member_component(typename MasterType::routable_link_type, outbound_link, none, none);
@@ -88,10 +89,12 @@ namespace Intersection_Components
 					{
 						_Regular_Movement_Interface* regular_outbound_movement = (_Regular_Movement_Interface*)(*regular_outbound_movement_itr);
 						_Routable_Movement_Interface* routable_outbound_movement = (_Routable_Movement_Interface*)Allocate<typename _Routable_Movement_Interface::Component_Type>();
+						routable_outbound_movement->template uuid<int>(regular_outbound_movement->template uuid<int>());
 						routable_outbound_movement->template forward_link_turn_travel_time<float>(regular_outbound_movement->template forward_link_turn_travel_time<float>());
 						_Regular_Link_Interface* regular_outbound_link = regular_outbound_movement->template outbound_link<_Regular_Link_Interface*>();
 						_Routable_Link_Interface* routable_outbound_link = (_Routable_Link_Interface*)linksMap.find(regular_outbound_link->template internal_id<int>())->second;
 						routable_outbound_movement->template outbound_link<_Routable_Link_Interface*>(routable_outbound_link);
+						routable_outbound_movement->template inbound_link<_Routable_Link_Interface*>(routable_link);
 						regular_outbound_movement->template replicas_container<_Routable_Movements_Container_Interface&>().push_back(routable_outbound_movement);
 						routable_inbound_outbound_movements->template outbound_movements<_Routable_Movements_Container_Interface&>().push_back(routable_outbound_movement);
 						
@@ -99,33 +102,27 @@ namespace Intersection_Components
 					}
 					inbound_outbound_movements<ComponentType,CallerType,_Routable_Inbound_Outbound_Movements_Container_Interface&>().push_back(routable_inbound_outbound_movements);
 				}
-					
-				// create outbound_inbound_movements
-				_Regular_Outbound_Inbound_Movements_Container_Interface& regular_outbound_inbound_movements_container = regular_intersection->template outbound_inbound_movements<_Regular_Outbound_Inbound_Movements_Container_Interface&>();
-				typename _Regular_Outbound_Inbound_Movements_Container_Interface::iterator regular_outbound_inbound_movements_itr;
-					
-				for(regular_outbound_inbound_movements_itr=regular_outbound_inbound_movements_container.begin(); regular_outbound_inbound_movements_itr!=regular_outbound_inbound_movements_container.end(); regular_outbound_inbound_movements_itr++)
+			}
+			
+			feature_implementation void set_forward_link_turn_travel_time(typename TargetType::ParamType movement_travel_time_map)
+			{
+				typedef Intersection_Prototype<typename MasterType::routable_intersection_type> _Routable_Intersection_Interface;
+				define_container_and_value_interface(_Routable_Inbound_Outbound_Movements_Container_Interface, _Routable_Inbound_Outbound_Movements_Interface, typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, typename _Routable_Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+
+				_Routable_Inbound_Outbound_Movements_Container_Interface::iterator inbound_outbound_movements_itr;
+				for (inbound_outbound_movements_itr = _inbound_outbound_movements.begin(); inbound_outbound_movements_itr != _inbound_outbound_movements.end(); inbound_outbound_movements_itr++)
 				{
-					_Regular_Outbound_Inbound_Movements_Interface* regular_outbound_inbound_movements = (_Regular_Outbound_Inbound_Movements_Interface*)(*regular_outbound_inbound_movements_itr);
-					_Routable_Outbound_Inbound_Movements_Interface* routable_outbound_inbound_movements = (_Routable_Outbound_Inbound_Movements_Interface*)Allocate<typename _Routable_Outbound_Inbound_Movements_Interface::Component_Type>();
-					_Regular_Link_Interface* regular_link = regular_outbound_inbound_movements->template outbound_link_reference<_Regular_Link_Interface*>();
-					_Routable_Link_Interface* routable_link = (_Routable_Link_Interface*)linksMap.find(regular_link->template internal_id<int>())->second;
-					routable_outbound_inbound_movements->template outbound_link_reference<_Routable_Link_Interface*>(routable_link);
-					//another level of loop
-					_Regular_Movements_Container_Interface& regular_inbound_movements_container = regular_outbound_inbound_movements->template inbound_movements<_Regular_Movements_Container_Interface&>();
-					typename _Regular_Movements_Container_Interface::iterator regular_inbound_movement_itr;
-					for(regular_inbound_movement_itr=regular_inbound_movements_container.begin(); regular_inbound_movement_itr!=regular_inbound_movements_container.end(); regular_inbound_movement_itr++)
+					_Routable_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Routable_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
+					_Routable_Movements_Container_Interface& outbound_movements = inbound_outbound_movements->template outbound_movements<_Routable_Movements_Container_Interface&>();
+					_Routable_Movements_Container_Interface::iterator movement_itr;
+					for (movement_itr = outbound_movements.begin(); movement_itr != outbound_movements.end(); movement_itr++)
 					{
-						_Regular_Movement_Interface* regular_inbound_movement = (_Regular_Movement_Interface*)(*regular_inbound_movement_itr);
-						_Routable_Movement_Interface* routable_inbound_movement = (_Routable_Movement_Interface*)Allocate<typename _Routable_Movement_Interface::Component_Type>();
-						routable_inbound_movement->template forward_link_turn_travel_time<float>(regular_inbound_movement->template forward_link_turn_travel_time<float>());
-						_Regular_Link_Interface* regular_inbound_link = regular_inbound_movement->template inbound_link<_Regular_Link_Interface*>();
-						_Routable_Link_Interface* routable_inbound_link = (_Routable_Link_Interface*)linksMap.find(regular_inbound_link->template internal_id<int>())->second;
-						routable_inbound_movement->template inbound_link<_Routable_Link_Interface*>(routable_inbound_link);
-						regular_inbound_movement->template replicas_container<_Routable_Movements_Container_Interface&>().push_back(routable_inbound_movement);
-						routable_outbound_inbound_movements->template inbound_movements<_Routable_Movements_Container_Interface&>().push_back(routable_inbound_movement);
+						_Routable_Movement_Interface* movement = (_Routable_Movement_Interface*)(*movement_itr);
+						int movement_uuid = movement->template uuid<int>();
+						float forward_link_turn_travel_time = movement_travel_time_map.find(movement_uuid)->second;
+						movement->template 	forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
 					}
-					outbound_inbound_movements<ComponentType,CallerType,_Routable_Outbound_Inbound_Movements_Container_Interface&>().push_back(routable_outbound_inbound_movements);
 				}
 			}
 		};

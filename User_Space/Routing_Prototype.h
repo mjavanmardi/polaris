@@ -68,10 +68,13 @@ namespace Routing_Components
 			feature_accessor(realtime_routable_network, none, none);
 			feature_accessor(routable_origin, none, none);
 			feature_accessor(routable_destination, none, none);
+			feature_accessor(routable_origin_index, none, none);
+			feature_accessor(routable_destination_index, none, none);
 			feature_accessor(update_increment,none,none);
 			feature_accessor(start_time,none,none);
 			feature_accessor(end_time,none,none);
 			feature_accessor(travel_times_to_link_container,none,none);
+			feature_accessor(departure_time,none,none); // the time at which routing is triggered.
 
 			feature_prototype void Evaluate_Condition(Conditional_Response& response, requires(check(TargetType,Concepts::Is_One_To_One_Router)))
 			{
@@ -120,14 +123,16 @@ namespace Routing_Components
 
 				//_Routable_Network_Interface* routable_net=routable_network<_Routable_Network_Interface*>();
 				routable_net->template reset_routable_network<NULLTYPE>();
-				
+				define_component_interface(_Vehicle_Interface, typename get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+					
 				//RoutableNetworkInterface* routable_network=routable_network<RoutableNetworkInterface*>();
 				float max_free_flow_speed=routable_net->template max_free_flow_speed<float>();
 				ScanListType& scan_list=routable_net->template scan_list<ScanListType&>();
 				//NumSearchesType& num_searches=routable_network->template num_searches<NumSearchesType&>();
-
-				_Routable_Link_Interface* origin_link_ptr=routable_origin<_Routable_Link_Interface*>();
-				_Routable_Link_Interface* destination_link_ptr=routable_destination<_Routable_Link_Interface*>();
+				int origin_index = routable_origin_index<int>();
+				int destination_index = routable_destination_index<int>();
+				_Routable_Link_Interface* origin_link_ptr=routable_net->links_container<_Routable_Links_Container_Interface&>()[origin_index];
+				_Routable_Link_Interface* destination_link_ptr=routable_net->links_container<_Routable_Links_Container_Interface&>()[destination_index];
 				_Regular_Link_Interface* destination_reference=destination_link_ptr->template network_link_reference<_Regular_Link_Interface*>();
 				
 				_Regular_Link_Interface* net_origin_link=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>();
@@ -178,7 +183,6 @@ namespace Routing_Components
 				}
 
 				current_link->template label_pointer<_Routable_Link_Interface*>(current_link);
-
 				scan_list.insert(make_pair(current_link->template f_cost<float>(),current_link));
 				current_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
 				int cur_link_id;
@@ -254,7 +258,6 @@ namespace Routing_Components
 						}
 					}
 				}
-
 				if (destination_link_ptr->template label_pointer<_Routable_Link_Interface*>() == destination_link_ptr)
 				{
 					return false;
@@ -262,10 +265,9 @@ namespace Routing_Components
 				else
 				{
 
-					//_Reversed_Path_Container_Interface& reversed_path_container=routable_network<_Routable_Network_Interface*>()->template reversed_path_container<_Reversed_Path_Container_Interface&>();
 					_Reversed_Path_Container_Interface& reversed_path_container=routable_net->template reversed_path_container<_Reversed_Path_Container_Interface&>();
 
-					current_link=routable_destination<_Routable_Link_Interface*>();
+					current_link=destination_link_ptr;
 				
 					while (true)
 					{
@@ -410,12 +412,15 @@ namespace Routing_Components
 				return true;
 			};
 
-			feature_prototype void Schedule_Route_Computation(int departed_time)
+			feature_prototype void Schedule_Route_Computation(int time_to_depart)
 			{
+				load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+			}
 
-				define_component_interface(_Regular_Network_Interface, typename get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
-				define_component_interface(_Scenario_Interface, typename _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+			feature_prototype void Schedule_Route_Computation(int time_to_depart, int planning_time, bool use_snapshot)
+			{
+				departure_time<int>(time_to_depart);
+				load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route_Using_Snapshot,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 			}
 
 			feature_prototype void Initialize_Tree_Computation(int departed_time)
@@ -470,16 +475,14 @@ namespace Routing_Components
 				
 				_this_ptr->template routable_origin<_Regular_Link_Interface*>(origin_link);
 				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
-
+				
 				_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
-
 				bool pathFound = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
 
 				if (pathFound)
 				{	
 
 					mp->valid_trajectory<bool>(true);
-					
 
 					// print out and break when scheduling departure for veh_id 101319
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
@@ -489,7 +492,113 @@ namespace Routing_Components
 					}
 
 					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
+				}
+			}
+
+			feature_prototype void write_path()
+			{
+				define_component_interface(_Traveler_Interface, typename get_type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
+				define_component_interface(_Vehicle_Interface, typename _Traveler_Interface::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajecotry_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype, ComponentType);
+				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
+				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				_Movement_Plan_Interface* mp= movement_plan<_Movement_Plan_Interface*>();
+								
+						_Vehicle_Interface* v_ptr = vehicle<_Vehicle_Interface*>();
+
+						int vehicle_id = v_ptr->template uuid<int>();
+						int origin_zone_index = 0;
+						int destination_zone_index = 0;
+						int origin_activity_location_index = 0;
+						int destination_activity_location_index = 0;
+						int origin_link_index = mp->template origin<_Link_Interface*>()->template uuid<int>();
+						int destination_link_index = mp->template destination<_Link_Interface*>()->template uuid<int>();
+						int num_links = (int)mp->template trajectory_container<_Trajecotry_Container_Interface&>().size();
+
+						int departure_time = mp->template departed_time<Time_Seconds>();
+						int arrival_time = mp->template arrived_time<Time_Seconds>();
+						float travel_time = float ((arrival_time - departure_time)/60.0f);
+
+						fstream& routed_path_file = ((_Scenario_Interface*)_global_scenario)->template routed_path_file<fstream&>();			
+						routed_path_file
+							<< vehicle_id << ","
+							<< 0 << ","
+							<< 0 << ","
+							<< 0 << ","
+							<< 0 << ","
+							<< origin_link_index << ","
+							<< destination_link_index << ","
+							<< num_links << ","
+							<< convert_seconds_to_hhmmss(departure_time)<< ","
+							<< convert_seconds_to_hhmmss(arrival_time)<< ","
+							<< travel_time
+							<<endl;
+
+						float path_delayed_time = 0;
+						for (int route_link_counter=0;route_link_counter<num_links;route_link_counter++)
+						{
+
+							_Trajectory_Unit_Interface* trajectory_unit = mp->template trajectory_container<_Trajecotry_Container_Interface&>()[route_link_counter];
+							_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+							int route_link_id = route_link->template uuid<int>();
+							int route_link_enter_time = trajectory_unit->template enter_time<int>();
+							float route_link_delayed_time = float(trajectory_unit->template delayed_time<float>()/60.0f);
+								
+							int route_link_exit_time = mp->template get_route_link_exit_time<NULLTYPE>(route_link_counter);
+							float route_link_travel_time = float((route_link_exit_time - route_link_enter_time)/60.0f);
+
+							path_delayed_time+=route_link_delayed_time;
 					
+							routed_path_file
+								<<route_link_counter + 1 << ","
+								<<route_link_id << ","
+								<<convert_seconds_to_hhmmss(route_link_enter_time) << ","
+								<<route_link_travel_time << ","
+								<<route_link_delayed_time
+								<<endl;
+						}
+			}
+
+			declare_feature_event(Compute_Route_Using_Snapshot)
+			{
+				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
+				typedef Link_Components::Prototypes::Link_Prototype<typename ComponentType::routable_link_type, ComponentType> _Routable_Link_Interface;
+				typedef Network_Components::Prototypes::Network_Prototype<typename ComponentType::network_type, ComponentType> _Regular_Network_Interface;
+				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
+				typedef Network_Components::Prototypes::Network_Prototype<typename ComponentType::routable_network_type, ComponentType> _Routable_Network_Interface;
+				define_component_interface(_Regular_Network_Interface, typename get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_component_interface(_Scenario_Interface, typename _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+				define_component_interface(_Traveler_Interface, typename get_type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
+				define_component_interface(_Vehicle_Interface, typename _Traveler_Interface::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename ComponentType::routable_network_type::type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+
+				_Movement_Plan_Interface* mp= _this_ptr->template movement_plan<_Movement_Plan_Interface*>();
+
+				_Regular_Link_Interface* origin_link=mp->template origin<_Regular_Link_Interface*>();
+				_Regular_Link_Interface* destination_link=mp->template destination<_Regular_Link_Interface*>();
+				
+				_this_ptr->template routable_origin<_Regular_Link_Interface*>(origin_link);
+				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
+				
+				_Routable_Network_Interface* routable_network_ptr=((_Regular_Network_Interface*)_global_network)->template get_routable_network_from_snapshots<_Routable_Network_Interface*>(_this_ptr->template departure_time<int>());
+				bool pathFound = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
+				
+				if (pathFound)
+				{	
+
+					mp->valid_trajectory<bool>(true);
+
+					// print out and break when scheduling departure for veh_id 101319
+					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
+					{
+						THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
+						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->uuid<int>() << " and destination link uuid " << destination_link->uuid<int>());
+					}
+
+					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
+					_this_ptr->template write_path<NULLTYPE>();
 					//origin_link->push_vehicle(veh);
 				}
 			}

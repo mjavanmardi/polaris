@@ -63,6 +63,7 @@ namespace Movement_Plan_Components
 			tag_as_prototype;
 
 			feature_accessor(trajectory_container, none, none);
+
 			feature_accessor(current_trajectory_position, none, none);
 			feature_accessor(departed_time, none, none);
 			feature_accessor(arrived_time, none, none);

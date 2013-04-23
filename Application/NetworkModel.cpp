@@ -202,7 +202,6 @@ void run_with_input_from_db()
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
 
-
 	//cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
 
@@ -333,6 +332,8 @@ void run_with_input_from_files()
 	scenario->template read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);
 	scenario->template write_output_summary<bool>(true);
 	scenario->template output_moe_for_assignment_interval<bool>(true);
+	scenario->template write_network_snapshots<bool>(true);
+	scenario->template read_network_snapshots<bool>(true);
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
 	_Network_Interface* network = (_Network_Interface*)Allocate<typename MasterType::network_type>();

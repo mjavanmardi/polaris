@@ -49,6 +49,7 @@ namespace Turn_Movement_Components
 			member_container(vector<typename MasterType::routable_movement_type*>, replicas_container, none, none);
 			member_container(vector<typename MasterType::routable_movement_type*>, realtime_replicas_container, none, none);
 
+
 			//==================================================================================================================
 			/// forward_link_turn_travel_time
 			//------------------------------------------------------------------------------------------------------------------

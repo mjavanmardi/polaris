@@ -43,6 +43,10 @@ namespace Scenario_Components
 			member_data(string, vehicle_trajectory_file_name, none, none);
 			member_data(fstream, vehicle_trajectory_file, none, none);
 
+			member_data(string, routed_path_file_name, none, none);
+			member_data(fstream, routed_path_file, none, none);
+
+
 			member_data(string, network_link_flow_file_name, none, none);
 			member_data(fstream, network_link_flow_file, none, none);
 
@@ -66,8 +70,10 @@ namespace Scenario_Components
 			member_data(fstream, out_link_moe_file, none, none);
 			member_data(fstream, out_movement_moe_file, none, none);
 			member_data(fstream, reference_realtime_network_moe_file, none, none);
-			
-			// PopSyn members
+
+			member_data(fstream, output_network_snapshots_file, none, none);
+			member_data(fstream, input_network_snapshots_file, none, none);
+
 			member_data(double, percent_to_synthesize, none,none);
 			member_data(double, ipf_tolerance, none,none);
 			member_data(int, marginal_tolerance, none,none);
@@ -90,6 +96,9 @@ namespace Scenario_Components
 
 			member_data(bool, write_db_input_to_files, none, none); // to control whether database input is written to files
 			member_data(bool, run_simulation_for_db_input, none, none); // to control whether to run simulation for database input
+
+			member_data(bool, write_network_snapshots, none, none);
+			member_data(bool, read_network_snapshots, none, none);
 			
 			member_data(bool, write_node_control_state, none, none);
 			member_data(bool, write_vehicle_trajectory, none, none);

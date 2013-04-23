@@ -117,6 +117,9 @@ namespace Scenario_Components
 			feature_accessor(vehicle_trajectory_file_name, none, none);
 			feature_accessor(vehicle_trajectory_file, none, none);
 
+			feature_accessor(routed_path_file_name, none, none);
+			feature_accessor(routed_path_file, none, none);
+
 			feature_accessor(network_link_flow_file_name, none, none);
 			feature_accessor(network_link_flow_file, none, none);
 
@@ -139,6 +142,9 @@ namespace Scenario_Components
 			feature_accessor(out_realtime_network_moe_file, none, none);
 			feature_accessor(out_realtime_link_moe_file, none, none);
 			feature_accessor(out_realtime_movement_moe_file, none, none);
+			
+			feature_accessor(output_network_snapshots_file, none, none);
+			feature_accessor(input_network_snapshots_file, none, none);
 
 			feature_accessor(reference_realtime_network_moe_file, none, none);
 
@@ -175,11 +181,15 @@ namespace Scenario_Components
 			feature_accessor(write_network_link_flow, none, none);
 			feature_accessor(write_network_link_turn_time, none, none);
 			feature_accessor(write_output_summary, none, none);
+			
+			feature_accessor(write_network_snapshots, none, none);
+			feature_accessor(read_network_snapshots, none, none);
+
 			feature_accessor(output_moe_for_assignment_interval, none, none);
 			feature_accessor(output_link_moe_for_simulation_interval, none, none);
 			feature_accessor(output_turn_movement_moe_for_simulation_interval, none, none);
 			feature_accessor(output_network_moe_for_simulation_interval, none, none);
-
+			
 			feature_accessor(use_event_manager, none, none);
 
 			/// enroute switching parameters
@@ -257,7 +267,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(0.0);
 				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0.0);
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
-				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(3600);
+				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(300);
 
 				//=======================================================================================================================================================
 				// PopSyn parameters
@@ -325,7 +335,9 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("output_link_moe_for_simulation_interval", output_link_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_simulation_interval<bool>(false);
 				if (cfgReader.getParameter("output_turn_movement_moe_for_simulation_interval", output_turn_movement_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_simulation_interval<bool>(false);
 				if (cfgReader.getParameter("output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_simulation_interval<bool>(false);
-				
+				if (cfgReader.getParameter("write_network_snapshots", write_network_snapshots<bool*>())!= PARAMETER_FOUND) write_network_snapshots<bool>(false);
+				if (cfgReader.getParameter("read_network_snapshots", read_network_snapshots<bool*>())!= PARAMETER_FOUND) read_network_snapshots<bool>(false);
+
 				if (cfgReader.getParameter("use_event_manager", use_event_manager<bool*>())!= PARAMETER_FOUND) use_event_manager<bool>(false);
 
 				output_dir_name<string&>() = "";
@@ -444,6 +456,40 @@ namespace Scenario_Components
 						<<endl;
 
 					vehicle_trajectory_file<fstream&>() 
+						<< "link_number" <<  ","
+						<< "link_id " <<  ","
+						<< "entering_time" << ","
+						<< "travel_time" << ","
+						<< "delayed_time"
+						<<endl;
+				}
+				else
+				{
+					cout << "Cannot open file - "
+						<< vehicle_trajectory_file_name<string&>()
+						<< endl;
+				}
+
+				//routed path
+				routed_path_file_name<string&>().assign(output_dir_name<string&>() + "routed_path.csv");
+				routed_path_file<fstream&>().open(routed_path_file_name<string&>(),fstream::out);
+				if(routed_path_file<fstream&>().is_open()) 
+				{ 
+					routed_path_file<fstream&>() 
+						<< "vehicle" <<  ","
+						<< "origin_zone " <<  ","
+						<< "destination_zone" << ","
+						<< "origin_activity_location" << ","
+						<< "destination_activity_location" << ","
+						<< "origin_link" << ","
+						<< "destination_link" << ","
+						<< "num_links" << ","
+						<< "departure_time" << ","
+						<< "arrival_time" << ","
+						<< "travel_time"
+						<<endl;
+
+					routed_path_file<fstream&>() 
 						<< "link_number" <<  ","
 						<< "link_id " <<  ","
 						<< "entering_time" << ","
@@ -672,6 +718,12 @@ namespace Scenario_Components
 				out_movement_moe_file<fstream&>().open(out_movement_moe_file_name, fstream::out);
 				out_movement_moe_file<fstream&>() << "clock,time,turn_movement,inbound_link,outbound_link,node,turn_penalty_in_min,turn_penalty_sd_in_min,inbound_link_turn_time_in_min,outbound_link_turn_time_in_min,movement_flow_rate_in_vphpl\n";
 
+				//routable network snapshot
+				string routable_network_snapshots_file_name = output_dir_name<string&>() + "output_network_snapshots";
+				output_network_snapshots_file<fstream&>().open(routable_network_snapshots_file_name, fstream::out);
+				output_network_snapshots_file<fstream&>() << "time\t maximum_free_flow_speed" << endl;
+				output_network_snapshots_file<fstream&>() << "inbound_link_uuid\t inbound_link_travel_time" << endl;
+				output_network_snapshots_file<fstream&>() << "movement_uuid\t movement_forward_link_turn_travel_time";
 			};
 
 			feature_prototype void open_input_files()
@@ -683,16 +735,25 @@ namespace Scenario_Components
 				{
 					cout << "Reference network MOE file not found. There will be no hisotorical side-by-side plotting in Antares." << endl;
 				}
+
+				string routable_network_snapshots_file_name = input_dir_name<string&>() + "input_network_snapshots";
+				input_network_snapshots_file<fstream&>().open(routable_network_snapshots_file_name, fstream::in);
+				if (!input_network_snapshots_file<fstream&>().is_open())
+				{
+					cout << "Network snapshots file not found. Network snapshots will not be read." << endl;
+				}
 			}
 
 			feature_prototype void close_files()
 			{
 				close_output_files<NULLTYPE>();
+				close_input_files<NULLTYPE>();
 			}
 
 			feature_prototype void close_output_files()
 			{
 				vehicle_trajectory_file<fstream&>().close();
+				routed_path_file<fstream&>().close();
 				network_link_flow_file<fstream&>().close();
 				network_link_turn_time_file<fstream&>().close();
 				network_node_control_state_file<fstream&>().close();
@@ -706,10 +767,14 @@ namespace Scenario_Components
 				out_link_moe_file<fstream&>().close();
 				out_movement_moe_file<fstream&>().close();
 				out_network_moe_file<fstream&>().close();
+
+				output_network_snapshots_file<fstream&>().close();
 			};
 
 			feature_prototype void close_input_files()
 			{
+				reference_realtime_network_moe_file<fstream&>().close();
+				input_network_snapshots_file<fstream&>().close();
 			}
 
 

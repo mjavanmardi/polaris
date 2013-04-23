@@ -244,6 +244,11 @@ namespace Network_Components
 				assert_check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same,"TargetType should indicate Regular_Network if you want to create a routable network from a regular network");
 			}
 
+			feature_prototype void read_snapshot_data(float maximum_free_flow_speed, typename TargetType::ParamType link_travel_time_map, typename TargetType::ParamType movement_travel_time_map)
+			{
+				this_component()->template read_snapshot_data<ComponentType,CallerType,TargetType>(maximum_free_flow_speed, link_travel_time_map, movement_travel_time_map);
+			}
+
 			feature_prototype void set_network_bounds()
 			{
 				this_component()->template set_network_bounds<ComponentType,CallerType,TargetType>();
@@ -294,6 +299,11 @@ namespace Network_Components
 			{
 				define_component_interface(_Scenario_Interface, typename get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 				return (TargetType)(start_of_current_simulation_interval_relative<TargetType>() + scenario_reference<_Scenario_Interface*>()->template simulation_start_time<int>());
+			}
+
+			feature_prototype TargetType get_routable_network_from_snapshots(int current_time)
+			{
+				return (TargetType)(this_component()->template get_routable_network_from_snapshots<ComponentType,CallerType,TargetType>(current_time));
 			}
 		};
 
