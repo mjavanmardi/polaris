@@ -73,7 +73,7 @@ namespace Network_Event_Components
 				_notes = instance.lock()->getNote();
 
 				_start_time = 80 + rand()%20;
-				_end_time = 200;
+				_end_time = 2000;
 
 				const vector<int>& links=instance.lock()->getLinks();
 
