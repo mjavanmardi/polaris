@@ -641,29 +641,20 @@ public:
 	void			resize(size_type rows, size_type cols, value_type value)
 	{
 		pair<size_type,size_type> new_dimensions = pair<size_type,size_type>(rows,cols);
-		m_array<T> tmp = m_array<T>(*this);
+		matrix<T> tmp = matrix<T>(*this);
 		this->_cleanup();
 		this->_init(new_dimensions);
-		*this = m_array<T>(new_dimensions, value);
+		*this = matrix<T>(new_dimensions, value);
 		this->_nrow = rows; this->_ncol = cols;
 
 		iterator itr = this->begin();
 
-		for (itr; itr != this->end(); ++itr)
+		for (uint i = 0; i < tmp._nrow; ++i)
 		{
-			const vector<size_type>& index = itr.get_index();
-			if (tmp.valid_index(index))
+			for (uint j = 0; j < tmp._ncol; ++j)
 			{
-				size_type i = tmp.get_index(index);
-				(*itr) = tmp._data[i];
+				this->operator()(i,j) = tmp(i,j);
 			}
-			else (*itr) = value;
-			
-		}
-
-		for (int i = 0; i< this->size(); i++)
-		{
-			cout <<"**"<< this->_data[i] << " @ " << &this->_data[i]<<endl;
 		}
 	}
 	void			resize(index_type new_dimensions, value_type value)
@@ -677,7 +668,7 @@ public:
 	}
 
 	// MArray constructors/destructor
-	matrix (void){_size = 0;}
+	matrix (void){_size = 0;_nrow=0; _ncol=0;}
 	matrix (const_index_type dim_sizes);
 	matrix (const_index_type dim_sizes, T init_val);
 	matrix (const matrix& obj);
@@ -716,6 +707,7 @@ public:
 	{
 		return _data[index];
 	} 
+	matrix operator*(const matrix& obj);
 	
 	// Property access members
 	const size_type& size() {return _size;}
@@ -733,7 +725,10 @@ public:
 	// display member
 	void print(ostream& stream);
 
-	size_type get_index(const_index_type index)
+	// Arithmetic members
+	void cholesky(matrix& LU);
+
+	size_type get_index(const_index_type index) const
 	{
 		size_type ind=0;
 
@@ -850,6 +845,23 @@ matrix<T>& matrix<T>::operator=(const matrix<T>& obj)
 	}
 	return *this;
 }
+template <class T>
+matrix<T> matrix<T>::operator*(const matrix<T>& obj)
+{
+	// check appropriate conditions
+	if (this->_ncol != obj._nrow) THROW_EXCEPTION("ERROR: matrix rows != matrix columns in multiplication.");
+
+	matrix<T> m = matrix<T>(matrix<T>::index_type(this->_nrow, obj._ncol),0);
+
+	for (uint i = 0; i < this->_nrow; i++)
+	{
+		for (uint j = 0; j < obj._ncol; j++)
+		{
+			for (uint k = 0; k < this->_ncol; k++) m(i,j) += (*this)(i,k) * obj(k,j);		
+		}
+	}
+	return m;
+}
 
 
 // M_array destructor
@@ -888,5 +900,39 @@ void matrix<T>::print(ostream& stream, int n)
 		stream<<endl;
 	}
 	stream<<endl<<endl;
+}
+
+
+// Arithmetic functions
+template <class T>
+void matrix<T>::cholesky(matrix<T>& LU)
+{
+	assert(_nrow == _ncol);
+	
+	// Initialize the sqrt matrix
+	LU.resize(_nrow,_ncol, 0.0);
+
+	int d = this->_nrow;
+	double diff;
+
+	for(int k=0; k<d; ++k)
+	{
+		double sum=0.;
+		for(int p=0; p<k; ++p) sum += LU._data[k*d+p] * LU._data[k*d+p];
+
+		diff = sqrt(this->_data[k*d+k]-sum);
+		if (diff < 0) THROW_EXCEPTION("ERROR: matrix must be positive semi-definite to use cholesky decomposition.");
+		LU._data[k*d+k] = diff;
+
+		for(int i=k+1;i<d;++i)
+		{
+			double sum=0.;
+			for(int p=0; p<k; ++p) sum += LU._data[i*d+p] * LU._data[k*d+p];
+
+			diff = LU._data[k*d+k];
+			if (diff == 0) THROW_EXCEPTION("ERROR: matrix must be positive semi-definite to use cholesky decomposition.");
+			LU._data[i*d+k] = (this->_data[i*d+k]-sum) / diff;
+		}
+	}
 }
 

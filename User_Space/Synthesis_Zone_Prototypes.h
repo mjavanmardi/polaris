@@ -13,6 +13,32 @@ namespace PopSyn
 {
 	namespace Concepts
 	{
+		concept struct Is_Synthesis_Zone
+		{
+			check_getter(Has_Target_Joint_Distribution_P,Component_Type::Target_Joint_Distribution);
+			check_getter(Has_Target_Marginal_Distribution_P,Component_Type::Target_Marginal_Distribution);
+			check_getter(Has_Synthetic_Persons_Container_P,Component_Type::Synthetic_Persons_Container);
+			check_getter(Has_Activity_Locations_Container_P,Component_Type::Activity_Locations_Container);
+			check_getter(Has_scenario_reference_P, Component_Type::scenario_reference);
+			check_getter(Has_network_reference_P, Component_Type::network_reference);
+
+			define_sub_check(Is_Synthesizer_Usable_Prototype, Has_Target_Joint_Distribution_P && Has_Target_Marginal_Distribution_P && Has_Synthetic_Persons_Container_P && Has_scenario_reference_P);
+			define_sub_check(Is_Simulator_Usable_Prototype, Has_network_reference_P && Has_Activity_Locations_Container_P && Has_Synthetic_Persons_Container_P);
+			define_sub_check(Is_Synthesis_Zone_Prototype, Is_Synthesizer_Usable_Prototype && Is_Simulator_Usable_Prototype);
+
+			check_getter(Has_Target_Joint_Distribution,Target_Joint_Distribution);
+			check_getter(Has_Target_Marginal_Distribution,Target_Marginal_Distribution);
+			check_getter(Has_Synthetic_Persons_Container,Synthetic_Persons_Container);
+			check_getter(Has_Activity_Locations_Container,Activity_Locations_Container);
+			check_getter(Has_scenario_reference, scenario_reference);
+			check_getter(Has_network_reference, network_reference);
+
+			define_sub_check(Is_Synthesizer_Usable, Has_Target_Joint_Distribution && Has_Target_Marginal_Distribution && Has_Synthetic_Persons_Container && Has_scenario_reference);
+			define_sub_check(Is_Simulator_Usable, Has_network_reference && Has_Activity_Locations_Container && Has_Synthetic_Persons_Container);
+			define_sub_check(Is_Synthesis_Zone_Component, Is_Synthesizer_Usable && Is_Simulator_Usable);
+
+			define_default_check(Is_Synthesis_Zone_Prototype || Is_Synthesis_Zone_Component);
+		};
 		concept struct Is_IPF_Capable
 		{
 			check_typename_defined(Has_Value_Type, Value_Type);

@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Person_Prototype.h"
+//#include "Person_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "Network_Skimming_Prototype.h"
 #include "Activity_Prototype.h"
-//#include "Population_Unit_Implementations.h"
-#include "Person_Implementations.h"
+//#include "Person_Implementations.h"
 
 
 namespace Person_Components
@@ -28,18 +27,18 @@ namespace Person_Components
 			member_prototype(Person_Components::Prototypes::Person, Parent_Person, typename MasterType::person_type, none, none);
 
 			// Pointer to the child classses
+			member_prototype(Prototypes::Person_Scheduler, Person_Scheduler, typename MasterType::person_scheduler_type,none,none);
 			member_prototype(Prototypes::Activity_Generator, Activity_Generator, typename MasterType::activity_generator_type,none,none);
 			member_prototype(Prototypes::Destination_Chooser, Destination_Chooser, typename MasterType::person_destination_chooser_type,none,none);
+			member_prototype(Prototypes::Activity_Timing_Chooser, Timing_Chooser, typename MasterType::activity_timing_chooser_type,none,none);
 
 			// Next Activity Generation Time member - used to schedule the next activity generation
-			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Generation_Time,none,none);
-			member_component_feature(Next_Activity_Generation_Time, _Generation_Time, Value, Basic_Units::Prototypes::Time_Prototype);
+			member_component_and_feature_accessor(Next_Activity_Generation_Time, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			// Planning Time Increment member - sets the next iteration after all planning is completed
-			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Planning_Time_Increment,none,none);
-			member_component_feature(Planning_Time_Increment, _Planning_Time_Increment, Value, Basic_Units::Prototypes::Time_Prototype);
+			member_component_and_feature_accessor(Planning_Time_Increment, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			// Generation Time Increment member - sets the next Generation iteration 
-			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_Generation_Time_Increment,none,none);
-			member_component_feature(Generation_Time_Increment, _Generation_Time_Increment, Value, Basic_Units::Prototypes::Time_Prototype);
+			member_component_and_feature_accessor(Generation_Time_Increment, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(Next_Planning_Time, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			//Containers for activity planning events and movement planning events
 			member_container(list<typename MasterType::activity_type*>,Activity_Container,none,none);
 			member_container(list<typename MasterType::movement_plan_type*>,Movement_Plans_Container,none,none);
@@ -56,11 +55,6 @@ namespace Person_Components
 			define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan, type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 		
 
-			// Activity generation functionality
-			feature_implementation void Activity_Generation()
-			{
-			}
-			tag_feature_as_available(Activity_Generation);
 			feature_implementation TargetType current_movement_plan(requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
 				// Define interfaces to the container members of the class			
@@ -95,12 +89,14 @@ namespace Person_Components
 				if (_write_activity_files) 
 				{			
 					stringstream s;
+					Activity_Plan* act = move->activity_reference<Activity_Plan*>();
 					int o_id = move->template origin<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>()->template uuid<int>();
 					int d_id = move->template destination<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>()->template uuid<int>();
 					_Skim_Interface* skim = _Parent_Person->template network_reference<_Network_Interface*>()->template skimming_faculty<_Skim_Interface*>();		
-					s << _Parent_Person->template uuid<int>() << "," << move->template departed_time<Time_Hours>();
+					s << endl<<"MOVEMENT(PERID.ACTID.ACTTYPE.DEPART.O.D.SKIMTIME.TTIME)," << _Parent_Person->template uuid<int>() << "," << act->Activity_Plan_ID<int>() << ", " << act->Activity_Type<ACTIVITY_TYPES>() << ", " << move->template departed_time<Time_Hours>();
 					s << "," << move->template origin<_Activity_Location_Interface*>()->uuid<int>() << "," << move->template destination<_Activity_Location_Interface*>()->uuid<int>();
-					s << "," << skim->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_id, d_id, Vehicle_Components::Types::SOV)<<endl;
+					s << "," << skim->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_id, d_id, Vehicle_Components::Types::SOV);
+					s << "," << move->template routed_travel_time<Time_Minutes>();
 					this->Write_To_Log<ComponentType,CallerType,TargetType>(s);
 				}
 
@@ -129,18 +125,20 @@ namespace Person_Components
 				assert_check(TargetType, Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype, "Error, Function requires TargetType to be a Movement_Plan_Prototype.");
 			}
 			tag_feature_as_available(Add_Movement_Plan);
-			feature_implementation void Add_Activity_Plan(TargetType activity_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
+			feature_implementation void Add_Activity_Plan(TargetType activity_plan, requires(check_as_given(TargetType,is_pointer)/* && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 			{
-				define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan,ComponentType);	
+				//define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan,ComponentType);	
 				Activity_Plan* act = (Activity_Plan*)activity_plan;
 
-				long t1 = act->template Activity_Plan_Horizon<Simulation_Timestep_Increment>();
-				long t2 = this->template Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
-				long remain = (long)(t1 / t2);
-				Simulation_Timestep_Increment departure_time = remain * this->template Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
+				// print to log file if requested
+				if (_write_activity_files) 
+				{			
+					stringstream s;	
+					s << endl << "ACTIVITY GEN (PERID.ACTID.ACTTYPE)," << _Parent_Person->template uuid<int>() << "," << act->Activity_Plan_ID<int>() << ", " << act->Activity_Type<ACTIVITY_TYPES>();
+					this->Write_To_Log<ComponentType,CallerType,TargetType>(s);
+				}
 
-				// key the movement plan on the planning timestep just prior to departure
-				Activity_Plans* activities = this->template Activity_Plans_Container<Activity_Plans*>();
+				Activity_Plans* activities = this->Activity_Container<ComponentType,CallerType,Activity_Plans*>();
 				activities->push_back(act);
 			}
 		};
@@ -150,58 +148,11 @@ namespace Person_Components
 
 
 
-		implementation struct ADAPTS_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(ADAPTS_Person_Planner_Implementation)>
-		{
-			typedef General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(ADAPTS_Person_Planner_Implementation)> base_type;
 
-			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
-			{	
-				this->template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
-				this->template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(15);
-
-				// get reference to the parent pointer and set the first activity generation time to be the parent first iteration
-				/*define_component_interface(parent_itf,typename base_type::type_of(Parent_Person),Prototypes::Person_Prototype,ComponentType);
-				parent_itf* parent = this->template Parent_Person<ComponentType,CallerType,parent_itf*>();*/
-				this->template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(_Parent_Person->template First_Iteration<Time_Minutes>());	
-			}
-			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
-			{	
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Initialize_Defined, "The specified ParentType is not a valid Person type.");
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Properties_Defined, "The specified ParentType does not have the required Properties member defined.");
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Planner_Defined, "The specified ParentType does not have the required Planner member defined.");
-			}
-			tag_feature_as_available(Initialize);
-
-			feature_implementation void Activity_Generation()
-			{
-				// Create alias for this to use in conditional
-				typedef Prototypes::Person_Planner<ComponentType, ComponentType> _Planning_Interface;
-				_Planning_Interface* this_ptr=(_Planning_Interface*)this;
-
-				static_assert(false,"Do not use");
-				// Generate average of 4 activities per day
-
-				//define_container_and_value_interface(Activity_Plans,Activity_Plan,typename base_type::type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Components::Prototypes::Activity_Plan_Prototype,ComponentType);
-				//Activity_Plan* act = (Activity_Plan*)Allocate<typename base_type::type_of(Activity_Plans_Container)::unqualified_value_type>();
-				//act->template Activity_Plan_ID<long>(_iteration);
-				//Activity_Plans* activities = this_ptr->template Activity_Plans_Container<Activity_Plans*>();
-				//activities->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(15),act);
-
-				//define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-				//Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Movement_Plans_Container)::unqualified_value_type>();
-				//move->template Movement_Plan_ID<long>(_iteration);
-				//Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();
-				//movements->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(30),move);
-			}
-			tag_feature_as_available(Activity_Generation);
-		};
-
-
-
-		implementation struct CTRAMP_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(CTRAMP_Person_Planner_Implementation)>
+		implementation struct POLARIS_Person_Planner_Implementation : public General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(POLARIS_Person_Planner_Implementation)>
 		{
 			// IMPLEMENTATION TYPEDEFS AND INTERFACES
-			typedef General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(CTRAMP_Person_Planner_Implementation)> base_type;
+			typedef General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(POLARIS_Person_Planner_Implementation)> base_type;
 
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	

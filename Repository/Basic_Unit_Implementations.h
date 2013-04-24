@@ -70,7 +70,8 @@ namespace Basic_Units
 }
 
 
-
+namespace GLOBALS
+{
 //=================================================================================================================
 // SIMULATION TIMER DEFINITION - Used by agents as a wrapper for the global _iteration variable
 typedef Basic_Units::Implementations::Time_Implementation<NULLTYPE> Basic_Time;
@@ -96,3 +97,9 @@ struct _Simulation_Timer
 };
 
 static _Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;
+
+static Basic_Units::Prototypes::Time_Prototype<Basic_Time> Time_Converter;
+
+}
+
+using namespace GLOBALS;

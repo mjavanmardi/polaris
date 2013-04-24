@@ -8,6 +8,8 @@
 
 #ifdef DBIO
 #define WINDOWS
+
+
 #include "Application_Includes.h"
 
 
@@ -15,6 +17,9 @@ struct MasterType
 {
 	typedef MasterType M;
 
+	//==============================================================================================
+	#pragma region Network Types
+	//----------------------------------------------------------------------------------------------
 	#ifdef ANTARES
 	typedef Conductor_Implementation<M> conductor_type;
 	typedef Control_Panel_Implementation<M> control_panel_type;
@@ -41,8 +46,6 @@ struct MasterType
 	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 	#endif
 
-	//==============================================================================================
-	// Network Types
 	typedef Scenario_Components::Implementations::Polaris_Scenario_Implementation<M> scenario_type;
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<M> network_db_reader_type;
 	typedef Turn_Movement_Components::Implementations::Polaris_Movement_Implementation<M> movement_type;
@@ -71,13 +74,20 @@ struct MasterType
 	typedef Movement_Plan_Components::Implementations::Polaris_Integrated_Movement_Plan_Implementation<M> movement_plan_type;
 	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<M> trajectory_unit_type;
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
-	
-	// DEMAND AGENT Types
+	#pragma endregion
+	//----------------------------------------------------------------------------------------------
+
+
+	//==============================================================================================
+	#pragma region DEMAND Types
+	//----------------------------------------------------------------------------------------------
 	typedef Person_Components::Implementations::Person_Implementation<M> person_type;
-	typedef Person_Components::Implementations::CTRAMP_Person_Planner_Implementation<M, person_type> person_planner_type;
+	typedef Person_Components::Implementations::POLARIS_Person_Planner_Implementation<M, person_type> person_planner_type;
+	typedef Person_Components::Implementations::General_Person_Scheduler_Implementation<M, person_type> person_scheduler_type;
 	typedef Person_Components::Implementations::CTRAMP_Activity_Generator_Implementation<M, person_type> activity_generator_type;
 	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<M,person_type> person_properties_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<M> person_static_properties_type;
+	
 	typedef RNG_Components::Implementations::RngStream_Implementation<M> RNG;
 
 	typedef Activity_Components::Implementations::Basic_Activity_Plan_Implementation<M,person_type> activity_type;
@@ -85,7 +95,8 @@ struct MasterType
 	typedef Activity_Components::Implementations::ADAPTS_Routine_Activity_Plan_Implementation<M,person_type> routine_activity_plan_type;
 	typedef Activity_Components::Implementations::Activity_Record<M,person_type> activity_record_type;
 
-	// destination choice types
+	// Choice model types
+	typedef Person_Components::Implementations::Activity_Timing_Chooser_Implementation<M,person_type> activity_timing_chooser_type;
 	typedef Person_Components::Implementations::CTRAMP_Destination_Chooser_Implementation<M,person_type> person_destination_chooser_type;
 	typedef Person_Components::Implementations::CTRAMP_Destination_Choice_Option<M,person_type> person_destination_choice_option_type;
 	
@@ -95,11 +106,15 @@ struct MasterType
 	typedef PopSyn::Implementations::Synthesis_Region_Implementation<M> region;
 	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<M> IPF_Solver_Settings;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<M> popsyn_solver;
+	#pragma endregion
+	//----------------------------------------------------------------------------------------------
 
 
-
+	//==============================================================================================
+	#pragma region TMC Types
+	//----------------------------------------------------------------------------------------------
 	typedef Traffic_Management_Center_Components::Implementations::Simple_TMC<MasterType> traffic_management_center_type;
-#ifdef ANTARES
+	#ifdef ANTARES
 	typedef Network_Event_Components::Implementations::Antares_Weather_Network_Event<MasterType> weather_network_event_type;
 	typedef Network_Event_Components::Implementations::Antares_Accident_Network_Event<MasterType> accident_network_event_type;
 	typedef Network_Event_Components::Implementations::Antares_Congestion_Network_Event<MasterType> congestion_network_event_type;
@@ -110,7 +125,7 @@ struct MasterType
 	typedef Advisory_Radio_Components::Implementations::Antares_Highway_Advisory_Radio<MasterType> advisory_radio_type;
 	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Word_Sign<MasterType> variable_word_sign_type;
 	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Speed_Sign<MasterType> variable_speed_sign_type;
-#else
+	#else
 	typedef Network_Event_Components::Implementations::Weather_Network_Event<MasterType> weather_network_event_type;
 	typedef Network_Event_Components::Implementations::Accident_Network_Event<MasterType> accident_network_event_type;
 	typedef Network_Event_Components::Implementations::Congestion_Network_Event<MasterType> congestion_network_event_type;
@@ -121,15 +136,19 @@ struct MasterType
 	typedef Advisory_Radio_Components::Implementations::Highway_Advisory_Radio<MasterType> advisory_radio_type;
 	typedef Variable_Message_Sign_Components::Implementations::Variable_Word_Sign<MasterType> variable_word_sign_type;
 	typedef Variable_Message_Sign_Components::Implementations::Variable_Speed_Sign<MasterType> variable_speed_sign_type;
-#endif
+	#endif
 
 	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
 	typedef TYPELIST_4(weather_network_event_type,accident_network_event_type,congestion_network_event_type,lane_closure_network_event_type) network_event_types;
 	typedef TYPELIST_5(link_control_type,depot_type,advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
+	#pragma endregion
+	//----------------------------------------------------------------------------------------------
 };
-ostream* stream_ptr;
+
+
+
 
 int main(int argc,char** argv)
 {
@@ -140,14 +159,6 @@ int main(int argc,char** argv)
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
 
-	// OUTPUT OPTIONS
-	ofstream log_file("signal_log3.txt");
-	ostream output_stream(log_file.rdbuf());
-	stream_ptr = &output_stream;	
-	//----------------
-	//stream_ptr = &cout;
-
-	string output_dir_name = "";
 
 	network_models::network_information::scenario_data_information::ScenarioData scenario_data_for_output;
 	network_models::network_information::network_data_information::NetworkData network_data_for_output;
@@ -190,14 +201,14 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// Start Antares UI
 	//----------------------------------------------------------------------------------------------------------------------------------
-#ifdef ANTARES
+	#ifdef ANTARES
 	network->set_network_bounds<NULLTYPE>();
 	Rectangle_XY<MasterType>* local_bounds=network->network_bounds<Rectangle_XY<MasterType>*>();
 	START_UI(MasterType,local_bounds->_xmin,local_bounds->_ymin,local_bounds->_xmax,local_bounds->_ymax);
 	MasterType::vehicle_type::Initialize_Layer();
 	network->initialize_antares_layers<NULLTYPE>();
 	MasterType::link_type::configure_link_moes_layer();
-#endif
+	#endif
 	
 	//Network_Event<MasterType::network_event_manager_type>* net_event_manager=(Network_Event<MasterType::network_event_manager_type>*)Allocate<MasterType::network_event_manager_type>();
 
@@ -226,9 +237,8 @@ int main(int argc,char** argv)
 	cout <<"converting operation data..." << endl;
 	operation->write_operation_data<NULLTYPE>(network_data_for_output, operation_data_for_output);
 	cout<<"writing operation data..."<<endl;
-	network_models::network_information::operation_data_information::write_operation_data(output_dir_name,scenario_data_for_output,operation_data_for_output,network_data_for_output);
+	network_models::network_information::operation_data_information::write_operation_data(scenario->output_dir_name<string>(),scenario_data_for_output,operation_data_for_output,network_data_for_output);
 
-	//network_models::write_data("",scenario_data_for_output,demand_data_for_output,network_data_for_output, operation_data_for_output);
 
 	////initialize network agents	
 	cout << "initializing link agents..." <<endl;
@@ -261,7 +271,7 @@ int main(int argc,char** argv)
 	//---------------------------------------------------------------------------------------------------------------------------------- 
 	GLOBALS::Normal_RNG.Set_Seed<int>(100);
 	GLOBALS::Uniform_RNG.Set_Seed<int>(200);
-
+	
 
 	//==================================================================================================================================
 	// Set up graphical display
@@ -297,7 +307,9 @@ int main(int argc,char** argv)
 	MasterType::person_destination_choice_option_type::_B_TTIME = -0.1;
 	MasterType::person_destination_choice_option_type::_B_EMPLOYMENT = 0.0002;
 	MasterType::person_destination_choice_option_type::_B_POPULATION = 0.00005;
-		
+	// Initialize start time model
+	MasterType::activity_timing_chooser_type::static_initializer("start_time_duration_data.txt");	
+
 
 	//==================================================================================================================================
 	// POPSYN stuff
@@ -323,28 +335,14 @@ int main(int argc,char** argv)
 	p->Home_Location<int>(65);
 	p->Work_Location<int>(256);
 
+	properties_itf* props = p->Properties<properties_itf*>();
+	props->Average_Activity_Duration<Target_Type<NT,void,ACTIVITY_TYPES,Time_Hours> > (ACTIVITY_TYPES::EAT_OUT_ACTIVITY,2);
+	props->Average_Activity_Duration<Target_Type<NT,void,ACTIVITY_TYPES,Time_Hours> > (ACTIVITY_TYPES::SOCIAL_ACTIVITY,3);
+	props->Average_Activity_Frequency<Target_Type<NT,void,ACTIVITY_TYPES,float> > (ACTIVITY_TYPES::EAT_OUT_ACTIVITY,2.5);
+	
 	#else
-	//ofstream out, marg_out, popsyn_log;
-	//out.open("full_population.csv",ios_base::out);
-	//popsyn_log.open("popsyn_log.csv",ios_base::out);
-	//marg_out.open("marginals_and_distributions.csv",ios_base::out);
-
-	//// IPF Solver Settings
-	//define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
-	//solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
-	//solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(scenario->ipf_tolerance<float>(),scenario->percent_to_synthesize<float>(),scenario->maximum_iterations<int>());
-
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
-	//popsyn->write_marginal_output_flag<bool>(scenario->write_marginal_output<bool>());
-	//popsyn->write_full_output_flag<bool>(scenario->write_full_output<bool>());
-	//popsyn->linker_file_path<string>(string("linker_file.txt"));
-	//popsyn->Solution_Settings<solver_itf*>(solver);
-	////popsyn->Output_Stream<ostream&>(out);
-	////popsyn->Log_File<ostream&>(popsyn_log);
-	////popsyn->Marginal_Output_Stream<ostream&>(marg_out);
-	//popsyn->network_reference<_Network_Interface*>(network);
-	//popsyn->scenario_reference<_Scenario_Interface*>(scenario);
 	popsyn->Initialize<Target_Type<NT,NT,_Network_Interface*, _Scenario_Interface*> >(network,scenario);
 	#endif
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -356,10 +354,10 @@ int main(int argc,char** argv)
 	MasterType::person_planner_type::_write_activity_files = true;
 	for (int i = 0; i < _num_threads; ++i)
 	{
-		logfilename.str("");
 		logfilename << "generated_acts_" << i << ".csv";
 		MasterType::person_planner_type::logs[i].open(logfilename.str());
 		MasterType::person_planner_type::logs[i] << "PERID,DEPART,ORIG,DEST,EST_TTIME"<<endl;
+		logfilename.str("");
 	}
 	//----------------------------------------------------------------------------------------------------------------------------------
 	

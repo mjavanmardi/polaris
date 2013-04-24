@@ -897,4 +897,5 @@ namespace Basic_Units
 
 }
 
+using namespace Basic_Units::Concepts;
 using namespace Basic_Units::Prototypes;

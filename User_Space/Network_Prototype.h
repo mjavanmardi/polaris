@@ -137,7 +137,7 @@ namespace Network_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Network_Prototype
+		prototype struct Network_Prototype ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 

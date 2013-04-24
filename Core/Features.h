@@ -585,6 +585,9 @@ concept struct Is_Target_Type_Struct
 	check_typename_defined(check2,ParamType);
 	check_typename_defined(check3,Param2Type);
 
+	define_sub_check(has_ReturnType, check1);
+	define_sub_check(has_ParamType, check2);
+	define_sub_check(has_Param2Type, check3);
 	define_default_check(check1 && check2 && check3);
 };
 
@@ -691,3 +694,91 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 
 #define execute_static_typelist_loop(DISPATCHER_ALIAS, TYPELIST, OBJECT_PTR)\
 		DISPATCHER_ALIAS<TYPELIST>::Start_Dispatch<TypeAt<TYPELIST,0>::Result, NT>(OBJECT_PTR);
+
+
+
+
+
+
+#define feature_method_void(FEATURE_NAME, REQUIREMENTS)\
+	public:\
+		define_feature_exists_check(FEATURE_NAME, FEATURE_NAME##_exists);\
+		template<typename ReturnValueType>\
+		typename ReturnValueType FEATURE_NAME(requires_getter(check(ComponentType,FEATURE_NAME##_exists) && (REQUIREMENTS)))\
+		{\
+			return (ReturnValueType)this_component()->template FEATURE_NAME<ComponentType,CallerType,ReturnValueType>();\
+		}\
+		template<typename ReturnValueType>\
+		typename ReturnValueType FEATURE_NAME(requires_getter(!check(ComponentType,FEATURE_NAME##_exists) || !(REQUIREMENTS)))\
+		{\
+			static_assert(FEATURE_NAME##_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_as_available\"? ---------]\n\n");\
+			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
+		}
+
+#define feature_method_1_arg(FEATURE_NAME, ARG, REQUIREMENTS)\
+	public:\
+		define_feature_exists_check(FEATURE_NAME##_1args, FEATURE_NAME##_1args_exists);\
+		template<typename TargetType>\
+		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG,requires( check(TargetType,Is_Target_Type_Struct) && check(ComponentType,FEATURE_NAME##_1args_exists) && (REQUIREMENTS) ) )\
+		{\
+			return (TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG);\
+		}\
+		template<typename TargetType>\
+		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG,requires(!check(TargetType,Is_Target_Type_Struct)  || !check(ComponentType,FEATURE_NAME##_1args_exists) || !(REQUIREMENTS)))\
+		{\
+			static_assert(FEATURE_NAME##_1args_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_as_available\"? ---------]\n\n");\
+			assert_check(TargetType, Is_Target_Type_Struct, "Must use a Target_Type struct for the target type when using the feature_method macro_1.");\
+			assert_sub_check(TargetType, Is_Target_Type_Struct, has_ReturnType, "Check1 fail");\
+			assert_sub_check(TargetType, Is_Target_Type_Struct, has_ParamType, "Check2 fail");\
+			assert_sub_check(TargetType, Is_Target_Type_Struct, has_Param2Type, "Check3 fail");\
+			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
+		}
+		
+#define feature_method_2_arg(FEATURE_NAME, ARG1, ARG2, REQUIREMENTS)\
+	public:\
+		define_feature_exists_check(FEATURE_NAME##_2args, FEATURE_NAME##_2args_exists);\
+		template<typename TargetType>\
+		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,requires(check(ComponentType,FEATURE_NAME##_2args_exists) && check(TargetType,Is_Target_Type_Struct) && (REQUIREMENTS) ) )\
+		{\
+			return (TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2);\
+		}\
+		template<typename TargetType>\
+		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,requires(!check(ComponentType,FEATURE_NAME##_2args_exists) || !check(TargetType,Is_Target_Type_Struct)  || !(REQUIREMENTS)))\
+		{\
+			static_assert(FEATURE_NAME##_2args_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_signature_as_available\"? ---------]\n\n");\
+			static_assert(Is_Target_Type_Struct<TargetType>::value,"\n\n\n[--------- Must use a Target_Type struct for the target type when using the feature_method macro_1.---------]\n\n");\
+			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
+		}
+
+#define feature_method_3_arg(FEATURE_NAME, ARG1, ARG2, ARG3, REQUIREMENTS)\
+	public:\
+		define_feature_exists_check(FEATURE_NAME##_3args, FEATURE_NAME##_3args_exists);\
+		template<typename TargetType>\
+		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2, typename TargetType::Param3Type ARG3,requires(check(ComponentType,FEATURE_NAME##_3args_exists) && check(TargetType,Is_Target_Type_Struct) && (REQUIREMENTS) ) )\
+		{\
+			return (TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2,ARG3);\
+		}\
+		template<typename TargetType>\
+		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2, typename TargetType::Param3Type ARG3,requires(!check(ComponentType,FEATURE_NAME##_3args_exists) || !check(TargetType,Is_Target_Type_Struct)  || !(REQUIREMENTS)))\
+		{\
+			static_assert(FEATURE_NAME##_3args_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_signature_as_available\"? ---------]\n\n");\
+			static_assert(Is_Target_Type_Struct<TargetType>::value,"\n\n\n[--------- Must use a Target_Type struct for the target type when using the feature_method macro_1.---------]\n\n");\
+			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
+		}
+
+#define feature_method_4_arg(FEATURE_NAME, ARG1, ARG2, ARG3, ARG4, REQUIREMENTS)\
+	public:\
+		define_feature_exists_check(FEATURE_NAME##_4args, FEATURE_NAME##_4args_exists);\
+		template<typename TargetType>\
+		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,typename TargetType::Param3Type ARG3, typename TargetType::Param4Type ARG4,requires(check(ComponentType,FEATURE_NAME##_4args_exists) && check(TargetType,Is_Target_Type_Struct) && (REQUIREMENTS) ) )\
+		{\
+			return (TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2,ARG3,ARG4);\
+		}\
+		template<typename TargetType>\
+		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,typename TargetType::Param3Type ARG3, typename TargetType::Param4Type ARG4,requires(!check(ComponentType,FEATURE_NAME##_4args_exists) || !check(TargetType,Is_Target_Type_Struct)  || !(REQUIREMENTS)))\
+		{\
+			static_assert(FEATURE_NAME##_4args_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_as_available\"? ---------]\n\n");\
+			static_assert(Is_Target_Type_Struct<TargetType>::value,"\n\n\n[--------- Must use a Target_Type struct for the target type when using the feature_method macro_1.---------]\n\n");\
+			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
+		}
+#define tag_feature_signature_as_available(FEATURE_NAME,NUM_ARGS) typedef true_type FEATURE_NAME##_##NUM_ARGS##args_feature_tag;

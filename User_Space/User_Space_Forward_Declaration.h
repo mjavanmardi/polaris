@@ -143,8 +143,10 @@ namespace Person_Components {
 	{
 		forward_declare_prototype struct Person;
 		forward_declare_prototype struct Activity_Generator;
+		forward_declare_prototype struct Activity_Timing_Chooser;
 		forward_declare_prototype struct Person_Planner;
 		forward_declare_prototype struct Person_Properties;
+		forward_declare_prototype struct Person_Scheduler;
 	}
 };
 

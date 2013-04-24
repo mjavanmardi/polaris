@@ -67,6 +67,7 @@ namespace Movement_Plan_Components
 			feature_accessor(current_trajectory_position, none, none);
 			feature_accessor(departed_time, none, none);
 			feature_accessor(arrived_time, none, none);
+			feature_accessor(planning_time, none, none);
 			feature_accessor(plan, none, none);
 			feature_accessor(valid_trajectory,none,none);
 			feature_accessor(activity_reference,none,none);

@@ -261,7 +261,7 @@ namespace PopSyn
 					p->ID(sample_id);
 					p->Index(new_region->template Get_1D_Index<Target_Type<NULLTYPE,typename joint_itf::size_type,typename joint_itf::index_type>>(index));
 					p->Weight(weight);
-					p->Characteristics(data);
+					p->Characteristics<Target_Type<NT,void,vector<double>*> >(&data);
 
 					// Update the sample and joint distribution with the current population unit
 					sample->insert(p->template Index<typename sample_collection_type::key_type>(), p);
@@ -481,44 +481,24 @@ namespace PopSyn
 							person_itf* person = *p_itr;
 
 							// initialize the person - allocates all person subcomponents
-							person->Initialize<long>(uuid);
-							int home_loc_index;
+							person->Initialize<Target_Type<NT,void,long,zone_itf*> >(uuid, zone);
 
-							// assign person to a random activity location in the zone				
-							if (loc_indices->size() == 0)
-							{
-								home_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * activity_locations->size());
-								person->Home_Location<int>(home_loc_index);
-							}
-							else
-							{
-								home_loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * loc_indices->size());
-								person->Home_Location<int>(loc_indices->at(home_loc_index));
-							}
+							++uuid;
+							++counter;
 
-							// get the polaris zone of the synthesized person and increment its population counter;
-							_Zone_Interface* pzone = person->Home_Location<_Zone_Interface*>();
-							pzone->population<int&>()++;
-
-							// Assign workers to a work location
+							//===========================
+							// Print results
 							pop_unit_itf* properties = person->Static_Properties<pop_unit_itf*>();
 							if (properties->Employment_Status<Person_Components::Types::EMPLOYMENT_STATUS>() == Person_Components::Types::EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK) 
 							{
-								person->Choose_Work_Location<NT>();
-
-								popsyn_log <<endl <<"WORK,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->Work_Location<_Zone_Interface*>()->uuid<int>();
-								popsyn_log <<"," << properties->Journey_To_Work_Travel_Time<Time_Minutes>() <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->Work_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
+								popsyn_log <<endl <<"WORK,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->Work_Location<_Zone_Interface*>()->uuid<int>() <<"," << properties->Journey_To_Work_Travel_Time<Time_Minutes>() <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->Work_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
 							}
-
+							else popsyn_log <<endl<<"DOES NOT WORK,,,,,";
 							if (properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
 							{
-								person->Choose_School_Location<NT>();
-								popsyn_log <<endl <<"SCHOOL,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->School_Location<_Zone_Interface*>()->uuid<int>();
-								popsyn_log <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->School_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
+								popsyn_log <<",SCHOOL,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->School_Location<_Zone_Interface*>()->uuid<int>()<<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->School_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
 							}
-							++uuid;
-
-							++counter;
+							else popsyn_log <<",NOT_IN_SCHOOL,,,,";
 						}
 					}
 				}

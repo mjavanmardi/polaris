@@ -51,6 +51,7 @@ namespace Person_Components
 			typedef Prototypes::Person<ComponentType> this_itf;
 			define_component_interface(generator_itf,typename type_of(Planning_Faculty)::type_of(Activity_Generator),Prototypes::Activity_Generator,ComponentType);
 			define_component_interface(destination_choice_itf,typename type_of(Planning_Faculty)::type_of(Destination_Chooser),Prototypes::Destination_Chooser,ComponentType);
+			define_component_interface(timing_choice_itf,typename type_of(Planning_Faculty)::type_of(Timing_Chooser),Prototypes::Activity_Timing_Chooser,ComponentType);
 			define_container_and_value_interface(zones_container_interface, zone_interface, typename network_reference_interface::get_type_of(zones_container),Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 			define_container_and_value_interface(locations_container_interface, location_interface, typename network_reference_interface::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 
@@ -64,7 +65,7 @@ namespace Person_Components
 
 				// Create and Initialize the Properties faculty
 				_Properties = (Properties_interface*)Allocate<type_of(Properties)>();
-				_Properties->template Initialize<NULLTYPE>();
+				_Properties->template Initialize<void>();
 				_Properties->template Parent_Person<ComponentType*>(this);
 
 				// Create and Initialize the Planner faculty and its subcomponents
@@ -77,6 +78,9 @@ namespace Person_Components
 				destination_choice_itf* destination_chooser = (destination_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Destination_Chooser)>();
 				destination_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
 				_Planning_Faculty->template Destination_Chooser<destination_choice_itf*>(destination_chooser);
+				timing_choice_itf* timing_chooser = (timing_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)>();
+				timing_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
+				_Planning_Faculty->template Timing_Chooser<timing_choice_itf*>(timing_chooser);
 
 				// Create and Initialize the routing faculty
 				_router=(router_interface*)Allocate<type_of(router)>();
@@ -95,6 +99,11 @@ namespace Person_Components
 
 				// Add basic traveler properties							
 				this->template uuid<ComponentType,ComponentType,int>(id);
+			}
+			feature_implementation void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone)
+			{
+				this->Initialize<ComponentType,CallerType, TargetType::ParamType>(id);
+				_Properties->template Initialize<Target_Type<NT,void,TargetType::Param2Type> >(home_zone);
 			}
 			tag_feature_as_available(Initialize);	
 

@@ -233,6 +233,24 @@ namespace GLOBALS
 			TargetType r = rng->Next_Rand<TargetType>();
 			return r*sigma + mu;
 		}
+
+		template <typename TargetType>
+		void Correlated_Rands(vector<TargetType>& correlated_random_values, matrix<TargetType>& Sigma)
+		{
+			correlated_random_values.clear();
+
+			// factor the covariance matrix
+			matrix<TargetType> L;
+			Sigma.cholesky(L);
+
+			// create vector of uncorrelated normals
+			matrix<TargetType> norm = matrix<TargetType>(matrix<TargetType>::index_type(Sigma.num_rows(),1),0);
+			for (uint i = 0; i < Sigma.num_rows(); ++i) norm(i,0) = this->Next_Rand<TargetType>();
+
+			// correlate the normals and populate the return vector
+			matrix<TargetType> corr_norm = L*norm;
+			for (uint i = 0; i < Sigma.num_rows(); ++i) correlated_random_values.push_back(corr_norm(i,0));
+		}
 	private:
 		 RNG_type thread_rng[_num_threads];
 	};

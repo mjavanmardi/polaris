@@ -20,6 +20,7 @@ namespace Movement_Plan_Components
 			member_data(int, delayed_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, enter_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, enter_interval_index, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			
 			member_component(typename MasterType::link_type, link, none, none);
 
 			feature_implementation void Initialize(TargetType link_val)
@@ -71,10 +72,14 @@ namespace Movement_Plan_Components
 			member_component(typename MasterType::link_type, origin, none, none);
 			member_component(typename MasterType::link_type, destination, none, none);
 //#ifndef FOR_LINUX_PORTING
-			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_departed_time,none,none);
-			member_component_feature(departed_time, _departed_time, Value, Basic_Units::Prototypes::Time_Prototype);
-			member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_arrived_time,none,none);
-			member_component_feature(arrived_time, _arrived_time, Value, Basic_Units::Prototypes::Time_Prototype);
+			//member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_departed_time,none,none);
+			//member_component_feature(departed_time, _departed_time, Value, Basic_Units::Prototypes::Time_Prototype);
+			//member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_arrived_time,none,none);
+			//member_component_feature(arrived_time, _arrived_time, Value, Basic_Units::Prototypes::Time_Prototype);
+			member_component_and_feature_accessor(departed_time,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(planning_time,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(arrived_time,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(expected_travel_time,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 //#else
 //			member_data(int,departed_time,none,none);
 //			member_data(int,arrived_time,none,none);

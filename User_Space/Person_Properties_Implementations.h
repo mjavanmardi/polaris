@@ -17,20 +17,176 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct ADAPTS_Person_Properties_Implementation : public Polaris_Component<APPEND_CHILD(ADAPTS_Person_Properties_Implementation),MasterType,Data_Object,ParentType>
 		{
-			typedef true_type Census_Definition_Compliant;
-
+			// local data members
 			member_prototype(Prototypes::Person, Parent_Person, typename MasterType::person_type, none, none);
-
-			feature_implementation void Initialize(requires(check_2(ComponentType,CallerType,Is_Same_Entity)))
-			{	
-				_home_location_id = -1;
-				_work_location_id = -1;
-				_school_location_id = -1;
-			}	tag_feature_as_available(Initialize);
-
 			member_data(int, home_location_id, none, none);
 			member_data(int, work_location_id, none, none);
 			member_data(int, school_location_id, none, none);
+			member_associative_container(concat(hash_map<Activity_Components::Types::ACTIVITY_TYPES, pair<float,float>>), average_activity_frequency_and_duration_container,none,none);
+
+			
+			// Methods
+			feature_implementation void Initialize()
+			{
+				// initialize location indices
+				_home_location_id = -1;
+				_work_location_id = -1;
+				_school_location_id = -1;
+
+				// Initialize activity frequency and duration container
+				typedef pair<Activity_Components::Types::ACTIVITY_TYPES, pair<float, float>> avg_activity_record;
+				avg_activity_record a;
+				a.first = ACTIVITY_TYPES::AT_HOME_ACTIVITY;					a.second.first = 2.237f; a.second.second = 442.f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::SCHOOL_ACTIVITY;					a.second.first = 0.122f; a.second.second = 387.3f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::CHANGE_TRANSPORTATION_ACTIVITY;	a.second.first = 0.051f; a.second.second = 18.f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::RELIGIOUS_OR_CIVIC_ACTIVITY;		a.second.first = 0.065f; a.second.second = 109.f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::PICK_UP_OR_DROP_OFF_ACTIVITY;		a.second.first = 0.263f; a.second.second = 13.4f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::EAT_OUT_ACTIVITY;					a.second.first = 0.229f; a.second.second = 53.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::HEALTHCARE_ACTIVITY;				a.second.first = 0.075f; a.second.second = 97.6f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::ERRANDS_ACTIVITY;					a.second.first = 0.124f; a.second.second = 16.6f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::OTHER_ACTIVITY;					a.second.first = 0.002f; a.second.second = 14.f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::PERSONAL_BUSINESS_ACTIVITY;		a.second.first = 0.129f; a.second.second = 91.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::RECREATION_ACTIVITY;				a.second.first = 0.206f; a.second.second = 140.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::OTHER_SHOPPING_ACTIVITY;			a.second.first = 0.423f; a.second.second = 35.4f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::SERVICE_VEHICLE_ACTIVITY;			a.second.first = 0.066f; a.second.second = 13.7f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::MAJOR_SHOPPING_ACTIVITY;			a.second.first = 0.031f; a.second.second = 45.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::SOCIAL_ACTIVITY;					a.second.first = 0.168f; a.second.second = 198.1f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::OTHER_WORK_ACTIVITY;				a.second.first = 0.129f; a.second.second = 170.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY;			a.second.first = 0.381f; a.second.second = 390.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY;			a.second.first = 0.026f; a.second.second = 560.7f;	this->_average_activity_frequency_and_duration_container.insert(a);		
+				a.first = ACTIVITY_TYPES::LEISURE_ACTIVITY;					a.second.first = 0.213f; a.second.second = 142.0f;	this->_average_activity_frequency_and_duration_container.insert(a);	
+			}
+			tag_feature_as_available(Initialize);
+			feature_implementation void Initialize(typename TargetType::ParamType home_synthesis_zone/*, requires(check(typename TargetType::ParamType, PopSyn::Concepts::Is_Synthesis_Zone) && check_as_given(typename TargetType::ParamType, is_pointer))*/)
+			{	
+				//===============================================================================================================
+				// INITIALIZE HOME / WORK / SCHOOL LOCATIONS
+				//---------------------------------------------------------------------------------------------------------------
+				// get an interface to the given home zone;
+				typedef PopSyn::Prototypes::Synthesis_Zone_Prototype<MasterType::zone> zone_itf;
+				typedef Prototypes::Person_Properties<Parent_Person_interface::get_type_of(Static_Properties)> pop_unit_itf;
+				
+				// useful interfaces
+				define_simple_container_interface(activity_location_ids_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);				
+				define_component_interface(network_itf,typename Parent_Person_interface::get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_container_and_value_interface(activity_locations_itf, activity_location_itf,typename network_itf::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+				define_container_and_value_interface(_Zone_Container_Interface, _Zone_Interface,typename network_itf::get_type_of(zones_container),Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+			
+				zone_itf* zone = (zone_itf*)home_synthesis_zone;
+				network_itf* network = _Parent_Person->network_reference<network_itf*>();
+				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
+
+				// initialize location indices
+				_home_location_id = -1;
+				_work_location_id = -1;
+				_school_location_id = -1;
+				
+				// Available locations
+				activity_location_ids_itf* loc_indices = zone->Activity_Locations_Container<activity_location_ids_itf*>();
+
+				// assign person to a random activity location in the zone				
+				if (loc_indices->size() == 0)
+				{
+					_home_location_id= (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * activity_locations->size());
+				}
+				else
+				{
+					_home_location_id = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * loc_indices->size());
+				}
+
+				// get the polaris zone of the synthesized person and increment its population counter;
+				_Zone_Interface* pzone = _Parent_Person->Home_Location<_Zone_Interface*>();
+				pzone->population<int&>()++;
+
+				// Assign workers to a work location
+				pop_unit_itf* properties = _Parent_Person->Static_Properties<pop_unit_itf*>();
+				if (properties->Employment_Status<Person_Components::Types::EMPLOYMENT_STATUS>() == Person_Components::Types::EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK) 
+				{
+					_Parent_Person->Choose_Work_Location<NT>();
+				}
+
+				if (properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
+				{
+					_Parent_Person->Choose_School_Location<NT>();
+				}
+			}	
+			/*feature_implementation void Initialize(typename TargetType::ParamType home_synthesis_zone, requires(!check(typename TargetType::ParamType, Zone_Components::Concepts::Is_Zone_Prototype) || !check_as_given(typename TargetType::ParamType, is_pointer)))
+			{	
+				assert_check(TargetType::ParamType, Zone_Components::Concepts::Is_Zone_Prototype,"Error: must pass in home zone as a zone_prototype");
+				assert_check_as_given(TargetType::ParamType, is_pointer, "Error: must pass in home zone as a pointer.");
+			}*/
+			tag_feature_signature_as_available(Initialize,1);
+
+			// Getter / setter for the average activity duration
+			feature_implementation typename TargetType::ReturnType Average_Activity_Duration(ACTIVITY_TYPES act_type)
+			{
+				Time_Minutes value;
+				
+				average_activity_frequency_and_duration_container_type::iterator itr;
+				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
+				if (itr != this->_average_activity_frequency_and_duration_container.end())
+				{
+					value = itr->second.second;
+				}
+				else
+				{
+					THROW_WARNING("WARNING: Activity type '" << act_type << "' was not found in the Person_Properties average_activity_duration container. Activity duration assumed to be 0.");
+					value = 0.0;
+				}
+				// duration stored in minutes
+				TargetType::ReturnType duration;
+				duration = Time_Prototype<Basic_Units::Implementations::Time_Implementation<NT>>::Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes>>(value);
+				return duration;
+			}
+			tag_feature_signature_as_available(Average_Activity_Duration,1);
+			feature_implementation void Average_Activity_Duration(typename TargetType::ParamType act_type, typename TargetType::Param2Type value)
+			{
+				// duration stored in minutes
+				Time_Minutes duration = Time_Prototype<Basic_Units::Implementations::Time_Implementation<NT>>::Convert_Value<Target_Type<NT,Time_Minutes,TargetType::Param2Type>>(value);
+			
+				average_activity_frequency_and_duration_container_type::iterator itr;
+				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
+				if (itr != this->_average_activity_frequency_and_duration_container.end())
+				{
+					itr->second.second= duration;
+				}
+				else
+				{
+					this->_average_activity_frequency_and_duration_container.insert(pair<TargetType::ParamType, pair<TargetType::Param2Type,TargetType::Param2Type> >(act_type, pair<TargetType::Param2Type,TargetType::Param2Type>(0,duration)));
+				}
+			}
+			tag_feature_signature_as_available(Average_Activity_Duration,2);
+
+			// Getter / Setter for the activity frequency
+			feature_implementation typename TargetType::ReturnType Average_Activity_Frequency(ACTIVITY_TYPES act_type)
+			{
+				average_activity_frequency_and_duration_container_type::iterator itr;
+				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
+				if (itr != this->_average_activity_frequency_and_duration_container.end())
+				{
+					return (TargetType::ReturnType)itr->second.first;
+				}
+				else
+				{
+					THROW_WARNING("WARNING: Activity type '" << act_type << "' was not found in the Person_Properties average_activity_duration container. Activity duration assumed to be 0.");
+					return (TargetType::ReturnType)0.0;
+				}
+			}
+			tag_feature_signature_as_available(Average_Activity_Frequency,1);
+			feature_implementation void Average_Activity_Frequency(typename TargetType::ParamType act_type, typename TargetType::Param2Type value)
+			{
+				average_activity_frequency_and_duration_container_type::iterator itr;
+				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
+				if (itr != this->_average_activity_frequency_and_duration_container.end())
+				{
+					itr->second.first = value;
+				}
+				else
+				{
+					this->_average_activity_frequency_and_duration_container.insert(pair<TargetType::ParamType, pair<TargetType::Param2Type,TargetType::Param2Type> >(act_type, pair<TargetType::Param2Type,TargetType::Param2Type>(value,0)));
+				}
+			}
+			tag_feature_signature_as_available(Average_Activity_Frequency,2);
 		};
 
 		implementation struct ACS_Person_Static_Properties_Implementation : public Polaris_Component<APPEND_CHILD(ACS_Person_Static_Properties_Implementation), MasterType, Data_Object, ParentType>
@@ -54,6 +210,36 @@ namespace Person_Components
 			member_data(Types::EDUCATION_LEVEL, Educational_Attainment,none,none);	
 			member_data(Types::EMPLOYMENT_STATUS, Employment_Status,none,none);
 			member_data(Types::EMPLOYMENT_INDUSTRY, Employment_Industry,none,none);	
+			feature_implementation bool Is_Employed()
+			{
+				bool is_employed = false;
+				switch(this->_Employment_Status)
+				{
+					case EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK :
+					case EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK :
+						is_employed=true;
+						break;
+					default:
+						is_employed=false;
+				}
+				return is_employed;
+			}
+			tag_feature_as_available(Is_Employed);
+			feature_implementation bool Is_Student()
+			{
+				bool is_student = false;
+				switch(this->_School_Enrollment)
+				{
+					case SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE :
+					case SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC :
+						is_student=true;
+						break;
+					default:
+						is_student=false;
+				}
+				return is_student;
+			}
+			tag_feature_as_available(Is_Student);
 
 			member_data(int, Journey_To_Work_Vehicle_Occupancy,none,none);
 			member_data(int, Age, check(ReturnValueType, is_integral),check(SetValueType,is_integral));
@@ -373,30 +559,30 @@ namespace Person_Components
 			tag_getter_setter_as_available(Journey_To_Work_Arrival_Time);
 
 			// Characteristics setter
-			feature_implementation void Characteristics(vector<TargetType>& data)
+			feature_implementation void Characteristics(vector<double>* data)
 			{
 				// these setters correspond exactly to the ACS-PUMS definitions and layout as given in pums_file.txt.  if pumsfile changes change these functions
 				typedef Prototypes::Person_Properties<ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
 				
-				pthis->Age<int>(data[7]);
-				pthis->Class_of_worker<Types::CLASS_OF_WORKER>((Types::CLASS_OF_WORKER)(int)data[8]);
-				pthis->Educational_Attainment<Types::EDUCATION_LEVEL>((Types::EDUCATION_LEVEL)(int)data[17]);
-				pthis->Employment_Industry<Types::EMPLOYMENT_INDUSTRY>((Types::EMPLOYMENT_INDUSTRY)(int)data[23]);
-				pthis->Employment_Status<Types::EMPLOYMENT_STATUS>((Types::EMPLOYMENT_STATUS)(int)data[21]);
-				pthis->Gender<Types::GENDER>((Types::GENDER)(int)data[5]);
-				pthis->Income<Basic_Units::Currency_Variables::Dollars>(data[29]);
-				pthis->Journey_To_Work_Arrival_Time<int>(data[24]);
-				pthis->Journey_To_Work_Mode<Types::JOURNEY_TO_WORK_MODE>((Types::JOURNEY_TO_WORK_MODE)(int)data[11]);
-				pthis->Journey_To_Work_Travel_Time<Time_Minutes>(data[9]);
-				pthis->Journey_To_Work_Vehicle_Occupancy<int>(data[10]);
-				pthis->Marital_Status<Types::MARITAL_STATUS>((Types::MARITAL_STATUS)(int)data[12]);
-				pthis->Race<Types::RACE>((Types::RACE)(int)data[6]);
-				pthis->School_Enrollment<Types::SCHOOL_ENROLLMENT>((Types::SCHOOL_ENROLLMENT)(int)data[15]);
-				pthis->School_Grade_Level<Types::SCHOOL_GRADE_LEVEL>((Types::SCHOOL_GRADE_LEVEL)(int)data[16]);
-				pthis->Work_Hours<Time_Hours>(data[19]);
+				pthis->Age<int>((*data)[7]);
+				pthis->Class_of_worker<Types::CLASS_OF_WORKER>((Types::CLASS_OF_WORKER)(int)(*data)[8]);
+				pthis->Educational_Attainment<Types::EDUCATION_LEVEL>((Types::EDUCATION_LEVEL)(int)(*data)[17]);
+				pthis->Employment_Industry<Types::EMPLOYMENT_INDUSTRY>((Types::EMPLOYMENT_INDUSTRY)(int)(*data)[23]);
+				pthis->Employment_Status<Types::EMPLOYMENT_STATUS>((Types::EMPLOYMENT_STATUS)(int)(*data)[21]);
+				pthis->Gender<Types::GENDER>((Types::GENDER)(int)(*data)[5]);
+				pthis->Income<Basic_Units::Currency_Variables::Dollars>((*data)[29]);
+				pthis->Journey_To_Work_Arrival_Time<int>((*data)[24]);
+				pthis->Journey_To_Work_Mode<Types::JOURNEY_TO_WORK_MODE>((Types::JOURNEY_TO_WORK_MODE)(int)(*data)[11]);
+				pthis->Journey_To_Work_Travel_Time<Time_Minutes>((*data)[9]);
+				pthis->Journey_To_Work_Vehicle_Occupancy<int>((*data)[10]);
+				pthis->Marital_Status<Types::MARITAL_STATUS>((Types::MARITAL_STATUS)(int)(*data)[12]);
+				pthis->Race<Types::RACE>((Types::RACE)(int)(*data)[6]);
+				pthis->School_Enrollment<Types::SCHOOL_ENROLLMENT>((Types::SCHOOL_ENROLLMENT)(int)(*data)[15]);
+				pthis->School_Grade_Level<Types::SCHOOL_GRADE_LEVEL>((Types::SCHOOL_GRADE_LEVEL)(int)(*data)[16]);
+				pthis->Work_Hours<Time_Hours>((*data)[19]);
 			}
-			tag_feature_as_available(Characteristics);
+			tag_feature_signature_as_available(Characteristics, 1);
 		};
 
 	}

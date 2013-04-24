@@ -71,6 +71,20 @@ namespace Person_Components
 			typedef General_Activity_Generator_Implementation<MasterType, ParentType, APPEND_CHILD(CTRAMP_Activity_Generator_Implementation)> base_type;
 			typedef base_type base;
 			typedef Prototypes::Activity_Generator<base_type,base_type> base_itf;
+
+			// static discretionary activity generation model
+			static float eat_out_activity_freq[8];
+			static float errands_activity_freq[8];
+			static float healthcare_activity_freq[8];
+			static float leisure_activity_freq[8];
+			static float major_shopping_activity_freq[8];
+			static float other_activity_freq[8];
+			static float other_shopping_activity_freq[8];
+			static float personal_business_activity_freq[8];
+			static float religious_or_civic_activity_freq[8];
+			static float service_vehicle_activity_freq[8];
+			static float social_activity_freq[8];
+
 			
 			// Interface definitions
 			define_component_interface(_planner_itf,typename type_of(Parent_Planner),Prototypes::Person_Planner,ComponentType);
@@ -122,55 +136,138 @@ namespace Person_Components
 				//=========================================================================================================================
 				// Generate work activity
 				EMPLOYMENT_STATUS work_status = static_properties->Employment_Status<EMPLOYMENT_STATUS>();
-				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
-				{
-					Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
-					activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
-					
-					// Activity planning time
-					Simulation_Timestep_Increment plan_time = _iteration + act_count;
-					activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY, plan_time);
-					activities->push_back((Activity*)activity);
-					act_count++;
-				}
+				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count);
+				//{
+				//	Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
+				//	activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
+				//	activity->Activity_Plan_ID<int>(act_count);
+				//	
+				//	// Activity planning time
+				//	Simulation_Timestep_Increment plan_time = _iteration + act_count;
+				//	activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY, plan_time);
+				//	activities->push_back((Activity*)activity);
+				//	act_count++;
+				//}
 				//-------------------------------------------------------------------------------------------------------------------------
 
 
 				//=========================================================================================================================
 				// Generate school activity
 				Person_Components::Types::SCHOOL_ENROLLMENT sch_status = static_properties->School_Enrollment<SCHOOL_ENROLLMENT>();
-				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
-				{
-					Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
-					activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
-					
-					// Activity planning time
-					Simulation_Timestep_Increment plan_time = _iteration + act_count;
-					activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(ACTIVITY_TYPES::SCHOOL_ACTIVITY, plan_time);
-					activities->push_back((Activity*)activity);
-					act_count++;
-				}
+				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count);
+				//{
+				//	Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
+				//	activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
+				//	activity->Activity_Plan_ID<int>(act_count);
+				//	
+				//	// Activity planning time
+				//	Simulation_Timestep_Increment plan_time = _iteration + act_count;
+				//	activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(ACTIVITY_TYPES::SCHOOL_ACTIVITY, plan_time);
+				//	activities->push_back((Activity*)activity);
+				//	act_count++;
+				//}
 				//-------------------------------------------------------------------------------------------------------------------------
 
+				int person_index = this->Person_Type_index<ComponentType,CallerType,NT>();
 
 				//=========================================================================================================================
-				// Generate other activities
-				int num_activities = 1;
-				for (int i = act_count; i < act_count + num_activities; i++)
-				{
-					//cout << endl << "Allocating regular activity.";
-					Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
-					activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
-					
-					// Activity planning time
-					Simulation_Timestep_Increment plan_time = _iteration + i;
-					activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(ACTIVITY_TYPES::OTHER_ACTIVITY, plan_time);
-					activities->push_back((Activity*)activity);
-				}
-				act_count = act_count + num_activities;
+				// Get frequency of each activity type
+				float num_eat_out = eat_out_activity_freq[person_index];
+				float num_errand = errands_activity_freq[person_index];
+				float num_healthcare = healthcare_activity_freq[person_index];
+				float num_leisure = leisure_activity_freq[person_index];
+				float num_maj_shop = major_shopping_activity_freq[person_index];
+				float num_other = other_activity_freq[person_index];
+				float num_other_shop = other_shopping_activity_freq[person_index];
+				float num_pb = personal_business_activity_freq[person_index];
+				float num_civic = religious_or_civic_activity_freq[person_index];
+				float num_service = service_vehicle_activity_freq[person_index];
+				float num_social = social_activity_freq[person_index];
+
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_eat_out ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(EAT_OUT_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_errand ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(ERRANDS_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_healthcare ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_leisure ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(LEISURE_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_maj_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY,act_count);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_pb ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_civic ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_service ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_social ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SOCIAL_ACTIVITY,act_count);
+
 			}
 			tag_feature_as_available(Activity_Generation);
 
+			feature_implementation int Person_Type_index()
+			{
+				person_itf* _Parent_Person = base_type::_Parent_Planner->Parent_Person<person_itf*>();
+				_static_properties_itf* per = _Parent_Person->Static_Properties<_static_properties_itf*>();
+
+				int age = per->Age<int>();
+				Time_Hours hours = per->Work_Hours<Time_Hours>();
+				bool student = per->Is_Student<bool>();
+				bool employed = per->Is_Employed<bool>();
+
+				int index = -1;
+				if (employed && hours >= 30) index = 3;		// full time
+				else if (employed) index = 4;				// part time
+				else if (student && age > 18) index = 7;	// adult student
+				else if (age >= 65) index = 6;				// senior
+				else if (age < 65 && age > 18) index = 5;	// adult non-worker
+				else if (age >= 16 && age <= 18) index = 0;	// driving age school child
+				else if (age < 16 && age >= 5) index = 1;	// school child
+				else if (age < 5) index = 2;				// pre- school age child
+				else index = 5;
+
+				return index;
+			}
+
+			feature_implementation void Create_Routine_Activity(TargetType act_type, int& activity_count)
+			{
+				Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
+				activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
+				activity->Activity_Plan_ID<int>(activity_count);
+	
+				// Activity planning time
+				Simulation_Timestep_Increment plan_time = _iteration + activity_count;
+				activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, plan_time);
+
+				((base_type*)this)->_Parent_Planner->Add_Activity_Plan<Routine_Activity_Plan*>(activity);
+				//Activities* activities = typename base_type::_Parent_Planner->template Activity_Container<Activities*>();
+				//activities->push_back((Activity*)activity);
+				activity_count++;
+			}
+			feature_implementation void Create_Activity(TargetType act_type, int& activity_count)
+			{
+				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
+				activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
+				activity->Activity_Plan_ID<int>(activity_count);
+
+
+				Simulation_Timestep_Increment _plan_time = _iteration + activity_count;
+				activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, _plan_time);
+
+				((base_type*)this)->_Parent_Planner->Add_Activity_Plan<Activity_Plan*>(activity);
+				//Activities* activities = typename base_type::_Parent_Planner->template Activity_Container<Activities*>();
+				//activities->push_back((Activity*)activity);
+
+
+				
+				activity_count++;
+			}
+
 		};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::eat_out_activity_freq[]= {0.134,0.125,0.158,0.260,0.236,0.234,0.248,0.178};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::errands_activity_freq[]= {0.033,0.052,0.093,0.108,0.156,0.198,0.181,0.070};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::healthcare_activity_freq[]= {0.030,0.034,0.053,0.051,0.070,0.110,0.142,0.046};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::leisure_activity_freq[]= {0.198,0.271,0.234,0.161,0.213,0.236,0.184,0.206};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::major_shopping_activity_freq[]= {0.007,0.014,0.022,0.028,0.039,0.041,0.041,0.015};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::other_activity_freq[]= {0.008,0.016,0.021,0.027,0.023,0.034,0.031,0.028};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::other_shopping_activity_freq[]= {0.174,0.203,0.320,0.359,0.484,0.658,0.598,0.302};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::personal_business_activity_freq[]= {0.117,0.082,0.110,0.097,0.133,0.206,0.167,0.197};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::religious_or_civic_activity_freq[]= {0.059,0.069,0.033,0.049,0.074,0.113,0.103,0.043};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::service_vehicle_activity_freq[]= {0.021,0.023,0.043,0.080,0.076,0.077,0.076,0.061};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::social_activity_freq[]= {0.227,0.188,0.215,0.129,0.211,0.225,0.189,0.200};
 	}
 }

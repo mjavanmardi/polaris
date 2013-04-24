@@ -195,6 +195,9 @@ namespace Choice_Model_Components
 					}
 					i++;
 				}
+
+				selected_index = -1;
+				return nullptr;
 			}
 			feature_prototype TargetType Choose(int& selected_index,requires(!check(ComponentType, Concepts::Is_Probabilistic)))
 			{

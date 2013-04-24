@@ -751,7 +751,7 @@ namespace Network_Components
 				for(int i=0;i<_num_threads;i++)
 				{
 					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
-					routable_network->template read_realtime_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
+					routable_network->template read_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
 					_routable_networks_container.push_back((typename MasterType::routable_network_type*)routable_network);
 				}
 			}
@@ -764,7 +764,7 @@ namespace Network_Components
 				for(int i=0;i<_num_threads;i++)
 				{
 					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
-					routable_network->template read_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
+					routable_network->template read_realtime_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
 					_realtime_routable_networks_container.push_back((typename MasterType::routable_network_type*)routable_network);
 				}
 			}

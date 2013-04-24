@@ -69,10 +69,9 @@ namespace Activity_Components
 		{
 			declare_feature_conditional(Activity_Planning_Conditional)
 			{
+				
 				//----------------------------------------------
-				// CONDITIONALS FOR BASIC AGENT SCHEDULING
-				// 1.) Activity Generation (Occurs 
-				// Create alias for this to use in conditional
+				// CONDITIONALS FOR BASIC ACTIVITY PLAN SCHEDULING
 				typedef Activity_Planner<ComponentType, ComponentType> _Activity_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
@@ -115,7 +114,7 @@ namespace Activity_Components
 					}
 					else
 					{
-						response.next._iteration = _iteration+1;
+						response.next._iteration = _iteration+5;
 						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
@@ -337,6 +336,17 @@ namespace Activity_Components
 					response.next._iteration = END;
 					response.next._sub_iteration = END;
 				}
+				// catch any sub_iterations which have been modified (currenlty limited to routing, which can be changed by start_time_plan iteration)
+				// this will hit only if start time plan iteration is called immidiately be
+				else
+				{
+					Revision& route_itr = this_ptr->Route_Planning_Time<Revision&>();
+					if(route_itr._iteration  != END && route_itr._iteration >= _iteration)
+					{
+						response.result = false;
+						response.next._revision = this_ptr->Route_Planning_Time<Revision>();
+					}
+				}
 			}
 			declare_feature_event(Location_Planning_Event)
 			{
@@ -418,6 +428,7 @@ namespace Activity_Components
 
 			// Pointer back to planner
 			feature_accessor(Parent_Planner, none, none);
+			feature_accessor(Parent_ID, none, not_available);
 
 			// Fundamental activity properties
 			feature_accessor(Activity_Plan_ID, check(ReturnValueType,is_arithmetic), check(SetValueType,is_arithmetic));
@@ -454,6 +465,7 @@ namespace Activity_Components
 			feature_prototype void Initialize(typename TargetType::ParamType act_type, typename TargetType::Param2Type planning_time, requires(check(TargetType,Is_Target_Type_Struct) && check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same)))
 			{
 				this_component()->Initialize<ComponentType, ComponentType, typename TargetType::ParamType>(act_type);
+				this->Set_Meta_Attributes<void>();
 				this->Set_Attribute_Planning_Times<typename TargetType::Param2Type>(planning_time);
 			}
 			feature_prototype void Initialize(typename TargetType::ParamType act_type, typename TargetType::Param2Type planning_time, requires(!check(TargetType,Is_Target_Type_Struct) || !check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same)))
@@ -461,6 +473,9 @@ namespace Activity_Components
 				assert_check(TargetType,Is_Target_Type_Struct, "The TargetType for Activity.Initialize must be a Target_Type struct.");
 				assert_check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same, "TargetType::ParamType must be an ActivityType enumerator");
 			}
+			
+			feature_method_void(Set_Meta_Attributes,none);
+			
 			feature_prototype void Set_Attribute_Planning_Times(TargetType planning_time)
 			{
 				// Call the model to determine the attribute planning times
@@ -492,6 +507,7 @@ namespace Activity_Components
 					THROW_WARNING(err);
 				}
 			}
+			
 			feature_prototype bool Is_Minimum_Plan_Time(TargetType plan_time, requires(check_2(TargetType, Revision,is_same)))
 			{
 				Revision& rev = plan_time;
@@ -502,9 +518,9 @@ namespace Activity_Components
 				Revision& start_time = this->Start_Time_Planning_Time<Revision&>();
 				Revision& route = this->Route_Planning_Time<Revision&>();
 
-				if (rev._iteration <= persons._iteration && rev._sub_iteration <= persons._sub_iteration && rev._iteration <= mode._iteration && rev._sub_iteration <= mode._sub_iteration && 
-					rev._iteration <= duration._iteration && rev._sub_iteration <= duration._sub_iteration && rev._iteration <= location._iteration && rev._sub_iteration <= location._sub_iteration && 
-					rev._iteration <= start_time._iteration && rev._sub_iteration <= start_time._sub_iteration && rev._iteration <= route._iteration && rev._sub_iteration <= route._sub_iteration&& rev._iteration != END)
+				if (rev._revision <= persons._revision && rev._revision <= mode._revision && 
+					rev._revision <= duration._revision && rev._revision <= location._revision && 
+					rev._revision <= start_time._revision && rev._revision <= route._revision && rev._iteration != END)
 				{
 					return true;
 				}

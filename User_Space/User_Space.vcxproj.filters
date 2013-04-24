@@ -277,5 +277,20 @@
     <ClInclude Include="Advisory_ITS_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Person_Scheduler_Prototype.h">
+      <Filter>Prototypes\Person Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Person_Planner_Prototype.h">
+      <Filter>Prototypes\Person Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Person_Scheduler_Implementations.h">
+      <Filter>Implementations\Person Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Activity_Timing_Choice_Implementation.h">
+      <Filter>Implementations\Person Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Activity_Timing_Choice_Prototype.h">
+      <Filter>Prototypes\Person Components</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

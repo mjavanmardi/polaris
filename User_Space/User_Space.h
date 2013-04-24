@@ -31,7 +31,6 @@ void* _global_scenario;
 #include "Activity_Implementations.h"
 
 
-
 // POPSYN COMPONENTS
 //#include "Population_Unit_Implementations.h"
 //#include "Synthesis_Zone_Implementations.h"
@@ -46,7 +45,9 @@ void* _global_scenario;
 #include "Person_Planner_Implementations.h"
 #include "Activity_Generator_Implementations.h"
 #include "Destination_Choice_Implementation.h"
+#include "Activity_Timing_Choice_Implementation.h"
 #include "Person_Properties_Implementations.h"
+#include "Person_Scheduler_Implementations.h"
 #include "Person_Implementations.h"
 
 // ITS COMPONENTS
