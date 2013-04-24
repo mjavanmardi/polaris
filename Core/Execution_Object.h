@@ -161,38 +161,43 @@ void Execution_Loop(void* page_in, Revision& ptex_response)
 	
 	Conditional_Response optex_response;
 	
+	Revision object_revision;
+
 	do
 	{
 		//not necessary if developer doesn't compare response initial values
 		//response.next=INT_MAX;
 		//response.result=false;
 
-		if( ((Execution_Object*)page)->next_revision._revision == this_revision._revision )
+		Execution_Object* const current_page = ((Execution_Object*)page);
+
+		object_revision._revision = current_page->next_revision._revision;
+
+		if( object_revision._revision == this_revision._revision )
 		{
 			//((Execution_Object*)page)->conditional_register(page,optex_response);
 
-			Execution_Object::Conditional_Holder<DataType>::conditional_register(page,optex_response);
+			Execution_Object::Conditional_Holder<DataType>::conditional_register(current_page,optex_response);
 			
-			((Execution_Object*)page)->next_revision=optex_response.next;
+			object_revision._revision = optex_response.next._revision;
 
-			if(optex_response.result) ((Execution_Object*)page)->event_register(page);
+			current_page->next_revision._revision = object_revision._revision;
+
+			if(optex_response.result) current_page->event_register(current_page);
 		}
 
-		if(((Execution_Object*)page)->next_revision >= ptex_response)
+		if(object_revision._revision < ptex_response._revision)
 		{
-			continue;
-		}
-		else
-		{
-			if(((Execution_Object*)page)->next_revision >= 0)
+			if(object_revision._revision >= 0)
 			{
-				ptex_response=((Execution_Object*)page)->next_revision;
+				ptex_response._revision=object_revision._revision;
 			}
 			else
 			{
-				(DataType::singleton_reference)->Free((DataType*)page);
+				(DataType::singleton_reference)->Free((DataType*)current_page);
 			}
 		}
+
 	}
 	while(++page < end_page);
 }

@@ -130,7 +130,7 @@ namespace Demand_Components
 				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
 
-					if (++counter % 10000 == 0)
+					if (++counter % 100000 == 0)
 					{
 						cout << counter << " trips processed" << endl;
 					}
@@ -145,7 +145,7 @@ namespace Demand_Components
 
 					if(!activity_id_to_ptr.count(org_key))
 					{
-						if(++skipped_counter%10000==0)
+						if(++skipped_counter%100000==0)
 						{
 							cout << skipped_counter << " trips skipped" << endl;
 						}
@@ -156,7 +156,7 @@ namespace Demand_Components
 
 					if(!activity_id_to_ptr.count(dst_key))
 					{
-						if(++skipped_counter%10000==0)
+						if(++skipped_counter%100000==0)
 						{
 							cout << skipped_counter << " trips skipped" << endl;
 						}

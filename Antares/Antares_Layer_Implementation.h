@@ -222,12 +222,20 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		{
 			if(grouped)
 			{
-				const int* const geometry_data_end = geometry_itr + data_stride;
-
-				while( geometry_itr != geometry_data_end )
+				if(data_stride)
 				{
 					storage_reference->push_back(*geometry_itr);
 					++geometry_itr;
+					storage_reference->push_back(*geometry_itr);
+					++geometry_itr;
+
+					//const int* const geometry_data_end = geometry_itr + data_stride;
+
+					//while( geometry_itr != geometry_data_end )
+					//{
+					//	storage_reference->push_back(*geometry_itr);
+					//	++geometry_itr;
+					//}
 				}
 
 				if(group_color)
@@ -254,13 +262,16 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 				const int num_group_primitives=*((int*)geometry_itr);
 
-				const int* end_size_itr = geometry_itr+sizeof(int)/sizeof(int);
+				storage_reference->push_back(*geometry_itr);
+				++geometry_itr;
 
-				while(geometry_itr!=end_size_itr)
-				{
-					storage_reference->push_back(*geometry_itr);
-					++geometry_itr;
-				}
+				//const int* end_size_itr = geometry_itr+sizeof(int)/sizeof(int);
+
+				//while(geometry_itr!=end_size_itr)
+				//{
+				//	storage_reference->push_back(*geometry_itr);
+				//	++geometry_itr;
+				//}
 
 				const int* const group_end = (*((int**)geometry_itr)) + primitive_stride * num_group_primitives;
 				geometry_itr=(*((int**)geometry_itr));
@@ -269,13 +280,16 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 				{
 					if(primitive_color)
 					{
-						const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
+						storage_reference->push_back(*geometry_itr);
+						++geometry_itr;
 
-						while(geometry_itr!=end_data_itr)
-						{
-							storage_reference->push_back(*geometry_itr);
-							++geometry_itr;
-						}
+						//const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
+
+						//while(geometry_itr!=end_data_itr)
+						//{
+						//	storage_reference->push_back(*geometry_itr);
+						//	++geometry_itr;
+						//}
 					}
 
 					if(primitive_normal)
@@ -289,41 +303,61 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 						c = *((Point_3D<NT>*)read_itr);
 
 						Compute_Fast_Normal(a,b,c,result);
-
-						//const int* write_itr = (const int*)&result;
+						
 						const int* write_itr = (const int*)beg_write_itr;
 
-						//const int* end_data_itr = write_itr + sizeof(Point_3D<NT>)/sizeof(int);
+						//while(write_itr!=end_write_itr)
+						//{
+						//	storage_reference->push_back(*write_itr);
+						//	++write_itr;
+						//}
 
-						while(write_itr!=end_write_itr)
-						{
-							storage_reference->push_back(*write_itr);
-							++write_itr;
-						}
+						storage_reference->push_back(*write_itr);
+						++write_itr;
+						storage_reference->push_back(*write_itr);
+						++write_itr;
+						storage_reference->push_back(*write_itr);
+						++write_itr;
 					}
 
-					const int* const geometry_vert_end = geometry_itr + vert_stride;
+					int siz = storage_reference->size();
 
-					while( geometry_itr != geometry_vert_end )
-					{
-						const int* end_data_itr = geometry_itr + vert_size;
+					storage_reference->resize( siz + vert_stride );
 
-						while(geometry_itr!=end_data_itr)
-						{
-							storage_reference->push_back(*geometry_itr);
-							++geometry_itr;
-						}
-					}
+					memcpy( &( storage_reference->at(siz) ), geometry_itr, vert_stride*sizeof(int) );
+
+					geometry_itr += vert_stride;
+
+					//const int* const geometry_vert_end = geometry_itr + vert_stride;
+
+					//while( geometry_itr != geometry_vert_end )
+					//{
+					//	const int* end_data_itr = geometry_itr + vert_size;
+
+					//	while(geometry_itr!=end_data_itr)
+					//	{
+					//		storage_reference->push_back(*geometry_itr);
+					//		++geometry_itr;
+					//	}
+					//}
 				}
 			}
 			else
 			{
-				const int* const geometry_data_end = geometry_itr + data_stride;
-
-				while( geometry_itr != geometry_data_end )
+				if(data_stride)
 				{
 					storage_reference->push_back(*geometry_itr);
 					++geometry_itr;
+					storage_reference->push_back(*geometry_itr);
+					++geometry_itr;
+
+					//const int* const geometry_data_end = geometry_itr + data_stride;
+
+					//while( geometry_itr != geometry_data_end )
+					//{
+					//	storage_reference->push_back(*geometry_itr);
+					//	++geometry_itr;
+					//}
 				}
 
 				const int* const group_end = geometry_itr + primitive_stride;
@@ -332,13 +366,16 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 				{
 					if(primitive_color)
 					{
-						const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
+						storage_reference->push_back(*geometry_itr);
+						++geometry_itr;
 
-						while(geometry_itr!=end_data_itr)
-						{
-							storage_reference->push_back(*geometry_itr);
-							++geometry_itr;
-						}
+						//const int* end_data_itr = geometry_itr+sizeof(True_Color_RGBA<MasterType>)/sizeof(int);
+
+						//while(geometry_itr!=end_data_itr)
+						//{
+						//	storage_reference->push_back(*geometry_itr);
+						//	++geometry_itr;
+						//}
 					}
 
 					if(primitive_normal)
@@ -353,29 +390,42 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 						Compute_Fast_Normal(a,b,c,result);
 
-						const int* write_itr = (const int*)&result;
+						const int* write_itr = (const int*)beg_write_itr;
 
-						const int* end_data_itr = write_itr + sizeof(Point_3D<NT>)/sizeof(int);
+						//while(write_itr!=end_write_itr)
+						//{
+						//	storage_reference->push_back(*write_itr);
+						//	++write_itr;
+						//}
 
-						while(write_itr!=end_data_itr)
-						{
-							storage_reference->push_back(*write_itr);
-							++write_itr;
-						}
+						storage_reference->push_back(*write_itr);
+						++write_itr;
+						storage_reference->push_back(*write_itr);
+						++write_itr;
+						storage_reference->push_back(*write_itr);
+						++write_itr;
 					}
+					
+					int siz = storage_reference->size();
 
-					const int* const geometry_vert_end = geometry_itr + vert_stride;
+					storage_reference->resize( siz + vert_stride );
 
-					while( geometry_itr != geometry_vert_end )
-					{
-						const int* end_data_itr = geometry_itr+vert_size;
+					memcpy( &( storage_reference->at(siz) ), geometry_itr, vert_stride*sizeof(int) );
 
-						while(geometry_itr!=end_data_itr)
-						{
-							storage_reference->push_back(*geometry_itr);
-							++geometry_itr;
-						}
-					}
+					geometry_itr += vert_stride;
+
+					//const int* const geometry_vert_end = geometry_itr + vert_stride;
+
+					//while( geometry_itr != geometry_vert_end )
+					//{
+					//	const int* end_data_itr = geometry_itr+vert_size;
+
+					//	while(geometry_itr!=end_data_itr)
+					//	{
+					//		storage_reference->push_back(*geometry_itr);
+					//		++geometry_itr;
+					//	}
+					//}
 				}
 			}
 		}
