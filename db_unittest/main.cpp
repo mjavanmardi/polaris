@@ -56,6 +56,22 @@ TEST_F(DBTest, LocationFKLocation_Data){
 	ASSERT_EQ(count, 0);
 }
 
+
+TEST_F(DBTest, Depot){
+	typedef odb::query<polaris::io::Depot> query;
+	typedef odb::result<polaris::io::Depot> result;
+	odb::transaction t(this->db->begin());
+	result r(this->db->query<polaris::io::Depot>(query::true_expr));
+	int count = 0;
+	for (result::iterator i (r.begin()); i!=r.end(); ++i)
+	{
+	  count++;
+	}
+	t.commit();
+	ASSERT_EQ(count, 1);
+}
+
+
 TEST_F(DBTest, EventgetInstances)
 {
 	using namespace polaris::io;

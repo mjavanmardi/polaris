@@ -4,19 +4,16 @@
     <ClCompile Include="System-odb.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Supply-odb.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Result-odb.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Demand-odb.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Its-odb.cxx">
+    <ClCompile Include="Network_Event-odb.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Network_Event-odb.cxx">
+    <ClCompile Include="Supply-odb.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -45,9 +42,6 @@
     <ClInclude Include="Io.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Its-odb.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="endian.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -68,9 +62,6 @@
     <CustomBuild Include="Supply.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="Its.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="Network_Event.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -89,9 +80,6 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="System-odb.ixx">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Its-odb.ixx">
       <Filter>Header Files</Filter>
     </None>
     <None Include="Network_Event-odb.ixx">
