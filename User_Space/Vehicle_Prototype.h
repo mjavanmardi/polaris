@@ -96,6 +96,12 @@ namespace Vehicle_Components
 			{
 				this_component()->template enroute_switching<ComponentType,CallerType, TargetType>();
 			}
+
+			feature_prototype bool exploit_events_set(TargetType events_set)
+			{
+				return this_component()->template exploit_events_set<ComponentType,CallerType, TargetType>(events_set);
+			}
+
 		};
 	}
 }

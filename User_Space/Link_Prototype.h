@@ -168,6 +168,14 @@ namespace Link_Components
 			feature_accessor(depot, none, none);
 			feature_accessor(variable_word_sign, none, none);
 			feature_accessor(variable_speed_sign, none, none);
+
+			feature_accessor(weather_event_to_process, none, none);
+			feature_accessor(current_weather_event, none, none);
+			feature_accessor(accident_event_to_process, none, none);
+			feature_accessor(current_accident_event, none, none);
+			
+			// ITS-enabled link
+			feature_accessor(advisory_radio_events, none, none);
 			
 			feature_prototype void Push_ITS(TargetType its)
 			{
@@ -260,6 +268,20 @@ namespace Link_Components
 			feature_prototype void handle_events()
 			{
 				this_component()->template handle_events<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void get_events_from_vms()
+			{
+				this_component()->template get_events_from_vms<ComponentType,CallerType,TargetType>();
+			}
+			feature_prototype void get_events_from_har()
+			{
+				this_component()->template get_events_from_har<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density)
+			{
+				this_component()->template get_link_moe<ComponentType,CallerType,TargetType>(start_time, end_time, volume, speed, density);
 			}
 		};
 	}

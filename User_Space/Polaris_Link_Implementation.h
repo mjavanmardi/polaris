@@ -30,6 +30,9 @@ namespace Link_Components
 	{
 		struct Link_MOE_Data
 		{
+			int start_time;
+			int end_time;
+
 			float link_travel_time;
 			float link_travel_time_standard_deviation;
 			float link_queue_length;
@@ -176,6 +179,7 @@ namespace Link_Components
 			member_data(float, link_vht, none, none);
 
 			struct Link_MOE_Data link_moe_data;
+			struct Link_MOE_Data non_volatile_link_moe_data;
 
 			struct Link_MOE_Data realtime_link_moe_data;
 
@@ -190,6 +194,11 @@ namespace Link_Components
 			member_prototype(Depot, depot, typename MasterType::depot_type, none, none);
 			member_prototype(Advisory_ITS, variable_word_sign, typename MasterType::variable_word_sign_type, none, none);
 			member_prototype(Advisory_ITS, variable_speed_sign, typename MasterType::variable_speed_sign_type, none, none);
+
+			typedef typename MasterType::base_network_event_type base_network_event_type;
+			typedef Network_Event<base_network_event_type> _Network_Event_Interface;
+			member_container(vector<_Network_Event_Interface*>, advisory_radio_events, none, none);
+
 		//==================================================================================================================
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------
@@ -396,7 +405,8 @@ namespace Link_Components
 				define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
 				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, typename _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				
+				typedef Network_Event<typename MasterType::weather_network_event_type> _Weather_Network_Event_Interface;
+				typedef Network_Event<typename MasterType::accident_network_event_type> _Accident_Network_Event_Interface;				
 				define_container_and_value_interface_unqualified_container(_Movements_Container_Interface, _Movement_Interface, type_of(outbound_turn_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				typedef Link_Prototype<ComponentType, ComponentType> _Link_Interface;
@@ -423,6 +433,8 @@ namespace Link_Components
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
 				///enroute switching
+				bool enroute_switching_decision = false;
+
 				int outbound_turn_movement_size = (int)_outbound_turn_movements.size();
 				if (outbound_turn_movement_size>1)
 				{
@@ -431,16 +443,69 @@ namespace Link_Components
 						double r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
 						if (r1 <= vehicle->template information_compliance_rate<double>())
 						{
-							vehicle->template enroute_switching<NULLTYPE>();
+							enroute_switching_decision = true;
+							//cout<< "informed vehicle switching..." <<endl;
 						}
 					}
+				}
+
+
+				if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION) 
+				{///case 2: no realtime information
+					/// case 2.3: Accident
+					if (_current_accident_event != nullptr)
+					{
+						enroute_switching_decision = true;
+						cout<< "uninformed vehicle switching...accident" <<endl;
+					}
 					else
-					{///case 2: no realtime information
+					{
+						unordered_set<_Network_Event_Interface*> events_set;
 					
 						/// case 2.1: VMS
+						get_events_from_vms<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
+
+						bool vms = false;
+						int vms_event_size = int(events_set.size());
+						if (vms_event_size>0)
+						{
+							vms = true;
+						}
 						/// case 2.2: HAR
-						/// case 2.3: Accident
+						get_events_from_har<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
+						int har_event_size = int(events_set.size()) - vms_event_size;
+						bool har = false;
+						if (har_event_size>0)
+						{
+							har = true;
+						}
+						/// exploit
+						enroute_switching_decision = vehicle->template exploit_events_set<unordered_set<_Network_Event_Interface*>&>(events_set);
+
+						if (enroute_switching_decision)
+						{
+							if (vms && har)
+							{
+								cout<< "uninformed vehicle switching...vms or/and har" <<endl;
+							}
+							else
+							{
+								if (vms)
+								{
+									cout<< "uninformed vehicle switching...vms" <<endl;
+								}
+								else
+								{
+									cout<< "uninformed vehicle switching...har" <<endl;
+								}
+							}
+						}
 					}
+				}
+
+				if (enroute_switching_decision)
+				{
+					vehicle->template enroute_switching<NULLTYPE>();
 				}
 
 				if(_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
@@ -777,6 +842,38 @@ namespace Link_Components
 				_this_ptr->template handle_events<NT>();
 			}
 
+			feature_implementation void get_events_from_har(TargetType events_set)
+			{
+				if (_advisory_radio != nullptr)
+				{
+					vector<_Network_Event_Interface*> events;
+					
+					_advisory_radio->Get_Displayed_Messages<typename MasterType::base_network_event_type>(events);
+					vector<_Network_Event_Interface*>::iterator event_itr;
+					for (event_itr = events.begin(); event_itr != events.end(); event_itr++)
+					{
+						_Network_Event_Interface* event = (_Network_Event_Interface*)(*event_itr);
+						events_set.insert(event);
+					}
+				}
+			}
+
+			feature_implementation void get_events_from_vms(TargetType events_set)
+			{
+				if (_variable_word_sign != nullptr)
+				{
+					vector<_Network_Event_Interface*> events;
+					
+					_variable_word_sign->Get_Displayed_Messages<typename MasterType::base_network_event_type>(events);
+					vector<_Network_Event_Interface*>::iterator event_itr;
+					for (event_itr = events.begin(); event_itr != events.end(); event_itr++)
+					{
+						_Network_Event_Interface* event = (_Network_Event_Interface*)(*event_itr);
+						events_set.insert(event);
+					}
+				}
+			}
+
 			static void Weather_Event_Notification(void* link, Network_Event<type_of(typename MasterType::weather_network_event),NT>* net_event)
 			{
 				typedef typename MasterType::link_type _Link_Component;
@@ -800,12 +897,11 @@ namespace Link_Components
 				_accident_event_to_process = true;
 				_current_accident_event = (typename MasterType::accident_network_event_type*)net_event; 
 			}
-			
+
 			feature_implementation void handle_events()
 			{
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
 				int time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
-
 				if (!_weather_event_to_process && !_accident_event_to_process)
 				{
 					return;
@@ -894,6 +990,15 @@ namespace Link_Components
 				_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
 				network_event_manager->template Push_Subscriber<MasterType::weather_network_event_type>(&Weather_Event_Notification);
 				network_event_manager->template Push_Subscriber<MasterType::accident_network_event_type>(&Accident_Event_Notification);
+			}
+
+			feature_implementation void get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density)
+			{
+				start_time = non_volatile_link_moe_data.start_time;
+				end_time = non_volatile_link_moe_data.end_time;
+				volume = non_volatile_link_moe_data.link_out_volume;
+				speed = non_volatile_link_moe_data.link_speed;
+				density = non_volatile_link_moe_data.link_density;
 			}
 
 			feature_implementation void process_weather_event();

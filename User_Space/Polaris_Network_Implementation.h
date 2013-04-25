@@ -519,6 +519,7 @@ namespace Network_Components
 					{
 						((_Intersection_Interface*)(*intersection_itr))->template calculate_moe_for_assignment_interval<NULLTYPE>();
 					}
+					link_moe_post_process();
 					update_moe_for_assignment_interval_with_links();
 					update_moe_for_assignment_interval();
 					if (((_Scenario_Interface*)_global_scenario)->template output_moe_for_assignment_interval<bool>())
@@ -526,6 +527,24 @@ namespace Network_Components
 						output_moe_for_assignment_interval<ComponentType, CallerType, TargetType>();
 					}
 					reset_moe_for_assignment_interval();
+				}
+			}
+
+			void link_moe_post_process()
+			{
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, NULLTYPE);
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
+				typename _Links_Container_Interface::iterator link_itr;
+				typedef typename MasterType::link_type _link_component_type;
+				int end_time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+				int start_time = end_time - ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>();
+				for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+				{
+					_link_component_type* link_component = (_link_component_type*)(*link_itr);
+					link_component->link_moe_data.start_time = start_time;
+					link_component->link_moe_data.end_time = end_time;
+					link_component->non_volatile_link_moe_data = link_component->link_moe_data;
 				}
 			}
 

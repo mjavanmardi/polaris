@@ -736,11 +736,14 @@ namespace Scenario_Components
 					cout << "Reference network MOE file not found. There will be no hisotorical side-by-side plotting in Antares." << endl;
 				}
 
-				string routable_network_snapshots_file_name = input_dir_name<string&>() + "input_network_snapshots";
-				input_network_snapshots_file<fstream&>().open(routable_network_snapshots_file_name, fstream::in);
-				if (!input_network_snapshots_file<fstream&>().is_open())
+				if (read_network_snapshots<bool>())
 				{
-					cout << "Network snapshots file not found. Network snapshots will not be read." << endl;
+					string routable_network_snapshots_file_name = input_dir_name<string&>() + "input_network_snapshots";
+					input_network_snapshots_file<fstream&>().open(routable_network_snapshots_file_name, fstream::in);
+					if (!input_network_snapshots_file<fstream&>().is_open())
+					{
+						THROW_EXCEPTION(endl << "read_network_snapshots is enabled but network snapshots file cannot be opened." << endl);
+					}
 				}
 			}
 
@@ -830,6 +833,10 @@ namespace Scenario_Components
 				return (3.28084 * mepsValue * 3600.0 / 5280.0);
 			}
 
+			feature_prototype int moe_update_interval()
+			{
+				return _assignment_interval_length;
+			}
 		};
 	}
 }

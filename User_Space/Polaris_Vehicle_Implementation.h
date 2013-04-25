@@ -72,6 +72,49 @@ namespace Vehicle_Components
 				// do nothing for polaris vehicle
 			}
 
+			feature_implementation bool exploit_events_set(TargetType events_set)
+			{
+				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				typedef Network_Event<typename MasterType::base_network_event_type> _Base_Event_Interface;
+				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
+
+				_Trajectory_Container_Interface::iterator itr;
+
+				bool event_found_flag = false;
+				for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
+				{
+					_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
+					_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+					
+					///weather
+					_Base_Event_Interface* weather_event = route_link->current_weather_event<_Base_Event_Interface*>();
+					if (weather_event != nullptr)
+					{
+						if (events_set.find(weather_event) != events_set.end())
+						{
+							event_found_flag = true;
+							break;
+						}
+					}
+
+					///accident
+					_Base_Event_Interface* accident_event = route_link->current_accident_event<_Base_Event_Interface*>();
+					if (accident_event != nullptr)
+					{
+						if (events_set.find(accident_event) != events_set.end())
+						{
+							event_found_flag = true;
+							break;
+						}
+					}
+
+				}
+
+				return event_found_flag;
+			}
+
 			feature_implementation void update_enroute_switch_decisions()
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
