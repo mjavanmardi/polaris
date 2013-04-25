@@ -465,7 +465,6 @@ namespace Routing_Components
 				//define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename ComponentType::routable_network_type::type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_component_interface(_Activity_Interface, typename _Movement_Plan_Interface::get_type_of(activity_reference), Activity_Components::Prototypes::Activity_Planner, ComponentType);
 
 				//_Vehicle_Interface* veh = _this_ptr->template vehicle<_Vehicle_Interface*>();
 				//_Movement_Plan_Interface* mp= veh->template movement_plan<_Movement_Plan_Interface*>();
@@ -480,11 +479,6 @@ namespace Routing_Components
 				
 				_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
 				float routed_travel_time = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
-
-
-
-				_Activity_Interface* act = mp->activity_reference<_Activity_Interface*>();
-
 
 				if (routed_travel_time >= 0.0)
 				{	
@@ -580,8 +574,7 @@ namespace Routing_Components
 				define_component_interface(_Vehicle_Interface, typename _Traveler_Interface::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename ComponentType::routable_network_type::type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_component_interface(_Activity_Interface, typename _Movement_Plan_Interface::get_type_of(activity_reference), Activity_Components::Prototypes::Activity_Planner, ComponentType);
-
+				
 				_Movement_Plan_Interface* mp= _this_ptr->template movement_plan<_Movement_Plan_Interface*>();
 
 				_Regular_Link_Interface* origin_link=mp->template origin<_Regular_Link_Interface*>();
@@ -607,7 +600,6 @@ namespace Routing_Components
 
 					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
 					_this_ptr->template write_path<NULLTYPE>();
-					//origin_link->push_vehicle(veh);
 				}
 			}
 
