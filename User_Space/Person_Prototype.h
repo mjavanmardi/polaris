@@ -76,7 +76,7 @@ namespace Prototypes
 		// Event handling
 		declare_feature_conditional(Agent_Conditional)
 		{
-			response.next._iteration = Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(15);
+			response.next._iteration = END;
 			response.next._sub_iteration = 0;
 			response.result = true;
 		}
@@ -85,16 +85,14 @@ namespace Prototypes
 			typedef Person<ComponentType, ComponentType> _Person_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
-			
-			define_component_interface(_network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,CallerType);
-			_network_itf* network = pthis->network_reference<_network_itf*>();
+			pthis->Set_Home_Location<NT>();
 		}
 
 		// Initializers
 		feature_prototype void Initialize(TargetType id, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
 			this_component()->Initialize<ComponentType,CallerType, TargetType>(id);
-			load_event(ComponentType,Agent_Conditional,Agent_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
+			load_event(ComponentType,Agent_Conditional,Agent_Event,_iteration+1,0,NULLTYPE);
 		}
 		feature_prototype void Initialize(TargetType id, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{
@@ -103,7 +101,7 @@ namespace Prototypes
 		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
 			this_component()->Initialize<ComponentType,CallerType, TargetType>(id, home_zone);
-			load_event(ComponentType,Agent_Conditional,Agent_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
+			load_event(ComponentType,Agent_Conditional,Agent_Event,_iteration+1,0,NULLTYPE);
 		}
 		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{
@@ -120,6 +118,11 @@ namespace Prototypes
 		//}
 
 		// Sub-component accessors	
+
+		feature_prototype void Set_Home_Location()
+		{
+			this_component()->Set_Home_Location<ComponentType,CallerType, TargetType>();
+		}
 		feature_accessor(Planning_Faculty,none,none);
 		feature_accessor(router,none,none);
 		feature_accessor(Moving_Faculty,none,none);
@@ -454,6 +457,10 @@ namespace Prototypes
 		feature_prototype typename TargetType Calculate_Utility()
 		{
 			return this_component()->Calculate_Utility<ComponentType,CallerType,TargetType>();
+		}
+		feature_prototype typename TargetType Print_Utility()
+		{
+			return this_component()->Print_Utility<ComponentType,CallerType,TargetType>();
 		}
 	};
 }

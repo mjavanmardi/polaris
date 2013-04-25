@@ -25,6 +25,7 @@ namespace Person_Components
 			//=======================================================================================================================================================================
 			// DATA MEMBERS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			member_prototype(PopSyn::Prototypes::Synthesis_Zone_Prototype, home_synthesis_zone, typename MasterType::zone,none,none);
 			member_prototype(Vehicle_Components::Prototypes::Vehicle_Prototype, vehicle,typename MasterType::vehicle_type,none,none);
 			member_prototype(Routing_Components::Prototypes::Routing_Prototype, router,typename MasterType::routing_type,none,none);
 			member_prototype(Prototypes::Person_Mover, Moving_Faculty,Implementations::Person_Mover_Implementation<MasterType>, none, none);
@@ -103,9 +104,14 @@ namespace Person_Components
 			feature_implementation void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone)
 			{
 				this->Initialize<ComponentType,CallerType, TargetType::ParamType>(id);
-				_Properties->template Initialize<Target_Type<NT,void,TargetType::Param2Type> >(home_zone);
+				this->home_synthesis_zone<ComponentType,CallerType, TargetType::Param2Type>(home_zone);
 			}
 			tag_feature_as_available(Initialize);	
+
+			feature_implementation void Set_Home_Location()
+			{
+				_Properties->template Initialize<Target_Type<NT,void,home_synthesis_zone_interface*> >(this->_home_synthesis_zone);
+			}
 
 			feature_implementation void Choose_Work_Location()
 			{
@@ -202,6 +208,7 @@ namespace Person_Components
 					float size = work_locations->size();
 					int index = (int)(Uniform_RNG.Next_Rand<float>()*size);
 					location_interface* work_loc = (*work_locations)[index];
+
 					pthis->Work_Location<int>(work_loc->internal_id<int>());
 				}
 			}

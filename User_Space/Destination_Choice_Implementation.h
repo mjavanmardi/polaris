@@ -56,24 +56,56 @@ namespace Person_Components
 				_Skim_Interface* LOS = network->skimming_faculty<_Skim_Interface*>();
 
 				// variables used for utility calculation
-				float ttime, pop, emp, u;
-				float utility_sum = 0;
-				float prob_sum = 0;
+				TargetType ttime, pop, emp, u;
+				TargetType utility_sum = 0;
+				TargetType prob_sum = 0;
 				_Zone_Interface* zone;
 
 				// select zones to choose from and estimate utility
 				zone = _destination->template zone<_Zone_Interface*>();
 
 				ttime = LOS->Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_origin->zone<_Zone_Interface*>()->uuid<int>(),zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				pop = zone->population<float>();
-				emp = zone->employment<float>();
+				pop = zone->population<TargetType>();
+				emp = zone->employment<TargetType>();
 
-				u = exp(_B_POPULATION * pop + _B_EMPLOYMENT * emp - _B_TTIME * ttime);
-				return (typename TargetType)u;				
+				u = (_B_POPULATION * pop + _B_EMPLOYMENT * emp + _B_TTIME * ttime);
+				if (u > 100.0) THROW_WARNING("WARNING: utility > 100.0 will cause numeric overflow, possible misspecification in utility function for destination choice. [Pop,emp,ttime]="<<pop << ", " << emp << ", " << ttime);
+
+				//cout << zone->uuid<int>() << ", " << pop << ", " << emp << ", " << ttime;
+				return (TargetType)u;				
 			}
 			tag_feature_as_available(Calculate_Utility);
 
+			feature_implementation TargetType Print_Utility()
+			{
+				person_itf* _Parent_Person = _Parent_Planner->Parent_Person<person_itf*>();
 
+				// external knowledge references
+				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				_Zones_Container_Interface* zones = network->zones_container<_Zones_Container_Interface*>();
+				_Activity_Locations_Container_Interface* locations = network->activity_locations_container<_Activity_Locations_Container_Interface*>();
+				_Skim_Interface* LOS = network->skimming_faculty<_Skim_Interface*>();
+
+				// variables used for utility calculation
+				TargetType ttime, pop, emp, u;
+				TargetType utility_sum = 0;
+				TargetType prob_sum = 0;
+				_Zone_Interface* zone;
+
+				// select zones to choose from and estimate utility
+				zone = _destination->template zone<_Zone_Interface*>();
+
+				ttime = LOS->Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_origin->zone<_Zone_Interface*>()->uuid<int>(),zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				pop = zone->population<TargetType>();
+				emp = zone->employment<TargetType>();
+
+				u = (_B_POPULATION * pop + _B_EMPLOYMENT * emp + _B_TTIME * ttime);
+				if (u > 100.0) THROW_WARNING("WARNING: utility > 100.0 will cause numeric overflow, possible misspecification in utility function for destination choice. [Pop,emp,ttime]="<<pop << ", " << emp << ", " << ttime);
+
+				cout << zone->uuid<int>() << ": _BPOP["<<_B_POPULATION<<"] * " << pop << " + _B_EMP[" << _B_EMPLOYMENT<<"] * " << emp << " + B_TTIME["<<_B_TTIME << "] * " << ttime << " = " << u;
+				return (TargetType)u;				
+			}
+			tag_feature_as_available(Print_Utility);
 		};
 		#pragma region Choice option parameters
 		// INITIALIZE DESTINATION MODEL STATIC PARAMETERS
@@ -161,21 +193,20 @@ namespace Person_Components
 					choice->Parent_Planner<Parent_Planner_interface*>(_Parent_Planner);
 					choice_model->Add_Choice_Option<_Choice_Option_Interface*>(choice);
 					loc_options.push_back(choice);
-
-					//cout << endl << "location id: " << choice_model->Choice_At<_Choice_Option_Interface*>(i)->destination<_Activity_Location_Interface*>()->uuid<int>() << ", or: " << loc->uuid<int>() << ", at loc_index="<<loc_id;
 				}
 
 				// Make choice
 				int selected_index = 0;
 				choice_model->Evaluate_Choices<NT>();
 
-				//cout << endl << "location id at index 0 is: " << choice_model->Choice_At<_Choice_Option_Interface*>(0)->destination<_Activity_Location_Interface*>()->uuid<int>();
 
 				_Choice_Option_Interface* selected = choice_model->Choose<_Choice_Option_Interface*>(selected_index);
 
-				//cout << endl << "selected location id is: " << choice_model->Choice_At<_Choice_Option_Interface*>(selected_index)->destination<_Activity_Location_Interface*>()->uuid<int>();
-
-				//cout << endl << "selected location id: " << selected->destination<_Activity_Location_Interface*>()->uuid<int>();
+				if (selected == nullptr )
+				{
+					cout << endl << "ERROR: selected is null, index = " << selected_index;
+					return nullptr;
+				}
 
 				TargetType return_ptr = choice_model->Choice_At<_Choice_Option_Interface*>(selected_index)->destination<TargetType>();
 
@@ -184,9 +215,6 @@ namespace Person_Components
 				{
 					Free<_Choice_Option_Interface::Component_Type>((_Choice_Option_Interface::Component_Type*)loc_options[i]);
 				}
-
-									
-				//cout << ", destination:" <<return_ptr->uuid<int>() <<endl;
 
 				return return_ptr;
 			}

@@ -359,7 +359,8 @@ namespace Routing_Components
 		};
 
 
-		implementation struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType,false>
+		template<typename MasterType,typename ParentType=NULLTYPE,typename InheritanceList=NULLTYPELIST,int Page_Size_Param=4096>
+		struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType,false,Page_Size_Param>
 		{
 			//==================================================================================================
 			// TYPEDEFS AND INTERFACES

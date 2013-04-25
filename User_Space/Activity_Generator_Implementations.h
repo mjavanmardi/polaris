@@ -85,6 +85,9 @@ namespace Person_Components
 			static float service_vehicle_activity_freq[8];
 			static float social_activity_freq[8];
 
+			static int Generator_Count_Array[_num_threads];
+			static int Generator_Count;
+
 			
 			// Interface definitions
 			define_component_interface(_planner_itf,typename type_of(Parent_Planner),Prototypes::Person_Planner,ComponentType);
@@ -116,6 +119,15 @@ namespace Person_Components
 
 			feature_implementation void Activity_Generation()
 			{
+				// updates for counters
+				this->Generator_Count_Array[_thread_id]++;
+				if (this->Generator_Count_Array[_thread_id] % 10000 == 0)  
+				{
+					//LOCK(this->_update_lock);
+					this->Generator_Count+=10000;
+					cout << '\r' << "Activity Generation: " << this->Generator_Count << "                                 ";
+					//UNLOCK(this->_update_lock);
+				}
 				
 				person_itf* _Parent_Person = base_type::_Parent_Planner->Parent_Person<person_itf*>();
 				_static_properties_itf* static_properties = _Parent_Person->Static_Properties<_static_properties_itf*>();
@@ -137,17 +149,6 @@ namespace Person_Components
 				// Generate work activity
 				EMPLOYMENT_STATUS work_status = static_properties->Employment_Status<EMPLOYMENT_STATUS>();
 				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count);
-				//{
-				//	Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
-				//	activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
-				//	activity->Activity_Plan_ID<int>(act_count);
-				//	
-				//	// Activity planning time
-				//	Simulation_Timestep_Increment plan_time = _iteration + act_count;
-				//	activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY, plan_time);
-				//	activities->push_back((Activity*)activity);
-				//	act_count++;
-				//}
 				//-------------------------------------------------------------------------------------------------------------------------
 
 
@@ -155,17 +156,6 @@ namespace Person_Components
 				// Generate school activity
 				Person_Components::Types::SCHOOL_ENROLLMENT sch_status = static_properties->School_Enrollment<SCHOOL_ENROLLMENT>();
 				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count);
-				//{
-				//	Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
-				//	activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
-				//	activity->Activity_Plan_ID<int>(act_count);
-				//	
-				//	// Activity planning time
-				//	Simulation_Timestep_Increment plan_time = _iteration + act_count;
-				//	activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(ACTIVITY_TYPES::SCHOOL_ACTIVITY, plan_time);
-				//	activities->push_back((Activity*)activity);
-				//	act_count++;
-				//}
 				//-------------------------------------------------------------------------------------------------------------------------
 
 				int person_index = this->Person_Type_index<ComponentType,CallerType,NT>();
@@ -269,5 +259,7 @@ namespace Person_Components
 		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::religious_or_civic_activity_freq[]= {0.059,0.069,0.033,0.049,0.074,0.113,0.103,0.043};
 		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::service_vehicle_activity_freq[]= {0.021,0.023,0.043,0.080,0.076,0.077,0.076,0.061};
 		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::social_activity_freq[]= {0.227,0.188,0.215,0.129,0.211,0.225,0.189,0.200};
+		template<typename MasterType,typename ParentType, typename InheritanceList> int CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::Generator_Count_Array[];
+		template<typename MasterType,typename ParentType, typename InheritanceList> int CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::Generator_Count;
 	}
 }

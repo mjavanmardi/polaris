@@ -485,20 +485,6 @@ namespace PopSyn
 
 							++uuid;
 							++counter;
-
-							//===========================
-							// Print results
-							pop_unit_itf* properties = person->Static_Properties<pop_unit_itf*>();
-							if (properties->Employment_Status<Person_Components::Types::EMPLOYMENT_STATUS>() == Person_Components::Types::EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK) 
-							{
-								popsyn_log <<endl <<"WORK,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->Work_Location<_Zone_Interface*>()->uuid<int>() <<"," << properties->Journey_To_Work_Travel_Time<Time_Minutes>() <<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->Work_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
-							}
-							else popsyn_log <<endl<<"DOES NOT WORK,,,,,";
-							if (properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
-							{
-								popsyn_log <<",SCHOOL,"<< person->uuid<int>() << "," << person->Home_Location<_Zone_Interface*>()->uuid<int>() << "," << person->School_Location<_Zone_Interface*>()->uuid<int>()<<"," << network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(person->Home_Location<_Zone_Interface*>()->uuid<int>(), person->School_Location<_Zone_Interface*>()->uuid<int>(),Vehicle_Components::Types::SOV);
-							}
-							else popsyn_log <<",NOT_IN_SCHOOL,,,,";
 						}
 					}
 				}

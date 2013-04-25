@@ -14,8 +14,8 @@ namespace Choice_Model_Components
 		implementation struct Choice_Model_Implementation : public Polaris_Component<APPEND_CHILD(Choice_Model_Implementation),NT,Data_Object>
 		{
 			member_container(vector<void*>,choice_options, none, none);
-			member_container(vector<float>,choice_utilities, none, none);
-			member_container(vector<float>,choice_probabilities, none, none);
+			member_container(vector<double>,choice_utilities, none, none);
+			member_container(vector<double>,choice_probabilities, none, none);
 		};
 		implementation struct MNL_Model_Implementation : public Polaris_Component<APPEND_CHILD(Choice_Model_Implementation),NT,Data_Object>
 		{
@@ -24,8 +24,8 @@ namespace Choice_Model_Components
 			typedef true_type Utility_Based_Choice_tag;
 
 			member_container(vector<void*>,choice_options, none, none);
-			member_container(vector<float>,choice_utilities, none, none);
-			member_container(vector<float>,choice_probabilities, none, none);
+			member_container(vector<double>,choice_utilities, none, none);
+			member_container(vector<double>,choice_probabilities, none, none);
 		};
 	}
 }

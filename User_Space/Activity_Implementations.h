@@ -39,6 +39,7 @@ namespace Activity_Components
 			define_component_interface(_skim_itf, typename _network_itf::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 			define_container_and_value_interface(_activity_locations_container_itf, _activity_location_itf, typename _network_itf::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_links_container_itf, _link_itf, typename _activity_location_itf::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface(_turns_container_itf, _turn_itf, typename _link_itf::get_type_of(outbound_turn_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 			define_container_and_value_interface(_zones_container_itf, _zone_itf, typename _network_itf::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_activity_plans_container_itf,_activity_plan_itf, typename type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 			define_container_and_value_interface_unqualified_container(_movement_plans_container_itf,_movement_plan_itf, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
@@ -119,6 +120,8 @@ namespace Activity_Components
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
 				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
 
+				if (move->origin<_activity_location_itf*>() == nullptr || move->destination<_activity_location_itf*>() == nullptr) return;
+
 
 				// Assign the movement plan to the persons activity schedule, if null movement, leave valid_trajectory to false
 				if (move->valid_trajectory<bool>() || move->origin<_activity_location_itf*>() == move->destination<_activity_location_itf*>())
@@ -138,11 +141,11 @@ namespace Activity_Components
 				{
 					//----------------------------------------------------------------
 					// Print to log file
-					stringstream s;
-					s << endl <<"ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< this->Activity_Plan_ID<ComponentType,CallerType,int>();
-					s << "," <<move->template origin<_activity_location_itf*>()->uuid<int>() << ", " <<move->template destination<_activity_location_itf*>()->uuid<int>();
-					s << ",at iteration " << _iteration << "." << _sub_iteration<<". Scheduled for route planning @ " << move->planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->departed_time<Simulation_Timestep_Increment>();
-					planner->Write_To_Log<NT>(s);
+					//stringstream s;
+					//s << endl <<"ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< this->Activity_Plan_ID<ComponentType,CallerType,int>();
+					//s << "," <<move->template origin<_activity_location_itf*>()->uuid<int>() << ", " <<move->template destination<_activity_location_itf*>()->uuid<int>();
+					////s << ",at iteration " << _iteration << "." << _sub_iteration<<". Scheduled for route planning @ " << move->planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->departed_time<Simulation_Timestep_Increment>();
+					//planner->Write_To_Log<NT>(s);
 				}
 			}
 			feature_implementation void Route_Planning_Event_Handler()
@@ -178,14 +181,22 @@ namespace Activity_Components
 				{
 					// If the trip is valid, assign to a movement plan and add to the schedule
 					if (orig->origin_links<_links_container_itf&>().size() != 0 && dest->origin_links<_links_container_itf&>().size() != 0)
-					{			
+					{		
 						// add attributes to plan
 						move->template origin<_activity_location_itf*>(orig);
 						move->template destination<_activity_location_itf*>(dest);
 						move->template origin<_link_itf*>(orig->origin_links<_links_container_itf&>().at(0));
 						move->template destination<_link_itf*>(dest->origin_links<_links_container_itf&>().at(0));
+
+						if (move->origin<_link_itf*>()->outbound_turn_movements<_turns_container_itf*>()->size() == 0 || move->destination<_link_itf*>()->outbound_turn_movements<_turns_container_itf*>()->size() == 0)
+						{
+							_link_itf* o_link =move->origin<_link_itf*>();
+							_link_itf* d_link =move->destination<_link_itf*>();
+							THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "<<concat(this->Parent_ID<ComponentType,CallerType,int>()) << "." << concat(this->Activity_Plan_ID<ComponentType, CallerType,int>()) <<", " << concat(this->Activity_Type<ComponentType, CallerType,ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>());
+							return;
+						}
 						
-						// Add to plan to router schedule if the trip involves movement
+						// Add to plan to router schedule only if the trip involves movement, otherwise return
 						if (orig->internal_id<int>() == dest->internal_id<int>()) 
 						{
 							return;
@@ -570,9 +581,6 @@ namespace Activity_Components
 				_dest_choice_itf* dest_chooser = planner->Destination_Chooser<_dest_choice_itf*>();
 
 				_activity_location_itf* orig = person->Home_Location<_activity_location_itf*>();
-
-				//cout << endl << "schedule location origin: "<<orig->uuid<int>();
-
 				_activity_location_itf* dest = dest_chooser->Choose_Destination<_activity_location_itf*>(orig);
 
 				// check that origin and destination are valid
@@ -736,6 +744,11 @@ namespace Activity_Components
 				base_type* base_this = (base_type*)this;
 				_person_itf* person = base_this->_Parent_Planner->Parent_Person<_person_itf*>();
 				_activity_location_itf* orig = person->Home_Location<_activity_location_itf*>();
+
+
+				//cout << endl << endl << "ROUTINE CHOICE MODEL for per_id.act_id:" << this->Parent_ID<ComponentType,CallerType,int>() << "." << this->Activity_Plan_ID<ComponentType, CallerType,int>();
+
+
 
 				// Select the location based on the activity type
 				_activity_location_itf* dest = nullptr;		

@@ -97,6 +97,7 @@ namespace Choice_Model_Components
 
 			// use this to call the calculate utility method for types in TList's passed to features
 			define_feature_dispatcher(Calculate_Utility, calculate_utility_dispatcher);
+			define_feature_dispatcher(Print_Utility, print_utility_dispatcher);
 
 			feature_prototype void Initialize()
 			{
@@ -131,8 +132,8 @@ namespace Choice_Model_Components
 			feature_prototype void Evaluate_Choices(requires(check(ComponentType, Concepts::Is_MNL_Model)))
 			{	
 				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Containers::Random_Access_Sequence_Prototype,void*,ComponentType);
-				define_simple_container_interface(utilities_itf,typename get_type_of(choice_utilities),Containers::Random_Access_Sequence_Prototype,float,ComponentType);
-				define_simple_container_interface(probabilities_itf,typename get_type_of(choice_probabilities),Containers::Random_Access_Sequence_Prototype,float,ComponentType);
+				define_simple_container_interface(utilities_itf,typename get_type_of(choice_utilities),Containers::Random_Access_Sequence_Prototype,double,ComponentType);
+				define_simple_container_interface(probabilities_itf,typename get_type_of(choice_probabilities),Containers::Random_Access_Sequence_Prototype,double,ComponentType);
 
 				// Local type definition option
 				choice_options_itf* choices =	this->choice_options<choice_options_itf*>();
@@ -142,24 +143,44 @@ namespace Choice_Model_Components
 				utilities_itf::iterator			u_itr = utils->begin();
 				generic_prototype<generic_implementation<NT>>* choice;
 
-				float u, p;
-				float utility_sum = 0;
+				double u, p;
+				double utility_sum = 0;
 
+				
 				for (itr; itr!= choices->end(); itr++)
 				{
+					//cout << endl << "Option " << i <<": ";
 					choice = (generic_prototype<generic_implementation<NT>>*)(*itr);
 					//u = choice->Calculate_Utility<float>();
-					u = dispatch_to_feature(calculate_utility_dispatcher,Component_Type::TList,choice,Target_Type<float,float>);
+					u = dispatch_to_feature(calculate_utility_dispatcher,Component_Type::TList,choice,Target_Type<double,double>);
+					//cout << ", utility = " << u;
 					utils->push_back(u);
 					utility_sum = utility_sum + exp(u);
 				}
 
-				if (utility_sum == 0)THROW_EXCEPTION("ERROR: sum of utility is -infinity, unable to evaluate choices.");
+				// if sum(exp(u)) = 0 then no valid choices can be made as all options have -ininity utility
+				if (utility_sum == 0)
+				{
+					THROW_WARNING("ERROR: all options have zero probability [sum(exp(u))=0], unable to evaluate choices.  Num choices was=" << choices->size()); 
+					// print all choices
+					int i = 0;
+					for (itr; itr!= choices->end(); itr++, i++)
+					{
+						cout << endl << "Option " << i <<": ";
+						choice = (generic_prototype<generic_implementation<NT>>*)(*itr);
+						u = dispatch_to_feature(print_utility_dispatcher,Component_Type::TList,choice,Target_Type<double,double>);
+					}
+					choices->clear();
+					probs->clear();
+					utils->clear();
+					return;
+				}
 
 				for (u_itr=utils->begin(); u_itr!= utils->end(); u_itr++)
 				{
 					u = *u_itr;
 					p = exp(u)/utility_sum;
+					if (_isnan(p)){ THROW_WARNING("ERROR: p is not a number. U=" << u << ", exp(u)="<<exp(u) << ", u_sum="<<utility_sum); return;}
 					probs->push_back(p);
 				}
 
@@ -173,21 +194,22 @@ namespace Choice_Model_Components
 			feature_prototype TargetType Choose(int& selected_index, requires(check(ComponentType, Concepts::Is_Probabilistic)))
 			{
 				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Containers::Random_Access_Sequence_Prototype,void*,ComponentType);
-				define_simple_container_interface(probabilities_itf,typename get_type_of(choice_probabilities),Containers::Random_Access_Sequence_Prototype,float,ComponentType);
+				define_simple_container_interface(probabilities_itf,typename get_type_of(choice_probabilities),Containers::Random_Access_Sequence_Prototype,double,ComponentType);
 
 				// Local type definition option
 				choice_options_itf* choices = this->choice_options<choice_options_itf*>();
 				probabilities_itf* probs = this->choice_probabilities<probabilities_itf*>();
 				probabilities_itf::iterator p_itr = probs->begin(); 
 
-				float cumulative_probability = 0;
+				double cumulative_probability = 0;
 				
-				float rand = Uniform_RNG.Next_Rand<float>();
+				double rand = Uniform_RNG.Next_Rand<double>();
 
 				int i = 0;
 				for (choice_options_itf::iterator itr = choices->begin(); itr != choices->end(); ++itr, ++p_itr)
 				{
 					cumulative_probability += *p_itr;
+					if (ISNAN(cumulative_probability)) THROW_WARNING("ERROR: p is not a number. p=" << *p_itr << ", cum_p="<<cumulative_probability << ", index="<<i);
 					if (rand < cumulative_probability) 
 					{
 						selected_index = i;
@@ -195,8 +217,8 @@ namespace Choice_Model_Components
 					}
 					i++;
 				}
-
-				selected_index = -1;
+				
+				THROW_WARNING("WARNING: No choice selected from choice model (prob, cumulative_prob, selected_index) "<<rand << ", " << cumulative_probability << ", " << selected_index);
 				return nullptr;
 			}
 			feature_prototype TargetType Choose(int& selected_index,requires(!check(ComponentType, Concepts::Is_Probabilistic)))

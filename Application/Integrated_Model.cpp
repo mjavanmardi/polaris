@@ -152,6 +152,8 @@ struct MasterType
 
 int main(int argc,char** argv)
 {
+	cout << endl <<"Zone size = "<< sizeof(MasterType::zone);
+	cout << endl <<"Region size = "<<  sizeof(MasterType::region);
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -351,7 +353,7 @@ int main(int argc,char** argv)
 	// Logging of activity generation / scheduling outputs
 	//----------------------------------------------------------------------------------------------------------------------------------
 	stringstream logfilename;
-	MasterType::person_planner_type::_write_activity_files = true;
+	MasterType::person_planner_type::_write_activity_files = scenario->write_activity_output<bool>();
 	for (int i = 0; i < _num_threads; ++i)
 	{
 		logfilename << "generated_acts_" << i << ".csv";

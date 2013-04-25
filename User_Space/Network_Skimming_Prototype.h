@@ -130,7 +130,8 @@ namespace Network_Skimming_Components
 				// create the references to network items and create the lists of origins/destination to route from/to
 				define_container_and_value_interface(zones_itf,zone_itf,typename network_itf::get_type_of(zones_container),Associative_Container_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 				define_container_and_value_interface(locations_itf,location_itf,typename zone_itf::get_type_of(origin_activity_locations),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-				define_container_and_value_interface(links_itf,link_itf,typename location_itf::get_type_of(origin_links),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+				define_container_and_value_interface(links_itf,link_itf,typename location_itf::get_type_of(origin_links),Random_Access_Sequence_Prototype,Link_Components::Prototypes::Link_Prototype,ComponentType);			
+				define_container_and_value_interface(turns_itf,turn_itf,typename link_itf::get_type_of(outbound_turn_movements),Random_Access_Sequence_Prototype,Turn_Movement_Components::Prototypes::Movement_Prototype,ComponentType);
 				define_container_and_value_interface(origin_map_itf,origin_item_itf,typename get_type_of(origin_node_to_zone_map), Containers::Associative_Container_Prototype,Prototypes::Location_To_Zone_Map_Item_Prototype,CallerType);
 				define_container_and_value_interface(destination_map_itf,destination_item_itf,typename get_type_of(destination_node_to_zone_map), Containers::Associative_Container_Prototype,Prototypes::Location_To_Zone_Map_Item_Prototype,CallerType);
 				origin_map_itf* origin_map = this->template origin_node_to_zone_map<origin_map_itf*>();
@@ -143,10 +144,24 @@ namespace Network_Skimming_Components
 				for (itr= zones_container->begin();itr != zones_container->end(); ++itr)
 				{
 					zone_itf* orig_zone = itr->second;
+
+					// get the first location in the zone with a valid origin link
 					loc_itr = orig_zone->template origin_activity_locations<locations_itf*>()->begin();
+					while (loc_itr != orig_zone->template origin_activity_locations<locations_itf*>()->end())
+					{
+						location_itf* loc = *loc_itr;
+						links_itf::iterator link_itr = loc->origin_links<links_itf*>()->begin();
+						if (link_itr != loc->origin_links<links_itf*>()->end()	)
+						{
+							link_itf* link = *link_itr;
+							if (link->outbound_turn_movements<turns_itf*>()->size() > 0) break;
+						}
+						++loc_itr;
+					}
+
 					if (loc_itr == orig_zone->template origin_activity_locations<locations_itf*>()->end()) 
 					{
-						THROW_WARNING("warning, origin zone " << orig_zone->template internal_id<int>() << "has no activity locations associated with it");
+						THROW_WARNING("warning, origin zone " << orig_zone->template internal_id<int>() << "has no activity locations associated with it, or all activity locations have no valid origin links associated with them.");
 					}
 					else
 					{
@@ -163,7 +178,20 @@ namespace Network_Skimming_Components
 				for (itr = zones_container->begin();itr != zones_container->end(); ++itr)
 				{
 					zone_itf* dest_zone = itr->second;
+
 					loc_itr = dest_zone->template origin_activity_locations<locations_itf*>()->begin();
+					while (loc_itr != dest_zone->template origin_activity_locations<locations_itf*>()->end())
+					{
+						location_itf* loc = *loc_itr;
+						links_itf::iterator link_itr = loc->origin_links<links_itf*>()->begin();
+						if (link_itr != loc->origin_links<links_itf*>()->end()	)
+						{
+							link_itf* link = *link_itr;
+							if (link->outbound_turn_movements<turns_itf*>()->size() > 0) break;
+						}
+						++loc_itr;
+					}
+
 					if (loc_itr == dest_zone->template origin_activity_locations<locations_itf*>()->end()) 
 					{
 						THROW_WARNING("warning, destination zone " << dest_zone->template internal_id<int>() << "has no activity locations associated with it");

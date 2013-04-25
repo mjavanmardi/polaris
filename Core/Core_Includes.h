@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <random>
 #include <sstream>
+#include <cmath>
 
 #ifdef WINDOWS
 #include <Windows.h>
@@ -280,6 +281,15 @@ throw new std::runtime_error(s.str().c_str());}
 #define debug_3(MESSAGE) 
 #endif
 
+
+//---------------------------------------------------------
+//	define numeric check (tr1::isnan is not available on vc++
+//---------------------------------------------------------
+#ifdef WINDOWS
+#define ISNAN(x) _isnan(x)
+#else
+#define ISNAN(x) std::tr1::isnan(x)
+#endif
 
 //---------------------------------------------------------
 //	antares - build global antares singleton

@@ -155,6 +155,12 @@ namespace Scenario_Components
 			feature_accessor(condition_time_in_seconds, none, none);
 
 			//===============================================
+			// Demand model parameters
+			//-----------------------------------------------
+			feature_accessor(write_activity_output,none,none);
+
+
+			//===============================================
 			// Popsyn parameters
 			//-----------------------------------------------
 			feature_accessor(percent_to_synthesize, none, none);
@@ -268,6 +274,11 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0.0);
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
 				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(300);
+
+
+				//===============================================
+				// Demand model parameters
+				if (cfgReader.getParameter("write_activity_output", this->write_activity_output<bool*>()) != PARAMETER_FOUND) this->write_full_output<bool>(false);
 
 				//=======================================================================================================================================================
 				// PopSyn parameters
