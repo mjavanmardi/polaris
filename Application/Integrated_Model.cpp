@@ -212,19 +212,22 @@ int main(int argc,char** argv)
 	MasterType::link_type::configure_link_moes_layer();
 	#endif
 	
-	//Network_Event<MasterType::network_event_manager_type>* net_event_manager=(Network_Event<MasterType::network_event_manager_type>*)Allocate<MasterType::network_event_manager_type>();
+	if (scenario->template use_event_manager<bool>())
+	{
+		cout << "starting to init event manager" << endl;
+		define_component_interface(_Network_Event_Manager_Interface, typename MasterType::network_event_manager_type, Network_Event_Manager, NULLTYPE);
+		_Network_Event_Manager_Interface* net_event_manager=(_Network_Event_Manager_Interface*)Allocate<typename MasterType::network_event_manager_type>();
+		network->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
+		net_event_manager->Initialize<NT>();
+		cout << "finishing to init event manager" << endl;
 
-	//network->network_event_manager<MasterType::network_event_manager_type*>( (MasterType::network_event_manager_type*)net_event_manager );
 
-	//net_event_manager->Initialize<NT>();
-	
-	//typedef Traffic_Management_Center<MasterType::traffic_management_center_type,NT> TMC_Interface;
-	//TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+		typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
-	//network->traffic_management_center<MasterType::traffic_management_center_type*>(tmc);
-
-	//tmc->scenario_reference<_Scenario_Interface*>(scenario);
-	//tmc->Initialize<NT>();
+		TMC_Interface* tmc = (TMC_Interface*) Allocate< MasterType::traffic_management_center_type >();
+		tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
+		tmc->Initialize<NT>();
+	}
 
 	cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();

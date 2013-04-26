@@ -52,7 +52,7 @@ struct Entity_Extractor<ComponentType,NULLTYPE>
 /// Polaris_Component - adds implementation, without RTTI
 ///============================================================================
 
-template<typename InheritanceList=NULLTYPELIST,typename MasterType=NULLTYPE,typename ObjectType=Data_Object,typename ParentType=NULLTYPE,bool RTTI=false,unsigned int Desired_Page_Size=_Page_Size,typename GroupList=NULLTYPE>
+template<typename InheritanceList=NULLTYPELIST,typename MasterType=NULLTYPE,typename ObjectType=Data_Object,typename ParentType=NULLTYPE,bool RTTI=false,unsigned int Desired_Page_Size=_Default_Page_Size,typename GroupList=NULLTYPE>
 class Polaris_Component:public ObjectType
 {
 public:
@@ -210,7 +210,7 @@ struct Find_Closest_Greater_Divisor<target,number,0>
 //const unsigned int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI,Desired_Page_Size,GroupList>::page_factor = _Page_Size / Find_Closest_Greater_Divisor<_Page_Size,Desired_Page_Size>::result;
 
 template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,bool RTTI,unsigned int Desired_Page_Size,typename GroupList>
-const unsigned int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI,Desired_Page_Size,GroupList>::page_factor = _Page_Size / Find_Closest_Greater_Divisor<_Page_Size,Desired_Page_Size>::result;
+const unsigned int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI,Desired_Page_Size,GroupList>::page_factor = _Page_Size / Desired_Page_Size;
 
 
 template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,bool RTTI,unsigned int Desired_Page_Size,typename GroupList>
@@ -227,7 +227,7 @@ typename Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,RTTI
 	
 
 template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int Desired_Page_Size,typename GroupList>
-const unsigned int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,Desired_Page_Size,GroupList>::page_factor=_Page_Size / Find_Closest_Greater_Divisor<_Page_Size,Desired_Page_Size>::result;
+const unsigned int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,Desired_Page_Size,GroupList>::page_factor=_Page_Size / Desired_Page_Size;
 
 template<typename InheritanceList,typename MasterType,typename ObjectType,typename ParentType,unsigned int Desired_Page_Size,typename GroupList>
 const int Polaris_Component<InheritanceList,MasterType,ObjectType,ParentType,true,Desired_Page_Size,GroupList>::component_index=_component_counter++;

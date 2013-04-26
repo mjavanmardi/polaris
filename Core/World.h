@@ -34,6 +34,7 @@ public:
 		threads_running_counter=0;
 #ifdef WITH_WAIT
 		threads_finished_event = CreateEvent(NULL,FALSE,FALSE,NULL);
+		threads_start_event = CreateEvent(NULL,TRUE,FALSE,NULL);
 #endif
 		for(int i=0;i<_num_threads;i++)
 		{
@@ -90,9 +91,12 @@ public:
 			{
 #ifdef WITH_WAIT
 				ResetEvent(execution_root_ptr->ex_threads_finished_event);
-#endif
+				threads_finished_counter=0;
+				SetEvent(threads_start_event);
+#else
 				// instruct threads to leave the finished queue
 				threads_finished_counter=0;
+#endif
 			}
 		}
 	}
@@ -101,6 +105,7 @@ public:
 
 #ifdef WITH_WAIT	
 	HANDLE threads_finished_event;
+	HANDLE threads_start_event;
 #endif
 
 	volatile unsigned int threads_finished_counter;
@@ -162,14 +167,21 @@ static void* Thread_Loop(void* package_ptr)
 		AtomicIncrement(&world->threads_finished_counter);
 #endif
 
+#ifdef WITH_WAIT
+		WaitForSingleObject(world->threads_start_event,INFINITE);
+#else
 		// enter the finished queue
 		while(world->threads_finished_counter!=0) SLEEP(0);
-
+#endif
 		// thread indicates that it has left the finished queue
 		AtomicIncrement(&world->threads_running_counter);
 
 		// thread waits until all threads have left the finished queue to begin actual operation
 		while(world->threads_running_counter!=_num_threads) SLEEP(0);
+
+#ifdef WITH_WAIT
+		ResetEvent(world->threads_start_event);
+#endif
 	}
 
 	// let the world know that this thread is completely finished
