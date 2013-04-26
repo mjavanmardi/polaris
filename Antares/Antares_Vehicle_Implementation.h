@@ -117,25 +117,43 @@ namespace Vehicle_Components
 
 			declare_feature_conditional(compute_vehicle_position_condition)
 			{
-				response.result=true;
-				response.next._iteration=_iteration+1;
-				response.next._sub_iteration=Scenario_Components::Types::END_OF_ITERATION;
+				if (((Antares_Vehicle_Implementation*)_this)->simulation_status<ComponentType,ComponentType,Types::Vehicle_Status_Keys>() != Types::Vehicle_Status_Keys::OUT_NETWORK)
+				{
+					response.result=true;
+					response.next._iteration=_iteration+1;
+					response.next._sub_iteration=Scenario_Components::Types::END_OF_ITERATION;
+				}
+				else
+				{
+					response.result = false;
+					response.next._iteration=END;
+				}
 			}
 
 			declare_feature_event(compute_vehicle_position)
 			{
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
 				Antares_Vehicle_Implementation* pthis=(Antares_Vehicle_Implementation*)_this;
+				if (pthis->simulation_status<ComponentType,ComponentType,Types::Vehicle_Status_Keys>() != Types::Vehicle_Status_Keys::IN_NETWORK) return;
+				pthis->update_vehicle_position<ComponentType,ComponentType,NT>();
+				if (_vehicle_shapes->template draw<bool>() || _vehicle_points->template draw<bool>())
+				{
+					pthis->display_vehicle_position<ComponentType,ComponentType,NT>();
+				}
+			}
 
-				if(pthis->simulation_status<ComponentType,ComponentType,Types::Vehicle_Status_Keys>() != Types::Vehicle_Status_Keys::IN_NETWORK) return;
+			feature_implementation void update_vehicle_position()
+			{
+				float travel_distance = _local_speed * 5280.0f / 3600.0f;
+				float current_distance = _distance_to_stop_bar;
+				float new_distance = max(0.0f,(current_distance - travel_distance));
+				_distance_to_stop_bar = new_distance; 
+			}
 
-				Link_Interface* link=((_Movement_Plan_Interface*)pthis->_movement_plan)->template current_link<Link_Interface*>();
-
+			feature_implementation void display_vehicle_position()
+			{
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
+				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
 				Link_Line<MasterType>& link_line = link->template displayed_line<Link_Line<MasterType>&>();
-
-				pthis->vehicle_shape.ptr = _this;
-
-
 				float u_x = link_line.up_node._x;
 				float u_y = link_line.up_node._y;
 				float d_x = link_line.down_node._x;
@@ -143,88 +161,88 @@ namespace Vehicle_Components
 				float distance = sqrt((u_x - d_x) * (u_x - d_x) + (u_y - d_y) * (u_y - d_y));
 				float sin_alpha = (d_y - u_y) / distance;
 				float cos_alpha = (d_x - u_x) / distance;
-
-				float travel_distance = (pthis->_local_speed * 5280.0f / 3600.0f);
-				float current_distance = pthis->_distance_to_stop_bar;
-				float new_distance = max(0.0f,(current_distance - travel_distance));
-				pthis->_distance_to_stop_bar = new_distance; 
 				//float distance_from_up = link->length<float>() - pthis->_distance_to_stop_bar;
-				float distance_from_up = distance - pthis->_distance_to_stop_bar * (distance / link->length<float>());
+				float distance_from_up = distance - _distance_to_stop_bar * (distance / link->length<float>());
 				Point_3D<MasterType> vehicle_center;
 
 				vehicle_center._x = u_x + distance_from_up * cos_alpha;
 				vehicle_center._y = u_y + distance_from_up * sin_alpha;
-
-				// Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(vehicle_center);
-
-				// display on shape vehicle layer
-				float rear_x = vehicle_center._x - (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * cos_alpha;
-				float rear_y = vehicle_center._y - (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * sin_alpha;
-				float front_x = vehicle_center._x + (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * cos_alpha;
-				float front_y = vehicle_center._y + (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * sin_alpha;
-
-				pthis->vehicle_shape.a._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
-				pthis->vehicle_shape.a._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
-				pthis->vehicle_shape.a._z = 1;
 				
-				pthis->vehicle_shape.b._x = front_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
-				pthis->vehicle_shape.b._y = front_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
-				pthis->vehicle_shape.a._z = 1;
-
-				pthis->vehicle_shape.c._x = front_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
-				pthis->vehicle_shape.c._y = front_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
-				pthis->vehicle_shape.c._z = 1;
-
-				pthis->vehicle_shape.d._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
-				pthis->vehicle_shape.d._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
-				pthis->vehicle_shape.d._z = 1;
-
 				float los = ((MasterType::link_type*)link)->realtime_link_moe_data.link_density / ((MasterType::link_type*)link)->_jam_density;
-				pthis->vehicle_shape.color = ((MasterType::link_type*)link)->get_color_by_los(los);
-				pthis->vehicle_shape.color._a = 255;
-				_vehicle_shapes->Push_Element<Regular_Element>(&pthis->vehicle_shape);
+				
+				if (_vehicle_shapes->template draw<bool>())
+				{
+					vehicle_shape.ptr = this;
+					// Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(vehicle_center);
+
+					// display on shape vehicle layer
+					float rear_x = vehicle_center._x - (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * cos_alpha;
+					float rear_y = vehicle_center._y - (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * sin_alpha;
+					float front_x = vehicle_center._x + (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * cos_alpha;
+					float front_y = vehicle_center._y + (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * sin_alpha;
+
+					vehicle_shape.a._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.a._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.a._z = 1;
+				
+					vehicle_shape.b._x = front_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.b._y = front_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.a._z = 1;
+
+					vehicle_shape.c._x = front_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.c._y = front_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.c._z = 1;
+
+					vehicle_shape.d._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.d._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.d._z = 1;
 
 
-				// display on point vehicle layer
-#pragma pack(push,1)
-				struct attribute_coordinate
+					vehicle_shape.color = ((MasterType::link_type*)link)->get_color_by_los(los);
+					vehicle_shape.color._a = 255;
+				
+					_vehicle_shapes->Push_Element<Regular_Element>(&vehicle_shape);
+				}
+
+				if (_vehicle_points->template draw<bool>())
 				{
-					void* ptr;
-					True_Color_RGBA<NT> color;
-					Point_3D<MasterType> vertex;
-				} coordinate;
-#pragma pack(pop)
-				coordinate.ptr = _this;
-				coordinate.vertex._x=vehicle_center._x;//upstream_intersection->x_position<float>();
-				coordinate.vertex._y=vehicle_center._y;//upstream_intersection->y_position<float>();
-				coordinate.vertex._z=1;
-				//coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
-				//
-				int num_switch_decisions = (int)pthis->_switch_decisions_container.size();
-				if (num_switch_decisions > 0)
-				{
-					if (num_switch_decisions == 1)
+					// display on point vehicle layer
+	#pragma pack(push,1)
+					struct attribute_coordinate
 					{
-						coordinate.color._r = 191;
-						coordinate.color._g = 0;
-						coordinate.color._b = 255;
+						void* ptr;
+						True_Color_RGBA<NT> color;
+						Point_3D<MasterType> vertex;
+					} coordinate;
+	#pragma pack(pop)
+					coordinate.ptr = this;
+					coordinate.vertex._x=vehicle_center._x;//upstream_intersection->x_position<float>();
+					coordinate.vertex._y=vehicle_center._y;//upstream_intersection->y_position<float>();
+					coordinate.vertex._z=1;
+					//coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
+					//
+					int num_switch_decisions = (int)_switch_decisions_container.size();
+					if (num_switch_decisions > 0)
+					{
+						if (num_switch_decisions == 1)
+						{
+							coordinate.color._r = 191;
+							coordinate.color._g = 0;
+							coordinate.color._b = 255;
+						}
+						else
+						{
+							coordinate.color._r = 102;
+							coordinate.color._g = 0;
+							coordinate.color._b = 153;
+						}
 					}
 					else
 					{
-						coordinate.color._r = 102;
-						coordinate.color._g = 0;
-						coordinate.color._b = 153;
+						coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
 					}
+					_vehicle_points->Push_Element<Regular_Element>(&coordinate);
 				}
-				else
-				{
-					coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
-				}
-
-
-				_vehicle_points->Push_Element<Regular_Element>(&coordinate);
-
-				pthis->_vehicles_counter++;
 			}
 
 			//feature_implementation void load(requires(check_2(TargetType,Types::Load_To_Origin_Link,is_same)))
@@ -495,7 +513,7 @@ namespace Vehicle_Components
 					_Links_Container_Interface* links_container = switch_decision_data->template route_links_container<_Links_Container_Interface*>();
 					_Links_Container_Interface::iterator link_itr;
 					
-					for (link_itr = links_container->begin() + 1; link_itr != links_container->end() - 1; link_itr++)
+					for (link_itr = links_container->begin(); link_itr != links_container->end(); link_itr++)
 					{
 						_Link_Interface* link = (_Link_Interface*)(*link_itr);
 						link_line.up_node._x = link->template upstream_intersection<_Intersection_Interface*>()->template x_position<float>();

@@ -452,53 +452,58 @@ namespace Link_Components
 
 				if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION) 
 				{///case 2: no realtime information
-					/// case 2.3: Accident
-					if (_current_accident_event != nullptr)
+					double r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+					if (r1 <= vehicle->template information_compliance_rate<double>())
 					{
-						enroute_switching_decision = true;
-						cout<< "uninformed vehicle switching...accident" <<endl;
-					}
-					else
-					{
-						unordered_set<_Network_Event_Interface*> events_set;
+
+						/// case 2.3: Accident
+						if (_current_accident_event != nullptr)
+						{
+							//enroute_switching_decision = true;
+							//cout<< "uninformed vehicle switching...accident" <<endl;
+						}
+						else
+						{
+							unordered_set<_Network_Event_Interface*> events_set;
 					
-						/// case 2.1: VMS
-						get_events_from_vms<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
+							/// case 2.1: VMS
+							get_events_from_vms<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
 
-						bool vms = false;
-						int vms_event_size = int(events_set.size());
-						if (vms_event_size>0)
-						{
-							vms = true;
-						}
-						/// case 2.2: HAR
-						get_events_from_har<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
-						int har_event_size = int(events_set.size()) - vms_event_size;
-						bool har = false;
-						if (har_event_size>0)
-						{
-							har = true;
-						}
-						/// exploit
-						enroute_switching_decision = vehicle->template exploit_events_set<unordered_set<_Network_Event_Interface*>&>(events_set);
+							bool vms = false;
+							int vms_event_size = int(events_set.size());
+							if (vms_event_size>0)
+							{
+								vms = true;
+							}
+							/// case 2.2: HAR
+							get_events_from_har<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
+							int har_event_size = int(events_set.size()) - vms_event_size;
+							bool har = false;
+							if (har_event_size>0)
+							{
+								har = true;
+							}
+							/// exploit
+							enroute_switching_decision = vehicle->template exploit_events_set<unordered_set<_Network_Event_Interface*>&>(events_set);
 
-						if (enroute_switching_decision)
-						{
-							if (vms && har)
-							{
-								cout<< "uninformed vehicle switching...vms or/and har" <<endl;
-							}
-							else
-							{
-								if (vms)
-								{
-									cout<< "uninformed vehicle switching...vms" <<endl;
-								}
-								else
-								{
-									cout<< "uninformed vehicle switching...har" <<endl;
-								}
-							}
+							//if (enroute_switching_decision)
+							//{
+							//	if (vms && har)
+							//	{
+							//		cout<< "uninformed vehicle switching...vms or/and har" <<endl;
+							//	}
+							//	else
+							//	{
+							//		if (vms)
+							//		{
+							//			cout<< "uninformed vehicle switching...vms" <<endl;
+							//		}
+							//		else
+							//		{
+							//			cout<< "uninformed vehicle switching...har" <<endl;
+							//		}
+							//	}
+							//}
 						}
 					}
 				}

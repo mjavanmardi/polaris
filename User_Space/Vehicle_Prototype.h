@@ -102,6 +102,14 @@ namespace Vehicle_Components
 				return this_component()->template exploit_events_set<ComponentType,CallerType, TargetType>(events_set);
 			}
 
+			feature_prototype void update_vehicle_position()
+			{
+				return this_component()->template update_vehicle_position<ComponentType,CallerType, TargetType>();
+			}
+			feature_prototype void display_vehicle_position()
+			{
+				return this_component()->template update_vehicle_position<ComponentType,CallerType, TargetType>();
+			}
 		};
 	}
 }

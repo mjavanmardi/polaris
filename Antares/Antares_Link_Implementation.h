@@ -271,13 +271,20 @@ namespace Link_Components
 			typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
 			feature_implementation void Push_To_Link_MOE_Display()
 			{
-				push_to_link_travel_time_layer();
-				push_to_link_speed_layer();
-				push_to_link_density_layer();
-				push_to_link_speed_ratio_layer();
-				push_to_link_density_ratio_layer();
-				push_to_link_travel_time_ratio_layer();
-				push_to_link_queue_length_layer();
+				if (_link_travel_time_layer->template draw<bool>())
+					push_to_link_travel_time_layer();
+				if (_link_speed_layer->template draw<bool>())
+					push_to_link_speed_layer();
+				if (_link_density_layer->template draw<bool>())
+					push_to_link_density_layer();
+				if (_link_speed_ratio_layer->template draw<bool>())
+					push_to_link_speed_ratio_layer();
+				if (_link_density_ratio_layer->template draw<bool>())
+					push_to_link_density_ratio_layer();
+				if (_link_travel_time_ratio_layer->template draw<bool>())
+					push_to_link_travel_time_ratio_layer();
+				if (_link_queue_length_layer->template draw<bool>())
+					push_to_link_queue_length_layer();
 			}
 
 			void set_column_height(int height)
@@ -626,7 +633,7 @@ namespace Link_Components
 				bucket.push_back(key_value_pair);
 
 				key_value_pair.first="Free-flow speed";
-				sprintf(str_buf, "%.0f MPH", _free_flow_speed);
+				sprintf(str_buf, "%.0f MPH", _original_free_flow_speed);
 				key_value_pair.second=str_buf;
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);

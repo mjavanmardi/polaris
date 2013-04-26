@@ -107,14 +107,13 @@ namespace Network_Components
 			member_data(time_to_snapshot_map_type, network_snapshots, none, none);
 			member_data(vector<int>, snapshot_times, none, none);
 
-			typedef struct {
-				int a; 
-				int b;
-			} long_struct;
-			
 			typedef union {
-				long_struct c_struct;
-				long c_value;
+				struct
+				{
+					long inbound_link_id;
+					long outbound_link_id;
+				};
+				long long movement_id;
 			} long_hash_key_type;
 
 			typedef unordered_map<long,typename MasterType::turn_movement_type*> link_turn_movement_map_type;

@@ -278,6 +278,7 @@ namespace Network_Components
 				cfg.Configure_Lines();
 				cfg.draw=true;
 				cfg.primitive_color=true;
+				cfg.storage_period = 1;
 
 				cfg.selection_callback = &MasterType::type_of(link)::on_select;
 				cfg.head_accent_size_value = 3;

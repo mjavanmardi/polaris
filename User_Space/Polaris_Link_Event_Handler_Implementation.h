@@ -67,10 +67,10 @@ namespace Link_Components
 			float capacity_reduction_rate;
 			float free_flow_speed_reduction_rate;
 						
-			capacity_reduction_rate = 0.3;
+			capacity_reduction_rate = 0.01;
 			_maximum_flow_rate *= capacity_reduction_rate;
 			
-			free_flow_speed_reduction_rate = 0.3;
+			free_flow_speed_reduction_rate = 0.01;
 			_free_flow_speed *= free_flow_speed_reduction_rate;
 			
 			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds

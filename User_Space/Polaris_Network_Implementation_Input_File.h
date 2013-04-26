@@ -97,9 +97,9 @@ namespace Network_Components
 				int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template internal_id<int>();
 				int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template internal_id<int>();
 				typename MasterType::network_type::long_hash_key_type long_hash_key;
-				long_hash_key.c_struct.a = inbound_link_id;
-				long_hash_key.c_struct.b = outbound_link_id;
-				_link_turn_movement_map.insert(make_pair<long,typename MasterType::turn_movement_type*>(long_hash_key.c_value, (typename MasterType::turn_movement_type*)turn_movement));
+				long_hash_key.inbound_link_id = inbound_link_id;
+				long_hash_key.outbound_link_id = outbound_link_id;
+				_link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
 
 				//// assign the detector
 				//turn_movement_1->template detector<Detector_Interface*>(lane->template Detector_Thru<Detector_Interface*>());
