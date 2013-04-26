@@ -280,10 +280,53 @@ namespace Vehicle_Components
 							((_Movement_Plan_Interface*)_movement_plan)->template update_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
 							///en-route switching
 							cout<< "enroute switching..." <<endl;
-
+							int current_time = ((_Regular_Network_Interface*)_global_network)->start_of_current_simulation_interval_absolute<int>();
+							((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>(current_time + best_route_time_to_destination);
+							int routed_travel_time = ((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>();
+							((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>(routed_travel_time - current_route_time_to_destination + best_route_time_to_destination);
 						}
 					}
 				}
+			}
+
+			feature_implementation void initialize()
+			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				///
+				unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+_internal_id+1;
+				_rng_stream.SetSeed(seed);
+				double r1;
+				///information capability
+				r1 = _rng_stream.RandU01();
+				if (r1 <= ((_Scenario_Interface*)_global_scenario)->template realtime_informed_vehicle_market_share<double>())
+				{
+					_enroute_information_type = Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION;
+				}
+				else
+				{
+					_enroute_information_type = Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION;
+				}
+
+				/// information compliance rate
+				r1 = _rng_stream.RandU01();
+				_information_compliance_rate = r1;
+
+				///rib
+				r1 = _rng_stream.RandU01();
+				double mean = ((_Scenario_Interface*)_global_scenario)->template relative_indifference_bound_route_choice_mean<double>();
+				double a = 0.0;
+				double b = 2.0*mean;
+				double rib = _rng_stream.triangular_random_variate(r1,a,b,mean);
+				_relative_indifference_bound_route_choice = rib;
+
+				///mtts
+				r1 = _rng_stream.RandU01();
+				mean = ((_Scenario_Interface*)_global_scenario)->template minimum_travel_time_saving_mean<double>();
+				a = 0.5 * mean;
+				b = a + 2.0*mean;
+				double mtts = _rng_stream.triangular_random_variate(r1,a,b,mean);
+				_minimum_travel_time_saving = mtts;
+				///
 			}
 
 		};

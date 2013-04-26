@@ -97,6 +97,7 @@ namespace Person_Components
 				_vehicle->template uuid<int>(id);
 				_vehicle->template internal_id<int>(id);
 				_vehicle->template traveler<ComponentType*>(this);
+				_vehicle->template initialize<NT>();
 
 				// Add basic traveler properties							
 				this->template uuid<ComponentType,ComponentType,int>(id);

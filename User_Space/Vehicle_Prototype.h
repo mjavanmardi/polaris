@@ -110,6 +110,11 @@ namespace Vehicle_Components
 			{
 				return this_component()->template update_vehicle_position<ComponentType,CallerType, TargetType>();
 			}
+
+			feature_prototype void initialize()
+			{
+				this_component()->template initialize<ComponentType,CallerType, TargetType>();
+			}
 		};
 	}
 }

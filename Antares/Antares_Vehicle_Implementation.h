@@ -424,15 +424,62 @@ namespace Vehicle_Components
 			
 			feature_implementation void Display_Attributes(vector<pair<string,string>>& bucket)
 			{
+				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
+				typedef Movement_Plan_Prototype<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
+
 				pair<string,string> key_value_pair;
+				stringstream s;
+				char str_buf[128];
 
 				key_value_pair.first="ID";
-
-				stringstream s;
-				
 				s << _internal_id;
 				key_value_pair.second = s.str();
+				bucket.push_back(key_value_pair);
 
+				key_value_pair.first="origin link";
+				_Link_Interface* origin_link=((_Movement_Plan_Interface*)_movement_plan)->template origin<_Link_Interface*>();
+				sprintf(str_buf, "%d", origin_link->template uuid<int>());
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="destination link";
+				_Link_Interface* destination_link=((_Movement_Plan_Interface*)_movement_plan)->template destination<_Link_Interface*>();
+				sprintf(str_buf, "%d", destination_link->template uuid<int>());
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="realtime enroute information";
+				if (_enroute_information_type == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION)
+				{
+					sprintf(str_buf, "yes");
+				}
+				else
+				{
+					sprintf(str_buf, "no");
+				}
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);				
+
+				key_value_pair.first="information compliance rate";
+				sprintf(str_buf, "%.2f", _information_compliance_rate);
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="number of switches";
+				sprintf(str_buf, "%d", (int)_switch_decisions_container.size());
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="estimated time of arrival";
+				string time_str = convert_seconds_to_hhmm(((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<int>());
+				sprintf(str_buf, "%s", time_str.c_str());
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 			}
 
