@@ -20,45 +20,48 @@ namespace Person_Components
 			// static counters
 			static int Count_Array[_num_threads];
 			static int Count;
+			static member_associative_container(concat(hash_map<Activity_Components::Types::ACTIVITY_TYPES, pair<float,float>>), average_activity_frequency_and_duration_container,none,none);
+			static bool _is_initialized;
+			static void Static_Initializer()
+			{
+				// make sure only called once
+				if(_is_initialized) return;
 
+				// Initialize activity frequency and duration container
+				typedef pair<Activity_Components::Types::ACTIVITY_TYPES, pair<float, float>> avg_activity_record;
+				avg_activity_record a;
+				a.first = ACTIVITY_TYPES::AT_HOME_ACTIVITY;					a.second.first = 2.237f; a.second.second = 442.f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::SCHOOL_ACTIVITY;					a.second.first = 0.122f; a.second.second = 387.3f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::CHANGE_TRANSPORTATION_ACTIVITY;	a.second.first = 0.051f; a.second.second = 18.f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::RELIGIOUS_OR_CIVIC_ACTIVITY;		a.second.first = 0.065f; a.second.second = 109.f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::PICK_UP_OR_DROP_OFF_ACTIVITY;		a.second.first = 0.263f; a.second.second = 13.4f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::EAT_OUT_ACTIVITY;					a.second.first = 0.229f; a.second.second = 53.2f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::HEALTHCARE_ACTIVITY;				a.second.first = 0.075f; a.second.second = 97.6f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::ERRANDS_ACTIVITY;					a.second.first = 0.124f; a.second.second = 16.6f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::OTHER_ACTIVITY;					a.second.first = 0.002f; a.second.second = 14.f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::PERSONAL_BUSINESS_ACTIVITY;		a.second.first = 0.129f; a.second.second = 91.2f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::RECREATION_ACTIVITY;				a.second.first = 0.206f; a.second.second = 140.2f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::OTHER_SHOPPING_ACTIVITY;			a.second.first = 0.423f; a.second.second = 35.4f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::SERVICE_VEHICLE_ACTIVITY;			a.second.first = 0.066f; a.second.second = 13.7f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::MAJOR_SHOPPING_ACTIVITY;			a.second.first = 0.031f; a.second.second = 45.2f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::SOCIAL_ACTIVITY;					a.second.first = 0.168f; a.second.second = 198.1f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::OTHER_WORK_ACTIVITY;				a.second.first = 0.129f; a.second.second = 170.2f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY;			a.second.first = 0.381f; a.second.second = 390.2f;	_average_activity_frequency_and_duration_container.insert(a);
+				a.first = ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY;			a.second.first = 0.026f; a.second.second = 560.7f;	_average_activity_frequency_and_duration_container.insert(a);		
+				a.first = ACTIVITY_TYPES::LEISURE_ACTIVITY;					a.second.first = 0.213f; a.second.second = 142.0f;	_average_activity_frequency_and_duration_container.insert(a);	
+			}
 
 			// local data members
 			member_prototype(Prototypes::Person, Parent_Person, typename MasterType::person_type, none, none);
 			member_data(int, home_location_id, none, none);
 			member_data(int, work_location_id, none, none);
 			member_data(int, school_location_id, none, none);
-			member_associative_container(concat(hash_map<Activity_Components::Types::ACTIVITY_TYPES, pair<float,float>>), average_activity_frequency_and_duration_container,none,none);
+			
 
 			// Methods
 			feature_implementation void Initialize()
 			{
-				// initialize location indices
-				_home_location_id = -1;
-				_work_location_id = -1;
-				_school_location_id = -1;
-
-				// Initialize activity frequency and duration container
-				typedef pair<Activity_Components::Types::ACTIVITY_TYPES, pair<float, float>> avg_activity_record;
-				avg_activity_record a;
-				a.first = ACTIVITY_TYPES::AT_HOME_ACTIVITY;					a.second.first = 2.237f; a.second.second = 442.f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::SCHOOL_ACTIVITY;					a.second.first = 0.122f; a.second.second = 387.3f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::CHANGE_TRANSPORTATION_ACTIVITY;	a.second.first = 0.051f; a.second.second = 18.f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::RELIGIOUS_OR_CIVIC_ACTIVITY;		a.second.first = 0.065f; a.second.second = 109.f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::PICK_UP_OR_DROP_OFF_ACTIVITY;		a.second.first = 0.263f; a.second.second = 13.4f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::EAT_OUT_ACTIVITY;					a.second.first = 0.229f; a.second.second = 53.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::HEALTHCARE_ACTIVITY;				a.second.first = 0.075f; a.second.second = 97.6f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::ERRANDS_ACTIVITY;					a.second.first = 0.124f; a.second.second = 16.6f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::OTHER_ACTIVITY;					a.second.first = 0.002f; a.second.second = 14.f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::PERSONAL_BUSINESS_ACTIVITY;		a.second.first = 0.129f; a.second.second = 91.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::RECREATION_ACTIVITY;				a.second.first = 0.206f; a.second.second = 140.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::OTHER_SHOPPING_ACTIVITY;			a.second.first = 0.423f; a.second.second = 35.4f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::SERVICE_VEHICLE_ACTIVITY;			a.second.first = 0.066f; a.second.second = 13.7f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::MAJOR_SHOPPING_ACTIVITY;			a.second.first = 0.031f; a.second.second = 45.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::SOCIAL_ACTIVITY;					a.second.first = 0.168f; a.second.second = 198.1f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::OTHER_WORK_ACTIVITY;				a.second.first = 0.129f; a.second.second = 170.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY;			a.second.first = 0.381f; a.second.second = 390.2f;	this->_average_activity_frequency_and_duration_container.insert(a);
-				a.first = ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY;			a.second.first = 0.026f; a.second.second = 560.7f;	this->_average_activity_frequency_and_duration_container.insert(a);		
-				a.first = ACTIVITY_TYPES::LEISURE_ACTIVITY;					a.second.first = 0.213f; a.second.second = 142.0f;	this->_average_activity_frequency_and_duration_container.insert(a);	
+				
 			}
 			tag_feature_as_available(Initialize);
 			feature_implementation void Initialize(typename TargetType::ParamType home_synthesis_zone/*, requires(check(typename TargetType::ParamType, PopSyn::Concepts::Is_Synthesis_Zone) && check_as_given(typename TargetType::ParamType, is_pointer))*/)
@@ -68,7 +71,7 @@ namespace Person_Components
 				if (this->Count_Array[_thread_id] % 10000 == 0)  
 				{
 					this->Count+=10000;
-					cout << '\r' << "Initialize Agents: " << this->Count << "                                 ";
+					cout << '\r' << "Agent Home-Work-School Location Choice: " << this->Count << "                                                                           ";
 				}
 				
 
@@ -145,7 +148,7 @@ namespace Person_Components
 				}
 				else
 				{
-					THROW_WARNING("WARNING: Activity type '" << act_type << "' was not found in the Person_Properties average_activity_duration container. Activity duration assumed to be 0.");
+					//THROW_WARNING("WARNING: Activity type '" << act_type << "' was not found in the Person_Properties average_activity_duration container. Activity duration assumed to be 0.");
 					value = 0.0;
 				}
 				// duration stored in minutes
@@ -183,7 +186,7 @@ namespace Person_Components
 				}
 				else
 				{
-					THROW_WARNING("WARNING: Activity type '" << act_type << "' was not found in the Person_Properties average_activity_duration container. Activity duration assumed to be 0.");
+					//THROW_WARNING("WARNING: Activity type '" << act_type << "' was not found in the Person_Properties average_activity_duration container. Activity duration assumed to be 0.");
 					return (TargetType::ReturnType)0.0;
 				}
 			}
@@ -205,7 +208,8 @@ namespace Person_Components
 		};
 		template<typename MasterType,typename ParentType, typename InheritanceList> int ADAPTS_Person_Properties_Implementation<MasterType, ParentType, InheritanceList>::Count_Array[];
 		template<typename MasterType,typename ParentType, typename InheritanceList> int ADAPTS_Person_Properties_Implementation<MasterType, ParentType, InheritanceList>::Count;
-
+		template<typename MasterType,typename ParentType, typename InheritanceList> bool ADAPTS_Person_Properties_Implementation<MasterType, ParentType, InheritanceList>::_is_initialized = false;
+		template<typename MasterType,typename ParentType, typename InheritanceList> Polaris_Associative_Container<hash_map<Activity_Components::Types::ACTIVITY_TYPES, pair<float,float>>> ADAPTS_Person_Properties_Implementation<MasterType, ParentType, InheritanceList>::_average_activity_frequency_and_duration_container;
 
 		implementation struct ACS_Person_Static_Properties_Implementation : public Polaris_Component<APPEND_CHILD(ACS_Person_Static_Properties_Implementation), MasterType, Data_Object, ParentType>
 		{

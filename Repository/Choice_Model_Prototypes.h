@@ -161,7 +161,7 @@ namespace Choice_Model_Components
 				// if sum(exp(u)) = 0 then no valid choices can be made as all options have -ininity utility
 				if (utility_sum == 0)
 				{
-					THROW_WARNING("ERROR: all options have zero probability [sum(exp(u))=0], unable to evaluate choices.  Num choices was=" << choices->size()); 
+					THROW_WARNING("WARNING: all options have zero probability [sum(exp(u))=0], unable to evaluate choices.  Num choices was=" << choices->size()); 
 					// print all choices
 					int i = 0;
 					for (itr; itr!= choices->end(); itr++, i++)
@@ -209,7 +209,7 @@ namespace Choice_Model_Components
 				for (choice_options_itf::iterator itr = choices->begin(); itr != choices->end(); ++itr, ++p_itr)
 				{
 					cumulative_probability += *p_itr;
-					if (ISNAN(cumulative_probability)) THROW_WARNING("ERROR: p is not a number. p=" << *p_itr << ", cum_p="<<cumulative_probability << ", index="<<i);
+					if (ISNAN(cumulative_probability)) THROW_WARNING("WARNING: p is not a number. p=" << *p_itr << ", cum_p="<<cumulative_probability << ", index="<<i);
 					if (rand < cumulative_probability) 
 					{
 						selected_index = i;

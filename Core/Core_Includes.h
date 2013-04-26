@@ -234,12 +234,15 @@ void end_timer(timespec& start,long long& total)
 }
 
 #endif
-
+#ifdef SHOW_WARNINGS
 #define THROW_WARNING(MESSAGE_STREAM) \
 {std::stringstream s;\
 s << endl << "WARNING at "<<__FILE__<<", line: "<<__LINE__<<endl;\
 s << MESSAGE_STREAM;\
 std::cout << s.str();}
+#else 
+#define THROW_WARNING(MESSAGE_STREAM)
+#endif
 
 #define THROW_EXCEPTION(MESSAGE_STREAM) \
 {std::stringstream s;\

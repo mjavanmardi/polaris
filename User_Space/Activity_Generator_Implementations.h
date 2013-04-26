@@ -143,19 +143,23 @@ namespace Person_Components
 				_Scenario_Interface* scenario = _Parent_Person->template scenario_reference<_Scenario_Interface*>();
 
 				int act_count = 1;
+
+				//=========================================================================================================================
+				// Get random start plan time inthe first minute for generation
+				int start_plan_time = (int)(GLOBALS::Uniform_RNG.Next_Rand<float>()*60.0f) + _iteration;
 				
 
 				//=========================================================================================================================
 				// Generate work activity
 				EMPLOYMENT_STATUS work_status = static_properties->Employment_Status<EMPLOYMENT_STATUS>();
-				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count);
+				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count, start_plan_time);
 				//-------------------------------------------------------------------------------------------------------------------------
 
 
 				//=========================================================================================================================
 				// Generate school activity
 				Person_Components::Types::SCHOOL_ENROLLMENT sch_status = static_properties->School_Enrollment<SCHOOL_ENROLLMENT>();
-				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count);
+				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count, start_plan_time);
 				//-------------------------------------------------------------------------------------------------------------------------
 
 				int person_index = this->Person_Type_index<ComponentType,CallerType,NT>();
@@ -174,17 +178,17 @@ namespace Person_Components
 				float num_service = service_vehicle_activity_freq[person_index];
 				float num_social = social_activity_freq[person_index];
 
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_eat_out ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(EAT_OUT_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_errand ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(ERRANDS_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_healthcare ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_leisure ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(LEISURE_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_maj_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_eat_out ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(EAT_OUT_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_errand ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(ERRANDS_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_healthcare ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_leisure ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(LEISURE_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_maj_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY,act_count, start_plan_time);
 				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_pb ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_civic ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_service ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_social ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SOCIAL_ACTIVITY,act_count);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_pb ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_civic ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_service ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_social ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SOCIAL_ACTIVITY,act_count, start_plan_time);
 
 			}
 			tag_feature_as_available(Activity_Generation);
@@ -213,14 +217,14 @@ namespace Person_Components
 				return index;
 			}
 
-			feature_implementation void Create_Routine_Activity(TargetType act_type, int& activity_count)
+			feature_implementation void Create_Routine_Activity(TargetType act_type, int& activity_count, int start_plan_time)
 			{
 				Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
 				activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
 				activity->Activity_Plan_ID<int>(activity_count);
 	
 				// Activity planning time
-				Simulation_Timestep_Increment plan_time = _iteration + activity_count;
+				Simulation_Timestep_Increment plan_time = start_plan_time + activity_count;
 				activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, plan_time);
 
 				((base_type*)this)->_Parent_Planner->Add_Activity_Plan<Routine_Activity_Plan*>(activity);
@@ -228,14 +232,14 @@ namespace Person_Components
 				//activities->push_back((Activity*)activity);
 				activity_count++;
 			}
-			feature_implementation void Create_Activity(TargetType act_type, int& activity_count)
+			feature_implementation void Create_Activity(TargetType act_type, int& activity_count, int start_plan_time)
 			{
 				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
 				activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
 				activity->Activity_Plan_ID<int>(activity_count);
 
 
-				Simulation_Timestep_Increment _plan_time = _iteration + activity_count;
+				Simulation_Timestep_Increment _plan_time = start_plan_time + activity_count;
 				activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, _plan_time);
 
 				((base_type*)this)->_Parent_Planner->Add_Activity_Plan<Activity_Plan*>(activity);

@@ -314,7 +314,8 @@ int main(int argc,char** argv)
 	MasterType::person_destination_choice_option_type::_B_POPULATION = 0.00005;
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer("start_time_duration_data.txt");	
-
+	// Initialize person properties with average activity frequency and duration
+	MasterType::person_properties_type::Static_Initializer();
 
 	//==================================================================================================================================
 	// POPSYN stuff

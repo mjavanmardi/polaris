@@ -204,7 +204,7 @@ namespace Person_Components
 
 				if (selected == nullptr )
 				{
-					cout << endl << "ERROR: selected is null, index = " << selected_index;
+					THROW_WARNING("WARNING: selected is null - no destination choice made, index = " << selected_index);
 					return nullptr;
 				}
 

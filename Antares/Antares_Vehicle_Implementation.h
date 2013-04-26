@@ -85,7 +85,8 @@ namespace Vehicle_Components
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Points();
 				cfg.primitive_color=true;
-				cfg.head_accent_size_value=6;
+				cfg.head_accent_size_value=10;
+				cfg.head_size_value=6;
 
 				//cfg.attributes_schema = string("ID,Status,Current_Link");
 				
@@ -106,6 +107,7 @@ namespace Vehicle_Components
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Lines();
 				cfg.primitive_color=true;
+				
 				cfg.head_accent_size_value=4;
 
 				_routes_layer->Initialize<NULLTYPE>(cfg); 

@@ -161,7 +161,7 @@ namespace Network_Skimming_Components
 
 					if (loc_itr == orig_zone->template origin_activity_locations<locations_itf*>()->end()) 
 					{
-						THROW_WARNING("warning, origin zone " << orig_zone->template internal_id<int>() << "has no activity locations associated with it, or all activity locations have no valid origin links associated with them.");
+						//THROW_WARNING("warning, origin zone " << orig_zone->template internal_id<int>() << "has no activity locations associated with it, or all activity locations have no valid origin links associated with them.");
 					}
 					else
 					{
@@ -194,7 +194,7 @@ namespace Network_Skimming_Components
 
 					if (loc_itr == dest_zone->template origin_activity_locations<locations_itf*>()->end()) 
 					{
-						THROW_WARNING("warning, destination zone " << dest_zone->template internal_id<int>() << "has no activity locations associated with it");
+						//THROW_WARNING("warning, destination zone " << dest_zone->template internal_id<int>() << "has no activity locations associated with it");
 					}
 					else
 					{
@@ -299,7 +299,8 @@ namespace Network_Skimming_Components
 				typename _skim_container_itf::iterator itr;
 
 				// throw error if specified mode is not available in skim table
-				if ((itr = skim->find(Mode_Indicator)) == skim->end()) assert(false);
+				itr = skim->find(Mode_Indicator);
+				//if ((itr = skim->find(Mode_Indicator)) == skim->end()) assert(false);
 
 				// call mode_skim_tables get los functionality
 				return itr->second->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param3Type>>(Origin_ID,Destination_ID,Start_Time);

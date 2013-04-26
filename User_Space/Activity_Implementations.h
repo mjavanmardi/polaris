@@ -192,7 +192,7 @@ namespace Activity_Components
 						{
 							_link_itf* o_link =move->origin<_link_itf*>();
 							_link_itf* d_link =move->destination<_link_itf*>();
-							THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "<<concat(this->Parent_ID<ComponentType,CallerType,int>()) << "." << concat(this->Activity_Plan_ID<ComponentType, CallerType,int>()) <<", " << concat(this->Activity_Type<ComponentType, CallerType,ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>());
+							//THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "<<concat(this->Parent_ID<ComponentType,CallerType,int>()) << "." << concat(this->Activity_Plan_ID<ComponentType, CallerType,int>()) <<", " << concat(this->Activity_Type<ComponentType, CallerType,ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>());
 							return;
 						}
 						
@@ -625,9 +625,9 @@ namespace Activity_Components
 				pthis->Duration<Time_Seconds>(start_and_duration.second);
 
 				// start routing on the planning timestep prior to departure 
-				//int start_minutes = this->Start_Time<ComponentType,CallerType,Time_Minutes>();
-				//int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes) - _Parent_Planner->Planning_Time_Increment<Simulation_Timestep_Increment>(),_iteration+1);
-				//this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
+				int start_minutes = this->Start_Time<ComponentType,CallerType,Time_Minutes>();
+				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes) - _Parent_Planner->Planning_Time_Increment<Simulation_Timestep_Increment>(),_iteration+1);
+				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
 			}
 			feature_implementation void Involved_Persons_Planning_Event_Handler()
 			{
@@ -861,9 +861,9 @@ namespace Activity_Components
 				}
 
 				// start routing on the planning timestep prior to departure 
-				//int start_minutes = this->Start_Time<ComponentType,CallerType,Time_Minutes>();
-				//int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes) - _Parent_Planner->Planning_Time_Increment<Simulation_Timestep_Increment>(),_iteration);
-				//this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
+				int start_minutes = this->Start_Time<ComponentType,CallerType,Time_Minutes>();
+				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes) - _Parent_Planner->Planning_Time_Increment<Simulation_Timestep_Increment>(),_iteration);
+				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
 			}
 
 			feature_implementation void Involved_Persons_Planning_Event_Handler()
