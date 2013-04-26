@@ -5,6 +5,8 @@
 template<typename DataType>
 DataType* Typed_Execution_Pages<DataType>::Allocate()
 {
+	Byte* return_value;
+
 	if((world_ptr)->run) while(AtomicExchange(&mem_lock,1)) SLEEP(0); // lock the mem
 
 	if( pages_with_free_cells.Empty() )
@@ -31,22 +33,25 @@ DataType* Typed_Execution_Pages<DataType>::Allocate()
 			new_pages=(Typed_Execution_Page<DataType>*)(((Byte*)new_pages)+(unsigned int)(_Page_Size/DataType::page_factor));
 		}
 	}
+	Typed_Execution_Page<DataType>* const free_page=pages_with_free_cells.First();
 
-	if(pages_with_free_cells.First()->Empty())
+	if(!free_page->num_allocated)
 	{
-		active_pages.Push(pages_with_free_cells.First());
+		active_pages.Push((Typed_Execution_Page<DataType>*)free_page);
 	}
 
-	Byte* return_value=(Byte*)(pages_with_free_cells.First()->Allocate());
+	return_value=(Byte*)free_page->first_free_cell;
 
-	if(pages_with_free_cells.First()->Full())
+	free_page->first_free_cell=((Execution_Object*)return_value)->next_free_cell;
+
+	if(++free_page->num_allocated == Typed_Execution_Page<DataType>::num_cells)
 	{
 		pages_with_free_cells.Pop();
 	}
 
+	mem_lock=0; // unlock the mem
+	
 	new (return_value) DataType();
-
-	if(world_ptr->run) mem_lock=0; // unlock the mem
 
 	return (DataType*)return_value;
 }

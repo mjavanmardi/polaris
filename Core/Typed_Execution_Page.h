@@ -100,7 +100,7 @@ struct Typed_Execution_Page
 	static const int stride;
 	static const int num_cells;
 
-	volatile unsigned int num_allocated;
+	unsigned int num_allocated;
 };
 
 template<typename DataType>
