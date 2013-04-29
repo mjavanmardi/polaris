@@ -2,7 +2,7 @@
 
 #define EXCLUDE_DEMAND 
 #define FOR_LINUX_PORTING
-
+#define SHOW_WARNINGS
 #include "Application_Includes.h"
 #include "../File_IO/network_models.h"
 struct MasterType
@@ -329,11 +329,15 @@ void run_with_input_from_files()
 	define_component_interface(_Scenario_Interface, MasterType::scenario_type, Scenario_Prototype, NULLTYPE);
 	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
-	scenario->template read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);
 	scenario->template write_output_summary<bool>(true);
-	scenario->template output_moe_for_assignment_interval<bool>(true);
-	scenario->template write_network_snapshots<bool>(true);
-	scenario->template read_network_snapshots<bool>(true);
+	scenario->template write_network_snapshots<bool>(false);
+	scenario->template read_network_snapshots<bool>(false);
+	scenario->template write_network_link_turn_time<bool>(false);
+	scenario->template output_network_moe_for_simulation_interval<bool>(true);
+	scenario->template output_link_moe_for_assignment_interval<bool>(true);
+	scenario->template compare_with_moe_reference<bool>(false);
+
+	scenario->template read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
 	_Network_Interface* network = (_Network_Interface*)Allocate<typename MasterType::network_type>();

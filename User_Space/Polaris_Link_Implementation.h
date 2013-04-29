@@ -64,6 +64,8 @@ namespace Link_Components
 		//------------------------------------------------------------------------------------------------------------------
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, dbid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, direction, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, num_lanes, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, length, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, speed_limit, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -510,7 +512,7 @@ namespace Link_Components
 
 				if (enroute_switching_decision)
 				{
-					vehicle->template enroute_switching<NULLTYPE>();
+					//vehicle->template enroute_switching<NULLTYPE>();
 				}
 
 				if(_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())

@@ -64,6 +64,8 @@ namespace Link_Components
 			feature_accessor(length, none, none);
 			feature_accessor(link_type, none, none);
 			feature_accessor(activity_locations, none, none);
+			feature_accessor(dbid, none, none);
+			feature_accessor(direction, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================

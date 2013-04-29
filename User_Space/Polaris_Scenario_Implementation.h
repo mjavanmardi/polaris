@@ -70,7 +70,7 @@ namespace Scenario_Components
 			member_data(fstream, out_link_moe_file, none, none);
 			member_data(fstream, out_movement_moe_file, none, none);
 			member_data(fstream, reference_realtime_network_moe_file, none, none);
-
+			member_data(fstream, link_moe_reference_file, none, none);
 			member_data(fstream, output_network_snapshots_file, none, none);
 			member_data(fstream, input_network_snapshots_file, none, none);
 
@@ -102,13 +102,18 @@ namespace Scenario_Components
 
 			member_data(bool, write_network_snapshots, none, none);
 			member_data(bool, read_network_snapshots, none, none);
+
+			member_data(bool, compare_with_moe_reference, none, none);
 			
 			member_data(bool, write_node_control_state, none, none);
 			member_data(bool, write_vehicle_trajectory, none, none);
 			member_data(bool, write_network_link_flow, none, none);
 			member_data(bool, write_network_link_turn_time, none, none);
 			member_data(bool, write_output_summary, none, none);
-			member_data(bool, output_moe_for_assignment_interval, none, none);
+			member_data(bool, output_link_moe_for_assignment_interval, none, none);
+			member_data(bool, output_turn_movement_moe_for_assignment_interval, none, none);
+			member_data(bool, output_network_moe_for_assignment_interval, none, none);
+
 			member_data(bool, output_link_moe_for_simulation_interval, none, none);
 			member_data(bool, output_turn_movement_moe_for_simulation_interval, none, none);
 			member_data(bool, output_network_moe_for_simulation_interval, none, none);

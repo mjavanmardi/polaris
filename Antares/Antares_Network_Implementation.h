@@ -99,6 +99,16 @@ namespace Network_Components
 			member_prototype(Antares_Layer,network_avg_link_density_ratio_layer,typename type_of(MasterType::antares_layer),none,none);
 			member_prototype(Antares_Layer,network_avg_link_queue_length_layer,typename type_of(MasterType::antares_layer),none,none);
 
+			member_prototype(Antares_Layer,historic_link_travel_time_layer,typename type_of(MasterType::antares_layer),none,none);
+			member_prototype(Antares_Layer,historic_link_speed_layer,typename type_of(MasterType::antares_layer),none,none);
+			member_prototype(Antares_Layer,historic_link_density_layer,typename type_of(MasterType::antares_layer),none,none);
+			member_prototype(Antares_Layer,historic_link_in_volume_layer,typename type_of(MasterType::antares_layer),none,none);
+			member_prototype(Antares_Layer,historic_link_out_volume_layer,typename type_of(MasterType::antares_layer),none,none);
+			member_prototype(Antares_Layer,historic_link_travel_time_ratio_layer,typename type_of(MasterType::antares_layer),none,none);
+			member_prototype(Antares_Layer,historic_link_speed_ratio_layer,typename type_of(MasterType::antares_layer),none,none);
+			member_prototype(Antares_Layer,historic_link_density_ratio_layer,typename type_of(MasterType::antares_layer),none,none);
+			member_prototype(Antares_Layer,historic_link_queue_length_layer,typename type_of(MasterType::antares_layer),none,none);
+
 			vector<struct Extended_MOE_Data> reference_td_network_moe_data_array;
 
 			feature_implementation void set_network_bounds()
@@ -140,24 +150,24 @@ namespace Network_Components
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				reference_td_network_moe_data_array.clear();
-				fstream& reference_file = ((_Scenario_Interface*)_global_scenario)->template reference_realtime_network_moe_file<fstream&>();
-				if (reference_file.is_open())
+				fstream& network_moe_reference_file = ((_Scenario_Interface*)_global_scenario)->template reference_realtime_network_moe_file<fstream&>();
+				if (network_moe_reference_file.is_open())
 				{
 					struct Extended_MOE_Data moe_data;
 					vector<string> tokens;
 					string line;
 					int token_size = 20;
-					getline(reference_file,line); // skip the first line
-					while (reference_file.good())
+					getline(network_moe_reference_file,line); // skip the first line
+					while (network_moe_reference_file.good())
 					{
-						getline(reference_file,line);
+						getline(network_moe_reference_file,line);
 						string_split(tokens, line, token_size);
 						if (tokens[0].length() == 0)
 						{
 							break;
 						}
 						int time = stoi(tokens[1]);
-						if (time <= ((_Scenario_Interface*)_global_scenario)->template simulation_start_time<int>())
+						if (time < ((_Scenario_Interface*)_global_scenario)->template simulation_start_time<int>())
 						{
 							continue;
 						}
@@ -215,9 +225,9 @@ namespace Network_Components
 				_network_vht_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_vht_layer),Antares_Network_Implementation>*, string& > >(string("VHT"));
 				_network_vht_layer->Initialize<NULLTYPE>(pcfg);
 
-				pcfg.y_label = "cumulative loaded vehicles";
-				_network_cumulative_loaded_vehicles_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_cumulative_loaded_vehicles_layer),Antares_Network_Implementation>*, string& > >(string("cumulative loaded"));
-				_network_cumulative_loaded_vehicles_layer->Initialize<NULLTYPE>(pcfg);
+				//pcfg.y_label = "cumulative loaded vehicles";
+				//_network_cumulative_loaded_vehicles_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_cumulative_loaded_vehicles_layer),Antares_Network_Implementation>*, string& > >(string("cumulative loaded"));
+				//_network_cumulative_loaded_vehicles_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "cumulative departed vehicles";
 				_network_cumulative_departed_vehicles_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_cumulative_departed_vehicles_layer),Antares_Network_Implementation>*, string& > >(string("cumulative departed"));
@@ -236,32 +246,60 @@ namespace Network_Components
 				_network_in_network_vehicles_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "link travel time (minute)";
-				_network_avg_link_travel_time_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_travel_time_layer),Antares_Network_Implementation>*, string& > >(string("avg link travel time"));
+				_network_avg_link_travel_time_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_travel_time_layer),Antares_Network_Implementation>*, string& > >(string("network avg link travel time"));
 				_network_avg_link_travel_time_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "link speed (miles/hour)";
-				_network_avg_link_speed_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_speed_layer),Antares_Network_Implementation>*, string& > >(string("avg link speed"));
+				_network_avg_link_speed_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_speed_layer),Antares_Network_Implementation>*, string& > >(string("network avg link speed"));
 				_network_avg_link_speed_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "link density (vehiles/mile/lane)";
-				_network_avg_link_density_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_density_layer),Antares_Network_Implementation>*, string& > >(string("avg link density"));
+				_network_avg_link_density_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_density_layer),Antares_Network_Implementation>*, string& > >(string("network avg link density"));
 				_network_avg_link_density_layer->Initialize<NULLTYPE>(pcfg);
 
-				pcfg.y_label = "link travel time ratio";
-				_network_avg_link_travel_time_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_travel_time_ratio_layer),Antares_Network_Implementation>*, string& > >(string("avg link travel time ratio"));
-				_network_avg_link_travel_time_ratio_layer->Initialize<NULLTYPE>(pcfg);
+				pcfg.y_label = "link travel time (minute)";
+				_historic_link_travel_time_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(historic_link_travel_time_layer),Antares_Network_Implementation>*, string& > >(string("link travel time"));
+				_historic_link_travel_time_layer->Initialize<NULLTYPE>(pcfg);
 
-				pcfg.y_label = "link speed ratio";
-				_network_avg_link_speed_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_speed_ratio_layer),Antares_Network_Implementation>*, string& > >(string("avg link speed ratio"));
-				_network_avg_link_speed_ratio_layer->Initialize<NULLTYPE>(pcfg);
+				pcfg.y_label = "link speed (miles/hour)";
+				_historic_link_speed_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(historic_link_speed_layer),Antares_Network_Implementation>*, string& > >(string("link speed"));
+				_historic_link_speed_layer->Initialize<NULLTYPE>(pcfg);
 
-				pcfg.y_label = "link density ratio";
-				_network_avg_link_density_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_density_ratio_layer),Antares_Network_Implementation>*, string& > >(string("avg link density ratio"));
-				_network_avg_link_density_ratio_layer->Initialize<NULLTYPE>(pcfg);
+				pcfg.y_label = "link density (vehiles/mile/lane)";
+				_historic_link_density_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(historic_link_density_layer),Antares_Network_Implementation>*, string& > >(string("link density"));
+				_historic_link_density_layer->Initialize<NULLTYPE>(pcfg);
 
-				pcfg.y_label = "link queue length ratio";
-				_network_avg_link_queue_length_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_queue_length_layer),Antares_Network_Implementation>*, string& > >(string("avg link queue length"));
-				_network_avg_link_queue_length_layer->Initialize<NULLTYPE>(pcfg);
+				//pcfg.y_label = "link travel time ratio";
+				//_network_avg_link_travel_time_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_travel_time_ratio_layer),Antares_Network_Implementation>*, string& > >(string("avg link travel time ratio"));
+				//_network_avg_link_travel_time_ratio_layer->Initialize<NULLTYPE>(pcfg);
+
+				//pcfg.y_label = "link speed ratio";
+				//_network_avg_link_speed_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_speed_ratio_layer),Antares_Network_Implementation>*, string& > >(string("avg link speed ratio"));
+				//_network_avg_link_speed_ratio_layer->Initialize<NULLTYPE>(pcfg);
+
+				//pcfg.y_label = "link density ratio";
+				//_network_avg_link_density_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_density_ratio_layer),Antares_Network_Implementation>*, string& > >(string("avg link density ratio"));
+				//_network_avg_link_density_ratio_layer->Initialize<NULLTYPE>(pcfg);
+
+				//pcfg.y_label = "link queue length ratio";
+				//_network_avg_link_queue_length_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_queue_length_layer),Antares_Network_Implementation>*, string& > >(string("avg link queue length"));
+				//_network_avg_link_queue_length_layer->Initialize<NULLTYPE>(pcfg);
+
+				//pcfg.y_label = "link travel time ratio";
+				//_historic_link_travel_time_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(historic_link_travel_time_ratio_layer),Antares_Network_Implementation>*, string& > >(string("historic link travel time ratio"));
+				//_historic_link_travel_time_ratio_layer->Initialize<NULLTYPE>(pcfg);
+
+				//pcfg.y_label = "link speed ratio";
+				//_historic_link_speed_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(historic_link_speed_ratio_layer),Antares_Network_Implementation>*, string& > >(string("historic link speed ratio"));
+				//_historic_link_speed_ratio_layer->Initialize<NULLTYPE>(pcfg);
+
+				//pcfg.y_label = "link density ratio";
+				//_historic_link_density_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(historic_link_density_ratio_layer),Antares_Network_Implementation>*, string& > >(string("historic link density ratio"));
+				//_historic_link_density_ratio_layer->Initialize<NULLTYPE>(pcfg);
+
+				//pcfg.y_label = "link queue length ratio";
+				//_historic_link_queue_length_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(historic_link_queue_length_layer),Antares_Network_Implementation>*, string& > >(string("historic link queue length"));
+				//_historic_link_queue_length_layer->Initialize<NULLTYPE>(pcfg);
 			}
 
 			feature_implementation void initialize_network_map_layers()
@@ -480,12 +518,12 @@ namespace Network_Components
 				element.points = &_network_vht_cache.front();
 				_network_vht_layer->Push_Element<Regular_Element>((void*)&element);
 
-				// plot loaded vehicles
-				submission._y=((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int>();
-				_network_cumulative_loaded_vehicles_cache.push_back(submission);
-				element.num_primitives = _network_cumulative_loaded_vehicles_cache.size();
-				element.points = &_network_cumulative_loaded_vehicles_cache.front();
-				_network_cumulative_loaded_vehicles_layer->Push_Element<Regular_Element>((void*)&element);
+				//// plot loaded vehicles
+				//submission._y=((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int>();
+				//_network_cumulative_loaded_vehicles_cache.push_back(submission);
+				//element.num_primitives = _network_cumulative_loaded_vehicles_cache.size();
+				//element.points = &_network_cumulative_loaded_vehicles_cache.front();
+				//_network_cumulative_loaded_vehicles_layer->Push_Element<Regular_Element>((void*)&element);
 
 				// plot departed vehicles
 				submission._y=((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int>();
@@ -509,8 +547,8 @@ namespace Network_Components
 				_network_in_network_vehicles_layer->Push_Element<Regular_Element>((void*)&element);
 
 				// plot cumulative combined
-				element.num_primitives = _network_cumulative_loaded_vehicles_cache.size();
-				element.points = &_network_cumulative_loaded_vehicles_cache.front();
+				element.num_primitives = _network_cumulative_departed_vehicles_cache.size();
+				element.points = &_network_cumulative_departed_vehicles_cache.front();
 				_network_cumulative_combined_layer->Push_Element<Regular_Element>((void*)&element);
 				Plot_Element element2;
 				
@@ -540,35 +578,35 @@ namespace Network_Components
 				element.points = &_network_avg_link_density_cache.front();
 				_network_avg_link_density_layer->Push_Element<Regular_Element>((void*)&element);
 
-				// plot _network_avg_link_travel_time_ratio
-				submission._y=realtime_network_moe_data.network_avg_link_travel_time_ratio;
-				_network_avg_link_travel_time_ratio_cache.push_back(submission);
-				element.num_primitives = _network_avg_link_travel_time_ratio_cache.size();
-				element.points = &_network_avg_link_travel_time_ratio_cache.front();
-				_network_avg_link_travel_time_ratio_layer->Push_Element<Regular_Element>((void*)&element);
+				//// plot _network_avg_link_travel_time_ratio
+				//submission._y=realtime_network_moe_data.network_avg_link_travel_time_ratio;
+				//_network_avg_link_travel_time_ratio_cache.push_back(submission);
+				//element.num_primitives = _network_avg_link_travel_time_ratio_cache.size();
+				//element.points = &_network_avg_link_travel_time_ratio_cache.front();
+				//_network_avg_link_travel_time_ratio_layer->Push_Element<Regular_Element>((void*)&element);
 
 
-				// plot _network_avg_link_speed_ratio_cache
-				submission._y=realtime_network_moe_data.network_avg_link_speed_ratio;
-				_network_avg_link_speed_ratio_cache.push_back(submission);
-				element.num_primitives = _network_avg_link_speed_ratio_cache.size();
-				element.points = &_network_avg_link_speed_ratio_cache.front();
-				_network_avg_link_speed_ratio_layer->Push_Element<Regular_Element>((void*)&element);
+				//// plot _network_avg_link_speed_ratio_cache
+				//submission._y=realtime_network_moe_data.network_avg_link_speed_ratio;
+				//_network_avg_link_speed_ratio_cache.push_back(submission);
+				//element.num_primitives = _network_avg_link_speed_ratio_cache.size();
+				//element.points = &_network_avg_link_speed_ratio_cache.front();
+				//_network_avg_link_speed_ratio_layer->Push_Element<Regular_Element>((void*)&element);
 
 
-				// plot _network_avg_link_density_ratio_cache
-				submission._y=realtime_network_moe_data.network_avg_link_density_ratio;
-				_network_avg_link_density_ratio_cache.push_back(submission);
-				element.num_primitives = _network_avg_link_density_ratio_cache.size();
-				element.points = &_network_avg_link_density_ratio_cache.front();
-				_network_avg_link_density_ratio_layer->Push_Element<Regular_Element>((void*)&element);
+				//// plot _network_avg_link_density_ratio_cache
+				//submission._y=realtime_network_moe_data.network_avg_link_density_ratio;
+				//_network_avg_link_density_ratio_cache.push_back(submission);
+				//element.num_primitives = _network_avg_link_density_ratio_cache.size();
+				//element.points = &_network_avg_link_density_ratio_cache.front();
+				//_network_avg_link_density_ratio_layer->Push_Element<Regular_Element>((void*)&element);
 
-				// plot _network_avg_link_queue_length_cache
-				submission._y=realtime_network_moe_data.network_avg_link_queue_length;
-				_network_avg_link_queue_length_cache.push_back(submission);
-				element.num_primitives = _network_avg_link_queue_length_cache.size();
-				element.points = &_network_avg_link_queue_length_cache.front();
-				_network_avg_link_queue_length_layer->Push_Element<Regular_Element>((void*)&element);
+				//// plot _network_avg_link_queue_length_cache
+				//submission._y=realtime_network_moe_data.network_avg_link_queue_length;
+				//_network_avg_link_queue_length_cache.push_back(submission);
+				//element.num_primitives = _network_avg_link_queue_length_cache.size();
+				//element.points = &_network_avg_link_queue_length_cache.front();
+				//_network_avg_link_queue_length_layer->Push_Element<Regular_Element>((void*)&element);
 			}
 
 			void plot_reference_network_moes()
@@ -582,6 +620,11 @@ namespace Network_Components
 					return;
 				}
 				Extended_MOE_Data reference_moe_data = reference_td_network_moe_data_array[time_index];
+				if (time_index < (int)(reference_td_network_moe_data_array.size() - 1))
+				{
+					reference_moe_data.network_vmt =  reference_td_network_moe_data_array[time_index+1].network_vmt;
+					reference_moe_data.network_vht =  reference_td_network_moe_data_array[time_index+1].network_vht;
+				}
 #pragma pack(push,1)
 				struct Plot_Element
 				{
@@ -612,12 +655,12 @@ namespace Network_Components
 				element.points = &_reference_network_vht_cache.front();
 				_network_vht_layer->Push_Element<Regular_Element>((void*)&element);
 
-				// plot loaded vehicles
-				submission._y=reference_moe_data.network_cumulative_loaded_vehicles;
-				_reference_network_cumulative_loaded_vehicles_cache.push_back(submission);
-				element.num_primitives = _reference_network_cumulative_loaded_vehicles_cache.size();
-				element.points = &_reference_network_cumulative_loaded_vehicles_cache.front();
-				_network_cumulative_loaded_vehicles_layer->Push_Element<Regular_Element>((void*)&element);
+				//// plot loaded vehicles
+				//submission._y=reference_moe_data.network_cumulative_loaded_vehicles;
+				//_reference_network_cumulative_loaded_vehicles_cache.push_back(submission);
+				//element.num_primitives = _reference_network_cumulative_loaded_vehicles_cache.size();
+				//element.points = &_reference_network_cumulative_loaded_vehicles_cache.front();
+				//_network_cumulative_loaded_vehicles_layer->Push_Element<Regular_Element>((void*)&element);
 
 				// plot departed vehicles
 				submission._y=reference_moe_data.network_cumulative_departed_vehicles;
@@ -662,37 +705,102 @@ namespace Network_Components
 				element.points = &_reference_network_avg_link_density_cache.front();
 				_network_avg_link_density_layer->Push_Element<Regular_Element>((void*)&element);
 
-				// plot _network_avg_link_travel_time_ratio
-				submission._y=reference_moe_data.network_avg_link_travel_time_ratio;
-				_reference_network_avg_link_travel_time_ratio_cache.push_back(submission);
-				element.num_primitives = _reference_network_avg_link_travel_time_ratio_cache.size();
-				element.points = &_reference_network_avg_link_travel_time_ratio_cache.front();
-				_network_avg_link_travel_time_ratio_layer->Push_Element<Regular_Element>((void*)&element);
+				//// plot _network_avg_link_travel_time_ratio
+				//submission._y=reference_moe_data.network_avg_link_travel_time_ratio;
+				//_reference_network_avg_link_travel_time_ratio_cache.push_back(submission);
+				//element.num_primitives = _reference_network_avg_link_travel_time_ratio_cache.size();
+				//element.points = &_reference_network_avg_link_travel_time_ratio_cache.front();
+				//_network_avg_link_travel_time_ratio_layer->Push_Element<Regular_Element>((void*)&element);
 
 
-				// plot _network_avg_link_speed_ratio_cache
-				submission._y=reference_moe_data.network_avg_link_speed_ratio;
-				_reference_network_avg_link_speed_ratio_cache.push_back(submission);
-				element.num_primitives = _reference_network_avg_link_speed_ratio_cache.size();
-				element.points = &_reference_network_avg_link_speed_ratio_cache.front();
-				_network_avg_link_speed_ratio_layer->Push_Element<Regular_Element>((void*)&element);
+				//// plot _network_avg_link_speed_ratio_cache
+				//submission._y=reference_moe_data.network_avg_link_speed_ratio;
+				//_reference_network_avg_link_speed_ratio_cache.push_back(submission);
+				//element.num_primitives = _reference_network_avg_link_speed_ratio_cache.size();
+				//element.points = &_reference_network_avg_link_speed_ratio_cache.front();
+				//_network_avg_link_speed_ratio_layer->Push_Element<Regular_Element>((void*)&element);
 
 
-				// plot _network_avg_link_density_ratio_cache
-				submission._y=reference_moe_data.network_avg_link_density_ratio;
-				_reference_network_avg_link_density_ratio_cache.push_back(submission);
-				element.num_primitives = _reference_network_avg_link_density_ratio_cache.size();
-				element.points = &_reference_network_avg_link_density_ratio_cache.front();
-				_network_avg_link_density_ratio_layer->Push_Element<Regular_Element>((void*)&element);
+				//// plot _network_avg_link_density_ratio_cache
+				//submission._y=reference_moe_data.network_avg_link_density_ratio;
+				//_reference_network_avg_link_density_ratio_cache.push_back(submission);
+				//element.num_primitives = _reference_network_avg_link_density_ratio_cache.size();
+				//element.points = &_reference_network_avg_link_density_ratio_cache.front();
+				//_network_avg_link_density_ratio_layer->Push_Element<Regular_Element>((void*)&element);
 
-				// plot _network_avg_link_queue_length_cache
-				submission._y=reference_moe_data.network_avg_link_queue_length;
-				_reference_network_avg_link_queue_length_cache.push_back(submission);
-				element.num_primitives = _reference_network_avg_link_queue_length_cache.size();
-				element.points = &_reference_network_avg_link_queue_length_cache.front();
-				_network_avg_link_queue_length_layer->Push_Element<Regular_Element>((void*)&element);
+				//// plot _network_avg_link_queue_length_cache
+				//submission._y=reference_moe_data.network_avg_link_queue_length;
+				//_reference_network_avg_link_queue_length_cache.push_back(submission);
+				//element.num_primitives = _reference_network_avg_link_queue_length_cache.size();
+				//element.points = &_reference_network_avg_link_queue_length_cache.front();
+				//_network_avg_link_queue_length_layer->Push_Element<Regular_Element>((void*)&element);
 			}
 
+			void read_link_moe_reference()
+			{
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, NULLTYPE);
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Network_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+
+				fstream& link_moe_reference_file = ((_Scenario_Interface*)_global_scenario)->template link_moe_reference_file<fstream&>();
+				if (!link_moe_reference_file.is_open())
+				{
+					THROW_EXCEPTION(endl << "Link MOE reference file cannot be opened" << endl);
+				}
+				struct Link_MOE_Data link_moe_data;
+				vector<string> tokens;
+				string line;
+				int current_time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>();
+				int record_time;
+				typename MasterType::link_type* link;
+				Network_Components::Types::Link_ID_Dir link_id_dir;
+				for (int i = 0; i < (int)_links_container.size(); i++)
+				{
+					getline(link_moe_reference_file, line); 
+					string_split(tokens, line);
+					if (tokens.size() == 0)
+					{
+						break;
+					}
+					record_time = stoi(tokens[1]);
+					if (record_time < current_time)
+					{
+						// skip until current time
+						while(link_moe_reference_file.good())
+						{
+							getline(link_moe_reference_file, line);
+							string_split(tokens, line);
+							record_time = stoi(tokens[1]);
+							if (record_time >= current_time)
+							{
+								break;
+							}
+						}
+					}
+					link_id_dir.id = stol(tokens[3]);
+					link_id_dir.dir = stol(tokens[4]);
+					link = (typename MasterType::link_type*)(_link_dbid_dir_to_ptr_map[link_id_dir.id_dir]);
+					int offset = 8;
+					link_moe_data.link_travel_time = stof(tokens[offset++]);
+					link_moe_data.link_travel_time_standard_deviation = stof(tokens[offset++]);
+					link_moe_data.link_queue_length = stof(tokens[offset++]);
+					link_moe_data.link_travel_delay = stof(tokens[offset++]);
+					link_moe_data.link_travel_delay_standard_deviation = stof(tokens[offset++]);
+					link_moe_data.link_speed = stof(tokens[offset++]);
+					link_moe_data.link_density = stof(tokens[offset++]);
+					link_moe_data.link_in_flow_rate = stof(tokens[offset++]);
+					link_moe_data.link_out_flow_rate = stof(tokens[offset++]);
+					link_moe_data.link_in_volume = stof(tokens[offset++]);
+					link_moe_data.link_out_volume = stof(tokens[offset++]);
+					link_moe_data.link_speed_ratio = stof(tokens[offset++]);
+					link_moe_data.link_in_flow_ratio = stof(tokens[offset++]);
+					link_moe_data.link_out_flow_ratio = stof(tokens[offset++]);
+					link_moe_data.link_density_ratio = stof(tokens[offset++]);
+					link_moe_data.link_travel_time_ratio = stof(tokens[offset++]);
+					link_moe_data.num_vehicles_in_link = stof(tokens[offset++]);
+					link->historic_link_moe_data = link_moe_data;
+				}
+			}
 			member_data(Rectangle_XY<MasterType>, network_bounds,none,none);
 			
 			member_prototype(Antares_Layer,link_lines,typename type_of(MasterType::antares_layer),none,none);

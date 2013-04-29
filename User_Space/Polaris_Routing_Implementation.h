@@ -241,7 +241,7 @@ namespace Routing_Components
 					_Routable_Link_Interface* routable_link =  (_Routable_Link_Interface*)Allocate<typename _Routable_Link_Interface::Component_Type>();
 					routable_link->template construct_routable_from_regular<_Regular_Link_Interface*>(regular_link);
 					int link_uuid = routable_link->template uuid<int>();
-					float link_travel_time = link_travel_time_map.find(link_uuid)->second;
+					float link_travel_time = link_travel_time_map[link_uuid];
 					routable_link->template travel_time<float>(link_travel_time);
 					links_container<ComponentType,CallerType,_Routable_Links_Container_Interface&>().push_back(routable_link);
 					linksMap.insert(pair<int, _Routable_Link_Interface*>(regular_link->template internal_id<int>(), routable_link));

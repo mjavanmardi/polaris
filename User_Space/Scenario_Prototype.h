@@ -147,6 +147,7 @@ namespace Scenario_Components
 			feature_accessor(input_network_snapshots_file, none, none);
 
 			feature_accessor(reference_realtime_network_moe_file, none, none);
+			feature_accessor(link_moe_reference_file, none, none);
 
 			feature_accessor(assignment_time_in_seconds, none, none);
 			feature_accessor(simulation_time_in_seconds, none, none);
@@ -190,12 +191,16 @@ namespace Scenario_Components
 			
 			feature_accessor(write_network_snapshots, none, none);
 			feature_accessor(read_network_snapshots, none, none);
+			
+			feature_accessor(compare_with_moe_reference, none, none);
 
-			feature_accessor(output_moe_for_assignment_interval, none, none);
 			feature_accessor(output_link_moe_for_simulation_interval, none, none);
 			feature_accessor(output_turn_movement_moe_for_simulation_interval, none, none);
 			feature_accessor(output_network_moe_for_simulation_interval, none, none);
-			
+			feature_accessor(output_link_moe_for_assignment_interval, none, none);
+			feature_accessor(output_turn_movement_moe_for_assignment_interval, none, none);
+			feature_accessor(output_network_moe_for_assignment_interval, none, none);
+
 			feature_accessor(use_event_manager, none, none);
 
 			/// enroute switching parameters
@@ -342,19 +347,19 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("write_network_link_flow", write_network_link_flow<bool*>())!= PARAMETER_FOUND) write_network_link_flow<bool>(false);
 				if (cfgReader.getParameter("write_network_link_turn_time", write_network_link_turn_time<bool*>())!= PARAMETER_FOUND) write_network_link_turn_time<bool>(false);
 				if (cfgReader.getParameter("write_output_summary", write_output_summary<bool*>())!= PARAMETER_FOUND) write_output_summary<bool>(true);
-				if (cfgReader.getParameter("output_moe_for_assignment_interval", output_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_moe_for_assignment_interval<bool>(true);
 				if (cfgReader.getParameter("output_link_moe_for_simulation_interval", output_link_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_simulation_interval<bool>(false);
 				if (cfgReader.getParameter("output_turn_movement_moe_for_simulation_interval", output_turn_movement_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_simulation_interval<bool>(false);
 				if (cfgReader.getParameter("output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_simulation_interval<bool>(false);
 				if (cfgReader.getParameter("write_network_snapshots", write_network_snapshots<bool*>())!= PARAMETER_FOUND) write_network_snapshots<bool>(false);
 				if (cfgReader.getParameter("read_network_snapshots", read_network_snapshots<bool*>())!= PARAMETER_FOUND) read_network_snapshots<bool>(false);
+				if (cfgReader.getParameter("compare_with_moe_reference", compare_with_moe_reference<bool*>())!= PARAMETER_FOUND) compare_with_moe_reference<bool>(false);
+
+				if (cfgReader.getParameter("output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_assignment_interval<bool>(false);
+				if (cfgReader.getParameter("output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_assignment_interval<bool>(false);
+				if (cfgReader.getParameter("output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_assignment_interval<bool>(true);
+
 
 				if (cfgReader.getParameter("use_event_manager", use_event_manager<bool*>())!= PARAMETER_FOUND) use_event_manager<bool>(false);
-
-				output_dir_name<string&>() = "";
-				input_dir_name<string&>() = "";
-				open_output_files<NULLTYPE>();
-				open_input_files<NULLTYPE>();
 
 				///enroute switching
 				if (cfgReader.getParameter("realtime_informed_vehicle_market_share", realtime_informed_vehicle_market_share<double*>())!= PARAMETER_FOUND) realtime_informed_vehicle_market_share<double>(0.5);
@@ -363,6 +368,12 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("relative_indifference_bound_route_choice_mean", relative_indifference_bound_route_choice_mean<double*>())!= PARAMETER_FOUND) relative_indifference_bound_route_choice_mean<double>(0.1);
 				if (cfgReader.getParameter("minimum_travel_time_saving_mean", minimum_travel_time_saving_mean<double*>())!= PARAMETER_FOUND) minimum_travel_time_saving_mean<double>(1.0); // in minutes
 				if (cfgReader.getParameter("minimum_travel_time_saving_standard_deviation", minimum_travel_time_saving_standard_deviation<double*>())!= PARAMETER_FOUND) minimum_travel_time_saving_standard_deviation<double>(1.0); // in minutes
+
+				output_dir_name<string&>() = "";
+				input_dir_name<string&>() = "";
+				open_output_files<NULLTYPE>();
+				open_input_files<NULLTYPE>();
+
 			}
 
 			feature_prototype void read_scenario_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data)
@@ -704,7 +715,7 @@ namespace Scenario_Components
 				//link
 				string out_realtime_link_moe_file_name = output_dir_name<string&>() + "realtime_moe_link.csv";
 				out_realtime_link_moe_file<fstream&>().open(out_realtime_link_moe_file_name, fstream::out);
-				out_realtime_link_moe_file<fstream&>() << "clock,time,link,unode,dnode,link_type,travel_time_in_min,travel_delay_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio\n";
+				out_realtime_link_moe_file<fstream&>() << "clock,time,link,dbid,direction,unode,dnode,link_type,travel_time_in_min,travel_delay_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio\n";
 
 				//movement
 				string out_realtime_movement_moe_file_name = output_dir_name<string&>() + "realtime_moe_movement.csv";
@@ -721,7 +732,7 @@ namespace Scenario_Components
 				//link
 				string out_link_moe_file_name = output_dir_name<string&>() + "moe_link.csv";
 				out_link_moe_file<fstream&>().open(out_link_moe_file_name, fstream::out);
-				out_link_moe_file<fstream&>() << "clock,time,link,unode,dnode,link_type,travel_time_in_min,travel_time_sd_in_min,travel_delay_in_min,travel_delay_sd_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_flow_rate_in_vphpl,out_flow_rate_in_vphpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio,in_flow_ratio,out_flow_ratio,vht,vmt\n";
+				out_link_moe_file<fstream&>() << "clock,time,link,dbid,direction,unode,dnode,link_type,travel_time_in_min,travel_time_sd_in_min,travel_delay_in_min,travel_delay_sd_in_min,queue_length,speed_in_mph,density_in_vpmpl,in_flow_rate_in_vphpl,out_flow_rate_in_vphpl,in_volume,out_volume,travel_time_ratio,speed_ratio,density_ratio,in_flow_ratio,out_flow_ratio,vht,vmt\n";
 
 				//movement
 				string out_movement_moe_file_name = output_dir_name<string&>() + "moe_movement.csv";
@@ -732,20 +743,34 @@ namespace Scenario_Components
 				string routable_network_snapshots_file_name = output_dir_name<string&>() + "output_network_snapshots";
 				output_network_snapshots_file<fstream&>().open(routable_network_snapshots_file_name, fstream::out);
 				output_network_snapshots_file<fstream&>() << "time\t maximum_free_flow_speed" << endl;
-				output_network_snapshots_file<fstream&>() << "inbound_link_uuid\t inbound_link_travel_time" << endl;
+				output_network_snapshots_file<fstream&>() << "inbound_link_uuid\t inbound_link_dbid\t inbound_link_direction\t inbound_link_travel_time\t number_of_movements" << endl;
 				output_network_snapshots_file<fstream&>() << "movement_uuid\t movement_forward_link_turn_travel_time";
 			};
 
 			feature_prototype void open_input_files()
 			{
 				//reference network moe file
-				string reference_realtime_network_moe_file_name = input_dir_name<string&>() + "realtime_moe_network_to_compare.csv";
-				reference_realtime_network_moe_file<fstream&>().open(reference_realtime_network_moe_file_name, fstream::in);
-				if (!reference_realtime_network_moe_file<fstream&>().is_open())
+				if (compare_with_moe_reference<bool>())
 				{
-					cout << "Reference network MOE file not found. There will be no hisotorical side-by-side plotting in Antares." << endl;
-				}
+					string reference_realtime_network_moe_file_name = input_dir_name<string&>() + "realtime_moe_network_to_compare.csv";
+					reference_realtime_network_moe_file<fstream&>().open(reference_realtime_network_moe_file_name, fstream::in);
+					if (!reference_realtime_network_moe_file<fstream&>().is_open())
+					{
+						THROW_EXCEPTION(endl << "compare_with_moe_reference is enabled but reference network MOE file cannot be openned." << endl);
+					}
 
+					string link_moe_reference_file_name = input_dir_name<string&>() + "moe_link_to_compare.csv";
+					link_moe_reference_file<fstream&>().open(link_moe_reference_file_name, fstream::in);
+					if (!link_moe_reference_file<fstream&>().is_open())
+					{
+						THROW_EXCEPTION(endl << "compare_with_moe_reference is enabled but reference link MOE file cannot be openned." << endl);
+					}
+					else
+					{
+						string aLine;
+						getline(link_moe_reference_file<fstream&>(),aLine); // skip the first line
+					}
+				}
 				if (read_network_snapshots<bool>())
 				{
 					string routable_network_snapshots_file_name = input_dir_name<string&>() + "input_network_snapshots";

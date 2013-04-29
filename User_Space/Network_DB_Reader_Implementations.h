@@ -156,7 +156,12 @@ namespace Network_Components
 
 						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir]=link;
 
+						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+						link_dbid_dir_to_ptr_map_type& link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type&>();
+						link_dbid_dir_to_ptr_map[link_id_dir.id_dir] = link;
 
+						link->template dbid<int>(db_itr->getLink());
+						link->template direction<int>(0);
 
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
@@ -254,6 +259,13 @@ namespace Network_Components
 						link_id_dir.dir=1;
 
 						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir]=link;
+						
+						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+						link_dbid_dir_to_ptr_map_type& link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type&>();
+						link_dbid_dir_to_ptr_map[link_id_dir.id_dir] = link;
+
+						link->template dbid<int>(db_itr->getLink());
+						link->template direction<int>(0);
 
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
@@ -461,7 +473,8 @@ namespace Network_Components
 					long_hash_key.outbound_link_id = outbound_link_id;
 
 					MasterType::network_type::link_turn_movement_map_type& link_turn_movement_map = _network_reference->link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
-					link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+					//link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+					link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
 
 
 					turn_movements_container.push_back(turn_movement);

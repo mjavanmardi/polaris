@@ -52,6 +52,9 @@ namespace Network_Components
 		{
 			member_data_component(typename MasterType::network_db_reader_type, db_reader, none,none);
 
+			typedef unordered_map<long long,void*> link_dbid_dir_to_ptr_map_type;
+			member_data(link_dbid_dir_to_ptr_map_type, link_dbid_dir_to_ptr_map, none, none);
+
 			member_data(float, max_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_container(vector<typename MasterType::intersection_type*>, intersections_container, none, none);
@@ -158,10 +161,11 @@ namespace Network_Components
 			{
 				cout << "reading snapshots" << endl;
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Link_Components::Prototypes::Link_Prototype<typename MasterType::link_type> _Link_Interface;
 				fstream& input_network_snapshots_file = ((_Scenario_Interface*)_global_scenario)->template input_network_snapshots_file<fstream&>();
 				if (!input_network_snapshots_file.is_open())
 				{
-					return;
+					THROW_EXCEPTION(endl << "Cannot open snapshots file" << endl);
 				}
 
 				string line;
@@ -174,8 +178,10 @@ namespace Network_Components
 				float movement_forward_link_turn_travel_time;
 				int num_movements;
 				float maximum_free_flow_speed;
+				Network_Components::Types::Link_ID_Dir link_id_dir;
 				unordered_map<int,float> link_travel_time_map;
 				unordered_map<int,float> movement_travel_time_map;
+				_Link_Interface* link;
 				while (input_network_snapshots_file.good())
 				{
 					getline(input_network_snapshots_file,line);
@@ -187,6 +193,7 @@ namespace Network_Components
 				}
 				bool first = true;
 				int current_time;
+
 				while(input_network_snapshots_file.good())
 				{
 					getline(input_network_snapshots_file, line);
@@ -211,15 +218,18 @@ namespace Network_Components
 						current_time = stoi(tokens[0]);
 						maximum_free_flow_speed = stof(tokens[1]);
 					}
-					else if (tokens.size() == 3)
+					else if (tokens.size() == 5)
 					{
 						// starting link 
-						token_size = 3;
-						string_split(tokens, line, token_size);
+						//token_size = 3;
+						//string_split(tokens, line, token_size);
 						link_uuid = stoi(tokens[0]);
-						link_travel_time = stof(tokens[1]);
-						link_travel_time_map.insert(std::make_pair<int, float>(link_uuid, link_travel_time));
-						num_movements = stoi(tokens[2]);
+						link_id_dir.id = stol(tokens[1]);
+						link_id_dir.dir = stol(tokens[2]);
+						link_travel_time = stof(tokens[3]);
+						link = (_Link_Interface*)(_link_dbid_dir_to_ptr_map[link_id_dir.id_dir]);
+						link_travel_time_map.insert(std::make_pair<int, float>(link->template uuid<int>(), link_travel_time));
+						num_movements = stoi(tokens[4]);
 						// starting movements
 						for (int i = 0; i < num_movements; i++)
 						{
@@ -389,6 +399,15 @@ namespace Network_Components
 						((typename MasterType::network_type*)_this)->output_snapshot();
 					}
 				}
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>() && ((_Network_Interface*)_this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				{
+					((typename MasterType::network_type*)_this)->read_link_moe_reference();
+				}
+			}
+
+			void read_link_moe_reference()
+			{
+				// do nothing for non-visualized network implementaiton
 			}
 
 			void create_snapshot()
@@ -412,6 +431,7 @@ namespace Network_Components
 				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				define_component_interface(_Regular_Link_Interface, typename _Routable_Link_Interface::get_type_of(network_link_reference), Link_Components::Prototypes::Link_Prototype, typename MasterType::network_type);
 
 				_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)_routable_networks_container[0];
 				((_Scenario_Interface*)_global_scenario)->template output_network_snapshots_file<fstream&>() << endl << ((_Regular_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>() << "\t" << routable_network->template max_free_flow_speed<float>();
@@ -431,6 +451,8 @@ namespace Network_Components
 						((_Scenario_Interface*)_global_scenario)->template output_network_snapshots_file<fstream&>()
 							<< endl
 							<< inbound_link->template uuid<int>() << "\t"
+							<< inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template dbid<int>() << "\t"
+							<< inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template direction<int>() << "\t"
 							<< inbound_link->template travel_time<float>() << "\t"
 							<< outbound_movements.size();
 
@@ -521,10 +543,7 @@ namespace Network_Components
 					link_moe_post_process();
 					update_moe_for_assignment_interval_with_links();
 					update_moe_for_assignment_interval();
-					if (((_Scenario_Interface*)_global_scenario)->template output_moe_for_assignment_interval<bool>())
-					{		
-						output_moe_for_assignment_interval<ComponentType, CallerType, TargetType>();
-					}
+					output_moe_for_assignment_interval<ComponentType, CallerType, TargetType>();
 					reset_moe_for_assignment_interval();
 				}
 			}
@@ -799,7 +818,6 @@ namespace Network_Components
 				_Network_Interface* _this_ptr = (_Network_Interface*)this;
 				printf("%s, ", convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str());
 				printf("loaded=%7d, departed=%7d, arrived=%7d, in_network=%7d, VMT=%7f, VHT=%7f\n",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>(),_network_vmt, _network_vht);
-
 				if (((_Scenario_Interface*)_global_scenario)->template write_node_control_state<bool>())
 				{
 					write_node_control_state<ComponentType,CallerType,TargetType>();

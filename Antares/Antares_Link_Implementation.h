@@ -65,6 +65,9 @@ namespace Link_Components
 			static float _link_shift;
 			Link_MOE_Column column;
 			Link_MOE_Bar queue_length_box;
+
+			Link_MOE_Data historic_link_moe_data;
+
 			feature_implementation void Initialize()
 			{
 				((Polaris_Link_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Link_Implementation)>*)this)->Initialize<ComponentType,CallerType,TargetType>();
@@ -265,11 +268,71 @@ namespace Link_Components
 
 			feature_implementation void visualize_moe()
 			{
-				Push_To_Link_MOE_Display<ComponentType,CallerType,TargetType>();
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
+				Push_To_Link_MOE_Plot_Display<ComponentType,CallerType,TargetType>();
+				Push_To_Link_MOE_Map_Display<ComponentType,CallerType,TargetType>();
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>())
+				{
+					Push_To_Historic_Link_MOE_Plot_Display<ComponentType,CallerType,TargetType>();
+				}
+			}
+
+			feature_implementation void Push_To_Historic_Link_MOE_Plot_Display()
+			{
+				Point_2D<MasterType> submission;
+				submission._x = _iteration;
+				
+				submission._y = historic_link_moe_data.link_travel_time;
+				_historic_link_travel_time_cache.push_back(submission);
+
+				submission._y = historic_link_moe_data.link_speed;
+				_historic_link_speed_cache.push_back(submission);
+
+				submission._y = historic_link_moe_data.link_density;
+				_historic_link_density_cache.push_back(submission);
+
+				submission._y = historic_link_moe_data.link_speed_ratio;
+				_historic_link_speed_ratio_cache.push_back(submission);
+
+				submission._y = historic_link_moe_data.link_density_ratio;
+				_historic_link_density_ratio_cache.push_back(submission);
+
+				submission._y = historic_link_moe_data.link_travel_time_ratio;
+				_historic_link_travel_time_ratio_cache.push_back(submission);
+
+				submission._y = historic_link_moe_data.link_queue_length;
+				_historic_link_queue_length_cache.push_back(submission);
+			}
+
+			feature_implementation void Push_To_Link_MOE_Plot_Display()
+			{
+				Point_2D<MasterType> submission;
+				submission._x = _iteration;
+				
+				submission._y = realtime_link_moe_data.link_travel_time;
+				_link_travel_time_cache.push_back(submission);
+
+				submission._y = realtime_link_moe_data.link_speed;
+				_link_speed_cache.push_back(submission);
+
+				submission._y = realtime_link_moe_data.link_density;
+				_link_density_cache.push_back(submission);
+
+				submission._y = realtime_link_moe_data.link_speed_ratio;
+				_link_speed_ratio_cache.push_back(submission);
+
+				submission._y = realtime_link_moe_data.link_density_ratio;
+				_link_density_ratio_cache.push_back(submission);
+
+				submission._y = realtime_link_moe_data.link_travel_time_ratio;
+				_link_travel_time_ratio_cache.push_back(submission);
+
+				submission._y = realtime_link_moe_data.link_queue_length;
+				_link_queue_length_cache.push_back(submission);
 			}
 
 			typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
-			feature_implementation void Push_To_Link_MOE_Display()
+			feature_implementation void Push_To_Link_MOE_Map_Display()
 			{
 				if (_link_travel_time_layer->template draw<bool>())
 					push_to_link_travel_time_layer();
@@ -350,11 +413,6 @@ namespace Link_Components
 
 			void push_to_link_travel_time_layer()
 			{
-				Point_2D<MasterType> submission;
-				submission._x = _iteration;
-				submission._y = realtime_link_moe_data.link_travel_time;
-				_link_travel_time_cache.push_back(submission);
-				
 				int height = (realtime_link_moe_data.link_travel_time / visualization_reference.link_travel_time) * base_height;
 				set_column_height(height);
 				//float los = 1.0f - _link_fftt / (realtime_link_moe_data.link_travel_time * 60.0f);
@@ -370,10 +428,6 @@ namespace Link_Components
 
 			void push_to_link_speed_layer()
 			{
-				Point_2D<MasterType> submission;
-				submission._x = _iteration;
-				submission._y = realtime_link_moe_data.link_speed;
-				_link_speed_cache.push_back(submission);
 
 				int height = (realtime_link_moe_data.link_speed / visualization_reference.link_speed) * base_height;
 				set_column_height(height);
@@ -385,11 +439,6 @@ namespace Link_Components
 
 			void push_to_link_density_layer()
 			{
-				Point_2D<MasterType> submission;
-				submission._x = _iteration;
-				submission._y = realtime_link_moe_data.link_density;
-				_link_density_cache.push_back(submission);
-
 				int height = (realtime_link_moe_data.link_density / visualization_reference.link_density) * base_height;
 				set_column_height(height);
 				//float los = realtime_link_moe_data.link_density / _jam_density;
@@ -400,11 +449,6 @@ namespace Link_Components
 
 			void push_to_link_speed_ratio_layer()
 			{
-				Point_2D<MasterType> submission;
-				submission._x = _iteration;
-				submission._y = realtime_link_moe_data.link_speed_ratio;
-				_link_speed_ratio_cache.push_back(submission);
-
 				int height = (realtime_link_moe_data.link_speed_ratio / visualization_reference.link_speed_ratio) * base_height;
 				set_column_height(height);
 				//float los = 1.0f - realtime_link_moe_data.link_speed / _original_free_flow_speed;
@@ -415,11 +459,6 @@ namespace Link_Components
 
 			void push_to_link_density_ratio_layer()
 			{
-				Point_2D<MasterType> submission;
-				submission._x = _iteration;
-				submission._y = realtime_link_moe_data.link_density_ratio;
-				_link_density_ratio_cache.push_back(submission);
-
 				int height = (realtime_link_moe_data.link_density_ratio / visualization_reference.link_density_ratio) * base_height;
 				set_column_height(height);
 				//float los = realtime_link_moe_data.link_density_ratio;
@@ -430,11 +469,6 @@ namespace Link_Components
 
 			void push_to_link_travel_time_ratio_layer()
 			{
-				Point_2D<MasterType> submission;
-				submission._x = _iteration;
-				submission._y = realtime_link_moe_data.link_travel_time_ratio;
-				_link_travel_time_ratio_cache.push_back(submission);
-
 				int height = (realtime_link_moe_data.link_travel_time_ratio / visualization_reference.link_travel_time_ratio) * base_height;
 				set_column_height(height);
 				//float los = 1.0f - _link_fftt / (realtime_link_moe_data.link_travel_time * 60.0f);
@@ -445,11 +479,6 @@ namespace Link_Components
 			
 			void push_to_link_queue_length_layer()
 			{
-				Point_2D<MasterType> submission;
-				submission._x = _iteration;
-				submission._y = realtime_link_moe_data.link_queue_length;
-				_link_queue_length_cache.push_back(submission);
-
 				if (realtime_link_moe_data.link_queue_length == 0)
 					return;
 				configure_queue_length_box();
@@ -470,13 +499,34 @@ namespace Link_Components
 
 			void plot_link_moe()
 			{
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_travel_time_layer->Clear_Accented<NT>();
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_speed_layer->Clear_Accented<NT>();
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_density_layer->Clear_Accented<NT>();
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_travel_time_ratio_layer->Clear_Accented<NT>();
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_speed_ratio_layer->Clear_Accented<NT>();
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_density_ratio_layer->Clear_Accented<NT>();
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_queue_length_layer->Clear_Accented<NT>();
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_travel_time_layer->Clear_Accented<NT>();
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_speed_layer->Clear_Accented<NT>();
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_density_layer->Clear_Accented<NT>();
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_travel_time_ratio_layer->Clear_Accented<NT>();
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_speed_ratio_layer->Clear_Accented<NT>();
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_density_ratio_layer->Clear_Accented<NT>();
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_queue_length_layer->Clear_Accented<NT>();
+
+				//plot_current_link_moe();
+
+
+				((typename MasterType::network_type*)_global_network)->_historic_link_travel_time_layer->Clear_Accented<NT>();
+				((typename MasterType::network_type*)_global_network)->_historic_link_speed_layer->Clear_Accented<NT>();
+				((typename MasterType::network_type*)_global_network)->_historic_link_density_layer->Clear_Accented<NT>();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_travel_time_ratio_layer->Clear_Accented<NT>();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_speed_ratio_layer->Clear_Accented<NT>();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_density_ratio_layer->Clear_Accented<NT>();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_queue_length_layer->Clear_Accented<NT>();
+				plot_current_link_moe_in_historic_plot();
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>())
+				{
+					plot_historic_link_moe();
+				}
+			}
+
+			void plot_current_link_moe()
+			{
 #pragma pack(push,1)
 				struct Plot_Element
 				{
@@ -525,7 +575,108 @@ namespace Link_Components
 				element.points = &_link_queue_length_cache.front();
 				((typename MasterType::network_type*)_global_network)->_network_avg_link_queue_length_layer->Push_Element<Accented_Element>((void*)&element);
 			}
-			
+
+			void plot_current_link_moe_in_historic_plot()
+			{
+#pragma pack(push,1)
+				struct Plot_Element
+				{
+					True_Color_RGBA<NT> color;
+					int num_primitives;
+					Point_2D<MasterType>* points;
+				};
+#pragma pack(pop)
+				Plot_Element element;
+				element.color._r = 255;
+				element.color._g = 0;
+				element.color._b = 0;
+				element.color._a = 255;
+				// plot link_travel_time
+				element.num_primitives = _link_travel_time_cache.size();
+				element.points = &_link_travel_time_cache.front();
+				((typename MasterType::network_type*)_global_network)->_historic_link_travel_time_layer->Push_Element<Accented_Element>((void*)&element);
+
+				// plot link_speed
+				element.num_primitives = _link_speed_cache.size();
+				element.points = &_link_speed_cache.front();
+				((typename MasterType::network_type*)_global_network)->_historic_link_speed_layer->Push_Element<Accented_Element>((void*)&element);
+
+				// plot link_density
+				element.num_primitives = _link_density_cache.size();
+				element.points = &_link_density_cache.front();
+				((typename MasterType::network_type*)_global_network)->_historic_link_density_layer->Push_Element<Accented_Element>((void*)&element);
+
+				//// plot link_travel_time_ratio
+				//element.num_primitives = _link_travel_time_ratio_cache.size();
+				//element.points = &_link_travel_time_ratio_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_travel_time_ratio_layer->Push_Element<Accented_Element>((void*)&element);
+
+				//// plot link_speed_ratio
+				//element.num_primitives = _link_speed_ratio_cache.size();
+				//element.points = &_link_speed_ratio_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_speed_ratio_layer->Push_Element<Accented_Element>((void*)&element);
+
+				//// plot link_density_ratio
+				//element.num_primitives = _link_density_ratio_cache.size();
+				//element.points = &_link_density_ratio_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_density_ratio_layer->Push_Element<Accented_Element>((void*)&element);
+
+				//// plot link_queue_length
+				//element.num_primitives = _link_queue_length_cache.size();
+				//element.points = &_link_queue_length_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_queue_length_layer->Push_Element<Accented_Element>((void*)&element);
+			}
+			void plot_historic_link_moe()
+			{
+#pragma pack(push,1)
+				struct Plot_Element
+				{
+					True_Color_RGBA<NT> color;
+					int num_primitives;
+					Point_2D<MasterType>* points;
+				};
+#pragma pack(pop)
+				Plot_Element element;
+				element.color._r = 0;
+				element.color._g = 255;
+				element.color._b = 255;
+				element.color._a = 255;
+				// plot link_travel_time
+				element.num_primitives = _historic_link_travel_time_cache.size();
+				element.points = &_historic_link_travel_time_cache.front();
+				((typename MasterType::network_type*)_global_network)->_historic_link_travel_time_layer->Push_Element<Accented_Element>((void*)&element);
+
+				// plot link_speed
+				element.num_primitives = _historic_link_speed_cache.size();
+				element.points = &_historic_link_speed_cache.front();
+				((typename MasterType::network_type*)_global_network)->_historic_link_speed_layer->Push_Element<Accented_Element>((void*)&element);
+
+				// plot link_density
+				element.num_primitives = _historic_link_density_cache.size();
+				element.points = &_historic_link_density_cache.front();
+				((typename MasterType::network_type*)_global_network)->_historic_link_density_layer->Push_Element<Accented_Element>((void*)&element);
+
+				//// plot link_travel_time_ratio
+				//element.num_primitives = _historic_link_travel_time_ratio_cache.size();
+				//element.points = &_historic_link_travel_time_ratio_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_travel_time_ratio_layer->Push_Element<Accented_Element>((void*)&element);
+
+				//// plot link_speed_ratio
+				//element.num_primitives = _historic_link_speed_ratio_cache.size();
+				//element.points = &_historic_link_speed_ratio_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_speed_ratio_layer->Push_Element<Accented_Element>((void*)&element);
+
+				//// plot link_density_ratio
+				//element.num_primitives = _historic_link_density_ratio_cache.size();
+				//element.points = &_historic_link_density_ratio_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_density_ratio_layer->Push_Element<Accented_Element>((void*)&element);
+
+				//// plot link_queue_length
+				//element.num_primitives = _historic_link_queue_length_cache.size();
+				//element.points = &_historic_link_queue_length_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_historic_link_queue_length_layer->Push_Element<Accented_Element>((void*)&element);
+			}			
+
 			static void on_select(const list<void*>& removed,const list<void*>& added,const list<void*>& selected,vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
@@ -792,6 +943,32 @@ namespace Link_Components
 				}
 			}
 
+			//void set_historic_link_moe(Link_MOE_Data historic_link_moe)
+			//{
+			//	Point_2D<MasterType> submission;
+			//	submission._x = _iteration;
+			//	submission._y = historic_link_moe.link_travel_time;
+			//	_historic_link_travel_time_cache.push_back(submission);
+
+			//	submission._y = historic_link_moe.link_speed;
+			//	_historic_link_speed_cache.push_back(submission);
+
+			//	submission._y = historic_link_moe.link_density;
+			//	_historic_link_density_cache.push_back(submission);
+
+			//	submission._y = historic_link_moe.link_travel_time_ratio;
+			//	_historic_link_travel_time_ratio_cache.push_back(submission);
+
+			//	submission._y = historic_link_moe.link_speed_ratio;
+			//	_historic_link_speed_ratio_cache.push_back(submission);
+
+			//	submission._y = historic_link_moe.link_density_ratio;
+			//	_historic_link_density_ratio_cache.push_back(submission);
+
+			//	submission._y = historic_link_moe.link_queue_length;
+			//	_historic_link_queue_length_cache.push_back(submission);
+			//}
+
 			declare_feature_conditional(Newells_Conditional)
 			{
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
@@ -859,6 +1036,14 @@ namespace Link_Components
 			member_data(vector<Point_2D<MasterType>>,link_speed_ratio_cache,none,none);
 			member_data(vector<Point_2D<MasterType>>,link_density_ratio_cache,none,none);
 			member_data(vector<Point_2D<MasterType>>,link_queue_length_cache,none,none);
+
+			member_data(vector<Point_2D<MasterType>>,historic_link_travel_time_cache,none,none);
+			member_data(vector<Point_2D<MasterType>>,historic_link_speed_cache,none,none);
+			member_data(vector<Point_2D<MasterType>>,historic_link_density_cache,none,none);
+			member_data(vector<Point_2D<MasterType>>,historic_link_travel_time_ratio_cache,none,none);
+			member_data(vector<Point_2D<MasterType>>,historic_link_speed_ratio_cache,none,none);
+			member_data(vector<Point_2D<MasterType>>,historic_link_density_ratio_cache,none,none);
+			member_data(vector<Point_2D<MasterType>>,historic_link_queue_length_cache,none,none);
 
 			member_data(Link_Line<MasterType>, displayed_line, none, none);
 

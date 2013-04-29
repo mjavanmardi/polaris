@@ -147,6 +147,7 @@ namespace Network_Components
 			feature_accessor(intersections_container, none, none);
 			feature_accessor(links_container, none, none);
 			feature_accessor(db_reader,none,none);
+			feature_accessor(link_dbid_dir_to_ptr_map, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 			
 			//==================================================================================================================

@@ -80,7 +80,7 @@ Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Informa
 
 	_information_book=new wxAuiNotebook(this,-1,wxDefaultPosition,wxDefaultSize,wxAUI_NB_TOP);
 
-	for(int i=0;i<20;i++)
+	for(int i=0;i<25;i++)
 	{
 		Information_Page<typename MasterType::type_of(information_page),ComponentType>* layer = (Information_Page<typename MasterType::type_of(information_page),ComponentType>*) new typename MasterType::type_of(information_page)(_information_book);
 		

@@ -415,12 +415,14 @@ namespace Routing_Components
 			feature_prototype void Schedule_Route_Computation(int time_to_depart)
 			{
 				load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+				//departure_time<int>(time_to_depart);
+				//load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route_Using_Snapshot,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 			}
 
 			feature_prototype void Schedule_Route_Computation(int time_to_depart, int planning_time, bool use_snapshot)
 			{
 				departure_time<int>(time_to_depart);
-				if (use_snapshot)load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route_Using_Snapshot,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+				if (use_snapshot) load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route_Using_Snapshot,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 				else load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 			}
 

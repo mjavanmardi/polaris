@@ -41,6 +41,7 @@ namespace Network_Components
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			_Link_Interface* link;
+			Network_Components::Types::Link_ID_Dir link_id_dir;
 			for (int i = 0; i < network_data.network_link_size; i++) {
 				link = (_Link_Interface*)Allocate<typename _Link_Interface::Component_Type>();
 				int upstream_intersection_id = network_data.link_data_array[i].unode_index;
@@ -54,6 +55,12 @@ namespace Network_Components
 				network_models::network_information::network_data_information::LinkData& raw_link = network_data.link_data_array[i];
 				link->template uuid<int>(raw_link.uuid);
 				link->template internal_id<int>(i);
+				link->template dbid<int>(link->template uuid<int>());
+				link->template direction<int>(link->template uuid<int>());
+				link_id_dir.id = link->template dbid<int>();
+				link_id_dir.dir = link->template direction<int>();
+				_link_dbid_dir_to_ptr_map[link_id_dir.id_dir] = link;
+
 				link->template num_lanes<int>(raw_link.num_lanes);
 				link->template link_type<int>(raw_link.link_type);
 				link->template length<float>(raw_link.length);
@@ -99,7 +106,8 @@ namespace Network_Components
 				typename MasterType::network_type::long_hash_key_type long_hash_key;
 				long_hash_key.inbound_link_id = inbound_link_id;
 				long_hash_key.outbound_link_id = outbound_link_id;
-				_link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+				//_link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
+				_link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
 
 				//// assign the detector
 				//turn_movement_1->template detector<Detector_Interface*>(lane->template Detector_Thru<Detector_Interface*>());
