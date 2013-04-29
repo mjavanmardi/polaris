@@ -91,6 +91,7 @@ public:
 							execution_type->tex_next_next_revision._iteration=INT_MAX;
 							execution_type->tex_next_next_revision._sub_iteration=0;
 							execution_type->tex_threads_counter=0;
+							//execution_type->page_stride=max( (int)(( execution_type->active_pages.Size() )/( _Execution_Segments_Per_Thread * _num_threads )), 1 );
 						}
 
 					execution_type->tex_lock=0; // unlock the type

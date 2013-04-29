@@ -132,6 +132,7 @@ public:
 		tex_next_next_revision._iteration=INT_MAX;
 		tex_next_next_revision._sub_iteration=0;
 		tex_threads_counter=0;
+		page_stride=1;
 	}
 
 	void Process(Revision& tex_response)
@@ -146,6 +147,10 @@ public:
 
 		const int header_size=sizeof(Typed_Execution_Page<DataType>);
 		
+		//const unsigned int pstride = page_stride;
+
+		const unsigned int pstride = max( (int)(( active_pages.Size() )/( _Execution_Segments_Per_Thread * _num_threads )), 1 );
+
 		Typed_Execution_Page<DataType>* execution_page;
 
 		while(itr!=nullptr)
@@ -155,71 +160,115 @@ public:
 
 			if(process == 1)
 			{
-				// allow one thread into this page per _iteration / _sub_iteration				
-				
-				Revision ptex_response=execution_page->ptex_next_revision;
+				// allow one thread into this page per _iteration / _sub_iteration
 
-				if(ptex_response == this_revision)
+				for(unsigned int i=0;i<pstride;i++)
 				{
-					ptex_response=execution_page->ptex_next_next_revision;
-					
-					current_page=((Byte*)execution_page)+header_size;
+					Revision ptex_response=execution_page->ptex_next_revision;
 
-					(*process_directive)(current_page,ptex_response);
-
-					// extend shorthand _iteration to include _sub_iteration
-					//if(ptex_response._iteration == this_revision._iteration) ptex_response._sub_iteration=this_revision._sub_iteration+1;
-					//else ptex_response._sub_iteration=0;
-					
-					while(AtomicExchange(&execution_page->ptex_lock,1)) SLEEP(0); // lock the page
-					
-					if(ptex_response < execution_page->ptex_next_next_revision)
+					if(ptex_response == this_revision)
 					{
-						// PTEX wishes to return sooner in the future than already assumed
-						// should be assumed that these are strictly ordered: execution_page->ptex_next_revision < execution_page->ptex_next_next_revision
-						execution_page->ptex_next_next_revision=ptex_response;
-					}
+						ptex_response=execution_page->ptex_next_next_revision;
 					
-					execution_page->ptex_current_revision=this_revision;
-					execution_page->ptex_next_revision=execution_page->ptex_next_next_revision;
-					execution_page->ptex_next_next_revision._iteration=INT_MAX;
-					execution_page->ptex_next_next_revision._sub_iteration=0;
+						current_page=((Byte*)execution_page)+header_size;
+
+						(*process_directive)(current_page,ptex_response);
+
+						// extend shorthand _iteration to include _sub_iteration
+						//if(ptex_response._iteration == this_revision._iteration) ptex_response._sub_iteration=this_revision._sub_iteration+1;
+						//else ptex_response._sub_iteration=0;
 					
-					execution_page->ptex_lock=0; // unlock the page
-				}
-				
-				if(ptex_response < tex_response)
-				{
-					tex_response=ptex_response;
-				}
-			}
-			
-			if(process == _num_threads)
-			{
-				// inform type that this page is no longer relevant for the execution
-				if(execution_page->Empty())
-				{
-					typename Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* fitr=active_pages.Begin();
-
-					// as long as you will be looping through structure, take the liberty of passing linking information
-					typename Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* litr=nullptr;
-
-					while(fitr!=nullptr)
-					{
-						if(fitr->data==execution_page)
+						while(AtomicExchange(&execution_page->ptex_lock,1)) SLEEP(0); // lock the page
+					
+						if(ptex_response < execution_page->ptex_next_next_revision)
 						{
-							active_pages.Erase(fitr,litr);
-							break;
+							// PTEX wishes to return sooner in the future than already assumed
+							// should be assumed that these are strictly ordered: execution_page->ptex_next_revision < execution_page->ptex_next_next_revision
+							execution_page->ptex_next_next_revision=ptex_response;
 						}
-
-						litr=fitr;
-						fitr=fitr->next_allocated_cell;
+					
+						execution_page->ptex_current_revision=this_revision;
+						execution_page->ptex_next_revision=execution_page->ptex_next_next_revision;
+						execution_page->ptex_next_next_revision._iteration=INT_MAX;
+						execution_page->ptex_next_next_revision._sub_iteration=0;
+					
+						execution_page->ptex_lock=0; // unlock the page
 					}
+				
+					if(ptex_response < tex_response)
+					{
+						tex_response=ptex_response;
+					}
+
+					//Take responsibility for pages which only you visit
+					if(i != 0)
+					{
+						//// inform type that this page is no longer relevant for the execution
+						//if(execution_page->Empty())
+						//{
+						//	typename Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* fitr=active_pages.Begin();
+
+						//	// as long as you will be looping through structure, take the liberty of passing linking information
+						//	typename Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* litr=nullptr;
+
+						//	while(fitr!=nullptr)
+						//	{
+						//		if(fitr->data==execution_page)
+						//		{
+						//			active_pages.Erase(fitr,litr);
+						//			break;
+						//		}
+
+						//		litr=fitr;
+						//		fitr=fitr->next_allocated_cell;
+						//	}
+						//}
+
+						execution_page->ptex_threads_counter=0;
+					}
+
+					itr=itr->next_allocated_cell;
+					if(itr==nullptr) break;
+
+					execution_page = itr->data;
+				}
+			}
+			else
+			{
+				//Take responsibility for shared page that many threads may visit
+				if(process == _num_threads)
+				{
+					//// inform type that this page is no longer relevant for the execution
+					//if(execution_page->Empty())
+					//{
+					//	typename Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* fitr=active_pages.Begin();
+
+					//	// as long as you will be looping through structure, take the liberty of passing linking information
+					//	typename Quick_List<Typed_Execution_Page<DataType>*>::List_Cell* litr=nullptr;
+
+					//	while(fitr!=nullptr)
+					//	{
+					//		if(fitr->data==execution_page)
+					//		{
+					//			active_pages.Erase(fitr,litr);
+					//			break;
+					//		}
+
+					//		litr=fitr;
+					//		fitr=fitr->next_allocated_cell;
+					//	}
+					//}
+
+					execution_page->ptex_threads_counter=0;
 				}
 
-				execution_page->ptex_threads_counter=0;
+				// skip over page_stride pages
+				for(unsigned int i=0;i<pstride;i++)
+				{
+					itr=itr->next_allocated_cell;
+					if(itr==nullptr) break;
+				}
 			}
-			itr=itr->next_allocated_cell;
 		}
 	}
 	
@@ -249,7 +298,8 @@ public:
 	bool type_activated;
 
 	const unsigned int stride;
-	
+	unsigned int page_stride;
+
 	const unsigned int num_cells;
 	
 	const Execution_Directive process_directive;
