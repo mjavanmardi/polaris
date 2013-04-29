@@ -159,7 +159,7 @@ namespace Person_Components
 				//=========================================================================================================================
 				// Generate school activity
 				Person_Components::Types::SCHOOL_ENROLLMENT sch_status = static_properties->School_Enrollment<SCHOOL_ENROLLMENT>();
-				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count, start_plan_time);
+				//if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count, start_plan_time);
 				//-------------------------------------------------------------------------------------------------------------------------
 
 				int person_index = this->Person_Type_index<ComponentType,CallerType,NT>();
@@ -178,17 +178,17 @@ namespace Person_Components
 				float num_service = service_vehicle_activity_freq[person_index];
 				float num_social = social_activity_freq[person_index];
 
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_eat_out ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(EAT_OUT_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_errand ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(ERRANDS_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_healthcare ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_leisure ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(LEISURE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_maj_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY,act_count, start_plan_time);
-				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_pb ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_civic ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_service ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_social ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SOCIAL_ACTIVITY,act_count, start_plan_time);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_eat_out ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(EAT_OUT_ACTIVITY,act_count, start_plan_time);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_errand ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(ERRANDS_ACTIVITY,act_count, start_plan_time);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_healthcare ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY,act_count, start_plan_time);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_leisure ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(LEISURE_ACTIVITY,act_count, start_plan_time);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_maj_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY,act_count, start_plan_time);
+				////if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_ACTIVITY,act_count);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY,act_count, start_plan_time);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_pb ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY,act_count, start_plan_time);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_civic ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY,act_count, start_plan_time);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_service ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY,act_count, start_plan_time);
+				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_social ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SOCIAL_ACTIVITY,act_count, start_plan_time);
 
 			}
 			tag_feature_as_available(Activity_Generation);

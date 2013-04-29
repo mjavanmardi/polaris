@@ -70,8 +70,10 @@ namespace Person_Components
 				if (itr == _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].end()) THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
 			
 				pair<typename TargetType::ReturnType,typename TargetType::ReturnType> return_val;
-				return_val.first = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.first);
-				return_val.second = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.second);
+
+				// add random draw from between 0-6 minutes as this is the aggregation level of the start_time-duration data
+				return_val.first = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.first + GLOBALS::Uniform_RNG.Next_Rand<float>()*6.0f);
+				return_val.second = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.second + GLOBALS::Uniform_RNG.Next_Rand<float>()*6.0f);
 				return return_val;
 			}
 			tag_feature_signature_as_available(Get_Start_Time_and_Duration,1);

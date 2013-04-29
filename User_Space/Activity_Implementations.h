@@ -72,6 +72,13 @@ namespace Activity_Components
 			member_data(Revision,Involved_Persons_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			member_data(Revision,Route_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 
+			feature_implementation bool Location_Is_Planned(){return (_Location_Planning_Time._iteration == END && _Location_Planning_Time._sub_iteration == END);} tag_feature_as_available(Location_Is_Planned);
+			feature_implementation bool Mode_Is_Planned(){return (_Mode_Planning_Time._iteration == END && _Mode_Planning_Time._sub_iteration == END);}	tag_feature_as_available(Mode_Is_Planned);
+			feature_implementation bool Duration_Is_Planned(){return (_Duration_Planning_Time._iteration == END && _Duration_Planning_Time._sub_iteration == END);}	tag_feature_as_available(Duration_Is_Planned);
+			feature_implementation bool Involved_Persons_Is_Planned(){return (_Involved_Persons_Planning_Time._iteration == END && _Involved_Persons_Planning_Time._sub_iteration == END);}	tag_feature_as_available(Involved_Persons_Is_Planned);
+			feature_implementation bool Start_Is_Planned(){return (_Start_Time_Planning_Time._iteration == END && _Start_Time_Planning_Time._sub_iteration == END);} tag_feature_as_available(Start_Is_Planned);
+			feature_implementation bool Route_Is_Planned(){return (_Route_Planning_Time._iteration == END && _Route_Planning_Time._sub_iteration == END);} tag_feature_as_available(Route_Is_Planned);
+
 			// Basic Activity Events - Plan route and add to schedule
 			feature_implementation void Initialize(TargetType act_type)
 			{
@@ -541,7 +548,7 @@ namespace Activity_Components
 				route._iteration = max(_iteration+1, (int)planning_time);
 				
 				start._sub_iteration = start_sub;
-				dur._sub_iteration = 0; //dur._sub_iteration = dur_sub;
+				dur._sub_iteration = END; //dur._sub_iteration = dur_sub;
 				loc._sub_iteration = loc_sub;
 				mode._sub_iteration = mode_sub;
 				persons._sub_iteration = inv_sub;
@@ -611,6 +618,8 @@ namespace Activity_Components
 			feature_implementation void Start_Time_Planning_Event_Handler()
 			{
 				this_itf* pthis = (this_itf*)this;
+				base_type* bthis = (base_type*)this;
+
 				// interfaces
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
 				_person_itf* person = planner->Parent_Person<_person_itf*>();
@@ -624,9 +633,21 @@ namespace Activity_Components
 				pthis->Start_Time<Time_Seconds>(std::max<int>(start_and_duration.first,time_min.Value));
 				pthis->Duration<Time_Seconds>(start_and_duration.second);
 
-				// start routing on the planning timestep prior to departure 
-				int start_minutes = this->Start_Time<ComponentType,CallerType,Time_Minutes>();
-				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes) - _Parent_Planner->Planning_Time_Increment<Simulation_Timestep_Increment>(),_iteration+1);
+
+				// start routing on the planning timestep at 1.5 times the estimated travel time from skims prior to departure - rounded to nearest minute
+				Time_Minutes exp_ttime;
+				if (bthis->Location_Is_Planned<ComponentType,CallerType,NT>())
+				{
+					_network_itf* network = person->network_reference<_network_itf*>();
+					_zone_itf* o_zone = person->Home_Location<_zone_itf*>();
+					_zone_itf* d_zone = pthis->Location<_activity_location_itf*>()->zone<_zone_itf*>();
+
+					exp_ttime = network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_zone->uuid<int>(),d_zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				}
+				else exp_ttime = 60.0f;
+
+				int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 1.5);
+				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
 				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
 			}
 			feature_implementation void Involved_Persons_Planning_Event_Handler()
@@ -860,9 +881,20 @@ namespace Activity_Components
 					THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");
 				}
 
-				// start routing on the planning timestep prior to departure 
-				int start_minutes = this->Start_Time<ComponentType,CallerType,Time_Minutes>();
-				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes) - _Parent_Planner->Planning_Time_Increment<Simulation_Timestep_Increment>(),_iteration);
+				// start routing on the planning timestep at 1.5 times the estimated travel time from skims prior to departure - rounded to nearest minute
+				Time_Minutes exp_ttime;
+				if (bthis->Location_Is_Planned<ComponentType,CallerType,NT>())
+				{
+					_network_itf* network = person->network_reference<_network_itf*>();
+					_zone_itf* o_zone = person->Home_Location<_zone_itf*>();
+					_zone_itf* d_zone = bthis->Location<ComponentType,CallerType,_activity_location_itf*>()->zone<_zone_itf*>();
+
+					exp_ttime = network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_zone->uuid<int>(),d_zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				}
+				else exp_ttime = 60.0f;
+
+				int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 1.5);
+				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
 				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
 			}
 
