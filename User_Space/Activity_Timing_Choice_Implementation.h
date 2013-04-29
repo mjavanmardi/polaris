@@ -11,7 +11,7 @@ namespace Person_Components
 		implementation struct Activity_Timing_Chooser_Implementation : public Polaris_Component<APPEND_CHILD(Activity_Timing_Chooser_Implementation),MasterType,Data_Object,ParentType>
 		{
 			// local types
-			typedef pair<Time_Minutes,Time_Minutes> data_type;
+			typedef pair<float,float> data_type;
 			typedef pair<float,data_type> record_type;
 			typedef map<float,data_type> map_type;
 
@@ -22,7 +22,6 @@ namespace Person_Components
 
 			// static start time and duration lookup container for each activity type
 			static member_associative_container(concat(hash_map<Activity_Components::Types::ACTIVITY_TYPES, map_type >), start_time_duration_container,none,none);
-			
 
 			//=======================================================================================================
 			// Time of day and duration choice model
@@ -71,9 +70,10 @@ namespace Person_Components
 			
 				pair<typename TargetType::ReturnType,typename TargetType::ReturnType> return_val;
 
-				// add random draw from between 0-6 minutes as this is the aggregation level of the start_time-duration data
-				return_val.first = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.first + GLOBALS::Uniform_RNG.Next_Rand<float>()*6.0f);
-				return_val.second = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.second + GLOBALS::Uniform_RNG.Next_Rand<float>()*6.0f);
+				// add random draw from between 0-30 minutes as this is the aggregation level of the start_time data
+				return_val.first = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.first + GLOBALS::Uniform_RNG.Next_Rand<float>()*30.0f);
+				// add random draw from between 0-5 minutes as this is the aggregation level of the duration data
+				return_val.second = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.second + GLOBALS::Uniform_RNG.Next_Rand<float>()*5.0f);
 				return return_val;
 			}
 			tag_feature_signature_as_available(Get_Start_Time_and_Duration,1);
@@ -125,7 +125,7 @@ namespace Person_Components
 				_is_initialized = true;
 
 
-				// Initialize hashmap
+				// Initialize hashmap for start time
 				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::EAT_OUT_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::ERRANDS_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::HEALTHCARE_ACTIVITY,map_type()));
@@ -137,6 +137,7 @@ namespace Person_Components
 				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::RELIGIOUS_OR_CIVIC_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::SERVICE_VEHICLE_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::SOCIAL_ACTIVITY,map_type()));
+
 
 				// add items
 				ifstream data_file;

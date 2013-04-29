@@ -872,7 +872,7 @@ namespace Activity_Components
 				else if (act_type == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == WORK_AT_HOME_ACTIVITY)
 				{
 					Time_Seconds start_work = static_properties->Journey_To_Work_Arrival_Time<Time_Seconds>();
-					start_work = start_work + Uniform_RNG.Next_Rand<float>() * 5.0 * 60.0; // add random uniform time between 0 and 5 minutes since ACS start is rounded to 5 min
+					start_work = start_work + (0.5f - Uniform_RNG.Next_Rand<float>()) * 30.0 * 60.0; // add random uniform time between -15 and 15 minutes since ACS is rounded	
 					Time_Seconds start_min = Simulation_Time.Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->Planning_Time_Increment<Time_Seconds>());
 					pthis->Start_Time<Time_Seconds>(std::max<int>(start_work.Value,start_min.Value));
 				}
