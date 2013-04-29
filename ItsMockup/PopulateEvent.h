@@ -13,6 +13,7 @@ void PopulateEvent(std::string db_path)
 	db->execute("delete from Event_Instance_Values;");
 	db->execute("delete from Event_Key;");
 	db->execute("delete from Network_Event_Keys;");
+	db->execute("delete from sqlite_sequence;");
 	std::map<int, shape_geometry> point_map;
 	vector<int> links;
 	shape_geometry point;
@@ -41,6 +42,8 @@ void PopulateEvent(std::string db_path)
 		value.reset(new Event_Instance_Value(0, "3"));   value->setKey(evnt_key); instance->setValu(value); instance->setValu(value); db->persist(value);
 
 		evnt_key.reset(new Event_Key("temperature", "int", "0..1000", false, "")); db->persist(evnt_key); evnt->setKey(evnt_key);
+		evnt_key.reset(new Event_Key("asphalt", "int", "0..1000", false, "")); db->persist(evnt_key); evnt->setKey(evnt_key);
+		evnt_key.reset(new Event_Key("wind", "int", "0..1000", false, "")); db->persist(evnt_key); evnt->setKey(evnt_key);
 		evnt_key.reset(new Event_Key("zip", "int", "0..99999", false, "")); db->persist(evnt_key); evnt->setKey(evnt_key);
 		evnt_key.reset(new Event_Key("county", "string", "", false, "Name of the county")); db->persist(evnt_key); evnt->setKey(evnt_key);
 		value.reset(new Event_Instance_Value(0, "Lake"));   value->setKey(evnt_key); instance->setValu(value); instance->setValu(value); db->persist(value);
@@ -105,6 +108,7 @@ void PopulateEvent(std::string db_path)
 	try
 	{
 		t.commit();
+		cout << "Created a mockup Network_Event database\n";
 	}
 	catch (const odb::exception& e)
 	{
