@@ -1,0 +1,236 @@
+[
+    {
+        "weather type" : "CLEAR_DRY",
+        "description" : "clear, dry pavement",
+        "capacity factor" : {"freeway" : 1.00, "arterial" : 1.00},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 1.00, "arterial" : 1.00}],
+                [60, {"freeway" : 1.00, "arterial" : 1.00}],
+                [65, {"freeway" : 1.00, "arterial" : 1.00}],
+                [70, {"freeway" : 1.00, "arterial" : 1.00}],
+                [75, {"freeway" : 1.00, "arterial" : 1.00}]
+            ]
+    },
+    {
+        "weather type" : "CLEAR_WET",
+        "description" : "clear, wet pavement",
+        "capacity factor" : {"freeway" : 0.98, "arterial" : 0.98},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.97, "arterial" : 0.97}],
+                [60, {"freeway" : 0.96, "arterial" : 0.96}],
+                [65, {"freeway" : 0.96, "arterial" : 0.96}],
+                [70, {"freeway" : 0.95, "arterial" : 0.95}],
+                [75, {"freeway" : 0.94, "arterial" : 0.94}]
+            ]
+    },
+    {
+        "weather type" : "RAIN_1",
+        "description" : "rain, <= 0.10 in/h",
+        "capacity factor" : {"freeway" : 0.98, "arterial" : 0.98},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.97, "arterial" : 0.97}],
+                [60, {"freeway" : 0.96, "arterial" : 0.96}],
+                [65, {"freeway" : 0.96, "arterial" : 0.96}],
+                [70, {"freeway" : 0.95, "arterial" : 0.95}],
+                [75, {"freeway" : 0.94, "arterial" : 0.94}]
+            ]
+    },
+    {
+        "weather type" : "RAIN_2",
+        "description" : "rain, <= 0.25 in/h",
+        "capacity factor" : {"freeway" : 0.93, "arterial" : 0.93},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.96, "arterial" : 0.96}],
+                [60, {"freeway" : 0.95, "arterial" : 0.95}],
+                [65, {"freeway" : 0.94, "arterial" : 0.94}],
+                [70, {"freeway" : 0.93, "arterial" : 0.93}],
+                [75, {"freeway" : 0.93, "arterial" : 0.93}]
+            ]
+    },
+    {
+        "weather type" : "RAIN_3",
+        "description" : "rain, > 0.25 in/h",
+        "capacity factor" : {"freeway" : 0.86, "arterial" : 0.86},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.94, "arterial" : 0.94}],
+                [60, {"freeway" : 0.93, "arterial" : 0.93}],
+                [65, {"freeway" : 0.93, "arterial" : 0.93}],
+                [70, {"freeway" : 0.92, "arterial" : 0.92}],
+                [75, {"freeway" : 0.91, "arterial" : 0.91}]
+            ]
+    },
+    {
+        "weather type" : "SNOW_1",
+        "description" : "snow, <= 0.05 in/h",
+        "capacity factor" : {"freeway" : 0.96, "arterial" : 0.96},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.94, "arterial" : 0.94}],
+                [60, {"freeway" : 0.92, "arterial" : 0.92}],
+                [65, {"freeway" : 0.89, "arterial" : 0.89}],
+                [70, {"freeway" : 0.87, "arterial" : 0.87}],
+                [75, {"freeway" : 0.84, "arterial" : 0.84}]
+            ]
+    },
+    {
+        "weather type" : "SNOW_2",
+        "description" : "snow, <= 0.10 in/h",
+        "capacity factor" : {"freeway" : 0.91, "arterial" : 0.91},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.92, "arterial" : 0.92}],
+                [60, {"freeway" : 0.90, "arterial" : 0.90}],
+                [65, {"freeway" : 0.88, "arterial" : 0.88}],
+                [70, {"freeway" : 0.86, "arterial" : 0.86}],
+                [75, {"freeway" : 0.83, "arterial" : 0.83}]
+            ]
+    },
+    {
+        "weather type" : "SNOW_3",
+        "description" : "snow, <= 0.50 in/h",
+        "capacity factor" : {"freeway" : 0.89, "arterial" : 0.89},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.90, "arterial" : 0.90}],
+                [60, {"freeway" : 0.88, "arterial" : 0.88}],
+                [65, {"freeway" : 0.86, "arterial" : 0.86}],
+                [70, {"freeway" : 0.84, "arterial" : 0.84}],
+                [75, {"freeway" : 0.82, "arterial" : 0.82}]
+            ]
+    },
+    {
+        "weather type" : "SNOW_4",
+        "description" : "snow, > 0.50 in/h",
+        "capacity factor" : {"freeway" : 0.78, "arterial" : 0.78},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.88, "arterial" : 0.88}],
+                [60, {"freeway" : 0.86, "arterial" : 0.86}],
+                [65, {"freeway" : 0.85, "arterial" : 0.85}],
+                [70, {"freeway" : 0.83, "arterial" : 0.83}],
+                [75, {"freeway" : 0.81, "arterial" : 0.81}]
+            ]
+    },
+    {
+        "weather type" : "TEMP_1",
+        "description" : "temp, < 50 deg F",
+        "capacity factor" : {"freeway" : 0.99, "arterial" : 0.99},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.99, "arterial" : 0.99}],
+                [60, {"freeway" : 0.99, "arterial" : 0.99}],
+                [65, {"freeway" : 0.99, "arterial" : 0.99}],
+                [70, {"freeway" : 0.98, "arterial" : 0.98}],
+                [75, {"freeway" : 0.98, "arterial" : 0.98}]
+            ]
+    },
+    {
+        "weather type" : "TEMP_2",
+        "description" : "temp, < 34 deg F",
+        "capacity factor" : {"freeway" : 0.98, "arterial" : 0.98},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.99, "arterial" : 0.99}],
+                [60, {"freeway" : 0.98, "arterial" : 0.98}],
+                [65, {"freeway" : 0.98, "arterial" : 0.98}],
+                [70, {"freeway" : 0.98, "arterial" : 0.98}],
+                [75, {"freeway" : 0.97, "arterial" : 0.97}]
+            ]
+    },
+    {
+        "weather type" : "TEMP_3",
+        "description" : "temp, < -4 deg F",
+        "capacity factor" : {"freeway" : 0.91, "arterial" : 0.91},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.95, "arterial" : 0.95}],
+                [60, {"freeway" : 0.95, "arterial" : 0.95}],
+                [65, {"freeway" : 0.94, "arterial" : 0.94}],
+                [70, {"freeway" : 0.93, "arterial" : 0.93}],
+                [75, {"freeway" : 0.92, "arterial" : 0.92}]
+            ]
+    },
+    {
+        "weather type" : "WIND_1",
+        "description" : "wind, < 10 mph",
+        "capacity factor" : {"freeway" : 1.00, "arterial" : 1.00},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 1.00, "arterial" : 1.00}],
+                [60, {"freeway" : 1.00, "arterial" : 1.00}],
+                [65, {"freeway" : 1.00, "arterial" : 1.00}],
+                [70, {"freeway" : 1.00, "arterial" : 1.00}],
+                [75, {"freeway" : 1.00, "arterial" : 1.00}]
+            ]
+    },
+    {
+        "weather type" : "WIND_2",
+        "description" : "wind, <= 20 mph",
+        "capacity factor" : {"freeway" : 0.99, "arterial" : 0.99},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.99, "arterial" : 0.99}],
+                [60, {"freeway" : 0.98, "arterial" : 0.98}],
+                [65, {"freeway" : 0.98, "arterial" : 0.98}],
+                [70, {"freeway" : 0.97, "arterial" : 0.97}],
+                [75, {"freeway" : 0.96, "arterial" : 0.96}]
+            ]
+    },
+    {
+        "weather type" : "WIND_3",
+        "description" : "wind, > 20 mph",
+        "capacity factor" : {"freeway" : 0.98, "arterial" : 0.98},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.98, "arterial" : 0.98}],
+                [60, {"freeway" : 0.98, "arterial" : 0.98}],
+                [65, {"freeway" : 0.97, "arterial" : 0.97}],
+                [70, {"freeway" : 0.97, "arterial" : 0.97}],
+                [75, {"freeway" : 0.96, "arterial" : 0.96}]
+            ]
+    },
+    {
+        "weather type" : "VISIBILITY_1",
+        "description" : "visibility, < 1 mi",
+        "capacity factor" : {"freeway" : 0.93, "arterial" : 0.93},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.96, "arterial" : 0.96}],
+                [60, {"freeway" : 0.95, "arterial" : 0.95}],
+                [65, {"freeway" : 0.94, "arterial" : 0.94}],
+                [70, {"freeway" : 0.94, "arterial" : 0.94}],
+                [75, {"freeway" : 0.93, "arterial" : 0.93}]
+            ]
+    },
+    {
+        "weather type" : "VISIBILITY_2",
+        "description" : "visibility, <= 0.50 mi",
+        "capacity factor" : {"freeway" : 0.89, "arterial" : 0.89},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.95, "arterial" : 0.95}],
+                [60, {"freeway" : 0.94, "arterial" : 0.94}],
+                [65, {"freeway" : 0.93, "arterial" : 0.93}],
+                [70, {"freeway" : 0.92, "arterial" : 0.92}],
+                [75, {"freeway" : 0.91, "arterial" : 0.91}]
+            ]
+    },
+    {
+        "weather type" : "VISIBILITY_3",
+        "description" : "visibility, <= 0.25 mi",
+        "capacity factor" : {"freeway" : 0.88, "arterial" : 0.88},
+        "speed factor" : 
+            [
+                [55, {"freeway" : 0.95, "arterial" : 0.95}],
+                [60, {"freeway" : 0.94, "arterial" : 0.94}],
+                [65, {"freeway" : 0.93, "arterial" : 0.93}],
+                [70, {"freeway" : 0.92, "arterial" : 0.92}],
+                [75, {"freeway" : 0.91, "arterial" : 0.91}]
+            ]
+    }
+]
