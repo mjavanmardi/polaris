@@ -512,7 +512,7 @@ namespace Link_Components
 
 				if (enroute_switching_decision)
 				{
-					//vehicle->template enroute_switching<NULLTYPE>();
+					vehicle->template enroute_switching<NULLTYPE>();
 				}
 
 				if(_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
