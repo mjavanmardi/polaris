@@ -162,6 +162,7 @@ namespace Variable_Message_Sign_Components
 				cfg.Configure_Lines();
 				cfg.grouped=true;
 				cfg.head_size_value=4;
+				cfg.head_accent_size_value=6;
 				cfg.selection_callback=&on_select;
 				cfg.double_click_callback=&on_double_click;
 				cfg.submission_callback=&on_submit;
