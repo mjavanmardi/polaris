@@ -211,6 +211,8 @@ namespace Scenario_Components
 			feature_accessor(relative_indifference_bound_route_choice_standard_deviation, none, none);
 			feature_accessor(minimum_travel_time_saving_mean, none, none);
 			feature_accessor(minimum_travel_time_saving_standard_deviation, none, none);
+			feature_accessor(enroute_switching_enabled, none, none);
+			feature_accessor(use_realtime_travel_time_for_enroute_switching, none, none);
 
 			feature_prototype void read_scenario_data()
 			{
@@ -368,6 +370,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("relative_indifference_bound_route_choice_mean", relative_indifference_bound_route_choice_mean<double*>())!= PARAMETER_FOUND) relative_indifference_bound_route_choice_mean<double>(0.1);
 				if (cfgReader.getParameter("minimum_travel_time_saving_mean", minimum_travel_time_saving_mean<double*>())!= PARAMETER_FOUND) minimum_travel_time_saving_mean<double>(1.0); // in minutes
 				if (cfgReader.getParameter("minimum_travel_time_saving_standard_deviation", minimum_travel_time_saving_standard_deviation<double*>())!= PARAMETER_FOUND) minimum_travel_time_saving_standard_deviation<double>(1.0); // in minutes
+				if (cfgReader.getParameter("enroute_switching_enabled", enroute_switching_enabled<bool*>())!= PARAMETER_FOUND) enroute_switching_enabled<bool>(true); 
+				if (cfgReader.getParameter("use_realtime_travel_time_for_enroute_switching", use_realtime_travel_time_for_enroute_switching<bool*>())!= PARAMETER_FOUND) use_realtime_travel_time_for_enroute_switching<bool>(false);
 
 				output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";

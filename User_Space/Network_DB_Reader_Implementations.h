@@ -228,6 +228,7 @@ namespace Network_Components
 						link->template jam_density<float>(jam_density);
 						link->template original_free_flow_speed<float>(link->template free_flow_speed<float>());
 						link->template original_maximum_flow_rate<float>(maximum_flow_rate);
+						link->template original_num_lanes<int>(link->template num_lanes<int>());
 
 						_network_reference->max_free_flow_speed<float>(max(_network_reference->max_free_flow_speed<float>(),link->template free_flow_speed<float>()));
 
@@ -332,6 +333,7 @@ namespace Network_Components
 						link->template jam_density<float>(jam_density);
 						link->template original_free_flow_speed<float>(link->template free_flow_speed<float>());
 						link->template original_maximum_flow_rate<float>(maximum_flow_rate);
+						link->template original_num_lanes<int>(link->template num_lanes<int>());
 
 						_network_reference->max_free_flow_speed<float>(max(_network_reference->max_free_flow_speed<float>(),link->template free_flow_speed<float>()));
 

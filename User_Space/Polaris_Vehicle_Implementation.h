@@ -148,7 +148,7 @@ namespace Vehicle_Components
 				define_component_interface(_Traveler_Interface, type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
 				define_component_interface(_Routing_Interface, _Traveler_Interface::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
-
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::routable_network_type> _Routable_Network_Interface;
 				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
@@ -169,7 +169,7 @@ namespace Vehicle_Components
 				float current_route_time_to_destination = 0.0f; 
 				int current_route_link_sum_to_destination = 0;
 
-				bool use_realtime_travel_time = true;
+				bool use_realtime_travel_time = ((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>();
 
 				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
 				_Trajectory_Container_Interface::iterator itr;

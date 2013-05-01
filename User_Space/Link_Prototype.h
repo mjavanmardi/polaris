@@ -163,7 +163,9 @@ namespace Link_Components
 			feature_accessor(link_num_vehicles_in_queue, none, none);
 			feature_accessor(original_free_flow_speed, none, none);
 			feature_accessor(original_maximum_flow_rate, none, none);
-			
+			feature_accessor(original_num_lanes, none, none);
+			feature_accessor(shoulder_opened, none, none);
+
 			// event-aware link
 			feature_accessor(event_affected, none, none);
 			feature_accessor(advisory_radio, none, none);
@@ -284,6 +286,14 @@ namespace Link_Components
 			feature_prototype void get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density)
 			{
 				this_component()->template get_link_moe<ComponentType,CallerType,TargetType>(start_time, end_time, volume, speed, density);
+			}
+			feature_prototype void open_shoulder()
+			{
+				this_component()->template open_shoulder<ComponentType,CallerType,TargetType>();
+			}
+			feature_prototype void close_shoulder()
+			{
+				this_component()->template close_shoulder<ComponentType,CallerType,TargetType>();
 			}
 		};
 	}

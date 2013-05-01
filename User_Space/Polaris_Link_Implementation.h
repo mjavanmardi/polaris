@@ -124,7 +124,8 @@ namespace Link_Components
 			member_data(float, critical_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, original_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, original_maximum_flow_rate, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
-
+			member_data(int, original_num_lanes, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(bool, shoulder_opened, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
 		//------------------------------------------------------------------------------------------------------------------
@@ -434,85 +435,88 @@ namespace Link_Components
 				}
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
-				///enroute switching
-				bool enroute_switching_decision = false;
-
-				int outbound_turn_movement_size = (int)_outbound_turn_movements.size();
-				if (outbound_turn_movement_size>1)
+				if (((_Scenario_Interface*)_global_scenario)->template enroute_switching_enabled<bool>())
 				{
-					if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION) 
-					{///case 1: with realtime information
+					///enroute switching
+					bool enroute_switching_decision = false;
+
+					int outbound_turn_movement_size = (int)_outbound_turn_movements.size();
+					if (outbound_turn_movement_size>1)
+					{
+						if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION) 
+						{///case 1: with realtime information
+							double r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+							if (r1 <= vehicle->template information_compliance_rate<double>())
+							{
+								enroute_switching_decision = true;
+								//cout<< "informed vehicle switching..." <<endl;
+							}
+						}
+					}
+
+
+					if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION) 
+					{///case 2: no realtime information
 						double r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
 						if (r1 <= vehicle->template information_compliance_rate<double>())
 						{
-							enroute_switching_decision = true;
-							//cout<< "informed vehicle switching..." <<endl;
-						}
-					}
-				}
 
-
-				if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION) 
-				{///case 2: no realtime information
-					double r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
-					if (r1 <= vehicle->template information_compliance_rate<double>())
-					{
-
-						/// case 2.3: Accident
-						if (_current_accident_event != nullptr)
-						{
-							//enroute_switching_decision = true;
-							//cout<< "uninformed vehicle switching...accident" <<endl;
-						}
-						else
-						{
-							unordered_set<_Network_Event_Interface*> events_set;
+							/// case 2.3: Accident
+							if (_current_accident_event != nullptr)
+							{
+								//enroute_switching_decision = true;
+								//cout<< "uninformed vehicle switching...accident" <<endl;
+							}
+							else
+							{
+								unordered_set<_Network_Event_Interface*> events_set;
 					
-							/// case 2.1: VMS
-							get_events_from_vms<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
+								/// case 2.1: VMS
+								get_events_from_vms<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
 
-							bool vms = false;
-							int vms_event_size = int(events_set.size());
-							if (vms_event_size>0)
-							{
-								vms = true;
-							}
-							/// case 2.2: HAR
-							get_events_from_har<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
-							int har_event_size = int(events_set.size()) - vms_event_size;
-							bool har = false;
-							if (har_event_size>0)
-							{
-								har = true;
-							}
-							/// exploit
-							enroute_switching_decision = vehicle->template exploit_events_set<unordered_set<_Network_Event_Interface*>&>(events_set);
+								bool vms = false;
+								int vms_event_size = int(events_set.size());
+								if (vms_event_size>0)
+								{
+									vms = true;
+								}
+								/// case 2.2: HAR
+								get_events_from_har<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
+								int har_event_size = int(events_set.size()) - vms_event_size;
+								bool har = false;
+								if (har_event_size>0)
+								{
+									har = true;
+								}
+								/// exploit
+								enroute_switching_decision = vehicle->template exploit_events_set<unordered_set<_Network_Event_Interface*>&>(events_set);
 
-							//if (enroute_switching_decision)
-							//{
-							//	if (vms && har)
-							//	{
-							//		cout<< "uninformed vehicle switching...vms or/and har" <<endl;
-							//	}
-							//	else
-							//	{
-							//		if (vms)
-							//		{
-							//			cout<< "uninformed vehicle switching...vms" <<endl;
-							//		}
-							//		else
-							//		{
-							//			cout<< "uninformed vehicle switching...har" <<endl;
-							//		}
-							//	}
-							//}
+								//if (enroute_switching_decision)
+								//{
+								//	if (vms && har)
+								//	{
+								//		cout<< "uninformed vehicle switching...vms or/and har" <<endl;
+								//	}
+								//	else
+								//	{
+								//		if (vms)
+								//		{
+								//			cout<< "uninformed vehicle switching...vms" <<endl;
+								//		}
+								//		else
+								//		{
+								//			cout<< "uninformed vehicle switching...har" <<endl;
+								//		}
+								//	}
+								//}
+							}
 						}
 					}
-				}
 
-				if (enroute_switching_decision)
-				{
-					vehicle->template enroute_switching<NULLTYPE>();
+					if (enroute_switching_decision)
+					{
+						vehicle->template enroute_switching<NULLTYPE>();
+					}
 				}
 
 				if(_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
@@ -713,6 +717,7 @@ namespace Link_Components
 				_variable_word_sign = nullptr;
 				_variable_speed_sign = nullptr;
 
+				_shoulder_opened = false;
 			}
 
 			void initialize_moe()
@@ -1006,6 +1011,24 @@ namespace Link_Components
 				volume = non_volatile_link_moe_data.link_out_volume;
 				speed = non_volatile_link_moe_data.link_speed;
 				density = non_volatile_link_moe_data.link_density;
+			}
+
+			feature_implementation void open_shoulder()
+			{
+				if (!_shoulder_opened)
+				{
+					_shoulder_opened = true;
+					_num_lanes = _original_num_lanes + 1;
+				}
+			}
+
+			feature_implementation void close_shoulder()
+			{
+				if (_shoulder_opened)
+				{
+					_shoulder_opened = false;
+					_num_lanes = _original_num_lanes;
+				}
 			}
 
 			feature_implementation void process_weather_event();

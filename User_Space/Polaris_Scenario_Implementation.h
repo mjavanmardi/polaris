@@ -128,6 +128,8 @@ namespace Scenario_Components
 			member_data(double, relative_indifference_bound_route_choice_standard_deviation, none, none);
 			member_data(double, minimum_travel_time_saving_mean, none, none);
 			member_data(double, minimum_travel_time_saving_standard_deviation, none, none);
+			member_data(bool, enroute_switching_enabled, none, none);
+			member_data(bool, use_realtime_travel_time_for_enroute_switching, none, none);
 
 			Polaris_Scenario_Implementation()
 			{
