@@ -279,7 +279,7 @@ namespace Vehicle_Components
 							update_enroute_switch_decisions<ComponentType, CallerType, TargetType>();
 							((_Movement_Plan_Interface*)_movement_plan)->template update_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
 							///en-route switching
-							cout<< "enroute switching..." <<endl;
+							//cout<< "enroute switching..." <<endl;
 							int current_time = ((_Regular_Network_Interface*)_global_network)->start_of_current_simulation_interval_absolute<int>();
 							((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>(current_time + best_route_time_to_destination);
 							int routed_travel_time = ((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>();
@@ -308,8 +308,9 @@ namespace Vehicle_Components
 				}
 
 				/// information compliance rate
-				r1 = _rng_stream.RandU01();
-				_information_compliance_rate = r1;
+				//r1 = _rng_stream.RandU01();
+				double cr = ((_Scenario_Interface*)_global_scenario)->information_compliance_rate_mean<double>();
+				_information_compliance_rate = cr;
 
 				///rib
 				r1 = _rng_stream.RandU01();

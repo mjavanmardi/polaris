@@ -36,30 +36,24 @@ namespace Movement_Plan_Components
 		{
 			typedef Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 			member_container(vector<trajectory_unit_type*>, trajectory_container, none, none);
-			
+
 			//==================================================================================================================
 			/// current_trajectory_position
 			//------------------------------------------------------------------------------------------------------------------
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType current_trajectory_position(requires(check_2(TargetType,int,is_same) || check_2(TargetType,int&,is_same)))
+			feature_implementation TargetType current_trajectory_position(requires(check_2(TargetType,int,is_same) || check_2(TargetType,int&,is_same)))
 			{
 				return (TargetType)_current_trajectory_index;
 			}
-
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			TargetType current_trajectory_position(requires(!check_2(TargetType,int,is_same) && !check_2(TargetType,int&,is_same)))
+			feature_implementation TargetType current_trajectory_position(requires(!check_2(TargetType,int,is_same) && !check_2(TargetType,int&,is_same)))
 			{
 				return (TargetType)_trajectory_container[_current_trajectory_index];
 			}
-			
-			tag_getter_as_available(current_trajectory_position);
-
-			template<typename ComponentType, typename CallerType, typename TargetType>
-			void current_trajectory_position(TargetType val,requires(check_2(TargetType,int,is_same) || check_2(TargetType,int&,is_same)))
+			feature_implementation void current_trajectory_position(TargetType val,requires(check_2(TargetType,int,is_same) || check_2(TargetType,int&,is_same)))
 			{
 				_current_trajectory_index=val;
 			}
-			tag_setter_as_available(current_trajectory_position);
+			tag_getter_setter_as_available(current_trajectory_position);
+			
 			int _current_trajectory_index;
 			//------------------------------------------------------------------------------------------------------------------
 
@@ -71,19 +65,12 @@ namespace Movement_Plan_Components
 
 			member_component(typename MasterType::link_type, origin, none, none);
 			member_component(typename MasterType::link_type, destination, none, none);
-//#ifndef FOR_LINUX_PORTING
-			//member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_departed_time,none,none);
-			//member_component_feature(departed_time, _departed_time, Value, Basic_Units::Prototypes::Time_Prototype);
-			//member_data_component(typename Basic_Units::Implementations::Time_Implementation<MasterType>,_arrived_time,none,none);
-			//member_component_feature(arrived_time, _arrived_time, Value, Basic_Units::Prototypes::Time_Prototype);
+
 			member_component_and_feature_accessor(departed_time,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(planning_time,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(arrived_time,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(expected_travel_time,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
-//#else
-//			member_data(int,departed_time,none,none);
-//			member_data(int,arrived_time,none,none);
-//#endif
+
 			member_component(typename MasterType::plan_type, plan, none, none);
 			member_data(int, routed_travel_time, none, none);
 			member_data(int, estimated_time_of_arrival, none, none);
@@ -118,6 +105,39 @@ namespace Movement_Plan_Components
 		implementation struct Polaris_Integrated_Movement_Plan_Implementation : public Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)>
 		{
 			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_plan_type,none,none);
+		};
+
+		implementation struct Polaris_Movement_Plan_Record_Implementation : public Polaris_Component<APPEND_CHILD(Polaris_Movement_Plan_Record_Implementation),MasterType,Data_Object,ParentType>
+		{
+			// Initialize the record with an existing movement plan
+			feature_implementation void Initialize(typename TargetType::ParamType movement_to_copy)
+			{
+				// get interface to the input parameter
+				typedef Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type> movement_itf;
+				movement_itf* move = (movement_itf*)movement_to_copy;
+
+				// interace to the movement plan trajectory
+				define_container_and_value_interface(trajectory_container_itf,trajectory_itf,typename movement_itf::get_type_of(trajectory_container),Containers::Random_Access_Sequence_Prototype,Prototypes::Trajectory_Unit_Prototype,ComponentType);				
+				trajectory_container_itf* trajectory = move->trajectory_container<trajectory_container_itf*>();
+
+				// Extract the link pointer from the trajectory unit and store in the movement_plan_record trajectory container
+				for (trajectory_container_itf::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
+				{
+					trajectory_itf* traj_unit = *itr;
+					_trajectory_container.push_back(traj_unit->link<MasterType::link_type*>());
+				}
+
+				// copy valid movement at time of creation
+				_valid_trajectory = move->valid_trajectory<bool>();
+
+				// copy pointer to the activity reference from original movement plan
+				_activity_reference = move->activity_reference<activity_reference_interface*>();
+			}	 
+			tag_feature_signature_as_available(Initialize, 1);
+
+			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_plan_type,none,none);
+			member_container(vector<typename MasterType::link_type*>, trajectory_container, none, none);
+			member_data(bool, valid_trajectory,none,none);
 		};
 	}
 }

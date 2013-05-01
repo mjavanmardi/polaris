@@ -59,6 +59,7 @@ namespace Person_Components
 			define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan, type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 		
 
+			// scheduling features - move to Person_Scheduler eventually
 			feature_implementation TargetType current_movement_plan(requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
 				// Define interfaces to the container members of the class			
@@ -79,6 +80,58 @@ namespace Person_Components
 				else return NULL;
 			}
 			tag_feature_as_available(current_activity_plan);
+			feature_implementation typename TargetType::ReturnType previous_activity_plan(typename TargetType::ParamType current_time)
+			{
+				// Define interfaces to the container members of the class
+				define_container_and_value_interface(Activity_Plans_List,Activity_Plan,type_of(Activity_Container),Containers::Random_Access_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+				Activity_Plans_List* activity_plans = this->template Activity_Container<ComponentType,CallerType,Activity_Plans_List*>();
+				typename Activity_Plans_List::iterator itr;
+
+				// convert current time to seconds
+				Time_Seconds start_time = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,Time_Seconds,typename TargetType::ParamType>>(current_time);
+				Time_Seconds max_previous = 0;
+				Activity_Plan* act;
+				Activity_Plan* previous = nullptr;
+				
+				// search for the closest preceeding activity
+				for (itr = activity_plans->begin(); itr != activity_plans->end(); ++itr)
+				{
+					act = (Activity_Plan*)(*itr);
+					if (act->Start_Is_Planned<bool>() && act->Start_Time<Time_Seconds>() < start_time && act->Start_Time<Time_Seconds>() > max_previous)
+					{
+						max_previous = act->Start_Time<Time_Seconds>();
+						previous = act;
+					}
+				}
+				return (TargetType::ReturnType)previous;
+			}
+			tag_feature_signature_as_available(previous_activity_plan,1);
+			feature_implementation typename TargetType::ReturnType next_activity_plan(typename TargetType::ParamType current_time)
+			{
+				// Define interfaces to the container members of the class
+				define_container_and_value_interface(Activity_Plans_List,Activity_Plan,type_of(Activity_Plans_Container),Containers::Random_Access_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+				Activity_Plans_List* activity_plans = this->template Activity_Plans_Container<Activity_Plans_List*>();
+				typename Activity_Plans_List::iterator itr;
+
+				// convert current time to seconds
+				Time_Seconds start_time = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,Time_Seconds,typename TargetType::ParamType>>(current_time);
+				Time_Seconds min_next = 0;
+				Activity_Plan* act;
+				Activity_Plan* next = nullptr;
+				
+				// search for the closest preceeding activity
+				for (itr = activity_plans->begin(); itr != activity_plans->end(); ++itr)
+				{
+					act = (Activity_Plan*)(*itr);
+					if (act->Start_Is_Planned<bool>() && act->Start_Time<Time_Seconds>() > start_time && act->Start_Time<Time_Seconds>() < min_next)
+					{
+						min_next = act->Start_Time<Time_Secondes>();
+						next = act;
+					}
+				}
+				return next;
+			}
+			tag_feature_signature_as_available(next_activity_plan,1);
 
 			// Adding activities and movements to the planning schedules
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))

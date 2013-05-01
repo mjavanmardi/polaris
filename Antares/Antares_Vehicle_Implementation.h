@@ -418,7 +418,7 @@ namespace Vehicle_Components
 				Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
 				list<typename type_of(MasterType::activity)*>* activities = planner->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
 
-				Activity_Location_Interface* previous_location = nullptr;
+				Activity_Location_Interface* previous_location = person->Home_Location<Activity_Location_Interface*>();
 
 				for(list<typename type_of(MasterType::activity)*>::iterator itr=activities->begin();itr!=activities->end();itr++)
 				{
@@ -426,7 +426,7 @@ namespace Vehicle_Components
 					display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location );
 					previous_location = activity_planner->Location<Activity_Location_Interface*>();
 				}
-
+				display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location );
 				
 				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
 

@@ -72,7 +72,10 @@ struct MasterType
 	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation<M> phase_movement_type;
 	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<M> approach_type;
 	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<M> plan_type;
+
 	typedef Movement_Plan_Components::Implementations::Polaris_Integrated_Movement_Plan_Implementation<M> movement_plan_type;
+	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Record_Implementation<M> movement_plan_record_type;
+
 	typedef Movement_Plan_Components::Implementations::Polaris_Trajectory_Unit_Implementation<M> trajectory_unit_type;
 	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<M> network_skim_type;
 	#pragma endregion

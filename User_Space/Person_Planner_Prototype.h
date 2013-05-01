@@ -257,6 +257,13 @@ namespace Person_Components
 							}
 
 							// add movement plan to the person's vehicle and schedule the departure
+							if (movement_faculty->Movement_Scheduled<bool>() == true)
+							{
+								THROW_WARNING("WARNING: movement already scheduled for current iteration for person: " << parent->uuid<int>() << ", movement ignored.");
+								typename Movement_Plans::iterator prev = move_itr++;
+								movements->erase(prev);
+								return;
+							}
 							vehicle->template movement_plan<Movement_Plan*>(move);
 							movement_faculty->Schedule_Movement<Target_Type<NT,void,Simulation_Timestep_Increment,Movement_Plan*>>(move->template departed_time<Simulation_Timestep_Increment>(),move);
 						}
@@ -342,8 +349,12 @@ namespace Person_Components
 			feature_accessor(Activity_Container,none,none);
 			feature_accessor(Movement_Plans_Container,none,none);
 			feature_accessor(Schedule_Container,none,none);	
+
+
 			feature_accessor(current_movement_plan,none,none);
 			feature_accessor(current_activity_plan,none,none);
+			feature_method_1_arg(next_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) && check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype));
+			feature_method_1_arg(previous_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
 			feature_prototype void Add_Movement_Plan(TargetType movement_plan)
 			{
 				this_component()->Add_Movement_Plan<ComponentType,CallerType,TargetType>(movement_plan);

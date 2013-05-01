@@ -244,9 +244,6 @@
     <ClInclude Include="Traffic_Management_Center_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
-    <ClInclude Include="Link_Control_Implementation.h">
-      <Filter>Implementations</Filter>
-    </ClInclude>
     <ClInclude Include="Depot_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
@@ -296,6 +293,9 @@
       <Filter>Prototypes\Person Components</Filter>
     </ClInclude>
     <ClInclude Include="Person_Perception_Implementation.h">
+      <Filter>Implementations\Person Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Link_Control_Implementation.h">
       <Filter>Implementations\Person Components</Filter>
     </ClInclude>
   </ItemGroup>

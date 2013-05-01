@@ -2,6 +2,7 @@
 #include "User_Space_Includes.h"
 #include "Person_Prototype.h"
 #include "Activity_Location_Prototype.h"
+#include "Movement_Plan_Prototype.h"
 #include "Vehicle_Prototype.h"
 #include "Scenario_Prototype.h"
 
@@ -51,15 +52,16 @@ namespace Activity_Components
 
 	namespace Concepts
 	{
-		concept struct Is_Activity_Plan
-		{
-			check_getter(has_id,Activity_Plan_ID);
-			define_default_check(has_id);
-		};
 		concept struct Is_Activity_Plan_Prototype
 		{
 			check_getter(has_id,Component_Type::Activity_Plan_ID);
 			define_default_check(has_id);
+		};
+			concept struct Is_Activity_Plan
+		{
+			check_getter(has_id,Activity_Plan_ID);
+			check_concept(is_prototype, Is_Activity_Plan_Prototype);
+			define_default_check(has_id || is_prototype);
 		};
 	}
 	
@@ -73,6 +75,7 @@ namespace Activity_Components
 			feature_accessor(Parent_Planner, none, none);
 			feature_accessor(Parent_ID, none, not_available);
 			feature_accessor(movement_plan, none, none);
+			feature_accessor(movement_record,check(ReturnValueType,Movement_Plan_Components::Concepts::Is_Movement_Record_Prototype),not_available);
 
 			//===========================================
 			// Activity Plan execution scheduling functionality

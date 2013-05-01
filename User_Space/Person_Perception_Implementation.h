@@ -15,6 +15,7 @@ namespace Person_Components
 			// Pointer to the Parent class
 			member_prototype(Person_Components::Prototypes::Person, Parent_Person, typename MasterType::person_type, none, none);
 
+			// Physical world elements
 			member_prototype(Network_Components::Prototypes::Network_Prototype, Network, typename MasterType::network_type, none, none);
 			member_prototype(Scenario_Components::Prototypes::Scenario_Prototype, Scenario, typename MasterType::scenario_type, none, none);
 

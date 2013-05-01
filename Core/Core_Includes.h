@@ -241,7 +241,7 @@ s << endl << "WARNING at "<<__FILE__<<", line: "<<__LINE__<<endl;\
 s << MESSAGE_STREAM;\
 std::cout << s.str();}
 #else 
-#define THROW_WARNING(MESSAGE_STREAM)
+#define THROW_WARNING(MESSAGE_STREAM) int _random_thing_that_wont_be_used;
 #endif
 
 #define THROW_EXCEPTION(MESSAGE_STREAM) \

@@ -2,6 +2,7 @@
 #include "User_Space_Includes.h"
 #include "Activity_Location_Prototype.h"
 #include "Link_Prototype.h"
+#include "Zone_Prototype.h"
 
 namespace Movement_Plan_Components
 {
@@ -32,6 +33,12 @@ namespace Movement_Plan_Components
 			check_getter(has_arrived_time, arrived_time);
 			check_concept(is_prototype, Is_Movement_Plan_Prototype);
 			define_default_check(is_prototype || (has_trajectory && has_origin && has_destination && has_departed_time && has_arrived_time));
+		};
+
+		concept struct Is_Movement_Record_Prototype
+		{
+			check_getter(has_trajectory, Component_Type::trajectory_container);
+			define_default_check(has_trajectory);
 		};
 	}
 	
@@ -125,12 +132,16 @@ namespace Movement_Plan_Components
 				return this_component()->destination_zone<ComponentType,CallerType,TargetType>();
 			}
 
+			feature_method_void(Initialize,none);
+			feature_method_1_arg(Initialize,movement_to_copy, none);
 
 			feature_prototype void set_trajectory(TargetType& path_container)
 			{
 				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, typename _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
+				trajectory.clear();
+
 				typename TargetType::reverse_iterator itr;
 				for(itr = path_container.rbegin(); itr != path_container.rend(); itr++)
 				{

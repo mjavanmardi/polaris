@@ -23,8 +23,10 @@ namespace Activity_Components
 			//=================================================================
 			// Pointer back to planner
 			member_prototype(Person_Components::Prototypes::Person_Planner, Parent_Planner, typename MasterType::person_planner_type, none, none);
-			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type,none,none);
 
+			// pointer to movement plan associated with activity
+			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type,none,none);
+			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, movement_record, typename MasterType::movement_plan_record_type,none,none);
 
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
@@ -126,6 +128,10 @@ namespace Activity_Components
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
 				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
+
+				// copy the movement plan into the cached movement record before addition
+				movement_record_interface* move_record = (movement_record_interface*)Allocate<movement_record_type>();
+				move_record->Initialize<Target_Type<NT,void,_movement_plan_itf*>>(move);
 
 				if (move->origin<_activity_location_itf*>() == nullptr || move->destination<_activity_location_itf*>() == nullptr) return;
 
@@ -572,6 +578,8 @@ namespace Activity_Components
 			// Attribute planning events
 			feature_implementation void Location_Planning_Event_Handler()
 			{
+				base_type* bthis = (base_type*)this;
+
 				// updates for counters
 				//this->Location_Planning_Counter[_thread_id]++;
 				//if (this->Location_Planning_Counter[_thread_id] % 10000 == 0)  
@@ -587,7 +595,17 @@ namespace Activity_Components
 				_person_itf* person = planner->Parent_Person<_person_itf*>();
 				_dest_choice_itf* dest_chooser = planner->Destination_Chooser<_dest_choice_itf*>();
 
-				_activity_location_itf* orig = person->Home_Location<_activity_location_itf*>();
+				// Get activity origin from previous planned activity (or from home if no preceeding activities)
+				_activity_location_itf* orig;
+				if (bthis->Start_Is_Planned<ComponentType,CallerType,bool>())
+				{
+					this_itf* previous = planner->previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->Start_Time<ComponentType,CallerType,Time_Seconds>());
+					if (previous == nullptr) orig = person->Home_Location<_activity_location_itf*>();
+					else orig = previous->Location<_activity_location_itf*>();
+				}
+				else orig = person->Home_Location<_activity_location_itf*>();
+
+				// call destination choice
 				_activity_location_itf* dest = dest_chooser->Choose_Destination<_activity_location_itf*>(orig);
 
 				// check that origin and destination are valid

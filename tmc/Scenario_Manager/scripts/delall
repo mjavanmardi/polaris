@@ -1,1 +1,0 @@
-qstat|grep bxu|cut -f1 -d' '|xargs qdel
