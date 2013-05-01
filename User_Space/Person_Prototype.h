@@ -10,6 +10,7 @@
 #include "Person_Properties_Prototype.h"
 #include "Person_Planner_Prototype.h"
 #include "Person_Scheduler_Prototype.h"
+#include "Person_Perception_Prototype.h"
 
 namespace Person_Components
 {
@@ -98,15 +99,15 @@ namespace Prototypes
 		{
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
-		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, requires(check(ComponentType,Concepts::Has_Initialize)))
+		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref/*,requires(check(ComponentType,Concepts::Has_Initialize))*/)
 		{
-			this_component()->Initialize<ComponentType,CallerType, TargetType>(id, home_zone);
+			this_component()->Initialize<ComponentType,CallerType, TargetType>(id, home_zone, network_ref, scenario_ref);
 			load_event(ComponentType,Agent_Conditional,Agent_Event,_iteration+1,0,NULLTYPE);
 		}
-		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, requires(!check(ComponentType,Concepts::Has_Initialize)))
-		{
-			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-		}
+		//feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref,requires(!check(ComponentType,Concepts::Has_Initialize)))
+		//{
+		//	assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+		//}
 		//feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type trip, requires(check(ComponentType,Concepts::Has_Initialize)))
 		//{
 		//	this_component()->Initialize<ComponentType,CallerType, TargetType>(id, trip);
@@ -124,6 +125,7 @@ namespace Prototypes
 			this_component()->Set_Home_Location<ComponentType,CallerType, TargetType>();
 		}
 		feature_accessor(Planning_Faculty,none,none);
+		feature_accessor(Perception_Faculty,none,none);
 		feature_accessor(router,none,none);
 		feature_accessor(Moving_Faculty,none,none);
 		feature_accessor(Properties,none,none);
@@ -145,10 +147,12 @@ namespace Prototypes
 		feature_prototype TargetType Home_Location(requires(check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location) && check_as_given(TargetType,is_pointer)))
 		{
 			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
-			define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+			define_component_interface(perception_itf,typename get_type_of(Perception_Faculty),Person_Perception,ComponentType);
+			define_component_interface(network_itf, typename perception_itf::get_type_of(Network),Network_Components::Prototypes::Network_Prototype,ComponentType);
+
 			define_container_and_value_interface(activity_locations_container_itf, activity_location_itf, typename network_itf::get_type_of(activity_locations_container), Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 			properties_itf* properties = this->Properties<properties_itf*>();
-			network_itf* network = this->network_reference<network_itf*>();
+			network_itf* network = this->Perception_Faculty<perception_itf*>()->Network<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
 			
 			int loc_id = properties->home_location_id<int>();
@@ -339,6 +343,38 @@ namespace Prototypes
 		feature_prototype void Choose_School_Location(requires(!check(ComponentType,has_Choose_School_Location)))
 		{
 			assert_check(ComponentType,has_Choose_School_Location,"ComponentType does not have Choose_School_Location feature.");
+		}
+
+		feature_prototype string To_String()
+		{
+			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
+			define_component_interface(static_properties_itf,typename get_type_of(Static_Properties), Person_Properties,ComponentType);
+			define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+			define_container_and_value_interface(zone_container_itf, zone_itf, typename network_itf::get_type_of(zones_container), Containers::Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+			
+			properties_itf* props = this->Properties<properties_itf*>();
+			static_properties_itf* static_props = this->Static_Properties<static_properties_itf*>();
+
+			stringstream s;
+			s << this->uuid<int>() << ", ";
+			s << this->Home_Location<zone_itf*>()->uuid<int>();
+			if (static_props->Is_Employed<bool>())
+			{
+				s << ", WORK_ZONE," << this->Work_Location<zone_itf*>()->uuid<int>();
+			}
+			else
+			{
+				s << ", DOESNT_WORK,,";
+			}
+			if (static_props->Is_Student<bool>())
+			{
+				s << ", SCHOOL_ZONE," << this->School_Location<zone_itf*>()->uuid<int>();
+			}
+			else
+			{
+				s << ", NOT_IN_SCHOOL,,";
+			}
+			return s.str();
 		}
 	};
 

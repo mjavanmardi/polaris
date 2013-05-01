@@ -85,6 +85,7 @@ namespace Person_Components
 				// useful interfaces
 				define_simple_container_interface(activity_location_ids_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);				
 				define_component_interface(network_itf,typename Parent_Person_interface::get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_component_interface(planner_itf,typename Parent_Person_interface::get_type_of(Planning_Faculty),Person_Planner,ComponentType);
 				define_container_and_value_interface(activity_locations_itf, activity_location_itf,typename network_itf::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 				define_container_and_value_interface(_Zone_Container_Interface, _Zone_Interface,typename network_itf::get_type_of(zones_container),Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 			
@@ -127,6 +128,9 @@ namespace Person_Components
 				{
 					_Parent_Person->Choose_School_Location<NT>();
 				}
+
+				planner_itf* planner = this->_Parent_Person->Planning_Faculty<planner_itf*>();
+				planner->Write_To_Log<string>(_Parent_Person->To_String<NT>());
 			}	
 			/*feature_implementation void Initialize(typename TargetType::ParamType home_synthesis_zone, requires(!check(typename TargetType::ParamType, Zone_Components::Concepts::Is_Zone_Prototype) || !check_as_given(typename TargetType::ParamType, is_pointer)))
 			{	
@@ -279,7 +283,7 @@ namespace Person_Components
 				#pragma region CENSUS_CODE_SWITCH
 				switch(CENSUS_CODE)
 				{
-					case 1:  val=0; break;
+					case 1:  val = (int)(GLOBALS::Uniform_RNG.Next_Rand<float>() * 1440.0f); break;
 					case 2:  val=5; break;
 					case 3:  val=10; break;
 					case 4:  val=15; break;
@@ -564,7 +568,7 @@ namespace Person_Components
 					case 283:  val=1425; break;
 					case 284:  val=1430; break;
 					case 285:  val=1435; break;
-					default: val=540; /*THROW_WARNING("Warning, arrival time case value '"<<CENSUS_CODE<<"' found in census data input file is not a valid arrival time to work code.  Arrival time defaulting to 9:00 AM.");*/
+					default: val = 420 + (int)(GLOBALS::Uniform_RNG.Next_Rand<float>() * 120.0f); /*THROW_WARNING("Warning, arrival time case value '"<<CENSUS_CODE<<"' found in census data input file is not a valid arrival time to work code.  Arrival time defaulting to 8:00 AM.");*/
 				}
 				#pragma endregion
 

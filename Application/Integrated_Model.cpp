@@ -8,7 +8,7 @@
 
 #ifdef DBIO
 #define WINDOWS
-
+#define SHOW_WARNINGS
 
 #include "Application_Includes.h"
 
@@ -81,9 +81,14 @@ struct MasterType
 	//==============================================================================================
 	#pragma region DEMAND Types
 	//----------------------------------------------------------------------------------------------
+	typedef Demand_Components::Implementations::Polaris_Demand_Implementation<MasterType> demand_type;
+
+	typedef Traveler_Components::Implementations::Polaris_Traveler_Implementation<M> traveler_type;
 	typedef Person_Components::Implementations::Person_Implementation<M> person_type;
+
 	typedef Person_Components::Implementations::POLARIS_Person_Planner_Implementation<M, person_type> person_planner_type;
 	typedef Person_Components::Implementations::General_Person_Scheduler_Implementation<M, person_type> person_scheduler_type;
+	typedef Person_Components::Implementations::General_Person_Perception_Implementation<M, person_type> person_perception_type;
 	typedef Person_Components::Implementations::CTRAMP_Activity_Generator_Implementation<M, person_type> activity_generator_type;
 	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<M,person_type> person_properties_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<M> person_static_properties_type;
@@ -269,6 +274,17 @@ int main(int argc,char** argv)
 	}
 	cout << "starting sim..." <<endl;
 	#pragma endregion
+
+	
+	//==================================================================================================================================
+	// EXTERNAL Demand
+	//----------------------------------------------------------------------------------------------------------------------------------
+	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
+	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
+	demand->scenario_reference<_Scenario_Interface*>(scenario);
+	demand->network_reference<_Network_Interface*>(network);
+	cout << "reading external demand data..." <<endl;
+	demand->read_demand_data<Net_IO_Type>(network_io_maps);
 
 	
 	//==================================================================================================================================

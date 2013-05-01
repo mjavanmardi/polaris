@@ -79,7 +79,7 @@ namespace Person_Components
 					s << _Parent_Person->template uuid<int>() << "," << move->template departed_time<Time_Hours>();
 					s << "," << move->template origin<_Activity_Location_Interface*>()->uuid<int>() << "," << move->template destination<_Activity_Location_Interface*>()->uuid<int>();
 					s << "," << skim->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_id, d_id, Vehicle_Components::Types::SOV)<<endl;
-					this->Write_To_Log<ComponentType,CallerType,TargetType>(s);
+					this->Write_To_Log<ComponentType,CallerType,stringstream&>(s);
 				}
 
 				// catch skipped movement plans

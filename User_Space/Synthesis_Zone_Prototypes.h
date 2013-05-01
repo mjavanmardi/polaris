@@ -322,8 +322,8 @@ namespace PopSyn
 				persons_itf* person_container = (persons_itf*)this->Synthetic_Persons_Container<persons_itf*>();
 
 				person_itf* person=(person_itf*)Allocate<typename get_type_of(Synthetic_Persons_Container)::unqualified_value_type>();
-				person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
-				person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());	
+				//person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
+				//person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());	
 				person->Static_Properties<pop_unit_itf*>(static_properties);
 				person_container->push_back(person);
 				//person->Initialize<int>(id);

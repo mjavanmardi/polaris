@@ -228,8 +228,6 @@ namespace Person_Components
 				activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, plan_time);
 
 				((base_type*)this)->_Parent_Planner->Add_Activity_Plan<Routine_Activity_Plan*>(activity);
-				//Activities* activities = typename base_type::_Parent_Planner->template Activity_Container<Activities*>();
-				//activities->push_back((Activity*)activity);
 				activity_count++;
 			}
 			feature_implementation void Create_Activity(TargetType act_type, int& activity_count, int start_plan_time)
@@ -242,12 +240,7 @@ namespace Person_Components
 				Simulation_Timestep_Increment _plan_time = start_plan_time + activity_count;
 				activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, _plan_time);
 
-				((base_type*)this)->_Parent_Planner->Add_Activity_Plan<Activity_Plan*>(activity);
-				//Activities* activities = typename base_type::_Parent_Planner->template Activity_Container<Activities*>();
-				//activities->push_back((Activity*)activity);
-
-
-				
+				((base_type*)this)->_Parent_Planner->Add_Activity_Plan<Activity_Plan*>(activity);		
 				activity_count++;
 			}
 

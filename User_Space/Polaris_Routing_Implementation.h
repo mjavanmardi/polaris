@@ -359,8 +359,8 @@ namespace Routing_Components
 		};
 
 
-		template<typename MasterType,typename ParentType=NULLTYPE,typename InheritanceList=NULLTYPELIST>
-		struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType>
+		template<typename MasterType,typename ParentType=NULLTYPE,typename InheritanceList=NULLTYPELIST, unsigned int Page_Size = 4096U>
+		struct Polaris_Routing_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Routing_Implementation),MasterType,Execution_Object,ParentType,false,Page_Size>
 		{
 			//==================================================================================================
 			// TYPEDEFS AND INTERFACES
@@ -455,7 +455,7 @@ namespace Routing_Components
 		};
 
 
-		implementation struct Polaris_Skim_Routing_Implementation: public Polaris_Routing_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Skim_Routing_Implementation)>
+		implementation struct Polaris_Skim_Routing_Implementation: public Polaris_Routing_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Skim_Routing_Implementation),512U>
 		{
 			declare_feature_conditional(Compute_Route_Condition)
 			{

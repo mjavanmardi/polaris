@@ -442,11 +442,13 @@ namespace PopSyn
 				define_container_and_value_interface_unqualified_container(persons_collection_itf, person_itf,person_collection_type,Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person,ComponentType);
 				define_simple_container_interface(activity_location_ids_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);				
 				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_component_interface(scenario_itf,typename get_type_of(scenario_reference),Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
 				define_container_and_value_interface(activity_locations_itf, activity_location_itf,typename network_itf::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 				define_container_and_value_interface(_Zone_Container_Interface, _Zone_Interface,typename network_itf::get_type_of(zones_container),Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 				
 				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
 				network_itf* network = pthis->network_reference<network_itf*>();
+				scenario_itf* scenario = pthis->scenario_reference<scenario_itf*>();
 				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
 				
 
@@ -481,8 +483,10 @@ namespace PopSyn
 							person_itf* person = *p_itr;
 
 							// initialize the person - allocates all person subcomponents
-							person->Initialize<Target_Type<NT,void,long,zone_itf*> >(uuid, zone);
-
+							//person->network_reference<network_itf*>(network);
+							person->Initialize<Target_Type<NT,void,long,zone_itf*, network_itf*, scenario_itf*> >(uuid, zone, network, scenario);
+							pop_unit_itf* pop = person->Static_Properties<pop_unit_itf*>();
+														
 							++uuid;
 							++counter;
 						}

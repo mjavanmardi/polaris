@@ -152,7 +152,7 @@ namespace Activity_Components
 					//s << endl <<"ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< this->Activity_Plan_ID<ComponentType,CallerType,int>();
 					//s << "," <<move->template origin<_activity_location_itf*>()->uuid<int>() << ", " <<move->template destination<_activity_location_itf*>()->uuid<int>();
 					////s << ",at iteration " << _iteration << "." << _sub_iteration<<". Scheduled for route planning @ " << move->planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->departed_time<Simulation_Timestep_Increment>();
-					//planner->Write_To_Log<NT>(s);
+					//planner->Write_To_Log<stringstream>(s);
 				}
 			}
 			feature_implementation void Route_Planning_Event_Handler()
@@ -237,7 +237,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT SCHEDULED, null origin or destination: "<< person->template uuid<int>();
 					s << "," <<orig << ", " <<dest<<endl;
-					planner->template Write_To_Log<NT>(s);
+					planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 				}
 			}
@@ -602,7 +602,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
 					s << "," <<orig << ", " <<dest<<endl;
-					planner->Write_To_Log<NT>(s);
+					planner->Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 				}
 			}
@@ -646,7 +646,7 @@ namespace Activity_Components
 				}
 				else exp_ttime = 60.0f;
 
-				int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 1.5);
+				int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 2.0);
 				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
 				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
 			}
@@ -796,7 +796,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT GENERATED, only work, home, school and work at home activities can be routine at this point: "<< person->template uuid<int>();
 					s << "," <<orig << ", " <<dest<<endl;
-					base_this->_Parent_Planner->Write_To_Log<NT>(s);
+					base_this->_Parent_Planner->Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 					return;
 				}
@@ -813,7 +813,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
 					s << "," <<orig << ", " <<dest<<endl;
-					base_this->_Parent_Planner->Write_To_Log<NT>(s);
+					base_this->_Parent_Planner->Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 				}
 			}
@@ -863,7 +863,7 @@ namespace Activity_Components
 				// School Activity start time (randomly between 7 and 9AM)
 				if (act_type == ACTIVITY_TYPES::SCHOOL_ACTIVITY)
 				{
-					Time_Seconds start_school = (7.0 + Uniform_RNG.Next_Rand<float>() * 2.0) * 60.0 * 60.0;
+					Time_Seconds start_school = (7.0 + Uniform_RNG.Next_Rand<float>() * 1.0) * 60.0 * 60.0;
 					Time_Seconds start_min = Simulation_Time.Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->Planning_Time_Increment<Time_Seconds>());
 					pthis->Start_Time<Time_Seconds>(std::max<int>(start_school.Value,start_min.Value));
 				}
@@ -893,7 +893,7 @@ namespace Activity_Components
 				}
 				else exp_ttime = 60.0f;
 
-				int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 1.5);
+				int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 2.0);
 				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
 				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
 			}

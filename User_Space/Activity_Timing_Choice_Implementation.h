@@ -11,7 +11,8 @@ namespace Person_Components
 		implementation struct Activity_Timing_Chooser_Implementation : public Polaris_Component<APPEND_CHILD(Activity_Timing_Chooser_Implementation),MasterType,Data_Object,ParentType>
 		{
 			// local types
-			typedef pair<float,float> data_type;
+			typedef pair<Time_Minutes,Time_Minutes> data_type;
+
 			typedef pair<float,data_type> record_type;
 			typedef map<float,data_type> map_type;
 
@@ -22,6 +23,7 @@ namespace Person_Components
 
 			// static start time and duration lookup container for each activity type
 			static member_associative_container(concat(hash_map<Activity_Components::Types::ACTIVITY_TYPES, map_type >), start_time_duration_container,none,none);
+			
 
 			//=======================================================================================================
 			// Time of day and duration choice model
@@ -66,8 +68,11 @@ namespace Person_Components
 				map_type::iterator itr = _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
 
 				// make sure valid entry is found
-				if (itr == _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].end()) THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
-			
+				if (itr == _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].end()) 
+				{
+					THROW_WARNING("ERROR: no valid start-time / duration pair found for activity type '" << act->Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
+					itr = _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].begin();
+				}
 				pair<typename TargetType::ReturnType,typename TargetType::ReturnType> return_val;
 
 				// add random draw from between 0-30 minutes as this is the aggregation level of the start_time data

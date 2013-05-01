@@ -27,11 +27,8 @@ namespace Demand_Components
 			member_data(int, first_vehicle_departure_time, none, none);
 
 			member_data(int, last_vehicle_departure_time, none, none);
-#ifndef EXCLUDE_DEMAND
-			typedef typename MasterType::person_type traveler_type;
-#else
+
 			typedef typename MasterType::traveler_type traveler_type;
-#endif
 
 		};
 

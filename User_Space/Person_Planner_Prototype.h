@@ -329,7 +329,7 @@ namespace Person_Components
 				assert_check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan, "ERROR: TargetType is not a valid movement plan component.");
 			}
 
-			feature_prototype void Write_To_Log(stringstream& s)
+			feature_prototype void Write_To_Log(TargetType s)
 			{
 				this_component()->Write_To_Log<ComponentType,CallerType,TargetType>(s);
 			}

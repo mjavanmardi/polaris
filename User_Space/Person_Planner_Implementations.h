@@ -18,9 +18,13 @@ namespace Person_Components
 		{
 			static ofstream logs[_num_threads];
 			static member_data(bool, write_activity_files,none,none);
-			feature_implementation void Write_To_Log(stringstream& s)
+			feature_implementation void Write_To_Log(TargetType s, requires(!check_2(TargetType,string, is_same)))
 			{
 				if (_write_activity_files) this->logs[_thread_id] << s.str();
+			}
+			feature_implementation void Write_To_Log(TargetType s, requires(check_2(TargetType,string, is_same)))
+			{
+				if (_write_activity_files) this->logs[_thread_id] << s;
 			}
 
 			// Pointer to the Parent class
@@ -45,8 +49,8 @@ namespace Person_Components
 
 
 			// Interface definitions
-			define_component_interface(_Scenario_Interface, typename type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-			define_component_interface(_Network_Interface, typename type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
+			define_component_interface(_Scenario_Interface, typename Parent_Person_interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+			define_component_interface(_Network_Interface, typename Parent_Person_interface::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
 			define_component_interface(_Skim_Interface, typename _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -97,7 +101,7 @@ namespace Person_Components
 					s << "," << move->template origin<_Activity_Location_Interface*>()->uuid<int>() << "," << move->template destination<_Activity_Location_Interface*>()->uuid<int>();
 					s << "," << skim->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_id, d_id, Vehicle_Components::Types::SOV);
 					s << "," << move->template routed_travel_time<Time_Minutes>();
-					this->Write_To_Log<ComponentType,CallerType,TargetType>(s);
+					this->Write_To_Log<ComponentType,CallerType,stringstream&>(s);
 				}
 
 				// catch skipped movement plans
@@ -135,7 +139,7 @@ namespace Person_Components
 				{			
 					stringstream s;	
 					s << endl << "ACTIVITY GEN (PERID.ACTID.ACTTYPE)," << _Parent_Person->template uuid<int>() << "," << act->Activity_Plan_ID<int>() << ", " << act->Activity_Type<ACTIVITY_TYPES>();
-					this->Write_To_Log<ComponentType,CallerType,TargetType>(s);
+					this->Write_To_Log<ComponentType,CallerType,stringstream&>(s);
 				}
 
 				Activity_Plans* activities = this->Activity_Container<ComponentType,CallerType,Activity_Plans*>();

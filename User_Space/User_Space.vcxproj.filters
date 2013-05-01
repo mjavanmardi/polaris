@@ -292,5 +292,11 @@
     <ClInclude Include="Activity_Timing_Choice_Prototype.h">
       <Filter>Prototypes\Person Components</Filter>
     </ClInclude>
+    <ClInclude Include="Person_Perception_Prototype.h">
+      <Filter>Prototypes\Person Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Person_Perception_Implementation.h">
+      <Filter>Implementations\Person Components</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
