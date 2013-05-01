@@ -155,6 +155,12 @@
     <ClInclude Include="Antares_Advisory_ITS_Implementation.h">
       <Filter>User_Space</Filter>
     </ClInclude>
+    <ClInclude Include="Splash_Panel_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Splash_Panel.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">

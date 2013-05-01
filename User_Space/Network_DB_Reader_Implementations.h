@@ -687,13 +687,18 @@ namespace Network_Components
 						link->template activity_locations<_Activity_Locations_Container_Interface&>().push_back(activity_location);
 
 						activity_location->template destination_links<_Links_Container_Interface&>().push_back(link);
-				
+						
 						activity_location->template zone<_Zone_Interface*>(zone);
 						activity_location->template uuid<int>(db_itr->getPrimaryKey());
 						activity_location->template internal_id<int>(counter);
 
 						shared_ptr<LocationData> data_ptr = db_itr->getLocation_Data();
 						if (data_ptr == nullptr) continue;
+
+						//cout << activity_location->template uuid<int>() << ": " << data_ptr->getX()*.3048 << "," << data_ptr->getY()*.3048 << " | " << link->upstream_intersection<typename MasterType::intersection_type*>()->_x_position << "," << link->upstream_intersection<typename MasterType::intersection_type*>()->_y_position << endl;
+						activity_location->template x_position<float>(data_ptr->getX());
+						activity_location->template y_position<float>(data_ptr->getY());
+
 						activity_location->template census_zone_id<long long>(data_ptr->getCensus_Zone());
 						// set the location land use code
 						const char* land_use = data_ptr->getLand_Use().c_str();
@@ -751,7 +756,7 @@ namespace Network_Components
 						activity_locations_container.push_back(activity_location);
 						++counter;
 					}
-					catch (const odb::exception& e) {THROW_WARNING(e.what()); continue;}
+					//catch (const odb::exception& e) {THROW_WARNING(e.what()); continue;}
 					catch (std::exception e){THROW_WARNING(e.what()); continue;}
 				}
 			}

@@ -62,6 +62,10 @@ namespace Activity_Location_Components
 			feature_accessor(uuid, none, none);
 			feature_accessor(internal_id, none, none);
 			feature_accessor(land_use_type, none, none);
+
+			feature_accessor(x_position, none, none);
+			feature_accessor(y_position, none, none);
+			feature_accessor(z_position, none, none);
 		};
 	}
 }

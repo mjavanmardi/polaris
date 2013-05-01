@@ -31,6 +31,7 @@ struct MasterType
 	typedef Attributes_Panel_Implementation<M> attributes_panel_type;
 	typedef Control_Dialog_Implementation<M> control_dialog_type;
 	typedef Information_Page_Implementation<MasterType> information_page_type;
+	typedef Splash_Panel_Implementation<M> splash_panel_type;
 
 	typedef Antares_Network_Implementation<M> network_type;
 	typedef Antares_Link_Implementation<M> link_type;

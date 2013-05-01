@@ -14,7 +14,6 @@ namespace Activity_Location_Components
 	{
 		implementation struct Polaris_Activity_Location_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Activity_Location_Implementation),MasterType,Data_Object,ParentType>
 		{
-
 			member_component(typename MasterType::zone_type, zone, none, none);
 
 			member_container(vector<typename MasterType::link_type*>, origin_links, none, none);
@@ -33,6 +32,8 @@ namespace Activity_Location_Components
 
 			member_data(Types::LAND_USE, land_use_type, none, none);
 
+			member_data(float, x_position, none, none);
+			member_data(float, y_position, none, none);
 		};
 	}
 

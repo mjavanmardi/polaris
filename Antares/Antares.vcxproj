@@ -624,6 +624,8 @@
     <ClInclude Include="Navigation.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="Render_2D.h" />
+    <ClInclude Include="Splash_Panel.h" />
+    <ClInclude Include="Splash_Panel_Implementation.h" />
     <ClInclude Include="Time_Panel.h" />
     <ClInclude Include="Time_Panel_Implementation.h" />
     <ClInclude Include="Visibility_Testing.h" />

@@ -5,6 +5,7 @@
 #pragma once
 #include "Control_Panel.h"
 #include "Layer_Options.h"
+#include "Splash_Panel.h"
 
 //---------------------------------------------------------
 //	Control_Panel_Implementation - control panel class definition
@@ -18,6 +19,7 @@ public:
 
 	member_prototype(Layer_Options,layer_options,typename MasterType::type_of(layer_options),none,none);
 	member_prototype(Canvas,canvas,typename MasterType::type_of(canvas),none,none);
+	member_prototype(Splash_Panel,splash_panel,typename MasterType::type_of(splash_panel),none,none);
 
 	member_pointer(wxAuiNotebook,control_book,none,none);
 	member_pointer(wxBoxSizer,sizer,none,none);
@@ -35,6 +37,9 @@ Control_Panel_Implementation<MasterType,ParentType,InheritanceList>::Control_Pan
 	//---- initialize the sizer and container notebook ----
 	
 	_sizer=new wxBoxSizer(wxVERTICAL);
+	_splash_panel=(splash_panel_interface*)new type_of(splash_panel)(this);
+
+	_sizer->Add((wxPanel*)_splash_panel);
 
 	_control_book=new wxAuiNotebook(this,-1,wxDefaultPosition,wxDefaultSize,wxAUI_NB_TOP);
 	_sizer->Add(_control_book,1,wxEXPAND);

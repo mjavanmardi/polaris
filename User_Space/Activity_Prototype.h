@@ -72,6 +72,7 @@ namespace Activity_Components
 			//-------------------------------------------
 			feature_accessor(Parent_Planner, none, none);
 			feature_accessor(Parent_ID, none, not_available);
+			feature_accessor(movement_plan, none, none);
 
 			//===========================================
 			// Activity Plan execution scheduling functionality

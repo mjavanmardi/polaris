@@ -57,6 +57,7 @@ namespace Vehicle_Components
 				Initialize_Vehicle_Shapes_Layer();
 				Initialize_Vehicle_Points_Layer();
 				Initialize_Vehicle_Routes_Layer();
+				Initialize_Vehicle_Locations_Layer();
 			}
 
 			static void Initialize_Vehicle_Shapes_Layer()
@@ -112,6 +113,26 @@ namespace Vehicle_Components
 
 				_routes_layer->Initialize<NULLTYPE>(cfg); 
 				//_route_displayed_vehicle = nullptr;
+			}
+			
+			static void Initialize_Vehicle_Locations_Layer()
+			{
+				_locations_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Antares_Vehicle_Implementation>*, string& > >(string("Locations"));
+				Antares_Layer_Configuration cfg;
+				cfg.primitive_type=_TRIANGLE;
+				//cfg.head_accent_size_value=14;
+				//cfg.primitive_color=true;
+				cfg.grouped=true;
+				
+				cfg.primitive_normal=true;
+				cfg.group_color=true;
+
+				cfg.head_color._r=255;
+				cfg.head_color._g=0;
+				cfg.head_color._b=0;
+				cfg.head_color._a=255;
+
+				_locations_layer->Initialize<NULLTYPE>(cfg);
 			}
 
 			define_component_interface(Link_Interface,typename type_of(MasterType::link),Link_Prototype,Antares_Vehicle_Implementation);
@@ -267,6 +288,7 @@ namespace Vehicle_Components
 
 					(type_of(MasterType::vehicle)::_vehicle_points)->Clear_Accented<NT>();
 					(type_of(MasterType::vehicle)::_routes_layer)->Clear_Accented<NT>();
+					(type_of(MasterType::vehicle)::_locations_layer)->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -291,6 +313,7 @@ namespace Vehicle_Components
 
 					(type_of(MasterType::vehicle)::_vehicle_points)->Clear_Accented<NT>();
 					(type_of(MasterType::vehicle)::_routes_layer)->Clear_Accented<NT>();
+					(type_of(MasterType::vehicle)::_locations_layer)->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -385,9 +408,26 @@ namespace Vehicle_Components
 			{
 				if(simulation_status<ComponentType,ComponentType,Types::Vehicle_Status_Keys>() != Types::Vehicle_Status_Keys::IN_NETWORK) return;
 
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
+
 				display_route<typename MasterType::vehicle_type,NT,NT>();
 
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
+				typedef Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType> Activity_Location_Interface;
+
+				Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
+				Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
+				list<typename type_of(MasterType::activity)*>* activities = planner->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
+
+				Activity_Location_Interface* previous_location = nullptr;
+
+				for(list<typename type_of(MasterType::activity)*>::iterator itr=activities->begin();itr!=activities->end();itr++)
+				{
+					Activity_Planner<typename type_of(MasterType::activity),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity),ComponentType>*)(*itr);
+					display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location );
+					previous_location = activity_planner->Location<Activity_Location_Interface*>();
+				}
+
+				
 				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
 
 				Link_Line<MasterType>& link_line = link->template displayed_line<Link_Line<MasterType>&>();
@@ -484,34 +524,202 @@ namespace Vehicle_Components
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 			}
+			
+			feature_implementation void make_pyramid(Point_3D<MasterType>* vertex,const Point_3D<MasterType>& center,const float radius)
+			{
+				//---TOP---
+				vertex->_x = center._x;
+				vertex->_y = center._y;
+				vertex->_z = radius*2;
 
-			//static bool fetch_attributes(Antares_Vehicle_Implementation* _this,vector<string>& bucket)
-			//{
-			//	//_this->_graphical_network->accent_num_vehicles<NT>();
-			//	typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
-			//	stringstream s;
-			//	
-			//	s << _this->_internal_id;
-			//	bucket.push_back(s.str());
-			//	s.str("");
-			//	
-			//	bucket.push_back(string("IN_NETWORK"));
-			//	
-			//	s << ((_Movement_Plan_Interface*)_this->_movement_plan)->template current_link<Link_Prototype<typename MasterType::type_of(link)>*>()->internal_id<int>();
-			//	bucket.push_back(s.str());
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+				
+				vertex->_x = center._x - radius;
+				vertex->_y = center._y + radius;
+				vertex->_z = 0;
 
-			//	if (!_this->route_being_displayed)
-			//	{
-			//		_this->display_route<typename MasterType::vehicle_type,NT,NT>();
-			//		_this->route_being_displayed = true;
-			//		if (_route_displayed_vehicle != nullptr)
-			//		{
-			//			_route_displayed_vehicle->route_being_displayed = false;
-			//		}
-			//		_route_displayed_vehicle = _this;
-			//	}
-			//	return true;
-			//}
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+
+				vertex->_x = center._x + radius;
+				vertex->_y = center._y + radius;
+				vertex->_z = 0;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+
+
+
+				//---RIGHT---
+				vertex->_x = center._x;
+				vertex->_y = center._y;
+				vertex->_z = radius*2;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+				
+				vertex->_x = center._x + radius;
+				vertex->_y = center._y + radius;
+				vertex->_z = 0;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+
+				vertex->_x = center._x + radius;
+				vertex->_y = center._y - radius;
+				vertex->_z = 0;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+
+
+
+				//---BOTTOM---
+				vertex->_x = center._x;
+				vertex->_y = center._y;
+				vertex->_z = radius*2;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+				
+				vertex->_x = center._x + radius;
+				vertex->_y = center._y - radius;
+				vertex->_z = 0;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+
+				vertex->_x = center._x - radius;
+				vertex->_y = center._y - radius;
+				vertex->_z = 0;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+
+
+
+				//---LEFT---
+				vertex->_x = center._x;
+				vertex->_y = center._y;
+				vertex->_z = radius*2;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+				
+				vertex->_x = center._x - radius;
+				vertex->_y = center._y - radius;
+				vertex->_z = 0;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				++vertex;
+
+				vertex->_x = center._x - radius;
+				vertex->_y = center._y + radius;
+				vertex->_z = 0;
+
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(*vertex);
+				//++vertex;
+
+
+			}
+
+			feature_implementation void display_location(Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* location, Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* previous_location)
+			{
+#pragma pack(push,1)
+				struct attribute_coordinate
+				{
+					True_Color_RGBA<MasterType> group_color;
+					int num_primitives;
+					Point_3D<MasterType>* vertex;
+				} coordinate;
+#pragma pack(pop)
+
+				Point_3D<MasterType> vertices[12];
+				coordinate.num_primitives = 4;
+				coordinate.vertex = &vertices[0];
+
+				Point_3D<MasterType>* current_vertex;
+				
+				float radius = 200;
+				Point_3D<MasterType> center;
+
+				center._x = location->x_position<float>();
+				center._y = location->y_position<float>();
+				center._z = 0;
+				
+				current_vertex = &vertices[0];
+
+				make_pyramid<ComponentType,ComponentType,NT>(current_vertex,center,radius);
+
+				coordinate.group_color._r=235;
+				coordinate.group_color._g=100;
+				coordinate.group_color._b=50;
+				coordinate.group_color._a=200;
+
+				_locations_layer->Push_Element<Accented_Element>(&coordinate);
+
+
+#pragma pack(push,1)
+				struct Link_Line
+				{
+					True_Color_RGBA<NT> color;
+					Point_3D<MasterType> up_node;
+					Point_3D<MasterType> down_node;
+				} link_line;
+#pragma pack(pop)
+
+				if(previous_location!=nullptr)
+				{
+					Point_3D<MasterType> start;
+					start._x = previous_location->x_position<float>();
+					start._y = previous_location->y_position<float>();
+					start._z = 1;
+					
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(start);
+
+					Point_3D<MasterType> end;
+					end._x = location->x_position<float>();
+					end._y = location->y_position<float>();
+					end._z = 1;
+
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(end);
+
+					Point_3D<MasterType> mid;
+					mid._x = (start._x + end._x)/2;
+					mid._y = (start._y + end._y)/2;
+					mid._z = 1;
+
+					link_line.color._r=25;
+					link_line.color._g=255;
+					link_line.color._b=25;
+					link_line.color._a=255;
+
+					link_line.down_node=start;
+					link_line.up_node=mid;
+
+					//cout << "Start to Mid" << endl;
+					//cout << link_line.down_node._x << "," << link_line.down_node._y << endl;
+					//cout << link_line.up_node._x << "," << link_line.up_node._y << endl;
+
+					_routes_layer->template Push_Element<Accented_Element>(&link_line);
+
+					link_line.color._r=100;
+					link_line.color._g=100;
+					link_line.color._b=100;
+					link_line.color._a=255;
+
+					link_line.down_node=mid;
+					link_line.up_node=end;
+
+					//cout << "Mid to End" << endl;
+					//cout << link_line.down_node._x << "," << link_line.down_node._y << endl;
+					//cout << link_line.up_node._x << "," << link_line.up_node._y << endl;
+
+					_routes_layer->template Push_Element<Accented_Element>(&link_line);
+				}
+
+			}
 
 			feature_implementation void display_route()
 			{
@@ -585,29 +793,11 @@ namespace Vehicle_Components
 				}
 
 			}
-			
-			//static bool submit_attributes(Antares_Vehicle_Implementation* _this,vector<string>& bucket)
-			//{
-			//	vector<string>::iterator itr;
-
-			//	int new_id=atoi(bucket[0].c_str());
-
-			//	if(new_id%2==0)
-			//	{
-			//		_this->_internal_id = new_id;
-
-			//		return true;
-			//	}
-			//	else
-			//	{
-			//		return false;
-			//	}
-			//}
 
 			static member_prototype(Antares_Layer,vehicle_shapes,typename type_of(MasterType::antares_layer),none,none);
 			static member_prototype(Antares_Layer,vehicle_points,typename type_of(MasterType::antares_layer),none,none);
 			static member_prototype(Antares_Layer,routes_layer,typename type_of(MasterType::antares_layer),none,none);
-
+			static member_prototype(Antares_Layer,locations_layer,typename type_of(MasterType::antares_layer),none,none);
 		};
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
@@ -621,6 +811,9 @@ namespace Vehicle_Components
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Antares_Layer<typename MasterType::type_of(antares_layer),Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_num_vehicles;
+
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		Antares_Layer<typename MasterType::type_of(antares_layer),Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>>* Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_locations_layer;
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		volatile int Antares_Vehicle_Implementation<MasterType,ParentType,InheritanceList>::_vehicles_counter;

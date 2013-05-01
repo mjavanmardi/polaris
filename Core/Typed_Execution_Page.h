@@ -153,6 +153,8 @@ public:
 
 		Typed_Execution_Page<DataType>* execution_page;
 
+		//cout << _iteration << "." << _sub_iteration << ": " << typeid(DataType).name() << endl;
+
 		while(itr!=nullptr)
 		{
 			execution_page = itr->data;
@@ -201,7 +203,7 @@ public:
 					}
 
 					//Take responsibility for pages which only you visit
-					if(i != 0)
+					if(i != 0 || _num_threads == 1)
 					{
 						//// inform type that this page is no longer relevant for the execution
 						//if(execution_page->Empty())
