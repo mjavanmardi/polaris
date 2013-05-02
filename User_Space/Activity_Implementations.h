@@ -28,6 +28,10 @@ namespace Activity_Components
 			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type,none,none);
 			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, movement_record, typename MasterType::movement_plan_record_type,none,none);
 
+			static int Route_Planning_Counter[_num_threads];
+			static member_data(int, Route_Planning_Count,none,none);
+			static member_data(_lock, update_lock,none,none);
+
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 			// Interfaces
@@ -163,12 +167,12 @@ namespace Activity_Components
 			}
 			feature_implementation void Route_Planning_Event_Handler()
 			{
-				//// updates for counters
+				// updates for counters
 				//this->Route_Planning_Counter[_thread_id]++;
-				//if (this->Route_Planning_Counter[_thread_id] % 10000 == 0)  
+				//if (this->Route_Planning_Counter[_thread_id] % 1000 == 0)  
 				//{
 				//	LOCK(this->_update_lock);
-				//	this->_Route_Planning_Count+=10000;
+				//	this->_Route_Planning_Count+=1000;
 				//	cout << '\r' << "Route Planning: " <<  this->_Route_Planning_Count<< "                                 ";
 				//	UNLOCK(this->_update_lock);
 				//}
@@ -664,9 +668,13 @@ namespace Activity_Components
 				}
 				else exp_ttime = 60.0f;
 
-				int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 2.0);
-				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
+				Simulation_Timestep_Increment start_seconds = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
+				int start_increment = std::max<int>(start_seconds, _iteration);
 				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
+				
+				/*int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 2.0);
+				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
+				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;*/
 			}
 			feature_implementation void Involved_Persons_Planning_Event_Handler()
 			{
@@ -911,9 +919,13 @@ namespace Activity_Components
 				}
 				else exp_ttime = 60.0f;
 
-				int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 2.0);
-				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
+				Simulation_Timestep_Increment start_seconds = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
+				int start_increment = std::max<int>(start_seconds, _iteration);
 				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
+
+				/*int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 2.0);
+				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
+				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;*/
 			}
 
 			feature_implementation void Involved_Persons_Planning_Event_Handler()
@@ -1052,10 +1064,11 @@ namespace Activity_Components
 		// Static activity plan member initialization
 		//-----------------------------------------------------------------------
 		//static_array_definition(Basic_Activity_Plan_Implementation, Location_Planning_Counter, int);
-		//static_array_definition(Basic_Activity_Plan_Implementation, Route_Planning_Counter, int);
+		static_array_definition(Basic_Activity_Plan_Implementation, Route_Planning_Counter, int);
 		//static_array_definition(Basic_Activity_Plan_Implementation, Scheduling_Counter, int);
 		//static_member_initialization(Basic_Activity_Plan_Implementation, Location_Planning_Count, 0);
-		//static_member_initialization(Basic_Activity_Plan_Implementation, Route_Planning_Count, 0);
+		static_member_initialization(Basic_Activity_Plan_Implementation, Route_Planning_Count, 0);
 		//static_member_initialization(Basic_Activity_Plan_Implementation, Scheduling_Count, 0);
+		template<typename MasterType,typename ParentType, typename InheritanceList> _lock Basic_Activity_Plan_Implementation<MasterType, ParentType, InheritanceList>::_update_lock = 0;
 	}
 }
