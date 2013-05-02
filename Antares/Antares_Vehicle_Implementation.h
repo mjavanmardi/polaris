@@ -411,7 +411,7 @@ namespace Vehicle_Components
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
 
 				display_route<typename MasterType::vehicle_type,NT,NT>();
-
+#ifdef IntegratedModelApplication
 				typedef Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType> Activity_Location_Interface;
 
 				Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
@@ -427,7 +427,7 @@ namespace Vehicle_Components
 					previous_location = activity_planner->Location<Activity_Location_Interface*>();
 				}
 				display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location );
-				
+#endif				
 				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
 
 				Link_Line<MasterType>& link_line = link->template displayed_line<Link_Line<MasterType>&>();
