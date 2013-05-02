@@ -316,6 +316,7 @@ public:
 
 	// display member
 	void print(ostream& stream);
+	void scale(const T&);
 
 	size_type get_index(const_index_type index)
 	{
@@ -457,6 +458,13 @@ m_array<T>& m_array<T>::operator=(const m_array<T>& obj)
 		_copy(obj);
 	}
 	return *this;
+}
+
+
+template <class T>
+void m_array<T>::scale(const T& value)
+{
+	for (size_type i=0; i<_size; i++) _data[i] *= value;
 }
 
 // M_array destructor
@@ -708,6 +716,8 @@ public:
 		return _data[index];
 	} 
 	matrix operator*(const matrix& obj);
+	matrix& operator*(const T& value);
+	void scale(const T& value);
 	
 	// Property access members
 	const size_type& size() {return _size;}
@@ -862,7 +872,29 @@ matrix<T> matrix<T>::operator*(const matrix<T>& obj)
 	}
 	return m;
 }
-
+template <class T>
+matrix<T>& matrix<T>::operator*(const T& value)
+{
+	for (uint i = 0; i < this->_nrow; i++)
+	{
+		for (uint j = 0; j < this->_ncol; j++)
+		{
+			(*this)(i,j) = (*this)(i,j) * value;		
+		}
+	}
+	return *this;
+}
+template <class T>
+void matrix<T>::scale(const T& value)
+{
+	for (uint i = 0; i < this->_nrow; i++)
+	{
+		for (uint j = 0; j < this->_ncol; j++)
+		{
+			(*this)(i,j) = (*this)(i,j) * value;		
+		}
+	}
+}
 
 // M_array destructor
 template <class T>

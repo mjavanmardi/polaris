@@ -20,7 +20,7 @@ namespace Advisory_Radio_Components
 
 				const vector<int>& links = (*link_list).getLinks();
 
-				Simple_Advisory_ITS::Initialize<ComponentType,ComponentType,const vector<int>&>(links);
+				Simple_Advisory_ITS::Initialize<ComponentType,ComponentType,const vector<int>&>(links/*,true*/);
 			}
 		};
 	}

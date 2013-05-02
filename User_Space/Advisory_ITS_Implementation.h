@@ -11,7 +11,7 @@ namespace Advisory_ITS_Components
 	{
 		implementation struct Simple_Advisory_ITS : public Polaris_Component<APPEND_CHILD(Simple_Advisory_ITS),MasterType,Data_Object>
 		{
-			feature_implementation void Initialize(const vector<int>& db_covered_links)
+			feature_implementation void Initialize(const vector<int>& db_covered_links/*,bool flag=false*/)
 			{
 				using namespace polaris::io;
 
@@ -30,6 +30,7 @@ namespace Advisory_ITS_Components
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
 							_covered_links.push_back( (Link_Interface*)(*vitr) );
+							//if(flag) cout << "pushing HAR to: " << ((Link_Interface*)(*vitr))->internal_id<int>();
 							((Link_Interface*)(*vitr))->Push_ITS< ComponentType* >( (ComponentType*)this);
 						}
 					}

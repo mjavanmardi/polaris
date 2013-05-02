@@ -214,6 +214,8 @@ namespace PopSyn
 				typedef typename get_type_of(Target_Joint_Distribution)::unqualified_value_type value_type;
 				define_simple_container_interface(mway_itf, typename get_type_of(Target_Joint_Distribution),Multidimensional_Random_Access_Array_Prototype,value_type,NULLTYPE);
 				mway_itf& mway = this->Target_Joint_Distribution<mway_itf&>();
+				mway.scale(settings.template Percentage_to_synthesize<double>());
+			
 
 				// Get pointers to the regional and zonal household samples
 				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, Person_Components::Prototypes::Person_Properties ,NULLTYPE);
@@ -258,19 +260,19 @@ namespace PopSyn
 						int num_generated=0;
 						double w = range.first->second->template Weight<double>();
 
-						int attempts_to_make = (int)((float)num_required * settings.template Percentage_to_synthesize<float>());
+						int attempts_to_make = (int)num_required;//(int)((double)num_required * settings.template Percentage_to_synthesize<double>());
 						
 						for (int i = 0; i<attempts_to_make; ++i)
 						{
 							if (rand.template Next_Rand<double>() < w/cumulative_weight)
 							{					
 								int size = sizeof(typename sample_itf::Component_Type);
-								num_generated += (int)(1.0f / settings.template Percentage_to_synthesize<float>());
+								num_generated++;// += (int)(1.0 / settings.template Percentage_to_synthesize<double>());
 
 								// create the actual person agent from the census static properties and add to the zones created person agent list
 								this->Create_Person<pop_unit_itf*>(stored_pop_unit);
 
-								num_created += (int)(1.0f / settings.template Percentage_to_synthesize<float>());
+								num_created++;// += (int)(1.0 / settings.template Percentage_to_synthesize<double>());
 							}
 						}
 						// reduce the number required by the number generated and the cumulative weight
@@ -283,22 +285,22 @@ namespace PopSyn
 
 					//----------------------------------------------------------------------------------
 					// add a copy of the last unit until num_required < 1
-					while (num_required > 1.0 / settings.template Percentage_to_synthesize<float>())
+					while (num_required > 1.0 /*/ settings.template Percentage_to_synthesize<double>()*/)
 					{
 						// create the actual person agent
 						this->Create_Person<pop_unit_itf*>(stored_pop_unit);
-						num_created+=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
-						num_required-=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
+						num_created++;	//+=(int)(1.0 /*/ settings.template Percentage_to_synthesize<double>()*/);
+						num_required--;	//-=(int)(1.0 /*/ settings.template Percentage_to_synthesize<double>()*/);
 					}
 
 					//----------------------------------------------------------------------------------
 					// if a fractional num_required is left, add another unit with probability of num_required
-					if (num_required > 0.0 && rand.template Next_Rand<double>() < num_required * settings.template Percentage_to_synthesize<float>())
+					if (num_required > 0.0 && rand.template Next_Rand<double>() < num_required /** settings.template Percentage_to_synthesize<double>()*/)
 					{
 						// create the actual person agent
 						this->Create_Person<pop_unit_itf*>(stored_pop_unit);
-						num_created+=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
-						num_required-=(int)(1.0f / settings.template Percentage_to_synthesize<float>());
+						num_created++;	//+=(int)(1.0 / settings.template Percentage_to_synthesize<double>());
+						num_required--;	//-=(int)(1.0 / settings.template Percentage_to_synthesize<double>());
 					}
 
 					// if at the end of the map, break so that increment does not go past end of data_structure

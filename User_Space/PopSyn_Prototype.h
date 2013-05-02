@@ -514,7 +514,7 @@ namespace PopSyn
 							if (pthis->write_marginal_output_flag<bool>() == true )
 							{
 								marg_out <<endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
-								zone->template Target_Joint_Distribution<joint_itf*>()->write(marg_out);
+								//zone->template Target_Joint_Distribution<joint_itf*>()->write(marg_out);
 								marg_out <<endl;
 								zone->template Target_Marginal_Distribution<marginal_itf*>()->write(marg_out);
 								marg_out <<endl;

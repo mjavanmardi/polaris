@@ -327,6 +327,8 @@ struct Multidimensional_Random_Access_Array_Prototype ADD_DEBUG_INFO
 
 	void clear(){return ((ComponentType*)this)->clear();}
 
+	void scale(const TargetValueType& value){((ComponentType*)this)->scale(value);} 
+
 	void Copy(const Multidimensional_Random_Access_Array_Prototype<ComponentType,CallerType,TargetValueType>& obj)
 	{
 		((ComponentType*)this)->Copy(*((typename Multidimensional_Random_Access_Array_Prototype<ComponentType,CallerType,TargetValueType>::Component_Type::Container_Type*)&obj));
