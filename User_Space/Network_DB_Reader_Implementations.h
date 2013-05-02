@@ -169,6 +169,7 @@ namespace Network_Components
 											
 						link->template internal_id<int>(++link_counter);
 						link->template uuid<int>(link->template internal_id<int>());
+
 						//link->template uuid<int>(link_id_dir.id /*link_counter*/);
 
 						link->template num_lanes<int>(db_itr->getLanes_Ab());
@@ -263,10 +264,11 @@ namespace Network_Components
 						
 						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 						link_dbid_dir_to_ptr_map_type& link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type&>();
+
 						link_dbid_dir_to_ptr_map[link_id_dir.id_dir] = link;
 
 						link->template dbid<int>(db_itr->getLink());
-						link->template direction<int>(0);
+						link->template direction<int>(1);
 
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);

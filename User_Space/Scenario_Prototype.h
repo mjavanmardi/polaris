@@ -191,8 +191,11 @@ namespace Scenario_Components
 			
 			feature_accessor(write_network_snapshots, none, none);
 			feature_accessor(read_network_snapshots, none, none);
-			
+			feature_accessor(input_network_snapshots_file_path_name, none, none);	
+
 			feature_accessor(compare_with_moe_reference, none, none);
+			feature_accessor(historic_network_moe_file_path_name, none, none);
+			feature_accessor(historic_link_moe_file_path_name, none, none);
 
 			feature_accessor(output_link_moe_for_simulation_interval, none, none);
 			feature_accessor(output_turn_movement_moe_for_simulation_interval, none, none);
@@ -354,7 +357,11 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_simulation_interval<bool>(false);
 				if (cfgReader.getParameter("write_network_snapshots", write_network_snapshots<bool*>())!= PARAMETER_FOUND) write_network_snapshots<bool>(false);
 				if (cfgReader.getParameter("read_network_snapshots", read_network_snapshots<bool*>())!= PARAMETER_FOUND) read_network_snapshots<bool>(false);
+				if (cfgReader.getParameter("input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<string*>())!= PARAMETER_FOUND) input_network_snapshots_file_path_name<string>("input_network_snapshots");
+				
 				if (cfgReader.getParameter("compare_with_moe_reference", compare_with_moe_reference<bool*>())!= PARAMETER_FOUND) compare_with_moe_reference<bool>(false);
+				if (cfgReader.getParameter("historic_network_moe_file_path_name", historic_network_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_network_moe_file_path_name<string>("historic_realtime_moe_network.csv");
+				if (cfgReader.getParameter("historic_link_moe_file_path_name", historic_link_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_link_moe_file_path_name<string>("historic_moe_link.csv");
 
 				if (cfgReader.getParameter("output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_assignment_interval<bool>(false);
@@ -756,18 +763,16 @@ namespace Scenario_Components
 				//reference network moe file
 				if (compare_with_moe_reference<bool>())
 				{
-					string reference_realtime_network_moe_file_name = input_dir_name<string&>() + "realtime_moe_network_to_compare.csv";
-					reference_realtime_network_moe_file<fstream&>().open(reference_realtime_network_moe_file_name, fstream::in);
+					reference_realtime_network_moe_file<fstream&>().open(historic_network_moe_file_path_name<string&>(), fstream::in);
 					if (!reference_realtime_network_moe_file<fstream&>().is_open())
 					{
-						THROW_EXCEPTION(endl << "compare_with_moe_reference is enabled but reference network MOE file cannot be openned." << endl);
+						THROW_EXCEPTION(endl << "compare_with_moe_reference is enabled but reference network MOE file " << historic_network_moe_file_path_name<string&>() << " cannot be openned." << endl);
 					}
 
-					string link_moe_reference_file_name = input_dir_name<string&>() + "moe_link_to_compare.csv";
-					link_moe_reference_file<fstream&>().open(link_moe_reference_file_name, fstream::in);
+					link_moe_reference_file<fstream&>().open(historic_link_moe_file_path_name<string&>(), fstream::in);
 					if (!link_moe_reference_file<fstream&>().is_open())
 					{
-						THROW_EXCEPTION(endl << "compare_with_moe_reference is enabled but reference link MOE file cannot be openned." << endl);
+						THROW_EXCEPTION(endl << "compare_with_moe_reference is enabled but reference link MOE file " << historic_link_moe_file_path_name<string&>() << " cannot be openned." << endl);
 					}
 					else
 					{
@@ -777,11 +782,10 @@ namespace Scenario_Components
 				}
 				if (read_network_snapshots<bool>())
 				{
-					string routable_network_snapshots_file_name = input_dir_name<string&>() + "input_network_snapshots";
-					input_network_snapshots_file<fstream&>().open(routable_network_snapshots_file_name, fstream::in);
+					input_network_snapshots_file<fstream&>().open(input_network_snapshots_file_path_name<string&>(), fstream::in);
 					if (!input_network_snapshots_file<fstream&>().is_open())
 					{
-						THROW_EXCEPTION(endl << "read_network_snapshots is enabled but network snapshots file cannot be opened." << endl);
+						THROW_EXCEPTION(endl << "read_network_snapshots is enabled but network snapshots file " << input_network_snapshots_file_path_name<string&>() << " cannot be opened." << endl);
 					}
 				}
 			}

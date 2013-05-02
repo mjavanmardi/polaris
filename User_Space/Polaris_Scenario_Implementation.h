@@ -102,9 +102,12 @@ namespace Scenario_Components
 
 			member_data(bool, write_network_snapshots, none, none);
 			member_data(bool, read_network_snapshots, none, none);
+			member_data(string, input_network_snapshots_file_path_name, none, none);
 
 			member_data(bool, compare_with_moe_reference, none, none);
-			
+			member_data(string, historic_network_moe_file_path_name, none, none);
+			member_data(string, historic_link_moe_file_path_name, none, none);
+
 			member_data(bool, write_node_control_state, none, none);
 			member_data(bool, write_vehicle_trajectory, none, none);
 			member_data(bool, write_network_link_flow, none, none);

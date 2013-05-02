@@ -83,6 +83,7 @@ namespace Movement_Plan_Components
 			
 			feature_accessor(absolute_departure_time, none, none);
 
+
 			// overloaded origin and destination, depending on targetType
 			feature_prototype void origin(TargetType activity_location, requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
@@ -142,7 +143,6 @@ namespace Movement_Plan_Components
 				define_component_interface(_Link_Interface, typename _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
 				trajectory.clear();
-
 				typename TargetType::reverse_iterator itr;
 				for(itr = path_container.rbegin(); itr != path_container.rend(); itr++)
 				{
