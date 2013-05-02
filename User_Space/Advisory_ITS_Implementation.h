@@ -56,11 +56,11 @@ namespace Advisory_ITS_Components
 			{
 				const int target_component_index = TargetType::component_index;
 
-				for(vector<Network_Event<typename type_of(MasterType::base_network_event)>*::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
+				for(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
 				{
 					if( (*itr)->_component_index == target_component_index )
 					{
-						bucket.push_back( *itr );
+						bucket.push_back( (Network_Event<TargetType>*)*itr );
 					}
 				}
 			}

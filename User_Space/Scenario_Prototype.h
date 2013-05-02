@@ -42,6 +42,12 @@ namespace Scenario_Components
 				MOE_VISUALIZATION_SUB_ITERATIONS,
 				END_OF_ITERATION=40,
 			};
+			enum Demand_Sub_Iteration_keys
+			{
+				PRETRIP_INFORMATION_ACQUISITION = 0,
+				PRETRIP_PLANNING_SUB_ITERATION,
+				PRETRIP_ROUTING_SUB_ITERATION,
+			};
 	}
 
 	namespace Concepts

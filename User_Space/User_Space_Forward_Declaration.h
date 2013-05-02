@@ -126,6 +126,22 @@ namespace Scenario_Components {
 		forward_declare_prototype struct Scenario_Prototype;
 	}
 };
+
+namespace Network_Event_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Network_Event;
+	}
+}
+
+namespace Advisory_ITS_Components{
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Advisory_ITS;
+	}
+}
+
+
 namespace Vehicle_Components {
 	namespace Prototypes
 	{

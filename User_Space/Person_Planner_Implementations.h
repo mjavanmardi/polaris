@@ -49,8 +49,8 @@ namespace Person_Components
 
 
 			// Interface definitions
-			define_component_interface(_Scenario_Interface, typename Parent_Person_interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-			define_component_interface(_Network_Interface, typename Parent_Person_interface::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
+			define_component_interface(_Scenario_Interface, typename type_of(Parent_Person)::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+			define_component_interface(_Network_Interface, typename type_of(Parent_Person)::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
 			define_component_interface(_Skim_Interface, typename _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);

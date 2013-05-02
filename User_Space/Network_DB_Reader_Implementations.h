@@ -696,6 +696,9 @@ namespace Network_Components
 						activity_location->template uuid<int>(db_itr->getPrimaryKey());
 						activity_location->template internal_id<int>(counter);
 
+						////////
+						//link->zones->insert(activity_location->zone)
+
 						shared_ptr<LocationData> data_ptr = db_itr->getLocation_Data();
 						if (data_ptr == nullptr) continue;
 

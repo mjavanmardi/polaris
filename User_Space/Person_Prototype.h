@@ -70,7 +70,7 @@ namespace Types
 
 namespace Prototypes
 {
-	prototype struct Person /*ADD_DEBUG_INFO*/
+	prototype struct Person ADD_DEBUG_INFO
 	{
 		tag_as_prototype;
 
@@ -386,17 +386,45 @@ namespace Prototypes
 		// Event handling
 		declare_feature_conditional(Movement_Conditional)
 		{
-			typedef Person_Mover<ComponentType, ComponentType> _Person_Interface;
+			typedef Person_Mover<ComponentType, ComponentType> _Person_Mover_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
-			_Person_Interface* pthis =(_Person_Interface*)_pthis;
+			_Person_Mover_Interface* pthis =(_Person_Mover_Interface*)_pthis;
 
-			if (_sub_iteration == Scenario_Components::Types::ROUTING_SUB_ITERATION)
+			define_component_interface(person_itf, typename get_type_of(Parent_Person),Prototypes::Person,ComponentType);
+			define_component_interface(vehicle_itf, typename person_itf::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype,ComponentType);
+			define_component_interface(movement_itf, typename get_type_of(Movement), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+
+			movement_itf* movement = pthis->Movement<movement_itf*>();
+			person_itf* person = pthis->Parent_Person<person_itf*>();
+			vehicle_itf* vehicle = person->vehicle<vehicle_itf*>();
+
+			// Do pretrip rerouting if car has realtime info
+			bool has_realtime_info = (vehicle->enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION);
+
+
+			// DO PRE-TRIP PLANNING, THEN SCHEDULE NEXT ITERATION FOR DEPARTURE TIME
+			if (_sub_iteration == Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION)
 			{
-				//_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Routing_Event<NULLTYPE>);
 				response.next._iteration = _iteration;
+				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION;
+				response.result = has_realtime_info;
+			}
+			else if (_sub_iteration == Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION)
+			{
+				_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Replanning_Event<NULLTYPE>);
+				response.next._iteration = movement->departed_time<Simulation_Timestep_Increment>();
+				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION;
+				response.result = has_realtime_info;
+			}
+			else if (_sub_iteration == Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION)
+			{
+				_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Routing_Event<NULLTYPE>);
+				response.next._iteration = movement->departed_time<Simulation_Timestep_Increment>();
 				response.next._sub_iteration = Scenario_Components::Types::END_OF_ITERATION;
 				response.result = true;
 			}
+
+			// GO TO DEPARTURE TIMESTEP
 			else if (_sub_iteration == Scenario_Components::Types::END_OF_ITERATION)
 			{
 				_pthis->Swap_Event((Event)&Person_Mover::Movement_Event<NULLTYPE>);
@@ -404,12 +432,29 @@ namespace Prototypes
 				response.next._sub_iteration = END;
 				response.result = true;
 			}
+
+			// ERROR SHOULDN"T REACH HERE
 			else
 			{
+				THROW_EXCEPTION("ERROR: should not reach this point in conditional, improper response.revision set at some point.");
 				response.next._iteration = END;
 				response.next._sub_iteration = END;
 				response.result = false;
 			}
+		}
+		declare_feature_event(Pretrip_Information_Acquisition_Event)
+		{
+			typedef Person_Mover<ComponentType, ComponentType> _Person_Interface;
+			ComponentType* _pthis = (ComponentType*)_this;
+			_Person_Interface* pthis =(_Person_Interface*)_pthis;
+			pthis->Do_Pretrip_Information_Acquisition<NT>();
+		}
+		declare_feature_event(Pretrip_Replanning_Event)
+		{
+			typedef Person_Mover<ComponentType, ComponentType> _Person_Interface;
+			ComponentType* _pthis = (ComponentType*)_this;
+			_Person_Interface* pthis =(_Person_Interface*)_pthis;
+			pthis->Do_Pretrip_Replanning<NT>();
 		}
 		declare_feature_event(Pretrip_Routing_Event)
 		{
@@ -433,7 +478,17 @@ namespace Prototypes
 		{
 			this->Movement<typename TargetType::Param2Type>(movement);
 			this->Movement_Scheduled<bool>(true);
-			load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,Simulation_Time.Convert_Time_To_Simulation_Timestep<typename TargetType::ParamType>(departure_time),Scenario_Components::Types::ROUTING_SUB_ITERATION,NULLTYPE);
+
+			// if departure_time is greater than current iteration, load pre-trip stuff on current iteration, otherwise skip pretrip and schedule departure
+			if (departure_time > _iteration + 2)
+			{
+				load_event(ComponentType,Movement_Conditional,Pretrip_Information_Acquisition_Event,Simulation_Time.Convert_Time_To_Simulation_Timestep<typename TargetType::ParamType>(_iteration+1),Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION,NULLTYPE);
+			}
+			else
+			{
+				load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,Simulation_Time.Convert_Time_To_Simulation_Timestep<typename TargetType::ParamType>(_iteration+1),Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);			
+			}
+			
 		}
 		feature_prototype void Schedule_Movement(typename TargetType::ParamType departure_time, typename TargetType::Param2Type movement, requires(
 			!check(typename TargetType::ParamType, Basic_Units::Concepts::Is_Time_Value) || 
@@ -445,6 +500,66 @@ namespace Prototypes
 			assert_check(typename TargetType::Param2Type, is_pointer, "Error, must pass movement plan interface as a pointer or reference.");
 		}
 		
+		feature_prototype void Do_Pretrip_Information_Acquisition()
+		{
+			// interfaces
+			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
+			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+			define_component_interface(movement_itf, typename Vehicle_Itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+
+			// HAR interface
+			define_component_interface(advisory_radio_itf, typename link_itf::get_type_of(advisory_radio), Advisory_ITS_Components::Prototypes::Advisory_ITS, ComponentType);
+
+
+			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+			Routing_Itf* itf= person ->template router<Routing_Itf*>();	
+			Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
+			network_itf* network = person->template network_reference<network_itf*>();
+			movement_itf* movements = this->Movement<movement_itf*>();
+			link_itf* origin_link = movements->template origin<link_itf*>();
+			advisory_radio_itf* har = origin_link->advisory_radio<advisory_radio_itf*>();
+			
+
+			typedef Network_Event<typename MasterType::base_network_event_type> event_itf;
+			typedef Network_Event<typename MasterType::weather_network_event_type> weather_itf;
+			typedef Network_Event<typename MasterType::accident_network_event_type> accident_itf;
+
+			if (har != nullptr)
+			{	
+				vector<event_itf*> base_events;
+				har->Get_Displayed_Messages<MasterType::base_network_event_type>(base_events);
+
+				cout << endl << "Advisory radio for link " << origin_link->uuid<int>() << ", num_events: " << base_events.size();
+
+				// process weather events from HAR
+				vector<weather_itf*> weather_events;
+				har->Get_Displayed_Messages<MasterType::weather_network_event_type>(weather_events);
+			
+				vector<accident_itf*> accident_events;
+				har->Get_Displayed_Messages<MasterType::accident_network_event_type>(accident_events);
+			}
+			
+		}
+		feature_prototype void Do_Pretrip_Replanning()
+		{
+			// interfaces
+			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
+			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+			define_component_interface(movement_itf, typename Vehicle_Itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+
+			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+			Routing_Itf* itf= person ->template router<Routing_Itf*>();	
+			Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
+			network_itf* network = person->template network_reference<network_itf*>();
+			movement_itf* movements = this->Movement<movement_itf*>();
+			link_itf* origin_link = movements->template origin<link_itf*>();
+		}
 		feature_prototype void Do_Pretrip_Routing()
 		{
 			// interfaces
@@ -462,9 +577,8 @@ namespace Prototypes
 			movement_itf* movements = this->Movement<movement_itf*>();
 			link_itf* origin_link = movements->template origin<link_itf*>();
 
-			//itf->Schedule_Route_Computation<int>(departed_time);
 			itf->movement_plan<movement_itf*>(movements);
-			itf->Schedule_Route_Computation<int>(_iteration);
+			itf->Schedule_Route_Computation<int>(_iteration+1);
 		}
 		feature_prototype void Do_Movement()
 		{

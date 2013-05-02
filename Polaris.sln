@@ -76,7 +76,6 @@ Global
 		{03356212-5DD0-4D56-A243-5DABB710DD31}.Debug|Win32.ActiveCfg = Debug|Win32
 		{03356212-5DD0-4D56-A243-5DABB710DD31}.Debug|Win32.Build.0 = Debug|Win32
 		{03356212-5DD0-4D56-A243-5DABB710DD31}.Debug|x64.ActiveCfg = Debug|x64
-		{03356212-5DD0-4D56-A243-5DABB710DD31}.Debug|x64.Build.0 = Debug|x64
 		{03356212-5DD0-4D56-A243-5DABB710DD31}.Release_Antares|Win32.ActiveCfg = Release_Antares|Win32
 		{03356212-5DD0-4D56-A243-5DABB710DD31}.Release_Antares|Win32.Build.0 = Release_Antares|Win32
 		{03356212-5DD0-4D56-A243-5DABB710DD31}.Release_Antares|x64.ActiveCfg = Release_Antares|x64
@@ -196,7 +195,6 @@ Global
 		{FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F}.Debug|Win32.ActiveCfg = Debug|Win32
 		{FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F}.Debug|Win32.Build.0 = Debug|Win32
 		{FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F}.Debug|x64.ActiveCfg = Debug|x64
-		{FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F}.Debug|x64.Build.0 = Debug|x64
 		{FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F}.Release_Antares|Win32.ActiveCfg = Release_Antares|Win32
 		{FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F}.Release_Antares|Win32.Build.0 = Release_Antares|Win32
 		{FE16CA2C-E4C8-4C9C-9A8F-F63DC734205F}.Release_Antares|x64.ActiveCfg = Release_Antares|x64
@@ -276,7 +274,6 @@ Global
 		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Debug|Win32.ActiveCfg = Debug|Win32
 		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Debug|Win32.Build.0 = Debug|Win32
 		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Debug|x64.ActiveCfg = Debug|x64
-		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Debug|x64.Build.0 = Debug|x64
 		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Release_Antares|Win32.ActiveCfg = Release_Antares|Win32
 		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Release_Antares|Win32.Build.0 = Release_Antares|Win32
 		{70F1765F-C7C3-4EE7-89C4-5274CFCC4030}.Release_Antares|x64.ActiveCfg = Release_Antares|x64
@@ -367,7 +364,6 @@ Global
 		{5ED95B61-C4B2-4883-A960-DA348347A260}.Debug|Win32.ActiveCfg = Debug|Win32
 		{5ED95B61-C4B2-4883-A960-DA348347A260}.Debug|Win32.Build.0 = Debug|Win32
 		{5ED95B61-C4B2-4883-A960-DA348347A260}.Debug|x64.ActiveCfg = Debug|x64
-		{5ED95B61-C4B2-4883-A960-DA348347A260}.Debug|x64.Build.0 = Debug|x64
 		{5ED95B61-C4B2-4883-A960-DA348347A260}.Release_Antares|Win32.ActiveCfg = Release|x64
 		{5ED95B61-C4B2-4883-A960-DA348347A260}.Release_Antares|x64.ActiveCfg = Release|x64
 		{5ED95B61-C4B2-4883-A960-DA348347A260}.Release_Antares|x64.Build.0 = Release|x64
