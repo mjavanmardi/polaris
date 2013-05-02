@@ -442,10 +442,18 @@ namespace Link_Components
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
 				///enroute switching
-				if (((((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				if (((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>())
 				{
 					vehicle->template enroute_updated<bool>(false);
 					vehicle->template update_eta<NULLTYPE>();
+				}
+				else
+				{
+					if (((((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+					{
+						vehicle->template enroute_updated<bool>(false);
+						vehicle->template update_eta<NULLTYPE>();
+					}
 				}
 
 				if (((_Scenario_Interface*)_global_scenario)->template enroute_switching_enabled<bool>())

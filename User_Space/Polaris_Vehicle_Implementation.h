@@ -311,14 +311,14 @@ namespace Vehicle_Components
 							int new_routed_travel_time = ((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>();
 
 							/////en-route switching
-							//if (_enroute_information_type == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION)
-							//{
-							//	cout<< "enroute switching...realtime informed vehicle " << _internal_id << " switches " << int(_switch_decisions_container.size()) << " times and saves " << time_saved << " seconds." <<endl;
-							//}
-							//else
-							//{
-							//	cout<< "enroute switching...realtime uninformed vehicle " << _internal_id << " switches " << int(_switch_decisions_container.size()) << " times and saves " << time_saved << " seconds." <<endl;
-							//}
+							if (_enroute_information_type == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION)
+							{
+								cout<< "enroute switching...realtime informed vehicle  " << _internal_id << "'s #" << int(_switch_decisions_container.size()) << " switch with " << time_saved/60.0f << " minutes time saving." <<endl;
+							}
+							else
+							{
+								cout<< "enroute switching...realtime uninformed vehicle " << _internal_id << "'s #" << int(_switch_decisions_container.size()) << " switch with " << time_saved/60.0f << " minutes time saving." <<endl;
+							}
 							//cout<< "current_time" << convert_seconds_to_hhmmss(current_time) <<endl;
 							//cout<< "departure_time" << convert_seconds_to_hhmmss(departure_time) <<endl;
 							//cout<< "current_route_time_to_destination = " << current_route_time_to_destination << " seconds, best_route_time_to_destination = " << best_route_time_to_destination << " seconds." <<endl;
