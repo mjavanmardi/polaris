@@ -153,7 +153,8 @@ namespace Routing_Components
 				destination_x = destination_upstream_intersection->template x_position<float>();
 				destination_y = destination_upstream_intersection->template y_position<float>();
 				
-				next_cost=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>()->template travel_time<float>();
+				//next_cost=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>()->template travel_time<float>();
+				next_cost= 0.0f;
 				new_cost = next_cost;
 				_Routable_Link_Interface* current_link=origin_link_ptr;
 
@@ -284,7 +285,8 @@ namespace Routing_Components
 						
 					}
 
-					return destination_link_ptr->template label_cost<float>(); 
+					float route_travel_time = destination_link_ptr->template label_cost<float>();// + destination_link_ptr->template network_link_reference<_Regular_Link_Interface*>()->template travel_time<float>();
+					return route_travel_time; 
 				}
 
 			};
@@ -325,7 +327,8 @@ namespace Routing_Components
 				float next_cost,new_cost;
 
 
-				next_cost=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>()->template travel_time<float>();
+				//next_cost=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>()->template travel_time<float>();
+				next_cost= 0.0f;
 				new_cost = next_cost;
 				_Routable_Link_Interface* current_link=origin_link_ptr;
 
@@ -484,10 +487,9 @@ namespace Routing_Components
 
 				if (routed_travel_time >= 0.0)
 				{	
-
 					mp->template valid_trajectory<bool>(true);
 					mp->template routed_travel_time<float>(routed_travel_time);
-					mp->template estimated_time_of_arrival<Simulation_Timestep_Increment>(mp->template departed_time<Simulation_Timestep_Increment>() + routed_travel_time);
+					mp->template estimated_time_of_arrival<Simulation_Timestep_Increment>(mp->template absolute_departure_time<int>() + routed_travel_time);
 					// print out and break when scheduling departure for veh_id 101319
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
 					{
@@ -594,7 +596,7 @@ namespace Routing_Components
 
 					mp->template valid_trajectory<bool>(true);
 					mp->template routed_travel_time<float>(routed_travel_time);
-					mp->template estimated_time_of_arrival<Simulation_Timestep_Increment>(mp->template departed_time<Simulation_Timestep_Increment>() + routed_travel_time);
+					mp->template estimated_time_of_arrival<Simulation_Timestep_Increment>(mp->template absolute_departure_time<int>() + routed_travel_time);
 
 					// print out and break when scheduling departure for veh_id 101319
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)

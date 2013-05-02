@@ -72,6 +72,7 @@ namespace Vehicle_Components
 			feature_accessor(information_compliance_rate, none, none);
 			feature_accessor(relative_indifference_bound_route_choice, none, none);
 			feature_accessor(minimum_travel_time_saving, none, none);
+			feature_accessor(enroute_updated, none, none);
 
 
 			feature_prototype void advance()
@@ -114,6 +115,11 @@ namespace Vehicle_Components
 			feature_prototype void initialize()
 			{
 				this_component()->template initialize<ComponentType,CallerType, TargetType>();
+			}
+
+			feature_prototype void update_eta()
+			{
+				this_component()->template update_eta<ComponentType,CallerType,TargetType>();
 			}
 		};
 	}

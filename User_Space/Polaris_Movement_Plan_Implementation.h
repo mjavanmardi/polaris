@@ -36,7 +36,7 @@ namespace Movement_Plan_Components
 		{
 			typedef Implementations::Polaris_Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 			member_container(vector<trajectory_unit_type*>, trajectory_container, none, none);
-
+			
 			//==================================================================================================================
 			/// current_trajectory_position
 			//------------------------------------------------------------------------------------------------------------------
@@ -75,6 +75,13 @@ namespace Movement_Plan_Components
 			member_data(int, routed_travel_time, none, none);
 			member_data(int, estimated_time_of_arrival, none, none);
 
+			template<typename ComponentType, typename CallerType, typename ReturnValueType>
+			ReturnValueType absolute_departure_time()
+			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				return (ReturnValueType)(int(departed_time<ComponentType,CallerType,Simulation_Timestep_Increment>()) + ((_Scenario_Interface*)_global_scenario)->template simulation_start_time<int>());
+			}
+			tag_getter_as_available(absolute_departure_time);
 
 			feature_implementation void arrive_to_destination()
 			{
@@ -98,6 +105,7 @@ namespace Movement_Plan_Components
 				((Movement_Plan_Prototype<ComponentType,ComponentType>*)this)->template advance_trajectory<_Trajectory_Unit_Interface*>();
 				_trajectory_container[_current_trajectory_index]->_enter_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
 			}
+
 
 			member_data(bool, valid_trajectory,none,none);
 		};

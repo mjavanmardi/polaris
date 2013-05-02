@@ -165,7 +165,6 @@ namespace Link_Components
 			feature_accessor(original_maximum_flow_rate, none, none);
 			feature_accessor(original_num_lanes, none, none);
 			feature_accessor(shoulder_opened, none, none);
-
 			// event-aware link
 			feature_accessor(event_affected, none, none);
 			feature_accessor(advisory_radio, none, none);
@@ -178,6 +177,11 @@ namespace Link_Components
 			feature_accessor(accident_event_to_process, none, none);
 			feature_accessor(current_accident_event, none, none);
 			
+			feature_accessor(speed_adjustment_factor_due_to_weather, none, none);
+			feature_accessor(speed_adjustment_factor_due_to_accident, none, none);
+			feature_accessor(capacity_adjustment_factor_due_to_weather, none, none);
+			feature_accessor(capacity_adjustment_factor_due_to_accident, none, none);
+
 			// ITS-enabled link
 			feature_accessor(advisory_radio_events, none, none);
 			

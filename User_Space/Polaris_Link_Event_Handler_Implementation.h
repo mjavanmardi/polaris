@@ -68,9 +68,11 @@ namespace Link_Components
 			float free_flow_speed_reduction_rate;
 						
 			capacity_reduction_rate = 0.01;
+			_capacity_adjustment_factor_due_to_accident = capacity_reduction_rate;
 			_maximum_flow_rate *= capacity_reduction_rate;
 			
 			free_flow_speed_reduction_rate = 0.01;
+			_speed_adjustment_factor_due_to_accident = free_flow_speed_reduction_rate;
 			_free_flow_speed *= free_flow_speed_reduction_rate;
 			
 			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
@@ -84,12 +86,16 @@ namespace Link_Components
 			int weather_index = get_weather_index<ComponentType,CallerType,TargetType>(_current_weather_event);
 			
 			capacity_reduction_rate = link_capacity_reduction_factors[weather_index];
+			_capacity_adjustment_factor_due_to_weather = capacity_reduction_rate;
 			_maximum_flow_rate *= capacity_reduction_rate;
 
 			free_flow_speed_reduction_rate = find_free_flow_speed_reduction_rate<ComponentType,CallerType,TargetType>(weather_index);
+			_speed_adjustment_factor_due_to_weather = free_flow_speed_reduction_rate;
 			_free_flow_speed *= free_flow_speed_reduction_rate;
 
 			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
+
+			
 		}
 
 		feature_implementation_definition float Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::find_free_flow_speed_reduction_rate(int weather_index)

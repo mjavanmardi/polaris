@@ -126,6 +126,12 @@ namespace Link_Components
 			member_data(float, original_maximum_flow_rate, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, original_num_lanes, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(bool, shoulder_opened, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+
+			member_data(float, speed_adjustment_factor_due_to_weather, none, none);
+			member_data(float, speed_adjustment_factor_due_to_accident, none, none);
+			member_data(float, capacity_adjustment_factor_due_to_weather, none, none);
+			member_data(float, capacity_adjustment_factor_due_to_accident, none, none);
+
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
 		//------------------------------------------------------------------------------------------------------------------
@@ -435,9 +441,15 @@ namespace Link_Components
 				}
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
+				///enroute switching
+				if (((((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				{
+					vehicle->template enroute_updated<bool>(false);
+					vehicle->template update_eta<NULLTYPE>();
+				}
+
 				if (((_Scenario_Interface*)_global_scenario)->template enroute_switching_enabled<bool>())
 				{
-					///enroute switching
 					bool enroute_switching_decision = false;
 
 					int outbound_turn_movement_size = (int)_outbound_turn_movements.size();
@@ -445,11 +457,14 @@ namespace Link_Components
 					{
 						if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION) 
 						{///case 1: with realtime information
-							double r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
-							if (r1 <= vehicle->template information_compliance_rate<double>())
+							if (!vehicle->template enroute_updated<bool>())
 							{
-								enroute_switching_decision = true;
-								//cout<< "informed vehicle switching..." <<endl;
+								double r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+								if (r1 <= vehicle->template information_compliance_rate<double>())
+								{
+									enroute_switching_decision = true;
+									//cout<< "informed vehicle switching..." <<endl;
+								}
 							}
 						}
 					}
@@ -518,7 +533,6 @@ namespace Link_Components
 						vehicle->template enroute_switching<NULLTYPE>();
 					}
 				}
-
 				if(_internal_id == (mp->template destination<_Link_Interface*>())->template internal_id<int>())
 				{
 					vehicle->template unload<NULLTYPE>();
