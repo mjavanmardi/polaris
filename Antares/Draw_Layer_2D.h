@@ -166,10 +166,16 @@ void Information_Page_Implementation<MasterType,ParentType,InheritanceList>::Dra
 	if(ymin == FLT_MAX) ymin=0;
 
 	if(xmin == xmax) ++xmax;
-
-	ymin *= .9;
-	ymax += 1;
-	ymax *= 1.2;
+	
+	if(ymin == ymax)
+	{
+		++ymax;
+	}
+	else
+	{
+		ymin *= .9;
+		ymax *= 1.2;
+	}
 	
 	wxPLplotstream* pls = _plotwindow->GetStream();
 

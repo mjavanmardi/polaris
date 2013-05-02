@@ -74,13 +74,13 @@ namespace Link_Components
 				// set bar attributes that are common for all MOEs.
 				initialize_column();
 
-				_link_travel_time_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
-				_link_speed_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
-				_link_density_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
-				_link_travel_time_ratio_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
-				_link_speed_ratio_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
-				_link_density_ratio_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
-				_link_queue_length_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				//_link_travel_time_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				//_link_speed_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				//_link_density_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				//_link_travel_time_ratio_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				//_link_speed_ratio_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				//_link_density_ratio_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				//_link_queue_length_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
 			}
 
 			void configure_queue_length_box()

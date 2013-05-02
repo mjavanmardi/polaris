@@ -209,6 +209,24 @@ int main(int argc,char** argv)
 	cout<<"writing network data..."<<endl;
 	//network_models::network_information::network_data_information::write_network_data(output_dir_name,network_data_for_output);
 
+	
+	cout << "initializing simulation..." <<endl;	
+	network->simulation_initialize<NULLTYPE>();
+
+
+
+	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
+	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
+	operation->network_reference<_Network_Interface*>(network);
+	if (scenario->intersection_control_flag<int>() == 1) {
+		cout <<"reading operation data..." << endl;
+		operation->read_operation_data<Net_IO_Type>(network_io_maps);
+	}
+	cout <<"converting operation data..." << endl;
+	operation->write_operation_data<NULLTYPE>(network_data_for_output, operation_data_for_output);
+	cout<<"writing operation data..."<<endl;
+	network_models::network_information::operation_data_information::write_operation_data(scenario->output_dir_name<string>(),scenario_data_for_output,operation_data_for_output,network_data_for_output);
+	
 	//==================================================================================================================================
 	// Start Antares UI
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -220,7 +238,7 @@ int main(int argc,char** argv)
 	network->initialize_antares_layers<NULLTYPE>();
 	MasterType::link_type::configure_link_moes_layer();
 	#endif
-	
+
 	if (scenario->template use_event_manager<bool>())
 	{
 		cout << "starting to init event manager" << endl;
@@ -237,22 +255,6 @@ int main(int argc,char** argv)
 		tmc->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 		tmc->Initialize<NT>();
 	}
-
-	cout << "initializing simulation..." <<endl;	
-	network->simulation_initialize<NULLTYPE>();
-
-	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
-	operation->network_reference<_Network_Interface*>(network);
-	if (scenario->intersection_control_flag<int>() == 1) {
-		cout <<"reading operation data..." << endl;
-		operation->read_operation_data<Net_IO_Type>(network_io_maps);
-	}
-	cout <<"converting operation data..." << endl;
-	operation->write_operation_data<NULLTYPE>(network_data_for_output, operation_data_for_output);
-	cout<<"writing operation data..."<<endl;
-	network_models::network_information::operation_data_information::write_operation_data(scenario->output_dir_name<string>(),scenario_data_for_output,operation_data_for_output,network_data_for_output);
-
 
 	////initialize network agents	
 	cout << "initializing link agents..." <<endl;
