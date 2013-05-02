@@ -87,7 +87,7 @@ namespace Vehicle_Components
 				cfg.Configure_Points();
 				cfg.primitive_color=true;
 				cfg.head_accent_size_value=10;
-				cfg.head_size_value=6;
+				cfg.head_size_value=3;
 
 				//cfg.attributes_schema = string("ID,Status,Current_Link");
 				

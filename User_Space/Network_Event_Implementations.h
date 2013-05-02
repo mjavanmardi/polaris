@@ -72,9 +72,6 @@ namespace Network_Event_Components
 
 				_notes = instance.lock()->getNote();
 
-				_start_time = 80 + rand()%20;
-				_end_time = 2000;
-
 				const vector<int>& links=instance.lock()->getLinks();
 
 				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
@@ -181,6 +178,9 @@ namespace Network_Event_Components
 
 				Base_Network_Event::Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
 				
+				_start_time = 14400;
+				_end_time = 43200;
+
 				const vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
 				for(vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
@@ -227,6 +227,9 @@ namespace Network_Event_Components
 
 				Base_Network_Event::Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
 				
+				_start_time = 28800 + rand()%(20*60);
+				_end_time = _start_time + 30*60;
+
 				const vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
 				for(vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)

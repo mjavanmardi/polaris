@@ -224,7 +224,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize_GL
 	
 	glewInit();
 
-	glClearColor(1,1,1,1);
+	glClearColor(.975f,.975f,.975f,1);
 	glClearDepth(1.0f);
 
 	glEnable(GL_DEPTH_TEST);

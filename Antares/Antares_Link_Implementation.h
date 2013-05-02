@@ -73,6 +73,14 @@ namespace Link_Components
 				((Polaris_Link_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Link_Implementation)>*)this)->Initialize<ComponentType,CallerType,TargetType>();
 				// set bar attributes that are common for all MOEs.
 				initialize_column();
+
+				_link_travel_time_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				_link_speed_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				_link_density_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				_link_travel_time_ratio_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				_link_speed_ratio_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				_link_density_ratio_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
+				_link_queue_length_cache.reserve(100000 / sizeof(Point_2D<MasterType>));
 			}
 
 			void configure_queue_length_box()
@@ -248,6 +256,7 @@ namespace Link_Components
 				cfg.grouped = false;
 				_link_queue_length_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_queue_length_layer),ComponentType>*, string& > >(string("Link queue length"));
 				_link_queue_length_layer->Initialize<NULLTYPE>(cfg);
+
 
 			}
 

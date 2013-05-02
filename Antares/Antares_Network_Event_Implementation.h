@@ -261,7 +261,7 @@ namespace Network_Event_Components
 
 				for(int i=0;i<num_drop_vals;i++)
 				{
-					drops[i] = rand()%100+75;
+					drops[i] = rand()%50+25;
 				}
 
 				const int* const drops_begin = &drops[0];
@@ -275,7 +275,7 @@ namespace Network_Event_Components
 
 					itr->particle._z -= *drops_iterator; 
 
-					if(itr->particle._z < 0) itr->particle._z = 10000;
+					if(itr->particle._z < 0) itr->particle._z = (5000 - (*drops_iterator)*10);
 
 					_particle_layer->Push_Element<Regular_Element>( &(*itr) );
 				}
@@ -306,7 +306,7 @@ namespace Network_Event_Components
 
 						precipitation_particle.particle._x = intersection->x_position<float>();
 						precipitation_particle.particle._y = intersection->y_position<float>();
-						precipitation_particle.particle._z = rand()%10000;
+						precipitation_particle.particle._z = rand()%5000;
 
 						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( precipitation_particle.particle );
 
@@ -326,7 +326,7 @@ namespace Network_Event_Components
 
 						precipitation_particle.particle._x = intersection->x_position<float>();
 						precipitation_particle.particle._y = intersection->y_position<float>();
-						precipitation_particle.particle._z = rand()%10000;
+						precipitation_particle.particle._z = rand()%5000;
 
 						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( precipitation_particle.particle );
 
@@ -392,7 +392,7 @@ namespace Network_Event_Components
 
 				for(int i=0;i<num_drop_vals;i++)
 				{
-					drops[i] = rand()%10+10;
+					drops[i] = rand()%5+5;
 				}
 
 				const int* const drops_begin = &drops[0];
@@ -460,9 +460,9 @@ namespace Network_Event_Components
 
 					_precipitation_particles.push_back(precipitation_particle);
 
-					const float parts = 25.0f;
+					const float parts = 100.0f;
 
-					for(int i=0;i<25;i++)
+					for(int i=0;i<100;i++)
 					{
 						saturation = (float)(rand()%50+50);
 						saturation/=100.0f;
