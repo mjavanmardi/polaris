@@ -70,7 +70,7 @@ Antares_Implementation<MasterType,ParentType,InheritanceList>::Antares_Implement
 
 	_attributes_panel=(attributes_panel_interface*)new type_of(attributes_panel)(this);
 	
-	_aui_manager.AddPane((type_of(attributes_panel)*)_attributes_panel,wxAuiPaneInfo().Name("Attributes_Panel").Right().MinSize(200,100));
+	_aui_manager.AddPane((type_of(attributes_panel)*)_attributes_panel,wxAuiPaneInfo().Name("Attributes_Panel").Right().MinSize(250,100));
 
 	_aui_manager.Update();
 	

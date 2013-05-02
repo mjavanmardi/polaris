@@ -46,6 +46,8 @@ namespace Link_Control_Components
 						}
 					}
 				}
+
+				_shoulder_opened=false;
 			}
 
 			//member_data(float, x_position, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -53,6 +55,7 @@ namespace Link_Control_Components
 
 			typedef Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
 			member_data(vector<Link_Interface*>,covered_links,none,none);
+			member_data(bool,shoulder_opened,none,none);
 
 			//member_prototype(Traffic_Management_Center,traffic_management_center,typename type_of(MasterType::traffic_management_center),none,none);
 			//static member_data(vector<string>, component_keys, none, none);

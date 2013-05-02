@@ -37,10 +37,12 @@ namespace Link_Control_Components
 				cfg.head_size_value=4;
 				cfg.head_accent_size_value=6;
 				cfg.selection_callback=&on_select;
+				cfg.submission_callback=&on_submit;
+				cfg.double_click_callback=&on_double_click;
 
-				cfg.head_color._r = 0;
+				cfg.head_color._r = 200;
 				cfg.head_color._g = 0;
-				cfg.head_color._b = 255;
+				cfg.head_color._b = 200;
 				cfg.head_color._a = 255;
 
 				_its_component_layer->Initialize<NULLTYPE>(cfg);
@@ -62,7 +64,54 @@ namespace Link_Control_Components
 				Link_Line_Segment* segments;
 			};
 #pragma pack(pop)
-			
+			static bool on_submit(const list<void*>& selected,const vector<string>& attribute_choices,const vector<string>& dropdown_choices)
+			{
+				ComponentType* its_component=(ComponentType*)selected.back();
+
+				bool open_shoulder;
+
+				if(dropdown_choices[0] == "Open Shoulder")
+				{
+					open_shoulder=true;
+					its_component->_shoulder_opened=true;
+				}
+				else if(dropdown_choices[0] == "Close Shoulder")
+				{
+					open_shoulder=false;
+					its_component->_shoulder_opened=false;
+				}
+				else return false;
+
+				for(vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr = its_component->_covered_links.begin(); itr != its_component->_covered_links.end(); itr++)
+				{
+					Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
+					
+					if(open_shoulder)
+					{
+						link->open_shoulder<NT>();
+					}
+					else
+					{
+						link->close_shoulder<NT>();
+					}
+				}
+
+				return true;
+			}
+
+			static void on_double_click(const list<void*>& selected,vector<pair<string,string>>& attributes,vector<vector<string>>& dropdowns)
+			{
+				ComponentType* its_component=(ComponentType*)selected.back();
+
+				dropdowns.resize(1);
+
+				//for(vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
+				//{
+					dropdowns[0].push_back( "Open Shoulder" );
+					dropdowns[0].push_back( "Close Shoulder" );
+				//}
+			}
+
 			static void on_select(const list<void*>& removed,const list<void*>& added,const list<void*>& selected,vector<pair<string,string>>& bucket)
 			{
 				if(removed.size())
@@ -84,8 +133,31 @@ namespace Link_Control_Components
 						((ComponentType*)*itr)->Accent_Self<ComponentType,ComponentType,NT>();
 					}
 				}
+
+				if(selected.size())
+				{
+					((ComponentType*) (selected.back()))->Display_Attributes<ComponentType,ComponentType,NT>(bucket);
+				}
 			}
-			
+
+			feature_implementation void Display_Attributes(vector<pair<string,string>>& bucket)
+			{
+				pair<string,string> key_value_pair;
+				
+				key_value_pair.first="Shoulder Opened";
+				
+				if(_shoulder_opened)
+				{
+					key_value_pair.second="Yes";
+				}
+				else
+				{
+					key_value_pair.second="No";
+				}
+				
+				bucket.push_back(key_value_pair);
+			}
+
 			feature_implementation void Accent_Self()
 			{
 				Link_Line_Segment* segments = new Link_Line_Segment[ _covered_links.size() ];
@@ -106,7 +178,7 @@ namespace Link_Control_Components
 					
 					current_segment->a._x = intersection->x_position<float>();
 					current_segment->a._y = intersection->y_position<float>();
-					current_segment->a._z = 2;
+					current_segment->a._z = 3;
 
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
 
@@ -114,7 +186,7 @@ namespace Link_Control_Components
 
 					current_segment->b._x = intersection->x_position<float>();
 					current_segment->b._y = intersection->y_position<float>();
-					current_segment->b._z = 2;
+					current_segment->b._z = 3;
 
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
 
@@ -151,7 +223,7 @@ namespace Link_Control_Components
 						
 						current_segment->a._x = intersection->x_position<float>();
 						current_segment->a._y = intersection->y_position<float>();
-						current_segment->a._z = 2;
+						current_segment->a._z = 3;
 
 						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
 
@@ -159,7 +231,7 @@ namespace Link_Control_Components
 
 						current_segment->b._x = intersection->x_position<float>();
 						current_segment->b._y = intersection->y_position<float>();
-						current_segment->b._z = 2;
+						current_segment->b._z = 3;
 
 						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
 

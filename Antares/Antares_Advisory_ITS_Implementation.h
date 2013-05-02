@@ -60,7 +60,7 @@ namespace Advisory_ITS_Components
 						
 						current_segment->a._x = intersection->x_position<float>();
 						current_segment->a._y = intersection->y_position<float>();
-						current_segment->a._z = 2;
+						current_segment->a._z = 3;
 
 						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
 
@@ -68,7 +68,7 @@ namespace Advisory_ITS_Components
 
 						current_segment->b._x = intersection->x_position<float>();
 						current_segment->b._y = intersection->y_position<float>();
-						current_segment->b._z = 2;
+						current_segment->b._z = 3;
 
 						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
 
@@ -93,20 +93,27 @@ namespace Advisory_ITS_Components
 
 			static bool on_submit(const list<void*>& selected,const vector<string>& attribute_choices,const vector<string>& dropdown_choices)
 			{
-				ComponentType* its_component=(ComponentType*)selected.back();
-				
 				string user_event_choice = dropdown_choices[0];
+				bool update_successful = false;
 
-				for(vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
+				for(list<void*>::const_iterator sitr=selected.begin();sitr!=selected.end();sitr++)
 				{
-					if(user_event_choice == (*itr)->notes<string&>())
+					ComponentType* its_component=(ComponentType*) (*sitr);
+
+					for(vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
 					{
-						its_component->_displayed_events.push_back( *itr );
-						return true;
+						if(user_event_choice == (*itr)->notes<string&>())
+						{
+							its_component->_displayed_events.clear();
+							its_component->_displayed_events.push_back( *itr );
+
+							update_successful = true;
+						}
 					}
 				}
 
-				return false;
+				if(update_successful) return true;
+				else return false;
 			}
 
 			static void on_double_click(const list<void*>& selected,vector<pair<string,string>>& attributes,vector<vector<string>>& dropdowns)
@@ -142,6 +149,29 @@ namespace Advisory_ITS_Components
 						((ComponentType*)*itr)->Accent_Self<ComponentType,ComponentType,NT>();
 					}
 				}
+
+				if(selected.size())
+				{
+					((ComponentType*) (selected.back()))->Display_Attributes<ComponentType,ComponentType,NT>(bucket);
+				}
+			}
+
+			feature_implementation void Display_Attributes(vector<pair<string,string>>& bucket)
+			{
+				pair<string,string> key_value_pair;
+				
+				key_value_pair.first="Displayed";
+
+				if(_displayed_events.size())
+				{
+					key_value_pair.second=_displayed_events[0]->notes<string&>();
+				}
+				else
+				{
+					key_value_pair.second="None Displayed";
+				}
+				
+				bucket.push_back(key_value_pair);
 			}
 
 			feature_implementation void Accent_Self()
@@ -164,7 +194,7 @@ namespace Advisory_ITS_Components
 					
 					current_segment->a._x = intersection->x_position<float>();
 					current_segment->a._y = intersection->y_position<float>();
-					current_segment->a._z = 2;
+					current_segment->a._z = 3;
 
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
 
@@ -172,7 +202,7 @@ namespace Advisory_ITS_Components
 
 					current_segment->b._x = intersection->x_position<float>();
 					current_segment->b._y = intersection->y_position<float>();
-					current_segment->b._z = 2;
+					current_segment->b._z = 3;
 
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
 

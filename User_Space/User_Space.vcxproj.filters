@@ -250,9 +250,6 @@
     <ClInclude Include="Depot_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
-    <ClInclude Include="..\Antares\Geometry.h">
-      <Filter>Prototypes</Filter>
-    </ClInclude>
     <ClInclude Include="Network_Event_Implementations.h">
       <Filter>Implementations</Filter>
     </ClInclude>
@@ -296,7 +293,7 @@
       <Filter>Implementations\Person Components</Filter>
     </ClInclude>
     <ClInclude Include="Link_Control_Implementation.h">
-      <Filter>Implementations\Person Components</Filter>
+      <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

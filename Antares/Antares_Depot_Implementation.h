@@ -88,7 +88,7 @@ namespace Depot_Components
 						
 						current_segment->a._x = intersection->x_position<float>();
 						current_segment->a._y = intersection->y_position<float>();
-						current_segment->a._z = 2;
+						current_segment->a._z = 3;
 
 						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
 
@@ -96,7 +96,7 @@ namespace Depot_Components
 
 						current_segment->b._x = intersection->x_position<float>();
 						current_segment->b._y = intersection->y_position<float>();
-						current_segment->b._z = 2;
+						current_segment->b._z = 3;
 
 						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
 
@@ -153,7 +153,7 @@ namespace Depot_Components
 					
 					current_segment->a._x = intersection->x_position<float>();
 					current_segment->a._y = intersection->y_position<float>();
-					current_segment->a._z = 2;
+					current_segment->a._z = 3;
 
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
 
@@ -161,7 +161,7 @@ namespace Depot_Components
 
 					current_segment->b._x = intersection->x_position<float>();
 					current_segment->b._y = intersection->y_position<float>();
-					current_segment->b._z = 2;
+					current_segment->b._z = 3;
 
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
 

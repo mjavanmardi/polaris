@@ -12,7 +12,7 @@
 implementation class Splash_Panel_Implementation : public Polaris_Component<APPEND_CHILD(Splash_Panel_Implementation),MasterType,NULLTYPE>,public wxPanel
 {
 public:
-	Splash_Panel_Implementation(wxWindow* parent) : wxPanel(parent,-1,wxDefaultPosition,wxSize(300,225))
+	Splash_Panel_Implementation(wxWindow* parent) : wxPanel(parent,-1,wxDefaultPosition,wxSize(300,200))
 	{
 		Connect(wxEVT_PAINT,wxPaintEventHandler(Splash_Panel_Implementation::Render));
 		
@@ -28,7 +28,7 @@ public:
 	void Render(wxPaintEvent& event)
 	{
 		wxPaintDC dc(this);
-		dc.DrawBitmap(_image, 25, 0, false);
+		dc.DrawBitmap(_image, 30, 0, false);
 	}
 
 	member_data(wxBitmap,image,none,none);

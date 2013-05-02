@@ -46,6 +46,23 @@ namespace Network_Event_Components
 						((ComponentType*)*itr)->Accent_Self<ComponentType,ComponentType,NT>();
 					}
 				}
+
+				if(selected.size())
+				{
+					((ComponentType*) (selected.back()))->Display_Attributes<ComponentType,ComponentType,NT>(bucket);
+				}
+			}
+
+			feature_implementation void Display_Attributes(vector<pair<string,string>>& bucket)
+			{
+				pair<string,string> key_value_pair;
+				
+				key_value_pair.first="Event";
+
+				key_value_pair.second=_notes;
+
+				
+				bucket.push_back(key_value_pair);
 			}
 
 			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys,string& name)
@@ -59,6 +76,7 @@ namespace Network_Event_Components
 				cfg.grouped=true;
 				cfg.head_size_value=3;
 				cfg.storage_period=1;
+				cfg.head_accent_size_value=6;
 				cfg.selection_callback=&on_select;
 
 				cfg.head_color._r = 255;
@@ -468,7 +486,7 @@ namespace Network_Event_Components
 			{
 				Base_Antares_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(keys,string("Accident_Events"));
 
-				_particle_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(event_layer),ComponentType>*, string& > >(string("Accident Fallout"));
+				_particle_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(event_layer),ComponentType>*, string& > >(string("Accident Smoke"));
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Points();
