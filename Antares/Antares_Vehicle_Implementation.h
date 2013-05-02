@@ -492,6 +492,13 @@ namespace Vehicle_Components
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 
+				key_value_pair.first="departure time";
+				string departure_time_str = convert_seconds_to_hhmm(((_Movement_Plan_Interface*)_movement_plan)->template absolute_departure_time<int>());
+				sprintf(str_buf, "%s", departure_time_str.c_str());
+				key_value_pair.second=str_buf;				
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
 				key_value_pair.first="realtime enroute information";
 				if (_enroute_information_type == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION)
 				{
