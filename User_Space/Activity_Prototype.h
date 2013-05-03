@@ -393,6 +393,10 @@ namespace Activity_Components
 			//===========================================
 			// Activity Planner Methods
 			//-------------------------------------------
+			feature_prototype void Initialize(TargetType activity/*, requires(check(TargetType,Concepts::Is_Activity_Plan_Prototype))*/)
+			{
+				this_component()->Initialize<ComponentType,CallerType,TargetType>(activity);
+			}
 			feature_prototype void Initialize(typename TargetType::ParamType act_type, typename TargetType::Param2Type planning_time, requires(check(TargetType,Is_Target_Type_Struct) && check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same)))
 			{
 				this_component()->Initialize<ComponentType, ComponentType, typename TargetType::ParamType>(act_type);

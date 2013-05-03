@@ -570,7 +570,7 @@ namespace Prototypes
 			typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::weather_network_event_type> weather_itf;
 			weather_itf* weather_event = (weather_itf*)event;
 
-			cout << endl << "EVALUATING WEATHER EVENT: ";
+			//cout << endl << "EVALUATING WEATHER EVENT: ";
 
 			if (this->Is_Event_Relevant<weather_itf*>(weather_event))
 			{
@@ -582,7 +582,7 @@ namespace Prototypes
 			typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::accident_network_event_type> accident_itf;
 			accident_itf* accident_event = (accident_itf*)event;
 			
-			cout << endl << "EVALUATING ACCIDENT EVENT: ";
+			//cout << endl << "EVALUATING ACCIDENT EVENT: ";
 
 			if (this->Is_Event_Relevant<accident_itf*>(accident_event))
 			{

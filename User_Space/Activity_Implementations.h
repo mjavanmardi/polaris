@@ -1034,28 +1034,28 @@ namespace Activity_Components
 		// Stripped down activity record with minimal memory usage (used for storing and printing completed activities)
 		implementation struct Activity_Record : public Polaris_Component<APPEND_CHILD(Activity_Record), MasterType, Data_Object, ParentType>
 		{
-			feature_implementation void Initialize(TargetType object,requires(check(TargetType, Concepts::Is_Activity_Plan_Prototype)))
+			feature_implementation void Initialize(TargetType object/*,requires(check(TargetType, Concepts::Is_Activity_Plan_Prototype))*/)
 			{
 				typedef Activity_Location_Components::Prototypes::Activity_Location_Prototype<MasterType::activity_location_type> location_itf;
 				typedef Zone_Components::Prototypes::Zone_Prototype<MasterType::zone_type> zone_itf;
-				typedef Prototypes::Activity_Planner<TargetType::Component_Type, TargetType::Caller_Type> object_itf;
+				typedef Prototypes::Activity_Planner<typename MasterType::activity_type> object_itf;
 				object_itf* obj = (object_itf*)object;
 
-				this->Activity_Plan_ID<char>(obj->Activity_Plan_ID<char>());
-				this->Activity_Type<char>((char)obj->Activity_Type<Types::ACTIVITY_TYPES>());
-				this->Location<int>(obj->Location<location_itf*>()->zone<zone_itf*>()->uuid<int>());
-				this->Duration<Time_Minutes_Short>(obj->Duration<Time_Minutes_Short>());
-				this->Start_Time<Time_Minutes_Short>(obj->Start_Time<Time_Minutes_Short>());
-				this->Travel_Time<Time_Minutes_Short>(obj->Travel_Time<Time_Minutes_Short>());
+				this->_Activity_Plan_ID = obj->Activity_Plan_ID<char>();
+				this->_Activity_Type = (char)obj->Activity_Type<Types::ACTIVITY_TYPES>();
+				this->Location<ComponentType,CallerType,location_itf*>(obj->Location<location_itf*>());
+				//this->Duration<ComponentType,CallerType,Time_Minutes>(obj->Duration<Time_Minutes>());
+				//this->Start_Time<ComponentType,CallerType,Time_Minutes>(obj->Start_Time<Time_Minutes>());
+				//this->Travel_Time<ComponentType,CallerType,Time_Minutes>(obj->Expected_Travel_Time<Time_Minutes>());
 			}
 
 			// Fundamental activity properties
 			member_data(char, Activity_Plan_ID, check(ReturnValueType,is_arithmetic), check(SetValueType,is_arithmetic));
 			member_data(char, Activity_Type,none,none);
-			member_data(int, Location, none,none);
-			member_data(Time_Minutes_Short, Start_Time, check_2(ReturnValueType,Time_Minutes_Short, is_same),check_2(SetValueType,Time_Minutes_Short, is_same));
-			member_data(Time_Minutes_Short, Duration, check_2(ReturnValueType,Time_Minutes_Short, is_same),check_2(SetValueType,Time_Minutes_Short, is_same));
-			member_data(Time_Minutes_Short, Travel_Time, check_2(ReturnValueType,Time_Minutes_Short, is_same),check_2(SetValueType,Time_Minutes_Short, is_same));
+			member_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype, Location, typename MasterType::activity_location_type, check(ReturnValueType,Activity_Location_Components::Concepts::Is_Activity_Location), check(SetValueType,Activity_Location_Components::Concepts::Is_Activity_Location));
+			member_data(Time_Minutes, Start_Time, check_2(ReturnValueType,Time_Minutes, is_same),check_2(SetValueType,Time_Minutes, is_same));
+			member_data(Time_Minutes, Duration, check_2(ReturnValueType,Time_Minutes, is_same),check_2(SetValueType,Time_Minutes, is_same));
+			member_data(Time_Minutes, Travel_Time, check_2(ReturnValueType,Time_Minutes, is_same),check_2(SetValueType,Time_Minutes, is_same));
 		};
 
 

@@ -347,6 +347,7 @@ namespace Person_Components
 			feature_accessor(Timing_Chooser,none,none);
 
 			feature_accessor(Activity_Container,none,none);
+			feature_accessor(Activity_Record_Container,none,none);
 			feature_accessor(Movement_Plans_Container,none,none);
 			feature_accessor(Schedule_Container,none,none);	
 

@@ -57,6 +57,7 @@ namespace Person_Components
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan, type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface_unqualified_container(Activity_Records,Activity_Record, type_of(Activity_Record_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 			define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan, type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 		
 
@@ -174,7 +175,14 @@ namespace Person_Components
 					if (current_move->template departed_time<Simulation_Timestep_Increment>() > move->template departed_time<Simulation_Timestep_Increment>()) break;
 					++move_itr;
 				}
-				movements->insert(move_itr,move);
+				movements->insert(move_itr,move);			
+
+				// cache the movement plans activity in the activity record container since all attributes have been planned at this point
+				Activity_Plan* act = move->activity_reference<Activity_Plan*>();
+				Activity_Records* act_records = this->Activity_Record_Container<ComponentType,CallerType,Activity_Records*>();
+				Activity_Record* act_record = (Activity_Record*)Allocate<typename MasterType::activity_record_type>();
+				act_record->Initialize<Activity_Plan*>(act);
+				act_records->push_back(act_record);
 				
 			}
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(!check_as_given(TargetType,is_pointer) || !check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
@@ -196,7 +204,7 @@ namespace Person_Components
 					this->Write_To_Log<ComponentType,CallerType,stringstream&>(s);
 				}
 
-				Activity_Plans* activities = this->Activity_Container<ComponentType,CallerType,Activity_Plans*>();
+				Activity_Plans* activities = this->Activity_Container<ComponentType,CallerType,Activity_Plans*>();		
 				activities->push_back(act);
 			}
 		};
