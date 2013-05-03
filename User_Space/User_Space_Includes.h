@@ -12,6 +12,7 @@
 
 // use hashmap
 #include <hash_map>
+#include <hash_set>
 #ifndef WINDOWS
 #include <ext/hash_map>
 using namespace __gnu_cxx;

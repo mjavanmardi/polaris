@@ -67,14 +67,14 @@ namespace Person_Components
 			tag_getter_as_available(scenario_reference);
 			tag_setter_as_available(scenario_reference);
 			define_component_interface(network_reference_interface,typename Perception_Faculty_type::type_of(Network),Network_Components::Prototypes::Network_Prototype, ComponentType);
-
-
+			define_component_interface(scenario_reference_interface,typename Perception_Faculty_type::type_of(Scenario),Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 
 
 
 			// Agent ID
 			member_data(long,uuid,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			member_data(bool,has_pretrip_information,check_2(ReturnValueType,bool,is_same), check_2(SetValueType,bool,is_same));
 
 			// First iteration  - sets the next iteration after all planning is completed
 			member_component_and_feature_accessor(First_Iteration, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
@@ -142,6 +142,7 @@ namespace Person_Components
 
 				// Add basic traveler properties							
 				this->template uuid<ComponentType,ComponentType,int>(id);
+				
 			}
 			feature_implementation void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref)
 			{
@@ -150,6 +151,10 @@ namespace Person_Components
 				this->_Perception_Faculty->Network<TargetType::Param3Type>(network_ref);
 				this->_Perception_Faculty->Scenario<TargetType::Param4Type>(scenario_ref);
 				this->_router->template network<TargetType::Param3Type>(network_ref);
+
+				// Randomly determine if person uses pretrip-information sources (Radio, internet, news, etc.)
+				scenario_reference_interface* scenario = this->scenario_reference<ComponentType,CallerType,scenario_reference_interface*>();
+				this->_has_pretrip_information = (GLOBALS::Uniform_RNG.Next_Rand<float>() < scenario->pretrip_informed_market_share<float>());
 			}
 			tag_feature_as_available(Initialize);
 

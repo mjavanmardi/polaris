@@ -213,6 +213,7 @@ namespace Scenario_Components
 			feature_accessor(use_event_manager, none, none);
 
 			/// enroute switching parameters
+			feature_accessor(pretrip_informed_market_share,none,none);
 			feature_accessor(realtime_informed_vehicle_market_share, none, none);
 			feature_accessor(information_compliance_rate_mean, none, none);
 			feature_accessor(information_compliance_rate_standard_deviation, none, none);
@@ -376,7 +377,8 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("use_event_manager", use_event_manager<bool*>())!= PARAMETER_FOUND) use_event_manager<bool>(false);
 
-				///enroute switching
+				///enroute switching pretrip_informed_market_share
+				if (cfgReader.getParameter("pretrip_informed_market_share", pretrip_informed_market_share<double*>())!= PARAMETER_FOUND) pretrip_informed_market_share<double>(0.5);
 				if (cfgReader.getParameter("realtime_informed_vehicle_market_share", realtime_informed_vehicle_market_share<double*>())!= PARAMETER_FOUND) realtime_informed_vehicle_market_share<double>(0.5);
 				if (cfgReader.getParameter("information_compliance_rate_mean", information_compliance_rate_mean<double*>())!= PARAMETER_FOUND) information_compliance_rate_mean<double>(1.0);
 				if (cfgReader.getParameter("information_compliance_rate_standard_deviation", information_compliance_rate_standard_deviation<double*>())!= PARAMETER_FOUND) information_compliance_rate_standard_deviation<double>(0.5);
