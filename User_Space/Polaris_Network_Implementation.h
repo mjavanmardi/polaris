@@ -818,7 +818,7 @@ namespace Network_Components
 				_Network_Interface* _this_ptr = (_Network_Interface*)this;
 				printf("%s, ", convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str());
 				//printf("loaded=%7d, departed=%7d, arrived=%7d, in_network=%7d, VMT=%7f, VHT=%7f\n",scenario->template network_cumulative_loaded_vehicles<int>(),scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>(),_network_vmt, _network_vht);
-				printf("departed=%7d, arrived=%7d, in_network=%7d, VMT=%7f, VHT=%7f\n",scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>(),_network_vmt, _network_vht);
+				printf("departed=%7d, arrived=%7d, in_network=%7d, VMT=%7.2f, VHT=%7.2f\n",scenario->template network_cumulative_departed_vehicles<int>(),scenario->template network_cumulative_arrived_vehicles<int>(),scenario->template network_in_network_vehicles<int>(),_network_vmt, _network_vht);
 				if (((_Scenario_Interface*)_global_scenario)->template write_node_control_state<bool>())
 				{
 					write_node_control_state<ComponentType,CallerType,TargetType>();

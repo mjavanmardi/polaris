@@ -131,18 +131,29 @@ namespace Network_Event_Components
 			{
 				ComponentType* pthis = (ComponentType*)_this;
 
-				if( _iteration >= pthis->_end_time || _iteration < pthis->_start_time )
-				{
-					pthis->_active = false;
-
-					pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
-				}
-				else
+				if(_iteration == pthis->_start_time)
 				{
 					pthis->_active = true;
-
 					pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
 				}
+				else if(_iteration == pthis->_end_time)
+				{
+					pthis->_active = false;
+					pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
+				}
+
+				//if( _iteration >= pthis->_end_time || _iteration < pthis->_start_time )
+				//{
+				//	pthis->_active = false;
+
+				//	pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
+				//}
+				//else
+				//{
+				//	pthis->_active = true;
+
+				//	pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
+				//}
 			}
 
 			member_data(vector<Link_Interface*>,affected_links,none,none);
@@ -185,25 +196,28 @@ namespace Network_Event_Components
 
 				for(vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
 				{
-					if( (*itr)->getKey()->getKey() == "type" )
-					{
-						if((*itr)->getValue() == "snow")
-						{
-							_weather_type = Types::WEATHER_TYPE::SNOW;
-						}
-					}
-					else if( (*itr)->getKey()->getKey() == "snowdepthm" )
-					{
-						_precipitation_depth = stof((*itr)->getValue());
-					}
-					else if( (*itr)->getKey()->getKey() == "vism" )
-					{
-						_visibility = stoi((*itr)->getValue());
-					}
-					else if( (*itr)->getKey()->getKey() == "county" )
-					{
-						_county = (*itr)->getValue();
-					}
+					_weather_type = Types::WEATHER_TYPE::SNOW;
+					_precipitation_depth = .6;
+
+					//if( (*itr)->getKey()->getKey() == "type" )
+					//{
+					//	if((*itr)->getValue() == "snow")
+					//	{
+					//		_weather_type = Types::WEATHER_TYPE::SNOW;
+					//	}
+					//}
+					//else if( (*itr)->getKey()->getKey() == "snowdepthm" )
+					//{
+					//	_precipitation_depth = stof((*itr)->getValue());
+					//}
+					//else if( (*itr)->getKey()->getKey() == "vism" )
+					//{
+					//	_visibility = stoi((*itr)->getValue());
+					//}
+					//else if( (*itr)->getKey()->getKey() == "county" )
+					//{
+					//	_county = (*itr)->getValue();
+					//}
 				}
 			}
 
@@ -228,6 +242,7 @@ namespace Network_Event_Components
 				Base_Network_Event::Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
 				
 				//_start_time = 28800 + rand()%(20*60);
+				//_start_time = 500;
 				//_end_time = _start_time + 30*60;
 
 				const vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();

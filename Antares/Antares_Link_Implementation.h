@@ -300,44 +300,61 @@ namespace Link_Components
 				submission._y = historic_link_moe_data.link_density;
 				_historic_link_density_cache.push_back(submission);
 
-				submission._y = historic_link_moe_data.link_speed_ratio;
-				_historic_link_speed_ratio_cache.push_back(submission);
+				//submission._y = historic_link_moe_data.link_speed_ratio;
+				//_historic_link_speed_ratio_cache.push_back(submission);
 
-				submission._y = historic_link_moe_data.link_density_ratio;
-				_historic_link_density_ratio_cache.push_back(submission);
+				//submission._y = historic_link_moe_data.link_density_ratio;
+				//_historic_link_density_ratio_cache.push_back(submission);
 
-				submission._y = historic_link_moe_data.link_travel_time_ratio;
-				_historic_link_travel_time_ratio_cache.push_back(submission);
+				//submission._y = historic_link_moe_data.link_travel_time_ratio;
+				//_historic_link_travel_time_ratio_cache.push_back(submission);
 
-				submission._y = historic_link_moe_data.link_queue_length;
-				_historic_link_queue_length_cache.push_back(submission);
+				//submission._y = historic_link_moe_data.link_queue_length;
+				//_historic_link_queue_length_cache.push_back(submission);
 			}
 
 			feature_implementation void Push_To_Link_MOE_Plot_Display()
 			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 				Point_2D<MasterType> submission;
 				submission._x = _iteration;
 				
-				submission._y = realtime_link_moe_data.link_travel_time;
-				_link_travel_time_cache.push_back(submission);
+				int current_time = ((_Network_Interface*)_global_network)->start_of_current_simulation_interval_relative<int>();
+				if (current_time <= ((_Scenario_Interface*)_global_scenario)->assignment_interval_length<int>())
+				{
+					submission._y = realtime_link_moe_data.link_travel_time;
+					_link_travel_time_cache.push_back(submission);
 
-				submission._y = realtime_link_moe_data.link_speed;
-				_link_speed_cache.push_back(submission);
+					submission._y = realtime_link_moe_data.link_speed;
+					_link_speed_cache.push_back(submission);
 
-				submission._y = realtime_link_moe_data.link_density;
-				_link_density_cache.push_back(submission);
+					submission._y = realtime_link_moe_data.link_density;
+					_link_density_cache.push_back(submission);
+				}
+				else
+				{
+					submission._y = non_volatile_link_moe_data.link_travel_time;
+					_link_travel_time_cache.push_back(submission);
 
-				submission._y = realtime_link_moe_data.link_speed_ratio;
-				_link_speed_ratio_cache.push_back(submission);
+					submission._y = non_volatile_link_moe_data.link_speed;
+					_link_speed_cache.push_back(submission);
 
-				submission._y = realtime_link_moe_data.link_density_ratio;
-				_link_density_ratio_cache.push_back(submission);
+					submission._y = non_volatile_link_moe_data.link_density;
+					_link_density_cache.push_back(submission);
+				}
 
-				submission._y = realtime_link_moe_data.link_travel_time_ratio;
-				_link_travel_time_ratio_cache.push_back(submission);
+				//submission._y = realtime_link_moe_data.link_speed_ratio;
+				//_link_speed_ratio_cache.push_back(submission);
 
-				submission._y = realtime_link_moe_data.link_queue_length;
-				_link_queue_length_cache.push_back(submission);
+				//submission._y = realtime_link_moe_data.link_density_ratio;
+				//_link_density_ratio_cache.push_back(submission);
+
+				//submission._y = realtime_link_moe_data.link_travel_time_ratio;
+				//_link_travel_time_ratio_cache.push_back(submission);
+
+				//submission._y = realtime_link_moe_data.link_queue_length;
+				//_link_queue_length_cache.push_back(submission);
 			}
 
 			typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
@@ -564,25 +581,25 @@ namespace Link_Components
 				element.points = &_link_density_cache.front();
 				((typename MasterType::network_type*)_global_network)->_network_avg_link_density_layer->Push_Element<Accented_Element>((void*)&element);
 
-				// plot link_travel_time_ratio
-				element.num_primitives = _link_travel_time_ratio_cache.size();
-				element.points = &_link_travel_time_ratio_cache.front();
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_travel_time_ratio_layer->Push_Element<Accented_Element>((void*)&element);
+				//// plot link_travel_time_ratio
+				//element.num_primitives = _link_travel_time_ratio_cache.size();
+				//element.points = &_link_travel_time_ratio_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_travel_time_ratio_layer->Push_Element<Accented_Element>((void*)&element);
 
-				// plot link_speed_ratio
-				element.num_primitives = _link_speed_ratio_cache.size();
-				element.points = &_link_speed_ratio_cache.front();
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_speed_ratio_layer->Push_Element<Accented_Element>((void*)&element);
+				//// plot link_speed_ratio
+				//element.num_primitives = _link_speed_ratio_cache.size();
+				//element.points = &_link_speed_ratio_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_speed_ratio_layer->Push_Element<Accented_Element>((void*)&element);
 
-				// plot link_density_ratio
-				element.num_primitives = _link_density_ratio_cache.size();
-				element.points = &_link_density_ratio_cache.front();
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_density_ratio_layer->Push_Element<Accented_Element>((void*)&element);
+				//// plot link_density_ratio
+				//element.num_primitives = _link_density_ratio_cache.size();
+				//element.points = &_link_density_ratio_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_density_ratio_layer->Push_Element<Accented_Element>((void*)&element);
 
-				// plot link_queue_length
-				element.num_primitives = _link_queue_length_cache.size();
-				element.points = &_link_queue_length_cache.front();
-				((typename MasterType::network_type*)_global_network)->_network_avg_link_queue_length_layer->Push_Element<Accented_Element>((void*)&element);
+				//// plot link_queue_length
+				//element.num_primitives = _link_queue_length_cache.size();
+				//element.points = &_link_queue_length_cache.front();
+				//((typename MasterType::network_type*)_global_network)->_network_avg_link_queue_length_layer->Push_Element<Accented_Element>((void*)&element);
 			}
 
 			void plot_current_link_moe_in_historic_plot()
@@ -730,6 +747,7 @@ namespace Link_Components
 			
 			feature_implementation void Display_Attributes(vector<pair<string,string>>& bucket)
 			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				plot_link_moe();
 
 				stringstream s;
@@ -792,8 +810,26 @@ namespace Link_Components
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 
-				key_value_pair.first="Free-flow speed";
+				key_value_pair.first="Original free-flow speed";
 				sprintf(str_buf, "%.0f MPH", _original_free_flow_speed);
+				key_value_pair.second=str_buf;
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="Free-flow speed";
+				sprintf(str_buf, "%.0f MPH", _free_flow_speed);
+				key_value_pair.second=str_buf;
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+				
+				key_value_pair.first="Original maximum flow rate";
+				sprintf(str_buf, "%.0f MPH", _original_maximum_flow_rate);
+				key_value_pair.second=str_buf;
+				memset(&str_buf[0],0,128);
+				bucket.push_back(key_value_pair);
+
+				key_value_pair.first="Maximum flow rate";
+				sprintf(str_buf, "%.0f MPH", _maximum_flow_rate);
 				key_value_pair.second=str_buf;
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
@@ -803,18 +839,45 @@ namespace Link_Components
 				key_value_pair.second=str_buf;				
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
+				
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>()) 
+				{
+					key_value_pair.first="Historic travel time";
+					sprintf(str_buf, "%.2f minutes", historic_link_moe_data.link_travel_time);
+					key_value_pair.second=str_buf;				
+					memset(&str_buf[0],0,128);
+					bucket.push_back(key_value_pair);
+				}
 
 				key_value_pair.first="Speed";
 				sprintf(str_buf, "%.2f MPH", realtime_link_moe_data.link_speed);
 				key_value_pair.second=str_buf;				
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
-
+				
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>()) 
+				{
+					key_value_pair.first="Historic speed";
+					sprintf(str_buf, "%.2f MPH", historic_link_moe_data.link_speed);
+					key_value_pair.second=str_buf;				
+					memset(&str_buf[0],0,128);
+					bucket.push_back(key_value_pair);
+				}
+				
 				key_value_pair.first="Density";
 				sprintf(str_buf, "%.2f VPMPL", realtime_link_moe_data.link_density);
 				key_value_pair.second=str_buf;				
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
+
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>()) 
+				{
+					key_value_pair.first="Historic density";
+					sprintf(str_buf, "%.2f VPMPL", historic_link_moe_data.link_density);
+					key_value_pair.second=str_buf;				
+					memset(&str_buf[0],0,128);
+					bucket.push_back(key_value_pair);
+				}
 
 				key_value_pair.first="Travel time ratio";
 				sprintf(str_buf, "%.2f", realtime_link_moe_data.link_travel_time_ratio);

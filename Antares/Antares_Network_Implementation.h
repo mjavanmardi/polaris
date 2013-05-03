@@ -189,8 +189,8 @@ namespace Network_Components
 							moe_data.network_avg_link_speed_ratio = stof(tokens[11]);
 							moe_data.network_avg_link_density_ratio = stof(tokens[12]);
 							moe_data.network_avg_link_queue_length = stof(tokens[13]);
-							moe_data.network_vmt = stoi(tokens[14]);
-							moe_data.network_vht = stoi(tokens[15]);
+							moe_data.network_vmt = int(stof(tokens[14]));
+							moe_data.network_vht = int(stof(tokens[15]));
 							moe_data.network_cumulative_loaded_vehicles = stoi(tokens[16]);
 							moe_data.network_cumulative_departed_vehicles = stoi(tokens[17]);
 							moe_data.network_in_network_vehicles = stoi(tokens[18]);
