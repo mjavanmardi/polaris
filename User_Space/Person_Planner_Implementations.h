@@ -45,6 +45,7 @@ namespace Person_Components
 			member_component_and_feature_accessor(Next_Planning_Time, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			//Containers for activity planning events and movement planning events
 			member_container(list<typename MasterType::activity_type*>,Activity_Container,none,none);
+			member_container(list<typename MasterType::activity_record_type*>,Activity_Record_Container,none,none);
 			member_container(list<typename MasterType::movement_plan_type*>,Movement_Plans_Container,none,none);
 
 

@@ -18,6 +18,7 @@ namespace Person_Components
 			member_prototype(Prototypes::Person,Parent_Person,typename MasterType::person_type,none,none);
 			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,Movement,typename MasterType::movement_plan_type,none,none);
 			member_data(bool, Movement_Scheduled, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
+			member_data(bool, Replanning_Needed, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
 		};
 
 		implementation struct Person_Implementation : public Polaris_Component<APPEND_CHILD(Person_Implementation),MasterType,Execution_Object,ParentType>

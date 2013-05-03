@@ -2,6 +2,7 @@
 
 //#include "User_Space_Includes.h"
 #include "Activity_Prototype.h"
+#include "Network_Event_Prototype.h"
 #include "Activity_Location_Prototype.h"
 #include "Network_Prototype.h"
 #include "Zone_Prototype.h"
@@ -383,7 +384,9 @@ namespace Prototypes
 	{
 		tag_as_prototype;
 
-		// Event handling
+		//========================================================
+		// Events
+		//--------------------------------------------------------
 		declare_feature_conditional(Movement_Conditional)
 		{
 			typedef Person_Mover<ComponentType, ComponentType> _Person_Mover_Interface;
@@ -471,6 +474,10 @@ namespace Prototypes
 			pthis->Do_Movement<NT>();
 		}
 
+
+		//========================================================
+		// Main hook to person planner - called 5 minutes prior to estimated departure
+		//--------------------------------------------------------
 		feature_prototype void Schedule_Movement(typename TargetType::ParamType departure_time, typename TargetType::Param2Type movement, requires(
 			check(typename TargetType::ParamType, Basic_Units::Concepts::Is_Time_Value) && 
 			check(typename TargetType::Param2Type, Movement_Plan_Components::Concepts::Is_Movement_Plan) && 
@@ -500,6 +507,11 @@ namespace Prototypes
 			assert_check(typename TargetType::Param2Type, is_pointer, "Error, must pass movement plan interface as a pointer or reference.");
 		}
 		
+			
+
+		//========================================================
+		// Information Acquisition Functionality
+		//--------------------------------------------------------
 		feature_prototype void Do_Pretrip_Information_Acquisition()
 		{
 			// interfaces
@@ -532,17 +544,193 @@ namespace Prototypes
 				vector<event_itf*> base_events;
 				har->Get_Displayed_Messages<MasterType::base_network_event_type>(base_events);
 
-				cout << endl << "Advisory radio for link " << origin_link->uuid<int>() << ", num_events: " << base_events.size();
-
 				// process weather events from HAR
 				vector<weather_itf*> weather_events;
 				har->Get_Displayed_Messages<MasterType::weather_network_event_type>(weather_events);
+				cout << endl << "Weather events size: " << weather_events.size();
+				for (vector<weather_itf*>::iterator w_itr = weather_events.begin(); w_itr != weather_events.end(); ++w_itr)
+				{
+					this->Evaluate_Network_Event<weather_itf*>(*w_itr);
+				}
 			
+				// process accident events from HAR
 				vector<accident_itf*> accident_events;
 				har->Get_Displayed_Messages<MasterType::accident_network_event_type>(accident_events);
+				cout << endl << "Accident events size: " << accident_events.size();
+				for (vector<accident_itf*>::iterator a_itr = accident_events.begin(); a_itr != accident_events.end(); ++a_itr)
+				{
+					this->Evaluate_Network_Event<accident_itf*>(*a_itr);
+				}
 			}
 			
 		}
+
+		feature_prototype void Evaluate_Network_Event(TargetType event, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
+		{
+			typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::weather_network_event_type> weather_itf;
+			weather_itf* weather_event = (weather_itf*)event;
+
+			cout << endl << "EVALUATING WEATHER EVENT: ";
+
+			if (this->Is_Event_Relevant<weather_itf*>(weather_event))
+			{
+				cout << "WEATHER_ADVISORY: destination is affected by weather event.";
+			}
+		}
+		feature_prototype void Evaluate_Network_Event(TargetType event, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
+		{
+			typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::accident_network_event_type> accident_itf;
+			accident_itf* accident_event = (accident_itf*)event;
+			
+			cout << endl << "EVALUATING ACCIDENT EVENT: ";
+
+			if (this->Is_Event_Relevant<accident_itf*>(accident_event))
+			{
+				cout << endl << "ACCIDENT_ADVISORY: there is an accident along your route.";
+			}
+		}
+		feature_prototype void Evaluate_Network_Event(TargetType event, requires(!check(typename TargetType,Network_Event_Components::Concepts::Is_Weather_Event_Prototype) && !check(typename TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
+		{
+			assert_check(TargetType, Is_Polaris_Prototype, "Warning: TargetType event must be a polaris prototype.");
+			assert_check(TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype, "Warning: TargetType component must be a weather_network_event, or ");
+			assert_check(TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype, "TargetType component must be an accident_network_event_type.");
+		}
+
+		feature_prototype bool Is_Event_Relevant(TargetType event, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
+		{
+			// interfaces
+			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
+			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+			define_component_interface(movement_itf, typename get_type_of(Movement),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+			define_container_and_value_interface(trajectory_interface,trajectory_unit_interface,typename movement_itf::get_type_of(trajectory_container),Containers::Random_Access_Sequence_Prototype,Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype,ComponentType);
+			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			
+			// get destination link for current movement
+			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+			movement_itf* movement = this->Movement<movement_itf*>();
+			link_itf* destination_link = movement->destination<link_itf*>();
+
+			// interface to event
+			typedef Network_Event<typename MasterType::weather_network_event_type> weather_itf;
+			weather_itf* my_event = (weather_itf*)event;
+		
+			// does event affect destination link?
+			links* affected_links = my_event->affected_links<links*>();
+			link_itf* affected_link;
+			for (links::iterator itr = affected_links->begin(); itr != affected_links->end(); ++itr)
+			{
+				affected_link = *itr;
+				if (affected_link == destination_link) return true;
+			}
+			return false;
+		}
+		feature_prototype bool Is_Event_Relevant(TargetType event, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
+		{
+			// interfaces
+			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
+			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+			define_component_interface(movement_itf, typename get_type_of(Movement),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+			define_container_and_value_interface(trajectory_interface,trajectory_unit_interface,typename movement_itf::get_type_of(trajectory_container),Containers::Random_Access_Sequence_Prototype,Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype,ComponentType);
+			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			
+			// get destination link for current movement
+			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+			movement_itf* movement = this->Movement<movement_itf*>();
+			trajectory_interface* trajectory = movement->trajectory_container<trajectory_interface*>();
+			trajectory_unit_interface* traj_unit;
+			
+			// interface to event
+			typedef Network_Event<typename MasterType::weather_network_event_type> weather_itf;
+			weather_itf* my_event = (weather_itf*)event;
+		
+			// does event affect destination link?
+			links* affected_links = my_event->affected_links<links*>();
+			link_itf* affected_link;
+			for (links::iterator itr = affected_links->begin(); itr != affected_links->end(); ++itr)
+			{
+				affected_link = *itr;
+				for (trajectory_interface::iterator t_itr = trajectory->begin(); t_itr != trajectory->end(); ++t_itr)
+				{
+					traj_unit = *t_itr;
+					if (affected_link == traj_unit->link<link_itf*>()) return true;
+				}
+			}
+			return false;
+		}
+
+		feature_prototype bool Get_Event_Extents(typename TargetType::ParamType event, typename TargetType::Param2Type extents, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
+		{
+			// interfaces
+			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
+			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+			define_component_interface(movement_itf, typename get_type_of(Movement),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+			define_container_and_value_interface(trajectory_interface,trajectory_unit_interface,typename movement_itf::get_type_of(trajectory_container),Containers::Random_Access_Sequence_Prototype,Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype,ComponentType);
+			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			
+			// get destination link for current movement
+			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+			movement_itf* movement = this->Movement<movement_itf*>();
+			link_itf* destination_link = movement->destination<link_itf*>();
+
+			// interface to event
+			typedef Network_Event<typename MasterType::weather_network_event_type> weather_itf;
+			weather_itf* my_event = (weather_itf*)event;
+		
+			// does event affect destination link?
+			links* affected_links = my_event->affected_links<links*>();
+			link_itf* affected_link;
+			for (links::iterator itr = affected_links->begin(); itr != affected_links->end(); ++itr)
+			{
+				affected_link = *itr;
+				if (affected_link == destination_link) return true;
+			}
+			return false;
+		}
+		feature_prototype bool Get_Event_Extents(TargetType event, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
+		{
+			// interfaces
+			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
+			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+			define_component_interface(movement_itf, typename get_type_of(Movement),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+			define_container_and_value_interface(trajectory_interface,trajectory_unit_interface,typename movement_itf::get_type_of(trajectory_container),Containers::Random_Access_Sequence_Prototype,Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype,ComponentType);
+			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			
+			// get destination link for current movement
+			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+			movement_itf* movement = this->Movement<movement_itf*>();
+			trajectory_interface* trajectory = movement->trajectory_container<trajectory_interface*>();
+			trajectory_unit_interface* traj_unit;
+			
+			// interface to event
+			typedef Network_Event<typename MasterType::weather_network_event_type> weather_itf;
+			weather_itf* my_event = (weather_itf*)event;
+		
+			// does event affect destination link?
+			links* affected_links = my_event->affected_links<links*>();
+			link_itf* affected_link;
+			for (links::iterator itr = affected_links->begin(); itr != affected_links->end(); ++itr)
+			{
+				affected_link = *itr;
+				for (trajectory_interface::iterator t_itr = trajectory->begin(); t_itr != trajectory->end(); ++t_itr)
+				{
+					traj_unit = *t_itr;
+					if (affected_link == traj_unit->link<link_itf*>()) return true;
+				}
+			}
+			return false;
+		}
+
+		//========================================================
+		// Pre-trip Replanning Functionality
+		//--------------------------------------------------------
 		feature_prototype void Do_Pretrip_Replanning()
 		{
 			// interfaces
@@ -560,6 +748,10 @@ namespace Prototypes
 			movement_itf* movements = this->Movement<movement_itf*>();
 			link_itf* origin_link = movements->template origin<link_itf*>();
 		}
+
+		//========================================================
+		// Pre-trip Rerouting Functionality
+		//--------------------------------------------------------
 		feature_prototype void Do_Pretrip_Routing()
 		{
 			// interfaces
@@ -580,6 +772,10 @@ namespace Prototypes
 			itf->movement_plan<movement_itf*>(movements);
 			itf->Schedule_Route_Computation<int>(_iteration+1);
 		}
+
+		//========================================================
+		// Movement Functionality
+		//--------------------------------------------------------
 		feature_prototype void Do_Movement()
 		{
 			// free up movement schedule
@@ -608,10 +804,15 @@ namespace Prototypes
 			}
 		}
 
-		// Features
+
+
+		//========================================================
+		// Basic Features
+		//--------------------------------------------------------
 		feature_accessor(Parent_Person,none,none);
 		feature_accessor(Movement,none,none);
 		feature_accessor(Movement_Scheduled,none,none);
+		feature_accessor(Replanning_Needed,none,none);
 	};
 
 

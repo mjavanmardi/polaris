@@ -6,6 +6,42 @@ namespace Network_Event_Components
 {
 	namespace Concepts
 	{
+		concept struct Is_Weather_Event_Prototype
+		{
+			check_getter(has_type,Component_Type::weather_type);
+			check_getter(has_precipitation_depth,Component_Type::precipitation_depth);
+			check_getter(has_visibility,Component_Type::visibility);
+			check_getter(has_temperature,Component_Type::temperature);
+			check_getter(has_wind_speed,Component_Type::wind_speed);
+			define_default_check(has_type & has_precipitation_depth & has_visibility & has_temperature & has_wind_speed);
+		};
+		concept struct Is_Weather_Event
+		{
+			check_getter(has_type,weather_type);
+			check_getter(has_precipitation_depth,precipitation_depth);
+			check_getter(has_visibility,visibility);
+			check_getter(has_temperature,temperature);
+			check_getter(has_wind_speed,wind_speed);
+			check_concept(is_prototype, Is_Weather_Event_Prototype);
+			define_sub_check(is_component, has_type & has_precipitation_depth & has_visibility & has_temperature & has_wind_speed);
+			define_default_check(is_prototype || is_component);
+		};
+		concept struct Is_Accident_Event_Prototype
+		{
+			check_getter(has_type,Component_Type::accident_type);
+			check_getter(has_severity,Component_Type::severity);
+			check_getter(has_lanes,Component_Type::lanes);
+			define_default_check(has_type & has_severity & has_lanes);
+		};
+		concept struct Is_Accident_Event
+		{
+			check_getter(has_type,accident_type);
+			check_getter(has_severity,severity);
+			check_getter(has_lanes,lanes);
+			check_concept(is_prototype, Is_Accident_Event_Prototype);
+			define_sub_check(is_component, has_type & has_severity & has_lanes);
+			define_default_check(is_prototype || is_component);
+		};
 	}
 	
 	namespace Types

@@ -178,8 +178,8 @@ namespace Network_Event_Components
 
 				Base_Network_Event::Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
 				
-				_start_time = 14400;
-				_end_time = 43200;
+				//_start_time = 14400;
+				//_end_time = 43200;
 
 				const vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
@@ -227,8 +227,8 @@ namespace Network_Event_Components
 
 				Base_Network_Event::Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
 				
-				_start_time = 28800 + rand()%(20*60);
-				_end_time = _start_time + 30*60;
+				//_start_time = 28800 + rand()%(20*60);
+				//_end_time = _start_time + 30*60;
 
 				const vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
