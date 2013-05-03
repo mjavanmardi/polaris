@@ -210,7 +210,8 @@ namespace Scenario_Components
 			feature_accessor(output_turn_movement_moe_for_assignment_interval, none, none);
 			feature_accessor(output_network_moe_for_assignment_interval, none, none);
 
-			feature_accessor(use_event_manager, none, none);
+			feature_accessor(use_tmc, none, none);
+			feature_accessor(use_network_events, none, none);
 
 			/// enroute switching parameters
 			feature_accessor(pretrip_informed_market_share,none,none);
@@ -375,7 +376,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_assignment_interval<bool>(true);
 
 
-				if (cfgReader.getParameter("use_event_manager", use_event_manager<bool*>())!= PARAMETER_FOUND) use_event_manager<bool>(false);
+				if (cfgReader.getParameter("use_tmc", use_tmc<bool*>())!= PARAMETER_FOUND) use_tmc<bool>(false);
+				if (cfgReader.getParameter("use_network_events", use_network_events<bool*>())!= PARAMETER_FOUND) use_network_events<bool>(false);
 
 				///enroute switching pretrip_informed_market_share
 				if (cfgReader.getParameter("pretrip_informed_market_share", pretrip_informed_market_share<double*>())!= PARAMETER_FOUND) pretrip_informed_market_share<double>(0.5);

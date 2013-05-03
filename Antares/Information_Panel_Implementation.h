@@ -23,9 +23,11 @@ public:
 
 		list< Information_Page<typename MasterType::type_of(information_page),ComponentType>* >::iterator itr;
 
+		bool blank_page_skipped=false;
+
 		for(itr=_2D_layers.begin();itr!=_2D_layers.end();itr++)
 		{
-			if((*itr)->layer<Antares_Layer_Interface*>()==nullptr)
+			if((*itr)->layer<Antares_Layer_Interface*>()==nullptr && blank_page_skipped)
 			{
 				new_layer=(Antares_Layer_Interface*)Allocate<typename type_of(MasterType::antares_layer)>();
 
@@ -40,6 +42,8 @@ public:
 
 				break;
 			}
+
+			blank_page_skipped=true;
 		}
 
 		return new_layer;

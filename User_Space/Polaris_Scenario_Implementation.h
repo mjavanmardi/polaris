@@ -121,8 +121,9 @@ namespace Scenario_Components
 			member_data(bool, output_turn_movement_moe_for_simulation_interval, none, none);
 			member_data(bool, output_network_moe_for_simulation_interval, none, none);
 
-			member_data(bool, use_event_manager, none, none);
-			
+			member_data(bool, use_tmc, none, none);
+			member_data(bool, use_network_events, none, none);
+
 			/// enroute switching parameters pretrip_informed_market_share
 			member_data(double, pretrip_informed_market_share, none, none);
 			member_data(double, realtime_informed_vehicle_market_share, none, none);

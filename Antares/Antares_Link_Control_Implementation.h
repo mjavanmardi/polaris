@@ -66,33 +66,47 @@ namespace Link_Control_Components
 #pragma pack(pop)
 			static bool on_submit(const list<void*>& selected,const vector<string>& attribute_choices,const vector<string>& dropdown_choices)
 			{
-				ComponentType* its_component=(ComponentType*)selected.back();
+				//ComponentType* its_component=(ComponentType*)selected.back();
 
 				bool open_shoulder;
 
 				if(dropdown_choices[0] == "Open Shoulder")
 				{
 					open_shoulder=true;
-					its_component->_shoulder_opened=true;
+					//its_component->_shoulder_opened=true;
 				}
 				else if(dropdown_choices[0] == "Close Shoulder")
 				{
 					open_shoulder=false;
-					its_component->_shoulder_opened=false;
+					//its_component->_shoulder_opened=false;
 				}
 				else return false;
 
-				for(vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr = its_component->_covered_links.begin(); itr != its_component->_covered_links.end(); itr++)
+				for(list<void*>::const_iterator itr=selected.begin();itr!=selected.end();itr++)
 				{
-					Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
-					
+					ComponentType* its_component=(ComponentType*) (*itr);
+
 					if(open_shoulder)
 					{
-						link->open_shoulder<NT>();
+						its_component->_shoulder_opened=true;
 					}
 					else
 					{
-						link->close_shoulder<NT>();
+						its_component->_shoulder_opened=false;
+					}
+
+					for(vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr = its_component->_covered_links.begin(); itr != its_component->_covered_links.end(); itr++)
+					{
+						Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
+					
+						if(open_shoulder)
+						{
+							link->open_shoulder<NT>();
+						}
+						else
+						{
+							link->close_shoulder<NT>();
+						}
 					}
 				}
 

@@ -168,8 +168,8 @@ namespace Variable_Message_Sign_Components
 				cfg.submission_callback=&on_submit;
 
 				cfg.head_color._r = 25;
-				cfg.head_color._g = 175;
-				cfg.head_color._b = 25;
+				cfg.head_color._g = 25;
+				cfg.head_color._b = 225;
 				cfg.head_color._a = 255;
 
 				_its_component_layer->Initialize<NULLTYPE>(cfg);

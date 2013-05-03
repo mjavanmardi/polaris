@@ -87,7 +87,7 @@ namespace Vehicle_Components
 				cfg.Configure_Points();
 				cfg.primitive_color=true;
 				cfg.head_accent_size_value=10;
-				cfg.head_size_value=5;
+				cfg.head_size_value=4;
 
 				//cfg.attributes_schema = string("ID,Status,Current_Link");
 				
@@ -411,23 +411,53 @@ namespace Vehicle_Components
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
 
 				display_route<typename MasterType::vehicle_type,NT,NT>();
-#ifdef IntegratedModelApplication
-				typedef Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType> Activity_Location_Interface;
 
-				Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
-				Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
-				list<typename type_of(MasterType::activity)*>* activities = planner->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
-
-				Activity_Location_Interface* previous_location = person->Home_Location<Activity_Location_Interface*>();
-
-				for(list<typename type_of(MasterType::activity)*>::iterator itr=activities->begin();itr!=activities->end();itr++)
+//#ifdef IntegratedModelApplication
+				if (_locations_layer->template draw<bool>())
 				{
-					Activity_Planner<typename type_of(MasterType::activity),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity),ComponentType>*)(*itr);
-					display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location );
-					previous_location = activity_planner->Location<Activity_Location_Interface*>();
-				}
-				display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location );
-#endif				
+
+					typedef Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType> Activity_Location_Interface;
+
+					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
+					Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
+					list<typename type_of(MasterType::activity)*>* activities = planner->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
+					Activity_Location_Interface* previous_location;
+
+					if(activities->size() && person->Home_Location<Activity_Location_Interface*>())
+					{
+						previous_location = person->Home_Location<Activity_Location_Interface*>();
+
+						for(list<typename type_of(MasterType::activity)*>::iterator itr=activities->begin();itr!=activities->end();itr++)
+						{
+							Activity_Planner<typename type_of(MasterType::activity),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity),ComponentType>*)(*itr);
+							if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
+
+							display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location, false );
+							previous_location = activity_planner->Location<Activity_Location_Interface*>();
+						}
+
+						display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, false );
+					}
+
+					list<typename type_of(MasterType::activity_record)*>* discarded_activities = planner->Activity_Record_Container<list<typename type_of(MasterType::activity_record)*>*>();
+
+					if(discarded_activities->size() && person->Home_Location<Activity_Location_Interface*>())
+					{
+						previous_location = person->Home_Location<Activity_Location_Interface*>();
+
+						for(list<typename type_of(MasterType::activity_record)*>::iterator itr=discarded_activities->begin();itr!=discarded_activities->end();itr++)
+						{
+							Activity_Planner<typename type_of(MasterType::activity_record),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity_record),ComponentType>*)(*itr);
+							if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
+
+							display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location, true );
+							previous_location = activity_planner->Location<Activity_Location_Interface*>();
+						}
+
+						display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, true );
+					}
+				}	
+//#endif						
 				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
 
 				Link_Line<MasterType>& link_line = link->template displayed_line<Link_Line<MasterType>&>();
@@ -631,7 +661,7 @@ namespace Vehicle_Components
 
 			}
 
-			feature_implementation void display_location(Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* location, Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* previous_location)
+			feature_implementation void display_location(Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* location, Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* previous_location, bool discarded=false)
 			{
 #pragma pack(push,1)
 				struct attribute_coordinate
@@ -659,10 +689,20 @@ namespace Vehicle_Components
 
 				make_pyramid<ComponentType,ComponentType,NT>(current_vertex,center,radius);
 
-				coordinate.group_color._r=235;
-				coordinate.group_color._g=100;
-				coordinate.group_color._b=50;
-				coordinate.group_color._a=200;
+				if(!discarded)
+				{
+					coordinate.group_color._r=235;
+					coordinate.group_color._g=100;
+					coordinate.group_color._b=50;
+					coordinate.group_color._a=200;
+				}
+				else
+				{
+					coordinate.group_color._r=225;
+					coordinate.group_color._g=225;
+					coordinate.group_color._b=225;
+					coordinate.group_color._a=100;
+				}
 
 				_locations_layer->Push_Element<Accented_Element>(&coordinate);
 
@@ -696,32 +736,44 @@ namespace Vehicle_Components
 					mid._x = (start._x + end._x)/2;
 					mid._y = (start._y + end._y)/2;
 					mid._z = 1;
-
-					link_line.color._r=25;
-					link_line.color._g=255;
-					link_line.color._b=25;
-					link_line.color._a=255;
+					
+					if(!discarded)
+					{
+						link_line.color._r=25;
+						link_line.color._g=255;
+						link_line.color._b=25;
+						link_line.color._a=255;
+					}
+					else
+					{
+						link_line.color._r=200;
+						link_line.color._g=0;
+						link_line.color._b=0;
+						link_line.color._a=150;
+					}
 
 					link_line.down_node=start;
 					link_line.up_node=mid;
 
-					//cout << "Start to Mid" << endl;
-					//cout << link_line.down_node._x << "," << link_line.down_node._y << endl;
-					//cout << link_line.up_node._x << "," << link_line.up_node._y << endl;
-
 					_routes_layer->template Push_Element<Accented_Element>(&link_line);
-
-					link_line.color._r=100;
-					link_line.color._g=100;
-					link_line.color._b=100;
-					link_line.color._a=255;
+					
+					if(!discarded)
+					{
+						link_line.color._r=0;
+						link_line.color._g=0;
+						link_line.color._b=0;
+						link_line.color._a=255;
+					}
+					else
+					{
+						link_line.color._r=225;
+						link_line.color._g=225;
+						link_line.color._b=225;
+						link_line.color._a=100;
+					}
 
 					link_line.down_node=mid;
 					link_line.up_node=end;
-
-					//cout << "Mid to End" << endl;
-					//cout << link_line.down_node._x << "," << link_line.down_node._y << endl;
-					//cout << link_line.up_node._x << "," << link_line.up_node._y << endl;
 
 					_routes_layer->template Push_Element<Accented_Element>(&link_line);
 				}

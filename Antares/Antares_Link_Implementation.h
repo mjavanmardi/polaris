@@ -254,7 +254,7 @@ namespace Link_Components
 				_link_density_ratio_layer->Initialize<NULLTYPE>(cfg);
 
 				cfg.grouped = false;
-				_link_queue_length_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_queue_length_layer),ComponentType>*, string& > >(string("Link queue length"));
+				_link_queue_length_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_queue_length_layer),ComponentType>*, string& > >(string("Link Queue length"));
 				_link_queue_length_layer->Initialize<NULLTYPE>(cfg);
 
 
