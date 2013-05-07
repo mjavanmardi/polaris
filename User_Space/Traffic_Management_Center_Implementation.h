@@ -14,6 +14,7 @@ namespace Traffic_Management_Center_Components
 	{
 		implementation struct Simple_TMC:public Polaris_Component<APPEND_CHILD(Simple_TMC),MasterType,Execution_Object>
 		{
+			// added for convinience
 			typedef Network_Event<typename MasterType::type_of(base_network_event),ComponentType> Base_Network_Event_Interface;
 
 			typedef Advisory_ITS<typename MasterType::type_of(variable_speed_sign),Simple_TMC> Variable_Speed_Sign_Interface;
@@ -23,13 +24,18 @@ namespace Traffic_Management_Center_Components
 			typedef Depot<typename MasterType::type_of(depot),Simple_TMC> Depot_Interface;
 			typedef Link_Control<typename MasterType::type_of(link_control),Simple_TMC> Link_Control_Interface;
 
+			// that places a pointer to network_event_manager_type
+			//			  name of the prototype class		variable name					underlying type
 			member_prototype(Network_Event_Manager, network_event_manager, typename MasterType::network_event_manager_type, none, none);
 
+			//                                          name of the dunction
 			declare_feature_conditional_implementation(TMC_Conditional)
 			{
 				response.next._iteration = _iteration + 10;
 				response.next._sub_iteration = 0;
 
+
+				//this variable specifies wether the the Event fucntion to be called
 				response.result = true;
 			}
 
@@ -38,6 +44,35 @@ namespace Traffic_Management_Center_Components
 				ComponentType* pthis = (ComponentType*)_this;
 
 				pthis->template Load_New_Events<ComponentType,ComponentType,NT>();
+				pthis->DecideOnEventsToBeDisplayed<ComponentType,ComponentType,NT>();
+			}
+
+			feature_implementation void DecideOnEventsToBeDisplayed()
+			{
+				vector<Base_Network_Event_Interface*> current_events;
+				_network_event_manager->Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
+				for(vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
+				{
+					vector<Base_Network_Event_Interface*> events_to_display;
+					//some claculations here
+					(*itr)->Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+				}
+
+				for(vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
+				{
+					vector<Base_Network_Event_Interface*> events_to_display;
+					//some claculations here
+					(*itr)->Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+				}
+
+				for(vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
+				{
+					vector<Base_Network_Event_Interface*> events_to_display;
+					//some claculations here
+					(*itr)->Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+				}
+
+
 			}
 
 			feature_implementation void Load_New_Events()
@@ -48,6 +83,7 @@ namespace Traffic_Management_Center_Components
 				for(vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 				{
 					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+					
 				}
 
 				for(vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
@@ -76,7 +112,7 @@ namespace Traffic_Management_Center_Components
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				string db_name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
 
-				auto_ptr<database> db (open_sqlite_database (db_name));
+				unique_ptr<database> db (open_sqlite_database (db_name));
 				
 				session s;
 

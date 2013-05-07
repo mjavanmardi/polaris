@@ -11,7 +11,7 @@ protected:
 	virtual void SetUp() {
 		db = open_sqlite_database(db_path);
 	}
-	auto_ptr<odb::database> db;
+	unique_ptr<odb::database> db;
 };
 
 
@@ -32,7 +32,7 @@ protected:
 	typedef odb::query<T> query;
 	typedef T TT;
 	typedef odb::result<T> result;
-	auto_ptr<odb::database> db;
+	unique_ptr<odb::database> db;
 };
 
 
@@ -56,6 +56,50 @@ TEST_F(DBTest, LocationFKLocation_Data){
 	ASSERT_EQ(count, 0);
 }
 
+TEST_F(DBTest, LocationFKZone){
+	typedef odb::query<polaris::io::Location> query;
+	typedef odb::result<polaris::io::Location> result;
+	odb::transaction t(this->db->begin());
+	result r(this->db->query<polaris::io::Location>(query::zone.is_null()));
+	int count = 0;
+	for (result::iterator i (r.begin()); i!=r.end(); ++i)
+	{
+	  count++;
+	}
+	t.commit();
+	ASSERT_EQ(count, 0);
+}
+
+TEST_F(DBTest, LocationFKLink){
+	typedef odb::query<polaris::io::Location> query;
+	typedef odb::result<polaris::io::Location> result;
+	odb::transaction t(this->db->begin());
+	result r(this->db->query<polaris::io::Location>(query::link.is_null()));
+	int count = 0;
+	for (result::iterator i (r.begin()); i!=r.end(); ++i)
+	{
+	  count++;
+	}
+	t.commit();
+	ASSERT_EQ(count, 0);
+}
+
+TEST_F(DBTest, LocationLinkAttribute){
+	typedef odb::query<polaris::io::Location> query;
+	typedef odb::result<polaris::io::Location> result;
+	odb::session s;
+	odb::transaction t(this->db->begin());
+	result r(this->db->query<polaris::io::Location>(query::true_expr));
+	int count = 0;
+	for (result::iterator i (r.begin()); i!=r.end(); ++i)
+	{
+		i->getLocation();
+		i->getLink()->getLink();
+		count++;
+	}
+	t.commit();
+	ASSERT_NE(count, 0);
+}
 
 TEST_F(DBTest, Depot){
 	typedef odb::query<polaris::io::Depot> query;
@@ -131,6 +175,21 @@ TEST_F(DBTest, LinkFKNode_B){
 	}
 	t.commit();
 	ASSERT_EQ(count, 0);
+}
+
+TEST_F(DBTest, LinkLanes){
+	typedef odb::query<polaris::io::Link> query;
+	typedef odb::result<polaris::io::Link> result;
+	odb::transaction t(this->db->begin());
+	result r(this->db->query<polaris::io::Link>(query::true_expr));
+	int count = 0;
+	for (result::iterator i (r.begin()); i!=r.end(); ++i)
+	{
+		i->getLanes_Ab();
+		count++;
+	}
+	t.commit();
+	ASSERT_NE(count, 0);
 }
 
 typedef ::testing::Types<polaris::io::Link, polaris::io::Node, polaris::io::Zone> MyTypes;

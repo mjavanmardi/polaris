@@ -11,34 +11,20 @@ namespace Sensor_Components
 	
 	namespace Implementations
 	{
-		implementation struct Fixed_Sensor:public Polaris_Component_Class<Fixed_Sensor,MasterType,Execution_Object>
+		implementation struct FixedSensor:public Polaris_Component<APPEND_CHILD(FixedSensor),MasterType,Execution_Object,ParentType>
 		{
-			member_data(int,storage_start,none,none);
-			member_data(int,storage_interval,none,none);
-			member_data(int,storage_memory,none,none);
+			member_data(int, delta_t, none, none);
+			member_data(double, sigma_speed, none, none);
+			member_data(double, sigma_occupancy, none, none);
+			member_data(double, sigma_volume, none, none);
+			member_data(vector<Types::Reading>, reading_container, none, none);
+			member_prototype(Link_Prototype, link, MasterType::link_type, none, none);
 
-			feature_implementation void Initialize()
+			feature_prototye void Initialize(typename MasterType::link_type* link,TargetType::Param2Type tmc)
 			{
-				_quality=true;
-				_malfunction=false;
-				_operation=true;
-
-				_storage_start=0;
-				_storage_interval=1;
-				_storage_memory=60*5;
-
-				Load_Event<Fixed_Sensor>(&Sensor<Fixed_Sensor>::Maintenance_Condition<NULLTYPE>,&Sensor<Fixed_Sensor>::Maintenance<NULLTYPE>,0,0);
+				_link = link;
 			}
-
-			member_container(deque<float>,speeds,none,none);
-			member_container(deque<int>,volumes,none,none);
-			member_container(deque<float>,occupancies,none,none);
-			member_container(deque<int>,counts,none,none);
-
-			member_data(bool,quality,none,none);
-			member_data(bool,malfunction,none,none);
-			member_data(bool,operation,none,none);
-		};
+		}
 	}
 }
 

@@ -167,7 +167,7 @@ namespace Operation_Components
 				using namespace polaris::io;
 
 				string name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
-				auto_ptr<database> db (open_sqlite_database (name));
+				unique_ptr<database> db (open_sqlite_database (name));
 				transaction t(db->begin());
 
 				_Network_Interface* network = network_reference<_Network_Interface*>();

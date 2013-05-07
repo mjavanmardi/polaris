@@ -14,7 +14,10 @@
 #define DATABASE
 
 #include <string>
-#include <memory>   // auto_ptr
+#include <odb/tr1/memory.hxx>
+using std::tr1::shared_ptr;
+using std::tr1::weak_ptr;
+using std::unique_ptr;
 #include <cstdlib>  // std::exit
 #include <iostream>
 
@@ -35,7 +38,10 @@
 #include <iostream>
 #include <fstream>
 
-using namespace std;
+using std::vector;
+using std::string;
+using std::cout;
+using std::ifstream;
 
 //#pragma warning(disable:4099)
 //
@@ -179,10 +185,10 @@ inline sqlite3* open_spatialite_database(const std::string& name, bool init = tr
 	return db_handle;
 }
 
-inline auto_ptr<odb::database> open_sqlite_database(const std::string& name)
+inline unique_ptr<odb::database> open_sqlite_database(const std::string& name)
 {
 	using namespace polaris::io;
-	auto_ptr<odb::database> db (new odb::sqlite::database (make_name(name, db_inventory[0]), SQLITE_OPEN_READWRITE));	
+	unique_ptr<odb::database> db (new odb::sqlite::database (make_name(name, db_inventory[0]), SQLITE_OPEN_READWRITE));	
 	//odb::transaction t (db->begin());
 	//shared_ptr<polaris::io::MetaData> mt = db->find<MetaData>("schema_version");
 	//t.commit();
@@ -210,10 +216,10 @@ inline auto_ptr<odb::database> open_sqlite_database(const std::string& name)
 	return db;
 }
 
-inline auto_ptr<odb::database> open_sqlite_demand_database(const std::string& name)
+inline unique_ptr<odb::database> open_sqlite_demand_database(const std::string& name)
 {
 	using namespace polaris::io;
-	auto_ptr<odb::database> db (new odb::sqlite::database (make_name(name, db_inventory[2]), SQLITE_OPEN_READWRITE));
+	unique_ptr<odb::database> db (new odb::sqlite::database (make_name(name, db_inventory[2]), SQLITE_OPEN_READWRITE));
 	odb::connection_ptr c (db->connection ());
 	c->execute("PRAGMA synchronous = OFF");
 	c->execute("PRAGMA journal_mode = MEMORY");
@@ -235,12 +241,12 @@ inline auto_ptr<odb::database> open_sqlite_demand_database(const std::string& na
 	return db;
 }
 
-inline auto_ptr<odb::database> create_sqlite_database(const string& name, string& schema)
+inline unique_ptr<odb::database> create_sqlite_database(const string& name, string& schema)
 {
 	using namespace polaris::io;
 	try
 	{
-		auto_ptr<odb::database> db (new odb::sqlite::database (make_name(name, schema), SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE));
+		unique_ptr<odb::database> db (new odb::sqlite::database (make_name(name, schema), SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE));
 		// Create the database schema. Due to bugs in SQLite foreign key
 		// support for DDL statements, we need to temporarily disable
 		// foreign keys.
@@ -267,10 +273,10 @@ inline auto_ptr<odb::database> create_sqlite_database(const string& name, string
 
 }
 
-inline auto_ptr<odb::database> create_sqlite_database(const string& name)
+inline unique_ptr<odb::database> create_sqlite_database(const string& name)
 {
 	using namespace polaris::io;
-	auto_ptr<odb::database> db = create_sqlite_database(name, db_inventory[0]);
+	unique_ptr<odb::database> db = create_sqlite_database(name, db_inventory[0]);
 	shared_ptr<MetaData> mt (new MetaData("schema_version", SCHEMA_REVISION));
 	odb::transaction t (db->begin());
 	db->persist(mt);
@@ -282,7 +288,7 @@ inline auto_ptr<odb::database> create_sqlite_database(const string& name)
 		{
 			try
 			{
-				auto_ptr<odb::database> temp = create_sqlite_database(name, *it);
+				unique_ptr<odb::database> temp = create_sqlite_database(name, *it);
 			}
 			catch (odb::unknown_schema e)
 			{

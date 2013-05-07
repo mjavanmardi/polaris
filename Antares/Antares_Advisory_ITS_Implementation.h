@@ -81,16 +81,6 @@ namespace Advisory_ITS_Components
 				}
 			}
 
-			feature_implementation void Accept_Network_Events(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
-			{
-				_current_events.clear();
-
-				for(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
-				{
-					_current_events.push_back( *itr );
-				}
-			}
-
 			static bool on_submit(const list<void*>& selected,const vector<string>& attribute_choices,const vector<string>& dropdown_choices)
 			{
 				string user_event_choice = dropdown_choices[0];
@@ -154,6 +144,10 @@ namespace Advisory_ITS_Components
 				{
 					((ComponentType*) (selected.back()))->Display_Attributes<ComponentType,ComponentType,NT>(bucket);
 				}
+			}
+			
+			feature_implementation void Accept_Displayed_Network_Events(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
+			{
 			}
 
 			feature_implementation void Display_Attributes(vector<pair<string,string>>& bucket)

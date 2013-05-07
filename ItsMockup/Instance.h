@@ -1,9 +1,35 @@
 #include <Io\Io.h>
 #include <Io\Geometry.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+using std::map;
+
+std::vector<int > ReadLinksFromFile(const char* filename)
+{
+	std::string line;
+	int link, n_links;
+	std::vector<int > result;
+	std::ifstream fh(filename);
+	if (fh.is_open())
+	{
+		getline(fh, line);
+		n_links = atoi(line.c_str());
+		for (int i = 0; i < n_links; i++)
+		{
+			getline(fh, line);
+			link = atoi(line.c_str());
+			result.push_back(link);
+		}
+	}
+	return result;
+}
+
+
 void PopulateInstance(std::string db_path)
 {
 	using namespace polaris::io;
-	auto_ptr<odb::database> db = open_sqlite_database(db_path);
+	unique_ptr<odb::database> db = open_sqlite_database(db_path);
 	
 	//get link_geometry
 	map<int, shape_geometry> points; 
@@ -47,10 +73,10 @@ void PopulateInstance(std::string db_path)
 	shared_ptr<OpenShoulder>    os (nullptr);
 	shared_ptr<LinkList>		link_set (nullptr);
 
-	har.reset(new HAR(1,5817, 0,1000, 20, 0));
+	har.reset(new HAR(1,17436, 0,60, 20, 0));
 	har->setComponent(comp_har);
 	link_set.reset(new LinkList());
-	link_set->setLinks(GetLinksInsideCounty(db_path, "Lake"));
+	link_set->setLinks(GetLinksInsideCounty(db_path, "Cook"));
 	db->persist(link_set);
 	har->setLinks(link_set);
 	db->persist(har);
@@ -119,24 +145,123 @@ void PopulateInstance(std::string db_path)
 			
 		}
 		//put a OpenShoulder with probability 20%
-		if ( (type == "FREEWAY") && (p < 20) )
-		{
-			os.reset(new OpenShoulder());
-			os->setComponent(comp_os);
-			link_set.reset(new LinkList());
-			link_set->setLink(i->getLink());
-			db->persist(link_set);
-			os->setLinks(link_set);
-			try {
-				db->persist(os);
-			}
-			catch (odb::object_already_persistent e) {
-				std::cout << "OS Instance Values object already exists. " << e.what() << "\n";
-			}	
-			
-			
-		}
+		//if ( (type == "FREEWAY") && (p < 20) )
+		//{
+		//	std::string line;
+		//	int link, n_links;
+
+		//	os.reset(new OpenShoulder());
+		//	os->setComponent(comp_os);
+		//	link_set.reset(new LinkList());
+		//	std::ifstream fh("C:/Users/vsokolov/usr/polaris/Subarea/LSDLinks.txt");
+		//	if (fh.is_open())
+		//	{
+		//		getline(fh, line);
+		//		n_links = atoi(line.c_str());
+		//		for (int i = 0; i < n_links; i++)
+		//		{
+		//			getline(fh, line);
+		//			link = atoi(line.c_str());
+		//			link_set->setLink(link);
+
+		//		}
+		//	}
+		//	//link_set->setLink(i->getLink());
+		//	db->persist(link_set);
+		//	os->setLinks(link_set);
+		//	try {
+		//		db->persist(os);
+		//	}
+		//	catch (odb::object_already_persistent e) {
+		//		std::cout << "OS Instance Values object already exists. " << e.what() << "\n";
+		//	}	
+		//	
+		//	
+		//}
 	}
+
+	os.reset(new OpenShoulder());
+	os->setComponent(comp_os);
+	link_set.reset(new LinkList());
+	link_set->setLinks(ReadLinksFromFile("C:/Users/vsokolov/usr/polaris/Subarea/LSDLinks.txt"));
+	db->persist(link_set);
+	os->setLinks(link_set);
+	try {
+		db->persist(os);
+	}
+	catch (odb::object_already_persistent e) {
+		std::cout << "OS Instance Values object already exists. " << e.what() << "\n";
+	}
+
+	os.reset(new OpenShoulder());
+	os->setComponent(comp_os);
+	link_set.reset(new LinkList());
+	link_set->setLinks(ReadLinksFromFile("C:/Users/vsokolov/usr/polaris/Subarea/LinkGroup1.txt"));
+	db->persist(link_set);
+	os->setLinks(link_set);
+	try {
+		db->persist(os);
+	}
+	catch (odb::object_already_persistent e) {
+		std::cout << "OS Instance Values object already exists. " << e.what() << "\n";
+	}
+
+	os.reset(new OpenShoulder());
+	os->setComponent(comp_os);
+	link_set.reset(new LinkList());
+	link_set->setLinks(ReadLinksFromFile("C:/Users/vsokolov/usr/polaris/Subarea/LinkGroup1.txt"));
+	db->persist(link_set);
+	os->setLinks(link_set);
+	try {
+		db->persist(os);
+	}
+	catch (odb::object_already_persistent e) {
+		std::cout << "OS Instance Values object already exists. " << e.what() << "\n";
+	}
+
+	os.reset(new OpenShoulder());
+	os->setComponent(comp_os);
+	link_set.reset(new LinkList());
+	link_set->setLinks(ReadLinksFromFile("C:/Users/vsokolov/usr/polaris/Subarea/LinkGroup2.txt"));
+	db->persist(link_set);
+	os->setLinks(link_set);
+	try {
+		db->persist(os);
+	}
+	catch (odb::object_already_persistent e) {
+		std::cout << "OS Instance Values object already exists. " << e.what() << "\n";
+	}
+
+	os.reset(new OpenShoulder());
+	os->setComponent(comp_os);
+	link_set.reset(new LinkList());
+	link_set->setLinks(ReadLinksFromFile("C:/Users/vsokolov/usr/polaris/Subarea/LinkGroup3.txt"));
+	db->persist(link_set);
+	os->setLinks(link_set);
+	try {
+		db->persist(os);
+	}
+	catch (odb::object_already_persistent e) {
+		std::cout << "OS Instance Values object already exists. " << e.what() << "\n";
+	}
+
+
+	os.reset(new OpenShoulder());
+	os->setComponent(comp_os);
+	link_set.reset(new LinkList());
+	link_set->setLinks(ReadLinksFromFile("C:/Users/vsokolov/usr/polaris/Subarea/DwntwnLinks.txt"));
+	db->persist(link_set);
+	os->setLinks(link_set);
+	try {
+		db->persist(os);
+	}
+	catch (odb::object_already_persistent e) {
+		std::cout << "OS Instance Values object already exists. " << e.what() << "\n";
+	}
+
+
+
+
 	try {
 		t.commit();
 	}

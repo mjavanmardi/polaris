@@ -23,8 +23,8 @@ void test_create(const string& name)
 	container.Nodes[2] = n2;
 	container.Nodes[3] = n3;
 	container.Nodes[4] = n4;
-	//auto_ptr<odb::database> db (create_database (argc, argv));
-	auto_ptr<odb::database> db (create_sqlite_database (name));
+	//unique_ptr<odb::database> db (create_database (argc, argv));
+	unique_ptr<odb::database> db (create_sqlite_database (name));
 	cout << "New database "<< ((odb::sqlite::database*)&(*db))->name() <<" was created\n";
 	//shared_ptr<Link> l1 (new Link(1, "lalal", container.Nodes[1], container.Nodes[2], 1.0, 2.0, 3.0, 10, 20, 2, 0, 8, 12, 0.3, 2,22,22,122,1,33,333,2,3,2,1,2));
 	//shared_ptr<Link> l2 (new Link(2, "lalal", container.Nodes[3], container.Nodes[4], 1.0, 2.0, 3.0, 10, 20, 2, 0, 8, 12, 0.3, 2,22,22,122,1,33,333,2,3,2,1, 3));
@@ -47,7 +47,7 @@ void test_read(const string& name)
 	typedef odb::query<Link> query;
 	typedef odb::result<Link> result;
 	vector<char>::iterator it;
-	auto_ptr<odb::database> db (open_sqlite_database (name));
+	unique_ptr<odb::database> db (open_sqlite_database (name));
 	cout << "Database "<< ((odb::sqlite::database*)&(*db))->name() <<" was opened\n";
 	odb::transaction t (db->begin ());
 	result r (db->query<Link> ( (query::node_a >120)));
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 		net->Init();
 	else
 		net->Init(argc, argv);
-	//auto_ptr<odb::database> db = create_sqlite_database  (net->path_to_database);
+	//unique_ptr<odb::database> db = create_sqlite_database  (net->path_to_database);
 	shared_ptr<odb::database> db = create_sqlite_database  (net->path_to_database);
 	Db_File control_file;
 	char* control_record;

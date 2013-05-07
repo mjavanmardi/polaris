@@ -369,7 +369,7 @@ namespace Network_Event_Components
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				string name( ((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
 
-				auto_ptr<database> db (open_sqlite_database (name));
+				unique_ptr<database> db (open_sqlite_database (name));
 
 				session s;
 

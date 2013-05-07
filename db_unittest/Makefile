@@ -28,42 +28,19 @@ build_all_configurations: Debug Release
 
 # Builds the Debug configuration...
 .PHONY: Debug
-Debug: create_folders gccDebug/db-unittest.o gccDebug/global.o gccDebug/main.o 
-	g++ gccDebug/db-unittest.o gccDebug/global.o gccDebug/main.o  $(Debug_Library_Path) $(Debug_Libraries) -Wl,-rpath,./ -o ../gccDebug/db_unittest.exe
+Debug: create_folders gccDebug/main.o 
+	g++ gccDebug/main.o  $(Debug_Library_Path) $(Debug_Libraries) -Wl,-rpath,./ -o ../gccDebug/db_unittest.exe
 
-# Compiles file db-unittest.cpp for the Debug configuration...
--include gccDebug/db-unittest.d
-gccDebug/db-unittest.o: db-unittest.cpp ../Io/database.h
-	$(CPP_COMPILER) $(Debug_Preprocessor_Definitions) $(Debug_Compiler_Flags) -c db-unittest.cpp $(Debug_Include_Path) -o gccDebug/db-unittest.o
-	$(CPP_COMPILER) $(Debug_Preprocessor_Definitions) $(Debug_Compiler_Flags) -MM db-unittest.cpp $(Debug_Include_Path) > gccDebug/db-unittest.d
-
-# Compiles file global.cpp for the Debug configuration...
--include gccDebug/global.d
-gccDebug/global.o: global.cpp
-	$(CPP_COMPILER) $(Debug_Preprocessor_Definitions) $(Debug_Compiler_Flags) -c global.cpp $(Debug_Include_Path) -o gccDebug/global.o
-	$(CPP_COMPILER) $(Debug_Preprocessor_Definitions) $(Debug_Compiler_Flags) -MM global.cpp $(Debug_Include_Path) > gccDebug/global.d
 # Compiles file main.cpp for the Debug configuration...
 -include gccDebug/main.d
 gccDebug/main.o: main.cpp
-	$(CPP_COMPILER) $(Debug_Preprocessor_Definitions) $(Debug_Compiler_Flags) -c main.cpp $(Debug_Include_Path) -o gccDebug/main.o
-	$(CPP_COMPILER) $(Debug_Preprocessor_Definitions) $(Debug_Compiler_Flags) -MM main.cpp $(Debug_Include_Path) > gccDebug/main.d
+	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -c main.cpp $(Release_Include_Path) -o gccDebug/main.o
+	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -MM main.cpp $(Release_Include_Path) > gccDebug/main.d
 
 # Builds the Release configuration...
 .PHONY: Release
-Release: create_folders gccRelease/db-unittest.o gccRelease/global.o gccRelease/main.o 
-	g++ gccRelease/db-unittest.o gccRelease/global.o gccRelease/main.o  $(Release_Library_Path) $(Release_Libraries) -Wl,-rpath,./ -o ../gccRelease/db_unittest.exe
-
-# Compiles file db-unittest.cpp for the Release configuration...
--include gccRelease/db-unittest.d
-gccRelease/db-unittest.o: db-unittest.cpp
-	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -c db-unittest.cpp $(Release_Include_Path) -o gccRelease/db-unittest.o
-	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -MM db-unittest.cpp $(Release_Include_Path) > gccRelease/db-unittest.d
-
-# Compiles file global.cpp for the Release configuration...
--include gccRelease/global.d
-gccRelease/global.o: global.cpp
-	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -c global.cpp $(Release_Include_Path) -o gccRelease/global.o
-	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -MM global.cpp $(Release_Include_Path) > gccRelease/global.d
+Release: create_folders gccRelease/main.o 
+	g++ gccRelease/main.o  $(Release_Library_Path) $(Release_Libraries) -Wl,-rpath,./ -o ../gccRelease/db_unittest.exe
 
 # Compiles file main.cpp for the Release configuration...
 -include gccRelease/main.d

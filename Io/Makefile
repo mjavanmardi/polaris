@@ -15,8 +15,8 @@ Debug_Libraries=
 Release_Libraries=
 
 # Preprocessor definitions...
-Debug_Preprocessor_Definitions=-D GCC_BUILD -D _DEBUG -D _CONSOLE -D LIBODB_STATIC_LIB -D LIBODB_SQLITE_STATIC_LIB
-Release_Preprocessor_Definitions=-D GCC_BUILD -D NDEBUG -D _CONSOLE  -D LIBODB_STATIC_LIB -D LIBODB_SQLITE_STATIC_LIB 
+Debug_Preprocessor_Definitions=-std=c++0x -D GCC_BUILD -D _DEBUG -D _CONSOLE -D LIBODB_STATIC_LIB -D LIBODB_SQLITE_STATIC_LIB
+Release_Preprocessor_Definitions=-std=c++0x -D GCC_BUILD -D NDEBUG -D _CONSOLE  -D LIBODB_STATIC_LIB -D LIBODB_SQLITE_STATIC_LIB 
 
 # Implictly linked object files...
 Debug_Implicitly_Linked_Objects=
@@ -33,7 +33,7 @@ odb_compile:
 	odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name Demand Demand.h
 	odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name System System.h
 	odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name Result Result.h
-	odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name Its Its.h	
+	odb --std c++11 --database sqlite --generate-query --generate-schema --generate-session --default-pointer std::tr1::shared_ptr --schema-name Its Network_Event.h	
 
 # Builds all configurations for this project...
 .PHONY: build_all_configurations
@@ -42,7 +42,7 @@ build_all_configurations: Debug Release
 # Builds the Debug configuration...
 .PHONY: Debug
 Debug: create_folders gccDebug/Supply-odb.o gccDebug/Result-odb.o gccDebug/Demand-odb.o gccDebug/System-odb.o 
-	ar rcs ../gccDebug/libio.a gccDebug/Supply-odb.o gccDebug/Result-odb.o gccDebug/Demand-odb.o gccDebug/System-odb.o  gccDebug/Its-odb.o $(Debug_Implicitly_Linked_Objects)
+	ar rcs ../gccDebug/libio.a gccDebug/Supply-odb.o gccDebug/Result-odb.o gccDebug/Demand-odb.o gccDebug/System-odb.o  gccDebug/Network_Event-odb.o $(Debug_Implicitly_Linked_Objects)
 
 # Compiles file Supply-odb.cxx for the Debug configuration...
 -include gccDebug/Supply-odb.d
@@ -70,8 +70,8 @@ gccDebug/System-odb.o: System-odb.cxx
 
 # Builds the Release configuration...
 .PHONY: Release
-Release: create_folders gccRelease/Supply-odb.o gccRelease/Result-odb.o gccRelease/Demand-odb.o gccRelease/System-odb.o gccRelease/Its-odb.o 
-	ar rcs ../gccRelease/libio.a gccRelease/Supply-odb.o gccRelease/Result-odb.o gccRelease/Demand-odb.o gccRelease/System-odb.o  gccRelease/Its-odb.o $(Release_Implicitly_Linked_Objects)
+Release: create_folders gccRelease/Supply-odb.o gccRelease/Result-odb.o gccRelease/Demand-odb.o gccRelease/System-odb.o gccRelease/Network_Event-odb.o 
+	ar rcs ../gccRelease/libio.a gccRelease/Supply-odb.o gccRelease/Result-odb.o gccRelease/Demand-odb.o gccRelease/System-odb.o  gccRelease/Network_Event-odb.o $(Release_Implicitly_Linked_Objects)
 
 # Compiles file Supply-odb.cxx for the Release configuration...
 -include gccRelease/Supply-odb.d
@@ -97,11 +97,11 @@ gccRelease/System-odb.o: System-odb.cxx
 	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -c System-odb.cxx $(Release_Include_Path) -o gccRelease/System-odb.o
 	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -MM System-odb.cxx $(Release_Include_Path) > gccRelease/System-odb.d
 
-# Compiles file Its-odb.cxx for the Release configuration...
--include gccRelease/Its-odb.d
-gccRelease/Its-odb.o: Its-odb.cxx
-	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -c Its-odb.cxx $(Release_Include_Path) -o gccRelease/Its-odb.o
-	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -MM Its-odb.cxx $(Release_Include_Path) > gccRelease/Its-odb.d
+# Compiles file Network_Event-odb.cxx for the Release configuration...
+-include gccRelease/Network_Event-odb.d
+gccRelease/Network_Event-odb.o: Network_Event-odb.cxx
+	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -c Network_Event-odb.cxx $(Release_Include_Path) -o gccRelease/Network_Event-odb.o
+	$(CPP_COMPILER) $(Release_Preprocessor_Definitions) $(Release_Compiler_Flags) -MM Network_Event-odb.cxx $(Release_Include_Path) > gccRelease/Network_Event-odb.d
 
 # Creates the intermediate and output folders for each configuration...
 .PHONY: create_folders

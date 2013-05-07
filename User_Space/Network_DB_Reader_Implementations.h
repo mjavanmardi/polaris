@@ -35,7 +35,7 @@ namespace Network_Components
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				_scenario_reference = _network_reference->scenario_reference<_Scenario_Interface*>();
 				string name(_scenario_reference->template database_name<string&>());
-				auto_ptr<database> db (open_sqlite_database (name));
+				unique_ptr<database> db (open_sqlite_database (name));
 				transaction t(db->begin());
 
 				read_intersection_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
@@ -45,7 +45,7 @@ namespace Network_Components
 				read_activity_location_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 			}
 
-			feature_implementation void read_intersection_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+			feature_implementation void read_intersection_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
 				using namespace odb;
 				using namespace polaris::io;
@@ -103,7 +103,7 @@ namespace Network_Components
 				}
 			}
 
-			feature_implementation void read_link_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+			feature_implementation void read_link_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
 				using namespace odb;
 				using namespace polaris::io;
@@ -359,7 +359,7 @@ namespace Network_Components
 				}
 			}
 
-			feature_implementation void read_turn_movement_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+			feature_implementation void read_turn_movement_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
 				using namespace odb;
 				using namespace polaris::io;
@@ -565,7 +565,7 @@ namespace Network_Components
 				}
 			}
 
-			feature_implementation void read_zone_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+			feature_implementation void read_zone_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
 				using namespace odb;
 				using namespace polaris::io;
@@ -626,7 +626,7 @@ namespace Network_Components
 				}
 			}
 		
-			feature_implementation void read_activity_location_data(auto_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
+			feature_implementation void read_activity_location_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
 				using namespace odb;
 				using namespace polaris::io;

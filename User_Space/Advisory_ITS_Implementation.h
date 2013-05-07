@@ -44,13 +44,18 @@ namespace Advisory_ITS_Components
 			feature_implementation void Accept_Network_Events(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
 			{
 				_current_events.clear();
-				_displayed_events.clear();
 
 				for(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
 				{
 					_current_events.push_back( *itr );
-					_displayed_events.push_back( *itr );
 				}
+			}
+
+			feature_implementation void Accept_Displayed_Network_Events(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
+			{
+				_displayed_events.clear();
+				for (vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin(); itr!=network_events.end(); itr++)
+					_displayed_events.push_back( *itr );
 			}
 			
 			feature_implementation void Get_Displayed_Messages(vector<Network_Event<TargetType>*>& bucket,requires(!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same) && check(TargetType,Is_Polaris_Component)))

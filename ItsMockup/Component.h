@@ -3,7 +3,7 @@
 void PopulateComponent(std::string db_path)
 {
 	using namespace polaris::io;
-	auto_ptr<odb::database> db = open_sqlite_database(db_path);
+	unique_ptr<odb::database> db = open_sqlite_database(db_path);
 	
 	shared_ptr<Component>     co (nullptr);
 	shared_ptr<Component>     co1 (nullptr);

@@ -391,6 +391,19 @@ namespace io
 		ret = sqlite3_exec(db_handle, sql, link_callback, &result, &err_msg);
 		return result;
 	}
+
+	static std::vector<int> GetLinksInsideWeatherPolygon(const std::string& db_name)
+	{
+		std::vector<int> result;
+		int ret;
+		char *err_msg = NULL;
+		char sql[2048];
+		sqlite3* db_handle;
+		db_handle = open_spatialite_database(db_name, false);
+		strcpy(sql, "select Link.Link from Link, WeatherPoly where Within(Link.GEO, WeatherPoly.Geometry)");
+		ret = sqlite3_exec(db_handle, sql, link_callback, &result, &err_msg);
+		return result;
+	}
 	static std::vector<int> GetLinksInsideCounty(const std::string& db_name, const std::string& county_name)
 	{
 		std::vector<int> result;

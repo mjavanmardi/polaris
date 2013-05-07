@@ -59,7 +59,7 @@ namespace Demand_Components
 				define_component_interface(_Scenario_Interface, typename get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 				string name(scenario_reference<_Scenario_Interface*>()->template database_name<string&>());
-				auto_ptr<database> db (open_sqlite_demand_database (name));
+				unique_ptr<database> db (open_sqlite_demand_database (name));
 
 				define_component_interface(_Network_Interface, typename get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 
