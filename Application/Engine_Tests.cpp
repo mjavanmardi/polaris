@@ -1,7 +1,10 @@
 #include "Model_Selection.h"
 
 #ifdef ENGINE_TESTS
-#include "Application_Includes.h"
+//#include "Application_Includes.h"
+#include "../Core/Core.h"
+#include "../Core/Core_Includes.h"
+#include "../Core/Execution_Detail.h"
 #define TEST_1
 
 #ifdef TEST_1
@@ -10,9 +13,11 @@ static volatile unsigned long visited=0;
 implementation struct Test:public Polaris_Component<APPEND_CHILD(Test),MasterType,Execution_Object>
 {
 public:
-	void Initialize()
+	feature_implementation void Initialize()
 	{
-		Load_Event<Test>(&When_Do_Stuff<NULLTYPE>,&Do_Stuff<NULLTYPE>,0,0);
+		//Load_Event<Test>(&When_Do_Stuff<NULLTYPE>,&Do_Stuff<NULLTYPE>,0,0);
+		//typedef Polaris_Component<APPEND_CHILD(Test),MasterType,Execution_Object> ComponentType;
+		((ComponentType*)this)->template Load_Event<ComponentType>(&When_Do_Stuff<NULLTYPE>,&Do_Stuff<NULLTYPE>,0,0);
 		x=0;
 	}
 
@@ -37,42 +42,48 @@ public:
 	int z;
 };
 
-struct MasterType{};
-
-
-
-void main()
+struct MasterType
 {
-	_num_iterations=1000;
+	typedef Test<MasterType> test_type;
+};
 
-	LARGE_INTEGER start_timer, stop_timer, frequency;
+
+
+int main()
+{
+	_num_iterations=10;
+
+	long long start_timer, stop_timer, frequency;
 
 	double allocation_time,run_time;
 
-	const unsigned int num_agents=30000;
+	const unsigned int num_agents=30;
 	const int pages=(num_agents*sizeof(Test<MasterType*>))/_Page_Size;
 
-	QueryPerformanceFrequency(&frequency);
+	//QueryPerformanceFrequency(&frequency);
 
-	QueryPerformanceCounter(&start_timer);
+	//QueryPerformanceCounter(&start_timer);
 
 	for(int i=0;i<num_agents;i++)
 	{
-		Test<MasterType>* test=Allocate<Test<MasterType>>();
-		test->Initialize();
+		Test<MasterType>* test=Allocate<MasterType::test_type>();
+		
+		//cout << Test<MasterType>::component_index << endl;
+		
+		test->Initialize<MasterType::test_type,NT,NT>();
 	}
 
-	QueryPerformanceCounter(&stop_timer);
+	//QueryPerformanceCounter(&stop_timer);
 
-	allocation_time=((double)stop_timer.QuadPart-(double)start_timer.QuadPart)/((double)frequency.QuadPart);
+	//allocation_time=((double)stop_timer.QuadPart-(double)start_timer.QuadPart)/((double)frequency.QuadPart);
 
-	QueryPerformanceCounter(&start_timer);
+	//QueryPerformanceCounter(&start_timer);
 
 	START();
 
-	QueryPerformanceCounter(&stop_timer);
+	//QueryPerformanceCounter(&stop_timer);
 
-	run_time=((double)stop_timer.QuadPart-(double)start_timer.QuadPart)/((double)frequency.QuadPart);
+	//run_time=((double)stop_timer.QuadPart-(double)start_timer.QuadPart)/((double)frequency.QuadPart);
 
 	cout << "accuracy results: " << endl;
 	cout << "\t" << visited << ", " << num_agents*_num_iterations << ": " << (bool)(visited==(num_agents*_num_iterations)) << endl;
@@ -82,6 +93,7 @@ void main()
 	cout << "\trun time: " << run_time << endl;
 
 	bool pause=true;
+        return 0;
 }
 #endif
 

@@ -43,7 +43,7 @@ namespace Depot_Components
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
 							_covered_links.push_back( (Link_Interface*)(*vitr) );
-							((Link_Interface*)(*vitr))->Push_ITS< ComponentType* >( (ComponentType*)this);
+							((Link_Interface*)(*vitr))->template Push_ITS< ComponentType* >( (ComponentType*)this);
 						}
 					}
 				}

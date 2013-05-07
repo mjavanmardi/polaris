@@ -73,9 +73,9 @@ namespace Traveler_Components
 				define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 	
 				Vehicle_Itf* vehicle = this_ptr->template vehicle<Vehicle_Itf*>();
-				link_itf* origin_link = vehicle->movement_plan<movement_itf*>()->origin<link_itf*>();
+				link_itf* origin_link = vehicle->template movement_plan<movement_itf*>()->template origin<link_itf*>();
 				
-				if (!vehicle->movement_plan<movement_itf*>()->valid_trajectory<bool>())
+				if (!vehicle->template movement_plan<movement_itf*>()->template valid_trajectory<bool>())
 				{
 					return;
 				}

@@ -19,7 +19,7 @@ public:
 	Memory_Root()
 	{
 		mem_lock=0;
-#ifdef WINDOWS
+#ifdef _MSC_VER
 		pages=(Memory_Page*)VirtualAlloc(nullptr,_Page_Size*_Max_Pages,MEM_COMMIT,PAGE_READWRITE);
 #else
 		pages=(Memory_Page*)malloc(_Page_Size*_Max_Pages);

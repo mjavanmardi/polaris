@@ -19,17 +19,17 @@ namespace Depot_Components
 			
 			feature static void Initialize_Type(TargetType configuration)
 			{
-				ComponentType::Initialize_Type<ComponentType,CallerType,TargetType>(configuration);
+				ComponentType::template Initialize_Type<ComponentType,CallerType,TargetType>(configuration);
 			}
 			
 			feature static void Initialize_Type()
 			{
-				ComponentType::Initialize_Type<ComponentType,CallerType,TargetType>();
+				ComponentType::template Initialize_Type<ComponentType,CallerType,TargetType>();
 			}
 
 			feature void Initialize(TargetType configuration)
 			{
-				ComponentType::Initialize<ComponentType,CallerType,TargetType>(configuration);
+				ComponentType::template Initialize<ComponentType,CallerType,TargetType>(configuration);
 			}
 
 			feature_accessor(covered_area, none, none);

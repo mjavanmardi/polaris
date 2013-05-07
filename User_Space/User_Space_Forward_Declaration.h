@@ -126,22 +126,6 @@ namespace Scenario_Components {
 		forward_declare_prototype struct Scenario_Prototype;
 	}
 };
-
-namespace Network_Event_Components {
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Network_Event;
-	}
-}
-
-namespace Advisory_ITS_Components{
-	namespace Prototypes
-	{
-		forward_declare_prototype struct Advisory_ITS;
-	}
-}
-
-
 namespace Vehicle_Components {
 	namespace Prototypes
 	{
@@ -185,6 +169,56 @@ namespace Network_Skimming_Components {
 	}
 };
 namespace Network_Skimming_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Network_DB_Reader_Prototype;
+	}
+};
+namespace Advisory_ITS_Components
+{
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Advisory_ITS;
+	}
+};
+namespace Depot_Components
+{
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Depot;
+	}
+};
+namespace Network_Components
+{
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Network_DB_Reader_Prototype;
+	}
+};
+namespace Network_Event_Components
+{
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Network_Event;
+		forward_declare_prototype struct Network_Event_Manager;
+	}
+};
+namespace Sensor_Components
+{
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Sensor;
+	}
+};
+namespace Traffic_Management_Center_Components
+{
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Traffic_Management_Center;
+	}
+};
+namespace Network_Components
+{
 	namespace Prototypes
 	{
 		forward_declare_prototype struct Network_DB_Reader_Prototype;

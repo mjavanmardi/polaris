@@ -9,7 +9,7 @@ clean:
 	rm -f ../Test_Data/Chicago_Network/NetworkModel
 	rm -f ../Test_Data/Network_Model/NetworkModel
 NetworkModel: NetworkModel.o 
-	$(CC) -o NetworkModel $(LDFLAGS) NetworkModel.o -L../Scenario_Manager -ljson -L../File_IO -lfileio
+	$(CC) -o NetworkModel $(LDFLAGS) NetworkModel.o -L../Scenario_Manager -ljson -L../File_IO -lfileio -L../Repository -lrepository
 	cp -f NetworkModel ../Test_Data/Chicago_Network
 	cp -f NetworkModel ../Test_Data/Network_Model
 NetworkModel.o: NetworkModel.cpp $(HEADERS)

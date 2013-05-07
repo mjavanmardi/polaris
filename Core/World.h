@@ -1,7 +1,7 @@
 #pragma once
 #include "Polaris_Component.h"
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 DWORD WINAPI Thread_Loop(LPVOID package_ptr);
 #else
 static void* Thread_Loop(void* package_ptr);
@@ -40,7 +40,7 @@ public:
 		{
 			packages[i].id=i;
 			packages[i].world_ptr=this;
-	#ifdef WINDOWS
+	#ifdef _MSC_VER
 			threads[i]=CreateThread(NULL,0,Thread_Loop,&packages[i],0,NULL);
 	#else
 			pthread_create(&threads[i],NULL,Thread_Loop,&packages[i]);
@@ -116,7 +116,7 @@ public:
 	//LARGE_INTEGER end;
 
 	Thread_Package packages[_num_threads];
-#ifdef WINDOWS
+#ifdef _MSC_VER
 	void* threads[_num_threads];
 #else
 	pthread_t threads[_num_threads];
@@ -126,7 +126,7 @@ public:
 static World* world_ptr=nullptr;
 static World* world=new World(&world_ptr);
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 static DWORD WINAPI Thread_Loop(LPVOID package_ptr)
 #else
 static void* Thread_Loop(void* package_ptr)

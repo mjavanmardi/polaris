@@ -1,5 +1,6 @@
 #pragma once
 #include "Vehicle_Prototype.h"
+#include "Movement_Plan_Prototype.h"
 
 namespace Vehicle_Components
 {
@@ -76,13 +77,14 @@ namespace Vehicle_Components
 
 			feature_implementation bool exploit_events_set(TargetType events_set)
 			{
+#ifndef EXCLUDE_DB
 				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
-				define_component_interface(_Link_Interface, _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, typename _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				typedef Network_Event<typename MasterType::base_network_event_type> _Base_Event_Interface;
 				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
 
-				_Trajectory_Container_Interface::iterator itr;
+				typename _Trajectory_Container_Interface::iterator itr;
 
 				bool event_found_flag = false;
 				float route_adjustment_factor = 1.0f;
@@ -94,13 +96,13 @@ namespace Vehicle_Components
 					float adjustment_factor = 1.0f;
 
 					///weather
-					_Base_Event_Interface* weather_event = route_link->current_weather_event<_Base_Event_Interface*>();
+					_Base_Event_Interface* weather_event = route_link->template current_weather_event<_Base_Event_Interface*>();
 					if (weather_event != nullptr)
 					{
 						float adjustment_factor_weather = 1.0f;
 						if (events_set.find(weather_event) != events_set.end())
 						{
-							adjustment_factor_weather = min(adjustment_factor_weather,route_link->speed_adjustment_factor_due_to_weather<float>());
+							adjustment_factor_weather = min(adjustment_factor_weather,route_link->template speed_adjustment_factor_due_to_weather<float>());
 							//event_found_flag = true;
 							//break;
 						}
@@ -108,13 +110,13 @@ namespace Vehicle_Components
 					}
 
 					///accident
-					_Base_Event_Interface* accident_event = route_link->current_accident_event<_Base_Event_Interface*>();
+					_Base_Event_Interface* accident_event = route_link->template current_accident_event<_Base_Event_Interface*>();
 					if (accident_event != nullptr)
 					{
 						float adjustment_factor_accident = 1.0f;
 						if (events_set.find(accident_event) != events_set.end())
 						{
-							adjustment_factor_accident = min(adjustment_factor_accident,route_link->speed_adjustment_factor_due_to_accident<float>());
+							adjustment_factor_accident = min(adjustment_factor_accident,route_link->template speed_adjustment_factor_due_to_accident<float>());
 							//event_found_flag = true;
 							//break;
 						}
@@ -130,15 +132,20 @@ namespace Vehicle_Components
 				}
 
 				return event_found_flag;
+#else
+                cout << "should nenver reach here when EXCLUDE_DB is defined" << endl;
+                exit(0);
+                return true;
+#endif
 			}
 
 			feature_implementation void update_enroute_switch_decisions()
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
-				define_container_and_value_interface_unqualified_container(_Switch_Decision_Data_Container_Interface, _Switch_Decision_Data_Interface, typename type_of(switch_decisions_container), Random_Access_Sequence_Prototype, Switch_Decision_Data_Prototype, ComponentType);
-				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, _Switch_Decision_Data_Interface::get_type_of(route_links_container), Random_Access_Sequence_Prototype, Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_container_and_value_interface_unqualified_container(_Switch_Decision_Data_Container_Interface, _Switch_Decision_Data_Interface, type_of(switch_decisions_container), Random_Access_Sequence_Prototype, Switch_Decision_Data_Prototype, ComponentType);
+				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Switch_Decision_Data_Interface::get_type_of(route_links_container), Random_Access_Sequence_Prototype, Link_Prototype, ComponentType);
 
 				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
 
@@ -146,7 +153,7 @@ namespace Vehicle_Components
 				
 				switch_decision_data->template switch_decision_index<int>(int(_switch_decisions_container.size()));
 
-				_Trajectory_Container_Interface::iterator itr;
+				typename _Trajectory_Container_Interface::iterator itr;
 
 				for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
 				{
@@ -163,22 +170,22 @@ namespace Vehicle_Components
 			feature_implementation void enroute_switching()
 			{
 				define_component_interface(_Traveler_Interface, type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
-				define_component_interface(_Routing_Interface, _Traveler_Interface::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+				define_component_interface(_Routing_Interface, typename _Traveler_Interface::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
-				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::routable_network_type> _Routable_Network_Interface;
-				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
 				_Routing_Interface* router = traveler<ComponentType,CallerType,_Traveler_Interface*>()->template router<_Routing_Interface*>();
 
 				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Regular_Link_Interface::get_type_of(realtime_replicas_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface2, typename MasterType::routable_network_type::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Regular_Network_Interface;
 				define_container_and_value_interface(_Regular_Movements_Container_Interface, _Regular_Movement_Interface, typename _Regular_Network_Interface::get_type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, typename _Regular_Movement_Interface::get_type_of(realtime_replicas_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Regular_Links_Container_Interface, _Regular_Link_Interface3, typename _Regular_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				_Regular_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Regular_Link_Interface*>();
 				_Regular_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Regular_Link_Interface*>();
 				
@@ -189,7 +196,7 @@ namespace Vehicle_Components
 				bool use_realtime_travel_time = ((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>();
 
 				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
-				_Trajectory_Container_Interface::iterator itr;
+				typename _Trajectory_Container_Interface::iterator itr;
 
 				for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
 				{
@@ -228,7 +235,7 @@ namespace Vehicle_Components
 						typename MasterType::network_type::long_hash_key_type long_hash_key;
 						long_hash_key.inbound_link_id = inbound_link_id;
 						long_hash_key.outbound_link_id = outbound_link_id;
-						typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+						typename MasterType::network_type::type_of_link_turn_movement_map&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
 						_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
 						_Routable_Movement_Interface* routable_movement;
 						if (use_realtime_travel_time)
@@ -272,7 +279,7 @@ namespace Vehicle_Components
 						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->uuid<int>() << " and destination link uuid " << destination_link->uuid<int>());
 					}
 					
-					_Reversed_Path_Container_Interface::iterator itr;
+					typename _Reversed_Path_Container_Interface::iterator itr;
 					for(itr = routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin(); itr != routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().end(); itr++)
 					{
 						_Regular_Link_Interface* link = (_Regular_Link_Interface*)(*itr);
@@ -298,7 +305,7 @@ namespace Vehicle_Components
 							update_enroute_switch_decisions<ComponentType, CallerType, TargetType>();
 							((_Movement_Plan_Interface*)_movement_plan)->template update_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
 
-							int current_time = ((_Regular_Network_Interface*)_global_network)->start_of_current_simulation_interval_absolute<int>();
+							int current_time = ((_Regular_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
 
 							int current_eta = ((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>();
 							((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>(current_time + best_route_time_to_destination);
@@ -378,17 +385,17 @@ namespace Vehicle_Components
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::routable_network_type> _Routable_Network_Interface;
-				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Regular_Link_Interface::get_type_of(realtime_replicas_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface2, typename MasterType::routable_network_type::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				//define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface2, typename MasterType::routable_network_type::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Regular_Network_Interface;
 				define_container_and_value_interface(_Regular_Movements_Container_Interface, _Regular_Movement_Interface, typename _Regular_Network_Interface::get_type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, typename _Regular_Movement_Interface::get_type_of(realtime_replicas_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 				define_container_and_value_interface(_Regular_Links_Container_Interface, _Regular_Link_Interface3, typename _Regular_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			
 				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
-				_Trajectory_Container_Interface::iterator itr;
+				typename _Trajectory_Container_Interface::iterator itr;
 
 				_Regular_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Regular_Link_Interface*>();
 				_Regular_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Regular_Link_Interface*>();
@@ -436,7 +443,7 @@ namespace Vehicle_Components
 						typename MasterType::network_type::long_hash_key_type long_hash_key;
 						long_hash_key.inbound_link_id = inbound_link_id;
 						long_hash_key.outbound_link_id = outbound_link_id;
-						typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+						typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
 						_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
 						_Routable_Movement_Interface* routable_movement;
 						if (use_realtime_travel_time)
@@ -452,7 +459,7 @@ namespace Vehicle_Components
 					}
 				}
 
-				int current_time = ((_Regular_Network_Interface*)_global_network)->start_of_current_simulation_interval_absolute<int>();
+				int current_time = ((_Regular_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
 				int departure_time = ((_Movement_Plan_Interface*)_movement_plan)->template absolute_departure_time<int>();
 				float current_eta = ((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>();
 				((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>(current_time + current_route_time_to_destination);

@@ -8,7 +8,7 @@
 
 #include "RngStream.h"
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 #include <random>
 #else
 #include <tr1/random>

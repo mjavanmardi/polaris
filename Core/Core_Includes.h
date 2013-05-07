@@ -1,6 +1,6 @@
 #pragma once
 
-#define WINDOWS
+//#define _MSC_VER
 
 #include <list>
 #include <vector>
@@ -14,7 +14,7 @@
 #include <sstream>
 #include <cmath>
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 #include <Windows.h>
 #include <WinBase.h>
 #include <unordered_map>
@@ -51,7 +51,7 @@ using namespace std;
 
 
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 #include <intrin.h>
 #define AtomicExchange(TARGET,VALUE) _InterlockedExchange(TARGET,VALUE)
 #define AtomicIncrement(TARGET) _InterlockedIncrement(TARGET)
@@ -68,7 +68,7 @@ static const int inc_val=1;
 #define AtomicCompareExchange(TARGET,EXCHANGE_VALUE,COMPARE_VALUE) __sync_val_compare_and_swap(TARGET,EXCHANGE_VALUE,COMPARE_VALUE)
 #endif
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 #define SLEEP(Seconds) Sleep(Seconds*1000)
 #else
 #define SLEEP(Seconds) usleep(Seconds*1000000)
@@ -99,7 +99,7 @@ static volatile long long* request_sum=new volatile long long();
 static volatile long long* exec_sum=new volatile long long();
 static volatile unsigned int stdout_lock=0;
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 static __declspec(thread) int _thread_id;
 #else
 static __thread int _thread_id;
@@ -171,7 +171,7 @@ typedef bool (*submission_callback_type)(const list<void*>&,const vector<string>
 
 #define START() world->Start_Turning()
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 //static LARGE_INTEGER thread_start_timers[_num_threads];
 //static LARGE_INTEGER thread_stop_timers[_num_threads];
 //static LARGE_INTEGER thread_start_timers_B[_num_threads];
@@ -195,7 +195,7 @@ static SingletonType* Add_Component_Singleton(SingletonType* val)
 }
 
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 #else
 static timespec process_timer[_num_threads];
 static long long process_time[_num_threads];
@@ -288,7 +288,7 @@ throw new std::runtime_error(s.str().c_str());}
 //---------------------------------------------------------
 //	define numeric check (tr1::isnan is not available on vc++
 //---------------------------------------------------------
-#ifdef WINDOWS
+#ifdef _MSC_VER
 #define ISNAN(x) _isnan(x)
 #else
 #define ISNAN(x) std::tr1::isnan(x)

@@ -7,12 +7,12 @@
 #pragma warning(disable : 4800)
 
 
-
+#ifndef EXCLUDE_DEMAND
 #include "Choice_Model_Implementations.h"
-
+#endif
 #include "Basic_Unit_Implementations.h"
-
+#ifndef EXCLUDE_DEMAND
 #include "Distribution_Implementations.h"
-
+#endif
 
 

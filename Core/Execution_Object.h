@@ -113,7 +113,7 @@ struct Execution_Object
 
 	//	inline void operator = (const long long val){_revision=val;}
 	//	inline operator long long&(){return _revision;}
-	//#ifdef WINDOWS
+	//#ifdef _MSC_VER
 	//	struct
 	//	{
 	//		int _sub_iteration;

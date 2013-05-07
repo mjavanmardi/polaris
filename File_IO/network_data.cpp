@@ -1,6 +1,6 @@
 #include "network_data.h"
 
-//#ifdef LINUX
+//#ifdef __GNUC__
 //// for map
 //using namespace __gnu_cxx;
 //#endif

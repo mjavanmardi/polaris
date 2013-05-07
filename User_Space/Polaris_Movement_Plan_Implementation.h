@@ -53,7 +53,6 @@ namespace Movement_Plan_Components
 				_current_trajectory_index=val;
 			}
 			tag_getter_setter_as_available(current_trajectory_position);
-			
 			int _current_trajectory_index;
 			//------------------------------------------------------------------------------------------------------------------
 
@@ -106,10 +105,9 @@ namespace Movement_Plan_Components
 				_trajectory_container[_current_trajectory_index]->_enter_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
 			}
 
-
 			member_data(bool, valid_trajectory,none,none);
 		};
-
+#ifndef EXCLUDE_DEMAND
 		implementation struct Polaris_Integrated_Movement_Plan_Implementation : public Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)>
 		{
 			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_plan_type,none,none);
@@ -147,5 +145,6 @@ namespace Movement_Plan_Components
 			member_container(vector<typename MasterType::link_type*>, trajectory_container, none, none);
 			member_data(bool, valid_trajectory,none,none);
 		};
+#endif
 	}
 }

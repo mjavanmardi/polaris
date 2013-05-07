@@ -5,7 +5,7 @@
 #include "network_vehicle_data.h"
 #include "utilities.h"
 
-#ifdef LINUX
+#ifdef __GNUC__
 // for map
 using namespace __gnu_cxx;
 #endif

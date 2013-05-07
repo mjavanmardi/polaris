@@ -25,7 +25,7 @@ namespace Traffic_Management_Center_Components
 
 			feature void Initialize()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
 			}
 
 		};

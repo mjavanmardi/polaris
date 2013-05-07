@@ -55,7 +55,7 @@ namespace Variable_Message_Sign_Components
 				vector<int> links;
 				links.push_back(instance.getLink());
 
-				Simple_Advisory_ITS::Initialize<ComponentType,ComponentType,const vector<int>&>(links);
+				Simple_Advisory_ITS::template Initialize<ComponentType,ComponentType,const vector<int>&>(links);
 			}
 		};
 	}

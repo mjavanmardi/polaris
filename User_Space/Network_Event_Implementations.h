@@ -53,7 +53,7 @@ namespace Network_Event_Components
 
 				if(start < _end_time)
 				{
-					Load_Event<ComponentType>(&ComponentType::Incident_Conditional<ComponentType,NT,NT>,&ComponentType::Incident_Event<ComponentType,NT,NT>, start, 0);
+					Load_Event<ComponentType>(&ComponentType::template Incident_Conditional<ComponentType,NT,NT>,&ComponentType::template Incident_Event<ComponentType,NT,NT>, start, 0);
 				}
 				else
 				{
@@ -382,19 +382,19 @@ namespace Network_Event_Components
 
 					if(name == "Weather")
 					{
-						Weather_Network_Event_Interface::Initialize_Type<const vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
+						Weather_Network_Event_Interface::template Initialize_Type<const vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
 					}
 					else if(name == "Accident")
 					{
-						Accident_Network_Event_Interface::Initialize_Type<const vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
+						Accident_Network_Event_Interface::template Initialize_Type<const vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
 					}
 					else if(name == "Congestion")
 					{
-						Congestion_Network_Event_Interface::Initialize_Type<const vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
+						Congestion_Network_Event_Interface::template Initialize_Type<const vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
 					}
 					else if(name == "Lane Closure")
 					{
-						Lane_Closure_Network_Event_Interface::Initialize_Type<const vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
+						Lane_Closure_Network_Event_Interface::template Initialize_Type<const vector<shared_ptr<io::Event_Key>>&>(itr->getKeys());
 					}
 					
 					const vector<weak_ptr<io::Event_Instance> >& instances = itr->getInstances();
@@ -445,7 +445,7 @@ namespace Network_Event_Components
 
 						for(vector<Link_Interface*>::iterator vitr = affected_links->begin();vitr != affected_links->end();vitr++)
 						{
-							if((*vitr)->internal_id<int>() == link_id)
+							if((*vitr)->template internal_id<int>() == link_id)
 							{
 								container.push_back( *itr );
 								break;
@@ -463,7 +463,7 @@ namespace Network_Event_Components
 				{
 					Network_Event<typename TargetType,NT>* network_event=*itr;
 
-					if(network_event->active<bool>())
+					if(network_event->template active<bool>())
 					{
 						container.push_back( *itr );
 					}
@@ -480,7 +480,7 @@ namespace Network_Event_Components
 					{
 						Base_Network_Event_Interface* network_event=*itr;
 
-						if(network_event->active<bool>())
+						if(network_event->template active<bool>())
 						{
 							container.push_back( (Network_Event<typename MasterType::type_of(base_network_event),CallerType>*) *itr );
 						}

@@ -20,7 +20,7 @@ namespace Zone_Components
 	{
 		implementation struct Polaris_Zone_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Zone_Implementation),MasterType,Execution_Object,ParentType>
 		{
-			typedef Zone_Prototype<ComponentType> _this_interface;
+			typedef Zone_Prototype<typename MasterType::zone_type> _this_interface;
 
 			int production_counter[_num_threads];
 			int attraction_counter[_num_threads];

@@ -87,56 +87,57 @@ namespace Movement_Plan_Components
 			// overloaded origin and destination, depending on targetType
 			feature_prototype void origin(TargetType activity_location, requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
-				this_component()->origin_location<ComponentType,CallerType,TargetType>(activity_location);
+				this_component()->template origin_location<ComponentType,CallerType,TargetType>(activity_location);
 			}
 			feature_prototype TargetType origin(requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
-				return this_component()->origin_location<ComponentType,CallerType,TargetType>();
+				return this_component()->template origin_location<ComponentType,CallerType,TargetType>();
 			}
 			feature_prototype void destination(TargetType activity_location, requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
-				this_component()->destination_location<ComponentType,CallerType,TargetType>(activity_location);
+				this_component()->template destination_location<ComponentType,CallerType,TargetType>(activity_location);
 			}
 			feature_prototype TargetType destination(requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
-				return this_component()->destination_location<ComponentType,CallerType,TargetType>();
+				return this_component()->template destination_location<ComponentType,CallerType,TargetType>();
 			}
 			feature_prototype void origin(TargetType link, requires(check(TargetType,Link_Components::Concepts::Is_Basic_Link)))
 			{
-				this_component()->origin<ComponentType,CallerType,TargetType>(link);
+				this_component()->template origin<ComponentType,CallerType,TargetType>(link);
 			}
 			feature_prototype TargetType origin(requires(check(TargetType,Link_Components::Concepts::Is_Basic_Link)))
 			{
-				return this_component()->origin<ComponentType,CallerType,TargetType>();
+				return this_component()->template origin<ComponentType,CallerType,TargetType>();
 			}
 			feature_prototype void destination(TargetType link, requires(check(TargetType,Link_Components::Concepts::Is_Basic_Link)))
 			{
-				this_component()->destination<ComponentType,CallerType,TargetType>(link);
+				this_component()->template destination<ComponentType,CallerType,TargetType>(link);
 			}
 			feature_prototype TargetType destination(requires(check(TargetType,Link_Components::Concepts::Is_Basic_Link)))
 			{
-				return this_component()->destination<ComponentType,CallerType,TargetType>();
+				return this_component()->template destination<ComponentType,CallerType,TargetType>();
 			}
 			feature_prototype void origin(TargetType zone, requires(check(TargetType,Zone_Components::Concepts::Is_Zone)))
 			{
-				this_component()->origin_zone<ComponentType,CallerType,TargetType>(zone);
+				this_component()->template origin_zone<ComponentType,CallerType,TargetType>(zone);
 			}
 			feature_prototype TargetType origin(requires(check(TargetType,Zone_Components::Concepts::Is_Zone)))
 			{
-				return this_component()->origin_zone<ComponentType,CallerType,TargetType>();
+				return this_component()->template origin_zone<ComponentType,CallerType,TargetType>();
 			}
 			feature_prototype void destination(TargetType link, requires(check(TargetType,Zone_Components::Concepts::Is_Zone)))
 			{
-				this_component()->destination_zone<ComponentType,CallerType,TargetType>(link);
+				this_component()->template destination_zone<ComponentType,CallerType,TargetType>(link);
 			}
 			feature_prototype TargetType destination(requires(check(TargetType,Zone_Components::Concepts::Is_Zone)))
 			{
-				return this_component()->destination_zone<ComponentType,CallerType,TargetType>();
+				return this_component()->template destination_zone<ComponentType,CallerType,TargetType>();
 			}
 
+#ifndef EXCLUDE_DEMAND 
 			feature_method_void(Initialize,none);
 			feature_method_1_arg(Initialize,movement_to_copy, none);
-
+#endif
 			feature_prototype void set_trajectory(TargetType& path_container)
 			{
 				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);

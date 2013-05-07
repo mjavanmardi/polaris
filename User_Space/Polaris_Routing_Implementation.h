@@ -290,10 +290,10 @@ namespace Routing_Components
 			{
 				typedef Network_Prototype<typename MasterType::routable_network_type> _Routable_Network_Interface;
 				typedef Network_Prototype<typename MasterType::network_type> _Regular_Network_Interface;
-				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Routable_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-				define_container_and_value_interface(_Routable_Intersections_Container_Interface, _Routable_Intersection_Interface, typename _Routable_Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
-				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
-				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Routable_Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, typename MasterType::routable_network_type);
+				define_container_and_value_interface(_Routable_Intersections_Container_Interface, _Routable_Intersection_Interface, typename _Routable_Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, typename MasterType::routable_network_type);
+				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, typename MasterType::routable_network_type);
+				define_container_and_value_interface(_Movements_Container_Interface, _Movement_Interface, typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, typename MasterType::routable_network_type);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 
 
@@ -301,13 +301,13 @@ namespace Routing_Components
 
 				_Routable_Network_Interface* routable_net = (_Routable_Network_Interface*)(this);
 				_Routable_Intersections_Container_Interface& routable_intersections_container = routable_net->template intersections_container<_Routable_Intersections_Container_Interface&>();
-				_Routable_Intersections_Container_Interface::iterator intersection_itr;
+				typename _Routable_Intersections_Container_Interface::iterator intersection_itr;
 				for (intersection_itr = routable_intersections_container.begin(); intersection_itr != routable_intersections_container.end(); intersection_itr++)
 				{
 
 					_Routable_Intersection_Interface* intersection = (_Routable_Intersection_Interface*)(*intersection_itr);
 					_Inbound_Outbound_Movements_Container_Interface& routable_inbound_outbound_movements_container = intersection->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>();
-					_Inbound_Outbound_Movements_Container_Interface::iterator inbound_outbound_movements_itr;
+					typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_outbound_movements_itr;
 					for (inbound_outbound_movements_itr = routable_inbound_outbound_movements_container.begin(); inbound_outbound_movements_itr != routable_inbound_outbound_movements_container.end(); inbound_outbound_movements_itr++)
 					{
 
@@ -320,7 +320,7 @@ namespace Routing_Components
 							<< outbound_movements.size()
 							<< endl;
 
-						_Movements_Container_Interface::iterator movement_itr;
+						typename _Movements_Container_Interface::iterator movement_itr;
 						for (movement_itr = outbound_movements.begin(); movement_itr != outbound_movements.end(); movement_itr++)
 						{
 							_Movement_Interface* movement = (_Movement_Interface*)(*movement_itr);
@@ -335,21 +335,21 @@ namespace Routing_Components
 
 				cout << "starting outbound movements" << endl;
 				_Routable_Links_Container_Interface& routable_links_container = routable_net->template links_container<_Routable_Links_Container_Interface&>();
-				_Routable_Links_Container_Interface::iterator link_itr;
+				typename _Routable_Links_Container_Interface::iterator link_itr;
 				for (link_itr = routable_links_container.begin(); link_itr != routable_links_container.end(); link_itr++)
 				{
 					_Routable_Link_Interface* link = (_Routable_Link_Interface*)(*link_itr);
-					define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, typename _Routable_Link_Interface::get_type_of(outbound_turn_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
-					_Routable_Movements_Container_Interface& routable_outbound_movements = link->outbound_turn_movements<_Routable_Movements_Container_Interface&>();
-					_Routable_Movements_Container_Interface::iterator routable_movement_itr;
-					cout << "print outbound morements of link " << link->uuid<int>() << endl;
+					define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, typename _Routable_Link_Interface::get_type_of(outbound_turn_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, typename MasterType::routable_network_type);
+					_Routable_Movements_Container_Interface& routable_outbound_movements = link->template outbound_turn_movements<_Routable_Movements_Container_Interface&>();
+					typename _Routable_Movements_Container_Interface::iterator routable_movement_itr;
+					cout << "print outbound morements of link " << link->template uuid<int>() << endl;
 					for (routable_movement_itr = routable_outbound_movements.begin(); routable_movement_itr != routable_outbound_movements.end(); routable_movement_itr++)
 					{
 						_Routable_Movement_Interface* routable_movement = (_Routable_Movement_Interface*)(*routable_movement_itr);
-						cout << "\t" << routable_movement->uuid<int>();
-						cout << ": inbound_link = " << routable_movement->inbound_link<_Routable_Link_Interface*>()->uuid<int>();
-						cout << ", outbound_link = " << routable_movement->outbound_link<_Routable_Link_Interface*>()->uuid<int>();
-						cout << ", forward_link_turn = " << routable_movement->forward_link_turn_travel_time<float>() << endl;
+						cout << "\t" << routable_movement->template uuid<int>();
+						cout << ": inbound_link = " << routable_movement->template inbound_link<_Routable_Link_Interface*>()->template uuid<int>();
+						cout << ", outbound_link = " << routable_movement->template outbound_link<_Routable_Link_Interface*>()->template uuid<int>();
+						cout << ", forward_link_turn = " << routable_movement->template forward_link_turn_travel_time<float>() << endl;
 					}
 					cout << endl;
 				}
@@ -380,8 +380,8 @@ namespace Routing_Components
 
 			declare_feature_conditional(Compute_Route_Condition)
 			{
-				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
-				define_component_interface(_Traveler_Interface, typename get_type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
+				typedef Routing_Components::Prototypes::Routing_Prototype<typename MasterType::routing_type> _Routing_Interface;
+				define_component_interface(_Traveler_Interface, type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, typename MasterType::routing_type);
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION)
 				{
@@ -454,8 +454,8 @@ namespace Routing_Components
 			int _routable_destination;	
 		};
 
-
-		implementation struct Polaris_Skim_Routing_Implementation: public Polaris_Routing_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Skim_Routing_Implementation),512U>
+#ifndef EXCLUDE_DEMAND
+		implementation struct Polaris_Skim_Routing_Implementation: public Polaris_Routing_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Skim_Routing_Implementation), 512U>
 		{
 			declare_feature_conditional(Compute_Route_Condition)
 			{
@@ -499,6 +499,7 @@ namespace Routing_Components
 			member_component_feature(end_time,_end_time,Value,Basic_Units::Prototypes::Time_Prototype);
 
 		};
+#endif
 	}
 
 }

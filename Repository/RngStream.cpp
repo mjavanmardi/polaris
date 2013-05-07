@@ -1,5 +1,5 @@
 #include "RngStream.h"
-
+#include <math.h>
 namespace RNG_Components
 {
 	//-------------------------------------------------------------------------

@@ -37,7 +37,7 @@ DataType* Typed_Execution_Pages<DataType>::Allocate()
 
 	if(!free_page->num_allocated)
 	{
-		active_pages.Push((Typed_Execution_Page<DataType>*)free_page);
+		active_pages.Push((Typed_Execution_Page<DataType>*&)free_page);
 	}
 
 	return_value=(Byte*)free_page->first_free_cell;

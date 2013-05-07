@@ -13,7 +13,7 @@
 // use hashmap
 #include <hash_map>
 #include <hash_set>
-#ifndef WINDOWS
+#ifndef _MSC_VER
 #include <ext/hash_map>
 using namespace __gnu_cxx;
 #endif
@@ -103,7 +103,7 @@ typedef unsigned long ulong;
 #endif
 
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 struct Counter
 {
 private:
@@ -167,6 +167,6 @@ public:
 #endif
 
 
-#ifndef WINDOWS
+#ifndef _MSC_VER
 #define FLT_MAX	3.402823466e+38F	/* max value */
 #endif

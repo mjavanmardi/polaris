@@ -1,10 +1,17 @@
+//#define EXCLUDE_DEMAND
+//#define EXCLUDE_DB 
+
 #include "Polaris_PCH.h"
 
-#define EXCLUDE_DEMAND 
 #define FOR_LINUX_PORTING
 #define SHOW_WARNINGS
 #include "Application_Includes.h"
 #include "../File_IO/network_models.h"
+#ifndef EXCLUDE_DB
+#ifdef EXCLUDE_DEMAND
+#include "../Repository/RNG_Implementations.h"
+#endif
+#endif
 struct MasterType
 {
 #ifdef ANTARES
@@ -109,11 +116,9 @@ struct MasterType
     //typedef Person_Components::Implementations::CTRAMP_Person_Planner_Implementation<MasterType, person_type> person_planner_type;
 
     //typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<MasterType,person_type> person_properties_type;
-
+#ifndef EXCLUDE_DB
     typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
-
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
-
 	typedef Traffic_Management_Center_Components::Implementations::Simple_TMC<MasterType> traffic_management_center_type;
 	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
 #ifdef ANTARES
@@ -144,6 +149,7 @@ struct MasterType
 	typedef TYPELIST_5(link_control_type,depot_type,advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
+#endif
 };
 
 ostream* stream_ptr;
@@ -160,11 +166,14 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
+#ifndef EXCLUDE_DB
 		cout << "Input from DB" << endl;
 		run_with_input_from_db();
+#endif
 	}
 }
 
+#ifndef EXCLUDE_DB
 void run_with_input_from_db()
 {
 	Network_Components::Types::Network_IO_Maps network_io_maps;
@@ -310,6 +319,7 @@ void run_with_input_from_db()
 		system("PAUSE");
 	}
 }
+#endif
 
 void run_with_input_from_files()
 {
@@ -330,15 +340,15 @@ void run_with_input_from_files()
 	define_component_interface(_Scenario_Interface, MasterType::scenario_type, Scenario_Prototype, NULLTYPE);
 	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
 	_global_scenario = scenario;
-	scenario->template write_output_summary<bool>(true);
-	scenario->template write_network_snapshots<bool>(false);
-	scenario->template read_network_snapshots<bool>(false);
-	scenario->template write_network_link_turn_time<bool>(false);
-	scenario->template output_network_moe_for_simulation_interval<bool>(true);
-	scenario->template output_link_moe_for_assignment_interval<bool>(true);
-	scenario->template compare_with_moe_reference<bool>(false);
+	scenario->write_output_summary<bool>(true);
+	scenario->write_network_snapshots<bool>(false);
+	scenario->read_network_snapshots<bool>(false);
+	scenario->write_network_link_turn_time<bool>(false);
+	scenario->output_network_moe_for_simulation_interval<bool>(true);
+	scenario->output_link_moe_for_assignment_interval<bool>(true);
+	scenario->compare_with_moe_reference<bool>(false);
 
-	scenario->template read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);
+	scenario->read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
 	_Network_Interface* network = (_Network_Interface*)Allocate<typename MasterType::network_type>();

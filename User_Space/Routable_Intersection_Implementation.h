@@ -161,12 +161,12 @@ namespace Intersection_Components
 				define_container_and_value_interface(_Routable_Inbound_Outbound_Movements_Container_Interface, _Routable_Inbound_Outbound_Movements_Interface, typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
 				define_container_and_value_interface(_Routable_Movements_Container_Interface, _Routable_Movement_Interface, typename _Routable_Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 
-				_Routable_Inbound_Outbound_Movements_Container_Interface::iterator inbound_outbound_movements_itr;
+				typename _Routable_Inbound_Outbound_Movements_Container_Interface::iterator inbound_outbound_movements_itr;
 				for (inbound_outbound_movements_itr = _inbound_outbound_movements.begin(); inbound_outbound_movements_itr != _inbound_outbound_movements.end(); inbound_outbound_movements_itr++)
 				{
 					_Routable_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Routable_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
 					_Routable_Movements_Container_Interface& outbound_movements = inbound_outbound_movements->template outbound_movements<_Routable_Movements_Container_Interface&>();
-					_Routable_Movements_Container_Interface::iterator movement_itr;
+					typename _Routable_Movements_Container_Interface::iterator movement_itr;
 					for (movement_itr = outbound_movements.begin(); movement_itr != outbound_movements.end(); movement_itr++)
 					{
 						_Routable_Movement_Interface* movement = (_Routable_Movement_Interface*)(*movement_itr);

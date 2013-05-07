@@ -22,12 +22,17 @@ void* _global_scenario;
 #include "Polaris_Movement_Plan_Implementation.h"
 #include "Polaris_Turn_Movement_Implementation.h"
 
+#ifndef EXCLUDE_DB
 #include "Polaris_Link_Event_Handler_Implementation.h"
+#endif
 #include "Polaris_Network_Implementation_Input_File.h"
 #include "Polaris_Network_Implementation_Output_File.h"
 #include "Polaris_Network_Implementation_Results.h"
+#ifndef EXCLUDE_DB
 #include "Polaris_Network_Skimming_Implementation.h"
+#endif
 
+#ifndef EXCLUDE_DEMAND
 #include "Activity_Implementations.h"
 
 
@@ -36,12 +41,9 @@ void* _global_scenario;
 //#include "Synthesis_Zone_Implementations.h"
 #include "Synthesis_Region_Implementation.h"
 #include "PopSyn_Implementations.h"
+#endif
 
-
-
-
-
-
+#ifndef EXCLUDE_DB
 // ITS COMPONENTS
 
 #include "Geometry_Implementation.h"
@@ -54,8 +56,8 @@ void* _global_scenario;
 // NETWORK_EVENT COMPONENTS
 
 #include "Network_Event_Implementations.h"
-
-
+#endif
+#ifndef EXCLUDE_DEMAND
 // PERSON AGENT COMPONENTS
 
 #include "Person_Planner_Implementations.h"
@@ -66,3 +68,4 @@ void* _global_scenario;
 #include "Person_Scheduler_Implementations.h"
 #include "Person_Perception_Implementation.h"
 #include "Person_Implementations.h"
+#endif

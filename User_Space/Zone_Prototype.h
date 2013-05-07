@@ -39,11 +39,11 @@ namespace Zone_Components
 
 			feature_prototype void push_zone_information(typename TargetType::ParamType coordinates, void* this_ptr, typename TargetType::Param2Type productions, typename TargetType::Param2Type attractions)
 			{
-				this_component()->accept_zone_information<ComponentType,CallerType,TargetType>(coordinates, this_ptr, productions, attractions);
+				this_component()->template accept_zone_information<ComponentType,CallerType,TargetType>(coordinates, this_ptr, productions, attractions);
 			}
 			feature_prototype void configure_zones_layer()
 			{
-				this_component()->configure_zones_layer<ComponentType,CallerType,TargetType>();
+				this_component()->template configure_zones_layer<ComponentType,CallerType,TargetType>();
 			}
 			feature_accessor(input_offset,none,none);
 			feature_accessor(network_bounds,none,none);
@@ -92,24 +92,37 @@ namespace Zone_Components
 			feature_prototype TargetType Get_Random_Location(requires(check_as_given(TargetType,is_pointer) && check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				define_container_and_value_interface(activity_locations_itf,activity_location_itf, typename get_type_of(origin_activity_locations),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-				activity_locations_itf* locations = this->origin_activity_locations<activity_locations_itf*>();
+				activity_locations_itf* locations = this->template origin_activity_locations<activity_locations_itf*>();
 				
 				int size = locations->size();
-				int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);
+
+#ifndef EXCLUDE_DEMAND
+                int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);
+#else
+                int loc_index = 0;
+                cout << "error: cannot reach here when demand is not enabled!!!" << endl;
+                exit(0);
+#endif
+
 				return locations->at(loc_index);
 			}
 			feature_prototype void Push_To_Zone_Display()
 			{
-				this_component()->Push_To_Zone_Display<ComponentType,CallerType,TargetType>();
+				this_component()->template Push_To_Zone_Display<ComponentType,CallerType,TargetType>();
 			}
 			feature_prototype void reset_counters()
 			{
-				this_component()->reset_counters<ComponentType,CallerType,TargetType>();
+				this_component()->template reset_counters<ComponentType,CallerType,TargetType>();
 			}
 
 			// features for counting productions and attractions, use TargetType as a reference to set for a specific thread and as a value to return the sum total
-			feature_accessor(production_count,none,not_available);
-			feature_accessor(attraction_count,none,not_available);
+#ifndef EXCLUDE_DEMAND
+            feature_accessor(production_count,none,not_available);
+            feature_accessor(attraction_count,none,not_available);
+#else
+            feature_accessor(production_count,none,none);
+            feature_accessor(attraction_count,none,none);
+#endif
 		};
 	}
 }

@@ -888,7 +888,7 @@ namespace Scenario_Components
 
 			feature_prototype int moe_update_interval()
 			{
-				return _assignment_interval_length;
+				return assignment_interval_length<int>();
 			}
 		};
 	}

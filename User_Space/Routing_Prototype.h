@@ -1,9 +1,10 @@
 #pragma once
 #include "User_Space_Includes.h"
 #include "../File_IO/utilities.h"
+#ifndef EXCLUDE_DB
 #include "Network_Skimming_Prototype.h"
-
-#ifndef WINDOWS
+#endif
+#ifndef _MSC_VER
 // for hash_map
 using namespace __gnu_cxx;
 #endif
@@ -75,7 +76,7 @@ namespace Routing_Components
 			feature_accessor(end_time,none,none);
 			feature_accessor(travel_times_to_link_container,none,none);
 			feature_accessor(departure_time,none,none); // the time at which routing is triggered.
-
+#ifndef EXCLUDE_DB
 			feature_prototype void Evaluate_Condition(Conditional_Response& response, requires(check(TargetType,Concepts::Is_One_To_One_Router)))
 			{
 				response.result=true;
@@ -84,7 +85,7 @@ namespace Routing_Components
 			}
 			feature_prototype void Evaluate_Condition(Conditional_Response& response, requires(check(TargetType,Concepts::Is_One_To_All_Router)))
 			{
-				if (_iteration >= _this_ptr->start_time<Simulation_Timestep_Increment>() && _iteration < _this_ptr->end_time<Simulation_Timestep_Increment>())
+				if (_iteration >= _this_ptr->template start_time<Simulation_Timestep_Increment>() && _iteration < _this_ptr->end_time<Simulation_Timestep_Increment>())
 				{
 					response.result=true;
 					response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
@@ -107,7 +108,7 @@ namespace Routing_Components
 				assert_sub_check(TargetType,Concepts::Is_One_To_One_Router,has_network, "ControlType has no network");
 				assert_sub_check(TargetType,Concepts::Is_One_To_One_Router,has_vehicle, "ControlType has no vehicle");
 			}
-
+#endif
 			feature_prototype float one_to_one_link_based_least_time_path_a_star(TargetType routable_net)
 			{
 
@@ -131,8 +132,8 @@ namespace Routing_Components
 				//NumSearchesType& num_searches=routable_network->template num_searches<NumSearchesType&>();
 				int origin_index = routable_origin_index<int>();
 				int destination_index = routable_destination_index<int>();
-				_Routable_Link_Interface* origin_link_ptr=routable_net->links_container<_Routable_Links_Container_Interface&>()[origin_index];
-				_Routable_Link_Interface* destination_link_ptr=routable_net->links_container<_Routable_Links_Container_Interface&>()[destination_index];
+				_Routable_Link_Interface* origin_link_ptr=routable_net->template links_container<_Routable_Links_Container_Interface&>()[origin_index];
+				_Routable_Link_Interface* destination_link_ptr=routable_net->template links_container<_Routable_Links_Container_Interface&>()[destination_index];
 				_Regular_Link_Interface* destination_reference=destination_link_ptr->template network_link_reference<_Regular_Link_Interface*>();
 				
 				_Regular_Link_Interface* net_origin_link=origin_link_ptr->template network_link_reference<_Regular_Link_Interface*>();
@@ -417,7 +418,7 @@ namespace Routing_Components
 
 			feature_prototype void Schedule_Route_Computation(int time_to_depart)
 			{
-				load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+				load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 				//departure_time<int>(time_to_depart);
 				//load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route_Using_Snapshot,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 			}
@@ -425,10 +426,10 @@ namespace Routing_Components
 			feature_prototype void Schedule_Route_Computation(int time_to_depart, int planning_time, bool use_snapshot)
 			{
 				departure_time<int>(time_to_depart);
-				if (use_snapshot) load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route_Using_Snapshot,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
-				else load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+				if (use_snapshot) load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route_Using_Snapshot,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+				else load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 			}
-
+#ifndef EXCLUDE_DEMAND
 			feature_prototype void Initialize_Tree_Computation(int departed_time)
 			{
 				// initialize the containers for skimmed travel times to links
@@ -443,7 +444,7 @@ namespace Routing_Components
 
 				define_component_interface(_Regular_Network_Interface, typename get_type_of(network), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, typename _Regular_Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Tree,departed_time,Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING,NULLTYPE);
+				load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Tree,departed_time,Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING,NULLTYPE);
 			}
 
 			feature_prototype TargetType Get_Tree_Results_For_Destination(int destination_internal_id, requires(check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
@@ -455,7 +456,7 @@ namespace Routing_Components
 				// return travel time to destion in requested time units
 				return Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Simulation_Timestep_Increment>>(travel_times->at(destination_internal_id));
 			}
-
+#endif
 			//first event
 			declare_feature_event(Compute_Route)
 			{
@@ -487,6 +488,7 @@ namespace Routing_Components
 
 				if (routed_travel_time >= 0.0)
 				{	
+
 					mp->template valid_trajectory<bool>(true);
 					mp->template routed_travel_time<float>(routed_travel_time);
 					mp->template estimated_time_of_arrival<Simulation_Timestep_Increment>(mp->template absolute_departure_time<int>() + routed_travel_time);
@@ -494,7 +496,7 @@ namespace Routing_Components
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
 					{
 						THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
-						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->uuid<int>() << " and destination link uuid " << destination_link->uuid<int>());
+						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->template uuid<int>() << " and destination link uuid " << destination_link->template uuid<int>());
 					}
 
 					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
@@ -507,8 +509,8 @@ namespace Routing_Components
 				define_component_interface(_Vehicle_Interface, typename _Traveler_Interface::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Trajecotry_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype, ComponentType);
-				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
-				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+                define_component_interface(_Link_Interface, typename _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				typedef Scenario_Prototype<typename Component_Type::Master_Type::scenario_type> _Scenario_Interface;
 				_Movement_Plan_Interface* mp= movement_plan<_Movement_Plan_Interface*>();
 								
 						_Vehicle_Interface* v_ptr = vehicle<_Vehicle_Interface*>();
@@ -602,7 +604,7 @@ namespace Routing_Components
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
 					{
 						THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
-						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->uuid<int>() << " and destination link uuid " << destination_link->uuid<int>());
+						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->template uuid<int>() << " and destination link uuid " << destination_link->template uuid<int>());
 					}
 
 					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());

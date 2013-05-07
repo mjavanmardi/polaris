@@ -611,7 +611,7 @@ namespace Intersection_Components
 					_link_component_type* inbound_link_component = ((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->_inbound_link_reference;
 					float link_speed = inbound_link_component->realtime_link_moe_data.link_speed;
 
-					float travel_distance = (link_speed * 5280.0f / 3600.0f) * ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<float>();
+					float travel_distance = (link_speed * 5280.0f / 3600.0f) * ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>();
 					_Outbound_Movements_Container_Interface& outbound_movements_container = inbound_outbound_movements->template outbound_movements<_Outbound_Movements_Container_Interface&>();
 					typename _Outbound_Movements_Container_Interface::iterator outbound_movement_itr;
 					for (outbound_movement_itr=outbound_movements_container.begin();outbound_movement_itr!=outbound_movements_container.end();outbound_movement_itr++)

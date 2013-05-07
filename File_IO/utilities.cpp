@@ -234,7 +234,7 @@ void calculate_mean(const vector<float>& data_array, float& mean)
 	}
 };
 
-#ifdef LINUX
+#ifdef __GNUC__
 	double get_current_cpu_time_in_seconds()
 	{
 		struct timespec current_cpu_time;

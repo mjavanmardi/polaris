@@ -20,7 +20,7 @@
 #include <iterator>
 
 //random number
-#include "..\Repository\RngStream.h"
+#include "../Repository/RngStream.h"
 
 using namespace RNG_Components;
 
@@ -31,13 +31,13 @@ using namespace RNG_Components;
 #include <functional>
 #include <omp.h>
 
-#ifdef LINUX
+#ifdef __GNUC__
 #include <sys/time.h>
 #else
 #include <windows.h>
 #endif
 
-#ifdef LINUX
+#ifdef __GNUC__
 // for map
 using namespace __gnu_cxx;
 #endif
