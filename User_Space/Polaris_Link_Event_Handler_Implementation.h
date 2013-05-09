@@ -1,5 +1,6 @@
 #pragma once
 #include"Polaris_Link_Implementation.h"
+#include"Network_Event_Implementations.h"
 namespace Link_Components
 {
 	namespace Types

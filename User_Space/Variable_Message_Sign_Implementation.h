@@ -41,8 +41,8 @@ namespace Variable_Message_Sign_Components
 				vector<int> links;
 				links.push_back(instance.getLink());
 
-
-				Simple_Advisory_ITS::Initialize<ComponentType,ComponentType,const vector<int>&>(links);
+				//Simple_Advisory_ITS::template Initialize<ComponentType,ComponentType,const vector<int>&>(links);
+				((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,NT,APPEND_CHILD(Variable_Speed_Sign)>*)this)->template Initialize<ComponentType,ComponentType,const vector<int>&>(links);
 			}
 		};
 
@@ -55,7 +55,8 @@ namespace Variable_Message_Sign_Components
 				vector<int> links;
 				links.push_back(instance.getLink());
 
-				Simple_Advisory_ITS::template Initialize<ComponentType,ComponentType,const vector<int>&>(links);
+				//Simple_Advisory_ITS::template Initialize<ComponentType,ComponentType,const vector<int>&>(links);
+				((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,NT,APPEND_CHILD(Variable_Word_Sign)>*)this)->template Initialize<ComponentType,ComponentType,const vector<int>&>(links);
 			}
 		};
 	}

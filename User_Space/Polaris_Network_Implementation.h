@@ -62,6 +62,7 @@ namespace Network_Components
 
 		implementation struct Polaris_Network_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			typedef typename Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>::Component_Type ComponentType;
 #ifndef EXCLUDE_DB
 			member_data_component(typename MasterType::network_db_reader_type, db_reader, none,none);
 #endif
@@ -887,8 +888,8 @@ namespace Network_Components
 			{
 				define_component_interface(_DB_Interface,type_of(db_reader),Prototypes::Network_DB_Reader_Prototype,ComponentType);
 				_DB_Interface* db = (_DB_Interface*)&_db_reader;
-				db->network_reference<ComponentType*>((ComponentType*)this);
-				db->read_network_data<Network_Components::Types::Network_IO_Maps&>(net_io_maps);
+				db->template network_reference<ComponentType*>((ComponentType*)this);
+				db->template read_network_data<Network_Components::Types::Network_IO_Maps&>(net_io_maps);
 			}
 #endif
 

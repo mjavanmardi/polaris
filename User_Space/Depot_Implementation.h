@@ -12,6 +12,7 @@ namespace Depot_Components
 	{
 		implementation struct Tow_Truck_Depot:public Polaris_Component<APPEND_CHILD(Tow_Truck_Depot),MasterType,Data_Object>
 		{
+			typedef typename Polaris_Component<APPEND_CHILD(Tow_Truck_Depot),MasterType,Data_Object>::Component_Type ComponentType;
 			feature_implementation static void Initialize_Type(/*const vector<shared_ptr<polaris::io::Component_Key>>& keys*/)
 			{
 				//for(vector<shared_ptr<polaris::io::Component_Key>>::const_iterator itr=keys.begin();itr!=keys.end();itr++)
@@ -24,11 +25,11 @@ namespace Depot_Components
 			{
 				using namespace polaris::io;
 				
-				shared_ptr<LinkList> link_list = instance.getLinks();
+				std::tr1::shared_ptr<LinkList> link_list = instance.getLinks();
 
 				const vector<int>& db_covered_links = (*link_list).getLinks();
 
-				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
 
 				for(vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
 				{
@@ -38,7 +39,7 @@ namespace Depot_Components
 					{
 						vector<typename MasterType::link_type*>& links=db_map[link];
 
-						vector<typename type_of(MasterType::link)*>::iterator vitr;
+						typename vector<typename type_of(MasterType::link)*>::iterator vitr;
 
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{

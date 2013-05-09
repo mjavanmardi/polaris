@@ -660,7 +660,7 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 };
 
 #define dispatch_to_feature(DISPATCHER_ALIAS, TYPELIST, OBJECT, TARGETTYPE_STRUCT_WITH_CONTROLTYPE_FOR_DISPATCH_TARGET_AND_RETURNTYPE_DEFINED, ...)\
-	DISPATCHER_ALIAS<TYPELIST>::Start_Dispatch<TypeAt<TYPELIST,0>::Result, concat(TARGETTYPE_STRUCT_WITH_CONTROLTYPE_FOR_DISPATCH_TARGET_AND_RETURNTYPE_DEFINED,__VA_ARGS__)>(OBJECT);
+	DISPATCHER_ALIAS<TYPELIST>::template Start_Dispatch<TypeAt<TYPELIST,0>::Result, concat(TARGETTYPE_STRUCT_WITH_CONTROLTYPE_FOR_DISPATCH_TARGET_AND_RETURNTYPE_DEFINED,__VA_ARGS__)>(OBJECT);
 
 
 
@@ -682,18 +682,18 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 		template<class HeadType_As_Given, typename TargetType>\
 		static inline void Start_Dispatch(void* obj)\
 		{\
-			DISPATCH_ALIAS<TypeList<HeadType_As_Given, Tail> >::Dispatch<HeadType_As_Given::Component_Type,HeadType_As_Given, TargetType>(obj);\
+			DISPATCH_ALIAS<TypeList<HeadType_As_Given, Tail> >::template Dispatch<HeadType_As_Given::Component_Type,HeadType_As_Given, TargetType>(obj);\
 		}\
 		template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
 		static inline void Dispatch(void* obj)\
 		{\
-			Head::FEATURE_NAME<HeadType_As_Given, HeadType_As_Given, NT>(obj);\
-			DISPATCH_ALIAS<Tail>::Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
+			Head::template FEATURE_NAME<HeadType_As_Given, HeadType_As_Given, NT>(obj);\
+			DISPATCH_ALIAS<Tail>::template Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
 		}\
 	};
 
 #define execute_static_typelist_loop(DISPATCHER_ALIAS, TYPELIST, OBJECT_PTR)\
-		DISPATCHER_ALIAS<TYPELIST>::Start_Dispatch<TypeAt<TYPELIST,0>::Result, NT>(OBJECT_PTR);
+		DISPATCHER_ALIAS<TYPELIST>::template Start_Dispatch<TypeAt<TYPELIST,0>::Result, NT>(OBJECT_PTR);
 
 
 

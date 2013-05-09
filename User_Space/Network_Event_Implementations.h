@@ -7,6 +7,8 @@ define_static_typelist_loop(Initialize_Type,Initialize_List);
 
 namespace Network_Event_Components
 {
+    using std::tr1::shared_ptr;
+    using std::tr1::weak_ptr;
 
 	namespace Types
 	{
@@ -30,11 +32,12 @@ namespace Network_Event_Components
 	{
 		implementation struct Base_Network_Event : public Polaris_Component<APPEND_CHILD(Base_Network_Event),MasterType,Execution_Object,ParentType,true>
 		{
+			typedef typename  Polaris_Component<APPEND_CHILD(Base_Network_Event),MasterType,Execution_Object,ParentType,true>::Component_Type ComponentType;
 			typedef Link_Components::Prototypes::Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
 			
 			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
-				for(vector<shared_ptr<polaris::io::Event_Key>>::const_iterator itr=keys.begin();itr!=keys.end();itr++)
+				for(typename vector<shared_ptr<polaris::io::Event_Key>>::const_iterator itr=keys.begin();itr!=keys.end();itr++)
 				{
 					_event_keys.push_back( (*itr)->getKey() );
 				}
@@ -53,7 +56,7 @@ namespace Network_Event_Components
 
 				if(start < _end_time)
 				{
-					Load_Event<ComponentType>(&ComponentType::template Incident_Conditional<ComponentType,NT,NT>,&ComponentType::template Incident_Event<ComponentType,NT,NT>, start, 0);
+					((ComponentType*)this)->template Load_Event<ComponentType>(&ComponentType::template Incident_Conditional<ComponentType,NT,NT>,&ComponentType::template Incident_Event<ComponentType,NT,NT>, start, 0);
 				}
 				else
 				{
@@ -74,9 +77,9 @@ namespace Network_Event_Components
 
 				const vector<int>& links=instance.lock()->getLinks();
 
-				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
 
-				for(vector<int>::const_iterator itr=links.begin();itr!=links.end();itr++)
+				for(typename vector<int>::const_iterator itr=links.begin();itr!=links.end();itr++)
 				{
 					int link = *itr;
 
@@ -84,7 +87,7 @@ namespace Network_Event_Components
 					{
 						vector<typename MasterType::link_type*>& links=db_map[link];
 
-						vector<typename type_of(MasterType::link)*>::iterator vitr;
+						typename vector<typename type_of(MasterType::link)*>::iterator vitr;
 
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
@@ -120,7 +123,7 @@ namespace Network_Event_Components
 				{
 					typename Network_Event_Callback<ComponentType>::type callback=_callbacks_by_component_index[subscriber];
 
-					for(vector<Link_Interface*>::iterator itr=_affected_links.begin();itr!=_affected_links.end();itr++)
+					for(typename vector<Link_Interface*>::iterator itr=_affected_links.begin();itr!=_affected_links.end();itr++)
 					{
 						(*callback)( (void*)(*itr), (Network_Event<ComponentType,NT>*)this );
 					}
@@ -181,20 +184,22 @@ namespace Network_Event_Components
 		{
 			//feature_implementation static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj);}
 
-			feature_implementation void Start(){Base_Network_Event::Start<ComponentType,CallerType,NT>();}
-			
+			//feature_implementation void Start(){Base_Network_Event::template Start<ComponentType,CallerType,NT>();}
+			feature_implementation void Start(){((Base_Network_Event<MasterType,NT,APPEND_CHILD(Weather_Network_Event)>*)this)->template Start<ComponentType,CallerType,NT>();}
+
 			feature_implementation void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
 			{
 				using namespace polaris::io;
+				//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
 
-				Base_Network_Event::Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
-				
+				((Base_Network_Event<MasterType,NT,APPEND_CHILD(Weather_Network_Event)>*)this)-> Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+
 				//_start_time = 14400;
 				//_end_time = 43200;
 
 				const vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
-				for(vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
+				for(typename vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
 				{
 					_weather_type = Types::WEATHER_TYPE::SNOW;
 					_precipitation_depth = .6;
@@ -232,22 +237,24 @@ namespace Network_Event_Components
 		implementation struct Accident_Network_Event : public Base_Network_Event<MasterType,NT,APPEND_CHILD(Accident_Network_Event)>
 		{
 			//feature_implementation static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj);}
-			
-			feature_implementation void Start(){Base_Network_Event::Start<ComponentType,CallerType,NT>();}
-			
+	
+			//feature_implementation void Start(){Base_Network_Event::template Start<ComponentType,CallerType,NT>();}
+			feature_implementation void Start(){((Base_Network_Event<MasterType,NT,APPEND_CHILD(Accident_Network_Event)>*)this)->template Start<ComponentType,CallerType,NT>();}
+
 			feature_implementation void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
 			{
 				using namespace polaris::io;
 
-				Base_Network_Event::Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
-				
+				//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+				((Base_Network_Event<MasterType,NT,APPEND_CHILD(Accident_Network_Event)>*)this)->template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+
 				//_start_time = 28800 + rand()%(20*60);
 				//_start_time = 500;
 				//_end_time = _start_time + 30*60;
 
 				const vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
-				for(vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
+				for(typename vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
 				{
 					if( (*itr)->getKey()->getKey() == "lanes" )
 					{
@@ -288,17 +295,19 @@ namespace Network_Event_Components
 		{
 			//feature_implementation static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj);}
 			
-			feature_implementation void Start(){Base_Network_Event::Start<ComponentType,CallerType,NT>();}
+			//feature_implementation void Start(){Base_Network_Event::template Start<ComponentType,CallerType,NT>();}
+			feature_implementation void Start(){((Base_Network_Event<MasterType,NT,APPEND_CHILD(Congestion_Network_Event)>*)this)->template Start<ComponentType,CallerType,NT>();}
 			
 			feature_implementation void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
 			{
 				using namespace polaris::io;
 
-				Base_Network_Event::Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
-				
+				//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+				((Base_Network_Event<MasterType,NT,APPEND_CHILD(Congestion_Network_Event)>*)this)->template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+			
 				const vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
-				for(vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
+				for(typename vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
 				{
 					if( (*itr)->getKey()->getKey() == "travel_time" )
 					{
@@ -318,18 +327,20 @@ namespace Network_Event_Components
 		implementation struct Lane_Closure_Network_Event : public Base_Network_Event<MasterType,NT,APPEND_CHILD(Lane_Closure_Network_Event)>
 		{
 			//feature_implementation static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj);}
-			
-			feature_implementation void Start(){Base_Network_Event::Start<ComponentType,CallerType,NT>();}
-			
+		
+			//feature_implementation void Start(){Base_Network_Event::template Start<ComponentType,CallerType,NT>();}
+			feature_implementation void Start(){((Base_Network_Event<MasterType,NT,APPEND_CHILD(Lane_Closure_Network_Event)>*)this)->template Start<ComponentType,CallerType,NT>();}
+
 			feature_implementation void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
 			{
 				using namespace polaris::io;
 
-				Base_Network_Event::Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
-				
+				//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+				((Base_Network_Event<MasterType,NT,APPEND_CHILD(Lane_Closure_Network_Event)>*)this)->template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
+
 				const vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
-				for(vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
+				for(typename vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
 				{
 					if( (*itr)->getKey()->getKey() == "lanes_closed" )
 					{
@@ -344,6 +355,7 @@ namespace Network_Event_Components
 
 		implementation struct Network_Event_Manager_Implementation : public Polaris_Component<APPEND_CHILD(Network_Event_Manager_Implementation),MasterType,Data_Object,ParentType>
 		{
+			typedef typename Polaris_Component<APPEND_CHILD(Network_Event_Manager_Implementation),MasterType,Data_Object,ParentType>::Component_Type ComponentType;
 			typedef Network_Event<typename MasterType::type_of(base_network_event),ComponentType> Base_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::type_of(weather_network_event),ComponentType> Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::type_of(accident_network_event),ComponentType> Accident_Network_Event_Interface;
@@ -352,7 +364,7 @@ namespace Network_Event_Components
 			
 			feature_implementation void Push_Subscriber(typename Network_Event_Callback<TargetType>::type callback)
 			{
-				Network_Event<TargetType,ComponentType>::Push_Subscriber<typename Network_Event_Callback<TargetType>::type>(callback,CallerType::component_index);
+				Network_Event<TargetType,ComponentType>::template Push_Subscriber<typename Network_Event_Callback<TargetType>::type>(callback,CallerType::component_index);
 			}
 
 			feature_implementation void Initialize()
@@ -374,7 +386,7 @@ namespace Network_Event_Components
 				session s;
 
 				transaction t (db->begin());
-				result<io::Network_Event> r = db->query<io::Network_Event> (query<io::Network_Event>::true_expr);
+				result<io::Network_Event> r = db->template query<io::Network_Event> (query<io::Network_Event>::true_expr);
 
 				for (result<io::Network_Event>::iterator itr=r.begin(); itr!=r.end(); ++itr)
 				{
@@ -399,31 +411,31 @@ namespace Network_Event_Components
 					
 					const vector<weak_ptr<io::Event_Instance> >& instances = itr->getInstances();
 
-					for(vector<weak_ptr<io::Event_Instance>>::const_iterator vitr=instances.begin();vitr!=instances.end();vitr++)
+					for(typename vector<weak_ptr<io::Event_Instance>>::const_iterator vitr=instances.begin();vitr!=instances.end();vitr++)
 					{
 						weak_ptr<io::Event_Instance> _ptr=*vitr;
 
 						if(name == "Weather")
 						{
-							Weather_Network_Event_Interface* net_event = (Weather_Network_Event_Interface*)Allocate<MasterType::type_of(weather_network_event)>();
+							Weather_Network_Event_Interface* net_event = (Weather_Network_Event_Interface*)Allocate<typename MasterType::type_of(weather_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
 							Create_Network_Event<ComponentType,ComponentType,typename Weather_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Accident")
 						{
-							Accident_Network_Event_Interface* net_event = (Accident_Network_Event_Interface*)Allocate<MasterType::type_of(accident_network_event)>();
+							Accident_Network_Event_Interface* net_event = (Accident_Network_Event_Interface*)Allocate<typename MasterType::type_of(accident_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
 							Create_Network_Event<ComponentType,ComponentType,typename Accident_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Congestion")
 						{
-							Congestion_Network_Event_Interface* net_event = (Congestion_Network_Event_Interface*)Allocate<MasterType::type_of(congestion_network_event)>();
+							Congestion_Network_Event_Interface* net_event = (Congestion_Network_Event_Interface*)Allocate<typename MasterType::type_of(congestion_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
 							Create_Network_Event<ComponentType,ComponentType,typename Congestion_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Lane Closure")
 						{
-							Lane_Closure_Network_Event_Interface* net_event = (Lane_Closure_Network_Event_Interface*)Allocate<MasterType::type_of(lane_closure_network_event)>();
+							Lane_Closure_Network_Event_Interface* net_event = (Lane_Closure_Network_Event_Interface*)Allocate<typename MasterType::type_of(lane_closure_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
 							Create_Network_Event<ComponentType,ComponentType,typename Lane_Closure_Network_Event_Interface::ComponentType>(net_event);
 						}
@@ -433,17 +445,17 @@ namespace Network_Event_Components
 
 			feature_implementation void Get_Network_Events(int link_id,vector< Network_Event<TargetType,NT>* >& container/*,requires(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(CallerType,typename type_of(MasterType::traffic_management_center),is_same))*/)
 			{
-				list<Network_Event<typename TargetType,NT>*>* events_of_type = (list<Network_Event<typename TargetType,NT>*>*) & (_network_event_container[TargetType::component_index]);
+				list<Network_Event<TargetType,NT>*>* events_of_type = (list<Network_Event<TargetType,NT>*>*) & (_network_event_container[TargetType::component_index]);
 
-				for(list< Network_Event<typename TargetType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+				for(typename list< Network_Event<TargetType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
-					Network_Event<typename TargetType,NT>* network_event=*itr;
+					Network_Event<TargetType,NT>* network_event=*itr;
 
-					if(network_event->active<bool>())
+					if(network_event->template active<bool>())
 					{
-						vector<Link_Interface*>* affected_links = network_event->affected_links<vector<Link_Interface*>*>();
+						vector<Link_Interface*>* affected_links = network_event->template affected_links<vector<Link_Interface*>*>();
 
-						for(vector<Link_Interface*>::iterator vitr = affected_links->begin();vitr != affected_links->end();vitr++)
+						for(typename vector<Link_Interface*>::iterator vitr = affected_links->begin();vitr != affected_links->end();vitr++)
 						{
 							if((*vitr)->template internal_id<int>() == link_id)
 							{
@@ -457,11 +469,11 @@ namespace Network_Event_Components
 
 			feature_implementation void Get_Network_Events( vector< Network_Event<TargetType,NT>* >& container, requires(!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
-				list<Network_Event<typename TargetType,NT>*>* events_of_type = (list<Network_Event<typename TargetType,NT>*>*) & (_network_event_container[TargetType::component_index]);
+				list<Network_Event<TargetType,NT>*>* events_of_type = (list<Network_Event<TargetType,NT>*>*) & (_network_event_container[TargetType::component_index]);
 
-				for(list< Network_Event<typename TargetType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+				for(typename list< Network_Event<TargetType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
-					Network_Event<typename TargetType,NT>* network_event=*itr;
+					Network_Event<TargetType,NT>* network_event=*itr;
 
 					if(network_event->template active<bool>())
 					{
@@ -472,11 +484,11 @@ namespace Network_Event_Components
 			
 			feature_implementation void Get_Network_Events( vector< Network_Event<TargetType,CallerType>* >& container, requires(check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
-				for(hash_map< int, list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
+				for(typename hash_map< int, list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
 				{
 					list< Base_Network_Event_Interface* >* events_of_type=&h_itr->second;
 
-					for(list< Base_Network_Event_Interface* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+					for(typename list< Base_Network_Event_Interface* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 					{
 						Base_Network_Event_Interface* network_event=*itr;
 
@@ -495,7 +507,7 @@ namespace Network_Event_Components
 
 			feature_implementation void Create_Network_Event(Network_Event<TargetType,CallerType>* network_event)
 			{
-				network_event->Start<NT>();
+				network_event->template Start<NT>();
 
 				_network_event_container[TargetType::component_index].push_back( (Base_Network_Event_Interface*) network_event );
 			}
@@ -504,7 +516,7 @@ namespace Network_Event_Components
 			{
 				list<Network_Event<typename TargetType::ControlType,NT>*>* events_of_type = (list<Network_Event<typename TargetType::ControlType,NT>*>*) & (_network_event_container[TargetType::ControlType::component_index]);
 
-				for(list< Network_Event<typename TargetType::ControlType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+				for(typename list< Network_Event<typename TargetType::ControlType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
 					if( (*itr) == network_event )
 					{

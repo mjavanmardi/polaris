@@ -62,6 +62,9 @@ namespace Link_Components
 	//------------------------------------------------------------------------------------------------------------------
 		implementation struct Polaris_Link_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Link_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			 
+			typedef typename Polaris_Component<APPEND_CHILD(Polaris_Link_Implementation),MasterType,Execution_Object,ParentType>::Component_Type ComponentType;
+
 		//==================================================================================================================
 		/// Simple Link Members
 		//------------------------------------------------------------------------------------------------------------------
@@ -897,8 +900,8 @@ namespace Link_Components
 				{
 					vector<_Network_Event_Interface*> events;
 					
-					_advisory_radio->Get_Displayed_Messages<typename MasterType::base_network_event_type>(events);
-					vector<_Network_Event_Interface*>::iterator event_itr;
+					_advisory_radio->template Get_Displayed_Messages<typename MasterType::base_network_event_type>(events);
+					typename vector<_Network_Event_Interface*>::iterator event_itr;
 					for (event_itr = events.begin(); event_itr != events.end(); event_itr++)
 					{
 						_Network_Event_Interface* event = (_Network_Event_Interface*)(*event_itr);
@@ -913,8 +916,8 @@ namespace Link_Components
 				{
 					vector<_Network_Event_Interface*> events;
 					
-					_variable_word_sign->Get_Displayed_Messages<typename MasterType::base_network_event_type>(events);
-					vector<_Network_Event_Interface*>::iterator event_itr;
+					_variable_word_sign->template Get_Displayed_Messages<typename MasterType::base_network_event_type>(events);
+					typename vector<_Network_Event_Interface*>::iterator event_itr;
 					for (event_itr = events.begin(); event_itr != events.end(); event_itr++)
 					{
 						_Network_Event_Interface* event = (_Network_Event_Interface*)(*event_itr);
@@ -1039,11 +1042,11 @@ namespace Link_Components
 			{
 				// event subscription
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
-				define_component_interface(_Network_Event_Manager_Interface, _Network_Interface::get_type_of(network_event_manager), Network_Event_Components::Prototypes::Network_Event_Manager, ComponentType);
+				define_component_interface(_Network_Event_Manager_Interface, typename _Network_Interface::get_type_of(network_event_manager), Network_Event_Components::Prototypes::Network_Event_Manager, ComponentType);
 
 				_Network_Event_Manager_Interface* network_event_manager = ((_Network_Interface*)_global_network)->template network_event_manager<_Network_Event_Manager_Interface*>();
-				network_event_manager->template Push_Subscriber<MasterType::weather_network_event_type>(&Weather_Event_Notification);
-				network_event_manager->template Push_Subscriber<MasterType::accident_network_event_type>(&Accident_Event_Notification);
+				network_event_manager->template Push_Subscriber<typename MasterType::weather_network_event_type>(&Weather_Event_Notification);
+				network_event_manager->template Push_Subscriber<typename MasterType::accident_network_event_type>(&Accident_Event_Notification);
 			}
 
 			feature_implementation void get_link_moe(int& start_time, int& end_time, int& volume, float& speed, float& density)

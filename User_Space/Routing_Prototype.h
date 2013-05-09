@@ -1,7 +1,7 @@
 #pragma once
 #include "User_Space_Includes.h"
 #include "../File_IO/utilities.h"
-#ifndef EXCLUDE_DB
+#ifndef EXCLUDE_DEMAND
 #include "Network_Skimming_Prototype.h"
 #endif
 #ifndef _MSC_VER
@@ -76,7 +76,7 @@ namespace Routing_Components
 			feature_accessor(end_time,none,none);
 			feature_accessor(travel_times_to_link_container,none,none);
 			feature_accessor(departure_time,none,none); // the time at which routing is triggered.
-#ifndef EXCLUDE_DB
+#ifndef EXCLUDE_DEMAND
 			feature_prototype void Evaluate_Condition(Conditional_Response& response, requires(check(TargetType,Concepts::Is_One_To_One_Router)))
 			{
 				response.result=true;

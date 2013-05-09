@@ -29,8 +29,8 @@
 #include <limits.h>
 #include <pthread.h>
 #define __forceinline inline
-#define unordered_map tr1::unordered_map
-#define unordered_set tr1::unordered_set
+//#define unordered_map tr1::unordered_map
+//#define unordered_set tr1::unordered_set
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

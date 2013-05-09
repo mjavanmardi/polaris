@@ -9,4 +9,4 @@ OBJS=$(patsubst %.cpp, %.o, $(SRC))
 librepository.a: $(OBJS)
 	ar rcs $@ $^
 %.o: %.cpp *.h
-	$(CC) -c $(CFLAGS) -D LINUX $<
+	$(CC) -c $(CFLAGS) $<

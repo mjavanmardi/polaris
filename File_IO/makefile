@@ -9,4 +9,4 @@ OBJS=$(patsubst %.cpp, %.o, $(SRC))
 libfileio.a: $(OBJS)
 	ar rcs $@ $^
 %.o: %.cpp
-	$(CC) -c $(CFLAGS) -D LINUX $<
+	$(CC) -c $(CFLAGS) $<

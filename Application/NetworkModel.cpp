@@ -204,7 +204,7 @@ void run_with_input_from_db()
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
 	_Network_Interface* network=(_Network_Interface*)Allocate<typename MasterType::network_type>();
 	_global_network = network;
-	network->template scenario_reference<_Scenario_Interface*>(scenario);
+	network->scenario_reference<_Scenario_Interface*>(scenario);
 	
 	cout << "reading scenario data..." <<endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>();
@@ -230,7 +230,7 @@ void run_with_input_from_db()
 		operation->read_operation_data<Net_IO_Type>(network_io_maps);
 	}
 
-	if (scenario->template write_db_input_to_files<bool>())
+	if (scenario->write_db_input_to_files<bool>())
 	{
 		cout << "converting scenario data..." << endl;
 		scenario->write_scenario_data<NULLTYPE>(scenario_data_for_output);
@@ -255,7 +255,7 @@ void run_with_input_from_db()
 		network_models::network_information::operation_data_information::write_operation_data(output_dir_name,scenario_data_for_output,operation_data_for_output,network_data_for_output);
 	}
 
-	if (scenario->template run_simulation_for_db_input<bool>())
+	if (scenario->run_simulation_for_db_input<bool>())
 	{
 #ifdef ANTARES
 		network->set_network_bounds<NULLTYPE>();
@@ -266,14 +266,14 @@ void run_with_input_from_db()
 		MasterType::link_type::configure_link_moes_layer();
 #endif
 		
-		if(scenario->template use_network_events<bool>())
+		if(scenario->use_network_events<bool>())
 		{
 			define_component_interface(_Network_Event_Manager_Interface, typename MasterType::network_event_manager_type, Network_Event_Manager, NULLTYPE);
 			_Network_Event_Manager_Interface* net_event_manager=(_Network_Event_Manager_Interface*)Allocate<typename MasterType::network_event_manager_type>();
 			network->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 			net_event_manager->Initialize<NT>();
 
-			if (scenario->template use_tmc<bool>())
+			if (scenario->use_tmc<bool>())
 			{
 				typedef Traffic_Management_Center<MasterType::traffic_management_center_type> TMC_Interface;
 
@@ -306,7 +306,7 @@ void run_with_input_from_db()
 			((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
 		}
 
-		if (scenario->template use_network_events<bool>())
+		if (scenario->use_network_events<bool>())
 		{
 			MasterType::link_type::subscribe_events();
 		}

@@ -39,7 +39,7 @@ namespace Advisory_ITS_Components
 
 			feature void Push_Displayed_Network_Events(vector<Network_Event<TargetType>*>& network_events)
 			{
-				this_component()->Accept_Displayed_Network_Events<ComponentType,CallerType,TargetType>(network_events);
+				this_component()->template Accept_Displayed_Network_Events<ComponentType,CallerType,TargetType>(network_events);
 			}
 
 

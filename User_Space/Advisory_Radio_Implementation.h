@@ -16,11 +16,10 @@ namespace Advisory_Radio_Components
 			{
 				using namespace polaris::io;
 
-				shared_ptr<LinkList> link_list = instance.getLinks();
+				std::tr1::shared_ptr<LinkList> link_list = instance.getLinks();
 
 				const vector<int>& links = (*link_list).getLinks();
-
-				Simple_Advisory_ITS::template Initialize<ComponentType,ComponentType,const vector<int>&>(links);
+				((Advisory_ITS_Components::Implementations::Simple_Advisory_ITS<MasterType,NT,APPEND_CHILD(Highway_Advisory_Radio)>*)this)->template Initialize<ComponentType,ComponentType,const vector<int>&>(links);
 			}
 		};
 	}

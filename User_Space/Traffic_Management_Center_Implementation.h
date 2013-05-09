@@ -14,6 +14,7 @@ namespace Traffic_Management_Center_Components
 	{
 		implementation struct Simple_TMC:public Polaris_Component<APPEND_CHILD(Simple_TMC),MasterType,Execution_Object>
 		{
+			typedef typename Polaris_Component<APPEND_CHILD(Simple_TMC),MasterType,Execution_Object>::Component_Type ComponentType;
 			// added for convinience
 			typedef Network_Event<typename MasterType::type_of(base_network_event),ComponentType> Base_Network_Event_Interface;
 
@@ -44,32 +45,32 @@ namespace Traffic_Management_Center_Components
 				ComponentType* pthis = (ComponentType*)_this;
 
 				pthis->template Load_New_Events<ComponentType,ComponentType,NT>();
-				pthis->DecideOnEventsToBeDisplayed<ComponentType,ComponentType,NT>();
+				pthis->template DecideOnEventsToBeDisplayed<ComponentType,ComponentType,NT>();
 			}
 
 			feature_implementation void DecideOnEventsToBeDisplayed()
 			{
 				vector<Base_Network_Event_Interface*> current_events;
-				_network_event_manager->Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
-				for(vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
+				_network_event_manager->template Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
+				for(typename vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 				{
 					vector<Base_Network_Event_Interface*> events_to_display;
 					//some claculations here
-					(*itr)->Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
 				}
 
-				for(vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
+				for(typename vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
 				{
 					vector<Base_Network_Event_Interface*> events_to_display;
 					//some claculations here
-					(*itr)->Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
 				}
 
-				for(vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
+				for(typename vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
 				{
 					vector<Base_Network_Event_Interface*> events_to_display;
 					//some claculations here
-					(*itr)->Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
 				}
 
 
@@ -80,18 +81,18 @@ namespace Traffic_Management_Center_Components
 				vector<Base_Network_Event_Interface*> current_events;
 				_network_event_manager->template Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
 
-				for(vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
+				for(typename vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 				{
 					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
 					
 				}
 
-				for(vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
+				for(typename vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
 				{
 					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
 				}
 
-				for(vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
+				for(typename vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
 				{
 					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
 				}
@@ -101,7 +102,7 @@ namespace Traffic_Management_Center_Components
 			{
 				this_component()->template Read_Database<ComponentType,CallerType,TargetType>();
 
-				Load_Event<ComponentType>(&ComponentType::template TMC_Conditional<ComponentType,NT,NT>,&ComponentType::template TMC_Event<ComponentType,NT,NT>, 0, 0);
+				((ComponentType*)this)->template Load_Event<ComponentType>(&ComponentType::template TMC_Conditional<ComponentType,NT,NT>,&ComponentType::template TMC_Event<ComponentType,NT,NT>, 0, 0);
 			}
 
 			feature_implementation void Read_Database()
@@ -127,9 +128,9 @@ namespace Traffic_Management_Center_Components
 				
 				Variable_Speed_Sign_Interface::template Initialize_Type<NT>();
 
-				for(result<VSS>::iterator db_itr = vss_component_result.begin (); db_itr != vss_component_result.end (); ++db_itr)
+				for(typename result<VSS>::iterator db_itr = vss_component_result.begin (); db_itr != vss_component_result.end (); ++db_itr)
 				{
-					Variable_Speed_Sign_Interface* its_component = (Variable_Speed_Sign_Interface*)Allocate<Variable_Speed_Sign_Interface::ComponentType>();
+					Variable_Speed_Sign_Interface* its_component = (Variable_Speed_Sign_Interface*)Allocate<typename Variable_Speed_Sign_Interface::ComponentType>();
 					its_component->template Initialize< VSS& >( *db_itr );
 					_variable_speed_signs.push_back(its_component);				
 				}
@@ -141,9 +142,9 @@ namespace Traffic_Management_Center_Components
 
 				Variable_Word_Sign_Interface::template Initialize_Type<NT>();
 
-				for(result<VMS>::iterator db_itr = vws_component_result.begin (); db_itr != vws_component_result.end (); ++db_itr)
+				for(typename result<VMS>::iterator db_itr = vws_component_result.begin (); db_itr != vws_component_result.end (); ++db_itr)
 				{
-					Variable_Word_Sign_Interface* its_component = (Variable_Word_Sign_Interface*)Allocate<Variable_Word_Sign_Interface::ComponentType>();
+					Variable_Word_Sign_Interface* its_component = (Variable_Word_Sign_Interface*)Allocate<typename Variable_Word_Sign_Interface::ComponentType>();
 					its_component->template Initialize< VMS& >( *db_itr );
 					_variable_word_signs.push_back(its_component);				
 				}
@@ -153,11 +154,11 @@ namespace Traffic_Management_Center_Components
 
 				result<HAR> har_component_result=db->template query<HAR>(query<HAR>::true_expr);
 
-				Advisory_Radio_Interface::Initialize_Type<NT>();
+				Advisory_Radio_Interface::template Initialize_Type<NT>();
 
-				for(result<HAR>::iterator db_itr = har_component_result.begin (); db_itr != har_component_result.end (); ++db_itr)
+				for(typename result<HAR>::iterator db_itr = har_component_result.begin (); db_itr != har_component_result.end (); ++db_itr)
 				{
-					Advisory_Radio_Interface* its_component = (Advisory_Radio_Interface*)Allocate<Advisory_Radio_Interface::ComponentType>();
+					Advisory_Radio_Interface* its_component = (Advisory_Radio_Interface*)Allocate<typename Advisory_Radio_Interface::ComponentType>();
 					its_component->Initialize< HAR& >( *db_itr );
 					_advisory_radios.push_back(its_component);				
 				}
@@ -169,9 +170,9 @@ namespace Traffic_Management_Center_Components
 
 				Depot_Interface::template Initialize_Type<NT>();
 
-				for(result<polaris::io::Depot>::iterator db_itr = depot_component_result.begin (); db_itr != depot_component_result.end (); ++db_itr)
+				for(typename result<polaris::io::Depot>::iterator db_itr = depot_component_result.begin (); db_itr != depot_component_result.end (); ++db_itr)
 				{
-					Depot_Interface* its_component = (Depot_Interface*)Allocate<Depot_Interface::ComponentType>();
+					Depot_Interface* its_component = (Depot_Interface*)Allocate<typename Depot_Interface::ComponentType>();
 					its_component->template Initialize< polaris::io::Depot& >( *db_itr );
 					_depots.push_back(its_component);				
 				}
@@ -181,11 +182,11 @@ namespace Traffic_Management_Center_Components
 
 				result<OpenShoulder> link_control_component_result=db->template query<OpenShoulder>(query<OpenShoulder>::true_expr);
 
-				Link_Control_Interface::Initialize_Type<NT>();
+				Link_Control_Interface::template Initialize_Type<NT>();
 
-				for(result<OpenShoulder>::iterator db_itr = link_control_component_result.begin (); db_itr != link_control_component_result.end (); ++db_itr)
+				for(typename result<OpenShoulder>::iterator db_itr = link_control_component_result.begin (); db_itr != link_control_component_result.end (); ++db_itr)
 				{
-					Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<Link_Control_Interface::ComponentType>();
+					Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<typename Link_Control_Interface::ComponentType>();
 					its_component->template Initialize< OpenShoulder& >( *db_itr );
 					_link_controls.push_back(its_component);				
 				}

@@ -244,6 +244,12 @@ struct Associative_Container_Prototype ADD_DEBUG_INFO
 		return ((ComponentType*)this)->insert(t);
 	}
 
+	pair<iterator,bool> insert(pair<key_type,TargetValueType>&& p)
+	{
+		pair<key_type,Val_Type> t = pair<key_type,Val_Type>(p.first,(Val_Type)(p.second));
+		return ((ComponentType*)this)->insert(t);
+	}
+
 	iterator insert(key_type key, TargetValueType& value)
 	{	
 		return ((ComponentType*)this)->insert(pair<key_type,typename Component_Type::mapped_type>(key,(typename Component_Type::mapped_type)value));

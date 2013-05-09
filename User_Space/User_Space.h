@@ -28,11 +28,8 @@ void* _global_scenario;
 #include "Polaris_Network_Implementation_Input_File.h"
 #include "Polaris_Network_Implementation_Output_File.h"
 #include "Polaris_Network_Implementation_Results.h"
-#ifndef EXCLUDE_DB
-#include "Polaris_Network_Skimming_Implementation.h"
-#endif
-
 #ifndef EXCLUDE_DEMAND
+#include "Polaris_Network_Skimming_Implementation.h"
 #include "Activity_Implementations.h"
 
 

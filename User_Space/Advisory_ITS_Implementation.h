@@ -11,13 +11,15 @@ namespace Advisory_ITS_Components
 	{
 		implementation struct Simple_Advisory_ITS : public Polaris_Component<APPEND_CHILD(Simple_Advisory_ITS),MasterType,Data_Object>
 		{
+			
+			typedef typename Polaris_Component<APPEND_CHILD(Simple_Advisory_ITS),MasterType,Data_Object>::Component_Type ComponentType;
 			feature_implementation void Initialize(const vector<int>& db_covered_links/*,bool flag=false*/)
 			{
 				using namespace polaris::io;
 
-				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
 
-				for(vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
+				for(typename vector<int>::const_iterator itr=db_covered_links.begin();itr!=db_covered_links.end();itr++)
 				{
 					int link = *itr;
 
@@ -25,13 +27,13 @@ namespace Advisory_ITS_Components
 					{
 						vector<typename MasterType::link_type*>& links=db_map[link];
 
-						vector<typename type_of(MasterType::link)*>::iterator vitr;
+						typename vector<typename type_of(MasterType::link)*>::iterator vitr;
 
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
 							_covered_links.push_back( (Link_Interface*)(*vitr) );
 							//if(flag) cout << "pushing HAR to: " << ((Link_Interface*)(*vitr))->internal_id<int>();
-							((Link_Interface*)(*vitr))->Push_ITS< ComponentType* >( (ComponentType*)this);
+							((Link_Interface*)(*vitr))->template Push_ITS< ComponentType* >( (ComponentType*)this);
 						}
 					}
 				}
@@ -45,7 +47,7 @@ namespace Advisory_ITS_Components
 			{
 				_current_events.clear();
 
-				for(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
+				for(typename vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin();itr!=network_events.end();itr++)
 				{
 					_current_events.push_back( *itr );
 				}
@@ -54,15 +56,15 @@ namespace Advisory_ITS_Components
 			feature_implementation void Accept_Displayed_Network_Events(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
 			{
 				_displayed_events.clear();
-				for (vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin(); itr!=network_events.end(); itr++)
+				for (typename vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin(); itr!=network_events.end(); itr++)
 					_displayed_events.push_back( *itr );
 			}
 			
-			feature_implementation void Get_Displayed_Messages(vector<Network_Event<TargetType>*>& bucket,requires(!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same) && check(TargetType,Is_Polaris_Component)))
+			feature_implementation void Get_Displayed_Messages(vector<Network_Event<TargetType>*>& bucket,requires(!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
 				const int target_component_index = TargetType::component_index;
 
-				for(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
+				for(typename vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
 				{
 					if( (*itr)->_component_index == target_component_index )
 					{
@@ -73,16 +75,16 @@ namespace Advisory_ITS_Components
 			
 			feature_implementation void Get_Displayed_Messages(vector<Network_Event<TargetType>*>& bucket,requires(check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
-				for(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
+				for(typename vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
 				{
 					bucket.push_back( *itr );
 				}
 			}
 
-			feature_implementation void Get_Displayed_Messages(vector<Network_Event<TargetType>*>& bucket,requires(!check(TargetType,Is_Polaris_Component)))
-			{
-				static_assert(false,"TargetType is not a Polaris Component!");
-			}
+			//feature_implementation void Get_Displayed_Messages(vector<Network_Event<TargetType>*>& bucket,requires(!check(TargetType,Is_Polaris_Component)))
+			//{
+			//	static_assert(false,"TargetType is not a Polaris Component!");
+			//}
 
 			member_data(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>, current_events, none, none);
 			member_data(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>, displayed_events, none, none);
