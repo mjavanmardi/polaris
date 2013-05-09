@@ -212,6 +212,7 @@ namespace Network_Components
 				pcfg.Configure_Plot();
 				pcfg.storage_period = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
 				pcfg.storage_offset = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>() - 1;
+				pcfg.target_sub_iteration = Scenario_Components::Types::END_OF_ITERATION + 1;
 				pcfg.grouped = true;
 				pcfg.group_color = true;
 

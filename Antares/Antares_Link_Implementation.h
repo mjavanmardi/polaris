@@ -228,6 +228,7 @@ namespace Link_Components
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Dynamic_Quads(True_Color_RGBA<NULLTYPE>(0,255,100,255),10);
 				cfg.storage_period = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
+				cfg.target_sub_iteration = Scenario_Components::Types::END_OF_ITERATION + 1;
 				cfg.storage_offset = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>() - 1;
 				cfg.primitive_color = true;
 				cfg.primitive_normal = true;

@@ -9,7 +9,7 @@
 //	Antares_Layer_Implementation - layer definition
 //---------------------------------------------------------
 
-implementation struct Antares_Layer_Implementation:public Polaris_Component<APPEND_CHILD(Antares_Layer_Implementation),MasterType,Execution_Object>
+implementation struct Antares_Layer_Implementation:public Polaris_Component<APPEND_CHILD(Antares_Layer_Implementation),MasterType,Execution_Object,NT,false,4096/8>
 {
 	Antares_Layer_Implementation()
 	{
@@ -886,11 +886,13 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	declare_feature_event(Update)
 	{
 		Antares_Layer_Implementation* pthis=(Antares_Layer_Implementation*)_this;
-
+		
 		if(pthis->_dynamic_data)
 		{
 			int reserve;
-			LOCK(_canvas_lock);
+
+			//while( AtomicExchange(&_canvas_lock,1) ) SLEEP(0);
+
 			for(int i=0;i<_num_antares_threads;i++)
 			{
 				reserve=pthis->_storage[_iteration + pthis->_storage.period][i].size();
@@ -901,7 +903,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 				//pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].clear();
 				//pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].reserve(reserve);
 			}
-			UNLOCK(_canvas_lock);
+
+			//UNLOCK(_canvas_lock);
 		}
 
 		pthis->Refresh_Selection<ComponentType,ComponentType,NT>();
