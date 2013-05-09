@@ -134,19 +134,6 @@ TEST_F(DBTest, EventgetInstances)
 }
 
 
-TEST_F(DBTest, ZoneFKZone_Land_Use){
-	typedef odb::query<polaris::io::Zone> query;
-	typedef odb::result<polaris::io::Zone> result;
-	odb::transaction t(this->db->begin());
-	result r(this->db->query<polaris::io::Zone>(query::zone_land_use.is_null()));
-	int count = 0;
-	for (result::iterator i (r.begin()); i!=r.end(); ++i)
-	{
-		count++;
-	}
-	t.commit();
-	ASSERT_EQ(count, 0);
-}
 
 TEST_F(DBTest, LinkFKNode_A){
 	typedef odb::query<polaris::io::Link> query;
@@ -216,30 +203,6 @@ TEST(SpatialiteT, LinksInsidePoly)
 	std::vector<int> res;
 	res = GetLinksInsideDepotPolygon(db_path);
 	ASSERT_EQ(res.size(), 275);
-}
-
-TEST(SpatialiteT, LinksInsideLakeCounty)
-{
-	using namespace polaris::io;
-	std::vector<int> res;
-	res = GetLinksInsideCounty(db_path, "Lake");
-	ASSERT_EQ(res.size(), 2224);
-}
-
-TEST(SpatialiteT, GetLinksInsideZip)
-{
-	using namespace polaris::io;
-	std::vector<int> res;
-	res = GetLinksInsideZip(db_path, "60490");
-	ASSERT_EQ(res.size(), 28);
-}
-
-TEST(SpatialiteT, LinksInsideDekalbCounty)
-{
-	using namespace polaris::io;
-	std::vector<int> res;
-	res = GetLinksInsideCounty(db_path, "DeKalb");
-	ASSERT_EQ(res.size(), 400);
 }
 
 
