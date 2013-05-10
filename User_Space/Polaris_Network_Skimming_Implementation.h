@@ -18,6 +18,9 @@ namespace Network_Skimming_Components
 	{
 		implementation struct Location_To_Zone_Map_Item : public Polaris_Component<APPEND_CHILD(Location_To_Zone_Map_Item),MasterType,Data_Object,ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Location_To_Zone_Map_Item),MasterType,Data_Object>::Component_Type ComponentType;
+
 			feature_implementation void initialize(typename TargetType::ParamType loc_index, typename TargetType::ParamType zone_index, typename TargetType::Param2Type weight)
 			{
 				this->template loc_index<ComponentType,ComponentType,typename TargetType::ParamType>(loc_index);
@@ -34,6 +37,10 @@ namespace Network_Skimming_Components
 		//--------------------------------------------------------------------------------------
 		implementation struct Skim_Table_Implementation : public Polaris_Component<APPEND_CHILD(Skim_Table_Implementation),MasterType,Data_Object,ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Skim_Table_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+
+
 			member_container(matrix<double>, skim_table, none,none);
 			member_associative_container(concat(dense_hash_map<long,typename MasterType::skim_routing_type*>), path_trees_container,none,none);
 
@@ -151,6 +158,9 @@ namespace Network_Skimming_Components
 		//--------------------------------------------------------------------------------------
 		implementation struct Mode_Skim_Table_Implementation : public Polaris_Component<APPEND_CHILD(Mode_Skim_Table_Implementation),MasterType,Data_Object,ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Mode_Skim_Table_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+
 			member_data(long, mode_id, check(ReturnValueType,is_arithmetic),  check(SetValueType,is_arithmetic));
 			member_container(vector<Skim_Table_Implementation<MasterType>*>, skims_by_time_container,none,none);
 					
@@ -199,6 +209,9 @@ namespace Network_Skimming_Components
 		//--------------------------------------------------------------------------------------
 		implementation struct Basic_Network_Skimming_Implementation : public Polaris_Component<APPEND_CHILD(Basic_Network_Skimming_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Basic_Network_Skimming_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+
 			typedef Time_Minutes Stored_Time_Type;
 
 			// reference to the transportation network
@@ -252,7 +265,8 @@ namespace Network_Skimming_Components
 		//--------------------------------------------------------------------------------------
 		implementation struct Advanced_Network_Skimming_Implementation : public Basic_Network_Skimming_Implementation<MasterType, ParentType,APPEND_CHILD(Advanced_Network_Skimming_Implementation)>
 		{
-
+			// Tag as implementation
+			typedef typename Basic_Network_Skimming_Implementation<MasterType, ParentType,APPEND_CHILD(Advanced_Network_Skimming_Implementation)>::Component_Type ComponentType;
 		};
 	}
 

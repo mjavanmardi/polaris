@@ -45,10 +45,17 @@ namespace PopSyn
 			member_container(vector<int>, Activity_Locations_Container,none,none);
 		};
 
-		implementation struct Synthesis_Zone_Implementation : public Polaris_Component<APPEND_CHILD(Synthesis_Zone_Implementation), MasterType, Data_Object, ParentType>, _Synthesis_Zone_Implementation<MasterType,ParentType> {};
+		implementation struct Synthesis_Zone_Implementation : public Polaris_Component<APPEND_CHILD(Synthesis_Zone_Implementation), MasterType, Data_Object, ParentType>, _Synthesis_Zone_Implementation<MasterType,ParentType>
+		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Synthesis_Zone_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+		};
 
 		implementation struct IPF_Solver_Settings_Implementation : public Polaris_Component<APPEND_CHILD(IPF_Solver_Settings_Implementation), MasterType, Data_Object, ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(IPF_Solver_Settings_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+
 			feature_implementation void Initialize(typename TargetType::ParamType tolerance, typename TargetType::ParamType percent_to_synthesize, typename TargetType::Param2Type iterations)
 			{
 				this->Tolerance<ComponentType,CallerType, typename TargetType::ParamType>(tolerance);

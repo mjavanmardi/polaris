@@ -82,7 +82,7 @@ namespace PopSyn
 
 			feature_prototype void Initialize(typename TargetType::ParamType tolerance, typename TargetType::ParamType percent_to_synthesize, typename TargetType::Param2Type iterations)
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>(tolerance,percent_to_synthesize,iterations);
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>(tolerance,percent_to_synthesize,iterations);
 			}
 			feature_accessor(Tolerance,check(ReturnValueType, is_arithmetic),none);
 			feature_accessor(Iterations,check(ReturnValueType, is_arithmetic),none);
@@ -94,7 +94,7 @@ namespace PopSyn
 			tag_as_prototype;
 			feature_prototype void Initialize()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
 			}
 
 			//===================================================================================================================================
@@ -326,7 +326,7 @@ namespace PopSyn
 				person_itf* person=(person_itf*)Allocate<typename get_type_of(Synthetic_Persons_Container)::unqualified_value_type>();
 				//person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
 				//person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());	
-				person->Static_Properties<pop_unit_itf*>(static_properties);
+				person->template Static_Properties<pop_unit_itf*>(static_properties);
 				person_container->push_back(person);
 				//person->Initialize<int>(id);
 			}
@@ -354,7 +354,7 @@ namespace PopSyn
 
 			feature_prototype typename TargetType::ReturnType Get_1D_Index(typename TargetType::ParamType& multi_dimensional_index_vector)
 			{
-				return this_component()->Get_1D_Index<ComponentType,CallerType,TargetType>(multi_dimensional_index_vector);
+				return this_component()->template Get_1D_Index<ComponentType,CallerType,TargetType>(multi_dimensional_index_vector);
 			}
 		};
 

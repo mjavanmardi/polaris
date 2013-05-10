@@ -25,7 +25,7 @@ namespace PopSyn
 			// Load the execution event
 			feature_prototype void Initialize()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
 				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population, PopSyn::POPSYN_ITERATIONS::MAIN_PROCESS,PopSyn::POPSYN_SUBITERATIONS::PROCESS,NULLTYPE);
 			}
 
@@ -47,7 +47,7 @@ namespace PopSyn
 			}
 			declare_feature_event(Call_Synthesize_Population)
 			{
-				((Synthesis_Region_Prototype<ComponentType,CallerType>*) _this)->Synthesize_Population<NULLTYPE>();
+				((Synthesis_Region_Prototype<ComponentType,CallerType>*) _this)->template Synthesize_Population<NULLTYPE>();
 			}
 			feature_prototype void Synthesize_Population(requires(check(ComponentType,Concepts::Is_IPF_Capable)))
 			{

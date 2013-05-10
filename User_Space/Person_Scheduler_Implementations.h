@@ -14,6 +14,9 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct General_Person_Scheduler_Implementation : public Polaris_Component<APPEND_CHILD(General_Person_Scheduler_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(General_Person_Scheduler_Implementation),MasterType,Execution_Object>::Component_Type ComponentType;
+
 			// Pointer to the Parent class
 			member_prototype(Person_Components::Prototypes::Person_Planner, Parent_Planner, typename MasterType::person_planner_type, none, none);
 

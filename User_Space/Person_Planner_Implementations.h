@@ -16,6 +16,9 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct General_Person_Planner_Implementation : public Polaris_Component<APPEND_CHILD(General_Person_Planner_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(General_Person_Planner_Implementation),MasterType,Execution_Object>::Component_Type ComponentType;
+
 			static ofstream logs[_num_threads];
 			static member_data(bool, write_activity_files,none,none);
 			feature_implementation void Write_To_Log(TargetType s, requires(!check_2(TargetType,string, is_same)))
@@ -99,9 +102,9 @@ namespace Person_Components
 				for (itr = activity_plans->begin(); itr != activity_plans->end(); ++itr)
 				{
 					act = (Activity_Plan*)(*itr);
-					if (act->Start_Is_Planned<bool>() && act->Start_Time<Time_Seconds>() < start_time && act->Start_Time<Time_Seconds>() > max_previous)
+					if (act->template Start_Is_Planned<bool>() && act->template Start_Time<Time_Seconds>() < start_time && act->template Start_Time<Time_Seconds>() > max_previous)
 					{
-						max_previous = act->Start_Time<Time_Seconds>();
+						max_previous = act->template Start_Time<Time_Seconds>();
 						previous = act;
 					}
 				}
@@ -125,9 +128,9 @@ namespace Person_Components
 				for (itr = activity_plans->begin(); itr != activity_plans->end(); ++itr)
 				{
 					act = (Activity_Plan*)(*itr);
-					if (act->Start_Is_Planned<bool>() && act->Start_Time<Time_Seconds>() > start_time && act->Start_Time<Time_Seconds>() < min_next)
+					if (act->template Start_Is_Planned<bool>() && act->template Start_Time<Time_Seconds>() > start_time && act->template Start_Time<Time_Seconds>() < min_next)
 					{
-						min_next = act->Start_Time<Time_Secondes>();
+						min_next = act->template Start_Time<Time_Secondes>();
 						next = act;
 					}
 				}
@@ -148,7 +151,7 @@ namespace Person_Components
 				if (_write_activity_files) 
 				{			
 					stringstream s;
-					Activity_Plan* act = move->activity_reference<Activity_Plan*>();
+					Activity_Plan* act = move->template activity_reference<Activity_Plan*>();
 					int o_id = move->template origin<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>()->template uuid<int>();
 					int d_id = move->template destination<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>()->template uuid<int>();
 					_Skim_Interface* skim = _Parent_Person->template network_reference<_Network_Interface*>()->template skimming_faculty<_Skim_Interface*>();		
@@ -178,10 +181,10 @@ namespace Person_Components
 				movements->insert(move_itr,move);			
 
 				// cache the movement plans activity in the activity record container since all attributes have been planned at this point
-				Activity_Plan* act = move->activity_reference<Activity_Plan*>();
+				Activity_Plan* act = move->template activity_reference<Activity_Plan*>();
 				Activity_Records* act_records = this->Activity_Record_Container<ComponentType,CallerType,Activity_Records*>();
 				Activity_Record* act_record = (Activity_Record*)Allocate<typename MasterType::activity_record_type>();
-				act_record->Initialize<Activity_Plan*>(act);
+				act_record->template Initialize<Activity_Plan*>(act);
 				act_records->push_back(act_record);
 				
 			}
@@ -219,6 +222,7 @@ namespace Person_Components
 		{
 			// IMPLEMENTATION TYPEDEFS AND INTERFACES
 			typedef General_Person_Planner_Implementation<MasterType, ParentType, APPEND_CHILD(POLARIS_Person_Planner_Implementation)> base_type;
+			typedef typename base_type::Component_Type ComponentType;
 
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	

@@ -91,19 +91,19 @@ namespace Activity_Components
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// DURATION_PLANNING Iteration
-				if (this_ptr->Is_Current_Iteration(this_ptr->Duration_Planning_Time<Revision&>()))
+				if (this_ptr->Is_Current_Iteration(this_ptr->template Duration_Planning_Time<Revision&>()))
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Duration_Planning_Event<NULLTYPE>);
-					this_ptr->Duration_Planning_Time<Revision&>()._iteration = END;
-					this_ptr->Duration_Planning_Time<Revision&>()._sub_iteration = END;
+					this_ptr->template Duration_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Duration_Planning_Time<Revision&>()._sub_iteration = END;
 					
 					// Determine the next event to fire
-					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->Involved_Persons_Planning_Time<Revision&>())) this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Involved_Persons_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Location_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Location_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Mode_Planning_Time<Revision&>()))				this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Mode_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Start_Time_Planning_Time<Revision&>()))		this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Start_Time_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Route_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Route_Planning_Time<Revision&>(),true);
+					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Involved_Persons_Planning_Time<Revision&>())) this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Involved_Persons_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Location_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Location_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Mode_Planning_Time<Revision&>()))				this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Mode_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>(),true);
 					else
 					{
 						response.next._iteration = _iteration+5;
@@ -112,19 +112,19 @@ namespace Activity_Components
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
 				// INVOLVED_PERSONS_PLANNING Iteration
-				else if (this_ptr->Is_Current_Iteration(this_ptr->Involved_Persons_Planning_Time<Revision&>()))
+				else if (this_ptr->Is_Current_Iteration(this_ptr->template Involved_Persons_Planning_Time<Revision&>()))
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Involved_Persons_Planning_Event<NULLTYPE>);
-					this_ptr->Involved_Persons_Planning_Time<Revision&>()._iteration = END;
-					this_ptr->Involved_Persons_Planning_Time<Revision&>()._sub_iteration = END;
+					this_ptr->template Involved_Persons_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Involved_Persons_Planning_Time<Revision&>()._sub_iteration = END;
 
 					// Determine the next event to fire
-					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->Duration_Planning_Time<Revision&>()))		this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Duration_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Location_Planning_Time<Revision&>()))		this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Location_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Mode_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Mode_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Start_Time_Planning_Time<Revision&>()))	this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Start_Time_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Route_Planning_Time<Revision&>()))		this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Route_Planning_Time<Revision&>(),true);
+					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Duration_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Duration_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Location_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Location_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Mode_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Mode_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))	this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>(),true);
 					else
 					{
 						response.next._iteration = _iteration+5;
@@ -133,19 +133,19 @@ namespace Activity_Components
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
 				// LOCATION_PLANNING Iteration
-				else if (this_ptr->Is_Current_Iteration(this_ptr->Location_Planning_Time<Revision&>()))
+				else if (this_ptr->Is_Current_Iteration(this_ptr->template Location_Planning_Time<Revision&>()))
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Location_Planning_Event<NULLTYPE>);
-					this_ptr->Location_Planning_Time<Revision&>()._iteration = END;
-					this_ptr->Location_Planning_Time<Revision&>()._sub_iteration = END;
+					this_ptr->template Location_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Location_Planning_Time<Revision&>()._sub_iteration = END;
 
 					// Determine the next event to fire
-					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->Involved_Persons_Planning_Time<Revision&>())) this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Involved_Persons_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Duration_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Duration_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Mode_Planning_Time<Revision&>()))				this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Mode_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Start_Time_Planning_Time<Revision&>()))		this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Start_Time_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Route_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Route_Planning_Time<Revision&>(),true);
+					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Involved_Persons_Planning_Time<Revision&>())) this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Involved_Persons_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Duration_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Duration_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Mode_Planning_Time<Revision&>()))				this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Mode_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>(),true);
 					else
 					{
 						response.next._iteration = _iteration+5;
@@ -154,19 +154,19 @@ namespace Activity_Components
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
 				// MODE_PLANNING Iteration
-				else if (this_ptr->Is_Current_Iteration(this_ptr->Mode_Planning_Time<Revision&>()))
+				else if (this_ptr->Is_Current_Iteration(this_ptr->template Mode_Planning_Time<Revision&>()))
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Mode_Planning_Event<NULLTYPE>);
-					this_ptr->Mode_Planning_Time<Revision&>()._iteration = END;
-					this_ptr->Mode_Planning_Time<Revision&>()._sub_iteration = END;
+					this_ptr->template Mode_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Mode_Planning_Time<Revision&>()._sub_iteration = END;
 
 					// Determine the next event to fire
-					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->Involved_Persons_Planning_Time<Revision&>())) this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Involved_Persons_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Duration_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Duration_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Location_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Location_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Start_Time_Planning_Time<Revision&>()))		this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Start_Time_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Route_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Route_Planning_Time<Revision&>(),true);
+					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Involved_Persons_Planning_Time<Revision&>())) this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Involved_Persons_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Duration_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Duration_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Location_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Location_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>(),true);
 					else
 					{
 						response.next._iteration = _iteration+5;
@@ -175,19 +175,19 @@ namespace Activity_Components
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
 				// START_TIME_PLANNING Iteration
-				else if (this_ptr->Is_Current_Iteration(this_ptr->Start_Time_Planning_Time<Revision&>()))
+				else if (this_ptr->Is_Current_Iteration(this_ptr->template Start_Time_Planning_Time<Revision&>()))
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Start_Time_Planning_Event<NULLTYPE>);
-					this_ptr->Start_Time_Planning_Time<Revision&>()._iteration = END;
-					this_ptr->Start_Time_Planning_Time<Revision&>()._sub_iteration = END;
+					this_ptr->template Start_Time_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Start_Time_Planning_Time<Revision&>()._sub_iteration = END;
 									
 					// Determine the next event to fire
-					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->Involved_Persons_Planning_Time<Revision&>())) this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Involved_Persons_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Duration_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Duration_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Location_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Location_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Mode_Planning_Time<Revision&>()))				this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Mode_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Route_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Route_Planning_Time<Revision&>(),true);
+					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Involved_Persons_Planning_Time<Revision&>())) this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Involved_Persons_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Duration_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Duration_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Location_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Location_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Mode_Planning_Time<Revision&>()))				this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Mode_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>(),true);
 					else
 					{
 						response.next._iteration = _iteration+5;
@@ -196,19 +196,19 @@ namespace Activity_Components
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
 				// ROUTE_PLANNING Iteration
-				else if (this_ptr->Is_Current_Iteration(this_ptr->Route_Planning_Time<Revision&>()))
+				else if (this_ptr->Is_Current_Iteration(this_ptr->template Route_Planning_Time<Revision&>()))
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Route_Planning_Event<NULLTYPE>);
-					this_ptr->Route_Planning_Time<Revision&>()._iteration = END;
-					this_ptr->Route_Planning_Time<Revision&>()._sub_iteration = END;
+					this_ptr->template Route_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Route_Planning_Time<Revision&>()._sub_iteration = END;
 									
 					// Determine the next event to fire
-					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->Involved_Persons_Planning_Time<Revision&>())) this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Involved_Persons_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Duration_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Duration_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Location_Planning_Time<Revision&>()))			this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Location_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Mode_Planning_Time<Revision&>()))				this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Mode_Planning_Time<Revision&>(),true);
-					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->Start_Time_Planning_Time<Revision&>()))		this_ptr->Set_As_Next_Revison<NT>(response,this_ptr->Start_Time_Planning_Time<Revision&>(),true);
+					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Involved_Persons_Planning_Time<Revision&>())) this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Involved_Persons_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Duration_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Duration_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Location_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Location_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Mode_Planning_Time<Revision&>()))				this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Mode_Planning_Time<Revision&>(),true);
+					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>(),true);
 					else
 					{
 						response.next._iteration = _iteration+5;
@@ -226,8 +226,8 @@ namespace Activity_Components
 				// this will hit only if start time plan iteration is called immidiately be
 				else
 				{
-					Revision& route_itr = this_ptr->Route_Planning_Time<Revision&>();
-					if(route_itr._iteration  != END && route_itr._iteration >= _iteration) response.next._revision = this_ptr->Route_Planning_Time<Revision>();
+					Revision& route_itr = this_ptr->template Route_Planning_Time<Revision&>();
+					if(route_itr._iteration  != END && route_itr._iteration >= _iteration) response.next._revision = this_ptr->template Route_Planning_Time<Revision>();
 					response.result = false;
 				}
 			}
@@ -269,11 +269,11 @@ namespace Activity_Components
 				typedef Activity_Planner<ComponentType, ComponentType> _Activity_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
-				this_ptr->Location_Planning_Event_Handler<NT>();
+				this_ptr->template Location_Planning_Event_Handler<NT>();
 			}
 			feature_prototype void Location_Planning_Event_Handler()
 			{
-				this_component()->Location_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
+				this_component()->template Location_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
 				this->Location_Planning_Time<Revision&>()._iteration = END+1;
 				this->Location_Planning_Time<Revision&>()._sub_iteration = END+1;
 			}
@@ -282,11 +282,11 @@ namespace Activity_Components
 				typedef Activity_Planner<ComponentType, ComponentType> _Activity_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
-				this_ptr->Mode_Planning_Event_Handler<NT>();
+				this_ptr->template Mode_Planning_Event_Handler<NT>();
 			}
 			feature_prototype void Mode_Planning_Event_Handler()
 			{
-				this_component()->Mode_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
+				this_component()->template Mode_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
 				this->Mode_Planning_Time<Revision&>()._iteration = END+1;
 				this->Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
 			}
@@ -295,11 +295,11 @@ namespace Activity_Components
 				typedef Activity_Planner<ComponentType, ComponentType> _Activity_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
-				this_ptr->Start_Time_Planning_Event_Handler<NT>();
+				this_ptr->template Start_Time_Planning_Event_Handler<NT>();
 			}
 			feature_prototype void Start_Time_Planning_Event_Handler()
 			{
-				this_component()->Start_Time_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
+				this_component()->template Start_Time_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
 				this->Start_Time_Planning_Time<Revision&>()._iteration = END+1;
 				this->Start_Time_Planning_Time<Revision&>()._sub_iteration = END+1;
 			}
@@ -308,11 +308,11 @@ namespace Activity_Components
 				typedef Activity_Planner<ComponentType, ComponentType> _Activity_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
-				this_ptr->Duration_Planning_Event_Handler<NT>();
+				this_ptr->template Duration_Planning_Event_Handler<NT>();
 			}
 			feature_prototype void Duration_Planning_Event_Handler()
 			{
-				this_component()->Duration_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
+				this_component()->template Duration_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
 				// set duration planning time schedule to END - duration Is Planned
 				this->Duration_Planning_Time<Revision&>()._iteration = END;
 				this->Duration_Planning_Time<Revision&>()._sub_iteration = END;
@@ -322,11 +322,11 @@ namespace Activity_Components
 				typedef Activity_Planner<ComponentType, ComponentType> _Activity_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
-				this_ptr->Involved_Persons_Planning_Event_Handler<NT>();
+				this_ptr->template Involved_Persons_Planning_Event_Handler<NT>();
 			}
 			feature_prototype void Involved_Persons_Planning_Event_Handler()
 			{
-				this_component()->Involved_Persons_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
+				this_component()->template Involved_Persons_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
 				this->Involved_Persons_Planning_Time<Revision&>()._iteration = END+1;
 				this->Involved_Persons_Planning_Time<Revision&>()._sub_iteration = END+1;
 			}
@@ -335,11 +335,11 @@ namespace Activity_Components
 				typedef Activity_Planner<ComponentType, ComponentType> _Activity_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
-				this_ptr->Route_Planning_Event_Handler<NT>();
+				this_ptr->template Route_Planning_Event_Handler<NT>();
 			}
 			feature_prototype void Route_Planning_Event_Handler()
 			{
-				this_component()->Route_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
+				this_component()->template Route_Planning_Event_Handler<ComponentType,CallerType,TargetType>();
 				this->Route_Planning_Time<Revision&>()._iteration = END+1;
 				this->Route_Planning_Time<Revision&>()._sub_iteration = END+1;
 			}
@@ -348,11 +348,11 @@ namespace Activity_Components
 				typedef Activity_Planner<ComponentType, ComponentType> _Activity_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
-				this_ptr->Add_Activity_To_Schedule_Event_Handler<NT>();
+				this_ptr->template Add_Activity_To_Schedule_Event_Handler<NT>();
 			}
 			feature_prototype void Add_Activity_To_Schedule_Event_Handler()
 			{
-				this_component()->Add_Activity_To_Schedule_Event_Handler<ComponentType,CallerType,TargetType>();
+				this_component()->template Add_Activity_To_Schedule_Event_Handler<ComponentType,CallerType,TargetType>();
 			}
 
 			//===========================================
@@ -395,11 +395,11 @@ namespace Activity_Components
 			//-------------------------------------------
 			feature_prototype void Initialize(TargetType activity/*, requires(check(TargetType,Concepts::Is_Activity_Plan_Prototype))*/)
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>(activity);
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>(activity);
 			}
 			feature_prototype void Initialize(typename TargetType::ParamType act_type, typename TargetType::Param2Type planning_time, requires(check(TargetType,Is_Target_Type_Struct) && check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same)))
 			{
-				this_component()->Initialize<ComponentType, ComponentType, typename TargetType::ParamType>(act_type);
+				this_component()->template Initialize<ComponentType, ComponentType, typename TargetType::ParamType>(act_type);
 				this->Set_Meta_Attributes<void>();
 				this->Set_Attribute_Planning_Times<typename TargetType::Param2Type>(planning_time);
 			}
@@ -411,7 +411,7 @@ namespace Activity_Components
 			feature_prototype void Set_Attribute_Planning_Times(TargetType planning_time)
 			{
 				// Call the model to determine the attribute planning times
-				this_component()->Set_Attribute_Planning_Times<ComponentType,CallerType,TargetType>(planning_time);
+				this_component()->template Set_Attribute_Planning_Times<ComponentType,CallerType,TargetType>(planning_time);
 
 				// store for later use
 				Revision& persons = this->Involved_Persons_Planning_Time<Revision&>();

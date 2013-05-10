@@ -77,6 +77,9 @@ namespace Network_Event_Components
 			//Basic properties
 			feature_accessor(network_event_type,none,none);
 			feature_accessor(affected_links,none,none);
+			feature_accessor(affected_zones,none,none);
+			feature_accessor(affected_locations,none,none);
+			feature_accessor(unaffected_locations,none,none);
 			feature_accessor(time_detected,none,none);
 			feature_accessor(start_time,none,none);
 			feature_accessor(expected_duration,none,none);

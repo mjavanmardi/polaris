@@ -9,6 +9,9 @@ namespace PopSyn
 	{
 		implementation struct Synthesis_Region_Implementation : public Polaris_Component<APPEND_CHILD(Synthesis_Region_Implementation),MasterType,Execution_Object,ParentType>, _Synthesis_Zone_Implementation<MasterType,ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Synthesis_Region_Implementation),MasterType,Execution_Object>::Component_Type ComponentType;
+
 			typedef dense_hash_map<long long, typename MasterType::zone*> zone_map_type;
 			member_associative_container(zone_map_type, Synthesis_Zone_Collection,none,none);
 			member_pointer(ostream,Output_Stream,none,none);

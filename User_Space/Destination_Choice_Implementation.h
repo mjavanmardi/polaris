@@ -12,6 +12,10 @@ namespace Person_Components
 
 		implementation struct CTRAMP_Destination_Choice_Option : public Polaris_Component<APPEND_CHILD(CTRAMP_Destination_Choice_Option),MasterType,Data_Object,ParentType,true>
 		{
+			// Tag as Implementation
+			typedef typename Polaris_Component<APPEND_CHILD(CTRAMP_Destination_Choice_Option),MasterType,Data_Object>::Component_Type ComponentType;
+
+
 			// Pointer to the Parent class
 			member_prototype(Person_Components::Prototypes::Person_Planner, Parent_Planner, typename MasterType::person_planner_type, none, none);
 
@@ -47,13 +51,13 @@ namespace Person_Components
 
 			feature_implementation TargetType Calculate_Utility()
 			{
-				person_itf* _Parent_Person = _Parent_Planner->Parent_Person<person_itf*>();
+				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				_Zones_Container_Interface* zones = network->zones_container<_Zones_Container_Interface*>();
-				_Activity_Locations_Container_Interface* locations = network->activity_locations_container<_Activity_Locations_Container_Interface*>();
-				_Skim_Interface* LOS = network->skimming_faculty<_Skim_Interface*>();
+				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+				_Activity_Locations_Container_Interface* locations = network->template activity_locations_container<_Activity_Locations_Container_Interface*>();
+				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
 
 				// variables used for utility calculation
 				TargetType ttime, pop, emp, u;
@@ -64,27 +68,26 @@ namespace Person_Components
 				// select zones to choose from and estimate utility
 				zone = _destination->template zone<_Zone_Interface*>();
 
-				ttime = LOS->Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_origin->zone<_Zone_Interface*>()->uuid<int>(),zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				pop = zone->population<TargetType>();
-				emp = zone->employment<TargetType>();
+				ttime = LOS->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_origin->template zone<_Zone_Interface*>()->template uuid<int>(),zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				pop = zone->template population<TargetType>();
+				emp = zone->template employment<TargetType>();
 
 				u = (_B_POPULATION * pop + _B_EMPLOYMENT * emp + _B_TTIME * ttime);
 				if (u > 100.0) THROW_WARNING("WARNING: utility > 100.0 will cause numeric overflow, possible misspecification in utility function for destination choice. [Pop,emp,ttime]="<<pop << ", " << emp << ", " << ttime);
 
-				//cout << zone->uuid<int>() << ", " << pop << ", " << emp << ", " << ttime;
 				return (TargetType)u;				
 			}
 			tag_feature_as_available(Calculate_Utility);
 
 			feature_implementation TargetType Print_Utility()
 			{
-				person_itf* _Parent_Person = _Parent_Planner->Parent_Person<person_itf*>();
+				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				_Zones_Container_Interface* zones = network->zones_container<_Zones_Container_Interface*>();
-				_Activity_Locations_Container_Interface* locations = network->activity_locations_container<_Activity_Locations_Container_Interface*>();
-				_Skim_Interface* LOS = network->skimming_faculty<_Skim_Interface*>();
+				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+				_Activity_Locations_Container_Interface* locations = network->template activity_locations_container<_Activity_Locations_Container_Interface*>();
+				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
 
 				// variables used for utility calculation
 				TargetType ttime, pop, emp, u;
@@ -95,14 +98,14 @@ namespace Person_Components
 				// select zones to choose from and estimate utility
 				zone = _destination->template zone<_Zone_Interface*>();
 
-				ttime = LOS->Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_origin->zone<_Zone_Interface*>()->uuid<int>(),zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				pop = zone->population<TargetType>();
-				emp = zone->employment<TargetType>();
+				ttime = LOS->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_origin->template zone<_Zone_Interface*>()->template uuid<int>(),zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				pop = zone->template population<TargetType>();
+				emp = zone->template employment<TargetType>();
 
 				u = (_B_POPULATION * pop + _B_EMPLOYMENT * emp + _B_TTIME * ttime);
 				if (u > 100.0) THROW_WARNING("WARNING: utility > 100.0 will cause numeric overflow, possible misspecification in utility function for destination choice. [Pop,emp,ttime]="<<pop << ", " << emp << ", " << ttime);
 
-				cout << zone->uuid<int>() << ": _BPOP["<<_B_POPULATION<<"] * " << pop << " + _B_EMP[" << _B_EMPLOYMENT<<"] * " << emp << " + B_TTIME["<<_B_TTIME << "] * " << ttime << " = " << u;
+				cout << zone->template uuid<int>() << ": _BPOP["<<_B_POPULATION<<"] * " << pop << " + _B_EMP[" << _B_EMPLOYMENT<<"] * " << emp << " + B_TTIME["<<_B_TTIME << "] * " << ttime << " = " << u;
 				return (TargetType)u;				
 			}
 			tag_feature_as_available(Print_Utility);
@@ -118,6 +121,7 @@ namespace Person_Components
 		implementation struct Destination_Choice_Model_Implementation : public Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType,ParentType, APPEND_CHILD(Destination_Choice_Model_Implementation)>
 		{
 			typedef Choice_Model_Components::Implementations::MNL_Model_Implementation<MasterType,ParentType, APPEND_CHILD(Destination_Choice_Model_Implementation)> BaseType;
+			typedef typename BaseType::Component_Type ComponentType;
 			typedef TypeList<Prototypes::Destination_Choice_Option<typename MasterType::person_destination_choice_option_type >> TList;
 		};
 
@@ -125,6 +129,9 @@ namespace Person_Components
 
 		implementation struct CTRAMP_Destination_Chooser_Implementation : public Polaris_Component<APPEND_CHILD(CTRAMP_Destination_Chooser_Implementation),MasterType,Data_Object,ParentType>
 		{
+			// Tag as Implementation
+			typedef typename Polaris_Component<APPEND_CHILD(CTRAMP_Destination_Chooser_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+
 			// Pointer to the Parent class
 			member_prototype(Person_Components::Prototypes::Person_Planner, Parent_Planner, typename MasterType::person_planner_type, none, none);
 			member_prototype(Choice_Model_Components::Prototypes::Choice_Model, Choice_Model, Destination_Choice_Model_Implementation<MasterType>,none,none);
@@ -155,9 +162,9 @@ namespace Person_Components
 			}
 			tag_feature_as_available(Initialize);
 
-			feature_implementation TargetType Choose_Destination(TargetType origin, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+			feature_implementation TargetType Choose_Destination(TargetType origin, vector<TargetType>* destinations_to_use=nullptr, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
-				person_itf* _Parent_Person = _Parent_Planner->Parent_Person<person_itf*>();
+				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				
 				// create local choice model
 				Destination_Choice_Model_Implementation<MasterType> a;
@@ -169,9 +176,14 @@ namespace Person_Components
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				_Zones_Container_Interface* zones = network->zones_container<_Zones_Container_Interface*>();
-				_Activity_Locations_Container_Interface* locations = network->activity_locations_container<_Activity_Locations_Container_Interface*>();
-				_Skim_Interface* LOS = network->skimming_faculty<_Skim_Interface*>();
+				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
+
+				// selecte locations to choose from - use all of destinations to use not specified
+				_Activity_Locations_Container_Interface* locations;
+				if (destinations_to_use == nullptr) locations= network->template activity_locations_container<_Activity_Locations_Container_Interface*>();
+				else locations = (_Activity_Locations_Container_Interface*)destinations_to_use;
+
+				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
 
 				// get reference to origin zone
 				_Activity_Location_Interface* orig = (_Activity_Location_Interface*)origin;
@@ -184,23 +196,23 @@ namespace Person_Components
 				// select zones to choose from and estimate utility
 				for (int i=0; i<_choice_set_size; i++)
 				{
-					loc_id = (int)((Uniform_RNG.Next_Rand<float>()*0.999999)*size);
+					loc_id = (int)((Uniform_RNG.template Next_Rand<float>()*0.999999)*size);
 					_Activity_Location_Interface* loc = locations->at(loc_id);
 
 					_Choice_Option_Interface* choice = (_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
-					choice->origin<_Activity_Location_Interface*>(orig);
-					choice->destination<_Activity_Location_Interface*>(loc);
-					choice->Parent_Planner<Parent_Planner_interface*>(_Parent_Planner);
-					choice_model->Add_Choice_Option<_Choice_Option_Interface*>(choice);
+					choice->template origin<_Activity_Location_Interface*>(orig);
+					choice->template destination<_Activity_Location_Interface*>(loc);
+					choice->template Parent_Planner<Parent_Planner_interface*>(_Parent_Planner);
+					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>(choice);
 					loc_options.push_back(choice);
 				}
 
 				// Make choice
 				int selected_index = 0;
-				choice_model->Evaluate_Choices<NT>();
+				choice_model->template Evaluate_Choices<NT>();
 
 
-				_Choice_Option_Interface* selected = choice_model->Choose<_Choice_Option_Interface*>(selected_index);
+				_Choice_Option_Interface* selected = choice_model->template Choose<_Choice_Option_Interface*>(selected_index);
 
 				if (selected == nullptr )
 				{
@@ -208,7 +220,7 @@ namespace Person_Components
 					return nullptr;
 				}
 
-				TargetType return_ptr = choice_model->Choice_At<_Choice_Option_Interface*>(selected_index)->destination<TargetType>();
+				TargetType return_ptr = choice_model->template Choice_At<_Choice_Option_Interface*>(selected_index)->template destination<TargetType>();
 
 				// free memory allocated locally
 				for (int i = 0; i < loc_options.size(); i++)

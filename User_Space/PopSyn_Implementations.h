@@ -8,6 +8,9 @@ namespace PopSyn
 	{
 		implementation struct ADAPTS_Population_Synthesis_Implementation : public Polaris_Component<APPEND_CHILD(ADAPTS_Population_Synthesis_Implementation), MasterType, Execution_Object, ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(ADAPTS_Population_Synthesis_Implementation),MasterType,Execution_Object>::Component_Type ComponentType;
+
 			member_associative_container(concat(dense_hash_map<typename MasterType::region::ID_type, typename MasterType::region*>),Synthesis_Regions_Collection, none,none);
 			member_component(typename MasterType::IPF_Solver_Settings,Solution_Settings,none,none);
 			member_component(typename MasterType::scenario_type, scenario_reference, none, none);

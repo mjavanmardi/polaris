@@ -59,11 +59,11 @@ namespace Person_Components
 				// Create alias for this to use in conditional
 				typedef Person_Planner<ComponentType, ComponentType> _Planning_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
-				_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
+				_Planning_Interface* this_ptr =(_Planning_Interface*)_pthis;
 
 				// Define interfaces to the container members of the class
 				define_container_and_value_interface(Movement_Plans_List,Movement_Plan,typename get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-				Movement_Plans_List* movement_plans = this_ptr->Movement_Plans_Container<Movement_Plans_List*>();
+				Movement_Plans_List* movement_plans = this_ptr->template Movement_Plans_Container<Movement_Plans_List*>();
 				typename Movement_Plans_List::iterator move_itr = movement_plans->begin();
 				Movement_Plan* movement;			
 				if (move_itr != movement_plans->end()) movement = *move_itr;
@@ -73,21 +73,21 @@ namespace Person_Components
 				if (_sub_iteration == 0)
 				{
 					// If activity generation is to be performed, do that next
-					if(this_ptr->Next_Activity_Generation_Time<Time_Seconds>() == Simulation_Time.Current_Time<Time_Seconds>()) 
+					if(this_ptr->template Next_Activity_Generation_Time<Time_Seconds>() == Simulation_Time.template Current_Time<Time_Seconds>()) 
 					{	
-						this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,false,response);
+						this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION,false,response);
 					}
 					else if (move_itr != movement_plans->end())
 					{
-						if (movement->departed_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
-							this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,false,response);
+						if (movement->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment, Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
+							this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,false,response);
 						else
-							this_ptr->Go_To_Next_Iteration<NT>(false,response);
+							this_ptr->template Go_To_Next_Iteration<NT>(false,response);
 					}
 					// otherwise move on to next main iteration
 					else
 					{
-						this_ptr->Go_To_Next_Iteration<NT>(false,response);
+						this_ptr->template Go_To_Next_Iteration<NT>(false,response);
 					}
 				}
 
@@ -96,7 +96,7 @@ namespace Person_Components
 				else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
 				{
 					_pthis->Swap_Event((Event)&Person_Planner::Activity_Generation_Event<NULLTYPE>);
-					this_ptr->Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
+					this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
 				}
 
 				//------------------------------------------------------------------------------------------------------------------------------
@@ -104,17 +104,17 @@ namespace Person_Components
 				else if (_sub_iteration == Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING)
 				{
 					_pthis->Swap_Event((Event)&Person_Planner::Movement_Planning_Event<NULLTYPE>);
-					this_ptr->Go_To_Next_Iteration<NT>(true,response);
+					this_ptr->template Go_To_Next_Iteration<NT>(true,response);
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
 				// No valid events scheduled - skip to next iteration
 				else
 				{
-					this_ptr->Go_To_Next_Iteration<NT>(false,response);
+					this_ptr->template Go_To_Next_Iteration<NT>(false,response);
 				}
 
 				// set next planning time for other functions to use
-				this_ptr->Next_Planning_Time<Simulation_Timestep_Increment>(_iteration + this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>());
+				this_ptr->template Next_Planning_Time<Simulation_Timestep_Increment>(_iteration + this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>());
 			}
 			feature_prototype void Go_To_Subiteration(Person_Components::Types::PLANNING_ITERATION_STEP_KEYS sub_iteration, bool do_current_event, Conditional_Response& response)
 			{
@@ -124,7 +124,7 @@ namespace Person_Components
 			}
 			feature_prototype void Go_To_Next_Iteration(bool do_current_event, Conditional_Response& response)
 			{
-				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Planning_Time_Increment<Simulation_Timestep_Increment>()));
+				response.next._iteration = Round<long,double>(Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Planning_Time_Increment<Simulation_Timestep_Increment>()));
 				response.next._sub_iteration = 0;
 				response.result = do_current_event;
 			}
@@ -140,11 +140,11 @@ namespace Person_Components
 
 				// Call specific implementation of the activity generation routine
 				define_component_interface(activity_generator_itf,typename get_type_of(Activity_Generator),Prototypes::Activity_Generator,ComponentType);
-				activity_generator_itf* generator = this_ptr->Activity_Generator<activity_generator_itf*>();
+				activity_generator_itf* generator = this_ptr->template Activity_Generator<activity_generator_itf*>();
 				generator->template Activity_Generation<TargetType>();
 
 				// set next activity generation occurence
-				this_ptr->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
+				this_ptr->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
 			}
 			declare_feature_event(Activity_Planning_Event)
 			{
@@ -210,7 +210,7 @@ namespace Person_Components
 
 				// Get reference to movement plans
 				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-				Movement_Plans* movements = this_ptr->Movement_Plans_Container<Movement_Plans*>();
+				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();
 				typename Movement_Plans::iterator move_itr = movements->begin();
 
 				while (move_itr != movements->end())
@@ -218,23 +218,23 @@ namespace Person_Components
 					Movement_Plan* move = *move_itr;
 
 					// if movement happens in the current planning increment, execute movement
-					if (move->template departed_time<Simulation_Timestep_Increment>() >= Simulation_Time.Current_Time<Simulation_Timestep_Increment>() &&
-						move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->Planning_Time_Increment<Simulation_Timestep_Increment>()))
+					if (move->template departed_time<Simulation_Timestep_Increment>() >= Simulation_Time.template Current_Time<Simulation_Timestep_Increment>() &&
+						move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
 					{
 
-						if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"MOVE_EVENT:," << parent->uuid<int>() << ", PASSED."<<endl;
+						if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"MOVE_EVENT:," << parent->template uuid<int>() << ", PASSED."<<endl;
 				
 						// make sure vehicle is not already being simulated, skip movement if it is
 						if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
 						{
 							// increment the zone origin/destination counters based on movement plan
-							_Activity_Location_Interface* orig = move->origin<_Activity_Location_Interface*>();
-							_Activity_Location_Interface* dest = move->destination<_Activity_Location_Interface*>();
-							_Zone_Interface* orig_zone = orig->zone<_Zone_Interface*>();
-							_Zone_Interface* dest_zone = dest->zone<_Zone_Interface*>();
+							_Activity_Location_Interface* orig = move->template origin<_Activity_Location_Interface*>();
+							_Activity_Location_Interface* dest = move->template destination<_Activity_Location_Interface*>();
+							_Zone_Interface* orig_zone = orig->template zone<_Zone_Interface*>();
+							_Zone_Interface* dest_zone = dest->template zone<_Zone_Interface*>();
 
 							// if origin or destination zones are unavailable, abort trip
-							if (orig_zone->zone_is_available<bool>()== false || dest_zone->zone_is_available<bool>() == false)
+							if (orig_zone->template zone_is_available<bool>()== false || dest_zone->template zone_is_available<bool>() == false)
 							{
 								cout << endl << "zone is unavailable";
 								typename Movement_Plans::iterator prev = move_itr++;
@@ -244,12 +244,12 @@ namespace Person_Components
 
 
 							// increment counters for display
-							orig_zone->production_count<int&>()++;
-							dest_zone->attraction_count<int&>()++;
+							orig_zone->template production_count<int&>()++;
+							dest_zone->template attraction_count<int&>()++;
 
 
 							// if null trip, print out and remove from schedule
-							if (orig->internal_id<int>() == dest->internal_id<int>())
+							if (orig->template internal_id<int>() == dest->template internal_id<int>())
 							{
 								typename Movement_Plans::iterator prev = move_itr++;
 								movements->erase(prev);
@@ -257,7 +257,7 @@ namespace Person_Components
 							}
 
 							// add movement plan to the person's vehicle and schedule the departure
-							if (movement_faculty->Movement_Scheduled<bool>() == true)
+							if (movement_faculty->template Movement_Scheduled<bool>() == true)
 							{
 								THROW_WARNING("WARNING: movement already scheduled for current iteration for person: " << parent->uuid<int>() << ", movement ignored.");
 								typename Movement_Plans::iterator prev = move_itr++;
@@ -274,7 +274,7 @@ namespace Person_Components
 					}
 
 					// remove movements which have already been skipped
-					else if (move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.Current_Time<Simulation_Timestep_Increment>())
+					else if (move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Current_Time<Simulation_Timestep_Increment>())
 					{
 						typename Movement_Plans::iterator prev = move_itr++;
 						movements->erase(prev);
@@ -293,7 +293,7 @@ namespace Person_Components
 				define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person,ComponentType);
 				parent_itf* parent = this->Parent_Person<parent_itf*>();
 				long first_iter = parent->template First_Iteration<Simulation_Timestep_Increment>();
-				this_component()->Initialize<ComponentType,CallerType, TargetType>();
+				this_component()->template Initialize<ComponentType,CallerType, TargetType>();
 				load_event(ComponentType,Planning_Conditional,Activity_Generation_Event,first_iter,0,NULLTYPE);
 			}
 			feature_prototype void Initialize(requires(!check(ComponentType,Has_Initialize)))
@@ -304,7 +304,7 @@ namespace Person_Components
 			{
 				define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person,ComponentType);
 				parent_itf* parent = this->Parent_Person<parent_itf*>();
-				this_component()->Initialize<ComponentType,CallerType, TargetType>(initializer);
+				this_component()->template Initialize<ComponentType,CallerType, TargetType>(initializer);
 				load_event(ComponentType,Planning_Conditional,Movement_Planning_Event,parent->template First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 			}
 			feature_prototype void Initialize(TargetType initializer, requires(!check(ComponentType,Has_Initialize)))
@@ -322,14 +322,14 @@ namespace Person_Components
 
 				Parent_Person_Itf* person_itf = this->Parent_Person<Parent_Person_Itf*>();
 				Routing_Itf* itf= person_itf->template router<Routing_Itf*>();	
-				itf->movement_plan<Movement_Itf*>((Movement_Itf*)movement_plan);	
+				itf->template movement_plan<Movement_Itf*>((Movement_Itf*)movement_plan);	
 
-				movement_plan->planning_time<Simulation_Timestep_Increment>(planning_time);
+				movement_plan->template planning_time<Simulation_Timestep_Increment>(planning_time);
 
 				// whether to use snapshot or not
 				Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type>* scenario = (Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type>*)_global_scenario;
 
-				itf->template Schedule_Route_Computation<NULLTYPE>(movement_plan->departed_time<Simulation_Timestep_Increment>(), planning_time,scenario->read_network_snapshots<bool>());
+				itf->template Schedule_Route_Computation<NULLTYPE>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time,scenario->template read_network_snapshots<bool>());
 			}
 			feature_prototype void Schedule_New_Routing(int planning_time, TargetType movement_plan, requires(!check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan)))
 			{
@@ -358,11 +358,11 @@ namespace Person_Components
 			feature_method_1_arg(previous_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
 			feature_prototype void Add_Movement_Plan(TargetType movement_plan)
 			{
-				this_component()->Add_Movement_Plan<ComponentType,CallerType,TargetType>(movement_plan);
+				this_component()->template Add_Movement_Plan<ComponentType,CallerType,TargetType>(movement_plan);
 			}
 			feature_prototype void Add_Activity_Plan(TargetType activity_plan)
 			{
-				this_component()->Add_Activity_Plan<ComponentType,CallerType,TargetType>(activity_plan);
+				this_component()->template Add_Activity_Plan<ComponentType,CallerType,TargetType>(activity_plan);
 			}
 
 			// indicators used to determine next iteration for generation/planning events

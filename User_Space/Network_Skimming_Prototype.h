@@ -64,13 +64,13 @@ namespace Network_Skimming_Components
 				else if (_sub_iteration == Types::SUB_ITERATIONS::UPDATE)
 				{
 					_pthis->Swap_Event((Event)&Update_Skim_Tables_Event<NULLTYPE>);
-					response.next._iteration = Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->update_increment<Simulation_Timestep_Increment>());
+					response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
 					response.next._sub_iteration = 0;
 					response.result = true;
 				}
 				else
 				{
-					response.next._iteration = Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->update_increment<Simulation_Timestep_Increment>());
+					response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
 					response.next._sub_iteration = 0;
 					response.result = true;
 				}
@@ -81,7 +81,7 @@ namespace Network_Skimming_Components
 				typedef Network_Skimming_Prototype<ComponentType, CallerType> _Skim_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Skim_Interface* this_ptr=(_Skim_Interface*)_pthis;
-				this_ptr->timer<Counter&>().Start();
+				this_ptr->template timer<Counter&>().Start();
 			}
 			declare_feature_event(Update_Skim_Tables_Event)
 			{
@@ -89,7 +89,7 @@ namespace Network_Skimming_Components
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Skim_Interface* this_ptr=(_Skim_Interface*)_pthis;
 
-				this_ptr->Update_Skim_Tables<NULLTYPE>();
+				this_ptr->template Update_Skim_Tables<NULLTYPE>();
 			}
 
 
@@ -150,11 +150,11 @@ namespace Network_Skimming_Components
 					while (loc_itr != orig_zone->template origin_activity_locations<locations_itf*>()->end())
 					{
 						location_itf* loc = *loc_itr;
-						links_itf::iterator link_itr = loc->origin_links<links_itf*>()->begin();
-						if (link_itr != loc->origin_links<links_itf*>()->end()	)
+						typename links_itf::iterator link_itr = loc->template origin_links<links_itf*>()->begin();
+						if (link_itr != loc->template origin_links<links_itf*>()->end()	)
 						{
 							link_itf* link = *link_itr;
-							if (link->outbound_turn_movements<turns_itf*>()->size() > 0) break;
+							if (link->template outbound_turn_movements<turns_itf*>()->size() > 0) break;
 						}
 						++loc_itr;
 					}
@@ -183,11 +183,11 @@ namespace Network_Skimming_Components
 					while (loc_itr != dest_zone->template origin_activity_locations<locations_itf*>()->end())
 					{
 						location_itf* loc = *loc_itr;
-						links_itf::iterator link_itr = loc->origin_links<links_itf*>()->begin();
-						if (link_itr != loc->origin_links<links_itf*>()->end()	)
+						typename links_itf::iterator link_itr = loc->template origin_links<links_itf*>()->begin();
+						if (link_itr != loc->template origin_links<links_itf*>()->end()	)
 						{
 							link_itf* link = *link_itr;
-							if (link->outbound_turn_movements<turns_itf*>()->size() > 0) break;
+							if (link->template outbound_turn_movements<turns_itf*>()->size() > 0) break;
 						}
 						++loc_itr;
 					}
@@ -289,7 +289,7 @@ namespace Network_Skimming_Components
 				else THROW_EXCEPTION("ERROR, destination zone id: " << Destination_Zone_ID << " was not found.");
 				
 				// call the get los function
-				return this->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, Simulation_Timestep_Increment>>(orig_zone->template internal_id<int>(), dest_zone->template internal_id<int>(), Mode_Indicator, Simulation_Time.Current_Time<Simulation_Timestep_Increment>());
+				return this->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, Simulation_Timestep_Increment>>(orig_zone->template internal_id<int>(), dest_zone->template internal_id<int>(), Mode_Indicator, Simulation_Time.template Current_Time<Simulation_Timestep_Increment>());
 			}
 			// This returns the travel time during a specific time interval
 			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator, typename TargetType::Param3Type Start_Time, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
@@ -404,7 +404,7 @@ namespace Network_Skimming_Components
 
 
 				// call implementation initializer
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
 
 				// set the network reference
 				define_simple_container_interface(skim_table_itf,typename get_type_of(skim_table),Containers::Multidimensional_Random_Access_Array_Prototype,typename get_type_of(skim_table)::unqualified_value_type,ComponentType);
@@ -536,11 +536,11 @@ namespace Network_Skimming_Components
 
 				ofstream outfile;
 				stringstream filename;
-				filename <<"los_file_hour_"<< Simulation_Time.Current_Time<Time_Hours>() << ".xls";
+				filename <<"los_file_hour_"<< Simulation_Time.template Current_Time<Time_Hours>() << ".xls";
 				outfile.open(filename.str().c_str(),ios_base::out);
 				
 				outfile << endl <<endl << "---------------------------------------------------";
-				outfile << endl << "LOS at hour " << Simulation_Time.Current_Time<Time_Hours>();
+				outfile << endl << "LOS at hour " << Simulation_Time.template Current_Time<Time_Hours>();
 				los->write(outfile);
 				outfile << endl << "---------------------------------------------------"<<endl;
 
@@ -562,7 +562,7 @@ namespace Network_Skimming_Components
 			tag_as_prototype;
 			feature_prototype void initialize(typename TargetType::ParamType loc_index, typename TargetType::ParamType zone_index, typename TargetType::Param2Type weight)
 			{
-				this_component()->initialize<ComponentType,CallerType,TargetType>(loc_index,zone_index,weight);
+				this_component()->template initialize<ComponentType,CallerType,TargetType>(loc_index,zone_index,weight);
 			}
 			feature_accessor(loc_index,none,none);
 			feature_accessor(zone_index,none,none);

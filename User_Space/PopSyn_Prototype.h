@@ -44,9 +44,9 @@ namespace PopSyn
 			feature_prototype void Initialize(typename TargetType::ParamType network, typename TargetType::Param2Type scenario, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType, Network_Components::Concepts::Is_Transportation_Network) && check(typename TargetType::Param2Type, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data)))
 			{
 				// Allocate IPF Solver and get Settings from scenario reference
-				define_component_interface(solver_itf,MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
-				solver_itf* solver = (solver_itf*)Allocate<MasterType::IPF_Solver_Settings>();
-				solver->Initialize<Target_Type<NULLTYPE,void,double,int>>(scenario->ipf_tolerance<double>(),scenario->percent_to_synthesize<double>(),scenario->maximum_iterations<int>());
+				define_component_interface(solver_itf,typename MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
+				solver_itf* solver = (solver_itf*)Allocate<typename MasterType::IPF_Solver_Settings>();
+				solver->template Initialize<Target_Type<NULLTYPE,void,double,int>>(scenario->template ipf_tolerance<double>(),scenario->template percent_to_synthesize<double>(),scenario->template maximum_iterations<int>());
 
 				// get output control params from scenario
 				this->write_marginal_output_flag<bool>(scenario->write_marginal_output<bool>());
@@ -64,7 +64,7 @@ namespace PopSyn
 				this->scenario_reference<TargetType::Param2Type>(scenario);
 		
 
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
 
 				load_event(ComponentType,Start_Popsyn_Conditional,Start_Popsyn_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::INITIALIZE,NULLTYPE);
 			}
@@ -117,7 +117,7 @@ namespace PopSyn
 			}
 			declare_feature_event(Start_Popsyn_Event)
 			{
-				((Population_Synthesizer_Prototype<ComponentType,CallerType>*) _this)->Start_Popsyn<NULLTYPE>();
+				((Population_Synthesizer_Prototype<ComponentType,CallerType>*) _this)->template Start_Popsyn<NULLTYPE>();
 			}
 			feature_prototype bool Start_Popsyn(requires(check(ComponentType,Concepts::Uses_Linker_File)))
 			{
@@ -140,7 +140,7 @@ namespace PopSyn
 				// CREATE RNG for later use
 				define_component_interface(Rand_Interface,typename ComponentType::Master_Type::RNG,RNG_Prototype,NULLTYPE);
 				Rand_Interface* rand = (Rand_Interface*)Allocate<typename ComponentType::Master_Type::RNG>();
-				rand->Initialize<double>(0.0);
+				rand->template Initialize<double>(0.0);
 
 				// IPF Solver Settings
 				define_component_interface(solver_itf,typename get_type_of(Solution_Settings),PopSyn::Prototypes::Solver_Settings_Prototype,ComponentType);
@@ -261,7 +261,7 @@ namespace PopSyn
 					p->ID(sample_id);
 					p->Index(new_region->template Get_1D_Index<Target_Type<NULLTYPE,typename joint_itf::size_type,typename joint_itf::index_type>>(index));
 					p->Weight(weight);
-					p->Characteristics<Target_Type<NT,void,vector<double>*> >(&data);
+					p->template Characteristics<Target_Type<NT,void,vector<double>*> >(&data);
 
 					// Update the sample and joint distribution with the current population unit
 					sample->insert(p->template Index<typename sample_collection_type::key_type>(), p);
@@ -357,20 +357,20 @@ namespace PopSyn
 				for (loc_itr = locations->begin(); loc_itr != locations->end(); ++loc_itr)
 				{
 					location = *loc_itr;
-					long long zone_id = location->census_zone_id<long long >();
+					long long zone_id = location->template census_zone_id<long long >();
 
 					for (region_itr = regions->begin(); region_itr != regions->end(); ++region_itr)
 					{
 						region = region_itr->second;
 
-						zones_itf* zones = region->Synthesis_Zone_Collection<zones_itf*>();
+						zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
 						
 						zone_itr = zones->find(zone_id);
 
 						if (zone_itr != zones->end())
 						{
 							zone = zone_itr->second;
-							zone->Activity_Locations_Container<location_id_container_itf*>()->push_back(location->internal_id<int>());
+							zone->template Activity_Locations_Container<location_id_container_itf*>()->push_back(location->template internal_id<int>());
 							break;
 						}
 					}
@@ -472,7 +472,7 @@ namespace PopSyn
 					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 					{
 						zone_itf* zone = z_itr->second;
-						activity_location_ids_itf* loc_indices = zone->Activity_Locations_Container<activity_location_ids_itf*>();
+						activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
 
 						// loop through each synthesized person
 						persons_collection_itf* persons = zone->template Synthetic_Persons_Container<persons_collection_itf*>();
@@ -484,8 +484,8 @@ namespace PopSyn
 
 							// initialize the person - allocates all person subcomponents
 							//person->network_reference<network_itf*>(network);
-							person->Initialize<Target_Type<NT,void,long,zone_itf*, network_itf*, scenario_itf*> >(uuid, zone, network, scenario);
-							pop_unit_itf* pop = person->Static_Properties<pop_unit_itf*>();
+							person->template Initialize<Target_Type<NT,void,long,zone_itf*, network_itf*, scenario_itf*> >(uuid, zone, network, scenario);
+							pop_unit_itf* pop = person->template Static_Properties<pop_unit_itf*>();
 														
 							++uuid;
 							++counter;
@@ -528,7 +528,7 @@ namespace PopSyn
 								for (typename persons_collection_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
 								{
 									person = *s_itr;
-									pop_unit_itf* p = person->Static_Properties<pop_unit_itf*>();
+									pop_unit_itf* p = person->template Static_Properties<pop_unit_itf*>();
 									sample_out << "ZONE_ID: "<<zone->template ID<long long int>() << endl << "ID: " << person->template uuid<uint>() << ",  weight: "<<p->template Weight<float>() <<", index: "<<p->template Index<uint>() << ", Gender: "<<p->Gender<GENDER>();
 								}
 							}

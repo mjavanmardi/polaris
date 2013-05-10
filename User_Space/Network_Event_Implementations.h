@@ -1,6 +1,7 @@
 #pragma once
 #include "Network_Event_Prototype.h"
 #include "Link_Prototype.h"
+#include "Zone_Prototype.h"
 
 define_static_typelist_loop(Initialize_Type,Initialize_List);
 //define_feature_dispatcher(Initialize,Initialize_Object);
@@ -34,7 +35,9 @@ namespace Network_Event_Components
 		{
 			typedef typename  Polaris_Component<APPEND_CHILD(Base_Network_Event),MasterType,Execution_Object,ParentType,true>::Component_Type ComponentType;
 			typedef Link_Components::Prototypes::Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
-			
+			typedef Zone_Components::Prototypes::Zone_Prototype<typename MasterType::zone_type,ComponentType> Zone_Interface;
+			define_container_and_value_interface(Location_Container_Interface,Location_Interface,typename Link_Interface::get_type_of(activity_locations),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+
 			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
 				for(typename vector<shared_ptr<polaris::io::Event_Key>>::const_iterator itr=keys.begin();itr!=keys.end();itr++)
@@ -79,6 +82,10 @@ namespace Network_Event_Components
 
 				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
 
+				// temporary containers used to fill affected zone vector			
+				hash_set<Zone_Interface*> zone_set;
+
+				cout << endl << "INITIALIZE NETWORK EVENT:";
 				for(typename vector<int>::const_iterator itr=links.begin();itr!=links.end();itr++)
 				{
 					int link = *itr;
@@ -91,10 +98,42 @@ namespace Network_Event_Components
 
 						for(vitr=links.begin();vitr!=links.end();vitr++)
 						{
+							Link_Interface* link = (Link_Interface*)(*vitr);
 							_affected_links.push_back( (Link_Interface*)(*vitr) );
+							Location_Container_Interface* locations = link->activity_locations<Location_Container_Interface*>();
+
+							// push locations from link to affected locations container
+							for (Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
+							{
+								Location_Interface* loc = (*litr);
+								 this->_affected_locations.push_back(loc);
+								 zone_set.insert(loc->zone<Zone_Interface*>());
+							}
+
 						}
 					}
 				}
+				
+				// create the affected zones list
+				for (hash_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
+				{
+					Zone_Interface* zone = *zitr;
+					this->_affected_zones.push_back(zone);
+					cout <<endl << "Affected zone: "<< zone->uuid<int>();
+				}
+
+				// create the unaffected locations list
+				Location_Container_Interface* all_locations = ((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->activity_locations_container<Location_Container_Interface*>();
+				for (Location_Container_Interface::iterator litr = all_locations->begin(); litr != all_locations->end(); ++litr)
+				{
+					bool add = true;
+					for (vector<Location_Interface*>::iterator itr = this->_affected_locations.begin(); itr != this->_affected_locations.end(); ++itr)
+					{
+						if (*litr == *itr){add=false; break;}
+					}
+					if (add) this->_unaffected_locations.push_back(*litr);
+				}
+				cout << endl << "Total Locations: " << all_locations->size() << ", Affected Locations: " << this->_affected_locations.size() << ", Unaffected Locations: " << this->_unaffected_locations.size();
 			}
 			
 			declare_feature_conditional_implementation(Incident_Conditional)
@@ -160,6 +199,10 @@ namespace Network_Event_Components
 			}
 
 			member_data(vector<Link_Interface*>,affected_links,none,none);
+			member_data(vector<Location_Interface*>,affected_locations,none,none);
+			member_data(vector<Location_Interface*>,unaffected_locations,none,none);
+			member_data(vector<Zone_Interface*>,affected_zones,none,none);
+
 			member_data(int,start_time,none,none);
 			member_data(int,end_time,none,none);
 			member_data(bool,active,none,none);

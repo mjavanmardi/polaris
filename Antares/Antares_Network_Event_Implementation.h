@@ -293,7 +293,7 @@ namespace Network_Event_Components
 					
 					Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
 					
-					if( rand()%2 )
+					if( rand()%4 )
 					{
 						intersection = link->upstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
 						
@@ -313,7 +313,7 @@ namespace Network_Event_Components
 						_precipitation_particles.push_back(precipitation_particle);
 					}
 
-					if( rand()%2 )
+					if( rand()%4 )
 					{
 						intersection = link->downstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
 
@@ -344,7 +344,7 @@ namespace Network_Event_Components
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Points();
-				cfg.head_size_value = 2;
+				cfg.head_size_value = 4;
 				cfg.primitive_color = true;
 
 				cfg.head_color._r = 100;

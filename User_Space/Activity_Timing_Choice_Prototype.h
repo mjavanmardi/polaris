@@ -39,15 +39,15 @@ namespace Person_Components
 
 			feature_prototype typename TargetType::ReturnType Get_Start_Time(typename TargetType::ParamType activity_ref, requires(check(typename TargetType::ParamType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(typename TargetType::ReturnType,Is_Time_Value)))
 			{
-				this_component()->Get_Start_Time<ComponentType,CallerType,TargetType>();
+				this_component()->template Get_Start_Time<ComponentType,CallerType,TargetType>();
 			}
 			feature_prototype typename TargetType::ReturnType Get_Duration(typename TargetType::ParamType activity_ref, requires(check(typename TargetType::ParamType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(typename TargetType::ReturnType,Is_Time_Value)))
 			{
-				this_component()->Get_Duration<ComponentType,CallerType,TargetType>();
+				this_component()->template Get_Duration<ComponentType,CallerType,TargetType>();
 			}
 			feature_prototype pair<typename TargetType::ReturnType,typename TargetType::ReturnType> Get_Start_Time_and_Duration(typename TargetType::ParamType activity_ref, requires(check(typename TargetType::ParamType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(typename TargetType::ReturnType,Is_Time_Value)))
 			{
-				return this_component()->Get_Start_Time_and_Duration<ComponentType,CallerType,TargetType>(activity_ref);
+				return this_component()->template Get_Start_Time_and_Duration<ComponentType,CallerType,TargetType>(activity_ref);
 			}
 		};
 	}

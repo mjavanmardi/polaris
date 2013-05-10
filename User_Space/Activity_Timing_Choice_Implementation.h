@@ -10,6 +10,9 @@ namespace Person_Components
 	{
 		implementation struct Activity_Timing_Chooser_Implementation : public Polaris_Component<APPEND_CHILD(Activity_Timing_Chooser_Implementation),MasterType,Data_Object,ParentType>
 		{
+			// Tag as Implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Activity_Timing_Chooser_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+
 			// local types
 			typedef pair<Time_Minutes,Time_Minutes> data_type;
 
@@ -62,23 +65,23 @@ namespace Person_Components
 				act = (Activity_Components::Prototypes::Activity_Planner<strip_modifiers(TargetType::ParamType)::Component_Type>*) activity_ref;
 				
 				// draw random from uniform distribution
-				float rand = GLOBALS::Uniform_RNG.Next_Rand<float>();
+				float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
 
 				// use upper bound to draw the start time / duration pair with first cumulative probability greater than rand
-				map_type::iterator itr = _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
+				map_type::iterator itr = _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
 
 				// make sure valid entry is found
-				if (itr == _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].end()) 
+				if (itr == _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].end()) 
 				{
-					THROW_WARNING("ERROR: no valid start-time / duration pair found for activity type '" << act->Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
-					itr = _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].begin();
+					THROW_WARNING("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
+					itr = _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].begin();
 				}
 				pair<typename TargetType::ReturnType,typename TargetType::ReturnType> return_val;
 
 				// add random draw from between 0-30 minutes as this is the aggregation level of the start_time data
-				return_val.first = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.first + GLOBALS::Uniform_RNG.Next_Rand<float>()*30.0f);
+				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.first + GLOBALS::Uniform_RNG.template Next_Rand<float>()*30.0f);
 				// add random draw from between 0-5 minutes as this is the aggregation level of the duration data
-				return_val.second = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.second + GLOBALS::Uniform_RNG.Next_Rand<float>()*5.0f);
+				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.second + GLOBALS::Uniform_RNG.template Next_Rand<float>()*5.0f);
 				return return_val;
 			}
 			tag_feature_signature_as_available(Get_Start_Time_and_Duration,1);
@@ -96,12 +99,12 @@ namespace Person_Components
 				
 				// draw random from uniform distribution and get corresponding data item - loop while draw is outside of range
 				int iter = 0;
-				float rand = GLOBALS::Uniform_RNG.Next_Rand<float>();
-				map_type::iterator itr = _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
+				float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
+				map_type::iterator itr = _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
 				while (itr->second.first < start || itr->second.first >= end)
 				{
-					rand = GLOBALS::Uniform_RNG.Next_Rand<float>();
-					itr = _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
+					rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
+					itr = _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
 					++iter;
 					if (iter >= 100)
 					{
@@ -111,7 +114,7 @@ namespace Person_Components
 				}
 
 				// make sure valid entry is found
-				if (itr == _start_time_duration_container[act->Activity_Type<ACTIVITY_TYPES>()].end()) THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
+				if (itr == _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].end()) THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
 			
 				pair<typename TargetType::ReturnType,typename TargetType::ReturnType> return_val;
 				return_val.first = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.first);

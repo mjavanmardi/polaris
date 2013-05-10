@@ -12,6 +12,9 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct General_Person_Perception_Implementation : public Polaris_Component<APPEND_CHILD(General_Person_Perception_Implementation),MasterType,Data_Object,ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(General_Person_Perception_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+
 			// Pointer to the Parent class
 			member_prototype(Person_Components::Prototypes::Person, Parent_Person, typename MasterType::person_type, none, none);
 

@@ -87,7 +87,7 @@ namespace Vehicle_Components
 				cfg.Configure_Points();
 				cfg.primitive_color=true;
 				cfg.head_accent_size_value=10;
-				cfg.head_size_value=4;
+				cfg.head_size_value=6;
 
 				//cfg.attributes_schema = string("ID,Status,Current_Link");
 				
@@ -174,6 +174,8 @@ namespace Vehicle_Components
 
 			feature_implementation void display_vehicle_position()
 			{
+				Polaris_Vehicle_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Vehicle_Implementation)>* bthis = (Polaris_Vehicle_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Vehicle_Implementation)>*)this;
+				
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
 				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
 				Link_Line<MasterType>& link_line = link->template displayed_line<Link_Line<MasterType>&>();
@@ -245,8 +247,22 @@ namespace Vehicle_Components
 					//coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
 					//
 					int num_switch_decisions = (int)_switch_decisions_container.size();
-					if (num_switch_decisions > 0)
+					
+					typedef Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType> Activity_Location_Interface;
+
+					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;				
+					
+					if(person->has_done_replanning<bool>())
 					{
+						coordinate.color._r = 0;
+						coordinate.color._g = 0;
+						coordinate.color._b = 255;
+					}
+					else if (num_switch_decisions > 0)
+					{
+
+						
+
 						if (num_switch_decisions == 1)
 						{
 							coordinate.color._r = 191;
@@ -698,10 +714,10 @@ namespace Vehicle_Components
 				}
 				else
 				{
-					coordinate.group_color._r=225;
-					coordinate.group_color._g=225;
+					coordinate.group_color._r=0;
+					coordinate.group_color._g=0;
 					coordinate.group_color._b=225;
-					coordinate.group_color._a=100;
+					coordinate.group_color._a=150;
 				}
 
 				_locations_layer->Push_Element<Accented_Element>(&coordinate);
@@ -746,10 +762,10 @@ namespace Vehicle_Components
 					}
 					else
 					{
-						link_line.color._r=200;
+						link_line.color._r=0;
 						link_line.color._g=0;
-						link_line.color._b=0;
-						link_line.color._a=150;
+						link_line.color._b=200;
+						link_line.color._a=200;
 					}
 
 					link_line.down_node=start;
@@ -766,10 +782,10 @@ namespace Vehicle_Components
 					}
 					else
 					{
-						link_line.color._r=225;
-						link_line.color._g=225;
-						link_line.color._b=225;
-						link_line.color._a=100;
+						link_line.color._r=0;
+						link_line.color._g=0;
+						link_line.color._b=0;
+						link_line.color._a=200;
 					}
 
 					link_line.down_node=mid;

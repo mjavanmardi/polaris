@@ -11,6 +11,10 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct General_Activity_Generator_Implementation : public Polaris_Component<APPEND_CHILD(General_Activity_Generator_Implementation),MasterType,Data_Object,ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(General_Activity_Generator_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+
+
 			// Pointer to the Parent class
 			member_prototype(Person_Components::Prototypes::Person_Planner, Parent_Planner, typename MasterType::person_planner_type, none, none);
 
@@ -29,6 +33,8 @@ namespace Person_Components
 		implementation struct ADAPTS_Activity_Generator_Implementation : public General_Activity_Generator_Implementation<MasterType, ParentType, APPEND_CHILD(ADAPTS_Activity_Generator_Implementation)>
 		{
 			typedef General_Activity_Generator_Implementation<MasterType, ParentType, APPEND_CHILD(ADAPTS_Activity_Generator_Implementation)> base_type;
+			typedef typename base_type::Component_Type ComponentType;
+
 			typedef Prototypes::Activity_Generator<base_type,base_type> base_itf;
 			define_component_interface(person_itf,typename base_type::type_of(Parent_Planner)::type_of(Parent_Person), Prototypes::Person,ComponentType);
 
@@ -54,13 +60,13 @@ namespace Person_Components
 				Activity_Plan* act = (Activity_Plan*)Allocate<typename base_type::type_of(Activity_Plans_Container)::unqualified_value_type>();
 				act->template Activity_Plan_ID<long>(_iteration);
 				Activity_Plans* activities = this_ptr->template Activity_Plans_Container<Activity_Plans*>();
-				activities->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(15),act);
+				activities->insert(Simulation_Time.template Future_Time<Time_Minutes,Simulation_Timestep_Increment>(15),act);
 
 				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename base_type::type_of(Movement_Plans_Container),Associative_Container_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 				Movement_Plan* move = (Movement_Plan*)Allocate<typename base_type::type_of(Movement_Plans_Container)::unqualified_value_type>();
 				move->template Movement_Plan_ID<long>(_iteration);
 				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();
-				movements->insert(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(30),move);
+				movements->insert(Simulation_Time.template Future_Time<Time_Minutes,Simulation_Timestep_Increment>(30),move);
 			}
 			tag_feature_as_available(Activity_Generation);
 		};
@@ -69,6 +75,8 @@ namespace Person_Components
 		{
 			// IMPLEMENTATION TYPEDEFS AND INTERFACES
 			typedef General_Activity_Generator_Implementation<MasterType, ParentType, APPEND_CHILD(CTRAMP_Activity_Generator_Implementation)> base_type;
+			typedef typename base_type::Component_Type ComponentType;
+
 			typedef base_type base;
 			typedef Prototypes::Activity_Generator<base_type,base_type> base_itf;
 
@@ -129,10 +137,10 @@ namespace Person_Components
 					//UNLOCK(this->_update_lock);
 				}
 				
-				person_itf* _Parent_Person = base_type::_Parent_Planner->Parent_Person<person_itf*>();
-				_static_properties_itf* static_properties = _Parent_Person->Static_Properties<_static_properties_itf*>();
-				_properties_itf* properties = _Parent_Person->Properties<_properties_itf*>();
-				_Destination_Choice_Itf* destination_chooser = base_type::_Parent_Planner->Destination_Chooser<_Destination_Choice_Itf*>();
+				person_itf* _Parent_Person = base_type::_Parent_Planner->template Parent_Person<person_itf*>();
+				_static_properties_itf* static_properties = _Parent_Person->template Static_Properties<_static_properties_itf*>();
+				_properties_itf* properties = _Parent_Person->template Properties<_properties_itf*>();
+				_Destination_Choice_Itf* destination_chooser = base_type::_Parent_Planner->template Destination_Chooser<_Destination_Choice_Itf*>();
 				
 				// get references to the plan containers
 				Activities* activities = typename base_type::_Parent_Planner->template Activity_Container<Activities*>();
@@ -146,19 +154,19 @@ namespace Person_Components
 
 				//=========================================================================================================================
 				// Get random start plan time inthe first minute for generation
-				int start_plan_time = (int)(GLOBALS::Uniform_RNG.Next_Rand<float>()*60.0f) + _iteration;
+				int start_plan_time = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>()*60.0f) + _iteration;
 				
 
 				//=========================================================================================================================
 				// Generate work activity
-				EMPLOYMENT_STATUS work_status = static_properties->Employment_Status<EMPLOYMENT_STATUS>();
+				EMPLOYMENT_STATUS work_status = static_properties->template Employment_Status<EMPLOYMENT_STATUS>();
 				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count, start_plan_time);
 				//-------------------------------------------------------------------------------------------------------------------------
 
 
 				//=========================================================================================================================
 				// Generate school activity
-				Person_Components::Types::SCHOOL_ENROLLMENT sch_status = static_properties->School_Enrollment<SCHOOL_ENROLLMENT>();
+				Person_Components::Types::SCHOOL_ENROLLMENT sch_status = static_properties->template School_Enrollment<SCHOOL_ENROLLMENT>();
 				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count, start_plan_time);
 				//-------------------------------------------------------------------------------------------------------------------------
 
@@ -178,30 +186,30 @@ namespace Person_Components
 				float num_service = service_vehicle_activity_freq[person_index];
 				float num_social = social_activity_freq[person_index];
 
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_eat_out ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(EAT_OUT_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_errand ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(ERRANDS_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_healthcare ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_leisure ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(LEISURE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_maj_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_eat_out ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(EAT_OUT_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_errand ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(ERRANDS_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_healthcare ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(HEALTHCARE_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_leisure ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(LEISURE_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_maj_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(MAJOR_SHOPPING_ACTIVITY,act_count, start_plan_time);
 				//if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_ACTIVITY,act_count);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_other_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_pb ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_civic ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_service ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY,act_count, start_plan_time);
-				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < num_social ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SOCIAL_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_other_shop ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(OTHER_SHOPPING_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_pb ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PERSONAL_BUSINESS_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_civic ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(RELIGIOUS_OR_CIVIC_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_service ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SERVICE_VEHICLE_ACTIVITY,act_count, start_plan_time);
+				if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_social ) Create_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SOCIAL_ACTIVITY,act_count, start_plan_time);
 
 			}
 			tag_feature_as_available(Activity_Generation);
 
 			feature_implementation int Person_Type_index()
 			{
-				person_itf* _Parent_Person = base_type::_Parent_Planner->Parent_Person<person_itf*>();
-				_static_properties_itf* per = _Parent_Person->Static_Properties<_static_properties_itf*>();
+				person_itf* _Parent_Person = base_type::_Parent_Planner->template Parent_Person<person_itf*>();
+				_static_properties_itf* per = _Parent_Person->template Static_Properties<_static_properties_itf*>();
 
-				int age = per->Age<int>();
-				Time_Hours hours = per->Work_Hours<Time_Hours>();
-				bool student = per->Is_Student<bool>();
-				bool employed = per->Is_Employed<bool>();
+				int age = per->template Age<int>();
+				Time_Hours hours = per->template Work_Hours<Time_Hours>();
+				bool student = per->template Is_Student<bool>();
+				bool employed = per->template Is_Employed<bool>();
 
 				int index = -1;
 				if (employed && hours >= 30) index = 3;		// full time
@@ -220,27 +228,27 @@ namespace Person_Components
 			feature_implementation void Create_Routine_Activity(TargetType act_type, int& activity_count, int start_plan_time)
 			{
 				Routine_Activity_Plan* activity = (Routine_Activity_Plan*)Allocate<typename MasterType::routine_activity_plan_type>();
-				activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
-				activity->Activity_Plan_ID<int>(activity_count);
+				activity->template Parent_Planner<_planner_itf*>(_Parent_Planner);
+				activity->template Activity_Plan_ID<int>(activity_count);
 	
 				// Activity planning time
 				Simulation_Timestep_Increment plan_time = start_plan_time + activity_count;
-				activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, plan_time);
+				activity->template Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, plan_time);
 
-				((base_type*)this)->_Parent_Planner->Add_Activity_Plan<Routine_Activity_Plan*>(activity);
+				((base_type*)this)->_Parent_Planner->template Add_Activity_Plan<Routine_Activity_Plan*>(activity);
 				activity_count++;
 			}
 			feature_implementation void Create_Activity(TargetType act_type, int& activity_count, int start_plan_time)
 			{
 				Activity_Plan* activity = (Activity_Plan*)Allocate<typename MasterType::activity_plan_type>();
-				activity->Parent_Planner<_planner_itf*>(_Parent_Planner);
-				activity->Activity_Plan_ID<int>(activity_count);
+				activity->template Parent_Planner<_planner_itf*>(_Parent_Planner);
+				activity->template Activity_Plan_ID<int>(activity_count);
 
 
 				Simulation_Timestep_Increment _plan_time = start_plan_time + activity_count;
-				activity->Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, _plan_time);
+				activity->template Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, _plan_time);
 
-				((base_type*)this)->_Parent_Planner->Add_Activity_Plan<Activity_Plan*>(activity);		
+				((base_type*)this)->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);		
 				activity_count++;
 			}
 

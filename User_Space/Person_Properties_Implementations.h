@@ -17,6 +17,9 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct ADAPTS_Person_Properties_Implementation : public Polaris_Component<APPEND_CHILD(ADAPTS_Person_Properties_Implementation),MasterType,Data_Object,ParentType>
 		{
+			// Tag as Implementation
+			typedef typename Polaris_Component<APPEND_CHILD(ADAPTS_Person_Properties_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+
 			// static counters
 			static int Count_Array[_num_threads];
 			static int Count;
@@ -79,7 +82,7 @@ namespace Person_Components
 				// INITIALIZE HOME / WORK / SCHOOL LOCATIONS
 				//---------------------------------------------------------------------------------------------------------------
 				// get an interface to the given home zone;
-				typedef PopSyn::Prototypes::Synthesis_Zone_Prototype<MasterType::zone> zone_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone_Prototype<typename MasterType::zone> zone_itf;
 				typedef Prototypes::Person_Properties<Parent_Person_interface::get_type_of(Static_Properties)> pop_unit_itf;
 				
 				// useful interfaces
@@ -90,7 +93,7 @@ namespace Person_Components
 				define_container_and_value_interface(_Zone_Container_Interface, _Zone_Interface,typename network_itf::get_type_of(zones_container),Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 			
 				zone_itf* zone = (zone_itf*)home_synthesis_zone;
-				network_itf* network = _Parent_Person->network_reference<network_itf*>();
+				network_itf* network = _Parent_Person->template network_reference<network_itf*>();
 				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
 
 				// initialize location indices
@@ -99,38 +102,38 @@ namespace Person_Components
 				_school_location_id = -1;
 				
 				// Available locations
-				activity_location_ids_itf* loc_indices = zone->Activity_Locations_Container<activity_location_ids_itf*>();
+				activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
 
 				// assign person to a random activity location in the zone				
 				if (loc_indices->size() == 0)
 				{
-					_home_location_id= (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * activity_locations->size());
+					_home_location_id= (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * activity_locations->size());
 				}
 				else
 				{
 					int index = -1;
-					index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * loc_indices->size());
+					index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * loc_indices->size());
 					_home_location_id = loc_indices->at(index);
 				}
 
 				// get the polaris zone of the synthesized person and increment its population counter;
-				_Zone_Interface* pzone = _Parent_Person->Home_Location<_Zone_Interface*>();
-				pzone->population<int&>()++;
+				_Zone_Interface* pzone = _Parent_Person->template Home_Location<_Zone_Interface*>();
+				pzone->template population<int&>()++;
 
 				// Assign workers to a work location
-				pop_unit_itf* properties = _Parent_Person->Static_Properties<pop_unit_itf*>();
-				if (properties->Employment_Status<Person_Components::Types::EMPLOYMENT_STATUS>() == Person_Components::Types::EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK) 
+				pop_unit_itf* properties = _Parent_Person->template Static_Properties<pop_unit_itf*>();
+				if (properties->template Employment_Status<Person_Components::Types::EMPLOYMENT_STATUS>() == Person_Components::Types::EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK) 
 				{
-					_Parent_Person->Choose_Work_Location<NT>();
+					_Parent_Person->template Choose_Work_Location<NT>();
 				}
 
-				if (properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
+				if (properties->template School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || properties->template School_Enrollment<SCHOOL_ENROLLMENT>() == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
 				{
-					_Parent_Person->Choose_School_Location<NT>();
+					_Parent_Person->template Choose_School_Location<NT>();
 				}
 
-				planner_itf* planner = this->_Parent_Person->Planning_Faculty<planner_itf*>();
-				planner->Write_To_Log<string>(_Parent_Person->To_String<NT>());
+				planner_itf* planner = this->_Parent_Person->template Planning_Faculty<planner_itf*>();
+				planner->template Write_To_Log<string>(_Parent_Person->template To_String<NT>());
 			}	
 			/*feature_implementation void Initialize(typename TargetType::ParamType home_synthesis_zone, requires(!check(typename TargetType::ParamType, Zone_Components::Concepts::Is_Zone_Prototype) || !check_as_given(typename TargetType::ParamType, is_pointer)))
 			{	
@@ -144,7 +147,7 @@ namespace Person_Components
 			{
 				Time_Minutes value;
 				
-				average_activity_frequency_and_duration_container_type::iterator itr;
+				typename average_activity_frequency_and_duration_container_type::iterator itr;
 				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
 				if (itr != this->_average_activity_frequency_and_duration_container.end())
 				{
@@ -166,7 +169,7 @@ namespace Person_Components
 				// duration stored in minutes
 				Time_Minutes duration = Time_Prototype<Basic_Units::Implementations::Time_Implementation<NT>>::Convert_Value<Target_Type<NT,Time_Minutes,TargetType::Param2Type>>(value);
 			
-				average_activity_frequency_and_duration_container_type::iterator itr;
+				typename average_activity_frequency_and_duration_container_type::iterator itr;
 				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
 				if (itr != this->_average_activity_frequency_and_duration_container.end())
 				{
@@ -182,7 +185,7 @@ namespace Person_Components
 			// Getter / Setter for the activity frequency
 			feature_implementation typename TargetType::ReturnType Average_Activity_Frequency(ACTIVITY_TYPES act_type)
 			{
-				average_activity_frequency_and_duration_container_type::iterator itr;
+				typename average_activity_frequency_and_duration_container_type::iterator itr;
 				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
 				if (itr != this->_average_activity_frequency_and_duration_container.end())
 				{
@@ -197,7 +200,7 @@ namespace Person_Components
 			tag_feature_signature_as_available(Average_Activity_Frequency,1);
 			feature_implementation void Average_Activity_Frequency(typename TargetType::ParamType act_type, typename TargetType::Param2Type value)
 			{
-				average_activity_frequency_and_duration_container_type::iterator itr;
+				typename average_activity_frequency_and_duration_container_type::iterator itr;
 				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
 				if (itr != this->_average_activity_frequency_and_duration_container.end())
 				{
@@ -217,6 +220,9 @@ namespace Person_Components
 
 		implementation struct ACS_Person_Static_Properties_Implementation : public Polaris_Component<APPEND_CHILD(ACS_Person_Static_Properties_Implementation), MasterType, Data_Object, ParentType>
 		{
+			// Tag as Implementation
+			typedef typename Polaris_Component<APPEND_CHILD(ACS_Person_Static_Properties_Implementation),MasterType,Data_Object>::Component_Type ComponentType;
+
 			//=================================================================
 			// Basic Person Characteristics Used in Popsyn algorithms
 			member_data(double,ID,none,none);
@@ -283,7 +289,7 @@ namespace Person_Components
 				#pragma region CENSUS_CODE_SWITCH
 				switch(CENSUS_CODE)
 				{
-					case 1:  val = (int)(GLOBALS::Uniform_RNG.Next_Rand<float>() * 1440.0f); break;
+					case 1:  val = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>() * 1440.0f); break;
 					case 2:  val=5; break;
 					case 3:  val=10; break;
 					case 4:  val=15; break;
@@ -568,19 +574,19 @@ namespace Person_Components
 					case 283:  val=1425; break;
 					case 284:  val=1430; break;
 					case 285:  val=1435; break;
-					default: val = 420 + (int)(GLOBALS::Uniform_RNG.Next_Rand<float>() * 120.0f); /*THROW_WARNING("Warning, arrival time case value '"<<CENSUS_CODE<<"' found in census data input file is not a valid arrival time to work code.  Arrival time defaulting to 8:00 AM.");*/
+					default: val = 420 + (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>() * 120.0f); /*THROW_WARNING("Warning, arrival time case value '"<<CENSUS_CODE<<"' found in census data input file is not a valid arrival time to work code.  Arrival time defaulting to 8:00 AM.");*/
 				}
 				#pragma endregion
 
 				define_component_interface(_Journey_To_Work_Arrival_Time_itf,type_of(typename ComponentType::_Journey_To_Work_Arrival_Time),Basic_Units::Prototypes::Time_Prototype,ComponentType);
 				_Journey_To_Work_Arrival_Time_itf* itf = this->template _Journey_To_Work_Arrival_Time<ComponentType,CallerType,_Journey_To_Work_Arrival_Time_itf*>();
-				itf->Value<Time_Minutes>(val);
+				itf->template Value<Time_Minutes>(val);
 			}
 			feature_implementation TargetType Journey_To_Work_Arrival_Time(requires(check(TargetType,Basic_Units::Concepts::Is_Time_Value)))
 			{
 				define_component_interface(_Journey_To_Work_Arrival_Time_itf,type_of(typename ComponentType::_Journey_To_Work_Arrival_Time),Basic_Units::Prototypes::Time_Prototype,ComponentType);
 				_Journey_To_Work_Arrival_Time_itf* itf = this->template _Journey_To_Work_Arrival_Time<ComponentType,CallerType,_Journey_To_Work_Arrival_Time_itf*>();
-				return itf->Value<TargetType>();
+				return itf->template Value<TargetType>();
 			}
 			tag_getter_setter_as_available(Journey_To_Work_Arrival_Time);
 

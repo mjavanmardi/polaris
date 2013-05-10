@@ -15,6 +15,9 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct Person_Mover_Implementation : public Polaris_Component<APPEND_CHILD(Person_Mover_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			// Tag as Implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Person_Mover_Implementation),MasterType,Execution_Object>::Component_Type ComponentType;
+
 			member_prototype(Prototypes::Person,Parent_Person,typename MasterType::person_type,none,none);
 			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,Movement,typename MasterType::movement_plan_type,none,none);
 			member_data(bool, Movement_Scheduled, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
@@ -23,6 +26,10 @@ namespace Person_Components
 
 		implementation struct Person_Implementation : public Polaris_Component<APPEND_CHILD(Person_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			// Tag as Implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Person_Implementation),MasterType,Execution_Object>::Component_Type ComponentType;
+
+
 			//=======================================================================================================================================================================
 			// DATA MEMBERS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -75,6 +82,7 @@ namespace Person_Components
 			// Agent ID
 			member_data(long,uuid,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 			member_data(bool,has_pretrip_information,check_2(ReturnValueType,bool,is_same), check_2(SetValueType,bool,is_same));
+			member_data(bool,has_done_replanning,check_2(ReturnValueType,bool,is_same), check_2(SetValueType,bool,is_same));
 
 			// First iteration  - sets the next iteration after all planning is completed
 			member_component_and_feature_accessor(First_Iteration, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
@@ -98,7 +106,7 @@ namespace Person_Components
 			feature_implementation void Initialize(TargetType id)
 			{	
 				// Set the initial iteration to process
-				this->template First_Iteration<ComponentType,CallerType,Time_Minutes>(1.0);
+				this->First_Iteration<ComponentType,CallerType,Time_Minutes>(1.0);
 
 				// Create and Initialize the Properties faculty
 				_Properties = (Properties_interface*)Allocate<type_of(Properties)>();
@@ -131,7 +139,7 @@ namespace Person_Components
 
 				// Moving faculty
 				_Moving_Faculty = (Moving_Faculty_interface*)Allocate<Implementations::Person_Mover_Implementation<MasterType>>();
-				_Moving_Faculty->Parent_Person<ComponentType*>(this);
+				_Moving_Faculty->template Parent_Person<ComponentType*>(this);
 
 				// Create and Initialize the vehicle		
 				_vehicle = (vehicle_interface*)Allocate<type_of(vehicle)>(); 	
@@ -154,7 +162,7 @@ namespace Person_Components
 
 				// Randomly determine if person uses pretrip-information sources (Radio, internet, news, etc.)
 				scenario_reference_interface* scenario = this->scenario_reference<ComponentType,CallerType,scenario_reference_interface*>();
-				this->_has_pretrip_information = (GLOBALS::Uniform_RNG.Next_Rand<float>() < scenario->pretrip_informed_market_share<float>());
+				this->_has_pretrip_information = (GLOBALS::Uniform_RNG.template Next_Rand<float>() < scenario->pretrip_informed_market_share<float>());
 			}
 			tag_feature_as_available(Initialize);
 
@@ -170,7 +178,7 @@ namespace Person_Components
 
 
 				// first, make sure person is worker, if not exit
-				EMPLOYMENT_STATUS status = _Static_Properties->Employment_Status<EMPLOYMENT_STATUS>();
+				EMPLOYMENT_STATUS status = _Static_Properties->template Employment_Status<EMPLOYMENT_STATUS>();
 				if (status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK && status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
 				{
 					pthis->Work_Location<int>(-1);
@@ -179,12 +187,12 @@ namespace Person_Components
 
 
 				// Get the expected travel time from the persons static properties
-				Time_Minutes ttime = _Static_Properties->Journey_To_Work_Travel_Time<Time_Minutes>();
+				Time_Minutes ttime = _Static_Properties->template Journey_To_Work_Travel_Time<Time_Minutes>();
 
 				// if minimimal travel time, assign the home location as the work location
 				if (ttime < 2)
 				{
-					pthis->Work_Location<int>(pthis->Home_Location<int>());
+					pthis->template Work_Location<int>(pthis->Home_Location<int>());
 					return;
 				}
 
@@ -192,10 +200,10 @@ namespace Person_Components
 				// Find available zones within the specified target range of the given work travel time
 				//---------------------------------------------------------
 				zones_container_interface* zones = this->network_reference<ComponentType,CallerType,network_reference_interface*>()->zones_container<zones_container_interface*>();
-				zones_container_interface::iterator z_itr;
+				typename zones_container_interface::iterator z_itr;
 				vector<zone_interface*> temp_zones;
 				vector<float> temp_zone_probabilities;
-				zone_interface* orig = pthis->Home_Location<zone_interface*>();
+				zone_interface* orig = pthis->template Home_Location<zone_interface*>();
 
 				// loop through all zones, store those within +- 2 min of estimated work travel time that have available work locations
 				float time_range_to_search = 2.0;
@@ -205,10 +213,10 @@ namespace Person_Components
 					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 					{
 						zone_interface* zone = z_itr->second;
-						Time_Minutes t = network_reference<ComponentType,CallerType,network_reference_interface*>()->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(orig->uuid<int>(),zone->uuid<int>(), Vehicle_Components::Types::SOV);
+						Time_Minutes t = network_reference<ComponentType,CallerType,network_reference_interface*>()->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(orig->template uuid<int>(),zone->template uuid<int>(), Vehicle_Components::Types::SOV);
 						if (t > ttime - time_range_to_search && t < ttime + time_range_to_search && zone->work_locations<locations_container_interface*>()->size() > 0 && zone->employment<int>() > 0)
 						{
-							employment += zone->employment<int>();
+							employment += zone->template employment<int>();
 							temp_zones.push_back(zone);
 						}
 					}
@@ -219,16 +227,16 @@ namespace Person_Components
 				}
 				// calculate probabilities
 				float cum_prob = 0;
-				for (vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
+				for (typename vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
 				{
-					cum_prob += (*t_itr)->employment<float>() / employment;
+					cum_prob += (*t_itr)->template employment<float>() / employment;
 					temp_zone_probabilities.push_back(cum_prob);
 				}
 
 				//=========================================================
 				// select zone
 				//---------------------------------------------------------
-				float r = Uniform_RNG.Next_Rand<float>();
+				float r = Uniform_RNG.template Next_Rand<float>();
 				zone_interface* selected_zone = nullptr;
 				vector<zone_interface*>::iterator t_itr;
 				vector<float>::iterator p_itr;
@@ -254,12 +262,12 @@ namespace Person_Components
 				// select work location from within available work locations in the zone
 				else
 				{
-					locations_container_interface* work_locations = selected_zone->work_locations<locations_container_interface*>();
+					locations_container_interface* work_locations = selected_zone->template work_locations<locations_container_interface*>();
 					float size = work_locations->size();
-					int index = (int)(Uniform_RNG.Next_Rand<float>()*size);
+					int index = (int)(Uniform_RNG.template Next_Rand<float>()*size);
 					location_interface* work_loc = (*work_locations)[index];
 
-					pthis->Work_Location<int>(work_loc->internal_id<int>());
+					pthis->template Work_Location<int>(work_loc->template internal_id<int>());
 				}
 			}
 			tag_feature_as_available(Choose_Work_Location);
@@ -274,26 +282,26 @@ namespace Person_Components
 				//=========================================================
 				// first, make sure person is student, if not exit
 				//---------------------------------------------------------
-				SCHOOL_ENROLLMENT status = _Static_Properties->School_Enrollment<SCHOOL_ENROLLMENT>();
+				SCHOOL_ENROLLMENT status = _Static_Properties->template School_Enrollment<SCHOOL_ENROLLMENT>();
 				if (status != SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC && status != SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
 				{
-					pthis->School_Location<int>(-1);
+					pthis->template School_Location<int>(-1);
 					return;
 				}
 
 				//=========================================================
 				// Find available zones within the specified target range of the given work travel time
 				//---------------------------------------------------------
-				zones_container_interface* zones = network_reference<ComponentType,CallerType,network_reference_interface*>()->zones_container<zones_container_interface*>();
-				zones_container_interface::iterator z_itr;
+				zones_container_interface* zones = network_reference<ComponentType,CallerType,network_reference_interface*>()->template zones_container<zones_container_interface*>();
+				typename zones_container_interface::iterator z_itr;
 				vector<zone_interface*> temp_zones;
 				vector<float> temp_zone_probabilities;
-				zone_interface* orig = pthis->Home_Location<zone_interface*>();
+				zone_interface* orig = pthis->template Home_Location<zone_interface*>();
 
 				//=========================================================
 				// if origin zone has school locations, select, else search
 				//---------------------------------------------------------
-				if (orig->school_locations<locations_container_interface*>()->size() > 0)
+				if (orig->template school_locations<locations_container_interface*>()->size() > 0)
 				{
 					selected_zone = orig;
 				}
@@ -307,10 +315,10 @@ namespace Person_Components
 						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 						{
 							zone_interface* zone = z_itr->second;
-							Time_Minutes t = network_reference<ComponentType,CallerType,network_reference_interface*>()->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(orig->uuid<int>(),zone->uuid<int>(), Vehicle_Components::Types::SOV);
-							if (t < time_range_to_search && zone->school_locations<locations_container_interface*>()->size() > 0)
+							Time_Minutes t = network_reference<ComponentType,CallerType,network_reference_interface*>()->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(orig->template uuid<int>(),zone->template uuid<int>(), Vehicle_Components::Types::SOV);
+							if (t < time_range_to_search && zone->template school_locations<locations_container_interface*>()->size() > 0)
 							{
-								school_locations += (int)zone->school_locations<locations_container_interface*>()->size();
+								school_locations += (int)zone->template school_locations<locations_container_interface*>()->size();
 								temp_zones.push_back(zone);
 							}
 						}
@@ -321,18 +329,18 @@ namespace Person_Components
 					}
 					// calculate probabilities
 					float cum_prob = 0;
-					for (vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
+					for (typename vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
 					{
-						cum_prob += (*t_itr)->school_locations<locations_container_interface*>()->size() / school_locations;
+						cum_prob += (*t_itr)->template school_locations<locations_container_interface*>()->size() / school_locations;
 						temp_zone_probabilities.push_back(cum_prob);
 					}
 
 					//=========================================================
 					// select zone
 					//---------------------------------------------------------
-					float r = Uniform_RNG.Next_Rand<float>();
+					float r = Uniform_RNG.template Next_Rand<float>();
 					zone_interface* selected_zone = nullptr;
-					vector<zone_interface*>::iterator t_itr;
+					typename vector<zone_interface*>::iterator t_itr;
 					vector<float>::iterator p_itr;
 					for (t_itr = temp_zones.begin(), p_itr = temp_zone_probabilities.begin(); t_itr != temp_zones.end(); ++t_itr, ++p_itr)
 					{
@@ -356,11 +364,11 @@ namespace Person_Components
 				// select school location from within available school locations in the zone
 				else
 				{
-					locations_container_interface* school_locations = selected_zone->school_locations<locations_container_interface*>();
+					locations_container_interface* school_locations = selected_zone->template school_locations<locations_container_interface*>();
 					float size = school_locations->size();
-					int index = (int)(Uniform_RNG.Next_Rand<float>()*size);
+					int index = (int)(Uniform_RNG.template Next_Rand<float>()*size);
 					location_interface* loc = (*school_locations)[index];
-					pthis->School_Location<int>(loc->internal_id<int>());
+					pthis->School_Location<int>(loc->template internal_id<int>());
 				}
 			}
 			tag_feature_as_available(Choose_School_Location);

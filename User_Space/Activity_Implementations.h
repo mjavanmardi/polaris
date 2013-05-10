@@ -20,6 +20,10 @@ namespace Activity_Components
 		//-----------------------------------------------------------------------
 		implementation struct Basic_Activity_Plan_Implementation : public Polaris_Component<APPEND_CHILD(Basic_Activity_Plan_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			// Tag As Implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Basic_Activity_Plan_Implementation),MasterType,Execution_Object>::Component_Type ComponentType;
+
+
 			//=================================================================
 			// Pointer back to planner
 			member_prototype(Person_Components::Prototypes::Person_Planner, Parent_Planner, typename MasterType::person_planner_type, none, none);
@@ -135,23 +139,23 @@ namespace Activity_Components
 
 				// copy the movement plan into the cached movement record before addition
 				movement_record_interface* move_record = (movement_record_interface*)Allocate<movement_record_type>();
-				move_record->Initialize<Target_Type<NT,void,_movement_plan_itf*>>(move);
+				move_record->template Initialize<Target_Type<NT,void,_movement_plan_itf*>>(move);
 
-				if (move->origin<_activity_location_itf*>() == nullptr || move->destination<_activity_location_itf*>() == nullptr) return;
+				if (move->template origin<_activity_location_itf*>() == nullptr || move->template destination<_activity_location_itf*>() == nullptr) return;
 
 
 				// Assign the movement plan to the persons activity schedule, if null movement, leave valid_trajectory to false
-				if (move->valid_trajectory<bool>() || move->origin<_activity_location_itf*>() == move->destination<_activity_location_itf*>())
+				if (move->template valid_trajectory<bool>() || move->template origin<_activity_location_itf*>() == move->template destination<_activity_location_itf*>())
 				{			
-					Simulation_Timestep_Increment ttime = move->routed_travel_time<Simulation_Timestep_Increment>();
+					Simulation_Timestep_Increment ttime = move->template routed_travel_time<Simulation_Timestep_Increment>();
 					Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
-					if (depart < planner->Next_Planning_Time<Simulation_Timestep_Increment>())
+					if (depart < planner->template Next_Planning_Time<Simulation_Timestep_Increment>())
 					{
-						depart = planner->Next_Planning_Time<Simulation_Timestep_Increment>();
+						depart = planner->template Next_Planning_Time<Simulation_Timestep_Increment>();
 						this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
 					}
 
-					move->departed_time<Simulation_Timestep_Increment>(depart);
+					move->template departed_time<Simulation_Timestep_Increment>(depart);
 					planner->template Add_Movement_Plan<_movement_plan_itf*>(move);
 				}
 				else
@@ -197,31 +201,31 @@ namespace Activity_Components
 				if (orig != nullptr && dest != nullptr) 
 				{
 					// If the trip is valid, assign to a movement plan and add to the schedule
-					if (orig->origin_links<_links_container_itf&>().size() != 0 && dest->origin_links<_links_container_itf&>().size() != 0)
+					if (orig->template origin_links<_links_container_itf&>().size() != 0 && dest->template origin_links<_links_container_itf&>().size() != 0)
 					{		
 						// add attributes to plan
 						move->template origin<_activity_location_itf*>(orig);
 						move->template destination<_activity_location_itf*>(dest);
-						move->template origin<_link_itf*>(orig->origin_links<_links_container_itf&>().at(0));
-						move->template destination<_link_itf*>(dest->origin_links<_links_container_itf&>().at(0));
+						move->template origin<_link_itf*>(orig->template origin_links<_links_container_itf&>().at(0));
+						move->template destination<_link_itf*>(dest->template origin_links<_links_container_itf&>().at(0));
 
-						if (move->origin<_link_itf*>()->outbound_turn_movements<_turns_container_itf*>()->size() == 0 || move->destination<_link_itf*>()->outbound_turn_movements<_turns_container_itf*>()->size() == 0)
+						if (move->template origin<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0 || move->template destination<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0)
 						{
-							_link_itf* o_link =move->origin<_link_itf*>();
-							_link_itf* d_link =move->destination<_link_itf*>();
+							_link_itf* o_link =move->template origin<_link_itf*>();
+							_link_itf* d_link =move->template destination<_link_itf*>();
 							//THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "<<concat(this->Parent_ID<ComponentType,CallerType,int>()) << "." << concat(this->Activity_Plan_ID<ComponentType, CallerType,int>()) <<", " << concat(this->Activity_Type<ComponentType, CallerType,ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>());
 							return;
 						}
 						
 						// Add to plan to router schedule only if the trip involves movement, otherwise return
-						if (orig->internal_id<int>() == dest->internal_id<int>()) 
+						if (orig->template internal_id<int>() == dest->template internal_id<int>()) 
 						{
 							return;
 						}
 
 						// shift departure time by estimated travel time, and make sure that it does not occur before next iteration
 						_skim_itf* skim = person->template network_reference<_network_itf*>()->template skimming_faculty<_skim_itf*>();	
-						Simulation_Timestep_Increment ttime = skim->template Get_LOS<Target_Type<NT,Simulation_Timestep_Increment,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->zone<_zone_itf*>()->uuid<int>(),dest->zone<_zone_itf*>()->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+						Simulation_Timestep_Increment ttime = skim->template Get_LOS<Target_Type<NT,Simulation_Timestep_Increment,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->template zone<_zone_itf*>()->template uuid<int>(),dest->template zone<_zone_itf*>()->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 						Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
 						if (depart < _iteration+1)
 						{
@@ -237,7 +241,7 @@ namespace Activity_Components
 					{
 						move->template origin<_activity_location_itf*>(orig);
 						move->template destination<_activity_location_itf*>(dest);
-						THROW_WARNING("WARNING: movement from " << orig->uuid<int>() << " to " << dest->uuid<int>() << ", can not happen as no origin / destination links are available for the locations.");
+						THROW_WARNING("WARNING: movement from " << orig->template uuid<int>() << " to " << dest->template uuid<int>() << ", can not happen as no origin / destination links are available for the locations.");
 					}
 				}
 				else
@@ -259,6 +263,7 @@ namespace Activity_Components
 		implementation struct ADAPTS_Activity_Plan_Implementation : public Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_Activity_Plan_Implementation)>
 		{
 			typedef Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_Activity_Plan_Implementation)> base_type;
+			typedef typename Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_Activity_Plan_Implementation)>::Component_Type ComponentType;
 
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
@@ -318,10 +323,10 @@ namespace Activity_Components
 				// get references to use in model
 				base_type* base_this = (base_type*)this;
 				this_itf* pthis = (this_itf*)this;
-				_planning_itf* planner = pthis->Parent_Planner<_planning_itf*>();
-				_person_itf* person = planner->Parent_Person<_person_itf*>();
-				_properties_itf* properties = person->Properties<_properties_itf*>();
-				_static_properties_itf* static_props = person->Static_Properties<_static_properties_itf*>();
+				_planning_itf* planner = pthis->template Parent_Planner<_planning_itf*>();
+				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_properties_itf* properties = person->template Properties<_properties_itf*>();
+				_static_properties_itf* static_props = person->template Static_Properties<_static_properties_itf*>();
 
 				//Create local variables
 				int ACT1, ACT2, ACT3, ACT4, ACT5, Employed, Student, Male, Senior, TELEWORK, ICT_USE;
@@ -333,14 +338,14 @@ namespace Activity_Components
 				else if (base_this->_Activity_Type == Types::ERRANDS_ACTIVITY || base_this->_Activity_Type == PICK_UP_OR_DROP_OFF_ACTIVITY || base_this->_Activity_Type == SERVICE_VEHICLE_ACTIVITY) ACT3 = 1;
 				else if (base_this->_Activity_Type == Types::LEISURE_ACTIVITY|| base_this->_Activity_Type == Types::EAT_OUT_ACTIVITY || base_this->_Activity_Type == Types::RECREATION_ACTIVITY || base_this->_Activity_Type == Types::SOCIAL_ACTIVITY) ACT4 = 1;
 				else if (base_this->_Activity_Type == Types::OTHER_SHOPPING_ACTIVITY ||base_this-> _Activity_Type == Types::MAJOR_SHOPPING_ACTIVITY) ACT5 = 1;
-				if (static_props->Is_Employed<bool>()) Employed = 1;
-				if (static_props->Is_Student<bool>()) Student = 1;
-				if (static_props->Gender<GENDER>() == GENDER::MALE) Male = 1;
-				if (static_props->Age<int>() >= 65) Senior = 1;
+				if (static_props->template Is_Employed<bool>()) Employed = 1;
+				if (static_props->template Is_Student<bool>()) Student = 1;
+				if (static_props->template Gender<GENDER>() == GENDER::MALE) Male = 1;
+				if (static_props->template Age<int>() >= 65) Senior = 1;
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
-				if (static_props->Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-				AvgFreq = properties->Average_Activity_Frequency<Target_Type<NT,float,ACTIVITY_TYPES>>(base_this->_Activity_Type);
-				AvgDur = properties->Average_Activity_Duration<Target_Type<NT,Time_Minutes,ACTIVITY_TYPES>>(base_this->_Activity_Type);
+				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
+				AvgFreq = properties->template Average_Activity_Frequency<Target_Type<NT,float,ACTIVITY_TYPES>>(base_this->_Activity_Type);
+				AvgDur = properties->template Average_Activity_Duration<Target_Type<NT,Time_Minutes,ACTIVITY_TYPES>>(base_this->_Activity_Type);
 
 
 				//===========================================================================================================================
@@ -374,16 +379,16 @@ namespace Activity_Components
 				// Get probabilities of each response level
 				for (int i = 0; i < 2; i++)
 				{
-					P_mod[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha(i + 1, 0) - xB_mod);
-					P_per[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha(i + 1, 1) - xB_per);
-					P_loc[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha(i + 1, 2) - xB_loc);
-					P_tim[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha(i + 1, 3) - xB_tim);
-					P_dur[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha(i + 1, 4) - xB_dur);
+					P_mod[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha(i + 1, 0) - xB_mod);
+					P_per[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha(i + 1, 1) - xB_per);
+					P_loc[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha(i + 1, 2) - xB_loc);
+					P_tim[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha(i + 1, 3) - xB_tim);
+					P_dur[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha(i + 1, 4) - xB_dur);
 				}
 
 				// Set correlated random variables
 				vector<double> rand;
-				GLOBALS::Normal_RNG.Correlated_Rands<double>(rand, Sigma);
+				GLOBALS::Normal_RNG.template Correlated_Rands<double>(rand, Sigma);
 
 				// Set flexibility values
 				for (int i = 0; i < 2; i++)
@@ -419,7 +424,7 @@ namespace Activity_Components
 				double Pimp, Pday, Pweek;
 				double a1 = 1.646398;
 				double a2 = 3.505000;
-				double r = Uniform_RNG.Next_Rand<double>();
+				double r = Uniform_RNG.template Next_Rand<double>();
 
 				// calculate probabilities
 				Pimp = 1.0 / (1.0 + exp(xB));
@@ -482,16 +487,16 @@ namespace Activity_Components
 				// Get probabilities of each response level
 				for (int i = 0; i < 5; i++)
 				{
-					P_pmod[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha2[i + 1, 0] - xB_pmod, 0, 1);
-					P_pper[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha2[i + 1, 1] - xB_pper, 0, 1);
-					P_ploc[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha2[i + 1, 2] - xB_ploc, 0, 1);
-					P_ptim[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha2[i + 1, 3] - xB_ptim, 0, 1);
-					P_pdur[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha2[i + 1, 4] - xB_pdur, 0, 1);
+					P_pmod[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2[i + 1, 0] - xB_pmod, 0, 1);
+					P_pper[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2[i + 1, 1] - xB_pper, 0, 1);
+					P_ploc[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2[i + 1, 2] - xB_ploc, 0, 1);
+					P_ptim[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2[i + 1, 3] - xB_ptim, 0, 1);
+					P_pdur[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha2[i + 1, 4] - xB_pdur, 0, 1);
 				}
 
 				// Set correlated random variables
 				vector<double> rand2;
-				GLOBALS::Normal_RNG.Correlated_Rands<double>(rand2, Sigma2);
+				GLOBALS::Normal_RNG.template Correlated_Rands<double>(rand2, Sigma2);
 
 				// Set attribute plan horizon values
 				for (int i = 0; i < 5; i++)
@@ -596,21 +601,21 @@ namespace Activity_Components
 
 
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
-				_person_itf* person = planner->Parent_Person<_person_itf*>();
-				_dest_choice_itf* dest_chooser = planner->Destination_Chooser<_dest_choice_itf*>();
+				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_dest_choice_itf* dest_chooser = planner->template Destination_Chooser<_dest_choice_itf*>();
 
 				// Get activity origin from previous planned activity (or from home if no preceeding activities)
 				_activity_location_itf* orig;
-				if (bthis->Start_Is_Planned<ComponentType,CallerType,bool>())
+				if (bthis->template Start_Is_Planned<ComponentType,CallerType,bool>())
 				{
-					this_itf* previous = planner->previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->Start_Time<ComponentType,CallerType,Time_Seconds>());
-					if (previous == nullptr) orig = person->Home_Location<_activity_location_itf*>();
-					else orig = previous->Location<_activity_location_itf*>();
+					this_itf* previous = planner->template previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->template Start_Time<ComponentType,CallerType,Time_Seconds>());
+					if (previous == nullptr) orig = person->template Home_Location<_activity_location_itf*>();
+					else orig = previous->template Location<_activity_location_itf*>();
 				}
-				else orig = person->Home_Location<_activity_location_itf*>();
+				else orig = person->template Home_Location<_activity_location_itf*>();
 
 				// call destination choice
-				_activity_location_itf* dest = dest_chooser->Choose_Destination<_activity_location_itf*>(orig);
+				_activity_location_itf* dest = dest_chooser->template Choose_Destination<_activity_location_itf*>(orig);
 
 				// check that origin and destination are valid
 				if (orig != nullptr && dest != nullptr) 
@@ -624,7 +629,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
 					s << "," <<orig << ", " <<dest<<endl;
-					planner->Write_To_Log<stringstream&>(s);
+					planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 				}
 			}
@@ -644,31 +649,31 @@ namespace Activity_Components
 
 				// interfaces
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
-				_person_itf* person = planner->Parent_Person<_person_itf*>();
+				_person_itf* person = planner->template Parent_Person<_person_itf*>();
 
 				// get the combined start time and duration
-				_timing_choice_itf* timing_planner = planner->Timing_Chooser<_timing_choice_itf*>();
-				pair<Time_Seconds,Time_Seconds> start_and_duration = timing_planner->Get_Start_Time_and_Duration<Target_Type<NT,Time_Seconds,Component_Type*>>(this);
+				_timing_choice_itf* timing_planner = planner->template Timing_Chooser<_timing_choice_itf*>();
+				pair<Time_Seconds,Time_Seconds> start_and_duration = timing_planner->template Get_Start_Time_and_Duration<Target_Type<NT,Time_Seconds,Component_Type*>>(this);
 
 				// make sure start time is not prior to current iteration
-				Time_Seconds time_min = Simulation_Time.Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->Planning_Time_Increment<Time_Seconds>());
-				pthis->Start_Time<Time_Seconds>(std::max<int>(start_and_duration.first,time_min.Value));
-				pthis->Duration<Time_Seconds>(start_and_duration.second);
+				Time_Seconds time_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->template Planning_Time_Increment<Time_Seconds>());
+				pthis->template Start_Time<Time_Seconds>(std::max<int>(start_and_duration.first,time_min.Value));
+				pthis->template Duration<Time_Seconds>(start_and_duration.second);
 
 
 				// start routing on the planning timestep at 1.5 times the estimated travel time from skims prior to departure - rounded to nearest minute
 				Time_Minutes exp_ttime;
-				if (bthis->Location_Is_Planned<ComponentType,CallerType,NT>())
+				if (bthis->template Location_Is_Planned<ComponentType,CallerType,NT>())
 				{
-					_network_itf* network = person->network_reference<_network_itf*>();
-					_zone_itf* o_zone = person->Home_Location<_zone_itf*>();
-					_zone_itf* d_zone = pthis->Location<_activity_location_itf*>()->zone<_zone_itf*>();
+					_network_itf* network = person->template network_reference<_network_itf*>();
+					_zone_itf* o_zone = person->template Home_Location<_zone_itf*>();
+					_zone_itf* d_zone = pthis->template Location<_activity_location_itf*>()->template zone<_zone_itf*>();
 
-					exp_ttime = network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_zone->uuid<int>(),d_zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+					exp_ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_zone->template uuid<int>(),d_zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 				}
 				else exp_ttime = 60.0f;
 
-				Simulation_Timestep_Increment start_seconds = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
+				Simulation_Timestep_Increment start_seconds = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
 				int start_increment = std::max<int>(start_seconds, _iteration);
 				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
 				
@@ -689,6 +694,7 @@ namespace Activity_Components
 		implementation struct ADAPTS_Routine_Activity_Plan_Implementation : public Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_Routine_Activity_Plan_Implementation)>
 		{
 			typedef Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_Routine_Activity_Plan_Implementation)> base_type;
+			typedef typename Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_Routine_Activity_Plan_Implementation)>::Component_Type ComponentType;
 			typedef Prototypes::Activity_Planner<ComponentType,ComponentType> this_itf;
 		
 			//================================================================================================================================================================================================
@@ -789,8 +795,8 @@ namespace Activity_Components
 			{
 				this_itf* pthis = (this_itf*)this;
 				base_type* base_this = (base_type*)this;
-				_person_itf* person = base_this->_Parent_Planner->Parent_Person<_person_itf*>();
-				_activity_location_itf* orig = person->Home_Location<_activity_location_itf*>();
+				_person_itf* person = base_this->_Parent_Planner->template Parent_Person<_person_itf*>();
+				_activity_location_itf* orig = person->template Home_Location<_activity_location_itf*>();
 
 
 				//cout << endl << endl << "ROUTINE CHOICE MODEL for per_id.act_id:" << this->Parent_ID<ComponentType,CallerType,int>() << "." << this->Activity_Plan_ID<ComponentType, CallerType,int>();
@@ -799,21 +805,21 @@ namespace Activity_Components
 
 				// Select the location based on the activity type
 				_activity_location_itf* dest = nullptr;		
-				if (pthis->Activity_Type<Types::ACTIVITY_TYPES>() == Types::AT_HOME_ACTIVITY)
+				if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::AT_HOME_ACTIVITY)
 				{
-					dest = person->Home_Location<_activity_location_itf*>();
+					dest = person->template Home_Location<_activity_location_itf*>();
 				}
-				else if (pthis->Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+				else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
 				{
-					dest = person->Work_Location<_activity_location_itf*>();
+					dest = person->template Work_Location<_activity_location_itf*>();
 				}
-				else if (pthis->Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+				else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
 				{
-					dest = person->School_Location<_activity_location_itf*>();
+					dest = person->template School_Location<_activity_location_itf*>();
 				}
-				else if (pthis->Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY)
+				else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY)
 				{
-					dest = person->Home_Location<_activity_location_itf*>();
+					dest = person->template Home_Location<_activity_location_itf*>();
 				}
 				else
 				{
@@ -822,7 +828,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT GENERATED, only work, home, school and work at home activities can be routine at this point: "<< person->template uuid<int>();
 					s << "," <<orig << ", " <<dest<<endl;
-					base_this->_Parent_Planner->Write_To_Log<stringstream&>(s);
+					base_this->_Parent_Planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 					return;
 				}
@@ -839,7 +845,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
 					s << "," <<orig << ", " <<dest<<endl;
-					base_this->_Parent_Planner->Write_To_Log<stringstream&>(s);
+					base_this->_Parent_Planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 				}
 			}
@@ -855,16 +861,16 @@ namespace Activity_Components
 				this_itf* pthis = (this_itf*)this;
 				base_type* bthis = (base_type*)this;
 
-				_person_itf* person = bthis->_Parent_Planner->Parent_Person<_person_itf*>();
-				_static_properties_itf* static_properties = person->Static_Properties<_static_properties_itf*>();
+				_person_itf* person = bthis->_Parent_Planner->template Parent_Person<_person_itf*>();
+				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
 
 				Time_Minutes duration; 	
 	
-				if (pthis->Activity_Type<ACTIVITY_TYPES>() == PRIMARY_WORK_ACTIVITY || pthis->Activity_Type<ACTIVITY_TYPES>() == WORK_AT_HOME_ACTIVITY)
+				if (pthis->template Activity_Type<ACTIVITY_TYPES>() == PRIMARY_WORK_ACTIVITY || pthis->template Activity_Type<ACTIVITY_TYPES>() == WORK_AT_HOME_ACTIVITY)
 				{
-					duration = static_properties->Work_Hours<Time_Minutes>()/5.0;
+					duration = static_properties->template Work_Hours<Time_Minutes>()/5.0;
 				}
-				else if (pthis->Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+				else if (pthis->template Activity_Type<Types::ACTIVITY_TYPES>() == Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
 				{
 					duration = 60.0 * 7.0;
 				}
@@ -872,7 +878,7 @@ namespace Activity_Components
 				{
 					THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");
 				}
-				pthis->Duration<Time_Minutes>(duration);
+				pthis->template Duration<Time_Minutes>(duration);
 
 			}
 
@@ -881,26 +887,26 @@ namespace Activity_Components
 				this_itf* pthis = (this_itf*)this;
 				base_type* bthis = (base_type*)this;
 
-				_person_itf* person = bthis->_Parent_Planner->Parent_Person<_person_itf*>();
-				_static_properties_itf* static_properties = person->Static_Properties<_static_properties_itf*>();
+				_person_itf* person = bthis->_Parent_Planner->template Parent_Person<_person_itf*>();
+				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
 
-				ACTIVITY_TYPES act_type = pthis->Activity_Type<ACTIVITY_TYPES>();
+				ACTIVITY_TYPES act_type = pthis->template Activity_Type<ACTIVITY_TYPES>();
 
 				// School Activity start time (randomly between 7 and 9AM)
 				if (act_type == ACTIVITY_TYPES::SCHOOL_ACTIVITY)
 				{
-					Time_Seconds start_school = (7.0 + Uniform_RNG.Next_Rand<float>() * 1.0) * 60.0 * 60.0;
-					Time_Seconds start_min = Simulation_Time.Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->Planning_Time_Increment<Time_Seconds>());
-					pthis->Start_Time<Time_Seconds>(std::max<int>(start_school.Value,start_min.Value));
+					Time_Seconds start_school = (7.0 + Uniform_RNG.template Next_Rand<float>() * 1.0) * 60.0 * 60.0;
+					Time_Seconds start_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->template Planning_Time_Increment<Time_Seconds>());
+					pthis->template Start_Time<Time_Seconds>(std::max<int>(start_school.Value,start_min.Value));
 				}
 
 				// Work activity start time, based on census data
 				else if (act_type == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == WORK_AT_HOME_ACTIVITY)
 				{
-					Time_Seconds start_work = static_properties->Journey_To_Work_Arrival_Time<Time_Seconds>();
-					start_work = start_work + (0.5f - Uniform_RNG.Next_Rand<float>()) * 30.0 * 60.0; // add random uniform time between -15 and 15 minutes since ACS is rounded	
-					Time_Seconds start_min = Simulation_Time.Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->Planning_Time_Increment<Time_Seconds>());
-					pthis->Start_Time<Time_Seconds>(std::max<int>(start_work.Value,start_min.Value));
+					Time_Seconds start_work = static_properties->template Journey_To_Work_Arrival_Time<Time_Seconds>();
+					start_work = start_work + (0.5f - Uniform_RNG.template Next_Rand<float>()) * 30.0 * 60.0; // add random uniform time between -15 and 15 minutes since ACS is rounded	
+					Time_Seconds start_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(_Parent_Planner->template Planning_Time_Increment<Time_Seconds>());
+					pthis->template Start_Time<Time_Seconds>(std::max<int>(start_work.Value,start_min.Value));
 				}
 				else
 				{
@@ -909,17 +915,17 @@ namespace Activity_Components
 
 				// start routing on the planning timestep at 1.5 times the estimated travel time from skims prior to departure - rounded to nearest minute
 				Time_Minutes exp_ttime;
-				if (bthis->Location_Is_Planned<ComponentType,CallerType,NT>())
+				if (bthis->template Location_Is_Planned<ComponentType,CallerType,NT>())
 				{
-					_network_itf* network = person->network_reference<_network_itf*>();
-					_zone_itf* o_zone = person->Home_Location<_zone_itf*>();
-					_zone_itf* d_zone = bthis->Location<ComponentType,CallerType,_activity_location_itf*>()->zone<_zone_itf*>();
+					_network_itf* network = person->template network_reference<_network_itf*>();
+					_zone_itf* o_zone = person->template Home_Location<_zone_itf*>();
+					_zone_itf* d_zone = bthis->template Location<ComponentType,CallerType,_activity_location_itf*>()->template zone<_zone_itf*>();
 
-					exp_ttime = network->Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_zone->uuid<int>(),d_zone->uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+					exp_ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_zone->template uuid<int>(),d_zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 				}
 				else exp_ttime = 60.0f;
 
-				Simulation_Timestep_Increment start_seconds = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
+				Simulation_Timestep_Increment start_seconds = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
 				int start_increment = std::max<int>(start_seconds, _iteration);
 				this->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
 
@@ -942,10 +948,10 @@ namespace Activity_Components
 				// get references to use in model
 				base_type* base_this = (base_type*)this;
 				this_itf* pthis = (this_itf*)this;
-				_planning_itf* planner = pthis->Parent_Planner<_planning_itf*>();
-				_person_itf* person = planner->Parent_Person<_person_itf*>();
-				_properties_itf* properties = person->Properties<_properties_itf*>();
-				_static_properties_itf* static_props = person->Static_Properties<_static_properties_itf*>();
+				_planning_itf* planner = pthis->template Parent_Planner<_planning_itf*>();
+				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_properties_itf* properties = person->template Properties<_properties_itf*>();
+				_static_properties_itf* static_props = person->template Static_Properties<_static_properties_itf*>();
 
 				//Create local variables
 				int ACT1, ACT2, ACT3, ACT4, ACT5, Employed, Student, Male, Senior, TELEWORK, ICT_USE;
@@ -957,14 +963,14 @@ namespace Activity_Components
 				else if (base_this->_Activity_Type == Types::ERRANDS_ACTIVITY || base_this->_Activity_Type == PICK_UP_OR_DROP_OFF_ACTIVITY || base_this->_Activity_Type == SERVICE_VEHICLE_ACTIVITY) ACT3 = 1;
 				else if (base_this->_Activity_Type == Types::LEISURE_ACTIVITY|| base_this->_Activity_Type == Types::EAT_OUT_ACTIVITY || base_this->_Activity_Type == Types::RECREATION_ACTIVITY || base_this->_Activity_Type == Types::SOCIAL_ACTIVITY) ACT4 = 1;
 				else if (base_this->_Activity_Type == Types::OTHER_SHOPPING_ACTIVITY ||base_this-> _Activity_Type == Types::MAJOR_SHOPPING_ACTIVITY) ACT5 = 1;
-				if (static_props->Is_Employed<bool>()) Employed = 1;
-				if (static_props->Is_Student<bool>()) Student = 1;
-				if (static_props->Gender<GENDER>() == GENDER::MALE) Male = 1;
-				if (static_props->Age<int>() >= 65) Senior = 1;
+				if (static_props->template Is_Employed<bool>()) Employed = 1;
+				if (static_props->template Is_Student<bool>()) Student = 1;
+				if (static_props->template Gender<GENDER>() == GENDER::MALE) Male = 1;
+				if (static_props->template Age<int>() >= 65) Senior = 1;
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
-				if (static_props->Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-				AvgFreq = properties->Average_Activity_Frequency<Target_Type<NT,float,ACTIVITY_TYPES>>(base_this->_Activity_Type);
-				AvgDur = properties->Average_Activity_Duration<Target_Type<NT,Time_Minutes,ACTIVITY_TYPES>>(base_this->_Activity_Type);
+				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
+				AvgFreq = properties->template Average_Activity_Frequency<Target_Type<NT,float,ACTIVITY_TYPES>>(base_this->_Activity_Type);
+				AvgDur = properties->template Average_Activity_Duration<Target_Type<NT,Time_Minutes,ACTIVITY_TYPES>>(base_this->_Activity_Type);
 
 
 				//===========================================================================================================================
@@ -998,16 +1004,16 @@ namespace Activity_Components
 				// Get probabilities of each response level
 				for (int i = 0; i < 2; i++)
 				{
-					P_mod[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha(i + 1, 0) - xB_mod);
-					P_per[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha(i + 1, 1) - xB_per);
-					P_loc[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha(i + 1, 2) - xB_loc);
-					P_tim[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha(i + 1, 3) - xB_tim);
-					P_dur[i] = Normal_Distribution->Cumulative_Distribution_Value<float>(alpha(i + 1, 4) - xB_dur);
+					P_mod[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha(i + 1, 0) - xB_mod);
+					P_per[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha(i + 1, 1) - xB_per);
+					P_loc[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha(i + 1, 2) - xB_loc);
+					P_tim[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha(i + 1, 3) - xB_tim);
+					P_dur[i] = Normal_Distribution->template Cumulative_Distribution_Value<float>(alpha(i + 1, 4) - xB_dur);
 				}
 
 				// Set correlated random variables
 				vector<double> rand;
-				GLOBALS::Normal_RNG.Correlated_Rands<double>(rand, Sigma);
+				GLOBALS::Normal_RNG.template Correlated_Rands<double>(rand, Sigma);
 
 				// Set flexibility values
 				for (int i = 0; i < 2; i++)
@@ -1034,10 +1040,13 @@ namespace Activity_Components
 		// Stripped down activity record with minimal memory usage (used for storing and printing completed activities)
 		implementation struct Activity_Record : public Polaris_Component<APPEND_CHILD(Activity_Record), MasterType, Data_Object, ParentType>
 		{
+			// Tag as implementation
+			typedef typename Polaris_Component<APPEND_CHILD(Activity_Record),MasterType,Data_Object>::Component_Type ComponentType;
+
 			feature_implementation void Initialize(TargetType object/*,requires(check(TargetType, Concepts::Is_Activity_Plan_Prototype))*/)
 			{
-				typedef Activity_Location_Components::Prototypes::Activity_Location_Prototype<MasterType::activity_location_type> location_itf;
-				typedef Zone_Components::Prototypes::Zone_Prototype<MasterType::zone_type> zone_itf;
+				typedef Activity_Location_Components::Prototypes::Activity_Location_Prototype<typename MasterType::activity_location_type> location_itf;
+				typedef Zone_Components::Prototypes::Zone_Prototype<typename MasterType::zone_type> zone_itf;
 				typedef Prototypes::Activity_Planner<typename MasterType::activity_type> object_itf;
 				object_itf* obj = (object_itf*)object;
 
