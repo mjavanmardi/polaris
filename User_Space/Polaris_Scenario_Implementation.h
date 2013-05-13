@@ -129,8 +129,8 @@ namespace Scenario_Components
 			member_data(double, realtime_informed_vehicle_market_share, none, none);
 			member_data(double, information_compliance_rate_mean, none, none);
 			member_data(double, information_compliance_rate_standard_deviation, none, none);
-			member_data(double, relative_indifference_bound_route_choice_mean, none, none);
-			member_data(double, relative_indifference_bound_route_choice_standard_deviation, none, none);
+			member_data(double, relative_indifference_band_route_choice_mean, none, none);
+			member_data(double, relative_indifference_band_route_choice_standard_deviation, none, none);
 			member_data(double, minimum_travel_time_saving_mean, none, none);
 			member_data(double, minimum_travel_time_saving_standard_deviation, none, none);
 			member_data(bool, enroute_switching_enabled, none, none);

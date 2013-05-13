@@ -218,8 +218,8 @@ namespace Scenario_Components
 			feature_accessor(realtime_informed_vehicle_market_share, none, none);
 			feature_accessor(information_compliance_rate_mean, none, none);
 			feature_accessor(information_compliance_rate_standard_deviation, none, none);
-			feature_accessor(relative_indifference_bound_route_choice_mean, none, none);
-			feature_accessor(relative_indifference_bound_route_choice_standard_deviation, none, none);
+			feature_accessor(relative_indifference_band_route_choice_mean, none, none);
+			feature_accessor(relative_indifference_band_route_choice_standard_deviation, none, none);
 			feature_accessor(minimum_travel_time_saving_mean, none, none);
 			feature_accessor(minimum_travel_time_saving_standard_deviation, none, none);
 			feature_accessor(enroute_switching_enabled, none, none);
@@ -384,7 +384,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("realtime_informed_vehicle_market_share", realtime_informed_vehicle_market_share<double*>())!= PARAMETER_FOUND) realtime_informed_vehicle_market_share<double>(0.5);
 				if (cfgReader.getParameter("information_compliance_rate_mean", information_compliance_rate_mean<double*>())!= PARAMETER_FOUND) information_compliance_rate_mean<double>(1.0);
 				if (cfgReader.getParameter("information_compliance_rate_standard_deviation", information_compliance_rate_standard_deviation<double*>())!= PARAMETER_FOUND) information_compliance_rate_standard_deviation<double>(0.5);
-				if (cfgReader.getParameter("relative_indifference_bound_route_choice_mean", relative_indifference_bound_route_choice_mean<double*>())!= PARAMETER_FOUND) relative_indifference_bound_route_choice_mean<double>(0.1);
+				if (cfgReader.getParameter("relative_indifference_band_route_choice_mean", relative_indifference_band_route_choice_mean<double*>())!= PARAMETER_FOUND) relative_indifference_band_route_choice_mean<double>(0.1);
 				if (cfgReader.getParameter("minimum_travel_time_saving_mean", minimum_travel_time_saving_mean<double*>())!= PARAMETER_FOUND) minimum_travel_time_saving_mean<double>(1.0); // in minutes
 				if (cfgReader.getParameter("minimum_travel_time_saving_standard_deviation", minimum_travel_time_saving_standard_deviation<double*>())!= PARAMETER_FOUND) minimum_travel_time_saving_standard_deviation<double>(1.0); // in minutes
 				if (cfgReader.getParameter("enroute_switching_enabled", enroute_switching_enabled<bool*>())!= PARAMETER_FOUND) enroute_switching_enabled<bool>(true); 
@@ -442,8 +442,8 @@ namespace Scenario_Components
 				realtime_informed_vehicle_market_share<double>(0.5);
 				information_compliance_rate_mean<double>(0.5);
 				information_compliance_rate_standard_deviation<double>(0.5);
-				relative_indifference_bound_route_choice_mean<double>(0.1);
-				relative_indifference_bound_route_choice_standard_deviation<double>(0.1);
+				relative_indifference_band_route_choice_mean<double>(0.1);
+				relative_indifference_band_route_choice_standard_deviation<double>(0.1);
 				minimum_travel_time_saving_mean<double>(1.0);	// in minutes
 				minimum_travel_time_saving_standard_deviation<double>(1.0);	// in minutes
 

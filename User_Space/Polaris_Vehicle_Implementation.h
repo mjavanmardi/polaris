@@ -41,7 +41,7 @@ namespace Vehicle_Components
 			member_data(RNG_Components::RngStream, rng_stream, none, none);
 			member_data(Vehicle_Components::Types::Enroute_Information_Keys, enroute_information_type, none, none);
 			member_data(double, information_compliance_rate, none, none);
-			member_data(double, relative_indifference_bound_route_choice, none, none);
+			member_data(double, relative_indifference_band_route_choice, none, none);
 			member_data(double, minimum_travel_time_saving, none, none);
 			member_data(bool, enroute_updated, none, none);
 
@@ -299,7 +299,7 @@ namespace Vehicle_Components
 
 					if (best_route_link_sum != current_route_link_sum_to_destination)
 					{
-						if (best_route_time_to_destination < current_route_time_to_destination*(1.0 - _relative_indifference_bound_route_choice) &&
+						if (best_route_time_to_destination < current_route_time_to_destination*(1.0 - _relative_indifference_band_route_choice) &&
 							best_route_time_to_destination < (current_route_time_to_destination - _minimum_travel_time_saving))
 						{
 							update_enroute_switch_decisions<ComponentType, CallerType, TargetType>();
@@ -362,11 +362,11 @@ namespace Vehicle_Components
 
 				///rib
 				r1 = _rng_stream.RandU01();
-				double mean = ((_Scenario_Interface*)_global_scenario)->template relative_indifference_bound_route_choice_mean<double>();
+				double mean = ((_Scenario_Interface*)_global_scenario)->template relative_indifference_band_route_choice_mean<double>();
 				double a = 0.0;
 				double b = 2.0*mean;
 				double rib = _rng_stream.triangular_random_variate(r1,a,b,mean);
-				_relative_indifference_bound_route_choice = rib;
+				_relative_indifference_band_route_choice = rib;
 
 				///mtts
 				r1 = _rng_stream.RandU01();

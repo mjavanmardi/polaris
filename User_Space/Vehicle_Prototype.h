@@ -70,7 +70,7 @@ namespace Vehicle_Components
 			feature_accessor(rng_stream, none, none);
 			feature_accessor(enroute_information_type, none, none);
 			feature_accessor(information_compliance_rate, none, none);
-			feature_accessor(relative_indifference_bound_route_choice, none, none);
+			feature_accessor(relative_indifference_band_route_choice, none, none);
 			feature_accessor(minimum_travel_time_saving, none, none);
 			feature_accessor(enroute_updated, none, none);
 
