@@ -1,4 +1,4 @@
-//#define EXCLUDE_DEMAND
+#define EXCLUDE_DEMAND
 //#define EXCLUDE_DB 
 
 #include "Polaris_PCH.h"
