@@ -10,7 +10,5 @@ clean:
 	rm -f ../Test_Data/Network_Model/NetworkModel
 NetworkModel: NetworkModel.o 
 	$(CC) -o NetworkModel $(LDFLAGS) NetworkModel.o -L../Scenario_Manager -ljson -L../File_IO -lfileio -L../Repository -lrepository -L ~/odb/lib -lodb -lodb-sqlite -L../gccRelease -lio
-	cp -f NetworkModel ../Test_Data/Chicago_Network
-	cp -f NetworkModel ../Test_Data/Network_Model
 NetworkModel.o: NetworkModel.cpp $(HEADERS)
 	$(CC) -w -c $(CFLAGS) NetworkModel.cpp

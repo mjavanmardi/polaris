@@ -83,7 +83,7 @@ namespace Network_Event_Components
 				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
 
 				// temporary containers used to fill affected zone vector			
-				hash_set<Zone_Interface*> zone_set;
+				unordered_set<Zone_Interface*> zone_set;
 
 				cout << endl << "INITIALIZE NETWORK EVENT:";
 				for(typename vector<int>::const_iterator itr=links.begin();itr!=links.end();itr++)
@@ -100,14 +100,14 @@ namespace Network_Event_Components
 						{
 							Link_Interface* link = (Link_Interface*)(*vitr);
 							_affected_links.push_back( (Link_Interface*)(*vitr) );
-							Location_Container_Interface* locations = link->activity_locations<Location_Container_Interface*>();
+							Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
 
 							// push locations from link to affected locations container
-							for (Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
+							for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
 							{
 								Location_Interface* loc = (*litr);
 								 this->_affected_locations.push_back(loc);
-								 zone_set.insert(loc->zone<Zone_Interface*>());
+								 zone_set.insert(loc->template zone<Zone_Interface*>());
 							}
 
 						}
@@ -115,19 +115,19 @@ namespace Network_Event_Components
 				}
 				
 				// create the affected zones list
-				for (hash_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
+				for (typename unordered_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
 				{
-					Zone_Interface* zone = *zitr;
+					Zone_Interface* zone = (Zone_Interface*)(*zitr);
 					this->_affected_zones.push_back(zone);
-					cout <<endl << "Affected zone: "<< zone->uuid<int>();
+					cout <<endl << "Affected zone: "<< zone->template uuid<int>();
 				}
 
 				// create the unaffected locations list
-				Location_Container_Interface* all_locations = ((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->activity_locations_container<Location_Container_Interface*>();
-				for (Location_Container_Interface::iterator litr = all_locations->begin(); litr != all_locations->end(); ++litr)
+				Location_Container_Interface* all_locations = ((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template activity_locations_container<Location_Container_Interface*>();
+				for (typename Location_Container_Interface::iterator litr = all_locations->begin(); litr != all_locations->end(); ++litr)
 				{
 					bool add = true;
-					for (vector<Location_Interface*>::iterator itr = this->_affected_locations.begin(); itr != this->_affected_locations.end(); ++itr)
+					for (typename vector<Location_Interface*>::iterator itr = this->_affected_locations.begin(); itr != this->_affected_locations.end(); ++itr)
 					{
 						if (*litr == *itr){add=false; break;}
 					}
