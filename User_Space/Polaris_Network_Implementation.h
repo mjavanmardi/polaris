@@ -372,7 +372,7 @@ namespace Network_Components
 			feature_implementation void initialize_network_agent()
 			{
 				define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-				load_event(ComponentType,End_Iteration_Conditional,End_Iteration_Handler, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION,NULLTYPE);
+				load_event(ComponentType,ComponentType::template End_Iteration_Conditional,ComponentType::template End_Iteration_Handler, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION,NULLTYPE);
                 _start_cpu_time_in_seconds = (long)get_current_cpu_time_in_seconds();
  			}
 

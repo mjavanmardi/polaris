@@ -849,7 +849,7 @@ namespace Link_Components
 			feature_implementation void Initialize()
 			{
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				load_event(ComponentType,Newells_Conditional,Update_Events,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION,NULLTYPE);
+				load_event(ComponentType,ComponentType::template Newells_Conditional,ComponentType::template Update_Events,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION,NULLTYPE);
 			}
 
 			declare_feature_conditional(Newells_Conditional)

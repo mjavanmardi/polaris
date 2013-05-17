@@ -433,7 +433,7 @@ namespace Intersection_Components
 				{
 					((_Intersection_Control_Interface*)_intersection_control)->template Initialize<NULLTYPE>();
 					int start_iteration = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1;
-					load_event(ComponentType,Newells_Conditional,Compute_Step_Flow,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,NULLTYPE);
+					load_event(ComponentType,ComponentType::template Newells_Conditional,ComponentType::template Compute_Step_Flow,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,NULLTYPE);
 				}
 			}
 			
