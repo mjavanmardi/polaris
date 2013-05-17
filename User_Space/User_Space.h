@@ -22,9 +22,9 @@ void* _global_scenario;
 #include "Polaris_Movement_Plan_Implementation.h"
 #include "Polaris_Turn_Movement_Implementation.h"
 
-#ifndef EXCLUDE_DB
+
 #include "Polaris_Link_Event_Handler_Implementation.h"
-#endif
+
 #include "Polaris_Network_Implementation_Input_File.h"
 #include "Polaris_Network_Implementation_Output_File.h"
 #include "Polaris_Network_Implementation_Results.h"
@@ -40,7 +40,7 @@ void* _global_scenario;
 #include "PopSyn_Implementations.h"
 #endif
 
-#ifndef EXCLUDE_DB
+
 // ITS COMPONENTS
 
 #include "Geometry_Implementation.h"
@@ -53,7 +53,7 @@ void* _global_scenario;
 // NETWORK_EVENT COMPONENTS
 
 #include "Network_Event_Implementations.h"
-#endif
+
 #ifndef EXCLUDE_DEMAND
 // PERSON AGENT COMPONENTS
 

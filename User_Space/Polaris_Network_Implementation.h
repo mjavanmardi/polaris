@@ -1,24 +1,12 @@
 #pragma once
 #include "Network_Prototype.h"
-#ifndef EXCLUDE_DB
 #include "Traffic_Management_Center_Prototype.h"
 #include "Network_Event_Prototype.h"
-#endif
+
 namespace Network_Components
 {
 	namespace Types
 	{
-#ifdef EXCLUDE_DB
-		union Link_ID_Dir
-		{
-			struct
-			{
-				int id;
-				int dir;
-			};
-			long long id_dir;
-		};
-#endif
 	}
 
 	namespace Concepts
@@ -63,9 +51,8 @@ namespace Network_Components
 		implementation struct Polaris_Network_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			typedef typename Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>::Component_Type ComponentType;
-#ifndef EXCLUDE_DB
+
 			member_data_component(typename MasterType::network_db_reader_type, db_reader, none,none);
-#endif
 			typedef unordered_map<long long,void*> type_of_link_dbid_dir_to_ptr_map;
 			member_data(type_of_link_dbid_dir_to_ptr_map, link_dbid_dir_to_ptr_map, none, none);
 
@@ -880,7 +867,7 @@ namespace Network_Components
 			feature_implementation void write_activity_location_data(network_models::network_information::network_data_information::NetworkData& network_data);
 
 			feature_implementation void write_zone_data(network_models::network_information::network_data_information::NetworkData& network_data);
-#ifndef EXCLUDE_DB
+
 			//==================================================================================================================
 			/// read from database
 			//------------------------------------------------------------------------------------------------------------------		
@@ -891,7 +878,7 @@ namespace Network_Components
 				db->template network_reference<ComponentType*>((ComponentType*)this);
 				db->template read_network_data<Network_Components::Types::Network_IO_Maps&>(net_io_maps);
 			}
-#endif
+
 
 			//==================================================================================================================
 			/// Convert network data from C++ data structure to Plaris structure
@@ -917,14 +904,14 @@ namespace Network_Components
 			//==================================================================================================================
 			/// network events
 			//------------------------------------------------------------------------------------------------------------------
-#ifndef EXCLUDE_DB
+
 			member_prototype(Network_Event_Manager, network_event_manager, typename MasterType::network_event_manager_type, none, none);
 
 			//==================================================================================================================
 			/// traffic management center
 			//------------------------------------------------------------------------------------------------------------------
 			member_prototype(Traffic_Management_Center, traffic_management_center, typename type_of(MasterType::traffic_management_center), none, none);
-#endif
+
 		};
 
 		implementation struct Integrated_Polaris_Network_Implementation : public Polaris_Network_Implementation<MasterType,ParentType,APPEND_CHILD(Integrated_Polaris_Network_Implementation)>

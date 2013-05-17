@@ -146,7 +146,7 @@ namespace Operation_Components
 					movement->template inbound_link_green_cycle_ratio<float>(operation_data.link_green_cycle_ratio_array[p]);
 				}
 			}
-#ifndef EXCLUDE_DB
+
 			feature_prototype void read_operation_data(typename TargetType::ParamType& network_mapping,requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
 				Network_Components::Types::Network_IO_Maps& net_io_maps=(Network_Components::Types::Network_IO_Maps&)network_mapping;
@@ -635,7 +635,6 @@ namespace Operation_Components
 					}
 				}
 			}
-#endif
 
 			feature_prototype void write_operation_data(network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::operation_data_information::OperationData& operation_data)
 			{

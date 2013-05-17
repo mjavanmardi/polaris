@@ -7,12 +7,10 @@
 #ifndef EXCLUDE_DEMAND
 #include "Person_Prototype.h"
 #endif
-#ifndef EXCLUDE_DB
 #include "Network_Event_Prototype.h"
 #include "Depot_Prototype.h"
 #include "Link_Control_Prototype.h"
 #include "Advisory_ITS_Prototype.h"
-#endif
 
 namespace Link_Components
 {
@@ -199,7 +197,6 @@ namespace Link_Components
 			struct Link_MOE_Data realtime_link_moe_data;
 
 			vector<struct Link_MOE_Data> td_link_moe_data_array;
-#ifndef EXCLUDE_DB
 			member_data(bool, weather_event_to_process, none, none);
 			member_component(typename MasterType::weather_network_event_type, current_weather_event, none, none);
 			member_data(bool, accident_event_to_process, none, none);
@@ -213,7 +210,6 @@ namespace Link_Components
 			typedef typename MasterType::base_network_event_type base_network_event_type;
 			typedef Network_Event<base_network_event_type> _Network_Event_Interface;
 			member_container(vector<_Network_Event_Interface*>, advisory_radio_events, none, none);
-#endif
 		//==================================================================================================================
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------
@@ -426,10 +422,10 @@ namespace Link_Components
 				define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
 				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, typename _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-#ifndef EXCLUDE_DB
+
 				typedef Network_Event<typename MasterType::weather_network_event_type> _Weather_Network_Event_Interface;
 				typedef Network_Event<typename MasterType::accident_network_event_type> _Accident_Network_Event_Interface;				
-#endif
+
 				define_container_and_value_interface_unqualified_container(_Movements_Container_Interface, _Movement_Interface, type_of(outbound_turn_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 
 				typedef Link_Prototype<ComponentType, ComponentType> _Link_Interface;
@@ -491,7 +487,6 @@ namespace Link_Components
 						}
 					}
 
-#ifndef EXCLUDE_DB
 					if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION) 
 					{///case 2: no realtime information
 						double r1 = vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
@@ -549,7 +544,6 @@ namespace Link_Components
 							}
 						}
 					}
-#endif
 					if (enroute_switching_decision)
 					{
 						vehicle->template enroute_switching<NULLTYPE>();
@@ -744,7 +738,6 @@ namespace Link_Components
 
 				td_link_moe_data_array.clear();
 				initialize_moe();
-#ifndef EXCLUDE_DB
 				_weather_event_to_process = false;
 				_current_weather_event = nullptr;
 				_accident_event_to_process = false;
@@ -755,7 +748,6 @@ namespace Link_Components
 				_variable_speed_sign = nullptr;
 
 				_shoulder_opened = false;
-#endif
 			}
 
 			void initialize_moe()
@@ -885,8 +877,6 @@ namespace Link_Components
 				}
 			}
 
-
-#ifndef EXCLUDE_DB
 			declare_feature_event(Update_Events)
 			{
 				typedef Link_Prototype<typename MasterType::link_type> _Link_Interface;
@@ -992,11 +982,7 @@ namespace Link_Components
 				_maximum_flow_rate = _original_maximum_flow_rate;
 				_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
 			}
-#else
-			declare_feature_event(Update_Events)
-			{
-			}
-#endif
+
 			declare_feature_event(Compute_Step_Flow_Supply_Update)
 			{
 
@@ -1017,7 +1003,6 @@ namespace Link_Components
 				_this_ptr->template network_state_update<NULLTYPE>();
 			}
 			
-#ifndef EXCLUDE_DB
 			feature_implementation void Accept_ITS( typename type_of(MasterType::variable_speed_sign)* vss)
 			{
 				_variable_speed_sign = (variable_speed_sign_interface*)vss;
@@ -1080,7 +1065,7 @@ namespace Link_Components
 			feature_implementation float find_free_flow_speed_reduction_rate(int weather_index);
 			feature_implementation int get_weather_index(TargetType weather_event);
 			feature_implementation void process_accident_event();
-#endif			
+		
 			static float link_capacity_reduction_factors[18];
 			static float link_free_flow_speed_reduction_factors[18][5];
 		};

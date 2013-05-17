@@ -14,8 +14,7 @@
 #include "wxPLplotwindow.h"
 #endif
 
-#ifndef EXCLUDE_DB
 #include "../Io/Io.h"
-#endif
+
 #include "../File_IO/network_models.h"
 #include "../Repository/Repository.h"

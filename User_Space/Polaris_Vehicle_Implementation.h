@@ -77,7 +77,7 @@ namespace Vehicle_Components
 
 			feature_implementation bool exploit_events_set(TargetType events_set)
 			{
-#ifndef EXCLUDE_DB
+
 				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, typename _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -132,11 +132,6 @@ namespace Vehicle_Components
 				}
 
 				return event_found_flag;
-#else
-                cout << "should nenver reach here when EXCLUDE_DB is defined" << endl;
-                exit(0);
-                return true;
-#endif
 			}
 
 			feature_implementation void update_enroute_switch_decisions()
