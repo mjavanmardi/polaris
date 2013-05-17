@@ -183,8 +183,8 @@ namespace Operation_Components
 				{
 					struct
 					{
-						long id;
-						long dir;
+						int id;
+						int dir;
 					};
 
 					long long id_dir;

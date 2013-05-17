@@ -13,8 +13,8 @@ namespace Network_Components
 		{
 			struct
 			{
-				long id;
-				long dir;
+				int id;
+				int dir;
 			};
 			long long id_dir;
 		};
@@ -166,7 +166,7 @@ namespace Network_Components
 						link_dbid_dir_to_ptr_map[link_id_dir.id_dir] = link;
 
 						link->template dbid<int>(db_itr->getLink());
-						link->template direction<int>(0);
+						link->template direction<int>(0.0);
 
 						link->template upstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_A()->getNode()]);
 						link->template downstream_intersection<_Intersection_Interface*>((_Intersection_Interface*)net_io_maps.intersection_id_to_ptr[db_itr->getNode_B()->getNode()]);
@@ -445,6 +445,8 @@ namespace Network_Components
 					turn_movement->template outbound_link<_Link_Interface*>(outbound_link);
 
 					turn_movement->template uuid<int>(db_itr->getConn());
+
+
 					turn_movement->template internal_id<int>(counter);
 
 					const string& connect_type=db_itr->getType();
