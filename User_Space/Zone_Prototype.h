@@ -117,8 +117,8 @@ namespace Zone_Components
 
 			// features for counting productions and attractions, use TargetType as a reference to set for a specific thread and as a value to return the sum total
 #ifndef EXCLUDE_DEMAND
-            feature_accessor(production_count,none,not_available);
-            feature_accessor(attraction_count,none,not_available);
+            feature_accessor(production_count,none,none);
+            feature_accessor(attraction_count,none,none);
 #else
             feature_accessor(production_count,none,none);
             feature_accessor(attraction_count,none,none);

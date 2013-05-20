@@ -83,7 +83,7 @@ namespace Person_Components
 				//---------------------------------------------------------------------------------------------------------------
 				// get an interface to the given home zone;
 				typedef PopSyn::Prototypes::Synthesis_Zone_Prototype<typename MasterType::zone> zone_itf;
-				typedef Prototypes::Person_Properties<Parent_Person_interface::get_type_of(Static_Properties)> pop_unit_itf;
+				typedef Prototypes::Person_Properties<typename Parent_Person_interface::get_type_of(Static_Properties)> pop_unit_itf;
 				
 				// useful interfaces
 				define_simple_container_interface(activity_location_ids_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);				
@@ -159,15 +159,15 @@ namespace Person_Components
 					value = 0.0;
 				}
 				// duration stored in minutes
-				TargetType::ReturnType duration;
-				duration = Time_Prototype<Basic_Units::Implementations::Time_Implementation<NT>>::Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes>>(value);
+				typename TargetType::ReturnType duration;
+				duration = Time_Prototype<Basic_Units::Implementations::Time_Implementation<NT>>::Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes>>(value);
 				return duration;
 			}
 			tag_feature_signature_as_available(Average_Activity_Duration,1);
 			feature_implementation void Average_Activity_Duration(typename TargetType::ParamType act_type, typename TargetType::Param2Type value)
 			{
 				// duration stored in minutes
-				Time_Minutes duration = Time_Prototype<Basic_Units::Implementations::Time_Implementation<NT>>::Convert_Value<Target_Type<NT,Time_Minutes,TargetType::Param2Type>>(value);
+				Time_Minutes duration = Time_Prototype<Basic_Units::Implementations::Time_Implementation<NT>>::Convert_Value<Target_Type<NT,Time_Minutes,typename TargetType::Param2Type>>(value);
 			
 				typename average_activity_frequency_and_duration_container_type::iterator itr;
 				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
@@ -177,7 +177,7 @@ namespace Person_Components
 				}
 				else
 				{
-					this->_average_activity_frequency_and_duration_container.insert(pair<TargetType::ParamType, pair<TargetType::Param2Type,TargetType::Param2Type> >(act_type, pair<TargetType::Param2Type,TargetType::Param2Type>(0,duration)));
+					this->_average_activity_frequency_and_duration_container.insert(pair<typename TargetType::ParamType, pair<typename TargetType::Param2Type,typename TargetType::Param2Type> >(act_type, pair<typename TargetType::Param2Type,typename TargetType::Param2Type>(0,duration)));
 				}
 			}
 			tag_feature_signature_as_available(Average_Activity_Duration,2);
@@ -189,12 +189,12 @@ namespace Person_Components
 				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
 				if (itr != this->_average_activity_frequency_and_duration_container.end())
 				{
-					return (TargetType::ReturnType)itr->second.first;
+					return (typename TargetType::ReturnType)itr->second.first;
 				}
 				else
 				{
 					//THROW_WARNING("WARNING: Activity type '" << act_type << "' was not found in the Person_Properties average_activity_duration container. Activity duration assumed to be 0.");
-					return (TargetType::ReturnType)0.0;
+					return (typename TargetType::ReturnType)0.0;
 				}
 			}
 			tag_feature_signature_as_available(Average_Activity_Frequency,1);
@@ -208,7 +208,7 @@ namespace Person_Components
 				}
 				else
 				{
-					this->_average_activity_frequency_and_duration_container.insert(pair<TargetType::ParamType, pair<TargetType::Param2Type,TargetType::Param2Type> >(act_type, pair<TargetType::Param2Type,TargetType::Param2Type>(value,0)));
+					this->_average_activity_frequency_and_duration_container.insert(pair<typename TargetType::ParamType, pair<typename TargetType::Param2Type,typename TargetType::Param2Type> >(act_type, pair<typename TargetType::Param2Type,typename TargetType::Param2Type>(value,0)));
 				}
 			}
 			tag_feature_signature_as_available(Average_Activity_Frequency,2);

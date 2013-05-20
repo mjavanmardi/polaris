@@ -2,7 +2,7 @@
 
 #include "User_Space_Includes.h"
 //#include "Person_Prototype.h"
-#include "PopSyn_Prototype.h"
+//#include "PopSyn_Prototype.h"
 
 //---------------------------------------------------------
 //	POP_PROPERTIES OBJECT CLASS (i.e. HH, PERSON, VEHICLE, FIRM, etc.)
@@ -455,61 +455,12 @@ namespace Person_Components
 			
 			// Pass through methods
 			feature_method_void(Initialize,	check_2(ReturnValueType,void,is_same));
-			feature_method_1_arg(Initialize, home_zone, check_2(typename TargetType::ReturnType,void,is_same) && check(typename TargetType::ParamType, PopSyn::Concepts::Is_Synthesis_Zone));
+			feature_method_1_arg(Initialize, home_zone, check_2(typename TargetType::ReturnType,void,is_same));
 			feature_method_void(Is_Employed,check_2(ReturnValueType,bool,is_same));
 			feature_method_void(Is_Student,	check_2(ReturnValueType,bool,is_same));	
 			feature_method_1_arg(Characteristics, data, check_2(typename TargetType::ParamType, vector<double>*, is_same) && check_2(typename TargetType::ReturnType, void, is_same) );
 
 
-			// prototype member functions
-			//define_feature_exists_check(Characteristics,Has_Characteristics);
-			//feature_prototype void Characteristics(vector<TargetType>& data, requires(check(ComponentType,Has_Characteristics)))
-			//{
-			//	this_component()->Characteristics<ComponentType,CallerType,TargetType>(data);
-			//}
-			//feature_prototype void Characteristics(vector<TargetType>& data, requires(!check(ComponentType,Has_Characteristics)))
-			//{
-			//	assert_check(ComponentType,Has_Characteristics,"This ComponentType is not a valid Static_Property, does not have a Characteristics member.   Did you forget to use tag_feature_as_available macro?");
-			//}
-			
-			//derived properties
-			//define_feature_exists_check(Initialize,Has_Is_Employed);
-			//feature_prototype bool Is_Employed(requires(check(ComponentType,Has_Characteristics)))
-			//{
-			//	return this_component()->Is_Employed<ComponentType,CallerType,TargetType>();
-			//}
-			//define_feature_exists_check(Is_Student,Has_Is_Student);
-			//feature_prototype bool Is_Student()
-			//{
-			//	return this_component()->Is_Student<ComponentType,CallerType,TargetType>();
-			//}
-			//define_feature_exists_check(Initialize,Has_Initialize);
-			//feature_prototype void Initialize(requires(check(ComponentType,Has_Initialize)))
-			//{
-			//	this_component()->Initialize<ComponentType,CallerType, TargetType>();
-			//}
-			//feature_prototype void Initialize(requires(!check(ComponentType,Has_Initialize)))
-			//{
-			//	assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-			//}
-			//feature_prototype void Initialize(TargetType object_to_copy, requires(check(ComponentType,Has_Initialize)))
-			//{
-			//	uint i = object_to_copy.ID<typename get_type_of(ID)>();
-			//	this->ID<typename get_type_of(ID)>(object_to_copy.ID<typename get_type_of(ID)>());
-			//	this->Weight<typename get_type_of(Weight)>(object_to_copy.Weight<typename get_type_of(Weight)>());
-			//	this->Index<typename get_type_of(Index)>(object_to_copy.Index<typename get_type_of(Index)>());
-
-			//	typedef typename get_type_of(Characteristics)::unqualified_value_type value_type;
-			//	define_simple_container_interface(characteristics_itf,typename get_type_of(Characteristics),Random_Access_Sequence_Prototype,value_type,NULLTYPE);
-			//	characteristics_itf& data = this->Characteristics<characteristics_itf&>();
-			//	characteristics_itf& obj_data = object_to_copy.Characteristics<characteristics_itf&>();
-			//	typename characteristics_itf::iterator itr = obj_data.begin();
-			//	for (itr; itr != obj_data.end(); ++itr) data.push_back(*itr);
-			//}
-			//feature_prototype void Initialize(TargetType object_to_copy, requires(!check(ComponentType,Has_Initialize)))
-			//{
-			//	assert_check(ComponentType,Has_Initialize,"This ComponentType does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-			//}
 			feature_prototype void Normalize_Weight(TargetType normalization_factor, requires(check(TargetType,is_arithmetic)))
 			{
 				this->Weight<TargetType>(this->Weight<TargetType>()/normalization_factor);

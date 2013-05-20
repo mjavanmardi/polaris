@@ -139,8 +139,8 @@ namespace Person_Components
 				_Planning_Interface* this_ptr=(_Planning_Interface*)_pthis;
 
 				// Call specific implementation of the activity generation routine
-				define_component_interface(activity_generator_itf,typename get_type_of(Activity_Generator),Prototypes::Activity_Generator,ComponentType);
-				activity_generator_itf* generator = this_ptr->template Activity_Generator<activity_generator_itf*>();
+				define_component_interface(activity_generator_itf,typename get_type_of(Activity_Generation_Faculty),Prototypes::Activity_Generator,ComponentType);
+				activity_generator_itf* generator = this_ptr->template Activity_Generation_Faculty<activity_generator_itf*>();
 				generator->template Activity_Generation<TargetType>();
 
 				// set next activity generation occurence
@@ -222,7 +222,7 @@ namespace Person_Components
 						move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
 					{
 
-						if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"MOVE_EVENT:," << parent->template uuid<int>() << ", PASSED."<<endl;
+						if (ComponentType::_write_activity_files) ComponentType::logs[_thread_id]<<"MOVE_EVENT:," << parent->template uuid<int>() << ", PASSED."<<endl;
 				
 						// make sure vehicle is not already being simulated, skip movement if it is
 						if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
@@ -265,7 +265,7 @@ namespace Person_Components
 								return;
 							}
 							vehicle->template movement_plan<Movement_Plan*>(move);
-							movement_faculty->Schedule_Movement<Target_Type<NT,void,Simulation_Timestep_Increment,Movement_Plan*>>(move->template departed_time<Simulation_Timestep_Increment>(),move);
+							movement_faculty->template Schedule_Movement<Target_Type<NT,void,Simulation_Timestep_Increment,Movement_Plan*>>(move->template departed_time<Simulation_Timestep_Increment>(),move);
 						}
 	
 						//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
@@ -298,7 +298,7 @@ namespace Person_Components
 			}
 			feature_prototype void Initialize(requires(!check(ComponentType,Has_Initialize)))
 			{
-				assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+				assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 			}
 			feature_prototype void Initialize(TargetType initializer, requires(check(ComponentType,Has_Initialize)))
 			{
@@ -309,7 +309,7 @@ namespace Person_Components
 			}
 			feature_prototype void Initialize(TargetType initializer, requires(!check(ComponentType,Has_Initialize)))
 			{
-				assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+				assert_check(ComponentType,Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 			}
 
 			feature_prototype void Schedule_New_Routing(int planning_time, TargetType movement_plan, requires(check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan)))
@@ -327,7 +327,7 @@ namespace Person_Components
 				movement_plan->template planning_time<Simulation_Timestep_Increment>(planning_time);
 
 				// whether to use snapshot or not
-				Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type>* scenario = (Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type>*)_global_scenario;
+				Scenario_Components::Prototypes::Scenario_Prototype<typename Component_Type::MasterType::scenario_type>* scenario = (Scenario_Components::Prototypes::Scenario_Prototype<typename Component_Type::MasterType::scenario_type>*)_global_scenario;
 
 				itf->template Schedule_Route_Computation<NULLTYPE>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time,scenario->template read_network_snapshots<bool>());
 			}
@@ -342,8 +342,8 @@ namespace Person_Components
 			}
 	
 			// Activity Plans and Movement plans, stored in a hashmap keyed based on next required plan time (updated in the plan class after plan completion)
-			feature_accessor(Activity_Generator,none,none);
-			feature_accessor(Destination_Chooser,none,none);
+			feature_accessor(Activity_Generation_Faculty,none,none);
+			feature_accessor(Destination_Choice_Faculty,none,none);
 			feature_accessor(Timing_Chooser,none,none);
 
 			feature_accessor(Activity_Container,none,none);

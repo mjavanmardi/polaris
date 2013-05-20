@@ -7,7 +7,7 @@
 #endif
 
 #ifdef DBIO
-#define WINDOWS
+//#define WINDOWS
 #define SHOW_WARNINGS
 
 #include "Application_Includes.h"
@@ -87,7 +87,6 @@ struct MasterType
 	//----------------------------------------------------------------------------------------------
 	typedef Demand_Components::Implementations::Polaris_Demand_Implementation<MasterType> demand_type;
 
-	typedef Traveler_Components::Implementations::Polaris_Traveler_Implementation<M> traveler_type;
 	typedef Person_Components::Implementations::Person_Implementation<M> person_type;
 
 	typedef Person_Components::Implementations::POLARIS_Person_Planner_Implementation<M, person_type> person_planner_type;
@@ -182,14 +181,14 @@ int main(int argc,char** argv)
 	cout << "allocating data structures..." <<endl;	
 	define_component_interface(_Scenario_Interface, MasterType::scenario_type, Scenario_Prototype, NULLTYPE);
 	
-	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<typename MasterType::scenario_type>();
+	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<MasterType::scenario_type>();
 	_global_scenario = scenario;
 
 	define_component_interface(_Network_Interface, MasterType::network_type, Network_Prototype, NULLTYPE);
 	
-	_Network_Interface* network=(_Network_Interface*)Allocate<typename MasterType::network_type>();
+	_Network_Interface* network=(_Network_Interface*)Allocate<MasterType::network_type>();
 	_global_network = network;
-	network->template scenario_reference<_Scenario_Interface*>(scenario);
+	network->scenario_reference<_Scenario_Interface*>(scenario);
 	
 	////data input
 	cout << "reading scenario data..." <<endl;
@@ -216,7 +215,7 @@ int main(int argc,char** argv)
 
 
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
-	_Operation_Interface* operation = (_Operation_Interface*)Allocate<typename MasterType::operation_type>();
+	_Operation_Interface* operation = (_Operation_Interface*)Allocate<MasterType::operation_type>();
 	operation->network_reference<_Network_Interface*>(network);
 	if (scenario->intersection_control_flag<int>() == 1) {
 		cout <<"reading operation data..." << endl;
@@ -239,15 +238,15 @@ int main(int argc,char** argv)
 	MasterType::link_type::configure_link_moes_layer();
 	#endif
 
-	if(scenario->template use_network_events<bool>())
+	if(scenario->use_network_events<bool>())
 	{
 		cout << "setting up network events" << endl;
-		define_component_interface(_Network_Event_Manager_Interface, typename MasterType::network_event_manager_type, Network_Event_Manager, NULLTYPE);
-		_Network_Event_Manager_Interface* net_event_manager=(_Network_Event_Manager_Interface*)Allocate<typename MasterType::network_event_manager_type>();
+		define_component_interface(_Network_Event_Manager_Interface, MasterType::network_event_manager_type, Network_Event_Manager, NULLTYPE);
+		_Network_Event_Manager_Interface* net_event_manager=(_Network_Event_Manager_Interface*)Allocate<MasterType::network_event_manager_type>();
 		network->network_event_manager<_Network_Event_Manager_Interface*>(net_event_manager);
 		net_event_manager->Initialize<NT>();
 
-		if (scenario->template use_tmc<bool>())
+		if (scenario->use_tmc<bool>())
 		{
 			cout << "setting up tmc" << endl;
 
@@ -277,8 +276,8 @@ int main(int argc,char** argv)
 	define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, _Network_Interface::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Prototype, NULLTYPE);
 	_Intersections_Container_Interface::iterator intersections_itr;
 
-	for(intersections_itr=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().begin();
-		intersections_itr!=network->intersections_container<typename MasterType::network_type::intersections_container_type&>().end();
+	for(intersections_itr=network->intersections_container<MasterType::network_type::intersections_container_type&>().begin();
+		intersections_itr!=network->intersections_container<MasterType::network_type::intersections_container_type&>().end();
 		intersections_itr++)
 	{
 		((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
@@ -291,7 +290,7 @@ int main(int argc,char** argv)
 	// EXTERNAL Demand
 	//----------------------------------------------------------------------------------------------------------------------------------
 	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	_Demand_Interface* demand = (_Demand_Interface*)Allocate<typename MasterType::demand_type>();
+	_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
 	demand->scenario_reference<_Scenario_Interface*>(scenario);
 	demand->network_reference<_Network_Interface*>(network);
 	cout << "reading external demand data..." <<endl;
@@ -394,7 +393,7 @@ int main(int argc,char** argv)
 	}
 	//----------------------------------------------------------------------------------------------------------------------------------
 	
-	if (scenario->template use_network_events<bool>())
+	if (scenario->use_network_events<bool>())
 	{
 		MasterType::link_type::subscribe_events();
 	}

@@ -138,15 +138,28 @@ namespace Zone_Components {
 		forward_declare_prototype struct Zone_Prototype;
 	}
 };
+
+namespace PopSyn {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Population_Synthesizer_Prototype;
+		forward_declare_prototype struct Synthesis_Zone_Prototype;
+		forward_declare_prototype struct Synthesis_Region_Prototype;
+		forward_declare_prototype struct Solver_Settings_Prototype;
+	}
+};
+
 namespace Person_Components {
 	namespace Prototypes
 	{
 		forward_declare_prototype struct Person;
 		forward_declare_prototype struct Activity_Generator;
 		forward_declare_prototype struct Activity_Timing_Chooser;
+		forward_declare_prototype struct Destination_Chooser;
 		forward_declare_prototype struct Person_Planner;
 		forward_declare_prototype struct Person_Properties;
 		forward_declare_prototype struct Person_Scheduler;
+		forward_declare_prototype struct Person_Mover;
 	}
 };
 

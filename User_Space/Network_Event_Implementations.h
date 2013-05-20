@@ -83,7 +83,7 @@ namespace Network_Event_Components
 				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
 
 				// temporary containers used to fill affected zone vector			
-				unordered_set<Zone_Interface*> zone_set;
+				hash_set<Zone_Interface*> zone_set;
 
 				cout << endl << "INITIALIZE NETWORK EVENT:";
 				for(typename vector<int>::const_iterator itr=links.begin();itr!=links.end();itr++)
@@ -115,9 +115,9 @@ namespace Network_Event_Components
 				}
 				
 				// create the affected zones list
-				for (typename unordered_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
+				for (typename hash_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
 				{
-					Zone_Interface* zone = (Zone_Interface*)(*zitr);
+					Zone_Interface* zone = *zitr;
 					this->_affected_zones.push_back(zone);
 					cout <<endl << "Affected zone: "<< zone->template uuid<int>();
 				}

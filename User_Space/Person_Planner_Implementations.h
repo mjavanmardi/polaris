@@ -35,8 +35,8 @@ namespace Person_Components
 
 			// Pointer to the child classses
 			member_prototype(Prototypes::Person_Scheduler, Person_Scheduler, typename MasterType::person_scheduler_type,none,none);
-			member_prototype(Prototypes::Activity_Generator, Activity_Generator, typename MasterType::activity_generator_type,none,none);
-			member_prototype(Prototypes::Destination_Chooser, Destination_Chooser, typename MasterType::person_destination_chooser_type,none,none);
+			member_prototype(Prototypes::Activity_Generator, Activity_Generation_Faculty, typename MasterType::activity_generator_type,none,none);
+			member_prototype(Prototypes::Destination_Chooser, Destination_Choice_Faculty, typename MasterType::person_destination_chooser_type,none,none);
 			member_prototype(Prototypes::Activity_Timing_Chooser, Timing_Chooser, typename MasterType::activity_timing_chooser_type,none,none);
 
 			// Next Activity Generation Time member - used to schedule the next activity generation
@@ -53,8 +53,8 @@ namespace Person_Components
 
 
 			// Interface definitions
-			define_component_interface(_Scenario_Interface, typename type_of(Parent_Person)::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
-			define_component_interface(_Network_Interface, typename type_of(Parent_Person)::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
+			define_component_interface(_Scenario_Interface, typename Parent_Person_interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+			define_component_interface(_Network_Interface, typename Parent_Person_interface::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
 			define_component_interface(_Skim_Interface, typename _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -78,8 +78,8 @@ namespace Person_Components
 			feature_implementation TargetType current_activity_plan(requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
 				// Define interfaces to the container members of the class
-				define_container_and_value_interface_unqualified_container(Activity_Plans_List,Activity_Plan,type_of(Activity_Plans_Container),Associative_Container_Prototype,Activity_Plan_Prototype,ComponentType);
-				Activity_Plans_List* activity_plans = this->template Activity_Plans_Container<Activity_Plans_List*>();
+				define_container_and_value_interface_unqualified_container(Activity_Plans_List,Activity_Plan,type_of(Activity_Container),Associative_Container_Prototype,Activity_Planner,ComponentType);
+				Activity_Plans_List* activity_plans = this->template Activity_Container<Activity_Plans_List*>();
 				typename Activity_Plans_List::iterator itr;
 				if ((itr = activity_plans->find(_iteration)) != activity_plans->end()) return (TargetType)*itr;
 				else return NULL;
@@ -88,7 +88,7 @@ namespace Person_Components
 			feature_implementation typename TargetType::ReturnType previous_activity_plan(typename TargetType::ParamType current_time)
 			{
 				// Define interfaces to the container members of the class
-				define_container_and_value_interface(Activity_Plans_List,Activity_Plan,type_of(Activity_Container),Containers::Random_Access_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+				define_container_and_value_interface_unqualified_container(Activity_Plans_List,Activity_Plan,type_of(Activity_Container),Containers::Random_Access_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 				Activity_Plans_List* activity_plans = this->template Activity_Container<ComponentType,CallerType,Activity_Plans_List*>();
 				typename Activity_Plans_List::iterator itr;
 
@@ -108,14 +108,14 @@ namespace Person_Components
 						previous = act;
 					}
 				}
-				return (TargetType::ReturnType)previous;
+				return (typename TargetType::ReturnType)previous;
 			}
 			tag_feature_signature_as_available(previous_activity_plan,1);
 			feature_implementation typename TargetType::ReturnType next_activity_plan(typename TargetType::ParamType current_time)
 			{
 				// Define interfaces to the container members of the class
-				define_container_and_value_interface(Activity_Plans_List,Activity_Plan,type_of(Activity_Plans_Container),Containers::Random_Access_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
-				Activity_Plans_List* activity_plans = this->template Activity_Plans_Container<Activity_Plans_List*>();
+				define_container_and_value_interface_unqualified_container(Activity_Plans_List,Activity_Plan,type_of(Activity_Container),Containers::Random_Access_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+				Activity_Plans_List* activity_plans = this->template Activity_Container<Activity_Plans_List*>();
 				typename Activity_Plans_List::iterator itr;
 
 				// convert current time to seconds
@@ -130,7 +130,7 @@ namespace Person_Components
 					act = (Activity_Plan*)(*itr);
 					if (act->template Start_Is_Planned<bool>() && act->template Start_Time<Time_Seconds>() > start_time && act->template Start_Time<Time_Seconds>() < min_next)
 					{
-						min_next = act->template Start_Time<Time_Secondes>();
+						min_next = act->template Start_Time<Time_Seconds>();
 						next = act;
 					}
 				}
@@ -155,8 +155,8 @@ namespace Person_Components
 					int o_id = move->template origin<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>()->template uuid<int>();
 					int d_id = move->template destination<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>()->template uuid<int>();
 					_Skim_Interface* skim = _Parent_Person->template network_reference<_Network_Interface*>()->template skimming_faculty<_Skim_Interface*>();		
-					s << endl<<"MOVEMENT(PERID.ACTID.ACTTYPE.DEPART.O.D.SKIMTIME.TTIME)," << _Parent_Person->template uuid<int>() << "," << act->Activity_Plan_ID<int>() << ", " << act->Activity_Type<ACTIVITY_TYPES>() << ", " << move->template departed_time<Time_Hours>();
-					s << "," << move->template origin<_Activity_Location_Interface*>()->uuid<int>() << "," << move->template destination<_Activity_Location_Interface*>()->uuid<int>();
+					s << endl<<"MOVEMENT(PERID.ACTID.ACTTYPE.DEPART.O.D.SKIMTIME.TTIME)," << _Parent_Person->template uuid<int>() << "," << act->template Activity_Plan_ID<int>() << ", " << act->template Activity_Type<ACTIVITY_TYPES>() << ", " << move->template departed_time<Time_Hours>();
+					s << "," << move->template origin<_Activity_Location_Interface*>()->template uuid<int>() << "," << move->template destination<_Activity_Location_Interface*>()->template uuid<int>();
 					s << "," << skim->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_id, d_id, Vehicle_Components::Types::SOV);
 					s << "," << move->template routed_travel_time<Time_Minutes>();
 					this->Write_To_Log<ComponentType,CallerType,stringstream&>(s);
@@ -203,7 +203,7 @@ namespace Person_Components
 				if (_write_activity_files) 
 				{			
 					stringstream s;	
-					s << endl << "ACTIVITY GEN (PERID.ACTID.ACTTYPE)," << _Parent_Person->template uuid<int>() << "," << act->Activity_Plan_ID<int>() << ", " << act->Activity_Type<ACTIVITY_TYPES>();
+					s << endl << "ACTIVITY GEN (PERID.ACTID.ACTTYPE)," << _Parent_Person->template uuid<int>() << "," << act->template Activity_Plan_ID<int>() << ", " << act->template Activity_Type<ACTIVITY_TYPES>();
 					this->Write_To_Log<ComponentType,CallerType,stringstream&>(s);
 				}
 
@@ -229,7 +229,7 @@ namespace Person_Components
 				base_type::template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
 				base_type::template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(5);
 				// get reference to the parent pointer and set the first activity generation time to be the parent first iteration
-				this->template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(_Parent_Person->template First_Iteration<Time_Minutes>());	
+				base_type::template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(base_type::_Parent_Person->template First_Iteration<Time_Minutes>());	
 			}
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
 			{	

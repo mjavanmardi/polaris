@@ -1,7 +1,7 @@
 #pragma once
 
 #include "User_Space_Includes.h"
-//#include "Population_Unit_Implementations.h"
+//#include "Population_Unit_Prototype.h"
 
 
 using namespace std;
@@ -11,6 +11,23 @@ using namespace std;
 //---------------------------------------------------------
 namespace PopSyn
 {
+	namespace Types
+	{
+		enum POPSYN_ITERATIONS
+		{
+			MAIN_INITIALIZE,
+			MAIN_PROCESS
+		};
+		enum POPSYN_SUBITERATIONS
+		{
+			INITIALIZE=23,
+			START_TIMING,
+			PROCESS,
+			STOP_TIMING,
+			OUTPUT
+		};
+	} using namespace Types;
+
 	namespace Concepts
 	{
 		concept struct Is_Synthesis_Zone
@@ -172,33 +189,7 @@ namespace PopSyn
 				assert_sub_check(ComponentType,Concepts::Is_IPF_Capable,Has_Marginals,"doesn't have marginals");
 				
 			}
-			feature_prototype void Normalize_Sample()
-			{
-				define_container_and_value_interface(sample_itf,unit_itf,typename get_type_of(Sample_Data),Containers::Associative_Container_Prototype,PopSyn::Prototypes::Population_Unit_Prototype,NULLTYPE);
-				sample_itf& sample = this->Sample_Data<sample_itf&>();
-				
-				
-				for (typename sample_itf::iterator itr = sample.begin(); itr != sample.end(); ++itr)
-				{
-					double sum = 0;
-					typename sample_itf::key_type stored_key = itr->first;
-					pair<typename sample_itf::iterator,typename sample_itf::iterator> range = sample.equal_range(stored_key);
-					while (range.first != range.second)
-					{
-						sum += range.first->second->template Weight<double>();
-						++range.first;
-					}
 
-					range = sample.equal_range(stored_key);
-					while (range.first != range.second)
-					{
-						range.first->second->template Weight<double>(range.first->second->template Weight<double>()/sum);
-						++range.first;
-					}
-					itr = range.second;
-					if (itr == sample.end()) break;
-				}
-			}
 
 			//===================================================================================================================================
 			// Defintion of the Household/Person selection procedure - can be used for IPF, Combinatorial Optimization, etc. methods
@@ -313,7 +304,7 @@ namespace PopSyn
 			{
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
 				assert_check_as_given(TargetType, is_pointer,"Is not a pointer");
-				assert_check(TargetType, Containers::Concepts::Is_Associative_Container, "Container is not associative.");
+				assert_check(TargetType, Containers::Concepts::Is_Associative, "Container is not associative.");
 			}
 			feature_prototype void Create_Person(TargetType static_properties)
 			{

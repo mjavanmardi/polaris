@@ -110,11 +110,14 @@ namespace Movement_Plan_Components
 #ifndef EXCLUDE_DEMAND
 		implementation struct Polaris_Integrated_Movement_Plan_Implementation : public Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)>
 		{
+			typedef typename Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)>::Component_Type ComponentType;
 			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_plan_type,none,none);
 		};
 
 		implementation struct Polaris_Movement_Plan_Record_Implementation : public Polaris_Component<APPEND_CHILD(Polaris_Movement_Plan_Record_Implementation),MasterType,Data_Object,ParentType>
 		{
+			typedef typename Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Movement_Plan_Record_Implementation)>::Component_Type ComponentType;
+			
 			// Initialize the record with an existing movement plan
 			feature_implementation void Initialize(typename TargetType::ParamType movement_to_copy)
 			{
@@ -127,10 +130,10 @@ namespace Movement_Plan_Components
 				trajectory_container_itf* trajectory = move->trajectory_container<trajectory_container_itf*>();
 
 				// Extract the link pointer from the trajectory unit and store in the movement_plan_record trajectory container
-				for (trajectory_container_itf::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
+				for (typename trajectory_container_itf::iterator itr = trajectory->begin(); itr != trajectory->end(); ++itr)
 				{
 					trajectory_itf* traj_unit = *itr;
-					_trajectory_container.push_back(traj_unit->link<MasterType::link_type*>());
+					_trajectory_container.push_back(traj_unit->template link<typename MasterType::link_type*>());
 				}
 
 				// copy valid movement at time of creation

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Person_Prototype.h"
 #include "User_Space_Includes.h"
 #include "Synthesis_Region_Implementation.h"
 #include "Network_Prototype.h"
@@ -9,19 +10,7 @@ namespace PopSyn
 {
 	namespace Types
 	{
-		enum POPSYN_ITERATIONS
-		{
-			MAIN_INITIALIZE,
-			MAIN_PROCESS
-		};
-		enum POPSYN_SUBITERATIONS
-		{
-			INITIALIZE=23,
-			START_TIMING,
-			PROCESS,
-			STOP_TIMING,
-			OUTPUT
-		};
+
 	} using namespace Types;
 
 	namespace Concepts
@@ -44,14 +33,14 @@ namespace PopSyn
 			feature_prototype void Initialize(typename TargetType::ParamType network, typename TargetType::Param2Type scenario, requires(check(TargetType,Is_Target_Type_Struct) && check(typename TargetType::ParamType, Network_Components::Concepts::Is_Transportation_Network) && check(typename TargetType::Param2Type, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data)))
 			{
 				// Allocate IPF Solver and get Settings from scenario reference
-				define_component_interface(solver_itf,typename MasterType::IPF_Solver_Settings,PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
-				solver_itf* solver = (solver_itf*)Allocate<typename MasterType::IPF_Solver_Settings>();
+				define_component_interface(solver_itf,typename get_type_of(Solution_Settings),PopSyn::Prototypes::Solver_Settings_Prototype,NULLTYPE);
+				solver_itf* solver = (solver_itf*)Allocate<typename get_type_of(Solution_Settings)>();
 				solver->template Initialize<Target_Type<NULLTYPE,void,double,int>>(scenario->template ipf_tolerance<double>(),scenario->template percent_to_synthesize<double>(),scenario->template maximum_iterations<int>());
 
 				// get output control params from scenario
-				this->write_marginal_output_flag<bool>(scenario->write_marginal_output<bool>());
-				this->write_full_output_flag<bool>(scenario->write_full_output<bool>());
-				this->linker_file_path<string>(scenario->popsyn_control_file_name<string>());
+				this->write_marginal_output_flag<bool>(scenario->template write_marginal_output<bool>());
+				this->write_full_output_flag<bool>(scenario->template write_full_output<bool>());
+				this->linker_file_path<string>(scenario->template popsyn_control_file_name<string>());
 
 				// set up output files
 				this->Output_Stream<ofstream&>().open("full_population.csv",ios_base::out);
@@ -60,8 +49,8 @@ namespace PopSyn
 
 				// Add references to other objects to the population synthesizer
 				this->Solution_Settings<solver_itf*>(solver);
-				this->network_reference<TargetType::ParamType>(network);
-				this->scenario_reference<TargetType::Param2Type>(scenario);
+				this->network_reference<typename TargetType::ParamType>(network);
+				this->scenario_reference<typename TargetType::Param2Type>(scenario);
 		
 
 				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
@@ -71,7 +60,7 @@ namespace PopSyn
 			feature_prototype void Initialize(typename TargetType::ParamType network, typename TargetType::Param2Type scenario, requires(!check(TargetType,Is_Target_Type_Struct) || !check(typename TargetType::ParamType, Network_Components::Concepts::Is_Transportation_Network) || !check(typename TargetType::Param2Type, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data)))
 			{
 				assert_check(TargetType, Is_Target_Type_Struct,"Error, the TargetType must be passed as a Target_Type struct to this function.");
-				assert_check(typename TargetType::ParamType, Network_Components::Concepts::Is_Trasportation_Network, "Error, the specified TargetType ParamType is not a valid Transportation network.");
+				assert_check(typename TargetType::ParamType, Network_Components::Concepts::Is_Transportation_Network, "Error, the specified TargetType ParamType is not a valid Transportation network.");
 				assert_check(typename TargetType::Param2Type, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data, "Error, the specified TargetType Param2Type is not a valid Scenario reference.");
 			}
 			
@@ -529,7 +518,7 @@ namespace PopSyn
 								{
 									person = *s_itr;
 									pop_unit_itf* p = person->template Static_Properties<pop_unit_itf*>();
-									sample_out << "ZONE_ID: "<<zone->template ID<long long int>() << endl << "ID: " << person->template uuid<uint>() << ",  weight: "<<p->template Weight<float>() <<", index: "<<p->template Index<uint>() << ", Gender: "<<p->Gender<GENDER>();
+									sample_out << "ZONE_ID: "<<zone->template ID<long long int>() << endl << "ID: " << person->template uuid<uint>() << ",  weight: "<<p->template Weight<float>() <<", index: "<<p->template Index<uint>() << ", Gender: "<<p->template Gender<Person_Components::Types::GENDER>();
 								}
 							}
 						}

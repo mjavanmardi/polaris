@@ -31,7 +31,7 @@ namespace Person_Components
 			//=======================================================================================================
 			// Time of day and duration choice model
 			//-------------------------------------------------------------------------------------------------------
-			feature_implementation typename pair<typename TargetType::ReturnType,typename TargetType::ReturnType> Choose_Time_Of_Day_Period(typename TargetType::ParamType activity_ref)
+			feature_implementation pair<typename TargetType::ReturnType,typename TargetType::ReturnType> Choose_Time_Of_Day_Period(typename TargetType::ParamType activity_ref)
 			{
 				// returns a pair for start and end times of the selected period
 			}
@@ -61,8 +61,8 @@ namespace Person_Components
 			feature_implementation pair<typename TargetType::ReturnType,typename TargetType::ReturnType> Get_Start_Time_and_Duration(typename TargetType::ParamType activity_ref)
 			{
 				// get interface to activity reference
-				Activity_Components::Prototypes::Activity_Planner<strip_modifiers(TargetType::ParamType)::Component_Type>* act;
-				act = (Activity_Components::Prototypes::Activity_Planner<strip_modifiers(TargetType::ParamType)::Component_Type>*) activity_ref;
+				Activity_Components::Prototypes::Activity_Planner<strip_modifiers(typename TargetType::ParamType)::Component_Type>* act;
+				act = (Activity_Components::Prototypes::Activity_Planner<strip_modifiers(typename TargetType::ParamType)::Component_Type>*) activity_ref;
 				
 				// draw random from uniform distribution
 				float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
@@ -79,9 +79,9 @@ namespace Person_Components
 				pair<typename TargetType::ReturnType,typename TargetType::ReturnType> return_val;
 
 				// add random draw from between 0-30 minutes as this is the aggregation level of the start_time data
-				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.first + GLOBALS::Uniform_RNG.template Next_Rand<float>()*30.0f);
+				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.first + GLOBALS::Uniform_RNG.template Next_Rand<float>()*30.0f);
 				// add random draw from between 0-5 minutes as this is the aggregation level of the duration data
-				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.second + GLOBALS::Uniform_RNG.template Next_Rand<float>()*5.0f);
+				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.second + GLOBALS::Uniform_RNG.template Next_Rand<float>()*5.0f);
 				return return_val;
 			}
 			tag_feature_signature_as_available(Get_Start_Time_and_Duration,1);
@@ -90,12 +90,12 @@ namespace Person_Components
 				assert(range_end > range_start);
 
 				// get interface to activity reference
-				Activity_Components::Prototypes::Activity_Planner<strip_modifiers(TargetType::ParamType)::Component_Type>* act;
-				act = (Activity_Components::Prototypes::Activity_Planner<strip_modifiers(TargetType::ParamType)::Component_Type>*) activity_ref;
+				Activity_Components::Prototypes::Activity_Planner<strip_modifiers(typename TargetType::ParamType)::Component_Type>* act;
+				act = (Activity_Components::Prototypes::Activity_Planner<strip_modifiers(typename TargetType::ParamType)::Component_Type>*) activity_ref;
 
 				// convert given range bounds to minutes
-				Time_Minutes start = GLOBALS::Time_Converter.Convert_ValueTarget_Type<NT,Time_Minutes,TargetType::Param2Type> >(range_start);
-				Time_Minutes end = GLOBALS::Time_Converter.Convert_ValueTarget_Type<NT,Time_Minutes,TargetType::Param2Type> >(range_end);
+				Time_Minutes start = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,Time_Minutes,typename TargetType::Param2Type> >(range_start);
+				Time_Minutes end = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,Time_Minutes,typename TargetType::Param2Type> >(range_end);
 				
 				// draw random from uniform distribution and get corresponding data item - loop while draw is outside of range
 				int iter = 0;
@@ -117,8 +117,8 @@ namespace Person_Components
 				if (itr == _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].end()) THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
 			
 				pair<typename TargetType::ReturnType,typename TargetType::ReturnType> return_val;
-				return_val.first = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.first);
-				return_val.second = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType::ReturnType,Time_Minutes> >(itr->second.second);
+				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.first);
+				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.second);
 				return return_val;
 			}
 			tag_feature_signature_as_available(Get_Start_Time_and_Duration,3);

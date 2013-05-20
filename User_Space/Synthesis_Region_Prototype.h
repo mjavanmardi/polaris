@@ -4,6 +4,7 @@
 #include "Synthesis_Zone_Implementations.h"
 
 
+
 using namespace std;
 
 //---------------------------------------------------------
@@ -26,14 +27,14 @@ namespace PopSyn
 			feature_prototype void Initialize()
 			{
 				this_component()->template Initialize<ComponentType,CallerType,TargetType>();
-				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population, PopSyn::POPSYN_ITERATIONS::MAIN_PROCESS,PopSyn::POPSYN_SUBITERATIONS::PROCESS,NULLTYPE);
+				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population, PopSyn::Types::POPSYN_ITERATIONS::MAIN_PROCESS,PopSyn::Types::POPSYN_SUBITERATIONS::PROCESS,NULLTYPE);
 			}
 
 			//==============================================================================================================
 			// This handles the main population synthesis loop on the region-level, calls IPF and Selection for each zone
 			declare_feature_conditional(Call_Synthesize_Population_Conditional)
 			{
-				if (_sub_iteration == PopSyn::POPSYN_SUBITERATIONS::PROCESS)
+				if (_sub_iteration == PopSyn::Types::POPSYN_SUBITERATIONS::PROCESS)
 				{
 					response.result = true;
 					response.next._iteration = END;

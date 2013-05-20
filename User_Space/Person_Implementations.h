@@ -55,21 +55,21 @@ namespace Person_Components
 			typedef typename Perception_Faculty_type::type_of(Scenario) scenario_reference_type;
 			feature_implementation TargetType network_reference()
 			{
-				return this->_Perception_Faculty->Network<TargetType>();
+				return this->_Perception_Faculty->template Network<TargetType>();
 			}
 			feature_implementation void network_reference(TargetType set_value)
 			{
-				this->_Perception_Faculty->Network<TargetType>(set_value);
+				this->_Perception_Faculty->template Network<TargetType>(set_value);
 			}	
 			tag_getter_as_available(network_reference);		
 			tag_setter_as_available(network_reference);	
 			feature_implementation TargetType scenario_reference()
 			{
-				return this->_Perception_Faculty->Scenario<TargetType>();
+				return this->_Perception_Faculty->template Scenario<TargetType>();
 			}
 			feature_implementation void scenario_reference(TargetType set_value)
 			{
-				this->_Perception_Faculty->Scenario<TargetType>(set_value);
+				this->_Perception_Faculty->template Scenario<TargetType>(set_value);
 			}	
 			tag_getter_as_available(scenario_reference);
 			tag_setter_as_available(scenario_reference);
@@ -94,8 +94,8 @@ namespace Person_Components
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			typedef Prototypes::Person<ComponentType> this_itf;	
-			define_component_interface(generator_itf,typename type_of(Planning_Faculty)::type_of(Activity_Generator),Prototypes::Activity_Generator,ComponentType);
-			define_component_interface(destination_choice_itf,typename type_of(Planning_Faculty)::type_of(Destination_Chooser),Prototypes::Destination_Chooser,ComponentType);
+			define_component_interface(generator_itf,typename type_of(Planning_Faculty)::type_of(Activity_Generation_Faculty),Prototypes::Activity_Generator,ComponentType);
+			define_component_interface(destination_choice_itf,typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty),Prototypes::Destination_Chooser,ComponentType);
 			define_component_interface(timing_choice_itf,typename type_of(Planning_Faculty)::type_of(Timing_Chooser),Prototypes::Activity_Timing_Chooser,ComponentType);
 			define_container_and_value_interface(zones_container_interface, zone_interface, typename network_reference_interface::get_type_of(zones_container),Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 			define_container_and_value_interface(locations_container_interface, location_interface, typename network_reference_interface::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
@@ -117,12 +117,12 @@ namespace Person_Components
 				_Planning_Faculty = (Planning_Faculty_interface*)Allocate<type_of(Planning_Faculty)>();	
 				_Planning_Faculty->template Parent_Person<ComponentType*>(this);
 				_Planning_Faculty->template Initialize<NULLTYPE>();
-				generator_itf* generator = (generator_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Activity_Generator)>();
+				generator_itf* generator = (generator_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Activity_Generation_Faculty)>();
 				generator->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
-				_Planning_Faculty->template Activity_Generator<generator_itf*>(generator);
-				destination_choice_itf* destination_chooser = (destination_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Destination_Chooser)>();
+				_Planning_Faculty->template Activity_Generation_Faculty<generator_itf*>(generator);
+				destination_choice_itf* destination_chooser = (destination_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty)>();
 				destination_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
-				_Planning_Faculty->template Destination_Chooser<destination_choice_itf*>(destination_chooser);
+				_Planning_Faculty->template Destination_Choice_Faculty<destination_choice_itf*>(destination_chooser);
 				timing_choice_itf* timing_chooser = (timing_choice_itf*)Allocate<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)>();
 				timing_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
 				_Planning_Faculty->template Timing_Chooser<timing_choice_itf*>(timing_chooser);
@@ -154,15 +154,15 @@ namespace Person_Components
 			}
 			feature_implementation void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref)
 			{
-				this->Initialize<ComponentType,CallerType, TargetType::ParamType>(id);
-				this->home_synthesis_zone<ComponentType,CallerType, TargetType::Param2Type>(home_zone);
-				this->_Perception_Faculty->Network<TargetType::Param3Type>(network_ref);
-				this->_Perception_Faculty->Scenario<TargetType::Param4Type>(scenario_ref);
-				this->_router->template network<TargetType::Param3Type>(network_ref);
+				this->Initialize<ComponentType,CallerType, typename TargetType::ParamType>(id);
+				this->home_synthesis_zone<ComponentType,CallerType, typename TargetType::Param2Type>(home_zone);
+				this->_Perception_Faculty->template Network<typename TargetType::Param3Type>(network_ref);
+				this->_Perception_Faculty->template Scenario<typename TargetType::Param4Type>(scenario_ref);
+				this->_router->template network<typename TargetType::Param3Type>(network_ref);
 
 				// Randomly determine if person uses pretrip-information sources (Radio, internet, news, etc.)
 				scenario_reference_interface* scenario = this->scenario_reference<ComponentType,CallerType,scenario_reference_interface*>();
-				this->_has_pretrip_information = (GLOBALS::Uniform_RNG.template Next_Rand<float>() < scenario->pretrip_informed_market_share<float>());
+				this->_has_pretrip_information = (GLOBALS::Uniform_RNG.template Next_Rand<float>() < scenario->template pretrip_informed_market_share<float>());
 			}
 			tag_feature_as_available(Initialize);
 
@@ -181,7 +181,7 @@ namespace Person_Components
 				EMPLOYMENT_STATUS status = _Static_Properties->template Employment_Status<EMPLOYMENT_STATUS>();
 				if (status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK && status != EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
 				{
-					pthis->Work_Location<int>(-1);
+					pthis->template Work_Location<int>(-1);
 					return;
 				}
 
@@ -192,14 +192,14 @@ namespace Person_Components
 				// if minimimal travel time, assign the home location as the work location
 				if (ttime < 2)
 				{
-					pthis->template Work_Location<int>(pthis->Home_Location<int>());
+					pthis->template Work_Location<int>(pthis->template Home_Location<int>());
 					return;
 				}
 
 				//=========================================================
 				// Find available zones within the specified target range of the given work travel time
 				//---------------------------------------------------------
-				zones_container_interface* zones = this->network_reference<ComponentType,CallerType,network_reference_interface*>()->zones_container<zones_container_interface*>();
+				zones_container_interface* zones = this->network_reference<ComponentType,CallerType,network_reference_interface*>()->template zones_container<zones_container_interface*>();
 				typename zones_container_interface::iterator z_itr;
 				vector<zone_interface*> temp_zones;
 				vector<float> temp_zone_probabilities;
@@ -214,7 +214,7 @@ namespace Person_Components
 					{
 						zone_interface* zone = z_itr->second;
 						Time_Minutes t = network_reference<ComponentType,CallerType,network_reference_interface*>()->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(orig->template uuid<int>(),zone->template uuid<int>(), Vehicle_Components::Types::SOV);
-						if (t > ttime - time_range_to_search && t < ttime + time_range_to_search && zone->work_locations<locations_container_interface*>()->size() > 0 && zone->employment<int>() > 0)
+						if (t > ttime - time_range_to_search && t < ttime + time_range_to_search && zone->template work_locations<locations_container_interface*>()->size() > 0 && zone->template employment<int>() > 0)
 						{
 							employment += zone->template employment<int>();
 							temp_zones.push_back(zone);
@@ -238,7 +238,7 @@ namespace Person_Components
 				//---------------------------------------------------------
 				float r = Uniform_RNG.template Next_Rand<float>();
 				zone_interface* selected_zone = nullptr;
-				vector<zone_interface*>::iterator t_itr;
+				typename vector<zone_interface*>::iterator t_itr;
 				vector<float>::iterator p_itr;
 				for (t_itr = temp_zones.begin(), p_itr = temp_zone_probabilities.begin(); t_itr != temp_zones.end(); ++t_itr, ++p_itr)
 				{
@@ -255,7 +255,7 @@ namespace Person_Components
 				// set work location to home if no valid locations found
 				if (selected_zone == nullptr)
 				{
-					pthis->Work_Location<int>(pthis->Home_Location<int>());
+					pthis->template Work_Location<int>(pthis->template Home_Location<int>());
 					//THROW_WARNING("WARNING: no valid work zone found for person id: " << pthis->uuid<int>() << ", setting work location to home location.");
 				}
 
@@ -358,7 +358,7 @@ namespace Person_Components
 				// set school location to home if no valid locations found
 				if (selected_zone == nullptr)
 				{
-					pthis->School_Location<int>(pthis->Home_Location<int>());
+					pthis->template School_Location<int>(pthis->template Home_Location<int>());
 				}
 
 				// select school location from within available school locations in the zone
@@ -368,7 +368,7 @@ namespace Person_Components
 					float size = school_locations->size();
 					int index = (int)(Uniform_RNG.template Next_Rand<float>()*size);
 					location_interface* loc = (*school_locations)[index];
-					pthis->School_Location<int>(loc->template internal_id<int>());
+					pthis->template School_Location<int>(loc->template internal_id<int>());
 				}
 			}
 			tag_feature_as_available(Choose_School_Location);

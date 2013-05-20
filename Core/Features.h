@@ -616,7 +616,7 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 	template<class HeadType_As_Given, typename TargetType>\
 	static inline typename TargetType::ReturnType Start_Dispatch(void* obj, requires(check(HeadType_As_Given, Is_Polaris_Prototype) || check(HeadType_As_Given, Is_Polaris_Component)))\
 	{\
-		return DISPATCH_ALIAS<TypeList<HeadType_As_Given, Tail> >::Dispatch<HeadType_As_Given::Component_Type,HeadType_As_Given, TargetType>(obj);\
+		return DISPATCH_ALIAS<TypeList<HeadType_As_Given, Tail> >::template Dispatch<typename HeadType_As_Given::Component_Type,HeadType_As_Given, TargetType>(obj);\
 	}\
 	template<class HeadType_As_Given, typename TargetType>\
 	static inline typename TargetType::ReturnType Start_Dispatch(void* obj, requires(!check(HeadType_As_Given, Is_Polaris_Prototype) && !check(HeadType_As_Given, Is_Polaris_Component)))\
@@ -628,11 +628,11 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 	{\
 		if(((generic_implementation<NT>*)obj)->Identify() == Head::Component_Type::component_index)\
 		{\
-			return (TargetType::ReturnType)((Head*)obj)->FEATURE_NAME<TargetType::ControlType>();\
+			return (typename TargetType::ReturnType)((Head*)obj)->template FEATURE_NAME<typename TargetType::ControlType>();\
 		}\
 		else\
 		{\
-			return DISPATCH_ALIAS<Tail>::Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
+			return DISPATCH_ALIAS<Tail>::template Start_Dispatch<typename TypeAt<Tail,0>::Result, TargetType>(obj);\
 		}\
 	}\
 	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
@@ -640,11 +640,11 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 	{\
 		if(((generic_implementation<NT>*)obj)->Identify() == Head::Component_Type::component_index)\
 		{\
-			return (TargetType::ReturnType)((Head*)obj)->FEATURE_NAME<HeadType_As_Given, HeadType_As_Given, TargetType::ControlType>();\
+			return (typename TargetType::ReturnType)((Head*)obj)->template FEATURE_NAME<HeadType_As_Given, HeadType_As_Given, typename TargetType::ControlType>();\
 		}\
 		else\
 		{\
-			return DISPATCH_ALIAS<Tail>::Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
+			return DISPATCH_ALIAS<Tail>::template Start_Dispatch<typename TypeAt<Tail,0>::Result, TargetType>(obj);\
 		}\
 	}\
 	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
@@ -728,9 +728,6 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 		{\
 			static_assert(FEATURE_NAME##_1args_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_as_available\"? ---------]\n\n");\
 			assert_check(TargetType, Is_Target_Type_Struct, "Must use a Target_Type struct for the target type when using the feature_method macro_1.");\
-			assert_sub_check(TargetType, Is_Target_Type_Struct, has_ReturnType, "Check1 fail");\
-			assert_sub_check(TargetType, Is_Target_Type_Struct, has_ParamType, "Check2 fail");\
-			assert_sub_check(TargetType, Is_Target_Type_Struct, has_Param2Type, "Check3 fail");\
 			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
 		}
 		

@@ -73,9 +73,9 @@ namespace Activity_Components
 			// Pointer back to planner parent class
 			//-------------------------------------------
 			feature_accessor(Parent_Planner, none, none);
-			feature_accessor(Parent_ID, none, not_available);
+			feature_accessor(Parent_ID, none, none);
 			feature_accessor(movement_plan, none, none);
-			feature_accessor(movement_record,check(ReturnValueType,Movement_Plan_Components::Concepts::Is_Movement_Record_Prototype),not_available);
+			feature_accessor(movement_record,check(ReturnValueType,Movement_Plan_Components::Concepts::Is_Movement_Record_Prototype),none);
 
 			//===========================================
 			// Activity Plan execution scheduling functionality

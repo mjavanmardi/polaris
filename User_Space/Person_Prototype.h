@@ -156,7 +156,7 @@ namespace Prototypes
 
 			define_container_and_value_interface(activity_locations_container_itf, activity_location_itf, typename network_itf::get_type_of(activity_locations_container), Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 			properties_itf* properties = this->Properties<properties_itf*>();
-			network_itf* network = this->Perception_Faculty<perception_itf*>()->Network<network_itf*>();
+			network_itf* network = this->Perception_Faculty<perception_itf*>()->template Network<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
 			
 			int loc_id = properties->template home_location_id<int>();
@@ -539,18 +539,18 @@ namespace Prototypes
 			advisory_radio_itf* har = origin_link->template advisory_radio<advisory_radio_itf*>();
 			
 
-			typedef Network_Event<typename MasterType::base_network_event_type> event_itf;
-			typedef Network_Event<typename MasterType::weather_network_event_type> weather_itf;
-			typedef Network_Event<typename MasterType::accident_network_event_type> accident_itf;
+			typedef Network_Event<typename Component_Type::MasterType::base_network_event_type> event_itf;
+			typedef Network_Event<typename Component_Type::MasterType::weather_network_event_type> weather_itf;
+			typedef Network_Event<typename Component_Type::MasterType::accident_network_event_type> accident_itf;
 
 			if (har != nullptr)
 			{	
 				vector<event_itf*> base_events;
-				har->template Get_Displayed_Messages<typename MasterType::base_network_event_type>(base_events);
+				har->template Get_Displayed_Messages<typename Component_Type::MasterType::base_network_event_type>(base_events);
 
 				// process weather events from HAR
 				vector<weather_itf*> weather_events;
-				har->template Get_Displayed_Messages<typename MasterType::weather_network_event_type>(weather_events);
+				har->template Get_Displayed_Messages<typename Component_Type::MasterType::weather_network_event_type>(weather_events);
 				for (typename vector<weather_itf*>::iterator w_itr = weather_events.begin(); w_itr != weather_events.end(); ++w_itr)
 				{
 					this->Evaluate_Network_Event<weather_itf*>(*w_itr);
@@ -558,7 +558,7 @@ namespace Prototypes
 			
 				// process accident events from HAR
 				vector<accident_itf*> accident_events;
-				har->template Get_Displayed_Messages<typename MasterType::accident_network_event_type>(accident_events);
+				har->template Get_Displayed_Messages<typename Component_Type::MasterType::accident_network_event_type>(accident_events);
 				for (typename vector<accident_itf*>::iterator a_itr = accident_events.begin(); a_itr != accident_events.end(); ++a_itr)
 				{
 					this->Evaluate_Network_Event<accident_itf*>(*a_itr);
@@ -567,12 +567,12 @@ namespace Prototypes
 			
 		}
 
-		feature_prototype void Evaluate_Network_Event(TargetType event, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
+		feature_prototype void Evaluate_Network_Event(TargetType event, requires(check(TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
 		{
 			// interfaces
 			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
 			define_component_interface(planning_itf, typename Parent_Person_Itf::get_type_of(Planning_Faculty), Person_Components::Prototypes::Person_Planner, ComponentType);
-			define_component_interface(destination_chooser_itf, typename planning_itf::get_type_of(Destination_Chooser), Person_Components::Prototypes::Destination_Chooser, ComponentType);
+			define_component_interface(destination_chooser_itf, typename planning_itf::get_type_of(Destination_Choice_Faculty), Person_Components::Prototypes::Destination_Chooser, ComponentType);
 			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 			define_component_interface(movement_itf, typename Vehicle_Itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 			//define_component_interface(activity_itf, typename movement_itf::get_type_of(activity_reference),Activity_Components::Prototypes::Activity_Planner, ComponentType);
@@ -586,14 +586,14 @@ namespace Prototypes
 			// person, router, etc. interfaces
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			planning_itf* planner = person->template Planning_Faculty<planning_itf*>();
-			destination_chooser_itf* dest_chooser = planner->template Destination_Chooser<destination_chooser_itf*>();
+			destination_chooser_itf* dest_chooser = planner->template Destination_Choice_Faculty<destination_chooser_itf*>();
 			Routing_Itf* itf= person ->template router<Routing_Itf*>();	
 			Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
 			network_itf* network = person->template network_reference<network_itf*>();
 			movement_itf* movement = this->Movement<movement_itf*>();
 
 			// event interface
-			typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::weather_network_event_type> weather_itf;
+			typedef Network_Event_Components::Prototypes::Network_Event<typename Component_Type::MasterType::weather_network_event_type> weather_itf;
 			weather_itf* weather_event = (weather_itf*)event;
 	
 			// If event affects traveler
@@ -608,7 +608,7 @@ namespace Prototypes
 				// replan, select new zone ouside of affected area
 				location_itf* orig, * dest;
 				zone_itf* zone_dest = movement->template destination<zone_itf*>();
-				int old_dest_id = zone_dest == nullptr ? -1 : movement->template destination<zone_itf*>()->uuid<int>();
+				int old_dest_id = zone_dest == nullptr ? -1 : movement->template destination<zone_itf*>()->template uuid<int>();
 				activity_itf* prev_act = planner->template previous_activity_plan<Target_Type<NT,activity_itf*,Simulation_Timestep_Increment>>(_iteration);
 				if (prev_act == nullptr) orig = person->template Home_Location<location_itf*>();
 				else orig = prev_act->template Location<location_itf*>();
@@ -621,9 +621,9 @@ namespace Prototypes
 				//cout << endl << "Destination Replanned due to weather, switch from zone '" << old_dest_id << "', to new zone '" << dest->zone<zone_itf*>()->uuid<int>()<<"'.";
 			}
 		}
-		feature_prototype void Evaluate_Network_Event(TargetType event, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
+		feature_prototype void Evaluate_Network_Event(TargetType event, requires(check(TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
 		{
-			typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::accident_network_event_type> accident_itf;
+			typedef Network_Event_Components::Prototypes::Network_Event<typename Component_Type::MasterType::accident_network_event_type> accident_itf;
 			accident_itf* accident_event = (accident_itf*)event;
 			
 			//cout << endl << "EVALUATING ACCIDENT EVENT: ";
@@ -633,14 +633,14 @@ namespace Prototypes
 				cout << endl << "ACCIDENT_ADVISORY: there is an accident along your route.";
 			}
 		}
-		feature_prototype void Evaluate_Network_Event(TargetType event, requires(!check(typename TargetType,Network_Event_Components::Concepts::Is_Weather_Event_Prototype) && !check(typename TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
+		feature_prototype void Evaluate_Network_Event(TargetType event, requires(!check(TargetType,Network_Event_Components::Concepts::Is_Weather_Event_Prototype) && !check(TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
 		{
 			assert_check(TargetType, Is_Polaris_Prototype, "Warning: TargetType event must be a polaris prototype.");
 			assert_check(TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype, "Warning: TargetType component must be a weather_network_event, or ");
 			assert_check(TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype, "TargetType component must be an accident_network_event_type.");
 		}
 
-		feature_prototype bool Is_Event_Relevant(TargetType event, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
+		feature_prototype bool Is_Event_Relevant(TargetType event, requires(check(TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
 		{
 			// interfaces
 			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
@@ -659,7 +659,7 @@ namespace Prototypes
 			//link_itf* destination_link = movement->destination<link_itf*>();
 
 			// interface to event
-			typedef Network_Event<typename MasterType::weather_network_event_type> weather_itf;
+			typedef Network_Event<typename Component_Type::MasterType::weather_network_event_type> weather_itf;
 			weather_itf* my_event = (weather_itf*)event;
 
 			// does event affect destination zone?
@@ -686,7 +686,7 @@ namespace Prototypes
 			//}
 			//return false;
 		}
-		feature_prototype bool Is_Event_Relevant(TargetType event, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
+		feature_prototype bool Is_Event_Relevant(TargetType event, requires(check(TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
 		{
 			// interfaces
 			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
@@ -704,7 +704,7 @@ namespace Prototypes
 			trajectory_unit_interface* traj_unit;
 			
 			// interface to event
-			typedef Network_Event<typename MasterType::weather_network_event_type> weather_itf;
+			typedef Network_Event<typename Component_Type::MasterType::weather_network_event_type> weather_itf;
 			weather_itf* my_event = (weather_itf*)event;
 		
 			// does event affect destination link?
@@ -722,7 +722,7 @@ namespace Prototypes
 			return false;
 		}
 
-		feature_prototype void Get_Event_Extents(TargetType event, hash_set<int>& affected_indices, requires(check(typename TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
+		feature_prototype void Get_Event_Extents(TargetType event, hash_set<int>& affected_indices, requires(check(TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
 		{
 			// interfaces
 			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
@@ -736,7 +736,7 @@ namespace Prototypes
 			define_component_interface(zone_itf, typename location_itf::get_type_of(zone), Zone_Components::Prototypes::Zone_Prototype, ComponentType);		
 			
 			// interface to event
-			typedef Network_Event<typename MasterType::weather_network_event_type> weather_itf;
+			typedef Network_Event<typename Component_Type::MasterType::weather_network_event_type> weather_itf;
 			weather_itf* my_event = (weather_itf*)event;
 		
 			// does event affect destination link?
@@ -823,7 +823,7 @@ namespace Prototypes
 			link_itf* origin_link = movements->template origin<link_itf*>();
 
 			// Schedule the routing if the vehicle is not already in the network, otherwise return false
-			if (movements->valid_trajectory<bool>() && (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK))
+			if (movements->template valid_trajectory<bool>() && (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK))
 			{
 				//if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"MOVEMENT:," << person->uuid<int>() << ","<<departed_time<<endl;
 				origin_link->push_vehicle(vehicle);
@@ -881,11 +881,11 @@ namespace Prototypes
 		feature_accessor(origin,none,none);
 		feature_accessor(destination,none,none);
 
-		feature_prototype typename TargetType Calculate_Utility()
+		feature_prototype TargetType Calculate_Utility()
 		{
 			return this_component()->template Calculate_Utility<ComponentType,CallerType,TargetType>();
 		}
-		feature_prototype typename TargetType Print_Utility()
+		feature_prototype TargetType Print_Utility()
 		{
 			return this_component()->template Print_Utility<ComponentType,CallerType,TargetType>();
 		}

@@ -457,10 +457,11 @@ namespace Routing_Components
 #ifndef EXCLUDE_DEMAND
 		implementation struct Polaris_Skim_Routing_Implementation: public Polaris_Routing_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Skim_Routing_Implementation), 512U>
 		{
+			typedef typename  Polaris_Routing_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Skim_Routing_Implementation), 512U>::Component_Type ComponentType;
 			declare_feature_conditional(Compute_Route_Condition)
 			{
-				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType, ComponentType> _Routing_Interface;
-				define_component_interface(_Traveler_Interface, typename get_type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
+				typedef Routing_Components::Prototypes::Routing_Prototype<typename MasterType::routing_type> _Routing_Interface;
+				
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
 				if(_sub_iteration == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
 				{
@@ -483,20 +484,11 @@ namespace Routing_Components
 					cout << "Should never reach here in routing conditional!" << endl;
 				}
 			}
-
-
-
 			member_container(vector<float>,travel_times_to_link_container,none,none);
 			
-			// time increment at which skim tables are updated - set in the initializer
-			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_update_increment,none,none);
-			member_component_feature(update_increment,_update_increment,Value,Basic_Units::Prototypes::Time_Prototype);
-
-			// time period during which routing takes place
-			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_start_time,none,none);
-			member_component_feature(start_time,_start_time,Value,Basic_Units::Prototypes::Time_Prototype);
-			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_end_time,none,none);
-			member_component_feature(end_time,_end_time,Value,Basic_Units::Prototypes::Time_Prototype);
+			member_component_and_feature_accessor(update_increment,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<MasterType>);
+			member_component_and_feature_accessor(start_time,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<MasterType>);
+			member_component_and_feature_accessor(end_time,Value,Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<MasterType>);
 
 		};
 #endif

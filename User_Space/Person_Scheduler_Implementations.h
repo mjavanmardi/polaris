@@ -29,8 +29,8 @@ namespace Person_Components
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan, typename type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
-			define_container_and_value_interface_unqualified_container(Movement_Plans,Movement_Plan, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Activity_Plans,Activity_Plan, typename type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface(Movement_Plans,Movement_Plan, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 	
 
 			// Pass through accessors for the Activities / movements
@@ -47,7 +47,7 @@ namespace Person_Components
 			feature_implementation TargetType current_movement_plan(requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{
 				// Define interfaces to the container members of the class			
-				Movement_Plans* movement_plans = this->template Movement_Plans_Container<ComponentType,CallerType, Movement_Plans*>();
+				Movement_Plans* movement_plans = _Parent_Planner->template Movement_Plans_Container<Movement_Plans*>();
 				typename Movement_Plans::iterator itr;
 				if ((itr = movement_plans->find(_iteration)) != movement_plans->end()) return (TargetType)*itr;
 				else return nullptr;
@@ -56,7 +56,7 @@ namespace Person_Components
 			feature_implementation TargetType current_activity_plan(requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
 				// Define interfaces to the container members of the class
-				Activity_Plans* activity_plans = this->template Activity_Plans_Container<ComponentType,CallerType,Activity_Plans*>();
+				Activity_Plans* activity_plans = _Parent_Planner->template Activity_Plans_Container<Activity_Plans*>();
 				typename Activity_Plans::iterator itr;
 				if ((itr = activity_plans->find(_iteration)) != activity_plans->end()) return (TargetType)*itr;
 				else return nullptr;
@@ -68,32 +68,33 @@ namespace Person_Components
 			{
 				// define interfaces
 				typename Movement_Plans::iterator move_itr;
+				_Person_Interface* _Parent_Person = _Parent_Planner->template Parent_Person<_Person_Interface*>();
 
 				// get interface to the movement plan to be added
 				Movement_Plan* move = (Movement_Plan*)movement_plan;
 
 				// print to log file if requested
-				if (_write_activity_files) 
+				if (_Parent_Planner->template write_activity_files<bool>()) 
 				{			
 					stringstream s;
 					int o_id = move->template origin<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>()->template uuid<int>();
 					int d_id = move->template destination<_Activity_Location_Interface*>()->template zone<_Zone_Interface*>()->template uuid<int>();
 					_Skim_Interface* skim = _Parent_Person->template network_reference<_Network_Interface*>()->template skimming_faculty<_Skim_Interface*>();		
 					s << _Parent_Person->template uuid<int>() << "," << move->template departed_time<Time_Hours>();
-					s << "," << move->template origin<_Activity_Location_Interface*>()->uuid<int>() << "," << move->template destination<_Activity_Location_Interface*>()->uuid<int>();
+					s << "," << move->template origin<_Activity_Location_Interface*>()->template uuid<int>() << "," << move->template destination<_Activity_Location_Interface*>()->template uuid<int>();
 					s << "," << skim->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_id, d_id, Vehicle_Components::Types::SOV)<<endl;
-					this->Write_To_Log<ComponentType,CallerType,stringstream&>(s);
+					_Parent_Planner->template Write_To_Log<ComponentType,CallerType,stringstream&>(s);
 				}
 
 				// catch skipped movement plans
 				if (move->template departed_time<Simulation_Timestep_Increment>() < _iteration)
 				{
-					if (_write_activity_files) this->logs[_thread_id] <<",invalid-start prior to current iteration."<<endl;
+					if (_Parent_Planner->template write_activity_files<bool>()) _Parent_Planner->logs[_thread_id] <<",invalid-start prior to current iteration."<<endl;
 					return;
 				}
 
 				// Insert new movement plan at the appropriate space in plan schedule
-				Movement_Plans* movements = this->template Movement_Plans_Container<ComponentType,CallerType,Movement_Plans*>();
+				Movement_Plans* movements = _Parent_Planner->template Movement_Plans_Container<Movement_Plans*>();
 				move_itr = movements->begin();
 				while(move_itr != movements->end())
 				{
@@ -112,7 +113,6 @@ namespace Person_Components
 			tag_feature_as_available(Add_Movement_Plan);
 			feature_implementation void Add_Activity_Plan(TargetType activity_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
-				define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan,ComponentType);	
 				Activity_Plan* act = (Activity_Plan*)activity_plan;
 
 				long t1 = act->template Activity_Plan_Horizon<Simulation_Timestep_Increment>();
@@ -121,7 +121,7 @@ namespace Person_Components
 				Simulation_Timestep_Increment departure_time = remain * this->template Planning_Time_Increment<ComponentType,CallerType,Simulation_Timestep_Increment>();
 
 				// key the movement plan on the planning timestep just prior to departure
-				Activity_Plans* activities = this->template Activity_Plans_Container<Activity_Plans*>();
+				Activity_Plans* activities = _Parent_Planner->template Activity_Container<Activity_Plans*>();
 				activities->push_back(act);
 			}
 		};

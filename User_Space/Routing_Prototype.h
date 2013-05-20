@@ -76,7 +76,7 @@ namespace Routing_Components
 			feature_accessor(end_time,none,none);
 			feature_accessor(travel_times_to_link_container,none,none);
 			feature_accessor(departure_time,none,none); // the time at which routing is triggered.
-#ifndef EXCLUDE_DEMAND
+/*#ifndef EXCLUDE_DEMAND
 			feature_prototype void Evaluate_Condition(Conditional_Response& response, requires(check(TargetType,Concepts::Is_One_To_One_Router)))
 			{
 				response.result=true;
@@ -108,7 +108,7 @@ namespace Routing_Components
 				assert_sub_check(TargetType,Concepts::Is_One_To_One_Router,has_network, "ControlType has no network");
 				assert_sub_check(TargetType,Concepts::Is_One_To_One_Router,has_vehicle, "ControlType has no vehicle");
 			}
-#endif
+#endif*/
 			feature_prototype float one_to_one_link_based_least_time_path_a_star(TargetType routable_net)
 			{
 
