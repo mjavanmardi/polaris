@@ -83,7 +83,7 @@ namespace Network_Event_Components
 				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
 
 				// temporary containers used to fill affected zone vector			
-				hash_set<Zone_Interface*> zone_set;
+				unordered_set<Zone_Interface*> zone_set;
 
 				cout << endl << "INITIALIZE NETWORK EVENT:";
 				for(typename vector<int>::const_iterator itr=links.begin();itr!=links.end();itr++)
@@ -115,7 +115,7 @@ namespace Network_Event_Components
 				}
 				
 				// create the affected zones list
-				for (typename hash_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
+				for (typename unordered_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
 				{
 					Zone_Interface* zone = *zitr;
 					this->_affected_zones.push_back(zone);
@@ -211,14 +211,14 @@ namespace Network_Event_Components
 			static member_data(vector<string>,event_keys,none,none);
 			static member_prototype(Network_Event_Manager,network_event_manager,typename type_of(MasterType::network_event_manager),none,none);
 			
-			static member_data(concat(hash_map<int,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_index,none,none);
+			static member_data(concat(unordered_map<int,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_index,none,none);
 		};
 		
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		vector<string> Base_Network_Event<MasterType,ParentType,InheritanceList>::_event_keys;
 		
 		template<typename MasterType,typename ParentType,typename InheritanceList>
-		hash_map<int,typename Network_Event_Callback<typename Base_Network_Event<MasterType,ParentType,InheritanceList>::ComponentType>::type> Base_Network_Event<MasterType,ParentType,InheritanceList>::_callbacks_by_component_index;
+		unordered_map<int,typename Network_Event_Callback<typename Base_Network_Event<MasterType,ParentType,InheritanceList>::ComponentType>::type> Base_Network_Event<MasterType,ParentType,InheritanceList>::_callbacks_by_component_index;
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		Network_Event_Manager<typename type_of(MasterType::network_event_manager),typename Base_Network_Event<MasterType,ParentType,InheritanceList>::ComponentType>* Base_Network_Event<MasterType,ParentType,InheritanceList>::_network_event_manager;
@@ -527,7 +527,7 @@ namespace Network_Event_Components
 			
 			feature_implementation void Get_Network_Events( vector< Network_Event<TargetType,CallerType>* >& container, requires(check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
-				for(typename hash_map< int, list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
+				for(typename unordered_map< int, list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
 				{
 					list< Base_Network_Event_Interface* >* events_of_type=&h_itr->second;
 
@@ -570,7 +570,7 @@ namespace Network_Event_Components
 			
 			typedef Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
 
-			member_data( concat(hash_map< int, list<Base_Network_Event_Interface*> >), network_event_container, none ,none);
+			member_data( concat(unordered_map< int, list<Base_Network_Event_Interface*> >), network_event_container, none ,none);
 		};
 	}
 

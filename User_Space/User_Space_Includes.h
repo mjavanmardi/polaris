@@ -11,10 +11,11 @@
 #include <fstream>
 
 // use hashmap
-#include <hash_map>
-#include <hash_set>
+#include <unordered_map>
+#include <unordered_set>
 #ifndef _MSC_VER
-#include <ext/hash_map>
+#include <tr1/unordered_map>
+#include <tr1/unordered_set>
 using namespace __gnu_cxx;
 #endif
 

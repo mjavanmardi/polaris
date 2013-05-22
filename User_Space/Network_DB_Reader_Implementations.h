@@ -640,7 +640,7 @@ namespace Network_Components
 
 				Types::Link_ID_Dir link_id_dir;
 
-				hash_map<int,int> uuid_to_index;
+				unordered_map<int,int> uuid_to_index;
 
 				cout << "Reading Activity Locations " << endl;
 

@@ -25,7 +25,7 @@ namespace Person_Components
 
 
 			// static start time and duration lookup container for each activity type
-			static member_associative_container(concat(hash_map<Activity_Components::Types::ACTIVITY_TYPES, map_type >), start_time_duration_container,none,none);
+			static member_associative_container(concat(unordered_map<int, map_type >), start_time_duration_container,none,none);
 			
 
 			//=======================================================================================================
@@ -68,13 +68,13 @@ namespace Person_Components
 				float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
 
 				// use upper bound to draw the start time / duration pair with first cumulative probability greater than rand
-				map_type::iterator itr = _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
+				map_type::iterator itr = _start_time_duration_container[(int)(act->template Activity_Type<ACTIVITY_TYPES>())].upper_bound(rand);
 
 				// make sure valid entry is found
-				if (itr == _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].end()) 
+				if (itr == _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end()) 
 				{
 					THROW_WARNING("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
-					itr = _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].begin();
+					itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].begin();
 				}
 				pair<typename TargetType::ReturnType,typename TargetType::ReturnType> return_val;
 
@@ -100,11 +100,11 @@ namespace Person_Components
 				// draw random from uniform distribution and get corresponding data item - loop while draw is outside of range
 				int iter = 0;
 				float rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
-				map_type::iterator itr = _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
+				map_type::iterator itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
 				while (itr->second.first < start || itr->second.first >= end)
 				{
 					rand = GLOBALS::Uniform_RNG.template Next_Rand<float>();
-					itr = _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
+					itr = _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].upper_bound(rand);
 					++iter;
 					if (iter >= 100)
 					{
@@ -114,7 +114,7 @@ namespace Person_Components
 				}
 
 				// make sure valid entry is found
-				if (itr == _start_time_duration_container[act->template Activity_Type<ACTIVITY_TYPES>()].end()) THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
+				if (itr == _start_time_duration_container[(int)act->template Activity_Type<ACTIVITY_TYPES>()].end()) THROW_EXCEPTION("ERROR: no valid start-time / duration pair found for activity type '" << act->template Activity_Type<ACTIVITY_TYPES>() <<"' and random value = " << rand);
 			
 				pair<typename TargetType::ReturnType,typename TargetType::ReturnType> return_val;
 				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.first);
@@ -134,17 +134,17 @@ namespace Person_Components
 
 
 				// Initialize hashmap for start time
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::EAT_OUT_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::ERRANDS_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::HEALTHCARE_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::LEISURE_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::MAJOR_SHOPPING_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::OTHER_SHOPPING_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::PERSONAL_BUSINESS_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::PICK_UP_OR_DROP_OFF_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::RELIGIOUS_OR_CIVIC_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::SERVICE_VEHICLE_ACTIVITY,map_type()));
-				_start_time_duration_container.insert(pair<ACTIVITY_TYPES,map_type>(ACTIVITY_TYPES::SOCIAL_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::EAT_OUT_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::ERRANDS_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::HEALTHCARE_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::LEISURE_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::MAJOR_SHOPPING_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::OTHER_SHOPPING_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::PERSONAL_BUSINESS_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::PICK_UP_OR_DROP_OFF_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::RELIGIOUS_OR_CIVIC_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::SERVICE_VEHICLE_ACTIVITY,map_type()));
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::SOCIAL_ACTIVITY,map_type()));
 
 
 				// add items
@@ -160,12 +160,13 @@ namespace Person_Components
 
 				while(data_file >> act_type >> start >> dur >> prob )
 				{
-					_start_time_duration_container[(ACTIVITY_TYPES)act_type].insert(record_type(prob,data_type(start,dur)));
+					_start_time_duration_container[act_type].insert(record_type(prob,data_type(start,dur)));
 				}
 			}
 		};
 
 		static_member_initialization(Activity_Timing_Chooser_Implementation,is_initialized,false);
-		static_member_definition(Activity_Timing_Chooser_Implementation, start_time_duration_container);
+		//static_member_definition(Activity_Timing_Chooser_Implementation, start_time_duration_container);
+		template<typename MasterType,typename ParentType, typename InheritanceList> Polaris_Associative_Container<unordered_map<int, map<float,pair<Time_Minutes,Time_Minutes>>>> Activity_Timing_Chooser_Implementation<MasterType, ParentType, InheritanceList>::_start_time_duration_container;
 	}
 }

@@ -316,6 +316,7 @@ namespace Person_Components
 			{
 				// schedule routing		
 				define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
+				define_component_interface(Scenario_Itf, typename Parent_Person_Itf::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
 				define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 				define_component_interface(Movement_Itf, typename Routing_Itf::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
@@ -327,7 +328,7 @@ namespace Person_Components
 				movement_plan->template planning_time<Simulation_Timestep_Increment>(planning_time);
 
 				// whether to use snapshot or not
-				Scenario_Components::Prototypes::Scenario_Prototype<typename Component_Type::MasterType::scenario_type>* scenario = (Scenario_Components::Prototypes::Scenario_Prototype<typename Component_Type::MasterType::scenario_type>*)_global_scenario;
+				Scenario_Itf* scenario = (Scenario_Itf*)_global_scenario;
 
 				itf->template Schedule_Route_Computation<NULLTYPE>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time,scenario->template read_network_snapshots<bool>());
 			}

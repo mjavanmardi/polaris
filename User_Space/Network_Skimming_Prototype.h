@@ -552,7 +552,7 @@ namespace Network_Skimming_Components
 				define_simple_container_interface(skim_table_itf,typename get_type_of(skim_table),Containers::Multidimensional_Random_Access_Array_Prototype,typename get_type_of(skim_table)::unqualified_value_type,ComponentType);
 				define_component_interface(skimmer_itf,typename get_type_of(skim_reference),Prototypes::Network_Skimming_Prototype,ComponentType);
 				skim_table_itf* los = this->skim_table<skim_table_itf*>();
-				typename skimmer_itf::Component_Type::Stored_Time_Type value = (*los)[skim_table_itf::index_type(Origin_ID,Destination_ID)];
+				typename skimmer_itf::Component_Type::Stored_Time_Type value = (*los)[typename skim_table_itf::index_type(Origin_ID,Destination_ID)];
 				return Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,typename TargetType::ReturnType,typename skimmer_itf::Component_Type::Stored_Time_Type>>(value);
 			}
 		};

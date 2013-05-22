@@ -27,7 +27,9 @@ namespace Activity_Components
 		};
 		enum ACTIVITY_TYPES
 		{
-			WORK_AT_HOME_ACTIVITY,
+			DELETED=-1,
+			EMPTY=-2,
+			WORK_AT_HOME_ACTIVITY=0,
 			AT_HOME_ACTIVITY,
 			PRIMARY_WORK_ACTIVITY,
 			OTHER_WORK_ACTIVITY,
@@ -227,7 +229,11 @@ namespace Activity_Components
 				else
 				{
 					Revision& route_itr = this_ptr->template Route_Planning_Time<Revision&>();
-					if(route_itr._iteration  != END && route_itr._iteration >= _iteration) response.next._revision = this_ptr->template Route_Planning_Time<Revision>();
+					if(route_itr._iteration  != END && route_itr._iteration >= _iteration) 
+					{
+						response.next._iteration = route_itr._iteration;
+						response.next._sub_iteration = route_itr._sub_iteration;
+					}
 					response.result = false;
 				}
 			}
@@ -366,7 +372,7 @@ namespace Activity_Components
 			feature_accessor(Start_Time_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			feature_accessor(Duration_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			feature_accessor(Involved_Persons_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
-			feature_accessor(Route_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			feature_accessor(Route_Planning_Time, none,none/*check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same)*/);
 			feature_accessor(Location_Plan_Horizon, none, none);
 			feature_accessor(Location_Flexibility, none, none);
 			feature_accessor(Mode_Plan_Horizon, none, none);

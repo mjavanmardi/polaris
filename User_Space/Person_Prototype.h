@@ -539,18 +539,18 @@ namespace Prototypes
 			advisory_radio_itf* har = origin_link->template advisory_radio<advisory_radio_itf*>();
 			
 
-			typedef Network_Event<typename Component_Type::MasterType::base_network_event_type> event_itf;
-			typedef Network_Event<typename Component_Type::MasterType::weather_network_event_type> weather_itf;
-			typedef Network_Event<typename Component_Type::MasterType::accident_network_event_type> accident_itf;
+			typedef Network_Event<typename Component_Type::base_network_event_type> event_itf;
+			typedef Network_Event<typename Component_Type::weather_network_event_type> weather_itf;
+			typedef Network_Event<typename Component_Type::accident_network_event_type> accident_itf;
 
 			if (har != nullptr)
 			{	
 				vector<event_itf*> base_events;
-				har->template Get_Displayed_Messages<typename Component_Type::MasterType::base_network_event_type>(base_events);
+				har->template Get_Displayed_Messages<typename Component_Type::base_network_event_type>(base_events);
 
 				// process weather events from HAR
 				vector<weather_itf*> weather_events;
-				har->template Get_Displayed_Messages<typename Component_Type::MasterType::weather_network_event_type>(weather_events);
+				har->template Get_Displayed_Messages<typename Component_Type::weather_network_event_type>(weather_events);
 				for (typename vector<weather_itf*>::iterator w_itr = weather_events.begin(); w_itr != weather_events.end(); ++w_itr)
 				{
 					this->Evaluate_Network_Event<weather_itf*>(*w_itr);
@@ -558,7 +558,7 @@ namespace Prototypes
 			
 				// process accident events from HAR
 				vector<accident_itf*> accident_events;
-				har->template Get_Displayed_Messages<typename Component_Type::MasterType::accident_network_event_type>(accident_events);
+				har->template Get_Displayed_Messages<typename Component_Type::accident_network_event_type>(accident_events);
 				for (typename vector<accident_itf*>::iterator a_itr = accident_events.begin(); a_itr != accident_events.end(); ++a_itr)
 				{
 					this->Evaluate_Network_Event<accident_itf*>(*a_itr);
@@ -593,7 +593,7 @@ namespace Prototypes
 			movement_itf* movement = this->Movement<movement_itf*>();
 
 			// event interface
-			typedef Network_Event_Components::Prototypes::Network_Event<typename Component_Type::MasterType::weather_network_event_type> weather_itf;
+			typedef Network_Event_Components::Prototypes::Network_Event<typename Component_Type::weather_network_event_type> weather_itf;
 			weather_itf* weather_event = (weather_itf*)event;
 	
 			// If event affects traveler
@@ -623,7 +623,7 @@ namespace Prototypes
 		}
 		feature_prototype void Evaluate_Network_Event(TargetType event, requires(check(TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
 		{
-			typedef Network_Event_Components::Prototypes::Network_Event<typename Component_Type::MasterType::accident_network_event_type> accident_itf;
+			typedef Network_Event_Components::Prototypes::Network_Event<typename Component_Type::accident_network_event_type> accident_itf;
 			accident_itf* accident_event = (accident_itf*)event;
 			
 			//cout << endl << "EVALUATING ACCIDENT EVENT: ";
@@ -659,7 +659,7 @@ namespace Prototypes
 			//link_itf* destination_link = movement->destination<link_itf*>();
 
 			// interface to event
-			typedef Network_Event<typename Component_Type::MasterType::weather_network_event_type> weather_itf;
+			typedef Network_Event<typename Component_Type::weather_network_event_type> weather_itf;
 			weather_itf* my_event = (weather_itf*)event;
 
 			// does event affect destination zone?
@@ -704,7 +704,7 @@ namespace Prototypes
 			trajectory_unit_interface* traj_unit;
 			
 			// interface to event
-			typedef Network_Event<typename Component_Type::MasterType::weather_network_event_type> weather_itf;
+			typedef Network_Event<typename Component_Type::weather_network_event_type> weather_itf;
 			weather_itf* my_event = (weather_itf*)event;
 		
 			// does event affect destination link?
@@ -722,7 +722,7 @@ namespace Prototypes
 			return false;
 		}
 
-		feature_prototype void Get_Event_Extents(TargetType event, hash_set<int>& affected_indices, requires(check(TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
+		feature_prototype void Get_Event_Extents(TargetType event, unordered_set<int>& affected_indices, requires(check(TargetType, Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
 		{
 			// interfaces
 			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
@@ -736,7 +736,7 @@ namespace Prototypes
 			define_component_interface(zone_itf, typename location_itf::get_type_of(zone), Zone_Components::Prototypes::Zone_Prototype, ComponentType);		
 			
 			// interface to event
-			typedef Network_Event<typename Component_Type::MasterType::weather_network_event_type> weather_itf;
+			typedef Network_Event<typename Component_Type::weather_network_event_type> weather_itf;
 			weather_itf* my_event = (weather_itf*)event;
 		
 			// does event affect destination link?

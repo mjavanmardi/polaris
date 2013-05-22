@@ -23,7 +23,7 @@ namespace Person_Components
 			// static counters
 			static int Count_Array[_num_threads];
 			static int Count;
-			static member_associative_container(concat(hash_map<Activity_Components::Types::ACTIVITY_TYPES, pair<float,float>>), average_activity_frequency_and_duration_container,none,none);
+			static member_associative_container(concat(unordered_map<int, pair<float,float>>), average_activity_frequency_and_duration_container,none,none);
 			static bool _is_initialized;
 			static void Static_Initializer()
 			{
@@ -31,7 +31,7 @@ namespace Person_Components
 				if(_is_initialized) return;
 
 				// Initialize activity frequency and duration container
-				typedef pair<Activity_Components::Types::ACTIVITY_TYPES, pair<float, float>> avg_activity_record;
+				typedef pair<int, pair<float, float>> avg_activity_record;
 				avg_activity_record a;
 				a.first = ACTIVITY_TYPES::AT_HOME_ACTIVITY;					a.second.first = 2.237f; a.second.second = 442.f;	_average_activity_frequency_and_duration_container.insert(a);
 				a.first = ACTIVITY_TYPES::SCHOOL_ACTIVITY;					a.second.first = 0.122f; a.second.second = 387.3f;	_average_activity_frequency_and_duration_container.insert(a);
@@ -216,7 +216,7 @@ namespace Person_Components
 		template<typename MasterType,typename ParentType, typename InheritanceList> int ADAPTS_Person_Properties_Implementation<MasterType, ParentType, InheritanceList>::Count_Array[];
 		template<typename MasterType,typename ParentType, typename InheritanceList> int ADAPTS_Person_Properties_Implementation<MasterType, ParentType, InheritanceList>::Count;
 		template<typename MasterType,typename ParentType, typename InheritanceList> bool ADAPTS_Person_Properties_Implementation<MasterType, ParentType, InheritanceList>::_is_initialized = false;
-		template<typename MasterType,typename ParentType, typename InheritanceList> Polaris_Associative_Container<hash_map<Activity_Components::Types::ACTIVITY_TYPES, pair<float,float>>> ADAPTS_Person_Properties_Implementation<MasterType, ParentType, InheritanceList>::_average_activity_frequency_and_duration_container;
+		template<typename MasterType,typename ParentType, typename InheritanceList> Polaris_Associative_Container<unordered_map<int, pair<float,float>>> ADAPTS_Person_Properties_Implementation<MasterType, ParentType, InheritanceList>::_average_activity_frequency_and_duration_container;
 
 		implementation struct ACS_Person_Static_Properties_Implementation : public Polaris_Component<APPEND_CHILD(ACS_Person_Static_Properties_Implementation), MasterType, Data_Object, ParentType>
 		{

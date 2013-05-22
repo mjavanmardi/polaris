@@ -244,7 +244,7 @@ namespace GLOBALS
 			Sigma.cholesky(L);
 
 			// create vector of uncorrelated normals
-			matrix<TargetType> norm = matrix<TargetType>(matrix<TargetType>::index_type(Sigma.num_rows(),1),0);
+			matrix<TargetType> norm = matrix<TargetType>(typename matrix<TargetType>::index_type(Sigma.num_rows(),1),0);
 			for (uint i = 0; i < Sigma.num_rows(); ++i) norm(i,0) = this->Next_Rand<TargetType>();
 
 			// correlate the normals and populate the return vector

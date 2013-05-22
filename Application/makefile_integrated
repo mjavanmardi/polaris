@@ -1,0 +1,16 @@
+CC = g++
+CFLAGS = -O2 -std=c++0x -pthread -I ~/odb/include -D DBIO
+LDFLAGS = -pthread -lstdc++ -lrt
+HEADERS = ../Core/*.h ../User_Space/*.h ../Repository/*.h ./*.h
+all: Integrated_Model
+clean: 
+	rm -f Integrated_Model
+	rm -f Integrated_Model.o
+	rm -f ../Test_Data/Chicago_Network/Integrated_Model
+	rm -f ../Test_Data/Network_Model/Integrated_Model
+Integrated_Model: Integrated_Model.o 
+	$(CC) -o Integrated_Model$(LDFLAGS) Integrated_Model.o -L../Scenario_Manager -ljson -L../File_IO -lfileio -L../Repository -lrepository -L ~/odb/lib -lodb -lodb-sqlite -L../gccRelease -lio
+	cp -f Integrated_Model../Test_Data/Chicago_Network
+	cp -f Integrated_Model../Test_Data/Network_Model
+Integrated_Model.o: Integrated_Model.cpp $(HEADERS)
+	$(CC) -w -c $(CFLAGS) Integrated_Model.cpp

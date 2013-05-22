@@ -290,7 +290,7 @@ struct member_function_ptr_types<Type,setter_type>
 		typedef DATA_TYPE FEATURE_NAME##_type;\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(!check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
-		{return (ReturnValueType)(_##FEATURE_NAME);}\
+		{return ReturnValueType(_##FEATURE_NAME);}\
 		template<typename ComponentType, typename CallerType, typename ReturnValueType>\
 		ReturnValueType FEATURE_NAME(requires_getter(check_as_given(ReturnValueType,is_pointer) && (GETTER_REQUIREMENTS)))\
 		{return (ReturnValueType)(&_##FEATURE_NAME);}\
@@ -658,9 +658,8 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 		assert_check(HeadComponentType, FEATURE_NAME##_exists, "" #FEATURE_NAME "does not exist.  Make sure to 'tag_feature_as_available' if the feature does exist in the component." );\
 	}\
 };
-
 #define dispatch_to_feature(DISPATCHER_ALIAS, TYPELIST, OBJECT, TARGETTYPE_STRUCT_WITH_CONTROLTYPE_FOR_DISPATCH_TARGET_AND_RETURNTYPE_DEFINED, ...)\
-	DISPATCHER_ALIAS<TYPELIST>::template Start_Dispatch<TypeAt<TYPELIST,0>::Result, concat(TARGETTYPE_STRUCT_WITH_CONTROLTYPE_FOR_DISPATCH_TARGET_AND_RETURNTYPE_DEFINED,__VA_ARGS__)>(OBJECT);
+	DISPATCHER_ALIAS<TYPELIST>::template Start_Dispatch<typename TypeAt<TYPELIST,0>::Result, concat(TARGETTYPE_STRUCT_WITH_CONTROLTYPE_FOR_DISPATCH_TARGET_AND_RETURNTYPE_DEFINED,__VA_ARGS__)>(OBJECT);
 
 
 
@@ -704,12 +703,12 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 	public:\
 		define_feature_exists_check(FEATURE_NAME, FEATURE_NAME##_exists);\
 		template<typename ReturnValueType>\
-		typename ReturnValueType FEATURE_NAME(requires_getter(check(ComponentType,FEATURE_NAME##_exists) && (REQUIREMENTS)))\
+		ReturnValueType FEATURE_NAME(requires_getter(check(ComponentType,FEATURE_NAME##_exists) && (REQUIREMENTS)))\
 		{\
 			return (ReturnValueType)this_component()->template FEATURE_NAME<ComponentType,CallerType,ReturnValueType>();\
 		}\
 		template<typename ReturnValueType>\
-		typename ReturnValueType FEATURE_NAME(requires_getter(!check(ComponentType,FEATURE_NAME##_exists) || !(REQUIREMENTS)))\
+		ReturnValueType FEATURE_NAME(requires_getter(!check(ComponentType,FEATURE_NAME##_exists) || !(REQUIREMENTS)))\
 		{\
 			static_assert(FEATURE_NAME##_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_as_available\"? ---------]\n\n");\
 			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
@@ -721,13 +720,16 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 		template<typename TargetType>\
 		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG,requires( check(TargetType,Is_Target_Type_Struct) && check(ComponentType,FEATURE_NAME##_1args_exists) && (REQUIREMENTS) ) )\
 		{\
-			return (TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG);\
+			return (typename TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG);\
 		}\
 		template<typename TargetType>\
 		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG,requires(!check(TargetType,Is_Target_Type_Struct)  || !check(ComponentType,FEATURE_NAME##_1args_exists) || !(REQUIREMENTS)))\
 		{\
 			static_assert(FEATURE_NAME##_1args_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_as_available\"? ---------]\n\n");\
 			assert_check(TargetType, Is_Target_Type_Struct, "Must use a Target_Type struct for the target type when using the feature_method macro_1.");\
+			assert_sub_check(TargetType, Is_Target_Type_Struct, has_ReturnType, "Check1 fail");\
+			assert_sub_check(TargetType, Is_Target_Type_Struct, has_ParamType, "Check2 fail");\
+			assert_sub_check(TargetType, Is_Target_Type_Struct, has_Param2Type, "Check3 fail");\
 			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
 		}
 		
@@ -737,7 +739,7 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 		template<typename TargetType>\
 		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,requires(check(ComponentType,FEATURE_NAME##_2args_exists) && check(TargetType,Is_Target_Type_Struct) && (REQUIREMENTS) ) )\
 		{\
-			return (TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2);\
+			return (typename TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2);\
 		}\
 		template<typename TargetType>\
 		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,requires(!check(ComponentType,FEATURE_NAME##_2args_exists) || !check(TargetType,Is_Target_Type_Struct)  || !(REQUIREMENTS)))\
@@ -753,7 +755,7 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 		template<typename TargetType>\
 		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2, typename TargetType::Param3Type ARG3,requires(check(ComponentType,FEATURE_NAME##_3args_exists) && check(TargetType,Is_Target_Type_Struct) && (REQUIREMENTS) ) )\
 		{\
-			return (TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2,ARG3);\
+			return (typename TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2,ARG3);\
 		}\
 		template<typename TargetType>\
 		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2, typename TargetType::Param3Type ARG3,requires(!check(ComponentType,FEATURE_NAME##_3args_exists) || !check(TargetType,Is_Target_Type_Struct)  || !(REQUIREMENTS)))\
@@ -769,7 +771,7 @@ struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
 		template<typename TargetType>\
 		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,typename TargetType::Param3Type ARG3, typename TargetType::Param4Type ARG4,requires(check(ComponentType,FEATURE_NAME##_4args_exists) && check(TargetType,Is_Target_Type_Struct) && (REQUIREMENTS) ) )\
 		{\
-			return (TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2,ARG3,ARG4);\
+			return (typename TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2,ARG3,ARG4);\
 		}\
 		template<typename TargetType>\
 		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,typename TargetType::Param3Type ARG3, typename TargetType::Param4Type ARG4,requires(!check(ComponentType,FEATURE_NAME##_4args_exists) || !check(TargetType,Is_Target_Type_Struct)  || !(REQUIREMENTS)))\

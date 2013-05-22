@@ -460,7 +460,7 @@ namespace Routing_Components
 			typedef typename  Polaris_Routing_Implementation<MasterType,ParentType,APPEND_CHILD(Polaris_Skim_Routing_Implementation), 512U>::Component_Type ComponentType;
 			declare_feature_conditional(Compute_Route_Condition)
 			{
-				typedef Routing_Components::Prototypes::Routing_Prototype<typename MasterType::routing_type> _Routing_Interface;
+				typedef Routing_Components::Prototypes::Routing_Prototype<ComponentType> _Routing_Interface;
 				
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
 				if(_sub_iteration == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
