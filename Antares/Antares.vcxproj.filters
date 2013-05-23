@@ -161,6 +161,9 @@
     <ClInclude Include="Splash_Panel.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
+    <ClInclude Include="Antares_Sensor_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">

@@ -11,6 +11,7 @@
 #include "Depot_Prototype.h"
 #include "Link_Control_Prototype.h"
 #include "Advisory_ITS_Prototype.h"
+#include "Sensor_Prototype.h"
 
 namespace Link_Components
 {
@@ -193,23 +194,34 @@ namespace Link_Components
 
 			struct Link_MOE_Data link_moe_data;
 			struct Link_MOE_Data non_volatile_link_moe_data;
-
+			struct Link_MOE_Data normal_day_link_moe_data;
 			struct Link_MOE_Data realtime_link_moe_data;
 
 			vector<struct Link_MOE_Data> td_link_moe_data_array;
+
+		//==================================================================================================================
+		/// Events
+		//------------------------------------------------------------------------------------------------------------------
+
 			member_data(bool, weather_event_to_process, none, none);
 			member_component(typename MasterType::weather_network_event_type, current_weather_event, none, none);
 			member_data(bool, accident_event_to_process, none, none);
 			member_component(typename MasterType::accident_network_event_type, current_accident_event, none, none);
 
+			typedef typename MasterType::base_network_event_type base_network_event_type;
+			typedef Network_Event<base_network_event_type> _Network_Event_Interface;
+			member_container(vector<_Network_Event_Interface*>, advisory_radio_events, none, none);
+
+		//==================================================================================================================
+		/// ITS
+		//------------------------------------------------------------------------------------------------------------------
+
 			member_prototype(Advisory_ITS, advisory_radio, typename MasterType::advisory_radio_type, none, none);
 			member_prototype(Depot, depot, typename MasterType::depot_type, none, none);
 			member_prototype(Advisory_ITS, variable_word_sign, typename MasterType::variable_word_sign_type, none, none);
 			member_prototype(Advisory_ITS, variable_speed_sign, typename MasterType::variable_speed_sign_type, none, none);
+			member_prototype(Sensor, link_sensor, typename MasterType::link_sensor_type, none, none);
 
-			typedef typename MasterType::base_network_event_type base_network_event_type;
-			typedef Network_Event<base_network_event_type> _Network_Event_Interface;
-			member_container(vector<_Network_Event_Interface*>, advisory_radio_events, none, none);
 		//==================================================================================================================
 		/// travel_time
 		//------------------------------------------------------------------------------------------------------------------
@@ -1022,6 +1034,11 @@ namespace Link_Components
 			{
 				_depot = (depot_interface*)depot;
 			}
+			
+			feature_implementation void Accept_ITS( typename type_of(MasterType::link_sensor)* link_sensor)
+			{
+				_link_sensor = (link_sensor_interface*)link_sensor;
+			}
 
 			static void subscribe_events()
 			{
@@ -1041,6 +1058,28 @@ namespace Link_Components
 				volume = non_volatile_link_moe_data.link_out_volume;
 				speed = non_volatile_link_moe_data.link_speed;
 				density = non_volatile_link_moe_data.link_density;
+			}
+			feature_implementation void get_prevailing_link_moe(int& volume, float& speed, float& density)
+			{
+				volume = non_volatile_link_moe_data.link_out_volume;
+				speed = non_volatile_link_moe_data.link_speed;
+				density = non_volatile_link_moe_data.link_density;
+			}
+
+			feature_implementation bool get_normal_day_link_moe(int& volume, float& speed, float& density)
+			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
+				if (((_Scenario_Interface*)_global_scenario)->template read_normal_day_link_moe<bool>())
+				{
+					volume = normal_day_link_moe_data.link_out_volume;
+					speed = normal_day_link_moe_data.link_speed;
+					density = normal_day_link_moe_data.link_density;
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
 
 			feature_implementation void open_shoulder()

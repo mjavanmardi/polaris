@@ -199,7 +199,7 @@ static void Initialize_Exchange_Interval(unsigned int partition,unsigned int exc
 }
 
 ///============================================================================
-/// Broadcast_Message - send individual message to target partition
+/// Send_Message - send individual message to target partition
 ///============================================================================
 
 template<typename ComponentType>

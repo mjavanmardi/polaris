@@ -23,12 +23,21 @@ namespace Sensor_Components
 		prototype struct Sensor:public ComponentType
 		{
 			tag_as_prototype;
-			feature_accessor(link, none, none);
-			feature_accessor(delta_t, none, none);
-			feature_accessor(sigma_speed, none, none);
-			feature_accessor(sigma_occupancy, none, none);
-			feature_accessor(sigma_volume, none, none);
-			feature_accessor(reading_container, none, none);
+			
+			feature static void Initialize_Type(TargetType configuration)
+			{
+				ComponentType::template Initialize_Type<ComponentType,CallerType,TargetType>(configuration);
+			}
+
+			feature static void Initialize_Type()
+			{
+				ComponentType::template Initialize_Type<ComponentType,CallerType,TargetType>();
+			}	
+
+			feature void Initialize(TargetType configuration)
+			{
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>(configuration);
+			}
 		};
 
 	}

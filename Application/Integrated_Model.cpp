@@ -133,6 +133,8 @@ struct MasterType
 	typedef Advisory_Radio_Components::Implementations::Antares_Highway_Advisory_Radio<MasterType> advisory_radio_type;
 	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Word_Sign<MasterType> variable_word_sign_type;
 	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Speed_Sign<MasterType> variable_speed_sign_type;
+
+	typedef Sensor_Components::Implementations::Antares_Link_Sensor<MasterType> link_sensor_type;
 	#else
 	typedef Network_Event_Components::Implementations::Weather_Network_Event<MasterType> weather_network_event_type;
 	typedef Network_Event_Components::Implementations::Accident_Network_Event<MasterType> accident_network_event_type;
@@ -144,6 +146,8 @@ struct MasterType
 	typedef Advisory_Radio_Components::Implementations::Highway_Advisory_Radio<MasterType> advisory_radio_type;
 	typedef Variable_Message_Sign_Components::Implementations::Variable_Word_Sign<MasterType> variable_word_sign_type;
 	typedef Variable_Message_Sign_Components::Implementations::Variable_Speed_Sign<MasterType> variable_speed_sign_type;
+
+	typedef Sensor_Components::Implementations::Link_Sensor<MasterType> link_sensor_type;
 	#endif
 
 	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;

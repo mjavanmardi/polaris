@@ -55,6 +55,7 @@ class Link_Type;
 class LinkList;
 class Component;
 class VMS;
+class Fixed_Sensor;
 class HAR;
 class VSS;
 class Depot;
@@ -1912,6 +1913,20 @@ private:
 };
 
 
+#pragma db object
+class Fixed_Sensor
+{
+public:
+	Fixed_Sensor() {}
+	#pragma db auto id
+	int id;
+	int link;
+	bool dir;
+	double offset;
+	double sigma;
+	int aggregation_period_sec;
+
+};
 #pragma db object
 class Action_Key
 {

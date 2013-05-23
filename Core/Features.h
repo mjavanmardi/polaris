@@ -213,11 +213,51 @@ struct member_function_ptr_types<Type,communication_handler_type>
 		}\
 
 
+#define feature_accessor_check(FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	public:\
+		template<typename T>\
+		struct FEATURE_NAME##_set_check\
+		{\
+			template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_setter_tag*);\
+			template<typename U> static large_type has_matching_typename(...);\
+			static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+		};\
+		template<typename TargetType>\
+		void FEATURE_NAME(TargetType set_value,requires(!check(ComponentType,FEATURE_NAME##_set_check) || (SETTER_REQUIREMENTS)))\
+		{\
+			static_assert(FEATURE_NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_setter_as_available\"? ---------]\n\n");\
+			static_assert(!SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
+		}\
+		template<typename T>\
+		struct FEATURE_NAME##_get_check\
+		{\
+			template<typename U> static small_type has_matching_typename(typename U::FEATURE_NAME##_getter_tag*);\
+			template<typename U> static large_type has_matching_typename(...);\
+			static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+		};\
+		template<typename TargetType>\
+		TargetType FEATURE_NAME(requires(!check(ComponentType,FEATURE_NAME##_get_check) || (GETTER_REQUIREMENTS)))\
+		{\
+			static_assert(FEATURE_NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_getter_as_available\"? ---------]\n\n");\
+			static_assert(!GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
+		}\
+
+#define feature_accessor_specialization(DATA_TYPE,FEATURE_NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+	public:\
+		template<typename TargetType>\
+		void FEATURE_NAME(DATA_TYPE set_value,requires(check(ComponentType,FEATURE_NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+		{\
+			this_component()->template FEATURE_NAME<ComponentType,CallerType,DATA_TYPE>(set_value);\
+		}\
+		template<typename TargetType>\
+		DATA_TYPE FEATURE_NAME(requires(check(ComponentType,FEATURE_NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+		{\
+			return this_component()->template FEATURE_NAME<ComponentType,CallerType,DATA_TYPE>();\
+		}\
+
 
 
 #define tag_feature_as_available(FEATURE_NAME) typedef true_type FEATURE_NAME##_feature_tag;
-
-
 
 ///============================================================================
 /// feature_getter - catches the standard get dispatches meeting concepts
@@ -230,8 +270,6 @@ struct member_function_ptr_types<Type,getter_type>
 {
 	typedef NULLTYPE (Type::* type)(void);
 };
-
-
 
 #define tag_getter_as_available(FEATURE_NAME) typedef getter_type FEATURE_NAME##_getter_tag;
 

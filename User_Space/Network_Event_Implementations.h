@@ -370,7 +370,7 @@ namespace Network_Event_Components
 		implementation struct Lane_Closure_Network_Event : public Base_Network_Event<MasterType,NT,APPEND_CHILD(Lane_Closure_Network_Event)>
 		{
 			//feature_implementation static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj);}
-		
+			
 			//feature_implementation void Start(){Base_Network_Event::template Start<ComponentType,CallerType,NT>();}
 			feature_implementation void Start(){((Base_Network_Event<MasterType,NT,APPEND_CHILD(Lane_Closure_Network_Event)>*)this)->template Start<ComponentType,CallerType,NT>();}
 
@@ -399,12 +399,15 @@ namespace Network_Event_Components
 		implementation struct Network_Event_Manager_Implementation : public Polaris_Component<APPEND_CHILD(Network_Event_Manager_Implementation),MasterType,Data_Object,ParentType>
 		{
 			typedef typename Polaris_Component<APPEND_CHILD(Network_Event_Manager_Implementation),MasterType,Data_Object,ParentType>::Component_Type ComponentType;
+			
 			typedef Network_Event<typename MasterType::type_of(base_network_event),ComponentType> Base_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::type_of(weather_network_event),ComponentType> Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::type_of(accident_network_event),ComponentType> Accident_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::type_of(congestion_network_event),ComponentType> Congestion_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::type_of(lane_closure_network_event),ComponentType> Lane_Closure_Network_Event_Interface;
 			
+			typedef Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
+
 			feature_implementation void Push_Subscriber(typename Network_Event_Callback<TargetType>::type callback)
 			{
 				Network_Event<TargetType,ComponentType>::template Push_Subscriber<typename Network_Event_Callback<TargetType>::type>(callback,CallerType::component_index);
@@ -567,8 +570,6 @@ namespace Network_Event_Components
 					}
 				}
 			}
-			
-			typedef Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
 
 			member_data( concat(unordered_map< int, list<Base_Network_Event_Interface*> >), network_event_container, none ,none);
 		};

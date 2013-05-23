@@ -737,14 +737,14 @@ namespace Network_Components
 				//_network_avg_link_queue_length_layer->Push_Element<Regular_Element>((void*)&element);
 			}
 
-			void read_link_moe_reference()
+			void read_historic_link_moe()
 			{
 				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, NULLTYPE);
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 
-				fstream& link_moe_reference_file = ((_Scenario_Interface*)_global_scenario)->template link_moe_reference_file<fstream&>();
-				if (!link_moe_reference_file.is_open())
+				fstream& historic_link_moe_file = ((_Scenario_Interface*)_global_scenario)->template historic_link_moe_file<fstream&>();
+				if (!historic_link_moe_file.is_open())
 				{
 					THROW_EXCEPTION(endl << "Link MOE reference file cannot be opened" << endl);
 				}
@@ -757,7 +757,7 @@ namespace Network_Components
 				Network_Components::Types::Link_ID_Dir link_id_dir;
 				for (int i = 0; i < (int)_links_container.size(); i++)
 				{
-					getline(link_moe_reference_file, line); 
+					getline(historic_link_moe_file, line); 
 					string_split(tokens, line);
 					if (tokens.size() == 0)
 					{
@@ -767,9 +767,9 @@ namespace Network_Components
 					if (record_time < current_time)
 					{
 						// skip until current time
-						while(link_moe_reference_file.good())
+						while(historic_link_moe_file.good())
 						{
-							getline(link_moe_reference_file, line);
+							getline(historic_link_moe_file, line);
 							string_split(tokens, line);
 							record_time = stoi(tokens[1]);
 							if (record_time >= current_time)

@@ -67,7 +67,7 @@ namespace Vehicle_Components
 				cfg.dynamic_data=true;
 				cfg.target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
 				cfg.storage_offset=_iteration;
-				cfg.storage_size=3;
+				cfg.storage_size=4;
 				cfg.storage_period=1;
 
 				cfg.primitive_type=_QUAD;

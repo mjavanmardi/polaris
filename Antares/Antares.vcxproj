@@ -598,6 +598,7 @@
     <ClInclude Include="Antares_Layer_Implementation.h" />
     <ClInclude Include="Antares_Link_Implementation.h" />
     <ClInclude Include="Antares_Network_Implementation.h" />
+    <ClInclude Include="Antares_Sensor_Implementation.h" />
     <ClInclude Include="Antares_Traffic_Management_Center_Implementation.h" />
     <ClInclude Include="Antares_Variable_Message_Sign_Implementation.h" />
     <ClInclude Include="Antares_Vehicle_Implementation.h" />

@@ -281,7 +281,7 @@ namespace Link_Components
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				Push_To_Link_MOE_Plot_Display<ComponentType,CallerType,TargetType>();
 				Push_To_Link_MOE_Map_Display<ComponentType,CallerType,TargetType>();
-				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>())
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_historic_moe<bool>())
 				{
 					Push_To_Historic_Link_MOE_Plot_Display<ComponentType,CallerType,TargetType>();
 				}
@@ -546,7 +546,7 @@ namespace Link_Components
 				//((typename MasterType::network_type*)_global_network)->_historic_link_density_ratio_layer->Clear_Accented<NT>();
 				//((typename MasterType::network_type*)_global_network)->_historic_link_queue_length_layer->Clear_Accented<NT>();
 				plot_current_link_moe_in_historic_plot();
-				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>())
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_historic_moe<bool>())
 				{
 					plot_historic_link_moe();
 				}
@@ -841,7 +841,7 @@ namespace Link_Components
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 				
-				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>()) 
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_historic_moe<bool>()) 
 				{
 					key_value_pair.first="Historic travel time";
 					sprintf(str_buf, "%.2f minutes", historic_link_moe_data.link_travel_time);
@@ -856,7 +856,7 @@ namespace Link_Components
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 				
-				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>()) 
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_historic_moe<bool>()) 
 				{
 					key_value_pair.first="Historic speed";
 					sprintf(str_buf, "%.2f MPH", historic_link_moe_data.link_speed);
@@ -871,7 +871,7 @@ namespace Link_Components
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 
-				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>()) 
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_historic_moe<bool>()) 
 				{
 					key_value_pair.first="Historic density";
 					sprintf(str_buf, "%.2f VPMPL", historic_link_moe_data.link_density);

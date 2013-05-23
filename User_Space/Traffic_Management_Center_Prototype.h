@@ -4,6 +4,7 @@
 #include "Advisory_Radio_Prototype.h"
 #include "Depot_Prototype.h"
 #include "Variable_Message_Sign_Prototype.h"
+#include "Sensor_Prototype.h"
 
 namespace Traffic_Management_Center_Components
 {

@@ -203,7 +203,7 @@ struct Antares_Layer_Configuration
 	{
 		Configure_Default();
 		dynamic_data=true;
-		storage_size=3;
+		storage_size=4;
 		storage_period=1;
 
 		primitive_type=_LINE;
@@ -220,7 +220,7 @@ struct Antares_Layer_Configuration
 		dynamic_data=true;
 
 		storage_offset=_iteration;
-		storage_size=3;
+		storage_size=4;
 		storage_period=1;
 
 		primitive_type=_POINT;
@@ -274,7 +274,7 @@ struct Antares_Layer_Configuration
 	{
 		Configure_Default();
 		dynamic_data=true;
-		storage_size=3;
+		storage_size=4;
 		storage_period=1;
 
 		primitive_type=_QUAD;
@@ -292,7 +292,7 @@ struct Antares_Layer_Configuration
 		draw=true;
 		dynamic_data=true;
 
-		storage_size=3;
+		storage_size=4;
 		storage_period=1;
 
 		primitive_type=_PLOT;

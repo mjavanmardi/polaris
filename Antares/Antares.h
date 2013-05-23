@@ -21,6 +21,7 @@
 #include "Antares_Depot_Implementation.h"
 #include "Antares_Advisory_Radio_Implementation.h"
 #include "Antares_Link_Control_Implementation.h"
+#include "Antares_Sensor_Implementation.h"
 #include "Antares_Network_Event_Implementation.h"
 #include "Splash_Panel_Implementation.h"
 

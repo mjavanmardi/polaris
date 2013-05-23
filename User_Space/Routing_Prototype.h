@@ -169,11 +169,9 @@ namespace Routing_Components
 
 				current_link->template label_cost<float>(new_cost); // g - label_cost
 
-				_Routable_Intersection_Interface* current_intersection;
-
 				if(current_link->template network_link_reference<_Regular_Link_Interface*>() != destination_reference)
 				{
-					current_intersection=current_link->template upstream_intersection<_Routable_Intersection_Interface*>();
+					_Routable_Intersection_Interface* current_intersection=current_link->template upstream_intersection<_Routable_Intersection_Interface*>();
 					dx = destination_x - current_intersection->template x_position<float>();
 					dy = destination_y - current_intersection->template y_position<float>();
 					current_link->template h_cost<float>(sqrt(dx*dx+dy*dy)/max_free_flow_speed); // h - estimated = sqrt(dx*dx+dy*dy)/max_free_flow_speed 
@@ -187,7 +185,7 @@ namespace Routing_Components
 				current_link->template label_pointer<_Routable_Link_Interface*>(current_link);
 				scan_list.insert(make_pair(current_link->template f_cost<float>(),current_link));
 				current_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
-				int cur_link_id;
+
 				while(!scan_list.empty())
 				{ 
 
@@ -199,7 +197,6 @@ namespace Routing_Components
 						current_link->template reset_list_status<bool>(1);
 					}
 
-					cur_link_id=current_link->template network_link_reference<_Regular_Link_Interface*>()->template uuid<int>();
 					if(current_link == destination_link_ptr)
 					{
 						break;
@@ -207,9 +204,6 @@ namespace Routing_Components
 
 					scan_list.erase(scan_list.begin());	// no need to find minimum since set is ordered by its first element, i.e. label cost.
 					current_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::SCANNED);
-
-					current_intersection=current_link->template downstream_intersection<_Routable_Intersection_Interface*>();
-
 
 					_Movements_Container_Interface& outbound_movements_container = current_link->template outbound_turn_movements<_Movements_Container_Interface&>();
 					typename _Movements_Container_Interface::iterator outbound_itr;
@@ -341,13 +335,11 @@ namespace Routing_Components
 				}
 				current_link->template label_cost<float>(new_cost); // g - label_cost
 
-				_Routable_Intersection_Interface* current_intersection;
-
 				current_link->template label_pointer<_Routable_Link_Interface*>(current_link);
 
 				scan_list.insert(make_pair(current_link->template label_cost<float>(),current_link));
 				current_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
-				int cur_link_id;
+				
 				while(!scan_list.empty())
 				{ 
 
@@ -358,58 +350,41 @@ namespace Routing_Components
 						reset_links_container.push_back(current_link);
 						current_link->template reset_list_status<bool>(1);
 					}
-					cur_link_id=current_link->template network_link_reference<_Regular_Link_Interface*>()->template uuid<int>();
 
 					scan_list.erase(scan_list.begin());	// no need to find minimum since set is ordered by its first element, i.e. label cost.
 					current_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::SCANNED);
 
-					current_intersection=current_link->template downstream_intersection<_Routable_Intersection_Interface*>();
-
-					
 					//for all outbound turn movements
-					_Inbound_Outbound_Movements_Container_Interface& inbound_outbound_movements_container = current_intersection->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>();
-					typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_itr;
-					for(inbound_itr=inbound_outbound_movements_container.begin(); inbound_itr!=inbound_outbound_movements_container.end(); inbound_itr++)
+					_Movements_Container_Interface& outbound_movements_container = current_link->template outbound_turn_movements<_Movements_Container_Interface&>();
+					typename _Movements_Container_Interface::iterator outbound_itr;
+
+					for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
 					{
-						_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_itr);
-						_Routable_Link_Interface* inbound_link = inbound_outbound_movements->template inbound_link_reference<_Routable_Link_Interface*>();
-						int inbound_link_id=inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
+						_Movement_Interface* outbound_movement = (_Movement_Interface*)(*outbound_itr);
+						_Routable_Link_Interface* next_link=outbound_movement->template outbound_link<_Routable_Link_Interface*>();
+						int next_link_id=next_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
 
-						if (inbound_link == current_link)
+						if(next_link->template reset_list_status<bool>()==0)
 						{
-							_Movements_Container_Interface& outbound_movements_container = inbound_outbound_movements->template outbound_movements<_Movements_Container_Interface&>();
-							typename _Movements_Container_Interface::iterator outbound_itr;
+							reset_links_container.push_back(next_link);
+							next_link->template reset_list_status<bool>(1);
+						}
+						next_cost=outbound_movement->template forward_link_turn_travel_time<float>();
+						new_cost=current_link->template label_cost<float>() + next_cost;
 
-							for(outbound_itr=outbound_movements_container.begin(); outbound_itr!=outbound_movements_container.end(); outbound_itr++)
+						if(next_link->template label_cost<float>()>new_cost)
+						{
+							if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>()==Network_Components::Types::INSELIST)
 							{
-								_Movement_Interface* outbound_movement = (_Movement_Interface*)(*outbound_itr);
-								_Routable_Link_Interface* next_link=outbound_movement->template outbound_link<_Routable_Link_Interface*>();
-								int next_link_id=next_link->template network_link_reference<_Regular_Link_Interface*>()->template internal_id<int>();
-
-								if(next_link->template reset_list_status<bool>()==0)
-								{
-									reset_links_container.push_back(next_link);
-									next_link->template reset_list_status<bool>(1);
-								}
-								next_cost=outbound_movement->template forward_link_turn_travel_time<float>();
-								new_cost=current_link->template label_cost<float>() + next_cost;
-
-								if(next_link->template label_cost<float>()>new_cost)
-								{
-									if(next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>()==Network_Components::Types::INSELIST)
-									{
-										scan_list.erase(make_pair(next_link->template label_cost<float>(),next_link)); // delete the old cost
-									}
-
-									next_link->template label_cost<float>(new_cost);
-									next_link->template label_pointer<_Routable_Link_Interface*>(current_link);
-
-									scan_list.insert(make_pair(next_link->template label_cost<float>(),next_link)); // update with the new cos
-
-									next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
-								}
+								scan_list.erase(make_pair(next_link->template label_cost<float>(),next_link)); // delete the old cost
 							}
-							break;
+
+							next_link->template label_cost<float>(new_cost);
+							next_link->template label_pointer<_Routable_Link_Interface*>(current_link);
+
+							scan_list.insert(make_pair(next_link->template label_cost<float>(),next_link)); // update with the new cos
+
+							next_link->template scan_list_status<Network_Components::Types::Scan_List_Status_Keys>(Network_Components::Types::INSELIST);
 						}
 					}
 				}

@@ -24,12 +24,22 @@ namespace Traffic_Management_Center_Components
 
 			typedef Depot<typename MasterType::type_of(depot),Simple_TMC> Depot_Interface;
 			typedef Link_Control<typename MasterType::type_of(link_control),Simple_TMC> Link_Control_Interface;
+			typedef Sensor<typename MasterType::type_of(link_sensor),Simple_TMC> Sensor_Interface;
 
 			// that places a pointer to network_event_manager_type
 			//			  name of the prototype class		variable name					underlying type
 			member_prototype(Network_Event_Manager, network_event_manager, typename MasterType::network_event_manager_type, none, none);
 
-			//                                          name of the dunction
+			member_data(vector<Variable_Word_Sign_Interface*>,variable_word_signs,none,none);
+			member_data(vector<Variable_Speed_Sign_Interface*>,variable_speed_signs,none,none);
+			member_data(vector<Advisory_Radio_Interface*>,advisory_radios,none,none);
+			
+			member_data(vector<Depot_Interface*>,depots,none,none);
+			member_data(vector<Link_Control_Interface*>,link_controls,none,none);
+
+			member_data(vector<Sensor_Interface*>,traffic_sensors,none,none);
+
+			//                                          name of the function
 			declare_feature_conditional_implementation(TMC_Conditional)
 			{
 				response.next._iteration = _iteration + 10;
@@ -45,35 +55,6 @@ namespace Traffic_Management_Center_Components
 				ComponentType* pthis = (ComponentType*)_this;
 
 				pthis->template Load_New_Events<ComponentType,ComponentType,NT>();
-				pthis->template DecideOnEventsToBeDisplayed<ComponentType,ComponentType,NT>();
-			}
-
-			feature_implementation void DecideOnEventsToBeDisplayed()
-			{
-				vector<Base_Network_Event_Interface*> current_events;
-				_network_event_manager->template Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
-				for(typename vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
-				{
-					vector<Base_Network_Event_Interface*> events_to_display;
-					//some claculations here
-					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
-				}
-
-				for(typename vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
-				{
-					vector<Base_Network_Event_Interface*> events_to_display;
-					//some claculations here
-					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
-				}
-
-				for(typename vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
-				{
-					vector<Base_Network_Event_Interface*> events_to_display;
-					//some claculations here
-					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
-				}
-
-
 			}
 
 			feature_implementation void Load_New_Events()
@@ -84,7 +65,6 @@ namespace Traffic_Management_Center_Components
 				for(typename vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 				{
 					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
-					
 				}
 
 				for(typename vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
@@ -122,7 +102,7 @@ namespace Traffic_Management_Center_Components
 				cout << "Reading Components" << endl;
 
 				
-				cout << "VSS" << endl;
+				cout << "\tVSS" << endl;
 
 				result<VSS> vss_component_result=db->template query<VSS>(query<VSS>::true_expr);
 				
@@ -136,7 +116,7 @@ namespace Traffic_Management_Center_Components
 				}
 				
 
-				cout << "VWS" << endl;
+				cout << "\tVWS" << endl;
 
 				result<VMS> vws_component_result=db->template query<VMS>(query<VMS>::true_expr);
 
@@ -164,7 +144,7 @@ namespace Traffic_Management_Center_Components
 				}
 
 
-				cout << "Depot" << endl;
+				cout << "\tDepot" << endl;
 
 				result<polaris::io::Depot> depot_component_result=db->template query<polaris::io::Depot>(query<polaris::io::Depot>::true_expr);
 
@@ -178,7 +158,7 @@ namespace Traffic_Management_Center_Components
 				}
 
 
-				cout << "Link Control" << endl;
+				cout << "\tLink Control" << endl;
 
 				result<OpenShoulder> link_control_component_result=db->template query<OpenShoulder>(query<OpenShoulder>::true_expr);
 
@@ -191,94 +171,23 @@ namespace Traffic_Management_Center_Components
 					_link_controls.push_back(its_component);				
 				}
 
+
+				cout << "\tSensor" << endl;
+
+				result<Fixed_Sensor> sensor_component_result=db->template query<Fixed_Sensor>(query<Fixed_Sensor>::true_expr);
+
+				Sensor_Interface::template Initialize_Type<NT>();
+
+				for(typename result<Fixed_Sensor>::iterator db_itr = sensor_component_result.begin (); db_itr != sensor_component_result.end (); ++db_itr)
+				{
+					Sensor_Interface* its_component = (Sensor_Interface*)Allocate<typename Sensor_Interface::ComponentType>();
+					its_component->template Initialize< Fixed_Sensor& >( *db_itr );
+					_traffic_sensors.push_back(its_component);				
+				}
+
 				cout << "Done Reading" << endl;
-
-				//result<Component> component_result=db->template query<Component>(query<Component>::true_expr);
-
-				//cout << "Reading Components: " << db_name << endl;
-
-				//for(result<Component>::iterator db_itr = component_result.begin (); db_itr != component_result.end (); ++db_itr)
-				//{
-				//	const string& name = db_itr->getName();
-
-				//	cout << name << endl;
-
-				//	if(name == "Variable Speed Sign")
-				//	{
-				//		Variable_Speed_Sign_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
-				//	}
-				//	else if(name == "Variable Message Sign")
-				//	{
-				//		Variable_Word_Sign_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
-				//	}
-				//	else if(name == "Tow Truck Depot")
-				//	{
-				//		Depot_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
-
-				//		Depot_Interface* its_component = (Depot_Interface*)Allocate<Depot_Interface::ComponentType>();											
-				//		vector<int>& covered_links = GetLinksInsideDepotPolygon(db_name);
-				//		its_component->Initialize< vector<int>& >(covered_links);
-				//		_depots.push_back(its_component);
-				//	}
-				//	else if(name == "HAR")
-				//	{
-				//		Advisory_Radio_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
-
-				//		map<string, POLY>& har_locations = GetCountyPolygons(db_name);
-
-				//		for(map<string, POLY>::iterator itr = har_locations.begin(); itr!= har_locations.end(); itr++)
-				//		{
-				//			vector<int>& covered_links = GetLinksInsideCounty(db_name,itr->first);
-
-				//			if(covered_links.size() > 0)
-				//			{
-				//				Advisory_Radio_Interface* its_component = (Advisory_Radio_Interface*)Allocate<Advisory_Radio_Interface::ComponentType>();
-				//				its_component->Initialize< vector<int>& >(covered_links);
-				//				_advisory_radios.push_back(its_component);
-				//			}
-				//		}
-				//	}
-				//	else if(name == "Open Shoulder")
-				//	{
-				//		Link_Control_Interface::Initialize_Type<const vector<shared_ptr<Component_Key>>&>(db_itr->getKeys());
-				//	}
-				//	
-				//	const vector<weak_ptr<Instance> >& instances = db_itr->getInstances();
-
-				//	for(vector<weak_ptr<Instance>>::const_iterator vitr=instances.begin();vitr!=instances.end();vitr++)
-				//	{
-				//		weak_ptr<Instance> _ptr=*vitr;
-
-				//		if(name == "Variable Speed Sign")
-				//		{
-				//			Variable_Speed_Sign_Interface* its_component = (Variable_Speed_Sign_Interface*)Allocate<Variable_Speed_Sign_Interface::ComponentType>();
-				//			its_component->Initialize< weak_ptr<Instance>& >(_ptr);
-				//			_variable_speed_signs.push_back(its_component);
-				//		}
-				//		else if(name == "Variable Message Sign")
-				//		{
-				//			Variable_Word_Sign_Interface* its_component = (Variable_Word_Sign_Interface*)Allocate<Variable_Word_Sign_Interface::ComponentType>();
-				//			its_component->Initialize< weak_ptr<Instance>& >(_ptr);
-				//			_variable_word_signs.push_back(its_component);
-				//		}
-				//		else if(name == "Open Shoulder")
-				//		{
-				//			Link_Control_Interface* its_component = (Link_Control_Interface*)Allocate<Link_Control_Interface::ComponentType>();
-				//			its_component->Initialize< weak_ptr<Instance>& >(_ptr);
-				//			_link_controls.push_back(its_component);
-				//		}
-				//	}
-				//}
-
-				
 			}
 
-			member_data(vector<Variable_Word_Sign_Interface*>,variable_word_signs,none,none);
-			member_data(vector<Variable_Speed_Sign_Interface*>,variable_speed_signs,none,none);
-			member_data(vector<Advisory_Radio_Interface*>,advisory_radios,none,none);
-			
-			member_data(vector<Depot_Interface*>,depots,none,none);
-			member_data(vector<Link_Control_Interface*>,link_controls,none,none);
 		};
 	}
 }

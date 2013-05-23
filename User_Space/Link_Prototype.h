@@ -291,6 +291,19 @@ namespace Link_Components
 			{
 				this_component()->template get_link_moe<ComponentType,CallerType,TargetType>(start_time, end_time, volume, speed, density);
 			}
+			feature_prototype void get_prevailing_link_moe(int& volume, float& speed, float& density)
+			{
+				this_component()->template get_prevailing_link_moe<ComponentType,CallerType,TargetType>(volume, speed, density);
+			}
+
+			/*
+			 * return true if normal day link moe is available in which case volume, speed, and density are filled up with corresponding data;
+			 * return false if normal day link moe is unavailable.
+			 */
+			feature_prototype bool get_normal_day_link_moe(int& volume, float& speed, float& density)
+			{
+				return this_component()->template get_normal_day_link_moe<ComponentType,CallerType,TargetType>(volume, speed, density);
+			}
 			feature_prototype void open_shoulder()
 			{
 				this_component()->template open_shoulder<ComponentType,CallerType,TargetType>();

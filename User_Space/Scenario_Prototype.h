@@ -153,7 +153,8 @@ namespace Scenario_Components
 			feature_accessor(input_network_snapshots_file, none, none);
 
 			feature_accessor(reference_realtime_network_moe_file, none, none);
-			feature_accessor(link_moe_reference_file, none, none);
+			feature_accessor(historic_link_moe_file, none, none);
+			feature_accessor(normal_day_link_moe_file, none, none);
 
 			feature_accessor(assignment_time_in_seconds, none, none);
 			feature_accessor(simulation_time_in_seconds, none, none);
@@ -199,9 +200,11 @@ namespace Scenario_Components
 			feature_accessor(read_network_snapshots, none, none);
 			feature_accessor(input_network_snapshots_file_path_name, none, none);	
 
-			feature_accessor(compare_with_moe_reference, none, none);
+			feature_accessor(compare_with_historic_moe, none, none);
 			feature_accessor(historic_network_moe_file_path_name, none, none);
 			feature_accessor(historic_link_moe_file_path_name, none, none);
+			feature_accessor(read_normal_day_link_moe, none, none);
+			feature_accessor(normal_day_link_moe_file_path_name, none, none);
 
 			feature_accessor(output_link_moe_for_simulation_interval, none, none);
 			feature_accessor(output_turn_movement_moe_for_simulation_interval, none, none);
@@ -367,10 +370,12 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("read_network_snapshots", read_network_snapshots<bool*>())!= PARAMETER_FOUND) read_network_snapshots<bool>(false);
 				if (cfgReader.getParameter("input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<string*>())!= PARAMETER_FOUND) input_network_snapshots_file_path_name<string>("input_network_snapshots");
 				
-				if (cfgReader.getParameter("compare_with_moe_reference", compare_with_moe_reference<bool*>())!= PARAMETER_FOUND) compare_with_moe_reference<bool>(false);
+				if (cfgReader.getParameter("compare_with_historic_moe", compare_with_historic_moe<bool*>())!= PARAMETER_FOUND) compare_with_historic_moe<bool>(false);
 				if (cfgReader.getParameter("historic_network_moe_file_path_name", historic_network_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_network_moe_file_path_name<string>("historic_realtime_moe_network.csv");
 				if (cfgReader.getParameter("historic_link_moe_file_path_name", historic_link_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_link_moe_file_path_name<string>("historic_moe_link.csv");
-
+				if (cfgReader.getParameter("read_normal_day_link_moe", read_normal_day_link_moe<bool*>())!= PARAMETER_FOUND) read_normal_day_link_moe<bool>(false);
+				if (cfgReader.getParameter("normal_day_link_moe_file_path_name", normal_day_link_moe_file_path_name<string*>())!= PARAMETER_FOUND) normal_day_link_moe_file_path_name<string>("normal_day_moe_link.csv");
+				
 				if (cfgReader.getParameter("output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_assignment_interval<bool>(true);
@@ -771,23 +776,23 @@ namespace Scenario_Components
 			feature_prototype void open_input_files()
 			{
 				//reference network moe file
-				if (compare_with_moe_reference<bool>())
+				if (compare_with_historic_moe<bool>())
 				{
 					reference_realtime_network_moe_file<fstream&>().open(historic_network_moe_file_path_name<string&>(), fstream::in);
 					if (!reference_realtime_network_moe_file<fstream&>().is_open())
 					{
-						THROW_EXCEPTION(endl << "compare_with_moe_reference is enabled but reference network MOE file " << historic_network_moe_file_path_name<string&>() << " cannot be openned." << endl);
+						THROW_EXCEPTION(endl << "compare_with_historic_moe is enabled but reference network MOE file " << historic_network_moe_file_path_name<string&>() << " cannot be openned." << endl);
 					}
 
-					link_moe_reference_file<fstream&>().open(historic_link_moe_file_path_name<string&>(), fstream::in);
-					if (!link_moe_reference_file<fstream&>().is_open())
+					historic_link_moe_file<fstream&>().open(historic_link_moe_file_path_name<string&>(), fstream::in);
+					if (!historic_link_moe_file<fstream&>().is_open())
 					{
-						THROW_EXCEPTION(endl << "compare_with_moe_reference is enabled but reference link MOE file " << historic_link_moe_file_path_name<string&>() << " cannot be openned." << endl);
+						THROW_EXCEPTION(endl << "compare_with_historic_moe is enabled but reference link MOE file " << historic_link_moe_file_path_name<string&>() << " cannot be openned." << endl);
 					}
 					else
 					{
 						string aLine;
-						getline(link_moe_reference_file<fstream&>(),aLine); // skip the first line
+						getline(historic_link_moe_file<fstream&>(),aLine); // skip the first line
 					}
 				}
 				if (read_network_snapshots<bool>())
@@ -796,6 +801,19 @@ namespace Scenario_Components
 					if (!input_network_snapshots_file<fstream&>().is_open())
 					{
 						THROW_EXCEPTION(endl << "read_network_snapshots is enabled but network snapshots file " << input_network_snapshots_file_path_name<string&>() << " cannot be opened." << endl);
+					}
+				}
+				if (read_normal_day_link_moe<bool>())
+				{
+					normal_day_link_moe_file<fstream&>().open(normal_day_link_moe_file_path_name<string&>(), fstream::in);
+					if (!normal_day_link_moe_file<fstream&>().is_open())
+					{
+						THROW_EXCEPTION(endl << "read_normal_day_link_moe is enabled but reference link MOE file " << normal_day_link_moe_file_path_name<string&>() << " cannot be openned." << endl);
+					}
+					else
+					{
+						string aLine;
+						getline(normal_day_link_moe_file<fstream&>(),aLine); // skip the first line
 					}
 				}
 			}

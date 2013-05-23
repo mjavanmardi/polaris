@@ -2,6 +2,7 @@
 #include "Network_Prototype.h"
 #include "Traffic_Management_Center_Prototype.h"
 #include "Network_Event_Prototype.h"
+#include "Polaris_Link_Implementation.h"
 
 namespace Network_Components
 {
@@ -400,15 +401,85 @@ namespace Network_Components
 						((typename MasterType::network_type*)_this)->output_snapshot();
 					}
 				}
-				if (((_Scenario_Interface*)_global_scenario)->template compare_with_moe_reference<bool>() && ((_Network_Interface*)_this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_historic_moe<bool>() && ((_Network_Interface*)_this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{
-					((typename MasterType::network_type*)_this)->read_link_moe_reference();
+					((typename MasterType::network_type*)_this)->read_historic_link_moe();
+				}
+				if (((_Scenario_Interface*)_global_scenario)->template read_normal_day_link_moe<bool>() && ((_Network_Interface*)_this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				{
+					((typename MasterType::network_type*)_this)->read_normal_day_link_moe();
 				}
 			}
 
-			void read_link_moe_reference()
+			void read_historic_link_moe()
 			{
 				// do nothing for non-visualized network implementaiton
+			}
+
+			void read_normal_day_link_moe()
+			{
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, NULLTYPE);
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Network_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+
+				fstream& normal_day_link_moe_file = ((_Scenario_Interface*)_global_scenario)->template normal_day_link_moe_file<fstream&>();
+				if (!normal_day_link_moe_file.is_open())
+				{
+					THROW_EXCEPTION(endl << "Link MOE reference file cannot be opened" << endl);
+				}
+				struct Link_Components::Implementations::Link_MOE_Data link_moe_data;
+				vector<string> tokens;
+				string line;
+				int current_time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>();
+				int record_time;
+				typename MasterType::link_type* link;
+				Network_Components::Types::Link_ID_Dir link_id_dir;
+				for (int i = 0; i < (int)_links_container.size(); i++)
+				{
+					getline(normal_day_link_moe_file, line); 
+					string_split(tokens, line);
+					if (tokens.size() == 0)
+					{
+						break;
+					}
+					record_time = stoi(tokens[1]);
+					if (record_time < current_time)
+					{
+						// skip until current time
+						while(normal_day_link_moe_file.good())
+						{
+							getline(normal_day_link_moe_file, line);
+							string_split(tokens, line);
+							record_time = stoi(tokens[1]);
+							if (record_time >= current_time)
+							{
+								break;
+							}
+						}
+					}
+					link_id_dir.id = stol(tokens[3]);
+					link_id_dir.dir = stol(tokens[4]);
+					link = (typename MasterType::link_type*)(_link_dbid_dir_to_ptr_map[link_id_dir.id_dir]);
+					int offset = 8;
+					link_moe_data.link_travel_time = stof(tokens[offset++]);
+					link_moe_data.link_travel_time_standard_deviation = stof(tokens[offset++]);
+					link_moe_data.link_queue_length = stof(tokens[offset++]);
+					link_moe_data.link_travel_delay = stof(tokens[offset++]);
+					link_moe_data.link_travel_delay_standard_deviation = stof(tokens[offset++]);
+					link_moe_data.link_speed = stof(tokens[offset++]);
+					link_moe_data.link_density = stof(tokens[offset++]);
+					link_moe_data.link_in_flow_rate = stof(tokens[offset++]);
+					link_moe_data.link_out_flow_rate = stof(tokens[offset++]);
+					link_moe_data.link_in_volume = stof(tokens[offset++]);
+					link_moe_data.link_out_volume = stof(tokens[offset++]);
+					link_moe_data.link_speed_ratio = stof(tokens[offset++]);
+					link_moe_data.link_in_flow_ratio = stof(tokens[offset++]);
+					link_moe_data.link_out_flow_ratio = stof(tokens[offset++]);
+					link_moe_data.link_density_ratio = stof(tokens[offset++]);
+					link_moe_data.link_travel_time_ratio = stof(tokens[offset++]);
+					link_moe_data.num_vehicles_in_link = stof(tokens[offset++]);
+					link->normal_day_link_moe_data = link_moe_data;
+				}
 			}
 
 			void create_snapshot()

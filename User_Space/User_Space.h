@@ -49,6 +49,7 @@ void* _global_scenario;
 #include "Depot_Implementation.h"
 #include "Link_Control_Implementation.h"
 #include "Traffic_Management_Center_Implementation.h"
+#include "Polaris_Sensor_Implementation.h"
 
 // NETWORK_EVENT COMPONENTS
 

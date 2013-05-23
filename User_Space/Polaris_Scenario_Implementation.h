@@ -70,7 +70,8 @@ namespace Scenario_Components
 			member_data(fstream, out_link_moe_file, none, none);
 			member_data(fstream, out_movement_moe_file, none, none);
 			member_data(fstream, reference_realtime_network_moe_file, none, none);
-			member_data(fstream, link_moe_reference_file, none, none);
+			member_data(fstream, historic_link_moe_file, none, none);
+			member_data(fstream, normal_day_link_moe_file, none, none);
 			member_data(fstream, output_network_snapshots_file, none, none);
 			member_data(fstream, input_network_snapshots_file, none, none);
 
@@ -104,9 +105,11 @@ namespace Scenario_Components
 			member_data(bool, read_network_snapshots, none, none);
 			member_data(string, input_network_snapshots_file_path_name, none, none);
 
-			member_data(bool, compare_with_moe_reference, none, none);
+			member_data(bool, compare_with_historic_moe, none, none);
 			member_data(string, historic_network_moe_file_path_name, none, none);
 			member_data(string, historic_link_moe_file_path_name, none, none);
+			member_data(bool, read_normal_day_link_moe, none, none);
+			member_data(string, normal_day_link_moe_file_path_name, none, none);
 
 			member_data(bool, write_node_control_state, none, none);
 			member_data(bool, write_vehicle_trajectory, none, none);

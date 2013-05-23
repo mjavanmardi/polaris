@@ -145,7 +145,6 @@ namespace Intersection_Components
 				this_component()->template turn_movement_supply_allocation<ComponentType,CallerType,TargetType>();
 			}
 
-
 			feature_prototype void node_transfer()
 			{
 				this_component()->template node_transfer<ComponentType,CallerType,TargetType>();
@@ -182,10 +181,12 @@ namespace Intersection_Components
 			{
 				this_component()->template construct_routable_from_regular<ComponentType,CallerType,TargetType>(regular_intersection_param, linksMap_param);
 			}
+			
 			feature_prototype void construct_realtime_routable_from_regular(typename TargetType::ParamType regular_intersection_param, typename TargetType::Param2Type linksMap_param)
 			{
 				this_component()->template construct_realtime_routable_from_regular<ComponentType,CallerType,TargetType>(regular_intersection_param, linksMap_param);
 			}
+			
 			feature_prototype void set_forward_link_turn_travel_time(typename TargetType::ParamType movement_travel_time_map)
 			{
 				this_component()->template set_forward_link_turn_travel_time<ComponentType,CallerType,TargetType>(movement_travel_time_map);

@@ -123,6 +123,8 @@ namespace Network_Event_Components
 		{
 			tag_as_prototype;
 			
+			// Create new network event automatically starts it upon allocation
+
 			feature void Initialize()
 			{
 				this_component()->template Initialize<ComponentType,CallerType,TargetType>();

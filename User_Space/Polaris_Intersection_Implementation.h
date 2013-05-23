@@ -20,6 +20,7 @@ namespace Intersection_Components
 		{
 			// pointer to the outbound link
 			member_component(typename MasterType::link_type, outbound_link_reference, none, none);
+			
 			// container of inbound movements
 			member_container(vector<typename MasterType::movement_type*>, inbound_movements, none, none);
 			
@@ -423,7 +424,6 @@ namespace Intersection_Components
 				}
 			}
 
-
 			feature_implementation void Initialize()
 			{
 				define_component_interface(_Intersection_Control_Interface, type_of(intersection_control), Intersection_Control_Components::Prototypes::Intersection_Control_Prototype, ComponentType);
@@ -587,6 +587,7 @@ namespace Intersection_Components
 					inbound_link->calculate_moe_for_assignment_interval<NULLTYPE>();
 				}
 			}
+			
 			feature_implementation void update_vehicle_locations()
 			{
 				define_container_and_value_interface_unqualified_container(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
@@ -683,7 +684,6 @@ namespace Intersection_Components
 				_this_ptr->template node_transfer<NULLTYPE>();
 				////step 6: origin link loading
 				//_this_ptr->template origin_link_loading<NULLTYPE>();
-
 			}
 
 			declare_feature_event(Origin_Loading_Step)

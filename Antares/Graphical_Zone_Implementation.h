@@ -222,7 +222,7 @@ namespace Zone_Components
 				cfg.storage_period = 300;
 				cfg.target_sub_iteration = Types::ZONE_UPDATE_SUBITERATION+1;
 				cfg.storage_offset = 60/*_iteration*/;
-				cfg.storage_size = 3;
+				cfg.storage_size = 4;
 				cfg.primitive_color = true;
 				cfg.primitive_normal = true;
 
