@@ -131,6 +131,7 @@ struct MasterType
 	typedef Advisory_Radio_Components::Implementations::Antares_Highway_Advisory_Radio<MasterType> advisory_radio_type;
 	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Word_Sign<MasterType> variable_word_sign_type;
 	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Speed_Sign<MasterType> variable_speed_sign_type;
+	typedef Sensor_Components::Implementations::Antares_Link_Sensor<MasterType> link_sensor_type;
 #else
 	typedef Network_Event_Components::Implementations::Weather_Network_Event<MasterType> weather_network_event_type;
 	typedef Network_Event_Components::Implementations::Accident_Network_Event<MasterType> accident_network_event_type;
@@ -142,6 +143,7 @@ struct MasterType
 	typedef Advisory_Radio_Components::Implementations::Highway_Advisory_Radio<MasterType> advisory_radio_type;
 	typedef Variable_Message_Sign_Components::Implementations::Variable_Word_Sign<MasterType> variable_word_sign_type;
 	typedef Variable_Message_Sign_Components::Implementations::Variable_Speed_Sign<MasterType> variable_speed_sign_type;
+	typedef Sensor_Components::Implementations::Link_Sensor<MasterType> link_sensor_type;
 #endif
 	
 	typedef TYPELIST_4(weather_network_event_type,accident_network_event_type,congestion_network_event_type,lane_closure_network_event_type) network_event_types;
@@ -344,7 +346,7 @@ void run_with_input_from_files()
 	scenario->write_network_link_turn_time<bool>(false);
 	scenario->output_network_moe_for_simulation_interval<bool>(true);
 	scenario->output_link_moe_for_assignment_interval<bool>(true);
-	scenario->compare_with_moe_reference<bool>(false);
+	//scenario->compare_with_moe_reference<bool>(false);
 
 	scenario->read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);
 
