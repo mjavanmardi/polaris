@@ -291,7 +291,7 @@ throw new std::runtime_error(s.str().c_str());}
 #ifdef _MSC_VER
 #define ISNAN(x) _isnan(x)
 #else
-#define ISNAN(x) std::tr1::isnan(x)
+#define ISNAN(x) std::isnan(x)
 #endif
 
 //---------------------------------------------------------

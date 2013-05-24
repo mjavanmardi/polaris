@@ -61,26 +61,26 @@ namespace Traffic_Management_Center_Components
 			feature_implementation void DecideOnEventsToBeDisplayed()
 			{
 				vector<Base_Network_Event_Interface*> current_events;
-				_network_event_manager->Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
-				for(vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
+				_network_event_manager->template Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
+				for(typename vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 				{
 					vector<Base_Network_Event_Interface*> events_to_display;
 					//some claculations here
-					(*itr)->Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
 				}
 
-				for(vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
+				for(typename vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
 				{
 					vector<Base_Network_Event_Interface*> events_to_display;
 					//some claculations here
-					(*itr)->Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
 				}
 
-				for(vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
+				for(typename vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
 				{
 					vector<Base_Network_Event_Interface*> events_to_display;
 					//some claculations here
-					(*itr)->Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
 				}
 
 

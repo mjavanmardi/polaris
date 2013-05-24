@@ -294,12 +294,12 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// EXTERNAL Demand
 	//----------------------------------------------------------------------------------------------------------------------------------
-	define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
-	demand->scenario_reference<_Scenario_Interface*>(scenario);
-	demand->network_reference<_Network_Interface*>(network);
-	cout << "reading external demand data..." <<endl;
-	demand->read_demand_data<Net_IO_Type>(network_io_maps);
+	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
+	//_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
+	//demand->scenario_reference<_Scenario_Interface*>(scenario);
+	//demand->network_reference<_Network_Interface*>(network);
+	//cout << "reading external demand data..." <<endl;
+	//demand->read_demand_data<Net_IO_Type>(network_io_maps);
 
 	
 	//==================================================================================================================================
