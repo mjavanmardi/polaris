@@ -13,20 +13,6 @@ namespace Person_Components
 		//==================================================================================
 		/// Person Agent classes
 		//----------------------------------------------------------------------------------
-		implementation struct Person_Mover_Implementation : public Polaris_Component<APPEND_CHILD(Person_Mover_Implementation),MasterType,Execution_Object,ParentType>
-		{
-			// Tag as Implementation
-			typedef typename Polaris_Component<APPEND_CHILD(Person_Mover_Implementation),MasterType,Execution_Object>::Component_Type ComponentType;
-			typedef typename MasterType::base_network_event_type base_network_event_type;
-			typedef typename MasterType::weather_network_event_type weather_network_event_type;
-			typedef typename MasterType::accident_network_event_type accident_network_event_type;
-
-			member_prototype(Prototypes::Person,Parent_Person,typename MasterType::person_type,none,none);
-			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,Movement,typename MasterType::movement_plan_type,none,none);
-			member_data(bool, Movement_Scheduled, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
-			member_data(bool, Replanning_Needed, check(ReturnValueType,is_integral), check(SetValueType,is_integral));
-		};
-
 		implementation struct Person_Implementation : public Polaris_Component<APPEND_CHILD(Person_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			// Tag as Implementation
@@ -39,17 +25,14 @@ namespace Person_Components
 			member_prototype(PopSyn::Prototypes::Synthesis_Zone_Prototype, home_synthesis_zone, typename MasterType::zone,none,none);
 			member_prototype(Vehicle_Components::Prototypes::Vehicle_Prototype, vehicle,typename MasterType::vehicle_type,none,none);
 			member_prototype(Routing_Components::Prototypes::Routing_Prototype, router,typename MasterType::routing_type,none,none);
-			member_prototype(Prototypes::Person_Mover, Moving_Faculty,Implementations::Person_Mover_Implementation<MasterType>, none, none);
-		
+			
+			member_prototype(Prototypes::Person_Mover, Moving_Faculty,typename MasterType::person_mover_type, none, none);
 			member_prototype(Prototypes::Person_Planner, Planning_Faculty, typename MasterType::person_planner_type,none,check_2(ComponentType,CallerType, Is_Same_Entity));
+			member_prototype(Prototypes::Person_Scheduler, Scheduling_Faculty, typename MasterType::person_scheduler_type,none,check_2(ComponentType,CallerType, Is_Same_Entity));
 			member_prototype(Prototypes::Person_Perception, Perception_Faculty, typename MasterType::person_perception_type,none,check_2(ComponentType,CallerType, Is_Same_Entity));
 			member_prototype(Prototypes::Person_Properties, Properties, typename MasterType::person_properties_type,none,check_2(ComponentType,CallerType, Is_Same_Entity));
 			member_prototype(Prototypes::Person_Properties, Static_Properties,typename MasterType::person_static_properties_type,none,none);
 			
-
-
-
-
 
 			//member_prototype(Network_Components::Prototypes::Network_Prototype, network_reference, typename MasterType::network_type, none, none);
 			//member_prototype(Scenario_Components::Prototypes::Scenario_Prototype, scenario_reference, typename MasterType::scenario_type, none, none);
@@ -91,7 +74,7 @@ namespace Person_Components
 			member_component_and_feature_accessor(First_Iteration, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
 
 			// Record of completed activities (stores a simplified subset of activity data)
-			member_container(vector<typename MasterType::activity_record_type*>, activity_record_container, none, none);
+			member_container(list<typename MasterType::activity_record_type*>, Activity_Record_Container, none, none);
 
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
@@ -130,6 +113,11 @@ namespace Person_Components
 				timing_chooser->template Parent_Planner<Planning_Faculty_interface*>(_Planning_Faculty);
 				_Planning_Faculty->template Timing_Chooser<timing_choice_itf*>(timing_chooser);
 
+				// Create and Initialize the Scheduling faculty and its subcomponents
+				_Scheduling_Faculty = (Scheduling_Faculty_interface*)Allocate<type_of(Scheduling_Faculty)>();
+				_Scheduling_Faculty->template Parent_Person<ComponentType*>(this);
+				_Scheduling_Faculty->template Initialize<void>();
+
 				// Create and Initialize the Perception faculty and its subcomponents
 				_Perception_Faculty = (Perception_Faculty_interface*)Allocate<type_of(Perception_Faculty)>();	
 				_Perception_Faculty->template Parent_Person<ComponentType*>(this);
@@ -141,7 +129,7 @@ namespace Person_Components
 					
 
 				// Moving faculty
-				_Moving_Faculty = (Moving_Faculty_interface*)Allocate<Implementations::Person_Mover_Implementation<MasterType>>();
+				_Moving_Faculty = (Moving_Faculty_interface*)Allocate<type_of(Moving_Faculty)>();
 				_Moving_Faculty->template Parent_Person<ComponentType*>(this);
 
 				// Create and Initialize the vehicle		
@@ -381,6 +369,14 @@ namespace Person_Components
 
 			}
 			tag_feature_as_available(arrive_at_destination);
+
+
+			//=======================================================================================================================================================================
+			// PASS THROUGH FEATURES -> dispatched to member sub-objects
+			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			feature_implementation TargetType current_movement_plan()
+			{
+			}
 		};
 
 	}

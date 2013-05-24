@@ -428,7 +428,7 @@ namespace Vehicle_Components
 
 				display_route<typename MasterType::vehicle_type,NT,NT>();
 
-//#ifdef IntegratedModelApplication
+#ifdef IntegratedModelApplication
 				if (_locations_layer->template draw<bool>())
 				{
 
@@ -436,26 +436,37 @@ namespace Vehicle_Components
 
 					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
 					Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
-					list<typename type_of(MasterType::activity)*>* activities = planner->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
+					Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* scheduler = person->Scheduling_Faculty<Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* >();
+
+					list<typename type_of(MasterType::activity)*>* activities = scheduler->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
 					Activity_Location_Interface* previous_location;
+
+					cout << endl << "Sizes: activities="<<activities->size();
 
 					if(activities->size() && person->Home_Location<Activity_Location_Interface*>())
 					{
 						previous_location = person->Home_Location<Activity_Location_Interface*>();
+						int prev_end, current_start;
+						Activity_Planner<typename type_of(MasterType::activity),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity),ComponentType>*)(*(activities->begin()));
+						prev_end = activity_planner->Start_Time<Time_Minutes>() - activity_planner->Expected_Travel_Time<Time_Minutes>();
 
 						for(list<typename type_of(MasterType::activity)*>::iterator itr=activities->begin();itr!=activities->end();itr++)
 						{
 							Activity_Planner<typename type_of(MasterType::activity),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity),ComponentType>*)(*itr);
 							if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
+							current_start = activity_planner->Start_Time<Time_Minutes>();
 
-							display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location, false );
+							display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location,prev_end,current_start, false );
+							prev_end = current_start + activity_planner->Duration<Time_Minutes>();
 							previous_location = activity_planner->Location<Activity_Location_Interface*>();
 						}
 
-						display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, false );
+						display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, prev_end, prev_end + 15, false );
 					}
 
-					list<typename type_of(MasterType::activity_record)*>* discarded_activities = planner->Activity_Record_Container<list<typename type_of(MasterType::activity_record)*>*>();
+					list<typename type_of(MasterType::activity_record)*>* discarded_activities = person->Activity_Record_Container<list<typename type_of(MasterType::activity_record)*>*>();
+
+					cout << "discarded activities="<<discarded_activities->size() << endl;
 
 					if(discarded_activities->size() && person->Home_Location<Activity_Location_Interface*>())
 					{
@@ -466,14 +477,14 @@ namespace Vehicle_Components
 							Activity_Planner<typename type_of(MasterType::activity_record),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity_record),ComponentType>*)(*itr);
 							if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
 
-							display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location, true );
+							display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location, 1,1,true );
 							previous_location = activity_planner->Location<Activity_Location_Interface*>();
 						}
 
-						display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, true );
+						display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, 1,1,true );
 					}
 				}	
-//#endif						
+#endif						
 				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
 
 				Link_Line<MasterType>& link_line = link->template displayed_line<Link_Line<MasterType>&>();
@@ -677,7 +688,7 @@ namespace Vehicle_Components
 
 			}
 
-			feature_implementation void display_location(Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* location, Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* previous_location, bool discarded=false)
+			feature_implementation void display_location(Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* location, Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* previous_location, int previous_act_end, int current_act_start, bool discarded=false)
 			{
 #pragma pack(push,1)
 				struct attribute_coordinate
@@ -737,21 +748,23 @@ namespace Vehicle_Components
 					Point_3D<MasterType> start;
 					start._x = previous_location->x_position<float>();
 					start._y = previous_location->y_position<float>();
-					start._z = 1;
+					start._z = previous_act_end*25;
 					
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(start);
 
 					Point_3D<MasterType> end;
 					end._x = location->x_position<float>();
 					end._y = location->y_position<float>();
-					end._z = 1;
+					end._z = current_act_start*25;
+
+					cout << endl << "Start: " << start._x << "," << start._y << "," << start._z << ".  End: " << end._x << ", " << end._y << ", " << end._z;
 
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(end);
 
 					Point_3D<MasterType> mid;
 					mid._x = (start._x + end._x)/2;
 					mid._y = (start._y + end._y)/2;
-					mid._z = 1;
+					mid._z = (start._z + end._z)/2;
 					
 					if(!discarded)
 					{
@@ -775,16 +788,24 @@ namespace Vehicle_Components
 					
 					if(!discarded)
 					{
-						link_line.color._r=0;
+						/*link_line.color._r=0;
 						link_line.color._g=0;
 						link_line.color._b=0;
+						link_line.color._a=255;*/
+						link_line.color._r=25;
+						link_line.color._g=255;
+						link_line.color._b=25;
 						link_line.color._a=255;
 					}
 					else
 					{
-						link_line.color._r=0;
+						/*link_line.color._r=0;
 						link_line.color._g=0;
 						link_line.color._b=0;
+						link_line.color._a=200;*/
+						link_line.color._r=0;
+						link_line.color._g=0;
+						link_line.color._b=200;
 						link_line.color._a=200;
 					}
 
@@ -793,7 +814,6 @@ namespace Vehicle_Components
 
 					_routes_layer->template Push_Element<Accented_Element>(&link_line);
 				}
-
 			}
 
 			feature_implementation void display_route()

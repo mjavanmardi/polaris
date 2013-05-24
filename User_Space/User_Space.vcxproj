@@ -659,6 +659,8 @@
     <ClInclude Include="Network_Skimming_Prototype.h" />
     <ClInclude Include="Operation_Prototype.h" />
     <ClInclude Include="Person_Implementations.h" />
+    <ClInclude Include="Person_Mover_Implementations.h" />
+    <ClInclude Include="Person_Mover_Prototype.h" />
     <ClInclude Include="Person_Perception_Implementation.h" />
     <ClInclude Include="Person_Perception_Prototype.h" />
     <ClInclude Include="Person_Planner_Implementations.h" />

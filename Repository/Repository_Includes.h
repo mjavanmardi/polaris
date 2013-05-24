@@ -8,11 +8,11 @@
 
 #include "RngStream.h"
 
-#ifdef _MSC_VER
+//#ifdef _MSC_VER
 #include <random>
-#else
-#include <tr1/random>
-#endif
+//#else
+//#include <tr1/random>
+//#endif
 
 
 

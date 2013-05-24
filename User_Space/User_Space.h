@@ -58,6 +58,7 @@ void* _global_scenario;
 #ifndef EXCLUDE_DEMAND
 // PERSON AGENT COMPONENTS
 
+#include "Person_Mover_Implementations.h"
 #include "Person_Planner_Implementations.h"
 #include "Activity_Generator_Implementations.h"
 #include "Destination_Choice_Implementation.h"

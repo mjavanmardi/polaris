@@ -90,6 +90,7 @@ struct MasterType
 	typedef Person_Components::Implementations::Person_Implementation<M> person_type;
 
 	typedef Person_Components::Implementations::POLARIS_Person_Planner_Implementation<M, person_type> person_planner_type;
+	typedef Person_Components::Implementations::Person_Mover_Implementation<M, person_type> person_mover_type;
 	typedef Person_Components::Implementations::General_Person_Scheduler_Implementation<M, person_type> person_scheduler_type;
 	typedef Person_Components::Implementations::General_Person_Perception_Implementation<M, person_type> person_perception_type;
 	typedef Person_Components::Implementations::CTRAMP_Activity_Generator_Implementation<M, person_type> activity_generator_type;

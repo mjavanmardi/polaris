@@ -148,6 +148,7 @@ namespace Person_Components
 				Time_Minutes value;
 				
 				typename average_activity_frequency_and_duration_container_type::iterator itr;
+
 				itr = this->_average_activity_frequency_and_duration_container.find(act_type);
 				if (itr != this->_average_activity_frequency_and_duration_container.end())
 				{

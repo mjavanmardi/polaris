@@ -295,5 +295,11 @@
     <ClInclude Include="Link_Control_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Person_Mover_Prototype.h">
+      <Filter>Prototypes\Person Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Person_Mover_Implementations.h">
+      <Filter>Implementations\Person Components</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

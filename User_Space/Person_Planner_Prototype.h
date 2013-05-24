@@ -62,8 +62,14 @@ namespace Person_Components
 				_Planning_Interface* this_ptr =(_Planning_Interface*)_pthis;
 
 				// Define interfaces to the container members of the class
-				define_container_and_value_interface(Movement_Plans_List,Movement_Plan,typename get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-				Movement_Plans_List* movement_plans = this_ptr->template Movement_Plans_Container<Movement_Plans_List*>();
+				define_component_interface(person_itf,typename get_type_of(Parent_Person),Prototypes::Person,ComponentType);
+				define_component_interface(scheduler_itf,typename person_itf::get_type_of(Scheduling_Faculty),Prototypes::Person_Scheduler,ComponentType);
+				define_container_and_value_interface(Movement_Plans_List,Movement_Plan,typename scheduler_itf::get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				
+				person_itf* person = this_ptr->template Parent_Person<person_itf*>();
+				scheduler_itf* scheduler = person->template Scheduling_Faculty<scheduler_itf*>();
+				Movement_Plans_List* movement_plans = scheduler->template Movement_Plans_Container<Movement_Plans_List*>();
+
 				typename Movement_Plans_List::iterator move_itr = movement_plans->begin();
 				Movement_Plan* movement;			
 				if (move_itr != movement_plans->end()) movement = *move_itr;
@@ -195,6 +201,7 @@ namespace Person_Components
 
 				// create aliases for network components from parent
 				define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person,ComponentType);
+				define_component_interface(scheduler_itf,typename parent_itf::get_type_of(Scheduling_Faculty),Prototypes::Person_Scheduler,ComponentType);
 				define_component_interface(_Movement_Faculty_Interface, typename parent_itf::get_type_of(Moving_Faculty), Person_Components::Prototypes::Person_Mover, ComponentType);
 				define_component_interface(_Network_Interface, typename parent_itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
 				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
@@ -209,8 +216,8 @@ namespace Person_Components
 				vehicle_itf* vehicle = parent->template vehicle<vehicle_itf*>();
 
 				// Get reference to movement plans
-				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-				Movement_Plans* movements = this_ptr->template Movement_Plans_Container<Movement_Plans*>();
+				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename scheduler_itf::get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				Movement_Plans* movements = parent->template Scheduling_Faculty<scheduler_itf*>()->template Movement_Plans_Container<Movement_Plans*>();
 				typename Movement_Plans::iterator move_itr = movements->begin();
 
 				while (move_itr != movements->end())
@@ -342,21 +349,21 @@ namespace Person_Components
 				this_component()->Write_To_Log<ComponentType,CallerType,TargetType>(s);
 			}
 	
-			// Activity Plans and Movement plans, stored in a hashmap keyed based on next required plan time (updated in the plan class after plan completion)
+			// Sub faculties of the Person Planner
 			feature_accessor(Activity_Generation_Faculty,none,none);
 			feature_accessor(Destination_Choice_Faculty,none,none);
 			feature_accessor(Timing_Chooser,none,none);
 
-			feature_accessor(Activity_Container,none,none);
-			feature_accessor(Activity_Record_Container,none,none);
-			feature_accessor(Movement_Plans_Container,none,none);
-			feature_accessor(Schedule_Container,none,none);	
+			//feature_accessor(Activity_Container,none,none);
+			//feature_accessor(Activity_Record_Container,none,none);
+			//feature_accessor(Movement_Plans_Container,none,none);
+			//feature_accessor(Schedule_Container,none,none);	
 
-
-			feature_accessor(current_movement_plan,none,none);
-			feature_accessor(current_activity_plan,none,none);
-			feature_method_1_arg(next_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) && check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype));
-			feature_method_1_arg(previous_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
+			// Pass through members to scheduler class
+			//feature_accessor(current_movement_plan,none,none);
+			//feature_accessor(current_activity_plan,none,none);
+			//feature_method_1_arg(next_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) && check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype));
+			//feature_method_1_arg(previous_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
 			feature_prototype void Add_Movement_Plan(TargetType movement_plan)
 			{
 				this_component()->template Add_Movement_Plan<ComponentType,CallerType,TargetType>(movement_plan);

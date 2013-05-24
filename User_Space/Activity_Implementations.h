@@ -40,9 +40,10 @@ namespace Activity_Components
 			//================================================================================================================================================================================================
 			// Interfaces
 			typedef Prototypes::Activity_Planner<ComponentType,ComponentType> this_itf;
+			define_component_interface(_person_itf, typename type_of(Parent_Planner)::type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
+			define_component_interface(_scheduler_itf, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Scheduling_Faculty), Person_Components::Prototypes::Person_Scheduler, ComponentType);
 			define_component_interface(_properties_itf, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
 			define_component_interface(_planning_itf,type_of(Parent_Planner),Person_Components::Prototypes::Person_Planner,ComponentType);
-			define_component_interface(_person_itf,typename _planning_itf::get_type_of(Parent_Person),Person_Components::Prototypes::Person,ComponentType);
 			define_component_interface(_dest_choice_itf,typename _planning_itf::get_type_of(Destination_Choice_Faculty),Person_Components::Prototypes::Destination_Chooser,ComponentType);
 			define_component_interface(_scenario_itf, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 			define_component_interface(_network_itf, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
@@ -51,8 +52,8 @@ namespace Activity_Components
 			define_container_and_value_interface(_links_container_itf, _link_itf, typename _activity_location_itf::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_turns_container_itf, _turn_itf, typename _link_itf::get_type_of(outbound_turn_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
 			define_container_and_value_interface(_zones_container_itf, _zone_itf, typename _network_itf::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface(_activity_plans_container_itf,_activity_plan_itf, typename type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
-			define_container_and_value_interface(_movement_plans_container_itf,_movement_plan_itf, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(_activity_plans_container_itf,_activity_plan_itf, typename _scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface(_movement_plans_container_itf,_movement_plan_itf, typename _scheduler_itf::get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 
@@ -171,18 +172,8 @@ namespace Activity_Components
 			}
 			feature_implementation void Route_Planning_Event_Handler()
 			{
-				// updates for counters
-				//this->Route_Planning_Counter[_thread_id]++;
-				//if (this->Route_Planning_Counter[_thread_id] % 1000 == 0)  
-				//{
-				//	LOCK(this->_update_lock);
-				//	this->_Route_Planning_Count+=1000;
-				//	cout << '\r' << "Route Planning: " <<  this->_Route_Planning_Count<< "                                 ";
-				//	UNLOCK(this->_update_lock);
-				//}
-
 				// Create movement plan and give it an ID
-				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename type_of(Parent_Planner)::type_of(Movement_Plans_Container)::unqualified_value_type>();
+				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename _scheduler_itf::get_type_of(Movement_Plans_Container)::unqualified_value_type>();
 				move->template initialize_trajectory<NULLTYPE>();
 				move->template activity_reference<ComponentType*>((ComponentType*)this);
 
@@ -281,8 +272,8 @@ namespace Activity_Components
 			define_container_and_value_interface(_activity_locations_container_itf, _activity_location_itf, typename _network_itf::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_links_container_itf, _link_itf, typename _activity_location_itf::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_zones_container_itf, _zone_itf, typename _network_itf::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface(_activity_plans_container_itf,_activity_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
-			define_container_and_value_interface(_movement_plans_container_itf,_movement_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			//define_container_and_value_interface(_activity_plans_container_itf,_activity_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			//define_container_and_value_interface(_movement_plans_container_itf,_movement_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 		
@@ -588,37 +579,54 @@ namespace Activity_Components
 			feature_implementation void Location_Planning_Event_Handler()
 			{
 				base_type* bthis = (base_type*)this;
+				this_itf* pthis = (this_itf*)this;
 
-				// updates for counters
-				//this->Location_Planning_Counter[_thread_id]++;
-				//if (this->Location_Planning_Counter[_thread_id] % 10000 == 0)  
-				//{
-				//	//LOCK(this->_update_lock);
-				//	this->_Location_Planning_Count+=10000;
-				//	cout << '\r' << "Location Planning: " << this->_Location_Planning_Count << "                                 ";
-				//	UNLOCK(this->_update_lock);
-				//}
-
-
+				// references to external agents
 				_planning_itf* planner = bthis->template Parent_Planner<ComponentType,CallerType,_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
 				_dest_choice_itf* dest_chooser = planner->template Destination_Choice_Faculty<_dest_choice_itf*>();
+				_network_itf* network = person->template network_reference<_network_itf*>();
+
+				// timing variables
+				Time_Minutes start, end, prev_end, next_start, time_before, time_after, ttime_prev_to_home, ttime_home_to_next;
+				start = pthis->template Start_Time<Time_Minutes>();
+				end = pthis->template Start_Time<Time_Minutes>() + pthis->template Duration<Time_Minutes>();
 
 				// Get activity origin from previous planned activity (or from home if no preceeding activities)
-				_activity_location_itf* orig;
+				_activity_location_itf *prev_loc, *next_loc, *home_loc;
+				home_loc = person->template Home_Location<_activity_location_itf*>();
+
 				if (bthis->template Start_Is_Planned<ComponentType,CallerType,bool>())
 				{
-					this_itf* previous = planner->template previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->template Start_Time<ComponentType,CallerType,Time_Seconds>());
-					if (previous == nullptr) orig = person->template Home_Location<_activity_location_itf*>();
-					else orig = previous->template Location<_activity_location_itf*>();
+					// set previous activity location, =home if no previous activity
+					this_itf* previous = person->template previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->template Start_Time<ComponentType,CallerType,Time_Seconds>());
+					if (previous == nullptr) prev_loc = home_loc;
+					else prev_loc = previous->template Location<_activity_location_itf*>();
+
+					// determine if agent can go home prior to activity
+					time_before = start - (previous->template Start_Time<Time_Minutes>() + previous->template Duration<Time_Minutes>());
+					ttime_prev_to_home = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Type_Keys>>(prev_loc->template zone<_zone_itf*>()->template uuid<int>(), home_loc->template zone<_zone_itf*>()->template uuid<int>(),SOV);
+
+					// set next activity location, =home if no next activity
+					this_itf* next = person->template previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->template Start_Time<ComponentType,CallerType,Time_Seconds>());
+					if (next == nullptr) next_loc = home_loc;
+					else next_loc = next->template Location<_activity_location_itf*>();
+
+					// determine if agent can go home after activity before next activity
+					time_after = next->template Start_Time<Time_Minutes>() - end;
+					ttime_home_to_next = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Type_Keys>>(home_loc->template zone<_zone_itf*>()->template uuid<int>(),next_loc->template zone<_zone_itf*>()->template uuid<int>(),SOV);
 				}
-				else orig = person->template Home_Location<_activity_location_itf*>();
+				else 
+				{
+					prev_loc = home_loc;
+					next_loc = home_loc;
+				}
 
 				// call destination choice
-				_activity_location_itf* dest = dest_chooser->template Choose_Destination<_activity_location_itf*>(orig);
+				_activity_location_itf* dest = dest_chooser->template Choose_Destination<_activity_location_itf*>(prev_loc, next_loc);
 
 				// check that origin and destination are valid
-				if (orig != nullptr && dest != nullptr) 
+				if (prev_loc != nullptr && dest != nullptr) 
 				{
 					bthis->template Location<ComponentType,CallerType,_activity_location_itf*>(dest);
 				}
@@ -628,7 +636,7 @@ namespace Activity_Components
 					// Print to log file
 					stringstream s;
 					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
-					s << "," <<orig << ", " <<dest<<endl;
+					s << "," <<prev_loc << ", " <<dest<<endl;
 					planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 				}
@@ -711,8 +719,8 @@ namespace Activity_Components
 			define_container_and_value_interface(_activity_locations_container_itf, _activity_location_itf, typename _network_itf::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_links_container_itf, _link_itf, typename _activity_location_itf::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_zones_container_itf, _zone_itf, typename _network_itf::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface(_activity_plans_container_itf,_activity_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
-			define_container_and_value_interface(_movement_plans_container_itf,_movement_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+		/*	define_container_and_value_interface(_activity_plans_container_itf,_activity_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface(_movement_plans_container_itf,_movement_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);*/
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 

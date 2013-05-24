@@ -19,14 +19,17 @@ namespace Person_Components
 			member_prototype(Person_Components::Prototypes::Person_Planner, Parent_Planner, typename MasterType::person_planner_type, none, none);
 
 			// Interface definitions
+			define_component_interface(_Person_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person), Prototypes::Person, ComponentType);
+			define_component_interface(_Scheduler_Interface, typename _Person_Interface::get_type_of(Scheduling_Faculty), Prototypes::Person_Scheduler, ComponentType);
+			
 			define_component_interface(_Scenario_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 			define_component_interface(_Network_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
 			define_component_interface(_Skim_Interface, typename _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface(Activity_Plans,Activity_Plan, typename type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
-			define_container_and_value_interface(Movement_Plans,Movement_Plan, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Activity_Plans,Activity_Plan, typename _Scheduler_Interface::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface(Movement_Plans,Movement_Plan, typename _Scheduler_Interface::get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 		
 		};
 
@@ -96,6 +99,7 @@ namespace Person_Components
 			define_component_interface(_planner_itf,typename base_type::type_of(Parent_Planner),Prototypes::Person_Planner,ComponentType);
 			//define_component_interface(_Destination_Choice_Itf, typename _planner_itf::get_type_of(Destination_Chooser), Prototypes::Destination_Chooser, ComponentType);
 			define_component_interface(person_itf,typename base_type::type_of(Parent_Planner)::type_of(Parent_Person), Prototypes::Person,ComponentType);
+			define_component_interface(scheduler_itf,typename person_itf::get_type_of(Scheduling_Faculty), Prototypes::Person_Scheduler,ComponentType);
 			define_component_interface(_static_properties_itf,typename base_type::type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Static_Properties), Prototypes::Person_Properties,ComponentType);
 			define_component_interface(_properties_itf,typename base_type::type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Properties), Prototypes::Person_Properties,ComponentType);
 			define_component_interface(_Scenario_Interface, typename base_type::type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
@@ -104,10 +108,10 @@ namespace Person_Components
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface(Activities, Activity, typename base_type::type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface(Activities, Activity, typename scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::routine_activity_plan_type,ComponentType> Routine_Activity_Plan;
 			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_plan_type,ComponentType> Activity_Plan;
-			define_container_and_value_interface(Movement_Plans,Movement_Plan, typename base_type::type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Movement_Plans,Movement_Plan, typename scheduler_itf::get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
@@ -133,13 +137,14 @@ namespace Person_Components
 				}
 				
 				person_itf* _Parent_Person = base_type::_Parent_Planner->template Parent_Person<person_itf*>();
+				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
 				_static_properties_itf* static_properties = _Parent_Person->template Static_Properties<_static_properties_itf*>();
 				_properties_itf* properties = _Parent_Person->template Properties<_properties_itf*>();
 				//_Destination_Choice_Itf* destination_chooser = base_type::_Parent_Planner->template Destination_Chooser<_Destination_Choice_Itf*>();
 				
 				// get references to the plan containers
-				Activities* activities = base_type::_Parent_Planner->template Activity_Container<Activities*>();
-				Movement_Plans* movements = base_type::_Parent_Planner->template Movement_Plans_Container<Movement_Plans*>();	
+				Activities* activities = scheduler->template Activity_Container<Activities*>();
+				Movement_Plans* movements = scheduler->template Movement_Plans_Container<Movement_Plans*>();	
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();

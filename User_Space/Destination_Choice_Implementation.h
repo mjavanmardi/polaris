@@ -24,19 +24,23 @@ namespace Person_Components
 			static member_data(float, B_EMPLOYMENT, none,none);
 			static member_data(float, B_POPULATION, none,none);
 
-			member_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype, origin, typename MasterType::activity_location_type, none,none );
+			member_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype, previous, typename MasterType::activity_location_type, none,none );
 			member_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype, destination, typename MasterType::activity_location_type, none,none );
+			member_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype, next, typename MasterType::activity_location_type, none,none );
 			
+			//====================================================================================================================================
 			// Interface definitions
 			define_component_interface(person_itf,typename type_of(Parent_Planner)::type_of(Parent_Person), Prototypes::Person,ComponentType);
+			define_component_interface(scheduler_itf,typename person_itf::get_type_of(Scheduling_Faculty), Prototypes::Person_Scheduler,ComponentType);
 			define_component_interface(_Scenario_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 			define_component_interface(_Network_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
 			define_component_interface(_Skim_Interface, typename _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface(Activity_Plans,Activity_Plan, typename type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
-			define_container_and_value_interface(Movement_Plans,Movement_Plan, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Activity_Plans,Activity_Plan, typename scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface(Movement_Plans,Movement_Plan, typename scheduler_itf::get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			//------------------------------------------------------------------------------------------------------------------------------------
 
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
@@ -60,7 +64,7 @@ namespace Person_Components
 				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
 
 				// variables used for utility calculation
-				TargetType ttime, pop, emp, u;
+				TargetType ttime_before, ttime_after, ttime_without, ttime_deflected, pop, emp, u;
 				TargetType utility_sum = 0;
 				TargetType prob_sum = 0;
 				_Zone_Interface* zone;
@@ -68,11 +72,16 @@ namespace Person_Components
 				// select zones to choose from and estimate utility
 				zone = _destination->template zone<_Zone_Interface*>();
 
-				ttime = LOS->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_origin->template zone<_Zone_Interface*>()->template uuid<int>(),zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				// get the deflected travel time due to the addition of the current activity
+				ttime_before = LOS->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_previous->template zone<_Zone_Interface*>()->template uuid<int>(),zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				ttime_after = LOS->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(zone->template uuid<int>(),_next->template zone<_Zone_Interface*>()->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				ttime_without = LOS->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_previous->template zone<_Zone_Interface*>()->template uuid<int>(),_next->template zone<_Zone_Interface*>()->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				ttime_deflected = ttime_before + ttime_after - ttime_without;
+				
 				pop = zone->template population<TargetType>();
 				emp = zone->template employment<TargetType>();
 
-				u = (_B_POPULATION * pop + _B_EMPLOYMENT * emp + _B_TTIME * ttime);
+				u = (_B_POPULATION * pop + _B_EMPLOYMENT * emp + _B_TTIME * ttime_deflected);
 				if (u > 100.0) THROW_WARNING("WARNING: utility > 100.0 will cause numeric overflow, possible misspecification in utility function for destination choice. [Pop,emp,ttime]="<<pop << ", " << emp << ", " << ttime);
 
 				return (TargetType)u;				
@@ -98,7 +107,7 @@ namespace Person_Components
 				// select zones to choose from and estimate utility
 				zone = _destination->template zone<_Zone_Interface*>();
 
-				ttime = LOS->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_origin->template zone<_Zone_Interface*>()->template uuid<int>(),zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				ttime = LOS->template Get_LOS<Target_Type<NULLTYPE,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(_previous->template zone<_Zone_Interface*>()->template uuid<int>(),zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 				pop = zone->template population<TargetType>();
 				emp = zone->template employment<TargetType>();
 
@@ -141,15 +150,17 @@ namespace Person_Components
 			// Interface definitions
 			typedef Choice_Model_Components::Prototypes::Choice_Model<Destination_Choice_Model_Implementation<MasterType> > _Choice_Model_Interface;
 			typedef Prototypes::Destination_Choice_Option<typename MasterType::person_destination_choice_option_type> _Choice_Option_Interface;
+
 			define_component_interface(person_itf,typename type_of(Parent_Planner)::type_of(Parent_Person), Prototypes::Person,ComponentType);
+			define_component_interface(scheduler_itf,typename person_itf::get_type_of(Scheduling_Faculty),Prototypes::Person_Scheduler,ComponentType);
 			define_component_interface(_Scenario_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 			define_component_interface(_Network_Interface, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
 			define_component_interface(_Skim_Interface, typename _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
 			define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
-			define_container_and_value_interface(Activity_Plans,Activity_Plan, typename type_of(Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
-			define_container_and_value_interface(Movement_Plans,Movement_Plan, typename type_of(Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+			define_container_and_value_interface(Activity_Plans,Activity_Plan, typename scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface(Movement_Plans,Movement_Plan, typename scheduler_itf::get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
 			{	
@@ -162,7 +173,7 @@ namespace Person_Components
 			}
 			tag_feature_as_available(Initialize);
 
-			feature_implementation TargetType Choose_Destination(TargetType origin, vector<TargetType>* destinations_to_use=nullptr, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+			feature_implementation TargetType Choose_Destination(TargetType previous_location, TargetType next_location, vector<TargetType>* destinations_to_use=nullptr, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				
@@ -171,14 +182,14 @@ namespace Person_Components
 				_Choice_Model_Interface* choice_model = (_Choice_Model_Interface*)&a;
 
 				// get references to the plan containers
-				Activity_Plans* activities = _Parent_Planner->template Activity_Container<Activity_Plans*>();
-				Movement_Plans* movements = _Parent_Planner->template Movement_Plans_Container<Movement_Plans*>();	
+				//Activity_Plans* activities = _Parent_Person->template Activity_Container<Activity_Plans*>();
+				//Movement_Plans* movements = _Parent_Person->template Movement_Plans_Container<Movement_Plans*>();	
 
 				// external knowledge references
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
 				_Zones_Container_Interface* zones = network->template zones_container<_Zones_Container_Interface*>();
 
-				// selecte locations to choose from - use all of destinations to use not specified
+				// selecte locations to choose from - use all if destinations to use not specified
 				_Activity_Locations_Container_Interface* locations;
 				if (destinations_to_use == nullptr) locations= network->template activity_locations_container<_Activity_Locations_Container_Interface*>();
 				else locations = (_Activity_Locations_Container_Interface*)destinations_to_use;
@@ -186,7 +197,8 @@ namespace Person_Components
 				_Skim_Interface* LOS = network->template skimming_faculty<_Skim_Interface*>();
 
 				// get reference to origin zone
-				_Activity_Location_Interface* orig = (_Activity_Location_Interface*)origin;
+				_Activity_Location_Interface* prev = (_Activity_Location_Interface*)previous_location;
+				_Activity_Location_Interface* next = (_Activity_Location_Interface*)next_location;
 
 				// variables used for utility calculation
 				const int size = (int)locations->size();
@@ -200,8 +212,9 @@ namespace Person_Components
 					_Activity_Location_Interface* loc = locations->at(loc_id);
 
 					_Choice_Option_Interface* choice = (_Choice_Option_Interface*)Allocate<typename MasterType::person_destination_choice_option_type>();
-					choice->template origin<_Activity_Location_Interface*>(orig);
+					choice->template previous<_Activity_Location_Interface*>(prev);
 					choice->template destination<_Activity_Location_Interface*>(loc);
+					choice->template next<_Activity_Location_Interface*>(next);
 					choice->template Parent_Planner<Parent_Planner_interface*>(_Parent_Planner);
 					choice_model->template Add_Choice_Option<_Choice_Option_Interface*>(choice);
 					loc_options.push_back(choice);

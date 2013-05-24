@@ -27,10 +27,27 @@ namespace Person_Components
 			typedef Person_Scheduler<ComponentType, CallerType> This_Type;
 			
 			// accessor to parent class
-			feature_accessor(Parent_Planner,none,none);
+			feature_accessor(Parent_Person,none,none);
 			// accessors to parent class members
-			feature_accessor(Activity_Schedule,none,none);
-			feature_accessor(Movement_Schedule,none,none);
+			feature_accessor(Activity_Container,none,none);
+			feature_accessor(Movement_Plans_Container,none,none);
+
+			feature_method_void(Initialize,none);
+
+			feature_accessor(current_movement_plan,none,none);
+			feature_accessor(current_activity_plan,none,none);
+			
+			feature_method_1_arg(next_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
+			feature_method_1_arg(previous_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
+			
+			feature_prototype void Add_Movement_Plan(TargetType movement_plan)
+			{
+				this_component()->template Add_Movement_Plan<ComponentType,CallerType,TargetType>(movement_plan);
+			}
+			feature_prototype void Add_Activity_Plan(TargetType activity_plan)
+			{
+				this_component()->template Add_Activity_Plan<ComponentType,CallerType,TargetType>(activity_plan);
+			}
 		};
 	}
 

@@ -40,8 +40,8 @@ namespace RNG_Components
 			tag_feature_as_available(Next_Rand);
 
 			member_data(unsigned long, seed, none, none);
-			member_data(std::tr1::mt19937, generator, none, none);
-			member_data(std::tr1::uniform_real<double>, distribution, none, none);
+			member_data(std::mt19937, generator, none, none);
+			member_data(std::uniform_real_distribution<double>, distribution, none, none);
 		};
 
 		implementation struct MT_Uniform_Double : public MT_Probability_Double<MasterType,ParentType,APPEND_CHILD(MT_Uniform_Double)>
@@ -58,7 +58,7 @@ namespace RNG_Components
 			feature_implementation void Initialize()
 			{		
 				BaseType::_generator.seed(BaseType::_seed);
-				BaseType::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
+				BaseType::_distribution = std::uniform_real_distribution<double>(_minimum,_maximum);
 			}
 
 			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)0, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
@@ -67,7 +67,7 @@ namespace RNG_Components
 				this->template minimum<ComponentType,CallerType, TargetType>(min);
 				this->template maximum<ComponentType,CallerType, TargetType>(max);
 
-				BaseType::_distribution = std::tr1::uniform_real<double>(_minimum,_maximum);
+				BaseType::_distribution = std::uniform_real_distribution<double>(_minimum,_maximum);
 			}
 			tag_feature_as_available(Initialize);
 
@@ -91,7 +91,7 @@ namespace RNG_Components
 			{		
 				assert(_scale > 0);
 				GrandBaseType::_generator.seed(GrandBaseType::_seed);
-				_distribution = std::tr1::normal_distribution<double>(_location,_scale);
+				_distribution = std::normal_distribution<double>(_location,_scale);
 			}
 
 			feature_implementation void Initialize(	TargetType seed_value, TargetType min = (TargetType)0, TargetType max = (TargetType)1, TargetType location = (TargetType)0, TargetType scale = (TargetType)1, TargetType shape = (TargetType)1, requires(check(TargetType,is_arithmetic)))
@@ -101,8 +101,8 @@ namespace RNG_Components
 				this->template location<ComponentType,CallerType, TargetType>(location);
 				this->template scale<ComponentType,CallerType, TargetType>(scale);
 
-				_distribution = std::tr1::normal_distribution<double>(_location,_scale);
-				//_distribution = std::tr1::uniform_real<double>(MT_Uniform_Double::_minimum,MT_Uniform_Double::_maximum);
+				_distribution = std::normal_distribution<double>(_location,_scale);
+				//_distribution = std::tr1::uniform_real_distribution<double>(MT_Uniform_Double::_minimum,MT_Uniform_Double::_maximum);
 			}
 			tag_feature_as_available(Initialize);
 
@@ -112,7 +112,7 @@ namespace RNG_Components
 			}
 			tag_feature_as_available(Next_Rand);
 
-			member_data(std::tr1::normal_distribution<double>, distribution, none, none);
+			member_data(std::normal_distribution<double>, distribution, none, none);
 			member_data(double, location, none, none);
 			member_data(double, scale, none, none);
 		};
