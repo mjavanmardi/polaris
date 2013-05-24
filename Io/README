@@ -23,7 +23,7 @@ http://www.codesynthesis.com/download/odb/2.2/libodb-sqlite-2.2.0.zip
 Download and install the odb compiler for your platform from http://www.codesynthesis.com/download/odb/2.2/
 
 For example for Debian x32 it would be http://www.codesynthesis.com/download/odb/2.2/odb_2.2.0-1_i386.deb
-On zyphyr cluster the odb is installed in /mnt/lustre/app/polaris/bin/odb, so just append it ot your path
+On zyphyr cluster the odb is installed in /mnt/lustre/app/polaris/bin, so just append it ot your path
 
  
 

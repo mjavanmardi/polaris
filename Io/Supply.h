@@ -1912,12 +1912,32 @@ private:
 	std::string note;
 };
 
-
 #pragma db object
 class Fixed_Sensor
 {
 public:
-	Fixed_Sensor() {}
+    // Default Constructor
+    Fixed_Sensor () {}        
+	Fixed_Sensor (int id_, int link_, bool dir_, double offset_, double sigma_, int aggregation_period_sec_)
+	: id (id_), link (link_), dir (dir_), offset (offset_), sigma (sigma_), aggregation_period_sec (aggregation_period_sec_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const int& getLink () const {return link;}
+	void setLink (const int& link_) {link = link_;}
+	const bool& getDir () const {return dir;}
+	void setDir (const bool& dir_) {dir = dir_;}
+	const double& getOffset () const {return offset;}
+	void setOffset (const double& offset_) {offset = offset_;}
+	const double& getSigma () const {return sigma;}
+	void setSigma (const double& sigma_) {sigma = sigma_;}
+	const int& getAggregation_Period_Sec () const {return aggregation_period_sec;}
+	void setAggregation_Period_Sec (const int& aggregation_period_sec_) {aggregation_period_sec = aggregation_period_sec_;}
+	//Data Fields
+private:
+	friend class odb::access;
 	#pragma db auto id
 	int id;
 	int link;
@@ -1925,7 +1945,6 @@ public:
 	double offset;
 	double sigma;
 	int aggregation_period_sec;
-
 };
 #pragma db object
 class Action_Key

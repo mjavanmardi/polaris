@@ -145,9 +145,9 @@ inline int attach_spatialite(sqlite3* db_handle, bool init)
 			strcpy (sql, "SELECT load_extension('c:/opt/polarisdeps/Win32/bin/libspatialite-4.dll')");
 		#endif
 	#elif defined (__GNUC__)
+		std::cout << "SELECT load_extension('libspatialite.so')\n";
 		strcpy (sql, "SELECT load_extension('libspatialite.so')");
 	#else
-		std::cout << "Undefined architecture, not able to load libspatialite. Exiting...\n";
 		exit(1);
 	#endif
 	ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);

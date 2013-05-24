@@ -27,7 +27,7 @@ namespace Sensor_Components
 			feature static void Initialize_Type(TargetType configuration)
 			{
 				ComponentType::template Initialize_Type<ComponentType,CallerType,TargetType>(configuration);
-			}
+	}
 
 			feature static void Initialize_Type()
 			{

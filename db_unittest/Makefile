@@ -6,6 +6,14 @@ C_COMPILER = gcc
 Debug_Include_Path=-I../ -I$(HOME)/odb/include/
 Release_Include_Path=-I../ -I$(HOME)/odb/include/
 
+export GTEST_DIR=/mnt/lustre/home/vsokolov/gtest-1.6.0
+g++ -std=c++0x -I${GTEST_DIR}/include -I${HOME}/odb/include/ -I.. -L../gccRelease -L/usr/lib -L${HOME}/odb/lib -L${GTEST_DIR} -Wl,--start-group -lgtest -lsqlite3 -lodb -lodb-sqlite -Wl,--end-group main.cpp ../gccRelease/libio.a /mnt/lustre/home/vsokolov/gtest-1.6.0/libgtest.a -o db_unittest
+
+
+# Include paths... 
+Debug_Include_Path=-I../ -I$(HOME)/odb/include/
+Release_Include_Path=-I../ -I$(HOME)/odb/include/
+
 # Library paths...
 Debug_Library_Path=-L$(HOME)/odb/lib -L../gccDebug -L/usr/lib
 Release_Library_Path=-L$(HOME)/odb/lib -L../gccRelease -L/usr/lib

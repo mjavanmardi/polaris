@@ -5,16 +5,6 @@
 #include "Instance.h"
 #include "PopulateEvent.h"
 
-//#ifdef _DEBUG
-//#pragma comment(lib, "odb-sqlite-d-mt.lib")
-//#pragma comment(lib, "sqlite3-d-mt.lib")
-//#pragma comment(lib, "odb-d-mt.lib")
-//#else
-//#pragma comment(lib, "odb-sqlite-mt.lib")
-//#pragma comment(lib, "sqlite3-mt.lib")
-//#pragma comment(lib, "odb-mt.lib")
-//#endif
-
 
 int main(int argc, char* argv[])
 {

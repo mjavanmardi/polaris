@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <Io/Io.h>
 #include <Io/Geometry.h>
+#include <Io/Utils.h>
 
 char *db_path;
 
@@ -27,7 +28,7 @@ template <typename T>
 class TableTest : public testing::Test {
 protected:
 	virtual void SetUp() {
-		db = ::open_sqlite_database(::db_path);
+		db = open_sqlite_database(db_path);
 	}
 	typedef odb::query<T> query;
 	typedef T TT;
@@ -41,6 +42,24 @@ protected:
 TEST_F(DBTest, OpenFunction){
 	EXPECT_FALSE(this->db.get() == NULL);
 }
+
+TEST_F(DBTest, Path){
+	typedef odb::query<polaris::io::Path> query;
+	typedef odb::result<polaris::io::Path> result;
+	odb::transaction t1(this->db->begin());
+	result r(this->db->query<polaris::io::Path>(query::true_expr));	
+	int count = 0;
+	int len = r.begin()->link.size();
+	for (result::iterator i (r.begin()); i!=r.end(); ++i)
+	{
+	  count++;
+	}	
+	ASSERT_EQ(count, 8);
+	ASSERT_EQ(len, 2);
+	t1.commit();
+}
+
+
 
 TEST_F(DBTest, LocationFKLocation_Data){
 	typedef odb::query<polaris::io::Location> query;
@@ -195,6 +214,22 @@ TEST(SpatialiteT, LinkPoints)
 	std::map<int, shape_geometry> res;
 	res = GetLinkPoints(::db_path);
 	ASSERT_EQ(res.size(), 31205);
+}
+
+TEST(SpatialiteT, NumberNodes)
+{
+	using namespace polaris::io;
+	int res;
+	res = polaris::CountRows(db_path, "Node");
+	ASSERT_EQ(res, 18904);
+}
+
+TEST(SpatialiteT, NumberLinks)
+{
+	using namespace polaris::io;
+	int res;
+	res = polaris::CountRows(db_path, "Link");
+	ASSERT_EQ(res, 31205);
 }
 
 TEST(SpatialiteT, LinksInsidePoly)

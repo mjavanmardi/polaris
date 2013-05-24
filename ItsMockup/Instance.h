@@ -65,6 +65,7 @@ void PopulateInstance(std::string db_path)
 	db->execute("DELETE from HAR;");
 	db->execute("DELETE from Depot;");
 	db->execute("DELETE from OpenShoulder;");
+	db->execute("DELETE from Fixed_Sensor;");
 
 	shared_ptr<VMS>				vms (nullptr);
 	shared_ptr<VSS>				vss (nullptr);
@@ -72,6 +73,7 @@ void PopulateInstance(std::string db_path)
 	shared_ptr<Depot>			depot (nullptr);
 	shared_ptr<OpenShoulder>    os (nullptr);
 	shared_ptr<LinkList>		link_set (nullptr);
+	shared_ptr<Fixed_Sensor>	fixed_sensor (nullptr);
 
 	har.reset(new HAR(1,17436, 0,60, 20, 0));
 	har->setComponent(comp_har);
@@ -118,6 +120,28 @@ void PopulateInstance(std::string db_path)
 			catch (odb::object_already_persistent e) 
 			{
 				std::cout << "VMS Instance object already exists. " << e.what() << "\n";
+			}
+		}
+		if ( (type == "FREEWAY" || type == "EXPRESSWAY" ) && (p < 60) )
+		{
+			fixed_sensor.reset(new Fixed_Sensor());
+			if (i->getLanes_Ab() == 0 && i->getLanes_Ba() == 0)
+				continue;
+			if (i->getLanes_Ab() > 0) 
+				fixed_sensor->setDir(0);
+			else
+				fixed_sensor->setDir(1);
+			fixed_sensor->setLink(i->getLink());
+			fixed_sensor->setOffset(0);
+			fixed_sensor->setAggregation_Period_Sec(60*5);
+			fixed_sensor->setSigma(0.1);
+			try 
+			{
+				db->persist(fixed_sensor);
+			}
+			catch (odb::object_already_persistent e) 
+			{
+				std::cout << "fixed_sensor Instance object already exists. " << e.what() << "\n";
 			}
 		}
 		//put a VSS with probability 5%

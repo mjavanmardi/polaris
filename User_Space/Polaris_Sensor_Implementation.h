@@ -75,8 +75,8 @@ namespace Sensor_Components
 					long long id_dir;
 				} link_id_dir;
 
-				link_id_dir.id = instance.link;
-				link_id_dir.dir = instance.dir;
+				link_id_dir.id = instance.getLink();
+				link_id_dir.dir = instance.getDir();
 
 				unordered_map<long long,void*>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template link_dbid_dir_to_ptr_map<unordered_map<long long,void*>&>();
 
