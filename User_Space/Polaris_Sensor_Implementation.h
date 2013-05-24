@@ -89,7 +89,7 @@ namespace Sensor_Components
 					polaris_link->template Push_ITS< ComponentType* >( (ComponentType*)this );
 
 					typedef Scenario_Prototype<typename MasterType::scenario_type> Scenario_Interface;
-					load_event_implementation(ComponentType, ComponentType::template Sensor_Conditional,ComponentType::Sensor_Event,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1, Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS, NULLTYPE);
+					load_event_implementation(ComponentType, ComponentType::template Sensor_Conditional,ComponentType::template Sensor_Event,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1, Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS, NULLTYPE);
 				}
 			}
 
