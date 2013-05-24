@@ -1101,12 +1101,13 @@ namespace Link_Components
 			}
 
 			feature_implementation void process_weather_event();
-			feature_implementation float find_free_flow_speed_reduction_rate(int weather_index);
+			feature_implementation float find_free_flow_speed_adjustment_rate_for_weather(int weather_index);
 			feature_implementation int get_weather_index(TargetType weather_event);
 			feature_implementation void process_accident_event();
 		
-			static float link_capacity_reduction_factors[18];
-			static float link_free_flow_speed_reduction_factors[18][5];
+			static float link_capacity_adjustment_factors_for_weather[19];
+			static float link_free_flow_speed_adjustment_factors_for_weather[19][5];
+			static float link_capacity_adjustment_factors_for_accident[8][5];
 		};
 	}
 }

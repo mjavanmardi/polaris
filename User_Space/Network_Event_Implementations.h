@@ -23,6 +23,15 @@ namespace Network_Event_Components
 			WIND,
 			VISIBILITY
 		};
+
+		enum ACCIDENT_SEVERITY
+		{
+			SHOULDER_DISABLEMENT = 0,
+			SHOULDER_ACCIDENT,
+			ONE_LANE_BLOCKED,
+			TWO_LANES_BLOCKED,
+			THREE_LANES_BLOCKED
+		};
 	}
 
 	namespace Concepts
@@ -37,6 +46,8 @@ namespace Network_Event_Components
 			typedef Link_Components::Prototypes::Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
 			typedef Zone_Components::Prototypes::Zone_Prototype<typename MasterType::zone_type,ComponentType> Zone_Interface;
 			define_container_and_value_interface(Location_Container_Interface,Location_Interface,typename Link_Interface::get_type_of(activity_locations),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+			typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Network_Interface;
+			define_container_and_value_interface(_Links_Container_Interface, _Link_Interface2, typename _Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
 			feature_implementation static void Initialize_Type(const vector<shared_ptr<polaris::io::Event_Key>>& keys)
 			{
@@ -79,37 +90,62 @@ namespace Network_Event_Components
 				_notes = instance.lock()->getNote();
 
 				const vector<int>& links=instance.lock()->getLinks();
-
-				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
-
 				// temporary containers used to fill affected zone vector			
 				unordered_set<Zone_Interface*> zone_set;
-
-				cout << endl << "INITIALIZE NETWORK EVENT:";
-				for(typename vector<int>::const_iterator itr=links.begin();itr!=links.end();itr++)
+				if (links[0] == -1)
 				{
-					int link = *itr;
-
-					if(db_map.count(link))
+					// affect all links
+					_Links_Container_Interface& links_container = ((_Network_Interface*)_global_network)->template links_container<_Links_Container_Interface&>();
+					typename _Links_Container_Interface::iterator link_itr;
+					for (link_itr = links_container.begin(); link_itr != links_container.end(); link_itr++)
 					{
-						vector<typename MasterType::link_type*>& links=db_map[link];
+						Link_Interface* link = (Link_Interface*)(*link_itr);
+						_affected_links.push_back(link);
+//cout << "link " << link->template internal_id<int>() << " affected" << endl;
+						Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
 
-						typename vector<typename type_of(MasterType::link)*>::iterator vitr;
-
-						for(vitr=links.begin();vitr!=links.end();vitr++)
+						// push locations from link to affected locations container
+						for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
 						{
-							Link_Interface* link = (Link_Interface*)(*vitr);
-							_affected_links.push_back( (Link_Interface*)(*vitr) );
-							Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
+							Location_Interface* loc = (*litr);
+								this->_affected_locations.push_back(loc);
+								zone_set.insert(loc->template zone<Zone_Interface*>());
+						}
+					}
+				}
+				else
+				{
 
-							// push locations from link to affected locations container
-							for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
+					unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+
+
+				
+					cout << endl << "INITIALIZE NETWORK EVENT:";
+					for(typename vector<int>::const_iterator itr=links.begin();itr!=links.end();itr++)
+					{
+						int link = *itr;
+
+						if(db_map.count(link))
+						{
+							vector<typename MasterType::link_type*>& links=db_map[link];
+
+							typename vector<typename type_of(MasterType::link)*>::iterator vitr;
+
+							for(vitr=links.begin();vitr!=links.end();vitr++)
 							{
-								Location_Interface* loc = (*litr);
-								 this->_affected_locations.push_back(loc);
-								 zone_set.insert(loc->template zone<Zone_Interface*>());
-							}
+								Link_Interface* link = (Link_Interface*)(*vitr);
+								_affected_links.push_back( (Link_Interface*)(*vitr) );
+								Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
 
+								// push locations from link to affected locations container
+								for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
+								{
+									Location_Interface* loc = (*litr);
+									 this->_affected_locations.push_back(loc);
+									 zone_set.insert(loc->template zone<Zone_Interface*>());
+								}
+
+							}
 						}
 					}
 				}
@@ -117,7 +153,7 @@ namespace Network_Event_Components
 				// create the affected zones list
 				for (typename unordered_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
 				{
-					Zone_Interface* zone = *zitr;
+					Zone_Interface* zone = (Zone_Interface*)(*zitr);
 					this->_affected_zones.push_back(zone);
 					cout <<endl << "Affected zone: "<< zone->template uuid<int>();
 				}
@@ -244,34 +280,72 @@ namespace Network_Event_Components
 
 				for(typename vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)
 				{
-					_weather_type = Types::WEATHER_TYPE::SNOW;
-					_precipitation_depth = .6;
+					//_weather_type = Types::WEATHER_TYPE::SNOW;
+					//_precipitation_depth = .6;
 
-					//if( (*itr)->getKey()->getKey() == "type" )
-					//{
-					//	if((*itr)->getValue() == "snow")
-					//	{
-					//		_weather_type = Types::WEATHER_TYPE::SNOW;
-					//	}
-					//}
-					//else if( (*itr)->getKey()->getKey() == "snowdepthm" )
-					//{
-					//	_precipitation_depth = stof((*itr)->getValue());
-					//}
-					//else if( (*itr)->getKey()->getKey() == "vism" )
-					//{
-					//	_visibility = stoi((*itr)->getValue());
-					//}
-					//else if( (*itr)->getKey()->getKey() == "county" )
-					//{
-					//	_county = (*itr)->getValue();
-					//}
+					if( (*itr)->getKey()->getKey() == "type" )
+					{
+						if((*itr)->getValue() == "clear_dry_pavement")
+						{
+							_weather_type = Types::WEATHER_TYPE::CLEAR_DRY_PAVEMENT;
+						}
+						else if((*itr)->getValue() == "clear_wet_pavement")
+						{
+							_weather_type = Types::WEATHER_TYPE::CLEAR_WET_PAVEMENT;
+						}
+						else if((*itr)->getValue() == "rain")
+						{
+							_weather_type = Types::WEATHER_TYPE::RAIN;
+						}
+						else if((*itr)->getValue() == "snow")
+						{
+							_weather_type = Types::WEATHER_TYPE::SNOW;
+						}
+						else if((*itr)->getValue() == "temperature")
+						{
+							_weather_type = Types::WEATHER_TYPE::TEMP;
+						}
+						else if((*itr)->getValue() == "wind")
+						{
+							_weather_type = Types::WEATHER_TYPE::WIND;
+						}
+						else if ((*itr)->getValue() == "visibility")
+						{
+							_weather_type = Types::WEATHER_TYPE::VISIBILITY;
+						}
+					}
+					else if( (*itr)->getKey()->getKey() == "snowdepthm" )
+					{
+						_snow_depth = stof((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "precipm" )
+					{
+						_precipitation_depth = stof((*itr)->getValue());
+
+					}
+					else if( (*itr)->getKey()->getKey() == "vism" )
+					{
+						_visibility = stof((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "wind" )
+					{
+						_wind_speed = stof((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "temperature" )
+					{
+						_wind_speed = stof((*itr)->getValue());
+					}
+					else if( (*itr)->getKey()->getKey() == "county" )
+					{
+						_county = (*itr)->getValue();
+					}
 				}
 			}
 
 			member_data(Types::WEATHER_TYPE,weather_type,none,none);
 			member_data(float,precipitation_depth,none,none);
-			member_data(int,visibility,none,none);
+			member_data(float,snow_depth,none,none);
+			member_data(float,visibility,none,none);
 			member_data(string,county,none,none);
 			member_data(float,temperature,none,none);
 			member_data(float,wind_speed,none,none);
@@ -370,7 +444,7 @@ namespace Network_Event_Components
 		implementation struct Lane_Closure_Network_Event : public Base_Network_Event<MasterType,NT,APPEND_CHILD(Lane_Closure_Network_Event)>
 		{
 			//feature_implementation static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj);}
-			
+		
 			//feature_implementation void Start(){Base_Network_Event::template Start<ComponentType,CallerType,NT>();}
 			feature_implementation void Start(){((Base_Network_Event<MasterType,NT,APPEND_CHILD(Lane_Closure_Network_Event)>*)this)->template Start<ComponentType,CallerType,NT>();}
 
@@ -399,7 +473,6 @@ namespace Network_Event_Components
 		implementation struct Network_Event_Manager_Implementation : public Polaris_Component<APPEND_CHILD(Network_Event_Manager_Implementation),MasterType,Data_Object,ParentType>
 		{
 			typedef typename Polaris_Component<APPEND_CHILD(Network_Event_Manager_Implementation),MasterType,Data_Object,ParentType>::Component_Type ComponentType;
-			
 			typedef Network_Event<typename MasterType::type_of(base_network_event),ComponentType> Base_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::type_of(weather_network_event),ComponentType> Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::type_of(accident_network_event),ComponentType> Accident_Network_Event_Interface;

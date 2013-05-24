@@ -16,6 +16,7 @@ namespace Link_Components
 			SNOW_2,
 			SNOW_3,
 			SNOW_4,
+			SNOW_5,
 			TEMP_1,
 			TEMP_2,
 			TEMP_3,
@@ -34,12 +35,14 @@ namespace Link_Components
 	
 	namespace Implementations
 	{
+		// Adjustment factors recommended by the Guidebook on the Analysis of ATDM Strategies.
+
 		template<typename MasterType,typename ParentType,typename InheritanceList>
-		float Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::link_capacity_reduction_factors[18] 
-			= {1.00, 0.98, 0.98, 0.93, 0.86, 0.96, 0.91, 0.89, 0.78, 0.99, 0.98, 0.91, 1.00, 0.99, 0.98, 0.93, 0.88, 0.89};
+		float Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::link_capacity_adjustment_factors_for_weather[19] 
+			= {1.00, 0.98, 0.98, 0.93, 0.86, 0.96, 0.91, 0.89, 0.78, 0.20, 0.99, 0.98, 0.91, 1.00, 0.99, 0.98, 0.93, 0.88, 0.89};
 		
 		template<typename MasterType,typename ParentType,typename InheritanceList>
-		float Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::link_free_flow_speed_reduction_factors[18][5]
+		float Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::link_free_flow_speed_adjustment_factors_for_weather[19][5]
 			= {
 				{1.00, 1.00, 1.00, 1.00, 1.00},
 				{0.97, 0.96, 0.96, 0.95, 0.94},
@@ -50,6 +53,7 @@ namespace Link_Components
 				{0.92, 0.90, 0.88, 0.86, 0.83},
 				{0.90, 0.88, 0.86, 0.84, 0.82},
 				{0.88, 0.86, 0.85, 0.83, 0.81},
+				{0.20, 0.20, 0.20, 0.20, 0.20},
 				{0.99, 0.99, 0.99, 0.98, 0.98},
 				{0.99, 0.98, 0.98, 0.98, 0.97},
 				{0.95, 0.95, 0.94, 0.93, 0.92},
@@ -61,70 +65,81 @@ namespace Link_Components
 				{0.95, 0.94, 0.93, 0.92, 0.91}
 			};
 
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		float Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::link_capacity_adjustment_factors_for_accident[8][5]
+			= {
+				{0.93, 0.79, 0.25, 0.00, 0.00},
+				{0.95, 0.81, 0.35, 0.00, 0.00},
+				{0.99, 0.83, 0.49, 0.16, 0.00},
+				{0.99, 0.85, 0.58, 0.25, 0.13},
+				{0.99, 0.87, 0.65, 0.40, 0.20},
+				{0.99, 0.89, 0.71, 0.50, 0.26},
+				{0.99, 0.91, 0.75, 0.57, 0.36},
+				{0.99, 0.93, 0.28, 0.63, 0.41}
+			};
+
 		feature_implementation_definition void Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::process_accident_event()
 		{
 			typedef Network_Event<typename MasterType::accident_network_event_type> _Accident_Event_Interface;
 			cout << "accident " << _current_accident_event->_accident_type << " being processed" << endl;
-			float capacity_reduction_rate;
-			float free_flow_speed_reduction_rate;
-						
-			capacity_reduction_rate = 0.01;
-			_capacity_adjustment_factor_due_to_accident = capacity_reduction_rate;
-			_maximum_flow_rate *= capacity_reduction_rate;
+			float capacity_adjustment_rate;
+			float free_flow_speed_adjustment_rate;
+			int accident_severity = _current_accident_event->_severity;	
+			capacity_adjustment_rate = link_capacity_adjustment_factors_for_accident[accident_severity][_num_lanes - 1];
+			_capacity_adjustment_factor_due_to_accident = capacity_adjustment_rate;
+			_maximum_flow_rate *= capacity_adjustment_rate;
 			
-			free_flow_speed_reduction_rate = 0.01;
-			_speed_adjustment_factor_due_to_accident = free_flow_speed_reduction_rate;
-			_free_flow_speed *= free_flow_speed_reduction_rate;
+			free_flow_speed_adjustment_rate = 1.0; // nominal adjsutment factor of 1.0 according to the Guidebook
+			_speed_adjustment_factor_due_to_accident = free_flow_speed_adjustment_rate;
+			_free_flow_speed *= free_flow_speed_adjustment_rate;
 			
 			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
 		}
 
 		feature_implementation_definition void Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::process_weather_event()
 		{
-			float capacity_reduction_rate;
-			float free_flow_speed_reduction_rate;
+			float capacity_adjustment_rate;
+			float free_flow_speed_adjustment_rate;
 			
 			int weather_index = get_weather_index<ComponentType,CallerType,TargetType>(_current_weather_event);
 			
-			//capacity_reduction_rate = link_capacity_reduction_factors[weather_index];
-			capacity_reduction_rate = 0.2;
-			_capacity_adjustment_factor_due_to_weather = capacity_reduction_rate;
-			_maximum_flow_rate *= capacity_reduction_rate;
+			capacity_adjustment_rate = link_capacity_adjustment_factors_for_weather[weather_index];
+			//capacity_adjustment_rate = 0.2;
+			_capacity_adjustment_factor_due_to_weather = capacity_adjustment_rate;
+			_maximum_flow_rate *= capacity_adjustment_rate;
 
-			//free_flow_speed_reduction_rate = find_free_flow_speed_reduction_rate<ComponentType,CallerType,TargetType>(weather_index);
-			free_flow_speed_reduction_rate = 0.2;
-			_speed_adjustment_factor_due_to_weather = free_flow_speed_reduction_rate;
-			_free_flow_speed *= free_flow_speed_reduction_rate;
+			free_flow_speed_adjustment_rate = find_free_flow_speed_adjustment_rate_for_weather<ComponentType,CallerType,TargetType>(weather_index);
+			//free_flow_speed_adjustment_rate = 0.2;
+			_speed_adjustment_factor_due_to_weather = free_flow_speed_adjustment_rate;
+			_free_flow_speed *= free_flow_speed_adjustment_rate;
 
 			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
-
-			
 		}
 
-		feature_implementation_definition float Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::find_free_flow_speed_reduction_rate(int weather_index)
+		feature_implementation_definition float Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::find_free_flow_speed_adjustment_rate_for_weather(int weather_index)
 		{
-			float free_flow_speed_reduction_rate;
+			float free_flow_speed_adjustment_rate;
 			if (_original_free_flow_speed < 55)
 			{
-				free_flow_speed_reduction_rate = link_free_flow_speed_reduction_factors[weather_index][0];
+				free_flow_speed_adjustment_rate = link_free_flow_speed_adjustment_factors_for_weather[weather_index][0];
 			}
 			else if (_original_free_flow_speed < 60)
 			{
-				free_flow_speed_reduction_rate = link_free_flow_speed_reduction_factors[weather_index][1];
+				free_flow_speed_adjustment_rate = link_free_flow_speed_adjustment_factors_for_weather[weather_index][1];
 			}
 			else if (_original_free_flow_speed < 65)
 			{
-				free_flow_speed_reduction_rate = link_free_flow_speed_reduction_factors[weather_index][2];
+				free_flow_speed_adjustment_rate = link_free_flow_speed_adjustment_factors_for_weather[weather_index][2];
 			}
 			else if (_original_free_flow_speed < 70)
 			{
-				free_flow_speed_reduction_rate = link_free_flow_speed_reduction_factors[weather_index][3];
+				free_flow_speed_adjustment_rate = link_free_flow_speed_adjustment_factors_for_weather[weather_index][3];
 			}
 			else
 			{
-				free_flow_speed_reduction_rate = link_free_flow_speed_reduction_factors[weather_index][4];
+				free_flow_speed_adjustment_rate = link_free_flow_speed_adjustment_factors_for_weather[weather_index][4];
 			}
-			return free_flow_speed_reduction_rate;
+			return free_flow_speed_adjustment_rate;
 		}
 
 		feature_implementation_definition int Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::get_weather_index(TargetType weather_event)
@@ -161,7 +176,7 @@ namespace Link_Components
 				}
 				break;
 			case Network_Event_Components::Types::SNOW:
-				snow_precipitation_depth = ((_Weather_Event_Interface*)weather_event)->template precipitation_depth<float>();
+				snow_precipitation_depth = ((_Weather_Event_Interface*)weather_event)->template snow_depth<float>();
 				if (snow_precipitation_depth <= 0.05)
 				{
 					weather_index = Link_Components::Types::SNOW_1;
@@ -174,9 +189,13 @@ namespace Link_Components
 				{
 					weather_index = Link_Components::Types::SNOW_3;
 				}
-				else
+				else if (snow_precipitation_depth <= 1.0)
 				{
 					weather_index = Link_Components::Types::SNOW_4;
+				}
+				else
+				{
+					weather_index = Link_Components::Types::SNOW_5;
 				}
 				break;
 			case Network_Event_Components::Types::TEMP:
@@ -225,7 +244,6 @@ namespace Link_Components
 				}
 				break;
 			}
-
 			return weather_index;
 		}
 	}

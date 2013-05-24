@@ -49,7 +49,7 @@ namespace Sensor_Components
 				
 				new_data.time_recorded=_iteration;
 
-				_covered_link->get_prevailing_link_moe<NT>(new_data.volume,new_data.speed,new_data.density);
+				_covered_link->template get_prevailing_link_moe<NT>(new_data.volume,new_data.speed,new_data.density);
 
 				_sensor_data.push_back(new_data);
 			}
@@ -89,7 +89,7 @@ namespace Sensor_Components
 					polaris_link->template Push_ITS< ComponentType* >( (ComponentType*)this );
 
 					typedef Scenario_Prototype<typename MasterType::scenario_type> Scenario_Interface;
-					Load_Event<ComponentType>(&Sensor_Conditional<ComponentType,ComponentType,NT>,&Sensor_Event<ComponentType,ComponentType,NT>,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1, Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
+					load_event_implementation(ComponentType, ComponentType::template Sensor_Conditional,ComponentType::Sensor_Event,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1, Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS, NULLTYPE);
 				}
 			}
 
