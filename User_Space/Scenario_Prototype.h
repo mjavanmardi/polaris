@@ -228,6 +228,8 @@ namespace Scenario_Components
 			feature_accessor(enroute_switching_enabled, none, none);
 			feature_accessor(use_realtime_travel_time_for_enroute_switching, none, none);
 
+			feature_accessor(multimodal_network_input, none, none);
+
 			feature_prototype void read_scenario_data()
 			{
 				CfgReader cfgReader;
@@ -394,6 +396,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("minimum_travel_time_saving_standard_deviation", minimum_travel_time_saving_standard_deviation<double*>())!= PARAMETER_FOUND) minimum_travel_time_saving_standard_deviation<double>(1.0); // in minutes
 				if (cfgReader.getParameter("enroute_switching_enabled", enroute_switching_enabled<bool*>())!= PARAMETER_FOUND) enroute_switching_enabled<bool>(true); 
 				if (cfgReader.getParameter("use_realtime_travel_time_for_enroute_switching", use_realtime_travel_time_for_enroute_switching<bool*>())!= PARAMETER_FOUND) use_realtime_travel_time_for_enroute_switching<bool>(false);
+
+				if (cfgReader.getParameter("multimodal_network_input", multimodal_network_input<bool*>())!= PARAMETER_FOUND) multimodal_network_input<bool>(false);
 
 				output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";

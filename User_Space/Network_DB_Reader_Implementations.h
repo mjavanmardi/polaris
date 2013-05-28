@@ -48,6 +48,10 @@ namespace Network_Components
 				read_turn_movement_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 				read_zone_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
 				read_activity_location_data<ComponentType,CallerType,TargetType>(db, net_io_maps);
+				if (!((_Scenario_Interface*)_global_scenario)->template multimodal_network_input<bool>())
+				{
+					clean_isolated_intersections<ComponentType,CallerType,TargetType>();
+				}
 			}
 
 			feature_implementation void read_intersection_data(unique_ptr<odb::database>& db, Network_Components::Types::Network_IO_Maps& net_io_maps)
@@ -128,8 +132,7 @@ namespace Network_Components
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename type_of(network_reference)::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				_Links_Container_Interface* links_container_ptr=_network_reference->template links_container<_Links_Container_Interface*>();
 				typename type_of(network_reference)::type_of(links_container)& links_container_monitor=(typename type_of(network_reference)::type_of(links_container)&)(*links_container_ptr);				
-				/*typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-				_Scenario_Interface* scenario = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>();*/				
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef unordered_map<int,vector<typename MasterType::link_type*>> id_to_links_type;
 
 				Types::Link_ID_Dir link_id_dir;
@@ -149,9 +152,33 @@ namespace Network_Components
 
 				for(typename result<Link>::iterator db_itr = link_result.begin (); db_itr != link_result.end (); ++db_itr)
 				{
+					const std::string& facility_type=db_itr->getType()->getLink_Type();
+					bool do_this_link = false;
+					
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_network_input<bool>())
+					{
+						do_this_link = true;
+					}
+					else
+					{
+						if (facility_type == "WALKWAY" || facility_type == "BIKEWAY" || facility_type == "FERRY" || facility_type == "LIGHTRAIL" || facility_type == "HEAVYRAIL")
+						{
+							do_this_link = false;
+						}
+						else
+						{
+							do_this_link = true;
+						}
+					}
+					
+					if (!do_this_link)
+					{
+						continue;
+					}
+					
 					counter++;
 					if(counter%10000==0) cout << "\t" << counter << endl;
-
+					//cout << "\t" << counter << endl;
 					if(db_itr->getLanes_Ab()>0)
 					{
 						link=(_Link_Interface*)Allocate<typename _Link_Interface::Component_Type>();
@@ -188,7 +215,7 @@ namespace Network_Components
 						link->template right_turn_bay_length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(0.0));
 
 						
-						const std::string& facility_type=db_itr->getType()->getLink_Type();
+						
 
 						if(facility_type=="FREEWAY")
 						{
@@ -370,6 +397,7 @@ namespace Network_Components
 				using namespace polaris::io;
 
 				Types::Link_ID_Dir link_id_dir;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 
 				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, typename type_of(network_reference)::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename type_of(network_reference)::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -387,6 +415,33 @@ namespace Network_Components
 
 				for(typename result<Connect>::iterator db_itr = connect_result.begin (); db_itr != connect_result.end (); ++db_itr)
 				{
+					const std::string& inbound_link_type = db_itr->getLink()->getType()->getLink_Type();
+					const std::string& outbound_link_type = db_itr->getTo_Link()->getType()->getLink_Type();
+
+					bool do_this_connection = false;
+					
+					if (((_Scenario_Interface*)_global_scenario)->template multimodal_network_input<bool>())
+					{
+						do_this_connection = true;
+					}
+					else
+					{
+						if (inbound_link_type == "WALKWAY" || inbound_link_type == "BIKEWAY" || inbound_link_type == "FERRY" || inbound_link_type == "LIGHTRAIL" || inbound_link_type == "HEAVYRAIL" ||
+							outbound_link_type == "WALKWAY" || outbound_link_type == "BIKEWAY" || outbound_link_type == "FERRY" || outbound_link_type == "LIGHTRAIL" || outbound_link_type == "HEAVYRAIL")
+						{
+							do_this_connection = false;
+						}
+						else
+						{
+							do_this_connection = true;
+						}
+					}
+					
+					if (!do_this_connection)
+					{
+						continue;
+					}
+
 
 					if(counter%10000==0) cout << "\t" << counter << endl;
 
@@ -773,6 +828,32 @@ namespace Network_Components
 				}
 			}
 
+			feature_implementation void clean_isolated_intersections()
+			{
+				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename type_of(network_reference)::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, typename type_of(network_reference)::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+				typename _Intersections_Container_Interface::iterator intersections_itr;
+				_Intersections_Container_Interface& intersections_container = _network_reference->template intersections_container<_Intersections_Container_Interface&>();
+
+				float counter = 0.0;
+				for(intersections_itr = intersections_container.begin(); intersections_itr != intersections_container.end(); intersections_itr++)
+				{
+					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersections_itr);
+					typename type_of(network_reference)::type_of(intersections_container)::type_of(unqualified_value)& intersection_monitor=(typename type_of(network_reference)::type_of(intersections_container)::type_of(unqualified_value)&)*intersection;
+
+					_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
+					_Links_Container_Interface& inbound_links = intersection->template inbound_links<_Links_Container_Interface&>();
+					// skip intersections_container that do not have any outbound links
+					if (outbound_links.size() == 0 && inbound_links.size() == 0)
+					{
+						intersections_container.erase(intersections_itr--);
+					}
+					else
+					{
+						intersection->template internal_id<int>(counter++);
+					}
+				}
+			}
 		};
 	}
 }
