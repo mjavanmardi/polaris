@@ -217,12 +217,18 @@ namespace Prototypes
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
 
 			int loc_id = properties->template work_location_id<int>();
-			if (loc_id < 0)
+			if (loc_id < 0 || loc_id >= locations->size())
 			{
 				THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' does not have a valid work location.  Should not be requesting this.");
 				return nullptr;
 			}
 			activity_location_itf* loc = (*locations)[loc_id];	
+			TargetType z = loc->template zone<TargetType>();
+			if (z == nullptr)
+			{
+				THROW_WARNING("Warning: Person '" << this->uuid<int>() << "' work location is not associated with a Traffic Analysis Zone.  Location reset to home location");
+				return nullptr;
+			}
 			return loc->template zone<TargetType>();
 		}
 		feature_prototype TargetType Work_Location(requires(check(TargetType, is_integral)))
@@ -350,6 +356,7 @@ namespace Prototypes
 			s << this->Home_Location<zone_itf*>()->uuid<int>();
 			if (static_props->template Is_Employed<bool>())
 			{
+				//cout << endl << "Work location id: " << this->Work_Location<int>()<<endl;
 				s << ", WORK_ZONE," << this->Work_Location<zone_itf*>()->template uuid<int>();
 			}
 			else

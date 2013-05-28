@@ -122,7 +122,7 @@ namespace Person_Components
 
 				// Assign workers to a work location
 				pop_unit_itf* properties = _Parent_Person->template Static_Properties<pop_unit_itf*>();
-				if (properties->template Employment_Status<Person_Components::Types::EMPLOYMENT_STATUS>() == Person_Components::Types::EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK) 
+				if (properties->template Is_Employed<bool>()) 
 				{
 					_Parent_Person->template Choose_Work_Location<NT>();
 				}
