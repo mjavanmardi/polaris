@@ -68,9 +68,9 @@ namespace Link_Components
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		float Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::link_capacity_adjustment_factors_for_accident[8][5]
 			= {
-				{0.93, 0.79, 0.25, 0.00, 0.00},
-				{0.95, 0.81, 0.35, 0.00, 0.00},
-				{0.99, 0.83, 0.49, 0.16, 0.00},
+				{0.93, 0.79, 0.01, 0.01, 0.01},
+				{0.95, 0.81, 0.35, 0.01, 0.01},
+				{0.99, 0.83, 0.49, 0.16, 0.01},
 				{0.99, 0.85, 0.58, 0.25, 0.13},
 				{0.99, 0.87, 0.65, 0.40, 0.20},
 				{0.99, 0.89, 0.71, 0.50, 0.26},
@@ -84,8 +84,9 @@ namespace Link_Components
 			cout << "accident " << _current_accident_event->_accident_type << " being processed" << endl;
 			float capacity_adjustment_rate;
 			float free_flow_speed_adjustment_rate;
-			int accident_severity = _current_accident_event->_severity;	
-			capacity_adjustment_rate = link_capacity_adjustment_factors_for_accident[accident_severity][_num_lanes - 1];
+			int lanes = min(8, _num_lanes);
+			int lanes_closed = min(3, _current_accident_event->_lanes_closed);	
+			capacity_adjustment_rate = link_capacity_adjustment_factors_for_accident[_num_lanes - 1][lanes_closed + 1];
 			_capacity_adjustment_factor_due_to_accident = capacity_adjustment_rate;
 			_maximum_flow_rate *= capacity_adjustment_rate;
 			

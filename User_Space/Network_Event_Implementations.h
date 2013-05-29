@@ -397,10 +397,15 @@ namespace Network_Event_Components
 					{
 						_injury_type = (*itr)->getValue();
 					}
+					else if( (*itr)->getKey()->getKey() == "lanes_closed" )
+					{
+						_lanes_closed = stoi((*itr)->getValue());
+					}
 				}
 			}
 
 			member_data(int,lanes,none,none);
+			member_data(int,lanes_closed,none,none);
 			member_data(int,severity,none,none);
 			member_data(string,accident_type,none,none);
 			member_data(int,vehicles_involved,none,none);

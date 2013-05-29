@@ -99,6 +99,7 @@ namespace Network_Event_Components
 
 			//Accident properties
 			feature_accessor(lanes,none,none);
+			feature_accessor(lanes_closed,none,none);
 			feature_accessor(severity,none,none);
 			feature_accessor(accident_type,none,none);
 			feature_accessor(vehicles_involved,none,none);
