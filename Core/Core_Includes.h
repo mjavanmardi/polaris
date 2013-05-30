@@ -21,6 +21,8 @@
 #include <type_traits>
 
 #else
+#define WITH_WAIT_LINUX
+
 #define nullptr NULL
 #include <time.h>
 #include <tr1/unordered_map>
@@ -171,13 +173,6 @@ typedef bool (*submission_callback_type)(const list<void*>&,const vector<string>
 
 #define START() world->Start_Turning()
 
-#ifdef _MSC_VER
-//static LARGE_INTEGER thread_start_timers[_num_threads];
-//static LARGE_INTEGER thread_stop_timers[_num_threads];
-//static LARGE_INTEGER thread_start_timers_B[_num_threads];
-//static LARGE_INTEGER thread_stop_timers_B[_num_threads];
-#endif
-
 
 ///============================================================================
 /// _all_components - type singletons for all compiled components
@@ -194,8 +189,16 @@ static SingletonType* Add_Component_Singleton(SingletonType* val)
 	return val;
 }
 
+//#define PROFILING
+
+#ifdef PROFILING
+static unordered_map<long long,long long> iteration_timer;
+static _lock iteration_timer_lock;
+#endif
 
 #ifdef _MSC_VER
+static LARGE_INTEGER thread_start_timers[_num_threads];
+static LARGE_INTEGER thread_stop_timers[_num_threads];
 #else
 static timespec process_timer[_num_threads];
 static long long process_time[_num_threads];

@@ -577,7 +577,7 @@ namespace Network_Components
 				}
 
 				((typename MasterType::network_type*)_this)->template calculate_moe<NULLTYPE,NULLTYPE,NULLTYPE>();
-				((typename MasterType::network_type*)_this)->template update_vehicle_locations<NULLTYPE,NULLTYPE,NULLTYPE>();
+				//((typename MasterType::network_type*)_this)->template update_vehicle_locations<NULLTYPE,NULLTYPE,NULLTYPE>();
 				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
 			}
 
@@ -598,20 +598,22 @@ namespace Network_Components
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 
 				typename _Intersections_Container_Interface::iterator intersection_itr;
-				for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
-				{
-					((_Intersection_Interface*)(*intersection_itr))->template calculate_moe_for_simulation_interval<NULLTYPE>();
-				}
+				//for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
+				//{
+				//	((_Intersection_Interface*)(*intersection_itr))->template calculate_moe_for_simulation_interval<NULLTYPE>();
+				//}
 				
 				calculate_realtime_network_moe();
+
 				output_moe_for_simulation_interval<ComponentType, CallerType, TargetType>();
 
 				if (((((_Network_Interface*)this)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{
-					for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
-					{
-						((_Intersection_Interface*)(*intersection_itr))->template calculate_moe_for_assignment_interval<NULLTYPE>();
-					}
+					//for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
+					//{
+					//	((_Intersection_Interface*)(*intersection_itr))->template calculate_moe_for_assignment_interval<NULLTYPE>();
+					//}
+
 					link_moe_post_process();
 					update_moe_for_assignment_interval_with_links();
 					update_moe_for_assignment_interval();
@@ -663,7 +665,6 @@ namespace Network_Components
 
 				for (link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
 				{
-						
 					_link_component_type* link_component = (_link_component_type*)(*link_itr);
 
 					realtime_network_moe_data.network_avg_link_density += link_component->realtime_link_moe_data.link_density;

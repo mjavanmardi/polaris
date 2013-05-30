@@ -82,7 +82,6 @@ namespace Vehicle_Components
 
 				_Trajectory_Container_Interface& trajectory = ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
 				trajectory.clear();
-				cout << "trajectory cleared for vehicle " << _uuid << endl;
 			}
 
 			feature_implementation void load_register()

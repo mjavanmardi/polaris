@@ -24,6 +24,9 @@ public:
 
 #ifdef WITH_WAIT
 		ex_threads_finished_event = CreateEvent(NULL,TRUE,FALSE,NULL);
+#elif defined WITH_WAIT_LINUX
+		pthread_mutex_init(&ex_threads_finished_mutex, NULL);
+		pthread_cond_init(&ex_threads_finished_conditional, NULL);		
 #endif
 	}
 
@@ -116,7 +119,9 @@ public:
 			ex_lock=0; // unlock the execution engine
 			
 			// collect all threads and advance the _sub_iteration
-			
+#ifdef WITH_WAIT_LINUX
+			pthread_mutex_lock(&ex_threads_finished_mutex);
+#endif
 			if(AtomicIncrement(&ex_threads_counter_begin) == _num_threads)
 			{
 				ex_next_revision=ex_next_next_revision;
@@ -127,13 +132,63 @@ public:
 				_sub_iteration = ex_next_revision._sub_iteration;
 #ifdef WITH_WAIT
 				SetEvent(ex_threads_finished_event);
+#elif defined WITH_WAIT_LINUX
+				
+				pthread_cond_broadcast(&ex_threads_finished_conditional);
+				pthread_mutex_unlock(&ex_threads_finished_mutex);
 #endif
 				ex_threads_counter_begin=0;
 			}
 			else
 			{
 #ifdef WITH_WAIT
+#ifdef PROFILING
+				long long my_revision = _sub_iteration;
+				
+				long long time_advanced = 0;
+				
+				QueryPerformanceCounter(&thread_start_timers[_thread_id]);
+#endif
+
 				WaitForSingleObject(ex_threads_finished_event,INFINITE);
+#ifdef PROFILING				
+				QueryPerformanceCounter(&thread_stop_timers[_thread_id]);
+
+				LOCK(iteration_timer_lock);
+
+				if(! iteration_timer.count(my_revision))
+				{
+					iteration_timer[my_revision] = 0;
+				}
+
+				iteration_timer[my_revision] += (thread_stop_timers[_thread_id].QuadPart - thread_start_timers[_thread_id].QuadPart);
+
+				UNLOCK(iteration_timer_lock);
+#endif
+#elif defined WITH_WAIT_LINUX
+#ifdef PROFILING
+				long long my_revision = _sub_iteration;
+				
+				long long time_advanced = 0;
+				
+				start_timer(process_timer[_thread_id]);
+#endif
+				pthread_cond_wait(&ex_threads_finished_conditional,&ex_threads_finished_mutex);
+				pthread_mutex_unlock(&ex_threads_finished_mutex);
+#ifdef PROFILING				
+				end_timer(process_timer[_thread_id],time_advanced);
+
+				LOCK(iteration_timer_lock);
+
+				if(! iteration_timer.count(my_revision))
+				{
+					iteration_timer[my_revision] = 0;
+				}
+
+				iteration_timer[my_revision] += time_advanced;
+
+				UNLOCK(iteration_timer_lock);
+#endif
 #else
 				while(AtomicCompareExchange(&ex_threads_counter_begin,0,0)) SLEEP(0);
 #endif
@@ -141,6 +196,8 @@ public:
 			
 			this_revision._sub_iteration = _sub_iteration;
 			this_revision._iteration = _iteration;
+			
+			
 			
 			// condition for collection is whether the next_revision occurs before the start of the next full iteration
 			if(/*ex_next_revision >= this_revision && */ex_next_revision < next_iteration)
@@ -152,6 +209,8 @@ public:
 				{
 #ifdef WITH_WAIT
 					ResetEvent(ex_threads_finished_event);
+#elif defined WITH_WAIT_LINUX
+					
 #endif
 					ex_threads_counter_end=0;
 				}
@@ -175,5 +234,9 @@ public:
 
 #ifdef WITH_WAIT
 	HANDLE ex_threads_finished_event;
+#elif defined WITH_WAIT_LINUX
+	pthread_mutex_t ex_threads_finished_mutex;
+	pthread_cond_t ex_threads_finished_conditional;
 #endif
+	
 };

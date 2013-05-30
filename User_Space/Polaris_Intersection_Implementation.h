@@ -660,9 +660,25 @@ namespace Intersection_Components
 
 					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Network_State_Update<NULLTYPE>);
 					response.result=true;
+					response.next._iteration=_iteration;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION;
+				} 
+				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION)
+				{
+
+					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Intersection_REALTIME_MOE_Update<NULLTYPE>);
+					response.result=true;
+					response.next._iteration=_iteration;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_MOE_COMPUTATION_SUB_ITERATION;
+				}
+				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_MOE_COMPUTATION_SUB_ITERATION)
+				{
+
+					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Intersection_MOE_Update<NULLTYPE>);
+					response.result=true;
 					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION;
-				} 
+				}
 				else
 				{
 					assert(false);
@@ -700,6 +716,41 @@ namespace Intersection_Components
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
 				//step 9: intersection network state update
 				_this_ptr->template network_state_update<NULLTYPE>();
+			}
+
+			declare_feature_event(Intersection_REALTIME_MOE_Update)
+			{
+				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
+				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+				//step 10: intersection realtime MOE update
+
+				_this_ptr->template calculate_moe_for_simulation_interval<NULLTYPE>();
+				
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+
+				//if(((((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				//{
+				//	_this_ptr->template calculate_moe_for_assignment_interval<NULLTYPE>();
+				//}
+
+				//_this_ptr->template update_vehicle_locations<NT>();
+			}
+
+			declare_feature_event(Intersection_MOE_Update)
+			{
+				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
+				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+				//step 11: intersection MOE update
+				
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+
+				if(((((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				{
+					_this_ptr->template calculate_moe_for_assignment_interval<NULLTYPE>();
+				}
+				_this_ptr->template update_vehicle_locations<NT>();
 			}
 		};
 	}
