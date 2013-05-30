@@ -110,7 +110,7 @@ namespace Movement_Plan_Components
 
 		implementation struct Polaris_Integrated_Movement_Plan_Implementation : public Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)>
 		{
-			typedef typename Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)> Base_Type;
+			typedef Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)> Base_Type;
 			typedef typename Base_Type::Component_Type ComponentType;
 			member_prototype(Activity_Components::Prototypes::Activity_Planner, destination_activity_reference, typename MasterType::activity_plan_type,none,none);
 			feature_implementation void arrive_to_destination()
@@ -118,7 +118,7 @@ namespace Movement_Plan_Components
 				Base_Type* bthis = (Base_Type*)this;
 
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
-				_trajectory_container[_current_trajectory_index]->_delayed_time = 0.0;
+				bthis->_trajectory_container[bthis->_current_trajectory_index]->_delayed_time = 0.0;
 				bthis->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>( ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() );
 
 				Simulation_Timestep_Increment ttime = bthis->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>() - bthis->template departed_time<ComponentType,CallerType,Simulation_Timestep_Increment>();

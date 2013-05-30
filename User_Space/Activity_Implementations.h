@@ -250,6 +250,12 @@ namespace Activity_Components
 					//planner->Write_To_Log<stringstream>(s);
 				}
 			}		
+			feature_implementation void Arrive_At_Activity()
+			{
+				define_component_interface(_Logger_Interface, typename MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
+				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Planner<ComponentType,CallerType>*>((Activity_Planner<ComponentType,CallerType>*)this,true);
+			}
+		
 		};
 
 

@@ -160,6 +160,7 @@ namespace Person_Components {
 		forward_declare_prototype struct Person_Properties;
 		forward_declare_prototype struct Person_Scheduler;
 		forward_declare_prototype struct Person_Mover;
+		forward_declare_prototype struct Person_Data_Logger;
 	}
 };
 

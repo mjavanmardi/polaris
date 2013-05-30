@@ -1,6 +1,7 @@
 #pragma once
 #include "User_Space_Includes.h"
 #include "Person_Prototype.h"
+#include "Person_Data_Logger_Prototype.h"
 #include "Activity_Location_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "Vehicle_Prototype.h"
@@ -449,8 +450,7 @@ namespace Activity_Components
 
 			feature_prototype void Arrive_At_Activity()
 			{
-				define_component_interface(_Logger_Interface, MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
-				((_Logger_Interface*)_global_person_logger)->Add_Record<Activity_Planner<ComponentType,CallerType>*>(this,true);
+				this_component()->template Arrive_At_Activity<ComponentType,CallerType,TargetType>();
 			}
 
 			// features to check if activity attributes have been planned - calculated based on reviion times for attribute planes (true if set to END)
