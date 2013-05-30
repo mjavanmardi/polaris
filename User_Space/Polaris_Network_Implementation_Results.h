@@ -95,7 +95,7 @@ namespace Network_Components
 						}
 
 						//deallocate vehicle
-
+						vehicle->clear_trajectory<NT>();
 						num_arrived_vehicls_of_a_link--;
 					}
 				}

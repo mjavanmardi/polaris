@@ -67,7 +67,22 @@ namespace Vehicle_Components
 
 			feature_implementation void unload()
 			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
+				
 				_simulation_status = Types::Vehicle_Status_Keys::OUT_NETWORK;
+				
+				if (!((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
+					clear_trajectory<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_implementation void clear_trajectory()
+			{
+				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+
+				_Trajectory_Container_Interface& trajectory = ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
+				trajectory.clear();
+				cout << "trajectory cleared for vehicle " << _uuid << endl;
 			}
 
 			feature_implementation void load_register()
