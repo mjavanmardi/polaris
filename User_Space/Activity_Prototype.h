@@ -56,10 +56,10 @@ namespace Activity_Components
 	{
 		concept struct Is_Activity_Plan_Prototype
 		{
-			check_getter(has_id,Component_Type::Activity_Plan_ID);
+			check_getter(has_id,ComponentType::Activity_Plan_ID);
 			define_default_check(has_id);
 		};
-			concept struct Is_Activity_Plan
+		concept struct Is_Activity_Plan
 		{
 			check_getter(has_id,Activity_Plan_ID);
 			check_concept(is_prototype, Is_Activity_Plan_Prototype);
@@ -394,7 +394,7 @@ namespace Activity_Components
 			feature_accessor(Duration, check(ReturnValueType,Basic_Units::Concepts::Is_Time_Value), check(SetValueType,Basic_Units::Concepts::Is_Time_Value)); 
 			feature_accessor(Involved_Persons_Container,none,none);
 			feature_accessor(Expected_Travel_Time, check(ReturnValueType,Basic_Units::Concepts::Is_Time_Value), check(SetValueType,Basic_Units::Concepts::Is_Time_Value)); 
-			
+			feature_accessor(Actual_Travel_Time, check(ReturnValueType,Basic_Units::Concepts::Is_Time_Value), check(SetValueType,Basic_Units::Concepts::Is_Time_Value)); 
 
 			//===========================================
 			// Activity Planner Methods
@@ -446,6 +446,12 @@ namespace Activity_Components
 				}
 			}
 			feature_method_void(Set_Meta_Attributes,none);	
+
+			feature_prototype void Arrive_At_Activity()
+			{
+				define_component_interface(_Logger_Interface, MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
+				((_Logger_Interface*)_global_person_logger)->Add_Record<Activity_Planner<ComponentType,CallerType>*>(this,true);
+			}
 
 			// features to check if activity attributes have been planned - calculated based on reviion times for attribute planes (true if set to END)
 			feature_method_void(Location_Is_Planned,check_2(ReturnValueType,bool,is_same));

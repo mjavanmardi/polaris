@@ -4,6 +4,7 @@
 
 void* _global_network;
 void* _global_scenario;
+void* _global_person_logger;
 
 #include "Polaris_Intersection_Implementation.h"
 #include "Polaris_Link_Implementation.h"
@@ -67,4 +68,5 @@ void* _global_scenario;
 #include "Person_Scheduler_Implementations.h"
 #include "Person_Perception_Implementation.h"
 #include "Person_Implementations.h"
+#include "Person_Data_Logger_Implementation.h"
 #endif

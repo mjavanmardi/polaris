@@ -4,6 +4,7 @@
 
 #pragma once
 #include "Antares_Includes.h"
+#include <sstream>
 #include "User_Space\Vehicle_Prototype.h"
 
 namespace Vehicle_Components
@@ -441,7 +442,7 @@ namespace Vehicle_Components
 					list<typename type_of(MasterType::activity)*>* activities = scheduler->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
 					Activity_Location_Interface* previous_location;
 
-					cout << endl << "Sizes: activities="<<activities->size();
+					cout << endl <<endl<< "Num activities="<<activities->size();
 
 					if(activities->size() && person->Home_Location<Activity_Location_Interface*>())
 					{
@@ -466,7 +467,7 @@ namespace Vehicle_Components
 
 					list<typename type_of(MasterType::activity_record)*>* discarded_activities = person->Activity_Record_Container<list<typename type_of(MasterType::activity_record)*>*>();
 
-					cout << "discarded activities="<<discarded_activities->size() << endl;
+					cout << endl <<endl<< "Num discarded activities="<<discarded_activities->size();
 
 					if(discarded_activities->size() && person->Home_Location<Activity_Location_Interface*>())
 					{
@@ -587,6 +588,63 @@ namespace Vehicle_Components
 				key_value_pair.second=str_buf;				
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
+
+#ifdef IntegratedModelApplication
+				// Activity Attributes
+				typedef Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType> Activity_Location_Interface;
+				typedef Zone_Prototype<typename type_of(MasterType::zone),ComponentType> zone_interface;
+				typedef Activity_Planner<typename type_of(MasterType::activity),ComponentType> activity_interface;
+
+				Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
+				Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
+				Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* scheduler = person->Scheduling_Faculty<Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* >();
+
+				list<activity_interface*>* activities = scheduler->Activity_Container<list<activity_interface*>*>();
+
+				stringstream ss("");
+				time_str;
+				int i = 1;
+				for (typename list<activity_interface*>::iterator itr = activities->begin(); itr != activities->end(); ++itr, ++i)
+				{
+					// blank space
+					key_value_pair.first="";
+					time_str = "";
+					sprintf(str_buf, "%s", time_str.c_str());
+					key_value_pair.second=str_buf;				
+					memset(&str_buf[0],0,128);
+					bucket.push_back(key_value_pair);
+
+					// activity start time
+					activity_interface* act = *itr;
+					ss.str("");
+					ss << "Act "<<i<<": Start Time";
+					key_value_pair.first=ss.str();
+					time_str = convert_seconds_to_hhmm(act->template Start_Time<Time_Seconds>());
+					sprintf(str_buf, "%s", time_str.c_str());
+					key_value_pair.second=str_buf;				
+					memset(&str_buf[0],0,128);
+					bucket.push_back(key_value_pair);
+
+					// activity duration
+					ss.str("");
+					ss << "Act "<<i<<": Duration";
+					key_value_pair.first=ss.str();
+					time_str = convert_seconds_to_hhmm(act->template Duration<Time_Seconds>());
+					sprintf(str_buf, "%s", time_str.c_str());
+					key_value_pair.second=str_buf;				
+					memset(&str_buf[0],0,128);
+					bucket.push_back(key_value_pair);
+
+					// activity destination
+					ss.str("");
+					ss << "Act "<<i<<": TAZ destination";
+					key_value_pair.first=ss.str();
+					sprintf(str_buf, "%d", act->Location<Activity_Location_Interface*>()->zone<zone_interface*>()->uuid<int>());
+					key_value_pair.second=str_buf;				
+					memset(&str_buf[0],0,128);
+					bucket.push_back(key_value_pair);
+				}
+#endif
 			}
 			
 			feature_implementation void make_pyramid(Point_3D<MasterType>* vertex,const Point_3D<MasterType>& center,const float radius)

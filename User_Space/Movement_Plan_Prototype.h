@@ -77,7 +77,7 @@ namespace Movement_Plan_Components
 			feature_accessor(planning_time, none, none);
 			feature_accessor(plan, none, none);
 			feature_accessor(valid_trajectory,none,none);
-			feature_accessor(activity_reference,none,none);
+			feature_accessor(destination_activity_reference,none,none);
 			feature_accessor(routed_travel_time,none,none);
 			feature_accessor(estimated_time_of_arrival,none,none);
 			

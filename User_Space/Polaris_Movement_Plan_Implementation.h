@@ -107,11 +107,24 @@ namespace Movement_Plan_Components
 
 			member_data(bool, valid_trajectory,none,none);
 		};
-#ifndef EXCLUDE_DEMAND
+
 		implementation struct Polaris_Integrated_Movement_Plan_Implementation : public Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)>
 		{
-			typedef typename Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)>::Component_Type ComponentType;
-			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_plan_type,none,none);
+			typedef typename Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)> Base_Type;
+			typedef typename Base_Type::Component_Type ComponentType;
+			member_prototype(Activity_Components::Prototypes::Activity_Planner, destination_activity_reference, typename MasterType::activity_plan_type,none,none);
+			feature_implementation void arrive_to_destination()
+			{
+				Base_Type* bthis = (Base_Type*)this;
+
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
+				_trajectory_container[_current_trajectory_index]->_delayed_time = 0.0;
+				bthis->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>( ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() );
+
+				Simulation_Timestep_Increment ttime = bthis->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>() - bthis->template departed_time<ComponentType,CallerType,Simulation_Timestep_Increment>();
+				this->_destination_activity_reference->template Actual_Travel_Time<Simulation_Timestep_Increment>(ttime);
+				this->_destination_activity_reference->template Arrive_At_Activity<NT>();
+			}
 		};
 
 		implementation struct Polaris_Movement_Plan_Record_Implementation : public Polaris_Component<APPEND_CHILD(Polaris_Movement_Plan_Record_Implementation),MasterType,Data_Object,ParentType>
@@ -140,14 +153,14 @@ namespace Movement_Plan_Components
 				_valid_trajectory = move->valid_trajectory<bool>();
 
 				// copy pointer to the activity reference from original movement plan
-				_activity_reference = move->activity_reference<activity_reference_interface*>();
+				_destination_activity_reference = move->destination_activity_reference<destination_activity_reference_interface*>();
 			}	 
 			tag_feature_signature_as_available(Initialize, 1);
 
-			member_prototype(Activity_Components::Prototypes::Activity_Planner, activity_reference, typename MasterType::activity_plan_type,none,none);
+			member_prototype(Activity_Components::Prototypes::Activity_Planner, destination_activity_reference, typename MasterType::activity_plan_type,none,none);
 			member_container(vector<typename MasterType::link_type*>, trajectory_container, none, none);
 			member_data(bool, valid_trajectory,none,none);
 		};
-#endif
+
 	}
 }

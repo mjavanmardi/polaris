@@ -96,6 +96,7 @@ struct MasterType
 	typedef Person_Components::Implementations::CTRAMP_Activity_Generator_Implementation<M, person_type> activity_generator_type;
 	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<M,person_type> person_properties_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<M> person_static_properties_type;
+	typedef Person_Components::Implementations::Person_Data_Logger_Implementation<M> person_data_logger_type;
 	
 	typedef RNG_Components::Implementations::RngStream_Implementation<M> RNG;
 
@@ -333,6 +334,7 @@ int main(int argc,char** argv)
 	define_component_interface(_network_skim_itf, _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,NULLTYPE);
 	_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<_Network_Interface::get_type_of(skimming_faculty)>();
 	skimmer->Initialize<_Network_Interface*>(network);
+	skimmer->write_output<bool>(scenario->write_skim_tables<bool>());
 	network->skimming_faculty<_network_skim_itf*>(skimmer);
 
 
@@ -351,42 +353,20 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// POPSYN stuff
 	//----------------------------------------------------------------------------------------------------------------------------------
-	#ifdef DEBUG_1
-	typedef Person_Components::Prototypes::Person<MasterType::person_type> person_itf;
-	typedef Person_Components::Prototypes::Person_Properties<MasterType::person_properties_type> properties_itf;
-	typedef Person_Components::Prototypes::Activity_Generator<MasterType::activity_generator_type> generator_itf;
-	typedef Person_Components::Prototypes::Person_Planner<MasterType::person_planner_type> planner_itf;
-	typedef Person_Components::Prototypes::Person_Properties<MasterType::person_static_properties_type> pop_unit_itf;
-	pop_unit_itf* data = (pop_unit_itf*)Allocate<MasterType::person_static_properties_type>();
-	data->Age<int>(26);
-	data->Class_of_worker<Person_Components::Types::CLASS_OF_WORKER>(Person_Components::Types::CLASS_OF_WORKER::COW_EMPLOYEE);
-	data->Employment_Status<Person_Components::Types::EMPLOYMENT_STATUS>(Person_Components::Types::EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK);
-	data->Journey_To_Work_Travel_Time<Time_Minutes>(3.0);
-	data->Journey_To_Work_Arrival_Time<int>(3);
-	data->Work_Hours<Time_Hours>(40.0);
-	person_itf* p = (person_itf*)Allocate<MasterType::person_type>();
-	p->network_reference<_Network_Interface*>(network);
-	p->scenario_reference<_Scenario_Interface*>(scenario);	
-	p->Initialize<int>(1);
-	p->Static_Properties<pop_unit_itf*>(data);
-	p->Home_Location<int>(65);
-	p->Work_Location<int>(256);
-
-	properties_itf* props = p->Properties<properties_itf*>();
-	props->Average_Activity_Duration<Target_Type<NT,void,ACTIVITY_TYPES,Time_Hours> > (ACTIVITY_TYPES::EAT_OUT_ACTIVITY,2);
-	props->Average_Activity_Duration<Target_Type<NT,void,ACTIVITY_TYPES,Time_Hours> > (ACTIVITY_TYPES::SOCIAL_ACTIVITY,3);
-	props->Average_Activity_Frequency<Target_Type<NT,void,ACTIVITY_TYPES,float> > (ACTIVITY_TYPES::EAT_OUT_ACTIVITY,2.5);
-	
-	#else
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
 	popsyn->Initialize<Target_Type<NT,NT,_Network_Interface*, _Scenario_Interface*> >(network,scenario);
-	#endif
 	//----------------------------------------------------------------------------------------------------------------------------------
 
 	//==================================================================================================================================
 	// Logging of activity generation / scheduling outputs
 	//----------------------------------------------------------------------------------------------------------------------------------
+	define_component_interface(_Logger_Interface, MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
+	_Logger_Interface* logger=(_Logger_Interface*)Allocate<MasterType::person_data_logger_type>();
+	logger->Initialize<NT>();
+	_global_person_logger = logger;
+
+	
 	stringstream logfilename;
 	MasterType::person_planner_type::_write_activity_files = scenario->write_activity_output<bool>();
 	for (int i = 0; i < _num_threads; ++i)

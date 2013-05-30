@@ -38,6 +38,7 @@ namespace Scenario_Components
 				INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION,
 				LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION,
 				INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION,
+				INTERSECTION_MOE_COMPUTATION_SUB_ITERATION,
 				MOE_COMPUTATION_SUB_ITERATION,
 				MOE_VISUALIZATION_SUB_ITERATIONS,
 				END_OF_ITERATION=40,
@@ -199,6 +200,7 @@ namespace Scenario_Components
 			feature_accessor(write_network_snapshots, none, none);
 			feature_accessor(read_network_snapshots, none, none);
 			feature_accessor(input_network_snapshots_file_path_name, none, none);	
+			feature_accessor(write_skim_tables,none,none);
 
 			feature_accessor(compare_with_historic_moe, none, none);
 			feature_accessor(historic_network_moe_file_path_name, none, none);
@@ -372,6 +374,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("read_network_snapshots", read_network_snapshots<bool*>())!= PARAMETER_FOUND) read_network_snapshots<bool>(false);
 				if (cfgReader.getParameter("input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<string*>())!= PARAMETER_FOUND) input_network_snapshots_file_path_name<string>("input_network_snapshots");
 				
+				if (cfgReader.getParameter("write_skim_tables", this->write_skim_tables<bool*>()) != PARAMETER_FOUND) this->write_skim_tables<bool>(false);
+
 				if (cfgReader.getParameter("compare_with_historic_moe", compare_with_historic_moe<bool*>())!= PARAMETER_FOUND) compare_with_historic_moe<bool>(false);
 				if (cfgReader.getParameter("historic_network_moe_file_path_name", historic_network_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_network_moe_file_path_name<string>("historic_realtime_moe_network.csv");
 				if (cfgReader.getParameter("historic_link_moe_file_path_name", historic_link_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_link_moe_file_path_name<string>("historic_moe_link.csv");

@@ -67,7 +67,7 @@ namespace Prototypes
 			else if (_sub_iteration == Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION)
 			{
 				_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Replanning_Event<NULLTYPE>);
-				response.next._iteration = movement->template departed_time<Simulation_Timestep_Increment>();
+				response.next._iteration = _iteration; //movement->template departed_time<Simulation_Timestep_Increment>();
 				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION;
 				response.result = pthis->template Replanning_Needed<bool>();
 			}
@@ -273,7 +273,7 @@ namespace Prototypes
 				dest = dest_chooser->template Choose_Destination<location_itf*>(orig,next,unaffected_locations);
 				movement->template destination<location_itf*>(dest);
 				movement->template destination<link_itf*>(dest->template origin_links<links*>()->at(0));
-				activity_itf* act = movement->template activity_reference<activity_itf*>();
+				activity_itf* act = movement->template destination_activity_reference<activity_itf*>();
 				act->template Location<location_itf*>(dest);
 
 				//cout << endl << "Destination Replanned due to weather, switch from zone '" << old_dest_id << "', to new zone '" << dest->zone<zone_itf*>()->uuid<int>()<<"'.";

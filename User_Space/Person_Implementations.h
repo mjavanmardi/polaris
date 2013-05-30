@@ -63,8 +63,6 @@ namespace Person_Components
 			define_component_interface(scenario_reference_interface,typename Perception_Faculty_type::type_of(Scenario),Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
 
-
-
 			// Agent ID
 			member_data(long,uuid,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 			member_data(bool,has_pretrip_information,check_2(ReturnValueType,bool,is_same), check_2(SetValueType,bool,is_same));

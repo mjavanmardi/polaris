@@ -114,6 +114,7 @@ namespace Network_Skimming_Components
 			feature_accessor(origin_node_to_zone_map,none,none);
 			feature_accessor(destination_node_to_zone_map,none,none);
 			feature_accessor(timer,none,none);
+			feature_accessor(write_output,none,none);
 
 			//=============================================
 			// Primary function accessors - used to pass through to the specific skimm table based on time-key
@@ -262,7 +263,7 @@ namespace Network_Skimming_Components
 				// Output network skims
 				for (typename _skim_container_itf::iterator itr = skim->begin(); itr != skim->end(); ++itr)
 				{
-					itr->second->template Write_LOS<NULLTYPE>();
+					if (this->write_output<bool>()) itr->second->template Write_LOS<NULLTYPE>();
 				}
 
 				return true;

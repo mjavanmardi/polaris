@@ -71,7 +71,6 @@ namespace Person_Components
 			{
 				_Scheduler_Interface* scheduler = this->_Parent_Person->template Scheduling_Faculty<_Scheduler_Interface*>();
 				scheduler->Add_Movement_Plan<TargetType>(movement_plan);
-
 			} tag_feature_as_available(Add_Movement_Plan);
 			feature_implementation void Add_Activity_Plan(TargetType activity_plan)
 			{

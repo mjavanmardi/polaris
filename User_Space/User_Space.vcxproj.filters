@@ -301,5 +301,11 @@
     <ClInclude Include="Person_Mover_Implementations.h">
       <Filter>Implementations\Person Components</Filter>
     </ClInclude>
+    <ClInclude Include="Person_Data_Logger_Implementation.h">
+      <Filter>Implementations\Person Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Person_Data_Logger_Prototype.h">
+      <Filter>Prototypes\Person Components</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

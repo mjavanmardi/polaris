@@ -73,6 +73,7 @@ namespace Activity_Components
 			member_component_and_feature_accessor(Start_Time, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>)
 			member_component_and_feature_accessor(Duration, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>)
 			member_component_and_feature_accessor(Expected_Travel_Time, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
+			member_component_and_feature_accessor(Actual_Travel_Time, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_container(vector<typename MasterType::person_type*>, Involved_Persons_Container, none, none);
 
 			// Planning event time members
@@ -132,50 +133,12 @@ namespace Activity_Components
 			}
 			tag_feature_as_available(Set_Attribute_Planning_Times);
 
-			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
-			{
-				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
-				_person_itf* person = planner->template Parent_Person<_person_itf*>();
-				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
-
-				// copy the movement plan into the cached movement record before addition
-				movement_record_interface* move_record = (movement_record_interface*)Allocate<movement_record_type>();
-				move_record->template Initialize<Target_Type<NT,void,_movement_plan_itf*>>(move);
-
-				if (move->template origin<_activity_location_itf*>() == nullptr || move->template destination<_activity_location_itf*>() == nullptr) return;
-
-
-				// Assign the movement plan to the persons activity schedule, if null movement, leave valid_trajectory to false
-				if (move->template valid_trajectory<bool>() || move->template origin<_activity_location_itf*>() == move->template destination<_activity_location_itf*>())
-				{			
-					Simulation_Timestep_Increment ttime = move->template routed_travel_time<Simulation_Timestep_Increment>();
-					Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
-					if (depart < planner->template Next_Planning_Time<Simulation_Timestep_Increment>())
-					{
-						depart = planner->template Next_Planning_Time<Simulation_Timestep_Increment>();
-						this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
-					}
-
-					move->template departed_time<Simulation_Timestep_Increment>(depart);
-					planner->template Add_Movement_Plan<_movement_plan_itf*>(move);
-				}
-				else
-				{
-					//----------------------------------------------------------------
-					// Print to log file
-					//stringstream s;
-					//s << endl <<"ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< this->Activity_Plan_ID<ComponentType,CallerType,int>();
-					//s << "," <<move->template origin<_activity_location_itf*>()->uuid<int>() << ", " <<move->template destination<_activity_location_itf*>()->uuid<int>();
-					////s << ",at iteration " << _iteration << "." << _sub_iteration<<". Scheduled for route planning @ " << move->planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->departed_time<Simulation_Timestep_Increment>();
-					//planner->Write_To_Log<stringstream>(s);
-				}
-			}
 			feature_implementation void Route_Planning_Event_Handler()
 			{
 				// Create movement plan and give it an ID
 				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename _scheduler_itf::get_type_of(Movement_Plans_Container)::unqualified_value_type>();
 				move->template initialize_trajectory<NULLTYPE>();
-				move->template activity_reference<ComponentType*>((ComponentType*)this);
+				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
 
 				// Get the origin and destination locations
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
@@ -217,6 +180,7 @@ namespace Activity_Components
 						// shift departure time by estimated travel time, and make sure that it does not occur before next iteration
 						_skim_itf* skim = person->template network_reference<_network_itf*>()->template skimming_faculty<_skim_itf*>();	
 						Simulation_Timestep_Increment ttime = skim->template Get_LOS<Target_Type<NT,Simulation_Timestep_Increment,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->template zone<_zone_itf*>()->template uuid<int>(),dest->template zone<_zone_itf*>()->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+						this->Expected_Travel_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(ttime);
 						Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
 						if (depart < _iteration+1)
 						{
@@ -246,6 +210,46 @@ namespace Activity_Components
 					//----------------------------------------------------------------
 				}
 			}
+			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
+			{
+				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
+				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
+
+				// copy the movement plan into the cached movement record before addition
+				movement_record_interface* move_record = (movement_record_interface*)Allocate<movement_record_type>();
+				move_record->template Initialize<Target_Type<NT,void,_movement_plan_itf*>>(move);
+
+				if (move->template origin<_activity_location_itf*>() == nullptr || move->template destination<_activity_location_itf*>() == nullptr) return;
+
+
+				// Assign the movement plan to the persons activity schedule, if null movement, leave valid_trajectory to false
+				if (move->template valid_trajectory<bool>() || move->template origin<_activity_location_itf*>() == move->template destination<_activity_location_itf*>())
+				{			
+					Simulation_Timestep_Increment ttime = move->template routed_travel_time<Simulation_Timestep_Increment>();
+					Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
+					if (depart < planner->template Next_Planning_Time<Simulation_Timestep_Increment>())
+					{
+						depart = planner->template Next_Planning_Time<Simulation_Timestep_Increment>();
+						this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
+					}
+
+					this->Expected_Travel_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(move->template routed_travel_time<Simulation_Timestep_Increment>());
+					move->template departed_time<Simulation_Timestep_Increment>(depart);
+					planner->template Add_Movement_Plan<_movement_plan_itf*>(move);
+
+				}
+				else
+				{
+					//----------------------------------------------------------------
+					// Print to log file
+					//stringstream s;
+					//s << endl <<"ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< this->Activity_Plan_ID<ComponentType,CallerType,int>();
+					//s << "," <<move->template origin<_activity_location_itf*>()->uuid<int>() << ", " <<move->template destination<_activity_location_itf*>()->uuid<int>();
+					////s << ",at iteration " << _iteration << "." << _sub_iteration<<". Scheduled for route planning @ " << move->planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->departed_time<Simulation_Timestep_Increment>();
+					//planner->Write_To_Log<stringstream>(s);
+				}
+			}		
 		};
 
 
@@ -681,13 +685,17 @@ namespace Activity_Components
 				}
 				else exp_ttime = 60.0f;
 
-				Simulation_Timestep_Increment start_seconds = pthis->template Start_Time<Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
-				int start_increment = std::max<int>(start_seconds, _iteration);
-				pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
+				//---------------------------
+				// Disaggregate plan routing
+				//Simulation_Timestep_Increment start_seconds = pthis->template Start_Time<Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
+				//int start_increment = std::max<int>(start_seconds, _iteration);
+				//pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
 				
-				/*int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 2.0);
-				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
-				pthis->Route_Planning_Time<Revision&>()._iteration = start_increment;*/
+				//---------------------------
+				// Aggregate plan routing
+				Time_Minutes start_minutes = (int)(pthis->template Start_Time<Time_Minutes>() - (exp_ttime * 2.0));
+				int start_increment = std::max<int>(Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
+				pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
 			}
 			feature_implementation void Involved_Persons_Planning_Event_Handler()
 			{
@@ -933,13 +941,17 @@ namespace Activity_Components
 				}
 				else exp_ttime = 60.0f;
 
-				Simulation_Timestep_Increment start_seconds = bthis->template Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
-				int start_increment = std::max<int>(start_seconds, _iteration);
-				bthis->template Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;
-
-				/*int start_minutes = (int)this->Start_Time<ComponentType,CallerType,Time_Minutes>() - (int)(exp_ttime * 2.0);
-				int start_increment = std::max<int>(Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
-				bthis->Route_Planning_Time<ComponentType,CallerType,Revision&>()._iteration = start_increment;*/
+				//---------------------------
+				// Disaggregate plan routing
+				//Simulation_Timestep_Increment start_seconds = pthis->template Start_Time<Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
+				//int start_increment = std::max<int>(start_seconds, _iteration);
+				//pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
+				
+				//---------------------------
+				// Aggregate plan routing
+				Time_Minutes start_minutes = (int)(pthis->template Start_Time<Time_Minutes>() - (exp_ttime * 2.0));
+				int start_increment = std::max<int>(Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
+				pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
 			}
 
 			feature_implementation void Involved_Persons_Planning_Event_Handler()

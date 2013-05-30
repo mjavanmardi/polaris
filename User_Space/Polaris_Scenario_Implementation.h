@@ -78,6 +78,8 @@ namespace Scenario_Components
 
 			member_data(bool, write_activity_output, none, none);
 
+			member_data(bool, write_skim_tables, none, none);
+
 			member_data(double, percent_to_synthesize, none,none);
 			member_data(double, ipf_tolerance, none,none);
 			member_data(int, marginal_tolerance, none,none);

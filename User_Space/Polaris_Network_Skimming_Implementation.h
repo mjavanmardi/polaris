@@ -231,6 +231,7 @@ namespace Network_Skimming_Components
 			member_associative_container(concat(dense_hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),destination_node_to_zone_map,none,none);
 
 			member_data(Counter, timer,none,none);
+			member_data(bool, write_output, none,none);
 
 			member_associative_container(concat(dense_hash_map<long,Mode_Skim_Table_Implementation<MasterType,ParentType>*>), mode_skim_table_container, none, none);
 

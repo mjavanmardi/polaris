@@ -130,10 +130,16 @@ namespace Person_Components
 					if (current_move->template departed_time<Simulation_Timestep_Increment>() > move->template departed_time<Simulation_Timestep_Increment>()) break;
 					++move_itr;
 				}
-				movements->insert(move_itr,move);			
+				movements->insert(move_itr,move);	
 
-				// cache the movement plans activity in the activity record container since all attributes have been planned at this point
-				Activity_Plan* act = move->template activity_reference<Activity_Plan*>();
+
+				// log the activity throught the global person logger
+				define_component_interface(_Logger_Interface, MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
+				Activity_Plan* act = move->template destination_activity_reference<Activity_Plan*>();
+				((_Logger_Interface*)_global_person_logger)->Add_Record<Activity_Plan*>(act,false);
+
+
+				// cache the movement plans activity in the activity record container since all attributes have been planned at this point			
 				Activity_Records* act_records = _Parent_Person->template Activity_Record_Container<Activity_Records*>();
 				Activity_Record* act_record = (Activity_Record*)Allocate<typename MasterType::activity_record_type>();
 				act_record->template Initialize<Activity_Plan*>(act);
