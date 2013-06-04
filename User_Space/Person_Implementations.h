@@ -71,8 +71,9 @@ namespace Person_Components
 			// First iteration  - sets the next iteration after all planning is completed
 			member_component_and_feature_accessor(First_Iteration, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
 
+		
 			// Record of completed activities (stores a simplified subset of activity data)
-			member_container(list<typename MasterType::activity_record_type*>, Activity_Record_Container, none, none);
+			member_container(vector<typename MasterType::activity_record_type*>, Activity_Record_Container, none, none);
 
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
@@ -202,7 +203,7 @@ namespace Person_Components
 					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 					{
 						zone_interface* zone = z_itr->second;
-						Time_Minutes t = network_reference<ComponentType,CallerType,network_reference_interface*>()->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(orig->template uuid<int>(),zone->template uuid<int>(), Vehicle_Components::Types::SOV);
+						Time_Minutes t = network_reference<ComponentType,CallerType,network_reference_interface*>()->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Hours> >(orig->template uuid<int>(),zone->template uuid<int>(), Vehicle_Components::Types::SOV,9);
 						if (t > ttime - time_range_to_search && t < ttime + time_range_to_search && zone->template work_locations<locations_container_interface*>()->size() > 0 && zone->template employment<int>() > 0)
 						{
 							employment += zone->template employment<int>();
@@ -304,7 +305,7 @@ namespace Person_Components
 						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 						{
 							zone_interface* zone = z_itr->second;
-							Time_Minutes t = network_reference<ComponentType,CallerType,network_reference_interface*>()->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(orig->template uuid<int>(),zone->template uuid<int>(), Vehicle_Components::Types::SOV);
+							Time_Minutes t = network_reference<ComponentType,CallerType,network_reference_interface*>()->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Hours> >(orig->template uuid<int>(),zone->template uuid<int>(), Vehicle_Components::Types::SOV,9);
 							if (t < time_range_to_search && zone->template school_locations<locations_container_interface*>()->size() > 0)
 							{
 								school_locations += (int)zone->template school_locations<locations_container_interface*>()->size();

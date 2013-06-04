@@ -168,6 +168,7 @@ namespace Scenario_Components
 			// Demand model parameters
 			//-----------------------------------------------
 			feature_accessor(write_activity_output,none,none);
+			feature_accessor(aggregate_routing,none,none);
 
 
 			//===============================================
@@ -202,6 +203,9 @@ namespace Scenario_Components
 			feature_accessor(read_network_snapshots, none, none);
 			feature_accessor(input_network_snapshots_file_path_name, none, none);	
 			feature_accessor(write_skim_tables,none,none);
+			feature_accessor(read_skim_tables,none,none);
+			feature_accessor(input_skim_file_path_name, none, none);	
+			feature_accessor(output_skim_file_path_name, none, none);	
 
 			feature_accessor(compare_with_historic_moe, none, none);
 			feature_accessor(historic_network_moe_file_path_name, none, none);
@@ -376,6 +380,9 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<string*>())!= PARAMETER_FOUND) input_network_snapshots_file_path_name<string>("input_network_snapshots");
 				
 				if (cfgReader.getParameter("write_skim_tables", this->write_skim_tables<bool*>()) != PARAMETER_FOUND) this->write_skim_tables<bool>(false);
+				if (cfgReader.getParameter("read_skim_tables", this->read_skim_tables<bool*>()) != PARAMETER_FOUND) this->read_skim_tables<bool>(false);
+				if (cfgReader.getParameter("input_skim_file_path_name", this->input_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->input_skim_file_path_name<string>((string)"skim_file_in.txt");
+				if (cfgReader.getParameter("output_skim_file_path_name", this->output_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->output_skim_file_path_name<string>((string)"skim_file_out.txt");
 
 				if (cfgReader.getParameter("compare_with_historic_moe", compare_with_historic_moe<bool*>())!= PARAMETER_FOUND) compare_with_historic_moe<bool>(false);
 				if (cfgReader.getParameter("historic_network_moe_file_path_name", historic_network_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_network_moe_file_path_name<string>("historic_realtime_moe_network.csv");

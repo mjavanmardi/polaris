@@ -118,7 +118,7 @@ namespace Movement_Plan_Components
 				Base_Type* bthis = (Base_Type*)this;
 
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
-				bthis->_trajectory_container[bthis->_current_trajectory_index]->_delayed_time = 0.0;
+				//bthis->_trajectory_container[bthis->_current_trajectory_index]->_delayed_time = 0.0;
 				bthis->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>( ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() );
 
 				Simulation_Timestep_Increment ttime = bthis->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>() - bthis->template departed_time<ComponentType,CallerType,Simulation_Timestep_Increment>();

@@ -675,6 +675,7 @@ public:
 		for (size_type i=0; i<_size; i++) _data[i]=value;
 	}
 
+
 	// MArray constructors/destructor
 	matrix (void){_size = 0;_nrow=0; _ncol=0;}
 	matrix (const_index_type dim_sizes);
@@ -682,6 +683,7 @@ public:
 	matrix (const matrix& obj);
 	void Init(const_index_type dim_sizes);
 	void Copy(const matrix& obj);
+	void Copy(const_index_type dim_sizes, T* mem_to_copy);
 	matrix& operator=(const matrix& obj);
 	~matrix (void);
 
@@ -718,6 +720,7 @@ public:
 	matrix operator*(const matrix& obj);
 	matrix& operator*(const T& value);
 	void scale(const T& value);
+	pointer get_data_pointer(){return _data;}
 	
 	// Property access members
 	const size_type& size() {return _size;}
@@ -812,6 +815,17 @@ void matrix<T>::Copy(const matrix<T>& obj)
 	if (this==&obj) return;
 	_cleanup();
 	_copy(obj);
+}
+template <class T>
+void matrix<T>::Copy(const_index_type dim_sizes, T* mem_to_copy)
+{
+	_cleanup();
+	_ndim = 2;
+	_dim_sizes.first = dim_sizes.first; _dim_sizes.second = dim_sizes.second;
+	_size = dim_sizes.first * dim_sizes.second;
+	_nrow = dim_sizes.first;
+	_ncol = dim_sizes.second;
+	_data = mem_to_copy;
 }
 template <class T>
 void matrix<T>::_copy(const matrix<T>& obj)

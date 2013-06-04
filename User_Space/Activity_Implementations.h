@@ -30,7 +30,7 @@ namespace Activity_Components
 
 			// pointer to movement plan associated with activity
 			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, movement_plan, typename MasterType::movement_plan_type,none,none);
-			member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, movement_record, typename MasterType::movement_plan_record_type,none,none);
+			//member_prototype(Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, movement_record, typename MasterType::movement_plan_record_type,none,none);
 
 			static int Route_Planning_Counter[_num_threads];
 			static member_data(int, Route_Planning_Count,none,none);
@@ -217,8 +217,8 @@ namespace Activity_Components
 				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
 
 				// copy the movement plan into the cached movement record before addition
-				movement_record_interface* move_record = (movement_record_interface*)Allocate<movement_record_type>();
-				move_record->template Initialize<Target_Type<NT,void,_movement_plan_itf*>>(move);
+				//movement_record_interface* move_record = (movement_record_interface*)Allocate<movement_record_type>();
+				//move_record->template Initialize<Target_Type<NT,void,_movement_plan_itf*>>(move);
 
 				if (move->template origin<_activity_location_itf*>() == nullptr || move->template destination<_activity_location_itf*>() == nullptr) return;
 
@@ -615,7 +615,7 @@ namespace Activity_Components
 
 					// determine if agent can go home prior to activity
 					time_before = start - (previous->template Start_Time<Time_Minutes>() + previous->template Duration<Time_Minutes>());
-					ttime_prev_to_home = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Type_Keys>>(prev_loc->template zone<_zone_itf*>()->template uuid<int>(), home_loc->template zone<_zone_itf*>()->template uuid<int>(),SOV);
+					ttime_prev_to_home = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Type_Keys, Time_Minutes>>(prev_loc->template zone<_zone_itf*>()->template uuid<int>(), home_loc->template zone<_zone_itf*>()->template uuid<int>(),SOV,start);
 
 					// set next activity location, =home if no next activity
 					this_itf* next = person->template previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->template Start_Time<ComponentType,CallerType,Time_Seconds>());
@@ -624,7 +624,7 @@ namespace Activity_Components
 
 					// determine if agent can go home after activity before next activity
 					time_after = next->template Start_Time<Time_Minutes>() - end;
-					ttime_home_to_next = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Type_Keys>>(home_loc->template zone<_zone_itf*>()->template uuid<int>(),next_loc->template zone<_zone_itf*>()->template uuid<int>(),SOV);
+					ttime_home_to_next = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Type_Keys, Time_Minutes>>(home_loc->template zone<_zone_itf*>()->template uuid<int>(),next_loc->template zone<_zone_itf*>()->template uuid<int>(),SOV,end);
 				}
 				else 
 				{
@@ -687,7 +687,7 @@ namespace Activity_Components
 					_zone_itf* o_zone = person->template Home_Location<_zone_itf*>();
 					_zone_itf* d_zone = pthis->template Location<_activity_location_itf*>()->template zone<_zone_itf*>();
 
-					exp_ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_zone->template uuid<int>(),d_zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+					exp_ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes> >(o_zone->template uuid<int>(),d_zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV, pthis->template Start_Time<Time_Minutes>());
 				}
 				else exp_ttime = 60.0f;
 
@@ -943,7 +943,7 @@ namespace Activity_Components
 					_zone_itf* o_zone = person->template Home_Location<_zone_itf*>();
 					_zone_itf* d_zone = bthis->template Location<ComponentType,CallerType,_activity_location_itf*>()->template zone<_zone_itf*>();
 
-					exp_ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys> >(o_zone->template uuid<int>(),d_zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+					exp_ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours> >(o_zone->template uuid<int>(),d_zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV, pthis->Start_Time<Time_Hours>());
 				}
 				else exp_ttime = 60.0f;
 

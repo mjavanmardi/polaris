@@ -339,6 +339,10 @@ struct Multidimensional_Random_Access_Array_Prototype ADD_DEBUG_INFO
 	{
 		((ComponentType*)this)->Copy(*((typename Multidimensional_Random_Access_Array_Prototype<ComponentType,CallerType,TargetValueType>::Component_Type::Container_Type*)&obj));
 	}
+	void Copy(const_index_type dim_sizes, TargetValueType* data)
+	{
+		((ComponentType*)this)->Copy(dim_sizes, data);
+	}
 
 	void write(ostream& s){return ((ComponentType*)this)->print(s);}
 
@@ -356,6 +360,8 @@ struct Multidimensional_Random_Access_Array_Prototype ADD_DEBUG_INFO
 	const TargetValueType& operator [](size_type i) const {return (TargetValueType&)((*((ComponentType*)this))[i]);}
 
 	TargetValueType& at(const_index_type i){return (TargetValueType&)(((ComponentType*)this)->at(i));}
+
+	TargetValueType* get_data_pointer(){return((ComponentType*)this)->get_data_pointer();}
 
 	// basic feature tags
 	typedef true_type begin_feature_tag;

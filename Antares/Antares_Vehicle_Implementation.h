@@ -465,7 +465,7 @@ namespace Vehicle_Components
 						display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, prev_end, prev_end + 15, false );
 					}
 
-					list<typename type_of(MasterType::activity_record)*>* discarded_activities = person->Activity_Record_Container<list<typename type_of(MasterType::activity_record)*>*>();
+					vector<typename type_of(MasterType::activity_record)*>* discarded_activities = person->Activity_Record_Container<vector<typename type_of(MasterType::activity_record)*>*>();
 
 					cout << endl <<endl<< "Num discarded activities="<<discarded_activities->size();
 
@@ -473,7 +473,7 @@ namespace Vehicle_Components
 					{
 						previous_location = person->Home_Location<Activity_Location_Interface*>();
 
-						for(list<typename type_of(MasterType::activity_record)*>::iterator itr=discarded_activities->begin();itr!=discarded_activities->end();itr++)
+						for(vector<typename type_of(MasterType::activity_record)*>::iterator itr=discarded_activities->begin();itr!=discarded_activities->end();itr++)
 						{
 							Activity_Planner<typename type_of(MasterType::activity_record),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity_record),ComponentType>*)(*itr);
 							if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;

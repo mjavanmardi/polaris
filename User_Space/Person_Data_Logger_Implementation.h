@@ -52,11 +52,11 @@ namespace Person_Components
 
 				if (!is_executed)
 				{
-					s<<act->template Expected_Travel_Time<Time_Minutes>()<<"\t"<<0;
+					s<<"\t"<<act->template Expected_Travel_Time<Time_Minutes>()<<"\t"<<0;
 				}
 				else
 				{
-					s<<act->template Actual_Travel_Time<Time_Minutes>()<<"\t"<<1;
+					s<<"\t"<<act->template Actual_Travel_Time<Time_Minutes>()<<"\t"<<1;
 				}
 				buff[_thread_id].push_back(s.str());
 			}
