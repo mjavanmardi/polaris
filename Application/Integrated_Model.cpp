@@ -414,14 +414,6 @@ cout << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_
 	skimmer->Initialize<_Network_Interface*>(network);
 	network->skimming_faculty<_network_skim_itf*>(skimmer);
 
-	cout << endl << network->Get_LOS<Target_Type<NT,Time_Minutes,int, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes>>(1,0,Vehicle_Components::Types::Vehicle_Type_Keys::SOV,30);
-	cout << endl << network->Get_LOS<Target_Type<NT,Time_Minutes,int, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes> >(1,0,Vehicle_Components::Types::Vehicle_Type_Keys::SOV,90);
-	cout << endl << network->Get_LOS<Target_Type<NT,Time_Minutes,int, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes> >(1,0,Vehicle_Components::Types::Vehicle_Type_Keys::SOV,150);
-	cout << endl << network->Get_LOS<Target_Type<NT,Time_Minutes,int, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes> >(1,0,Vehicle_Components::Types::Vehicle_Type_Keys::SOV,210);
-	cout << endl << network->Get_LOS<Target_Type<NT,Time_Minutes,int, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes> >(1,0,Vehicle_Components::Types::Vehicle_Type_Keys::SOV,270);
-	cout << endl << network->Get_LOS<Target_Type<NT,Time_Minutes,int, Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes> >(1,0,Vehicle_Components::Types::Vehicle_Type_Keys::SOV,330);
-	cout << endl;
-
 	//==================================================================================================================================
 	// Destination choice model - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------

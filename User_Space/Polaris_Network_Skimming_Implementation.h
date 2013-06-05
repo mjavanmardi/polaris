@@ -215,7 +215,6 @@ namespace Network_Skimming_Components
 
 			feature_implementation typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator)
 			{		
-				return (TargetType::ReturnType)(Basic_Units::Time_Variables::Time_Minutes(5));
 			}
 		};
 

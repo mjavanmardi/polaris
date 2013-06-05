@@ -282,6 +282,30 @@ namespace Network_Skimming_Components
 			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_Zone_ID, typename TargetType::ParamType Destination_Zone_ID, typename TargetType::Param2Type Mode_Indicator, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
 			{
 				// create the references to network items and create the lists of origins/destination to route from/to
+				//define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+				//define_container_and_value_interface(zones_itf,zone_itf,typename network_itf::get_type_of(zones_container),Associative_Container_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+				//network_itf* network = this->template network_reference<network_itf*>();
+				//zones_itf* zones = network->template zones_container<zones_itf*>();
+				//typename zones_itf::iterator zone_itr;
+
+				//// convert the ids to indices
+				//zone_itf *orig_zone, *dest_zone;
+				//if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = zone_itr->second;}
+				//else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found.");
+				//if ((zone_itr = zones->find(Destination_Zone_ID)) != zones->end()){ dest_zone = zone_itr->second;}
+				//else THROW_EXCEPTION("ERROR, destination zone id: " << Destination_Zone_ID << " was not found.");
+				
+				// call the get los function
+				return this->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, Simulation_Timestep_Increment>>(Origin_Zone_ID, Destination_Zone_ID, Mode_Indicator, Simulation_Time.template Current_Time<Simulation_Timestep_Increment>());
+			}
+			// This returns the travel time during a specific time interval
+			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_Zone_ID, typename TargetType::ParamType Destination_Zone_ID, typename TargetType::Param2Type Mode_Indicator, typename TargetType::Param3Type Start_Time, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
+			{
+				define_container_and_value_interface(_skim_container_itf, _skim_itf,typename get_type_of(mode_skim_table_container),Containers::Associative_Container_Prototype,Prototypes::Mode_Skim_Table_Prototype,CallerType);
+				_skim_container_itf* skim = this->mode_skim_table_container<_skim_container_itf*>();
+				typename _skim_container_itf::iterator itr;
+
+				// create the references to network items and create the lists of origins/destination to route from/to
 				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_container_and_value_interface(zones_itf,zone_itf,typename network_itf::get_type_of(zones_container),Associative_Container_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 				network_itf* network = this->template network_reference<network_itf*>();
@@ -294,23 +318,13 @@ namespace Network_Skimming_Components
 				else THROW_EXCEPTION("ERROR, origin zone id: " << Origin_Zone_ID << " was not found.");
 				if ((zone_itr = zones->find(Destination_Zone_ID)) != zones->end()){ dest_zone = zone_itr->second;}
 				else THROW_EXCEPTION("ERROR, destination zone id: " << Destination_Zone_ID << " was not found.");
-				
-				// call the get los function
-				return this->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, Simulation_Timestep_Increment>>(orig_zone->template internal_id<int>(), dest_zone->template internal_id<int>(), Mode_Indicator, Simulation_Time.template Current_Time<Simulation_Timestep_Increment>());
-			}
-			// This returns the travel time during a specific time interval
-			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID, typename TargetType::Param2Type Mode_Indicator, typename TargetType::Param3Type Start_Time, requires(check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
-			{
-				define_container_and_value_interface(_skim_container_itf, _skim_itf,typename get_type_of(mode_skim_table_container),Containers::Associative_Container_Prototype,Prototypes::Mode_Skim_Table_Prototype,CallerType);
-				_skim_container_itf* skim = this->mode_skim_table_container<_skim_container_itf*>();
-				typename _skim_container_itf::iterator itr;
 
 				// throw error if specified mode is not available in skim table
 				itr = skim->find(Mode_Indicator);
 				//if ((itr = skim->find(Mode_Indicator)) == skim->end()) assert(false);
 
 				// call mode_skim_tables get los functionality
-				return itr->second->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param3Type>>(Origin_ID,Destination_ID,Start_Time);
+				return itr->second->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param3Type>>(orig_zone->template internal_id<int>(), dest_zone->template internal_id<int>(),Start_Time);
 			}
 
 		};
