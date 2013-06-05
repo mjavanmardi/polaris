@@ -1,4 +1,4 @@
-#define EXCLUDE_DEMAND
+//#define EXCLUDE_DEMAND
 
 #include "Polaris_PCH.h"
 
@@ -34,7 +34,7 @@ struct MasterType
 	typedef Antares_Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<MasterType> vehicle_type;
 #else
-	typedef Network_Components::Implementations::Polaris_Network_Implementation<MasterType> network_type;
+	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<MasterType> network_type;
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<MasterType> link_type;
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<MasterType> vehicle_type;
@@ -120,6 +120,10 @@ struct MasterType
 	typedef Network_Components::Implementations::Network_DB_Reader_Implementation<MasterType> network_db_reader_type;
 	typedef Traffic_Management_Center_Components::Implementations::Simple_TMC<MasterType> traffic_management_center_type;
 	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
+    
+	typedef Network_Skimming_Components::Implementations::Basic_Network_Skimming_Implementation<MasterType> network_skim_type;
+    typedef Network_Skimming_Components::Implementations::Mode_Skim_Table_Implementation<MasterType> network_mode_skim_type;
+    typedef Routing_Components::Implementations::Polaris_Skim_Routing_Implementation<MasterType> skim_routing_type;
 #ifdef ANTARES
 	typedef Network_Event_Components::Implementations::Antares_Weather_Network_Event<MasterType> weather_network_event_type;
 	typedef Network_Event_Components::Implementations::Antares_Accident_Network_Event<MasterType> accident_network_event_type;
@@ -311,6 +315,20 @@ void run_with_input_from_db()
 		{
 			MasterType::link_type::subscribe_events();
 		}
+
+		//==================================================================================================================================
+		// Network Skimming stuff
+		//----------------------------------------------------------------------------------------------------------------------------------
+		define_component_interface(_network_skim_itf, _Network_Interface::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,NULLTYPE);
+		_network_skim_itf* skimmer = (_network_skim_itf*)Allocate<_Network_Interface::get_type_of(skimming_faculty)>();
+		skimmer->read_input<bool>(false);
+		skimmer->write_output<bool>(scenario->write_skim_tables<bool>());
+		if (skimmer->write_output<bool>())
+		{
+				skimmer->output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_skim_file_path_name<string>().c_str());
+		}
+		skimmer->Initialize<_Network_Interface*>(network);
+		network->skimming_faculty<_network_skim_itf*>(skimmer);
 
 		cout << "starting sim..." <<endl;
 

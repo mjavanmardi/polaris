@@ -115,7 +115,7 @@ namespace Network_Skimming_Components
 
 
 				// tree builder interface
-				define_container_and_value_interface(tree_builder_list_itf, tree_builder_itf, typename get_type_of(path_trees_container),Associative_Container_Prototype,Routing_Components::Prototypes::Routing_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(tree_builder_list_itf, tree_builder_itf, type_of(path_trees_container),Associative_Container_Prototype,Routing_Components::Prototypes::Routing_Prototype,ComponentType);
 				tree_builder_list_itf* tree_list = this->path_trees_container<ComponentType,CallerType,tree_builder_list_itf*>();
 
 				origin_map_itf* origin_map = skim->template origin_node_to_zone_map<origin_map_itf*>();	
@@ -132,7 +132,7 @@ namespace Network_Skimming_Components
 					location_itf* orig_node = activity_locations->at(orig);
 
 					// Allocate a tree_builder for each origin node		
-					tree_builder_itf* tree_builder = (tree_builder_itf*)Allocate<typename get_type_of(path_trees_container)::unqualified_value_type>();
+					tree_builder_itf* tree_builder = (tree_builder_itf*)Allocate<typename tree_builder_itf::Component_Type>();
 
 					// Set the current routable origin for the tree builder
 					tree_builder->template routable_origin<link_itf*>(*(orig_node->template origin_links<links_itf*>()->begin()));
@@ -179,7 +179,7 @@ namespace Network_Skimming_Components
 					skim_table->template network_reference<network_itf*>(network);
 					skim_table->template skim_reference<skimmer_itf*>(skim);
 					skim_table->template start_time<Simulation_Timestep_Increment>(start);
-					skim_table->template end_time<Simulation_Timestep_Increment>(start + skim->update_increment<Simulation_Timestep_Increment>());
+					skim_table->template end_time<Simulation_Timestep_Increment>(start + skim->template update_increment<Simulation_Timestep_Increment>());
 
 					skim_table->template mode_skim_reference<ComponentType*>(this);
 

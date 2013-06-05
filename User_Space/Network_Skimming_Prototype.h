@@ -268,7 +268,7 @@ namespace Network_Skimming_Components
 				{
 					if (this->write_output<bool>())
 					{
-						itr->second->Write_LOS<NULLTYPE>();
+						itr->second->template Write_LOS<NULLTYPE>();
 					}
 				}
 
@@ -564,17 +564,17 @@ namespace Network_Skimming_Components
 
 				bw.WriteArray<float>(los->get_data_pointer(), zones->size() * zones->size());
 
-				ofstream outfile;
-				stringstream filename;
-				filename <<"los_file_hour_"<< Simulation_Time.template Current_Time<Time_Hours>() << ".xls";
-				outfile.open(filename.str().c_str(),ios_base::out);
-				
-				outfile << endl <<endl << "---------------------------------------------------";
-				outfile << endl << "LOS at hour " << Simulation_Time.template Current_Time<Time_Hours>();
-				los->write(outfile);
-				outfile << endl << "---------------------------------------------------"<<endl;
+				//ofstream outfile;
+				//stringstream filename;
+				//filename <<"los_file_hour_"<< Simulation_Time.template Current_Time<Time_Hours>() << ".xls";
+				//outfile.open(filename.str().c_str(),ios_base::out);
+				//
+				//outfile << endl <<endl << "---------------------------------------------------";
+				//outfile << endl << "LOS at hour " << Simulation_Time.template Current_Time<Time_Hours>();
+				//los->write(outfile);
+				//outfile << endl << "---------------------------------------------------"<<endl;
 
-				outfile.close();
+				//outfile.close();
 			}
 
 			feature_prototype typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_ID, typename TargetType::ParamType Destination_ID)

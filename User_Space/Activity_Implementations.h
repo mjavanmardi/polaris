@@ -943,7 +943,7 @@ namespace Activity_Components
 					_zone_itf* o_zone = person->template Home_Location<_zone_itf*>();
 					_zone_itf* d_zone = bthis->template Location<ComponentType,CallerType,_activity_location_itf*>()->template zone<_zone_itf*>();
 
-					exp_ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours> >(o_zone->template uuid<int>(),d_zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV, pthis->Start_Time<Time_Hours>());
+					exp_ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours> >(o_zone->template uuid<int>(),d_zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV, pthis->template Start_Time<Time_Hours>());
 				}
 				else exp_ttime = 60.0f;
 
