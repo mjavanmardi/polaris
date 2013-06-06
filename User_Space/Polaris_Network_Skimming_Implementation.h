@@ -204,9 +204,9 @@ namespace Network_Skimming_Components
 				File_IO::Binary_File_Writer& outfile = skim->template output_file<File_IO::Binary_File_Writer&>();
 				if (skim->template write_output<bool>() == true)
 				{
-					int modes = skim->template mode_skim_table_container<modes_skim_container_itf&>().size();
+					int modes = (int)(skim->template mode_skim_table_container<modes_skim_container_itf&>().size());
 					outfile.Write_Value<int>(modes);
-					int zones = zones_container->size();
+					int zones = (int)zones_container->size();
 					outfile.Write_Value<int>(zones);
 					int increment = skim->template update_increment<Simulation_Timestep_Increment>();
 					outfile.Write_Value<int>(increment);

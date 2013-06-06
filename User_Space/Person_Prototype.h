@@ -62,23 +62,63 @@ namespace Prototypes
 		// Event handling
 		declare_feature_conditional(Agent_Conditional)
 		{
-			response.next._iteration = END;
-			response.next._sub_iteration = 0;
-			response.result = true;
+			define_component_interface(planner_itf,typename get_type_of(Planning_Faculty),Person_Planner,ComponentType);
+			typedef Person<ComponentType, ComponentType> _Person_Interface;
+			ComponentType* _pthis = (ComponentType*)_this;
+			_Person_Interface* pthis =(_Person_Interface*)_pthis;
+			planner_itf* planner = pthis->template Planning_Faculty<planner_itf*>();
+			
+
+			// First do the 'Set Locations Event', 
+			if (_iteration == pthis->template First_Iteration<Simulation_Timestep_Increment>())
+			{
+				Simulation_Timestep_Increment first_plan_time = planner->template Next_Planning_Time<Simulation_Timestep_Increment>() + planner->template Planning_Time_Increment<Simulation_Timestep_Increment>();
+				response.next._iteration = first_plan_time;
+				response.next._sub_iteration = 0;
+				response.result = true;
+			}
+			// then, prior to the first planning period, dump all preplanned activities to file
+			else
+			{	
+				_pthis->Swap_Event((Event)&Person::Print_Preplanned_Activities_Event<NULLTYPE>);
+				response.next._iteration = END;
+				response.next._sub_iteration = 0;
+				response.result = true;
+			}
 		}
-		declare_feature_event(Agent_Event)
+		declare_feature_event(Set_Locations_Event)
 		{
 			typedef Person<ComponentType, ComponentType> _Person_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
 			pthis->template Set_Home_Location<NT>();
 		}
+		declare_feature_event(Print_Preplanned_Activities_Event)
+		{
+			typedef Person<ComponentType, ComponentType> _Person_Interface;
+			ComponentType* _pthis = (ComponentType*)_this;
+			_Person_Interface* pthis =(_Person_Interface*)_pthis;
+
+			define_component_interface(scheduler_itf,typename get_type_of(Scheduling_Faculty),Person_Scheduler,ComponentType);
+			define_container_and_value_interface_unqualified_container(Activity_Records,Activity_Record, typename scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_component_interface(_Logger_Interface, typename MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
+			scheduler_itf* scheduler = pthis->template Scheduling_Faculty<scheduler_itf*>();
+			Activity_Records* activities = scheduler->template Activity_Container<Activity_Records*>();
+
+
+			for (typename Activity_Records::iterator itr = activities->begin(); itr != activities->end(); ++itr)
+			{
+				//cout << endl <<"Person ID: " << (*itr)->Parent_ID<int>() << "Activity Type: " << (*itr)->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
+				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Record*>(*itr,false);
+			}
+		}
 
 		// Initializers
 		feature_prototype void Initialize(TargetType id, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
-			this_component()->template Initialize<ComponentType,CallerType, TargetType>(id);
-			load_event(ComponentType,Agent_Conditional,Agent_Event,_iteration+1,0,NULLTYPE);
+			this->First_Iteration<Simulation_Timestep_Increment>(_iteration+1);
+			this_component()->template Initialize<ComponentType,CallerType, TargetType>(id);	
+			load_event(ComponentType,Agent_Conditional,Agent_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
 		feature_prototype void Initialize(TargetType id, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{
@@ -86,8 +126,9 @@ namespace Prototypes
 		}
 		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref/*,requires(check(ComponentType,Concepts::Has_Initialize))*/)
 		{
-			this_component()->template Initialize<ComponentType,CallerType, TargetType>(id, home_zone, network_ref, scenario_ref);
-			load_event(ComponentType,Agent_Conditional,Agent_Event,_iteration+1,0,NULLTYPE);
+			this->First_Iteration<Simulation_Timestep_Increment>(_iteration+1);
+			this_component()->template Initialize<ComponentType,CallerType, TargetType>(id, home_zone, network_ref, scenario_ref);		
+			load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
 		//feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref,requires(!check(ComponentType,Concepts::Has_Initialize)))
 		//{

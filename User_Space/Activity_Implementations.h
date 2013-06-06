@@ -212,8 +212,8 @@ namespace Activity_Components
 			}
 			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
 			{
-				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
-				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
+				_scheduler_itf* scheduler = person->Scheduling_Faculty<_scheduler_itf*>();
 				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
 
 				// copy the movement plan into the cached movement record before addition
@@ -228,15 +228,15 @@ namespace Activity_Components
 				{			
 					Simulation_Timestep_Increment ttime = move->template routed_travel_time<Simulation_Timestep_Increment>();
 					Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
-					if (depart < planner->template Next_Planning_Time<Simulation_Timestep_Increment>())
+					if (depart < _Parent_Planner->template Next_Planning_Time<Simulation_Timestep_Increment>())
 					{
-						depart = planner->template Next_Planning_Time<Simulation_Timestep_Increment>();
+						depart = _Parent_Planner->template Next_Planning_Time<Simulation_Timestep_Increment>();
 						this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
 					}
 
 					this->Expected_Travel_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(move->template routed_travel_time<Simulation_Timestep_Increment>());
 					move->template departed_time<Simulation_Timestep_Increment>(depart);
-					planner->template Add_Movement_Plan<_movement_plan_itf*>(move);
+					scheduler->template Add_Movement_Plan<_movement_plan_itf*>(move);
 
 				}
 				else
@@ -730,6 +730,7 @@ namespace Activity_Components
 			define_component_interface(_scenario_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 			define_component_interface(_network_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
 			define_component_interface(_skim_itf, typename _network_itf::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
+			define_component_interface(_timing_choice_itf,typename _planning_itf::get_type_of(Timing_Chooser),Person_Components::Prototypes::Activity_Timing_Chooser,ComponentType);
 			define_container_and_value_interface(_activity_locations_container_itf, _activity_location_itf, typename _network_itf::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(_links_container_itf, _link_itf, typename _activity_location_itf::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface(_zones_container_itf, _zone_itf, typename _network_itf::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
@@ -906,6 +907,7 @@ namespace Activity_Components
 
 			feature_implementation void Start_Time_Planning_Event_Handler()
 			{
+
 				this_itf* pthis = (this_itf*)this;
 				base_type* bthis = (base_type*)this;
 
@@ -917,9 +919,22 @@ namespace Activity_Components
 				// School Activity start time (randomly between 7 and 9AM)
 				if (act_type == ACTIVITY_TYPES::SCHOOL_ACTIVITY)
 				{
-					Time_Seconds start_school = (7.0 + Uniform_RNG.template Next_Rand<float>() * 1.0) * 60.0 * 60.0;
+					// interfaces
+					_planning_itf* planner = pthis->template Parent_Planner<_planning_itf*>();
+					_person_itf* person = planner->template Parent_Person<_person_itf*>();
+
+					// get the combined start time and duration
+					_timing_choice_itf* timing_planner = planner->template Timing_Chooser<_timing_choice_itf*>();
+					pair<Time_Seconds,Time_Seconds> start_and_duration = timing_planner->template Get_Start_Time_and_Duration<Target_Type<NT,Time_Seconds,ComponentType*>>(this);
+
+					// make sure start time is not prior to current iteration
+					Time_Seconds time_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(planner->template Planning_Time_Increment<Time_Seconds>());
+					pthis->template Start_Time<Time_Seconds>(std::max<int>(start_and_duration.first,time_min.Value));
+					pthis->template Duration<Time_Seconds>(start_and_duration.second);
+
+					/*Time_Seconds start_school = (7.0 + Uniform_RNG.template Next_Rand<float>() * 1.0) * 60.0 * 60.0;
 					Time_Seconds start_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(bthis->_Parent_Planner->template Planning_Time_Increment<Time_Seconds>());
-					pthis->template Start_Time<Time_Seconds>(std::max<int>(start_school.Value,start_min.Value));
+					pthis->template Start_Time<Time_Seconds>(std::max<int>(start_school.Value,start_min.Value));*/
 				}
 
 				// Work activity start time, based on census data

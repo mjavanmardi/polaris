@@ -91,7 +91,7 @@ namespace Person_Components
 			feature_implementation void Initialize(TargetType id)
 			{	
 				// Set the initial iteration to process
-				this->First_Iteration<ComponentType,CallerType,Time_Minutes>(1.0);
+				//this->First_Iteration<ComponentType,CallerType,Time_Minutes>(1.0);
 
 				// Create and Initialize the Properties faculty
 				_Properties = (Properties_interface*)Allocate<type_of(Properties)>();

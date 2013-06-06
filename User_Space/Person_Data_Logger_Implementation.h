@@ -12,6 +12,7 @@ namespace Person_Components
 		//----------------------------------------------------------------------------------
 		implementation struct Person_Data_Logger_Implementation : public Polaris_Component<APPEND_CHILD(Person_Data_Logger_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			vector<int> num_acts;
 			vector<string> output_data[_num_threads];
 			vector<string> output_data_buffer[_num_threads];
 			vector<string>* buff;
@@ -34,7 +35,9 @@ namespace Person_Components
 
 				this->_filename = "activity_output.xls";
 				this->_log.open(this->_filename);
-				this->_log << "PER_ID\tACT_ID\tSTART_min\tDUR_min\tDEST_ZONE\tTTIME_min\tEXECUTED";
+				this->_log << "PER_ID\tACT_ID\tACT_TYP\tSTART_min\tDUR_min\tDEST_ZONE\tTTIME_min\tEXECUTED";
+
+				num_acts.resize(20,0);
 			}
 
 			feature_implementation void Add_Record(TargetType act_record, bool is_executed)
@@ -46,9 +49,16 @@ namespace Person_Components
 				
 				act_record_itf* act = (act_record_itf*)act_record;
 				location_itf* loc = act->template Location<location_itf*>();
+
+				// count the number of acts added
+				if (!is_executed) num_acts[act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()] +=1;
+
+
+				if (loc == nullptr){ THROW_WARNING("Warning, null location pointer for activity record: " << act->template Parent_ID<int>() << "." << act->template Activity_Plan_ID<int>()); return;}
 				zone_itf* zone = loc->template zone<zone_itf*>();
 
-				s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>() << "\t"<<act->template Start_Time<Time_Minutes>() << "\t"<<act->template Duration<Time_Minutes>() << "\t"<<zone->template uuid<int>();
+
+				s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << "\t"<<act->template Start_Time<Time_Minutes>() << "\t"<<act->template Duration<Time_Minutes>() << "\t"<<zone->template uuid<int>();
 
 				if (!is_executed)
 				{
@@ -100,11 +110,15 @@ namespace Person_Components
 			{
 				typedef Prototypes::Person_Data_Logger<typename MasterType::person_data_logger_type> _Interface;
 				_Interface* _this_ptr=(_Interface*)_this;
-
 				_this_ptr->template Write_Data_To_File<NT>();
 			}
 			feature_implementation void Write_Data_To_File()
 			{
+				for (int i = 0; i < 20; ++i)
+				{
+					cout << endl << "Number of activity type : " << num_acts[i];
+				}
+
 				int i = _sub_iteration;
 				for (vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
 				{

@@ -79,9 +79,9 @@ namespace Person_Components
 				pair<typename TargetType::ReturnType,typename TargetType::ReturnType> return_val;
 
 				// add random draw from between 0-30 minutes as this is the aggregation level of the start_time data
-				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.first + GLOBALS::Uniform_RNG.template Next_Rand<float>()*30.0f);
+				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.first + (0.5f - GLOBALS::Uniform_RNG.template Next_Rand<float>())*30.0f);
 				// add random draw from between 0-5 minutes as this is the aggregation level of the duration data
-				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.second + GLOBALS::Uniform_RNG.template Next_Rand<float>()*5.0f);
+				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.second + (0.5f - GLOBALS::Uniform_RNG.template Next_Rand<float>())*5.0f);
 				return return_val;
 			}
 			tag_feature_signature_as_available(Get_Start_Time_and_Duration,1);
@@ -134,6 +134,7 @@ namespace Person_Components
 
 
 				// Initialize hashmap for start time
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::SCHOOL_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::EAT_OUT_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::ERRANDS_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::HEALTHCARE_ACTIVITY,map_type()));

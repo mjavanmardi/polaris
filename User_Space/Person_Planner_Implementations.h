@@ -96,8 +96,7 @@ namespace Person_Components
 			{	
 				base_type::template Generation_Time_Increment<ComponentType,CallerType,Time_Minutes>(END);
 				base_type::template Planning_Time_Increment<ComponentType,CallerType,Time_Minutes>(5);
-				// get reference to the parent pointer and set the first activity generation time to be the parent first iteration
-				base_type::template Next_Activity_Generation_Time<ComponentType,CallerType,Time_Minutes>(base_type::_Parent_Person->template First_Iteration<Time_Minutes>());	
+				base_type::template Next_Activity_Generation_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(60);	
 			}
 			feature_implementation void Initialize(requires(check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
 			{	

@@ -297,10 +297,8 @@ namespace Person_Components
 			define_feature_exists_check(Initialize,Has_Initialize);
 			feature_prototype void Initialize(requires(check(ComponentType, Has_Initialize)))
 			{
-				define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person,ComponentType);
-				parent_itf* parent = this->Parent_Person<parent_itf*>();
-				long first_iter = parent->template First_Iteration<Simulation_Timestep_Increment>();
 				this_component()->template Initialize<ComponentType,CallerType, TargetType>();
+				long first_iter = this->Next_Activity_Generation_Time<Simulation_Timestep_Increment>();
 				load_event(ComponentType,Planning_Conditional,Activity_Generation_Event,first_iter,0,NULLTYPE);
 			}
 			feature_prototype void Initialize(requires(!check(ComponentType,Has_Initialize)))
@@ -309,10 +307,9 @@ namespace Person_Components
 			}
 			feature_prototype void Initialize(TargetType initializer, requires(check(ComponentType,Has_Initialize)))
 			{
-				define_component_interface(parent_itf,typename get_type_of(Parent_Person),Prototypes::Person,ComponentType);
-				parent_itf* parent = this->Parent_Person<parent_itf*>();
 				this_component()->template Initialize<ComponentType,CallerType, TargetType>(initializer);
-				load_event(ComponentType,Planning_Conditional,Movement_Planning_Event,parent->template First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
+				long first_iter = this->Next_Activity_Generation_Time<Simulation_Timestep_Increment>();
+				load_event(ComponentType,Planning_Conditional,Movement_Planning_Event,first_iter,0,NULLTYPE);
 			}
 			feature_prototype void Initialize(TargetType initializer, requires(!check(ComponentType,Has_Initialize)))
 			{

@@ -134,9 +134,9 @@ namespace Person_Components
 
 
 				// log the activity throught the global person logger
-				define_component_interface(_Logger_Interface, typename MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
+				//define_component_interface(_Logger_Interface, typename MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
 				Activity_Plan* act = move->template destination_activity_reference<Activity_Plan*>();
-				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Plan*>(act,false);
+				//((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Plan*>(act,false);
 
 
 				// cache the movement plans activity in the activity record container since all attributes have been planned at this point			

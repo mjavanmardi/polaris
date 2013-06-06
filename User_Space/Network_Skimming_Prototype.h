@@ -576,7 +576,7 @@ namespace Network_Skimming_Components
 				
 				skim_table_itf* los = this->skim_table<skim_table_itf*>();
 
-				bw.WriteArray<float>(los->get_data_pointer(), zones->size() * zones->size());
+				bw.WriteArray<float>(los->get_data_pointer(), (int)(zones->size() * zones->size()));
 
 				//ofstream outfile;
 				//stringstream filename;
