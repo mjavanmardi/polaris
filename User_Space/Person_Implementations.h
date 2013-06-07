@@ -18,6 +18,8 @@ namespace Person_Components
 			// Tag as Implementation
 			typedef typename Polaris_Component<APPEND_CHILD(Person_Implementation),MasterType,Execution_Object>::Component_Type ComponentType;
 
+			typedef typename MasterType::person_data_logger_type person_data_logger_type;
+
 
 			//=======================================================================================================================================================================
 			// DATA MEMBERS

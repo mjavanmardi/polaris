@@ -100,8 +100,8 @@ namespace Prototypes
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
 
 			define_component_interface(scheduler_itf,typename get_type_of(Scheduling_Faculty),Person_Scheduler,ComponentType);
-			define_container_and_value_interface_unqualified_container(Activity_Records,Activity_Record, typename scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
-			define_component_interface(_Logger_Interface, typename MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
+			define_container_and_value_interface(Activity_Records,Activity_Record, typename scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_component_interface(_Logger_Interface, typename ComponentType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
 			scheduler_itf* scheduler = pthis->template Scheduling_Faculty<scheduler_itf*>();
 			Activity_Records* activities = scheduler->template Activity_Container<Activity_Records*>();
 
@@ -118,7 +118,7 @@ namespace Prototypes
 		{
 			this->First_Iteration<Simulation_Timestep_Increment>(_iteration+1);
 			this_component()->template Initialize<ComponentType,CallerType, TargetType>(id);	
-			load_event(ComponentType,Agent_Conditional,Agent_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
+			load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
 		feature_prototype void Initialize(TargetType id, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{
@@ -388,29 +388,32 @@ namespace Prototypes
 			define_component_interface(static_properties_itf,typename get_type_of(Static_Properties), Person_Properties,ComponentType);
 			define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 			define_container_and_value_interface(zone_container_itf, zone_itf, typename network_itf::get_type_of(zones_container), Containers::Random_Access_Sequence_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
-			
+			define_container_and_value_interface(locations_container_interface, location_interface, typename network_itf::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+
 			properties_itf* props = this->Properties<properties_itf*>();
 			static_properties_itf* static_props = this->Static_Properties<static_properties_itf*>();
 
 			stringstream s;
-			s << this->uuid<int>() << ", ";
-			s << this->Home_Location<zone_itf*>()->uuid<int>();
+			s << this->uuid<int>() << ", HOME_ZONE,";
+			s << this->Home_Location<location_interface*>()->template zone<zone_itf*>()->template uuid<int>();
+			s << ", HOME_LOC,";
+			s << this->Home_Location<location_interface*>()->template uuid<int>();
 			if (static_props->template Is_Employed<bool>())
 			{
 				//cout << endl << "Work location id: " << this->Work_Location<int>()<<endl;
-				s << ", WORK_ZONE," << this->Work_Location<zone_itf*>()->template uuid<int>();
+				s << ", WORK_ZONE," << this->Work_Location<zone_itf*>()->template uuid<int>() << ", WORK_LOC,"<<this->Work_Location<location_interface*>()->template uuid<int>();
 			}
 			else
 			{
-				s << ", DOESNT_WORK,,";
+				s << ", DOESNT_WORK,,,";
 			}
 			if (static_props->template Is_Student<bool>())
 			{
-				s << ", SCHOOL_ZONE," << this->School_Location<zone_itf*>()->template uuid<int>();
+				s << ", SCHOOL_ZONE," << this->School_Location<zone_itf*>()->template uuid<int>()  << ", SCHOOL_LOC,"<<this->School_Location<location_interface*>()->template uuid<int>();
 			}
 			else
 			{
-				s << ", NOT_IN_SCHOOL,,";
+				s << ", NOT_IN_SCHOOL,,,";
 			}
 			return s.str();
 		}

@@ -1,64 +1,38 @@
 #include "Polaris_PCH.h"
 
-prototype struct My_Prototype
-{
-	feature_prototype void Call()
-	{
-		this_component()->Call<ComponentType,CallerType,TargetType>();
-	}
-	feature_prototype void Call_Only_In_Base()
-	{
-		this_component()->Call_Only_In_Base<ComponentType,CallerType,TargetType>();
-	}
-	feature_prototype void Tester()
-	{
-		this_component()->Tester<ComponentType,CallerType,TargetType>();
-	}
-};
-
-implementation struct Base : public Polaris_Component<APPEND_CHILD(Base),MasterType,Data_Object>
-{
-	feature_implementation void Call()
-	{
-		cout << endl << "Called Base Version";
-	}
-	feature_implementation void Call_Only_In_Base()
-	{
-		cout << endl << "Called Version only in Base";
-	}
-};
-
-
-implementation struct Inherited : public Base<MasterType,ParentType,APPEND_CHILD(Inherited)>
-{
-	typedef Base<MasterType,ParentType,APPEND_CHILD(Inherited)> BaseType;
-	typedef typename BaseType::Component_Type ComponentType;
-
-	typedef My_Prototype<BaseType> base_itf;
-	typedef My_Prototype<ComponentType> this_itf;
-
-	feature_implementation void Call()
-	{
-		cout << endl << "Called Inherited Version";
-	}
-	feature_implementation void Tester()
-	{
-		base_itf* bthis = (base_itf*)this;
-		bthis->Call<NT>();
-		bthis->Call_Only_In_Base<NT>();
-		this_itf* pthis = (this_itf*)this;
-		pthis->Call<NT>();
-		pthis->Call_Only_In_Base<NT>();
-	}
-};
 
 int main()
 {
-	typedef Inherited<NT> test_type;
-	typedef My_Prototype<test_type> test_itf;
 
-	test_itf* tester = (test_itf*)Allocate<test_type>();
-	tester->Tester<NT>();
+	// write test
+	File_IO::Binary_File_Writer bw;
+	bw.Open("test.bin");
+
+	int num_ints_to_write = 5;
+	bw.Write_Value<int>(num_ints_to_write);
+	
+	int ints[5] = {1,2,3,4,12};
+	bw.WriteArray<int>(ints,num_ints_to_write);
+
+	bw.Close();
+
+
+	// read_test
+	File_IO::Binary_File_Reader br;
+	br.Open("test.bin");
+
+	int num_to_read;
+	br.Read_Value<int>(num_to_read);
+
+	int *ints_in = new int[5];
+	br.Read_Array<int>(ints_in, num_to_read);
+
+	cout << num_to_read<<endl;
+	
+	for (int i = 0; i < num_to_read; ++i)
+	{
+		cout << ints_in[i]<<endl;
+	}
 
 	int test;
 	cin >> test;

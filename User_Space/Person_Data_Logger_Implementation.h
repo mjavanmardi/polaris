@@ -51,14 +51,14 @@ namespace Person_Components
 				location_itf* loc = act->template Location<location_itf*>();
 
 				// count the number of acts added
-				if (!is_executed) num_acts[act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()] +=1;
+				if (!is_executed) num_acts[act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()] +=1;
 
 
 				if (loc == nullptr){ THROW_WARNING("Warning, null location pointer for activity record: " << act->template Parent_ID<int>() << "." << act->template Activity_Plan_ID<int>()); return;}
 				zone_itf* zone = loc->template zone<zone_itf*>();
 
 
-				s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << "\t"<<act->template Start_Time<Time_Minutes>() << "\t"<<act->template Duration<Time_Minutes>() << "\t"<<zone->template uuid<int>();
+				s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << "\t"<<act->template Start_Time<Time_Minutes>() << "\t"<<act->template Duration<Time_Minutes>() << "\t"<<zone->template uuid<int>();
 
 				if (!is_executed)
 				{

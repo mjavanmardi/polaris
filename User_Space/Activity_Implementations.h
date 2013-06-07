@@ -213,7 +213,7 @@ namespace Activity_Components
 			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
 			{
 				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
-				_scheduler_itf* scheduler = person->Scheduling_Faculty<_scheduler_itf*>();
+				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
 
 				// copy the movement plan into the cached movement record before addition
