@@ -84,6 +84,13 @@ namespace Activity_Components
 			member_data(Revision,Involved_Persons_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			member_data(Revision,Route_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 
+			member_data(Revision,Stored_Location_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			member_data(Revision,Stored_Mode_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			member_data(Revision,Stored_Start_Time_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			member_data(Revision,Stored_Duration_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			member_data(Revision,Stored_Involved_Persons_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			member_data(Revision,Stored_Route_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+
 			feature_implementation bool Location_Is_Planned(){return (_Location_Planning_Time._iteration == END && _Location_Planning_Time._sub_iteration == END);} tag_feature_as_available(Location_Is_Planned);
 			feature_implementation bool Mode_Is_Planned(){return (_Mode_Planning_Time._iteration == END && _Mode_Planning_Time._sub_iteration == END);}	tag_feature_as_available(Mode_Is_Planned);
 			feature_implementation bool Duration_Is_Planned(){return (_Duration_Planning_Time._iteration == END && _Duration_Planning_Time._sub_iteration == END);}	tag_feature_as_available(Duration_Is_Planned);
@@ -135,6 +142,7 @@ namespace Activity_Components
 
 			feature_implementation void Route_Planning_Event_Handler()
 			{
+				
 				// Create movement plan and give it an ID
 				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename _scheduler_itf::get_type_of(Movement_Plans_Container)::unqualified_value_type>();
 				move->template initialize_trajectory<NULLTYPE>();
@@ -143,11 +151,30 @@ namespace Activity_Components
 				// Get the origin and destination locations
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
-				_dest_choice_itf* dest_chooser = planner->template Destination_Choice_Faculty<_dest_choice_itf*>();
+				_network_itf* network = person->template network_reference<_network_itf*>();
+				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 
-				_activity_location_itf* orig = person->template Home_Location<_activity_location_itf*>();
+				Time_Seconds start = this->Start_Time<ComponentType,CallerType,Time_Seconds>();
+
+				_activity_location_itf* orig;
 				_activity_location_itf* dest = this->Location<ComponentType,CallerType,_activity_location_itf*>();
 
+				this_itf* prev_act = scheduler->template previous_activity_plan<Target_Type<NT,this_itf*, Time_Seconds>>(this->Start_Time<ComponentType,CallerType,Time_Seconds>());		
+				if (prev_act == nullptr)  orig = person->template Home_Location<_activity_location_itf*>();
+				else
+				{
+					orig = prev_act->template Location<_activity_location_itf*>();
+					// check if a stop at home will fit prior to activity
+					Time_Seconds time_before = start - (prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>());
+					Time_Seconds ttime_prev_to_home = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Type_Keys, Time_Seconds>>(orig->template zone<_zone_itf*>()->template uuid<int>(), person->template Home_Location<_zone_itf*>()->template uuid<int>(),SOV,start);
+					Time_Seconds ttime_home_to_this = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Type_Keys, Time_Seconds>>(person->template Home_Location<_zone_itf*>()->template uuid<int>(),dest->template zone<_zone_itf*>()->template uuid<int>(), SOV,start);
+					Time_Seconds ttime_prev_to_this = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Type_Keys, Time_Seconds>>(orig->template zone<_zone_itf*>()->template uuid<int>(), dest->template zone<_zone_itf*>()->template uuid<int>(),SOV,start);
+					// enough time between previous activity and this activity to go home, stay there for a minimimum amount of time (equal to the shortest leg of the return home trip) and get to this activity
+					float min_home_time = std::min((float)ttime_prev_to_home,(float)ttime_home_to_this);			
+					if (ttime_prev_to_home + ttime_home_to_this < time_before - min_home_time) orig = person->template Home_Location<_activity_location_itf*>();
+				}
+
+				// set the reference to the movement plan
 				this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>(move);
 				
 
@@ -213,7 +240,7 @@ namespace Activity_Components
 			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
 			{
 				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
-				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
+				_scheduler_itf* scheduler = person->Scheduling_Faculty<_scheduler_itf*>();
 				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
 
 				// copy the movement plan into the cached movement record before addition
@@ -255,6 +282,10 @@ namespace Activity_Components
 				define_component_interface(_Logger_Interface, typename MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
 				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Planner<ComponentType,CallerType>*>((Activity_Planner<ComponentType,CallerType>*)this,true);
 			}
+			feature_implementation void Depart_From_Activity()
+			{
+
+			}
 		
 		};
 
@@ -271,6 +302,7 @@ namespace Activity_Components
 			// Interfaces
 			typedef Prototypes::Activity_Planner<ComponentType,ComponentType> this_itf;
 			define_component_interface(_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
+			define_component_interface(_scheduler_itf, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Scheduling_Faculty), Person_Components::Prototypes::Person_Scheduler, ComponentType);
 			define_component_interface(_static_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Static_Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
 			define_component_interface(_planning_itf,typename type_of(base_type::Parent_Planner),Person_Components::Prototypes::Person_Planner,ComponentType);
 			define_component_interface(_person_itf,typename _planning_itf::get_type_of(Parent_Person),Person_Components::Prototypes::Person,ComponentType);
@@ -534,7 +566,19 @@ namespace Activity_Components
 				Revision &mode	= base_this->template Mode_Planning_Time<ComponentType, CallerType, Revision&>();
 				Revision &persons	= base_this->template Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>();
 				Revision &route	= base_this->template Route_Planning_Time<ComponentType, CallerType, Revision&>();
-				
+
+
+				//========================================================================
+				//TODO: remove stored versions of the planning times after testing
+				Revision &Stored_start	= base_this->template Stored_Start_Time_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_dur		= base_this->template Stored_Duration_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_loc		= base_this->template Stored_Location_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_mode	= base_this->template Stored_Mode_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_persons	= base_this->template Stored_Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_route	= base_this->template Stored_Route_Planning_Time<ComponentType, CallerType, Revision&>();
+				//========================================================================
+
+
 				// Set revisions based on the plan-horizons for each attribute
 				int dur_sub = (int)(this->_Duration_Plan_Horizon);
 				int loc_sub = (int)(this->_Location_Plan_Horizon);
@@ -569,6 +613,24 @@ namespace Activity_Components
 				mode._sub_iteration = mode_sub;
 				persons._sub_iteration = inv_sub;
 				route._sub_iteration = route_sub;
+
+
+				//========================================================================
+				//TODO: remove stored versions of the planning times after testing
+				Stored_start._iteration = start._iteration;
+				Stored_dur._iteration = dur._iteration;
+				Stored_loc._iteration = loc._iteration;
+				Stored_mode._iteration = mode._iteration;
+				Stored_persons._iteration = persons._iteration;
+				Stored_route._iteration = route._iteration;
+				
+				Stored_start._sub_iteration = start._sub_iteration;
+				Stored_dur._sub_iteration = dur._sub_iteration;
+				Stored_loc._sub_iteration = loc._sub_iteration;
+				Stored_mode._sub_iteration = mode._sub_iteration;
+				Stored_persons._sub_iteration = persons._sub_iteration;
+				Stored_route._sub_iteration = route._sub_iteration;
+				//========================================================================
 
 			
 				//cout << endl << ((base_type*)this)->_Parent_Planner->Parent_Person<_person_itf*>()->uuid<int>() <<",  ";
@@ -653,8 +715,61 @@ namespace Activity_Components
 			}
 			feature_implementation void Mode_Planning_Event_Handler()
 			{
+				//====================================================================
+				// Simplified mode choice model, based only on the expected travel time by auto
+				// And 3 activity types.  Distributions of auto share by travel time were
+				// estimated from CMAP travel tracker survey and are applied here.
+				// If the time to travel for the activity is not known, 12pm is assumed (for skim time lookup)
+				// If the locaion has not been planned we cannot estimate an approximate time and the average mode share is used
+				//--------------------------------------------------------------------
+				base_type* bthis = (base_type*)this;
 				this_itf* pthis = (this_itf*)this;
-				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+
+				// references to external agents
+				_planning_itf* planner = bthis->template Parent_Planner<ComponentType,CallerType,_planning_itf*>();
+				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
+				_dest_choice_itf* dest_chooser = planner->template Destination_Choice_Faculty<_dest_choice_itf*>();
+				_network_itf* network = person->template network_reference<_network_itf*>();
+
+				// expected travel time, based on whether start time is planned or not and location is planned or not
+				float p_auto = 0.0f;
+
+				// if start time planned use the planned start time, otherwise use 12pm.
+				Time_Seconds start;
+				if (pthis->template Start_Is_Planned<bool>()) start = pthis->template Start_Time<Time_Seconds>();
+				else start = 12.0*60.0*60.0;
+
+				// if location planned, get the travel time to location at start time
+				Time_Minutes ttime;
+				if (pthis->template Location_Is_Planned<bool>()) 
+				{
+					// get the previous activity
+					_activity_location_itf* orig = scheduler->template previous_location<Target_Type<NT,_activity_location_itf*,ComponentType*>>(this);
+					_activity_location_itf* dest = pthis->template Location<_activity_location_itf*>();
+					int o_id = orig->template zone<_zone_itf*>()->template uuid<int>();
+					int d_id = dest->template zone<_zone_itf*>()->template uuid<int>();
+
+					// get expected auto travel time
+					ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>>(o_id,d_id,Vehicle_Components::Types::Vehicle_Type_Keys::SOV,start);
+					if (ttime <10.0f) p_auto=0.831;
+					else if (ttime <20.0f) p_auto=0.855;
+					else if (ttime <30.0f) p_auto=0.844;
+					else if (ttime <40.0f) p_auto=0.8;
+					else if (ttime <50.0f) p_auto=0.762;
+					else if (ttime <60.0f) p_auto=0.726;
+					else if (ttime <70.0f) p_auto=0.687;
+					else if (ttime <80.0f) p_auto=0.619;
+					else if (ttime <90.0f) p_auto=0.531;
+					else if (ttime <100.0f) p_auto=0.501;
+					else p_auto=0.547;
+				}
+				// else if location is not planned, use the average auto mode choice percentage
+				else p_auto = 0.818;
+
+			
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < p_auto) pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				else pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
 			}
 			feature_implementation void Duration_Planning_Event_Handler()
 			{
@@ -807,6 +922,39 @@ namespace Activity_Components
 				base_this->template Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 4;
 				base_this->template Route_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = min(_iteration+1, (int)planning_time);
 				base_this->template Route_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 5;
+
+				//========================================================================
+				//TODO: remove stored versions of the planning times after testing
+				Revision &start	= base_this->template Start_Time_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &dur		= base_this->template Duration_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &loc		= base_this->template Location_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &mode	= base_this->template Mode_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &persons	= base_this->template Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &route	= base_this->template Route_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_start	= base_this->template Stored_Start_Time_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_dur		= base_this->template Stored_Duration_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_loc		= base_this->template Stored_Location_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_mode	= base_this->template Stored_Mode_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_persons	= base_this->template Stored_Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_route	= base_this->template Stored_Route_Planning_Time<ComponentType, CallerType, Revision&>();
+				//========================================================================
+
+				//========================================================================
+				//TODO: remove stored versions of the planning times after testing
+				Stored_start._iteration = start._iteration;
+				Stored_dur._iteration = dur._iteration;
+				Stored_loc._iteration = loc._iteration;
+				Stored_mode._iteration = mode._iteration;
+				Stored_persons._iteration = persons._iteration;
+				Stored_route._iteration = route._iteration;
+				
+				Stored_start._sub_iteration = start._sub_iteration;
+				Stored_dur._sub_iteration = dur._sub_iteration;
+				Stored_loc._sub_iteration = loc._sub_iteration;
+				Stored_mode._sub_iteration = mode._sub_iteration;
+				Stored_persons._sub_iteration = persons._sub_iteration;
+				Stored_route._sub_iteration = route._sub_iteration;
+				//========================================================================
 			}
 			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time, requires(!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
@@ -820,10 +968,6 @@ namespace Activity_Components
 				base_type* base_this = (base_type*)this;
 				_person_itf* person = base_this->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_activity_location_itf* orig = person->template Home_Location<_activity_location_itf*>();
-
-
-				//cout << endl << endl << "ROUTINE CHOICE MODEL for per_id.act_id:" << this->Parent_ID<ComponentType,CallerType,int>() << "." << this->Activity_Plan_ID<ComponentType, CallerType,int>();
-
 
 
 				// Select the location based on the activity type
@@ -875,8 +1019,77 @@ namespace Activity_Components
 
 			feature_implementation void Mode_Planning_Event_Handler()
 			{
+				base_type* bthis = (base_type*)this;
 				this_itf* pthis = (this_itf*)this;
-				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SOV);
+
+				// references to external agents
+				_planning_itf* planner = bthis->template Parent_Planner<ComponentType,CallerType,_planning_itf*>();
+				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
+				_dest_choice_itf* dest_chooser = planner->template Destination_Choice_Faculty<_dest_choice_itf*>();
+				_network_itf* network = person->template network_reference<_network_itf*>();
+
+				// expected travel time, based on whether start time is planned or not and location is planned or not
+				float p_auto = 0.0f;
+
+				// if start time planned use the planned start time, otherwise use 12pm.
+				Time_Seconds start;
+				if (pthis->template Start_Is_Planned<bool>()) start = pthis->template Start_Time<Time_Seconds>();
+				else start = 12.0*60.0*60.0;
+
+				// if location planned, get the travel time to location at start time
+				Time_Minutes ttime;
+				if (pthis->template Location_Is_Planned<bool>()) 
+				{
+					// get the previous activity
+					_activity_location_itf* orig = scheduler->template previous_location<Target_Type<NT,_activity_location_itf*,ComponentType*>>(this);
+					_activity_location_itf* dest = pthis->template Location<_activity_location_itf*>();
+					int o_id = orig->template zone<_zone_itf*>()->template uuid<int>();
+					int d_id = dest->template zone<_zone_itf*>()->template uuid<int>();
+
+					// get expected auto travel time
+					ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>>(o_id,d_id,Vehicle_Components::Types::Vehicle_Type_Keys::SOV,start);
+
+					if (pthis->template Activity_Type<ACTIVITY_TYPES>() == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+					{
+						if (ttime <10.0f) p_auto=0.737;
+						else if (ttime <20.0f) p_auto=0.871;
+						else if (ttime <30.0f) p_auto=0.887;
+						else if (ttime <40.0f) p_auto=0.889;
+						else if (ttime <50.0f) p_auto=0.813;
+						else if (ttime <60.0f) p_auto=0.629;
+						else if (ttime <70.0f) p_auto=0.687;
+						else if (ttime <80.0f) p_auto=0.468;
+						else if (ttime <90.0f) p_auto=0.344;
+						else if (ttime <100.0f) p_auto=0.501;
+						else p_auto=0.39;
+					}
+					else if (pthis->template Activity_Type<ACTIVITY_TYPES>() == ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+					{
+						if (ttime <10.0f) p_auto=0.717;
+						else if (ttime <20.0f) p_auto=0.491;
+						else if (ttime <30.0f) p_auto=0.356;
+						else if (ttime <40.0f) p_auto=0.365;
+						else if (ttime <50.0f) p_auto=0.276;
+						else if (ttime <60.0f) p_auto=0.312;
+						else if (ttime <70.0f) p_auto=0.303;
+						else if (ttime <80.0f) p_auto=0.312;
+						else if (ttime <90.0f) p_auto=0.24;
+						else if (ttime <100.0f) p_auto=0.068;
+						else p_auto=0.24;
+					}
+					else THROW_WARNING("Warning, non-work/school activity should not be created as routine");
+				}
+				// else if location is not planned, use the average auto mode choice percentage
+				else
+				{
+					if (pthis->template Activity_Type<ACTIVITY_TYPES>() == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY) p_auto = 0.79f;
+					else if (pthis->template Activity_Type<ACTIVITY_TYPES>() == ACTIVITY_TYPES::SCHOOL_ACTIVITY) p_auto = 0.5f;
+					else THROW_WARNING("Warning, non-work/school activity should not be created as routine");
+				}
+			
+				if (GLOBALS::Uniform_RNG.Next_Rand<float>() < p_auto) pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				else pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::Vehicle_Type_Keys::BUS);
 			}
 
 			feature_implementation void Duration_Planning_Event_Handler()
@@ -917,7 +1130,7 @@ namespace Activity_Components
 				ACTIVITY_TYPES act_type = pthis->template Activity_Type<ACTIVITY_TYPES>();
 
 				// School Activity start time (randomly between 7 and 9AM)
-				if (act_type == ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+				if (act_type == ACTIVITY_TYPES::SCHOOL_ACTIVITY || act_type == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
 				{
 					// interfaces
 					_planning_itf* planner = pthis->template Parent_Planner<_planning_itf*>();
@@ -938,13 +1151,13 @@ namespace Activity_Components
 				}
 
 				// Work activity start time, based on census data
-				else if (act_type == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == WORK_AT_HOME_ACTIVITY)
-				{
-					Time_Seconds start_work = static_properties->template Journey_To_Work_Arrival_Time<Time_Seconds>();
-					start_work = start_work + (0.5f - Uniform_RNG.template Next_Rand<float>()) * 30.0 * 60.0; // add random uniform time between -15 and 15 minutes since ACS is rounded	
-					Time_Seconds start_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(bthis->_Parent_Planner->template Planning_Time_Increment<Time_Seconds>());
-					pthis->template Start_Time<Time_Seconds>(std::max<int>(start_work.Value,start_min.Value));
-				}
+				//else if (act_type == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == WORK_AT_HOME_ACTIVITY)
+				//{
+				//	Time_Seconds start_work = static_properties->template Journey_To_Work_Arrival_Time<Time_Seconds>();
+				//	start_work = start_work + (0.5f - Uniform_RNG.template Next_Rand<float>()) * 30.0 * 60.0; // add random uniform time between -15 and 15 minutes since ACS is rounded	
+				//	Time_Seconds start_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(bthis->_Parent_Planner->template Planning_Time_Increment<Time_Seconds>());
+				//	pthis->template Start_Time<Time_Seconds>(std::max<int>(start_work.Value,start_min.Value));
+				//}
 				else
 				{
 					THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");

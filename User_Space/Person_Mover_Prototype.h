@@ -67,7 +67,7 @@ namespace Prototypes
 			else if (_sub_iteration == Scenario_Components::Types::PRETRIP_PLANNING_SUB_ITERATION)
 			{
 				_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Replanning_Event<NULLTYPE>);
-				response.next._iteration = _iteration; //movement->template departed_time<Simulation_Timestep_Increment>();
+				response.next._iteration = /*_iteration; */ movement->template departed_time<Simulation_Timestep_Increment>();
 				response.next._sub_iteration = Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION;
 				response.result = pthis->template Replanning_Needed<bool>();
 			}
@@ -444,6 +444,7 @@ namespace Prototypes
 			define_component_interface(movement_itf, typename Vehicle_Itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+			define_component_interface(location_itf, typename Parent_Person_Itf::get_type_of(current_location), Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
@@ -451,6 +452,10 @@ namespace Prototypes
 			Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
 			network_itf* network = person->template network_reference<network_itf*>();
 			movement_itf* movements = this->Movement<movement_itf*>();
+
+			// check if movement plan origin is aligned with persons current location, if not change it
+			if (movements->template origin<location_itf*>() != person->template current_location<location_itf*>()) movements->template origin<location_itf*>(person->template current_location<location_itf*>());
+
 			link_itf* origin_link = movements->template origin<link_itf*>();
 
 			itf->template movement_plan<movement_itf*>(movements);
@@ -471,6 +476,7 @@ namespace Prototypes
 			define_component_interface(movement_itf, typename Vehicle_Itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+			define_component_interface(location_itf, typename Parent_Person_Itf::get_type_of(current_location), Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
@@ -485,10 +491,33 @@ namespace Prototypes
 			{
 				//if (typename ComponentType::_write_activity_files) typename ComponentType::logs[_thread_id]<<"MOVEMENT:," << person->uuid<int>() << ","<<departed_time<<endl;
 				origin_link->push_vehicle(vehicle);
+
+				// set the persons location to be the destination
+				person->template current_location<location_itf*>(movements->template destination<location_itf*>());
 			}
 		}
 
+		//========================================================
+		// Movement Functionality
+		//--------------------------------------------------------
+		feature_prototype void Arrive_At_Destination()
+		{
+			// interfaces
+			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
+			define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+			define_component_interface(movement_itf, typename Vehicle_Itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+			define_component_interface(location_itf, typename Parent_Person_Itf::get_type_of(current_location), Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
+			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
+			Routing_Itf* itf= person ->template router<Routing_Itf*>();	
+			Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
+			network_itf* network = person->template network_reference<network_itf*>();
+			movement_itf* movements = this->Movement<movement_itf*>();
+			link_itf* origin_link = movements->template origin<link_itf*>();
+		}
 
 		//========================================================
 		// Basic Features

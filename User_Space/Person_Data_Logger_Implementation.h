@@ -25,8 +25,8 @@ namespace Person_Components
 
 			feature_implementation void Initialize()
 			{
-				this->Logging_Interval<ComponentType,CallerType,Time_Hours>(1);
-				this->Next_Logging_Time<ComponentType,CallerType,Time_Hours>(1);
+				this->Logging_Interval<ComponentType,CallerType,Time_Minutes>(15);
+				this->Next_Logging_Time<ComponentType,CallerType,Time_Minutes>(15);
 				Simulation_Timestep_Increment first_time = this->Next_Logging_Time<ComponentType,CallerType,Simulation_Timestep_Increment>();
 				load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,first_time,0,NULLTYPE);
 
@@ -54,12 +54,26 @@ namespace Person_Components
 				if (!is_executed) num_acts[act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()] +=1;
 
 
-				if (loc == nullptr){ THROW_WARNING("Warning, null location pointer for activity record: " << act->template Parent_ID<int>() << "." << act->template Activity_Plan_ID<int>()); return;}
+				if (loc == nullptr)
+				{
+					s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
+					//THROW_WARNING("Warning, null location pointer for activity record: " << act->template Parent_ID<int>() << "." << act->template Activity_Plan_ID<int>()); 
+					s<<"\tNull location pointer - act not planned?\t";
+					Revision& location = act->Location_Planning_Time<Revision&>();
+					Revision& start = act->Start_Time_Planning_Time<Revision&>();
+					Revision& route = act->Route_Planning_Time<Revision&>();
+					s << "\tPlan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
+					buff[_thread_id].push_back(s.str());
+					return;
+				}
 				zone_itf* zone = loc->template zone<zone_itf*>();
 
-
-				s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << "\t"<<act->template Start_Time<Time_Minutes>() << "\t"<<act->template Duration<Time_Minutes>() << "\t"<<zone->template uuid<int>();
-
+				Revision& location = act->template Stored_Location_Planning_Time<Revision&>();
+				Revision& start = act->template Stored_Start_Time_Planning_Time<Revision&>();
+				Revision& route = act->template Stored_Route_Planning_Time<Revision&>();
+				s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << "\t"<<act->template Start_Time<Time_Minutes>() << "\t"<<act->template Duration<Time_Minutes>() << "\t"<<zone->template uuid<int>();
+				s << "\tPlan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
+					
 				if (!is_executed)
 				{
 					s<<"\t"<<act->template Expected_Travel_Time<Time_Minutes>()<<"\t"<<0;

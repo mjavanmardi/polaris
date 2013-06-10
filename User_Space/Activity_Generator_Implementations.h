@@ -79,6 +79,8 @@ namespace Person_Components
 			typedef Prototypes::Activity_Generator<base_type,base_type> base_itf;
 
 			// static discretionary activity generation model
+			static float work_activity_freq[8];
+			static float school_activity_freq[8];
 			static float eat_out_activity_freq[8];
 			static float errands_activity_freq[8];
 			static float healthcare_activity_freq[8];
@@ -140,7 +142,9 @@ namespace Person_Components
 				scheduler_itf* scheduler = _Parent_Person->template Scheduling_Faculty<scheduler_itf*>();
 				_static_properties_itf* static_properties = _Parent_Person->template Static_Properties<_static_properties_itf*>();
 				_properties_itf* properties = _Parent_Person->template Properties<_properties_itf*>();
-				//_Destination_Choice_Itf* destination_chooser = base_type::_Parent_Planner->template Destination_Chooser<_Destination_Choice_Itf*>();
+				
+				// person type used in activity generation calculations
+				int person_index = this->Person_Type_index<ComponentType,CallerType,NT>();
 				
 				// get references to the plan containers
 				Activities* activities = scheduler->template Activity_Container<Activities*>();
@@ -160,17 +164,24 @@ namespace Person_Components
 				//=========================================================================================================================
 				// Generate work activity
 				EMPLOYMENT_STATUS work_status = static_properties->template Employment_Status<EMPLOYMENT_STATUS>();
-				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count, start_plan_time);
+				if (work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK || work_status == EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK)
+				{
+					float num_work = work_activity_freq[person_index];
+					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_work ) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(PRIMARY_WORK_ACTIVITY,act_count, start_plan_time);
+				}
 				//-------------------------------------------------------------------------------------------------------------------------
 
 
 				//=========================================================================================================================
 				// Generate school activity
 				Person_Components::Types::SCHOOL_ENROLLMENT sch_status = static_properties->template School_Enrollment<SCHOOL_ENROLLMENT>();
-				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count, start_plan_time);
+				if (sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC || sch_status == SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE)
+				{
+					float num_school = school_activity_freq[person_index];
+					if (GLOBALS::Uniform_RNG.template Next_Rand<float>() < num_school ) Create_Routine_Activity<ComponentType,CallerType,ACTIVITY_TYPES>(SCHOOL_ACTIVITY,act_count, start_plan_time);
+				}
 				//-------------------------------------------------------------------------------------------------------------------------
 
-				int person_index = this->Person_Type_index<ComponentType,CallerType,NT>();
 
 				//=========================================================================================================================
 				// Get frequency of each activity type
@@ -253,6 +264,9 @@ namespace Person_Components
 			}
 
 		};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::work_activity_freq[]= {0,0,0,0.82,0.55,0,0,0};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::school_activity_freq[]= {0.75,0.75,0,0,0,0,0.25,0};
+		
 		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::eat_out_activity_freq[]= {0.134,0.125,0.158,0.260,0.236,0.234,0.248,0.178};
 		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::errands_activity_freq[]= {0.033,0.052,0.093,0.108,0.156,0.198,0.181,0.070};
 		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::healthcare_activity_freq[]= {0.030,0.034,0.053,0.051,0.070,0.110,0.142,0.046};

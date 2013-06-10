@@ -148,7 +148,13 @@ namespace Prototypes
 
 		feature_prototype void Set_Home_Location()
 		{
+			define_component_interface(location_itf,typename get_type_of(current_location),Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+
+			// set the home/workplace/school locations on event
 			this_component()->template Set_Home_Location<ComponentType,CallerType, TargetType>();
+
+			// start the agent off at home
+			this->current_location<location_itf*>(this->Home_Location<location_itf*>());
 		}
 		feature_accessor(Planning_Faculty,none,none);
 		feature_accessor(Perception_Faculty,none,none);
@@ -173,6 +179,7 @@ namespace Prototypes
 		feature_accessor(First_Iteration,none,none);
 		feature_accessor(Write_Activity_Files,none,none);
 		feature_accessor(Activity_Record_Container,none,none);
+		feature_accessor(current_location,none,none);
 
 		// Accessors for setting the home/work locations (stores only an index into the network_reference::activity_locations_container) - overloaded to return either th loc_index, the location interface or the zone interface
 		feature_prototype TargetType Home_Location(requires(check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location) && check_as_given(TargetType,is_pointer)))

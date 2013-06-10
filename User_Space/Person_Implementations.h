@@ -35,6 +35,7 @@ namespace Person_Components
 			member_prototype(Prototypes::Person_Properties, Properties, typename MasterType::person_properties_type,none,check_2(ComponentType,CallerType, Is_Same_Entity));
 			member_prototype(Prototypes::Person_Properties, Static_Properties,typename MasterType::person_static_properties_type,none,none);
 			
+			member_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype, current_location, typename MasterType::activity_location_type, none, none);
 
 			//member_prototype(Network_Components::Prototypes::Network_Prototype, network_reference, typename MasterType::network_type, none, none);
 			//member_prototype(Scenario_Components::Prototypes::Scenario_Prototype, scenario_reference, typename MasterType::scenario_type, none, none);
@@ -139,6 +140,8 @@ namespace Person_Components
 				_vehicle->template internal_id<int>(id);
 				_vehicle->template traveler<ComponentType*>(this);
 				_vehicle->template initialize<NT>();
+
+				this->_current_location = nullptr;
 
 				// Add basic traveler properties							
 				this->template uuid<ComponentType,ComponentType,int>(id);

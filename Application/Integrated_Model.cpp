@@ -1,3 +1,5 @@
+//#define SHOW_WARNINGS
+
 #include "Polaris_PCH.h"
 
 
@@ -7,9 +9,6 @@
 #endif
 
 #ifdef DBIO
-//#define WINDOWS
-#define SHOW_WARNINGS
-
 #include "Application_Includes.h"
 
 
@@ -418,7 +417,7 @@ cout << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_
 	// Destination choice model - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
 	MasterType::person_destination_chooser_type::_choice_set_size = 50;
-	MasterType::person_destination_choice_option_type::_B_TTIME = -0.16;
+	MasterType::person_destination_choice_option_type::_B_TTIME = -0.15;
 	MasterType::person_destination_choice_option_type::_B_EMPLOYMENT = 0.0002;
 	MasterType::person_destination_choice_option_type::_B_POPULATION = 0.00005;
 	// Initialize start time model

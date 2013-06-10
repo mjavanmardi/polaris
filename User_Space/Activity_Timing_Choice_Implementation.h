@@ -134,6 +134,7 @@ namespace Person_Components
 
 
 				// Initialize hashmap for start time
+				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::SCHOOL_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::EAT_OUT_ACTIVITY,map_type()));
 				_start_time_duration_container.insert(pair<int,map_type>(ACTIVITY_TYPES::ERRANDS_ACTIVITY,map_type()));

@@ -57,7 +57,7 @@ namespace Activity_Components
 	{
 		concept struct Is_Activity_Plan_Prototype
 		{
-			check_getter(has_id,ComponentType::Activity_Plan_ID);
+			check_getter(has_id,Component_Type::Activity_Plan_ID);
 			define_default_check(has_id);
 		};
 		concept struct Is_Activity_Plan
@@ -384,6 +384,13 @@ namespace Activity_Components
 			feature_accessor(Duration_Flexibility,none,none);
 			feature_accessor(Involved_Persons_Plan_Horizon,none,none);
 			feature_accessor(Involved_Persons_Flexibility,none,none);
+
+			feature_accessor(Stored_Location_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			feature_accessor(Stored_Mode_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			feature_accessor(Stored_Start_Time_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			feature_accessor(Stored_Duration_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			feature_accessor(Stored_Involved_Persons_Planning_Time, check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
+			feature_accessor(Stored_Route_Planning_Time, none,none/*check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same)*/);
 
 			//===========================================
 			// Primary Activity attribute accessors

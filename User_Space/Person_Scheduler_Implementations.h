@@ -109,6 +109,44 @@ namespace Person_Components
 			}
 			tag_feature_signature_as_available(next_activity_plan,1);
 
+			feature_implementation typename TargetType::ReturnType previous_location(typename TargetType::ParamType current_activity)
+			{
+				Activity_Plan* act = (Activity_Plan*)current_activity;
+				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+
+				// if the start time of the activity has not been planned set the previous location to home
+				if (!act->Start_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
+				Time_Seconds start = act->template Start_Time<Time_Seconds>();
+
+				Activity_Plan* prev_act = this->previous_activity_plan<ComponentType,CallerType,Target_Type<NT,Activity_Plan*,Time_Seconds>>(act->template Start_Time<Time_Seconds>());
+
+				// if no previous activity, person is at home
+				if (prev_act == nullptr) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
+
+				// if previous act location is not planned treat person as if at home
+				if (!prev_act->Location_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
+
+				// otherwise, determine if person is at home or still at a previous activity
+				_Activity_Location_Interface* orig = prev_act->template Location<_Activity_Location_Interface*>();
+				_Activity_Location_Interface* dest = act->template Location<_Activity_Location_Interface*>();
+
+				// if current act location is not planned, treat current location as at home
+				if (!act->Location_Is_Planned<bool>()) dest = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+
+				// check if a stop at home will fit prior to activity
+				Time_Seconds time_before = start - (prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>());
+				Time_Seconds ttime_prev_to_home = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Type_Keys, Time_Seconds>>(orig->template zone<_Zone_Interface*>()->template uuid<int>(), _Parent_Person->template Home_Location<_Zone_Interface*>()->template uuid<int>(),SOV,start);
+				Time_Seconds ttime_home_to_this = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Type_Keys, Time_Seconds>>(_Parent_Person->template Home_Location<_Zone_Interface*>()->template uuid<int>(),dest->template zone<_Zone_Interface*>()->template uuid<int>(), SOV,start);
+				Time_Seconds ttime_prev_to_this = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Type_Keys, Time_Seconds>>(orig->template zone<_Zone_Interface*>()->template uuid<int>(), dest->template zone<_Zone_Interface*>()->template uuid<int>(),SOV,start);
+				// enough time between previous activity and this activity to go home, stay there for a minimimum amount of time (equal to the shortest leg of the return home trip) and get to this activity
+				float min_home_time = std::min((float)ttime_prev_to_home,(float)ttime_home_to_this);			
+				if (ttime_prev_to_home + ttime_home_to_this < time_before - min_home_time) orig = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+
+				// return the expected origin
+				return (typename TargetType::ReturnType)orig;
+			}
+			tag_feature_signature_as_available(previous_location,1);
+
 			// Adding activities and movements to the planning schedules
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
 			{

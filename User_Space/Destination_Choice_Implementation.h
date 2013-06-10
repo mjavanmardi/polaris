@@ -82,7 +82,7 @@ namespace Person_Components
 				emp = zone->template employment<TargetType>();
 
 				u = (_B_POPULATION * pop + _B_EMPLOYMENT * emp + _B_TTIME * ttime_deflected);
-				if (u > 100.0) THROW_WARNING("WARNING: utility > 100.0 will cause numeric overflow, possible misspecification in utility function for destination choice. [Pop,emp,ttime]="<<pop << ", " << emp << ", " << ttime);
+				if (u > 100.0) THROW_WARNING("WARNING: utility > 100.0 will cause numeric overflow, possible misspecification in utility function for destination choice. [Pop,emp,ttime]="<<pop << ", " << emp << ", " << ttime_deflected);
 
 				return (TargetType)u;				
 			}
