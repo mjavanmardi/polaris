@@ -18,6 +18,8 @@ public:
 		ex_next_next_revision._sub_iteration=0;
 
 		ex_lock=0;
+		
+		active_lock=0;
 
 		ex_threads_counter_begin=0;
 		ex_threads_counter_end=0;
@@ -32,7 +34,11 @@ public:
 
 	void Activate_Type(Typed_Execution_Pages<>* ptr)
 	{
-		active_types.push_back(ptr);
+		LOCK(active_lock);
+
+		new_types.push_back(ptr);
+
+		UNLOCK(active_lock);
 	}
 	
 	///============================================================================
@@ -63,7 +69,7 @@ public:
 			for(itr=active_types.begin();itr!=active_types.end();itr++)
 			{
 				Typed_Execution_Pages<>* execution_type=(*itr);
-				
+
 				Revision tex_response=execution_type->tex_next_revision;
 
 				// you are guaranteed that TEX::next_revision will not change until the final thread has finished this TEX
@@ -105,7 +111,7 @@ public:
 					ex_response=tex_response;
 				}
 			}
-
+			
 			while(AtomicExchange(&ex_lock,1)) SLEEP(0); // lock the execution engine
 				
 				// EX slice has revealed that it wishes to return some time in the future
@@ -124,6 +130,16 @@ public:
 #endif
 			if(AtomicIncrement(&ex_threads_counter_begin) == _num_threads)
 			{
+				if(new_types.size()>0)
+				{
+					for(list<Typed_Execution_Pages<>*>::iterator itr=new_types.begin();itr!=new_types.end();itr++)
+					{
+						active_types.push_back((*itr));
+					}
+
+					new_types.clear();
+				}
+
 				ex_next_revision=ex_next_next_revision;
 				ex_next_next_revision._iteration=INT_MAX;
 				ex_next_next_revision._sub_iteration=0;
@@ -223,11 +239,13 @@ public:
 	}
 
 	list<Typed_Execution_Pages<>*> active_types;
+	list<Typed_Execution_Pages<>*> new_types;
 
 	Revision ex_next_next_revision;
 	Revision ex_next_revision;
 
 	_lock ex_lock;
+	_lock active_lock;
 
 	volatile unsigned int ex_threads_counter_begin;
 	volatile unsigned int ex_threads_counter_end;

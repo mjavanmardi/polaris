@@ -133,6 +133,7 @@ public:
 		tex_next_next_revision._sub_iteration=0;
 		tex_threads_counter=0;
 		page_stride=1;
+		component_index=DataType::component_index;
 	}
 
 	void Process(Revision& tex_response)
@@ -152,8 +153,6 @@ public:
 		const unsigned int pstride = max( (int)(( active_pages.Size() )/( _Execution_Segments_Per_Thread * _num_threads )), 1 );
 
 		Typed_Execution_Page<DataType>* execution_page;
-
-		//cout << _iteration << "." << _sub_iteration << ": " << typeid(DataType).name() << endl;
 
 		while(itr!=nullptr)
 		{
@@ -304,6 +303,8 @@ public:
 
 	const unsigned int num_cells;
 	
+	int component_index;
+
 	const Execution_Directive process_directive;
 	void (Typed_Execution_Pages::* type_process_directive)(Revision&);
 };

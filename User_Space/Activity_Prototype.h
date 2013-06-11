@@ -468,8 +468,6 @@ namespace Activity_Components
 			feature_method_void(Involved_Persons_Is_Planned,check_2(ReturnValueType,bool,is_same));
 			feature_method_void(Route_Is_Planned,check_2(ReturnValueType,bool,is_same));
 		};
-
-
 	}
 }
 

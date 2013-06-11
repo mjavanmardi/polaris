@@ -318,23 +318,33 @@ namespace Person_Components
 
 			feature_prototype void Schedule_New_Routing(int planning_time, TargetType movement_plan, requires(check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan)))
 			{
-				// schedule routing		
+				// interfaces	
 				define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
 				define_component_interface(Scenario_Itf, typename Parent_Person_Itf::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
 				define_component_interface(Vehicle_Itf, typename get_type_of(Parent_Person)::get_type_of(vehicle), Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 				define_component_interface(Movement_Itf, typename Routing_Itf::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				define_component_interface(Activity_Itf, typename Movement_Itf::get_type_of(destination_activity_reference),Activity_Components::Prototypes::Activity_Planner,ComponentType);
 
+				// references
 				Parent_Person_Itf* person_itf = this->Parent_Person<Parent_Person_Itf*>();
 				Routing_Itf* itf= person_itf->template router<Routing_Itf*>();	
+				Movement_Itf* move = (Movement_Itf*)movement_plan;
+				Activity_Itf* act = move->template destination_activity_reference<Activity_Itf*>();
+
+				// set movement plan as current movement in router faculty
 				itf->template movement_plan<Movement_Itf*>((Movement_Itf*)movement_plan);	
 
-				movement_plan->template planning_time<Simulation_Timestep_Increment>(planning_time);
+				move->template planning_time<Simulation_Timestep_Increment>(planning_time);
 
 				// whether to use snapshot or not
 				Scenario_Itf* scenario = (Scenario_Itf*)_global_scenario;
 
-				itf->template Schedule_Route_Computation<NULLTYPE>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time,scenario->template read_network_snapshots<bool>());
+				// calculate route, if the mode is auto, otherwise return
+				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+				{
+					itf->template Schedule_Route_Computation<NULLTYPE>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time,scenario->template read_network_snapshots<bool>());
+				}
 			}
 			feature_prototype void Schedule_New_Routing(int planning_time, TargetType movement_plan, requires(!check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan)))
 			{
