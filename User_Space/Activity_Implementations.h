@@ -240,7 +240,7 @@ namespace Activity_Components
 			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
 			{
 				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
-				_scheduler_itf* scheduler = person->Scheduling_Faculty<_scheduler_itf*>();
+				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
 
 				// copy the movement plan into the cached movement record before addition
@@ -283,7 +283,7 @@ namespace Activity_Components
 				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Planner<ComponentType,CallerType>*>((Activity_Planner<ComponentType,CallerType>*)this,true);
 
 				// Person has arrived at activity destination
-				_Parent_Planner->Parent_Person<_person_itf*>()->Arrive_At_Destination<NT>();
+				_Parent_Planner->template Parent_Person<_person_itf*>()->template Arrive_At_Destination<NT>();
 			}
 			feature_implementation void Depart_From_Activity()
 			{
@@ -305,7 +305,7 @@ namespace Activity_Components
 			// Interfaces
 			typedef Prototypes::Activity_Planner<ComponentType,ComponentType> this_itf;
 			define_component_interface(_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
-			define_component_interface(_scheduler_itf, typename type_of(Parent_Planner)::type_of(Parent_Person)::type_of(Scheduling_Faculty), Person_Components::Prototypes::Person_Scheduler, ComponentType);
+			define_component_interface(_scheduler_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Scheduling_Faculty), Person_Components::Prototypes::Person_Scheduler, ComponentType);
 			define_component_interface(_static_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Static_Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
 			define_component_interface(_planning_itf,typename type_of(base_type::Parent_Planner),Person_Components::Prototypes::Person_Planner,ComponentType);
 			define_component_interface(_person_itf,typename _planning_itf::get_type_of(Parent_Person),Person_Components::Prototypes::Person,ComponentType);
@@ -664,11 +664,6 @@ namespace Activity_Components
 				_network_itf* network = person->template network_reference<_network_itf*>();
 
 
-				if (person->uuid<int>() == 1446 && pthis->Activity_Plan_ID<int>() == 2)
-				{
-					int test = 1;
-				}
-
 				// timing variables
 				Time_Minutes start, end, prev_end, next_start, time_before, time_after, ttime_prev_to_home, ttime_home_to_next;
 				start = pthis->template Start_Time<Time_Minutes>();
@@ -803,12 +798,12 @@ namespace Activity_Components
 
 				//========================================================================
 				// Resolve timing conflicts when timing is known
-				bool is_scheduled =	scheduler->Resolve_Timing_Conflict<Target_Type<NT,bool,this_itf*>>(pthis);
+				bool is_scheduled =	scheduler->template Resolve_Timing_Conflict<Target_Type<NT,bool,this_itf*>>(pthis);
 				// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
 				if (!is_scheduled) 
 				{
 					pthis->template Route_Planning_Time<Revision&>()._iteration = END+1;
-					scheduler->Remove_Activity_Plan<this_itf*>(pthis);
+					scheduler->template Remove_Activity_Plan<this_itf*>(pthis);
 				}
 
 
@@ -830,7 +825,7 @@ namespace Activity_Components
 				// Reset the route planning time based on the expected departure time, and aggregate as needed
 				//---------------------------
 				// Aggregate plan routing
-				if (scenario->aggregate_routing<bool>())
+				if (scenario->template aggregate_routing<bool>())
 				{
 					Time_Minutes start_minutes = (int)(pthis->template Start_Time<Time_Minutes>() - (exp_ttime * 2.0));
 					int start_increment = std::max<int>(Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
@@ -867,6 +862,7 @@ namespace Activity_Components
 			define_component_interface(_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
 			define_component_interface(_static_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Static_Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
 			define_component_interface(_planning_itf,typename type_of(base_type::Parent_Planner),Person_Components::Prototypes::Person_Planner,ComponentType);
+			define_component_interface(_scheduler_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Scheduling_Faculty), Person_Components::Prototypes::Person_Scheduler, ComponentType);
 			define_component_interface(_person_itf,typename _planning_itf::get_type_of(Parent_Person),Person_Components::Prototypes::Person,ComponentType);
 			define_component_interface(_dest_choice_itf,typename _planning_itf::get_type_of(Destination_Choice_Faculty),Person_Components::Prototypes::Destination_Chooser,ComponentType);
 			define_component_interface(_scenario_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
@@ -1207,7 +1203,7 @@ namespace Activity_Components
 				// Reset the route planning time based on the expected departure time, and aggregate as needed
 				//---------------------------
 				// Aggregate plan routing
-				if (scenario->aggregate_routing<bool>())
+				if (scenario->template aggregate_routing<bool>())
 				{
 					Time_Minutes start_minutes = (int)(pthis->template Start_Time<Time_Minutes>() - (exp_ttime * 2.0));
 					int start_increment = std::max<int>(Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);

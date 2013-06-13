@@ -520,7 +520,7 @@ namespace Scenario_Components
 					temp_dir_name.append(dir_id.str().c_str()); 
 				}		
 				output_dir_name<string>(temp_dir_name);
-				output_dir_name<string&>().append("\\");
+				output_dir_name<string&>().append("//");
 				//---------------------------------------------------
 
 				string out_skim_path = output_dir_name<string>().append(this->output_skim_file_path_name<string&>());

@@ -141,7 +141,7 @@ namespace Routing_Components
 				int outbound_turn_movement_size = (int)turn_mvmt_container.size();
 				if (origin_link_ptr != destination_link_ptr && outbound_turn_movement_size == 0)
 				{
-					THROW_WARNING("Origin link 'index="<<net_origin_link->internal_id<int>() <<" id="<<net_origin_link->uuid<int>()<<"' has no outbound turn movements, trip not able to be routed.");
+					THROW_WARNING("Origin link 'index="<<net_origin_link->template internal_id<int>() <<" id="<<net_origin_link->template uuid<int>()<<"' has no outbound turn movements, trip not able to be routed.");
 					return -1.0;
 				}
 
@@ -315,7 +315,7 @@ namespace Routing_Components
 				
 				if (outbound_turn_movement_size == 0)
 				{
-					THROW_WARNING("Origin link 'index="<<net_origin_link->internal_id<int>() <<" id="<<net_origin_link->uuid<int>()<<"' has no outbound turn movements, trip not able to be routed.");
+					THROW_WARNING("Origin link 'index="<<net_origin_link->template internal_id<int>() <<" id="<<net_origin_link->template uuid<int>()<<"' has no outbound turn movements, trip not able to be routed.");
 					return false;
 				}
 

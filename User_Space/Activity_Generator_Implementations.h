@@ -157,8 +157,8 @@ namespace Person_Components
 				int act_count = 1;
 
 				//=========================================================================================================================
-				// Get random start plan time inthe first minute for generation
-				int start_plan_time = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>()*60.0f) + _iteration;
+				// Get random start plan time inthe first 3 minutes for generation
+				int start_plan_time = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>()*180.0f) + _iteration;
 				
 
 				//=========================================================================================================================

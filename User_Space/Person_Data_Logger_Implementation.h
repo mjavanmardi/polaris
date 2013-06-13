@@ -47,7 +47,7 @@ namespace Person_Components
 				current = output_data;
 
 				stringstream filename("");
-				filename << scenario->output_dir_name<string>();
+				filename << scenario->template output_dir_name<string>();
 				filename << "activity_output.xls";
 
 				this->_filename = filename.str();
@@ -78,12 +78,12 @@ namespace Person_Components
 
 				if (loc == nullptr)
 				{
-					s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
+					s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 					//THROW_WARNING("Warning, null location pointer for activity record: " << act->template Parent_ID<int>() << "." << act->template Activity_Plan_ID<int>()); 
 					s<<"\tNull location pointer - act not planned?\t";
-					Revision& location = act->Location_Planning_Time<Revision&>();
-					Revision& start = act->Start_Time_Planning_Time<Revision&>();
-					Revision& route = act->Route_Planning_Time<Revision&>();
+					Revision& location = act->template Location_Planning_Time<Revision&>();
+					Revision& start = act->template Start_Time_Planning_Time<Revision&>();
+					Revision& route = act->template Route_Planning_Time<Revision&>();
 					s << "\tPlan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
 					buff[_thread_id].push_back(s.str());
 					return;
@@ -93,7 +93,7 @@ namespace Person_Components
 				Revision& location = act->template Stored_Location_Planning_Time<Revision&>();
 				Revision& start = act->template Stored_Start_Time_Planning_Time<Revision&>();
 				Revision& route = act->template Stored_Route_Planning_Time<Revision&>();
-				s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << "\t"<<act->template Start_Time<Time_Minutes>() << "\t"<<act->template Duration<Time_Minutes>() << "\t"<<zone->template uuid<int>()<<"\t"<<act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
+				s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << "\t"<<act->template Start_Time<Time_Minutes>() << "\t"<<act->template Duration<Time_Minutes>() << "\t"<<zone->template uuid<int>()<<"\t"<<act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 				s << "\tPlan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
 					
 				if (!is_executed)

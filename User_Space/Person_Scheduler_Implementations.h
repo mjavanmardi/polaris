@@ -116,7 +116,7 @@ namespace Person_Components
 				Parent_Person_interface* person = (Parent_Person_interface*)_Parent_Person;
 
 				// if the start time of the activity has not been planned set the previous location to home
-				if (!act->Start_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
+				if (!act->template Start_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
 				Time_Seconds start = act->template Start_Time<Time_Seconds>();
 
 				Activity_Plan* prev_act = this->previous_activity_plan<ComponentType,CallerType,Target_Type<NT,Activity_Plan*,Time_Seconds>>(act->template Start_Time<Time_Seconds>());
@@ -125,14 +125,14 @@ namespace Person_Components
 				if (prev_act == nullptr) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
 
 				// if previous act location is not planned treat person as if at home
-				if (!prev_act->Location_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
+				if (!prev_act->template Location_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
 
 				// otherwise, determine if person is at home or still at a previous activity
 				_Activity_Location_Interface* orig = prev_act->template Location<_Activity_Location_Interface*>();
 				_Activity_Location_Interface* dest = act->template Location<_Activity_Location_Interface*>();
 
 				// if current act location is not planned, treat current location as at home
-				if (!act->Location_Is_Planned<bool>()) dest = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				if (!act->template Location_Is_Planned<bool>()) dest = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 
 				// if current location is in the process of being planned, use previous location as only deflected time matters
 				if (dest == nullptr) return (typename TargetType::ReturnType)orig;
@@ -156,7 +156,7 @@ namespace Person_Components
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
 
 				// if the start time of the activity has not been planned set the next location to home
-				if (!act->Start_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
+				if (!act->template Start_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
 				Time_Seconds end = act->template Start_Time<Time_Seconds>() + act->template Duration<Time_Seconds>();
 
 				Activity_Plan* next_act = this->next_activity_plan<ComponentType,CallerType,Target_Type<NT,Activity_Plan*,Time_Seconds>>(act->template Start_Time<Time_Seconds>());
@@ -165,14 +165,14 @@ namespace Person_Components
 				if (next_act == nullptr) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
 
 				// if next act location is not planned treat person as if returning home
-				if (!next_act->Location_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
+				if (!next_act->template Location_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
 
 				// otherwise, determine if person goes home or to next activity
 				_Activity_Location_Interface* dest = next_act->template Location<_Activity_Location_Interface*>();
 				_Activity_Location_Interface* orig = act->template Location<_Activity_Location_Interface*>();
 
 				// if current act location is not planned, treat current location as at home
-				if (!act->Location_Is_Planned<bool>()) orig = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				if (!act->template Location_Is_Planned<bool>()) orig = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 
 				// if act is currently being planned (i.e. is_planned is true, but location pointer is null) then use next location
 				if (orig == nullptr) return (typename TargetType::ReturnType)dest;
@@ -206,7 +206,7 @@ namespace Person_Components
 
 				// get the activity location for calculating approximate travel times to from surrounding activities
 				_Activity_Location_Interface* loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
-				if (act->Location_Is_Planned<bool>()) loc = act->template Location<_Activity_Location_Interface*>();
+				if (act->template Location_Is_Planned<bool>()) loc = act->template Location<_Activity_Location_Interface*>();
 
 				// Get the surrounding activities in the schedule
 				Activity_Plan* prev_act = this->previous_activity_plan<ComponentType,CallerType,Target_Type<NT,Activity_Plan*,Time_Seconds>>(start);
@@ -272,7 +272,7 @@ namespace Person_Components
 				// 3. can't fit, delete activity
 				else
 				{
-					cout << endl << "Deleted activity";
+					//cout << endl << "Deleted activity";
 					return false;
 				}
 

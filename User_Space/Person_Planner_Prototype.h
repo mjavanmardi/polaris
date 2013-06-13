@@ -266,7 +266,7 @@ namespace Person_Components
 							// add movement plan to the person's vehicle and schedule the departure
 							if (movement_faculty->template Movement_Scheduled<bool>() == true)
 							{
-								THROW_WARNING("WARNING: movement already scheduled for current iteration for person: " << parent->uuid<int>() << ", movement ignored.");
+								THROW_WARNING("WARNING: movement already scheduled for current iteration for person: " << parent->template uuid<int>() << ", movement ignored.");
 								typename Movement_Plans::iterator prev = move_itr++;
 								movements->erase(prev);
 								return;

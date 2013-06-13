@@ -57,7 +57,7 @@ namespace Prototypes
 
 			// determine router aggregation properties - i.e. is routed called at departure or an aggregated time prior to departure
 			Simulation_Timestep_Increment routing_timestep = movement->template departed_time<Simulation_Timestep_Increment>();
-			if (scenario->aggregate_routing<bool>())
+			if (scenario->template aggregate_routing<bool>())
 			{
 				int minutes = (int)(movement->template departed_time<Time_Minutes>());
 				Simulation_Timestep_Increment temp = Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(minutes);
@@ -581,10 +581,10 @@ namespace Prototypes
 			if (begin_next - end_this > ttime_this_to_home + ttime_home_to_next + min_home_duration)
 			{
 				// Create movement plan and give it an ID
-				movement_itf* move = (movement_itf*)Allocate<typename Scheduler_Itf::get_type_of(Movement_Plans_Container)::unqualified_value_type>();
-				move->template initialize_trajectory<NULLTYPE>();
-				Activity_Itf* null_act = nullptr;
-				move->template destination_activity_reference<Activity_Itf*>(null_act);
+				/*movement_itf* move = (movement_itf*)Allocate<typename Scheduler_Itf::get_type_of(Movement_Plans_Container)::unqualified_value_type>();
+				move->template initialize_trajectory<NULLTYPE>();*/
+				/*Activity_Itf* null_act = nullptr;
+				move->template destination_activity_reference<Activity_Itf*>(null_act);*/
 
 				location_itf* orig = act->template Location<location_itf*>();
 				location_itf* dest = person->template Home_Location<location_itf*>();
@@ -595,19 +595,19 @@ namespace Prototypes
 				if (orig->template origin_links<links_container_itf&>().at(0)->template outbound_turn_movements<turns_container_itf*>()->size() == 0 || dest->template origin_links<links_container_itf&>().at(0)->template outbound_turn_movements<turns_container_itf*>()->size() == 0) THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "/*<<concat(this->Parent_Person<ComponentType,CallerType,int>()) << "." << concat(this->Activity_Plan_ID<ComponentType, CallerType,int>()) <<", " << concat(this->Activity_Type<ComponentType, CallerType,ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>()*/);
 
 				// GENERATE A NEW AT HOME ACTIVITY
-				typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::at_home_activity_plan_type,ComponentType> at_home_activity_itf;
-				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename MasterType::at_home_activity_plan_type>();
-				new_act->template movement_plan<movement_itf*>(move);
-				new_act->Parent_Planner<Planner_Itf*>(planner);
-				new_act->Initialize<Target_Type<NT,void,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>>(end_this, ttime_this_to_home,act->template Mode<MODE>());
+				typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type,ComponentType> at_home_activity_itf;
+				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
+				//new_act->template movement_plan<movement_itf*>(move);
+				new_act->template Parent_Planner<Planner_Itf*>(planner);
+				new_act->template Initialize<Target_Type<NT,void,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>>(end_this, ttime_this_to_home,act->template Mode<MODE>());
 
 				// If the trip is valid, assign to a movement plan and add to the schedule
-				move->template origin<location_itf*>(orig);
-				move->template destination<location_itf*>(dest);
-				move->template origin<link_itf*>(orig->template origin_links<links_container_itf&>().at(0));
-				move->template destination<link_itf*>(dest->template origin_links<links_container_itf&>().at(0));
-				move->template departed_time<Simulation_Timestep_Increment>(end_this);
-				scheduler->template Add_Movement_Plan<movement_itf*>(move);
+				//move->template origin<location_itf*>(orig);
+				//move->template destination<location_itf*>(dest);
+				//move->template origin<link_itf*>(orig->template origin_links<links_container_itf&>().at(0));
+				//move->template destination<link_itf*>(dest->template origin_links<links_container_itf&>().at(0));
+				//move->template departed_time<Simulation_Timestep_Increment>(end_this);
+				//scheduler->template Add_Movement_Plan<movement_itf*>(move);
 
 				Time_Seconds next_depart_time = next_act->template Start_Time<Time_Seconds>() - ttime_home_to_next;
 				//cout << endl << "Returning home @t=" << (int)end_this << ", expected arrival @t="<<(int)end_this+(int)ttime_this_to_home<<", approximate departure from home for next activity @t="<< (int)next_depart_time;

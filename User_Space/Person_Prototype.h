@@ -105,7 +105,7 @@ namespace Prototypes
 			
 			// exit if no activity output is specified
 			scenario_itf* scenario = (scenario_itf*)_global_scenario;
-			if (!scenario->write_activity_output<bool>()) return;
+			if (!scenario->template write_activity_output<bool>()) return;
 
 
 			scheduler_itf* scheduler = pthis->template Scheduling_Faculty<scheduler_itf*>();
