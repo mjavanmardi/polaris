@@ -422,6 +422,12 @@ namespace Activity_Components
 				assert_check(TargetType,Is_Target_Type_Struct, "The TargetType for Activity.Initialize must be a Target_Type struct.");
 				assert_check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same, "TargetType::ParamType must be an ActivityType enumerator");
 			}
+			feature_prototype void Initialize(typename TargetType::ParamType start_time, typename TargetType::ParamType duration, typename TargetType::Param2Type mode)
+			{
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>(start_time,duration,mode);
+				this->Set_Meta_Attributes<void>();
+				this->Set_Attribute_Planning_Times<typename TargetType::ParamType>(_iteration);
+			}
 			feature_prototype void Set_Attribute_Planning_Times(TargetType planning_time)
 			{
 				// Call the model to determine the attribute planning times

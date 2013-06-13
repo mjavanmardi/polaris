@@ -132,9 +132,9 @@ namespace Person_Components
 					_Parent_Person->template Choose_School_Location<NT>();
 				}
 
-				planner_itf* planner = this->_Parent_Person->template Planning_Faculty<planner_itf*>();
-				planner->template Write_To_Log<string>(_Parent_Person->template To_String<NT>());
-				planner->template Write_To_Log<string>("\n");
+				//planner_itf* planner = this->_Parent_Person->template Planning_Faculty<planner_itf*>();
+				//planner->template Write_To_Log<string>(_Parent_Person->template To_String<NT>());
+				//planner->template Write_To_Log<string>("\n");
 			}	
 			/*feature_implementation void Initialize(typename TargetType::ParamType home_synthesis_zone, requires(!check(typename TargetType::ParamType, Zone_Components::Concepts::Is_Zone_Prototype) || !check_as_given(typename TargetType::ParamType, is_pointer)))
 			{	

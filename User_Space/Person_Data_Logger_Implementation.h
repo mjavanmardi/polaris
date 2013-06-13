@@ -25,6 +25,19 @@ namespace Person_Components
 
 			feature_implementation void Initialize()
 			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+
+				// don't do logging if not specified in scenario
+				if (!scenario->template write_activity_output<bool>())
+				{
+					this->Logging_Interval<ComponentType,CallerType,Time_Minutes>(END);
+					this->Next_Logging_Time<ComponentType,CallerType,Time_Minutes>(END);
+					load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,END,0,NULLTYPE);
+					return;
+				}
+
+
 				this->Logging_Interval<ComponentType,CallerType,Time_Minutes>(15);
 				this->Next_Logging_Time<ComponentType,CallerType,Time_Minutes>(15);
 				Simulation_Timestep_Increment first_time = this->Next_Logging_Time<ComponentType,CallerType,Simulation_Timestep_Increment>();
@@ -33,9 +46,13 @@ namespace Person_Components
 				buff = output_data_buffer;
 				current = output_data;
 
-				this->_filename = "activity_output.xls";
+				stringstream filename("");
+				filename << scenario->output_dir_name<string>();
+				filename << "activity_output.xls";
+
+				this->_filename = filename.str();
 				this->_log.open(this->_filename);
-				this->_log << "PER_ID\tACT_ID\tACT_TYP\tSTART_min\tDUR_min\tDEST_ZONE\tTTIME_min\tEXECUTED";
+				this->_log << "PER_ID\tACT_ID\tACT_TYP\tSTART_min\tDUR_min\tDEST_ZONE\tMODE\tplanning_info\tTTIME_min\tEXECUTED";
 
 				num_acts.resize(20,0);
 			}
@@ -46,6 +63,11 @@ namespace Person_Components
 				typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type> act_record_itf;
 				typedef Activity_Location_Components::Prototypes::Activity_Location_Prototype<typename MasterType::activity_location_type> location_itf;
 				typedef Zone_Components::Prototypes::Zone_Prototype<typename MasterType::zone_type> zone_itf;
+				
+				// don't do logging if not specified in scenario
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+				if (!scenario->template write_activity_output<bool>()) return;
 				
 				act_record_itf* act = (act_record_itf*)act_record;
 				location_itf* loc = act->template Location<location_itf*>();
@@ -71,7 +93,7 @@ namespace Person_Components
 				Revision& location = act->template Stored_Location_Planning_Time<Revision&>();
 				Revision& start = act->template Stored_Start_Time_Planning_Time<Revision&>();
 				Revision& route = act->template Stored_Route_Planning_Time<Revision&>();
-				s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << "\t"<<act->template Start_Time<Time_Minutes>() << "\t"<<act->template Duration<Time_Minutes>() << "\t"<<zone->template uuid<int>();
+				s << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>() << "\t"<<act->template Start_Time<Time_Minutes>() << "\t"<<act->template Duration<Time_Minutes>() << "\t"<<zone->template uuid<int>()<<"\t"<<act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>();
 				s << "\tPlan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
 					
 				if (!is_executed)

@@ -91,7 +91,7 @@ namespace Person_Components
 
 				// convert current time to seconds
 				Time_Seconds start_time = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,Time_Seconds,typename TargetType::ParamType>>(current_time);
-				Time_Seconds min_next = 0;
+				Time_Seconds min_next = END;
 				Activity_Plan* act;
 				Activity_Plan* next = nullptr;
 				
@@ -113,6 +113,7 @@ namespace Person_Components
 			{
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				Parent_Person_interface* person = (Parent_Person_interface*)_Parent_Person;
 
 				// if the start time of the activity has not been planned set the previous location to home
 				if (!act->Start_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
@@ -133,6 +134,9 @@ namespace Person_Components
 				// if current act location is not planned, treat current location as at home
 				if (!act->Location_Is_Planned<bool>()) dest = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 
+				// if current location is in the process of being planned, use previous location as only deflected time matters
+				if (dest == nullptr) return (typename TargetType::ReturnType)orig;
+
 				// check if a stop at home will fit prior to activity
 				Time_Seconds time_before = start - (prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>());
 				Time_Seconds ttime_prev_to_home = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Type_Keys, Time_Seconds>>(orig->template zone<_Zone_Interface*>()->template uuid<int>(), _Parent_Person->template Home_Location<_Zone_Interface*>()->template uuid<int>(),SOV,start);
@@ -146,6 +150,136 @@ namespace Person_Components
 				return (typename TargetType::ReturnType)orig;
 			}
 			tag_feature_signature_as_available(previous_location,1);
+			feature_implementation typename TargetType::ReturnType next_location(typename TargetType::ParamType current_activity)
+			{
+				Activity_Plan* act = (Activity_Plan*)current_activity;
+				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+
+				// if the start time of the activity has not been planned set the next location to home
+				if (!act->Start_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
+				Time_Seconds end = act->template Start_Time<Time_Seconds>() + act->template Duration<Time_Seconds>();
+
+				Activity_Plan* next_act = this->next_activity_plan<ComponentType,CallerType,Target_Type<NT,Activity_Plan*,Time_Seconds>>(act->template Start_Time<Time_Seconds>());
+
+				// if no next activity, person goes home
+				if (next_act == nullptr) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
+
+				// if next act location is not planned treat person as if returning home
+				if (!next_act->Location_Is_Planned<bool>()) return _Parent_Person->template Home_Location<typename TargetType::ReturnType>();
+
+				// otherwise, determine if person goes home or to next activity
+				_Activity_Location_Interface* dest = next_act->template Location<_Activity_Location_Interface*>();
+				_Activity_Location_Interface* orig = act->template Location<_Activity_Location_Interface*>();
+
+				// if current act location is not planned, treat current location as at home
+				if (!act->Location_Is_Planned<bool>()) orig = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+
+				// if act is currently being planned (i.e. is_planned is true, but location pointer is null) then use next location
+				if (orig == nullptr) return (typename TargetType::ReturnType)dest;
+
+				// check if a stop at home will fit prior to activity
+				Time_Seconds time_after = next_act->template Start_Time<Time_Seconds>() - end;
+				Time_Seconds ttime_this_to_home = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Type_Keys, Time_Seconds>>(orig->template zone<_Zone_Interface*>()->template uuid<int>(), _Parent_Person->template Home_Location<_Zone_Interface*>()->template uuid<int>(),SOV,end);
+				Time_Seconds ttime_home_to_next = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Type_Keys, Time_Seconds>>(_Parent_Person->template Home_Location<_Zone_Interface*>()->template uuid<int>(),dest->template zone<_Zone_Interface*>()->template uuid<int>(), SOV,end);
+				Time_Seconds ttime_this_to_next = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Type_Keys, Time_Seconds>>(orig->template zone<_Zone_Interface*>()->template uuid<int>(), dest->template zone<_Zone_Interface*>()->template uuid<int>(),SOV,end);
+				// enough time between previous activity and this activity to go home, stay there for a minimimum amount of time (equal to the shortest leg of the return home trip) and get to this activity
+				float min_home_time = std::min((float)ttime_this_to_home,(float)ttime_home_to_next);			
+				if (ttime_this_to_home + min_home_time + ttime_home_to_next  < time_after) dest = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+
+				// return the expected origin
+				return (typename TargetType::ReturnType)dest;
+			}
+			tag_feature_signature_as_available(next_location,1);
+
+			// Simplified timing conflict resolution - only modifying the existing activity
+			feature_implementation typename TargetType::ReturnType Resolve_Timing_Conflict(typename TargetType::ParamType current_activity)
+			{
+				Activity_Plan* act = (Activity_Plan*)current_activity;
+				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+
+				// if the start time of the activity has not been planned no way to identify timing conflicts
+				if (!act->template Start_Is_Planned<bool>()) return false;
+
+				// else get the start and end times for the activity
+				Time_Seconds start = act->template Start_Time<Time_Seconds>();
+				Time_Seconds end = act->template Start_Time<Time_Seconds>() + act->template Duration<Time_Seconds>();
+
+				// get the activity location for calculating approximate travel times to from surrounding activities
+				_Activity_Location_Interface* loc = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
+				if (act->Location_Is_Planned<bool>()) loc = act->template Location<_Activity_Location_Interface*>();
+
+				// Get the surrounding activities in the schedule
+				Activity_Plan* prev_act = this->previous_activity_plan<ComponentType,CallerType,Target_Type<NT,Activity_Plan*,Time_Seconds>>(start);
+				Activity_Plan* next_act = this->next_activity_plan<ComponentType,CallerType,Target_Type<NT,Activity_Plan*,Time_Seconds>>(start);
+
+				//=======================================================================
+				// find maximum end time of the new activity
+				Time_Seconds end_max;
+				if (next_act == nullptr) end_max = END;
+				else
+				{
+					// if next activity location is known, get the expected travel time from current to next, else assume 20 minutes
+					Time_Seconds ttime;
+					_Activity_Location_Interface* next_loc;
+					if (next_act->template Location_Is_Planned<bool>())
+					{
+						next_loc = next_act->template Location<_Activity_Location_Interface*>();
+						ttime = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>>(loc->template zone<_Zone_Interface*>()->template uuid<int>(), next_loc->template zone<_Zone_Interface*>()->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV, end);
+					}
+					else ttime = 20.0 * 60.0;
+
+					// get maximum end time of current activity given departure time for next activity
+					end_max = next_act->template Start_Time<Time_Seconds>() - ttime;
+				}
+
+				//=======================================================================
+				// find minimum start time of the new activity
+				Time_Seconds start_min;
+				if (prev_act == nullptr) start_min = _iteration+1;
+				else
+				{
+					// if next activity location is known, get the expected travel time from current to next, else assume 20 minutes
+					Time_Seconds ttime;
+					_Activity_Location_Interface* prev_loc;
+					if (prev_act->template Location_Is_Planned<bool>())
+					{
+						prev_loc = prev_act->template Location<_Activity_Location_Interface*>();
+						ttime = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>>(prev_loc->template zone<_Zone_Interface*>()->template uuid<int>(),loc->template zone<_Zone_Interface*>()->template uuid<int>(), Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
+					}
+					else ttime = 20.0 * 60.0;
+
+					// get maximum end time of current activity given departure time for next activity
+					start_min = prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>() + ttime;
+				}
+
+				// determine conflict regimes and modify appropriately
+				Time_Seconds available_time = end_max - start_min;
+
+				// 1. simple conflict, fits without shortening
+				if (available_time > end - start)
+				{
+					if (start < start_min) act->template Start_Time<Time_Seconds>(start_min); // move forward in time
+					if (end > end_max) act->template Start_Time<Time_Seconds>(start - (end-end_max)); // move backward in time
+					return true;
+				}
+				// 2. complex conflict, move and shorten
+				else if (available_time > 0.5*(end-start) )
+				{
+					act->template Start_Time<Time_Seconds>(start_min);
+					act->template Duration<Time_Seconds>(end_max-start_min);
+					return true;
+				}
+				// 3. can't fit, delete activity
+				else
+				{
+					cout << endl << "Deleted activity";
+					return false;
+				}
+
+				
+			}
+			tag_feature_signature_as_available(Resolve_Timing_Conflict,1);
+
 
 			// Adding activities and movements to the planning schedules
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))
@@ -170,12 +304,13 @@ namespace Person_Components
 				}
 				movements->insert(move_itr,move);	
 
-
 				// log the activity throught the global person logger
 				//define_component_interface(_Logger_Interface, typename MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
 				Activity_Plan* act = move->template destination_activity_reference<Activity_Plan*>();
 				//((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Plan*>(act,false);
 
+				// no logging if the movement is a return home movement
+				if (act == nullptr) return;
 
 				// cache the movement plans activity in the activity record container since all attributes have been planned at this point			
 				Activity_Records* act_records = _Parent_Person->template Activity_Record_Container<Activity_Records*>();
@@ -190,6 +325,7 @@ namespace Person_Components
 				assert_check(TargetType, Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype, "Error, Function requires TargetType to be a Movement_Plan_Prototype.");
 			}
 			tag_feature_as_available(Add_Movement_Plan);
+			
 			feature_implementation void Add_Activity_Plan(TargetType activity_plan, requires(check_as_given(TargetType,is_pointer)/* && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 			{
 				//define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan,ComponentType);	
@@ -205,6 +341,32 @@ namespace Person_Components
 
 				Activity_Plans* activities = this->Activity_Container<ComponentType,CallerType,Activity_Plans*>();		
 				activities->push_back(act);
+			}
+			feature_implementation void Remove_Activity_Plan(TargetType activity_plan, requires(check_as_given(TargetType,is_pointer)/* && check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
+			{
+				//define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan,type_of(Activity_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Plan,ComponentType);	
+				Activity_Plan* act = (Activity_Plan*)activity_plan;
+
+				// print to log file if requested
+				//if (_write_activity_files) 
+				//{			
+				//	stringstream s;	
+				//	s << endl << "ACTIVITY GEN (PERID.ACTID.ACTTYPE)," << _Parent_Person->template uuid<int>() << "," << act->template Activity_Plan_ID<int>() << ", " << act->template Activity_Type<ACTIVITY_TYPES>();
+				//	this->Write_To_Log<ComponentType,CallerType,stringstream&>(s);
+				//}
+
+				Activity_Plans* activities = this->Activity_Container<ComponentType,CallerType,Activity_Plans*>();		
+				
+				typename Activity_Plans::iterator itr = activities->begin();
+
+				for (; itr != activities->end(); ++itr)
+				{
+					if (*itr == act)
+					{
+						activities->erase(itr);
+						break;
+					}
+				}
 			}
 		
 		};

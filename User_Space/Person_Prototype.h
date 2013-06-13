@@ -98,10 +98,16 @@ namespace Prototypes
 			typedef Person<ComponentType, ComponentType> _Person_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
-
 			define_component_interface(scheduler_itf,typename get_type_of(Scheduling_Faculty),Person_Scheduler,ComponentType);
+			define_component_interface(scenario_itf,typename get_type_of(scenario_reference),Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
 			define_container_and_value_interface(Activity_Records,Activity_Record, typename scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 			define_component_interface(_Logger_Interface, typename ComponentType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
+			
+			// exit if no activity output is specified
+			scenario_itf* scenario = (scenario_itf*)_global_scenario;
+			if (!scenario->write_activity_output<bool>()) return;
+
+
 			scheduler_itf* scheduler = pthis->template Scheduling_Faculty<scheduler_itf*>();
 			Activity_Records* activities = scheduler->template Activity_Container<Activity_Records*>();
 
@@ -180,6 +186,13 @@ namespace Prototypes
 		feature_accessor(Write_Activity_Files,none,none);
 		feature_accessor(Activity_Record_Container,none,none);
 		feature_accessor(current_location,none,none);
+
+		feature_prototype void Arrive_At_Destination()
+		{
+			define_component_interface(mover_itf, typename get_type_of(Moving_Faculty),Person_Mover,ComponentType);
+			mover_itf* mover = this->Moving_Faculty<mover_itf*>();
+			mover->template Arrive_At_Destination<TargetType>();
+		}
 
 		// Accessors for setting the home/work locations (stores only an index into the network_reference::activity_locations_container) - overloaded to return either th loc_index, the location interface or the zone interface
 		feature_prototype TargetType Home_Location(requires(check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location) && check_as_given(TargetType,is_pointer)))

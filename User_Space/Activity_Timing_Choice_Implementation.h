@@ -82,6 +82,8 @@ namespace Person_Components
 				return_val.first = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.first + (0.5f - GLOBALS::Uniform_RNG.template Next_Rand<float>())*30.0f);
 				// add random draw from between 0-5 minutes as this is the aggregation level of the duration data
 				return_val.second = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(itr->second.second + (0.5f - GLOBALS::Uniform_RNG.template Next_Rand<float>())*5.0f);
+				// make sure duration is greater than 5 minutes
+				if (return_val.second < GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(5.0f)) return_val.second = GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Minutes> >(5.0f);
 				return return_val;
 			}
 			tag_feature_signature_as_available(Get_Start_Time_and_Duration,1);

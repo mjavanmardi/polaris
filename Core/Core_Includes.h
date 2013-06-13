@@ -19,6 +19,7 @@
 #include <WinBase.h>
 #include <unordered_map>
 #include <type_traits>
+#include <direct.h>
 
 #else
 #define WITH_WAIT_LINUX

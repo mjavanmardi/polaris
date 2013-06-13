@@ -91,12 +91,12 @@ namespace Activity_Components
 			member_data(Revision,Stored_Involved_Persons_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 			member_data(Revision,Stored_Route_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
 
-			feature_implementation bool Location_Is_Planned(){return (_Location_Planning_Time._iteration == END && _Location_Planning_Time._sub_iteration == END);} tag_feature_as_available(Location_Is_Planned);
-			feature_implementation bool Mode_Is_Planned(){return (_Mode_Planning_Time._iteration == END && _Mode_Planning_Time._sub_iteration == END);}	tag_feature_as_available(Mode_Is_Planned);
-			feature_implementation bool Duration_Is_Planned(){return (_Duration_Planning_Time._iteration == END && _Duration_Planning_Time._sub_iteration == END);}	tag_feature_as_available(Duration_Is_Planned);
-			feature_implementation bool Involved_Persons_Is_Planned(){return (_Involved_Persons_Planning_Time._iteration == END && _Involved_Persons_Planning_Time._sub_iteration == END);}	tag_feature_as_available(Involved_Persons_Is_Planned);
-			feature_implementation bool Start_Is_Planned(){return (_Start_Time_Planning_Time._iteration == END && _Start_Time_Planning_Time._sub_iteration == END);} tag_feature_as_available(Start_Is_Planned);
-			feature_implementation bool Route_Is_Planned(){return (_Route_Planning_Time._iteration == END && _Route_Planning_Time._sub_iteration == END);} tag_feature_as_available(Route_Is_Planned);
+			feature_implementation bool Location_Is_Planned(){return (_Location_Planning_Time._iteration >= (int)END && _Location_Planning_Time._sub_iteration >= (int)END);} tag_feature_as_available(Location_Is_Planned);
+			feature_implementation bool Mode_Is_Planned(){return (_Mode_Planning_Time._iteration >= (int)END && _Mode_Planning_Time._sub_iteration >= (int)END);}	tag_feature_as_available(Mode_Is_Planned);
+			feature_implementation bool Duration_Is_Planned(){return (_Duration_Planning_Time._iteration >= (int)END && _Duration_Planning_Time._sub_iteration >= (int)END);}	tag_feature_as_available(Duration_Is_Planned);
+			feature_implementation bool Involved_Persons_Is_Planned(){return (_Involved_Persons_Planning_Time._iteration >= (int)END && _Involved_Persons_Planning_Time._sub_iteration >= (int)END);}	tag_feature_as_available(Involved_Persons_Is_Planned);
+			feature_implementation bool Start_Is_Planned(){return (_Start_Time_Planning_Time._iteration >= (int)END && _Start_Time_Planning_Time._sub_iteration >= (int)END);} tag_feature_as_available(Start_Is_Planned);
+			feature_implementation bool Route_Is_Planned(){return (_Route_Planning_Time._iteration >=(int)END && _Route_Planning_Time._sub_iteration >= (int)END);} tag_feature_as_available(Route_Is_Planned);
 
 			// Basic Activity Events - Plan route and add to schedule
 			feature_implementation void Initialize(TargetType act_type)
@@ -233,7 +233,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT SCHEDULED, null origin or destination: "<< person->template uuid<int>();
 					s << "," <<orig << ", " <<dest<<endl;
-					planner->template Write_To_Log<stringstream&>(s);
+					//planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 				}
 			}
@@ -281,6 +281,9 @@ namespace Activity_Components
 			{
 				define_component_interface(_Logger_Interface, typename MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
 				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Planner<ComponentType,CallerType>*>((Activity_Planner<ComponentType,CallerType>*)this,true);
+
+				// Person has arrived at activity destination
+				_Parent_Planner->Parent_Person<_person_itf*>()->Arrive_At_Destination<NT>();
 			}
 			feature_implementation void Depart_From_Activity()
 			{
@@ -656,46 +659,47 @@ namespace Activity_Components
 				// references to external agents
 				_planning_itf* planner = bthis->template Parent_Planner<ComponentType,CallerType,_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_dest_choice_itf* dest_chooser = planner->template Destination_Choice_Faculty<_dest_choice_itf*>();
 				_network_itf* network = person->template network_reference<_network_itf*>();
+
+
+				if (person->uuid<int>() == 1446 && pthis->Activity_Plan_ID<int>() == 2)
+				{
+					int test = 1;
+				}
 
 				// timing variables
 				Time_Minutes start, end, prev_end, next_start, time_before, time_after, ttime_prev_to_home, ttime_home_to_next;
 				start = pthis->template Start_Time<Time_Minutes>();
 				end = pthis->template Start_Time<Time_Minutes>() + pthis->template Duration<Time_Minutes>();
 
-				// Get activity origin from previous planned activity (or from home if no preceeding activities)
+				// Get half-tour origin from previous planned activity and destination from next planned activity (or from home if no preceeding activities)
 				_activity_location_itf *prev_loc, *next_loc, *home_loc;
 				home_loc = person->template Home_Location<_activity_location_itf*>();
 
 				if (bthis->template Start_Is_Planned<ComponentType,CallerType,bool>())
 				{
-					// set previous activity location, =home if no previous activity
+					// set previous activity location, =home if no previous activity or if person can go home before current activity
 					this_itf* previous = person->template previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->template Start_Time<ComponentType,CallerType,Time_Seconds>());
 					if (previous == nullptr) prev_loc = home_loc;
-					else prev_loc = previous->template Location<_activity_location_itf*>();
-
-					// determine if agent can go home prior to activity
-					time_before = start - (previous->template Start_Time<Time_Minutes>() + previous->template Duration<Time_Minutes>());
-					ttime_prev_to_home = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Type_Keys, Time_Minutes>>(prev_loc->template zone<_zone_itf*>()->template uuid<int>(), home_loc->template zone<_zone_itf*>()->template uuid<int>(),SOV,start);
+					else prev_loc = scheduler->template previous_location<Target_Type<NT,_activity_location_itf*, ComponentType*>>(this);
 
 					// set next activity location, =home if no next activity
 					this_itf* next = person->template previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->template Start_Time<ComponentType,CallerType,Time_Seconds>());
 					if (next == nullptr) next_loc = home_loc;
-					else next_loc = next->template Location<_activity_location_itf*>();
-
-					// determine if agent can go home after activity before next activity
-					time_after = next->template Start_Time<Time_Minutes>() - end;
-					ttime_home_to_next = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Type_Keys, Time_Minutes>>(home_loc->template zone<_zone_itf*>()->template uuid<int>(),next_loc->template zone<_zone_itf*>()->template uuid<int>(),SOV,end);
+					else next_loc = scheduler->template next_location<Target_Type<NT,_activity_location_itf*, ComponentType*>>(this);
 				}
+				// if the start time is not known, treat the tour as originating/destined for home
 				else 
 				{
 					prev_loc = home_loc;
 					next_loc = home_loc;
 				}
 
-				// call destination choice
+				// call destination choice - set to home of no location could be chosen
 				_activity_location_itf* dest = dest_chooser->template Choose_Destination<_activity_location_itf*>(prev_loc, next_loc);
+				if (dest == nullptr) dest = home_loc;
 
 				// check that origin and destination are valid
 				if (prev_loc != nullptr && dest != nullptr) 
@@ -709,7 +713,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
 					s << "," <<prev_loc << ", " <<dest<<endl;
-					planner->template Write_To_Log<stringstream&>(s);
+					//planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 				}
 			}
@@ -783,6 +787,8 @@ namespace Activity_Components
 				// interfaces
 				_planning_itf* planner = pthis->template Parent_Planner<_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
+				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
 				// get the combined start time and duration
 				_timing_choice_itf* timing_planner = planner->template Timing_Chooser<_timing_choice_itf*>();
@@ -791,9 +797,22 @@ namespace Activity_Components
 				// make sure start time is not prior to current iteration
 				Time_Seconds time_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(planner->template Planning_Time_Increment<Time_Seconds>());
 				pthis->template Start_Time<Time_Seconds>(std::max<int>(start_and_duration.first,time_min.Value));
+
+				// set the duration, making sure it fits into current schedule slot
 				pthis->template Duration<Time_Seconds>(start_and_duration.second);
 
+				//========================================================================
+				// Resolve timing conflicts when timing is known
+				bool is_scheduled =	scheduler->Resolve_Timing_Conflict<Target_Type<NT,bool,this_itf*>>(pthis);
+				// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
+				if (!is_scheduled) 
+				{
+					pthis->template Route_Planning_Time<Revision&>()._iteration = END+1;
+					scheduler->Remove_Activity_Plan<this_itf*>(pthis);
+				}
 
+
+				//========================================================================
 				// start routing on the planning timestep at 1.5 times the estimated travel time from skims prior to departure - rounded to nearest minute
 				Time_Minutes exp_ttime;
 				if (bthis->template Location_Is_Planned<ComponentType,CallerType,NT>())
@@ -806,17 +825,25 @@ namespace Activity_Components
 				}
 				else exp_ttime = 60.0f;
 
-				//---------------------------
-				// Disaggregate plan routing
-				//Simulation_Timestep_Increment start_seconds = pthis->template Start_Time<Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
-				//int start_increment = std::max<int>(start_seconds, _iteration);
-				//pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
-				
+
+				//==============================================================================================
+				// Reset the route planning time based on the expected departure time, and aggregate as needed
 				//---------------------------
 				// Aggregate plan routing
-				Time_Minutes start_minutes = (int)(pthis->template Start_Time<Time_Minutes>() - (exp_ttime * 2.0));
-				int start_increment = std::max<int>(Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
-				pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
+				if (scenario->aggregate_routing<bool>())
+				{
+					Time_Minutes start_minutes = (int)(pthis->template Start_Time<Time_Minutes>() - (exp_ttime * 2.0));
+					int start_increment = std::max<int>(Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
+					pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
+				}
+				//---------------------------
+				// Disaggregate plan routing
+				else
+				{
+					Simulation_Timestep_Increment start_seconds = pthis->template Start_Time<Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
+					int start_increment = std::max<int>(start_seconds, _iteration);
+					pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
+				}	
 			}
 			feature_implementation void Involved_Persons_Planning_Event_Handler()
 			{
@@ -995,7 +1022,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT GENERATED, only work, home, school and work at home activities can be routine at this point: "<< person->template uuid<int>();
 					s << "," <<orig << ", " <<dest<<endl;
-					base_this->_Parent_Planner->template Write_To_Log<stringstream&>(s);
+					//base_this->_Parent_Planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 					return;
 				}
@@ -1012,7 +1039,7 @@ namespace Activity_Components
 					stringstream s;
 					s <<"ACTIVITY NOT GENERATED, null origin or destination: "<< person->template uuid<int>();
 					s << "," <<orig << ", " <<dest<<endl;
-					base_this->_Parent_Planner->template Write_To_Log<stringstream&>(s);
+					//base_this->_Parent_Planner->template Write_To_Log<stringstream&>(s);
 					//----------------------------------------------------------------
 				}
 			}
@@ -1126,6 +1153,7 @@ namespace Activity_Components
 
 				_person_itf* person = bthis->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
+				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
 				ACTIVITY_TYPES act_type = pthis->template Activity_Type<ACTIVITY_TYPES>();
 
@@ -1175,17 +1203,24 @@ namespace Activity_Components
 				}
 				else exp_ttime = 60.0f;
 
-				//---------------------------
-				// Disaggregate plan routing
-				//Simulation_Timestep_Increment start_seconds = pthis->template Start_Time<Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
-				//int start_increment = std::max<int>(start_seconds, _iteration);
-				//pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
-				
+				//==============================================================================================
+				// Reset the route planning time based on the expected departure time, and aggregate as needed
 				//---------------------------
 				// Aggregate plan routing
-				Time_Minutes start_minutes = (int)(pthis->template Start_Time<Time_Minutes>() - (exp_ttime * 2.0));
-				int start_increment = std::max<int>(Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
-				pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
+				if (scenario->aggregate_routing<bool>())
+				{
+					Time_Minutes start_minutes = (int)(pthis->template Start_Time<Time_Minutes>() - (exp_ttime * 2.0));
+					int start_increment = std::max<int>(Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), _iteration);
+					pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
+				}
+				//---------------------------
+				// Disaggregate plan routing
+				else
+				{
+					Simulation_Timestep_Increment start_seconds = pthis->template Start_Time<Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
+					int start_increment = std::max<int>(start_seconds, _iteration);
+					pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
+				}
 			}
 
 			feature_implementation void Involved_Persons_Planning_Event_Handler()
@@ -1285,6 +1320,171 @@ namespace Activity_Components
 				IFLOC = P_loc[0];
 				IFTIM = P_tim[0];
 				IFDUR = P_dur[0];
+			}
+			tag_feature_as_available(Set_Meta_Attributes);
+		};
+
+
+
+		// Specialization for ADAPTS-style at-home activities
+		implementation struct ADAPTS_At_Home_Activity_Plan_Implementation : public Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_At_Home_Activity_Plan_Implementation)>
+		{
+			typedef Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_At_Home_Activity_Plan_Implementation)> base_type;
+			typedef typename Basic_Activity_Plan_Implementation<MasterType,ParentType,APPEND_CHILD(ADAPTS_At_Home_Activity_Plan_Implementation)>::Component_Type ComponentType;
+			typedef Prototypes::Activity_Planner<ComponentType,ComponentType> this_itf;
+		
+			//================================================================================================================================================================================================
+			//================================================================================================================================================================================================
+			// Interfaces
+			define_component_interface(_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
+			define_component_interface(_static_properties_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(Static_Properties), Person_Components::Prototypes::Person_Properties, ComponentType);
+			define_component_interface(_planning_itf,typename type_of(base_type::Parent_Planner),Person_Components::Prototypes::Person_Planner,ComponentType);
+			define_component_interface(_person_itf,typename _planning_itf::get_type_of(Parent_Person),Person_Components::Prototypes::Person,ComponentType);
+			define_component_interface(_dest_choice_itf,typename _planning_itf::get_type_of(Destination_Choice_Faculty),Person_Components::Prototypes::Destination_Chooser,ComponentType);
+			define_component_interface(_scenario_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
+			define_component_interface(_network_itf, typename type_of(base_type::Parent_Planner)::type_of(Parent_Person)::type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);	
+			define_component_interface(_skim_itf, typename _network_itf::get_type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming_Prototype,ComponentType);
+			define_component_interface(_timing_choice_itf,typename _planning_itf::get_type_of(Timing_Chooser),Person_Components::Prototypes::Activity_Timing_Chooser,ComponentType);
+			define_container_and_value_interface(_activity_locations_container_itf, _activity_location_itf, typename _network_itf::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
+			define_container_and_value_interface(_links_container_itf, _link_itf, typename _activity_location_itf::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_container_and_value_interface(_zones_container_itf, _zone_itf, typename _network_itf::get_type_of(zones_container), Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+		/*	define_container_and_value_interface(_activity_plans_container_itf,_activity_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface(_movement_plans_container_itf,_movement_plan_itf, typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);*/
+			//================================================================================================================================================================================================
+			//================================================================================================================================================================================================
+
+			// Fundamental activity properties
+			feature_implementation Types::PLAN_HORIZON_VALUES Activity_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Activity_Plan_Horizon);
+
+			// Activity attribute planning properties
+			feature_implementation Types::PLAN_HORIZON_VALUES Location_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Location_Plan_Horizon);
+			feature_implementation Types::PLAN_HORIZON_VALUES Mode_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Mode_Plan_Horizon);
+			feature_implementation Types::PLAN_HORIZON_VALUES Start_Time_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Start_Time_Plan_Horizon);
+			feature_implementation Types::PLAN_HORIZON_VALUES Duration_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Duration_Plan_Horizon);
+			feature_implementation Types::PLAN_HORIZON_VALUES Involved_Persons_Plan_Horizon()
+			{
+				return Types::PLAN_HORIZON_VALUES::ROUTINE;
+			}
+			tag_getter_as_available(Involved_Persons_Plan_Horizon);
+			member_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, none, none);
+			member_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, none, none);
+			member_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility,none,none);
+			member_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility,none,none);
+			member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);
+
+
+			// Activity methods
+			feature_implementation void Initialize(typename TargetType::ParamType start_time, typename TargetType::ParamType duration, typename TargetType::Param2Type mode)
+			{
+				
+				//UNLOCK(this->_update_lock);
+				this_itf* pthis = (this_itf*)this;
+
+				_planning_itf* planner = pthis->template Parent_Planner<_planning_itf*>();
+				_person_itf* person = planner->template Parent_Person<_person_itf*>();
+				
+				pthis->template Activity_Type<Types::ACTIVITY_TYPES>(Types::ACTIVITY_TYPES::AT_HOME_ACTIVITY);
+				pthis->template Duration<typename TargetType::ParamType>(duration);
+				pthis->template Start_Time<typename TargetType::ParamType>(start_time);
+				pthis->template Location<_activity_location_itf*>(person->template Home_Location<_activity_location_itf*>());
+				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(mode);
+			}
+
+			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time, requires(check_2(TargetType, Simulation_Timestep_Increment, is_same)))
+			{
+				base_type* base_this = (base_type*)this;
+
+				base_this->template Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = END+1;
+				base_this->template Start_Time_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = END+1;
+				base_this->template Duration_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = END+1;
+				base_this->template Duration_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = END+1;
+				base_this->template Location_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = END+1;
+				base_this->template Location_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = END+1;
+				base_this->template Mode_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = END+1;
+				base_this->template Mode_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = END+1;
+				base_this->template Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = END+1;
+				base_this->template Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = END+1;
+				base_this->template Route_Planning_Time<ComponentType, CallerType, Revision&>()._iteration = _iteration+1;
+				base_this->template Route_Planning_Time<ComponentType, CallerType, Revision&>()._sub_iteration = 0;
+
+				//========================================================================
+				//TODO: remove stored versions of the planning times after testing
+				Revision &start	= base_this->template Start_Time_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &dur		= base_this->template Duration_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &loc		= base_this->template Location_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &mode	= base_this->template Mode_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &persons	= base_this->template Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &route	= base_this->template Route_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_start	= base_this->template Stored_Start_Time_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_dur		= base_this->template Stored_Duration_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_loc		= base_this->template Stored_Location_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_mode	= base_this->template Stored_Mode_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_persons	= base_this->template Stored_Involved_Persons_Planning_Time<ComponentType, CallerType, Revision&>();
+				Revision &Stored_route	= base_this->template Stored_Route_Planning_Time<ComponentType, CallerType, Revision&>();
+				//========================================================================
+
+				//========================================================================
+				//TODO: remove stored versions of the planning times after testing
+				Stored_start._iteration = start._iteration;
+				Stored_dur._iteration = dur._iteration;
+				Stored_loc._iteration = loc._iteration;
+				Stored_mode._iteration = mode._iteration;
+				Stored_persons._iteration = persons._iteration;
+				Stored_route._iteration = route._iteration;
+				
+				Stored_start._sub_iteration = start._sub_iteration;
+				Stored_dur._sub_iteration = dur._sub_iteration;
+				Stored_loc._sub_iteration = loc._sub_iteration;
+				Stored_mode._sub_iteration = mode._sub_iteration;
+				Stored_persons._sub_iteration = persons._sub_iteration;
+				Stored_route._sub_iteration = route._sub_iteration;
+				//========================================================================
+			}
+			feature_implementation void Set_Attribute_Planning_Times(TargetType planning_time, requires(!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
+			{
+				assert_check_2(TargetType, Simulation_Timestep_Increment, is_same, "Error: planning_time must be passed as a Simulation_Timestep_Increment type when using this function.");
+			}
+			tag_feature_as_available(Set_Attribute_Planning_Times);
+
+			feature_implementation void Location_Planning_Event_Handler(){} tag_feature_as_available(Location_Planning_Event_Handler);
+			feature_implementation void Mode_Planning_Event_Handler(){} tag_feature_as_available(Mode_Planning_Event_Handler);
+			feature_implementation void Duration_Planning_Event_Handler(){} tag_feature_as_available(Duration_Planning_Event_Handler);
+			feature_implementation void Start_Time_Planning_Event_Handler(){} tag_feature_as_available(Start_Time_Planning_Event_Handler);
+			feature_implementation void Involved_Persons_Planning_Event_Handler(){} tag_feature_as_available(Involved_Persons_Planning_Event_Handler);
+
+			feature_implementation void Set_Meta_Attributes()
+			{
+				this->_Duration_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Location_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Mode_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Start_Time_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				this->_Involved_Persons_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+		
+				this->_Duration_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;
+				this->_Location_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;
+				this->_Mode_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;
+				this->_Start_Time_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;
+				this->_Involved_Persons_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;
 			}
 			tag_feature_as_available(Set_Meta_Attributes);
 		};

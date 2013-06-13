@@ -307,8 +307,9 @@ namespace Scenario_Components
 
 
 				//===============================================
-				// Demand model parameters
-				if (cfgReader.getParameter("write_activity_output", this->write_activity_output<bool*>()) != PARAMETER_FOUND) this->write_full_output<bool>(false);
+				// Demand model parameters 
+				if (cfgReader.getParameter("write_activity_output", this->write_activity_output<bool*>()) != PARAMETER_FOUND) this->write_activity_output<bool>(false);
+				if (cfgReader.getParameter("aggregate_routing", this->aggregate_routing<bool*>()) != PARAMETER_FOUND) this->aggregate_routing<bool>(false);
 
 				//=======================================================================================================================================================
 				// PopSyn parameters
@@ -364,6 +365,7 @@ namespace Scenario_Components
 			    output_time_in_seconds<double>(0.0);
 
 				// set I/O parameters
+				if (cfgReader.getParameter("output_dir_name", output_dir_name<string*>())!= PARAMETER_FOUND) output_dir_name<string>("");
 				if (cfgReader.getParameter("num_threads", num_threads<int*>())!= PARAMETER_FOUND) num_threads<int>(1);
 				if (cfgReader.getParameter("write_db_input_to_files", write_db_input_to_files<bool*>())!= PARAMETER_FOUND) write_db_input_to_files<bool>(false);
 				if (cfgReader.getParameter("run_simulation_for_db_input", run_simulation_for_db_input<bool*>())!= PARAMETER_FOUND) run_simulation_for_db_input<bool>(true);
@@ -383,7 +385,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("read_skim_tables", this->read_skim_tables<bool*>()) != PARAMETER_FOUND) this->read_skim_tables<bool>(false);
 				if (cfgReader.getParameter("input_skim_file_path_name", this->input_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->input_skim_file_path_name<string>((string)"skim_file_in.txt");
 				if (cfgReader.getParameter("output_skim_file_path_name", this->output_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->output_skim_file_path_name<string>((string)"skim_file_out.txt");
-
+				
 				if (cfgReader.getParameter("compare_with_historic_moe", compare_with_historic_moe<bool*>())!= PARAMETER_FOUND) compare_with_historic_moe<bool>(false);
 				if (cfgReader.getParameter("historic_network_moe_file_path_name", historic_network_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_network_moe_file_path_name<string>("historic_realtime_moe_network.csv");
 				if (cfgReader.getParameter("historic_link_moe_file_path_name", historic_link_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_link_moe_file_path_name<string>("historic_moe_link.csv");
@@ -411,7 +413,7 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("multimodal_network_input", multimodal_network_input<bool*>())!= PARAMETER_FOUND) multimodal_network_input<bool>(false);
 
-				output_dir_name<string&>() = "";
+				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
 				open_output_files<NULLTYPE>();
 				open_input_files<NULLTYPE>();
@@ -499,8 +501,33 @@ namespace Scenario_Components
 
 			feature_prototype void open_output_files()
 			{
+				//===================================================
+				// manage output directory
+				//---------------------------------------------------
+				int count = 1;
+				stringstream dir_id("");
+				string temp_dir_name = output_dir_name<string>();
+			#ifdef _WIN32		
+				while (_mkdir(temp_dir_name.c_str())==-1)
+			#else
+				while (!mkdir(temp_dir_name.c_str(), 0777)==-1)
+			#endif
+				{
+					dir_id.str(""); 
+					count++;
+					dir_id<<count; 
+					temp_dir_name = output_dir_name<string>();
+					temp_dir_name.append(dir_id.str().c_str()); 
+				}		
+				output_dir_name<string>(temp_dir_name);
+				output_dir_name<string&>().append("\\");
+				//---------------------------------------------------
+
+				string out_skim_path = output_dir_name<string>().append(this->output_skim_file_path_name<string&>());
+				this->output_skim_file_path_name<string&>(out_skim_path);
+
 				//vehicle trajectory
-				vehicle_trajectory_file_name<string&>().assign(output_dir_name<string&>() + "vehicle_trajecotry.csv");
+				vehicle_trajectory_file_name<string&>().assign(output_dir_name<string&>() + "vehicle_trajectory.csv");
 				vehicle_trajectory_file<fstream&>().open(vehicle_trajectory_file_name<string&>(),fstream::out);
 				if(vehicle_trajectory_file<fstream&>().is_open()) 
 				{ 

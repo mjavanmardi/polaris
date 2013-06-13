@@ -229,7 +229,7 @@ namespace Person_Components
 						move->template departed_time<Simulation_Timestep_Increment>() < Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Planning_Time_Increment<Simulation_Timestep_Increment>()))
 					{
 
-						if (ComponentType::_write_activity_files) ComponentType::logs[_thread_id]<<"MOVE_EVENT:," << parent->template uuid<int>() << ", PASSED."<<endl;
+						//if (ComponentType::_write_activity_files) ComponentType::logs[_thread_id]<<"MOVE_EVENT:," << parent->template uuid<int>() << ", PASSED."<<endl;
 				
 						// make sure vehicle is not already being simulated, skip movement if it is
 						if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
@@ -341,6 +341,11 @@ namespace Person_Components
 				Scenario_Itf* scenario = (Scenario_Itf*)_global_scenario;
 
 				// calculate route, if the mode is auto, otherwise return
+				if (act == nullptr)
+				{
+					itf->template Schedule_Route_Computation<NULLTYPE>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time,scenario->template read_network_snapshots<bool>());
+					return;
+				}
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
 				{
 					itf->template Schedule_Route_Computation<NULLTYPE>(movement_plan->template departed_time<Simulation_Timestep_Increment>(), planning_time,scenario->template read_network_snapshots<bool>());

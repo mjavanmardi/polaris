@@ -390,11 +390,16 @@ namespace Network_Skimming_Components
 				_skim_container_itf* skims = this->skims_by_time_container<_skim_container_itf*>();
 				typename _skim_container_itf::iterator itr = skims->begin();
 				_skim_itf* skim_table;
+
+				// get only the HH:MM:SS portion of requested time if Time > 1 day
+				int days = ((int)(GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,Time_Hours,typename TargetType::Param2Type>>(Time))/24);
+				typename TargetType::Param2Type rounded = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,typename TargetType::Param2Type,Time_Hours>>((float)days * 24.0);
+				typename TargetType::Param2Type remain = Time - rounded;
 				
 				for (; itr != skims->end(); ++itr)
 				{
 					skim_table = *itr;
-					if (skim_table->template end_time<typename TargetType::Param2Type>() > Time) return skim_table->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType,typename TargetType::ParamType>>(Origin_ID,Destination_ID);
+					if (skim_table->template end_time<typename TargetType::Param2Type>() > remain) return skim_table->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType,typename TargetType::ParamType>>(Origin_ID,Destination_ID);
 				}
 				// if the code gets here, then the requested time does not fall within any skim_table time period
 				assert(false);

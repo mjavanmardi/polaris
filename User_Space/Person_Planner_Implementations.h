@@ -19,15 +19,15 @@ namespace Person_Components
 			// Tag as implementation
 			typedef typename Polaris_Component<APPEND_CHILD(General_Person_Planner_Implementation),MasterType,Execution_Object>::Component_Type ComponentType;
 
-			static ofstream logs[_num_threads];
-			static member_data(bool, write_activity_files,none,none);
+			/*static ofstream logs[_num_threads];
+			static member_data(bool, write_activity_files,none,none);*/
 			feature_implementation void Write_To_Log(TargetType s, requires(!check_2(TargetType,string, is_same)))
 			{
-				if (_write_activity_files) this->logs[_thread_id] << s.str();
+				//if (_write_activity_files) this->logs[_thread_id] << s.str();
 			}
 			feature_implementation void Write_To_Log(TargetType s, requires(check_2(TargetType,string, is_same)))
 			{
-				if (_write_activity_files) this->logs[_thread_id] << s;
+				//if (_write_activity_files) this->logs[_thread_id] << s;
 			}
 
 			// Pointer to the Parent class
@@ -80,8 +80,8 @@ namespace Person_Components
 			} tag_feature_as_available(Add_Activity_Plan);
 		};
 		// static member definition
-		template<typename MasterType, typename ParentType, typename InheritanceList> ofstream General_Person_Planner_Implementation<MasterType, ParentType, InheritanceList>::logs[_num_threads];
-		static_member_definition(General_Person_Planner_Implementation,write_activity_files);
+		/*template<typename MasterType, typename ParentType, typename InheritanceList> ofstream General_Person_Planner_Implementation<MasterType, ParentType, InheritanceList>::logs[_num_threads];
+		static_member_definition(General_Person_Planner_Implementation,write_activity_files);*/
 
 
 

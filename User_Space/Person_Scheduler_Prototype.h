@@ -39,8 +39,11 @@ namespace Person_Components
 			
 			feature_method_1_arg(next_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
 			feature_method_1_arg(previous_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
+			feature_method_1_arg(next_location, current_activity, check_as_given(typename TargetType::ParamType,is_pointer) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
 			feature_method_1_arg(previous_location, current_activity, check_as_given(typename TargetType::ParamType,is_pointer) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
 			
+			feature_method_1_arg(Resolve_Timing_Conflict, current_activity, check_2(typename TargetType::ReturnType,bool,is_same));
+
 			feature_prototype void Add_Movement_Plan(TargetType movement_plan)
 			{
 				this_component()->template Add_Movement_Plan<ComponentType,CallerType,TargetType>(movement_plan);
@@ -49,6 +52,12 @@ namespace Person_Components
 			{
 				this_component()->template Add_Activity_Plan<ComponentType,CallerType,TargetType>(activity_plan);
 			}
+			feature_prototype void Remove_Activity_Plan(TargetType activity_plan)
+			{
+				this_component()->template Remove_Activity_Plan<ComponentType,CallerType,TargetType>(activity_plan);
+			}
+
+			
 		};
 	}
 

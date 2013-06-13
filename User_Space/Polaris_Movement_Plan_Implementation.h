@@ -112,7 +112,7 @@ namespace Movement_Plan_Components
 		{
 			typedef Polaris_Movement_Plan_Implementation<MasterType,ParentType, APPEND_CHILD(Polaris_Integrated_Movement_Plan_Implementation)> Base_Type;
 			typedef typename Base_Type::Component_Type ComponentType;
-			member_prototype(Activity_Components::Prototypes::Activity_Planner, destination_activity_reference, typename MasterType::activity_plan_type,none,none);
+			member_prototype(Activity_Components::Prototypes::Activity_Planner, destination_activity_reference, typename MasterType::activity_type,none,none);
 			feature_implementation void arrive_to_destination()
 			{
 				Base_Type* bthis = (Base_Type*)this;
@@ -157,7 +157,7 @@ namespace Movement_Plan_Components
 			}	 
 			tag_feature_signature_as_available(Initialize, 1);
 
-			member_prototype(Activity_Components::Prototypes::Activity_Planner, destination_activity_reference, typename MasterType::activity_plan_type,none,none);
+			member_prototype(Activity_Components::Prototypes::Activity_Planner, destination_activity_reference, typename MasterType::activity_type,none,none);
 			member_container(vector<typename MasterType::link_type*>, trajectory_container, none, none);
 			member_data(bool, valid_trajectory,none,none);
 		};
