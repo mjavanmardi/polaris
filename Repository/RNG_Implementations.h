@@ -170,7 +170,7 @@ namespace GLOBALS
 			{
 				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				rng->Initialize<int>(std::sin((float)i+1)*(float)INT_MAX);
+				rng->Initialize<int>(abs(std::sin((float)i+1))*(float)INT_MAX);
 			}
 		}
 

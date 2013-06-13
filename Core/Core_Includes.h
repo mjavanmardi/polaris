@@ -35,6 +35,7 @@
 //#define unordered_map tr1::unordered_map
 //#define unordered_set tr1::unordered_set
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>

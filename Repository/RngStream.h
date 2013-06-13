@@ -8,7 +8,7 @@ namespace RNG_Components
 	{
 	public:
 
-	RngStream ();
+		RngStream ();
 
 
 	static bool SetPackageSeed (const unsigned long seed[6]);
