@@ -84,9 +84,16 @@ namespace Link_Components
 			cout << "accident " << _current_accident_event->_accident_type << " being processed" << endl;
 			float capacity_adjustment_rate;
 			float free_flow_speed_adjustment_rate;
-			int lanes = min(8, _num_lanes);
-			int lanes_closed = min(3, _current_accident_event->_lanes_closed);	
-			capacity_adjustment_rate = link_capacity_adjustment_factors_for_accident[_num_lanes - 1][lanes_closed + 1];
+			if (_current_accident_event->_lanes_closed >= _num_lanes)
+			{
+				capacity_adjustment_rate = 0.01;
+			}
+			else
+			{
+				int lanes = min(8, _num_lanes);
+				int lanes_closed = min(3, _current_accident_event->_lanes_closed);	
+				capacity_adjustment_rate = link_capacity_adjustment_factors_for_accident[_num_lanes - 1][lanes_closed + 1];
+			}
 			_capacity_adjustment_factor_due_to_accident = capacity_adjustment_rate;
 			_maximum_flow_rate *= capacity_adjustment_rate;
 			

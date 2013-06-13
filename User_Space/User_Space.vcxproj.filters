@@ -262,9 +262,6 @@
     <ClInclude Include="Geometry_Implementation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Polaris_Link_Event_Handler_Implementation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Advisory_ITS_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
@@ -306,6 +303,9 @@
     </ClInclude>
     <ClInclude Include="Person_Data_Logger_Prototype.h">
       <Filter>Prototypes\Person Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Link_Event_Handler_Implementation.h">
+      <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
