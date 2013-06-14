@@ -56,6 +56,12 @@
     <ClInclude Include="Distribution_Implementations.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="File_Reader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="File_Writer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Repository.cpp">

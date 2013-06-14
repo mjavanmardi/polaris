@@ -78,6 +78,7 @@ namespace Scenario_Components
 
 			member_data(bool, write_activity_output, none, none);
 			member_data(bool, aggregate_routing, none,none);
+			member_data(bool, do_planner_routing, none,none);
 			member_data(bool, write_skim_tables, none, none);
 			member_data(bool, read_skim_tables, none, none);
 			member_data(string, input_skim_file_path_name, none, none);

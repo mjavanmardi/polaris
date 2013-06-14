@@ -92,6 +92,9 @@ namespace Activity_Components
 				_Activity_Interface* this_ptr=(_Activity_Interface*)_pthis;
 				response.result = true;
 
+				int id =  this_ptr->Parent_ID<int>();
+				int actid = this_ptr->Activity_Plan_ID<int>();
+
 				//------------------------------------------------------------------------------------------------------------------------------
 				// DURATION_PLANNING Iteration
 				if (this_ptr->Is_Current_Iteration(this_ptr->template Duration_Planning_Time<Revision&>()))
@@ -226,14 +229,20 @@ namespace Activity_Components
 					response.next._sub_iteration = END;
 				}
 				// catch any sub_iterations which have been modified (currenlty limited to routing, which can be changed by start_time_plan iteration)
-				// this will hit only if start time plan iteration is called immidiately be
+				// this will hit only if start time plan iteration is called immidiately
+				// also used to catch deleted activities and remove them from event scheduling
 				else
 				{
 					Revision& route_itr = this_ptr->template Route_Planning_Time<Revision&>();
-					if(route_itr._iteration  != END && route_itr._iteration >= _iteration) 
+					if(route_itr._iteration  < END && route_itr._iteration >= _iteration) 
 					{
 						response.next._iteration = route_itr._iteration;
 						response.next._sub_iteration = route_itr._sub_iteration;
+					}
+					else
+					{
+						response.next._iteration = END;
+						response.next._sub_iteration = END;
 					}
 					response.result = false;
 				}
@@ -243,6 +252,27 @@ namespace Activity_Components
 				response.result = result;
 				response.next._iteration = revision._iteration;
 				response.next._sub_iteration = revision._sub_iteration;
+			}
+			feature_prototype void Unschedule_Activity_Events()
+			{
+				Revision& persons = this->Involved_Persons_Planning_Time<Revision&>();
+				Revision& mode = this->Mode_Planning_Time<Revision&>();
+				Revision& duration = this->Duration_Planning_Time<Revision&>();
+				Revision& location = this->Location_Planning_Time<Revision&>();
+				Revision& start_time = this->Start_Time_Planning_Time<Revision&>();
+				Revision& route = this->Route_Planning_Time<Revision&>();
+				persons._iteration = END+1;
+				persons._sub_iteration = END+1;
+				mode._iteration = END+1;
+				mode._sub_iteration = END+1;
+				duration._iteration = END+1;
+				duration._sub_iteration = END+1;
+				location._iteration = END+1;
+				location._sub_iteration = END+1;
+				start_time._iteration = END+1;
+				start_time._sub_iteration = END+1;
+				route._iteration = END+1;
+				route._sub_iteration = END+1;
 			}
 			feature_prototype bool Is_Minimum_Plan_Time(TargetType plan_time, requires(check_2(TargetType, Revision,is_same)))
 			{

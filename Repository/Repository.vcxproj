@@ -607,6 +607,8 @@
     <ClInclude Include="Choice_Model_Prototypes.h" />
     <ClInclude Include="Distribution_Implementations.h" />
     <ClInclude Include="Distribution_Prototype.h" />
+    <ClInclude Include="File_Reader.h" />
+    <ClInclude Include="File_Writer.h" />
     <ClInclude Include="Repository.h" />
     <ClInclude Include="Repository_Includes.h" />
     <ClInclude Include="RngStream.h" />

@@ -327,6 +327,52 @@ namespace Network_Skimming_Components
 				return itr->second->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param3Type>>(orig_zone->template internal_id<int>(), dest_zone->template internal_id<int>(),Start_Time);
 			}
 
+			feature_prototype static void Convert_Binary_Skimfile_To_CSV(string infilename, string outfilename)
+			{
+				File_IO::Binary_File_Reader infile;
+				infile.Open(infilename);
+				
+				ofstream outfile;
+				outfile.open(outfilename);
+
+				//===========================================================================
+				// Read Header
+				int num_modes, num_zones, update_increment;
+				infile.Read_Value<int>(num_modes);
+				infile.Read_Value<int>(num_zones);
+				infile.Read_Value<int>(update_increment);
+				
+				//===========================================================================
+				// create the skim_table time periods, for basic create only a single time period skim_table
+				for (Simulation_Timestep_Increment start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,Simulation_Timestep_Increment,Time_Hours>>(24.0); start = start + update_increment)
+				{		
+					float* data = new float[num_zones*num_zones];
+
+
+
+					infile.Read_Array<float>(data, num_zones*num_zones);
+
+
+					vector<float> temp(data,data+num_zones*num_zones);
+
+					
+					outfile << "Skim table for time period starting at: " << start<<endl;
+
+					for (int i=0; i< num_zones; i++)
+					{
+						for (int j=0; j< num_zones; j++)
+						{
+							outfile << data[i*(num_zones)+j] << ",";
+						}
+						outfile << endl;
+					}
+					cout <<endl<< "finished period "<<start<<endl;
+					outfile << endl;
+				}
+
+				infile.Close();
+				outfile.close();
+			}
 		};
 
 		prototype struct Mode_Skim_Table_Prototype ADD_DEBUG_INFO
@@ -553,7 +599,8 @@ namespace Network_Skimming_Components
 						location_itf* dest_node = activity_locations->at(dest_node_index);
 						long dest_link_index = (*(dest_node->template destination_links<links_itf*>()->begin()))->template internal_id<long>();
 						long dest_zone_index = dest->template zone_index<long>();
-						(*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)] = tree->template Get_Tree_Results_For_Destination<typename skimmer_itf::Component_Type::Stored_Time_Type>(dest_link_index);
+						float time = tree->template Get_Tree_Results_For_Destination<typename skimmer_itf::Component_Type::Stored_Time_Type>(dest_link_index);
+						(*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)] = time;
 
 						//cout << (*activity_locations)[orig_itr->second->loc_index<long>()]->uuid<int>() << ", " << (*activity_locations)[dest_node_index]->uuid<int>() << ", ";
 						//cout << network->links_container<links_itf&>()[dest_link_index]->uuid<int>() << ", ";
@@ -580,6 +627,10 @@ namespace Network_Skimming_Components
 				File_IO::Binary_File_Writer& bw = skim->template output_file<File_IO::Binary_File_Writer&>();
 				
 				skim_table_itf* los = this->skim_table<skim_table_itf*>();
+
+
+				vector<float> temp(los->get_data_pointer(), los->get_data_pointer() + (int)(zones->size() * zones->size()));
+
 
 				bw.WriteArray<float>(los->get_data_pointer(), (int)(zones->size() * zones->size()));
 

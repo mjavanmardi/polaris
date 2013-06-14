@@ -169,6 +169,7 @@ namespace Scenario_Components
 			//-----------------------------------------------
 			feature_accessor(write_activity_output,none,none);
 			feature_accessor(aggregate_routing,none,none);
+			feature_accessor(do_planner_routing,none,none);
 
 
 			//===============================================
@@ -310,6 +311,7 @@ namespace Scenario_Components
 				// Demand model parameters 
 				if (cfgReader.getParameter("write_activity_output", this->write_activity_output<bool*>()) != PARAMETER_FOUND) this->write_activity_output<bool>(false);
 				if (cfgReader.getParameter("aggregate_routing", this->aggregate_routing<bool*>()) != PARAMETER_FOUND) this->aggregate_routing<bool>(false);
+				if (cfgReader.getParameter("do_planner_routing", this->do_planner_routing<bool*>()) != PARAMETER_FOUND) this->do_planner_routing<bool>(false);
 
 				//=======================================================================================================================================================
 				// PopSyn parameters

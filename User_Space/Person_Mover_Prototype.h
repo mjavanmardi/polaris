@@ -56,13 +56,15 @@ namespace Prototypes
 			scenario_itf* scenario = (scenario_itf*)_global_scenario;
 
 			// determine router aggregation properties - i.e. is routed called at departure or an aggregated time prior to departure
-			Simulation_Timestep_Increment routing_timestep = movement->template departed_time<Simulation_Timestep_Increment>();
+			Simulation_Timestep_Increment routing_timestep = movement->template departed_time<Simulation_Timestep_Increment>()-1;
 			if (scenario->template aggregate_routing<bool>())
 			{
 				int minutes = (int)(movement->template departed_time<Time_Minutes>());
 				Simulation_Timestep_Increment temp = Simulation_Time.Convert_Time_To_Simulation_Timestep<Time_Minutes>(minutes);
 				routing_timestep = std::max<int>(temp,_iteration);
 			}
+			if (routing_timestep < _iteration) routing_timestep = _iteration;
+
 
 			// Do pretrip rerouting if car has realtime info
 			bool has_pretrip_info = person->template has_pretrip_information<bool>();
@@ -85,7 +87,7 @@ namespace Prototypes
 			else if (_sub_iteration == Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION)
 			{
 				_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Routing_Event<NULLTYPE>);
-				response.next._iteration = movement->template departed_time<Simulation_Timestep_Increment>();
+				response.next._iteration = routing_timestep + 1;
 				response.next._sub_iteration = Scenario_Components::Types::END_OF_ITERATION;
 				response.result = true;
 			}
@@ -480,6 +482,8 @@ namespace Prototypes
 		feature_prototype void Do_Movement()
 		{
 			//this->Movement_Scheduled<bool>(true);
+			debug("DO_Movement @,"<<_iteration);
+
 
 			// interfaces
 			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);

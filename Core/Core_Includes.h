@@ -259,8 +259,10 @@ throw new std::runtime_error(s.str().c_str());}
 
 #ifdef _DEBUG
 #define ADD_DEBUG_INFO : ComponentType
+#define debug(MESSAGE_STREAM)std::stringstream s; s << MESSAGE_STREAM
 #else
 #define ADD_DEBUG_INFO
+#define debug(MESSAGE_STREAM) int _random_thing_that_wont_be_used=0;
 #endif
 
 

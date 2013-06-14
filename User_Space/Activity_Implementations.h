@@ -148,17 +148,18 @@ namespace Activity_Components
 				move->template initialize_trajectory<NULLTYPE>();
 				move->template destination_activity_reference<ComponentType*>((ComponentType*)this);
 
-				// Get the origin and destination locations
+				// General interfaces, to parent and global classes
 				_planning_itf* planner = this->Parent_Planner<ComponentType,CallerType,_planning_itf*>();
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
 				_network_itf* network = person->template network_reference<_network_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
+				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
-				Time_Seconds start = this->Start_Time<ComponentType,CallerType,Time_Seconds>();
-
+				
+				// Get the origin and destination locations
 				_activity_location_itf* orig;
 				_activity_location_itf* dest = this->Location<ComponentType,CallerType,_activity_location_itf*>();
-
+				Time_Seconds start = this->Start_Time<ComponentType,CallerType,Time_Seconds>();
 				this_itf* prev_act = scheduler->template previous_activity_plan<Target_Type<NT,this_itf*, Time_Seconds>>(this->Start_Time<ComponentType,CallerType,Time_Seconds>());		
 				if (prev_act == nullptr)  orig = person->template Home_Location<_activity_location_itf*>();
 				else
@@ -215,9 +216,9 @@ namespace Activity_Components
 							this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
 						}
 
-						// schedule the routing
+						// schedule the routing and do routin if requested through scenario, otherwise move to the activity scheduling phase
 						move->template departed_time<Simulation_Timestep_Increment>(depart);
-						planner->template Schedule_New_Routing<_movement_plan_itf*>(_iteration+1, move);
+						if(scenario->template do_planner_routing<bool>()) planner->template Schedule_New_Routing<_movement_plan_itf*>(_iteration+1, move);
 					}
 					else
 					{
@@ -239,42 +240,45 @@ namespace Activity_Components
 			}
 			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
 			{
+				// General interfaces
 				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
+				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
-				// copy the movement plan into the cached movement record before addition
-				//movement_record_interface* move_record = (movement_record_interface*)Allocate<movement_record_type>();
-				//move_record->template Initialize<Target_Type<NT,void,_movement_plan_itf*>>(move);
-
+				// exit if movement plan origin/destination not set
 				if (move->template origin<_activity_location_itf*>() == nullptr || move->template destination<_activity_location_itf*>() == nullptr) return;
 
+				if (scenario->template do_planner_routing<bool>())
+				{
+					// Assign the movement plan to the persons activity schedule, if null movement, leave valid_trajectory to false
+					if (move->template valid_trajectory<bool>() || move->template origin<_activity_location_itf*>() == move->template destination<_activity_location_itf*>())
+					{			
+						Simulation_Timestep_Increment ttime = move->template routed_travel_time<Simulation_Timestep_Increment>();
+						Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
+						if (depart < _Parent_Planner->template Next_Planning_Time<Simulation_Timestep_Increment>())
+						{
+							depart = _Parent_Planner->template Next_Planning_Time<Simulation_Timestep_Increment>();
+							this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
+						}
 
-				// Assign the movement plan to the persons activity schedule, if null movement, leave valid_trajectory to false
-				if (move->template valid_trajectory<bool>() || move->template origin<_activity_location_itf*>() == move->template destination<_activity_location_itf*>())
-				{			
-					Simulation_Timestep_Increment ttime = move->template routed_travel_time<Simulation_Timestep_Increment>();
-					Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
+						this->Expected_Travel_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(move->template routed_travel_time<Simulation_Timestep_Increment>());
+						move->template departed_time<Simulation_Timestep_Increment>(depart);
+						scheduler->template Add_Movement_Plan<_movement_plan_itf*>(move);
+
+					}
+					else THROW_WARNING("WARNING: ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< concat(this->Activity_Plan_ID<ComponentType,CallerType,int>()) << "," <<concat(move->template origin<_activity_location_itf*>()->uuid<int>()) << ", " <<concat(move->template destination<_activity_location_itf*>()->uuid<int>())<< ",at iteration " << _iteration << "." << _sub_iteration<<". Scheduled for route planning @ " << move->planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->departed_time<Simulation_Timestep_Increment>());		
+				}
+				else
+				{
+					Simulation_Timestep_Increment ttime = this->Expected_Travel_Time<ComponentType,CallerType,Simulation_Timestep_Increment>();
+					Simulation_Timestep_Increment depart = move->template departed_time<Simulation_Timestep_Increment>();
 					if (depart < _Parent_Planner->template Next_Planning_Time<Simulation_Timestep_Increment>())
 					{
 						depart = _Parent_Planner->template Next_Planning_Time<Simulation_Timestep_Increment>();
 						this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
 					}
-
-					this->Expected_Travel_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(move->template routed_travel_time<Simulation_Timestep_Increment>());
-					move->template departed_time<Simulation_Timestep_Increment>(depart);
 					scheduler->template Add_Movement_Plan<_movement_plan_itf*>(move);
-
-				}
-				else
-				{
-					//----------------------------------------------------------------
-					// Print to log file
-					//stringstream s;
-					//s << endl <<"ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< this->Activity_Plan_ID<ComponentType,CallerType,int>();
-					//s << "," <<move->template origin<_activity_location_itf*>()->uuid<int>() << ", " <<move->template destination<_activity_location_itf*>()->uuid<int>();
-					////s << ",at iteration " << _iteration << "." << _sub_iteration<<". Scheduled for route planning @ " << move->planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->departed_time<Simulation_Timestep_Increment>();
-					//planner->Write_To_Log<stringstream>(s);
 				}
 			}		
 			feature_implementation void Arrive_At_Activity()
@@ -802,23 +806,30 @@ namespace Activity_Components
 				// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
 				if (!is_scheduled) 
 				{
-					pthis->template Route_Planning_Time<Revision&>()._iteration = END+1;
+					pthis->template Unschedule_Activity_Events<NT>();
 					scheduler->template Remove_Activity_Plan<this_itf*>(pthis);
 				}
 
 
 				//========================================================================
-				// start routing on the planning timestep at 1.5 times the estimated travel time from skims prior to departure - rounded to nearest minute
-				Time_Minutes exp_ttime;
+				// END HERE if no planner routing is requested through scenario
+				if (!scenario->template do_planner_routing<bool>()) return;
+				//------------------------------------------------------------------------
+
+
+
+
+				//========================================================================
+				// start routing on the planning timestep at 2 times the estimated travel time from skims prior to departure - rounded to nearest minute
+				Time_Minutes exp_ttime=0.0f;
 				if (bthis->template Location_Is_Planned<ComponentType,CallerType,NT>())
 				{
 					_network_itf* network = person->template network_reference<_network_itf*>();
 					_zone_itf* o_zone = person->template Home_Location<_zone_itf*>();
 					_zone_itf* d_zone = pthis->template Location<_activity_location_itf*>()->template zone<_zone_itf*>();
-
 					exp_ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes> >(o_zone->template uuid<int>(),d_zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV, pthis->template Start_Time<Time_Minutes>());
-				}
-				else exp_ttime = 60.0f;
+				}			
+				exp_ttime = std::max<float>(exp_ttime,30.0f);
 
 
 				//==============================================================================================
@@ -1149,6 +1160,7 @@ namespace Activity_Components
 
 				_person_itf* person = bthis->_Parent_Planner->template Parent_Person<_person_itf*>();
 				_static_properties_itf* static_properties = person->template Static_Properties<_static_properties_itf*>();
+				_scheduler_itf* scheduler = person->template Scheduling_Faculty<_scheduler_itf*>();
 				_scenario_itf* scenario = (_scenario_itf*)_global_scenario;
 
 				ACTIVITY_TYPES act_type = pthis->template Activity_Type<ACTIVITY_TYPES>();
@@ -1168,27 +1180,34 @@ namespace Activity_Components
 					Time_Seconds time_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(planner->template Planning_Time_Increment<Time_Seconds>());
 					pthis->template Start_Time<Time_Seconds>(std::max<int>(start_and_duration.first,time_min.Value));
 					pthis->template Duration<Time_Seconds>(start_and_duration.second);
-
-					/*Time_Seconds start_school = (7.0 + Uniform_RNG.template Next_Rand<float>() * 1.0) * 60.0 * 60.0;
-					Time_Seconds start_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(bthis->_Parent_Planner->template Planning_Time_Increment<Time_Seconds>());
-					pthis->template Start_Time<Time_Seconds>(std::max<int>(start_school.Value,start_min.Value));*/
 				}
+				else THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");
 
-				// Work activity start time, based on census data
-				//else if (act_type == ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY || act_type == WORK_AT_HOME_ACTIVITY)
-				//{
-				//	Time_Seconds start_work = static_properties->template Journey_To_Work_Arrival_Time<Time_Seconds>();
-				//	start_work = start_work + (0.5f - Uniform_RNG.template Next_Rand<float>()) * 30.0 * 60.0; // add random uniform time between -15 and 15 minutes since ACS is rounded	
-				//	Time_Seconds start_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(bthis->_Parent_Planner->template Planning_Time_Increment<Time_Seconds>());
-				//	pthis->template Start_Time<Time_Seconds>(std::max<int>(start_work.Value,start_min.Value));
-				//}
-				else
+
+				//========================================================================
+				// Resolve timing conflicts when timing is known
+				//------------------------------------------------------------------------
+				bool is_scheduled =	scheduler->template Resolve_Timing_Conflict<Target_Type<NT,bool,this_itf*>>(pthis);
+				// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
+				if (!is_scheduled) 
 				{
-					THROW_EXCEPTION("ERROR: only work and school activities are currently allowed to be routine.");
+					pthis->template Unschedule_Activity_Events<NT>();
+					scheduler->template Remove_Activity_Plan<this_itf*>(pthis);
 				}
 
+
+				//========================================================================
+				// END HERE if no planner routing is requested through scenario
+				if (!scenario->template do_planner_routing<bool>()) return;
+				//------------------------------------------------------------------------
+
+
+
+				//==============================================================================================
+				// OTHERWISE, reset the event time for the planning router based on expected departure time
+				//------------------------------------------------------------------------
 				// start routing on the planning timestep at 1.5 times the estimated travel time from skims prior to departure - rounded to nearest minute
-				Time_Minutes exp_ttime;
+				Time_Minutes exp_ttime=0.0f;
 				if (bthis->template Location_Is_Planned<ComponentType,CallerType,NT>())
 				{
 					_network_itf* network = person->template network_reference<_network_itf*>();
@@ -1197,10 +1216,8 @@ namespace Activity_Components
 
 					exp_ttime = network->template Get_LOS<Target_Type<NT,Time_Minutes,int,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours> >(o_zone->template uuid<int>(),d_zone->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV, pthis->template Start_Time<Time_Hours>());
 				}
-				else exp_ttime = 60.0f;
-
-				//==============================================================================================
-				// Reset the route planning time based on the expected departure time, and aggregate as needed
+				exp_ttime = std::max<float>(exp_ttime,30.0f);
+				
 				//---------------------------
 				// Aggregate plan routing
 				if (scenario->template aggregate_routing<bool>())
