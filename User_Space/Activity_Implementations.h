@@ -75,6 +75,22 @@ namespace Activity_Components
 			member_component_and_feature_accessor(Expected_Travel_Time, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Actual_Travel_Time, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_container(vector<typename MasterType::person_type*>, Involved_Persons_Container, none, none);
+			feature_implementation TargetType End_Time()
+			{
+				this_itf* pthis = (this_itf*)this;
+				return pthis->template Start_Time<TargetType>() + pthis->template Duration<TargetType>();
+			}	tag_getter_as_available(End_Time);
+			feature_implementation TargetType End_Time(TargetType value, bool maintain_duration)
+			{
+				this_itf* pthis = (this_itf*)this;
+
+				if (maintain_duration) pthis->template Start_Time<TargetType>(value - pthis->template Duration<TargetType>());
+				else
+				{
+					if (value < pthis->Start_Time<TargetType>()) THROW_WARNING("WARNING: new end time less than start time is not possible if start time is fixed (maintain_duration=false)");
+					else pthis->template Duration<TargetType>(value - pthis->template Start_Time<TargetType>());
+				}
+			}	tag_getter_as_available(End_Time);
 
 			// Planning event time members
 			member_data(Revision,Location_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));

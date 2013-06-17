@@ -404,12 +404,19 @@ cout << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_
 	skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
 	if (skimmer->read_input<bool>())
 	{
-		skimmer->input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_skim_file_path_name<string>().c_str());
+		if (!skimmer->input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_skim_file_path_name<string>().c_str()))
+		{
+			THROW_EXCEPTION("Error: input binary skim file '" << scenario->input_skim_file_path_name<string>() << "' could not be opened.");
+		}
 	}
+
 	skimmer->write_output<bool>(scenario->write_skim_tables<bool>());	
 	if (skimmer->write_output<bool>())
 	{
-		skimmer->output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_skim_file_path_name<string>().c_str());
+		if (!skimmer->output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_skim_file_path_name<string>().c_str()))
+		{
+			THROW_EXCEPTION("Error: outpug binary skim file '" << scenario->output_skim_file_path_name<string>() << "' could not be opened.");
+		}
 	}
 	skimmer->Initialize<_Network_Interface*>(network);
 	network->skimming_faculty<_network_skim_itf*>(skimmer);

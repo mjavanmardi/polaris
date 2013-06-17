@@ -554,11 +554,23 @@ namespace Prototypes
 			skim_itf* skim = network->template skimming_faculty<skim_itf*>();
 			movement_itf* movements = this->Movement<movement_itf*>();
 
+
+
+
+
 			//=====================================================================
 			// schedule departure from destination if no following activity
 			Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();	
 			Activity_Itf* next_act = scheduler->template next_activity_plan<Target_Type<NT,Activity_Itf*, Simulation_Timestep_Increment>>(_iteration);
 			if (next_act == nullptr) return;
+
+
+			// check that arrive is not too delayed into the start of the following activity
+			Simulation_Timestep_Increment arrival_time = _iteration;
+			if (arrival_time > act->Start_Time<Simulation_Timestep_Increment>() + act->Duration<Simulation_Timestep_Increment>())
+			{
+				cout << endl << "Warning, excessive delay on trip to activity, arrival time is after original activity end.";
+			}
 
 			// don't add additional movement if already at home
 			if (act->template Location<location_itf*>() == person->template Home_Location<location_itf*>()) return;

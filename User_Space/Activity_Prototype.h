@@ -429,6 +429,7 @@ namespace Activity_Components
 			feature_accessor(Location, check(ReturnValueType,Activity_Location_Components::Concepts::Is_Activity_Location), check(SetValueType,Activity_Location_Components::Concepts::Is_Activity_Location));
 			feature_accessor(Mode, none, none);
 			feature_accessor(Start_Time, check(ReturnValueType,Basic_Units::Concepts::Is_Time_Value), check(SetValueType,Basic_Units::Concepts::Is_Time_Value)); 
+			feature_accessor(End_Time, check(ReturnValueType,Basic_Units::Concepts::Is_Time_Value), check(SetValueType,Basic_Units::Concepts::Is_Time_Value)); 
 			feature_accessor(Duration, check(ReturnValueType,Basic_Units::Concepts::Is_Time_Value), check(SetValueType,Basic_Units::Concepts::Is_Time_Value)); 
 			feature_accessor(Involved_Persons_Container,none,none);
 			feature_accessor(Expected_Travel_Time, check(ReturnValueType,Basic_Units::Concepts::Is_Time_Value), check(SetValueType,Basic_Units::Concepts::Is_Time_Value)); 
