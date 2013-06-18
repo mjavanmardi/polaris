@@ -196,7 +196,7 @@ namespace Person_Components
 			{
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				Movement_Plan* move = act->movement_plan<Movement_Plan*>();
+				Movement_Plan* move = act->template movement_plan<Movement_Plan*>();
 
 				// if the start time of the activity has not been planned no way to identify timing conflicts
 				if (!act->template Start_Is_Planned<bool>()) return false;
@@ -264,7 +264,7 @@ namespace Person_Components
 					//cout << ", resolution type: MOVE"<<endl;
 					if (start < start_min) act->template Start_Time<Time_Seconds>(start_min); // move forward in time
 					if (end > end_max) act->template Start_Time<Time_Seconds>(start - (end-end_max)); // move backward in time
-					if (update_movement_plans) move->departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - act->template Expected_Travel_Time<Time_Seconds>());
+					if (update_movement_plans) move->template departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - act->template Expected_Travel_Time<Time_Seconds>());
 					return true;
 				}
 				// 2. complex conflict, move and shorten
@@ -273,7 +273,7 @@ namespace Person_Components
 					//cout << ", resolution type: MOVE AND SHORTEN"<<endl;
 					act->template Start_Time<Time_Seconds>(start_min);
 					act->template Duration<Time_Seconds>(end_max-start_min);
-					if (update_movement_plans) move->departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - act->template Expected_Travel_Time<Time_Seconds>());
+					if (update_movement_plans) move->template departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - act->template Expected_Travel_Time<Time_Seconds>());
 					return true;
 				}
 				// 3. can't fit, delete activity
@@ -332,7 +332,7 @@ namespace Person_Components
 					_Activity_Location_Interface* orig = this->previous_location<ComponentType,CallerType,Target_Type<NT,_Activity_Location_Interface*,Activity_Plan*>>(next_act);
 					_Activity_Location_Interface* dest = next_act->template Location<_Activity_Location_Interface*>();
 					Simulation_Timestep_Increment end = act->template Start_Time<Simulation_Timestep_Increment>() + act->template Duration<Simulation_Timestep_Increment>();
-					next_act->Update_Movement_Plan<_Activity_Location_Interface*>(orig,dest,end);
+					next_act->template Update_Movement_Plan<_Activity_Location_Interface*>(orig,dest,end);
 				}
 
 				// check for timing conflicts again, after updated movement plans

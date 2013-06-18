@@ -87,10 +87,13 @@ namespace Activity_Components
 				if (maintain_duration) pthis->template Start_Time<TargetType>(value - pthis->template Duration<TargetType>());
 				else
 				{
-					if (value < pthis->Start_Time<TargetType>()) THROW_WARNING("WARNING: new end time less than start time is not possible if start time is fixed (maintain_duration=false)");
+					if (value < pthis->template Start_Time<TargetType>()) 
+					{
+						THROW_WARNING("WARNING: new end time less than start time is not possible if start time is fixed (maintain_duration=false)");
+					}
 					else pthis->template Duration<TargetType>(value - pthis->template Start_Time<TargetType>());
 				}
-			}	tag_getter_as_available(End_Time);
+			}	tag_setter_as_available(End_Time);
 
 			// Planning event time members
 			member_data(Revision,Location_Planning_Time,check_2(strip_modifiers(ReturnValueType),Revision,is_same), check_2(strip_modifiers(SetValueType),Revision,is_same));
@@ -292,7 +295,7 @@ namespace Activity_Components
 						scheduler->template Add_Movement_Plan<_movement_plan_itf*>(move);
 
 					}
-					else THROW_WARNING("WARNING: ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< concat(this->Activity_Plan_ID<ComponentType,CallerType,int>()) << "," <<concat(move->template origin<_activity_location_itf*>()->uuid<int>()) << ", " <<concat(move->template destination<_activity_location_itf*>()->uuid<int>())<< ",at iteration " << _iteration << "." << _sub_iteration<<". Scheduled for route planning @ " << move->planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->departed_time<Simulation_Timestep_Increment>());		
+					else THROW_WARNING("WARNING: ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< concat(this->Activity_Plan_ID<ComponentType,CallerType,int>()) << "," <<concat(move->template origin<_activity_location_itf*>()->template uuid<int>()) << ", " <<concat(move->template destination<_activity_location_itf*>()->template uuid<int>())<< ",at iteration " << _iteration << "." << _sub_iteration<<". Scheduled for route planning @ " << move->template planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->template departed_time<Simulation_Timestep_Increment>());		
 				}
 				else
 				{

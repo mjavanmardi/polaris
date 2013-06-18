@@ -238,11 +238,13 @@ namespace Scenario_Components
 
 			feature_accessor(multimodal_network_input, none, none);
 
-			feature_prototype void read_scenario_data()
+			feature_prototype void read_scenario_data(char* filename)
 			{
 				CfgReader cfgReader;
-				char* path = "scenario.json";
+				char* path = filename;
 				bool result = cfgReader.initialize(path);
+
+				if (!result) THROW_EXCEPTION("Scenario file '"<<filename<<"' was not able to be opened.");
 				
 				//===============================================
 				// set start time

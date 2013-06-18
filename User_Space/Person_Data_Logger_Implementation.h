@@ -109,12 +109,12 @@ namespace Person_Components
 				// Movement plans
 
 				define_component_interface(movement_itf,typename act_record_itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
-				movement_itf* move = act->movement_plan<movement_itf*>();
+				movement_itf* move = act->template movement_plan<movement_itf*>();
 
 				stringstream m;
 				m << "MOVEMENT(Parent,Actid,orig,dest,departure_time,start_time,end_time,mode:" << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t";
 				m <<move->template origin<location_itf*>()->template uuid<int>()<< "\t"<<move->template destination<location_itf*>()->template uuid<int>()<< "\t";
-				m <<move->template departed_time<Time_Seconds>()<< "\t" << act->Start_Time<Time_Seconds>()<< "\t" << act->End_Time<Time_Seconds>()<< "\t" << act->Mode<int>();
+				m <<move->template departed_time<Time_Seconds>()<< "\t" << act->template Start_Time<Time_Seconds>()<< "\t" << act->template End_Time<Time_Seconds>()<< "\t" << act->template Mode<int>();
 				buff[_thread_id].push_back(m.str());
 			}
 
@@ -161,10 +161,10 @@ namespace Person_Components
 			}
 			feature_implementation void Write_Data_To_File()
 			{
-				for (int i = 0; i < 20; ++i)
-				{
-					cout << endl << "Number of activity type : " << num_acts[i];
-				}
+				//for (int i = 0; i < 20; ++i)
+				//{
+				//	cout << endl << "Number of activity type : " << num_acts[i];
+				//}
 
 				int i = _sub_iteration;
 				for (vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)

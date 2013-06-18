@@ -268,9 +268,9 @@ namespace Person_Components
 							// add movement plan to the person's vehicle and schedule the departure
 							if (movement_faculty->template Movement_Scheduled<bool>() == true)
 							{
-								Movement_Plan* cur_move = movement_faculty->Movement<Movement_Plan*>();
-								Activity_Plan* cur_act = cur_move->destination_activity_reference<Activity_Plan*>();
-								THROW_WARNING("WARNING: movement already scheduled for current iteration for person: " << parent->template uuid<int>() << ", movement ignored.   " << "Act in progress: "<<cur_act->Activity_Plan_ID<int>()<<", departure time="<<cur_move->departed_time<Time_Seconds>()<<", expected start time=" << cur_act->Start_Time<Time_Seconds>());
+								Movement_Plan* cur_move = movement_faculty->template Movement<Movement_Plan*>();
+								Activity_Plan* cur_act = cur_move->template destination_activity_reference<Activity_Plan*>();
+								THROW_WARNING("WARNING: movement already scheduled for current iteration for person: " << parent->template uuid<int>() << ", movement ignored.   " << "Act in progress: "<<cur_act->template Activity_Plan_ID<int>()<<", departure time="<<cur_move->template departed_time<Time_Seconds>()<<", expected start time=" << cur_act->template Start_Time<Time_Seconds>()<<", cur trajactory position: " << cur_move->template current_trajectory_position<int>() <<" of " << cur_move->template trajectory_size<int>()<<", mode="<<cur_act->template Mode<int>()<<endl);
 								typename Movement_Plans::iterator prev = move_itr++;
 								movements->erase(prev);
 								return;

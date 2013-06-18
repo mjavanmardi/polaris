@@ -520,6 +520,17 @@ namespace Prototypes
 					act->template Arrive_At_Activity<NT>();
 				}
 			}
+
+			// for all non-auto modes, jump to activity arrival (will be replaced with simulation at some point
+			else if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+			{
+				act->template Arrive_At_Activity<NT>();
+			}
+			// else, if no valid trajectory, unschedule movement
+			else
+			{
+				this->Movement_Scheduled(false);
+			}
 		}
 
 		//========================================================
@@ -567,10 +578,9 @@ namespace Prototypes
 
 			// check that arrive is not too delayed into the start of the following activity
 			Simulation_Timestep_Increment arrival_time = _iteration;
-			if (arrival_time > act->Start_Time<Simulation_Timestep_Increment>() + act->Duration<Simulation_Timestep_Increment>())
+			if (arrival_time > act->template Start_Time<Simulation_Timestep_Increment>() + act->template Duration<Simulation_Timestep_Increment>())
 			{
-				cout << endl << "Warning, excessive delay on trip to activity '"<< act->Parent_ID<int>() << "." << act->Activity_Plan_ID<int>()<<"', arrival time is after original activity end.";
-				cout << "  Actstart="<<act->Start_Time<Time_Seconds>() << ", Actend=" << act->Start_Time<Time_Seconds>() + act->Duration<Time_Seconds>() <<", departure_time="<<movements->departed_time<Time_Seconds>() << ", arrival time="<<arrival_time<<", mode="<<act->Mode<int>()<<endl;
+				THROW_WARNING("Warning, excessive delay on trip to activity '"<< act->template Parent_ID<int>() << "." << act->template Activity_Plan_ID<int>()<<"', arrival time is after original activity end."<< "  Actstart="<<act->template Start_Time<Time_Seconds>() << ", Actend=" << act->template Start_Time<Time_Seconds>() + act->template Duration<Time_Seconds>() <<", departure_time="<<movements->template departed_time<Time_Seconds>() << ", arrival time="<<arrival_time<<", mode="<<act->template Mode<int>()<<endl);
 			}
 
 			// don't add additional movement if already at home
@@ -593,6 +603,8 @@ namespace Prototypes
 			Time_Seconds ttime_this_to_home = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,MODE,Time_Seconds>>(o_id,h_id,MODE::SOV,end_this);
 			Time_Seconds ttime_home_to_next = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,MODE,Time_Seconds>>(h_id,d_id,MODE::SOV,end_this + ttime_this_to_home);
 			Time_Seconds min_home_duration = min((float)ttime_this_to_home,(float)ttime_home_to_next);
+			min_home_duration = max((float)min_home_duration, 300.0f);
+
 			//=====================================================================
 			// Person can go home first, schedule an additional return home movement
 			if (begin_next - end_this > ttime_this_to_home + ttime_home_to_next + min_home_duration)
@@ -616,7 +628,7 @@ namespace Prototypes
 				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
 				//new_act->template movement_plan<movement_itf*>(move);
 				new_act->template Parent_Planner<Planner_Itf*>(planner);
-				new_act->template Initialize<Target_Type<NT,void,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>>(end_this, ttime_this_to_home,act->template Mode<MODE>());
+				new_act->template Initialize<Target_Type<NT,void,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>>(end_this+ttime_this_to_home, min_home_duration,act->template Mode<MODE>());
 
 				// If the trip is valid, assign to a movement plan and add to the schedule
 				//move->template origin<location_itf*>(orig);
@@ -626,7 +638,7 @@ namespace Prototypes
 				//move->template departed_time<Simulation_Timestep_Increment>(end_this);
 				//scheduler->template Add_Movement_Plan<movement_itf*>(move);
 
-				Time_Seconds next_depart_time = next_act->template Start_Time<Time_Seconds>() - ttime_home_to_next;
+				//Time_Seconds next_depart_time = next_act->template Start_Time<Time_Seconds>() - ttime_home_to_next;
 				//cout << endl << "Returning home @t=" << (int)end_this << ", expected arrival @t="<<(int)end_this+(int)ttime_this_to_home<<", approximate departure from home for next activity @t="<< (int)next_depart_time;
 			}
 
