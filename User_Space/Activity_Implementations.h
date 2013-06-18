@@ -157,8 +157,7 @@ namespace Activity_Components
 			tag_feature_as_available(Set_Attribute_Planning_Times);
 
 			feature_implementation void Route_Planning_Event_Handler()
-			{
-				
+			{			
 				// Create movement plan and give it an ID
 				_movement_plan_itf* move = (_movement_plan_itf*)Allocate<typename _scheduler_itf::get_type_of(Movement_Plans_Container)::unqualified_value_type>();
 				move->template initialize_trajectory<NULLTYPE>();
@@ -194,65 +193,75 @@ namespace Activity_Components
 				// set the reference to the movement plan
 				this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>(move);
 				
+				if (orig == nullptr || dest == nullptr) {THROW_WARNING("Null origin or destination values specified"); return;}
+
+				// update the movement plan with the specified origin/destination
+				this->Update_Movement_Plan<ComponentType,CallerType,_activity_location_itf*>(orig,dest,_iteration);
+
+				// exit if no trip is needed
+				if (orig->template internal_id<int>() == dest->template internal_id<int>()) return;
+
+				// route if planning router specified
+				if(scenario->template do_planner_routing<bool>()) planner->template Schedule_New_Routing<_movement_plan_itf*>(_iteration+1, move);
 
 				// check that origin and destination are valid
-				if (orig != nullptr && dest != nullptr) 
-				{
-					// If the trip is valid, assign to a movement plan and add to the schedule
-					if (orig->template origin_links<_links_container_itf&>().size() != 0 && dest->template origin_links<_links_container_itf&>().size() != 0)
-					{		
-						// add attributes to plan
-						move->template origin<_activity_location_itf*>(orig);
-						move->template destination<_activity_location_itf*>(dest);
-						move->template origin<_link_itf*>(orig->template origin_links<_links_container_itf&>().at(0));
-						move->template destination<_link_itf*>(dest->template origin_links<_links_container_itf&>().at(0));
+				//if (orig != nullptr && dest != nullptr) 
+				//{
+				//	// If the trip is valid, assign to a movement plan and add to the schedule
+				//	if (orig->template origin_links<_links_container_itf&>().size() != 0 && dest->template origin_links<_links_container_itf&>().size() != 0)
+				//	{		
+				//		// add attributes to plan
+				//		move->template origin<_activity_location_itf*>(orig);
+				//		move->template destination<_activity_location_itf*>(dest);
+				//		move->template origin<_link_itf*>(orig->template origin_links<_links_container_itf&>().at(0));
+				//		move->template destination<_link_itf*>(dest->template origin_links<_links_container_itf&>().at(0));
 
-						if (move->template origin<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0 || move->template destination<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0)
-						{
-							_link_itf* o_link =move->template origin<_link_itf*>();
-							_link_itf* d_link =move->template destination<_link_itf*>();
-							//THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "<<concat(this->Parent_ID<ComponentType,CallerType,int>()) << "." << concat(this->Activity_Plan_ID<ComponentType, CallerType,int>()) <<", " << concat(this->Activity_Type<ComponentType, CallerType,ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>());
-							return;
-						}
-						
-						// Add to plan to router schedule only if the trip involves movement, otherwise return
-						if (orig->template internal_id<int>() == dest->template internal_id<int>()) 
-						{
-							return;
-						}
+				//		if (move->template origin<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0 || move->template destination<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0)
+				//		{
+				//			_link_itf* o_link =move->template origin<_link_itf*>();
+				//			_link_itf* d_link =move->template destination<_link_itf*>();
+				//			//THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "<<concat(this->Parent_ID<ComponentType,CallerType,int>()) << "." << concat(this->Activity_Plan_ID<ComponentType, CallerType,int>()) <<", " << concat(this->Activity_Type<ComponentType, CallerType,ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>());
+				//			return;
+				//		}
+				//		
+				//		// Add to plan to router schedule only if the trip involves movement, otherwise return
+				//		if (orig->template internal_id<int>() == dest->template internal_id<int>()) 
+				//		{
+				//			return;
+				//		}
 
-						// shift departure time by estimated travel time, and make sure that it does not occur before next iteration
-						_skim_itf* skim = person->template network_reference<_network_itf*>()->template skimming_faculty<_skim_itf*>();	
-						Simulation_Timestep_Increment ttime = skim->template Get_LOS<Target_Type<NT,Simulation_Timestep_Increment,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->template zone<_zone_itf*>()->template uuid<int>(),dest->template zone<_zone_itf*>()->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-						this->Expected_Travel_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(ttime);
-						Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
-						if (depart < _iteration+1)
-						{
-							depart = _iteration+1;
-							this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
-						}
+				//		// shift departure time by estimated travel time, and make sure that it does not occur before next iteration
+				//		_skim_itf* skim = person->template network_reference<_network_itf*>()->template skimming_faculty<_skim_itf*>();	
+				//		Simulation_Timestep_Increment ttime = skim->template Get_LOS<Target_Type<NT,Simulation_Timestep_Increment,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->template zone<_zone_itf*>()->template uuid<int>(),dest->template zone<_zone_itf*>()->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				//		this->Expected_Travel_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(ttime);
+				//		Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
+				//		if (depart < _iteration+1)
+				//		{
+				//			depart = _iteration+1;
+				//			this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
+				//		}
 
-						// schedule the routing and do routin if requested through scenario, otherwise move to the activity scheduling phase
-						move->template departed_time<Simulation_Timestep_Increment>(depart);
-						if(scenario->template do_planner_routing<bool>()) planner->template Schedule_New_Routing<_movement_plan_itf*>(_iteration+1, move);
-					}
-					else
-					{
-						move->template origin<_activity_location_itf*>(orig);
-						move->template destination<_activity_location_itf*>(dest);
-						THROW_WARNING("WARNING: movement from " << orig->template uuid<int>() << " to " << dest->template uuid<int>() << ", can not happen as no origin / destination links are available for the locations.");
-					}
-				}
-				else
-				{
-					//----------------------------------------------------------------
-					// Print to log file
-					stringstream s;
-					s <<"ACTIVITY NOT SCHEDULED, null origin or destination: "<< person->template uuid<int>();
-					s << "," <<orig << ", " <<dest<<endl;
-					//planner->template Write_To_Log<stringstream&>(s);
-					//----------------------------------------------------------------
-				}
+				//		// schedule the routing and do routin if requested through scenario, otherwise move to the activity scheduling phase
+				//		move->template departed_time<Simulation_Timestep_Increment>(depart);
+				//		if(scenario->template do_planner_routing<bool>()) planner->template Schedule_New_Routing<_movement_plan_itf*>(_iteration+1, move);
+				//	}
+				//	else
+				//	{
+				//		move->template origin<_activity_location_itf*>(orig);
+				//		move->template destination<_activity_location_itf*>(dest);
+				//		THROW_WARNING("WARNING: movement from " << orig->template uuid<int>() << " to " << dest->template uuid<int>() << ", can not happen as no origin / destination links are available for the locations.");
+				//	}
+				//}
+				//else
+				//{
+				//	//----------------------------------------------------------------
+				//	// Print to log file
+				//	stringstream s;
+				//	s <<"ACTIVITY NOT SCHEDULED, null origin or destination: "<< person->template uuid<int>();
+				//	s << "," <<orig << ", " <<dest<<endl;
+				//	//planner->template Write_To_Log<stringstream&>(s);
+				//	//----------------------------------------------------------------
+				//}
 			}
 			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
 			{
@@ -297,6 +306,61 @@ namespace Activity_Components
 					scheduler->template Add_Movement_Plan<_movement_plan_itf*>(move);
 				}
 			}		
+			feature_implementation void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure)
+			{
+				_movement_plan_itf* move = this->movement_plan<ComponentType,CallerType,_movement_plan_itf*>();
+				_activity_location_itf* orig = (_activity_location_itf*)origin;
+				_activity_location_itf* dest = (_activity_location_itf*)destination;
+
+				// General interfaces, to parent and global classes
+				_person_itf* person = this->_Parent_Planner->template Parent_Person<_person_itf*>();
+				_network_itf* network = person->template network_reference<_network_itf*>();
+
+				if (orig != nullptr && dest != nullptr) 
+				{
+					// If the trip is valid, assign to a movement plan and add to the schedule
+					if (orig->template origin_links<_links_container_itf&>().size() != 0 && dest->template origin_links<_links_container_itf&>().size() != 0)
+					{		
+						// add attributes to plan
+						move->template origin<_activity_location_itf*>(orig);
+						move->template destination<_activity_location_itf*>(dest);
+						move->template origin<_link_itf*>(orig->template origin_links<_links_container_itf&>().at(0));
+						move->template destination<_link_itf*>(dest->template origin_links<_links_container_itf&>().at(0));
+
+						if (move->template origin<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0 || move->template destination<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0)
+						{
+							_link_itf* o_link =move->template origin<_link_itf*>();
+							_link_itf* d_link =move->template destination<_link_itf*>();
+							//THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "<<concat(this->Parent_ID<ComponentType,CallerType,int>()) << "." << concat(this->Activity_Plan_ID<ComponentType, CallerType,int>()) <<", " << concat(this->Activity_Type<ComponentType, CallerType,ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>());
+							return;
+						}
+						
+						// shift departure time by estimated travel time, and make sure that it does not occur before next iteration
+						Simulation_Timestep_Increment start = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>();
+						Simulation_Timestep_Increment ttime = network->template Get_LOS<Target_Type<NT,Simulation_Timestep_Increment,int,Vehicle_Components::Types::Vehicle_Type_Keys,Simulation_Timestep_Increment>>(orig->template zone<_zone_itf*>()->template uuid<int>(),dest->template zone<_zone_itf*>()->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV,start);
+						this->Expected_Travel_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(ttime);
+						Simulation_Timestep_Increment depart =  start - ttime;
+						if (depart < min_departure)
+						{
+							depart = min_departure+1;
+							this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
+						}
+
+						// schedule the routing and do routin if requested through scenario, otherwise move to the activity scheduling phase
+						move->template departed_time<Simulation_Timestep_Increment>(depart);
+					}
+					else
+					{
+						move->template origin<_activity_location_itf*>(orig);
+						move->template destination<_activity_location_itf*>(dest);
+						THROW_WARNING("WARNING: movement from " << orig->template uuid<int>() << " to " << dest->template uuid<int>() << ", can not happen as no origin / destination links are available for the locations.");
+					}
+				}
+				else
+				{
+					THROW_WARNING("Null origin or destination values specified");
+				}
+			}
 			feature_implementation void Arrive_At_Activity()
 			{
 				define_component_interface(_Logger_Interface, typename MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
@@ -818,7 +882,7 @@ namespace Activity_Components
 
 				//========================================================================
 				// Resolve timing conflicts when timing is known
-				bool is_scheduled =	scheduler->template Resolve_Timing_Conflict<Target_Type<NT,bool,this_itf*>>(pthis);
+				bool is_scheduled =	scheduler->template Resolve_Timing_Conflict<this_itf*>(pthis,false);
 				// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
 				if (!is_scheduled) 
 				{
@@ -1092,7 +1156,7 @@ namespace Activity_Components
 				if (pthis->template Location_Is_Planned<bool>()) 
 				{
 					// get the previous activity
-					_activity_location_itf* orig = scheduler->template previous_location<Target_Type<NT,_activity_location_itf*,ComponentType*>>(this);
+					_activity_location_itf* orig = scheduler->template previous_location<Target_Type<NT,_activity_location_itf*,this_itf*>>(pthis);
 					_activity_location_itf* dest = pthis->template Location<_activity_location_itf*>();
 					int o_id = orig->template zone<_zone_itf*>()->template uuid<int>();
 					int d_id = dest->template zone<_zone_itf*>()->template uuid<int>();
@@ -1203,7 +1267,7 @@ namespace Activity_Components
 				//========================================================================
 				// Resolve timing conflicts when timing is known
 				//------------------------------------------------------------------------
-				bool is_scheduled =	scheduler->template Resolve_Timing_Conflict<Target_Type<NT,bool,this_itf*>>(pthis);
+				bool is_scheduled =	scheduler->template Resolve_Timing_Conflict<this_itf*>(pthis,false);
 				// if conflict not resolved remove activity from schedule and modify routing response time so no further planning is done
 				if (!is_scheduled) 
 				{

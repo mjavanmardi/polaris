@@ -182,6 +182,8 @@ namespace Person_Components
 				}
 				//-------------------------------------------------------------------------------------------------------------------------
 
+				// separate routine and regular activity planning i.e. make sure all routine planning is done first
+				start_plan_time += 20;
 
 				//=========================================================================================================================
 				// Get frequency of each activity type
@@ -264,8 +266,8 @@ namespace Person_Components
 			}
 
 		};
-		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::work_activity_freq[]= {0,0,0,0.82,0.55,0,0,0};
-		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::school_activity_freq[]= {0.75,0.75,0,0,0,0,0.25,0};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::work_activity_freq[]= {0,0,0,1.0,0.75,0.15,0,0};
+		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::school_activity_freq[]= {0.75,0.75,0,0,0,0,0,0.25};
 		
 		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::eat_out_activity_freq[]= {0.134,0.125,0.158,0.260,0.236,0.234,0.248,0.178};
 		template<typename MasterType,typename ParentType, typename InheritanceList> float CTRAMP_Activity_Generator_Implementation<MasterType, ParentType, InheritanceList>::errands_activity_freq[]= {0.033,0.052,0.093,0.108,0.156,0.198,0.181,0.070};

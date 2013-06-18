@@ -72,6 +72,8 @@ namespace Activity_Components
 	{
 		prototype struct Activity_Planner ADD_DEBUG_INFO
 		{
+			tag_as_prototype;
+
 			//===========================================
 			// Pointer back to planner parent class
 			//-------------------------------------------
@@ -234,7 +236,7 @@ namespace Activity_Components
 				else
 				{
 					Revision& route_itr = this_ptr->template Route_Planning_Time<Revision&>();
-					if(route_itr._iteration  < END && route_itr._iteration >= _iteration) 
+					if(route_itr._iteration  < (int)END && route_itr._iteration >= _iteration) 
 					{
 						response.next._iteration = route_itr._iteration;
 						response.next._sub_iteration = route_itr._sub_iteration;
@@ -438,7 +440,7 @@ namespace Activity_Components
 			//===========================================
 			// Activity Planner Methods
 			//-------------------------------------------
-			feature_prototype void Initialize(TargetType activity/*, requires(check(TargetType,Concepts::Is_Activity_Plan_Prototype))*/)
+			feature_prototype void Initialize(TargetType activity, requires(check(TargetType,Concepts::Is_Activity_Plan_Prototype)))
 			{
 				this_component()->template Initialize<ComponentType,CallerType,TargetType>(activity);
 			}
@@ -491,6 +493,10 @@ namespace Activity_Components
 				}
 			}
 			feature_method_void(Set_Meta_Attributes,none);	
+			feature_prototype void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure, requires(check_as_given(TargetType,is_pointer) && check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
+			{
+				this_component()->Update_Movement_Plan<ComponentType,CallerType,TargetType>(origin,destination,min_departure);
+			}
 
 			feature_prototype void Arrive_At_Activity()
 			{

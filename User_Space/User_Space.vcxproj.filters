@@ -223,9 +223,6 @@
     <ClInclude Include="Network_DB_Reader_Implementations.h">
       <Filter>Implementations</Filter>
     </ClInclude>
-    <ClInclude Include="Network_DB_Reader_Prototype.h">
-      <Filter>Prototypes</Filter>
-    </ClInclude>
     <ClInclude Include="User_Space_with_odb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -306,6 +303,9 @@
     </ClInclude>
     <ClInclude Include="Polaris_Link_Event_Handler_Implementation.h">
       <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Network_DB_Reader_Prototype.h">
+      <Filter>Prototypes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

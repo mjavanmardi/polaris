@@ -105,6 +105,17 @@ namespace Person_Components
 					s<<"\t"<<act->template Actual_Travel_Time<Time_Minutes>()<<"\t"<<1;
 				}
 				buff[_thread_id].push_back(s.str());
+
+				// Movement plans
+
+				define_component_interface(movement_itf,typename act_record_itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				movement_itf* move = act->movement_plan<movement_itf*>();
+
+				stringstream m;
+				m << "MOVEMENT(Parent,Actid,orig,dest,departure_time,start_time,end_time,mode:" << act->template Parent_ID<int>() << "\t"<<act->template Activity_Plan_ID<int>()<<"\t";
+				m <<move->template origin<location_itf*>()->template uuid<int>()<< "\t"<<move->template destination<location_itf*>()->template uuid<int>()<< "\t";
+				m <<move->template departed_time<Time_Seconds>()<< "\t" << act->Start_Time<Time_Seconds>()<< "\t" << act->End_Time<Time_Seconds>()<< "\t" << act->Mode<int>();
+				buff[_thread_id].push_back(m.str());
 			}
 
 

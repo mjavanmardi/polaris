@@ -42,8 +42,12 @@ namespace Person_Components
 			feature_method_1_arg(next_location, current_activity, check_as_given(typename TargetType::ParamType,is_pointer) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
 			feature_method_1_arg(previous_location, current_activity, check_as_given(typename TargetType::ParamType,is_pointer) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
 			
-			feature_method_1_arg(Resolve_Timing_Conflict, current_activity, check_2(typename TargetType::ReturnType,bool,is_same));
+			//feature_method_1_arg(Resolve_Timing_Conflict, current_activity, check_2(typename TargetType::ReturnType,bool,is_same));
 
+			feature_prototype bool Resolve_Timing_Conflict(TargetType current_activity, bool update_movement_plans=false)
+			{
+				return this_component()->Resolve_Timing_Conflict<ComponentType,CallerType,TargetType>(current_activity, update_movement_plans);
+			}
 			feature_prototype void Add_Movement_Plan(TargetType movement_plan)
 			{
 				this_component()->template Add_Movement_Plan<ComponentType,CallerType,TargetType>(movement_plan);

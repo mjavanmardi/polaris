@@ -415,7 +415,7 @@ cout << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_
 	{
 		if (!skimmer->output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_skim_file_path_name<string>().c_str()))
 		{
-			THROW_EXCEPTION("Error: outpug binary skim file '" << scenario->output_skim_file_path_name<string>() << "' could not be opened.");
+			THROW_EXCEPTION("Error: output binary skim file '" << scenario->output_skim_file_path_name<string>() << "' could not be opened.");
 		}
 	}
 	skimmer->Initialize<_Network_Interface*>(network);
@@ -426,8 +426,8 @@ cout << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_
 	//----------------------------------------------------------------------------------------------------------------------------------
 	MasterType::person_destination_chooser_type::_choice_set_size = 50;
 	MasterType::person_destination_choice_option_type::_B_TTIME = -0.15;
-	MasterType::person_destination_choice_option_type::_B_EMPLOYMENT = 0.0002;
-	MasterType::person_destination_choice_option_type::_B_POPULATION = 0.00005;
+	MasterType::person_destination_choice_option_type::_B_EMPLOYMENT = 0.1;
+	MasterType::person_destination_choice_option_type::_B_POPULATION = 0.025;
 	// Initialize start time model
 	MasterType::activity_timing_chooser_type::static_initializer("start_time_duration_data.txt");	
 	// Initialize person properties with average activity frequency and duration

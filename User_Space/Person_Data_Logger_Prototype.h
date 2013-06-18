@@ -2,7 +2,7 @@
 
 #include "User_Space_Includes.h"
 #include "Person_Prototype.h"
-
+#include "Activity_Prototype.h"
 
 
 namespace Person_Components
@@ -25,7 +25,7 @@ namespace Prototypes
 		{
 			this_component()->Add_Record<ComponentType,CallerType,TargetType>(act_record,is_executed);
 		}
-		feature_prototype void Add_Record(TargetType act_record, bool is_executed, requires(!check_as_given(TargetType,is_pointer) /*|| !check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
+		feature_prototype void Add_Record(TargetType act_record, bool is_executed, requires(!check_as_given(TargetType,is_pointer)/* || !check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/))
 		{
 			assert_check(TargetType,is_pointer,"Target type is not a pointer");
 			//assert_check(TargetType,Activity_Components::Concepts::Is_Activity_Plan_Prototype,"Target type is not an activity plan prototype");

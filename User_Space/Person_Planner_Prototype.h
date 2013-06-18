@@ -207,6 +207,7 @@ namespace Person_Components
 				define_container_and_value_interface(_Activity_Locations_Container_Interface, _Activity_Location_Interface, typename _Network_Interface::get_type_of(activity_locations_container), Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Activity_Location_Interface::get_type_of(origin_links), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Zones_Container_Interface, _Zone_Interface, typename _Network_Interface::get_type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
+				
 				parent_itf* parent = this_ptr->template Parent_Person<parent_itf*>();
 				_Network_Interface* network = parent->template network_reference<_Network_Interface*>();
 				_Movement_Faculty_Interface* movement_faculty = parent->template Moving_Faculty<_Movement_Faculty_Interface*>();
@@ -217,6 +218,7 @@ namespace Person_Components
 
 				// Get reference to movement plans
 				define_container_and_value_interface(Movement_Plans,Movement_Plan,typename scheduler_itf::get_type_of(Movement_Plans_Container),Containers::Back_Insertion_Sequence_Prototype,Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				define_component_interface(Activity_Plan, typename Movement_Plan::get_type_of(destination_activity_reference),Activity_Components::Prototypes::Activity_Planner,ComponentType);
 				Movement_Plans* movements = parent->template Scheduling_Faculty<scheduler_itf*>()->template Movement_Plans_Container<Movement_Plans*>();
 				typename Movement_Plans::iterator move_itr = movements->begin();
 
@@ -266,7 +268,9 @@ namespace Person_Components
 							// add movement plan to the person's vehicle and schedule the departure
 							if (movement_faculty->template Movement_Scheduled<bool>() == true)
 							{
-								THROW_WARNING("WARNING: movement already scheduled for current iteration for person: " << parent->template uuid<int>() << ", movement ignored.");
+								Movement_Plan* cur_move = movement_faculty->Movement<Movement_Plan*>();
+								Activity_Plan* cur_act = cur_move->destination_activity_reference<Activity_Plan*>();
+								THROW_WARNING("WARNING: movement already scheduled for current iteration for person: " << parent->template uuid<int>() << ", movement ignored.   " << "Act in progress: "<<cur_act->Activity_Plan_ID<int>()<<", departure time="<<cur_move->departed_time<Time_Seconds>()<<", expected start time=" << cur_act->Start_Time<Time_Seconds>());
 								typename Movement_Plans::iterator prev = move_itr++;
 								movements->erase(prev);
 								return;

@@ -569,7 +569,8 @@ namespace Prototypes
 			Simulation_Timestep_Increment arrival_time = _iteration;
 			if (arrival_time > act->Start_Time<Simulation_Timestep_Increment>() + act->Duration<Simulation_Timestep_Increment>())
 			{
-				cout << endl << "Warning, excessive delay on trip to activity, arrival time is after original activity end.";
+				cout << endl << "Warning, excessive delay on trip to activity '"<< act->Parent_ID<int>() << "." << act->Activity_Plan_ID<int>()<<"', arrival time is after original activity end.";
+				cout << "  Actstart="<<act->Start_Time<Time_Seconds>() << ", Actend=" << act->Start_Time<Time_Seconds>() + act->Duration<Time_Seconds>() <<", departure_time="<<movements->departed_time<Time_Seconds>() << ", arrival time="<<arrival_time<<", mode="<<act->Mode<int>()<<endl;
 			}
 
 			// don't add additional movement if already at home

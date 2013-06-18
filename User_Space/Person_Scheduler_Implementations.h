@@ -192,10 +192,11 @@ namespace Person_Components
 			tag_feature_signature_as_available(next_location,1);
 
 			// Simplified timing conflict resolution - only modifying the existing activity
-			feature_implementation typename TargetType::ReturnType Resolve_Timing_Conflict(typename TargetType::ParamType current_activity)
+			feature_implementation bool Resolve_Timing_Conflict(TargetType current_activity, bool update_movement_plans)
 			{
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
+				Movement_Plan* move = act->movement_plan<Movement_Plan*>();
 
 				// if the start time of the activity has not been planned no way to identify timing conflicts
 				if (!act->template Start_Is_Planned<bool>()) return false;
@@ -255,24 +256,41 @@ namespace Person_Components
 				// determine conflict regimes and modify appropriately
 				Time_Seconds available_time = end_max - start_min;
 
+				//cout << endl <<"CONFLICT: min_start="<<start_min<<", max_end="<<end_max<<", act start/end="<<start <<","<<end;
+
 				// 1. simple conflict, fits without shortening
 				if (available_time > end - start)
 				{
+					//cout << ", resolution type: MOVE"<<endl;
 					if (start < start_min) act->template Start_Time<Time_Seconds>(start_min); // move forward in time
 					if (end > end_max) act->template Start_Time<Time_Seconds>(start - (end-end_max)); // move backward in time
+					if (update_movement_plans) move->departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - act->template Expected_Travel_Time<Time_Seconds>());
 					return true;
 				}
 				// 2. complex conflict, move and shorten
 				else if (available_time > 0.5*(end-start) )
 				{
+					//cout << ", resolution type: MOVE AND SHORTEN"<<endl;
 					act->template Start_Time<Time_Seconds>(start_min);
 					act->template Duration<Time_Seconds>(end_max-start_min);
+					if (update_movement_plans) move->departed_time<Time_Seconds>(act->template Start_Time<Time_Seconds>() - act->template Expected_Travel_Time<Time_Seconds>());
 					return true;
 				}
 				// 3. can't fit, delete activity
 				else
 				{
-					//cout << endl << "Deleted activity";
+					//cout << endl <<"CONFLICT: min_start="<<start_min<<", max_end="<<end_max<<", act start/end="<<start <<","<<end << ", resolution type: DELETE CONFLICTING"<<" -- ";
+					// output previous act
+					/*if (prev_act != nullptr)
+					{
+						cout << "Prev act start=" << prev_act->Start_Time<Time_Seconds>() <<", prev act end="<<prev_act->End_Time<Time_Seconds>();
+					}
+					else cout << "Prev act null, start at :"<<_iteration;
+					if (next_act != nullptr)
+					{
+						cout << ",  Next act start=" << next_act->Start_Time<Time_Seconds>() <<", next act end="<<next_act->End_Time<Time_Seconds>()<<endl;
+					}
+					else cout << ",  Next act null, end at :"<<END;*/
 					return false;
 				}
 
@@ -303,10 +321,26 @@ namespace Person_Components
 					++move_itr;
 				}
 				movements->insert(move_itr,move);	
+				Activity_Plan* act = move->template destination_activity_reference<Activity_Plan*>();
+
+				// modify the origin for the following movement plan
+				if (move_itr != movements->end())
+				{
+					Movement_Plan* next_move = *move_itr;				
+					Activity_Plan* next_act = next_move->template destination_activity_reference<Activity_Plan*>();
+					// update the movement plan to next act
+					_Activity_Location_Interface* orig = this->previous_location<ComponentType,CallerType,Target_Type<NT,_Activity_Location_Interface*,Activity_Plan*>>(next_act);
+					_Activity_Location_Interface* dest = next_act->template Location<_Activity_Location_Interface*>();
+					Simulation_Timestep_Increment end = act->template Start_Time<Simulation_Timestep_Increment>() + act->template Duration<Simulation_Timestep_Increment>();
+					next_act->Update_Movement_Plan<_Activity_Location_Interface*>(orig,dest,end);
+				}
+
+				// check for timing conflicts again, after updated movement plans
+				this->Resolve_Timing_Conflict<ComponentType,CallerType,Activity_Plan*>(act,true);
 
 				// log the activity throught the global person logger
 				//define_component_interface(_Logger_Interface, typename MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
-				Activity_Plan* act = move->template destination_activity_reference<Activity_Plan*>();
+				
 				//((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Plan*>(act,false);
 
 				// no logging if the movement is a return home movement
