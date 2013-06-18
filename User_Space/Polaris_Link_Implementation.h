@@ -533,7 +533,8 @@ namespace Link_Components
 									har = true;
 								}
 								/// exploit
-								enroute_switching_decision = vehicle->template exploit_events_set<unordered_set<_Network_Event_Interface*>&>(events_set);
+								if (vms || har)
+									enroute_switching_decision = vehicle->template exploit_events_set<unordered_set<_Network_Event_Interface*>&>(events_set);
 
 								//if (enroute_switching_decision)
 								//{

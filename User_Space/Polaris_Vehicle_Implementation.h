@@ -116,7 +116,7 @@ namespace Vehicle_Components
 						float adjustment_factor_weather = 1.0f;
 						if (events_set.find(weather_event) != events_set.end())
 						{
-							adjustment_factor_weather = 1.0f;//min(adjustment_factor_weather,route_link->template speed_adjustment_factor_due_to_weather<float>());
+							adjustment_factor_weather = min(adjustment_factor_weather,route_link->template speed_adjustment_factor_due_to_weather<float>());
 							//event_found_flag = true;
 							//break;
 						}
@@ -130,7 +130,7 @@ namespace Vehicle_Components
 						float adjustment_factor_accident = 1.0f;
 						if (events_set.find(accident_event) != events_set.end())
 						{
-							adjustment_factor_accident = min(adjustment_factor_accident,route_link->template speed_adjustment_factor_due_to_accident<float>());
+							adjustment_factor_accident = min(adjustment_factor_accident,route_link->template capacity_adjustment_factor_due_to_accident<float>()); // speed factor is not used because it is 1.0 according to the Guidebook
 							//event_found_flag = true;
 							//break;
 						}
