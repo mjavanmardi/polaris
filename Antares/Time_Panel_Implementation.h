@@ -15,6 +15,11 @@ public:
 	Time_Panel_Implementation(wxFrame* parent);
 	virtual ~Time_Panel_Implementation(void){};
 	
+	feature_implementation bool Is_Running()
+	{
+		return _play->GetValue();
+	}
+
 	void Update_Time(int updated_time);
 	void OnPlay(wxCommandEvent& event);
     void OnStop(wxCommandEvent& event);

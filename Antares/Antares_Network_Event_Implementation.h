@@ -60,7 +60,6 @@ namespace Network_Event_Components
 				key_value_pair.first="Event";
 
 				key_value_pair.second=_notes;
-
 				
 				bucket.push_back(key_value_pair);
 			}
@@ -77,6 +76,7 @@ namespace Network_Event_Components
 				cfg.head_size_value=3;
 				cfg.storage_period=1;
 				cfg.head_accent_size_value=6;
+				cfg.target_sub_iteration = 0;
 				cfg.selection_callback=&on_select;
 
 				cfg.head_color._r = 255;
@@ -148,10 +148,15 @@ namespace Network_Event_Components
 					delete[] segments;
 				}
 			}
-
+			
 			feature_implementation void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
 			{
-				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Base_Antares_Network_Event)>::Initialize<ComponentType,ComponentType,weak_ptr<polaris::io::Event_Instance>& >(instance);
+				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Base_Antares_Network_Event)>::Initialize<ComponentType,ComponentType,weak_ptr<polaris::io::Event_Instance>&>(instance);
+			}
+
+			feature_implementation void Initialize(int start_time, int end_time, vector<typename MasterType::link_type*>& affected_links)
+			{
+				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Base_Antares_Network_Event)>::Initialize<ComponentType,ComponentType,MasterType::link_type*>(start_time,end_time,affected_links);
 			}
 			
 			declare_feature_conditional_implementation(Incident_Conditional)
@@ -346,6 +351,7 @@ namespace Network_Event_Components
 				cfg.Configure_Points();
 				cfg.head_size_value = 4;
 				cfg.primitive_color = true;
+				cfg.target_sub_iteration = 0;
 
 				cfg.head_color._r = 100;
 				cfg.head_color._g = 150;
@@ -492,6 +498,7 @@ namespace Network_Event_Components
 				cfg.Configure_Points();
 				cfg.head_size_value = 4;
 				cfg.primitive_color = true;
+				cfg.target_sub_iteration = 0;
 
 				cfg.head_color._r = 255;
 				cfg.head_color._g = 175;

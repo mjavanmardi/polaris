@@ -1,18 +1,8 @@
 #ifndef IODemand
 #define IODemand
-#pragma warning(disable:4068)
 
-#include <map>
-#include <vector>
-#include <string>
+#include "Shared.h"
 
-#include <odb/core.hxx>
-
-// Include TR1 <memory> header in a compiler-specific fashion. Fall back
-// on the Boost implementation if the compiler does not support TR1.
-//
-#include <odb/tr1/memory.hxx>
-using std::tr1::shared_ptr;
 namespace polaris
 {
 namespace io
@@ -33,7 +23,7 @@ class Selection
 public:
 	// Default Constructor
 	Selection () {}	
-	//Contructor
+	//Constructor
 	Selection ( int hhold_, int person_, int tour_, int trip_, int type_, int partition_ )  
 	: hhold (hhold_), person (person_), tour (tour_), trip (trip_), type (type_), partition (partition_)
 	{
@@ -74,7 +64,7 @@ class Household
 public:
 	// Default Constructor
 	Household () {}	
-	//Contructor
+	//Constructor
 	Household ( int hhold_, int location_, int persons_, int workers_, int vehicles_, int type_, int partition_, int person_, int age_, int relate_, int gender_, int work_, int drive_ )  
 	: hhold (hhold_), location (location_), persons (persons_), workers (workers_), vehicles (vehicles_), type (type_), partition (partition_), person (person_), age (age_), relate (relate_), gender (gender_), work (work_), drive (drive_)
 	{
@@ -137,7 +127,7 @@ class Vehicle
 public:
 	// Default Constructor
 	Vehicle () {}	
-	//Contructor
+	//Constructor
 	Vehicle ( int hhold_, int vehicle_, int parking_, int type_, int subtype_, int partition_ )  
 	: hhold (hhold_), vehicle (vehicle_), parking (parking_), type (type_), subtype (subtype_), partition (partition_)
 	{
@@ -178,7 +168,7 @@ class Trip
 public:
 	// Default Constructor
 	Trip () {}	
-	//Contructor
+	//Constructor
 	Trip ( int hhold_, int person_, int tour_, int trip_, double start_, double end_, double duration_, int origin_, int destination_, int purpose_, int mode_, int constraint_, int priority_, int vehicle_, int passengers_, int type_, int partition_ )  
 	: hhold (hhold_), person (person_), tour (tour_), trip (trip_), start (start_), end (end_), duration (duration_), origin (origin_), destination (destination_), purpose (purpose_), mode (mode_), constraint (constraint_), priority (priority_), vehicle (vehicle_), passengers (passengers_), type (type_), partition (partition_)
 	{
@@ -252,7 +242,7 @@ class Plan
 public:
 	// Default Constructor
 	Plan () {}	
-	//Contructor
+	//Constructor
 	Plan ( double depart_, double arrive_, double activity_, double walk_, double drive_, double transit_, double wait_, double other_, double length_, double cost_, int impedance_, int leg_mode_, int leg_type_, int leg_id_, double leg_time_, double leg_length_, double leg_cost_, int leg_imp_ )  
 	: depart (depart_), arrive (arrive_), activity (activity_), walk (walk_), drive (drive_), transit (transit_), wait (wait_), other (other_), length (length_), cost (cost_), impedance (impedance_), leg_mode (leg_mode_), leg_type (leg_type_), leg_id (leg_id_), leg_time (leg_time_), leg_length (leg_length_), leg_cost (leg_cost_), leg_imp (leg_imp_)
 	{
@@ -328,7 +318,7 @@ class Traveler
 public:
 	// Default Constructor
 	Traveler () {}	
-	//Contructor
+	//Constructor
 	Traveler ( int hhold_, int person_, int tour_, int trip_, int mode_, double time_, double distance_, double speed_, int link_, int dir_, int lane_, double offset_, int route_ )  
 	: hhold (hhold_), person (person_), tour (tour_), trip (trip_), mode (mode_), time (time_), distance (distance_), speed (speed_), link (link_), dir (dir_), lane (lane_), offset (offset_), route (route_)
 	{

@@ -64,6 +64,11 @@ namespace Network_Event_Components
 				this_component()->template Initialize<ComponentType,CallerType,TargetType>(configuration);
 			}
 			
+			feature void Initialize(int start_time, int end_time, vector<typename TargetType::link_type*>& affected_links)
+			{
+				this_component()->template Initialize<ComponentType,CallerType,TargetType>(start_time,end_time,affected_links);
+			}
+
 			feature static void Initialize_Type(TargetType configuration)
 			{
 				ComponentType::template Initialize_Type<ComponentType,CallerType,TargetType>(configuration);

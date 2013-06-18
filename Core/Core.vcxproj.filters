@@ -149,6 +149,12 @@
     <ClInclude Include="Multi_Buffer.h">
       <Filter>Data_Structures</Filter>
     </ClInclude>
+    <ClInclude Include="Features_V5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Component_V5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">

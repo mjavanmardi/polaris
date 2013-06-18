@@ -18,6 +18,11 @@ prototype struct Time_Panel
 		this_component()->Update_Time(updated_time);
 	}
 
+	feature_prototype bool Is_Running()
+	{
+		return this_component()->Is_Running<ComponentType,CallerType,TargetType>();
+	}
+
 	feature_accessor(play,none,none);
 	feature_accessor(play_button,none,none);
 	feature_accessor(pause_button,none,none);

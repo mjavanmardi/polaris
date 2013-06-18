@@ -27,7 +27,7 @@ namespace Sensor_Components
 			feature static void Initialize_Type(TargetType configuration)
 			{
 				ComponentType::template Initialize_Type<ComponentType,CallerType,TargetType>(configuration);
-	}
+			}
 
 			feature static void Initialize_Type()
 			{
@@ -38,6 +38,18 @@ namespace Sensor_Components
 			{
 				this_component()->template Initialize<ComponentType,CallerType,TargetType>(configuration);
 			}
+			
+			feature void Attach_Detector(TargetType detector_configuration)
+			{
+				return this_component()->template Attach_Detector<ComponentType,CallerType,TargetType>(detector_configuration);
+			}
+
+			feature bool Check_Outlier()
+			{
+				return this_component()->template Check_Outlier<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_accessor(covered_link,none,none);
 		};
 
 	}

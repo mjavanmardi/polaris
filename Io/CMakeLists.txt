@@ -20,7 +20,7 @@ foreach (headerfile ${io_headers})
 		--database sqlite 
 		--generate-query --generate-schema --generate-session
 		--output-dir ${CMAKE_CURRENT_SOURCE_DIR}
-		--default-pointer std::tr1::shared_ptr 
+		--default-pointer std::shared_ptr 
 		--schema-name ${schema} 
 		${CMAKE_CURRENT_SOURCE_DIR}/${headerfile}
 		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${headerfile}

@@ -1,14 +1,7 @@
 #ifndef Dimensions
 #define Dimensions
-#pragma warning(disable:4068)    
-#include <vector>
-#include <string>
-#include <odb/core.hxx>
-// Include TR1 <memory> header in a compiler-specific fashion. Fall back
-// on the Boost implementation if the compiler does not support TR1.
-//
-#include <odb/tr1/memory.hxx>
-using std::tr1::shared_ptr;
+
+#include "Shared.h"
 
 namespace polaris::io {
 //Forward declarations.
@@ -20,8 +13,8 @@ class Dimension;
 class Dimension
 {
 public:
-    // Default Constructor
-    Dimension () {}        
+	// Default Constructor
+	Dimension () {}        
 	Dimension (std::string table-field_, std::string quantity_, int mass_, int length_, int time_)
 	: table-field (table-field_), quantity (quantity_), mass (mass_), length (length_), time (time_)
 	{

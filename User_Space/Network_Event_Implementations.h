@@ -78,6 +78,27 @@ namespace Network_Event_Components
 				}
 			}
 
+			feature_implementation void Initialize(int start_time, int end_time, vector<typename MasterType::link_type*>& affected_links)
+			{
+				_start_time = start_time;
+				_end_time = end_time;
+
+				for(typename vector<typename MasterType::link_type*>::iterator vitr=affected_links.begin();vitr!=affected_links.end();vitr++)
+				{
+					Link_Interface* link = (Link_Interface*)(*vitr);
+					_affected_links.push_back( (Link_Interface*)(*vitr) );
+					//Location_Container_Interface* locations = link->template activity_locations<Location_Container_Interface*>();
+
+					//// push locations from link to affected locations container
+					//for (typename Location_Container_Interface::iterator litr = locations->begin(); litr != locations->end(); ++litr)
+					//{
+					//	Location_Interface* loc = (*litr);
+					//	this->_affected_locations.push_back(loc);
+					//	zone_set.insert(loc->template zone<Zone_Interface*>());
+					//}
+				}
+			}
+
 			feature_implementation void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
 			{
 				using namespace polaris::io;
@@ -419,7 +440,12 @@ namespace Network_Event_Components
 			
 			//feature_implementation void Start(){Base_Network_Event::template Start<ComponentType,CallerType,NT>();}
 			feature_implementation void Start(){((Base_Network_Event<MasterType,NT,APPEND_CHILD(Congestion_Network_Event)>*)this)->template Start<ComponentType,CallerType,NT>();}
-			
+
+			feature_implementation void Initialize(int start_time, int end_time, vector<typename MasterType::link_type*>& affected_links)
+			{
+				((Base_Network_Event<MasterType,NT,APPEND_CHILD(Congestion_Network_Event)>*)this)->template Initialize< ComponentType,ComponentType,MasterType>(start_time,end_time,affected_links);
+			}
+
 			feature_implementation void Initialize(weak_ptr<polaris::io::Event_Instance>& instance)
 			{
 				using namespace polaris::io;
@@ -543,25 +569,29 @@ namespace Network_Event_Components
 						{
 							Weather_Network_Event_Interface* net_event = (Weather_Network_Event_Interface*)Allocate<typename MasterType::type_of(weather_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-							Create_Network_Event<ComponentType,ComponentType,typename Weather_Network_Event_Interface::ComponentType>(net_event);
+							net_event->Start<NT>();
+							Add_Network_Event<ComponentType,ComponentType,typename Weather_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Accident")
 						{
 							Accident_Network_Event_Interface* net_event = (Accident_Network_Event_Interface*)Allocate<typename MasterType::type_of(accident_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-							Create_Network_Event<ComponentType,ComponentType,typename Accident_Network_Event_Interface::ComponentType>(net_event);
+							net_event->Start<NT>();
+							Add_Network_Event<ComponentType,ComponentType,typename Accident_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Congestion")
 						{
 							Congestion_Network_Event_Interface* net_event = (Congestion_Network_Event_Interface*)Allocate<typename MasterType::type_of(congestion_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-							Create_Network_Event<ComponentType,ComponentType,typename Congestion_Network_Event_Interface::ComponentType>(net_event);
+							net_event->Start<NT>();
+							Add_Network_Event<ComponentType,ComponentType,typename Congestion_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Lane Closure")
 						{
 							Lane_Closure_Network_Event_Interface* net_event = (Lane_Closure_Network_Event_Interface*)Allocate<typename MasterType::type_of(lane_closure_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-							Create_Network_Event<ComponentType,ComponentType,typename Lane_Closure_Network_Event_Interface::ComponentType>(net_event);
+							net_event->Start<NT>();
+							Add_Network_Event<ComponentType,ComponentType,typename Lane_Closure_Network_Event_Interface::ComponentType>(net_event);
 						}
 					}
 				}
@@ -629,10 +659,8 @@ namespace Network_Event_Components
 			//	static_assert(false,"Non-TMC are only allowed to withdraw weather events!");
 			//}
 
-			feature_implementation void Create_Network_Event(Network_Event<TargetType,CallerType>* network_event)
+			feature_implementation void Add_Network_Event(Network_Event<TargetType,CallerType>* network_event)
 			{
-				network_event->template Start<NT>();
-
 				_network_event_container[TargetType::component_index].push_back( (Base_Network_Event_Interface*) network_event );
 			}
 

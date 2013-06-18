@@ -139,7 +139,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeftDown(wx
 	_y_start_utm=(float)posY;
 	
 	
-	if(_selected_layer != nullptr && _ctrl_down)
+	if(_selected_layer != nullptr && _ctrl_down && !_time_panel->Is_Running<NT>())
 	{
 		Point_3D<MasterType> location;
 		location._x=(float)posX;
@@ -228,7 +228,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 	}
 	else
 	{
-		if(_selected_layer != nullptr && _alt_down)
+		if(_selected_layer != nullptr && _alt_down && !_time_panel->Is_Running<NT>())
 		{
 			Point_3D<MasterType> location;
 			location._x=(float)posX;
@@ -341,7 +341,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnWheel(wxMou
 		_spatial_change=true;
 		Refresh();
 	}
-	else if(_scale*1.0/.8<5)
+	else if(_scale*1.0/.8 < 6)
 	{
 		_scale=_scale*(1.0/.8);
 		_spatial_change=true;
@@ -385,7 +385,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnDClick(wxMo
 {
 	//if(_interaction_mode == IDENTIFY)
 	//{
-		if(_selected_layer != nullptr)
+		if(_selected_layer != nullptr && !_time_panel->Is_Running<NT>())
 		{
 			_selected_layer->Double_Click<NULLTYPE>();
 		}

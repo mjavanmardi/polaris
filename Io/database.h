@@ -1,22 +1,14 @@
-// file      : access/database.hxx
-// copyright : not copyrighted - public domain
-
-//
-// Create concrete database instance based on the DATABASE_* macros.
-//
-
+#ifndef DATABASE
+#define DATABASE
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning( disable : 4996 )
 
 #define SCHEMA_REVISION "11"
 
-#ifndef DATABASE
-#define DATABASE
-
 #include <string>
-#include <odb/tr1/memory.hxx>
-using std::tr1::shared_ptr;
-using std::tr1::weak_ptr;
+
+#include <memory>
+using std::shared_ptr;
 using std::unique_ptr;
 #include <cstdlib>  // std::exit
 #include <iostream>
@@ -42,25 +34,6 @@ using std::vector;
 using std::string;
 using std::cout;
 using std::ifstream;
-
-//#pragma warning(disable:4099)
-//
-//#ifdef _DEBUG
-//#pragma comment(lib, "odb-sqlite-d-mt.lib")
-//#pragma comment(lib, "sqlite3-d-mt.lib")
-//#pragma comment(lib, "odb-d-mt.lib")
-//#pragma comment(lib, "odb-sqlite-d.lib")
-//#pragma comment(lib, "sqlite3-d.lib")
-//#pragma comment(lib, "odb-d.lib")
-//#else
-//#pragma comment(lib, "odb-sqlite-mt.lib")
-//#pragma comment(lib, "sqlite3-mt.lib")
-//#pragma comment(lib, "odb-mt.lib")
-//#pragma comment(lib, "odb-sqlite.lib")
-//#pragma comment(lib, "sqlite3.lib")
-//#pragma comment(lib, "odb.lib")
-//#endif
-
 
 
 namespace polaris
@@ -255,7 +228,8 @@ inline unique_ptr<odb::database> create_sqlite_database(const string& name, stri
 		odb::transaction t (c->begin ());
 		try
 		{
-			odb::schema_catalog::create_schema (*db, schema);
+			if (odb::schema_catalog::exists(*db, schema))
+				odb::schema_catalog::create_schema (*db, schema);
 		}
 		catch (odb::unknown_schema e)
 		{

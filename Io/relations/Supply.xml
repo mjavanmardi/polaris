@@ -8,4 +8,22 @@
 		<field name="sigma" type="double"/>
 		<field name="aggregation_period_sec" type="int"/>
 	</type>		
+	<type name="Microsoft_Event" pragma="object">
+		<field name="incidentId" type="int" pragma="id"/>
+		<field name="end" type="int"/>
+		<field name="lastModified" type="int"/>
+		<field name="start" type="int"/>
+		<field name="type" type="int"/>
+		<field name="severity" type="int"/>
+		<field name="description" type="std::string"/>
+		<field name="congestion" type="std::string"/>
+		<field name="lane" type="std::string"/>
+		<field name="lat" type="double"/>
+		<field name="lng" type="double"/>
+		<field name="x" type="double"/>
+		<field name="y" type="double"/>
+		<field name="roadClosed" type="bool"/>
+		<field name="verified" type="bool"/>
+		<field name="link_id" type="int"/>
+	</type>		
 </root>

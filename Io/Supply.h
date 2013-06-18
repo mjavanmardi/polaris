@@ -1,19 +1,8 @@
 #ifndef IOSupply
 #define IOSupply
-#pragma warning(disable:4068)
 
-#include <map>
-#include <vector>
-#include <string>
+#include "Shared.h"
 
-#include <odb/core.hxx>
-
-// Include TR1 <memory> header in a compiler-specific fashion. Fall back
-// on the Boost implementation if the compiler does not support TR1.
-//
-#include <odb/tr1/memory.hxx>
-using std::tr1::shared_ptr;
-using std::tr1::weak_ptr;
 
 
 namespace polaris
@@ -62,8 +51,17 @@ class Depot;
 class OpenShoulder;
 class Action;
 class Action_Key;
-
+class Microsoft_Event;
 class InputContainer;
+
+
+typedef shared_ptr<Node> node_ptr;
+typedef shared_ptr<Link_Type> link_type_ptr;
+typedef shared_ptr<Area_Type> area_type_ptr;
+#pragma db value(node_ptr) type("INTEGER") not_null
+#pragma db value(link_type_ptr) type("INTEGER") not_null
+#pragma db value(area_type_ptr) type("INTEGER") not_null
+
 #pragma db value
 class timing_phase
 {
@@ -110,7 +108,7 @@ public:
 class InputContainer 
 {
 public:
-	std::map<int,shared_ptr<Node> > Nodes;
+	std::map<int,node_ptr > Nodes;
 	std::map<int,shared_ptr<Zone> > Zones;
 	std::map<int,shared_ptr<Link> > Links;
 	std::map<int,shared_ptr<Parking> > Parkings;
@@ -154,7 +152,7 @@ class Node
 public:
 	// Default Constructor
 	Node () {}	
-	//Contructor
+	//Constructor
 	Node ( int node_, double x_, double y_, double z_, int subarea_, int part_ )  
 	: node (node_), x (x_), y (y_), z (z_), subarea (subarea_), part (part_)
 	{
@@ -192,8 +190,8 @@ private:
 class Zone
 {
 public:
-    // Default Constructor
-    Zone () {}        
+	// Default Constructor
+	Zone () {}        
 	Zone (int zone_, shared_ptr<ZoneLandUse> zone_land_use_, double x_, double y_, double z_, shared_ptr<Area_Type> area_, double min_x_, double min_y_, double max_x_, double max_y_)
 	: zone (zone_), zone_land_use (zone_land_use_), x (x_), y (y_), z (z_), area (area_), min_x (min_x_), min_y (min_y_), max_x (max_x_), max_y (max_y_)
 	{
@@ -242,8 +240,8 @@ private:
 class ZoneLandUse
 {
 public:
-    // Default Constructor
-    ZoneLandUse () {}        
+	// Default Constructor
+	ZoneLandUse () {}        
 	ZoneLandUse (int zone_, int area_, int area_res_low_, int area_res_hi_, int area_comm_, int area_ind_, int pop_hh_, int pop_per_, int pop_gq_, int emp_tot_, int emp_ret_)
 	: zone (zone_), area (area_), area_res_low (area_res_low_), area_res_hi (area_res_hi_), area_comm (area_comm_), area_ind (area_ind_), pop_hh (pop_hh_), pop_per (pop_per_), pop_gq (pop_gq_), emp_tot (emp_tot_), emp_ret (emp_ret_)
 	{
@@ -293,8 +291,8 @@ private:
 class LocationData
 {
 public:
-    // Default Constructor
-    LocationData () {}        
+	// Default Constructor
+	LocationData () {}        
 	LocationData (int location_, int truck_org_, int truck_des_, int auto_org_, int auto_des_, int transit_, int areatype_, std::string notes_, double census_zone_, double x_, double y_, std::string land_use_)
 	: location (location_), truck_org (truck_org_), truck_des (truck_des_), auto_org (auto_org_), auto_des (auto_des_), transit (transit_), areatype (areatype_), notes (notes_), census_zone (census_zone_), x (x_), y (y_), land_use (land_use_)
 	{
@@ -350,7 +348,7 @@ class Shape
 public:
 	// Default Constructor
 	Shape () {}	
-	//Contructor
+	//Constructor
 	Shape ( shared_ptr<Link> link_, int points_ )  
 	: link (link_), points (points_)
 	{
@@ -385,8 +383,8 @@ class Link
 public:
 	// Default Constructor
 	Link () {}	
-	//Contructor
-	Link ( int link_, std::string name_, shared_ptr<Node> node_a_, shared_ptr<Node> node_b_, double length_, double setback_a_, double setback_b_, int bearing_a_, int bearing_b_, shared_ptr<Link_Type> type_, int divided_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_, int lanes_ab_, double speed_ab_, double fspd_ab_, int cap_ab_, int lanes_ba_, double speed_ba_, double fspd_ba_, int cap_ba_, int left_ab_, int right_ab_, int left_ba_, int right_ba_ )  
+	//Constructor
+	Link ( int link_, std::string name_, node_ptr node_a_, node_ptr node_b_, double length_, double setback_a_, double setback_b_, int bearing_a_, int bearing_b_, shared_ptr<Link_Type> type_, int divided_, shared_ptr<Area_Type> area_type_, std::string use_, double grade_, int lanes_ab_, double speed_ab_, double fspd_ab_, int cap_ab_, int lanes_ba_, double speed_ba_, double fspd_ba_, int cap_ba_, int left_ab_, int right_ab_, int left_ba_, int right_ba_ )  
 	: link (link_), name (name_), node_a (node_a_), node_b (node_b_), length (length_), setback_a (setback_a_), setback_b (setback_b_), bearing_a (bearing_a_), bearing_b (bearing_b_), type (type_), divided (divided_), area_type (area_type_), use (use_), grade (grade_), lanes_ab (lanes_ab_), speed_ab (speed_ab_), fspd_ab (fspd_ab_), cap_ab (cap_ab_), lanes_ba (lanes_ba_), speed_ba (speed_ba_), fspd_ba (fspd_ba_), cap_ba (cap_ba_), left_ab (left_ab_), right_ab (right_ab_), left_ba (left_ba_), right_ba (right_ba_)
 	{
 	}
@@ -395,11 +393,11 @@ public:
 	void setLink (const int& link_){link = link_;}
 	const std::string& getName () const {return name;}
 	void setName (const std::string& name_){name = name_;}
-	const shared_ptr<Node>& getNode_A () const {return node_a;}
-	void setNode_A (const shared_ptr<Node>& node_a_){node_a = node_a_;}
+	const node_ptr& getNode_A () const {return node_a;}
+	void setNode_A (const node_ptr& node_a_){node_a = node_a_;}
 	void setNode_A (const int& node_a_, InputContainer& container){node_a = container.Nodes[node_a_];}
-	const shared_ptr<Node>& getNode_B () const {return node_b;}
-	void setNode_B (const shared_ptr<Node>& node_b_){node_b = node_b_;}
+	const node_ptr& getNode_B () const {return node_b;}
+	void setNode_B (const node_ptr& node_b_){node_b = node_b_;}
 	void setNode_B (const int& node_b_, InputContainer& container){node_b = container.Nodes[node_b_];}
 	const double& getLength () const {return length;}
 	void setLength (const double& length_){length = length_;}
@@ -454,9 +452,10 @@ private:
 	friend class odb::access;
 	#pragma db id
 	int link;
+#pragma db null
 	std::string name;
-	shared_ptr<Node> node_a;
-	shared_ptr<Node> node_b;
+	node_ptr node_a;
+	node_ptr node_b;
 	double length;
 	double setback_a;
 	double setback_b;
@@ -479,7 +478,6 @@ private:
 	int right_ab;
 	int left_ba;
 	int right_ba;
-	#pragma db index member(link)
 };
 
 #pragma db object //table("POCKET")
@@ -488,7 +486,7 @@ class Pocket
 public:
 	// Default Constructor
 	Pocket () {}	
-	//Contructor
+	//Constructor
 	Pocket ( shared_ptr<Link> link_, int dir_, std::string type_, int lanes_, double length_, double offset_ )  
 	: link (link_), dir (dir_), type (type_), lanes (lanes_), length (length_), offset (offset_)
 	{
@@ -530,7 +528,7 @@ class Lane_Use
 public:
 	// Default Constructor
 	Lane_Use () {}	
-	//Contructor
+	//Constructor
 	Lane_Use ( shared_ptr<Link> link_, int dir_, int lanes_, int use_, int type_, int min_type_, int max_type_, int min_trav_, int max_trav_, double start_, double end_, double offset_, double length_, int toll_, double rate_, double min_delay_, double max_delay_ )  
 	: link (link_), dir (dir_), lanes (lanes_), use (use_), type (type_), min_type (min_type_), max_type (max_type_), min_trav (min_trav_), max_trav (max_trav_), start (start_), end (end_), offset (offset_), length (length_), toll (toll_), rate (rate_), min_delay (min_delay_), max_delay (max_delay_)
 	{
@@ -605,7 +603,7 @@ class Connect
 public:
 	// Default Constructor
 	Connect () {}	
-	//Contructor
+	//Constructor
 	Connect ( shared_ptr<Link> link_, int dir_, shared_ptr<Link> to_link_, std::string lanes_, std::string to_lanes_, std::string type_, int penalty_, double speed_, int capacity_, int in_high_, int out_high_ )  
 	: link (link_), dir (dir_), to_link (to_link_), lanes (lanes_), to_lanes (to_lanes_), type (type_), penalty (penalty_), speed (speed_), capacity (capacity_), in_high (in_high_), out_high (out_high_)
 	{
@@ -663,8 +661,8 @@ class Turn_Pen
 public:
 	// Default Constructor
 	Turn_Pen () {}	
-	//Contructor
-	Turn_Pen ( shared_ptr<Link> link_, int dir_, shared_ptr<Link> to_link_, double start_, double end_, int use_, int min_type_, int max_type_, int penalty_, shared_ptr<Node> in_node_, shared_ptr<Node> out_node_ )  
+	//Constructor
+	Turn_Pen ( shared_ptr<Link> link_, int dir_, shared_ptr<Link> to_link_, double start_, double end_, int use_, int min_type_, int max_type_, int penalty_, node_ptr in_node_, node_ptr out_node_ )  
 	: link (link_), dir (dir_), to_link (to_link_), start (start_), end (end_), use (use_), min_type (min_type_), max_type (max_type_), penalty (penalty_), in_node (in_node_), out_node (out_node_)
 	{
 	}
@@ -689,11 +687,11 @@ public:
 	void setMax_Type (const int& max_type_){max_type = max_type_;}
 	const int& getPenalty () const {return penalty;}
 	void setPenalty (const int& penalty_){penalty = penalty_;}
-	const shared_ptr<Node>& getIn_Node () const {return in_node;}
-	void setIn_Node (const shared_ptr<Node>& in_node_){in_node = in_node_;}
+	const node_ptr& getIn_Node () const {return in_node;}
+	void setIn_Node (const node_ptr& in_node_){in_node = in_node_;}
 	void setIn_Node (const int& in_node_, InputContainer& container){in_node = container.Nodes[in_node_];}
-	const shared_ptr<Node>& getOut_Node () const {return out_node;}
-	void setOut_Node (const shared_ptr<Node>& out_node_){out_node = out_node_;}
+	const node_ptr& getOut_Node () const {return out_node;}
+	void setOut_Node (const node_ptr& out_node_){out_node = out_node_;}
 	void setOut_Node (const int& out_node_, InputContainer& container){out_node = container.Nodes[out_node_];}
 	const unsigned long& getPrimaryKey () const {return turn_pen;}
 	const unsigned long& getTurn_Pen () const {return turn_pen;}
@@ -712,8 +710,8 @@ private:
 	int min_type;
 	int max_type;
 	int penalty;
-	shared_ptr<Node> in_node;
-	shared_ptr<Node> out_node;
+	node_ptr in_node;
+	node_ptr out_node;
 
 };
 
@@ -723,7 +721,7 @@ class Parking
 public:
 	// Default Constructor
 	Parking () {}	
-	//Contructor
+	//Constructor
 	Parking ( int parking_, shared_ptr<Link> link_, int dir_, double offset_, int type_, int use_, double start_, double end_, int space_, double time_in_, double time_out_, int hourly_, int daily_ )  
 	: parking (parking_), link (link_), dir (dir_), offset (offset_), type (type_), use (use_), start (start_), end (end_), space (space_), time_in (time_in_), time_out (time_out_), hourly (hourly_), daily (daily_)
 	{
@@ -783,8 +781,8 @@ private:
 class Location
 {
 public:
-    // Default Constructor
-    Location () {}        
+	// Default Constructor
+	Location () {}        
 	Location (int location_, shared_ptr<Link> link_, int dir_, double offset_, double setback_, shared_ptr<Zone> zone_, shared_ptr<LocationData> location_data_)
 	: location (location_), link (link_), dir (dir_), offset (offset_), setback (setback_), zone (zone_), location_data (location_data_)
 	{
@@ -827,7 +825,7 @@ class Access
 public:
 	// Default Constructor
 	Access () {}	
-	//Contructor
+	//Constructor
 	Access ( shared_ptr<Link> link_, int from_id_, int from_type_, int to_id_, int to_type_, int dir_, double time_, int cost_ )  
 	: link (link_), from_id (from_id_), from_type (from_type_), to_id (to_id_), to_type (to_type_), dir (dir_), time (time_), cost (cost_)
 	{
@@ -875,7 +873,7 @@ class Sign
 public:
 	// Default Constructor
 	Sign () {}	
-	//Contructor
+	//Constructor
 	Sign ( shared_ptr<Link> link_, int dir_, std::string sign_ )  
 	: link (link_), dir (dir_), sign (sign_)
 	{
@@ -908,8 +906,8 @@ class Signal
 public:
 	// Default Constructor
 	Signal () {}	
-	//Contructor
-	Signal ( int signal_, int group_, int times_, shared_ptr<Node> nodes_, std::string type_, int offset_ )  
+	//Constructor
+	Signal ( int signal_, int group_, int times_, node_ptr nodes_, std::string type_, int offset_ )  
 	: signal (signal_), group (group_), times (times_), nodes (nodes_), type (type_), offset (offset_)
 	{
 	}
@@ -920,8 +918,8 @@ public:
 	void setGroup (const int& group_){group = group_;}
 	const int& getTimes () const {return times;}
 	void setTimes (const int& times_){times = times_;}
-	const shared_ptr<Node>& getNodes () const {return nodes;}
-	void setNodes (const shared_ptr<Node>& nodes_){nodes = nodes_;}
+	const node_ptr& getNodes () const {return nodes;}
+	void setNodes (const node_ptr& nodes_){nodes = nodes_;}
 	void setNodes (const int& nodes_, InputContainer& container){nodes = container.Nodes[nodes_];}
 	const std::string& getType () const {return type;}
 	void setType (const std::string& type_){type = type_;}
@@ -940,7 +938,7 @@ private:
 	int signal;
 	int group;
 	int times;
-	shared_ptr<Node> nodes;
+	node_ptr nodes;
 	std::string type;
 	int offset;
 	#pragma db index member(signal)
@@ -953,7 +951,7 @@ class Timing
 public:
 	// Default Constructor
 	Timing () {}	
-	//Contructor
+	//Constructor
 	Timing ( shared_ptr<Signal> signal_, int timing_, int type_, int cycle_, int offset_, int phases_ )  
 	: signal (signal_), timing (timing_), type (type_), cycle (cycle_), offset (offset_), phases (phases_)
 	{
@@ -999,7 +997,7 @@ class Phasing
 public:
 	// Default Constructor
 	Phasing () {}	
-	//Contructor
+	//Constructor
 	Phasing ( shared_ptr<Signal> signal_, int phasing_, int phase_, std::string detectors_, int movements_ )  
 	: signal (signal_), phasing (phasing_), phase (phase_), detectors (detectors_), movements (movements_)
 	{
@@ -1042,7 +1040,7 @@ class Detector
 public:
 	// Default Constructor
 	Detector () {}	
-	//Contructor
+	//Constructor
 	Detector ( int detector_, shared_ptr<Link> link_, int dir_, double offset_, double length_, int lanes_, int type_, int use_, int low_, int high_ )  
 	: detector (detector_), link (link_), dir (dir_), offset (offset_), length (length_), lanes (lanes_), type (type_), use (use_), low (low_), high (high_)
 	{
@@ -1095,7 +1093,7 @@ class Stop
 public:
 	// Default Constructor
 	Stop () {}	
-	//Contructor
+	//Constructor
 	Stop ( int stop_, std::string name_, shared_ptr<Link> link_, int dir_, double offset_, int use_, int type_, int space_ )  
 	: stop (stop_), name (name_), link (link_), dir (dir_), offset (offset_), use (use_), type (type_), space (space_)
 	{
@@ -1142,7 +1140,7 @@ class Fare
 public:
 	// Default Constructor
 	Fare () {}	
-	//Contructor
+	//Constructor
 	Fare ( shared_ptr<Zone> from_zone_, shared_ptr<Zone> to_zone_, int from_mode_, int to_mode_, int period_, int type_, int fare_ )  
 	: from_zone (from_zone_), to_zone (to_zone_), from_mode (from_mode_), to_mode (to_mode_), period (period_), type (type_), fare (fare_)
 	{
@@ -1187,7 +1185,7 @@ class Line
 public:
 	// Default Constructor
 	Line () {}	
-	//Contructor
+	//Constructor
 	Line ( int route_, shared_ptr<Stop> stops_, int mode_, int type_, std::string name_, shared_ptr<Stop> stop_, shared_ptr<Zone> zone_, int flag_ )  
 	: route (route_), stops (stops_), mode (mode_), type (type_), name (name_), stop (stop_), zone (zone_), flag (flag_)
 	{
@@ -1237,7 +1235,7 @@ class Schedule
 public:
 	// Default Constructor
 	Schedule () {}	
-	//Contructor
+	//Constructor
 	Schedule ( int route_, shared_ptr<Stop> stops_, shared_ptr<Stop> stop_ )  
 	: route (route_), stops (stops_), stop (stop_)
 	{
@@ -1271,7 +1269,7 @@ class Driver
 public:
 	// Default Constructor
 	Driver () {}	
-	//Contructor
+	//Constructor
 	Driver ( int route_, shared_ptr<Link> links_, int type_, int subtype_, shared_ptr<Link> link_, int dir_ )  
 	: route (route_), links (links_), type (type_), subtype (subtype_), link (link_), dir (dir_)
 	{
@@ -1314,8 +1312,8 @@ class Route_Nodes
 public:
 	// Default Constructor
 	Route_Nodes () {}	
-	//Contructor
-	Route_Nodes ( int route_, int mode_, shared_ptr<Veh_Type> veh_type_, shared_ptr<Node> nodes_, std::string name_, shared_ptr<Node> node_, int type_, double dwell_, double time_, double speed_ )  
+	//Constructor
+	Route_Nodes ( int route_, int mode_, shared_ptr<Veh_Type> veh_type_, node_ptr nodes_, std::string name_, node_ptr node_, int type_, double dwell_, double time_, double speed_ )  
 	: route (route_), mode (mode_), veh_type (veh_type_), nodes (nodes_), name (name_), node (node_), type (type_), dwell (dwell_), time (time_), speed (speed_)
 	{
 	}
@@ -1327,13 +1325,13 @@ public:
 	const shared_ptr<Veh_Type>& getVeh_Type () const {return veh_type;}
 	void setVeh_Type (const shared_ptr<Veh_Type>& veh_type_){veh_type = veh_type_;}
 	void setVeh_Type (const int& veh_type_, InputContainer& container){veh_type = container.Veh_Types[veh_type_];}
-	const shared_ptr<Node>& getNodes () const {return nodes;}
-	void setNodes (const shared_ptr<Node>& nodes_){nodes = nodes_;}
+	const node_ptr& getNodes () const {return nodes;}
+	void setNodes (const node_ptr& nodes_){nodes = nodes_;}
 	void setNodes (const int& nodes_, InputContainer& container){nodes = container.Nodes[nodes_];}
 	const std::string& getName () const {return name;}
 	void setName (const std::string& name_){name = name_;}
-	const shared_ptr<Node>& getNode () const {return node;}
-	void setNode (const shared_ptr<Node>& node_){node = node_;}
+	const node_ptr& getNode () const {return node;}
+	void setNode (const node_ptr& node_){node = node_;}
 	void setNode (const int& node_, InputContainer& container){node = container.Nodes[node_];}
 	const int& getType () const {return type;}
 	void setType (const int& type_){type = type_;}
@@ -1354,9 +1352,9 @@ private:
 	int route;
 	int mode;
 	shared_ptr<Veh_Type> veh_type;
-	shared_ptr<Node> nodes;
+	node_ptr nodes;
 	std::string name;
-	shared_ptr<Node> node;
+	node_ptr node;
 	int type;
 	double dwell;
 	double time;
@@ -1370,7 +1368,7 @@ class Veh_Type
 public:
 	// Default Constructor
 	Veh_Type () {}	
-	//Contructor
+	//Constructor
 	Veh_Type ( int type_, double length_, double max_speed_, double max_accel_, double max_decel_, double op_cost_, int use_, int capacity_, double load_, double unload_, int method_, double min_dwell_, double max_dwell_, int subtype_ )  
 	: type (type_), length (length_), max_speed (max_speed_), max_accel (max_accel_), max_decel (max_decel_), op_cost (op_cost_), use (use_), capacity (capacity_), load (load_), unload (unload_), method (method_), min_dwell (min_dwell_), max_dwell (max_dwell_), subtype (subtype_)
 	{
@@ -1435,7 +1433,7 @@ class Ridership
 public:
 	// Default Constructor
 	Ridership () {}	
-	//Contructor
+	//Constructor
 	Ridership ( int mode_, int route_, int run_, shared_ptr<Stop> stop_, double schedule_, double time_, int board_, int alight_, int load_, double factor_ )  
 	: mode (mode_), route (route_), run (run_), stop (stop_), schedule (schedule_), time (time_), board (board_), alight (alight_), load (load_), factor (factor_)
 	{
@@ -1486,8 +1484,8 @@ private:
 class Area_Type
 {
 public:
-    // Default Constructor
-    Area_Type () {}        
+	// Default Constructor
+	Area_Type () {}        
 	Area_Type (int area_type_, std::string name_, std::string notes_)
 	: area_type (area_type_), name (name_), notes (notes_)
 	{
@@ -1513,8 +1511,8 @@ private:
 class Link_Type
 {
 public:
-    // Default Constructor
-    Link_Type () {}        
+	// Default Constructor
+	Link_Type () {}        
 	Link_Type (std::string link_type_, int rank_, std::string use_codes_, std::string alternative_labels_, std::string notes_)
 	: link_type (link_type_), rank (rank_), use_codes (use_codes_), alternative_labels (alternative_labels_), notes (notes_)
 	{
@@ -1546,8 +1544,8 @@ private:
 class Use_Code
 {
 public:
-    // Default Constructor
-    Use_Code () {}        
+	// Default Constructor
+	Use_Code () {}        
 	Use_Code (std::string use_code_, int rank_, int routable_, std::string subset_of_, std::string superset_of_, std::string alternative_labels_, std::string notes_)
 	: use_code (use_code_), rank (rank_), routable (routable_), subset_of (subset_of_), superset_of (superset_of_), alternative_labels (alternative_labels_), notes (notes_)
 	{
@@ -1584,8 +1582,8 @@ private:
 class LinkList
 {
 public:
-    // Default Constructor
-    LinkList () {}        
+	// Default Constructor
+	LinkList () {}        
 	LinkList (int id_, std::vector<int > links_)
 	: id (id_), links (links_)
 	{
@@ -1609,9 +1607,9 @@ private:
 class Component
 {
 public:
-    // Default Constructor
-    Component () {}        
-	Component (int id_, std::string name_, std::string icon_, std::vector<weak_ptr<Action> > actions_)
+	// Default Constructor
+	Component () {}        
+	Component (int id_, std::string name_, std::string icon_, std::vector<std::weak_ptr<Action> > actions_)
 	: id (id_), name (name_), icon (icon_), actions (actions_)
 	{
 	}
@@ -1626,9 +1624,9 @@ public:
 	void setName (const std::string& name_) {name = name_;}
 	const std::string& getIcon () const {return icon;}
 	void setIcon (const std::string& icon_) {icon = icon_;}
-	const std::vector<weak_ptr<Action> >& getActions () const {return actions;}
-	void setActions (const std::vector<weak_ptr<Action> >& actions_) {actions = actions_;}
-	void setAction (const weak_ptr<Action>  actions_) {actions.push_back(actions_);}
+	const std::vector<std::weak_ptr<Action> >& getActions () const {return actions;}
+	void setActions (const std::vector<std::weak_ptr<Action> >& actions_) {actions = actions_;}
+	void setAction (const std::weak_ptr<Action>  actions_) {actions.push_back(actions_);}
 	//Data Fields
 private:
 	friend class odb::access;
@@ -1637,7 +1635,7 @@ private:
 	std::string name;
 	std::string icon;
 	#pragma db inverse(component)
-	std::vector<weak_ptr<Action> > actions;
+	std::vector<std::weak_ptr<Action> > actions;
 };
 
 
@@ -1645,8 +1643,8 @@ private:
 class VMS
 {
 public:
-    // Default Constructor
-    VMS () {}        
+	// Default Constructor
+	VMS () {}        
 	VMS (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, int initial_event_)
 	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_event (initial_event_)
 	{
@@ -1690,8 +1688,8 @@ private:
 class HAR
 {
 public:
-    // Default Constructor
-    HAR () {}        
+	// Default Constructor
+	HAR () {}        
 	HAR (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, int initial_event_, shared_ptr<LinkList> links_)
 	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_event (initial_event_), links (links_)
 	{
@@ -1738,8 +1736,8 @@ private:
 class VSS
 {
 public:
-    // Default Constructor
-    VSS () {}        
+	// Default Constructor
+	VSS () {}        
 	VSS (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, int initial_speed_, std::string speed_, shared_ptr<LinkList> links_)
 	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), initial_speed (initial_speed_), speed (speed_), links (links_)
 	{
@@ -1790,8 +1788,8 @@ private:
 class Depot
 {
 public:
-    // Default Constructor
-    Depot () {}        
+	// Default Constructor
+	Depot () {}        
 	Depot (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, shared_ptr<LinkList> links_, int fleet_size_, int available_)
 	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), links (links_), fleet_size (fleet_size_), available (available_)
 	{
@@ -1842,8 +1840,8 @@ private:
 class OpenShoulder
 {
 public:
-    // Default Constructor
-    OpenShoulder () {}        
+	// Default Constructor
+	OpenShoulder () {}        
 	OpenShoulder (int id_, shared_ptr<Component> component_, shared_ptr<LinkList> links_, bool open_)
 	: id (id_), component (component_), links (links_), open (open_)
 	{
@@ -1878,8 +1876,8 @@ private:
 class Action
 {
 public:
-    // Default Constructor
-    Action () {}        
+	// Default Constructor
+	Action () {}        
 	Action (int id_, shared_ptr<Component> component_, std::vector<shared_ptr<Action_Key> > keys_, std::string name_, std::string note_)
 	: id (id_), component (component_), keys (keys_), name (name_), note (note_)
 	{
@@ -1916,8 +1914,8 @@ private:
 class Fixed_Sensor
 {
 public:
-    // Default Constructor
-    Fixed_Sensor () {}        
+	// Default Constructor
+	Fixed_Sensor () {}        
 	Fixed_Sensor (int id_, int link_, bool dir_, double offset_, double sigma_, int aggregation_period_sec_)
 	: id (id_), link (link_), dir (dir_), offset (offset_), sigma (sigma_), aggregation_period_sec (aggregation_period_sec_)
 	{
@@ -1950,8 +1948,8 @@ private:
 class Action_Key
 {
 public:
-    // Default Constructor
-    Action_Key () {}        
+	// Default Constructor
+	Action_Key () {}        
 	Action_Key (std::string key_, std::string value_type_, std::string value_constraint_, bool required_, std::string note_)
 	: key (key_), value_type (value_type_), value_constraint (value_constraint_), required (required_), note (note_)
 	{
@@ -1977,7 +1975,70 @@ private:
 	bool required;
 	std::string note;
 };
-
+#pragma db object
+class Microsoft_Event
+{
+public:
+	// Default Constructor
+	Microsoft_Event () {}        
+	Microsoft_Event (int incidentId_, int end_, int lastModified_, int start_, int type_, int severity_, std::string description_, std::string congestion_, std::string lane_, double lat_, double lng_, double x_, double y_, bool roadClosed_, bool verified_, int link_id_)
+		: incidentId (incidentId_), end (end_), lastModified (lastModified_), start (start_), type (type_), severity (severity_), description (description_), congestion (congestion_), lane (lane_), lat (lat_), lng (lng_), x (x_), y (y_), roadClosed (roadClosed_), verified (verified_), link_id (link_id_)
+	{
+	}
+	//Accessors
+	const int& getIncidentid () const {return incidentId;}
+	void setIncidentid (const int& incidentId_) {incidentId = incidentId_;}
+	const int& getEnd () const {return end;}
+	void setEnd (const int& end_) {end = end_;}
+	const int& getLastmodified () const {return lastModified;}
+	void setLastmodified (const int& lastModified_) {lastModified = lastModified_;}
+	const int& getStart () const {return start;}
+	void setStart (const int& start_) {start = start_;}
+	const int& getType () const {return type;}
+	void setType (const int& type_) {type = type_;}
+	const int& getSeverity () const {return severity;}
+	void setSeverity (const int& severity_) {severity = severity_;}
+	const std::string& getDescription () const {return description;}
+	void setDescription (const std::string& description_) {description = description_;}
+	const std::string& getCongestion () const {return congestion;}
+	void setCongestion (const std::string& congestion_) {congestion = congestion_;}
+	const std::string& getLane () const {return lane;}
+	void setLane (const std::string& lane_) {lane = lane_;}
+	const double& getLat () const {return lat;}
+	void setLat (const double& lat_) {lat = lat_;}
+	const double& getLng () const {return lng;}
+	void setLng (const double& lng_) {lng = lng_;}
+	const double& getX () const {return x;}
+	void setX (const double& x_) {x = x_;}
+	const double& getY () const {return y;}
+	void setY (const double& y_) {y = y_;}
+	const bool& getRoadclosed () const {return roadClosed;}
+	void setRoadclosed (const bool& roadClosed_) {roadClosed = roadClosed_;}
+	const bool& getVerified () const {return verified;}
+	void setVerified (const bool& verified_) {verified = verified_;}
+	const int& getLink_Id () const {return link_id;}
+	void setLink_Id (const int& link_id_) {link_id = link_id_;}
+	//Data Fields
+private:
+	friend class odb::access;
+#pragma db id
+	int incidentId;
+	int end;
+	int lastModified;
+	int start;
+	int type;
+	int severity;
+	std::string description;
+	std::string congestion;
+	std::string lane;
+	double lat;
+	double lng;
+	double x;
+	double y;
+	bool roadClosed;
+	bool verified;
+	int link_id;
+};
 }//end of io namespace 
 }//end of polaris namespace
 #endif // IOSupply

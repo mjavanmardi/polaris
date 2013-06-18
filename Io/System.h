@@ -1,15 +1,7 @@
 #ifndef System
 #define System
-#pragma once
-#pragma warning(disable:4068)    
-#include <vector>
-#include <string>
-#include <odb/core.hxx>
-// Include TR1 <memory> header in a compiler-specific fashion. Fall back
-// on the Boost implementation if the compiler does not support TR1.
-//
-#include <odb/tr1/memory.hxx>
-using std::tr1::shared_ptr;
+
+#include "Shared.h"
 
 namespace polaris
 {
@@ -40,8 +32,8 @@ static bool operator< (const table_field& param1, const table_field& param2)
 class Quantity
 {
 public:
-    // Default Constructor
-    Quantity () {}        
+	// Default Constructor
+	Quantity () {}        
 	Quantity (table_field tf_, shared_ptr<Dimension> quantity_)
 	: tf (tf_), quantity (quantity_)
 	{
@@ -63,8 +55,8 @@ private:
 class Dimension
 {
 public:
-    // Default Constructor
-    Dimension () {}        
+	// Default Constructor
+	Dimension () {}        
 	Dimension (std::string quantity_, int mass_, int length_, int time_, int lane_, int usd_)
 	: quantity (quantity_), mass (mass_), length (length_), time (time_), lane (lane_), usd (usd_)
 	{
@@ -98,8 +90,8 @@ private:
 class Meta
 {
 public:
-    // Default Constructor
-    Meta () {}        
+	// Default Constructor
+	Meta () {}        
 	Meta (int id_, std::string key_, std::string value_)
 	: id (id_), key (key_), value (value_)
 	{

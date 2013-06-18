@@ -23,7 +23,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		_dynamic_data=cfg.dynamic_data;
 		_target_sub_iteration=cfg.target_sub_iteration;
 
-		Load_Event<Antares_Layer_Implementation>(&Update_Condition<NULLTYPE>, &Update<NULLTYPE>, _iteration + 1 ,_target_sub_iteration);
+		Load_Event<Antares_Layer_Implementation>(&Update_Condition<NULLTYPE>, &Update<NULLTYPE>, cfg.storage_offset ,_target_sub_iteration);
 
 		_storage.Initialize(cfg.storage_offset, cfg.storage_period, cfg.storage_size);
 		_accent_storage.Initialize(cfg.storage_offset, cfg.storage_period, 1);
@@ -891,7 +891,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		{
 			int reserve;
 
-			//while( AtomicExchange(&_canvas_lock,1) ) SLEEP(0);
+			LOCK(_canvas_lock);
 
 			for(int i=0;i<_num_antares_threads;i++)
 			{
@@ -904,7 +904,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 				//pthis->_accent_storage[_iteration + pthis->_accent_storage.period][i].reserve(reserve);
 			}
 
-			//UNLOCK(_canvas_lock);
+			UNLOCK(_canvas_lock);
 		}
 
 		pthis->Refresh_Selection<ComponentType,ComponentType,NT>();

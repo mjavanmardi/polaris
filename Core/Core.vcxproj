@@ -617,12 +617,14 @@
     <ClInclude Include="Data_Engine.h" />
     <ClInclude Include="Data_Object.h" />
     <ClInclude Include="Data_Structures.h" />
+    <ClInclude Include="Features_V5.h" />
     <ClInclude Include="Multi_Buffer.h" />
     <ClInclude Include="Execution_Detail.h" />
     <ClInclude Include="Execution_Engine.h" />
     <ClInclude Include="Execution_Object.h" />
     <ClInclude Include="Fibonacci_Heap.h" />
     <ClInclude Include="Min_Pool.h" />
+    <ClInclude Include="Polaris_Component_V5.h" />
     <ClInclude Include="Polaris_Variables.h" />
     <ClInclude Include="Quick_List.h" />
     <ClInclude Include="Features.h" />

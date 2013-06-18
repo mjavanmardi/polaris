@@ -40,6 +40,26 @@ public:
 	{
 		while(AtomicExchange(&mem_lock,1)) SLEEP(0); // lock the mem
 
+		// NEW ALLOCATION
+		//if(first_free_page->next_free_page == end_page)
+		//{
+		//	int pages_allocation = _Max_Pages;
+		//	int allocation = _Page_Size*pages_allocation;
+		//	Memory_Page* new_pages=(Memory_Page*)VirtualAlloc(nullptr,allocation,MEM_COMMIT,PAGE_READWRITE);
+
+		//	end_page = new_pages + pages_allocation;
+		//	
+		//	first_free_page->next_free_page = first_free_page;
+
+		//	Memory_Page* current_page=first_free_page;
+
+		//	for(int i=0;i<_Max_Pages;i++)
+		//	{
+		//		current_page->next_free_page=current_page+1;
+		//		current_page++;
+		//	}
+		//}
+
 		Page* return_val=&first_free_page->page;
 		
 		first_free_page=first_free_page->next_free_page;

@@ -1,15 +1,7 @@
 #ifndef Its
 #define Its
-#pragma warning(disable:4068)    
-#include <vector>
-#include <string>
-#include <odb/core.hxx>
-// Include TR1 <memory> header in a compiler-specific fashion. Fall back
-// on the Boost implementation if the compiler does not support TR1.
-//
-#include <odb/tr1/memory.hxx>
-using std::tr1::shared_ptr;
-using std::tr1::weak_ptr;
+
+#include "Shared.h"
 
 namespace polaris{ namespace io {
 //Forward declarations.

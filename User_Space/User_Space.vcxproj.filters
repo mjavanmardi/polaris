@@ -307,5 +307,8 @@
     <ClInclude Include="Network_DB_Reader_Prototype.h">
       <Filter>Prototypes</Filter>
     </ClInclude>
+    <ClInclude Include="Detector_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
