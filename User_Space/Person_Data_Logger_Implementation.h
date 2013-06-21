@@ -13,12 +13,16 @@ namespace Person_Components
 		implementation struct Person_Data_Logger_Implementation : public Polaris_Component<APPEND_CHILD(Person_Data_Logger_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			vector<int> num_acts;
+			vector<int> executed_acts[_num_threads];
+			vector<int> ttime_distribution[_num_threads];
 			vector<string> output_data[_num_threads];
 			vector<string> output_data_buffer[_num_threads];
 			vector<string>* buff;
 			vector<string>* current;
 			member_data(ofstream, log, none, none);
 			member_data(string, filename, none, none);
+			member_data(ofstream, ttime_file, none,none);
+			member_data(ofstream, executed_acts_file, none,none);
 
 			member_component_and_feature_accessor(Logging_Interval, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Next_Logging_Time, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
@@ -46,15 +50,36 @@ namespace Person_Components
 				buff = output_data_buffer;
 				current = output_data;
 
+				// Initialize log file
 				stringstream filename("");
 				filename << scenario->template output_dir_name<string>();
 				filename << "activity_output.xls";
-
 				this->_filename = filename.str();
 				this->_log.open(this->_filename);
 				this->_log << "PER_ID\tACT_ID\tACT_TYP\tSTART_min\tDUR_min\tDEST_ZONE\tMODE\tplanning_info\tTTIME_min\tEXECUTED";
 
+				// Initialize data counter files
+				stringstream filename_ttime("");
+				filename_ttime << scenario->template output_dir_name<string>();
+				filename_ttime << "ttime_distribution.csv";
+				this->_ttime_file.open(filename_ttime.str());
+				if (!this->_ttime_file.is_open()) THROW_EXCEPTION("ERROR: ttime distribution file could not be created.");
+				this->_ttime_file <<"TIME,5,10,15,20,25,30,35,40";
+				
+				stringstream filename_acts("");
+				filename_acts << scenario->template output_dir_name<string>();
+				filename_acts << "executed_activities.csv";
+				this->_executed_acts_file.open(filename_acts.str());
+				if (!this->_executed_acts_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");
+				this->_executed_acts_file <<"TIME,0,1,2,3,4,5,6,7";
+
+				// Initialize data count containers
 				num_acts.resize(20,0);
+				for (int i=0; i<_num_threads;++i)
+				{
+					ttime_distribution[i].resize(25,0); 
+					executed_acts[i].resize(20,0);
+				}
 			}
 
 			feature_implementation void Add_Record(TargetType act_record, bool is_executed)
@@ -102,7 +127,37 @@ namespace Person_Components
 				}
 				else
 				{
-					s<<"\t"<<act->template Actual_Travel_Time<Time_Minutes>()<<"\t"<<1;
+					Time_Minutes ttime = act->template Actual_Travel_Time<Time_Minutes>();
+					s<<"\t"<<ttime<<"\t"<<1;
+
+					executed_acts[_thread_id][act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()] +=1;
+
+					// update travel time distributions
+					if (ttime < 5) ttime_distribution[_thread_id][0]++;
+					else if (ttime < 10) ttime_distribution[_thread_id][1]++;
+					else if (ttime < 15) ttime_distribution[_thread_id][2]++;
+					else if (ttime < 20) ttime_distribution[_thread_id][3]++;
+					else if (ttime < 25) ttime_distribution[_thread_id][4]++;
+					else if (ttime < 30) ttime_distribution[_thread_id][5]++;
+					else if (ttime < 35) ttime_distribution[_thread_id][6]++;
+					else if (ttime < 40) ttime_distribution[_thread_id][7]++;
+					else if (ttime < 45) ttime_distribution[_thread_id][8]++;
+					else if (ttime < 50) ttime_distribution[_thread_id][9]++;
+					else if (ttime < 55) ttime_distribution[_thread_id][10]++;
+					else if (ttime < 60) ttime_distribution[_thread_id][11]++;
+					else if (ttime < 65) ttime_distribution[_thread_id][12]++;
+					else if (ttime < 70) ttime_distribution[_thread_id][13]++;
+					else if (ttime < 75) ttime_distribution[_thread_id][14]++;
+					else if (ttime < 80) ttime_distribution[_thread_id][15]++;
+					else if (ttime < 85) ttime_distribution[_thread_id][16]++;
+					else if (ttime < 90) ttime_distribution[_thread_id][17]++;
+					else if (ttime < 95) ttime_distribution[_thread_id][18]++;
+					else if (ttime < 100) ttime_distribution[_thread_id][19]++;
+					else if (ttime < 105) ttime_distribution[_thread_id][20]++;
+					else if (ttime < 110) ttime_distribution[_thread_id][21]++;
+					else if (ttime < 115) ttime_distribution[_thread_id][22]++;
+					else if (ttime < 120) ttime_distribution[_thread_id][23]++;
+					else  ttime_distribution[_thread_id][24]++;
 				}
 				buff[_thread_id].push_back(s.str());
 
@@ -172,6 +227,34 @@ namespace Person_Components
 					this->_log << '\n' << ": " << *itr;
 				}
 				current[i].clear();
+
+				// display the ttime and executed activity count distributions once
+				if (i == 0)
+				{
+					this->_ttime_file << _iteration;
+					for (int j=0; j < 25; j++)
+					{
+						int count = 0;
+						for (int k=0; k < _num_threads; k++) // collect value over all threads
+						{
+							count += ttime_distribution[k][j];
+						}
+						this->_ttime_file <<","<< count;
+					}
+					this->_ttime_file << endl;
+
+					this->_executed_acts_file << _iteration;
+					for (int j=0; j < 20; j++)
+					{
+						int count = 0;
+						for (int k=0; k < _num_threads; k++) // collect value over all threads
+						{
+							count += executed_acts[k][j];
+						}
+						this->_executed_acts_file <<","<< count;
+					}
+					this->_executed_acts_file << endl;
+				}
 			}
 		};
 	}

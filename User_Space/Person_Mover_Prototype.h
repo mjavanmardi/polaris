@@ -87,7 +87,7 @@ namespace Prototypes
 			else if (_sub_iteration == Scenario_Components::Types::PRETRIP_ROUTING_SUB_ITERATION)
 			{
 				_pthis->Swap_Event((Event)&Person_Mover::Pretrip_Routing_Event<NULLTYPE>);
-				response.next._iteration = routing_timestep + 1;
+				response.next._iteration = movement->template departed_time<Simulation_Timestep_Increment>();
 				response.next._sub_iteration = Scenario_Components::Types::END_OF_ITERATION;
 				response.result = true;
 			}
