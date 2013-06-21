@@ -164,6 +164,8 @@ namespace Scenario_Components
 			feature_accessor(output_time_in_seconds, none, none);
 			feature_accessor(condition_time_in_seconds, none, none);
 
+			feature_accessor(calculate_realtime_moe, none, none);
+
 			//===============================================
 			// Demand model parameters
 			//-----------------------------------------------
@@ -417,6 +419,8 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("multimodal_network_input", multimodal_network_input<bool*>())!= PARAMETER_FOUND) multimodal_network_input<bool>(false);
 
+				if (cfgReader.getParameter("calculate_realtime_moe", calculate_realtime_moe<bool*>())!= PARAMETER_FOUND) calculate_realtime_moe<bool>(true);
+				
 				//output_dir_name<string&>() = "";
 				input_dir_name<string&>() = "";
 				open_output_files<NULLTYPE>();

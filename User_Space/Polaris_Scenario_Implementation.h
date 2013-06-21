@@ -75,6 +75,7 @@ namespace Scenario_Components
 			member_data(fstream, output_network_snapshots_file, none, none);
 			member_data(fstream, input_network_snapshots_file, none, none);
 
+			member_data(bool, calculate_realtime_moe, none, none);
 
 			member_data(bool, write_activity_output, none, none);
 			member_data(bool, aggregate_routing, none,none);

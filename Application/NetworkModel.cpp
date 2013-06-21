@@ -212,7 +212,7 @@ void run_with_input_from_db()
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 	
 	cout << "reading scenario data..." <<endl;
-	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>();
+	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>("scenario.json");
 
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
@@ -364,6 +364,8 @@ void run_with_input_from_files()
 	scenario->write_network_link_turn_time<bool>(false);
 	scenario->output_network_moe_for_simulation_interval<bool>(true);
 	scenario->output_link_moe_for_assignment_interval<bool>(true);
+	scenario->output_network_moe_for_assignment_interval<bool>(true);
+	scenario->calculate_realtime_moe<bool>(true);
 	//scenario->compare_with_moe_reference<bool>(false);
 
 	scenario->read_scenario_data<Scenario_Components::Types::File_Scenario>(scenario_data);

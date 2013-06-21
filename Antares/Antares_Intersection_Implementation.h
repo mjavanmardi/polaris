@@ -190,6 +190,18 @@ namespace Intersection_Components
 			//	}
 			//	return true;
 			//}
+
+			declare_feature_event(Intersection_REALTIME_MOE_Update)
+			{
+
+				Polaris_Intersection_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Intersection_Implementation)::Intersection_REALTIME_MOE_Update(_this);
+
+				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+
+				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+				_this_ptr->template update_vehicle_locations<NT>();
+			}
 		};
 	}
 }

@@ -569,7 +569,10 @@ namespace Link_Components
 					_link_destination_cumulative_arrived_vehicles++;
 					_link_destination_arrived_vehicles++;
 
-					_link_destination_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
+					if (((_Scenario_Interface*)_global_scenario)->write_vehicle_trajectory<bool>())
+					{
+						_link_destination_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
+					}
 
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>();
 					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
