@@ -1,12 +1,12 @@
 #pragma once
 #include "Polaris_Variables.h"
 
-static const long long _Megabytes_To_Allocate=20000;
+static const long long _Megabytes_To_Allocate=2000;
 static unsigned int _num_iterations=60*60*24*2; // 2 days
 #ifdef _DEBUG
 static const int _num_threads=1;
 #else
-static const int _num_threads=20;
+static const int _num_threads=6;
 #endif
 
 static const int _num_antares_threads = _num_threads + 1;

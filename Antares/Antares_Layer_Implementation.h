@@ -23,7 +23,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		_dynamic_data=cfg.dynamic_data;
 		_target_sub_iteration=cfg.target_sub_iteration;
 
-		Load_Event<Antares_Layer_Implementation>(&Update_Condition<NULLTYPE>, &Update<NULLTYPE>, cfg.storage_offset ,_target_sub_iteration);
+		Load_Event<Antares_Layer_Implementation>(&Update_Condition<NULLTYPE>, &Update<NULLTYPE>, cfg.storage_offset, _target_sub_iteration);
 
 		_storage.Initialize(cfg.storage_offset, cfg.storage_period, cfg.storage_size);
 		_accent_storage.Initialize(cfg.storage_offset, cfg.storage_period, 1);
@@ -31,11 +31,12 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		_draw=cfg.draw;
 		_primitive_type=cfg.primitive_type;
 
+		_head_texture = cfg.head_texture;
 
 		_grouped=cfg.grouped;
 			_group_color=cfg.group_color;
 			_group_normal=cfg.group_normal;
-
+			_group_texture=cfg.group_texture;
 
 		_head_color._r = cfg.head_color._r;
 		_head_color._g = cfg.head_color._g;
@@ -54,7 +55,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		_primitive_color=cfg.primitive_color;
 		_primitive_normal=cfg.primitive_normal;
-		
+		_primitive_texture=cfg.primitive_texture;
+
 		_vert_size = sizeof(Point_3D<MasterType>);
 		_poly = false;
 
@@ -95,7 +97,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			break;
 		};
 
-		_primitive_stride = _vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>) + _primitive_normal*sizeof(Point_3D<MasterType>);
+		_primitive_stride = _vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>) + _primitive_normal*sizeof(Point_3D<MasterType>) + _primitive_texture*sizeof(int);
 
 		_submission_callback=cfg.submission_callback;
 		_selection_callback=cfg.selection_callback;
@@ -106,6 +108,30 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 		_selected_elements.clear();
 		_control_dialog = nullptr;
+
+
+		Canvas<typename MasterType::canvas_type>* _canvas = (Canvas<typename MasterType::canvas_type>*)canvas;
+
+		//Null texture
+		_texture_map.push_back(1);
+
+		for(vector<string>::iterator itr = cfg.textures.begin();itr!=cfg.textures.end();itr++)
+		{
+			wxImage tex_image;
+
+			if(tex_image.LoadFile(*itr))
+			{
+				int tex_id = _canvas->Build_Texture<NT>(tex_image.GetWidth(),tex_image.GetHeight(),tex_image.GetData());
+
+				_texture_map.push_back(tex_id);
+			}
+			else
+			{
+				_texture_map.push_back( -1 );
+
+				exit(0);
+			}
+		}
 	}
 
 	feature_implementation void Push_Element(void* data, int iteration, requires(check_2(TargetType,Regular_Element,is_same)))
@@ -115,12 +141,14 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		const bool grouped = _grouped;
 		const bool group_color = _group_color;
 		const bool group_normal = _group_normal;
-		
+		const bool group_texture = _group_texture;
+
 		const PrimitiveType primitive_type = _primitive_type;
 
 		const bool primitive_color = _primitive_color;
 		const bool primitive_normal = _primitive_normal;
-		const int primitive_stride = (_vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>))/sizeof(int);
+		const bool primitive_texture = _primitive_texture;
+		const int primitive_stride = (_vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>) + _primitive_texture*sizeof(int))/sizeof(int);
 		
 		const int vert_size = _vert_size/sizeof(int);
 		const int vert_stride = _vert_stride/sizeof(int);
@@ -260,6 +288,12 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 					}
 				}
 
+				if(group_texture)
+				{
+					storage_reference->push_back(*geometry_itr);
+					++geometry_itr;
+				}
+
 				const int num_group_primitives=*((int*)geometry_itr);
 
 				storage_reference->push_back(*geometry_itr);
@@ -318,6 +352,12 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 						++write_itr;
 						storage_reference->push_back(*write_itr);
 						++write_itr;
+					}
+
+					if(primitive_texture)
+					{
+						storage_reference->push_back(*geometry_itr);
+						++geometry_itr;
 					}
 
 					int siz = storage_reference->size();
@@ -406,6 +446,12 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 						++write_itr;
 					}
 					
+					if(primitive_texture)
+					{
+						storage_reference->push_back(*geometry_itr);
+						++geometry_itr;
+					}
+
 					int siz = storage_reference->size();
 
 					storage_reference->resize( siz + vert_stride );
@@ -438,12 +484,15 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 		const bool grouped = _grouped;
 		const bool group_color = _group_color;
 		const bool group_normal = _group_normal;
-		
+		const bool group_texture = _group_texture;
+
 		const PrimitiveType primitive_type = _primitive_type;
 
 		const bool primitive_color = _primitive_color;
 		const bool primitive_normal = _primitive_normal;
-		const int primitive_stride = (_vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>))/sizeof(int);
+		const bool primitive_texture = _primitive_texture;
+
+		const int primitive_stride = (_vert_stride + _primitive_color*sizeof(True_Color_RGBA<MasterType>) + _primitive_texture*sizeof(int))/sizeof(int);
 		
 		const int vert_size = _vert_size/sizeof(int);
 		const int vert_stride = _vert_stride/sizeof(int);
@@ -567,6 +616,12 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 						++geometry_itr;
 					}
 				}
+				
+				if(group_texture)
+				{
+					storage_reference.push_back(*geometry_itr);
+					++geometry_itr;
+				}
 
 				const int num_group_primitives=*((int*)geometry_itr);
 				
@@ -615,6 +670,12 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 							storage_reference.push_back(*write_itr);
 							++write_itr;
 						}
+					}
+					
+					if(primitive_texture)
+					{
+						storage_reference.push_back(*geometry_itr);
+						++geometry_itr;
 					}
 
 					const int* const geometry_vert_end = geometry_itr + vert_stride;
@@ -677,6 +738,12 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 							storage_reference.push_back(*write_itr);
 							++write_itr;
 						}
+					}
+					
+					if(primitive_texture)
+					{
+						storage_reference.push_back(*geometry_itr);
+						++geometry_itr;
 					}
 
 					const int* const geometry_vert_end = geometry_itr + vert_stride;
@@ -842,16 +909,21 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 	member_data(int,head_size_value,none,none);
 	member_data(int,head_accent_size_value,none,none);
 	//member_data(True_Color_RGBA<MasterType>,head_accent_color,none,none);
+	member_data(int,head_texture,none,none);
+
+	member_data(vector<unsigned int>,texture_map,none,none);
 
 	member_data(bool,grouped,none,none);
 	member_data(bool,group_color,none,none);
 	member_data(bool,group_normal,none,none);
+	member_data(bool,group_texture,none,none);
 
 	member_data(int,primitive_stride,none,none);
 
 	member_data(int,vert_stride,none,none);
 	member_data(bool,primitive_color,none,none);
 	member_data(bool,primitive_normal,none,none);
+	member_data(bool,primitive_texture,none,none);
 
 	member_data(int,vert_size,none,none);	
 

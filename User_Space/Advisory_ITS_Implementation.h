@@ -43,7 +43,7 @@ namespace Advisory_ITS_Components
 			{
 			}
 
-			feature_implementation void Accept_Network_Events(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
+			feature_implementation void Accept_Network_Events(vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
 			{
 				_current_events.clear();
 
@@ -53,14 +53,14 @@ namespace Advisory_ITS_Components
 				}
 			}
 
-			feature_implementation void Accept_Displayed_Network_Events(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
+			feature_implementation void Accept_Displayed_Network_Events(vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
 			{
 				_displayed_events.clear();
 				for (typename vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin(); itr!=network_events.end(); itr++)
 					_displayed_events.push_back( *itr );
 			}
 			
-			feature_implementation void Get_Displayed_Messages(vector<Network_Event<TargetType>*>& bucket,requires(!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
+			feature_implementation void Get_Displayed_Messages(vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket,requires(!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
 				const int target_component_index = TargetType::component_index;
 
@@ -73,7 +73,7 @@ namespace Advisory_ITS_Components
 				}
 			}
 			
-			feature_implementation void Get_Displayed_Messages(vector<Network_Event<TargetType>*>& bucket,requires(check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
+			feature_implementation void Get_Displayed_Messages(vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket,requires(check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
 				for(typename vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr=_displayed_events.begin();itr!=_displayed_events.end();itr++)
 				{
@@ -86,8 +86,8 @@ namespace Advisory_ITS_Components
 			//	static_assert(false,"TargetType is not a Polaris Component!");
 			//}
 
-			member_data(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>, current_events, none, none);
-			member_data(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>, displayed_events, none, none);
+			member_data(vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>, current_events, none, none);
+			member_data(vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>, displayed_events, none, none);
 			
 			typedef Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
 			member_data(vector<Link_Interface*>,covered_links,none,none);

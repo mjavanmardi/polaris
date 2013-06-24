@@ -528,6 +528,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>C:\wxWidgets-2.9.3\lib\vc_lib;C:\glew-1.7.0\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Integrated_Antares|x64'">

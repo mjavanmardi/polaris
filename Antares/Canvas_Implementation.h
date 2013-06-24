@@ -27,6 +27,7 @@ public:
 		coordinates._y += _input_offset._y;
 	}
 
+	feature_implementation int Build_Texture(int width, int height, unsigned char* data);
 	feature_implementation Antares_Layer_Interface* Allocate_New_Layer(string& name);
 	feature_implementation void Toggle_Layer(int identifier,bool checked);
 	feature_implementation void Select_Layer(int identifier);
@@ -247,5 +248,42 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize_GL
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
+	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+
+	unsigned int null_texture;
+
+	glGenTextures(1,&null_texture);
+
 	SetFocus();
+}
+
+template<typename MasterType,typename ParentType,typename InheritanceList>
+template<typename ComponentType,typename CallerType,typename TargetType>
+int Canvas_Implementation<MasterType,ParentType,InheritanceList>::Build_Texture(int width,int height,unsigned char* data)
+{
+	GLenum errCode;
+	const GLubyte *errString;
+
+	unsigned int tex_id;
+	glGenTextures(1, &tex_id);
+
+	float anisotropic_level;
+	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropic_level);
+
+	glBindTexture(GL_TEXTURE_2D, tex_id);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropic_level);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+	errCode = glGetError();
+	errString = gluErrorString(errCode);
+
+	return tex_id;
 }

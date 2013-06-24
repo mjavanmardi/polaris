@@ -18,28 +18,54 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	if(!draw) return;
 
 	const PrimitiveType primitive_type=layer->primitive_type<PrimitiveType>();	
-	
+
+
 	const True_Color_RGBA<MasterType> head_color=layer->head_color<True_Color_RGBA<MasterType>>();
 	const Point_3D<MasterType> head_normal=layer->head_normal<Point_3D<MasterType>>();
 	const int head_size_value=layer->head_size_value<int>();
 	
 	const int head_accent_size_value=layer->head_accent_size_value<int>();
+	
+	const int head_texture=layer->head_texture<int>();
 
 	const bool grouped=layer->grouped<bool>();
 	const bool group_color=layer->group_color<bool>();
 	const bool group_normal=layer->group_normal<bool>();
-	
+	const bool group_texture=layer->group_texture<bool>();
+
 	const bool poly=layer->poly<bool>();
 
 	const bool primitive_color=layer->primitive_color<bool>();
 	const bool primitive_normal=layer->primitive_normal<bool>();
+	const bool primitive_texture=layer->primitive_texture<bool>();
 	const int primitive_stride = layer->primitive_stride<int>();
 
 	const int vert_size = layer->vert_size<int>();
 	const int vert_stride = layer->vert_stride<int>();
 
 	const int data_stride=layer->data_stride<int>();
-	
+
+
+	const bool enable_textures = head_texture || primitive_texture || group_texture;
+	const bool texture_coordinates = enable_textures && (primitive_type != _POINT && primitive_type != _LINE);
+
+	const vector<int>& texture_map=layer->texture_map< const vector<int>& > ();
+	const float texture_coordinates_map_x[4] = {0.0f,1.0f,1.0f,0.0f};
+	const float texture_coordinates_map_y[4] = {1.0f,1.0f,0.0f,0.0f};
+
+	const float* texture_counter_x = &texture_coordinates_map_x[0];
+	const float* texture_counter_y = &texture_coordinates_map_y[0];
+
+	if(enable_textures)
+	{
+		glEnable(GL_TEXTURE_2D);
+	}
+
+	if(head_texture)
+	{
+		glBindTexture(GL_TEXTURE_2D, texture_map[ head_texture ] );
+	}
+
 	if(primitive_normal)
 	{
 		glEnable(GL_COLOR_MATERIAL);
@@ -55,10 +81,20 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	switch(primitive_type)
 	{
 	case _POINT:
+		if(enable_textures)
+		{
+			glEnable(GL_POINT_SPRITE);
+			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+		}
 		glPointSize(head_size_value);
 		glBegin(GL_POINTS);
 		break;
 	case _LINE:
+		if(enable_textures)
+		{
+			glEnable(GL_POINT_SPRITE);
+			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+		}
 		glLineWidth(head_size_value);
 		glBegin(GL_LINES);
 		break;
@@ -80,6 +116,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 		glColor4ubv((GLubyte*)&head_color);
 		glNormal3fv((GLfloat*)&head_normal);
 	}
+
+
 
 	int current_iteration=start_iteration;
 
@@ -117,6 +155,12 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 						geometry_itr += sizeof(Point_3D<MasterType>);
 					}
 
+					if(group_texture)
+					{
+						glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+						geometry_itr += sizeof(int);
+					}
+
 					const int num_group_primitives=*((int*)geometry_itr);
 
 					geometry_itr += sizeof(int);
@@ -137,12 +181,31 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 							geometry_itr += sizeof(Point_3D<MasterType>);
 						}
 
+						if(primitive_texture)
+						{
+							glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+							geometry_itr += sizeof(int);
+						}
+
 						const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
 
 						while( geometry_itr != geometry_vert_end )
 						{
+							if(texture_coordinates)
+							{
+								glTexCoord2f( *texture_counter_x, *texture_counter_y );
+
+								++texture_counter_x; ++texture_counter_y;
+							}
+
 							glVertex3fv((GLfloat*)geometry_itr);
 							geometry_itr += vert_size;
+						}
+
+						if(texture_coordinates)
+						{
+							texture_counter_x = &texture_coordinates_map_x[0];
+							texture_counter_y = &texture_coordinates_map_y[0];
 						}
 					}
 
@@ -165,12 +228,31 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 						geometry_itr += sizeof(Point_3D<MasterType>);
 					}
 
+					if(primitive_texture)
+					{
+						glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+						geometry_itr += sizeof(int);
+					}
+
 					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
 
 					while( geometry_itr != geometry_vert_end )
 					{
+						if(texture_coordinates)
+						{
+							glTexCoord2f( *texture_counter_x, *texture_counter_y );
+
+							++texture_counter_x; ++texture_counter_y;
+						}
+
 						glVertex3fv((GLfloat*)geometry_itr);
 						geometry_itr += vert_size;
+					}
+
+					if(texture_coordinates)
+					{
+						texture_counter_x = &texture_coordinates_map_x[0];
+						texture_counter_y = &texture_coordinates_map_y[0];
 					}
 				}
 
@@ -264,6 +346,12 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 						glNormal3fv((GLfloat*)geometry_itr);
 						geometry_itr += sizeof(Point_3D<MasterType>);
 					}
+					
+					if(group_texture)
+					{
+						glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+						geometry_itr += sizeof(int);
+					}
 
 					const int num_group_primitives=*((int*)geometry_itr);
 					geometry_itr += sizeof(int);
@@ -284,12 +372,31 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 							geometry_itr += sizeof(Point_3D<MasterType>);
 						}
 
+						if(primitive_texture)
+						{
+							glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+							geometry_itr += sizeof(int);
+						}
+
 						const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
 
 						while( geometry_itr != geometry_vert_end )
 						{
+							if(texture_coordinates)
+							{
+								glTexCoord2f( *texture_counter_x, *texture_counter_y );
+
+								++texture_counter_x; ++texture_counter_y;
+							}
+
 							glVertex3fv((GLfloat*)geometry_itr);
 							geometry_itr += vert_size;
+						}
+
+						if(texture_coordinates)
+						{
+							texture_counter_x = &texture_coordinates_map_x[0];
+							texture_counter_y = &texture_coordinates_map_y[0];
 						}
 					}
 
@@ -311,13 +418,32 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 						glNormal3fv((GLfloat*)geometry_itr);
 						geometry_itr += sizeof(Point_3D<MasterType>);
 					}
+					
+					if(primitive_texture)
+					{
+						glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+						geometry_itr += sizeof(int);
+					}
 
 					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
 
 					while( geometry_itr != geometry_vert_end )
 					{
+						if(texture_coordinates)
+						{
+							glTexCoord2f( *texture_counter_x, *texture_counter_y );
+
+							++texture_counter_x; ++texture_counter_y;
+						}
+
 						glVertex3fv((GLfloat*)geometry_itr);
 						geometry_itr += vert_size;
+					}
+
+					if(texture_coordinates)
+					{
+						texture_counter_x = &texture_coordinates_map_x[0];
+						texture_counter_y = &texture_coordinates_map_y[0];
 					}
 				}
 			}
@@ -337,6 +463,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 		glDisable(GL_COLOR_MATERIAL);
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
+	}
+	
+	if(enable_textures)
+	{
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	glDepthFunc(GL_LESS);

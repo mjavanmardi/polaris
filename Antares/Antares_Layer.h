@@ -77,17 +77,21 @@ prototype struct Antares_Layer
 	feature_accessor(head_size_value,none,none);
 	feature_accessor(head_accent_size_value,none,none);
 
-	feature_accessor(head_normal,none,none);	
-	
-	
+	feature_accessor(head_normal,none,none);
+
+	feature_accessor(head_texture,none,none);	
+	feature_accessor(texture_map,none,none);
+
 	feature_accessor(grouped,none,none);
 	feature_accessor(group_color,none,none);
 	feature_accessor(group_normal,none,none);
+	feature_accessor(group_texture,none,none);
 	feature_accessor(head_color,none,none);
 
 
 	feature_accessor(primitive_color,none,none);
 	feature_accessor(primitive_normal,none,none);
+	feature_accessor(primitive_texture,none,none);
 	feature_accessor(primitive_stride,none,none);
 	feature_accessor(vert_stride,none,none);	
 	feature_accessor(vert_size,none,none);	
@@ -151,6 +155,13 @@ struct Antares_Layer_Configuration
 		Configure_Default();
 	}
 
+	int Add_Texture(string& filename)
+	{
+		textures.push_back(filename);
+
+		return textures.size();
+	}
+
 	void Configure_Default()
 	{
 		draw=false;
@@ -160,12 +171,14 @@ struct Antares_Layer_Configuration
 		storage_size=1;
 		storage_period=END;
 		
+		head_texture = 0;
+
 		primitive_color=false;
 		head_color._r=0;
 		head_color._g=0;
 		head_color._b=0;
 		head_color._a=255;
-
+		
 		//head_accent_color._r=255;
 		//head_accent_color._g=255;
 		//head_accent_color._b=255;
@@ -176,9 +189,12 @@ struct Antares_Layer_Configuration
 		head_normal._y=0;
 		head_normal._z=1;
 		
+		primitive_texture=false;
+
 		grouped=false;
 		group_color=false;
 		group_normal=false;
+		group_texture=false;
 
 		head_size_value=1;
 		head_accent_size_value=1;
@@ -311,11 +327,12 @@ struct Antares_Layer_Configuration
 	unsigned int storage_size;
 	unsigned int storage_period;
 
-
 	PrimitiveType primitive_type;
 
 	True_Color_RGBA<NULLTYPE> head_color;
 	Point_3D<NULLTYPE> head_normal;
+	int head_texture;
+
 	//True_Color_RGBA<NULLTYPE> head_accent_color;
 	int head_size_value;
 	int head_accent_size_value;
@@ -325,13 +342,15 @@ struct Antares_Layer_Configuration
 			// 1 x True_Color_RGBA<NULLTYPE> group_color;
 		bool group_normal;
 			// 1 x Point_3D<NULLTYPE> group_normal;
-	
+		bool group_texture;
+			// 1 x int group_texture;	
 	
 	bool primitive_color;
 		// 1 x True_Color_RGBA<NULLTYPE> primitive_color;
 	bool primitive_normal;
 		// 1 x Point_3D<NULLTYPE> primitive_normal;
-	
+	bool primitive_texture;
+		// 1 x int primitive_texture;	
 
 	submission_callback_type submission_callback;
 	selection_callback_type selection_callback;
@@ -339,4 +358,6 @@ struct Antares_Layer_Configuration
 
 	string x_label;
 	string y_label;
+
+	vector<string> textures;
 };

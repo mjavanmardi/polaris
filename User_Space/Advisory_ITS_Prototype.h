@@ -32,18 +32,18 @@ namespace Advisory_ITS_Components
 				ComponentType::template Initialize<ComponentType,CallerType,TargetType>(configuration);
 			}
 			
-			feature void Push_Network_Events(vector<Network_Event<TargetType>*>& network_events)
+			feature void Push_Network_Events(vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& network_events)
 			{
 				this_component()->template Accept_Network_Events<ComponentType,CallerType,TargetType>(network_events);
 			}
 
-			feature void Push_Displayed_Network_Events(vector<Network_Event<TargetType>*>& network_events)
+			feature void Push_Displayed_Network_Events(vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& network_events)
 			{
 				this_component()->template Accept_Displayed_Network_Events<ComponentType,CallerType,TargetType>(network_events);
 			}
 
 
-			feature void Get_Displayed_Messages(vector<Network_Event<TargetType>*>& bucket)
+			feature void Get_Displayed_Messages(vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket)
 			{
 				return this_component()->template Get_Displayed_Messages<ComponentType,CallerType,TargetType>(bucket);
 			}

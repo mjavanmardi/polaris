@@ -39,6 +39,11 @@ prototype struct Canvas
 		return (TargetType::ReturnType)this_component()->Toggle_Layer<ComponentType,CallerType,TargetType>(name,checked);
 	}
 
+	feature_prototype int Build_Texture(int width, int height, unsigned char* data)
+	{
+		return this_component()->Build_Texture<ComponentType,CallerType,TargetType>(width,height,data);
+	}
+
 	feature_accessor(time_panel,none,none);
 	feature_accessor(information_panel,none,none);
 	feature_accessor(attributes_panel,none,none);

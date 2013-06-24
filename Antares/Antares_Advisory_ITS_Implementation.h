@@ -146,7 +146,7 @@ namespace Advisory_ITS_Components
 				}
 			}
 			
-			feature_implementation void Accept_Displayed_Network_Events(vector<Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
+			feature_implementation void Accept_Displayed_Network_Events(vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>& network_events)
 			{
 			}
 
