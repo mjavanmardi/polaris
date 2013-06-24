@@ -667,7 +667,7 @@ namespace Intersection_Components
 				else if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION)
 				{
 
-					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Intersection_REALTIME_MOE_Update<NULLTYPE>);
+					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&ComponentType::Intersection_REALTIME_MOE_Update<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration;
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_MOE_COMPUTATION_SUB_ITERATION;
