@@ -1,39 +1,23 @@
-#include "Polaris_PCH.h"
+//#include "Polaris_PCH.h"
+#include "Application_Includes.h"
 
+struct MasterType
+{
+	typedef Conductor_Implementation<MasterType> conductor_type;
+	typedef Control_Panel_Implementation<MasterType> control_panel_type;
+	typedef Time_Panel_Implementation<MasterType> time_panel_type;
+	typedef Information_Panel_Implementation<MasterType> information_panel_type;
+	typedef Canvas_Implementation<MasterType> canvas_type;
+	typedef Antares_Layer_Implementation<MasterType> antares_layer_type;
+	typedef Layer_Options_Implementation<MasterType> layer_options_type;
+	typedef Attributes_Panel_Implementation<MasterType> attributes_panel_type;
+	typedef Control_Dialog_Implementation<MasterType> control_dialog_type;
+	typedef Information_Page_Implementation<MasterType> information_page_type;
+	typedef Splash_Panel_Implementation<MasterType> splash_panel_type;
+};
 
 int main()
 {
-
-	// write test
-	File_IO::Binary_File_Writer bw;
-	bw.Open("test.bin");
-
-	int num_ints_to_write = 5;
-	bw.Write_Value<int>(num_ints_to_write);
-	
-	int ints[5] = {1,2,3,4,12};
-	bw.WriteArray<int>(ints,num_ints_to_write);
-
-	bw.Close();
-
-
-	// read_test
-	File_IO::Binary_File_Reader br;
-	br.Open("test.bin");
-
-	int num_to_read;
-	br.Read_Value<int>(num_to_read);
-
-	int *ints_in = new int[5];
-	br.Read_Array<int>(ints_in, num_to_read);
-
-	cout << num_to_read<<endl;
-	
-	for (int i = 0; i < num_to_read; ++i)
-	{
-		cout << ints_in[i]<<endl;
-	}
-
-	int test;
-	cin >> test;
+	START_UI(MasterType,1,2,3,4);
+	START();
 }

@@ -49,8 +49,8 @@ Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Attribut
 	columns[1].SetText("Value");
 	_attributes_list->InsertColumn(1, columns[1]);
 
-	wxListItem atts_rows[20];
-	for(int i=0;i<20;i++)
+	wxListItem atts_rows[25];
+	for(int i=0;i<25;i++)
 	{
 		atts_rows[i].SetId(i);
 		_attributes_list->InsertItem(atts_rows[i]);
