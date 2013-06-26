@@ -122,8 +122,8 @@ namespace Network_Components
 				float bwtt = (float) (link->template length<float>()/(link->template backward_wave_speed<float>()*5280.0/3600.0)); // in seconds
 				float fftt = (float) (link->template length<float>()/(link->template free_flow_speed<float>()*5280.0/3600.0)); //in seconds
 
-				int link_fftt_cached_simulation_interval_size = int(ceil(float(fftt/((float)simulation_interval_length))));
-				int link_bwtt_cached_simulation_interval_size = int(ceil(float(bwtt/((float)simulation_interval_length))));
+				int link_fftt_cached_simulation_interval_size = max(1, int(ceil(float(fftt/((float)simulation_interval_length)))));
+				int link_bwtt_cached_simulation_interval_size = max(1, int(ceil(float(bwtt/((float)simulation_interval_length)))));
 					
 				network_link_flow_file
 					<< convert_seconds_to_hhmmss(((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>()) <<  ","
@@ -164,7 +164,7 @@ namespace Network_Components
 				_Link_Interface* link = movement->template inbound_link<_Link_Interface*>();
 					
 				float fftt = (float) (movement->template inbound_link<_Link_Interface*>()->template length<float>()/(movement->template inbound_link<_Link_Interface*>()->template free_flow_speed<float>()*5280.0/3600.0)); //in seconds
-				int link_fftt_cached_simulation_interval_size = int(ceil(float(fftt/(simulation_interval_length*1.0))));
+				int link_fftt_cached_simulation_interval_size = max(1,int(ceil(float(fftt/(simulation_interval_length*1.0)))));
 					
 					
 				network_link_turn_time_file
@@ -293,6 +293,10 @@ namespace Network_Components
 
             _current_cpu_time_in_seconds = (long)get_current_cpu_time_in_seconds();
 
+			long long totalPhysicalMemory;
+			long long physicalMemoryUsedByProcess;
+			mem_info(totalPhysicalMemory, physicalMemoryUsedByProcess);
+
             long elapsed_time = _current_cpu_time_in_seconds - _start_cpu_time_in_seconds;
 			output_summary_file
                     << convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()).c_str() << ","
@@ -304,7 +308,9 @@ namespace Network_Components
 					<< _network_vmt << ","
 					<< _network_vht << ","
                     << convert_seconds_to_hhmmss(elapsed_time).c_str() << ","
-					<< _this_ptr->template start_of_current_simulation_interval_absolute<int>()
+					<< _this_ptr->template start_of_current_simulation_interval_absolute<int>() << ","
+					<< physicalMemoryUsedByProcess/1000000 << ","
+					<< int(float(physicalMemoryUsedByProcess)/float(totalPhysicalMemory)*100.0)
                     <<endl;
 		}
 
@@ -492,8 +498,9 @@ namespace Network_Components
 					<< network_moe_data.network_avg_link_density_ratio << ","
 					<< network_moe_data.network_avg_link_in_flow_ratio << ","
 					<< network_moe_data.network_avg_link_out_flow_ratio << ","
+					<< _network_vht_vehicle_based << ","
+					<< _network_vmt << ","
 					<< _network_vht << ","
-					<< _network_vmt 
 					//<< network_moe_data.assignment_calculation_time << ","
 					//<< network_moe_data.simulation_calculation_time << ","
 					//<< network_moe_data.operation_calculation_time << ","

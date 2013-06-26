@@ -146,6 +146,7 @@ void network_data_information::write_link(string output_dir_name, NetworkData& n
 			<< "dnode" << "	"
 			<< "length" << "	"
 			<< "free_flow_speed" << "	"
+			<< "speed_limit" << "	"
 			<< "capacity" << "	"
 			<< "type" << "	"
 			<< "num_lanes" << "	"
@@ -171,6 +172,7 @@ void network_data_information::write_link(string output_dir_name, NetworkData& n
 			<< network_data.node_data_array[network_data.link_data_array[i].dnode_index].uuid<< "	"
 			<< network_data.link_data_array[i].length<< "	"
 			<< network_data.link_data_array[i].free_flow_speed<< "	"
+			<< network_data.link_data_array[i].speed_limit<< "	"
 			<< network_data.link_data_array[i].maximum_flow_rate<< "	"
 			<< network_data.link_type_int_string_map[network_data.link_data_array[i].link_type]<< "	"
 			<< network_data.link_data_array[i].num_lanes<< "	"
@@ -1245,6 +1247,8 @@ void network_data_information::read_link(string input_dir_name, NetworkData& net
 					link_data.backward_wave_speed = 12.0;
 					link_data.jam_density = 220;
 
+					link_data.num_inbound_turn_lanes = 0;
+
 					network_data.link_data_array.push_back(link_data);
 
 					network_data.link_id_index_map.insert(make_pair(link_data.uuid,link_index));
@@ -1361,6 +1365,26 @@ void network_data_information::read_turn_movement(string input_dir_name, Network
 				turn_movement_data.outbound_link_index = outbound_link_index;
 				turn_movement_data.turn_movement_type = network_data.turn_movement_type_string_int_map[tokens[3]];
 				turn_movement_data.turn_movement_rule = network_data.turn_movement_rule_string_int_map[tokens[4]];
+
+				switch (turn_movement_data.turn_movement_type)
+				{
+					case LEFT_TURN:
+						turn_movement_data.num_turn_lanes = max(1,network_data.link_data_array[inbound_link_index].num_left_turn_bays);
+						break;
+					case THROUGH_TURN:
+						turn_movement_data.num_turn_lanes = network_data.link_data_array[inbound_link_index].num_lanes;
+						break;
+					case RIGHT_TURN:
+						turn_movement_data.num_turn_lanes = max(1,network_data.link_data_array[inbound_link_index].num_right_turn_bays);
+						break;
+					case U_TURN:
+						turn_movement_data.num_turn_lanes = max(1,network_data.link_data_array[inbound_link_index].num_left_turn_bays);
+						break;
+					default:
+						turn_movement_data.num_turn_lanes = network_data.link_data_array[inbound_link_index].num_lanes;
+						break;
+				}
+				network_data.link_data_array[outbound_link_index].num_inbound_turn_lanes += turn_movement_data.num_turn_lanes; // set num_inbound_turn_lanes=0 when reading links
 
 				network_data.turn_movement_data_array.push_back(turn_movement_data);
 

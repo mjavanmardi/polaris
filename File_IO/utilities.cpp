@@ -258,3 +258,71 @@ void calculate_mean(const vector<float>& data_array, float& mean)
 		return current_cpu_time_in_seconds;
 	};
 #endif
+
+#ifdef __GNUC__
+#include <unistd.h>
+#include <ios>
+#include <iostream>
+#include <fstream>
+#include <string>
+void mem_info(long long& totalPhysicalMemory, long long& physicalMemoryUsedByProcess)
+{
+   using std::ios_base;
+   using std::ifstream;
+   using std::string;
+
+   // 'file' stat seems to give the most reliable results
+   //
+   ifstream stat_stream("/proc/self/stat",ios_base::in);
+
+   // dummy vars for leading entries in stat that we don't care about
+   //
+   string pid, comm, state, ppid, pgrp, session, tty_nr;
+   string tpgid, flags, minflt, cminflt, majflt, cmajflt;
+   string utime, stime, cutime, cstime, priority, nice;
+   string O, itrealvalue, starttime;
+
+   // the two fields we want
+   //
+   unsigned long vsize;
+   long rss;
+
+   stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
+               >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
+               >> utime >> stime >> cutime >> cstime >> priority >> nice
+               >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
+
+   stat_stream.close();
+
+   long page_size = sysconf(_SC_PAGE_SIZE) ; // in case x86-64 is configured to use 2MB pages
+   totalPhysicalMemory = sysconf(_SC_PHYS_PAGES) * page_size;
+   physicalMemoryUsedByProcess = rss * page_size;
+}
+#else
+#include "windows.h"
+#include "psapi.h"
+void mem_info(long long& totalPhysicalMemory, long long& physicalMemoryUsedByProcess)
+{
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+	MEMORYSTATUSEX memInfo;
+    if (!GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)))
+	{
+		physicalMemoryUsedByProcess = -1;
+	}
+	else
+	{
+		physicalMemoryUsedByProcess = (long long)pmc.WorkingSetSize;
+		
+	}
+	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+	if (!GlobalMemoryStatusEx(&memInfo))
+	{
+		totalPhysicalMemory = -1;
+	}
+	else
+	{
+		totalPhysicalMemory = (long long)memInfo.ullTotalPhys;
+	}
+}
+#endif
+

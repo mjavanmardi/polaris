@@ -133,6 +133,11 @@ void demand_data_information::read_demand_vehicle(string input_dir_name,Scenario
 				}
 
 				demand_data.time_dependent_vehicle_index_array[departure_time].push_back(vehicle_index);
+
+				if (num_vehicles % 10000 == 0)
+				{
+					cout << num_vehicles << endl;
+				}
 				//time_in_second_parse_vehicle_data = get_current_cpu_time_in_seconds() - time_in_second_parse_vehicle_data_start;
 			}
 			//double time_in_second_parse = get_current_cpu_time_in_seconds() - time_in_second_read_parse_start;

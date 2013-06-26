@@ -1,6 +1,7 @@
 #pragma once
 #include "Vehicle_Prototype.h"
 #include "Movement_Plan_Prototype.h"
+#include "../Repository/RNG_Implementations.h"
 
 namespace Vehicle_Components
 {
@@ -38,7 +39,7 @@ namespace Vehicle_Components
 			member_data(float, local_speed, none, none);
 
 			member_container(vector<typename MasterType::switch_decision_data_type*>, switch_decisions_container, none, none);
-			member_data(RNG_Components::RngStream, rng_stream, none, none);
+			//member_data(RNG_Components::RngStream, rng_stream, none, none);
 			member_data(Vehicle_Components::Types::Enroute_Information_Keys, enroute_information_type, none, none);
 			member_data(double, information_compliance_rate, none, none);
 			member_data(double, relative_indifference_band_route_choice, none, none);
@@ -68,11 +69,31 @@ namespace Vehicle_Components
 			feature_implementation void unload()
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
-				
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
 				_simulation_status = Types::Vehicle_Status_Keys::OUT_NETWORK;
 				
+				int departure_time = ((_Movement_Plan_Interface*)_movement_plan)->template departed_time<Time_Seconds>();
+				int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+				float travel_time = float ((current_time - departure_time)/3600.0f);
+
+				((_Network_Interface*)_global_network)->template increase_out_network_vht_vehicle_based<NT>(travel_time);
+				 
 				if (!((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
 					clear_trajectory<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_implementation void update_vht()
+			{
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
+
+				int departure_time = ((_Movement_Plan_Interface*)_movement_plan)->template departed_time<Time_Seconds>();
+				int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+				float travel_time = float(current_time - departure_time) / 3600.0f;
+
+				((_Network_Interface*)_global_network)->template increase_in_network_vht_vehicle_based<NT>(travel_time);
 			}
 
 			feature_implementation void clear_trajectory()
@@ -116,7 +137,7 @@ namespace Vehicle_Components
 						float adjustment_factor_weather = 1.0f;
 						if (events_set.find(weather_event) != events_set.end())
 						{
-							adjustment_factor_weather = min(adjustment_factor_weather,route_link->template speed_adjustment_factor_due_to_weather<float>());
+							adjustment_factor_weather = 1.0f;//min(adjustment_factor_weather,route_link->template speed_adjustment_factor_due_to_weather<float>());
 							//event_found_flag = true;
 							//break;
 						}
@@ -351,11 +372,13 @@ namespace Vehicle_Components
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				///
-				unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+_internal_id+1;
-				_rng_stream.SetSeed(seed);
+				//unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+_internal_id+1;
+				//unsigned long seed = std::abs(std::sin(((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>() + (float)_internal_id + 1)*(float)INT_MAX);
+				//unsigned long seed = 1;
+				//_rng_stream.SetSeed(seed);
 				double r1;
 				///information capability
-				r1 = _rng_stream.RandU01();
+				r1 = Uniform_RNG.Next_Rand<double>();//_rng_stream.RandU01();
 				if (r1 <= ((_Scenario_Interface*)_global_scenario)->template realtime_informed_vehicle_market_share<double>())
 				{
 					_enroute_information_type = Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION;
@@ -370,19 +393,19 @@ namespace Vehicle_Components
 				_information_compliance_rate = r1;
 
 				///rib
-				r1 = _rng_stream.RandU01();
+				r1 = Uniform_RNG.Next_Rand<double>();//_rng_stream.RandU01();
 				double mean = ((_Scenario_Interface*)_global_scenario)->template relative_indifference_band_route_choice_mean<double>();
 				double a = 0.0;
 				double b = 2.0*mean;
-				double rib = _rng_stream.triangular_random_variate(r1,a,b,mean);
+				double rib = Uniform_RNG.triangular_random_variate<double>(r1,a,b,mean);//_rng_stream.triangular_random_variate(r1,a,b,mean);
 				_relative_indifference_band_route_choice = rib;
 
 				///mtts
-				r1 = _rng_stream.RandU01();
+				r1 = Uniform_RNG.Next_Rand<double>();//_rng_stream.RandU01();
 				mean = ((_Scenario_Interface*)_global_scenario)->template minimum_travel_time_saving_mean<double>();
 				a = 0.5 * mean;
 				b = a + 2.0*mean;
-				double mtts = _rng_stream.triangular_random_variate(r1,a,b,mean);
+				double mtts = Uniform_RNG.triangular_random_variate<double>(r1,a,b,mean);//_rng_stream.triangular_random_variate(r1,a,b,mean);
 				_minimum_travel_time_saving = mtts;
 				///
 

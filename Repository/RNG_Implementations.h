@@ -163,14 +163,14 @@ namespace GLOBALS
 {
 	implementation struct _Global_RNG : public Polaris_Component<APPEND_CHILD(_Global_RNG),MasterType,NULLTYPE>
 	{
-		typedef RNG_Components::Implementations::RngStream_Implementation<NULLTYPE> RNG_type;
+		typedef RNG_Components::Implementations::MT_Probability_Double<NULLTYPE> RNG_type;
 		_Global_RNG()
 		{
 			for (int i=0; i < _num_threads; i++)
 			{
 				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				rng->Initialize<int>(abs(std::sin((float)i+1))*(float)INT_MAX);
+				rng->Initialize<int>(std::abs(std::sin((float)i+1)*(float)INT_MAX));
 			}
 		}
 
@@ -181,7 +181,7 @@ namespace GLOBALS
 			{
 				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				rng->Initialize<TargetType>((TargetType)(std::sin((float)i+1)*(float)INT_MAX) + random_seed);
+				rng->Initialize<TargetType>((TargetType)(std::abs(std::sin((float)i+1)*(float)INT_MAX)) + random_seed);
 			}
 		}
 
@@ -194,6 +194,28 @@ namespace GLOBALS
 
 			return rng->Next_Rand<double>();
 		}
+
+		template <typename TargetType>
+		TargetType triangular_random_variate(TargetType u, TargetType a, TargetType b, TargetType mean)
+		{
+			if (mean == 0.0) return 0.0;
+
+			double x = 0.0;
+			double c = 3.0*mean - a - b;
+			double fc = (c - a) / (b - a);
+	
+			if (u < fc)
+			{
+				x = a + sqrt(u*(b - a)*(c - a));
+			}
+			else
+			{
+				x = b - sqrt((1 - u)*(b - a)*(b - c));
+			}
+
+			return x;
+		}
+
 	private:
 		 RNG_type thread_rng[_num_threads];
 	};
@@ -233,6 +255,8 @@ namespace GLOBALS
 			TargetType r = rng->Next_Rand<TargetType>();
 			return r*sigma + mu;
 		}
+
+
 
 		template <typename TargetType>
 		void Correlated_Rands(vector<TargetType>& correlated_random_values, matrix<TargetType>& Sigma)

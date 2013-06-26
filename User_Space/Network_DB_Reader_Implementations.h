@@ -214,7 +214,7 @@ namespace Network_Components
 						link->template left_turn_bay_length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(0.0));
 						link->template right_turn_bay_length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(0.0));
 
-						
+						link->template num_inbound_turn_lanes<int>(0.0);
 						
 
 						if(facility_type=="FREEWAY")
@@ -318,10 +318,9 @@ namespace Network_Components
 						
 						link->template left_turn_bay_length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(0.0));
 						link->template right_turn_bay_length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(0.0));
-
 						
-						const std::string& facility_type=db_itr->getType()->getLink_Type();
-
+						link->template num_inbound_turn_lanes<int>(0.0);
+						
 						if(facility_type=="FREEWAY")
 						{
 							link->template link_type<Link_Components::Types::Link_Type_Keys>(Link_Components::Types::FREEWAY);
@@ -509,18 +508,22 @@ namespace Network_Components
 					if(connect_type=="THRU")
 					{
 						turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::THROUGH_TURN);
+						turn_movement->template num_turn_lanes<int>(inbound_link->template num_lanes<int>());
 					}
 					else if(connect_type=="LEFT" || connect_type=="L_SPLIT" || connect_type=="L_MERGE")
 					{
 						turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::LEFT_TURN);
+						turn_movement->template num_turn_lanes<int>(max(1,inbound_link->template num_left_turn_bays<int>()));
 					}
 					else if(connect_type=="RIGHT" || connect_type=="R_SPLIT" || connect_type=="R_MERGE")
 					{
 						turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::RIGHT_TURN);
+						turn_movement->template num_turn_lanes<int>(max(1,inbound_link->template num_right_turn_bays<int>()));
 					}
 					else if(connect_type=="UTURN")
 					{
 						turn_movement->template movement_type<Turn_Movement_Components::Types::Turn_Movement_Type_Keys>(Turn_Movement_Components::Types::U_TURN);
+						turn_movement->template num_turn_lanes<int>(max(1,inbound_link->template num_left_turn_bays<int>()));
 					}
 					else
 					{
@@ -528,6 +531,7 @@ namespace Network_Components
 						break;
 					}
 
+					outbound_link->template num_inbound_turn_lanes<int&>() += turn_movement->template num_turn_lanes<int>();
 					
 					turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
 					int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template internal_id<int>();

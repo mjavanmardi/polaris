@@ -50,6 +50,19 @@ namespace Scenario_Components
 				PRETRIP_PLANNING_SUB_ITERATION,
 				PRETRIP_ROUTING_SUB_ITERATION,
 			};
+			enum RNG_Type_Keys
+			{
+				DETERMINISTIC = 0,
+				RANDOM,
+			};
+
+			enum Merging_Mode_Keys
+			{
+				DRIVING_RULE = 0,
+				PROPORTION_TO_DEMAND,
+				PROPORTION_TO_LINK,
+				PROPORTION_TO_LANE,
+			};
 	}
 
 	namespace Concepts
@@ -165,6 +178,8 @@ namespace Scenario_Components
 			feature_accessor(condition_time_in_seconds, none, none);
 
 			feature_accessor(calculate_realtime_moe, none, none);
+			feature_accessor(rng_type, none,none);
+			feature_accessor(merging_mode, none, none);
 
 			//===============================================
 			// Demand model parameters
@@ -304,8 +319,52 @@ namespace Scenario_Components
 				}
 
 				//===============================================
+				// set rng type
+				string rng_type_string;
+				if (cfgReader.getParameter("rng_type", &rng_type_string) != PARAMETER_FOUND) rng_type_string = "DETERMINISTIC";
+				if (rng_type_string.compare("DETERMINISTIC") == 0)
+				{
+					rng_type<int>(Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC);
+				}
+				else if (rng_type_string.compare("RANDOM") == 0)
+				{
+					rng_type<int>(Scenario_Components::Types::RNG_Type_Keys::RANDOM);
+				}
+				else
+				{
+					cout << "Rng type not supported" << endl;
+					assert(false);
+				}
+
+				//===============================================
+				// set merging mode
+				string merging_mode_string;
+				if (cfgReader.getParameter("merging_mode", &merging_mode_string) != PARAMETER_FOUND) merging_mode_string = "PROPORTION_TO_LANE";
+				if (merging_mode_string.compare("DRIVING_RULE") == 0)
+				{
+					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::DRIVING_RULE);
+				}
+				else if (merging_mode_string.compare("PROPORTION_TO_DEMAND") == 0)
+				{
+					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_DEMAND);
+				}
+				else if (merging_mode_string.compare("PROPORTION_TO_LINK") == 0)
+				{
+					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LINK);
+				}
+				else if (merging_mode_string.compare("PROPORTION_TO_LANE") == 0)
+				{
+					merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LANE);
+				}
+				else
+				{
+					cout << "Merging mode not supported" << endl;
+					assert(false);
+				}
+
+				//===============================================
 				// set control parameters
-				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(0.0);
+				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(1234567.0);
 				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0.0);
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
 				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(300);
@@ -351,6 +410,7 @@ namespace Scenario_Components
 					assert(false);
 				}
 
+
 				num_simulation_intervals<int>(planning_horizon<int>()/simulation_interval_length<int>());
 				num_assignment_intervals<int>(planning_horizon<int>()/assignment_interval_length<int>());
 				num_simulation_intervals_per_assignment_interval<int>(assignment_interval_length<int>()/simulation_interval_length<int>());
@@ -391,7 +451,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("read_skim_tables", this->read_skim_tables<bool*>()) != PARAMETER_FOUND) this->read_skim_tables<bool>(false);
 				if (cfgReader.getParameter("input_skim_file_path_name", this->input_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->input_skim_file_path_name<string>((string)"skim_file_in.txt");
 				if (cfgReader.getParameter("output_skim_file_path_name", this->output_skim_file_path_name<string*>()) != PARAMETER_FOUND) this->output_skim_file_path_name<string>((string)"skim_file_out.txt");
-				
+
 				if (cfgReader.getParameter("compare_with_historic_moe", compare_with_historic_moe<bool*>())!= PARAMETER_FOUND) compare_with_historic_moe<bool>(false);
 				if (cfgReader.getParameter("historic_network_moe_file_path_name", historic_network_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_network_moe_file_path_name<string>("historic_realtime_moe_network.csv");
 				if (cfgReader.getParameter("historic_link_moe_file_path_name", historic_link_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_link_moe_file_path_name<string>("historic_moe_link.csv");
@@ -740,7 +800,9 @@ namespace Scenario_Components
 						<< "VMT" << ","
 						<< "VHT" << ","
 						<< "wallclock_time" << ","
-						<< "simulated_time" 
+						<< "simulated_time" << ","
+						<< "physical_memory_usage" << ","
+						<< "physical_memory_percentage" 
 						<<endl;
 				}
 				else

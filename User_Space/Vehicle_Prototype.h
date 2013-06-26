@@ -126,6 +126,11 @@ namespace Vehicle_Components
 			{
 				this_component()->template clear_trajectory<ComponentType,CallerType,TargetType>();
 			}
+
+			feature_prototype void update_vht()
+			{
+				this_component()->template update_vht<ComponentType,CallerType,TargetType>();
+			}
 		};
 	}
 }

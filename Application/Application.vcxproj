@@ -549,7 +549,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);sqlite3-mt.lib;odb-mt.lib;odb-sqlite-mt.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);sqlite3-mt.lib;odb-mt.lib;odb-sqlite-mt.lib;psapi.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\opt\polarisdeps\x64\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -576,7 +576,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);sqlite3-d-mt.lib;odb-d-mt.lib;odb-sqlite-d-mt.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);sqlite3-d-mt.lib;odb-d-mt.lib;odb-sqlite-d-mt.lib;psapi.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\opt\polarisdeps\x64\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -629,7 +629,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>C:\glew-1.7.0\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\Release\;C:\wxWidgets-2.9.3\lib\vc_lib;C:\plplot\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>antares.lib;plplotd.lib;plplotcxxd.lib;csirocsa.lib;qsastime.lib;plplotwxwidgetsd.lib;comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wxpng.lib;wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);sqlite3-mt.lib;odb-mt.lib;odb-sqlite-mt.lib;io-mt.lib</AdditionalDependencies>
+      <AdditionalDependencies>antares.lib;plplotd.lib;plplotcxxd.lib;csirocsa.lib;qsastime.lib;plplotwxwidgetsd.lib;comctl32.lib;rpcrt4.lib;winmm.lib;advapi32.lib;wxpng.lib;wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);sqlite3-mt.lib;odb-mt.lib;odb-sqlite-mt.lib;io-mt.lib;psapi.lib</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -676,7 +676,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated_Single_Agent|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Antares|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Application.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel|x64'">NotUsing</PrecompiledHeader>
@@ -709,7 +708,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated_Single_Agent|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Antares|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Integrated_Model.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">NotUsing</PrecompiledHeader>
@@ -746,7 +744,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel_Antares|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Antares|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="NetworkModel.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel|x64'">NotUsing</PrecompiledHeader>
@@ -784,7 +781,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated_Single_Agent|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Antares|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Polaris_PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_NetworkModel|x64'">NotUsing</PrecompiledHeader>
@@ -829,7 +825,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated_Single_Agent|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Antares|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Sensor_Model.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -841,7 +836,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated_Single_Agent|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Antares|x64'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

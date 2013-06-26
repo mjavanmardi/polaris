@@ -82,6 +82,7 @@ namespace Link_Components
 			feature_accessor(left_turn_bay_length, none, none);
 			feature_accessor(right_turn_bay_length, none, none);
 			feature_accessor(approach, none, none);
+			feature_accessor(num_inbound_turn_lanes, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
@@ -138,6 +139,7 @@ namespace Link_Components
 			feature_accessor(link_origin_arrived_vehicles, none, none);
 			feature_accessor(link_origin_departed_vehicles, none, none);
 			feature_accessor(link_origin_loaded_vehicles, none, none);
+			feature_accessor(link_origin_loaded_capacity_leftover, none, none);
 		
 			//cumulative - Mid-Trip
 			feature_accessor(link_upstream_cumulative_arrived_vehicles, none, none);
@@ -213,9 +215,9 @@ namespace Link_Components
 				this_component()->template link_moving<ComponentType,CallerType,TargetType>();
 			}
 
-			feature_prototype void origin_link_loading(TargetType param)
+			feature_prototype void origin_link_loading()
 			{
-				this_component()->template origin_link_loading<ComponentType,CallerType,TargetType>(param);
+				this_component()->template origin_link_loading<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void network_state_update()

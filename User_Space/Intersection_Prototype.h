@@ -47,6 +47,16 @@ namespace Intersection_Components
 			{
 				this_component()->template supply_allocation_proportion_to_demand<ComponentType,CallerType,TargetType>();
 			}
+
+			feature_prototype void supply_allocation_proportion_to_link()
+			{
+				this_component()->template supply_allocation_proportion_to_link<ComponentType,CallerType,TargetType>();
+			}
+			
+			feature_prototype void supply_allocation_proportion_to_lane()
+			{
+				this_component()->template supply_allocation_proportion_to_lane<ComponentType,CallerType,TargetType>();
+			}
 		};
 
 		prototype struct Inbound_Outbound_Movements_Prototype
@@ -205,6 +215,11 @@ namespace Intersection_Components
 			feature_prototype void update_vehicle_locations()
 			{
 				this_component()->template update_vehicle_locations<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void update_in_network_vehicle_vht()
+			{
+				this_component()->template update_in_network_vehicle_vht<ComponentType,CallerType,TargetType>();
 			}
 		};
 	}

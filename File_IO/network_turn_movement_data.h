@@ -39,6 +39,8 @@ namespace network_models
 
 				Turn_Movement_Type_Keys turn_movement_type; ///LT; TH; RT; UT
 				Turn_Movement_Rule_Keys turn_movement_rule; ///prohibited; allowed;
+
+				int num_turn_lanes;
 			};
 		}
 	}

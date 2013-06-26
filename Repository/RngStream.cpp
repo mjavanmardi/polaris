@@ -292,4 +292,40 @@ namespace RNG_Components
 	{
 		return low + static_cast<int> ((high - low + 1.0) * RandU01 ());
 	};
+
+	StlRngStream::StlRngStream():generator(1u),distribution(0.0,1.0)
+	{
+		cout << "inside StlRngStream constructor" << endl;
+	}
+
+	double StlRngStream::RandU01()
+	{
+		return distribution(generator);
+	}
+
+	void StlRngStream::SetSeed(unsigned long iseed)
+	{
+		generator.seed(iseed);
+	}
+
+	double StlRngStream::triangular_random_variate(double u, double a, double b, double mean)
+	{
+		if (mean == 0.0) return 0.0;
+
+		double x = 0.0;
+		double c = 3.0*mean - a - b;
+		double fc = (c - a) / (b - a);
+	
+		if (u < fc)
+		{
+			x = a + sqrt(u*(b - a)*(c - a));
+		}
+		else
+		{
+			x = b - sqrt((1 - u)*(b - a)*(b - c));
+		}
+
+		return x;
+	}
+
 }

@@ -93,6 +93,7 @@ namespace Link_Components
 				int lanes = min(8, _num_lanes);
 				int lanes_closed = min(3, _current_accident_event->_lanes_closed);	
 				capacity_adjustment_rate = link_capacity_adjustment_factors_for_accident[lanes - 1][lanes_closed + 1];
+				_num_lanes = max(1, _num_lanes - _current_accident_event->_lanes_closed);
 			}
 			_capacity_adjustment_factor_due_to_accident = capacity_adjustment_rate;
 			_maximum_flow_rate *= capacity_adjustment_rate;

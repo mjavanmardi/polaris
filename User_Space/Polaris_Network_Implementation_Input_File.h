@@ -74,6 +74,7 @@ namespace Network_Components
 				link->template num_left_turn_bays<int>(raw_link.num_left_turn_bays);
 				link->template num_right_turn_bays<int>(raw_link.num_right_turn_bays);
 				link->template original_free_flow_speed<float>(raw_link.original_free_flow_speed);
+				link->template num_inbound_turn_lanes<int>(raw_link.num_inbound_turn_lanes);
 
 				link->template upstream_intersection<_Intersection_Interface*>()->template outbound_links<_Links_Container_Interface&>().push_back(link);
 				link->template downstream_intersection<_Intersection_Interface*>()->template inbound_links<_Links_Container_Interface&>().push_back(link);
@@ -101,6 +102,7 @@ namespace Network_Components
 				turn_movement->template movement_rule<int>(raw_turn_movement.turn_movement_rule);
 				turn_movement->template uuid<int>(raw_turn_movement.uuid);
 				turn_movement->template internal_id<int>(i);
+				turn_movement->template num_turn_lanes<int>(raw_turn_movement.num_turn_lanes);
 				int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template internal_id<int>();
 				int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template internal_id<int>();
 				typename MasterType::network_type::long_hash_key_type long_hash_key;
@@ -108,7 +110,7 @@ namespace Network_Components
 				long_hash_key.outbound_link_id = outbound_link_id;
 				//_link_turn_movement_map.insert(make_pair<long long,typename MasterType::turn_movement_type*>(long_hash_key.movement_id, (typename MasterType::turn_movement_type*)turn_movement));
 				_link_turn_movement_map[long_hash_key.movement_id] = (typename MasterType::turn_movement_type*)turn_movement;
-
+				
 				//// assign the detector
 				//turn_movement_1->template detector<Detector_Interface*>(lane->template Detector_Thru<Detector_Interface*>());
 				turn_movements_container<ComponentType,CallerType,_Turn_Movements_Container_Interface&>().push_back(turn_movement);

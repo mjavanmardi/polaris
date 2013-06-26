@@ -33,6 +33,7 @@ using namespace RNG_Components;
 
 #ifdef __GNUC__
 #include <sys/time.h>
+#define ULONG_MAX 0xffffffffUL
 #else
 #include <windows.h>
 #endif
@@ -84,5 +85,7 @@ double get_current_cpu_time_in_seconds();
 void calculate_mean_standard_deviation(const vector<float>& data_array, float& mean, float& standard_deviation);
 
 void calculate_mean(const vector<float>& data_array, float& mean);
+
+void mem_info(long long& vm_usage, long long& resident_set);
 
 #endif

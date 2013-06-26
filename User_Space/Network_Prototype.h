@@ -179,6 +179,9 @@ namespace Network_Components
 			feature_accessor(network_vht, none, none);
 			feature_accessor(network_snapshot_container, none, none);
 			feature_accessor(link_turn_movement_map, none, none);
+			feature_accessor(in_network_vht_vehicle_based, none, none);
+			feature_accessor(out_network_vht_vehicle_based_update_lock, none, none);
+			feature_accessor(network_vht_vehicle_based, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 
@@ -319,6 +322,16 @@ namespace Network_Components
 			feature_prototype TargetType get_routable_network_from_snapshots(int current_time)
 			{
 				return (TargetType)(this_component()->template get_routable_network_from_snapshots<ComponentType,CallerType,TargetType>(current_time));
+			}
+
+			feature_prototype void increase_in_network_vht_vehicle_based(float increase)
+			{
+				this_component()->template increase_in_network_vht_vehicle_based<ComponentType,CallerType,TargetType>(increase);
+			}
+
+			feature_prototype void increase_out_network_vht_vehicle_based(float increase)
+			{
+				this_component()->template increase_out_network_vht_vehicle_based<ComponentType,CallerType,TargetType>(increase);
 			}
 		};
 

@@ -51,6 +51,7 @@ namespace Turn_Movement_Components
 			// transportation movement
 			feature_accessor(movement_type, none, none);
 			feature_accessor(movement_rule, none, none);
+			feature_accessor(num_turn_lanes, none, none);
 
 			// routable movement
 			feature_accessor(replicas_container, none, none);
@@ -65,7 +66,7 @@ namespace Turn_Movement_Components
 			feature_accessor(movement_demand, none, none);
 			feature_accessor(movement_flow, none, none);
 			feature_accessor(movement_transferred, none, none);
-
+			feature_accessor(movement_capacity_leftover, none, none);
 
 			feature_accessor(vehicles_container, none, none);
 
@@ -107,9 +108,9 @@ namespace Turn_Movement_Components
 				this_component()->template update_flow<ComponentType,CallerType,TargetType>();
 			}
 
-			feature_prototype void transfer_vehicles(TargetType param)
+			feature_prototype void transfer_vehicles()
 			{
-				this_component()->template transfer_vehicles<ComponentType,CallerType,TargetType>(param);
+				this_component()->template transfer_vehicles<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void update_state(TargetType param)

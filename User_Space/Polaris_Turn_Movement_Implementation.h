@@ -1,5 +1,6 @@
 #pragma once
 #include "Turn_Movement_Prototype.h"
+#include "../Repository/RNG_Implementations.h"
 
 namespace Turn_Movement_Components
 {
@@ -32,9 +33,12 @@ namespace Turn_Movement_Components
 			member_data(float, movement_demand, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, movement_flow, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, movement_transferred, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, movement_capacity_leftover, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_data(Turn_Movement_Components::Types::Turn_Movement_Type_Keys, movement_type, none, none);
 			member_data(Turn_Movement_Components::Types::Turn_Movement_Rule_Keys, movement_rule, none, none);
+
+			member_data(int, num_turn_lanes, none, none);
 
 			member_data(float, inbound_link_departed_time_based_experienced_link_turn_travel_delay, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, outbound_link_arrived_time_based_experienced_link_turn_travel_delay, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -175,9 +179,29 @@ namespace Turn_Movement_Components
 					_movement_demand = 0.0;
 				}
 				_movement_flow = (float) min(min((double)_movement_demand,(double)_movement_capacity),(double)_movement_supply);
+				if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() == Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
+				{
+					float turn_movement_flow_leftover = _movement_flow + _movement_capacity_leftover;
+
+					int num_transfer_vehicles_of_turn_movement = (int)(turn_movement_flow_leftover);
+					turn_movement_flow_leftover -= num_transfer_vehicles_of_turn_movement;
+					
+					///protect float precision
+					if (turn_movement_flow_leftover >= 0.995)
+					{
+						num_transfer_vehicles_of_turn_movement++;
+						turn_movement_flow_leftover = 0.0f;
+					}
+					_movement_capacity_leftover = turn_movement_flow_leftover;
+					_movement_flow = float(num_transfer_vehicles_of_turn_movement);
+				}
+				if (_movement_flow > _vehicles_container.size())
+				{
+					_movement_flow = float(_vehicles_container.size());
+				}
 			}
 
-			feature_implementation void transfer_vehicles(RNG_Components::RngStream& rng_stream)
+			feature_implementation void transfer_vehicles()
 			{
 				define_component_interface(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
@@ -196,14 +220,21 @@ namespace Turn_Movement_Components
 						
 				int num_transfer_vehicles_of_turn_movement = (int)transfer_flow_turn_movement;
 				transfer_flow_turn_movement = transfer_flow_turn_movement - num_transfer_vehicles_of_turn_movement;
-						
-				if(transfer_flow_turn_movement > 0.0)
+				if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() != Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
 				{
-					double rng = rng_stream.RandU01();
-					if(rng<=transfer_flow_turn_movement)
-					{//partial vehicle, incomplete implementation
-						++num_transfer_vehicles_of_turn_movement;
+					if(transfer_flow_turn_movement > 0.0)
+					{
+						double rng = Uniform_RNG.Next_Rand<double>();//rng_stream.RandU01();
+						if(rng<=transfer_flow_turn_movement)
+						{//partial vehicle, incomplete implementation
+							++num_transfer_vehicles_of_turn_movement;
+						}
 					}
+				}
+
+				if (num_transfer_vehicles_of_turn_movement > (int)_vehicles_container.size())
+				{
+					num_transfer_vehicles_of_turn_movement = (int)_vehicles_container.size();
 				}
 
 				_movement_transferred = num_transfer_vehicles_of_turn_movement;
@@ -260,7 +291,7 @@ namespace Turn_Movement_Components
 
 					//update vehicle state: transfer to next link
 					int enter_time=vehicle->template movement_plan<_Movement_Plan_Interface*>()->template get_current_link_enter_time<int>();
-					int delayed_time = int((((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - enter_time) - ((_Link_Interface*)_inbound_link)->template link_fftt<float>());
+					int delayed_time = max(0, int((((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() - enter_time) - ((_Link_Interface*)_inbound_link)->template link_fftt<float>()));
 					int enter_interval_index = enter_time / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					int delayed_interval = current_simulation_interval_index - enter_interval_index;
 
@@ -359,6 +390,7 @@ namespace Turn_Movement_Components
 				_movement_demand = 0.0;
 				_movement_supply = 0.0;
 				_movement_flow = 0.0;
+				_movement_capacity_leftover = 0.0;
 				_movement_transferred = 0;
 				_turn_movement_cumulative_vehicles = 0;
 				_turn_movement_cumulative_arrived_vehicles = 0;

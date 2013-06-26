@@ -42,7 +42,8 @@ namespace network_models
 				int num_right_turn_bays;
 				float left_turn_bay_length;
 				float right_turn_bay_length;
-		
+				int num_inbound_turn_lanes;
+
 				float free_flow_speed; ///in miles per hour
 				float backward_wave_speed; ///in miles per hour
 				float jam_density;

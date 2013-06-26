@@ -93,6 +93,11 @@ namespace Network_Components
 
 			member_data(long,start_cpu_time_in_seconds,none,none);
 
+			member_data(float, in_network_vht_vehicle_based, none, none);
+			member_data(float, out_network_vht_vehicle_based, none, none);
+			member_data(float, network_vht_vehicle_based, none, none);
+			member_data(_lock, network_vht_vehicle_based_update_lock, none, none);
+
 			member_container(vector<typename MasterType::routable_network_type*>, network_snapshot_container, none, none);
 
 			typedef unordered_map<int,vector<typename MasterType::link_type*>> id_to_links_map_type;
@@ -143,6 +148,7 @@ namespace Network_Components
 			feature_implementation void simulation_initialize()
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				UNLOCK(_network_vht_vehicle_based_update_lock);
 				initialize_intersection_control<ComponentType,CallerType,TargetType>();
 				initialize_links<ComponentType,CallerType,TargetType>();
 				initialize_intersections<ComponentType,CallerType,TargetType>();
@@ -155,6 +161,7 @@ namespace Network_Components
 				}
 				_network_vht = 0.0;
 				_network_vmt = 0.0;
+				_out_network_vht_vehicle_based = 0.0;
 				initialize_moe();
 				initialize_network_agent<ComponentType,CallerType,TargetType>();
 			}
@@ -409,6 +416,10 @@ namespace Network_Components
 				{
 					((typename MasterType::network_type*)_this)->read_normal_day_link_moe();
 				}
+				if (((((_Network_Interface*)_this)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				{
+					((typename MasterType::network_type*)_this)->_in_network_vht_vehicle_based = 0.0;
+				}
 			}
 
 			void read_historic_link_moe()
@@ -614,8 +625,9 @@ namespace Network_Components
 					//for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
 					//{
 					//	((_Intersection_Interface*)(*intersection_itr))->template calculate_moe_for_assignment_interval<NULLTYPE>();
+					//	((_Intersection_Interface*)(*intersection_itr))->template update_in_network_vehicle_vht<NT>();
 					//}
-
+					_network_vht_vehicle_based = _in_network_vht_vehicle_based + _out_network_vht_vehicle_based;
 					link_moe_post_process();
 					update_moe_for_assignment_interval_with_links();
 					update_moe_for_assignment_interval();
@@ -846,11 +858,6 @@ namespace Network_Components
 					
 					mvmt_itf->template turn_travel_penalty<float>(turn_travel_penalty);
 					mvmt_itf->template forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
-					for (int j = 0; j < (int)mvmt_itf->template replicas_container<_Turn_Movements_Container_Interface&>().size(); j++)
-					{
-						_Turn_Movement_Interface* replica = (_Turn_Movement_Interface*)mvmt_itf->template replicas_container<_Turn_Movements_Container_Interface&>()[j];
-						replica->template forward_link_turn_travel_time<float>(forward_link_turn_travel_time);
-					}
 				}
 			}
 
@@ -916,6 +923,19 @@ namespace Network_Components
 				}
 			}
 
+			feature_implementation void increase_in_network_vht_vehicle_based(float increase)
+			{
+				LOCK(_network_vht_vehicle_based_update_lock);
+				_in_network_vht_vehicle_based += increase;
+				UNLOCK(_network_vht_vehicle_based_update_lock);
+			}
+
+			feature_implementation void increase_out_network_vht_vehicle_based(float increase)
+			{
+				LOCK(_network_vht_vehicle_based_update_lock);
+				_out_network_vht_vehicle_based += increase;
+				UNLOCK(_network_vht_vehicle_based_update_lock);
+			}
 			
 			feature_implementation void write_node_control_state();
 

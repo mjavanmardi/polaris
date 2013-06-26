@@ -103,6 +103,10 @@ namespace Scenario_Components
 			member_data(int, network_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, network_cumulative_switched_decisions, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
+			member_data(int, rng_type, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+
+			member_data(int, merging_mode, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+
 			member_data(int, snapshot_period, none, none); // in second
 
 			member_data(bool, write_db_input_to_files, none, none); // to control whether database input is written to files

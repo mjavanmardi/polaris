@@ -1,5 +1,5 @@
 #pragma once
-
+#include <random>
 #include <iostream>
 #include <string>
 namespace RNG_Components
@@ -8,7 +8,7 @@ namespace RNG_Components
 	{
 	public:
 
-		RngStream ();
+	RngStream ();
 
 
 	static bool SetPackageSeed (const unsigned long seed[6]);
@@ -72,6 +72,18 @@ namespace RNG_Components
 	double U01d ();
 
 
+	};
+
+	class StlRngStream
+	{
+	public:
+
+	StlRngStream();
+	std::mt19937_64 generator;  
+	std::uniform_real_distribution<double> distribution;
+	double RandU01();
+	void SetSeed(unsigned long iseed);
+	double triangular_random_variate(double u, double a, double b, double mean);
 	};
  
 	/***********************************************************************\
