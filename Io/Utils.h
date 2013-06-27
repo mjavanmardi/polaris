@@ -22,4 +22,5 @@ int CountRows(const std::string& db_path, const std::string& table_name)
 	ret = sqlite3_exec(db_handle, sql, int_callback, &result, &err_msg);
 	return result;
 }
+
 }

@@ -409,6 +409,7 @@ namespace Network_Components
 
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::output_moe_for_assignment_interval()
 		{
+			using namespace polaris::io;
 			define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, type_of(turn_movements_container), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
@@ -454,6 +455,37 @@ namespace Network_Components
 						<< endl;
 				}
 			}
+
+			if (((_Scenario_Interface*)_global_scenario)->template DB_output_link_moe_for_assignment_interval<bool>())
+			{
+				shared_ptr<LinkMOE> moe_rec(nullptr);
+				// output link moe to database
+				using namespace odb;
+				using namespace polaris::io;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				string name(((_Scenario_Interface*)_global_scenario)->template database_name<string&>());
+				unique_ptr<database> db (open_sqlite_database (name));
+				transaction t(db->begin());
+
+
+				typedef typename MasterType::link_type _link_component_type;
+				typename _Links_Container_Interface::iterator link_itr;
+				for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
+				{
+					_link_component_type* link = (_link_component_type*)(*link_itr);
+					moe_rec.reset(new LinkMOE());
+					moe_rec->setLink_Uid(link->_uuid);
+					moe_rec->setLink_Density(link->link_moe_data.link_density);
+					moe_rec->setLink_Density_Ratio(link->link_moe_data.link_density_ratio);
+					moe_rec->setLink_Speed(link->link_moe_data.link_speed);
+					moe_rec->setLink_In_Volume(link->link_moe_data.link_in_volume);
+					moe_rec->setLink_Out_Volume(link->link_moe_data.link_out_volume);
+					db->persist(moe_rec);
+				}
+				t.commit();
+			}
+
+			
 			if (((_Scenario_Interface*)_global_scenario)->template output_turn_movement_moe_for_assignment_interval<bool>())
 			{
 				// output turn movement moe

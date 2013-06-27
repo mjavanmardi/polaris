@@ -1916,8 +1916,8 @@ class Fixed_Sensor
 public:
 	// Default Constructor
 	Fixed_Sensor () {}        
-	Fixed_Sensor (int id_, int link_, bool dir_, double offset_, double sigma_, int aggregation_period_sec_)
-	: id (id_), link (link_), dir (dir_), offset (offset_), sigma (sigma_), aggregation_period_sec (aggregation_period_sec_)
+	Fixed_Sensor (int id_, int link_, bool dir_, double offset_, double sigma_, int aggregation_period_sec_, std::string original_name_)
+		: id (id_), link (link_), dir (dir_), offset (offset_), sigma (sigma_), aggregation_period_sec (aggregation_period_sec_), original_name (original_name_)
 	{
 	}
 	//Accessors
@@ -1933,16 +1933,19 @@ public:
 	void setSigma (const double& sigma_) {sigma = sigma_;}
 	const int& getAggregation_Period_Sec () const {return aggregation_period_sec;}
 	void setAggregation_Period_Sec (const int& aggregation_period_sec_) {aggregation_period_sec = aggregation_period_sec_;}
+	const std::string& getOriginal_Name () const {return original_name;}
+	void setOriginal_Name (const std::string& original_name_) {original_name = original_name_;}
 	//Data Fields
 private:
 	friend class odb::access;
-	#pragma db auto id
+#pragma db auto id
 	int id;
 	int link;
 	bool dir;
 	double offset;
 	double sigma;
 	int aggregation_period_sec;
+	std::string original_name;
 };
 #pragma db object
 class Action_Key
@@ -1981,8 +1984,8 @@ class Microsoft_Event
 public:
 	// Default Constructor
 	Microsoft_Event () {}        
-	Microsoft_Event (int incidentId_, int end_, int lastModified_, int start_, int type_, int severity_, std::string description_, std::string congestion_, std::string lane_, double lat_, double lng_, double x_, double y_, bool roadClosed_, bool verified_, int link_id_)
-		: incidentId (incidentId_), end (end_), lastModified (lastModified_), start (start_), type (type_), severity (severity_), description (description_), congestion (congestion_), lane (lane_), lat (lat_), lng (lng_), x (x_), y (y_), roadClosed (roadClosed_), verified (verified_), link_id (link_id_)
+	Microsoft_Event (int incidentId_, int end_, int lastModified_, int start_, int type_, int severity_, std::string description_, std::string congestion_, std::string lane_, double lat_, double lng_, double x_, double y_, bool roadClosed_, bool verified_, int link_id_, double link_distance_)
+		: incidentId (incidentId_), end (end_), lastModified (lastModified_), start (start_), type (type_), severity (severity_), description (description_), congestion (congestion_), lane (lane_), lat (lat_), lng (lng_), x (x_), y (y_), roadClosed (roadClosed_), verified (verified_), link_id (link_id_), link_distance (link_distance_)
 	{
 	}
 	//Accessors
@@ -2018,6 +2021,8 @@ public:
 	void setVerified (const bool& verified_) {verified = verified_;}
 	const int& getLink_Id () const {return link_id;}
 	void setLink_Id (const int& link_id_) {link_id = link_id_;}
+	const double& getLink_Distance () const {return link_distance;}
+	void setLink_Distance (const double& link_distance_) {link_distance = link_distance_;}
 	//Data Fields
 private:
 	friend class odb::access;
@@ -2038,6 +2043,7 @@ private:
 	bool roadClosed;
 	bool verified;
 	int link_id;
+	double link_distance;
 };
 }//end of io namespace 
 }//end of polaris namespace

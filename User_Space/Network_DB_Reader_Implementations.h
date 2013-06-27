@@ -6,7 +6,7 @@
 
 namespace Network_Components
 {
-    using std::tr1::shared_ptr;
+    using std::shared_ptr;
 	namespace Types
 	{
 		union Link_ID_Dir
@@ -200,7 +200,7 @@ namespace Network_Components
 
 											
 						link->template internal_id<int>(++link_counter);
-						link->template uuid<int>(link->template internal_id<int>());
+						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 						//link->template uuid<int>(link_id_dir.id /*link_counter*/);
 
 						link->template num_lanes<int>(db_itr->getLanes_Ab());
@@ -306,7 +306,7 @@ namespace Network_Components
 						
 						//link->template uuid<int>(link_id_dir.id);
 						link->template internal_id<int>(++link_counter);
-						link->template uuid<int>(link->template internal_id<int>());
+						link->template uuid<int>(link_id_dir.id * 2 + link_id_dir.dir);
 
 						link->template num_lanes<int>(db_itr->getLanes_Ba());
 						

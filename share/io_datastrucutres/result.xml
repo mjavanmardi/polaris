@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<root>
+	<type name="Link_Probability" pragma="object">
+		<field name="id" type="int" pragma="auto id"/>
+		<field name="dir_link_from" type="int"/>
+		<field name="dir_link_to" type="int"/>
+		<field name="count" type="int"/>
+		<field name="prob" type="float"/>
+	</type>		
+	<type name="LinkMOE" pragma="object">
+		<field name="id" type="int" pragma="auto id"/>		
+		<field name="link_uid" type="int" pragma="not_null"/>		
+		<field name="start_time" type="int"/>
+		<field name="end_time" type="int"/>
+		<field name="link_travel_time" type="float"/>
+		<field name="link_travel_time_standard_deviation" type="float"/>
+		<field name="link_queue_length" type="float"/>
+		<field name="link_travel_delay" type="float"/>
+		<field name="link_travel_delay_standard_deviation" type="float"/>
+		<field name="link_speed" type="float"/>
+		<field name="link_density" type="float"/>
+		<field name="link_in_flow_rate" type="float"/>
+		<field name="link_out_flow_rate" type="float"/>
+		<field name="link_in_volume" type="float"/>
+		<field name="link_out_volume" type="float"/>
+		<field name="link_speed_ratio" type="float"/>
+		<field name="link_in_flow_ratio" type="float"/>
+		<field name="link_out_flow_ratio" type="float"/>
+		<field name="link_density_ratio" type="float"/>
+		<field name="link_travel_time_ratio" type="float"/>
+		<field name="num_vehicles_in_link" type="float"/>
+	</type>		
+</root>

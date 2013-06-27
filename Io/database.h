@@ -64,6 +64,14 @@ namespace io
 		return "ATTACH \'" + make_name(db_name, schema_name) + "\' as " + schema_name;
 	}
 }}
+
+inline void hadnle_sqlite_error(char **err_msg, int ret)
+{
+	fprintf (stderr, "Error: %s\n", err_msg);
+	fprintf (stderr, "Error code: %d\n", ret);
+	sqlite3_free (err_msg);
+}
+
 inline sqlite3* open_raw_sqlite_database(const std::string& name)
 {
 	using namespace polaris::io;

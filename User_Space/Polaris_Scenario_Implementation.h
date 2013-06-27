@@ -130,6 +130,8 @@ namespace Scenario_Components
 			member_data(bool, output_link_moe_for_assignment_interval, none, none);
 			member_data(bool, output_turn_movement_moe_for_assignment_interval, none, none);
 			member_data(bool, output_network_moe_for_assignment_interval, none, none);
+			
+			member_data(bool, DB_output_link_moe_for_assignment_interval, none, none);
 
 			member_data(bool, output_link_moe_for_simulation_interval, none, none);
 			member_data(bool, output_turn_movement_moe_for_simulation_interval, none, none);

@@ -1,8 +1,55 @@
-file(GLOB_RECURSE hppfiles
-	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-	*.h)	
-file(GLOB_RECURSE cppfiles
-	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-	*.cpp)		
+set(hppfiles Application_Includes.h Polaris_PCH.h)
+
+if (IntegratedModelApplication)
+	set(cppfiles Integrated_Model.cpp)
+endif()
+if (NetworkModelApplication)
+	set(cppfiles NetworkModel.cpp)		
+endif()
+
+
 add_executable(application ${cppfiles} ${hppfiles})
-target_link_libraries(application antares userspace io scenariomanager ${Odb} ${Sqlite3} ${Odb_Sqlite} ${Glew})	
+if (Antares AND MSVC)
+	target_link_libraries(application antares)					
+	ADD_DEFINITIONS( -D_UNICODE )
+	ADD_DEFINITIONS( -DNDEBUG )
+	ADD_DEFINITIONS( -DGLEW_STATIC )
+	ADD_DEFINITIONS( -DWIN32 )
+	ADD_DEFINITIONS( -DWINVER=0x0600 )
+	ADD_DEFINITIONS( -D__WXMSW__ )
+	ADD_DEFINITIONS( -D_WINDOWS )
+	ADD_DEFINITIONS( -DwxUSE_GUI=1 )
+	ADD_DEFINITIONS( -D_CRT_SECURE_NO_DEPRECATE )
+	ADD_DEFINITIONS( -D_CRT_NONSTDC_NO_DEPRECATE )		
+	find_library(rt rt)
+	find_library(plplotd plplotd)
+	find_library(plplotcxxd plplotcxxd )
+	find_library(csirocsa csirocsa)
+	find_library(qsastime qsastime)
+	find_library(plplotwxwidgetsd plplotwxwidgetsd )
+	find_library(comctl32 comctl32)
+	find_library(rpcrt4 rpcrt4)
+	find_library(winmm winmm)
+	find_library(advapi32 advapi32)
+	find_library(wxpng wxpng)	
+	find_library(wxbase29u wxbase29u)	
+	find_library(wxbase29u_net wxbase29u_net)	
+	find_library(wxbase29u_xml wxbase29u_xml)	
+	find_library(wxregexu wxregexu)	
+	find_library(wxexpat wxexpat)	
+	find_library(wxjpeg wxjpeg)	
+	find_library(wxtiff wxtiff)	
+	# target_link_libraries(application ${Glew} ${plplotd} ${plplotcxxd} ${csirocsa} ${qsastime} ${plplotwxwidgetsd} ${comctl32} ${rpcrt4} ${winmm} ${advapi32} ${wxpng} ${wxbase29u} ${wxbase29u_net} ${wxbase29u_xml} 
+	# ${wxregexu} 
+	# ${wxexpat} 
+	# ${wxjpeg} 
+	# ${wxtiff} 
+	# )		
+	target_link_libraries(application ${Glew} ${plplotd} ${plplotcxxd} ${csirocsa} ${qsastime} ${plplotwxwidgetsd} ${comctl32} ${rpcrt4} ${winmm} ${advapi32})	
+endif()	
+target_link_libraries(application file_io userspace scenariomanager ${iolibs})
+
+if (UNIX)
+	target_link_libraries(application -lrt)
+	target_link_libraries(application -lstdc++)
+endif()

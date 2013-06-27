@@ -241,6 +241,8 @@ namespace Scenario_Components
 			feature_accessor(use_tmc, none, none);
 			feature_accessor(use_network_events, none, none);
 
+			feature_accessor(DB_output_link_moe_for_assignment_interval, none, none);
+
 			/// enroute switching parameters
 			feature_accessor(pretrip_informed_market_share,none,none);
 			feature_accessor(realtime_informed_vehicle_market_share, none, none);
@@ -462,6 +464,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_assignment_interval<bool>(true);
 
+				if (cfgReader.getParameter("DB_output_link_moe_for_assignment_interval", DB_output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) DB_output_link_moe_for_assignment_interval<bool>(false);
 
 				if (cfgReader.getParameter("use_tmc", use_tmc<bool*>())!= PARAMETER_FOUND) use_tmc<bool>(false);
 				if (cfgReader.getParameter("use_network_events", use_network_events<bool*>())!= PARAMETER_FOUND) use_network_events<bool>(false);

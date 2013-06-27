@@ -8,8 +8,8 @@ define_static_typelist_loop(Initialize_Type,Initialize_List);
 
 namespace Network_Event_Components
 {
-    using std::tr1::shared_ptr;
-    using std::tr1::weak_ptr;
+	using std::shared_ptr;
+	using std::weak_ptr;
 
 	namespace Types
 	{
@@ -166,11 +166,11 @@ namespace Network_Event_Components
 									 zone_set.insert(loc->template zone<Zone_Interface*>());
 								}
 
-							}
 						}
 					}
 				}
-				
+			}
+			
 				// create the affected zones list
 				for (typename unordered_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
 				{
@@ -375,7 +375,7 @@ namespace Network_Event_Components
 		implementation struct Accident_Network_Event : public Base_Network_Event<MasterType,NT,APPEND_CHILD(Accident_Network_Event)>
 		{
 			//feature_implementation static void Initialize_Type(void* obj){Base_Network_Event::Initialize_Type<ComponentType,CallerType,NT>(obj);}
-	
+			
 			//feature_implementation void Start(){Base_Network_Event::template Start<ComponentType,CallerType,NT>();}
 			feature_implementation void Start(){((Base_Network_Event<MasterType,NT,APPEND_CHILD(Accident_Network_Event)>*)this)->template Start<ComponentType,CallerType,NT>();}
 
@@ -452,7 +452,7 @@ namespace Network_Event_Components
 
 				//Base_Network_Event::template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
 				((Base_Network_Event<MasterType,NT,APPEND_CHILD(Congestion_Network_Event)>*)this)->template Initialize< ComponentType,ComponentType,weak_ptr<Event_Instance>& >(instance);
-			
+				
 				const vector<shared_ptr<Event_Instance_Value>>& values=instance.lock()->getValues();
 
 				for(typename vector<shared_ptr<Event_Instance_Value>>::const_iterator itr=values.begin();itr!=values.end();itr++)

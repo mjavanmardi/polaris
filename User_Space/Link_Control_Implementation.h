@@ -24,7 +24,7 @@ namespace Link_Control_Components
 			{
 				using namespace polaris::io;
 				
-				std::tr1::shared_ptr<LinkList> link_list = instance.getLinks();
+				std::shared_ptr<LinkList> link_list = instance.getLinks();
 
 				const vector<int>& db_covered_links = (*link_list).getLinks();
 
