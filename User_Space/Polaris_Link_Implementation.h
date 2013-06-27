@@ -140,6 +140,7 @@ namespace Link_Components
 			member_data(float, speed_adjustment_factor_due_to_accident, none, none);
 			member_data(float, capacity_adjustment_factor_due_to_weather, none, none);
 			member_data(float, capacity_adjustment_factor_due_to_accident, none, none);
+			member_data(float, lane_adjustment_due_to_accident, none, none);
 
 		//==================================================================================================================
 		/// Inbound and Outbound Turn Movement Members
@@ -575,7 +576,7 @@ namespace Link_Components
 					_link_destination_cumulative_arrived_vehicles++;
 					_link_destination_arrived_vehicles++;
 
-					if (((_Scenario_Interface*)_global_scenario)->write_vehicle_trajectory<bool>())
+					if (((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
 					{
 						_link_destination_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
 					}
@@ -1003,7 +1004,6 @@ namespace Link_Components
 				{
 					return;
 				}
-				revert_features<ComponentType,CallerType,TargetType>();
 				if (_weather_event_to_process)
 				{
 					_weather_event_to_process = false;
@@ -1013,6 +1013,7 @@ namespace Link_Components
 					}
 					else
 					{
+						revert_weather_event<ComponentType,CallerType,typename MasterType::weather_network_event_type*>();
 						_current_weather_event = NULL;
 					}
 				}
@@ -1026,17 +1027,10 @@ namespace Link_Components
 					}
 					else
 					{
+						revert_accident_event<ComponentType,CallerType,typename MasterType::accident_network_event_type*>();
 						_current_accident_event = NULL;
 					}
 				}
-			}
-
-			feature_implementation void revert_features()
-			{
-				_free_flow_speed = _original_free_flow_speed;
-				_maximum_flow_rate = _original_maximum_flow_rate;
-				_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
-				_num_lanes = _original_num_lanes;
 			}
 
 			declare_feature_event(Compute_Step_Flow_Supply_Update)
@@ -1144,10 +1138,19 @@ namespace Link_Components
 				}
 			}
 
+			feature_implementation void change_speed_limit(float a_speed_limit)
+			{
+				_speed_limit = a_speed_limit;
+				_free_flow_speed = min(_free_flow_speed, _speed_limit + 10.0f);
+				_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
+			}
+
 			feature_implementation void process_weather_event();
+			feature_implementation void revert_weather_event();
 			feature_implementation float find_free_flow_speed_adjustment_rate_for_weather(int weather_index);
 			feature_implementation int get_weather_index(TargetType weather_event);
 			feature_implementation void process_accident_event();
+			feature_implementation void revert_accident_event();
 		
 			static float link_capacity_adjustment_factors_for_weather[19];
 			static float link_free_flow_speed_adjustment_factors_for_weather[19][5];

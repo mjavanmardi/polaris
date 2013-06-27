@@ -183,6 +183,7 @@ namespace Link_Components
 			feature_accessor(speed_adjustment_factor_due_to_accident, none, none);
 			feature_accessor(capacity_adjustment_factor_due_to_weather, none, none);
 			feature_accessor(capacity_adjustment_factor_due_to_accident, none, none);
+			feature_accessor(lane_adjustment_due_to_accident, none, none);
 
 			// ITS-enabled link
 			feature_accessor(advisory_radio_events, none, none);
@@ -313,6 +314,10 @@ namespace Link_Components
 			feature_prototype void close_shoulder()
 			{
 				this_component()->template close_shoulder<ComponentType,CallerType,TargetType>();
+			}
+			feature_prototype void change_speed_limit(float speed_limit)
+			{
+				this_component()->template change_speed_limit<ComponentType,CallerType,TargetType>(speed_limit);
 			}
 		};
 	}

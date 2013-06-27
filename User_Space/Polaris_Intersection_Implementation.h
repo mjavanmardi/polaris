@@ -780,6 +780,7 @@ namespace Intersection_Components
 			{
 				typedef Intersection_Prototype<typename MasterType::intersection_type> _Intersection_Interface;
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef typename Polaris_Component<APPEND_CHILD(Polaris_Intersection_Implementation),MasterType,Execution_Object,ParentType>::Component_Type ComponentType;
 
 				typename MasterType::intersection_type* _pthis = (typename MasterType::intersection_type*)_this;
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;

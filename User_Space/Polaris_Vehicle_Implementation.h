@@ -397,7 +397,7 @@ namespace Vehicle_Components
 				double mean = ((_Scenario_Interface*)_global_scenario)->template relative_indifference_band_route_choice_mean<double>();
 				double a = 0.0;
 				double b = 2.0*mean;
-				double rib = Uniform_RNG.triangular_random_variate<double>(r1,a,b,mean);//_rng_stream.triangular_random_variate(r1,a,b,mean);
+				double rib = Uniform_RNG.template triangular_random_variate<double>(r1,a,b,mean);//_rng_stream.triangular_random_variate(r1,a,b,mean);
 				_relative_indifference_band_route_choice = rib;
 
 				///mtts
@@ -405,7 +405,7 @@ namespace Vehicle_Components
 				mean = ((_Scenario_Interface*)_global_scenario)->template minimum_travel_time_saving_mean<double>();
 				a = 0.5 * mean;
 				b = a + 2.0*mean;
-				double mtts = Uniform_RNG.triangular_random_variate<double>(r1,a,b,mean);//_rng_stream.triangular_random_variate(r1,a,b,mean);
+				double mtts = Uniform_RNG.template triangular_random_variate<double>(r1,a,b,mean);//_rng_stream.triangular_random_variate(r1,a,b,mean);
 				_minimum_travel_time_saving = mtts;
 				///
 
