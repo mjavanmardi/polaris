@@ -11,7 +11,6 @@ class Weather_Modeler(object):
         """ get capacity factor """
         self.freeway_capacity_factor = weather_factor_table.get("capacity factor").get("freeway")    
         self.arterial_capacity_factor = weather_factor_table.get("capacity factor").get("arterial")    
-
         self.speed_borders = list()
         self.freeway_speed_factors = list()
         self.arterial_speed_factors = list()
@@ -41,6 +40,7 @@ class Weather_Modeler(object):
                 continue
             else:
                 break
+        speed_index = min(len(self.speed_borders) - 1, speed_index)
         if link_type == 'FREEWAY' or link_type == 'EXPRESSWAY':
             factor = self.freeway_speed_factors[speed_index]
         else:

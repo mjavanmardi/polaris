@@ -1,0 +1,2 @@
+#qstat|grep bxu|cut -f1 -d' '|xargs qdel
+cat weather_jobs |cut -d' ' -f2 |xargs qdel 

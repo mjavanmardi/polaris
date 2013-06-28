@@ -1,0 +1,37 @@
+#! /bin/bash
+target_dir=workspaces
+dirs=`ls ${target_dir}`
+i=1
+for dir in $dirs
+do
+    scenarios[$i]=$dir
+    let i=i+1
+done
+let num_scenarios=i-1
+cp /dev/null plt.tmp
+echo set term png size 768,480 >> plt.tmp
+echo set xlabel \"Time\" >> plt.tmp
+echo set ylabel \"Average Link Speed \(MPH\)\" >> plt.tmp
+echo set output \"speed.png\" >> plt.tmp
+echo set title \"Probability weighted average link speed of Chicago network\" >> plt.tmp
+echo set xdata time >> plt.tmp
+echo set datafile separator \",\" >> plt.tmp
+echo set timefmt \"%H:%M:%S\" >> plt.tmp
+echo set xtics \(\"00:00\" \"00:00\", \"02:00\" \"02:00\", \"04:00\" \"04:00\", \"06:00\" \"06:00\", \"08:00\" \"08:00\", \"10:00\" \"10:00\", \"12:00\" \"12:00\", \"14:00\" \"14:00\", \"16:00\" \"16:00\", \"18:00\" \"18:00\", \"20:00\" \"20:00\", \"22:00\" \"22:00\", \"24:00\" \"24:00\"\) >> plt.tmp
+echo set key left bottom  >> plt.tmp
+i=1
+for dir in $dirs
+do
+    if [ $i == 1 ] 
+    then 
+        echo plot \[\"00:00:00\":\"24:00:00\"\]\[0:\] \'${target_dir}/${scenarios[$i]}/results/combined_moe_network.csv\' using 1:7 title \'${scenarios[$i]}\' with line $i, \\ >> plt.tmp
+    elif [ $i == $num_scenarios ]
+    then
+        echo \'${target_dir}/${scenarios[$i]}/results/combined_moe_network.csv\' using 1:7 title \'${scenarios[$i]}\' with line $i >> plt.tmp
+    else
+        echo \'${target_dir}/${scenarios[$i]}/results/combined_moe_network.csv\' using 1:7 title \'${scenarios[$i]}\' with line $i, \\ >> plt.tmp
+    fi
+    let i=i+1
+done
+gnuplot plt.tmp
+rm plt.tmp

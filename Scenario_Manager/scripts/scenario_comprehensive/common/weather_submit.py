@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/mnt/lustre/home/bxu/lib/simplejson-3.0.7')
+sys.path.append('simplejson-3.0.7')
 
 import os
 import subprocess
@@ -15,14 +15,14 @@ if not os.path.isdir(work_place):
     print 'Work place not valid'
     quit()
 
-weather_parameters = simplejson.load(open('weather_adjustments.json', 'r'))
+weather_parameters = simplejson.load(open('weather_scenarios.json', 'r'))
 weather_jobs = open('weather_jobs', 'w')
 for weather_factor_table in weather_parameters:
-    weather_type = weather_factor_table.get('weather type');
+    weather_type = weather_factor_table.get('scenario name');
     target_dir = work_place + '/' + weather_type
     pbs_name = target_dir + '/job.pbs'
     p = subprocess.Popen(['qsub', pbs_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
-    print 'job for weather type ' + weather_type + ' submitted with id ' + out
+    print 'job for scenario name ' + weather_type + ' submitted with id ' + out
     weather_jobs.write(weather_type + ' ' + out)
 weather_jobs.close()

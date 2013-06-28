@@ -50,33 +50,35 @@ target_dir=$1
 file=${target_dir}/${sub_dir}/summary.csv
 weather_type=$2
 printf "%12s" ${sub_dir}
-not_ready_line="---------------------------------------------------------------------------------------------"
+not_ready_line="---------------------------------------------------------------------------------------------------------------------------------"
 if [ ! -f ${file} ];
 then
-    printf "%96s" ${not_ready_line}
+    printf "%132s" ${not_ready_line}
 else
     str=`tail -n 1 ${file} | sed 's/,/ /g'`
     if [ ${str:0:1} = "t" ] 
     then
-    printf "%96s" ${not_ready_line}
+    printf "%132s" ${not_ready_line}
         #echo "  " ${not_ready_line}
     else
-        str=`tail -n 2 ${file} | head -n 1 | sed 's/,/ /g'`
+        str=`tail -n 1 ${file} | head -n 1 | sed 's/,/ /g'`
         if [ ${str:0:1} = "t" ]
         then 
-    printf "%96s" ${not_ready_line}
+            printf "%132s" ${not_ready_line}
             #echo "  " ${not_ready_line}
         else
-            data_str=`echo ${str} | cut -d' ' -f1-5`
-            run_time_str=`echo ${str} | cut -d' ' -f6`
+            data_str=`echo ${str} | cut -d' ' -f1-6`
+            run_time_str=`echo ${str} | cut -d' ' -f9`
+            mem_usage=`echo ${str} | cut -d' ' -f11`
+            mem_percentage=`echo ${str} | cut -d' ' -f12`
             for word in ${data_str}
             do
                 printf "%12s" ${word}
             done
-            start_time_str=`tail -n1 ${target_dir}/${sub_dir}/scenario | cut -f1` 
+            start_time_str=`grep starting_time_hh_mm ${target_dir}/${sub_dir}/scenario.json | cut -d' ' -f3 | cut -d'"' -f2` 
             _str_to_time ${start_time_str}
             start_time=${time_value}
-            end_time_str=`tail -n1 ${target_dir}/${sub_dir}/scenario | cut -f2` 
+            end_time_str=`grep ending_time_hh_mm ${target_dir}/${sub_dir}/scenario.json | cut -d' ' -f3 | cut -d'"' -f2` 
             _str_to_time ${end_time_str}
             end_time=${time_value}
             current_time_str=`echo ${str} | cut -d' ' -f1`
@@ -90,6 +92,8 @@ else
             if [ ${#run_time_str} = "00:00:00" ] || [ ${current_duration} -eq 0 ] 
             then
                 printf "%12s" "--------"
+                printf "%12s" "--------"
+                printf "%12s" "--------"
             else
                 _str_to_time ${run_time_str}
                 run_time=${time_value}
@@ -97,7 +101,10 @@ else
                 ((h=remaining_time/3600))
                 ((m=remaining_time%3600/60))
                 ((s=remaining_time%60))
-                printf "    %02d:%02d:%02d" $h $m $s
+                remaining_time_str=`printf "%02d:%02d:%02d" $h $m $s`
+                printf "%12s" $remaining_time_str
+                printf "%11sM" $mem_usage
+                printf "%11s%%" $mem_percentage
             fi
         fi
     fi
@@ -107,7 +114,7 @@ job_id=`cat weather_jobs | grep ${weather_type} | cut -d' ' -f2`
 status=`qstat | grep ${job_id} | tr -s ' ' | cut -d' ' -f5`
 if [ ${#status} -eq 0 ]
 then
-    printf "%10s" "--------\n"
+    printf "%10s\n" "--------"
 else
     printf "%10s\n" ${status}
 fi

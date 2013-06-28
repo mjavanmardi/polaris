@@ -1,0 +1,10 @@
+#!/bin/bash
+stty -echo
+target_dir=../scenarios
+while [ 1 == 1 ]
+do
+    clear
+    printf "%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%10s\n" "WEATHER_TYPE" "SIMU_TIME" "LOADED" "DEPARTED" "ARRIVED" "IN_NETWORK" "SWITCHED" "PROGRESS" "RUN_TIME" "REM_TIME" "MEM" "%MEM" "STATUS" 
+    ls ${target_dir} | xargs -L1 ./display ${target_dir}
+    sleep 6
+done
