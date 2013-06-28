@@ -264,25 +264,25 @@ namespace Traffic_Management_Center_Components
 			{
 				Types::Digraph my_digraph;
 
-				for(vector<Sensor_Interface*>::iterator itr = _traffic_sensors.begin();itr!=_traffic_sensors.end();itr++)
+				for(typename vector<Sensor_Interface*>::iterator itr = _traffic_sensors.begin();itr!=_traffic_sensors.end();itr++)
 				{
 					Sensor_Interface* sensor = *itr;
 
-					if( sensor->Check_Outlier<NT>() )
+					if( sensor->template Check_Outlier<NT>() )
 					{
-						Link_Interface* covered_link = sensor->covered_link<Link_Interface*>();
+						Link_Interface* covered_link = sensor->template covered_link<Link_Interface*>();
 
 						Intersection_Prototype<typename MasterType::intersection_type>* intersection;
 						
-						intersection = covered_link->upstream_intersection<Intersection_Prototype<typename MasterType::intersection_type>*>();
+						intersection = covered_link->template upstream_intersection<Intersection_Prototype<typename MasterType::intersection_type>*>();
 
-						int v = intersection->uuid<int>();
+						int v = intersection->template uuid<int>();
 
-						intersection = covered_link->downstream_intersection<Intersection_Prototype<typename MasterType::intersection_type>*>();
+						intersection = covered_link->template downstream_intersection<Intersection_Prototype<typename MasterType::intersection_type>*>();
 
-						int w = intersection->uuid<int>();
+						int w = intersection->template uuid<int>();
 
-						int id = covered_link->dbid<int>();
+						int id = covered_link->template dbid<int>();
 
 						my_digraph.addEdge(v,w,id);
 					}

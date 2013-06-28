@@ -136,11 +136,11 @@ namespace Sensor_Components
 
 				_outlier_detected = false;
 
-				if(detector_configuration.count(_covered_link->dbid<int>()*2+_covered_link->direction<int>()))
+				if(detector_configuration.count(_covered_link->template dbid<int>()*2+_covered_link->template direction<int>()))
 				{
 					_detector = new Detector1DU<double>();
 
-					*_detector = detector_configuration[_covered_link->dbid<int>()*2+_covered_link->direction<int>()];
+					*_detector = detector_configuration[_covered_link->template dbid<int>()*2+_covered_link->template direction<int>()];
 				}
 			}
 

@@ -569,28 +569,28 @@ namespace Network_Event_Components
 						{
 							Weather_Network_Event_Interface* net_event = (Weather_Network_Event_Interface*)Allocate<typename MasterType::type_of(weather_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-							net_event->Start<NT>();
+							net_event->template Start<NT>();
 							Add_Network_Event<ComponentType,ComponentType,typename Weather_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Accident")
 						{
 							Accident_Network_Event_Interface* net_event = (Accident_Network_Event_Interface*)Allocate<typename MasterType::type_of(accident_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-							net_event->Start<NT>();
+							net_event->template Start<NT>();
 							Add_Network_Event<ComponentType,ComponentType,typename Accident_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Congestion")
 						{
 							Congestion_Network_Event_Interface* net_event = (Congestion_Network_Event_Interface*)Allocate<typename MasterType::type_of(congestion_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-							net_event->Start<NT>();
+							net_event->template Start<NT>();
 							Add_Network_Event<ComponentType,ComponentType,typename Congestion_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Lane Closure")
 						{
 							Lane_Closure_Network_Event_Interface* net_event = (Lane_Closure_Network_Event_Interface*)Allocate<typename MasterType::type_of(lane_closure_network_event)>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
-							net_event->Start<NT>();
+							net_event->template Start<NT>();
 							Add_Network_Event<ComponentType,ComponentType,typename Lane_Closure_Network_Event_Interface::ComponentType>(net_event);
 						}
 					}

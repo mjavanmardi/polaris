@@ -223,7 +223,7 @@ namespace Network_Components
 				_Control_Plan_Interface* current_control_plan = intersection_control->template current_control_plan<_Control_Plan_Interface*>();
 				int starting_time = current_control_plan->template starting_time<int>();
 				int ending_time = current_control_plan->template ending_time<int>();
-				Intersection_Components::Types::Intersection_Type_Keys control_type = current_control_plan->template control_type<Intersection_Components::Types::Intersection_Type_Keys>();
+				Intersection_Control_Components::Types::Intersection_Type_Keys control_type = current_control_plan->template control_type<Intersection_Control_Components::Types::Intersection_Type_Keys>();
 
 				network_node_control_state_file
 					<< convert_seconds_to_hhmmss(_this_ptr->template start_of_current_simulation_interval_absolute<int>()) <<  ","
