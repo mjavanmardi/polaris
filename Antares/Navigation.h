@@ -55,12 +55,14 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnKeyDown(wxK
 		_alt_down=true;
 		Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
 		Connect(wxEVT_KEY_UP,wxKeyEventHandler(Canvas_Implementation::OnKeyUp));
+		Disconnect(wxEVT_KEY_DOWN,wxKeyEventHandler(Canvas_Implementation::OnKeyDown));
 	}
 	else if(event.GetModifiers() == wxMOD_CONTROL)
 	{
 		_ctrl_down=true;
 		//Connect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
 		Connect(wxEVT_KEY_UP,wxKeyEventHandler(Canvas_Implementation::OnKeyUp));
+		Disconnect(wxEVT_KEY_DOWN,wxKeyEventHandler(Canvas_Implementation::OnKeyDown));
 	}
 }
 
@@ -75,6 +77,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnKeyUp(wxKey
 	{
 		_alt_down=false;
 		Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
+		Disconnect(wxEVT_KEY_UP,wxKeyEventHandler(Canvas_Implementation::OnKeyUp));
+		Connect(wxEVT_KEY_DOWN,wxKeyEventHandler(Canvas_Implementation::OnKeyDown));
 		if(_selected_layer != nullptr) _selected_layer->Deselect_All<NULLTYPE>();
 		Refresh();
 	}
@@ -83,6 +87,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnKeyUp(wxKey
 		_ctrl_down=false;
 		//Disconnect(wxEVT_MOTION,wxMouseEventHandler(Canvas_Implementation::OnMotion));
 		//if(_selected_layer != nullptr) _selected_layer->Deselect_All<NULLTYPE>();
+		Disconnect(wxEVT_KEY_UP,wxKeyEventHandler(Canvas_Implementation::OnKeyUp));
+		Connect(wxEVT_KEY_DOWN,wxKeyEventHandler(Canvas_Implementation::OnKeyDown));
 		Refresh();
 	}
 }
@@ -121,12 +127,12 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnLeftDown(wx
 	//double near_width=_far_plane*(_panel_width/_panel_height);
 	double far_height=(_far_plane/_near_plane)*near_height;
 	double theta=-_x_rotation*(3.14159265/180.0);
-		
-	double ymax_screen=((far_height-near_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2-_near_plane)+near_height)/(1-(far_height-near_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
-	double ymin_screen=((near_height-far_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2-_near_plane)-near_height)/(1-(near_height-far_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
+	
+	double ymax_screen=((far_height-near_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2.0-_near_plane)+near_height)/(1.0-(far_height-near_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
+	double ymin_screen=((near_height-far_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2.0-_near_plane)-near_height)/(1.0-(near_height-far_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
 
 	double glY=((ymin_screen-ymax_screen)/_panel_height)*(double)y_pos+ymax_screen;
-		
+	
 	double z_dist=sin(theta)/cos(theta)*glY+(_near_plane+_far_plane)/2.0;
 
 	winZ=(1.0/_near_plane-1.0/z_dist)/(1.0/_near_plane-1.0/_far_plane);
@@ -193,10 +199,12 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 	double far_height=(_far_plane/_near_plane)*near_height;
 	double theta=-_x_rotation*(3.14159265/180.0);
 
+	
+
 	//---- figure out the viewport's maximum and minimum object coordinates (not window, not utm) ----
 
-	double ymax_screen=((far_height-near_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2-_near_plane)+near_height)/(1-(far_height-near_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
-	double ymin_screen=((near_height-far_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2-_near_plane)-near_height)/(1-(near_height-far_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
+	double ymax_screen=((far_height-near_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2.0-_near_plane)+near_height)/(1.0-(far_height-near_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
+	double ymin_screen=((near_height-far_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2.0-_near_plane)-near_height)/(1.0-(near_height-far_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
 
 	//---- convert window Y position to object y position ----
 
@@ -207,6 +215,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnMotion(wxMo
 	double z_dist=sin(theta)/cos(theta)*glY+(_near_plane+_far_plane)/2.0;
 
 	winZ=(1.0/_near_plane-1.0/z_dist)/(1.0/_near_plane-1.0/_far_plane);
+	
+	//cout << _scale << "," << theta << "," << y_pos << "," << ymax_screen << "," << ymin_screen << "," << glY << "," << z_dist << "," << winZ << endl;
 
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
@@ -341,7 +351,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnWheel(wxMou
 		_spatial_change=true;
 		Refresh();
 	}
-	else if(_scale*1.0/.8 < 6)
+	else if(_scale*1.0/.8 < _initial_scale*1.2)
 	{
 		_scale=_scale*(1.0/.8);
 		_spatial_change=true;

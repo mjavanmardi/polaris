@@ -39,8 +39,8 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Calculate_Bou
 	double far_height=(_far_plane/_near_plane)*near_height;
 	double theta=-_x_rotation*(3.14159265/180.0);
 	
-	double ymax_screen=((far_height-near_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2-_near_plane)+near_height)/(1-(far_height-near_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
-	double ymin_screen=((near_height-far_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2-_near_plane)-near_height)/(1-(near_height-far_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
+	double ymax_screen=((far_height-near_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2.0-_near_plane)+near_height)/(1.0-(far_height-near_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
+	double ymin_screen=((near_height-far_height)/(_far_plane-_near_plane)*((_near_plane+_far_plane)/2.0-_near_plane)-near_height)/(1.0-(near_height-far_height)/(_far_plane-_near_plane)*sin(theta)/cos(theta));
 
 	//---- figure out the z coordinate for the mid-line, left ----
 
@@ -102,24 +102,24 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Calculate_Bou
 
 	//---- calculate remaining trapezoid points ----
 
-	double dist=(double)sqrt(pow((double)mid_x_left-(double)bottom_x_left,2)+pow((double)mid_y_left-(double)bottom_y_left,2));
+	double dist=(double)sqrt(pow((double)mid_x_left-(double)bottom_x_left,2.0)+pow((double)mid_y_left-(double)bottom_y_left,2.0));
 
 	double diff=atan2(bottom_y_left-mid_y_left,bottom_x_left-mid_x_left)-atan2(mid_y_right-mid_y_left,mid_x_right-mid_x_left);
 
 	bottom_x_right=dist*cos(atan2(mid_y_left-mid_y_right,mid_x_left-mid_x_right)-diff)+mid_x_right;
 	bottom_y_right=dist*sin(atan2(mid_y_left-mid_y_right,mid_x_left-mid_x_right)-diff)+mid_y_right;
 
-	dist=(double)sqrt(pow((double)mid_x_left-(double)top_x_left,2)+pow((double)mid_y_left-(double)top_y_left,2));
+	dist=(double)sqrt(pow((double)mid_x_left-(double)top_x_left,2.0)+pow((double)mid_y_left-(double)top_y_left,2.0));
 
 	top_x_right=dist*cos(atan2(mid_y_left-mid_y_right,mid_x_left-mid_x_right)-diff+M_PI)+mid_x_right;
 	top_y_right=dist*sin(atan2(mid_y_left-mid_y_right,mid_x_left-mid_x_right)-diff+M_PI)+mid_y_right;
 
 	//---- compute ratio of utm to pixels and bounding box ----
 
-	double top_width=(double)sqrt(pow((double)top_x_right-(double)top_x_left,2)+pow((double)top_y_right-(double)top_y_left,2));
-	double left_height=(double)sqrt(pow((double)top_x_left-(double)bottom_x_left,2)+pow((double)top_y_right-(double)bottom_y_right,2));
-	double bottom_width=(double)sqrt(pow((double)bottom_x_right-(double)bottom_x_left,2)+pow((double)bottom_y_right-(double)bottom_y_left,2));
-	double mid_width=(double)sqrt(pow((double)mid_x_right-(double)mid_x_left,2)+pow((double)mid_y_right-(double)mid_y_left,2));
+	double top_width=(double)sqrt(pow((double)top_x_right-(double)top_x_left,2.0)+pow((double)top_y_right-(double)top_y_left,2.0));
+	double left_height=(double)sqrt(pow((double)top_x_left-(double)bottom_x_left,2.0)+pow((double)top_y_right-(double)bottom_y_right,2.0));
+	double bottom_width=(double)sqrt(pow((double)bottom_x_right-(double)bottom_x_left,2.0)+pow((double)bottom_y_right-(double)bottom_y_left,2.0));
+	double mid_width=(double)sqrt(pow((double)mid_x_right-(double)mid_x_left,2.0)+pow((double)mid_y_right-(double)mid_y_left,2.0));
 
 	_meters_per_pixel_max=max((double)(top_width/(double)viewport_matrix[2]),(double)(left_height/(double)viewport_matrix[3]));
 	_meters_per_pixel_mid=(double)(mid_width/(double)viewport_matrix[2]);

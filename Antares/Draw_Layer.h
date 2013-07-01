@@ -155,11 +155,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 						geometry_itr += sizeof(Point_3D<MasterType>);
 					}
 
-					if(group_texture)
-					{
-						glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
-						geometry_itr += sizeof(int);
-					}
+					//if(group_texture)
+					//{
+					//	glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+					//	geometry_itr += sizeof(int);
+					//}
 
 					const int num_group_primitives=*((int*)geometry_itr);
 
@@ -181,11 +181,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 							geometry_itr += sizeof(Point_3D<MasterType>);
 						}
 
-						if(primitive_texture)
-						{
-							glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
-							geometry_itr += sizeof(int);
-						}
+						//if(primitive_texture)
+						//{
+						//	glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+						//	geometry_itr += sizeof(int);
+						//}
 
 						const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
 
@@ -228,11 +228,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 						geometry_itr += sizeof(Point_3D<MasterType>);
 					}
 
-					if(primitive_texture)
-					{
-						glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
-						geometry_itr += sizeof(int);
-					}
+					//if(primitive_texture)
+					//{
+					//	glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+					//	geometry_itr += sizeof(int);
+					//}
 
 					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
 
@@ -347,11 +347,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 						geometry_itr += sizeof(Point_3D<MasterType>);
 					}
 					
-					if(group_texture)
-					{
-						glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
-						geometry_itr += sizeof(int);
-					}
+					//if(group_texture)
+					//{
+					//	glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+					//	geometry_itr += sizeof(int);
+					//}
 
 					const int num_group_primitives=*((int*)geometry_itr);
 					geometry_itr += sizeof(int);
@@ -372,11 +372,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 							geometry_itr += sizeof(Point_3D<MasterType>);
 						}
 
-						if(primitive_texture)
-						{
-							glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
-							geometry_itr += sizeof(int);
-						}
+						//if(primitive_texture)
+						//{
+						//	glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+						//	geometry_itr += sizeof(int);
+						//}
 
 						const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
 
@@ -419,11 +419,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 						geometry_itr += sizeof(Point_3D<MasterType>);
 					}
 					
-					if(primitive_texture)
-					{
-						glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
-						geometry_itr += sizeof(int);
-					}
+					//if(primitive_texture)
+					//{
+					//	glBindTexture(GL_TEXTURE_2D, texture_map[ *((int*)geometry_itr) ] );
+					//	geometry_itr += sizeof(int);
+					//}
 
 					const unsigned char* const geometry_vert_end = geometry_itr + vert_stride;
 

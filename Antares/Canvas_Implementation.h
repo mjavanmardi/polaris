@@ -61,23 +61,23 @@ public:
 
 	member_data(int,cached_iteration,none,none);
 
-	member_data(float,near_plane,none,none);
-	member_data(float,far_plane,none,none);
+	member_data(double,near_plane,none,none);
+	member_data(double,far_plane,none,none);
 	
-	member_data(float,win_z_mid,none,none);
+	member_data(double,win_z_mid,none,none);
 
 	member_data(float,panel_width,none,none);
 	member_data(float,panel_height,none,none);
-	member_data(float,scale,none,none);
+	member_data(double,scale,none,none);
 
-	member_data(float,x_rotation,none,none);
-	member_data(float,z_rotation,none,none);
-	member_data(float,x_translation,none,none);
-	member_data(float,y_translation,none,none);
+	member_data(double,x_rotation,none,none);
+	member_data(double,z_rotation,none,none);
+	member_data(double,x_translation,none,none);
+	member_data(double,y_translation,none,none);
 
-	member_data(float,meters_per_pixel_max,none,none);
-	member_data(float,meters_per_pixel_mid,none,none);
-	member_data(float,meters_per_pixel_min,none,none);
+	member_data(double,meters_per_pixel_max,none,none);
+	member_data(double,meters_per_pixel_mid,none,none);
+	member_data(double,meters_per_pixel_min,none,none);
 
 	member_data(Rectangle_XY<MasterType>,view_bounds,none,none);
 
@@ -91,13 +91,14 @@ public:
 	member_data(bool,shift_down,none,none);
 	member_data(bool,ctrl_down,none,none);
 	
-	member_data(float,x_start_utm,none,none);
-	member_data(float,y_start_utm,none,none);
+	member_data(double,x_start_utm,none,none);
+	member_data(double,y_start_utm,none,none);
 
 	member_data(int,x_start_win,none,none);
 	member_data(int,y_start_win,none,none);
 	
 	member_data(int,wheel_dir,none,none);
+	member_data(float,initial_scale,none,none);
 
 	GLint viewport[4];
 	GLdouble modelview[16];
@@ -139,7 +140,7 @@ Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementat
 	Connect(wxEVT_SIZE,wxSizeEventHandler(Canvas_Implementation::OnResize));
 	Connect(wxEVT_LEFT_DOWN,wxMouseEventHandler(Canvas_Implementation::OnLeftDown));
 	Connect(wxEVT_KEY_DOWN,wxKeyEventHandler(Canvas_Implementation::OnKeyDown));
-	Connect(wxEVT_KEY_UP,wxKeyEventHandler(Canvas_Implementation::OnKeyUp));
+	//Connect(wxEVT_KEY_UP,wxKeyEventHandler(Canvas_Implementation::OnKeyUp));
 	Connect(wxEVT_LEFT_UP,wxMouseEventHandler(Canvas_Implementation::OnLeftUp));
 	Connect(wxEVT_RIGHT_DOWN,wxMouseEventHandler(Canvas_Implementation::OnRightDown));
 	Connect(wxEVT_RIGHT_UP,wxMouseEventHandler(Canvas_Implementation::OnRightUp));
@@ -156,7 +157,8 @@ Canvas_Implementation<MasterType,ParentType,InheritanceList>::Canvas_Implementat
 	_x_rotation=_z_rotation=0;
 	_x_start_utm=_y_start_utm=0;
 	_x_start_win=_y_start_win=0;
-	_scale=5;
+	_initial_scale=.01;
+	_scale=.01;
 	//_interaction_mode=NAVIGATE;
 
 	//---- visibility ----
@@ -200,14 +202,15 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize(fl
 	// compute near and far planes with these bounds
 	if(_canvas_bounds._ymax-_canvas_bounds._ymin>_canvas_bounds._xmax-_canvas_bounds._xmin)
 	{
-		_near_plane=(_canvas_bounds._ymax-_canvas_bounds._ymin)/(tan(25.0*.0174532925)*4.0)*10;
-		_far_plane=(_canvas_bounds._ymax-_canvas_bounds._ymin)/(tan(25.0*.0174532925)*4.0)*10+2.0*(_canvas_bounds._ymax-_canvas_bounds._ymin);
+		_near_plane=(_canvas_bounds._ymax-_canvas_bounds._ymin)/(tan(25.0*.0174532925)*4.0)*10000.0;
+		_far_plane=(_canvas_bounds._ymax-_canvas_bounds._ymin)/(tan(25.0*.0174532925)*4.0)*10000.0+200.0*(_canvas_bounds._ymax-_canvas_bounds._ymin);
 	}
 	else
 	{
-		_near_plane=(_canvas_bounds._xmax-_canvas_bounds._xmin)/(tan(25.0*.0174532925)*4.0)*10;
-		_far_plane=(_canvas_bounds._xmax-_canvas_bounds._xmin)/(tan(25.0*.0174532925)*4.0)*10+2.0*(_canvas_bounds._xmax-_canvas_bounds._xmin);
+		_near_plane=(_canvas_bounds._xmax-_canvas_bounds._xmin)/(tan(25.0*.0174532925)*4.0)*10000.0;
+		_far_plane=(_canvas_bounds._xmax-_canvas_bounds._xmin)/(tan(25.0*.0174532925)*4.0)*10000.0+200.0*(_canvas_bounds._xmax-_canvas_bounds._xmin);
 	}
+
 	// connect the paint handler
 	Connect(wxEVT_PAINT,wxPaintEventHandler(Canvas_Implementation::Render));
 }
@@ -225,7 +228,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize_GL
 	
 	glewInit();
 
-	glClearColor(.975f,.975f,.975f,1);
+	glClearColor(.95f,.95f,.95f,1);
 	glClearDepth(1.0f);
 
 	glEnable(GL_DEPTH_TEST);
@@ -243,7 +246,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Initialize_GL
 	glEnable(GL_POLYGON_SMOOTH);
 	glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
 
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -261,9 +264,6 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
 int Canvas_Implementation<MasterType,ParentType,InheritanceList>::Build_Texture(int width,int height,unsigned char* data)
 {
-	GLenum errCode;
-	const GLubyte *errString;
-
 	unsigned int tex_id;
 	glGenTextures(1, &tex_id);
 
@@ -280,10 +280,9 @@ int Canvas_Implementation<MasterType,ParentType,InheritanceList>::Build_Texture(
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropic_level);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-	errCode = glGetError();
-	errString = gluErrorString(errCode);
+	//const GLubyte* errString = gluErrorString(glGetError());
 
 	return tex_id;
 }

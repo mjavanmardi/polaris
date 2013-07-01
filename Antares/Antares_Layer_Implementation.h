@@ -121,7 +121,31 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 
 			if(tex_image.LoadFile(*itr))
 			{
-				int tex_id = _canvas->Build_Texture<NT>(tex_image.GetWidth(),tex_image.GetHeight(),tex_image.GetData());
+				const bool has_alpha=tex_image.HasAlpha();
+
+				const unsigned char* rgb_data = tex_image.GetData();
+				const unsigned char* alpha_data = nullptr;
+				if(has_alpha) alpha_data = tex_image.GetAlpha();
+
+				const unsigned char* const rgb_end = rgb_data + tex_image.GetHeight()*tex_image.GetWidth()*3;
+
+				unsigned char* rgba_data = new unsigned char[tex_image.GetHeight()*tex_image.GetWidth()*4];
+				const unsigned char* const rgba_end = rgba_data + tex_image.GetHeight()*tex_image.GetWidth()*4;
+
+				while(rgb_data!=rgb_end)
+				{
+					(*rgba_data)=(*rgb_data); ++rgb_data; ++rgba_data;
+					(*rgba_data)=(*rgb_data); ++rgb_data; ++rgba_data;
+					(*rgba_data)=(*rgb_data); ++rgb_data; ++rgba_data;
+					if(has_alpha) {(*rgba_data)=(*alpha_data); ++alpha_data; ++rgba_data;}
+					else {(*rgba_data)=255; ++rgba_data;}
+				}
+				
+				rgba_data -= (tex_image.GetHeight()*tex_image.GetWidth()*4);
+
+				int tex_id = _canvas->Build_Texture<NT>(tex_image.GetWidth(),tex_image.GetHeight(),rgba_data);
+
+				delete[] rgba_data;
 
 				_texture_map.push_back(tex_id);
 			}
