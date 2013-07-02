@@ -1,4 +1,4 @@
-#define SHOW_WARNINGS
+//#define SHOW_WARNINGS
 
 #include "Polaris_PCH.h"
 
@@ -436,7 +436,7 @@ int main(int argc,char** argv)
 	// Destination choice model - set parameters
 	//----------------------------------------------------------------------------------------------------------------------------------
 	MasterType::person_destination_chooser_type::_choice_set_size = 50;
-	MasterType::person_destination_choice_option_type::_B_TTIME = -0.15;
+	MasterType::person_destination_choice_option_type::_B_TTIME = -0.12;
 	MasterType::person_destination_choice_option_type::_B_EMPLOYMENT = 0.1;
 	MasterType::person_destination_choice_option_type::_B_POPULATION = 0.025;
 	// Initialize start time model

@@ -77,6 +77,7 @@ namespace Scenario_Components
 
 			member_data(bool, calculate_realtime_moe, none, none);
 
+			member_data(bool, write_demand_to_database, none,none);
 			member_data(bool, write_activity_output, none, none);
 			member_data(bool, aggregate_routing, none,none);
 			member_data(bool, do_planner_routing, none,none);
