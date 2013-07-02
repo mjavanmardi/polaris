@@ -61,7 +61,7 @@ namespace Person_Components
 				this_component()->template Remove_Activity_Plan<ComponentType,CallerType,TargetType>(activity_plan);
 			}
 
-			
+			feature_method_void(Sort_Activity_Schedule,none);
 		};
 	}
 
