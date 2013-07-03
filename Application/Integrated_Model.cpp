@@ -133,7 +133,7 @@ struct MasterType
 
 	typedef Link_Control_Components::Implementations::Antares_Lane_Link_Control<MasterType> link_control_type;
 	typedef Depot_Components::Implementations::Antares_Tow_Truck_Depot<MasterType> depot_type;
-	typedef Advisory_Radio_Components::Implementations::Advisory_Radio_Components<MasterType> advisory_radio_type;
+	typedef Advisory_Radio_Components::Implementations::Antares_Advisory_Radio<MasterType> advisory_radio_type;
 	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Word_Sign<MasterType> variable_word_sign_type;
 	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Speed_Sign<MasterType> variable_speed_sign_type;
 
