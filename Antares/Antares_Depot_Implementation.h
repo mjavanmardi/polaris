@@ -49,7 +49,7 @@ namespace Depot_Components
 				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(name);
 
 				Antares_Layer_Configuration cfg;
-				cfg.Configure_Lines();
+				cfg.Configure_Static_Lines();
 				cfg.grouped=true;
 				cfg.head_size_value=4;
 				cfg.head_accent_size_value=6;

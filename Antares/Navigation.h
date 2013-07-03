@@ -305,9 +305,9 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::OnRotationMot
 	else if(_x_rotation<0) _x_rotation+=360.0;
 
 	//---- cap the maximum tilt ----
-		
+
 	if(_x_rotation<90.0) _x_rotation=360.0;
-	else if(_x_rotation<280.0) _x_rotation=280.0;
+	else if(_x_rotation<270.0) _x_rotation=270.0;
 
 	_z_rotation=_z_rotation+(x_end-_x_start_win)*zScale;
 	

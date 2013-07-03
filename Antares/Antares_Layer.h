@@ -203,8 +203,8 @@ struct Antares_Layer_Configuration
 		selection_callback=nullptr;
 		double_click_callback=nullptr;
 	}
-
-	void Configure_Lines()
+	
+	void Configure_Static_Lines()
 	{
 		Configure_Default();
 		primitive_type=_LINE;
@@ -230,7 +230,7 @@ struct Antares_Layer_Configuration
 		head_color._a=255;
 	}
 
-	void Configure_Points()
+	void Configure_Dynamic_Points()
 	{
 		Configure_Default();
 		dynamic_data=true;
@@ -247,6 +247,12 @@ struct Antares_Layer_Configuration
 		head_color._a=255;
 		
 		head_size_value=4;
+	}
+
+	void Configure_Static_Points()
+	{
+		Configure_Default();
+		primitive_type=_POINT;
 	}
 
 	void Configure_Static_Points(True_Color_RGBA<NULLTYPE>& Color, int size)

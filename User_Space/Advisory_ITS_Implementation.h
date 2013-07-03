@@ -89,7 +89,7 @@ namespace Advisory_ITS_Components
 			member_data(vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>, current_events, none, none);
 			member_data(vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>, displayed_events, none, none);
 			
-			typedef Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
+			typedef Link_Prototype<typename type_of(MasterType::link)> Link_Interface;
 			member_data(vector<Link_Interface*>,covered_links,none,none);
 
 			member_prototype(Traffic_Management_Center,traffic_management_center,typename type_of(MasterType::traffic_management_center),none,none);

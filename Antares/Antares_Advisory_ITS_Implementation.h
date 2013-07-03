@@ -18,6 +18,9 @@ namespace Advisory_ITS_Components
 		{
 			typedef typename InheritanceTemplate<MasterType,ParentType,APPEND_CHILD(Antares_Advisory_ITS)>::ComponentType ComponentType;
 
+			typedef Link_Prototype<typename type_of(MasterType::link)> Link_Interface;
+			typedef Intersection_Prototype<typename type_of(MasterType::intersection)> Intersection_Interface;
+
 #pragma pack(push,1)
 			struct Link_Line_Segment
 			{
@@ -29,9 +32,16 @@ namespace Advisory_ITS_Components
 #pragma pack(push,1)
 			struct Link_Line_Group
 			{
-				void* object;
 				int num_primitives;
 				Link_Line_Segment* segments;
+			};
+#pragma pack(pop)
+
+#pragma pack(push,1)
+			struct ITS_Location
+			{
+				void* object;
+				Point_3D<MasterType> position;
 			};
 #pragma pack(pop)
 
@@ -41,43 +51,113 @@ namespace Advisory_ITS_Components
 
 				if(_covered_links.size())
 				{
-					Link_Line_Segment* segments = new Link_Line_Segment[ _covered_links.size() ];
-					
-					Link_Line_Group group;
-					group.num_primitives = _covered_links.size();
-					group.segments = segments;
-					group.object = (void*)((ComponentType*)this);
+					float xmax = - (FLT_MAX/2.0);
+					float ymax = - (FLT_MAX/2.0);
+					float xmin = (FLT_MAX/2.0);
+					float ymin = (FLT_MAX/2.0);
 
-					Link_Line_Segment* current_segment = group.segments;
-
-					for(vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+					for(vector<Link_Interface*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 					{
-						Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
+						Link_Interface* link = *itr;
+
+						Intersection_Interface* intersection;
+
+						intersection = link->upstream_intersection<Intersection_Interface*>();
+
+						if(intersection->x_position<float>() < xmin)
+						{
+							xmin = intersection->x_position<float>();
+						}
 						
-						Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
+						if(intersection->x_position<float>() > xmax)
+						{
+							xmax = intersection->x_position<float>();
+						}
+
+						if(intersection->y_position<float>() < ymin)
+						{
+							ymin = intersection->y_position<float>();
+						}
 						
-						intersection = link->upstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+						if(intersection->y_position<float>() > ymax)
+						{
+							ymax = intersection->y_position<float>();
+						}
+
 						
-						current_segment->a._x = intersection->x_position<float>();
-						current_segment->a._y = intersection->y_position<float>();
-						current_segment->a._z = 3;
+						
+						intersection = link->downstream_intersection<Intersection_Interface*>();
 
-						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+						if(intersection->x_position<float>() < xmin)
+						{
+							xmin = intersection->x_position<float>();
+						}
+						
+						if(intersection->x_position<float>() > xmax)
+						{
+							xmax = intersection->x_position<float>();
+						}
 
-						intersection = link->downstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
-
-						current_segment->b._x = intersection->x_position<float>();
-						current_segment->b._y = intersection->y_position<float>();
-						current_segment->b._z = 3;
-
-						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
-
-						++current_segment;
+						if(intersection->y_position<float>() < ymin)
+						{
+							ymin = intersection->y_position<float>();
+						}
+						
+						if(intersection->y_position<float>() > ymax)
+						{
+							ymax = intersection->y_position<float>();
+						}
 					}
-					
-					_its_component_layer->Push_Element<Regular_Element>(&group);
 
-					delete[] segments;
+					ITS_Location its_location;
+
+					its_location.object = (void*)((ComponentType*)this);
+
+					its_location.position._x = (xmax + xmin)/2.0f;
+					its_location.position._y = (ymax + ymin)/2.0f;
+					its_location.position._z = 5;
+					
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
+
+					_its_component_layer->Push_Element<Regular_Element>(&its_location);
+
+					//Link_Line_Segment* segments = new Link_Line_Segment[ _covered_links.size() ];
+					//
+					//Link_Line_Group group;
+					//group.num_primitives = _covered_links.size();
+					//group.segments = segments;
+					//group.object = (void*)((ComponentType*)this);
+
+					//Link_Line_Segment* current_segment = group.segments;
+
+					//for(vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+					//{
+					//	Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
+					//	
+					//	Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
+					//	
+					//	intersection = link->upstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+					//	
+					//	current_segment->a._x = intersection->x_position<float>();
+					//	current_segment->a._y = intersection->y_position<float>();
+					//	current_segment->a._z = 3;
+
+					//	Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+
+					//	intersection = link->downstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+
+					//	current_segment->b._x = intersection->x_position<float>();
+					//	current_segment->b._y = intersection->y_position<float>();
+					//	current_segment->b._z = 3;
+
+					//	Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+
+					//	++current_segment;
+					//}
+					//
+					//_its_component_layer->Push_Element<Regular_Element>(&group);
+
+					//delete[] segments;
 				}
 			}
 
@@ -123,6 +203,7 @@ namespace Advisory_ITS_Components
 				if(removed.size())
 				{
 					_its_component_layer->Clear_Accented<NT>();
+					_its_coverage_layer->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -170,6 +251,81 @@ namespace Advisory_ITS_Components
 
 			feature_implementation void Accent_Self()
 			{
+				float xmax = - (FLT_MAX/2.0);
+				float ymax = - (FLT_MAX/2.0);
+				float xmin = (FLT_MAX/2.0);
+				float ymin = (FLT_MAX/2.0);
+
+				for(vector<Link_Interface*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+				{
+					Link_Interface* link = *itr;
+
+					Intersection_Interface* intersection;
+
+					intersection = link->upstream_intersection<Intersection_Interface*>();
+
+					if(intersection->x_position<float>() < xmin)
+					{
+						xmin = intersection->x_position<float>();
+					}
+						
+					if(intersection->x_position<float>() > xmax)
+					{
+						xmax = intersection->x_position<float>();
+					}
+
+					if(intersection->y_position<float>() < ymin)
+					{
+						ymin = intersection->y_position<float>();
+					}
+						
+					if(intersection->y_position<float>() > ymax)
+					{
+						ymax = intersection->y_position<float>();
+					}
+
+						
+						
+					intersection = link->downstream_intersection<Intersection_Interface*>();
+
+					if(intersection->x_position<float>() < xmin)
+					{
+						xmin = intersection->x_position<float>();
+					}
+						
+					if(intersection->x_position<float>() > xmax)
+					{
+						xmax = intersection->x_position<float>();
+					}
+
+					if(intersection->y_position<float>() < ymin)
+					{
+						ymin = intersection->y_position<float>();
+					}
+						
+					if(intersection->y_position<float>() > ymax)
+					{
+						ymax = intersection->y_position<float>();
+					}
+				}
+
+				ITS_Location its_location;
+
+				its_location.object = (void*)((ComponentType*)this);
+
+				its_location.position._x = (xmax + xmin)/2.0f;
+				its_location.position._y = (ymax + ymin)/2.0f;
+				its_location.position._z = 5;
+					
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
+
+				_its_component_layer->Push_Element<Accented_Element>(&its_location);
+
+
+
+
+
+
 				Link_Line_Segment* segments = new Link_Line_Segment[ _covered_links.size() ];
 					
 				Link_Line_Group group;
@@ -178,13 +334,13 @@ namespace Advisory_ITS_Components
 
 				Link_Line_Segment* current_segment = group.segments;
 
-				for(vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+				for(vector<Link_Interface*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 				{
-					Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
+					Link_Interface* link = (*itr);
 					
-					Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
+					Intersection_Interface* intersection;
 					
-					intersection = link->upstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+					intersection = link->upstream_intersection< Intersection_Interface* >();
 					
 					current_segment->a._x = intersection->x_position<float>();
 					current_segment->a._y = intersection->y_position<float>();
@@ -192,7 +348,7 @@ namespace Advisory_ITS_Components
 
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
 
-					intersection = link->downstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+					intersection = link->downstream_intersection< Intersection_Interface* >();
 
 					current_segment->b._x = intersection->x_position<float>();
 					current_segment->b._y = intersection->y_position<float>();
@@ -203,16 +359,20 @@ namespace Advisory_ITS_Components
 					++current_segment;
 				}
 				
-				_its_component_layer->Push_Element<Accented_Element>(&group);
+				_its_coverage_layer->Push_Element<Accented_Element>(&group);
 
 				delete[] segments;
 			}
 
 			static member_prototype(Antares_Layer,its_component_layer,typename type_of(MasterType::antares_layer),none,none);
+			static member_prototype(Antares_Layer,its_coverage_layer,typename type_of(MasterType::antares_layer),none,none);
 		};
 		
 		template<typename MasterType,typename ParentType,typename InheritanceList,template<class,class,class> class InheritanceTemplate>
 		Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Advisory_ITS<MasterType,ParentType,InheritanceList,InheritanceTemplate>::ComponentType>* Antares_Advisory_ITS<MasterType,ParentType,InheritanceList,InheritanceTemplate>::_its_component_layer;
+		
+		template<typename MasterType,typename ParentType,typename InheritanceList,template<class,class,class> class InheritanceTemplate>
+		Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Advisory_ITS<MasterType,ParentType,InheritanceList,InheritanceTemplate>::ComponentType>* Antares_Advisory_ITS<MasterType,ParentType,InheritanceList,InheritanceTemplate>::_its_coverage_layer;
 
 	}
 }

@@ -348,7 +348,7 @@ namespace Network_Event_Components
 				_particle_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(event_layer),ComponentType>*, string& > >(string("Weather_Event_Precipitation"));
 
 				Antares_Layer_Configuration cfg;
-				cfg.Configure_Points();
+				cfg.Configure_Dynamic_Points();
 				cfg.head_size_value = 4;
 				cfg.primitive_color = true;
 				cfg.target_sub_iteration = 0;
@@ -495,7 +495,7 @@ namespace Network_Event_Components
 				_particle_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(event_layer),ComponentType>*, string& > >(string("Accident Smoke"));
 
 				Antares_Layer_Configuration cfg;
-				cfg.Configure_Points();
+				cfg.Configure_Dynamic_Points();
 				cfg.head_size_value = 4;
 				cfg.primitive_color = true;
 				cfg.target_sub_iteration = 0;

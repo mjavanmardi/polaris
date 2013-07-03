@@ -314,7 +314,7 @@ namespace Network_Components
 				_link_lines=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_lines),Antares_Network_Implementation>*, string& > >(string("Links"));
 
 				Antares_Layer_Configuration cfg;
-				cfg.Configure_Lines();
+				cfg.Configure_Static_Lines();
 				cfg.draw=true;
 				cfg.primitive_color=true;
 				cfg.storage_period = 1;

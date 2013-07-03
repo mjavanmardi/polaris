@@ -1,6 +1,6 @@
-//*********************************************************
+//**************************************************************************************************
 //	Antares_Vehicle_Implementation.h - Graphical Vehicle Variant
-//*********************************************************
+//**************************************************************************************************
 
 #pragma once
 #include "Antares_Includes.h"
@@ -22,22 +22,59 @@ namespace Vehicle_Components
 	namespace Implementations
 	{
 #pragma pack(push,1)
-		struct Vehicle_Attribute_Shape
+		struct Vehicle_Attribute_Primitive
 		{
-			static const float _vehicle_rear_width;
-			static const float _vehicle_front_width;
-			static const float _vehicle_length;
-			void* ptr;
 			True_Color_RGBA<NT> color;
+			//int texture_index;
 			Point_3D<NT> a;
 			Point_3D<NT> b;
 			Point_3D<NT> c;
 			Point_3D<NT> d;
 		};
 #pragma pack(pop)
-		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 7 * 6; // rear width in feet
-		const float Vehicle_Attribute_Shape::_vehicle_front_width = 2 * 6; // front width in feet
-		const float Vehicle_Attribute_Shape::_vehicle_length = 13.5 * 6; // length in feet
+
+#pragma pack(push,1)
+		struct Vehicle_Attribute_Shape
+		{
+			Vehicle_Attribute_Shape()
+			{
+				data = new Vehicle_Attribute_Primitive[10];
+				num_primitives = 10;
+			}
+
+			~Vehicle_Attribute_Shape()
+			{
+				delete[] data;
+			}
+
+			static const float _vehicle_rear_width;
+			static const float _vehicle_front_width;
+			static const float _vehicle_length;
+			static const float _vehicle_height;
+			static const float _vehicle_mid_height;
+
+			//static int front_index;
+			//static int back_index;
+			//static int left_index;
+			//static int right_index;
+			//static int top_index;
+
+			void* ptr;
+			int num_primitives;
+			Vehicle_Attribute_Primitive* data;
+		};
+#pragma pack(pop)
+		//int Vehicle_Attribute_Shape::front_index;
+		//int Vehicle_Attribute_Shape::back_index;
+		//int Vehicle_Attribute_Shape::left_index;
+		//int Vehicle_Attribute_Shape::right_index;
+		//int Vehicle_Attribute_Shape::top_index;
+
+		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 6.775 * 5; // rear width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_front_width = 6.775 * 5; // front width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_length = 17 * 5; // length in feet
+		const float Vehicle_Attribute_Shape::_vehicle_height = 6.583 * 5; // height in feet
+		const float Vehicle_Attribute_Shape::_vehicle_mid_height = 6.583*2.0/3.0 * 5; // height in feet
 
 		implementation struct Antares_Vehicle_Implementation:public Polaris_Vehicle_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Vehicle_Implementation)>
 		{
@@ -70,6 +107,16 @@ namespace Vehicle_Components
 				cfg.storage_offset=_iteration;
 				cfg.storage_size=4;
 				cfg.storage_period=1;
+				cfg.grouped=true;
+				//cfg.primitive_texture = true;
+
+				//Vehicle_Attribute_Shape::front_index = cfg.Add_Texture(string("Front_Alpha.png"));
+				//Vehicle_Attribute_Shape::back_index = cfg.Add_Texture(string("Back_Alpha.png"));
+				//Vehicle_Attribute_Shape::left_index = cfg.Add_Texture(string("Side_Alpha_Left.png"));
+				//Vehicle_Attribute_Shape::right_index = cfg.Add_Texture(string("Side_Alpha_Right.png"));
+				//Vehicle_Attribute_Shape::top_index = cfg.Add_Texture(string("Top_Alpha.png"));
+
+				//cfg.head_texture = cfg.Add_Texture(string("Car.png"));
 
 				cfg.primitive_type=_QUAD;
 				cfg.primitive_color=true;
@@ -85,10 +132,11 @@ namespace Vehicle_Components
 			{
 				_vehicle_points=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Antares_Vehicle_Implementation>*, string& > >(string("Vehicles (point)"));
 				Antares_Layer_Configuration cfg;
-				cfg.Configure_Points();
+				cfg.Configure_Dynamic_Points();
 				cfg.primitive_color=true;
 				cfg.head_accent_size_value=10;
-				cfg.head_size_value=6;
+				cfg.head_size_value=8;
+				cfg.head_texture = cfg.Add_Texture(string("Car_Front.png"));
 
 				//cfg.attributes_schema = string("ID,Status,Current_Link");
 				
@@ -107,7 +155,7 @@ namespace Vehicle_Components
 			{
 				_routes_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(routes_layer),Antares_Vehicle_Implementation>*, string& > >(string("Routes"));
 				Antares_Layer_Configuration cfg;
-				cfg.Configure_Lines();
+				cfg.Configure_Static_Lines();
 				cfg.primitive_color=true;
 				
 				cfg.head_accent_size_value=4;
@@ -206,27 +254,241 @@ namespace Vehicle_Components
 					float rear_y = vehicle_center._y - (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * sin_alpha;
 					float front_x = vehicle_center._x + (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * cos_alpha;
 					float front_y = vehicle_center._y + (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * sin_alpha;
+					
+					float rear_windshield_x = vehicle_center._x - (Vehicle_Attribute_Shape::_vehicle_length / 2.3f) * cos_alpha;
+					float rear_windshield_y = vehicle_center._y - (Vehicle_Attribute_Shape::_vehicle_length / 2.3f) * sin_alpha;
 
-					vehicle_shape.a._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
-					vehicle_shape.a._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
-					vehicle_shape.a._z = 1;
-				
-					vehicle_shape.b._x = front_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
-					vehicle_shape.b._y = front_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
-					vehicle_shape.a._z = 1;
+					float front_windshield_x = vehicle_center._x + (Vehicle_Attribute_Shape::_vehicle_length / 6.0f) * cos_alpha;
+					float front_windshield_y = vehicle_center._y + (Vehicle_Attribute_Shape::_vehicle_length / 6.0f) * sin_alpha;
 
-					vehicle_shape.c._x = front_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
-					vehicle_shape.c._y = front_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
-					vehicle_shape.c._z = 1;
+					float front_hood_x = vehicle_center._x + (Vehicle_Attribute_Shape::_vehicle_length / 4.0f) * cos_alpha;
+					float front_hood_y = vehicle_center._y + (Vehicle_Attribute_Shape::_vehicle_length / 4.0f) * sin_alpha;
 
-					vehicle_shape.d._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
-					vehicle_shape.d._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
-					vehicle_shape.d._z = 1;
+					//vehicle_shape.data[0].texture_index = Vehicle_Attribute_Shape::top_index;
+					//vehicle_shape.data[1].texture_index = Vehicle_Attribute_Shape::back_index;
+					//vehicle_shape.data[2].texture_index = Vehicle_Attribute_Shape::front_index;
+					//vehicle_shape.data[3].texture_index = Vehicle_Attribute_Shape::left_index;
+					//vehicle_shape.data[4].texture_index = Vehicle_Attribute_Shape::right_index;
+
+					int counter = 0;
+
+					//top_back
+					vehicle_shape.data[counter].color._r = 255;
+					vehicle_shape.data[counter].color._b = 255;
+					vehicle_shape.data[counter].color._g = 255;
+					vehicle_shape.data[counter].color._a = 150;
+
+					vehicle_shape.data[counter].a._x = rear_windshield_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].a._y = rear_windshield_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].a._z = Vehicle_Attribute_Shape::_vehicle_height;
+
+					vehicle_shape.data[counter].b._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].b._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].b._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].c._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].c._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					
+					vehicle_shape.data[counter].d._x = rear_windshield_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].d._y = rear_windshield_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_height;
+					++counter;
+
+					//top_mid
+
+					vehicle_shape.data[counter].color = ((MasterType::link_type*)link)->get_color_by_los(los);
+
+					vehicle_shape.data[counter].a._x = front_windshield_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].a._y = front_windshield_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].a._z = Vehicle_Attribute_Shape::_vehicle_height;
+
+					vehicle_shape.data[counter].b._x = rear_windshield_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].b._y = rear_windshield_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].b._z = Vehicle_Attribute_Shape::_vehicle_height;
+
+					vehicle_shape.data[counter].c._x = rear_windshield_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].c._y = rear_windshield_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_height;
+					
+					vehicle_shape.data[counter].d._x = front_windshield_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].d._y = front_windshield_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_height;
+					++counter;
 
 
-					vehicle_shape.color = ((MasterType::link_type*)link)->get_color_by_los(los);
-					vehicle_shape.color._a = 255;
-				
+					//top_front
+					vehicle_shape.data[counter].color._r = 255;
+					vehicle_shape.data[counter].color._b = 255;
+					vehicle_shape.data[counter].color._g = 255;
+					vehicle_shape.data[counter].color._a = 150;
+
+					vehicle_shape.data[counter].a._x = front_hood_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].a._y = front_hood_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].a._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].b._x = front_windshield_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].b._y = front_windshield_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].b._z = Vehicle_Attribute_Shape::_vehicle_height;
+
+					vehicle_shape.data[counter].c._x = front_windshield_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].c._y = front_windshield_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_height;
+					
+					vehicle_shape.data[counter].d._x = front_hood_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].d._y = front_hood_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					++counter;
+
+					//top_hood
+					vehicle_shape.data[counter].color = ((MasterType::link_type*)link)->get_color_by_los(los);
+
+					vehicle_shape.data[counter].a._x = front_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].a._y = front_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].a._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].b._x = front_hood_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].b._y = front_hood_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].b._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].c._x = front_hood_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].c._y = front_hood_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					
+					vehicle_shape.data[counter].d._x = front_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].d._y = front_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					++counter;
+
+
+					//back
+					vehicle_shape.data[counter].color = ((MasterType::link_type*)link)->get_color_by_los(los);
+
+					vehicle_shape.data[counter].a._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].a._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].a._z = 1;
+
+					vehicle_shape.data[counter].b._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].b._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].b._z = 1;
+					
+					vehicle_shape.data[counter].c._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].c._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].d._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].d._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					++counter;
+
+					//front
+					vehicle_shape.data[counter].color = ((MasterType::link_type*)link)->get_color_by_los(los);
+
+					vehicle_shape.data[counter].a._x = front_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].a._y = front_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].a._z = 1;
+
+					vehicle_shape.data[counter].b._x = front_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].b._y = front_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].b._z = 1;
+					
+					vehicle_shape.data[counter].c._x = front_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].c._y = front_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].d._x = front_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].d._y = front_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					++counter;					
+					
+					
+					
+					
+					//right_bottom
+					vehicle_shape.data[counter].color = ((MasterType::link_type*)link)->get_color_by_los(los);
+
+					vehicle_shape.data[counter].a._x = front_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].a._y = front_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].a._z = 1;
+
+					vehicle_shape.data[counter].b._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].b._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].b._z = 1;
+					
+					vehicle_shape.data[counter].c._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].c._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].d._x = front_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].d._y = front_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					++counter;
+
+					//right_top
+					vehicle_shape.data[counter].color._r = 255;
+					vehicle_shape.data[counter].color._b = 255;
+					vehicle_shape.data[counter].color._g = 255;
+					vehicle_shape.data[counter].color._a = 150;
+
+					vehicle_shape.data[counter].a._x = front_hood_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].a._y = front_hood_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].a._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].b._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].b._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].b._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					
+					vehicle_shape.data[counter].c._x = rear_windshield_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].c._y = rear_windshield_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_height;
+
+					vehicle_shape.data[counter].d._x = front_windshield_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].d._y = front_windshield_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_height;
+					++counter;
+
+					//left_bottom
+					vehicle_shape.data[counter].color = ((MasterType::link_type*)link)->get_color_by_los(los);
+
+					vehicle_shape.data[counter].a._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].a._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].a._z = 1;
+
+					vehicle_shape.data[counter].b._x = front_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].b._y = front_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].b._z = 1;
+
+					vehicle_shape.data[counter].c._x = front_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].c._y = front_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].d._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].d._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					++counter;
+					
+					//left_top
+					vehicle_shape.data[counter].color._r = 255;
+					vehicle_shape.data[counter].color._b = 255;
+					vehicle_shape.data[counter].color._g = 255;
+					vehicle_shape.data[counter].color._a = 150;
+
+					vehicle_shape.data[counter].a._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].a._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].a._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].b._x = front_hood_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].b._y = front_hood_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].b._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+					vehicle_shape.data[counter].c._x = front_windshield_x + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].c._y = front_windshield_y - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_height;
+
+					vehicle_shape.data[counter].d._x = rear_windshield_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
+					vehicle_shape.data[counter].d._y = rear_windshield_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
+					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_height;
+
 					_vehicle_shapes->Push_Element<Regular_Element>(&vehicle_shape);
 				}
 
@@ -261,9 +523,6 @@ namespace Vehicle_Components
 					}
 					else if (num_switch_decisions > 0)
 					{
-
-						
-
 						if (num_switch_decisions == 1)
 						{
 							coordinate.color._r = 191;
@@ -281,6 +540,12 @@ namespace Vehicle_Components
 					{
 						coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
 					}
+
+					coordinate.color._r = 255;
+					coordinate.color._g = 255;
+					coordinate.color._b = 255;
+					coordinate.color._a = 255;
+
 					_vehicle_points->Push_Element<Regular_Element>(&coordinate);
 				}
 			}
@@ -408,15 +673,15 @@ namespace Vehicle_Components
 				Vehicle_Attribute_Shape accented_vehicle_shape;
 
 				accented_vehicle_shape.ptr=this;
-				accented_vehicle_shape.color._r = 255 - vehicle_shape.color._r;
-				accented_vehicle_shape.color._g = 255 - vehicle_shape.color._g;
-				accented_vehicle_shape.color._b = 255 - vehicle_shape.color._b;
-				accented_vehicle_shape.color._a = 255;
+				accented_vehicle_shape.data[0].color._r = 255 - vehicle_shape.data[0].color._r;
+				accented_vehicle_shape.data[0].color._g = 255 - vehicle_shape.data[0].color._g;
+				accented_vehicle_shape.data[0].color._b = 255 - vehicle_shape.data[0].color._b;
+				accented_vehicle_shape.data[0].color._a = 255;
 
-				accented_vehicle_shape.a = vehicle_shape.a;
-				accented_vehicle_shape.b = vehicle_shape.b;
-				accented_vehicle_shape.c = vehicle_shape.c;
-				accented_vehicle_shape.d = vehicle_shape.d;
+				accented_vehicle_shape.data[0].a = vehicle_shape.data[0].a;
+				accented_vehicle_shape.data[0].b = vehicle_shape.data[0].b;
+				accented_vehicle_shape.data[0].c = vehicle_shape.data[0].c;
+				accented_vehicle_shape.data[0].d = vehicle_shape.data[0].d;
 
 				_vehicle_shapes->Push_Element<Accented_Element>(&accented_vehicle_shape);
 			}
@@ -443,7 +708,7 @@ namespace Vehicle_Components
 					list<typename type_of(MasterType::activity)*>* activities = scheduler->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
 					Activity_Location_Interface* previous_location;
 
-					cout << endl <<endl<< "Num activities="<<activities->size();
+					//cout << endl <<endl<< "Num activities="<<activities->size();
 
 					scheduler->Sort_Activity_Schedule<void>();
 
@@ -471,7 +736,7 @@ namespace Vehicle_Components
 
 					vector<typename type_of(MasterType::activity_record)*>* discarded_activities = person->Activity_Record_Container<vector<typename type_of(MasterType::activity_record)*>*>();
 
-					cout << endl <<endl<< "Num discarded activities="<<discarded_activities->size();
+					//cout << endl <<endl<< "Num discarded activities="<<discarded_activities->size();
 
 					if(discarded_activities->size() && person->Home_Location<Activity_Location_Interface*>())
 					{
@@ -819,7 +1084,7 @@ namespace Vehicle_Components
 					end._y = location->y_position<float>();
 					end._z = current_act_start;
 
-					cout << endl << "Start: " << start._x << "," << start._y << "," << start._z << ".  End: " << end._x << ", " << end._y << ", " << end._z;
+					//cout << endl << "Start: " << start._x << "," << start._y << "," << start._z << ".  End: " << end._x << ", " << end._y << ", " << end._z;
 
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(end);
 
@@ -839,7 +1104,7 @@ namespace Vehicle_Components
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(start_act);
 					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(end_act);
 
-					cout << endl << "Start_act: " << start_act._x << "," << start_act._y << "," << start_act._z << ".  End_act: " << end_act._x << ", " << end_act._y << ", " << end_act._z;
+					//cout << endl << "Start_act: " << start_act._x << "," << start_act._y << "," << start_act._z << ".  End_act: " << end_act._x << ", " << end_act._y << ", " << end_act._z;
 					
 					if(!discarded)
 					{
@@ -896,7 +1161,7 @@ namespace Vehicle_Components
 					link_line.color._a=200;
 					link_line.down_node = start_act;
 					link_line.up_node=end_act;
-					cout << endl << "Push activity time line.";
+					//cout << endl << "Push activity time line.";
 					if(!discarded) _routes_layer->template Push_Element<Accented_Element>(&link_line);
 				}
 			}

@@ -83,6 +83,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	case _POINT:
 		if(enable_textures)
 		{
+			glDepthFunc(GL_ALWAYS);
 			glEnable(GL_POINT_SPRITE);
 			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 		}
@@ -301,9 +302,9 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 
 	True_Color_RGBA<MasterType> accent_color;
 	accent_color = head_color;
-	accent_color._r = 255 - accent_color._r;
-	accent_color._g = 255 - accent_color._g;
-	accent_color._b = 255 - accent_color._b;
+	//accent_color._r = 255 - accent_color._r;
+	//accent_color._g = 255 - accent_color._g;
+	//accent_color._b = 255 - accent_color._b;
 
 	if(!poly)
 	{
@@ -468,6 +469,11 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	if(enable_textures)
 	{
 		glDisable(GL_TEXTURE_2D);
+
+		if(primitive_type == _POINT)
+		{
+			glDepthFunc(GL_LESS);
+		}
 	}
 
 	glDepthFunc(GL_LESS);

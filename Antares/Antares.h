@@ -18,6 +18,7 @@
 #include "Control_Dialog_Implementation.h"
 #include "Antares_Traffic_Management_Center_Implementation.h"
 #include "Antares_Variable_Message_Sign_Implementation.h"
+#include "Antares_Variable_Speed_Sign_Implementation.h"
 #include "Antares_Depot_Implementation.h"
 #include "Antares_Advisory_Radio_Implementation.h"
 #include "Antares_Link_Control_Implementation.h"
