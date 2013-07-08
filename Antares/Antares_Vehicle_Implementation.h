@@ -109,6 +109,7 @@ namespace Vehicle_Components
 				cfg.storage_period=1;
 				cfg.grouped=true;
 				//cfg.primitive_texture = true;
+				cfg.primitive_normal = true;
 
 				//Vehicle_Attribute_Shape::front_index = cfg.Add_Texture(string("Front_Alpha.png"));
 				//Vehicle_Attribute_Shape::back_index = cfg.Add_Texture(string("Back_Alpha.png"));
@@ -276,7 +277,7 @@ namespace Vehicle_Components
 					vehicle_shape.data[counter].color._r = 255;
 					vehicle_shape.data[counter].color._b = 255;
 					vehicle_shape.data[counter].color._g = 255;
-					vehicle_shape.data[counter].color._a = 150;
+					vehicle_shape.data[counter].color._a = 255;
 
 					vehicle_shape.data[counter].a._x = rear_windshield_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
 					vehicle_shape.data[counter].a._y = rear_windshield_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
@@ -321,7 +322,7 @@ namespace Vehicle_Components
 					vehicle_shape.data[counter].color._r = 255;
 					vehicle_shape.data[counter].color._b = 255;
 					vehicle_shape.data[counter].color._g = 255;
-					vehicle_shape.data[counter].color._a = 150;
+					vehicle_shape.data[counter].color._a = 255;
 
 					vehicle_shape.data[counter].a._x = front_hood_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
 					vehicle_shape.data[counter].a._y = front_hood_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
@@ -363,22 +364,25 @@ namespace Vehicle_Components
 
 					//back
 					vehicle_shape.data[counter].color = ((MasterType::link_type*)link)->get_color_by_los(los);
-
+					
 					vehicle_shape.data[counter].a._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
 					vehicle_shape.data[counter].a._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
-					vehicle_shape.data[counter].a._z = 1;
-
+					vehicle_shape.data[counter].a._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					
 					vehicle_shape.data[counter].b._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
 					vehicle_shape.data[counter].b._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
-					vehicle_shape.data[counter].b._z = 1;
-					
+					vehicle_shape.data[counter].b._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+
+
 					vehicle_shape.data[counter].c._x = rear_x - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
 					vehicle_shape.data[counter].c._y = rear_y + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
-					vehicle_shape.data[counter].c._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
-
+					vehicle_shape.data[counter].c._z = 1;
+					
 					vehicle_shape.data[counter].d._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
 					vehicle_shape.data[counter].d._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;
-					vehicle_shape.data[counter].d._z = Vehicle_Attribute_Shape::_vehicle_mid_height;
+					vehicle_shape.data[counter].d._z = 1;
+
+
 					++counter;
 
 					//front
@@ -428,7 +432,7 @@ namespace Vehicle_Components
 					vehicle_shape.data[counter].color._r = 255;
 					vehicle_shape.data[counter].color._b = 255;
 					vehicle_shape.data[counter].color._g = 255;
-					vehicle_shape.data[counter].color._a = 150;
+					vehicle_shape.data[counter].color._a = 255;
 
 					vehicle_shape.data[counter].a._x = front_hood_x - (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * sin_alpha;
 					vehicle_shape.data[counter].a._y = front_hood_y + (Vehicle_Attribute_Shape::_vehicle_front_width / 2.0f) * cos_alpha;
@@ -471,7 +475,7 @@ namespace Vehicle_Components
 					vehicle_shape.data[counter].color._r = 255;
 					vehicle_shape.data[counter].color._b = 255;
 					vehicle_shape.data[counter].color._g = 255;
-					vehicle_shape.data[counter].color._a = 150;
+					vehicle_shape.data[counter].color._a = 255;
 
 					vehicle_shape.data[counter].a._x = rear_x + (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * sin_alpha;
 					vehicle_shape.data[counter].a._y = rear_y - (Vehicle_Attribute_Shape::_vehicle_rear_width / 2.0f) * cos_alpha;

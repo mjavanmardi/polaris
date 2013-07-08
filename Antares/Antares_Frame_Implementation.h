@@ -37,7 +37,7 @@ public:
 };
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
-Antares_Implementation<MasterType,ParentType,InheritanceList>::Antares_Implementation(wxFrame* parent):wxFrame(parent,-1,"Antares")
+Antares_Implementation<MasterType,ParentType,InheritanceList>::Antares_Implementation(wxFrame* parent):wxFrame(parent,-1,"POLARIS")
 {
 	//---- initialize conductor ----
 
@@ -47,7 +47,7 @@ Antares_Implementation<MasterType,ParentType,InheritanceList>::Antares_Implement
 	
 	//---- initialize icon ----
 
-	SetIcon( wxIcon("Antares_Icon.ico",wxBITMAP_TYPE_ICO) );
+	SetIcon( wxIcon("POLARIS_Icon.ico",wxBITMAP_TYPE_ICO) );
 
 	//---- initialize aui ----
 
@@ -55,11 +55,11 @@ Antares_Implementation<MasterType,ParentType,InheritanceList>::Antares_Implement
 
 	_aui_manager.GetArtProvider()->SetMetric(wxAUI_DOCKART_GRADIENT_TYPE,2);
 	_aui_manager.GetArtProvider()->SetColor(wxAUI_DOCKART_BORDER_COLOUR,wxColor(255,255,255));
-	_aui_manager.GetArtProvider()->SetColor(wxAUI_DOCKART_SASH_COLOUR,wxColor(255,255,255));
+	_aui_manager.GetArtProvider()->SetColor(wxAUI_DOCKART_SASH_COLOUR,wxColor(0,0,0));
 	_aui_manager.GetArtProvider()->SetMetric(wxAUI_DOCKART_PANE_BORDER_SIZE,0);
 	_aui_manager.GetArtProvider()->SetMetric(wxAUI_DOCKART_SASH_SIZE,5);
-	_aui_manager.GetArtProvider()->SetColor(wxAUI_DOCKART_INACTIVE_CAPTION_COLOUR,wxColor(200,15,15));
-	_aui_manager.GetArtProvider()->SetColor(wxAUI_DOCKART_INACTIVE_CAPTION_GRADIENT_COLOUR,wxColor(255,255,255));
+	_aui_manager.GetArtProvider()->SetColor(wxAUI_DOCKART_INACTIVE_CAPTION_COLOUR,wxColor(15,15,200));
+	_aui_manager.GetArtProvider()->SetColor(wxAUI_DOCKART_INACTIVE_CAPTION_GRADIENT_COLOUR,wxColor(0,0,0));
 	
 	//---- initialize the menu bar ----
 
