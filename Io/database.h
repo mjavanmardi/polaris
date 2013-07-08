@@ -166,6 +166,41 @@ inline sqlite3* open_spatialite_database(const std::string& name, bool init = tr
 	return db_handle;
 }
 
+template<typename T>
+struct is_pointer { static const bool value = false; };
+
+template<typename T>
+struct is_pointer<T*> { static const bool value = true; };
+template <class DBPtrType>
+inline DBPtrType open_sqlite_database(const std::string& name)
+{
+	using namespace polaris::io;
+	if (is_pointer<DBPtrType>::value)	
+		DBPtrType db = new odb::sqlite::database (make_name(name, db_inventory[0]), SQLITE_OPEN_READWRITE));	
+	else
+		DBPtrType db (new odb::sqlite::database (make_name(name, db_inventory[0]), SQLITE_OPEN_READWRITE));	
+
+	odb::connection_ptr c (db->connection ());
+	c->execute("PRAGMA synchronous = OFF");
+	c->execute("PRAGMA journal_mode = MEMORY");
+	ifstream test;
+	if (db_inventory.size()>1)
+	{
+		for (vector<string>::iterator it = db_inventory.begin()+1; it != db_inventory.end(); ++it)
+		{
+			test.open(make_name(name, *it).c_str());
+			if(test.is_open())
+			{
+				test.close();
+				c->execute(make_attach_string(name,*it));
+			}
+			test.close();			
+		}
+	}
+	return db;
+}
+
+
 inline unique_ptr<odb::database> open_sqlite_database(const std::string& name)
 {
 	using namespace polaris::io;
