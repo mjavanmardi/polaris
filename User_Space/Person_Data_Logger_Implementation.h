@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Io/Io.h"
+//#include "Io/Io.h"
 #include "Person_Data_Logger_Prototype.h"
 #include "Activity_Implementations.h"
 
@@ -18,15 +18,21 @@ namespace Person_Components
 			vector<int> ttime_distribution[_num_threads];
 			vector<string> output_data[_num_threads];
 			vector<string> output_data_buffer[_num_threads];
+			vector<shared_ptr<polaris::io::Trip>> trip_records[_num_threads];
+			vector<shared_ptr<polaris::io::Trip>> trip_records_buffer[_num_threads];
+
 			vector<string>* buff;
 			vector<string>* current;
+			vector<shared_ptr<polaris::io::Trip>>* trip_buff;
+			vector<shared_ptr<polaris::io::Trip>>* trip_current;
+
 			member_data(ofstream, log, none, none);
 			member_data(string, filename, none, none);
 			member_data(ofstream, ttime_file, none,none);
 			member_data(ofstream, executed_acts_file, none,none);
 			member_data(ofstream, external_demand_output_file,none,none);
-			member_pointer(unique_ptr<odb::database>, db_ptr, none,none);
-			member_pointer(odb::transaction, t, none,none);
+			member_data(shared_ptr<odb::database>, db_ptr, none,none);
+			//member_pointer(odb::transaction, t, none,none);
 
 			member_component_and_feature_accessor(Logging_Interval, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Next_Logging_Time, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
@@ -36,20 +42,16 @@ namespace Person_Components
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
-				// don't do logging if not specified in scenario
-				//if (!scenario->template write_activity_output<bool>())
-				//{
-				//	this->Logging_Interval<ComponentType,CallerType,Time_Minutes>(END);
-				//	this->Next_Logging_Time<ComponentType,CallerType,Time_Minutes>(END);
-				//	load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,END,0,NULLTYPE);
-				//	return;
-				//}
+
 
 				if (scenario->write_demand_to_database<bool>())
 				{
 					string name(scenario->template database_name<string&>());
-					this->_db_ptr = new unique_ptr<odb::database>(open_sqlite_database (name));
-					this->_t = new odb::transaction((*this->_db_ptr)->begin());
+					this->_db_ptr = open_sqlite_database<shared_ptr<odb::database> > (name);
+					odb::transaction t(this->_db_ptr->begin());
+					this->_db_ptr->execute("delete from trip");
+					t.commit();
+					//this->_t = new odb::transaction(this->_db_ptr->begin());
 				}
 
 
@@ -60,6 +62,9 @@ namespace Person_Components
 
 				buff = output_data_buffer;
 				current = output_data;
+
+				trip_buff = trip_records_buffer;
+				trip_current = trip_records;
 
 				// Initialize log file
 				stringstream filename("");
@@ -197,7 +202,16 @@ namespace Person_Components
 					O = orig->template uuid<int>();
 					D = dest->template uuid<int>();
 					H = home->template uuid<int>();
-					if(is_external_trip(O,D,H)) Push_To_Demand_Database<ComponentType,CallerType,TargetType>(act_record);
+					if(is_external_internal_trip(O,D,H)) 
+					{
+						int new_origin = get_nearest_external_location<ComponentType,CallerType,zone_itf*>(orig);
+						Push_To_Demand_Database<ComponentType,CallerType,TargetType>(act_record, new_origin);
+					}
+					else if (is_internal_external_trip(O,D,H))
+					{
+						int new_destination = get_nearest_external_location<ComponentType,CallerType,zone_itf*>(dest);
+						Push_To_Demand_Database<ComponentType,CallerType,TargetType>(act_record, -1, new_destination);
+					}
 				}
 				//----------------------------------------------------------
 				//==========================================================
@@ -244,12 +258,16 @@ namespace Person_Components
 				// set next planning time for other functions to use
 				this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>(_iteration + this_ptr->template Logging_Interval<Simulation_Timestep_Increment>());
 
+				// swap buffer and current for output strings and trip records
 				if(_sub_iteration == 0)
-				{
-					// swap buffer and current
+				{				
 					vector<string>* tmp = pthis->buff;
 					pthis->buff = pthis->current;
 					pthis->current = tmp;
+
+					vector<shared_ptr<polaris::io::Trip>>* tmp_trip = pthis->trip_buff;
+					pthis->trip_buff = pthis->trip_current;
+					pthis->trip_current = tmp_trip;
 
 					response.next._iteration = _iteration;
 					response.next._sub_iteration = 1;
@@ -276,12 +294,9 @@ namespace Person_Components
 			}
 			feature_implementation void Write_Data_To_File()
 			{
-				//for (int i = 0; i < 20; ++i)
-				//{
-				//	cout << endl << "Number of activity type : " << num_acts[i];
-				//}
-
 				int i = _sub_iteration;
+
+				// write out strings in the current buffer to log file and clear it
 				for (vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
 				{
 					this->_log << '\n' << ": " << *itr;
@@ -322,8 +337,27 @@ namespace Person_Components
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 				if (scenario->write_demand_to_database<bool>())
 				{
-					this->_t->commit();
-					this->_t->reset((*this->_db_ptr)->begin());
+					try
+					{
+					odb::transaction t(this->_db_ptr->begin());
+					for (vector<shared_ptr<polaris::io::Trip>>::iterator itr = trip_current[i].begin(); itr != trip_current[i].end(); ++itr)
+					{
+						this->_db_ptr->persist(*itr);
+					}
+					t.commit();
+					}
+					catch (odb::sqlite::database_exception ex)
+					{
+						cout << ex.message()<<endl;
+					}
+
+					trip_current[i].clear();
+					// remove dynamically allocated trip records
+					//while (trip_current[i].size() > 0)
+					//{
+					//	delete trip_current[i].back();
+					//	trip_current[i].pop_back();
+					//}
 				}
 			}
 			feature_implementation void Write_Summary_Data_To_File()
@@ -364,11 +398,8 @@ namespace Person_Components
 				}
 			}
 
-			bool is_external_trip(int O, int D, int H)
+			bool is_external_internal_trip(int O, int D, int H)
 			{
-				//TODO: remove when done
-				return true;
-
 				bool o_is_internal = is_internal(O);
 				bool d_is_internal = is_internal(D);
 				bool h_is_internal = is_internal(H);
@@ -376,7 +407,19 @@ namespace Person_Components
 				// not external trip - lives in CBD
 				if (h_is_internal) return false;
 
-				if (o_is_internal && !d_is_internal || !o_is_internal && d_is_internal) return true;
+				if (!o_is_internal && d_is_internal) return true;
+				else return false;
+			}
+			bool is_internal_external_trip(int O, int D, int H)
+			{
+				bool o_is_internal = is_internal(O);
+				bool d_is_internal = is_internal(D);
+				bool h_is_internal = is_internal(H);
+
+				// not external trip - lives in CBD
+				if (h_is_internal) return false;
+
+				if (o_is_internal && !d_is_internal) return true;
 				else return false;
 			}
 			bool is_internal(int id)
@@ -385,10 +428,54 @@ namespace Person_Components
 				if (id <= 88 || (id >= 166 && id <= 168) || (id >= 193 && id <= 196)) is_internal = true; 
 				return is_internal;
 			}
+			feature_implementation int get_nearest_external_location(TargetType zone)
+			{
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Network_Interface;
+				typedef Activity_Location_Components::Prototypes::Activity_Location_Prototype<typename MasterType::activity_location_type> location_itf;
+				define_container_and_value_interface(zones_container_itf, zone_itf,typename _Network_Interface::get_type_of(zones_container), Containers::Associative_Container_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+				_Network_Interface* network = (_Network_Interface*)_global_network;
+				zones_container_itf* zones_list = network->zones_container<zones_container_itf*>();
+
+				int zone_ids[7] = {143,149,165,183,192,223,225};
+
+				float min_distance = FLT_MAX;
+
+				float distance;
+
+				zone_itf* original_zone = (zone_itf*)zone;
+				float orig_x = original_zone->template X<float>();
+				float orig_y = original_zone->template Y<float>();
+
+				zone_itf* external_zone, *closest_zone;
+				float new_x, new_y;
+
+				typename zones_container_itf::iterator zone_itr;
+				for (int i = 0; i < 7; i++)
+				{
+					zone_itr = zones_list->find(zone_ids[i]);
+					if (zone_itr != zones_list->end()) external_zone = zone_itr->second;
+					new_x = external_zone->template X<float>();
+					new_y = external_zone->template Y<float>();
+
+					distance = sqrt(pow(orig_x - new_x,2) + pow(orig_y - new_y,2));
+
+					if (distance < min_distance)
+					{
+						min_distance = distance;
+						closest_zone = external_zone;
+					}
+				}
+
+				location_itf* closest_loc = closest_zone->template Get_Random_Location<location_itf*>();
+
+				//cout <<endl<<"Original zone: " << original_zone->template uuid<int>() << ", closes zone: " << closest_zone->template uuid<int>() << ", new location id: " << closest_loc->template uuid<int>();
+
+				return closest_loc->template uuid<int>();
+			}
 
 
 
-			feature_implementation void Push_To_Demand_Database(TargetType act_record)
+			feature_implementation void Push_To_Demand_Database(TargetType act_record, int new_origin=-1, int new_destination=-1)
 			{
 				typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type> act_itf;
 				typedef Activity_Location_Components::Prototypes::Activity_Location_Prototype<typename MasterType::activity_location_type> location_itf;
@@ -408,20 +495,38 @@ namespace Person_Components
 				
 				shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
 				trip_rec->setConstraint(0);
-				trip_rec->setDestination(dest->template uuid<int>());
-				trip_rec->setDuration(act->Duration<Time_Seconds>());
-				trip_rec->setEnd(act->End_Time<Time_Seconds>());
-				trip_rec->setHhold(person->uuid<int>());
+				trip_rec->setPerson(1);
+				trip_rec->setTrip(act->template Activity_Plan_ID<int>());
+				if (new_destination<0) trip_rec->setDestination(dest->template uuid<int>());
+				else trip_rec->setDestination(new_destination);
+				trip_rec->setDuration(act->template Duration<Time_Seconds>());
+				trip_rec->setEnd(act->template End_Time<Time_Seconds>());
+				trip_rec->setHhold(person->template uuid<int>());
 				trip_rec->setMode(0);
-				trip_rec->setOrigin(orig->uuid<int>());
+				if (new_origin <0) trip_rec->setOrigin(orig->template uuid<int>());
+				else trip_rec->setOrigin(new_origin);
 				trip_rec->setPartition(0);
 				trip_rec->setPassengers(0);
 				trip_rec->setPurpose(0);
-				trip_rec->setStart(act->Start_Time<Time_Seconds>());
+				trip_rec->setStart(act->template Start_Time<Time_Seconds>());
 				trip_rec->setTour(0);
+				trip_rec->setPriority(0);
+				trip_rec->setVehicle(1);
+				trip_rec->setType(0);
 
-				(*this->_db_ptr)->persist(trip_rec);
-				//this->_external_demand_output_file <<person->uuid<int>() <<","<< orig->uuid<int>() << ","<<dest->uuid<int>()<<","<<act->Start_Time<Time_Seconds>()<<","<<act->End_Time<Time_Seconds>() <<endl;
+				// add trip to the buffer for the current thread
+				trip_buff[_thread_id].push_back(trip_rec);
+
+				//try
+				//{
+				//	odb::transaction t(this->_db_ptr->begin());
+				//	this->_db_ptr->persist(trip_rec);
+				//	t.commit();
+				//}
+				//catch (odb::sqlite::database_exception ex)
+				//{
+				//	cout << ex.message()<<endl;
+				//}
 			}
 		};
 	}

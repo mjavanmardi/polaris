@@ -124,6 +124,8 @@ struct Back_Insertion_Sequence_Prototype ADD_DEBUG_INFO
 
 	void pop_front(){((ComponentType*)this)->pop_front();}
 
+	void sort(){((ComponentType*)this)->sort();}
+
 	// basic feature tags
 	typedef true_type begin_feature_tag;
 	typedef true_type end_feature_tag;

@@ -28,9 +28,6 @@
     <ClCompile Include="Engine_Tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Example.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Integrated_Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -38,9 +35,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Polaris_PCH.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PopSyn_Example.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Sensor_Model.cpp">

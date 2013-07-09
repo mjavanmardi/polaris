@@ -6,7 +6,7 @@
 
 namespace Network_Components
 {
-    using std::shared_ptr;
+    //using std::shared_ptr;
 	namespace Types
 	{
 		union Link_ID_Dir

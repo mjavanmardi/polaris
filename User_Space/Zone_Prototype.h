@@ -91,7 +91,7 @@ namespace Zone_Components
 			}
 			feature_prototype TargetType Get_Random_Location(requires(check_as_given(TargetType,is_pointer) && check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location)))
 			{
-				define_container_and_value_interface(activity_locations_itf,activity_location_itf, typename get_type_of(origin_activity_locations),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+				define_container_and_value_interface(activity_locations_itf,activity_location_itf, typename get_type_of(origin_activity_locations),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,NULLTYPE);
 				activity_locations_itf* locations = this->template origin_activity_locations<activity_locations_itf*>();
 				
 				int size = locations->size();
