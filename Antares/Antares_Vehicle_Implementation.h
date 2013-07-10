@@ -545,11 +545,6 @@ namespace Vehicle_Components
 						coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
 					}
 
-					coordinate.color._r = 255;
-					coordinate.color._g = 255;
-					coordinate.color._b = 255;
-					coordinate.color._a = 255;
-
 					_vehicle_points->Push_Element<Regular_Element>(&coordinate);
 				}
 			}

@@ -151,6 +151,8 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<APPE
 			}
 			else
 			{
+				cout << "Unable to load texture: " << *itr << endl;
+
 				_texture_map.push_back( -1 );
 
 				exit(0);

@@ -49,7 +49,7 @@ namespace Advisory_Radio_Components
 
 				
 				cfg.Configure_Static_Points();
-				cfg.head_texture = cfg.Add_Texture(string("HAR.jpg"));
+				cfg.head_texture = cfg.Add_Texture(string("HAR.png"));
 				cfg.grouped=false;
 				cfg.head_size_value=32;
 				cfg.head_accent_size_value=64;

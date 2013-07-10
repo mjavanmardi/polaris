@@ -59,6 +59,7 @@ void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Draw_Layer(in
 	if(enable_textures)
 	{
 		glEnable(GL_TEXTURE_2D);
+		glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 	}
 
 	if(head_texture)

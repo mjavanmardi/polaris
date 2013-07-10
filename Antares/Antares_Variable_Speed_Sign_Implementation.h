@@ -34,7 +34,7 @@ namespace Variable_Message_Sign_Components
 				
 				stringstream s;
 
-				for(float i=5.0f;i<link->speed_limit<float>();i+=5.0f)
+				for(float i=5.0f;i<link->speed_limit<float>()*1.2;i+=5.0f)
 				{
 					s << i;
 					dropdowns[0].push_back( s.str() );
