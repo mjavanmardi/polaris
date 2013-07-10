@@ -519,7 +519,7 @@ namespace Vehicle_Components
 
 					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;				
 					
-					if(person->has_done_replanning<bool>())
+					if(person->has_done_replanning<bool>() && ((ComponentType*)this)->_is_integrated)
 					{
 						coordinate.color._r = 0;
 						coordinate.color._g = 0;
@@ -543,6 +543,14 @@ namespace Vehicle_Components
 					else
 					{
 						coordinate.color = ((MasterType::link_type*)link)->get_color_by_los(los);
+					}
+
+					if (!((ComponentType*)this)->_is_integrated)
+					{
+						float color_scale = 0.6;
+						coordinate.color._r *= color_scale;
+						coordinate.color._g *= color_scale;
+						coordinate.color._b *= color_scale;
 					}
 
 					_vehicle_points->Push_Element<Regular_Element>(&coordinate);
@@ -694,65 +702,67 @@ namespace Vehicle_Components
 				display_route<typename MasterType::vehicle_type,NT,NT>();
 
 //#ifdef IntegratedModelApplication
-
-				if (_locations_layer->template draw<bool>())
+				if (((ComponentType*)this)->_is_integrated)
 				{
-
-					typedef Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType> Activity_Location_Interface;
-
-					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
-					Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
-					Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* scheduler = person->Scheduling_Faculty<Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* >();
-
-					list<typename type_of(MasterType::activity)*>* activities = scheduler->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
-					Activity_Location_Interface* previous_location;
-
-					//cout << endl <<endl<< "Num activities="<<activities->size();
-
-					scheduler->Sort_Activity_Schedule<void>();
-
-					if(activities->size() && person->Home_Location<Activity_Location_Interface*>())
+					if (_locations_layer->template draw<bool>())
 					{
-						previous_location = person->Home_Location<Activity_Location_Interface*>();
-						int prev_end, current_start, current_end;
-						Activity_Planner<typename type_of(MasterType::activity),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity),ComponentType>*)(*(activities->begin()));
-						prev_end = activity_planner->Start_Time<Time_Minutes>() - activity_planner->Expected_Travel_Time<Time_Minutes>();
+
+						typedef Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType> Activity_Location_Interface;
+
+						Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
+						Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
+						Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* scheduler = person->Scheduling_Faculty<Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* >();
+
+						list<typename type_of(MasterType::activity)*>* activities = scheduler->Activity_Container<list<typename type_of(MasterType::activity)*>*>();
+						Activity_Location_Interface* previous_location;
+
+						//cout << endl <<endl<< "Num activities="<<activities->size();
+
+						scheduler->Sort_Activity_Schedule<void>();
+
+						if(activities->size() && person->Home_Location<Activity_Location_Interface*>())
+						{
+							previous_location = person->Home_Location<Activity_Location_Interface*>();
+							int prev_end, current_start, current_end;
+							Activity_Planner<typename type_of(MasterType::activity),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity),ComponentType>*)(*(activities->begin()));
+							prev_end = activity_planner->Start_Time<Time_Minutes>() - activity_planner->Expected_Travel_Time<Time_Minutes>();
 
 						
-						for(list<typename type_of(MasterType::activity)*>::iterator itr=activities->begin();itr!=activities->end();itr++)
-						{
-							Activity_Planner<typename type_of(MasterType::activity),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity),ComponentType>*)(*itr);
-							if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
-							current_start = activity_planner->Start_Time<Time_Minutes>();
-							current_end = activity_planner->End_Time<Time_Minutes>();
+							for(list<typename type_of(MasterType::activity)*>::iterator itr=activities->begin();itr!=activities->end();itr++)
+							{
+								Activity_Planner<typename type_of(MasterType::activity),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity),ComponentType>*)(*itr);
+								if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
+								current_start = activity_planner->Start_Time<Time_Minutes>();
+								current_end = activity_planner->End_Time<Time_Minutes>();
 
-							display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location,prev_end,current_start, current_end, false );
-							prev_end = current_end; //current_start + activity_planner->Duration<Time_Minutes>();
-							previous_location = activity_planner->Location<Activity_Location_Interface*>();
-						}
-						display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, prev_end, prev_end + 15, 1440, false );
-					}
-
-					vector<typename type_of(MasterType::activity_record)*>* discarded_activities = person->Activity_Record_Container<vector<typename type_of(MasterType::activity_record)*>*>();
-
-					//cout << endl <<endl<< "Num discarded activities="<<discarded_activities->size();
-
-					if(discarded_activities->size() && person->Home_Location<Activity_Location_Interface*>())
-					{
-						previous_location = person->Home_Location<Activity_Location_Interface*>();
-
-						for(vector<typename type_of(MasterType::activity_record)*>::iterator itr=discarded_activities->begin();itr!=discarded_activities->end();itr++)
-						{
-							Activity_Planner<typename type_of(MasterType::activity_record),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity_record),ComponentType>*)(*itr);
-							if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
-
-							display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location, 1,1,1,true );
-							previous_location = activity_planner->Location<Activity_Location_Interface*>();
+								display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location,prev_end,current_start, current_end, false );
+								prev_end = current_end; //current_start + activity_planner->Duration<Time_Minutes>();
+								previous_location = activity_planner->Location<Activity_Location_Interface*>();
+							}
+							display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, prev_end, prev_end + 15, 1440, false );
 						}
 
-						display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, 1,1,1,true );
-					}
-				}	
+						vector<typename type_of(MasterType::activity_record)*>* discarded_activities = person->Activity_Record_Container<vector<typename type_of(MasterType::activity_record)*>*>();
+
+						//cout << endl <<endl<< "Num discarded activities="<<discarded_activities->size();
+
+						if(discarded_activities->size() && person->Home_Location<Activity_Location_Interface*>())
+						{
+							previous_location = person->Home_Location<Activity_Location_Interface*>();
+
+							for(vector<typename type_of(MasterType::activity_record)*>::iterator itr=discarded_activities->begin();itr!=discarded_activities->end();itr++)
+							{
+								Activity_Planner<typename type_of(MasterType::activity_record),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity_record),ComponentType>*)(*itr);
+								if(activity_planner->Location<Activity_Location_Interface*>() == nullptr) continue;
+
+								display_location<typename MasterType::vehicle_type,NT,NT>( activity_planner->Location<Activity_Location_Interface*>(), previous_location, 1,1,1,true );
+								previous_location = activity_planner->Location<Activity_Location_Interface*>();
+							}
+
+							display_location<typename MasterType::vehicle_type,NT,NT>( person->Home_Location<Activity_Location_Interface*>(), previous_location, 1,1,1,true );
+						}
+					}	
+				}
 //#endif						
 				Link_Interface* link=((_Movement_Plan_Interface*)_movement_plan)->template current_link<Link_Interface*>();
 
@@ -857,62 +867,65 @@ namespace Vehicle_Components
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 
-#ifdef IntegratedModelApplication
-				// Activity Attributes
-				typedef Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType> Activity_Location_Interface;
-				typedef Zone_Prototype<typename type_of(MasterType::zone),ComponentType> zone_interface;
-				typedef Activity_Planner<typename type_of(MasterType::activity),ComponentType> activity_interface;
-
-				Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
-				Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
-				Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* scheduler = person->Scheduling_Faculty<Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* >();
-
-				list<activity_interface*>* activities = scheduler->Activity_Container<list<activity_interface*>*>();
-
-				stringstream ss("");
-				time_str;
-				int i = 1;
-				for (typename list<activity_interface*>::iterator itr = activities->begin(); itr != activities->end(); ++itr, ++i)
+//#ifdef IntegratedModelApplication
+				if (((ComponentType*)this)->_is_integrated)
 				{
-					// blank space
-					key_value_pair.first="";
-					time_str = "";
-					sprintf(str_buf, "%s", time_str.c_str());
-					key_value_pair.second=str_buf;				
-					memset(&str_buf[0],0,128);
-					bucket.push_back(key_value_pair);
+					// Activity Attributes
+					typedef Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType> Activity_Location_Interface;
+					typedef Zone_Prototype<typename type_of(MasterType::zone),ComponentType> zone_interface;
+					typedef Activity_Planner<typename type_of(MasterType::activity),ComponentType> activity_interface;
 
-					// activity start time
-					activity_interface* act = *itr;
-					ss.str("");
-					ss << "Act "<<i<<": Start Time";
-					key_value_pair.first=ss.str();
-					time_str = convert_seconds_to_hhmm(act->template Start_Time<Time_Seconds>());
-					sprintf(str_buf, "%s", time_str.c_str());
-					key_value_pair.second=str_buf;				
-					memset(&str_buf[0],0,128);
-					bucket.push_back(key_value_pair);
+					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;
+					Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* planner=person->Planning_Faculty< Person_Planner<typename ComponentType::traveler_type::Planning_Faculty_type>* >();
+					Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* scheduler = person->Scheduling_Faculty<Person_Scheduler<typename ComponentType::traveler_type::Scheduling_Faculty_type>* >();
 
-					// activity duration
-					ss.str("");
-					ss << "Act "<<i<<": Duration";
-					key_value_pair.first=ss.str();
-					time_str = convert_seconds_to_hhmm(act->template Duration<Time_Seconds>());
-					sprintf(str_buf, "%s", time_str.c_str());
-					key_value_pair.second=str_buf;				
-					memset(&str_buf[0],0,128);
-					bucket.push_back(key_value_pair);
+					list<activity_interface*>* activities = scheduler->Activity_Container<list<activity_interface*>*>();
 
-					// activity destination
-					ss.str("");
-					ss << "Act "<<i<<": TAZ destination";
-					key_value_pair.first=ss.str();
-					sprintf(str_buf, "%d", act->Location<Activity_Location_Interface*>()->zone<zone_interface*>()->uuid<int>());
-					key_value_pair.second=str_buf;				
-					memset(&str_buf[0],0,128);
-					bucket.push_back(key_value_pair);
+					stringstream ss("");
+					time_str;
+					int i = 1;
+					for (typename list<activity_interface*>::iterator itr = activities->begin(); itr != activities->end(); ++itr, ++i)
+					{
+						// blank space
+						key_value_pair.first="";
+						time_str = "";
+						sprintf(str_buf, "%s", time_str.c_str());
+						key_value_pair.second=str_buf;				
+						memset(&str_buf[0],0,128);
+						bucket.push_back(key_value_pair);
+
+						// activity start time
+						activity_interface* act = *itr;
+						ss.str("");
+						ss << "Act "<<i<<": Start Time";
+						key_value_pair.first=ss.str();
+						time_str = convert_seconds_to_hhmm(act->template Start_Time<Time_Seconds>());
+						sprintf(str_buf, "%s", time_str.c_str());
+						key_value_pair.second=str_buf;				
+						memset(&str_buf[0],0,128);
+						bucket.push_back(key_value_pair);
+
+						// activity duration
+						ss.str("");
+						ss << "Act "<<i<<": Duration";
+						key_value_pair.first=ss.str();
+						time_str = convert_seconds_to_hhmm(act->template Duration<Time_Seconds>());
+						sprintf(str_buf, "%s", time_str.c_str());
+						key_value_pair.second=str_buf;				
+						memset(&str_buf[0],0,128);
+						bucket.push_back(key_value_pair);
+
+						// activity destination
+						ss.str("");
+						ss << "Act "<<i<<": TAZ destination";
+						key_value_pair.first=ss.str();
+						sprintf(str_buf, "%d", act->Location<Activity_Location_Interface*>()->zone<zone_interface*>()->uuid<int>());
+						key_value_pair.second=str_buf;				
+						memset(&str_buf[0],0,128);
+						bucket.push_back(key_value_pair);
+					}
 				}
-#endif
+//#endif
 			}
 			
 			feature_implementation void make_pyramid(Point_3D<MasterType>* vertex,const Point_3D<MasterType>& center,const float radius)

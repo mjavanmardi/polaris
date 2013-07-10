@@ -28,7 +28,8 @@ namespace Vehicle_Components
 			member_data(Vehicle_Components::Types::Vehicle_Status_Keys, simulation_status, none, none);
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);
-			
+			member_data(bool, is_integrated,none,none);
+
 			member_component(typename MasterType::movement_plan_type, movement_plan, none, none);
 #ifndef EXCLUDE_DEMAND
 			member_component(typename MasterType::person_type, traveler, none, none);
@@ -370,6 +371,8 @@ namespace Vehicle_Components
 
 			feature_implementation void initialize()
 			{
+				_is_integrated=false;
+
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				///
 				//unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+_internal_id+1;
