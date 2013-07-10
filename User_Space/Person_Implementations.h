@@ -140,6 +140,7 @@ namespace Person_Components
 				_vehicle->template internal_id<int>(id);
 				_vehicle->template traveler<ComponentType*>(this);
 				_vehicle->template initialize<NT>();
+				_vehicle->template is_integrated<bool>(true);
 
 				this->_current_location = nullptr;
 

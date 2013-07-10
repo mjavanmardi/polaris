@@ -65,6 +65,7 @@ namespace Vehicle_Components
 			feature_accessor(traveler, none, none);
 			feature_accessor(distance_to_stop_bar, none, none);
 			feature_accessor(local_speed, none, none);
+			feature_accessor(is_integrated, none, none);
 			
 			//enroute swtiching
 			feature_accessor(rng_stream, none, none);
@@ -83,6 +84,8 @@ namespace Vehicle_Components
 
 			feature_prototype void load()
 			{
+				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
+				movement_plan<_Movement_Plan_Interface*>()->template is_integrated<bool>(is_integrated<bool>());
 				this_component()->template load<ComponentType,CallerType, TargetType>();
 			}
 
@@ -90,6 +93,8 @@ namespace Vehicle_Components
 			{
 				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				this_component()->template unload<ComponentType,CallerType, TargetType>();
+
+				movement_plan<_Movement_Plan_Interface*>()->template is_integrated<bool>(is_integrated<bool>());
 				movement_plan<_Movement_Plan_Interface*>()->template arrive_to_destination<NULLTYPE>();
 			}
 			

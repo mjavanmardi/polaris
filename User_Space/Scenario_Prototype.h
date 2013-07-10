@@ -188,6 +188,7 @@ namespace Scenario_Components
 			feature_accessor(aggregate_routing,none,none);
 			feature_accessor(do_planner_routing,none,none);
 			feature_accessor(write_demand_to_database,none,none);
+			feature_accessor(read_demand_from_database,none,none);
 
 			//===============================================
 			// Popsyn parameters
@@ -378,6 +379,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("aggregate_routing", this->aggregate_routing<bool*>()) != PARAMETER_FOUND) this->aggregate_routing<bool>(false);
 				if (cfgReader.getParameter("do_planner_routing", this->do_planner_routing<bool*>()) != PARAMETER_FOUND) this->do_planner_routing<bool>(false);		
 				if (cfgReader.getParameter("write_demand_to_database", this->write_demand_to_database<bool*>()) != PARAMETER_FOUND) this->write_demand_to_database<bool>(false);
+				if (cfgReader.getParameter("read_demand_from_database", this->read_demand_from_database<bool*>()) != PARAMETER_FOUND) this->read_demand_from_database<bool>(false);
 
 				//=======================================================================================================================================================
 				// PopSyn parameters

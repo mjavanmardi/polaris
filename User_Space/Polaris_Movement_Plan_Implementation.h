@@ -74,6 +74,8 @@ namespace Movement_Plan_Components
 			member_data(int, routed_travel_time, none, none);
 			member_data(int, estimated_time_of_arrival, none, none);
 
+			member_data(bool, is_integrated, none, none);
+
 			template<typename ComponentType, typename CallerType, typename ReturnValueType>
 			ReturnValueType absolute_departure_time()
 			{
@@ -121,9 +123,12 @@ namespace Movement_Plan_Components
 				//bthis->_trajectory_container[bthis->_current_trajectory_index]->_delayed_time = 0.0;
 				bthis->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>( ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() );
 
-				Simulation_Timestep_Increment ttime = bthis->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>() - bthis->template departed_time<ComponentType,CallerType,Simulation_Timestep_Increment>();
-				this->_destination_activity_reference->template Actual_Travel_Time<Simulation_Timestep_Increment>(ttime);
-				this->_destination_activity_reference->template Arrive_At_Activity<NT>();
+				if (_is_integrated)
+				{
+					Simulation_Timestep_Increment ttime = bthis->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>() - bthis->template departed_time<ComponentType,CallerType,Simulation_Timestep_Increment>();
+					this->_destination_activity_reference->template Actual_Travel_Time<Simulation_Timestep_Increment>(ttime);
+					this->_destination_activity_reference->template Arrive_At_Activity<NT>();
+				}
 			}
 		};
 

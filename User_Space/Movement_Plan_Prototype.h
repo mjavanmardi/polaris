@@ -82,7 +82,7 @@ namespace Movement_Plan_Components
 			feature_accessor(estimated_time_of_arrival,none,none);
 			
 			feature_accessor(absolute_departure_time, none, none);
-
+			feature_accessor(is_integrated, none,none);
 
 			// overloaded origin and destination, depending on targetType
 			feature_prototype void origin(TargetType activity_location, requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))

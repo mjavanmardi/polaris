@@ -34,7 +34,9 @@ struct MasterType
 
 	typedef Antares_Network_Implementation<M> network_type;
 	typedef Antares_Link_Implementation<M> link_type;
-	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> vehicle_type;	
+	typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> vehicle_type;
+	//typedef Vehicle_Components::Implementations::Antares_Vehicle_Implementation<M> basic_vehicle_type;
+	//typedef Vehicle_Components::Implementations::Polaris_Base_Vehicle_Implementation<M> vehicle_type;
 	typedef Zone_Components::Implementations::Graphical_Zone_Implementation<M> zone_type;
 	typedef Antares_Intersection_Implementation<M> intersection_type;
 	typedef Zone_Components::Implementations::Graphical_Zone_Group_Implementation<M> graphical_zone_group_type;
@@ -42,7 +44,8 @@ struct MasterType
 	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<M> network_type;
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<M> link_type;
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<M> intersection_type;
-	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<M> vehicle_type;
+	//typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<M> vehicle_type;
+	typedef Vehicle_Components::Implementations::Polaris_Integrated_Vehicle_Implementation<M> vehicle_type;
 	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 	#endif
 
@@ -72,6 +75,7 @@ struct MasterType
 	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<M> approach_type;
 	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<M> plan_type;
 
+	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<M> basic_movement_plan_type;
 	typedef Movement_Plan_Components::Implementations::Polaris_Integrated_Movement_Plan_Implementation<M> movement_plan_type;
 	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Record_Implementation<M> movement_plan_record_type;
 
@@ -163,90 +167,15 @@ struct MasterType
 };
 
 
-
-
 int main(int argc,char** argv)
 {
-	char* scenario_filename;
-	if (argc >= 2)
-	{
-		scenario_filename = argv[1];
-	}
-	else
-	{
-		scenario_filename = "scenario.json";
-	}
-	#pragma region Output sizing info
-	cout << endl <<"network_type size = "<<sizeof(MasterType::network_type);
-	cout << endl <<"link_type size = "<<sizeof(MasterType::link_type);
-	cout << endl <<"intersection_type size = "<<sizeof(MasterType::intersection_type);
-	cout << endl <<"vehicle_type size = "<<sizeof(MasterType::vehicle_type);
-	cout << endl <<"zone_type size = "<<sizeof(MasterType::zone_type);
-	cout << endl <<"scenario_type size = "<<sizeof(MasterType::scenario_type);
-	cout << endl <<"network_db_reader_type size = "<<sizeof(MasterType::network_db_reader_type);
-	cout << endl <<"movement_type size = "<<sizeof(MasterType::movement_type);
-	cout << endl <<"turn_movement_type size = "<<sizeof(MasterType::turn_movement_type);
-	cout << endl <<"routable_network_type size = "<<sizeof(MasterType::routable_network_type);
-	cout << endl <<"routing_type size = "<<sizeof(MasterType::routing_type);
-	cout << endl <<"skim_routing_type size = "<<sizeof(MasterType::skim_routing_type);
-	cout << endl <<"routable_intersection_type size = "<<sizeof(MasterType::routable_intersection_type);
-	cout << endl <<"routable_link_type size = "<<sizeof(MasterType::routable_link_type);
-	cout << endl <<"activity_location_type size = "<<sizeof(MasterType::activity_location_type);
-	cout << endl <<"traveler_type size = "<<sizeof(MasterType::traveler_type);
-	cout << endl <<"switch_decision_data_type size = "<<sizeof(MasterType::switch_decision_data_type);
-	cout << endl <<"inbound_outbound_movements_type size = "<<sizeof(MasterType::inbound_outbound_movements_type);
-	cout << endl <<"outbound_inbound_movements_type size = "<<sizeof(MasterType::outbound_inbound_movements_type);
-	cout << endl <<"routable_inbound_outbound_movements_type size = "<<sizeof(MasterType::routable_inbound_outbound_movements_type);
-	cout << endl <<"routable_outbound_inbound_movements_type size = "<<sizeof(MasterType::routable_outbound_inbound_movements_type);
-	cout << endl <<"routable_movement_type size = "<<sizeof(MasterType::routable_movement_type);
-	cout << endl <<"operation_type size = "<<sizeof(MasterType::operation_type);
-	cout << endl <<"intersection_control_type size = "<<sizeof(MasterType::intersection_control_type);
-	cout << endl <<"control_plan_type size = "<<sizeof(MasterType::control_plan_type);
-	cout << endl <<"phase_type size = "<<sizeof(MasterType::phase_type);
-	cout << endl <<"phase_movement_type size = "<<sizeof(MasterType::phase_movement_type);
-	cout << endl <<"approach_type size = "<<sizeof(MasterType::approach_type);
-	cout << endl <<"plan_type size = "<<sizeof(MasterType::plan_type);
-	cout << endl <<"movement_plan_type size = "<<sizeof(MasterType::movement_plan_type);
-	cout << endl <<"movement_plan_record_type size = "<<sizeof(MasterType::movement_plan_record_type);
-	cout << endl <<"trajectory_unit_type size = "<<sizeof(MasterType::trajectory_unit_type);
-	cout << endl <<"network_skim_type size = "<<sizeof(MasterType::network_skim_type);
-	cout << endl <<"demand_type size = "<<sizeof(MasterType::demand_type);
-	cout << endl <<"person_type size = "<<sizeof(MasterType::person_type);
-	cout << endl <<"person_planner_type size = "<<sizeof(MasterType::person_planner_type);
-	cout << endl <<"person_mover_type size = "<<sizeof(MasterType::person_mover_type);
-	cout << endl <<"person_scheduler_type size = "<<sizeof(MasterType::person_scheduler_type);
-	cout << endl <<"person_perception_type size = "<<sizeof(MasterType::person_perception_type);
-	cout << endl <<"activity_generator_type size = "<<sizeof(MasterType::activity_generator_type);
-	cout << endl <<"person_properties_type size = "<<sizeof(MasterType::person_properties_type);
-	cout << endl <<"person_static_properties_type size = "<<sizeof(MasterType::person_static_properties_type);
-	cout << endl <<"person_data_logger_type size = "<<sizeof(MasterType::person_data_logger_type);
-	cout << endl <<"RNG size = "<<sizeof(MasterType::RNG);
-	cout << endl <<"activity_type size = "<<sizeof(MasterType::activity_type);
-	cout << endl <<"activity_plan_type size = "<<sizeof(MasterType::activity_plan_type);
-	cout << endl <<"routine_activity_plan_type size = "<<sizeof(MasterType::routine_activity_plan_type);
-	cout << endl <<"activity_record_type size = "<<sizeof(MasterType::activity_record_type);
-	cout << endl <<"activity_timing_chooser_type size = "<<sizeof(MasterType::activity_timing_chooser_type);
-	cout << endl <<"person_destination_chooser_type size = "<<sizeof(MasterType::person_destination_chooser_type);
-	cout << endl <<"person_destination_choice_option_type size = "<<sizeof(MasterType::person_destination_choice_option_type);
-	cout << endl <<"zone size = "<<sizeof(MasterType::zone);
-	cout << endl <<"region size = "<<sizeof(MasterType::region);
-	cout << endl <<"IPF_Solver_Settings size = "<<sizeof(MasterType::IPF_Solver_Settings);
-	cout << endl <<"popsyn_solver size = "<<sizeof(MasterType::popsyn_solver);
-	cout << endl <<"traffic_management_center_type size = "<<sizeof(MasterType::traffic_management_center_type);
-	cout << endl <<"weather_network_event_type size = "<<sizeof(MasterType::weather_network_event_type);
-	cout << endl <<"accident_network_event_type size = "<<sizeof(MasterType::accident_network_event_type);
-	cout << endl <<"congestion_network_event_type size = "<<sizeof(MasterType::congestion_network_event_type);
-	cout << endl <<"lane_closure_network_event_type size = "<<sizeof(MasterType::lane_closure_network_event_type);
-	cout << endl <<"link_control_type size = "<<sizeof(MasterType::link_control_type);
-	cout << endl <<"depot_type size = "<<sizeof(MasterType::depot_type);
-	cout << endl <<"advisory_radio_type size = "<<sizeof(MasterType::advisory_radio_type);
-	cout << endl <<"variable_word_sign_type size = "<<sizeof(MasterType::variable_word_sign_type);
-	cout << endl <<"variable_speed_sign_type size = "<<sizeof(MasterType::variable_speed_sign_type);
-	cout << endl <<"link_sensor_type size = "<<sizeof(MasterType::link_sensor_type);
-	cout << endl <<"base_network_event_type size = "<<sizeof(MasterType::base_network_event_type);
-	cout << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_event_manager_type);
-	#pragma endregion
+	//==================================================================================================================================
+	// Scenario initialization
+	//----------------------------------------------------------------------------------------------------------------------------------
+	char* scenario_filename = "scenario.json";
+	if (argc >= 2) scenario_filename = argv[1];
 
+	
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -374,12 +303,15 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// EXTERNAL Demand
 	//----------------------------------------------------------------------------------------------------------------------------------
-	//define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
-	//_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
-	//demand->scenario_reference<_Scenario_Interface*>(scenario);
-	//demand->network_reference<_Network_Interface*>(network);
-	//cout << "reading external demand data..." <<endl;
-	//demand->read_demand_data<Net_IO_Type>(network_io_maps);
+	if (scenario->template read_demand_from_database<bool>())
+	{
+		define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
+		_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();
+		demand->scenario_reference<_Scenario_Interface*>(scenario);
+		demand->network_reference<_Network_Interface*>(network);
+		cout << "reading external demand data..." <<endl;
+		demand->read_demand_data<Net_IO_Type>(network_io_maps);
+	}
 
 	
 	//==================================================================================================================================
@@ -415,22 +347,16 @@ int main(int argc,char** argv)
 	skimmer->read_input<bool>(scenario->read_skim_tables<bool>());
 	if (skimmer->read_input<bool>())
 	{
-		if (!skimmer->input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_skim_file_path_name<string>().c_str()))
-		{
-			THROW_EXCEPTION("Error: input binary skim file '" << scenario->input_skim_file_path_name<string>() << "' could not be opened.");
-		}
+		if (!skimmer->input_file<File_IO::Binary_File_Reader&>().Open(scenario->input_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: input binary skim file '" << scenario->input_skim_file_path_name<string>() << "' could not be opened.");
 	}
-
 	skimmer->write_output<bool>(scenario->write_skim_tables<bool>());	
 	if (skimmer->write_output<bool>())
 	{
-		if (!skimmer->output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_skim_file_path_name<string>().c_str()))
-		{
-			THROW_EXCEPTION("Error: output binary skim file '" << scenario->output_skim_file_path_name<string>() << "' could not be opened.");
-		}
+		if (!skimmer->output_file<File_IO::Binary_File_Writer&>().Open(scenario->output_skim_file_path_name<string>().c_str())) THROW_EXCEPTION("Error: output binary skim file '" << scenario->output_skim_file_path_name<string>() << "' could not be opened.");
 	}
 	skimmer->Initialize<_Network_Interface*>(network);
 	network->skimming_faculty<_network_skim_itf*>(skimmer);
+
 
 	//==================================================================================================================================
 	// Destination choice model - set parameters
@@ -460,22 +386,10 @@ int main(int argc,char** argv)
 	logger->Initialize<NT>();
 	_global_person_logger = logger;
 
+
 	
-	//stringstream logfilename;
-	//MasterType::person_planner_type::_write_activity_files = scenario->write_activity_output<bool>();
-	//for (int i = 0; i < _num_threads; ++i)
-	//{
-	//	logfilename << "generated_acts_" << i << ".csv";
-	//	MasterType::person_planner_type::logs[i].open(logfilename.str());
-	//	MasterType::person_planner_type::logs[i] << "PERID,DEPART,ORIG,DEST,EST_TTIME"<<endl;
-	//	logfilename.str("");
-	//}
-	//----------------------------------------------------------------------------------------------------------------------------------
-	
-	if (scenario->use_network_events<bool>())
-	{
-		MasterType::link_type::subscribe_events();
-	}
+	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events();
+
 
 	//==================================================================================================================================
 	// Start Simulation
@@ -493,3 +407,76 @@ int main(int argc,char** argv)
 	system("PAUSE");
 }
 #endif
+
+
+void output_object_sizes()
+{
+	cout << endl <<"network_type size = "<<sizeof(MasterType::network_type);
+	cout << endl <<"link_type size = "<<sizeof(MasterType::link_type);
+	cout << endl <<"intersection_type size = "<<sizeof(MasterType::intersection_type);
+	cout << endl <<"vehicle_type size = "<<sizeof(MasterType::vehicle_type);
+	cout << endl <<"zone_type size = "<<sizeof(MasterType::zone_type);
+	cout << endl <<"scenario_type size = "<<sizeof(MasterType::scenario_type);
+	cout << endl <<"network_db_reader_type size = "<<sizeof(MasterType::network_db_reader_type);
+	cout << endl <<"movement_type size = "<<sizeof(MasterType::movement_type);
+	cout << endl <<"turn_movement_type size = "<<sizeof(MasterType::turn_movement_type);
+	cout << endl <<"routable_network_type size = "<<sizeof(MasterType::routable_network_type);
+	cout << endl <<"routing_type size = "<<sizeof(MasterType::routing_type);
+	cout << endl <<"skim_routing_type size = "<<sizeof(MasterType::skim_routing_type);
+	cout << endl <<"routable_intersection_type size = "<<sizeof(MasterType::routable_intersection_type);
+	cout << endl <<"routable_link_type size = "<<sizeof(MasterType::routable_link_type);
+	cout << endl <<"activity_location_type size = "<<sizeof(MasterType::activity_location_type);
+	cout << endl <<"traveler_type size = "<<sizeof(MasterType::traveler_type);
+	cout << endl <<"switch_decision_data_type size = "<<sizeof(MasterType::switch_decision_data_type);
+	cout << endl <<"inbound_outbound_movements_type size = "<<sizeof(MasterType::inbound_outbound_movements_type);
+	cout << endl <<"outbound_inbound_movements_type size = "<<sizeof(MasterType::outbound_inbound_movements_type);
+	cout << endl <<"routable_inbound_outbound_movements_type size = "<<sizeof(MasterType::routable_inbound_outbound_movements_type);
+	cout << endl <<"routable_outbound_inbound_movements_type size = "<<sizeof(MasterType::routable_outbound_inbound_movements_type);
+	cout << endl <<"routable_movement_type size = "<<sizeof(MasterType::routable_movement_type);
+	cout << endl <<"operation_type size = "<<sizeof(MasterType::operation_type);
+	cout << endl <<"intersection_control_type size = "<<sizeof(MasterType::intersection_control_type);
+	cout << endl <<"control_plan_type size = "<<sizeof(MasterType::control_plan_type);
+	cout << endl <<"phase_type size = "<<sizeof(MasterType::phase_type);
+	cout << endl <<"phase_movement_type size = "<<sizeof(MasterType::phase_movement_type);
+	cout << endl <<"approach_type size = "<<sizeof(MasterType::approach_type);
+	cout << endl <<"plan_type size = "<<sizeof(MasterType::plan_type);
+	cout << endl <<"movement_plan_type size = "<<sizeof(MasterType::movement_plan_type);
+	cout << endl <<"movement_plan_record_type size = "<<sizeof(MasterType::movement_plan_record_type);
+	cout << endl <<"trajectory_unit_type size = "<<sizeof(MasterType::trajectory_unit_type);
+	cout << endl <<"network_skim_type size = "<<sizeof(MasterType::network_skim_type);
+	cout << endl <<"demand_type size = "<<sizeof(MasterType::demand_type);
+	cout << endl <<"person_type size = "<<sizeof(MasterType::person_type);
+	cout << endl <<"person_planner_type size = "<<sizeof(MasterType::person_planner_type);
+	cout << endl <<"person_mover_type size = "<<sizeof(MasterType::person_mover_type);
+	cout << endl <<"person_scheduler_type size = "<<sizeof(MasterType::person_scheduler_type);
+	cout << endl <<"person_perception_type size = "<<sizeof(MasterType::person_perception_type);
+	cout << endl <<"activity_generator_type size = "<<sizeof(MasterType::activity_generator_type);
+	cout << endl <<"person_properties_type size = "<<sizeof(MasterType::person_properties_type);
+	cout << endl <<"person_static_properties_type size = "<<sizeof(MasterType::person_static_properties_type);
+	cout << endl <<"person_data_logger_type size = "<<sizeof(MasterType::person_data_logger_type);
+	cout << endl <<"RNG size = "<<sizeof(MasterType::RNG);
+	cout << endl <<"activity_type size = "<<sizeof(MasterType::activity_type);
+	cout << endl <<"activity_plan_type size = "<<sizeof(MasterType::activity_plan_type);
+	cout << endl <<"routine_activity_plan_type size = "<<sizeof(MasterType::routine_activity_plan_type);
+	cout << endl <<"activity_record_type size = "<<sizeof(MasterType::activity_record_type);
+	cout << endl <<"activity_timing_chooser_type size = "<<sizeof(MasterType::activity_timing_chooser_type);
+	cout << endl <<"person_destination_chooser_type size = "<<sizeof(MasterType::person_destination_chooser_type);
+	cout << endl <<"person_destination_choice_option_type size = "<<sizeof(MasterType::person_destination_choice_option_type);
+	cout << endl <<"zone size = "<<sizeof(MasterType::zone);
+	cout << endl <<"region size = "<<sizeof(MasterType::region);
+	cout << endl <<"IPF_Solver_Settings size = "<<sizeof(MasterType::IPF_Solver_Settings);
+	cout << endl <<"popsyn_solver size = "<<sizeof(MasterType::popsyn_solver);
+	cout << endl <<"traffic_management_center_type size = "<<sizeof(MasterType::traffic_management_center_type);
+	cout << endl <<"weather_network_event_type size = "<<sizeof(MasterType::weather_network_event_type);
+	cout << endl <<"accident_network_event_type size = "<<sizeof(MasterType::accident_network_event_type);
+	cout << endl <<"congestion_network_event_type size = "<<sizeof(MasterType::congestion_network_event_type);
+	cout << endl <<"lane_closure_network_event_type size = "<<sizeof(MasterType::lane_closure_network_event_type);
+	cout << endl <<"link_control_type size = "<<sizeof(MasterType::link_control_type);
+	cout << endl <<"depot_type size = "<<sizeof(MasterType::depot_type);
+	cout << endl <<"advisory_radio_type size = "<<sizeof(MasterType::advisory_radio_type);
+	cout << endl <<"variable_word_sign_type size = "<<sizeof(MasterType::variable_word_sign_type);
+	cout << endl <<"variable_speed_sign_type size = "<<sizeof(MasterType::variable_speed_sign_type);
+	cout << endl <<"link_sensor_type size = "<<sizeof(MasterType::link_sensor_type);
+	cout << endl <<"base_network_event_type size = "<<sizeof(MasterType::base_network_event_type);
+	cout << endl <<"network_event_manager_type size = "<<sizeof(MasterType::network_event_manager_type);
+}
