@@ -20,7 +20,7 @@ DataType* Typed_Execution_Pages<DataType>::Allocate()
 
 		if(!type_activated)
 		{
-			execution_root_ptr->Activate_Type((Typed_Execution_Pages<>*)this);
+			execution_root_ptr->Activate_Type((Typed_Execution_Pages<>*)this,world_ptr->run);
 			type_activated=true;
 		}
 

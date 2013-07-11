@@ -32,13 +32,20 @@ public:
 #endif
 	}
 
-	void Activate_Type(Typed_Execution_Pages<>* ptr)
+	void Activate_Type(Typed_Execution_Pages<>* ptr,bool running)
 	{
-		LOCK(active_lock);
+		if(!running)
+		{
+			active_types.push_back(ptr);
+		}
+		else
+		{
+			LOCK(active_lock);
 
-		new_types.push_back(ptr);
+			new_types.push_back(ptr);
 
-		UNLOCK(active_lock);
+			UNLOCK(active_lock);
+		}
 	}
 	
 	///============================================================================
