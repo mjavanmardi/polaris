@@ -100,13 +100,27 @@ public:
 
 			//_sub_iteration=0;
 
-			if( (unsigned int)_iteration >= (_num_iterations-1) )
+			if( (unsigned int)_iteration >= (_num_iterations) )
 			{
 				AtomicDecrement(&run);
 
 				// instruct threads to leave the finished queue (and the simulation)
+#ifdef WITH_WAIT
+				ResetEvent(execution_root_ptr->ex_threads_finished_event);
 				threads_finished_counter=0;
-
+				SetEvent(threads_start_event);
+#elif defined WITH_WAIT_LINUX
+				//ResetEvent(execution_root_ptr->ex_threads_finished_event);
+				threads_finished_counter=0;
+				
+				// must toggle start lock in order to signal properly
+				pthread_mutex_lock(&threads_start_mutex);
+				pthread_cond_broadcast(&threads_start_conditional);
+				pthread_mutex_unlock(&threads_start_mutex);
+#else
+				// instruct threads to leave the finished queue
+				threads_finished_counter=0;
+#endif
 				// let all threads terminate before exiting
 				while(threads_finished_counter!=_num_threads) SLEEP(0);
 
