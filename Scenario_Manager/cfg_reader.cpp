@@ -12,7 +12,7 @@ bool CfgReader::initialize( const char *path )
 	}
 
 	std::string text( (std::istreambuf_iterator<char>(ifs) ),
-                      (std::istreambuf_iterator<char>()    ) );
+					  (std::istreambuf_iterator<char>()    ) );
 
 	
 	Json::Reader reader;

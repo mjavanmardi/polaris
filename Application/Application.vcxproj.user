@@ -10,7 +10,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Integrated|x64'">
-    <LocalDebuggerWorkingDirectory>..\..\Test_Data\Test_Network</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Users\vsokolov\usr\polaris\source\branches\test_run\Chicago_CBD_Model</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>"scenario.json"</LocalDebuggerCommandArguments>
   </PropertyGroup>
