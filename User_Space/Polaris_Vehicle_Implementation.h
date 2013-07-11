@@ -36,6 +36,7 @@ namespace Vehicle_Components
 #else
 			member_component(typename MasterType::traveler_type, traveler, none, none);
 #endif
+			member_prototype(Routing_Components::Prototypes::Routing_Prototype, router, typename MasterType::routing_type, none, none);
 			member_data(float, distance_to_stop_bar, none, none);
 			member_data(float, local_speed, none, none);
 
@@ -201,13 +202,14 @@ namespace Vehicle_Components
 			feature_implementation void enroute_switching()
 			{
 				define_component_interface(_Traveler_Interface, type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
-				define_component_interface(_Routing_Interface, typename _Traveler_Interface::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
+				//define_component_interface(_Routing_Interface, typename _Traveler_Interface::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::routable_network_type> _Routable_Network_Interface;
 				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename _Routable_Network_Interface::get_type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 
-				_Routing_Interface* router = traveler<ComponentType,CallerType,_Traveler_Interface*>()->template router<_Routing_Interface*>();
+				//_Routing_Interface* router = traveler<ComponentType,CallerType,_Traveler_Interface*>()->template router<_Routing_Interface*>();
+				
 
 				define_container_and_value_interface(_Routable_Links_Container_Interface, _Routable_Link_Interface, typename _Regular_Link_Interface::get_type_of(realtime_replicas_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
 				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
@@ -283,22 +285,24 @@ namespace Vehicle_Components
 				}
 
 				///calcualte travel time of the best route
-				router->template routable_origin<_Regular_Link_Interface*>(origin_link);
-				router->template routable_destination<_Regular_Link_Interface*>(destination_link);
+
+				_router->template routable_origin<_Regular_Link_Interface*>(origin_link);
+				_router->template routable_destination<_Regular_Link_Interface*>(destination_link);
 
 				_Routable_Network_Interface* routable_network_ptr;
 				if (use_realtime_travel_time)
 				{
-					routable_network_ptr = router->template realtime_routable_network<_Routable_Network_Interface*>();
+					routable_network_ptr = _router->template realtime_routable_network<_Routable_Network_Interface*>();
 				}
 				else
 				{
-					routable_network_ptr = router->template routable_network<_Routable_Network_Interface*>();
+
+					routable_network_ptr = _router->template routable_network<_Routable_Network_Interface*>();
 				}
 
 				//float routed_travel_time = router->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
 				int best_route_link_sum = 0;
-				float best_route_time_to_destination = router->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
+				float best_route_time_to_destination = _router->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
 
 				///find a new route using shortest path algorithm
 				//if (routed_travel_time >= 0.0)

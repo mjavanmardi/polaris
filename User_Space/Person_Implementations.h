@@ -68,6 +68,7 @@ namespace Person_Components
 
 			// Agent ID
 			member_data(long,uuid,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			member_data(long,internal_id,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 			member_data(bool,has_pretrip_information,check_2(ReturnValueType,bool,is_same), check_2(SetValueType,bool,is_same));
 			member_data(bool,has_done_replanning,check_2(ReturnValueType,bool,is_same), check_2(SetValueType,bool,is_same));
 
@@ -139,6 +140,7 @@ namespace Person_Components
 				_vehicle->template uuid<int>(id);
 				_vehicle->template internal_id<int>(id);
 				_vehicle->template traveler<ComponentType*>(this);
+				_vehicle->template router<router_interface*>(_router);
 				_vehicle->template initialize<NT>();
 				_vehicle->template is_integrated<bool>(true);
 
@@ -146,6 +148,8 @@ namespace Person_Components
 
 				// Add basic traveler properties							
 				this->template uuid<ComponentType,ComponentType,int>(id);
+				this->template internal_id<ComponentType,ComponentType,int>(id);
+
 				
 			}
 			feature_implementation void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref)

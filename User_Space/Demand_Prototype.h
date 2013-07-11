@@ -192,6 +192,7 @@ namespace Demand_Components
 					vehicle->template internal_id<int>(traveler_id_counter);
 					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 					vehicle->template traveler<_Traveler_Interface*>(traveler);
+					vehicle->template router<_Routing_Interface*>(router);
 					vehicle->template initialize<NT>();
 
 
@@ -270,6 +271,7 @@ namespace Demand_Components
 					vehicle->template internal_id<int>(i);
 					vehicle->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
 					vehicle->template traveler<_Traveler_Interface*>(traveler);
+					vehicle->template router<_Routing_Interface*>(router);
 
 					vehicle->template initialize<NT>();
 

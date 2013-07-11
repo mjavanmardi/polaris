@@ -63,6 +63,7 @@ namespace Vehicle_Components
 			feature_accessor(movement_plan, none, none);
 			feature_accessor(vehicle_information, none, none);
 			feature_accessor(traveler, none, none);
+			feature_accessor(router, none, none);
 			feature_accessor(distance_to_stop_bar, none, none);
 			feature_accessor(local_speed, none, none);
 			feature_accessor(is_integrated, none, none);
