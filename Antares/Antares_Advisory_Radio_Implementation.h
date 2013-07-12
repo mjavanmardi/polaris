@@ -28,21 +28,23 @@ namespace Advisory_Radio_Components
 			feature_implementation static void Initialize_Type()
 			{
 				Antares_Advisory_ITS::Initialize_Type<ComponentType,CallerType,NT>();
+
 				Antares_Layer_Configuration cfg;
-				_its_coverage_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(string("HAR Coverage"));
 
-				cfg.Configure_Static_Lines();
-				cfg.grouped=true;
-				cfg.head_size_value=6;
-				cfg.head_accent_size_value=6;
-				cfg.draw=true;
+				//_its_coverage_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(string("HAR Coverage"));
 
-				cfg.head_color._r = 255;
-				cfg.head_color._g = 0;
-				cfg.head_color._b = 0;
-				cfg.head_color._a = 200;
+				//cfg.Configure_Static_Lines();
+				//cfg.grouped=true;
+				//cfg.head_size_value=6;
+				//cfg.head_accent_size_value=6;
+				//cfg.draw=true;
 
-				_its_coverage_layer->Initialize<NULLTYPE>(cfg);
+				//cfg.head_color._r = 255;
+				//cfg.head_color._g = 0;
+				//cfg.head_color._b = 0;
+				//cfg.head_color._a = 200;
+
+				//_its_coverage_layer->Initialize<NULLTYPE>(cfg);
 
 				
 				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(string("Highway Advisory Radios"));

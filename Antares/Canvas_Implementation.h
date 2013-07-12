@@ -26,6 +26,12 @@ public:
 		coordinates._x += _input_offset._x;
 		coordinates._y += _input_offset._y;
 	}
+	
+	feature_implementation void Scale_Coordinates(Point_3D<NT>& coordinates)
+	{
+		coordinates._x += _input_offset._x;
+		coordinates._y += _input_offset._y;
+	}
 
 	feature_implementation int Build_Texture(int width, int height, unsigned char* data);
 	feature_implementation Antares_Layer_Interface* Allocate_New_Layer(string& name);

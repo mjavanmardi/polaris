@@ -131,7 +131,7 @@ template<typename MasterType,typename ParentType,typename InheritanceList>
 template<typename ComponentType,typename CallerType,typename TargetType>
 void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Push_Attributes(vector<pair<string,string>>& attributes)
 {
-	for(int i=0;i<20;i++)
+	for(int i=0;i<30;i++)
 	{
 		_attributes_list->SetItem(i,0,"");
 		_attributes_list->SetItem(i,1,"");
@@ -143,7 +143,7 @@ void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Pus
 
 	for(itr=attributes.begin();itr!=attributes.end();itr++,atts_row_counter++)
 	{
-		if(atts_row_counter == 20) break;
+		if(atts_row_counter == 30) break;
 
 		_attributes_list->SetItem(atts_row_counter,0,itr->first);
 		_attributes_list->SetItem(atts_row_counter,1,itr->second);

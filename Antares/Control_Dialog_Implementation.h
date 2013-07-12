@@ -92,7 +92,11 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 
 		for(vector<pair<string,string>>::iterator itr=attributes.begin();itr!=attributes.end();itr++,atts_row_counter++)
 		{
-			if(atts_row_counter == 30) exit(0);
+			if(atts_row_counter == 30)
+			{
+				cout << "exceeded attribute capacity" << endl;
+				exit(0);
+			}
 
 			_attributes_list->SetItem(atts_row_counter,0,itr->first);
 			_attributes_list->SetItem(atts_row_counter,1,itr->second);

@@ -27,20 +27,21 @@ namespace Variable_Message_Sign_Components
 			{
 				using namespace Advisory_ITS_Components::Implementations;
 				Antares_Layer_Configuration cfg;
-				_its_coverage_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(string("VMS Coverage"));
+				
+				//_its_coverage_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(string("VMS Coverage"));
 
-				cfg.Configure_Static_Lines();
-				cfg.grouped=true;
-				cfg.head_size_value=6;
-				cfg.head_accent_size_value=6;
-				cfg.draw=true;
+				//cfg.Configure_Static_Lines();
+				//cfg.grouped=true;
+				//cfg.head_size_value=6;
+				//cfg.head_accent_size_value=6;
+				//cfg.draw=true;
 
-				cfg.head_color._r = 255;
-				cfg.head_color._g = 0;
-				cfg.head_color._b = 0;
-				cfg.head_color._a = 200;
+				//cfg.head_color._r = 255;
+				//cfg.head_color._g = 0;
+				//cfg.head_color._b = 0;
+				//cfg.head_color._a = 200;
 
-				_its_coverage_layer->Initialize<NULLTYPE>(cfg);
+				//_its_coverage_layer->Initialize<NULLTYPE>(cfg);
 
 
 				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(string("Variable Message Signs"));

@@ -4,6 +4,7 @@
 
 #pragma once
 #include "Antares_Includes.h"
+#include "Antares_Link_Implementation.h"
 
 namespace Advisory_ITS_Components
 {
@@ -21,21 +22,23 @@ namespace Advisory_ITS_Components
 			typedef Link_Prototype<typename type_of(MasterType::link)> Link_Interface;
 			typedef Intersection_Prototype<typename type_of(MasterType::intersection)> Intersection_Interface;
 
-#pragma pack(push,1)
-			struct Link_Line_Segment
-			{
-				Point_3D<MasterType> a;
-				Point_3D<MasterType> b;
-			};
-#pragma pack(pop)
+			typedef Link_Components::Implementations::Link_Line<MasterType> Link_Line;
 
-#pragma pack(push,1)
-			struct Link_Line_Group
-			{
-				int num_primitives;
-				Link_Line_Segment* segments;
-			};
-#pragma pack(pop)
+//#pragma pack(push,1)
+//			struct Link_Line_Segment
+//			{
+//				Point_3D<MasterType> a;
+//				Point_3D<MasterType> b;
+//			};
+//#pragma pack(pop)
+//
+//#pragma pack(push,1)
+//			struct Link_Line_Group
+//			{
+//				int num_primitives;
+//				Link_Line_Segment* segments;
+//			};
+//#pragma pack(pop)
 
 #pragma pack(push,1)
 			struct ITS_Location
@@ -203,7 +206,7 @@ namespace Advisory_ITS_Components
 				if(removed.size())
 				{
 					_its_component_layer->Clear_Accented<NT>();
-					_its_coverage_layer->Clear_Accented<NT>();
+					MasterType::network_type::_link_lines->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -326,13 +329,22 @@ namespace Advisory_ITS_Components
 
 
 
-				Link_Line_Segment* segments = new Link_Line_Segment[ _covered_links.size() ];
-					
-				Link_Line_Group group;
-				group.num_primitives = _covered_links.size();
-				group.segments = segments;
+				//Link_Line_Segment* segments = new Link_Line_Segment[ _covered_links.size() ];
+				
+				Link_Line link_line;
 
-				Link_Line_Segment* current_segment = group.segments;
+				link_line.color._r = 255;
+				link_line.color._g = 50;
+				link_line.color._b = 50;
+				link_line.color._a = 200;
+
+				link_line.data = nullptr;
+
+				//Link_Line_Group group;
+				//group.num_primitives = _covered_links.size();
+				//group.segments = segments;
+
+				//Link_Line_Segment* current_segment = group.segments;
 
 				for(vector<Link_Interface*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 				{
@@ -342,37 +354,37 @@ namespace Advisory_ITS_Components
 					
 					intersection = link->upstream_intersection< Intersection_Interface* >();
 					
-					current_segment->a._x = intersection->x_position<float>();
-					current_segment->a._y = intersection->y_position<float>();
-					current_segment->a._z = 3;
+					link_line.up_node._x = intersection->x_position<float>();
+					link_line.up_node._y = intersection->y_position<float>();
+					link_line.up_node._z = 3;
 
-					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.up_node );
 
 					intersection = link->downstream_intersection< Intersection_Interface* >();
 
-					current_segment->b._x = intersection->x_position<float>();
-					current_segment->b._y = intersection->y_position<float>();
-					current_segment->b._z = 3;
+					link_line.down_node._x = intersection->x_position<float>();
+					link_line.down_node._y = intersection->y_position<float>();
+					link_line.down_node._z = 3;
 
-					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.down_node );
 
-					++current_segment;
+					MasterType::network_type::_link_lines->Push_Element<Accented_Element>(&link_line);
 				}
 				
-				_its_coverage_layer->Push_Element<Accented_Element>(&group);
+				
 
-				delete[] segments;
+				//delete[] segments;
 			}
 
 			static member_prototype(Antares_Layer,its_component_layer,typename type_of(MasterType::antares_layer),none,none);
-			static member_prototype(Antares_Layer,its_coverage_layer,typename type_of(MasterType::antares_layer),none,none);
+			//static member_prototype(Antares_Layer,its_coverage_layer,typename type_of(MasterType::antares_layer),none,none);
 		};
 		
 		template<typename MasterType,typename ParentType,typename InheritanceList,template<class,class,class> class InheritanceTemplate>
 		Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Advisory_ITS<MasterType,ParentType,InheritanceList,InheritanceTemplate>::ComponentType>* Antares_Advisory_ITS<MasterType,ParentType,InheritanceList,InheritanceTemplate>::_its_component_layer;
 		
-		template<typename MasterType,typename ParentType,typename InheritanceList,template<class,class,class> class InheritanceTemplate>
-		Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Advisory_ITS<MasterType,ParentType,InheritanceList,InheritanceTemplate>::ComponentType>* Antares_Advisory_ITS<MasterType,ParentType,InheritanceList,InheritanceTemplate>::_its_coverage_layer;
+		//template<typename MasterType,typename ParentType,typename InheritanceList,template<class,class,class> class InheritanceTemplate>
+		//Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Advisory_ITS<MasterType,ParentType,InheritanceList,InheritanceTemplate>::ComponentType>* Antares_Advisory_ITS<MasterType,ParentType,InheritanceList,InheritanceTemplate>::_its_coverage_layer;
 
 	}
 }

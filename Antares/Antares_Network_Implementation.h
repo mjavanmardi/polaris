@@ -804,8 +804,8 @@ namespace Network_Components
 			}
 			member_data(Rectangle_XY<MasterType>, network_bounds,none,none);
 			
-			member_prototype(Antares_Layer,link_lines,typename type_of(MasterType::antares_layer),none,none);
-			member_prototype(Antares_Layer,intersection_polygons,typename type_of(MasterType::antares_layer),none,none);
+			static member_prototype(Antares_Layer,link_lines,typename type_of(MasterType::antares_layer),none,none);
+			static member_prototype(Antares_Layer,intersection_polygons,typename type_of(MasterType::antares_layer),none,none);
 	
 			define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
@@ -813,6 +813,12 @@ namespace Network_Components
 
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		float Antares_Network_Implementation<MasterType,ParentType,InheritanceList>::_intersection_radius = 50;
+
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Network_Implementation<MasterType,ParentType,InheritanceList>::ComponentType>* Antares_Network_Implementation<MasterType,ParentType,InheritanceList>::_link_lines;
+		
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Network_Implementation<MasterType,ParentType,InheritanceList>::ComponentType>* Antares_Network_Implementation<MasterType,ParentType,InheritanceList>::_intersection_polygons;
 	}
 }
 

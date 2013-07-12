@@ -101,15 +101,19 @@ Antares_Implementation<MasterType,ParentType,InheritanceList>::Antares_Implement
 
 	_control_panel=(control_panel_interface*)new type_of(control_panel)(this);
 	
-	_aui_manager.AddPane((type_of(control_panel)*)_control_panel,wxAuiPaneInfo().Name("Control_Panel").Left().MinSize(300,100).CloseButton(false));
+	_aui_manager.AddPane((type_of(control_panel)*)_control_panel,wxAuiPaneInfo().Name("Control_Panel").Left().MinSize(250,100).CloseButton(false));
+	
 
-	_information_panel=(information_panel_interface*)new type_of(information_panel)(this);
-	
-	_aui_manager.AddPane((type_of(information_panel)*)_information_panel,wxAuiPaneInfo().Name("Information_Panel").Bottom().MinSize(1920-300,300).CloseButton(false));
-	
+
 	_time_panel=(time_panel_interface*)new type_of(time_panel)(this);
 
-	_aui_manager.InsertPane((type_of(time_panel)*)_time_panel,wxAuiPaneInfo().Name("Time_Panel").Bottom().CloseButton(false));
+	_aui_manager.AddPane((type_of(time_panel)*)_time_panel,wxAuiPaneInfo().Name("Time_Panel").Bottom().MinSize(250,300).CloseButton(false).Position(0));
+	
+	_information_panel=(information_panel_interface*)new type_of(information_panel)(this);
+
+	_aui_manager.AddPane((type_of(information_panel)*)_information_panel,wxAuiPaneInfo().Name("Information_Panel").Bottom().MinSize(1920-250,300).CloseButton(false).Position(1));
+	
+
 
 	_attributes_panel=(attributes_panel_interface*)new type_of(attributes_panel)(this);
 	
