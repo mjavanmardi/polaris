@@ -4,7 +4,7 @@
 
 namespace polaris {
 namespace io {
-//rerurns map link_id --> link shape
+//returns map link_id --> link shape
 static std::map<int, LineString2D> GetLinkShapes(const string& db_name)
 {
 	
@@ -166,6 +166,7 @@ void GetMicrosoftEventPoints(sqlite3* db_handle, std::vector<std::vector<double>
 	{
 		pt[0] = it->second.x;
 		pt[1] = it->second.y;
+		//std::cout << pt[0] << ", " << pt[1] << "\n";
 		out_points.push_back(pt);
 	}
 }

@@ -1,8 +1,2 @@
-file(GLOB_RECURSE cppfiles
-	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-	*.cpp)	
-file(GLOB_RECURSE hppfiles
-	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-	*.h)	
-add_executable(its_mockup ${cppfiles} ${hppfiles})
+add_executable(its_mockup its_mockup.cpp component.h instance.h populate_event.h)
 target_link_libraries(its_mockup ${iolibs})	

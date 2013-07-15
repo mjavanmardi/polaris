@@ -4,5 +4,5 @@
 # file(GLOB_RECURSE hppfiles
 	# RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 	# *.h)	
-add_executable(tmc test.cpp Tmc.h DataStructures.h DFS.h WeakCC.h Detector1DU.h Clustering.h)
+add_executable(tmc test.cpp Tmc.h DataStructures.h DFS.h WeakCC.h Detector1DU.h Clustering.h depot.h resampling_wheel.h)
 target_link_libraries(tmc ${iolibs})

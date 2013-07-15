@@ -15,7 +15,61 @@ protected:
 	unique_ptr<odb::database> db;
 };
 
+class DBTestTransactionMember : public testing::Test {
+protected:
+	virtual void SetUp() {
+		db = open_sqlite_database(db_path);
+		t = new odb::transaction(db->begin());
+	}
+	virtual void TearDown()
+	{
+		t->commit();
+		delete t;
+	}
+	void ResetTransaction()
+	{
+		t->commit();
+		t->reset(db->begin());
+	}
+	unique_ptr<odb::database> db;
+	odb::transaction* t;
+};
 
+TEST_F(DBTestTransactionMember, InsertTrip1){
+	shared_ptr<polaris::io::Trip> trip_rec( new polaris::io::Trip() );
+	trip_rec->setConstraint(0);
+	trip_rec->setDestination(15);
+	trip_rec->setDuration(20);
+	trip_rec->setEnd(11);
+	trip_rec->setHhold(11);
+	trip_rec->setMode(0);
+	trip_rec->setOrigin(22);
+	trip_rec->setPartition(0);
+	trip_rec->setPassengers(0);
+	trip_rec->setPurpose(0);
+	trip_rec->setStart(33);
+	trip_rec->setTour(0);
+	this->db->persist(trip_rec);
+	ASSERT_EQ(0, 0);
+}
+TEST_F(DBTestTransactionMember, InsertTrip2){
+	this->ResetTransaction();
+	shared_ptr<polaris::io::Trip> trip_rec( new polaris::io::Trip() );
+	trip_rec->setConstraint(1);
+	trip_rec->setDestination(115);
+	trip_rec->setDuration(120);
+	trip_rec->setEnd(111);
+	trip_rec->setHhold(111);
+	trip_rec->setMode(10);
+	trip_rec->setOrigin(122);
+	trip_rec->setPartition(10);
+	trip_rec->setPassengers(10);
+	trip_rec->setPurpose(10);
+	trip_rec->setStart(133);
+	trip_rec->setTour(10);
+	this->db->persist(trip_rec);
+	ASSERT_EQ(0, 0);
+}
 class SpatiaLiteTest : public testing::Test {
 protected:
 	virtual void SetUp() {
@@ -61,19 +115,19 @@ TEST_F(DBTest, OpenFunction){
 
 
 
-TEST_F(DBTest, LocationFKLocation_Data){
-	typedef odb::query<polaris::io::Location> query;
-	typedef odb::result<polaris::io::Location> result;
-	odb::transaction t(this->db->begin());
-	result r(this->db->query<polaris::io::Location>(query::location_data.is_null()));
-	int count = 0;
-	for (result::iterator i (r.begin()); i!=r.end(); ++i)
-	{
-	  count++;
-	}
-	t.commit();
-	ASSERT_EQ(count, 0);
-}
+//TEST_F(DBTest, LocationFKLocation_Data){
+//	typedef odb::query<polaris::io::Location> query;
+//	typedef odb::result<polaris::io::Location> result;
+//	odb::transaction t(this->db->begin());
+//	result r(this->db->query<polaris::io::Location>(query::location_data.is_null()));
+//	int count = 0;
+//	for (result::iterator i (r.begin()); i!=r.end(); ++i)
+//	{
+//	  count++;
+//	}
+//	t.commit();
+//	ASSERT_EQ(count, 0);
+//}
 
 TEST_F(DBTest, LocationFKZone){
 	typedef odb::query<polaris::io::Location> query;

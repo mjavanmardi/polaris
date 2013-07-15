@@ -63,59 +63,59 @@ int convert_hhmm_to_seconds(string hhmm)
 
 void string_split(std::vector<std::string>& results, const std::string &source, const int fields)
 {
-    results.clear();
-    results.resize(fields);
+	results.clear();
+	results.resize(fields);
 
-    const char* s = source.c_str();
+	const char* s = source.c_str();
 	const char* s2;
-    int count;
-    int pos = 0;
-    while (pos < fields)
-    {
-        count = 0;
-        while(*s != '\0' && (*s == '\t' || *s == ' ' || *s == '\r' || *s == ',')) s++;
-        if (*s == '\0')
-        {
-            break;
-        }
-        s2 = s;
-        while(*s2 != '\0' && *s2 != '\t' && *s2 != ' ' && *s2 != '\r' && *s2 != ',')
-        {
-            s2++;
-            count++;
-        }
-        results[pos].assign(s, count);
-        s = s2;
-        pos++;
-    }
+	int count;
+	int pos = 0;
+	while (pos < fields)
+	{
+		count = 0;
+		while(*s != '\0' && (*s == '\t' || *s == ' ' || *s == '\r' || *s == ',')) s++;
+		if (*s == '\0')
+		{
+			break;
+		}
+		s2 = s;
+		while(*s2 != '\0' && *s2 != '\t' && *s2 != ' ' && *s2 != '\r' && *s2 != ',')
+		{
+			s2++;
+			count++;
+		}
+		results[pos].assign(s, count);
+		s = s2;
+		pos++;
+	}
 };
 
 void string_split(std::vector<std::string>& results, const std::string &source)
 {
-    results.clear();
+	results.clear();
 
-    const char* s = source.c_str();
+	const char* s = source.c_str();
 	const char* s2;
-    int count;
-    while (true)
-    {
-        count = 0;
-        while(*s != '\0' && (*s == '\t' || *s == ' ' || *s == '\r' || *s == ',')) s++;
-        if (*s == '\0')
-        {
-            break;
-        }
-        s2 = s;
-        while(*s2 != '\0' && *s2 != '\t' && *s2 != ' ' && *s2 != '\r' && *s2 != ',')
-        {
-            s2++;
-            count++;
-        }
-        std::string str;
-        str.assign(s, count);
-        results.push_back(str);
-        s = s2;
-    }
+	int count;
+	while (true)
+	{
+		count = 0;
+		while(*s != '\0' && (*s == '\t' || *s == ' ' || *s == '\r' || *s == ',')) s++;
+		if (*s == '\0')
+		{
+			break;
+		}
+		s2 = s;
+		while(*s2 != '\0' && *s2 != '\t' && *s2 != ' ' && *s2 != '\r' && *s2 != ',')
+		{
+			s2++;
+			count++;
+		}
+		std::string str;
+		str.assign(s, count);
+		results.push_back(str);
+		s = s2;
+	}
 };
 
 //convert seconds to hh:mm:ss
@@ -288,9 +288,9 @@ void mem_info(long long& totalPhysicalMemory, long long& physicalMemoryUsedByPro
    long rss;
 
    stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
-               >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
-               >> utime >> stime >> cutime >> cstime >> priority >> nice
-               >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
+			   >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
+			   >> utime >> stime >> cutime >> cstime >> priority >> nice
+			   >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
 
    stat_stream.close();
 
@@ -303,9 +303,9 @@ void mem_info(long long& totalPhysicalMemory, long long& physicalMemoryUsedByPro
 #include "psapi.h"
 void mem_info(long long& totalPhysicalMemory, long long& physicalMemoryUsedByProcess)
 {
-    PROCESS_MEMORY_COUNTERS_EX pmc;
+	PROCESS_MEMORY_COUNTERS_EX pmc;
 	MEMORYSTATUSEX memInfo;
-    if (!GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)))
+	if (!GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)))
 	{
 		physicalMemoryUsedByProcess = -1;
 	}

@@ -34,15 +34,6 @@ int main(int argc, char** argv)
 	//tain_detector(db_prefix, out_link_detectors);
 
 	//cout << "Number of detectors: " << out_link_detectors.size() << "\n";
-	std::vector<std::vector<double> > centers;
-	accident_clustering(db_prefix, 10, centers);
-	for (auto it = centers.begin(); it != centers.end(); ++it)
-	{
-		std::cout << "Center:\t\t";
-		for (auto it1 = it->begin(); it1 != it->end(); ++it1)
-			std::cout << *it1 << "\t\t";
-		std::cout << "\n";
-	}
 
 
 

@@ -6,7 +6,8 @@ else()
 	set(odb_path c:/opt/polarisdeps/odb-2.2.0-i686-windows/bin/odb)
 endif()
 
-file(GLOB headerfiles *.h)
+#file(GLOB headerfiles *.h)
+set(headerfiles ${io_headers} database.h Utils.h)
 
 
 foreach (headerfile ${io_headers})

@@ -47,6 +47,7 @@
 		<field name="dir" type="int"/>
 		<field name="offset" type="float"/>	
 		<field name="setback" type="float"/>	
+		<field name="policy" type="std::string"/>	
 		<field name="links" type="shared_ptr&lt;LinkList&gt;"/>	
 		<field pragma="default(99999)" name="fleet_size" type="int"/>	
 		<field pragma="default(99999)" name="available" type="int"/>	

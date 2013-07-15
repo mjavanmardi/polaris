@@ -1,2 +1,2 @@
-add_executable(msevents main.cpp )
+add_executable(msevents msevents.cpp )
 target_link_libraries(msevents ${iolibs})

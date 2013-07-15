@@ -1790,12 +1790,12 @@ class Depot
 public:
 	// Default Constructor
 	Depot () {}        
-	Depot (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, shared_ptr<LinkList> links_, int fleet_size_, int available_)
-	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), links (links_), fleet_size (fleet_size_), available (available_)
+	Depot (int id_, shared_ptr<Component> component_, int link_, int dir_, float offset_, float setback_, std::string policy_, shared_ptr<LinkList> links_, int fleet_size_, int available_)
+	: id (id_), component (component_), link (link_), dir (dir_), offset (offset_), setback (setback_), policy (policy_), links (links_), fleet_size (fleet_size_), available (available_)
 	{
 	}
-	Depot (int id_, int link_, int dir_, float offset_, float setback_, int fleet_size_, int available_)
-	: id (id_), link (link_), dir (dir_), offset (offset_), setback (setback_), fleet_size (fleet_size_), available (available_)
+	Depot (int id_, int link_, int dir_, float offset_, float setback_, std::string policy_, int fleet_size_, int available_)
+	: id (id_), link (link_), dir (dir_), offset (offset_), setback (setback_), policy (policy_), fleet_size (fleet_size_), available (available_)
 	{
 	}
 	//Accessors
@@ -1811,6 +1811,8 @@ public:
 	void setOffset (const float& offset_) {offset = offset_;}
 	const float& getSetback () const {return setback;}
 	void setSetback (const float& setback_) {setback = setback_;}
+	const std::string& getPolicy () const {return policy;}
+	void setPolicy (const std::string& policy_) {policy = policy_;}
 	const shared_ptr<LinkList> getLinks () const {return links;}
 	void setLinks (const shared_ptr<LinkList> links_) {links = links_;}
 	const int& getFleet_Size () const {return fleet_size;}
@@ -1828,6 +1830,7 @@ private:
 	int dir;
 	float offset;
 	float setback;
+	std::string policy;
 	shared_ptr<LinkList> links;
 	#pragma db default(99999)
 	int fleet_size;

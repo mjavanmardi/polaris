@@ -197,6 +197,8 @@ void tain_detector(const std::string db_prefix, std::unordered_map<polaris::Link
 void accident_clustering(const std::string db_prefix, int k, std::vector<std::vector<double> >& out_centers)
 {
 	vector<double> pt;
+	std::set<std::pair<double, double> > point_set;
+	std::pair<double, double> point_pair;
 	std::vector<std::vector<double> > points;
 	using namespace polaris;
 	unique_ptr<odb::database> db = open_sqlite_database(db_prefix);
@@ -207,12 +209,19 @@ void accident_clustering(const std::string db_prefix, int k, std::vector<std::ve
 		pt.clear();
 		pt.push_back(it->getLng());
 		pt.push_back(it->getLat());
-		points.push_back(pt);
-	}
-	
+		point_pair.first = it->getLng();
+		point_pair.second = it->getLat();
+		auto sit = point_set.find(point_pair);
+		if (sit == point_set.cend())
+		{
+			points.push_back(pt);
+			point_set.insert(point_pair);
+		}
+	}	
 	polaris::KMClustering *kmc = new polaris::KMClustering();
 	kmc->Run(points, k);
 	out_centers = kmc->centers();
+	kmc->PrintCenters();
 	return;
 }
 

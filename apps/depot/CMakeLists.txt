@@ -1,2 +1,2 @@
-add_executable(depot main.cpp)
+add_executable(depot depot.cpp)
 target_link_libraries(depot ${iolibs})
