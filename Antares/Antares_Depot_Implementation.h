@@ -40,7 +40,7 @@ namespace Depot_Components
 				cfg.storage_period=60*5;
 				cfg.selection_callback=&on_select;
 				cfg.double_click_callback=&on_double_click;
-				//cfg.submission_callback=&on_submit;
+				cfg.submission_callback=&on_submit;
 
 				cfg.head_color._r = 50;
 				cfg.head_color._g = 150;
@@ -50,30 +50,86 @@ namespace Depot_Components
 				_its_component_layer->Initialize<NULLTYPE>(cfg);
 			}
 
-			//static bool on_submit(const list<void*>& selected,const vector<string>& attribute_choices,const vector<string>& dropdown_choices)
-			//{
-			//	string user_event_choice = dropdown_choices[0];
-			//	bool update_successful = false;
+			int Compute_Travel_Time(Network_Event< typename type_of(MasterType::base_network_event) >* net_event)
+			{
 
-			//	for(list<void*>::const_iterator sitr=selected.begin();sitr!=selected.end();sitr++)
-			//	{
-			//		ComponentType* its_component=(ComponentType*) (*sitr);
 
-			//		for(vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=its_component->_current_events.begin();itr!=its_component->_current_events.end();itr++)
-			//		{
-			//			if(user_event_choice == (*itr)->notes<string&>())
-			//			{
-			//				its_component->_displayed_events.clear();
-			//				its_component->_displayed_events.push_back( *itr );
 
-			//				update_successful = true;
-			//			}
-			//		}
-			//	}
+				vector<Link_Interface*>& event_links = net_event->affected_links< vector<Link_Interface*>& >();
 
-			//	if(update_successful) return true;
-			//	else return false;
-			//}
+				if(event_links.size())
+				{
+					Intersection_Interface* upstream_intersection = _truck_location->upstream_intersection<Intersection_Interface*>();
+					Intersection_Interface* downstream_intersection = _truck_location->downstream_intersection<Intersection_Interface*>();
+							
+					float truck_x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
+					float truck_y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
+
+
+					upstream_intersection = event_links[0]->upstream_intersection<Intersection_Interface*>();
+					downstream_intersection = event_links[0]->downstream_intersection<Intersection_Interface*>();
+
+					float event_x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
+					float event_y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
+
+
+					float distance = sqrt((truck_x - event_x)*(truck_x - event_x) + (truck_y - event_y)*(truck_y - event_y));
+
+					int time = (int)(distance / 22.0f);
+
+					return time;
+				}
+				else
+				{
+					return 0;
+				}
+
+			}
+
+			static bool on_submit(const list<void*>& selected,const vector<string>& attribute_choices,const vector<string>& dropdown_choices)
+			{
+				string user_event_choice = dropdown_choices[0];
+				bool update_successful = false;
+
+				//for(list<void*>::const_iterator sitr=selected.begin();sitr!=selected.end();sitr++)
+				//{
+				//	ComponentType* its_component=(ComponentType*) (*sitr);
+					
+					ComponentType* its_component=(ComponentType*)selected.back();
+
+					vector< Network_Event< typename type_of(MasterType::base_network_event) >* >& current_events = its_component->_associated_depot->current_events< vector< Network_Event< typename type_of(MasterType::base_network_event) >* >& >();
+
+					for(vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=current_events.begin();itr!=current_events.end();itr++)
+					{
+						if(user_event_choice == (*itr)->notes<string&>())
+						{
+							Network_Event< typename type_of(MasterType::base_network_event) >* net_event = *itr;
+
+							
+							
+							int travel_time = its_component->Compute_Travel_Time( net_event );
+
+							const int towing_time = 20*60;
+
+
+
+							int end_time = net_event->end_time<int>();
+
+							end_time = min(end_time,_iteration + travel_time + towing_time);
+
+							net_event->end_time<int>(end_time);
+
+							//its_component->_displayed_events.clear();
+							//its_component->_displayed_events.push_back( *itr );
+
+							update_successful = true;
+						}
+					}
+				//}
+
+				if(update_successful) return true;
+				else return false;
+			}
 
 			static void on_double_click(const list<void*>& selected,vector<pair<string,string>>& attributes,vector<vector<string>>& dropdowns)
 			{

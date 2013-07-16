@@ -166,10 +166,10 @@ namespace Network_Event_Components
 									 zone_set.insert(loc->template zone<Zone_Interface*>());
 								}
 
+							}
 						}
 					}
 				}
-			}
 			
 				// create the affected zones list
 				for (typename unordered_set<Zone_Interface*>::iterator zitr = zone_set.begin(); zitr != zone_set.end(); ++zitr)
@@ -196,15 +196,20 @@ namespace Network_Event_Components
 			declare_feature_conditional_implementation(Incident_Conditional)
 			{
 				ComponentType* pthis = (ComponentType*)_this;
-
-				if(_iteration >= pthis->_end_time)
+				
+				if( _iteration >= pthis->_end_time )
 				{
 					response.next._iteration = END;
 					response.next._sub_iteration = 0;
 				}
+				else if(_iteration < pthis->_start_time)
+				{
+					response.next._iteration = pthis->_start_time;
+					response.next._sub_iteration = 0;
+				}
 				else
 				{
-					response.next._iteration = pthis->_end_time;
+					response.next._iteration = _iteration + 1;
 					response.next._sub_iteration = 0;
 				}
 
@@ -230,29 +235,15 @@ namespace Network_Event_Components
 			{
 				ComponentType* pthis = (ComponentType*)_this;
 
-				if(_iteration == pthis->_start_time)
+				if(_iteration >= pthis->_start_time && _iteration < pthis->_end_time)
 				{
 					pthis->_active = true;
 					pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
 				}
-				else if(_iteration == pthis->_end_time)
+				else
 				{
 					pthis->_active = false;
-					pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
 				}
-
-				//if( _iteration >= pthis->_end_time || _iteration < pthis->_start_time )
-				//{
-				//	pthis->_active = false;
-
-				//	pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
-				//}
-				//else
-				//{
-				//	pthis->_active = true;
-
-				//	pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
-				//}
 			}
 
 			member_data(vector<Link_Interface*>,affected_links,none,none);

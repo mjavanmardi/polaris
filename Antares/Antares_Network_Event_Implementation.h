@@ -159,28 +159,28 @@ namespace Network_Event_Components
 				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Base_Antares_Network_Event)>::Initialize<ComponentType,ComponentType,MasterType::link_type*>(start_time,end_time,affected_links);
 			}
 			
-			declare_feature_conditional_implementation(Incident_Conditional)
-			{
-				ComponentType* pthis = (ComponentType*)_this;
-				
-				if( _iteration >= pthis->_end_time )
-				{
-					response.next._iteration = END;
-					response.next._sub_iteration = 0;
-				}
-				else if(_iteration < pthis->_start_time)
-				{
-					response.next._iteration = pthis->_start_time;
-					response.next._sub_iteration = 0;
-				}
-				else
-				{
-					response.next._iteration = _iteration + 1;
-					response.next._sub_iteration = 0;
-				}
+			//declare_feature_conditional_implementation(Incident_Conditional)
+			//{
+			//	ComponentType* pthis = (ComponentType*)_this;
+			//	
+			//	if( _iteration >= pthis->_end_time )
+			//	{
+			//		response.next._iteration = END;
+			//		response.next._sub_iteration = 0;
+			//	}
+			//	else if(_iteration < pthis->_start_time)
+			//	{
+			//		response.next._iteration = pthis->_start_time;
+			//		response.next._sub_iteration = 0;
+			//	}
+			//	else
+			//	{
+			//		response.next._iteration = _iteration + 1;
+			//		response.next._sub_iteration = 0;
+			//	}
 
-				response.result = true;
-			}
+			//	response.result = true;
+			//}
 
 			declare_feature_event_implementation(Incident_Event)
 			{
