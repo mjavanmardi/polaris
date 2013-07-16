@@ -310,5 +310,8 @@
     <ClInclude Include="Detector_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="..\tmc\depot.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

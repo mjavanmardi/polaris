@@ -20,93 +20,136 @@ namespace Depot_Components
 	
 	namespace Implementations
 	{
-		template<typename MasterType,typename ParentType=NULLTYPE,typename InheritanceList=NULLTYPELIST,template<class,class,class> class InheritanceTemplate=NULLTEMPLATE_3>
-		struct Antares_Depot : public InheritanceTemplate<MasterType,ParentType,APPEND_CHILD(Antares_Depot)>
+		implementation struct Antares_Tow_Truck_Depot : public Tow_Truck_Depot<MasterType,NT,APPEND_CHILD(Antares_Tow_Truck_Depot)>
 		{
-			typedef typename InheritanceTemplate<MasterType,NT,APPEND_CHILD(Antares_Depot)>::ComponentType ComponentType;
+			typedef typename Tow_Truck_Depot<MasterType,NT,APPEND_CHILD(Antares_Tow_Truck_Depot)>::ComponentType ComponentType;
+			
+			typedef Link_Components::Implementations::Link_Line<MasterType> Link_Line;
+			typedef Intersection_Prototype<typename type_of(MasterType::intersection)> Intersection_Interface;
 
 #pragma pack(push,1)
-			struct Link_Line_Segment
-			{
-				Point_3D<MasterType> a;
-				Point_3D<MasterType> b;
-			};
-#pragma pack(pop)
-
-#pragma pack(push,1)
-			struct Link_Line_Group
+			struct ITS_Location
 			{
 				void* object;
-				int num_primitives;
-				Link_Line_Segment* segments;
+				Point_3D<MasterType> position;
 			};
 #pragma pack(pop)
 
-			feature_implementation static void Initialize_Type(string& name)
+#pragma pack(push,1)
+			struct Truck_Location
 			{
-				//InheritanceTemplate<MasterType,NT,APPEND_CHILD(Antares_Depot)>::Initialize_Type<ComponentType,CallerType,NT>();
+				Point_3D<MasterType> position;
+			};
+#pragma pack(pop)
 
-				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(name);
+			template<typename ComponentType,typename CallerType,typename TargetType>
+			static void Depot_Condition(void* _this,Conditional_Response& response)
+			{
+				Tow_Truck_Depot<MasterType,NT,APPEND_CHILD(Antares_Tow_Truck_Depot)>::Depot_Condition<ComponentType,CallerType,TargetType>(_this,response);
+
+				response.next._iteration = _iteration + 60*5;
+				response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
+
+				response.result = true;
+
+				//Swap_Event(&Depot_Event<ComponentType,CallerType,TargetType>);
+			}
+			
+			template<typename ComponentType,typename CallerType,typename TargetType>
+			static void Depot_Event(void* _this)
+			{
+				ComponentType* pthis = (ComponentType*)_this;
+
+				const vector<polaris::LinkID>& truck_locations = pthis->_depot_service->getTruckLinks(_iteration);
+
+				Truck_Location truck_location;
+				//truck_location.object = nullptr;
+				
+				unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+
+				for(vector<polaris::LinkID>::const_iterator itr = truck_locations.begin();itr!=truck_locations.end();itr++)
+				{
+					//cout << "Truck at: " << (*itr) << endl;
+
+					if(db_map.count((*itr)))
+					{
+						Link_Interface* link = (Link_Interface*)db_map[(*itr)][0];
+
+						Intersection_Interface* upstream_intersection = link->upstream_intersection<Intersection_Interface*>();
+						Intersection_Interface* downstream_intersection = link->downstream_intersection<Intersection_Interface*>();
+					
+						truck_location.position._x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
+						truck_location.position._y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
+					
+						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( truck_location.position );
+
+						_depot_trucks_layer->Push_Element<Regular_Element>(&truck_location);
+					}
+				}
+			}
+
+			feature_implementation static void Initialize_Type()
+			{
+				Tow_Truck_Depot<MasterType,NT,APPEND_CHILD(Antares_Tow_Truck_Depot)>::Initialize_Type<ComponentType,CallerType,NT>();
 
 				Antares_Layer_Configuration cfg;
-				cfg.Configure_Static_Lines();
-				cfg.grouped=true;
-				cfg.head_size_value=4;
-				cfg.head_accent_size_value=6;
+
+				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(string("Tow Truck Depot"));
+
+				cfg.Configure_Static_Points();
+				cfg.head_texture = cfg.Add_Texture(string("HAR.png"));
+				cfg.grouped=false;
+				cfg.head_size_value=32;
+				cfg.head_accent_size_value=64;
 				cfg.selection_callback=&on_select;
 
-				cfg.head_color._r = 0;
-				cfg.head_color._g = 0;
+				cfg.head_color._r = 255;
+				cfg.head_color._g = 255;
 				cfg.head_color._b = 255;
 				cfg.head_color._a = 255;
-
+				
 				_its_component_layer->Initialize<NULLTYPE>(cfg);
+
+
+
+				_depot_trucks_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer),ComponentType>*, string& > >(string("Tow Truck Locations"));
+
+				cfg.Configure_Dynamic_Points();
+				cfg.head_texture = cfg.Add_Texture(string("Tow_Truck.png"));
+				cfg.grouped=false;
+				cfg.head_size_value=16;
+				cfg.head_accent_size_value=32;
+				cfg.target_sub_iteration=0;
+				cfg.storage_offset=((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1;
+				cfg.storage_period=60*5;
+				cfg.selection_callback=nullptr;
+
+				cfg.head_color._r = 50;
+				cfg.head_color._g = 150;
+				cfg.head_color._b = 225;
+				cfg.head_color._a = 255;
+				
+				_depot_trucks_layer->Initialize<NULLTYPE>(cfg);
 			}
 
 			feature_implementation void Initialize(TargetType configuration)
 			{
-				InheritanceTemplate<MasterType,NT,APPEND_CHILD(Antares_Depot)>::Initialize<ComponentType,CallerType,TargetType>(configuration);
+				Tow_Truck_Depot<MasterType,NT,APPEND_CHILD(Antares_Tow_Truck_Depot)>::Initialize<ComponentType,CallerType,TargetType>(configuration);
 
-				if(_covered_links.size())
-				{
-					Link_Line_Segment* segments = new Link_Line_Segment[ _covered_links.size() ];
-					
-					Link_Line_Group group;
-					group.num_primitives = _covered_links.size();
-					group.segments = segments;
-					group.object = (void*)((ComponentType*)this);
+				ITS_Location its_location;
 
-					Link_Line_Segment* current_segment = group.segments;
+				its_location.object = (void*)((ComponentType*)this);
 
-					for(vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
-					{
-						Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
-					
-						Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
-						
-						intersection = link->upstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
-						
-						current_segment->a._x = intersection->x_position<float>();
-						current_segment->a._y = intersection->y_position<float>();
-						current_segment->a._z = 3;
-
-						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
-
-						intersection = link->downstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
-
-						current_segment->b._x = intersection->x_position<float>();
-						current_segment->b._y = intersection->y_position<float>();
-						current_segment->b._z = 3;
-
-						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
-
-						++current_segment;
-					}
+				Intersection_Interface* upstream_intersection = _resident_link->upstream_intersection<Intersection_Interface*>();
+				Intersection_Interface* downstream_intersection = _resident_link->downstream_intersection<Intersection_Interface*>();
 				
-					_its_component_layer->Push_Element<Regular_Element>(&group);
+				its_location.position._x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
+				its_location.position._y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
+				its_location.position._z = 5;
+				
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
 
-					delete[] segments;
-				}
+				_its_component_layer->Push_Element<Regular_Element>(&its_location);
 			}
 
 			
@@ -115,6 +158,7 @@ namespace Depot_Components
 				if(removed.size())
 				{
 					_its_component_layer->Clear_Accented<NT>();
+					MasterType::network_type::_link_lines->Clear_Accented<NT>();
 
 					if(selected.size())
 					{
@@ -135,56 +179,66 @@ namespace Depot_Components
 
 			feature_implementation void Accent_Self()
 			{
-				Link_Line_Segment* segments = new Link_Line_Segment[ _covered_links.size() ];
+
+				ITS_Location its_location;
+
+				its_location.object = (void*)((ComponentType*)this);
+
+				Intersection_Interface* upstream_intersection = _resident_link->upstream_intersection<Intersection_Interface*>();
+				Intersection_Interface* downstream_intersection = _resident_link->downstream_intersection<Intersection_Interface*>();
 				
-				Link_Line_Group group;
-				group.num_primitives = _covered_links.size();
-				group.segments = segments;
+				its_location.position._x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
+				its_location.position._y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
+					
+				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
 
-				Link_Line_Segment* current_segment = group.segments;
+				_its_component_layer->Push_Element<Accented_Element>(&its_location);
 
-				for(vector<Link_Prototype<typename type_of(MasterType::link),ComponentType>*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
+
+				Link_Line link_line;
+
+				link_line.color._r = 255;
+				link_line.color._g = 50;
+				link_line.color._b = 50;
+				link_line.color._a = 200;
+
+				link_line.data = nullptr;
+
+				for(vector<Link_Interface*>::iterator itr = _covered_links.begin(); itr != _covered_links.end(); itr++)
 				{
-					Link_Prototype<typename type_of(MasterType::link),ComponentType>* link = (Link_Prototype<typename type_of(MasterType::link),ComponentType>*)(*itr);
+					Link_Interface* link = (*itr);
 					
-					Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* intersection;
+					Intersection_Interface* intersection;
 					
-					intersection = link->upstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+					intersection = link->upstream_intersection< Intersection_Interface* >();
 					
-					current_segment->a._x = intersection->x_position<float>();
-					current_segment->a._y = intersection->y_position<float>();
-					current_segment->a._z = 3;
+					link_line.up_node._x = intersection->x_position<float>();
+					link_line.up_node._y = intersection->y_position<float>();
+					link_line.up_node._z = 3;
 
-					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.up_node );
 
-					intersection = link->downstream_intersection< Intersection_Prototype<typename type_of(MasterType::intersection),ComponentType>* >();
+					intersection = link->downstream_intersection< Intersection_Interface* >();
 
-					current_segment->b._x = intersection->x_position<float>();
-					current_segment->b._y = intersection->y_position<float>();
-					current_segment->b._z = 3;
+					link_line.down_node._x = intersection->x_position<float>();
+					link_line.down_node._y = intersection->y_position<float>();
+					link_line.down_node._z = 3;
 
-					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.down_node );
 
-					++current_segment;
+					MasterType::network_type::_link_lines->Push_Element<Accented_Element>(&link_line);
 				}
-				
-				_its_component_layer->Push_Element<Accented_Element>(&group);
-
-				delete[] segments;
 			}
 
 			static member_prototype(Antares_Layer,its_component_layer,typename type_of(MasterType::antares_layer),none,none);
+			static member_prototype(Antares_Layer,depot_trucks_layer,typename type_of(MasterType::antares_layer),none,none);
 		};
 		
-		template<typename MasterType,typename ParentType,typename InheritanceList,template<class,class,class> class InheritanceTemplate>
-		Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Depot<MasterType,ParentType,InheritanceList,InheritanceTemplate>::ComponentType>* Antares_Depot<MasterType,ParentType,InheritanceList,InheritanceTemplate>::_its_component_layer;
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Tow_Truck_Depot<MasterType,ParentType,InheritanceList>::ComponentType>* Antares_Tow_Truck_Depot<MasterType,ParentType,InheritanceList>::_its_component_layer;
 
-		implementation struct Antares_Tow_Truck_Depot : public Antares_Depot<MasterType,NT,APPEND_CHILD(Antares_Tow_Truck_Depot),Tow_Truck_Depot>
-		{
-			feature_implementation static void Initialize_Type()
-			{
-				Antares_Depot::Initialize_Type<ComponentType,CallerType,NT>(string("Tow Truck Depots"));
-			}
-		};
+		template<typename MasterType,typename ParentType,typename InheritanceList>
+		Antares_Layer<typename type_of(MasterType::antares_layer),typename Antares_Tow_Truck_Depot<MasterType,ParentType,InheritanceList>::ComponentType>* Antares_Tow_Truck_Depot<MasterType,ParentType,InheritanceList>::_depot_trucks_layer;
+
 	}
 }

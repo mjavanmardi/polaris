@@ -627,6 +627,7 @@
     <ClCompile Include="User_Space.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\tmc\depot.h" />
     <ClInclude Include="Activity_Generator_Implementations.h" />
     <ClInclude Include="Activity_Implementations.h" />
     <ClInclude Include="Activity_Location_Prototype.h" />

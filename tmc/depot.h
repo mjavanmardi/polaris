@@ -9,17 +9,17 @@ class Depot
 public:
 	Depot (){}
 	// initialize an object using a record from Depot table in database
-	Depot (shared_ptr<io::Depot> depot_)
+	Depot (polaris::io::Depot& instance)
 	{
-		links_covered_ = depot_->getLinks()->getLinks();
-		if (depot_->getPolicy() == "depot")
+		links_covered_ = instance.getLinks()->getLinks();
+		if (instance.getPolicy() == "depot")
 			policy_ = depot;
-		if (depot_->getPolicy() == "enroute")
+		if (instance.getPolicy() == "enroute")
 			policy_ = enroute;
-		if (depot_->getPolicy() == "fixed_location")
+		if (instance.getPolicy() == "fixed_location")
 			policy_ = fixed_location;
-		depot_link_ = depot_->getLink()*2 + depot_->getDir();
-		fleet_size_ = depot_->getFleet_Size();
+		depot_link_ = instance.getLink()*2 + instance.getDir();
+		fleet_size_ = instance.getFleet_Size();
 		CalculateLinkPresenseFactor();
 	}
 	// this will run the calculations and will return the locations of the trucks at a given time step

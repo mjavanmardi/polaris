@@ -59,9 +59,9 @@ namespace Advisory_Radio_Components
 				cfg.double_click_callback=&on_double_click;
 				cfg.submission_callback=&on_submit;
 
-				cfg.head_color._r = 150;
+				cfg.head_color._r = 255;
 				cfg.head_color._g = 255;
-				cfg.head_color._b = 150;
+				cfg.head_color._b = 255;
 				cfg.head_color._a = 255;
 
 				_its_component_layer->Initialize<NULLTYPE>(cfg);
