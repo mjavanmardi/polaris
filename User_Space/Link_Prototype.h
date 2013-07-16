@@ -90,6 +90,7 @@ namespace Link_Components
 			//------------------------------------------------------------------------------------------------------------------
 			feature_accessor(detector, none, none);
 			feature_accessor(lane_groups, none, none);
+			feature_accessor(ramp_meter, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
@@ -163,6 +164,7 @@ namespace Link_Components
 			feature_accessor(jam_density, none, none);
 			feature_accessor(critical_density, none, none);
 			feature_accessor(link_num_vehicles_in_queue, none, none);
+			feature_accessor(num_vehicles_on_link, none, none);
 			feature_accessor(original_free_flow_speed, none, none);
 			feature_accessor(original_maximum_flow_rate, none, none);
 			feature_accessor(original_num_lanes, none, none);

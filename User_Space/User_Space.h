@@ -15,6 +15,7 @@ void* _global_person_logger;
 #include "Polaris_Activity_Location_Implementation.h"
 #include "Polaris_Traveler_Implementation.h"
 #include "Polaris_Intersection_Control_Implementation.h"
+#include "Polaris_Ramp_Metering_Implementation.h"
 
 
 //#include "Polaris_Operation_Implementation.h"

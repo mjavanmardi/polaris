@@ -994,6 +994,14 @@ namespace Link_Components
 				{
 				case Link_Components::Types::Link_Type_Keys::FREEWAY:
 				case Link_Components::Types::Link_Type_Keys::ON_RAMP:
+					if (_ramp_meter != nullptr)
+					{
+						color._r = 0;
+						color._g = 130;
+						color._b = 190;
+						color._a = 255;
+						return color;
+					}
 				case Link_Components::Types::Link_Type_Keys::OFF_RAMP:
 				case Link_Components::Types::Link_Type_Keys::EXPRESSWAY:
 					color._r = 0;

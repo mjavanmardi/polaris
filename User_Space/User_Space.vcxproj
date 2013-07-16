@@ -627,7 +627,6 @@
     <ClCompile Include="User_Space.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\tmc\depot.h" />
     <ClInclude Include="Activity_Generator_Implementations.h" />
     <ClInclude Include="Activity_Implementations.h" />
     <ClInclude Include="Activity_Location_Prototype.h" />
@@ -689,9 +688,11 @@
     <ClInclude Include="Polaris_Network_Skimming_Implementation.h" />
     <ClInclude Include="Polaris_Operation_Implementation.h" />
     <ClInclude Include="Polaris_Plan_Implementation.h" />
+    <ClInclude Include="Polaris_Ramp_Metering_Implementation.h" />
     <ClInclude Include="Polaris_Routing_Implementation.h" />
     <ClInclude Include="Polaris_Scenario_Implementation.h" />
     <ClInclude Include="Polaris_Sensor_Implementation.h" />
+    <ClInclude Include="Ramp_Metering_Prototype.h" />
     <ClInclude Include="Traffic_Management_Center_Implementation.h" />
     <ClInclude Include="Polaris_Traveler_Implementation.h" />
     <ClInclude Include="Polaris_Turn_Movement_Implementation.h" />

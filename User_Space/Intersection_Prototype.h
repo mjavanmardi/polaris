@@ -66,6 +66,25 @@ namespace Intersection_Components
 			feature_accessor(inbound_link_reference, none, none);
 			feature_accessor(lane_groups, none, none);
 			feature_accessor(outbound_movements, none, none);
+
+			feature_prototype void update_state()
+			{
+				define_component_interface(_Link_Interface, typename get_type_of(inbound_link_reference), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Outbound_Movements_Container_Interface, _Movement_Interface, typename get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename _Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+
+				_Link_Interface* inbound_link = inbound_link_reference<_Link_Interface*>();
+
+				int num_vehicles_on_link = 0;
+				_Outbound_Movements_Container_Interface& outbound_movements_container = outbound_movements<_Outbound_Movements_Container_Interface&>();
+				typename _Outbound_Movements_Container_Interface::iterator outbound_movement_itr;
+				for (outbound_movement_itr=outbound_movements_container.begin();outbound_movement_itr!=outbound_movements_container.end();outbound_movement_itr++)
+				{
+					_Movement_Interface* outbound_movement = (_Movement_Interface*)(*outbound_movement_itr);
+					num_vehicles_on_link += int(outbound_movement->template vehicles_container<_Vehicles_Container_Interface&>().size());
+				}
+				inbound_link->template num_vehicles_on_link<int>(num_vehicles_on_link);
+			}
 		};
 
 		prototype struct Intersection_Prototype
@@ -163,12 +182,19 @@ namespace Intersection_Components
 			feature_prototype void network_state_update()
 			{
 				define_container_and_value_interface(_Outbound_Inbound_Movements_Container_Interface, _Outbound_Inbound_Movements_Interface, typename get_type_of(outbound_inbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Outbound_Inbound_Movements_Prototype, ComponentType);
+				define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, typename get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
 
 				_Outbound_Inbound_Movements_Container_Interface& outbound_links_container=outbound_inbound_movements<_Outbound_Inbound_Movements_Container_Interface&>();
 				typename _Outbound_Inbound_Movements_Container_Interface::iterator outbound_itr;
 				for (outbound_itr=outbound_links_container.begin(); outbound_itr!=outbound_links_container.end(); outbound_itr++)
 				{
 					((_Outbound_Inbound_Movements_Interface*)(*outbound_itr))->template update_state<NULLTYPE>();
+				}
+				_Inbound_Outbound_Movements_Container_Interface& inbound_links_container=inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>();
+				typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_itr;
+				for (inbound_itr=inbound_links_container.begin(); inbound_itr!=inbound_links_container.end(); inbound_itr++)
+				{
+					((_Inbound_Outbound_Movements_Interface*)(*inbound_itr))->template update_state<NULLTYPE>();
 				}
 			}
 			

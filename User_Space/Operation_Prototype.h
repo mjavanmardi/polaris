@@ -149,6 +149,74 @@ namespace Operation_Components
 
 			feature_prototype void read_operation_data(typename TargetType::ParamType& network_mapping,requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
 			{
+				read_intersection_control_data(network_mapping);
+				read_ramp_metering_data(network_mapping);
+			}
+
+			feature_prototype void read_ramp_metering_data(typename TargetType::ParamType& network_mapping,requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
+			{
+				define_component_interface(_Network_Interface, typename get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
+				define_container_and_value_interface(_Ramp_Metering_Container_Interface, _Ramp_Metering_Interface, typename _Network_Interface::get_type_of(ramp_metering_container), Random_Access_Sequence_Prototype, Ramp_Metering_Components::Prototypes::Ramp_Metering_Prototype, ComponentType);
+				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename _Network_Interface::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_container_and_value_interface(_Turn_Movements_Container_Interface, _Turn_Movement_Interface, typename _Link_Interface::get_type_of(outbound_turn_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+
+				_Links_Container_Interface& links = ((_Network_Interface*)_global_network)->template links_container<_Links_Container_Interface&>();
+				_Link_Interface* link;
+				int ramp_metering_counter = 0;
+				typename _Links_Container_Interface::iterator link_itr;
+				for (link_itr = links.begin(); link_itr != links.end(); link_itr++)
+				{
+					link = (_Link_Interface*)(*link_itr);
+					if (link->template link_type<int>() == Link_Components::Types::ON_RAMP)
+					{
+						_Turn_Movements_Container_Interface& outbound_movements = link->template outbound_turn_movements<_Turn_Movements_Container_Interface&>();
+						if (outbound_movements.size() == 1)
+						{
+							_Link_Interface* outbound_link = ((_Turn_Movement_Interface*)outbound_movements[0])->template outbound_link<_Link_Interface*>();
+							if (outbound_link->template link_type<int>() == Link_Components::Types::FREEWAY || outbound_link->template link_type<int>() == Link_Components::Types::EXPRESSWAY)
+							{
+								_Turn_Movements_Container_Interface& inbound_movements = link->template inbound_turn_movements<_Turn_Movements_Container_Interface&>();
+								if (inbound_movements.size() >= 1)
+								{
+									_Link_Interface* inbound_link = inbound_movements[0]->template inbound_link<_Link_Interface*>();
+									if (inbound_link->template link_type<int>() == Link_Components::Types::ARTERIAL)
+									{
+										_Ramp_Metering_Interface* ramp_metering = (_Ramp_Metering_Interface*)Allocate<typename _Ramp_Metering_Interface::Component_Type>();
+
+										///
+
+										ramp_metering->template internal_id<int>(ramp_metering_counter++);
+				
+										ramp_metering->template on_ramp_link<_Link_Interface*>(link);
+										ramp_metering->template downstream_freeway_link<_Link_Interface*>(outbound_link);
+
+										float link_length = outbound_link->template length<float>();
+										ramp_metering->template downstream_freeway_detector_length<float>(link_length);
+										ramp_metering->template position_first_detector_on_freeway<float>(0.0f);
+										ramp_metering->template position_second_detector_on_freeway<float>(link_length);
+
+										ramp_metering->template starting_time<int>(0.0);
+										ramp_metering->template ending_time<int>(24*60*60);
+										ramp_metering->template metering_updating_interval_length<int>(6*10);
+
+										float alpha = 70.0f / float(link->template num_lanes<int>());
+										ramp_metering->template alpha<float>(alpha);
+										ramp_metering->template beta<float>(0.2f);
+										ramp_metering->template downstream_freeway_link_occupancy<float>(0.0f);
+										((_Network_Interface*)_global_network)->template ramp_metering_container<_Ramp_Metering_Container_Interface&>().push_back(ramp_metering);
+										link->template ramp_meter<_Ramp_Metering_Interface*>(ramp_metering);
+										if (ramp_metering_counter % 10 == 0)
+											cout << "number of ramp meters = " << ramp_metering_counter << endl;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			feature_prototype void read_intersection_control_data(typename TargetType::ParamType& network_mapping,requires(check_2(typename TargetType::NetIOType,Network_Components::Types::ODB_Network,is_same)))
+			{
 				Network_Components::Types::Network_IO_Maps& net_io_maps=(Network_Components::Types::Network_IO_Maps&)network_mapping;
 
 				define_component_interface(_Network_Interface, typename get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
@@ -635,6 +703,7 @@ namespace Operation_Components
 					}
 				}
 			}
+
 
 			feature_prototype void write_operation_data(network_models::network_information::network_data_information::NetworkData& network_data, network_models::network_information::operation_data_information::OperationData& operation_data)
 			{

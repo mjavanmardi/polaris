@@ -120,7 +120,7 @@ namespace Network_Components
 				const float link_length = 5280.0; // in foot
 				const float speed_limit = 60.0; // in miles per hour
 				const float speed_limit_ramp = 30.0; 
-				const float maximum_flow_rate = 2200.0; // in vehicles per hour per lane
+				float maximum_flow_rate = 2200.0; // in vehicles per hour per lane
 				const float maximum_flow_rate_ramp = 600.0; // 
 				const float maximum_flow_rate_arterial = 900;
 				const float jam_density = 220.0; // in vehiles per mile per lane
@@ -130,6 +130,7 @@ namespace Network_Components
 				_network_reference->template max_free_flow_speed<float>(-1);
 				define_container_and_value_interface(_Intersections_Container_Interface, _Intersection_Interface, typename type_of(network_reference)::get_type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
 				define_container_and_value_interface(_Links_Container_Interface, _Link_Interface, typename type_of(network_reference)::get_type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+				define_component_interface(_Ramp_Metering_Interface, typename _Link_Interface::get_type_of(ramp_meter), Ramp_Metering_Components::Prototypes::Ramp_Metering_Prototype, ComponentType);
 				_Links_Container_Interface* links_container_ptr=_network_reference->template links_container<_Links_Container_Interface*>();
 				typename type_of(network_reference)::type_of(links_container)& links_container_monitor=(typename type_of(network_reference)::type_of(links_container)&)(*links_container_ptr);				
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
@@ -255,12 +256,14 @@ namespace Network_Components
 						}
 
 						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()));
+						maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ab()) / link->num_lanes<float>());
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
 						link->template original_free_flow_speed<float>(link->template free_flow_speed<float>());
 						link->template original_maximum_flow_rate<float>(maximum_flow_rate);
 						link->template original_num_lanes<int>(link->template num_lanes<int>());
+						link->template ramp_meter<_Ramp_Metering_Interface*>(nullptr);
 
 						_network_reference->template max_free_flow_speed<float>(max(_network_reference->template max_free_flow_speed<float>(),link->template free_flow_speed<float>()));
 
@@ -359,12 +362,14 @@ namespace Network_Components
 						}
 
 						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()));
+						maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ba()) / link->num_lanes<float>());
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
 						link->template original_free_flow_speed<float>(link->template free_flow_speed<float>());
 						link->template original_maximum_flow_rate<float>(maximum_flow_rate);
 						link->template original_num_lanes<int>(link->template num_lanes<int>());
+						link->template ramp_meter<_Ramp_Metering_Interface*>(nullptr);
 
 						_network_reference->template max_free_flow_speed<float>(max(_network_reference->template max_free_flow_speed<float>(),link->template free_flow_speed<float>()));
 

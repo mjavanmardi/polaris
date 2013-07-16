@@ -135,6 +135,8 @@ namespace Link_Components
 			member_data(float, original_maximum_flow_rate, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, original_num_lanes, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(bool, shoulder_opened, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_component(typename MasterType::ramp_metering_type, ramp_meter, none, none);
+
 
 			member_data(float, speed_adjustment_factor_due_to_weather, none, none);
 			member_data(float, speed_adjustment_factor_due_to_accident, none, none);
@@ -190,6 +192,7 @@ namespace Link_Components
 			member_component(typename MasterType::approach_type, approach, none, none);
 			member_data(int, link_num_vehicles_in_queue, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_container(deque<typename MasterType::vehicle_type*>, link_destination_vehicle_queue, none, none);
+			member_data(int, num_vehicles_on_link, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_data(_lock,link_lock,none,none);
 
@@ -794,6 +797,12 @@ namespace Link_Components
 				_current_weather_event = nullptr;
 				_accident_event_to_process = false;
 				_current_accident_event = nullptr;
+
+				_capacity_adjustment_factor_due_to_accident = 1.0;
+				_speed_adjustment_factor_due_to_accident = 1.0;
+				_capacity_adjustment_factor_due_to_weather = 1.0;
+				_speed_adjustment_factor_due_to_weather = 1.0;
+
 				_advisory_radio = nullptr;
 				_depot = nullptr;
 				_variable_word_sign = nullptr;
@@ -1151,6 +1160,7 @@ namespace Link_Components
 			feature_implementation int get_weather_index(TargetType weather_event);
 			feature_implementation void process_accident_event();
 			feature_implementation void revert_accident_event();
+			feature_implementation void reset_features();
 		
 			static float link_capacity_adjustment_factors_for_weather[19];
 			static float link_free_flow_speed_adjustment_factors_for_weather[19][5];

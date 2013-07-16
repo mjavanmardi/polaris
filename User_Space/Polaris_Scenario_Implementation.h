@@ -21,6 +21,8 @@ namespace Scenario_Components
 			member_data(int, simulation_start_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, simulation_end_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, intersection_control_flag, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(bool, ramp_metering_flag, none, none);
+
 			member_data(int, demand_od_flag, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, io_source_flag,  check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, assignment_mode, none, none);

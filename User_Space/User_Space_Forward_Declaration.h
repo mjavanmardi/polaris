@@ -42,6 +42,12 @@ namespace Intersection_Control_Components {
 		forward_declare_prototype struct Intersection_Control_Prototype;
 	}
 };
+namespace Ramp_Metering_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Ramp_Metering_Prototype;
+	}
+};
 namespace Intersection_Components {
 	namespace Prototypes
 	{

@@ -310,7 +310,10 @@
     <ClInclude Include="Detector_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
-    <ClInclude Include="..\tmc\depot.h">
+    <ClInclude Include="Ramp_Metering_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Ramp_Metering_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
   </ItemGroup>

@@ -32,6 +32,7 @@ namespace Scenario_Components
 				EVENTS_UPDATE_SUB_ITERATION,
 				ROUTING_SUB_ITERATION,
 				TRAVELER_SET_DEPARTURE_SUB_ITERATION,
+				RAMP_METERING_SUB_ITERATION,
 				CONTROL_SUB_ITERATION,
 				LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION,
 				INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,
@@ -107,6 +108,7 @@ namespace Scenario_Components
 			feature_accessor(simulation_end_time, none, none);
 
 			feature_accessor(intersection_control_flag, none, none);
+			feature_accessor(ramp_metering_flag, none, none);
 			
 			feature_accessor(num_simulation_intervals, none, none);
 			feature_accessor(num_assignment_intervals, none, none);
@@ -369,6 +371,7 @@ namespace Scenario_Components
 				// set control parameters
 				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(1234567.0);
 				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0.0);
+				if (cfgReader.getParameter("ramp_metering_flag", ramp_metering_flag<bool*>())!= PARAMETER_FOUND) ramp_metering_flag<bool>(false);
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
 				if (cfgReader.getParameter("snapshot_period", snapshot_period<int*>())!=PARAMETER_FOUND) snapshot_period<int>(300);
 

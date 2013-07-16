@@ -73,6 +73,7 @@ struct MasterType
 	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Implementation<M> phase_type;
 	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation<M> phase_movement_type;
 	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<M> approach_type;
+	typedef Ramp_Metering_Components::Implementations::Polaris_Ramp_Metering_Implementation<M> ramp_metering_type;
 	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<M> plan_type;
 
 	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<M> basic_movement_plan_type;
@@ -232,8 +233,12 @@ int main(int argc,char** argv)
 	_Operation_Interface* operation = (_Operation_Interface*)Allocate<MasterType::operation_type>();
 	operation->network_reference<_Network_Interface*>(network);
 	if (scenario->intersection_control_flag<int>() == 1) {
-		cout <<"reading operation data..." << endl;
-		operation->read_operation_data<Net_IO_Type>(network_io_maps);
+		cout <<"reading intersection control data..." << endl;
+		operation->read_intersection_control_data<Net_IO_Type>(network_io_maps);
+	}
+	if (scenario->ramp_metering_flag<bool>() == true) {
+		cout <<"reading ramp metering data..." << endl;
+		operation->read_ramp_metering_data<Net_IO_Type>(network_io_maps);
 	}
 	cout <<"converting operation data..." << endl;
 	operation->write_operation_data<NULLTYPE>(network_data_for_output, operation_data_for_output);
@@ -296,6 +301,18 @@ int main(int argc,char** argv)
 	{
 		((_Intersection_Interface*)(*intersections_itr))->Initialize<NULLTYPE>();
 	}
+
+	cout << "initializing ramp metering agents..." <<endl;
+	define_container_and_value_interface(_Ramp_Metering_Container_Interface, _Ramp_Metering_Interface, _Network_Interface::get_type_of(ramp_metering_container), Random_Access_Sequence_Prototype, Ramp_Metering_Prototype, NULLTYPE);
+	_Ramp_Metering_Container_Interface::iterator ramp_metering_itr;
+
+	for(ramp_metering_itr=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().begin();
+		ramp_metering_itr!=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().end();
+		ramp_metering_itr++)
+	{
+		((_Ramp_Metering_Interface*)(*ramp_metering_itr))->Initialize<NULLTYPE>();
+	}
+
 	cout << "starting sim..." <<endl;
 	#pragma endregion
 

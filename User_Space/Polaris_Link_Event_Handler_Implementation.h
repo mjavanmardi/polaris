@@ -99,20 +99,30 @@ namespace Link_Components
 			}
 			_lane_adjustment_due_to_accident = prev_num_lanes - _num_lanes;
 			_capacity_adjustment_factor_due_to_accident = capacity_adjustment_rate;
-			_maximum_flow_rate *= capacity_adjustment_rate;
+			
+			//_maximum_flow_rate *= capacity_adjustment_rate;
 			
 			free_flow_speed_adjustment_rate = 1.0; // nominal adjsutment factor of 1.0 according to the Guidebook
 			_speed_adjustment_factor_due_to_accident = free_flow_speed_adjustment_rate;
-			_free_flow_speed *= free_flow_speed_adjustment_rate;
-		
-			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
+			//_free_flow_speed *= free_flow_speed_adjustment_rate;
+			reset_features<ComponentType,CallerType,TargetType>();
+			//_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
 		}
 
 		feature_implementation_definition void Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::revert_accident_event()
 		{
-			_maximum_flow_rate /= _capacity_adjustment_factor_due_to_accident;
+			_capacity_adjustment_factor_due_to_accident = 1.0;
+			_speed_adjustment_factor_due_to_accident = 1.0;
 			_num_lanes += _lane_adjustment_due_to_accident;
-			_free_flow_speed /= _speed_adjustment_factor_due_to_accident;
+			reset_features<ComponentType,CallerType,TargetType>();
+		}
+
+		feature_implementation_definition void Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::reset_features()
+		{
+			_maximum_flow_rate = _original_maximum_flow_rate * _capacity_adjustment_factor_due_to_accident;
+			_maximum_flow_rate *= _capacity_adjustment_factor_due_to_weather;
+			_free_flow_speed = _original_free_flow_speed * _speed_adjustment_factor_due_to_accident;
+			_free_flow_speed *= _speed_adjustment_factor_due_to_weather;
 			_free_flow_speed = min(_free_flow_speed, _speed_limit + 10.0f);
 			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
 		}
@@ -127,22 +137,22 @@ namespace Link_Components
 			capacity_adjustment_rate = link_capacity_adjustment_factors_for_weather[weather_index];
 			//capacity_adjustment_rate = 0.2;
 			_capacity_adjustment_factor_due_to_weather = capacity_adjustment_rate;
-			_maximum_flow_rate *= capacity_adjustment_rate;
+			//_maximum_flow_rate *= capacity_adjustment_rate;
 
 			free_flow_speed_adjustment_rate = find_free_flow_speed_adjustment_rate_for_weather<ComponentType,CallerType,TargetType>(weather_index);
 			//free_flow_speed_adjustment_rate = 0.2;
 			_speed_adjustment_factor_due_to_weather = free_flow_speed_adjustment_rate;
-			_free_flow_speed *= free_flow_speed_adjustment_rate;
+			reset_features<ComponentType,CallerType,TargetType>();
+			//_free_flow_speed *= free_flow_speed_adjustment_rate;
 
-			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
+			//_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
 		}
 
 		feature_implementation_definition void Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::revert_weather_event()
 		{
-			_maximum_flow_rate /= _capacity_adjustment_factor_due_to_weather;
-			_free_flow_speed /= _speed_adjustment_factor_due_to_weather;
-			_free_flow_speed = min(_free_flow_speed, _speed_limit + 10.0f);
-			_link_fftt = (float) (_length/(_free_flow_speed*5280.0/3600.0)); //in seconds
+			_capacity_adjustment_factor_due_to_weather = 1.0;
+			_speed_adjustment_factor_due_to_weather = 1.0;
+			reset_features<ComponentType,CallerType,TargetType>();
 		}
 
 		feature_implementation_definition float Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::find_free_flow_speed_adjustment_rate_for_weather(int weather_index)

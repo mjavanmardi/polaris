@@ -156,6 +156,7 @@ namespace Network_Components
 			feature_accessor(turn_movements_container, none, none);
 			feature_accessor(activity_locations_container, none, none);
 			feature_accessor(zones_container, none, none);
+			feature_accessor(ramp_metering_container, none, none);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
