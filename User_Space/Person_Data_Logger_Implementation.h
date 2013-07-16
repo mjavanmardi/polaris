@@ -14,6 +14,7 @@ namespace Person_Components
 		implementation struct Person_Data_Logger_Implementation : public Polaris_Component<APPEND_CHILD(Person_Data_Logger_Implementation),MasterType,Execution_Object,ParentType>
 		{
 			vector<int> num_acts;
+			vector<int> planned_acts[_num_threads];
 			vector<int> executed_acts[_num_threads];
 			vector<int> ttime_distribution[_num_threads];
 			vector<string> output_data[_num_threads];
@@ -32,7 +33,11 @@ namespace Person_Components
 			member_data(ofstream, executed_acts_file, none,none);
 			member_data(ofstream, external_demand_output_file,none,none);
 			member_data(shared_ptr<odb::database>, db_ptr, none,none);
-			//member_pointer(odb::transaction, t, none,none);
+
+			// GRAPHICAL DATA MEMBERS
+			member_data(float, activity_time_lost,none,none);
+			member_data(float, cancelled_activities,none,none);
+
 
 			member_component_and_feature_accessor(Logging_Interval, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Next_Logging_Time, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
@@ -41,7 +46,8 @@ namespace Person_Components
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
-
+				this->_cancelled_activities = 0;
+				this->_activity_time_lost = 0;
 
 
 				if (scenario->write_demand_to_database<bool>())
@@ -95,6 +101,7 @@ namespace Person_Components
 				{
 					ttime_distribution[i].resize(25,0); 
 					executed_acts[i].resize(20,0);
+					planned_acts[i].resize(20,0);
 				}
 
 				stringstream filename_demand("");
@@ -119,13 +126,27 @@ namespace Person_Components
 				// don't do logging if not specified in scenario
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
-				if (!scenario->template write_activity_output<bool>()) return;
+				
 				
 				act_record_itf* act = (act_record_itf*)act_record;
 				location_itf* loc = act->template Location<location_itf*>();
 
+				// determine delay, using current iteration as the arrival time
+				float expected_start = act->template Start_Time<Time_Minutes>();
+				float actual_start = GLOBALS::Simulation_Time.template Current_Time<Time_Minutes>();
+				float delay = std::max<float>(actual_start - expected_start,0.0f);
+				this->_activity_time_lost += delay;
+
+
 				// count the number of acts added
-				if (!is_executed) num_acts[act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()] +=1;
+				if (!is_executed) planned_acts[_thread_id][act->template Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>()] +=1;
+
+
+				// exit if not writing output
+				if (!scenario->template write_activity_output<bool>()) return;
+
+
+				
 
 
 				if (loc == nullptr)
@@ -246,6 +267,10 @@ namespace Person_Components
 				else if (ttime < 115) ttime_distribution[_thread_id][22]++;
 				else if (ttime < 120) ttime_distribution[_thread_id][23]++;
 				else  ttime_distribution[_thread_id][24]++;
+			}
+			feature_implementation void Increment_Cancelled_Activities()
+			{
+				this->_cancelled_activities++;
 			}
 
 			declare_feature_conditional(Logging_Conditional)
@@ -470,7 +495,8 @@ namespace Person_Components
 
 				//cout <<endl<<"Original zone: " << original_zone->template uuid<int>() << ", closes zone: " << closest_zone->template uuid<int>() << ", new location id: " << closest_loc->template uuid<int>();
 
-				return closest_loc->template uuid<int>();
+				//return closest_loc->template uuid<int>();
+				return closest_zone->template uuid<int>();
 			}
 
 

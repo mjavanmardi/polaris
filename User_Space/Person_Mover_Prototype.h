@@ -256,13 +256,18 @@ namespace Prototypes
 			Vehicle_Itf* vehicle = person->template vehicle<Vehicle_Itf*>();
 			network_itf* network = person->template network_reference<network_itf*>();
 			movement_itf* movement = this->Movement<movement_itf*>();
+			activity_itf* activity = movement->template destination_activity_reference<activity_itf*>();
 
 			// event interface
 			typedef Network_Event_Components::Prototypes::Network_Event<typename Component_Type::weather_network_event_type> weather_itf;
 			weather_itf* weather_event = (weather_itf*)event;
 	
+			// determine if destination activity is flexible
+			Activity_Components::Types::FLEXIBILITY_VALUES flexibility = activity->template Location_Flexibility<Activity_Components::Types::FLEXIBILITY_VALUES>();
+
+
 			// If event affects traveler
-			if (this->Is_Event_Relevant<weather_itf*>(weather_event))
+			if (this->Is_Event_Relevant<weather_itf*>(weather_event) && flexibility != Activity_Components::Types::FLEXIBILITY_VALUES::LOW_FLEXIBILITY)
 			{
 				this->Replanning_Needed<bool>(true);
 				person->template has_done_replanning<bool>(true);
@@ -284,12 +289,20 @@ namespace Prototypes
 				else next = next_act->template Location<location_itf*>();
 
 				dest = dest_chooser->template Choose_Destination<location_itf*>(orig,next,unaffected_locations);
-				movement->template destination<location_itf*>(dest);
-				movement->template destination<link_itf*>(dest->template origin_links<links*>()->at(0));
-				activity_itf* act = movement->template destination_activity_reference<activity_itf*>();
-				act->template Location<location_itf*>(dest);
 
-				//cout << endl << "Destination Replanned due to weather, switch from zone '" << old_dest_id << "', to new zone '" << dest->zone<zone_itf*>()->uuid<int>()<<"'.";
+				if (dest != nullptr)
+				{
+					movement->template destination<location_itf*>(dest);
+					movement->template destination<link_itf*>(dest->template origin_links<links*>()->at(0));
+					activity_itf* act = movement->template destination_activity_reference<activity_itf*>();
+					act->template Location<location_itf*>(dest);
+
+					//cout << endl << "Destination Replanned due to weather, switch from zone '" << old_dest_id << "', to new zone '" << dest->zone<zone_itf*>()->uuid<int>()<<"'.";
+				}
+				else
+				{
+					if (movement->destination<location_itf*>() == nullptr) THROW_WARNING("ERROR: valid destination not set for activity.");
+				}
 			}
 		}
 		feature_prototype void Evaluate_Network_Event(TargetType event, requires(check(TargetType, Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))

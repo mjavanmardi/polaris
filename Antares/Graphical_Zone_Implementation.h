@@ -85,6 +85,12 @@ namespace Zone_Components
 					quads[4].color._b = 255;
 				}
 
+				quads[0].color._a = 125;
+				quads[1].color._a = 125;
+				quads[2].color._a = 125;
+				quads[3].color._a = 125;
+				quads[4].color._a = 125;
+
 				// east side
 				quads[0].a._x = center_point._x + width/4;
 				quads[0].a._y = center_point._y - width/2;
@@ -103,15 +109,15 @@ namespace Zone_Components
 				quads[1].a._x = center_point._x - width/4;
 				quads[1].a._y = center_point._y - width/2;
 				quads[1].a._z = 1;
-				quads[1].b._x = center_point._x - width/4;
-				quads[1].b._y = center_point._y + width/2;
-				quads[1].b._z = 1;
+				quads[1].d._x = center_point._x - width/4;
+				quads[1].d._y = center_point._y + width/2;
+				quads[1].d._z = 1;
 				quads[1].c._x = center_point._x - width/4;
 				quads[1].c._y = center_point._y + width/2;
 				quads[1].c._z = height;
-				quads[1].d._x = center_point._x - width/4;
-				quads[1].d._y = center_point._y - width/2;
-				quads[1].d._z = height;
+				quads[1].b._x = center_point._x - width/4;
+				quads[1].b._y = center_point._y - width/2;
+				quads[1].b._z = height;
 				
 				//north side
 				quads[2].a._x = center_point._x + width/4;
@@ -131,29 +137,29 @@ namespace Zone_Components
 				quads[3].a._x = center_point._x + width/4;
 				quads[3].a._y = center_point._y - width/2;
 				quads[3].a._z = 1;
-				quads[3].b._x = center_point._x - width/4;
-				quads[3].b._y = center_point._y - width/2;
-				quads[3].b._z = 1;
+				quads[3].d._x = center_point._x - width/4;
+				quads[3].d._y = center_point._y - width/2;
+				quads[3].d._z = 1;
 				quads[3].c._x = center_point._x - width/4;
 				quads[3].c._y = center_point._y - width/2;
 				quads[3].c._z = height;
-				quads[3].d._x = center_point._x + width/4;
-				quads[3].d._y = center_point._y - width/2;
-				quads[3].d._z = height;
+				quads[3].b._x = center_point._x + width/4;
+				quads[3].b._y = center_point._y - width/2;
+				quads[3].b._z = height;
 				
 				//top side
 				quads[4].a._x = center_point._x + width/4;
 				quads[4].a._y = center_point._y - width/2;
 				quads[4].a._z = height;
-				quads[4].b._x = center_point._x - width/4;
-				quads[4].b._y = center_point._y - width/2;
-				quads[4].b._z = height;
+				quads[4].d._x = center_point._x - width/4;
+				quads[4].d._y = center_point._y - width/2;
+				quads[4].d._z = height;
 				quads[4].c._x = center_point._x - width/4;
 				quads[4].c._y = center_point._y + width/2;
 				quads[4].c._z = height;
-				quads[4].d._x = center_point._x + width/4;
-				quads[4].d._y = center_point._y + width/2;
-				quads[4].d._z = height;
+				quads[4].b._x = center_point._x + width/4;
+				quads[4].b._y = center_point._y + width/2;
+				quads[4].b._z = height;
 			}
 			feature_implementation void Push_To_Layer(TargetType Layer_Reference)
 			{
@@ -225,7 +231,7 @@ namespace Zone_Components
 				cfg.storage_size = 4;
 				cfg.primitive_color = true;
 				cfg.primitive_normal = true;
-
+				cfg.grouped = true;
 				cfg.selection_callback = (selection_callback_type)&Graphical_Zone_Implementation<MasterType>::on_select;
 
 				//cfg.selection_callback = (selection_callback_type)&Graphical_Zone_Implementation<MasterType>::fetch_attributes;

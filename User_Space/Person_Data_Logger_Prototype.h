@@ -39,6 +39,11 @@ namespace Prototypes
 			this_component()->Initialize<ComponentType,CallerType,TargetType>();
 		}
 
+		feature_prototype void Increment_Cancelled_Activities()
+		{
+			this_component()->Increment_Cancelled_Activities<ComponentType,CallerType,TargetType>();
+		}
+
 		feature_accessor(Next_Logging_Time,none,none);
 		feature_accessor(Logging_Interval,none,none);
 	};

@@ -42,15 +42,26 @@ namespace PopSyn
 				this->write_full_output_flag<bool>(scenario->template write_full_output<bool>());
 				this->linker_file_path<string>(scenario->template popsyn_control_file_name<string>());
 
-				// set up output files
-				this->Output_Stream<ofstream&>().open("full_population.csv",ios_base::out);
-				this->Log_File<ofstream&>().open("popsyn_log.csv",ios_base::out);
-				this->Marginal_Output_Stream<ofstream&>().open("marginals_and_distributions.csv",ios_base::out);
-
 				// Add references to other objects to the population synthesizer
 				this->Solution_Settings<solver_itf*>(solver);
 				this->network_reference<typename TargetType::ParamType>(network);
 				this->scenario_reference<typename TargetType::Param2Type>(scenario);
+
+				// set up output files
+				stringstream pop_filename("");
+				pop_filename << scenario->template output_dir_name<string>();
+				pop_filename << "full_population.csv";
+				this->Output_Stream<ofstream&>().open(pop_filename.str(),ios_base::out);
+
+				stringstream log_filename("");
+				log_filename << scenario->template output_dir_name<string>();
+				log_filename << "popsyn_log.csv";
+				this->Log_File<ofstream&>().open(log_filename.str(),ios_base::out);
+
+				stringstream marg_filename("");
+				marg_filename << scenario->template output_dir_name<string>();
+				marg_filename << "marginals_and_distributions.csv";
+				this->Log_File<ofstream&>().open(marg_filename.str(),ios_base::out);		
 		
 
 				this_component()->template Initialize<ComponentType,CallerType,TargetType>();

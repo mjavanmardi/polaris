@@ -103,10 +103,6 @@ namespace Prototypes
 			define_container_and_value_interface(Activity_Records,Activity_Record, typename scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
 			define_component_interface(_Logger_Interface, typename ComponentType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
 			
-			// exit if no activity output is specified
-			scenario_itf* scenario = (scenario_itf*)_global_scenario;
-			if (!scenario->template write_activity_output<bool>()) return;
-
 
 			scheduler_itf* scheduler = pthis->template Scheduling_Faculty<scheduler_itf*>();
 			Activity_Records* activities = scheduler->template Activity_Container<Activity_Records*>();
@@ -117,6 +113,10 @@ namespace Prototypes
 				//cout << endl <<"Person ID: " << (*itr)->Parent_ID<int>() << "Activity Type: " << (*itr)->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
 				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Record*>(*itr,false);
 			}
+
+			// exit if no activity output is specified
+			scenario_itf* scenario = (scenario_itf*)_global_scenario;
+			if (!scenario->template write_activity_output<bool>()) return;
 		}
 
 		// Initializers

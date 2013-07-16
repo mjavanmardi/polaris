@@ -122,8 +122,15 @@ namespace Demand_Components
 				int simulation_start_time = scenario->template simulation_start_time<int>();
 				int simulation_end_time = scenario->template simulation_end_time<int>();
 
+				float demand_percentage= scenario->template demand_reduction_factor<float>();
+
+				cout << "Demand Percentage: " << demand_percentage;
+
 				for(result<Trip>::iterator db_itr = trip_result.begin (); db_itr != trip_result.end (); ++db_itr)
 				{
+					// perform demand reduction
+					if (GLOBALS::Uniform_RNG.Next_Rand<float>() > demand_percentage) continue;
+
 
 					if (++counter % 100000 == 0)
 					{

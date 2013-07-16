@@ -461,6 +461,8 @@ namespace Network_Components
 					
 					link_id_dir.id=db_itr->getTo_Link()->getLink();
 					link_id_dir.dir=0;
+
+
 					if(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir))
 					{
 						outbound_link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
@@ -478,6 +480,7 @@ namespace Network_Components
 						assert(net_io_maps.link_id_dir_to_ptr.count(link_id_dir.id_dir));
 						outbound_link=(_Link_Interface*)net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir];
 					}
+
 
 					if ((inbound_link->template link_type<int>() != FREEWAY && 
 						inbound_link->template link_type<int>() != ON_RAMP &&

@@ -522,7 +522,7 @@ namespace Vehicle_Components
 					if(person->has_done_replanning<bool>() && ((ComponentType*)this)->_is_integrated)
 					{
 						coordinate.color._r = 0;
-						coordinate.color._g = 0;
+						coordinate.color._g = 100;
 						coordinate.color._b = 255;
 					}
 					else if (num_switch_decisions > 0)

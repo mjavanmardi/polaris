@@ -348,10 +348,10 @@ namespace Person_Components
 				if (act == nullptr) return;
 
 				// cache the movement plans activity in the activity record container since all attributes have been planned at this point			
-				Activity_Records* act_records = _Parent_Person->template Activity_Record_Container<Activity_Records*>();
-				Activity_Record* act_record = (Activity_Record*)Allocate<typename MasterType::activity_record_type>();
-				act_record->template Initialize<Activity_Plan*>(act);
-				act_records->push_back(act_record);
+				//Activity_Records* act_records = _Parent_Person->template Activity_Record_Container<Activity_Records*>();
+				//Activity_Record* act_record = (Activity_Record*)Allocate<typename MasterType::activity_record_type>();
+				//act_record->template Initialize<Activity_Plan*>(act);
+				//act_records->push_back(act_record);
 				
 			}
 			feature_implementation void Add_Movement_Plan(TargetType movement_plan, requires(!check_as_given(TargetType,is_pointer) || !check(TargetType,Movement_Plan_Components::Concepts::Is_Movement_Plan_Prototype)))

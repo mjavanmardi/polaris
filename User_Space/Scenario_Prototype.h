@@ -120,13 +120,15 @@ namespace Scenario_Components
 			feature_accessor(demand_od_flag, none, none);
 			feature_accessor(io_source_flag, none, none);
 
+			feature_accessor(demand_reduction_factor, none, none);
+
 			feature_accessor(path_calculation_interval_length, none, none);
 
 
 			feature_accessor(current_day_index, none, none);
 			
 
-			feature_accessor(output_writer, none, none);
+			//feature_accessor(output_writer, none, none);
 
 			feature_accessor(network_cumulative_loaded_vehicles, none, none);
 			feature_accessor(network_cumulative_departed_vehicles, none, none);
@@ -297,7 +299,13 @@ namespace Scenario_Components
 
 				//===============================================
 				// set interval length
-				if (cfgReader.getParameter("simulation_interval_length_in_second", simulation_interval_length<int*>()) != PARAMETER_FOUND)simulation_interval_length<int>(6);
+				if (cfgReader.getParameter("simulation_interval_length_in_second", simulation_interval_length<int*>()) != PARAMETER_FOUND) simulation_interval_length<int>(6);
+
+
+				//===============================================
+				// set the demand reduction factor, used to reduce the demand read from the database
+				if (cfgReader.getParameter("demand_reduction_factor", demand_reduction_factor<double*>()) != PARAMETER_FOUND) demand_reduction_factor<double>(1.0);
+				cout << endl << "demand reduction factor: " << demand_reduction_factor<float>();
 
 				//===============================================
 				// set sim_interval per assignment interval
@@ -424,8 +432,8 @@ namespace Scenario_Components
 				num_simulation_intervals_per_assignment_interval<int>(assignment_interval_length<int>()/simulation_interval_length<int>());
 				
 
-				typedef typename ComponentType::output_writer_type OutputWriterType;
-				output_writer<OutputWriterType&>().open("Polaris_Output.log");
+				//typedef typename ComponentType::output_writer_type OutputWriterType;
+				//output_writer<OutputWriterType&>().open("Polaris_Output.log");
 
 				network_cumulative_loaded_vehicles<int>(0.0);
 				network_cumulative_departed_vehicles<int>(0.0);
@@ -1004,13 +1012,13 @@ namespace Scenario_Components
 				this_component()->template increase_network_cumulative_arrived_vehicles<ComponentType,CallerType,TargetType>();
 			}
 
-			feature_prototype void output(std::string s)
-			{
-				typedef typename ComponentType::output_writer_type OutputWriterType;
-				//output_writer<OutputWriterType&>() << s;
-				cout << s;
-				cout.flush();
-			}
+			//feature_prototype void output(std::string s)
+			//{
+			//	typedef typename ComponentType::output_writer_type OutputWriterType;
+			//	//output_writer<OutputWriterType&>() << s;
+			//	cout << s;
+			//	cout.flush();
+			//}
 
 			// convert from meter to foot
 			feature_prototype float meterToFoot(float meterValue)

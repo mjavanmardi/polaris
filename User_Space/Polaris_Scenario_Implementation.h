@@ -29,6 +29,8 @@ namespace Scenario_Components
 			member_data(unsigned long, iseed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, num_threads, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
+			member_data(double, demand_reduction_factor, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+
 			member_data(int, planning_horizon, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, num_simulation_intervals, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, num_assignment_intervals, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -97,7 +99,7 @@ namespace Scenario_Components
 			member_data(bool, write_full_output,none,none);
 			member_data(string, popsyn_control_file_name,none,none);
 
-			member_data(ofstream, output_writer, none, none);
+			//member_data(ofstream, output_writer, none, none);
 
 			member_data(_lock, statistics_update_lock, none, none);
 

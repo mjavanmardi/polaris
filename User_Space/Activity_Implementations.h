@@ -66,6 +66,11 @@ namespace Activity_Components
 				return this->_Parent_Planner->template Parent_Person<_person_itf*>()->template uuid<TargetType>();
 			}	tag_getter_as_available(Parent_ID);
 			
+			member_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, none, none);
+			member_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, none, none);
+			member_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility,none,none);
+			member_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility,none,none);
+			member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);
 
 			// Activity attributes
 			member_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype, Location, typename MasterType::activity_location_type, check(ReturnValueType,Activity_Location_Components::Concepts::Is_Activity_Location), check(SetValueType,Activity_Location_Components::Concepts::Is_Activity_Location));
@@ -415,15 +420,15 @@ namespace Activity_Components
 			// Activity attribute planning properties		
 			member_data(Types::PLAN_HORIZON_VALUES, Activity_Plan_Horizon,none,none);
 			member_data(Types::PLAN_HORIZON_VALUES, Location_Plan_Horizon, none, none);
-			member_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, none, none);
+			//member_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, none, none);
 			member_data(Types::PLAN_HORIZON_VALUES, Mode_Plan_Horizon, none, none);
-			member_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, none, none);
+			//member_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, none, none);
 			member_data(Types::PLAN_HORIZON_VALUES, Start_Time_Plan_Horizon,none,none);
-			member_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility,none,none);
+			//member_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility,none,none);
 			member_data(Types::PLAN_HORIZON_VALUES, Duration_Plan_Horizon,none,none);
-			member_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility,none,none);
+			//member_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility,none,none);
 			member_data(Types::PLAN_HORIZON_VALUES, Involved_Persons_Plan_Horizon,none,none);
-			member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);
+			//member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);
 
 			// Activity methods
 			feature_implementation void Initialize(TargetType act_type)
@@ -516,11 +521,11 @@ namespace Activity_Components
 				// Set flexibility values
 				for (int i = 0; i < 2; i++)
 				{
-					if (rand[0] < P_mod[i]) {this->_Mode_Flexibility = (Types::FLEXIBILITY_VALUES)i;				rand[0] = 999;}
-					if (rand[1] < P_per[i]) {this->_Involved_Persons_Flexibility = (Types::FLEXIBILITY_VALUES)i;	rand[1] = 999; }
-					if (rand[2] < P_loc[i]) {this->_Location_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[2] = 999; }
-					if (rand[3] < P_tim[i]) {this->_Start_Time_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[3] = 999; }
-					if (rand[4] < P_dur[i]) {this->_Duration_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[4] = 999; }
+					if (rand[0] < P_mod[i]) {base_this->_Mode_Flexibility = (Types::FLEXIBILITY_VALUES)i;				rand[0] = 999;}
+					if (rand[1] < P_per[i]) {base_this->_Involved_Persons_Flexibility = (Types::FLEXIBILITY_VALUES)i;	rand[1] = 999; }
+					if (rand[2] < P_loc[i]) {base_this->_Location_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[2] = 999; }
+					if (rand[3] < P_tim[i]) {base_this->_Start_Time_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[3] = 999; }
+					if (rand[4] < P_dur[i]) {base_this->_Duration_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[4] = 999; }
 				}
             
 				// Set results of flexiblity model to use in next models
@@ -1004,11 +1009,6 @@ namespace Activity_Components
 				return Types::PLAN_HORIZON_VALUES::ROUTINE;
 			}
 			tag_getter_as_available(Involved_Persons_Plan_Horizon);
-			member_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, none, none);
-			member_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, none, none);
-			member_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility,none,none);
-			member_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility,none,none);
-			member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);
 
 
 			// Activity methods
@@ -1403,11 +1403,11 @@ namespace Activity_Components
 				// Set flexibility values
 				for (int i = 0; i < 2; i++)
 				{
-					if (rand[0] < P_mod[i]) {this->_Mode_Flexibility = (Types::FLEXIBILITY_VALUES)i;				rand[0] = 999;}
-					if (rand[1] < P_per[i]) {this->_Involved_Persons_Flexibility = (Types::FLEXIBILITY_VALUES)i;	rand[1] = 999; }
-					if (rand[2] < P_loc[i]) {this->_Location_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[2] = 999; }
-					if (rand[3] < P_tim[i]) {this->_Start_Time_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[3] = 999; }
-					if (rand[4] < P_dur[i]) {this->_Duration_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[4] = 999; }
+					if (rand[0] < P_mod[i]) {base_this->_Mode_Flexibility = (Types::FLEXIBILITY_VALUES)i;				rand[0] = 999;}
+					if (rand[1] < P_per[i]) {base_this->_Involved_Persons_Flexibility = (Types::FLEXIBILITY_VALUES)i;	rand[1] = 999; }
+					if (rand[2] < P_loc[i]) {base_this->_Location_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[2] = 999; }
+					if (rand[3] < P_tim[i]) {base_this->_Start_Time_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[3] = 999; }
+					if (rand[4] < P_dur[i]) {base_this->_Duration_Flexibility = (Types::FLEXIBILITY_VALUES)i;			rand[4] = 999; }
 				}
             
 				// Set results of flexiblity model to use in next models
@@ -1416,6 +1416,8 @@ namespace Activity_Components
 				IFLOC = P_loc[0];
 				IFTIM = P_tim[0];
 				IFDUR = P_dur[0];
+
+				pthis->Location_Flexibility<Types::FLEXIBILITY_VALUES>(Types::FLEXIBILITY_VALUES::LOW_FLEXIBILITY);
 			}
 			tag_feature_as_available(Set_Meta_Attributes);
 		};
@@ -1482,11 +1484,11 @@ namespace Activity_Components
 				return Types::PLAN_HORIZON_VALUES::ROUTINE;
 			}
 			tag_getter_as_available(Involved_Persons_Plan_Horizon);
-			member_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, none, none);
+			/*member_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, none, none);
 			member_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, none, none);
 			member_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility,none,none);
 			member_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility,none,none);
-			member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);
+			member_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility,none,none);*/
 
 
 			// Activity methods
@@ -1570,11 +1572,12 @@ namespace Activity_Components
 
 			feature_implementation void Set_Meta_Attributes()
 			{
-				this->_Duration_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				this->_Location_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				this->_Mode_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				this->_Start_Time_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
-				this->_Involved_Persons_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				base_type* base_this = (base_type*)this;
+				base_this->_Duration_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				base_this->_Location_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				base_this->_Mode_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				base_this->_Start_Time_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
+				base_this->_Involved_Persons_Flexibility = Types::FLEXIBILITY_VALUES::HIGH_FLEXIBILITY;
 		
 				this->_Duration_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;
 				this->_Location_Planning_Time = Types::PLAN_HORIZON_VALUES::IMPULSIVE;

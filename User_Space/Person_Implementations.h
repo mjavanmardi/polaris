@@ -264,6 +264,13 @@ namespace Person_Components
 				{
 					locations_container_interface* work_locations = selected_zone->template work_locations<locations_container_interface*>();
 					float size = work_locations->size();
+
+					if (size == 0)
+					{
+						pthis->template Work_Location<int>(pthis->template Home_Location<int>());
+						return;
+					}
+
 					int index = (int)(Uniform_RNG.template Next_Rand<float>()*size);
 					location_interface* work_loc = (*work_locations)[index];
 

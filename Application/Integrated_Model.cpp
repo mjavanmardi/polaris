@@ -44,8 +44,7 @@ struct MasterType
 	typedef Network_Components::Implementations::Integrated_Polaris_Network_Implementation<M> network_type;
 	typedef Link_Components::Implementations::Polaris_Link_Implementation<M> link_type;
 	typedef Intersection_Components::Implementations::Polaris_Intersection_Implementation<M> intersection_type;
-	//typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<M> vehicle_type;
-	typedef Vehicle_Components::Implementations::Polaris_Integrated_Vehicle_Implementation<M> vehicle_type;
+	typedef Vehicle_Components::Implementations::Polaris_Vehicle_Implementation<M> vehicle_type;
 	typedef Zone_Components::Implementations::Polaris_Zone_Implementation<M> zone_type;
 	#endif
 
@@ -101,7 +100,7 @@ struct MasterType
 	typedef Person_Components::Implementations::CTRAMP_Activity_Generator_Implementation<M, person_type> activity_generator_type;
 	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<M,person_type> person_properties_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<M> person_static_properties_type;
-	typedef Person_Components::Implementations::Person_Data_Logger_Implementation<M> person_data_logger_type;
+	
 	
 	typedef RNG_Components::Implementations::RngStream_Implementation<M> RNG;
 
@@ -116,6 +115,11 @@ struct MasterType
 	typedef Person_Components::Implementations::CTRAMP_Destination_Chooser_Implementation<M,person_type> person_destination_chooser_type;
 	typedef Person_Components::Implementations::CTRAMP_Destination_Choice_Option<M,person_type> person_destination_choice_option_type;
 	
+	#ifdef ANTARES
+		typedef Person_Components::Implementations::Antares_Person_Data_Logger_Implementation<M> person_data_logger_type;
+	#else
+		typedef Person_Components::Implementations::Person_Data_Logger_Implementation<M> person_data_logger_type;
+	#endif
 	
 	// POPULATION SYNTHESIS CLASSES
 	typedef PopSyn::Implementations::Synthesis_Zone_Implementation<M> zone;
@@ -214,17 +218,17 @@ int main(int argc,char** argv)
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
 	cout << "converting scenario data..." << endl;
 	scenario->write_scenario_data<NULLTYPE>(scenario_data_for_output);
-	network_models::network_information::scenario_data_information::write_scenario_data(scenario_data_for_output);
-	cout<<"writing scenario data..."<<endl;
-	network_models::network_information::scenario_data_information::write_scenario_data(scenario_data_for_output);	
+	//network_models::network_information::scenario_data_information::write_scenario_data(scenario_data_for_output);
+	//cout<<"writing scenario data..."<<endl;
+	//network_models::network_information::scenario_data_information::write_scenario_data(scenario_data_for_output);	
 
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);
 
 	cout << "converting network data..." << endl;
 	network->write_network_data<Target_Type<NULLTYPE,void,network_models::network_information::network_data_information::NetworkData&>>(network_data_for_output);
-	network_models::network_information::network_data_information::write_network_data("", network_data_for_output);
-	cout<<"writing network data..."<<endl;
+	//network_models::network_information::network_data_information::write_network_data("", network_data_for_output);
+	//cout<<"writing network data..."<<endl;
 	//network_models::network_information::network_data_information::write_network_data(output_dir_name,network_data_for_output);
 
 	
@@ -406,7 +410,6 @@ int main(int argc,char** argv)
 	_Logger_Interface* logger=(_Logger_Interface*)Allocate<MasterType::person_data_logger_type>();
 	logger->Initialize<NT>();
 	_global_person_logger = logger;
-
 
 	
 	if (scenario->use_network_events<bool>()) MasterType::link_type::subscribe_events();

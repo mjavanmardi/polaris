@@ -25,6 +25,7 @@
 #include "Antares_Sensor_Implementation.h"
 #include "Antares_Network_Event_Implementation.h"
 #include "Splash_Panel_Implementation.h"
+#include "Antares_Person_Data_Logger.h"
 
 #include "Navigation.h"
 #include "Render.h"
