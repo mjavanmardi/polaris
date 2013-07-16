@@ -362,6 +362,11 @@ namespace Traffic_Management_Center_Components
 				{
 					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
 				}
+
+				for(typename vector<Depot_Interface*>::iterator itr=_depots.begin();itr!=_depots.end();itr++)
+				{
+					(*itr)->template Push_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
+				}
 			}
 
 			feature_implementation void DecideOnEventsToBeDisplayed()
