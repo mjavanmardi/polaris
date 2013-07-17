@@ -81,7 +81,7 @@ namespace Link_Components
 		feature_implementation_definition void Polaris_Link_Implementation<MasterType,ParentType,InheritanceList>::process_accident_event()
 		{
 			typedef Network_Event<typename MasterType::accident_network_event_type> _Accident_Event_Interface;
-			cout << "accident " << _current_accident_event->_accident_type << " being processed" << endl;
+			//cout << "accident " << _current_accident_event->_accident_type << " being processed" << endl;
 			float capacity_adjustment_rate;
 			float free_flow_speed_adjustment_rate;
 			float prev_num_lanes = _num_lanes;

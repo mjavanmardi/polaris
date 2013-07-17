@@ -32,6 +32,8 @@ namespace Person_Components
 			member_data(ofstream, ttime_file, none,none);
 			member_data(ofstream, executed_acts_file, none,none);
 			member_data(ofstream, external_demand_output_file,none,none);
+			member_data(ofstream, activity_time_lost_file,none,none);
+			member_data(ofstream, cancelled_acts_file,none,none);
 			member_data(shared_ptr<odb::database>, db_ptr, none,none);
 
 			// GRAPHICAL DATA MEMBERS
@@ -66,6 +68,8 @@ namespace Person_Components
 				Simulation_Timestep_Increment first_time = this->Next_Logging_Time<ComponentType,CallerType,Simulation_Timestep_Increment>();
 				load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,first_time,0,NULLTYPE);
 
+
+				// Initialize pointers to data buffers
 				buff = output_data_buffer;
 				current = output_data;
 
@@ -78,7 +82,7 @@ namespace Person_Components
 				filename << "activity_output.xls";
 				this->_filename = filename.str();
 				this->_log.open(this->_filename);
-				this->_log << "PER_ID\tACT_ID\tACT_TYP\tSTART_min\tDUR_min\tDEST_ZONE\tMODE\tplanning_info\tTTIME_min\tEXECUTED";
+				this->_log << "PER_ID\tACT_ID\tACT_TYP\tSTART_min\tDUR_min\tDEST_ZONE\tMODE\tplanning_info\tTTIME_min\tEXECUTED"<<endl;
 
 				// Initialize data counter files
 				stringstream filename_ttime("");
@@ -86,14 +90,15 @@ namespace Person_Components
 				filename_ttime << "ttime_distribution.csv";
 				this->_ttime_file.open(filename_ttime.str());
 				if (!this->_ttime_file.is_open()) THROW_EXCEPTION("ERROR: ttime distribution file could not be created.");
-				this->_ttime_file <<"TIME,5,10,15,20,25,30,35,40";
+				this->_ttime_file <<"TIME(s),5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,120+"<<endl;
 				
+				// Initialize executed activities file
 				stringstream filename_acts("");
 				filename_acts << scenario->template output_dir_name<string>();
 				filename_acts << "executed_activities.csv";
 				this->_executed_acts_file.open(filename_acts.str());
 				if (!this->_executed_acts_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");
-				this->_executed_acts_file <<"TIME,0,1,2,3,4,5,6,7";
+				this->_executed_acts_file <<"TIME(s),0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18"<<endl;
 
 				// Initialize data count containers
 				num_acts.resize(20,0);
@@ -104,12 +109,21 @@ namespace Person_Components
 					planned_acts[i].resize(20,0);
 				}
 
+				// Initialize lost activity time file
+				stringstream filename_lost("");
+				filename_lost << scenario->template output_dir_name<string>();
+				filename_lost << "lost_activity_time.csv";
+				this->_activity_time_lost_file.open(filename_lost.str());
+				if (!this->_activity_time_lost_file.is_open())THROW_EXCEPTION("ERROR: activity time lost file could not be created.");
+				this->_activity_time_lost_file <<"TIME(s),LOST_ACTIVITY_TIME(min)"<<endl;
+
+				// Initialize cancelled activities file
 				stringstream filename_demand("");
 				filename_demand << scenario->template output_dir_name<string>();
-				filename_demand << "external_demand.csv";
-				this->_external_demand_output_file.open(filename_demand.str());
-				if (!this->_external_demand_output_file.is_open())THROW_EXCEPTION("ERROR: executed activity distribution file could not be created.");
-				//this->_external_demand_output_file <<"TIME,0,1,2,3,4,5,6,7";
+				filename_demand << "cancelled_activities.csv";
+				this->_cancelled_acts_file.open(filename_demand.str());
+				if (!this->_cancelled_acts_file.is_open())THROW_EXCEPTION("ERROR: cancelled activities file could not be created.");
+				this->_cancelled_acts_file <<"TIME(s),Cancelled_Acts_Count)"<<endl;
 			}
 
 			feature_implementation void Add_Record(TargetType act_record, bool is_executed)
@@ -354,6 +368,12 @@ namespace Person_Components
 						this->_executed_acts_file <<","<< count;
 					}
 					this->_executed_acts_file << endl;
+
+					// write to the lost activity time file
+					this->_activity_time_lost_file << _iteration << "," << this->_activity_time_lost << endl;
+
+					// write to the cancelled activities file
+					this->_cancelled_acts_file << _iteration << "," << this->_cancelled_activities << endl;
 				}
 
 

@@ -290,7 +290,9 @@ namespace Zone_Components
 				_production_count_buffer = prod_height;
 				_attraction_count_buffer = att_height;
 
-				_graphical_zone_group->push_zone_information<Target_Type<NULLTYPE,NULLTYPE,Point_3D<MasterType>&, int> >(coordinate, this, prod_height*100, att_height*100);
+				int height_scale = 50;
+
+				_graphical_zone_group->push_zone_information<Target_Type<NULLTYPE,NULLTYPE,Point_3D<MasterType>&, int> >(coordinate, this, prod_height*height_scale, att_height*height_scale);
 			}
 			
 			static void on_select(const list<void*>& removed,const list<void*>& added,const list<void*>& selected,vector<pair<string,string>>& bucket)

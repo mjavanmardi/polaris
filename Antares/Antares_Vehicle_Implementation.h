@@ -727,6 +727,7 @@ namespace Vehicle_Components
 							Activity_Planner<typename type_of(MasterType::activity),ComponentType>* activity_planner = (Activity_Planner<typename type_of(MasterType::activity),ComponentType>*)(*(activities->begin()));
 							prev_end = activity_planner->Start_Time<Time_Minutes>() - activity_planner->Expected_Travel_Time<Time_Minutes>();
 
+							display_location<typename MasterType::vehicle_type,NT,NT>(previous_location, previous_location,0,0, prev_end, false );
 						
 							for(list<typename type_of(MasterType::activity)*>::iterator itr=activities->begin();itr!=activities->end();itr++)
 							{
@@ -1029,6 +1030,12 @@ namespace Vehicle_Components
 
 			feature_implementation void display_location(Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* location, Activity_Location_Prototype<typename type_of(MasterType::activity_location),ComponentType>* previous_location, int previous_act_end, int current_act_start, int current_act_end, bool discarded=false)
 			{
+
+				int time_scale_factor = 5;
+				previous_act_end *= time_scale_factor;
+				current_act_start *= time_scale_factor;
+				current_act_end *= time_scale_factor;
+
 #pragma pack(push,1)
 				struct attribute_coordinate
 				{

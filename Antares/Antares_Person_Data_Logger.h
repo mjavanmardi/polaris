@@ -20,73 +20,139 @@ namespace Person_Components
 			vector<Point_2D<MasterType>> _generated_activity_distribution_cache;
 			vector<Point_2D<MasterType>> _executed_activity_distribution_cache;
 
+			vector<Point_2D<MasterType>> _ref_activity_time_lost_cache;
+			vector<Point_2D<MasterType>> _ref_ttime_distribution_cache;
+
+			typedef dense_hash_map<int,float> float_map;
+			typedef typename float_map::iterator float_map_itr;
+			float_map reference_activity_time_lost;
+			typedef dense_hash_map<int,vector<float>> vector_map;
+			typedef typename vector_map::iterator vector_map_itr;
+			vector_map reference_ttime_distribution;
+
 			member_prototype(Antares_Layer,activity_time_lost_layer,typename type_of(MasterType::antares_layer),none,none);
 			member_prototype(Antares_Layer,cancelled_activities_layer,typename type_of(MasterType::antares_layer),none,none);
 			member_prototype(Antares_Layer,ttime_distribution_layer,typename type_of(MasterType::antares_layer),none,none);
 			member_prototype(Antares_Layer,activity_type_distribution_layer,typename type_of(MasterType::antares_layer),none,none);
 
+			bool _draw_reference;
+
 			feature_implementation void Initialize()
 			{
 				cout << endl << "Initializing demand display...";
+
+				_draw_reference = false;
+
+				// Basic initialization for person data logger
 				((Person_Data_Logger_Implementation<MasterType,ParentType,APPEND_CHILD(Person_Data_Logger_Implementation)>*)this)->Initialize<ComponentType,CallerType,TargetType>();
+
+				// Initialization of 2D plotting layers
 				initialize_demand_moe_plotting_layers<ComponentType,CallerType,TargetType>();
-				//initialize_reference_data<ComponentType,CallerType,TargetType>();				
+
+				// Initialize historic data if directory provided
+				initialize_reference_data<ComponentType,CallerType,TargetType>();
 			}
 
-			//feature_implementation void initialize_reference_data()
-			//{
-			//	typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-			//	reference_td_network_moe_data_array.clear();
-			//	fstream& network_moe_reference_file = ((_Scenario_Interface*)_global_scenario)->template reference_realtime_network_moe_file<fstream&>();
-			//	if (network_moe_reference_file.is_open())
-			//	{
-			//		struct Extended_MOE_Data moe_data;
-			//		vector<string> tokens;
-			//		string line;
-			//		int token_size = 20;
-			//		getline(network_moe_reference_file,line); // skip the first line
-			//		while (network_moe_reference_file.good())
-			//		{
-			//			getline(network_moe_reference_file,line);
-			//			string_split(tokens, line, token_size);
-			//			if (tokens[0].length() == 0)
-			//			{
-			//				break;
-			//			}
-			//			int time = stoi(tokens[1]);
-			//			if (time < ((_Scenario_Interface*)_global_scenario)->template simulation_start_time<int>())
-			//			{
-			//				continue;
-			//			}
-			//			else if (time > ((_Scenario_Interface*)_global_scenario)->template simulation_end_time<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())
-			//			{
-			//				break;
-			//			}
-			//			else
-			//			{
-			//				moe_data.num_loaded_vehicles = stoi(tokens[2]);
-			//				moe_data.num_departed_vehicles = stoi(tokens[3]);
-			//				moe_data.num_arrived_vehicles = stoi(tokens[4]);
-			//				moe_data.network_avg_link_travel_time = stof(tokens[5]);
-			//				moe_data.network_avg_link_speed = stof(tokens[6]);
-			//				moe_data.network_avg_link_density = stof(tokens[7]);
-			//				moe_data.network_avg_link_in_volume = stof(tokens[8]);
-			//				moe_data.network_avg_link_out_volume = stof(tokens[9]);
-			//				moe_data.network_avg_link_travel_time_ratio = stof(tokens[10]);
-			//				moe_data.network_avg_link_speed_ratio = stof(tokens[11]);
-			//				moe_data.network_avg_link_density_ratio = stof(tokens[12]);
-			//				moe_data.network_avg_link_queue_length = stof(tokens[13]);
-			//				moe_data.network_vmt = int(stof(tokens[14]));
-			//				moe_data.network_vht = int(stof(tokens[15]));
-			//				moe_data.network_cumulative_loaded_vehicles = stoi(tokens[16]);
-			//				moe_data.network_cumulative_departed_vehicles = stoi(tokens[17]);
-			//				moe_data.network_in_network_vehicles = stoi(tokens[18]);
-			//				moe_data.network_cumulative_arrived_vehicles = stoi(tokens[19]);
-			//				reference_td_network_moe_data_array.push_back(moe_data);
-			//			}
-			//		}
-			//	}
-			//}
+			feature_implementation void initialize_reference_data()
+			{
+				// Initialize historic data if directory provided
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+				stringstream moe_directory("");
+				moe_directory << scenario->historic_demand_moe_directory<string>();
+
+
+				if (moe_directory.str() == "") return;	
+
+				_draw_reference = true;			
+
+
+				// open the lost activity time reference file and input to array
+				reference_activity_time_lost.clear();
+				reference_activity_time_lost.set_deleted_key(-2);
+				reference_activity_time_lost.set_empty_key(-1);
+				stringstream activity_time_lost_filename("");
+				activity_time_lost_filename << moe_directory.str() << "//lost_activity_time.csv";
+				fstream activity_time_lost_reference_file;
+				activity_time_lost_reference_file.open(activity_time_lost_filename.str());
+				if (activity_time_lost_reference_file.is_open())
+				{
+					
+					vector<string> tokens;
+					string line;
+					int token_size = 2;
+					getline(activity_time_lost_reference_file,line); // skip the first line
+					while (activity_time_lost_reference_file.good())
+					{
+						getline(activity_time_lost_reference_file,line);
+						string_split(tokens, line, token_size);
+						if (tokens[0].length() == 0)
+						{
+							break;
+						}
+						int time = stoi(tokens[0]);
+						if (time < ((_Scenario_Interface*)_global_scenario)->template simulation_start_time<int>())
+						{
+							continue;
+						}
+						else if (time > ((_Scenario_Interface*)_global_scenario)->template simulation_end_time<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())
+						{
+							break;
+						}
+						else
+						{
+							float lost_time = stof(tokens[1]);
+							reference_activity_time_lost.insert(pair<int,float>(time,lost_time));
+						}
+					}
+				}
+
+				// open the lost activity time reference file and input to array
+				reference_ttime_distribution.clear();
+				reference_ttime_distribution.set_deleted_key(-2);
+				reference_ttime_distribution.set_empty_key(-1);
+				stringstream ttime_distribution_filename("");
+				ttime_distribution_filename << moe_directory.str() << "//ttime_distribution.csv";
+				fstream ttime_distribution_file;
+				ttime_distribution_file.open(ttime_distribution_filename.str());
+				if (ttime_distribution_file.is_open())
+				{
+					
+					vector<string> tokens;
+					string line;
+					int token_size = 26;
+					getline(ttime_distribution_file,line); // skip the first line
+					while (ttime_distribution_file.good())
+					{
+						getline(ttime_distribution_file,line);
+
+						string_split(tokens, line, token_size);
+						if (tokens[0].length() == 0)
+						{
+							break;
+						}
+						int time = stoi(tokens[0]);
+						if (time < ((_Scenario_Interface*)_global_scenario)->template simulation_start_time<int>())
+						{
+							continue;
+						}
+						else if (time > ((_Scenario_Interface*)_global_scenario)->template simulation_end_time<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())
+						{
+							break;
+						}
+						else
+						{
+							vector<float> ttimes;
+							for (int i = 1; i < 26; i++)
+							{
+								float ttime = stof(tokens[i]);
+								ttimes.push_back(ttime);
+							}
+							reference_ttime_distribution.insert(pair<int,vector<float>>(time,ttimes));
+						}
+					}
+				}
+			}
 
 
 			feature_implementation void initialize_demand_moe_plotting_layers()
@@ -153,16 +219,39 @@ namespace Person_Components
 				element.color._b = 0;
 				element.color._a = 255;
 				submission._x=_iteration;
+				Plot_Element ref_element;
+				ref_element.color._r = 0;
+				ref_element.color._g = 0;
+				ref_element.color._b = 255;
+				ref_element.color._a = 255;
+
 
 				//==============================================================
 				// plot activity_time_lost
+				//------------------------
 				submission._y=_activity_time_lost;
 				_activity_time_lost_cache.push_back(submission);
 				element.num_primitives = _activity_time_lost_cache.size();
 				element.points = &_activity_time_lost_cache.front();
 				_activity_time_lost_layer->Push_Element<Regular_Element>((void*)&element);
-
-				cout << endl <<"X,Y, num points: " << submission._x << ", " << submission._y << ", " << element.num_primitives;
+				// plot reference activity time lost
+				//--------------------------
+				if (this->_draw_reference)
+				{
+					cout << "Draw reference data"<<endl;
+					float_map_itr itr = this->reference_activity_time_lost.find(_iteration);
+					if (itr != this->reference_activity_time_lost.end())
+					{
+						float ref_activity_time_lost = itr->second;
+						submission._y = ref_activity_time_lost;
+						cout << "Reference point: " << submission._x << ", " << submission._y<<endl;
+						_ref_activity_time_lost_cache.push_back(submission);
+						ref_element.num_primitives = _ref_activity_time_lost_cache.size();
+						ref_element.points = &_ref_activity_time_lost_cache.front();
+						_activity_time_lost_layer->Push_Element<Regular_Element>((void*)&ref_element);
+					}
+				}
+				
 
 				//==============================================================
 				// plot cancelled acts
@@ -174,6 +263,8 @@ namespace Person_Components
 
 				//==============================================================
 				// plot travel time distribution
+				//-----------------------------------
+				// Current model
 				_ttime_distribution_cache.clear();
 				vector<int> counts;
 				int count =0;
@@ -200,7 +291,34 @@ namespace Person_Components
 				element.num_primitives = _ttime_distribution_cache.size();
 				element.points = &_ttime_distribution_cache.front();
 				_ttime_distribution_layer->Push_Element<Regular_Element>((void*)&element);
-
+				//------------------------------------------
+				//reference data
+				if (this->_draw_reference)
+				{
+					_ref_ttime_distribution_cache.clear();
+					int count =0;
+					vector_map_itr itr = this->reference_ttime_distribution.find(_iteration);
+					if (itr != this->reference_ttime_distribution.end())
+					{
+						for (int j=0; j < 25; j++)
+						{
+							count += itr->second[j];
+						}
+						submission._x = 0;
+						submission._y = 0;
+						_ref_ttime_distribution_cache.push_back(submission);	
+						for (int j=0; j < 25; j++)
+						{
+							submission._x = 5*(j+1);
+							submission._y = (float)itr->second[j]/(float)count;
+							_ref_ttime_distribution_cache.push_back(submission);	
+						}			
+						ref_element.num_primitives = _ref_ttime_distribution_cache.size();
+						ref_element.points = &_ref_ttime_distribution_cache.front();
+						_ttime_distribution_layer->Push_Element<Regular_Element>((void*)&ref_element);
+					}
+					
+				}
 
 				//==============================================================
 				// plot activity generation curves
@@ -210,7 +328,7 @@ namespace Person_Components
 				submission._x = 0;
 				submission._y = 0;
 				_generated_activity_distribution_cache.push_back(submission);	
-				for (int j=0; j < 20; j++)
+				for (int j=0; j < 19; j++)
 				{
 					int count = 0;
 					for (int k=0; k < _num_threads; k++) // collect value over all threads
@@ -239,7 +357,7 @@ namespace Person_Components
 				submission._x = 0;
 				submission._y = 0;
 				_executed_activity_distribution_cache.push_back(submission);	
-				for (int j=0; j < 20; j++)
+				for (int j=0; j < 19; j++)
 				{
 					int count = 0;
 					for (int k=0; k < _num_threads; k++) // collect value over all threads

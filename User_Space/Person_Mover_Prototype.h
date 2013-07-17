@@ -54,7 +54,7 @@ namespace Prototypes
 			person_itf* person = pthis->template Parent_Person<person_itf*>();
 			vehicle_itf* vehicle = person->template vehicle<vehicle_itf*>();
 			scenario_itf* scenario = (scenario_itf*)_global_scenario;
-
+			
 			// determine router aggregation properties - i.e. is routed called at departure or an aggregated time prior to departure
 			Simulation_Timestep_Increment routing_timestep = movement->template departed_time<Simulation_Timestep_Increment>()-1;
 			if (scenario->template aggregate_routing<bool>())
@@ -296,8 +296,14 @@ namespace Prototypes
 					movement->template destination<link_itf*>(dest->template origin_links<links*>()->at(0));
 					activity_itf* act = movement->template destination_activity_reference<activity_itf*>();
 					act->template Location<location_itf*>(dest);
-
+					
 					//cout << endl << "Destination Replanned due to weather, switch from zone '" << old_dest_id << "', to new zone '" << dest->zone<zone_itf*>()->uuid<int>()<<"'.";
+					Time_Seconds ttime = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>>(orig->template zone<zone_itf*>()->template uuid<int>(), dest->template zone<zone_itf*>()->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV,_iteration);
+
+					// update start time
+					Time_Seconds old_start = act->template Start_Time<Time_Seconds>();
+					act->template Start_Time<Time_Seconds>(_iteration + ttime);
+					//cout << "Destination replanned due to weather, start time updated from " << old_start << " to " << act->template Start_Time<Time_Seconds>();
 				}
 				else
 				{

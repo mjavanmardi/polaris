@@ -125,6 +125,7 @@ namespace Scenario_Components
 			member_data(bool, compare_with_historic_moe, none, none);
 			member_data(string, historic_network_moe_file_path_name, none, none);
 			member_data(string, historic_link_moe_file_path_name, none, none);
+			member_data(string, historic_demand_moe_directory, none, none);
 			member_data(bool, read_normal_day_link_moe, none, none);
 			member_data(string, normal_day_link_moe_file_path_name, none, none);
 

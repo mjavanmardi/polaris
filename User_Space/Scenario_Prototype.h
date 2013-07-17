@@ -236,6 +236,8 @@ namespace Scenario_Components
 			feature_accessor(read_normal_day_link_moe, none, none);
 			feature_accessor(normal_day_link_moe_file_path_name, none, none);
 
+			feature_accessor(historic_demand_moe_directory, none, none);
+
 			feature_accessor(output_link_moe_for_simulation_interval, none, none);
 			feature_accessor(output_turn_movement_moe_for_simulation_interval, none, none);
 			feature_accessor(output_network_moe_for_simulation_interval, none, none);
@@ -473,7 +475,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("historic_link_moe_file_path_name", historic_link_moe_file_path_name<string*>())!= PARAMETER_FOUND) historic_link_moe_file_path_name<string>("historic_moe_link.csv");
 				if (cfgReader.getParameter("read_normal_day_link_moe", read_normal_day_link_moe<bool*>())!= PARAMETER_FOUND) read_normal_day_link_moe<bool>(false);
 				if (cfgReader.getParameter("normal_day_link_moe_file_path_name", normal_day_link_moe_file_path_name<string*>())!= PARAMETER_FOUND) normal_day_link_moe_file_path_name<string>("normal_day_moe_link.csv");
-				
+				if (cfgReader.getParameter("historic_demand_moe_directory", historic_demand_moe_directory<string*>())!= PARAMETER_FOUND) historic_demand_moe_directory<string>("");
+
 				if (cfgReader.getParameter("output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_assignment_interval<bool>(true);

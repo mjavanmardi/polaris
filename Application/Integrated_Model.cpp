@@ -157,7 +157,7 @@ struct MasterType
 
 	typedef Link_Control_Components::Implementations::Lane_Link_Control<MasterType> link_control_type;
 	typedef Depot_Components::Implementations::Tow_Truck_Depot<MasterType> depot_type;
-	typedef Depot_Components::Implementations::Tow_Truck<MasterType> tow_truck_type;
+	typedef Depot_Components::Implementations::Tow_Truck_Implementation<MasterType> tow_truck_type;
 
 	typedef Advisory_Radio_Components::Implementations::Highway_Advisory_Radio<MasterType> advisory_radio_type;
 	typedef Variable_Message_Sign_Components::Implementations::Variable_Word_Sign<MasterType> variable_word_sign_type;
