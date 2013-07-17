@@ -82,7 +82,7 @@ Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::Informa
 	
 	_sizer=new wxBoxSizer(wxVERTICAL);
 
-	_information_book=new wxAuiNotebook(this,-1,wxDefaultPosition,wxDefaultSize,wxAUI_NB_TOP);
+	_information_book=new wxAuiNotebook(this,-1,wxDefaultPosition,wxDefaultSize,wxAUI_NB_TOP|wxAUI_NB_SCROLL_BUTTONS);
 
 	for(int i=0;i<25;i++)
 	{
