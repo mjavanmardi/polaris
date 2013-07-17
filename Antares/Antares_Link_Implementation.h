@@ -413,25 +413,25 @@ namespace Link_Components
 
 				if (fraction < 0.3)
 				{
-					color._r = 51;
-					color._g = 177;
+					color._r = 0;
+					color._g = 255;
 					color._b = 0;
 				}
 				else if (fraction < 0.6)
 				{
 					color._r = 255;
-					color._g = 204;
+					color._g = 255;
 					color._b = 0;
 				}
 				else if (fraction < 0.9)
 				{
-					color._r = 153;
-					color._g = 0;
+					color._r = 255;
+					color._g = 50;
 					color._b = 0;
 				}
 				else
 				{
-					color._r = 100;
+					color._r = 150;
 					color._g = 0;
 					color._b = 0;
 				}

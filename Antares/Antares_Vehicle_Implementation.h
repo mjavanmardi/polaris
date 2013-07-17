@@ -70,11 +70,11 @@ namespace Vehicle_Components
 		//int Vehicle_Attribute_Shape::right_index;
 		//int Vehicle_Attribute_Shape::top_index;
 
-		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 6.775 * 5; // rear width in feet
-		const float Vehicle_Attribute_Shape::_vehicle_front_width = 6.775 * 5; // front width in feet
-		const float Vehicle_Attribute_Shape::_vehicle_length = 17 * 5; // length in feet
-		const float Vehicle_Attribute_Shape::_vehicle_height = 6.583 * 5; // height in feet
-		const float Vehicle_Attribute_Shape::_vehicle_mid_height = 6.583*2.0/3.0 * 5; // height in feet
+		const float Vehicle_Attribute_Shape::_vehicle_rear_width = 6.775 * 3; // rear width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_front_width = 6.775 * 3; // front width in feet
+		const float Vehicle_Attribute_Shape::_vehicle_length = 17 * 3; // length in feet
+		const float Vehicle_Attribute_Shape::_vehicle_height = 6.583 * 3; // height in feet
+		const float Vehicle_Attribute_Shape::_vehicle_mid_height = 6.583*2.0/3.0 * 3; // height in feet
 
 		implementation struct Antares_Vehicle_Implementation:public Polaris_Vehicle_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Vehicle_Implementation)>
 		{
@@ -529,15 +529,15 @@ namespace Vehicle_Components
 					{
 						if (num_switch_decisions == 1)
 						{
-							coordinate.color._r = 191;
+							coordinate.color._r = 255;
 							coordinate.color._g = 0;
 							coordinate.color._b = 255;
 						}
 						else
 						{
-							coordinate.color._r = 102;
+							coordinate.color._r = 175;
 							coordinate.color._g = 0;
-							coordinate.color._b = 153;
+							coordinate.color._b = 175;
 						}
 					}
 					else
