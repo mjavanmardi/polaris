@@ -118,6 +118,7 @@ namespace Network_Skimming_Components
 			feature_accessor(write_output,none,none);
 			feature_accessor(input_file,none,none);
 			feature_accessor(output_file,none,none);
+			feature_accessor(skim_fit_results_file,none,none);
 
 			//=============================================
 			// Primary function accessors - used to pass through to the specific skimm table based on time-key
@@ -260,8 +261,7 @@ namespace Network_Skimming_Components
 					itr->second->template Update_LOS<NULLTYPE>();
 				}
 
-				// Network Skim timer
-				cout << endl<<"Network Skimming run-time: " << this->template timer<Counter&>().Stop();
+				
 
 				// Output network skims
 				for (typename _skim_container_itf::iterator itr = skim->begin(); itr != skim->end(); ++itr)
@@ -272,6 +272,9 @@ namespace Network_Skimming_Components
 					}
 				}
 
+
+				// Network Skim timer
+				cout << endl<<"Network Skimming run-time: " << this->template timer<Counter&>().Stop();
 				return true;
 			}
 
@@ -471,6 +474,9 @@ namespace Network_Skimming_Components
 			feature_accessor(start_time,none,none);
 			feature_accessor(end_time,none,none);
 
+			feature_accessor(weighted_deviation,none,none);
+			feature_accessor(max_deviation,none,none);
+
 			//=============================================
 			// Primary function accessors - used to calculate/return LOS values for OD pairs
 			//---------------------------------------------
@@ -580,6 +586,11 @@ namespace Network_Skimming_Components
 				typedef typename skim_table_itf::size_type size_t;
 				typename skim_table_itf::iterator skim_table_itr = los->begin();
 
+				// fit characteristics initialized
+				float sum_of_deviation=0.0;
+				float sum_of_weight = 0.0;
+				float max_dev = 0.0;
+
 				// loop through each tree router, extract travel time info and place into los_skim
 				for (;tree_itr != trees_container->end(); ++tree_itr)
 				{
@@ -602,6 +613,10 @@ namespace Network_Skimming_Components
 						float time = tree->template Get_Tree_Results_For_Destination<typename skimmer_itf::Component_Type::Stored_Time_Type>(dest_link_index);
 						if (dest_zone_index == orig_zone_index) time = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,typename skimmer_itf::Component_Type::Stored_Time_Type,Time_Minutes>>(2.0);
 						float time_old = (*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)];
+						sum_of_deviation += (time-time_old);
+						sum_of_weight += time_old;
+						float dev = time_old > 0.0 ? (time-time_old)/time_old : 0.0;
+						if (dev > max_dev) max_dev = dev;
 						(*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)] = 0.5 * time + 0.5 * time_old;
 
 						//cout << (*activity_locations)[orig_itr->second->loc_index<long>()]->uuid<int>() << ", " << (*activity_locations)[dest_node_index]->uuid<int>() << ", ";
@@ -609,6 +624,16 @@ namespace Network_Skimming_Components
 						//cout << (*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)]<<endl;
 					}
 				}
+
+				this->weighted_deviation<float>(sum_of_deviation/sum_of_weight);
+				this->max_deviation<float>(max_dev);
+
+				stringstream outline("");
+				outline<<_iteration<<","<<this->weighted_deviation<float>()<<","<<this->max_deviation<float>();
+				File_IO::File_Writer& out_file = skim->skim_fit_results_file<File_IO::File_Writer&>();
+				out_file.Write_Line(outline);
+				cout << "W.A.A.P.D from previous skim: " << this->weighted_deviation<float>()<<endl;
+				cout << "Maximum deviation from previous: " << this->max_deviation<float>()<<endl;
 
 				return true;
 			}

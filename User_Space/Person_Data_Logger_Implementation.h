@@ -32,14 +32,13 @@ namespace Person_Components
 			member_data(ofstream, ttime_file, none,none);
 			member_data(ofstream, executed_acts_file, none,none);
 			member_data(ofstream, external_demand_output_file,none,none);
-			member_data(ofstream, activity_time_lost_file,none,none);
-			member_data(ofstream, cancelled_acts_file,none,none);
+			member_data(ofstream, demand_moe_file,none,none);
 			member_data(shared_ptr<odb::database>, db_ptr, none,none);
 
 			// GRAPHICAL DATA MEMBERS
 			member_data(float, activity_time_lost,none,none);
 			member_data(float, cancelled_activities,none,none);
-
+			member_data(float, replanned_activities,none,none);
 
 			member_component_and_feature_accessor(Logging_Interval, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Next_Logging_Time, Value, Basic_Units::Prototypes::Time_Prototype,Basic_Units::Implementations::Time_Implementation<NT>);
@@ -109,21 +108,13 @@ namespace Person_Components
 					planned_acts[i].resize(20,0);
 				}
 
-				// Initialize lost activity time file
-				stringstream filename_lost("");
-				filename_lost << scenario->template output_dir_name<string>();
-				filename_lost << "lost_activity_time.csv";
-				this->_activity_time_lost_file.open(filename_lost.str());
-				if (!this->_activity_time_lost_file.is_open())THROW_EXCEPTION("ERROR: activity time lost file could not be created.");
-				this->_activity_time_lost_file <<"TIME(s),LOST_ACTIVITY_TIME(min)"<<endl;
-
-				// Initialize cancelled activities file
-				stringstream filename_demand("");
-				filename_demand << scenario->template output_dir_name<string>();
-				filename_demand << "cancelled_activities.csv";
-				this->_cancelled_acts_file.open(filename_demand.str());
-				if (!this->_cancelled_acts_file.is_open())THROW_EXCEPTION("ERROR: cancelled activities file could not be created.");
-				this->_cancelled_acts_file <<"TIME(s),Cancelled_Acts_Count)"<<endl;
+				// Initialize demand MOE file
+				stringstream filename_moe("");
+				filename_moe << scenario->template output_dir_name<string>();
+				filename_moe << "moe_demand.csv";
+				this->_demand_moe_file.open(filename_moe.str());
+				if (!this->_demand_moe_file.is_open())THROW_EXCEPTION("ERROR: demand moe file could not be created.");
+				this->_demand_moe_file <<"TIME(s),LOST_ACTIVITY_TIME(min),Cancelled_Acts_Count"<<endl;
 			}
 
 			feature_implementation void Add_Record(TargetType act_record, bool is_executed)
@@ -286,6 +277,10 @@ namespace Person_Components
 			{
 				this->_cancelled_activities++;
 			}
+			feature_implementation void Increment_Replanned_Activities()
+			{
+				this->_replanned_activities++;
+			}
 
 			declare_feature_conditional(Logging_Conditional)
 			{
@@ -342,9 +337,10 @@ namespace Person_Components
 				}
 				current[i].clear();
 
-				// display the ttime and executed activity count distributions once
+				// do aggregated file writing on first subiteration
 				if (i == 0)
 				{
+					// display the ttime and executed activity count distributions once
 					this->_ttime_file << _iteration;
 					for (int j=0; j < 25; j++)
 					{
@@ -370,10 +366,10 @@ namespace Person_Components
 					this->_executed_acts_file << endl;
 
 					// write to the lost activity time file
-					this->_activity_time_lost_file << _iteration << "," << this->_activity_time_lost << endl;
+					this->_demand_moe_file << _iteration << "," << this->_activity_time_lost << endl;
 
 					// write to the cancelled activities file
-					this->_cancelled_acts_file << _iteration << "," << this->_cancelled_activities << endl;
+					this->_demand_moe_file << _iteration << "," << this->_cancelled_activities << endl;
 				}
 
 

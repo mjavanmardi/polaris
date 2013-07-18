@@ -745,7 +745,7 @@ namespace Vehicle_Components
 
 						vector<typename type_of(MasterType::activity_record)*>* discarded_activities = person->Activity_Record_Container<vector<typename type_of(MasterType::activity_record)*>*>();
 
-						//cout << endl <<endl<< "Num discarded activities="<<discarded_activities->size();
+						cout << endl <<endl<< "Num discarded activities="<<discarded_activities->size();
 
 						if(discarded_activities->size() && person->Home_Location<Activity_Location_Interface*>())
 						{
@@ -1143,7 +1143,7 @@ namespace Vehicle_Components
 					link_line.down_node=start;
 					link_line.up_node=mid;
 
-					if(!discarded)_routes_layer->template Push_Element<Accented_Element>(&link_line);
+					/*if(!discarded)*/_routes_layer->template Push_Element<Accented_Element>(&link_line);
 					
 					if(!discarded)
 					{
@@ -1171,7 +1171,7 @@ namespace Vehicle_Components
 					link_line.down_node=mid;
 					link_line.up_node=end;
 
-					if(!discarded) _routes_layer->template Push_Element<Accented_Element>(&link_line);
+					/*if(!discarded) */_routes_layer->template Push_Element<Accented_Element>(&link_line);
 
 					// Push activity time line
 					link_line.color._r=255;

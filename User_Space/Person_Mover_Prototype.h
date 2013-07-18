@@ -456,6 +456,7 @@ namespace Prototypes
 			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
+			define_component_interface(_Logger_Interface, MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);
 
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			Routing_Itf* itf= person ->template router<Routing_Itf*>();	
@@ -463,6 +464,10 @@ namespace Prototypes
 			network_itf* network = person->template network_reference<network_itf*>();
 			movement_itf* movements = this->Movement<movement_itf*>();
 			link_itf* origin_link = movements->template origin<link_itf*>();
+
+			// increment the replanned activities counter
+			_Logger_Interface* logger = (_Logger_Interface*)_global_person_logger;
+			logger->Increment_Replanned_Activities<NT>();
 		}
 
 		//========================================================
@@ -561,6 +566,7 @@ namespace Prototypes
 			this->Movement_Scheduled<bool>(false);
 
 			// interfaces
+			typedef Vehicle_Components::Types::Vehicle_Type_Keys MODE;
 			define_component_interface(Parent_Person_Itf, typename get_type_of(Parent_Person), Person_Components::Prototypes::Person, ComponentType);
 			define_component_interface(Scheduler_Itf, typename Parent_Person_Itf::get_type_of(Scheduling_Faculty), Person_Components::Prototypes::Person_Scheduler, ComponentType);
 			define_component_interface(Planner_Itf, typename Parent_Person_Itf::get_type_of(Planning_Faculty), Person_Components::Prototypes::Person_Planner, ComponentType);
@@ -584,16 +590,34 @@ namespace Prototypes
 			skim_itf* skim = network->template skimming_faculty<skim_itf*>();
 			movement_itf* movements = this->Movement<movement_itf*>();
 
-
-
-
-
 			//=====================================================================
 			// schedule departure from destination if no following activity
 			Activity_Itf* act = movements->template destination_activity_reference<Activity_Itf*>();	
 			Activity_Itf* next_act = scheduler->template next_activity_plan<Target_Type<NT,Activity_Itf*, Simulation_Timestep_Increment>>(_iteration);
-			if (next_act == nullptr) return;
 
+
+			// Define time window after current activity is completed
+			Time_Seconds end_this = act->template Start_Time<Time_Seconds>() + act->template Duration<Time_Seconds>();
+			int o_id = act->template Location<location_itf*>()->template zone<zone_itf*>()->template uuid<int>();
+			int h_id = person->template Home_Location<zone_itf*>()->template uuid<int>();
+			Time_Seconds ttime_this_to_home = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,MODE,Time_Seconds>>(o_id,h_id,MODE::SOV,end_this);
+
+			// don't add additional movement if already at home
+			if (act->template Location<location_itf*>() == person->template Home_Location<location_itf*>()) return;
+
+			// If this is the last act of the day, then return home afterward
+			if (next_act == nullptr)
+			{
+				// GENERATE A NEW AT HOME ACTIVITY
+				
+				typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type,ComponentType> at_home_activity_itf;
+				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
+				new_act->template Parent_Planner<Planner_Itf*>(planner);
+				Time_Seconds min_home_duration = 86400 - (end_this+ttime_this_to_home);
+				new_act->template Initialize<Target_Type<NT,void,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>>(end_this+ttime_this_to_home, min_home_duration,act->template Mode<MODE>());
+				return;
+			}
+			movement_itf* next_movement = next_act->template movement_plan<movement_itf*>();
 
 			// check that arrive is not too delayed into the start of the following activity
 			Simulation_Timestep_Increment arrival_time = _iteration;
@@ -602,24 +626,14 @@ namespace Prototypes
 				THROW_WARNING("Warning, excessive delay on trip to activity '"<< act->template Parent_ID<int>() << "." << act->template Activity_Plan_ID<int>()<<"', arrival time is after original activity end."<< "  Actstart="<<act->template Start_Time<Time_Seconds>() << ", Actend=" << act->template Start_Time<Time_Seconds>() + act->template Duration<Time_Seconds>() <<", departure_time="<<movements->template departed_time<Time_Seconds>() << ", arrival time="<<arrival_time<<", mode="<<act->template Mode<int>()<<endl);
 			}
 
-			// don't add additional movement if already at home
-			if (act->template Location<location_itf*>() == person->template Home_Location<location_itf*>()) return;
-
-			movement_itf* next_movement = next_act->template movement_plan<movement_itf*>();
-
-			// Define time window after current activity is completed
-			Time_Seconds end_this = act->template Start_Time<Time_Seconds>() + act->template Duration<Time_Seconds>();
-			Time_Seconds begin_next = next_act->template Start_Time<Time_Seconds>();
-
-			// O/D ids
-			int o_id = act->template Location<location_itf*>()->template zone<zone_itf*>()->template uuid<int>();
+			
+			// O/D ids		
 			int d_id = next_act->template Location<location_itf*>()->template zone<zone_itf*>()->template uuid<int>();
-			int h_id = person->template Home_Location<zone_itf*>()->template uuid<int>();
+			
 
 			// expected travel times
-			typedef Vehicle_Components::Types::Vehicle_Type_Keys MODE;
+			Time_Seconds begin_next = next_act->template Start_Time<Time_Seconds>();
 			Time_Seconds ttime_this_to_next = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,MODE,Time_Seconds>>(o_id,d_id,MODE::SOV,end_this);
-			Time_Seconds ttime_this_to_home = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,MODE,Time_Seconds>>(o_id,h_id,MODE::SOV,end_this);
 			Time_Seconds ttime_home_to_next = network->template Get_LOS<Target_Type<NT,Time_Seconds,int,MODE,Time_Seconds>>(h_id,d_id,MODE::SOV,end_this + ttime_this_to_home);
 			Time_Seconds min_home_duration = min((float)ttime_this_to_home,(float)ttime_home_to_next);
 			min_home_duration = max((float)min_home_duration, 300.0f);
@@ -628,37 +642,11 @@ namespace Prototypes
 			// Person can go home first, schedule an additional return home movement
 			if (begin_next - end_this > ttime_this_to_home + ttime_home_to_next + min_home_duration)
 			{
-				// Create movement plan and give it an ID
-				/*movement_itf* move = (movement_itf*)Allocate<typename Scheduler_Itf::get_type_of(Movement_Plans_Container)::unqualified_value_type>();
-				move->template initialize_trajectory<NULLTYPE>();*/
-				/*Activity_Itf* null_act = nullptr;
-				move->template destination_activity_reference<Activity_Itf*>(null_act);*/
-
-				location_itf* orig = act->template Location<location_itf*>();
-				location_itf* dest = person->template Home_Location<location_itf*>();
-
-				// check that origin and destination are valid
-				if (orig == nullptr || dest == nullptr) THROW_WARNING("WARNING: movement can not happen as no origin or destination is null pointer.");
-				if (orig->template origin_links<links_container_itf&>().size() == 0 || dest->template origin_links<links_container_itf&>().size() == 0) THROW_WARNING("WARNING: movement from " << orig->template uuid<int>() << " to " << dest->template uuid<int>() << ", can not happen as no origin / destination links are available for the locations.");
-				if (orig->template origin_links<links_container_itf&>().at(0)->template outbound_turn_movements<turns_container_itf*>()->size() == 0 || dest->template origin_links<links_container_itf&>().at(0)->template outbound_turn_movements<turns_container_itf*>()->size() == 0) THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "/*<<concat(this->Parent_Person<ComponentType,CallerType,int>()) << "." << concat(this->Activity_Plan_ID<ComponentType, CallerType,int>()) <<", " << concat(this->Activity_Type<ComponentType, CallerType,ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>()*/);
-
 				// GENERATE A NEW AT HOME ACTIVITY
 				typedef Activity_Components::Prototypes::Activity_Planner<typename ComponentType::Master_Type::at_home_activity_plan_type,ComponentType> at_home_activity_itf;
 				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
-				//new_act->template movement_plan<movement_itf*>(move);
 				new_act->template Parent_Planner<Planner_Itf*>(planner);
 				new_act->template Initialize<Target_Type<NT,void,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>>(end_this+ttime_this_to_home, min_home_duration,act->template Mode<MODE>());
-
-				// If the trip is valid, assign to a movement plan and add to the schedule
-				//move->template origin<location_itf*>(orig);
-				//move->template destination<location_itf*>(dest);
-				//move->template origin<link_itf*>(orig->template origin_links<links_container_itf&>().at(0));
-				//move->template destination<link_itf*>(dest->template origin_links<links_container_itf&>().at(0));
-				//move->template departed_time<Simulation_Timestep_Increment>(end_this);
-				//scheduler->template Add_Movement_Plan<movement_itf*>(move);
-
-				//Time_Seconds next_depart_time = next_act->template Start_Time<Time_Seconds>() - ttime_home_to_next;
-				//cout << endl << "Returning home @t=" << (int)end_this << ", expected arrival @t="<<(int)end_this+(int)ttime_this_to_home<<", approximate departure from home for next activity @t="<< (int)next_depart_time;
 			}
 
 			//=====================================================================

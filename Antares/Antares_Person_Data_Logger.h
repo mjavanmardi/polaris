@@ -14,6 +14,9 @@ namespace Person_Components
 	{
 		implementation struct Antares_Person_Data_Logger_Implementation:public Person_Data_Logger_Implementation<MasterType,ParentType,APPEND_CHILD(Antares_Person_Data_Logger_Implementation)>
 		{
+			//==================================================================================
+			// Data caches for current and historical plot points
+			vector<Point_2D<MasterType>> _replanned_activity_count_cache;
 			vector<Point_2D<MasterType>> _activity_time_lost_cache;
 			vector<Point_2D<MasterType>> _cancelled_activities_cache;
 			vector<Point_2D<MasterType>> _ttime_distribution_cache;
@@ -21,15 +24,25 @@ namespace Person_Components
 			vector<Point_2D<MasterType>> _executed_activity_distribution_cache;
 
 			vector<Point_2D<MasterType>> _ref_activity_time_lost_cache;
+			vector<Point_2D<MasterType>> _ref_cancelled_activities_cache;
 			vector<Point_2D<MasterType>> _ref_ttime_distribution_cache;
+			vector<Point_2D<MasterType>> _ref_generated_activity_distribution_cache;
+			vector<Point_2D<MasterType>> _ref_executed_activity_distribution_cache;
 
+			//==================================================================================
+			// Vectors of historical data read from file on initialization
 			typedef dense_hash_map<int,float> float_map;
 			typedef typename float_map::iterator float_map_itr;
 			float_map reference_activity_time_lost;
+			float_map reference_cancelled_activities;
 			typedef dense_hash_map<int,vector<float>> vector_map;
 			typedef typename vector_map::iterator vector_map_itr;
 			vector_map reference_ttime_distribution;
+			vector_map reference_executed_activity_distribution;
 
+			//==================================================================================
+			// 2D plotting layers
+			member_prototype(Antares_Layer,replanned_activities_layer,typename type_of(MasterType::antares_layer),none,none);
 			member_prototype(Antares_Layer,activity_time_lost_layer,typename type_of(MasterType::antares_layer),none,none);
 			member_prototype(Antares_Layer,cancelled_activities_layer,typename type_of(MasterType::antares_layer),none,none);
 			member_prototype(Antares_Layer,ttime_distribution_layer,typename type_of(MasterType::antares_layer),none,none);
@@ -53,38 +66,37 @@ namespace Person_Components
 				initialize_reference_data<ComponentType,CallerType,TargetType>();
 			}
 
+
 			feature_implementation void initialize_reference_data()
 			{
+				//==================================================================================
 				// Initialize historic data if directory provided
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 				stringstream moe_directory("");
 				moe_directory << scenario->historic_demand_moe_directory<string>();
-
-
+				// Exit if no historical directory provided
 				if (moe_directory.str() == "") return;	
-
 				_draw_reference = true;			
 
-
-				// open the lost activity time reference file and input to array
-				reference_activity_time_lost.clear();
-				reference_activity_time_lost.set_deleted_key(-2);
-				reference_activity_time_lost.set_empty_key(-1);
-				stringstream activity_time_lost_filename("");
-				activity_time_lost_filename << moe_directory.str() << "//lost_activity_time.csv";
-				fstream activity_time_lost_reference_file;
-				activity_time_lost_reference_file.open(activity_time_lost_filename.str());
-				if (activity_time_lost_reference_file.is_open())
+				//==================================================================================
+				// open the demand moe file and input to array
+				reference_activity_time_lost.clear(); reference_activity_time_lost.set_deleted_key(-2); reference_activity_time_lost.set_empty_key(-1);
+				reference_cancelled_activities.clear(); reference_cancelled_activities.set_deleted_key(-2); reference_cancelled_activities.set_empty_key(-1);
+				stringstream demand_moe_filename("");
+				demand_moe_filename << moe_directory.str() << "//moe_demand.csv";
+				fstream demand_moe_reference_file;
+				demand_moe_reference_file.open(demand_moe_filename.str());
+				if (demand_moe_reference_file.is_open())
 				{
 					
 					vector<string> tokens;
 					string line;
-					int token_size = 2;
-					getline(activity_time_lost_reference_file,line); // skip the first line
-					while (activity_time_lost_reference_file.good())
+					int token_size = 3;
+					getline(demand_moe_reference_file,line); // skip the first line
+					while (demand_moe_reference_file.good())
 					{
-						getline(activity_time_lost_reference_file,line);
+						getline(demand_moe_reference_file,line);
 						string_split(tokens, line, token_size);
 						if (tokens[0].length() == 0)
 						{
@@ -102,12 +114,15 @@ namespace Person_Components
 						else
 						{
 							float lost_time = stof(tokens[1]);
+							float cancelled_acts = stof(tokens[2]);
 							reference_activity_time_lost.insert(pair<int,float>(time,lost_time));
+							reference_cancelled_activities.insert(pair<int,float>(time,cancelled_acts));
 						}
 					}
 				}
 
-				// open the lost activity time reference file and input to array
+				//==================================================================================
+				// open the travel time distribution reference file and input to array
 				reference_ttime_distribution.clear();
 				reference_ttime_distribution.set_deleted_key(-2);
 				reference_ttime_distribution.set_empty_key(-1);
@@ -152,6 +167,53 @@ namespace Person_Components
 						}
 					}
 				}
+
+				//==================================================================================
+				// open the executed activitity distribution reference file and input to array
+				reference_executed_activity_distribution.clear();
+				reference_executed_activity_distribution.set_deleted_key(-2);
+				reference_executed_activity_distribution.set_empty_key(-1);
+				stringstream executed_activity_filename("");
+				executed_activity_filename << moe_directory.str() << "//executed_activities.csv";
+				fstream executed_activity_file;
+				executed_activity_file.open(executed_activity_filename.str());
+				if (executed_activity_file.is_open())
+				{
+					
+					vector<string> tokens;
+					string line;
+					int token_size = 26;
+					getline(executed_activity_file,line); // skip the first line
+					while (executed_activity_file.good())
+					{
+						getline(executed_activity_file,line);
+
+						string_split(tokens, line, token_size);
+						if (tokens[0].length() == 0)
+						{
+							break;
+						}
+						int time = stoi(tokens[0]);
+						if (time < ((_Scenario_Interface*)_global_scenario)->template simulation_start_time<int>())
+						{
+							continue;
+						}
+						else if (time > ((_Scenario_Interface*)_global_scenario)->template simulation_end_time<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())
+						{
+							break;
+						}
+						else
+						{
+							vector<float> gen_acts;
+							for (int i = 1; i < 20; i++)
+							{
+								float acts = stof(tokens[i]);
+								gen_acts.push_back(acts);
+							}
+							reference_executed_activity_distribution.insert(pair<int,vector<float>>(time,gen_acts));
+						}
+					}
+				}
 			}
 
 
@@ -174,6 +236,10 @@ namespace Person_Components
 				pcfg.y_label = "Time lost (minutes)";
 				_activity_time_lost_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(activity_time_lost_layer),Antares_Person_Data_Logger_Implementation>*, string& > >(string("Time Lost"));
 				_activity_time_lost_layer->Initialize<NULLTYPE>(pcfg);
+
+				pcfg.y_label = "Activity count";
+				_replanned_activities_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(replanned_activities_layer),Antares_Person_Data_Logger_Implementation>*, string& > >(string("Replanned Activities"));
+				_replanned_activities_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "Activities";
 				_cancelled_activities_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(cancelled_activities_layer),Antares_Person_Data_Logger_Implementation>*, string& > >(string("Cancelled Activities"));
@@ -238,13 +304,11 @@ namespace Person_Components
 				//--------------------------
 				if (this->_draw_reference)
 				{
-					cout << "Draw reference data"<<endl;
 					float_map_itr itr = this->reference_activity_time_lost.find(_iteration);
 					if (itr != this->reference_activity_time_lost.end())
 					{
 						float ref_activity_time_lost = itr->second;
 						submission._y = ref_activity_time_lost;
-						cout << "Reference point: " << submission._x << ", " << submission._y<<endl;
 						_ref_activity_time_lost_cache.push_back(submission);
 						ref_element.num_primitives = _ref_activity_time_lost_cache.size();
 						ref_element.points = &_ref_activity_time_lost_cache.front();
@@ -252,6 +316,14 @@ namespace Person_Components
 					}
 				}
 				
+				//==============================================================
+				// plot replanned activities
+				//------------------------
+				submission._y=_replanned_activities;
+				_replanned_activity_count_cache.push_back(submission);
+				element.num_primitives = _replanned_activity_count_cache.size();
+				element.points = &_replanned_activity_count_cache.front();
+				_replanned_activities_layer->Push_Element<Regular_Element>((void*)&element);
 
 				//==============================================================
 				// plot cancelled acts
@@ -260,6 +332,22 @@ namespace Person_Components
 				element.num_primitives = _cancelled_activities_cache.size();
 				element.points = &_cancelled_activities_cache.front();
 				_cancelled_activities_layer->Push_Element<Regular_Element>((void*)&element);
+				// plot reference cancelled acts
+				//--------------------------
+				if (this->_draw_reference)
+				{
+					float_map_itr itr = this->reference_cancelled_activities.find(_iteration);
+					if (itr != this->reference_cancelled_activities.end())
+					{
+						float ref_cancelled_acts = itr->second;
+						submission._y = ref_cancelled_acts;
+						_ref_cancelled_activities_cache.push_back(submission);
+						ref_element.num_primitives = _ref_cancelled_activities_cache.size();
+						ref_element.points = &_ref_cancelled_activities_cache.front();
+						_activity_time_lost_layer->Push_Element<Regular_Element>((void*)&ref_element);
+					}
+				}
+
 
 				//==============================================================
 				// plot travel time distribution
@@ -320,6 +408,7 @@ namespace Person_Components
 					
 				}
 
+
 				//==============================================================
 				// plot activity generation curves
 				//-------------------------------------------
@@ -335,16 +424,16 @@ namespace Person_Components
 					{
 						count += planned_acts[k][j];
 					}
-					submission._x = (float)j - 0.12;
+					submission._x = (float)j - 0.27;
 					submission._y = 0;
 					_generated_activity_distribution_cache.push_back(submission);
-					submission._x = (float)j - 0.12;
+					submission._x = (float)j - 0.27;
 					submission._y = (float)count;
 					_generated_activity_distribution_cache.push_back(submission);	
-					submission._x = (float)j + 0.12;
+					submission._x = (float)j -0.03;
 					submission._y = (float)count;
 					_generated_activity_distribution_cache.push_back(submission);	
-					submission._x = (float)j + 0.12;
+					submission._x = (float)j -0.03;
 					submission._y = 0;
 					_generated_activity_distribution_cache.push_back(submission);
 				}			
@@ -352,7 +441,7 @@ namespace Person_Components
 				element.points = &_generated_activity_distribution_cache.front();
 				_activity_type_distribution_layer->Push_Element<Regular_Element>((void*)&element);
 				//-------------------------------------------
-				// next do planned activities
+				// next do executed activities
 				_executed_activity_distribution_cache.clear();
 				submission._x = 0;
 				submission._y = 0;
@@ -364,16 +453,16 @@ namespace Person_Components
 					{
 						count += executed_acts[k][j];
 					}
-					submission._x = (float)j - 0.1;
+					submission._x = (float)j - 0.25;
 					submission._y = 0;
 					_executed_activity_distribution_cache.push_back(submission);
-					submission._x = (float)j - 0.1;
+					submission._x = (float)j - 0.25;
 					submission._y = (float)count;
 					_executed_activity_distribution_cache.push_back(submission);	
-					submission._x = (float)j + 0.1;
+					submission._x = (float)j - 0.05;
 					submission._y = (float)count;
 					_executed_activity_distribution_cache.push_back(submission);	
-					submission._x = (float)j + 0.1;
+					submission._x = (float)j - 0.05;
 					submission._y = 0;
 					_executed_activity_distribution_cache.push_back(submission);
 				}
@@ -382,205 +471,63 @@ namespace Person_Components
 				element2.color._g = 0;
 				element2.color._b = 255;
 				element2.color._a = 255;
-		
 				element2.num_primitives = _executed_activity_distribution_cache.size();
 				element2.points = &_executed_activity_distribution_cache.front();
 				_activity_type_distribution_layer->Push_Element<Regular_Element>((void*)&element2);
+				//---------------------------------------------
+				// plot reference activity generation data
+				if (this->_draw_reference)
+				{
+					_ref_executed_activity_distribution_cache.clear();
+					vector_map_itr itr = this->reference_executed_activity_distribution.find(_iteration);
+					if (itr != this->reference_executed_activity_distribution.end())
+					{
+						submission._x = 0;
+						submission._y = 0;
+						_ref_executed_activity_distribution_cache.push_back(submission);	
+						for (int j=0; j < 19; j++)
+						{
+							float count = (float)itr->second[j];
+
+							submission._x = (float)j + 0.05;
+							submission._y = 0;
+							_ref_executed_activity_distribution_cache.push_back(submission);
+							submission._x = (float)j + 0.05;
+							submission._y = (float)count;
+							_ref_executed_activity_distribution_cache.push_back(submission);	
+							submission._x = (float)j + 0.25;
+							submission._y = (float)count;
+							_ref_executed_activity_distribution_cache.push_back(submission);	
+							submission._x = (float)j + 0.25;
+							submission._y = 0;
+							_ref_executed_activity_distribution_cache.push_back(submission);	
+						}			
+						Plot_Element ref_element_act;
+						ref_element_act.color._r = 0;
+						ref_element_act.color._g = 255;
+						ref_element_act.color._b = 255;
+						ref_element_act.color._a = 255;
+						ref_element_act.num_primitives = _ref_executed_activity_distribution_cache.size();
+						ref_element_act.points = &_ref_executed_activity_distribution_cache.front();
+						_activity_type_distribution_layer->Push_Element<Regular_Element>((void*)&ref_element_act);
+					}
+					// replot the generated activities curve for comparison
+					for (vector<Point_2D<MasterType>>::iterator vitr = _generated_activity_distribution_cache.begin(); vitr != _generated_activity_distribution_cache.end(); ++vitr)
+					{
+						submission._x = vitr->_x + 0.3;
+						submission._y = vitr->_y;
+						_ref_generated_activity_distribution_cache.push_back(submission);
+					}
+					Plot_Element ref_element_gen;
+					ref_element_gen.color._r = 255;
+					ref_element_gen.color._g = 0;
+					ref_element_gen.color._b = 255;
+					ref_element_gen.color._a = 255;
+					ref_element_gen.num_primitives = _ref_generated_activity_distribution_cache.size();
+					ref_element_gen.points = &_ref_generated_activity_distribution_cache.front();
+					_activity_type_distribution_layer->Push_Element<Regular_Element>((void*)&ref_element_gen);
+				}
 			}
-
-//			void plot_reference_network_moes()
-//			{
-//				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-//				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Network_Interface;
-//
-//				int time_index = ((_Network_Interface*)this)->template current_simulation_interval_index<int>();
-//				if (time_index >= (int)(reference_td_network_moe_data_array.size())) 
-//				{
-//					return;
-//				}
-//				Extended_MOE_Data reference_moe_data = reference_td_network_moe_data_array[time_index];
-//				if (time_index < (int)(reference_td_network_moe_data_array.size() - 1))
-//				{
-//					reference_moe_data.network_vmt =  reference_td_network_moe_data_array[time_index+1].network_vmt;
-//					reference_moe_data.network_vht =  reference_td_network_moe_data_array[time_index+1].network_vht;
-//				}
-//#pragma pack(push,1)
-//				struct Plot_Element
-//				{
-//					True_Color_RGBA<NT> color;
-//					int num_primitives;
-//					Point_2D<MasterType>* points;
-//				};
-//#pragma pack(pop)
-//				Point_2D<MasterType> submission;
-//				Plot_Element element;
-//				element.color._r = 128;
-//				element.color._g = 128;
-//				element.color._b = 128;
-//				element.color._a = 255;
-//				submission._x=_iteration;
-//
-//				// plot vmt
-//				submission._y=reference_moe_data.network_vmt;
-//				_reference_network_vmt_cache.push_back(submission);
-//				element.num_primitives = _reference_network_vmt_cache.size();
-//				element.points = &_reference_network_vmt_cache.front();
-//				_network_vmt_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//				// plot vht
-//				submission._y=reference_moe_data.network_vht;
-//				_reference_network_vht_cache.push_back(submission);
-//				element.num_primitives = _reference_network_vht_cache.size();
-//				element.points = &_reference_network_vht_cache.front();
-//				_network_vht_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//				//// plot loaded vehicles
-//				//submission._y=reference_moe_data.network_cumulative_loaded_vehicles;
-//				//_reference_network_cumulative_loaded_vehicles_cache.push_back(submission);
-//				//element.num_primitives = _reference_network_cumulative_loaded_vehicles_cache.size();
-//				//element.points = &_reference_network_cumulative_loaded_vehicles_cache.front();
-//				//_network_cumulative_loaded_vehicles_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//				// plot departed vehicles
-//				submission._y=reference_moe_data.network_cumulative_departed_vehicles;
-//				_reference_network_cumulative_departed_vehicles_cache.push_back(submission);
-//				element.num_primitives = _reference_network_cumulative_departed_vehicles_cache.size();
-//				element.points = &_reference_network_cumulative_departed_vehicles_cache.front();
-//				_network_cumulative_departed_vehicles_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//				// plot arrived vehicles
-//				submission._y=reference_moe_data.network_cumulative_arrived_vehicles;
-//				_reference_network_cumulative_arrived_vehicles_cache.push_back(submission);
-//				element.num_primitives = _reference_network_cumulative_arrived_vehicles_cache.size();
-//				element.points = &_reference_network_cumulative_arrived_vehicles_cache.front();
-//				_network_cumulative_arrived_vehicles_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//				// plot in_network vehicles
-//				submission._y=reference_moe_data.network_in_network_vehicles;
-//				_reference_network_in_network_vehicles_cache.push_back(submission);
-//				element.num_primitives = _reference_network_in_network_vehicles_cache.size();
-//				element.points = &_reference_network_in_network_vehicles_cache.front();
-//				_network_in_network_vehicles_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//				// plot network_avg_link_travel_time
-//				submission._y=reference_moe_data.network_avg_link_travel_time;
-//				_reference_network_avg_link_travel_time_cache.push_back(submission);
-//				element.num_primitives = _reference_network_avg_link_travel_time_cache.size();
-//				element.points = &_reference_network_avg_link_travel_time_cache.front();
-//				_network_avg_link_travel_time_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//				// plot _network_avg_link_speed_cache
-//				submission._y=reference_moe_data.network_avg_link_speed;
-//				_reference_network_avg_link_speed_cache.push_back(submission);
-//				element.num_primitives = _reference_network_avg_link_speed_cache.size();
-//				element.points = &_reference_network_avg_link_speed_cache.front();
-//				_network_avg_link_speed_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//
-//				// plot _network_avg_link_density_cache
-//				submission._y=reference_moe_data.network_avg_link_density;
-//				_reference_network_avg_link_density_cache.push_back(submission);
-//				element.num_primitives = _reference_network_avg_link_density_cache.size();
-//				element.points = &_reference_network_avg_link_density_cache.front();
-//				_network_avg_link_density_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//				//// plot _network_avg_link_travel_time_ratio
-//				//submission._y=reference_moe_data.network_avg_link_travel_time_ratio;
-//				//_reference_network_avg_link_travel_time_ratio_cache.push_back(submission);
-//				//element.num_primitives = _reference_network_avg_link_travel_time_ratio_cache.size();
-//				//element.points = &_reference_network_avg_link_travel_time_ratio_cache.front();
-//				//_network_avg_link_travel_time_ratio_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//
-//				//// plot _network_avg_link_speed_ratio_cache
-//				//submission._y=reference_moe_data.network_avg_link_speed_ratio;
-//				//_reference_network_avg_link_speed_ratio_cache.push_back(submission);
-//				//element.num_primitives = _reference_network_avg_link_speed_ratio_cache.size();
-//				//element.points = &_reference_network_avg_link_speed_ratio_cache.front();
-//				//_network_avg_link_speed_ratio_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//
-//				//// plot _network_avg_link_density_ratio_cache
-//				//submission._y=reference_moe_data.network_avg_link_density_ratio;
-//				//_reference_network_avg_link_density_ratio_cache.push_back(submission);
-//				//element.num_primitives = _reference_network_avg_link_density_ratio_cache.size();
-//				//element.points = &_reference_network_avg_link_density_ratio_cache.front();
-//				//_network_avg_link_density_ratio_layer->Push_Element<Regular_Element>((void*)&element);
-//
-//				//// plot _network_avg_link_queue_length_cache
-//				//submission._y=reference_moe_data.network_avg_link_queue_length;
-//				//_reference_network_avg_link_queue_length_cache.push_back(submission);
-//				//element.num_primitives = _reference_network_avg_link_queue_length_cache.size();
-//				//element.points = &_reference_network_avg_link_queue_length_cache.front();
-//				//_network_avg_link_queue_length_layer->Push_Element<Regular_Element>((void*)&element);
-//			}
-//
-			//void read_historic_link_moe()
-			//{
-			//	define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, NULLTYPE);
-			//	typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Network_Interface;
-			//	typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
-
-			//	fstream& historic_link_moe_file = ((_Scenario_Interface*)_global_scenario)->template historic_link_moe_file<fstream&>();
-			//	if (!historic_link_moe_file.is_open())
-			//	{
-			//		THROW_EXCEPTION(endl << "Link MOE reference file cannot be opened" << endl);
-			//	}
-			//	struct Link_MOE_Data link_moe_data;
-			//	vector<string> tokens;
-			//	string line;
-			//	int current_time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>();
-			//	int record_time;
-			//	typename MasterType::link_type* link;
-			//	Network_Components::Types::Link_ID_Dir link_id_dir;
-			//	for (int i = 0; i < (int)_links_container.size(); i++)
-			//	{
-			//		getline(historic_link_moe_file, line); 
-			//		string_split(tokens, line);
-			//		if (tokens.size() == 0)
-			//		{
-			//			break;
-			//		}
-			//		record_time = stoi(tokens[1]);
-			//		if (record_time < current_time)
-			//		{
-			//			// skip until current time
-			//			while(historic_link_moe_file.good())
-			//			{
-			//				getline(historic_link_moe_file, line);
-			//				string_split(tokens, line);
-			//				record_time = stoi(tokens[1]);
-			//				if (record_time >= current_time)
-			//				{
-			//					break;
-			//				}
-			//			}
-			//		}
-			//		link_id_dir.id = stol(tokens[3]);
-			//		link_id_dir.dir = stol(tokens[4]);
-			//		link = (typename MasterType::link_type*)(_link_dbid_dir_to_ptr_map[link_id_dir.id_dir]);
-			//		int offset = 8;
-			//		link_moe_data.link_travel_time = stof(tokens[offset++]);
-			//		link_moe_data.link_travel_time_standard_deviation = stof(tokens[offset++]);
-			//		link_moe_data.link_queue_length = stof(tokens[offset++]);
-			//		link_moe_data.link_travel_delay = stof(tokens[offset++]);
-			//		link_moe_data.link_travel_delay_standard_deviation = stof(tokens[offset++]);
-			//		link_moe_data.link_speed = stof(tokens[offset++]);
-			//		link_moe_data.link_density = stof(tokens[offset++]);
-			//		link_moe_data.link_in_flow_rate = stof(tokens[offset++]);
-			//		link_moe_data.link_out_flow_rate = stof(tokens[offset++]);
-			//		link_moe_data.link_in_volume = stof(tokens[offset++]);
-			//		link_moe_data.link_out_volume = stof(tokens[offset++]);
-			//		link_moe_data.link_speed_ratio = stof(tokens[offset++]);
-			//		link_moe_data.link_in_flow_ratio = stof(tokens[offset++]);
-			//		link_moe_data.link_out_flow_ratio = stof(tokens[offset++]);
-			//		link_moe_data.link_density_ratio = stof(tokens[offset++]);
-			//		link_moe_data.link_travel_time_ratio = stof(tokens[offset++]);
-			//		link_moe_data.num_vehicles_in_link = stof(tokens[offset++]);
-			//		link->historic_link_moe_data = link_moe_data;
-			//	}
-			//}
-
 		};
 
 	}

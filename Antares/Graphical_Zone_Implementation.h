@@ -85,11 +85,11 @@ namespace Zone_Components
 					quads[4].color._b = 255;
 				}
 
-				quads[0].color._a = 125;
-				quads[1].color._a = 125;
-				quads[2].color._a = 125;
-				quads[3].color._a = 125;
-				quads[4].color._a = 125;
+				quads[0].color._a = 220;
+				quads[1].color._a = 220;
+				quads[2].color._a = 220;
+				quads[3].color._a = 220;
+				quads[4].color._a = 220;
 
 				// east side
 				quads[0].a._x = center_point._x + width/4;

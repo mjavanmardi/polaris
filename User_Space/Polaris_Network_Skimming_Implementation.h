@@ -49,6 +49,9 @@ namespace Network_Skimming_Components
 			member_component_feature(start_time,_start_time,Value,Basic_Units::Prototypes::Time_Prototype);
 			member_data_component(Basic_Units::Implementations::Time_Implementation<MasterType>,_end_time,none,none);
 			member_component_feature(end_time,_end_time,Value,Basic_Units::Prototypes::Time_Prototype);
+
+			member_data(float, weighted_deviation,none,none);
+			member_data(float, max_deviation,none,none);
 			
 			// Link back to the parent network_skimmer class
 			member_component(typename MasterType::network_skim_type, skim_reference, none, none);
@@ -250,6 +253,7 @@ namespace Network_Skimming_Components
 			member_data(bool, read_input, none,none);
 			member_data(File_IO::Binary_File_Writer, output_file,none,none);
 			member_data(File_IO::Binary_File_Reader, input_file,none,none);
+			member_data(File_IO::File_Writer, skim_fit_results_file,none,none);
 
 			member_associative_container(concat(dense_hash_map<long,Mode_Skim_Table_Implementation<MasterType,ParentType>*>), mode_skim_table_container, none, none);
 
@@ -275,6 +279,16 @@ namespace Network_Skimming_Components
 
 				// add the available modes for the current model
 				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
+
+				stringstream filename("");
+				filename << scenario->template output_dir_name<string>();
+				filename << "skim_file_fit_results.xls";
+
+				this->_skim_fit_results_file.Open(filename.str());
+				this->_skim_fit_results_file.Write_Line(stringstream("Time,WAAPD,maxPD"));
 			}
 		};
 

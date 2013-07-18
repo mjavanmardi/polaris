@@ -100,18 +100,25 @@ namespace Prototypes
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
 			define_component_interface(scheduler_itf,typename get_type_of(Scheduling_Faculty),Person_Scheduler,ComponentType);
 			define_component_interface(scenario_itf,typename get_type_of(scenario_reference),Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
-			define_container_and_value_interface(Activity_Records,Activity_Record, typename scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface(Activities, Activity, typename scheduler_itf::get_type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			define_container_and_value_interface(Activity_Records, Activity_Record, typename get_type_of(Activity_Record_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,ComponentType);
+			
 			define_component_interface(_Logger_Interface, typename ComponentType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);	
 			
 
 			scheduler_itf* scheduler = pthis->template Scheduling_Faculty<scheduler_itf*>();
-			Activity_Records* activities = scheduler->template Activity_Container<Activity_Records*>();
+			Activities* activities = scheduler->template Activity_Container<Activities*>();
+			Activity_Records* activity_records = pthis->template Activity_Record_Container<Activity_Records*>();
 
-
-			for (typename Activity_Records::iterator itr = activities->begin(); itr != activities->end(); ++itr)
+			for (typename Activities::iterator itr = activities->begin(); itr != activities->end(); ++itr)
 			{
 				//cout << endl <<"Person ID: " << (*itr)->Parent_ID<int>() << "Activity Type: " << (*itr)->Activity_Type<Activity_Components::Types::ACTIVITY_TYPES>();
-				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Record*>(*itr,false);
+				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity*>(*itr,false);
+
+				// store activity records in the person activity record container.
+				Activity_Record* new_record = (Activity_Record*)Allocate<typename get_type_of(Activity_Record_Container)::unqualified_value_type>();
+				new_record->Initialize<Activity*>(*itr);
+				activity_records->push_back(new_record);
 			}
 
 			// exit if no activity output is specified

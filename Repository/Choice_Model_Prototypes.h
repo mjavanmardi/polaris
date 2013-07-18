@@ -181,8 +181,8 @@ namespace Choice_Model_Components
 				{
 					u = *u_itr;
 					p = exp(u)/utility_sum;
-					if (ISNAN(p)){ THROW_WARNING("ERROR: p is not a number. U=" << u << ", exp(u)="<<exp(u) << ", u_sum="<<utility_sum); return;}
-					probs->push_back(p);
+					if (ISNAN(p)){ THROW_WARNING("ERROR: p is not a number. U=" << u << ", exp(u)="<<exp(u) << ", u_sum="<<utility_sum); probs->push_back(0.0);}
+					else probs->push_back(p);
 				}
 
 			}
