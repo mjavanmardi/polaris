@@ -168,6 +168,7 @@ namespace Link_Components
 			feature_accessor(original_free_flow_speed, none, none);
 			feature_accessor(original_maximum_flow_rate, none, none);
 			feature_accessor(original_num_lanes, none, none);
+			feature_accessor(original_speed_limit, none, none);
 			feature_accessor(shoulder_opened, none, none);
 			// event-aware link
 			feature_accessor(event_affected, none, none);

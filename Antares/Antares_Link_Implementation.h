@@ -811,14 +811,14 @@ namespace Link_Components
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 
-				key_value_pair.first="Original free-flow speed";
-				sprintf(str_buf, "%.0f MPH", _original_free_flow_speed);
+				key_value_pair.first="Original speed limit";
+				sprintf(str_buf, "%.0f MPH", _original_speed_limit);
 				key_value_pair.second=str_buf;
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 
-				key_value_pair.first="Free-flow speed";
-				sprintf(str_buf, "%.0f MPH", _free_flow_speed);
+				key_value_pair.first="Speed limit";
+				sprintf(str_buf, "%.0f MPH", _speed_limit);
 				key_value_pair.second=str_buf;
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);

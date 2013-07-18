@@ -207,7 +207,8 @@ namespace Network_Components
 						link->template num_lanes<int>(db_itr->getLanes_Ab());
 						
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
-						link->template speed_limit<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()));
+						link->template speed_limit<float>(floor(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()) + 0.5f));
+						link->template original_speed_limit<float>(link->template speed_limit<float>());
 						
 						link->template num_left_turn_bays<int>(db_itr->getLeft_Ab());
 						link->template num_right_turn_bays<int>(db_itr->getRight_Ab());
@@ -314,7 +315,8 @@ namespace Network_Components
 						link->template num_lanes<int>(db_itr->getLanes_Ba());
 						
 						link->template length<float>(_scenario_reference->template meterToFoot<NULLTYPE>(db_itr->getLength()));
-						link->template speed_limit<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()));
+						link->template speed_limit<float>(floor(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()) + 0.5f));
+						link->template original_speed_limit<float>(link->template speed_limit<float>());
 						
 						link->template num_left_turn_bays<int>(db_itr->getLeft_Ba());
 						link->template num_right_turn_bays<int>(db_itr->getRight_Ba());

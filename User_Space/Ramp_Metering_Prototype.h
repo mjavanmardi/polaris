@@ -24,6 +24,7 @@ namespace Ramp_Metering_Components
 			feature_accessor(internal_id, none, none);
 			feature_accessor(on_ramp_link, none, none);
 			feature_accessor(downstream_freeway_link, none, none);
+			feature_accessor(operation_status, none, none);
 
 			//detector
 			feature_accessor(position_first_detector_on_freeway, none, none);
@@ -31,12 +32,13 @@ namespace Ramp_Metering_Components
 			feature_accessor(downstream_freeway_detector_length, none, none);
 
 			//parameter
-			feature_accessor(starting_time, none, none);
-			feature_accessor(ending_time, none, none);
+			feature_accessor(starting_time, none, none);	
+			feature_accessor(ending_time, none, none);		
 			feature_accessor(metering_updating_interval_length, none, none);
-			feature_accessor(alpha, none, none);
-			feature_accessor(beta, none, none);
+			feature_accessor(alpha, none, none); 
+			feature_accessor(beta, none, none);	
 			feature_accessor(downstream_freeway_link_occupancy, none, none);
+			
 
 			feature_prototype void ramp_metering_update()
 			{
@@ -46,6 +48,19 @@ namespace Ramp_Metering_Components
 			feature_prototype void Initialize()
 			{
 				this_component()->template Initialize<ComponentType,CallerType,TargetType>();			
+			}
+
+			feature_prototype bool is_enabled()
+			{
+				return this_component()->template is_enabled<ComponentType,CallerType,TargetType>();			
+			}
+			feature_prototype void enable(bool status)
+			{
+				this_component()->template enable<ComponentType,CallerType,TargetType>(status);			
+			}
+			feature_prototype float meter_flow_ratio()
+			{
+				return this_component()->template meter_flow_ratio<ComponentType,CallerType,TargetType>();			
 			}
 		};
 	}

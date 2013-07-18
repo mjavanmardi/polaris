@@ -133,6 +133,7 @@ namespace Link_Components
 			member_data(float, critical_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, original_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, original_maximum_flow_rate, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, original_speed_limit, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, original_num_lanes, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(bool, shoulder_opened, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_component(typename MasterType::ramp_metering_type, ramp_meter, none, none);

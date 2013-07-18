@@ -19,6 +19,7 @@ namespace Ramp_Metering_Components
 			member_data(int, internal_id, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_component(typename MasterType::link_type, on_ramp_link, none, none);
 			member_component(typename MasterType::link_type, downstream_freeway_link, none, none);
+			member_data(bool, operation_status, none, none);
 
 			//detector
 			member_data(float, position_first_detector_on_freeway, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -48,7 +49,7 @@ namespace Ramp_Metering_Components
 				int t_start = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>()%(24*60*60);
 				int t_end = t_start + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 
-				if (_starting_time <= t_start && _ending_time >= t_end)
+				if (_starting_time <= t_start && _ending_time >= t_end && _operation_status == true)
 				{
 					///update freeway occupancy - we need to implement a detector in the simulation part
 					_downstream_freeway_link_occupancy += float(downstream_freeway_link<ComponentType,CallerType,_Link_Interface*>()->template num_vehicles_on_link<int>()) * _average_vehicle_length;	//in feet
@@ -94,6 +95,7 @@ namespace Ramp_Metering_Components
 			{
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
+				_operation_status = true;
 				load_event(ComponentType,ComponentType::Ramp_Metering_Conditional,Ramp_Metering,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION,NULLTYPE);
 			}
 
@@ -125,6 +127,23 @@ namespace Ramp_Metering_Components
 				_Ramp_Metering_Interface* _this_ptr=(_Ramp_Metering_Interface*)_this;
 				//step 1: update ramp metering
 				_this_ptr->template ramp_metering_update<NULLTYPE>();
+			}
+
+			feature_implementation bool is_enabled()
+			{
+				return _operation_status;			
+			}
+			feature_implementation void enable(bool status)
+			{
+				_operation_status = status;			
+			}
+			feature_implementation float meter_flow_ratio()
+			{
+				define_component_interface(_Link_Interface, type_of(on_ramp_link), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				float maximum_flow_rate = on_ramp_link<ComponentType,CallerType,_Link_Interface*>()->template maximum_flow_rate<float>();
+				float original_maximum_flow_rate = on_ramp_link<ComponentType,CallerType,_Link_Interface*>()->template original_maximum_flow_rate<float>();
+				float ratio = maximum_flow_rate / original_maximum_flow_rate;
+				return ratio;			
 			}
 		};
 		template<typename MasterType,typename ParentType,typename InheritanceList>
