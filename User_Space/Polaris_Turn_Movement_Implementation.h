@@ -149,6 +149,9 @@ namespace Turn_Movement_Components
 			feature_implementation void update_flow()
 			{
 				define_component_interface(_Link_Interface, type_of(inbound_link), Link_Components::Prototypes::Link_Prototype,  ComponentType);
+				define_container_and_value_interface_unqualified_container(_Vehicles_Container_Interface, _Vehicle_Interface, type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
+
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 
@@ -173,7 +176,34 @@ namespace Turn_Movement_Components
 				{
 					_turn_movement_cumulative_shifted_arrived_vehicles = 0;
 				}
-				_movement_demand = _turn_movement_cumulative_shifted_arrived_vehicles - _turn_movement_cumulative_vehicles;
+				
+				//_movement_demand = _turn_movement_cumulative_shifted_arrived_vehicles - _turn_movement_cumulative_vehicles;
+
+				///count vehicles ready for transferring to next link
+				_movement_demand -= _movement_transferred;
+				if (_movement_demand < 0)
+				{
+					cout << "movement demand cannot be negative! " << endl;
+					assert(false);
+				}
+				typename _Vehicles_Container_Interface::iterator vehicle_itr;
+				int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
+
+				for (vehicle_itr = _vehicles_container.begin() + _movement_demand; vehicle_itr != _vehicles_container.end(); vehicle_itr++)
+				{
+					_Vehicle_Interface* vehicle = (_Vehicle_Interface*)(*vehicle_itr);
+					int pdt = vehicle->template downstream_preferred_departure_time<int>();
+
+					if (pdt <= current_time)
+					{
+						_movement_demand++;
+					}
+					else
+					{
+						break;
+					}
+				}
+
 				if(_movement_demand < 0.0) 
 				{
 					_movement_demand = 0.0;

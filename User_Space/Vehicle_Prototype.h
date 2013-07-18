@@ -67,6 +67,7 @@ namespace Vehicle_Components
 			feature_accessor(distance_to_stop_bar, none, none);
 			feature_accessor(local_speed, none, none);
 			feature_accessor(is_integrated, none, none);
+			feature_accessor(downstream_preferred_departure_time, none, none);
 			
 			//enroute swtiching
 			feature_accessor(rng_stream, none, none);

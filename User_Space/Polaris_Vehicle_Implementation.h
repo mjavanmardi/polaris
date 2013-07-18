@@ -39,6 +39,7 @@ namespace Vehicle_Components
 			member_prototype(Routing_Components::Prototypes::Routing_Prototype, router, typename MasterType::routing_type, none, none);
 			member_data(float, distance_to_stop_bar, none, none);
 			member_data(float, local_speed, none, none);
+			member_data(int, downstream_preferred_departure_time, none, none);
 
 			member_container(vector<typename MasterType::switch_decision_data_type*>, switch_decisions_container, none, none);
 			//member_data(RNG_Components::RngStream, rng_stream, none, none);

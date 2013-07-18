@@ -235,14 +235,15 @@ namespace Network_Event_Components
 			{
 				ComponentType* pthis = (ComponentType*)_this;
 
-				if(_iteration >= pthis->_start_time && _iteration < pthis->_end_time)
+				if(_iteration == pthis->_start_time)
 				{
 					pthis->_active = true;
 					pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
 				}
-				else
+				else if(_iteration == pthis->_end_time)
 				{
 					pthis->_active = false;
+					pthis->Notify_Subscribers<ComponentType,ComponentType,NT>();
 				}
 			}
 

@@ -589,6 +589,17 @@ namespace Link_Components
 				}
 				else
 				{
+					///set up downstream preferred departure time
+					int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
+					int pdt = current_time + _link_fftt;
+
+					if (_current_vehicle_queue.size() >= 1)
+					{
+						_Vehicle_Interface* last_vehicle = (_Vehicle_Interface*)_current_vehicle_queue.back();
+						int last_vehicle_pdt = last_vehicle->template downstream_preferred_departure_time<int>();
+						pdt = max(float(last_vehicle_pdt), float(pdt));
+					}
+					vehicle->template downstream_preferred_departure_time<int>(pdt);
 					_current_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
 				}
 			}
