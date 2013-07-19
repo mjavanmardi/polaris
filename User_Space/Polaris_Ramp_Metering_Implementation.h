@@ -91,12 +91,14 @@ namespace Ramp_Metering_Components
 				}
 			}
 			
+			feature_implementation static void Initialize_Type(){}
+
 			feature_implementation void Initialize()
 			{
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
 				_operation_status = true;
-				load_event(ComponentType,ComponentType::Ramp_Metering_Conditional,Ramp_Metering,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION,NULLTYPE);
+				load_event(ComponentType,ComponentType::Ramp_Metering_Conditional,ComponentType::Ramp_Metering,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION,NULLTYPE);
 			}
 
 			declare_feature_conditional(Ramp_Metering_Conditional)
@@ -108,7 +110,7 @@ namespace Ramp_Metering_Components
 				_Ramp_Metering_Interface* _this_ptr=(_Ramp_Metering_Interface*)_this;
 				if(_sub_iteration == Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION)
 				{
-					((typename MasterType::ramp_metering_type*)_this)->Swap_Event((Event)&Ramp_Metering<NULLTYPE>);
+					//((typename MasterType::ramp_metering_type*)_this)->Swap_Event((Event)&Ramp_Metering<NULLTYPE>);
 					response.result=true;
 					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION;

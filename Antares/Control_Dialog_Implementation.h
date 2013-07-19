@@ -18,13 +18,13 @@ public:
 	//feature_implementation void Push_Schema(vector<string>& attributes_schema,vector<vector<string>>& dropdown_schema);
 	//feature_implementation void Push_Attributes(vector<string>& attributes);
 
-	void OnApply(wxCommandEvent& event);
+	//void OnApply(wxCommandEvent& event);
 	void OnOk(wxCommandEvent& event);
 
 	member_pointer(wxListCtrl,attributes_list,none,none);
 	
 	member_pointer(wxButton,ok_button,none,none);
-	member_pointer(wxButton,apply_button,none,none);
+	//member_pointer(wxButton,apply_button,none,none);
 	//member_pointer(wxButton,cancel_button,none,none);
 
 	member_pointer(wxBoxSizer,sizer,none,none);
@@ -160,9 +160,9 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 	Connect(_ok_button->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Control_Dialog_Implementation::OnOk));
 	_button_sizer->Add(_ok_button,0,wxLEFT,10);
 
-	_apply_button=new wxButton(this,wxID_ANY,"Apply");
-	Connect(_apply_button->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Control_Dialog_Implementation::OnApply));
-	_button_sizer->Add(_apply_button,0,wxLEFT,10);
+	//_apply_button=new wxButton(this,wxID_ANY,"Apply");
+	//Connect(_apply_button->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(Control_Dialog_Implementation::OnApply));
+	//_button_sizer->Add(_apply_button,0,wxLEFT,10);
 
 	_sizer->Add(_button_sizer,0,wxTOP,20);
 
@@ -359,12 +359,65 @@ Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Control_Di
 //	Refresh();
 //}
 
+////---------------------------------------------------------
+////	OnApply
+////--------------------------------------------------------
+//
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::OnApply(wxCommandEvent& event)
+//{
+//	vector<string> attributes_update;
+//	string text;
+//
+//	if(_num_attributes)
+//	{
+//		wxListItem itr;
+//
+//		
+//		for(int i=0;i<_num_attributes;i++)
+//		{
+//			itr.SetId(i);
+//			itr.SetColumn(0);
+//			itr.SetMask(wxLIST_MASK_TEXT);
+//
+//			_attributes_list->GetItem(itr);
+//			text=itr.GetText();
+//
+//			if(text=="") break;
+//			else attributes_update.push_back(text);
+//		}
+//	}
+//	
+//	vector<string> dropdowns_update;
+//
+//	if(_num_dropdowns)
+//	{
+//		for(int i=0;i<_num_dropdowns;i++)
+//		{
+//			text=_dropdown_menus[i]->GetStringSelection();
+//
+//			dropdowns_update.push_back(text);
+//		}
+//	}
+//
+//	if(_submission_callback(_selected_elements,attributes_update,dropdowns_update))
+//	{
+//		_apply_button->SetBackgroundColour(wxColour(75,200,75));
+//	}
+//	else
+//	{
+//		_apply_button->SetBackgroundColour(wxColour(200,75,75));
+//	}
+//
+//	Refresh();
+//}
+
 //---------------------------------------------------------
-//	OnApply
+//	OnOk
 //--------------------------------------------------------
 
 template<typename MasterType,typename ParentType,typename InheritanceList>
-void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::OnApply(wxCommandEvent& event)
+void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::OnOk(wxCommandEvent& event)
 {
 	vector<string> attributes_update;
 	string text;
@@ -402,25 +455,13 @@ void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::OnApp
 
 	if(_submission_callback(_selected_elements,attributes_update,dropdowns_update))
 	{
-		_apply_button->SetBackgroundColour(wxColour(75,200,75));
+		_ok_button->SetBackgroundColour(wxNullColour);
+		EndModal(true);
 	}
 	else
 	{
-		_apply_button->SetBackgroundColour(wxColour(200,75,75));
+		_ok_button->SetBackgroundColour(wxColour(200,75,75));
 	}
 
 	Refresh();
-}
-
-//---------------------------------------------------------
-//	OnOk
-//--------------------------------------------------------
-
-template<typename MasterType,typename ParentType,typename InheritanceList>
-void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::OnOk(wxCommandEvent& event)
-{
-	_apply_button->SetBackgroundColour(wxNullColour);
-	Refresh();
-
-	EndModal(true);
 }

@@ -49,6 +49,11 @@ namespace Ramp_Metering_Components
 			{
 				this_component()->template Initialize<ComponentType,CallerType,TargetType>();			
 			}
+			
+			feature static void Initialize_Type()
+			{
+				ComponentType::template Initialize_Type<ComponentType,CallerType,TargetType>();
+			}
 
 			feature_prototype bool is_enabled()
 			{

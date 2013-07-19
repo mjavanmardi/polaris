@@ -170,6 +170,9 @@
     <ClInclude Include="Antares_Person_Data_Logger.h">
       <Filter>User_Space</Filter>
     </ClInclude>
+    <ClInclude Include="Antares_Ramp_Metering_Implementation.h">
+      <Filter>User_Space</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antares.cpp">

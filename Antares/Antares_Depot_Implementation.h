@@ -250,6 +250,7 @@ namespace Depot_Components
 			typedef Link_Components::Implementations::Link_Line<MasterType> Link_Line;
 			typedef Intersection_Prototype<typename type_of(MasterType::intersection)> Intersection_Interface;
 			typedef Depot<typename type_of(MasterType::depot)> Depot_Interface;
+			typedef Link_Prototype<typename type_of(MasterType::link)> Link_Interface;
 
 #pragma pack(push,1)
 			struct ITS_Location

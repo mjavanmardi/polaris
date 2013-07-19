@@ -243,7 +243,7 @@ namespace Traffic_Management_Center_Components
 			declare_feature_conditional_implementation(TMC_Conditional)
 			{
 				response.next._iteration = _iteration + 5*60;
-				response.next._sub_iteration = 0;
+				response.next._sub_iteration = 1;
 
 				//this variable specifies whether the the Event function will be called
 				response.result = true;
@@ -397,7 +397,7 @@ namespace Traffic_Management_Center_Components
 			{
 				this_component()->template Read_Database<ComponentType,CallerType,TargetType>();
 
-				((ComponentType*)this)->template Load_Event<ComponentType>(&ComponentType::template TMC_Conditional<ComponentType,NT,NT>,&ComponentType::template TMC_Event<ComponentType,NT,NT>, 0, 0);
+				((ComponentType*)this)->template Load_Event<ComponentType>(&ComponentType::template TMC_Conditional<ComponentType,NT,NT>,&ComponentType::template TMC_Event<ComponentType,NT,NT>, 0, 1);
 			}
 
 			/// This function reads the speed data from LinkMOE data and uses is to train the outliers detector

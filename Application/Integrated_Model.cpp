@@ -72,7 +72,7 @@ struct MasterType
 	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Implementation<M> phase_type;
 	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation<M> phase_movement_type;
 	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<M> approach_type;
-	typedef Ramp_Metering_Components::Implementations::Polaris_Ramp_Metering_Implementation<M> ramp_metering_type;
+
 	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<M> plan_type;
 
 	typedef Movement_Plan_Components::Implementations::Polaris_Movement_Plan_Implementation<M> basic_movement_plan_type;
@@ -149,6 +149,8 @@ struct MasterType
 	typedef Variable_Message_Sign_Components::Implementations::Antares_Variable_Speed_Sign<MasterType> variable_speed_sign_type;
 
 	typedef Sensor_Components::Implementations::Antares_Link_Sensor<MasterType> link_sensor_type;
+
+	typedef Ramp_Metering_Components::Implementations::Antares_Ramp_Metering_Implementation<M> ramp_metering_type;
 	#else
 	typedef Network_Event_Components::Implementations::Weather_Network_Event<MasterType> weather_network_event_type;
 	typedef Network_Event_Components::Implementations::Accident_Network_Event<MasterType> accident_network_event_type;
@@ -164,6 +166,8 @@ struct MasterType
 	typedef Variable_Message_Sign_Components::Implementations::Variable_Speed_Sign<MasterType> variable_speed_sign_type;
 
 	typedef Sensor_Components::Implementations::Link_Sensor<MasterType> link_sensor_type;
+
+	typedef Ramp_Metering_Components::Implementations::Polaris_Ramp_Metering_Implementation<M> ramp_metering_type;
 	#endif
 
 	typedef Network_Event_Components::Implementations::Base_Network_Event<MasterType> base_network_event_type;
@@ -314,6 +318,7 @@ int main(int argc,char** argv)
 	define_container_and_value_interface(_Ramp_Metering_Container_Interface, _Ramp_Metering_Interface, _Network_Interface::get_type_of(ramp_metering_container), Random_Access_Sequence_Prototype, Ramp_Metering_Prototype, NULLTYPE);
 	_Ramp_Metering_Container_Interface::iterator ramp_metering_itr;
 
+	Ramp_Metering_Prototype<MasterType::ramp_metering_type>::Initialize_Type<NT>();
 	for(ramp_metering_itr=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().begin();
 		ramp_metering_itr!=network->ramp_metering_container<_Ramp_Metering_Container_Interface&>().end();
 		ramp_metering_itr++)

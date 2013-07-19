@@ -34,12 +34,34 @@ namespace Variable_Message_Sign_Components
 				
 				stringstream s;
 
-				for(float i=5.0f;i<link->speed_limit<float>()*1.2;i+=5.0f)
+				for(float i=5.0f;i<link->speed_limit<float>()*2.0;i+=5.0f)
 				{
 					s << i;
 					dropdowns[0].push_back( s.str() );
 					s.str("");
 				}
+
+				pair<string,string> atts;
+
+				
+				
+				s << link->speed_limit<float>();
+
+				atts.first = "Current Speed Limit";
+				atts.second = s.str();
+				
+				s.str("");
+				
+				attributes.push_back(atts);
+
+				
+				
+				s << link->speed_limit<float>();
+
+				atts.first = "Original Speed Limit";
+				atts.second = s.str();
+
+				attributes.push_back(atts);
 			}
 
 			feature_implementation void Display_Attributes(vector<pair<string,string>>& bucket)
