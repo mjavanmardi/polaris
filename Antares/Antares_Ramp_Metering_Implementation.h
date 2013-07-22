@@ -60,7 +60,7 @@ namespace Ramp_Metering_Components
 				{
 					ComponentType* its_component=(ComponentType*) (*sitr);
 
-					its_component->_operation_status = its_component->enable<ComponentType,CallerType,TargetType>(toggle_operation);
+					its_component->enable<ComponentType,NT,NT>(toggle_operation);
 
 					update_successful = true;
 				}
