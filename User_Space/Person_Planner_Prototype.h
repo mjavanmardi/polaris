@@ -291,9 +291,9 @@ namespace Person_Components
 						movements->erase(prev);
 						
 						// increment the deleted activities counter
-						define_component_interface(_Logger_Interface, MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);
+						define_component_interface(_Logger_Interface, typename ComponentType::Master_Type::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);
 						_Logger_Interface* logger = (_Logger_Interface*)_global_person_logger;
-						logger->Increment_Cancelled_Activities<NT>();
+						logger->template Increment_Cancelled_Activities<NT>();
 					}
 					// exit if no movements in current timestep
 					else

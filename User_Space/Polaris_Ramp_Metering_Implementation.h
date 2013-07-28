@@ -15,6 +15,8 @@ namespace Ramp_Metering_Components
 	{
 		implementation struct Polaris_Ramp_Metering_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Ramp_Metering_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			typedef typename Polaris_Component<APPEND_CHILD(Polaris_Ramp_Metering_Implementation),MasterType,Execution_Object,ParentType>::ComponentType ComponentType;
+			
 			//ramp
 			member_data(int, internal_id, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_component(typename MasterType::link_type, on_ramp_link, none, none);
@@ -98,7 +100,7 @@ namespace Ramp_Metering_Components
 				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
 				_operation_status = true;
-				load_event(ComponentType,ComponentType::Ramp_Metering_Conditional,ComponentType::Ramp_Metering,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION,NULLTYPE);
+				load_event(ComponentType, Ramp_Metering_Conditional,Ramp_Metering,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION,NULLTYPE);
 			}
 
 			declare_feature_conditional(Ramp_Metering_Conditional)

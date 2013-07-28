@@ -288,7 +288,8 @@ namespace Network_Skimming_Components
 				filename << "skim_file_fit_results.xls";
 
 				this->_skim_fit_results_file.Open(filename.str());
-				this->_skim_fit_results_file.Write_Line(stringstream("Time,WAAPD,maxPD"));
+				stringstream header("Time,WAAPD,maxPD");
+				this->_skim_fit_results_file.Write_Line(header);
 			}
 		};
 

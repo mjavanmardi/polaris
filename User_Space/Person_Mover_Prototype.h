@@ -307,7 +307,7 @@ namespace Prototypes
 				}
 				else
 				{
-					if (movement->destination<location_itf*>() == nullptr) THROW_WARNING("ERROR: valid destination not set for activity.");
+					if (movement->template destination<location_itf*>() == nullptr) THROW_WARNING("ERROR: valid destination not set for activity.");
 				}
 			}
 		}
@@ -456,7 +456,7 @@ namespace Prototypes
 			define_component_interface(Routing_Itf, typename get_type_of(Parent_Person)::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
 			define_component_interface(network_itf, typename Parent_Person_Itf::get_type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 			define_container_and_value_interface(links, link_itf, typename network_itf::get_type_of(links_container),Containers::Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-			define_component_interface(_Logger_Interface, MasterType::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);
+			define_component_interface(_Logger_Interface, typename ComponentType::Master_Type::person_data_logger_type, Person_Components::Prototypes::Person_Data_Logger, NULLTYPE);
 
 			Parent_Person_Itf* person = this->Parent_Person<Parent_Person_Itf*>();
 			Routing_Itf* itf= person ->template router<Routing_Itf*>();	
@@ -467,7 +467,7 @@ namespace Prototypes
 
 			// increment the replanned activities counter
 			_Logger_Interface* logger = (_Logger_Interface*)_global_person_logger;
-			logger->Increment_Replanned_Activities<NT>();
+			logger->template Increment_Replanned_Activities<NT>();
 		}
 
 		//========================================================

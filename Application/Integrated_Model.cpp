@@ -333,7 +333,7 @@ int main(int argc,char** argv)
 	//==================================================================================================================================
 	// EXTERNAL Demand
 	//----------------------------------------------------------------------------------------------------------------------------------
-	if (scenario->template read_demand_from_database<bool>())
+	if (scenario->read_demand_from_database<bool>())
 	{
 		define_component_interface(_Demand_Interface, MasterType::demand_type, Demand_Prototype, NULLTYPE);
 		_Demand_Interface* demand = (_Demand_Interface*)Allocate<MasterType::demand_type>();

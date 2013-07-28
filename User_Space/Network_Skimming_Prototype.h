@@ -630,7 +630,7 @@ namespace Network_Skimming_Components
 
 				stringstream outline("");
 				outline<<_iteration<<","<<this->weighted_deviation<float>()<<","<<this->max_deviation<float>();
-				File_IO::File_Writer& out_file = skim->skim_fit_results_file<File_IO::File_Writer&>();
+				File_IO::File_Writer& out_file = skim->template skim_fit_results_file<File_IO::File_Writer&>();
 				out_file.Write_Line(outline);
 				cout << "W.A.A.P.D from previous skim: " << this->weighted_deviation<float>()<<endl;
 				cout << "Maximum deviation from previous: " << this->max_deviation<float>()<<endl;

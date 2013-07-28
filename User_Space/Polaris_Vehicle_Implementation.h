@@ -25,6 +25,8 @@ namespace Vehicle_Components
 
 		implementation struct Polaris_Vehicle_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Vehicle_Implementation),MasterType,Execution_Object,ParentType>
 		{
+			typedef typename Polaris_Component<APPEND_CHILD(Polaris_Vehicle_Implementation),MasterType,Execution_Object,ParentType>::ComponentType ComponentType;
+			
 			member_data(Vehicle_Components::Types::Vehicle_Status_Keys, simulation_status, none, none);
 			member_data(int, uuid, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, internal_id, none, none);

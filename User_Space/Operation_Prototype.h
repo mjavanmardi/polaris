@@ -7,6 +7,7 @@
 #include "../File_IO/network_operation_data.h"
 #include "Intersection_Control_Prototype.h"
 extern void* _global_scenario;
+extern void* _global_network;
 
 namespace Operation_Components
 {

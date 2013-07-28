@@ -1417,7 +1417,7 @@ namespace Activity_Components
 				IFTIM = P_tim[0];
 				IFDUR = P_dur[0];
 
-				pthis->Location_Flexibility<Types::FLEXIBILITY_VALUES>(Types::FLEXIBILITY_VALUES::LOW_FLEXIBILITY);
+				pthis->template Location_Flexibility<Types::FLEXIBILITY_VALUES>(Types::FLEXIBILITY_VALUES::LOW_FLEXIBILITY);
 			}
 			tag_feature_as_available(Set_Meta_Attributes);
 		};

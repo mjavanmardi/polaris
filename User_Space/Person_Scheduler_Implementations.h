@@ -409,7 +409,7 @@ namespace Person_Components
 				//define_container_and_value_interface_unqualified_container(Activity_Plans,Activity_Plan, type_of(Activity_Container),Containers::Back_Insertion_Sequence_Prototype,Activity_Components::Prototypes::Activity_Planner,NT);
 				Activity_Plan* act1_itf = (Activity_Plan*)act1;
 				Activity_Plan* act2_itf = (Activity_Plan*)act2;
-				return (act1_itf->Start_Time<Time_Seconds>() < act2_itf->Start_Time<Time_Seconds>());
+				return (act1_itf->template Start_Time<Time_Seconds>() < act2_itf->template Start_Time<Time_Seconds>());
 			}
 
 			feature_implementation TargetType Sort_Activity_Schedule()

@@ -51,7 +51,7 @@ namespace Person_Components
 				this->_activity_time_lost = 0;
 
 
-				if (scenario->write_demand_to_database<bool>())
+				if (scenario->template write_demand_to_database<bool>())
 				{
 					string name(scenario->template database_name<string&>());
 					this->_db_ptr = open_sqlite_database<shared_ptr<odb::database> > (name);
@@ -213,7 +213,7 @@ namespace Person_Components
 
 				//==========================================================
 				//----------------------------------------------------------
-				if (scenario->write_demand_to_database<bool>())
+				if (scenario->template write_demand_to_database<bool>())
 				{
 					define_component_interface(movement_itf,typename act_record_itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 					define_component_interface(planner_itf,typename act_record_itf::get_type_of(Parent_Planner),Prototypes::Person_Planner,ComponentType);
@@ -223,7 +223,7 @@ namespace Person_Components
 					zone_itf* dest = move->template destination<location_itf*>()->template zone<zone_itf*>();
 					planner_itf* planner = act->template Parent_Planner<planner_itf*>();
 					person_itf* person = planner->template Parent_Person<person_itf*>();
-					zone_itf* home = person->Home_Location<zone_itf*>();
+					zone_itf* home = person->template Home_Location<zone_itf*>();
 					int O, D, H;
 					O = orig->template uuid<int>();
 					D = dest->template uuid<int>();
@@ -376,7 +376,7 @@ namespace Person_Components
 				// database write for external trips
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
-				if (scenario->write_demand_to_database<bool>())
+				if (scenario->template write_demand_to_database<bool>())
 				{
 					try
 					{
@@ -475,7 +475,7 @@ namespace Person_Components
 				typedef Activity_Location_Components::Prototypes::Activity_Location_Prototype<typename MasterType::activity_location_type> location_itf;
 				define_container_and_value_interface(zones_container_itf, zone_itf,typename _Network_Interface::get_type_of(zones_container), Containers::Associative_Container_Prototype,Zone_Components::Prototypes::Zone_Prototype,ComponentType);
 				_Network_Interface* network = (_Network_Interface*)_global_network;
-				zones_container_itf* zones_list = network->zones_container<zones_container_itf*>();
+				zones_container_itf* zones_list = network->template zones_container<zones_container_itf*>();
 
 				int zone_ids[7] = {143,149,165,183,192,223,225};
 
@@ -534,6 +534,7 @@ namespace Person_Components
 				person_itf* person = planner->template Parent_Person<person_itf*>();		
 
 				// Do Stuff to write trip to demand database....
+				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
 				
 				shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
 				trip_rec->setConstraint(0);

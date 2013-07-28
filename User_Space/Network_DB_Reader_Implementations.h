@@ -257,7 +257,7 @@ namespace Network_Components
 						}
 
 						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ab()));
-						maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ab()) / link->num_lanes<float>());
+						maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ab()) / link->template num_lanes<float>());
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);
@@ -364,7 +364,7 @@ namespace Network_Components
 						}
 
 						link->template free_flow_speed<float>(_scenario_reference->template mepsToMiph<NULLTYPE>(db_itr->getSpeed_Ba()));
-						maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ba()) / link->num_lanes<float>());
+						maximum_flow_rate = min(2200.0f, float(db_itr->getCap_Ba()) / link->template num_lanes<float>());
 						link->template maximum_flow_rate<float>(maximum_flow_rate);
 						link->template backward_wave_speed<float>(backward_wave_speed);
 						link->template jam_density<float>(jam_density);

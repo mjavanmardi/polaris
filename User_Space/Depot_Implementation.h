@@ -1,7 +1,7 @@
 #pragma once
 #include "Depot_Prototype.h"
 #include "Geometry_Implementation.h"
-#include "tmc\depot.h"
+#include "tmc/depot.h"
 
 namespace Depot_Components
 {
@@ -52,7 +52,7 @@ namespace Depot_Components
 				{
 					Network_Event<typename type_of(MasterType::base_network_event)>* net_event = *itr;
 
-					if( net_event->Is_Type<typename type_of(MasterType::accident_network_event)>() )
+					if( net_event->template Is_Type<typename type_of(MasterType::accident_network_event)>() )
 					{
 						_current_events.push_back( *itr );
 					}
@@ -78,7 +78,7 @@ namespace Depot_Components
 
 			feature_implementation void Initialize(polaris::io::Depot& instance)
 			{
-				Load_Event<ComponentType>(&ComponentType::Depot_Condition<ComponentType,NT,NT>,&ComponentType::Depot_Event<ComponentType,NT,NT>,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
+				ComponentType::template Load_Event<ComponentType>(&ComponentType::template Depot_Condition<ComponentType,NT,NT>,&ComponentType::template Depot_Event<ComponentType,NT,NT>,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
 
 				using namespace polaris::io;
 				
