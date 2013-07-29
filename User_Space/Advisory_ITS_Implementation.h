@@ -57,7 +57,9 @@ namespace Advisory_ITS_Components
 			{
 				_displayed_events.clear();
 				for (typename vector<Network_Event<typename type_of(MasterType::base_network_event)>*>::iterator itr = network_events.begin(); itr!=network_events.end(); itr++)
+				{
 					_displayed_events.push_back( *itr );
+				}
 			}
 			
 			feature_implementation void Get_Displayed_Messages(vector<Network_Event_Components::Prototypes::Network_Event<TargetType>*>& bucket,requires(!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))

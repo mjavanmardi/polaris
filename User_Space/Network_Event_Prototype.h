@@ -146,12 +146,12 @@ namespace Network_Event_Components
 				this_component()->template Remove_Network_Event<ComponentType,CallerType,TargetType>(network_event);
 			}
 
-			feature void Get_Network_Events(int link,vector< Network_Event<TargetType,CallerType>* >& container)
+			feature void Get_Network_Events(int link,vector< Network_Event<TargetType>* >& container)
 			{
 				this_component()->template Get_Network_Events<ComponentType,CallerType,TargetType>(link,container);
 			}
 			
-			feature void Get_Network_Events(vector< Network_Event<TargetType,CallerType>* >& container)
+			feature void Get_Network_Events(vector< Network_Event<TargetType>* >& container)
 			{
 				this_component()->template Get_Network_Events<ComponentType,CallerType,TargetType>(container);
 			}

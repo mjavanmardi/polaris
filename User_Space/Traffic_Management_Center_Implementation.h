@@ -206,8 +206,8 @@ namespace Traffic_Management_Center_Components
 			typedef MasterType Reference_Type;
 
 			// added for convenience
-			typedef Network_Event<typename MasterType::type_of(base_network_event),ComponentType> Base_Network_Event_Interface;
-
+			typedef Network_Event<typename MasterType::type_of(base_network_event)> Base_Network_Event_Interface;
+			typedef Network_Event<typename MasterType::weather_network_event_type> Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::congestion_network_event_type> Congestion_Network_Event_Interface;
 
 			typedef Link_Prototype<typename type_of(MasterType::link),ComponentType> Link_Interface;
@@ -372,24 +372,23 @@ namespace Traffic_Management_Center_Components
 			feature_implementation void DecideOnEventsToBeDisplayed()
 			{
 				vector<Base_Network_Event_Interface*> current_events;
-				_network_event_manager->template Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
+
+				_network_event_manager->template Get_Network_Events<typename type_of(MasterType::weather_network_event)>((vector<Weather_Network_Event_Interface*>&)current_events);
 				for(typename vector<Advisory_Radio_Interface*>::iterator itr=_advisory_radios.begin();itr!=_advisory_radios.end();itr++)
 				{
-					vector<Base_Network_Event_Interface*> events_to_display;
+					//vector<Base_Network_Event_Interface*> events_to_display;
 					//some calculations here
-					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
 				}
+
+				current_events.clear();
+
+				_network_event_manager->template Get_Network_Events<typename type_of(MasterType::base_network_event)>(current_events);
 				for(typename vector<Variable_Word_Sign_Interface*>::iterator itr=_variable_word_signs.begin();itr!=_variable_word_signs.end();itr++)
 				{
-					vector<Base_Network_Event_Interface*> events_to_display;
+					//vector<Base_Network_Event_Interface*> events_to_display;
 					//some calculations here
-					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
-				}
-				for(typename vector<Variable_Speed_Sign_Interface*>::iterator itr=_variable_speed_signs.begin();itr!=_variable_speed_signs.end();itr++)
-				{
-					vector<Base_Network_Event_Interface*> events_to_display;
-					//some calculations here
-					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)events_to_display);
+					(*itr)->template Push_Displayed_Network_Events<typename type_of(MasterType::base_network_event)>((vector<Network_Event<typename type_of(MasterType::base_network_event)>*>&)current_events);
 				}
 			}
 

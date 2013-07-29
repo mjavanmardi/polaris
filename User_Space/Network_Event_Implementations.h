@@ -589,7 +589,7 @@ namespace Network_Event_Components
 				}
 			}
 
-			feature_implementation void Get_Network_Events(int link_id,vector< Network_Event<TargetType,NT>* >& container/*,requires(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(CallerType,typename type_of(MasterType::traffic_management_center),is_same))*/)
+			feature_implementation void Get_Network_Events(int link_id,vector< Network_Event<TargetType>* >& container/*,requires(check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(CallerType,typename type_of(MasterType::traffic_management_center),is_same))*/)
 			{
 				list<Network_Event<TargetType,NT>*>* events_of_type = (list<Network_Event<TargetType,NT>*>*) & (_network_event_container[TargetType::component_index]);
 
@@ -613,13 +613,13 @@ namespace Network_Event_Components
 				}
 			}
 
-			feature_implementation void Get_Network_Events( vector< Network_Event<TargetType,NT>* >& container, requires(!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
+			feature_implementation void Get_Network_Events( vector< Network_Event<TargetType>* >& container, requires(!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
-				list<Network_Event<TargetType,NT>*>* events_of_type = (list<Network_Event<TargetType,NT>*>*) & (_network_event_container[TargetType::component_index]);
+				list<Network_Event<TargetType>*>* events_of_type = (list<Network_Event<TargetType>*>*) & (_network_event_container[TargetType::component_index]);
 
-				for(typename list< Network_Event<TargetType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
+				for(typename list< Network_Event<TargetType>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
-					Network_Event<TargetType,NT>* network_event=*itr;
+					Network_Event<TargetType>* network_event=*itr;
 
 					if(network_event->template active<bool>())
 					{
@@ -628,7 +628,7 @@ namespace Network_Event_Components
 				}
 			}
 			
-			feature_implementation void Get_Network_Events( vector< Network_Event<TargetType,CallerType>* >& container, requires(check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
+			feature_implementation void Get_Network_Events( vector< Network_Event<TargetType>* >& container, requires(check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
 				for(typename unordered_map< int, list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
 				{
@@ -640,7 +640,7 @@ namespace Network_Event_Components
 
 						if(network_event->template active<bool>())
 						{
-							container.push_back( (Network_Event<typename MasterType::type_of(base_network_event),CallerType>*) *itr );
+							container.push_back( (Network_Event<typename MasterType::type_of(base_network_event)>*) *itr );
 						}
 					}
 				}
@@ -656,7 +656,7 @@ namespace Network_Event_Components
 				_network_event_container[TargetType::component_index].push_back( (Base_Network_Event_Interface*) network_event );
 			}
 
-			feature_implementation void Remove_Network_Event(Network_Event<TargetType,NT>* network_event)
+			feature_implementation void Remove_Network_Event(Network_Event<TargetType>* network_event)
 			{
 				list<Network_Event<typename TargetType::ControlType,NT>*>* events_of_type = (list<Network_Event<typename TargetType::ControlType,NT>*>*) & (_network_event_container[TargetType::ControlType::component_index]);
 
