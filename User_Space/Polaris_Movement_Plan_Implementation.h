@@ -20,6 +20,7 @@ namespace Movement_Plan_Components
 			member_data(int, delayed_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, enter_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, enter_interval_index, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(int, estimated_link_accepting_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			
 			member_component(typename MasterType::link_type, link, none, none);
 
@@ -73,7 +74,6 @@ namespace Movement_Plan_Components
 			member_component(typename MasterType::plan_type, plan, none, none);
 			member_data(int, routed_travel_time, none, none);
 			member_data(int, estimated_time_of_arrival, none, none);
-
 			member_data(bool, is_integrated, none, none);
 
 			template<typename ComponentType, typename CallerType, typename ReturnValueType>

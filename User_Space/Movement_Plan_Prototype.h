@@ -58,6 +58,7 @@ namespace Movement_Plan_Components
 			feature_accessor(delayed_time, none, none);
 			feature_accessor(enter_time, none, none);
 			feature_accessor(enter_interval_index, none, none);
+			feature_accessor(estimated_link_accepting_time, none, none);
 			feature_prototype TargetType exit_time()
 			{
 				return (TargetType)(enter_time<int>() + delayed_time<float>());
@@ -80,6 +81,7 @@ namespace Movement_Plan_Components
 			feature_accessor(destination_activity_reference,none,none);
 			feature_accessor(routed_travel_time,none,none);
 			feature_accessor(estimated_time_of_arrival,none,none);
+			feature_accessor(travel_time_when_routed, none, none);
 			
 			feature_accessor(absolute_departure_time, none, none);
 			feature_accessor(is_integrated, none,none);
@@ -138,25 +140,31 @@ namespace Movement_Plan_Components
 			feature_method_void(Initialize,none);
 			feature_method_1_arg(Initialize,movement_to_copy, none);
 #endif
-			feature_prototype void set_trajectory(TargetType& path_container)
+			feature_prototype void set_trajectory(TargetType& path_container, vector<float>& reversed_arrival_time_container)
 			{
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, typename _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
 				trajectory.clear();
 				typename TargetType::reverse_iterator itr;
-				for(itr = path_container.rbegin(); itr != path_container.rend(); itr++)
+				typename vector<float>::reverse_iterator arrival_time_itr;
+				for(itr = path_container.rbegin(), arrival_time_itr = reversed_arrival_time_container.rbegin(); itr != path_container.rend(); itr++,arrival_time_itr++)
 				{
 					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
 					vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::unqualified_value_type*>((typename TargetType::Component_Type::unqualified_value_type*)*itr);
 					//vehicle_trajectory_data->Initialize<_Link_Interface*>((_Link_Interface*)*itr);
+					if (arrival_time_itr != reversed_arrival_time_container.rbegin())
+						vehicle_trajectory_data->estimated_link_accepting_time<int>(*(arrival_time_itr - 1));
+					else
+						vehicle_trajectory_data->estimated_link_accepting_time<int>(0.0f);
+					cout << "estimated_link_accepting_time= " << vehicle_trajectory_data->estimated_link_accepting_time<int>() << endl;
 					trajectory.push_back(vehicle_trajectory_data);
 				}
 			}
 
-			feature_prototype void update_trajectory(TargetType& path_container)
+			feature_prototype void update_trajectory(TargetType& path_container, vector<float>& reversed_arrival_time_container)
 			{
-				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Back_Insertion_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 				define_component_interface(_Link_Interface, typename _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
 				
 				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
@@ -165,9 +173,11 @@ namespace Movement_Plan_Components
 				trajectory.erase(trajectory.begin() + current_trajectory_position<int&>() + 1,trajectory.end());
 				
 				typename TargetType::reverse_iterator itr;
-				for(itr = path_container.rbegin() + 1; itr != path_container.rend(); itr++)
+				typename vector<float>::reverse_iterator arrival_time_itr;
+				for(itr = path_container.rbegin() + 1, arrival_time_itr = reversed_arrival_time_container.rbegin() + 1; itr != path_container.rend(); itr++,arrival_time_itr++)
 				{
 					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
+					vehicle_trajectory_data->estimated_link_accepting_time<int>(*(arrival_time_itr - 1));
 					vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::unqualified_value_type*>((typename TargetType::Component_Type::unqualified_value_type*)*itr);
 					trajectory.push_back(vehicle_trajectory_data);
 				}

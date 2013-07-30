@@ -109,7 +109,7 @@ namespace Routing_Components
 				assert_sub_check(TargetType,Concepts::Is_One_To_One_Router,has_vehicle, "ControlType has no vehicle");
 			}
 #endif*/
-			feature_prototype float one_to_one_link_based_least_time_path_a_star(TargetType routable_net)
+			feature_prototype float one_to_one_link_based_least_time_path_a_star(TargetType routable_net, vector<float>& reversed_arrival_time_container)
 			{
 
 				define_component_interface(_Routable_Network_Interface, typename get_type_of(routable_network), Network_Components::Prototypes::Network_Prototype, ComponentType);
@@ -269,6 +269,8 @@ namespace Routing_Components
 					{
 						reversed_path_container.push_back(current_link->template network_link_reference<_Regular_Link_Interface*>());
 
+						reversed_arrival_time_container.push_back(current_link->template label_cost<float>());
+						cout << "label cost pushed as " << reversed_arrival_time_container.back() << endl;
 						if (current_link->template label_pointer<_Routable_Link_Interface*>() != current_link)
 						{
 							current_link=current_link->template label_pointer<_Routable_Link_Interface*>();
@@ -446,7 +448,7 @@ namespace Routing_Components
 				//define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				define_container_and_value_interface(_Reversed_Path_Container_Interface, _Regular_Link_Interface, typename ComponentType::routable_network_type::type_of(reversed_path_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);
-
+				
 				//_Vehicle_Interface* veh = _this_ptr->template vehicle<_Vehicle_Interface*>();
 				//_Movement_Plan_Interface* mp= veh->template movement_plan<_Movement_Plan_Interface*>();
 
@@ -459,7 +461,8 @@ namespace Routing_Components
 				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
 				
 				_Routable_Network_Interface* routable_network_ptr=_this_ptr->template routable_network<_Routable_Network_Interface*>();
-				float routed_travel_time = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
+				vector<float> reversed_arrival_time_container;
+				float routed_travel_time = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr, reversed_arrival_time_container);
 
 				if (routed_travel_time >= 0.0)
 				{	
@@ -474,7 +477,8 @@ namespace Routing_Components
 						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->template uuid<int>() << " and destination link uuid " << destination_link->template uuid<int>());
 					}
 
-					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
+					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>(), reversed_arrival_time_container);
+
 				}
 			}
 
@@ -566,7 +570,8 @@ namespace Routing_Components
 				_this_ptr->template routable_destination<_Regular_Link_Interface*>(destination_link);
 				
 				_Routable_Network_Interface* routable_network_ptr=((_Regular_Network_Interface*)_global_network)->template get_routable_network_from_snapshots<_Routable_Network_Interface*>(_this_ptr->template departure_time<int>());
-				float routed_travel_time = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
+				vector<float> reversed_arrival_time_container;
+				float routed_travel_time = _this_ptr->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr, reversed_arrival_time_container);
 				
 				if (routed_travel_time >= 0.0)
 				{	
@@ -582,7 +587,7 @@ namespace Routing_Components
 						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->template uuid<int>() << " and destination link uuid " << destination_link->template uuid<int>());
 					}
 
-					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>());
+					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>(), reversed_arrival_time_container);
 					_this_ptr->template write_path<NULLTYPE>();
 				}
 			}

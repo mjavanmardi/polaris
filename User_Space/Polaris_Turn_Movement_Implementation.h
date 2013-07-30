@@ -378,7 +378,10 @@ namespace Turn_Movement_Components
 
 				_cached_outbound_link_arrived_time_based_experienced_link_turn_travel_delay_array[t_cached_delay] = _outbound_link_arrived_time_based_experienced_link_turn_travel_delay;
 
-				realtime_forward_link_turn_travel_time<ComponentType,CallerType,float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
+				if (((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>())
+				{
+					realtime_forward_link_turn_travel_time<ComponentType,CallerType,float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
+				}
 
 				if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{	

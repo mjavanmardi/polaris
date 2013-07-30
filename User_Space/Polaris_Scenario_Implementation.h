@@ -158,6 +158,7 @@ namespace Scenario_Components
 			member_data(double, minimum_travel_time_saving_standard_deviation, none, none);
 			member_data(bool, enroute_switching_enabled, none, none);
 			member_data(bool, use_realtime_travel_time_for_enroute_switching, none, none);
+			member_data(double, arrival_delay_ratio_threshold_for_enroute_switching, none, none);
 
 			member_data(bool, multimodal_network_input, none, none);
 

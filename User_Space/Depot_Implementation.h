@@ -78,8 +78,8 @@ namespace Depot_Components
 
 			feature_implementation void Initialize(polaris::io::Depot& instance)
 			{
-				ComponentType::template Load_Event<ComponentType>(&ComponentType::template Depot_Condition<ComponentType,NT,NT>,&ComponentType::template Depot_Event<ComponentType,NT,NT>,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
-
+				//ComponentType::template Load_Event<ComponentType>(&ComponentType::template Depot_Condition<ComponentType,NT,NT>,&ComponentType::template Depot_Event<ComponentType,NT,NT>,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
+				//load_event(ComponentType,Depot_Condition,Depot_Event, ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS,NULLTYPE);
 				using namespace polaris::io;
 				
 				std::shared_ptr<LinkList> link_list = instance.getLinks();

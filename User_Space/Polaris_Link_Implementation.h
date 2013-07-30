@@ -443,6 +443,8 @@ namespace Link_Components
 				define_container_and_value_interface_unqualified_container(_Vehicle_Queue_Interface, _Vehicle_Interface, type_of(current_vehicle_queue), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_container_and_value_interface_unqualified_container(_Destination_Vehicle_Queue_Interface, _Vehicle_Interface_2, type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+
 				define_component_interface(_Network_Interface, type_of(network_reference), Network_Components::Prototypes::Network_Prototype, ComponentType);
 				define_component_interface(_Scenario_Interface, typename _Network_Interface::get_type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);
 
@@ -474,6 +476,9 @@ namespace Link_Components
 				}
 				mp->template transfer_to_next_link<NULLTYPE>(a_delayed_time);
 
+
+				//GLOBALS::Simulation_Time.Current_Time<Time_Seconds>()
+
 				///enroute switching
 				if (((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>())
 				{
@@ -489,82 +494,97 @@ namespace Link_Components
 					}
 				}
 
+
 				if (((_Scenario_Interface*)_global_scenario)->template enroute_switching_enabled<bool>())
 				{
 					bool enroute_switching_decision = false;
-
-					int outbound_turn_movement_size = (int)_outbound_turn_movements.size();
-					if (outbound_turn_movement_size>1)
+					int current_travel_time = ((_Network_Interface*)_network_reference)->template start_of_current_simulation_interval_relative<int>() - mp->departed_time<Time_Seconds>();
+					int position_index = mp->template current_trajectory_position<int>();
+					_Trajectory_Container_Interface& traj_container = mp->trajectory_container<_Trajectory_Container_Interface&>();
+					_Trajectory_Unit_Interface* current_traj_unit = traj_container[position_index];
+					int routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
+					float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0;
+					
+					if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template arrival_delay_ratio_threshold_for_enroute_switching<float>())
 					{
-						if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION) 
-						{///case 1: with realtime information
-							if (!vehicle->template enroute_updated<bool>())
-							{
-								double r1 = Uniform_RNG.Next_Rand<double>();//vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
-								if (r1 <= vehicle->template information_compliance_rate<double>())
+						cout << "current_travel_time = " << current_travel_time << ", routed_travel_time = " << routed_travel_time << ", observed_delay_ratio = " << observed_delay_ratio << endl;
+						enroute_switching_decision = true;
+					}
+					else
+					{
+						int outbound_turn_movement_size = (int)_outbound_turn_movements.size();
+						if (outbound_turn_movement_size>1)
+						{
+							if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION) 
+							{///case 1: with realtime information
+								if (!vehicle->template enroute_updated<bool>())
 								{
-									enroute_switching_decision = true;
-									//cout<< "informed vehicle switching..." <<endl;
+									double r1 = Uniform_RNG.Next_Rand<double>();//vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+									if (r1 <= vehicle->template information_compliance_rate<double>())
+									{
+										enroute_switching_decision = true;
+										//cout<< "informed vehicle switching..." <<endl;
+									}
 								}
 							}
 						}
-					}
 
-					if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION) 
-					{///case 2: no realtime information
-						double r1 = Uniform_RNG.Next_Rand<double>();//vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
-						if (r1 <= vehicle->template information_compliance_rate<double>())
-						{
+						if (vehicle->template enroute_information_type<Vehicle_Components::Types::Enroute_Information_Keys>() == Vehicle_Components::Types::Enroute_Information_Keys::NO_REALTIME_INFORMATION) 
+						{///case 2: no realtime information
+							double r1 = Uniform_RNG.Next_Rand<double>();//vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
+							if (r1 <= vehicle->template information_compliance_rate<double>())
+							{
 
-							/// case 2.3: Accident
-							if (_current_accident_event != nullptr)
-							{
-								//enroute_switching_decision = true;
-								//cout<< "uninformed vehicle switching...accident" <<endl;
-							}
-							else
-							{
-								unordered_set<_Network_Event_Interface*> events_set;
+								/// case 2.3: Accident
+								if (_current_accident_event != nullptr)
+								{
+									//enroute_switching_decision = true;
+									//cout<< "uninformed vehicle switching...accident" <<endl;
+								}
+								else
+								{
+									unordered_set<_Network_Event_Interface*> events_set;
 					
-								/// case 2.1: VMS
-								get_events_from_vms<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
+									/// case 2.1: VMS
+									get_events_from_vms<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
 
-								bool vms = false;
-								int vms_event_size = int(events_set.size());
-								if (vms_event_size>0)
-								{
-									vms = true;
-								}
-								/// case 2.2: HAR
-								get_events_from_har<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
-								int har_event_size = int(events_set.size()) - vms_event_size;
-								bool har = false;
-								if (har_event_size>0)
-								{
-									har = true;
-								}
-								/// exploit
-								if (vms || har)
-									enroute_switching_decision = vehicle->template exploit_events_set<unordered_set<_Network_Event_Interface*>&>(events_set);
+									bool vms = false;
+									int vms_event_size = int(events_set.size());
+									if (vms_event_size>0)
+									{
+										vms = true;
+									}
+									/// case 2.2: HAR
+									get_events_from_har<ComponentType,CallerType,unordered_set<_Network_Event_Interface*>&>(events_set);
+									int har_event_size = int(events_set.size()) - vms_event_size;
+									bool har = false;
+									if (har_event_size>0)
+									{
+										har = true;
+									}
+									/// exploit
+									if (vms || har)
+										enroute_switching_decision = vehicle->template exploit_events_set<unordered_set<_Network_Event_Interface*>&>(events_set);
 
-								//if (enroute_switching_decision)
-								//{
-								//	if (vms && har)
-								//	{
-								//		cout<< "uninformed vehicle switching...vms or/and har" <<endl;
-								//	}
-								//	else
-								//	{
-								//		if (vms)
-								//		{
-								//			cout<< "uninformed vehicle switching...vms" <<endl;
-								//		}
-								//		else
-								//		{
-								//			cout<< "uninformed vehicle switching...har" <<endl;
-								//		}
-								//	}
-								//}
+									//if (enroute_switching_decision)
+									//{
+									//	if (vms && har)
+									//	{
+									//		cout<< "uninformed vehicle switching...vms or/and har" <<endl;
+									//	}
+									//	else
+									//	{
+									//		if (vms)
+									//		{
+									//			cout<< "uninformed vehicle switching...vms" <<endl;
+									//		}
+									//		else
+									//		{
+									//			cout<< "uninformed vehicle switching...har" <<endl;
+									//		}
+									//	}
+									//}
+								}
 							}
 						}
 					}
