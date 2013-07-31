@@ -498,9 +498,10 @@ namespace Link_Components
 				if (((_Scenario_Interface*)_global_scenario)->template enroute_switching_enabled<bool>())
 				{
 					bool enroute_switching_decision = false;
-					int current_travel_time = ((_Network_Interface*)_network_reference)->template start_of_current_simulation_interval_relative<int>() - mp->departed_time<Time_Seconds>();
+					
+					int current_travel_time = ((_Network_Interface*)_network_reference)->template start_of_current_simulation_interval_relative<int>() - mp->template departed_time<Time_Seconds>();
 					int position_index = mp->template current_trajectory_position<int>();
-					_Trajectory_Container_Interface& traj_container = mp->trajectory_container<_Trajectory_Container_Interface&>();
+					_Trajectory_Container_Interface& traj_container = mp->template trajectory_container<_Trajectory_Container_Interface&>();
 					_Trajectory_Unit_Interface* current_traj_unit = traj_container[position_index];
 					int routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
 					float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0;
