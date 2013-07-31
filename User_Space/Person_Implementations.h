@@ -274,7 +274,15 @@ namespace Person_Components
 					int index = (int)(Uniform_RNG.template Next_Rand<float>()*size);
 					location_interface* work_loc = (*work_locations)[index];
 
-					pthis->template Work_Location<int>(work_loc->template internal_id<int>());
+					if (work_loc == nullptr)
+					{
+						pthis->template Work_Location<int>(pthis->template Home_Location<int>());
+						return;
+					}
+					else
+					{
+						pthis->template Work_Location<int>(work_loc->template internal_id<int>());
+					}
 				}
 			}
 			tag_feature_as_available(Choose_Work_Location);
@@ -334,6 +342,13 @@ namespace Person_Components
 						time_range_to_search += time_range_to_search;
 					
 					}
+
+					if (temp_zones.size()==0)
+					{
+						pthis->template School_Location<int>(pthis->template Home_Location<int>());
+						return;
+					}
+
 					// calculate probabilities
 					float cum_prob = 0;
 					for (typename vector<zone_interface*>::iterator t_itr = temp_zones.begin(); t_itr != temp_zones.end(); ++t_itr)
@@ -375,7 +390,9 @@ namespace Person_Components
 					float size = school_locations->size();
 					int index = (int)(Uniform_RNG.template Next_Rand<float>()*size);
 					location_interface* loc = (*school_locations)[index];
-					pthis->template School_Location<int>(loc->template internal_id<int>());
+
+					if (loc != nullptr) pthis->template School_Location<int>(loc->template internal_id<int>());
+					else pthis->template School_Location<int>(pthis->template Home_Location<int>());
 				}
 			}
 			tag_feature_as_available(Choose_School_Location);

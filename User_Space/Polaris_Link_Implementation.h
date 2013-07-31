@@ -505,7 +505,7 @@ namespace Link_Components
 					int routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
 					float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0;
 					
-					if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template arrival_delay_ratio_threshold_for_enroute_switching<float>())
+					if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template arrival_delay_ratio_threshold_for_enroute_switching<float>() && current_travel_time - routed_travel_time > 300 && routed_travel_time > 300)
 					{
 						cout << "current_travel_time = " << current_travel_time << ", routed_travel_time = " << routed_travel_time << ", observed_delay_ratio = " << observed_delay_ratio << endl;
 						enroute_switching_decision = true;

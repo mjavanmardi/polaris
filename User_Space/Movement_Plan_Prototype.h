@@ -157,7 +157,6 @@ namespace Movement_Plan_Components
 						vehicle_trajectory_data->estimated_link_accepting_time<int>(*(arrival_time_itr - 1));
 					else
 						vehicle_trajectory_data->estimated_link_accepting_time<int>(0.0f);
-					cout << "estimated_link_accepting_time= " << vehicle_trajectory_data->estimated_link_accepting_time<int>() << endl;
 					trajectory.push_back(vehicle_trajectory_data);
 				}
 			}
@@ -172,12 +171,15 @@ namespace Movement_Plan_Components
 				//erase 
 				trajectory.erase(trajectory.begin() + current_trajectory_position<int&>() + 1,trajectory.end());
 				
+				// add the time entering the current link to the relative estimated arrival time for the new trajectory_unit links
+				int stored_ttime = trajectory[current_trajectory_position<int&>()]->template enter_time<int>() - (int)this->departed_time<Time_Seconds>();
+
 				typename TargetType::reverse_iterator itr;
 				typename vector<float>::reverse_iterator arrival_time_itr;
 				for(itr = path_container.rbegin() + 1, arrival_time_itr = reversed_arrival_time_container.rbegin() + 1; itr != path_container.rend(); itr++,arrival_time_itr++)
 				{
 					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
-					vehicle_trajectory_data->estimated_link_accepting_time<int>(*(arrival_time_itr - 1));
+					vehicle_trajectory_data->estimated_link_accepting_time<int>(*(arrival_time_itr - 1) + stored_ttime);
 					vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::unqualified_value_type*>((typename TargetType::Component_Type::unqualified_value_type*)*itr);
 					trajectory.push_back(vehicle_trajectory_data);
 				}

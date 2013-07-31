@@ -94,7 +94,7 @@ namespace Zone_Components
 				define_container_and_value_interface(activity_locations_itf,activity_location_itf, typename get_type_of(origin_activity_locations),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,NULLTYPE);
 				activity_locations_itf* locations = this->template origin_activity_locations<activity_locations_itf*>();
 				
-				int size = locations->size();
+				int size = (int)locations->size();
 
 #ifndef EXCLUDE_DEMAND
                 int loc_index = (int)((GLOBALS::Uniform_RNG.Next_Rand<float>()*0.9999999) * size);

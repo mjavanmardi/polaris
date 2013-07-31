@@ -270,7 +270,6 @@ namespace Routing_Components
 						reversed_path_container.push_back(current_link->template network_link_reference<_Regular_Link_Interface*>());
 
 						reversed_arrival_time_container.push_back(current_link->template label_cost<float>());
-						cout << "label cost pushed as " << reversed_arrival_time_container.back() << endl;
 						if (current_link->template label_pointer<_Routable_Link_Interface*>() != current_link)
 						{
 							current_link=current_link->template label_pointer<_Routable_Link_Interface*>();
