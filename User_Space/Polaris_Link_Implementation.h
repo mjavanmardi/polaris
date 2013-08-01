@@ -508,7 +508,7 @@ namespace Link_Components
 					
 					if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template arrival_delay_ratio_threshold_for_enroute_switching<float>() && current_travel_time - routed_travel_time > 300 && routed_travel_time > 300)
 					{
-						cout << "current_travel_time = " << current_travel_time << ", routed_travel_time = " << routed_travel_time << ", observed_delay_ratio = " << observed_delay_ratio << endl;
+						//cout << "current_travel_time = " << current_travel_time << ", routed_travel_time = " << routed_travel_time << ", observed_delay_ratio = " << observed_delay_ratio << endl;
 						enroute_switching_decision = true;
 					}
 					else

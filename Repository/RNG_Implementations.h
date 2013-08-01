@@ -181,7 +181,18 @@ namespace GLOBALS
 			{
 				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				rng->Initialize<TargetType>((TargetType)(std::abs(std::sin((float)i+1)*(float)INT_MAX)) + random_seed);
+				rng->Initialize<TargetType>((TargetType)(std::abs(std::sin((float)(i+1)*random_seed)*(float)INT_MAX)) + random_seed);
+			}
+		}
+		template <typename TargetType>
+		void Set_Seed()
+		{
+			for (int i=0; i < _num_threads; i++)
+			{
+				TargetType random_seed = time(NULL);
+				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
+				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
+				rng->Initialize<TargetType>((TargetType)(std::abs(std::sin((float)(i+1)*random_seed)*(float)INT_MAX)) + random_seed);
 			}
 		}
 
@@ -243,7 +254,18 @@ namespace GLOBALS
 			{
 				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
-				rng->Initialize<TargetType>((TargetType)(std::sin((float)i+1)*(float)INT_MAX) + random_seed);
+				rng->Initialize<TargetType>((TargetType)(std::sin((float)(i+1)*random_seed)*(float)INT_MAX) + random_seed);
+			}
+		}
+		template <typename TargetType>
+		void Set_Seed()
+		{
+			for (int i=0; i < _num_threads; i++)
+			{
+				TargetType random_seed = time(NULL);
+				typedef RNG_Components::Prototypes::RNG_Prototype<RNG_type> rng_itf;
+				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
+				rng->Initialize<TargetType>((TargetType)(std::abs(std::sin((float)(i+1)*random_seed)*(float)INT_MAX)) + random_seed);
 			}
 		}
 

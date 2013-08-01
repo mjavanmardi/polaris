@@ -345,10 +345,19 @@ int main(int argc,char** argv)
 
 	
 	//==================================================================================================================================
-	// Initialize global randon number generators
+	// Initialize global randon number generators - if seed set to zero or left blank use system time
 	//---------------------------------------------------------------------------------------------------------------------------------- 
-	GLOBALS::Normal_RNG.Set_Seed<int>(100);
-	GLOBALS::Uniform_RNG.Set_Seed<int>(200);
+	int seed = scenario->iseed<int>();
+	if (seed != 0)
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
+		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
+	}
+	else
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>();
+		GLOBALS::Uniform_RNG.Set_Seed<int>();
+	}
 	
 
 	//==================================================================================================================================

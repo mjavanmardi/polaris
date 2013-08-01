@@ -587,7 +587,7 @@ namespace Routing_Components
 					}
 
 					mp->template set_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>(), reversed_arrival_time_container);
-					_this_ptr->template write_path<NULLTYPE>();
+					//_this_ptr->template write_path<NULLTYPE>();
 				}
 			}
 

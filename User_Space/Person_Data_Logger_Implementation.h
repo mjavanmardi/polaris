@@ -218,26 +218,29 @@ namespace Person_Components
 					define_component_interface(movement_itf,typename act_record_itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 					define_component_interface(planner_itf,typename act_record_itf::get_type_of(Parent_Planner),Prototypes::Person_Planner,ComponentType);
 					define_component_interface(person_itf,typename planner_itf::get_type_of(Parent_Person),Prototypes::Person,ComponentType);
-					movement_itf* move = act->template movement_plan<movement_itf*>();
-					zone_itf* orig = move->template origin<location_itf*>()->template zone<zone_itf*>();
-					zone_itf* dest = move->template destination<location_itf*>()->template zone<zone_itf*>();
-					planner_itf* planner = act->template Parent_Planner<planner_itf*>();
-					person_itf* person = planner->template Parent_Person<person_itf*>();
-					zone_itf* home = person->template Home_Location<zone_itf*>();
-					int O, D, H;
-					O = orig->template uuid<int>();
-					D = dest->template uuid<int>();
-					H = home->template uuid<int>();
-					if(is_external_internal_trip(O,D,H)) 
-					{
-						int new_origin = get_nearest_external_location<ComponentType,CallerType,zone_itf*>(orig);
-						Push_To_Demand_Database<ComponentType,CallerType,TargetType>(act_record, new_origin);
-					}
-					else if (is_internal_external_trip(O,D,H))
-					{
-						int new_destination = get_nearest_external_location<ComponentType,CallerType,zone_itf*>(dest);
-						Push_To_Demand_Database<ComponentType,CallerType,TargetType>(act_record, -1, new_destination);
-					}
+
+					Push_To_Demand_Database<ComponentType,CallerType,TargetType>(act_record);
+
+					//movement_itf* move = act->template movement_plan<movement_itf*>();
+					//zone_itf* orig = move->template origin<location_itf*>()->template zone<zone_itf*>();
+					//zone_itf* dest = move->template destination<location_itf*>()->template zone<zone_itf*>();
+					//planner_itf* planner = act->template Parent_Planner<planner_itf*>();
+					//person_itf* person = planner->template Parent_Person<person_itf*>();
+					//zone_itf* home = person->template Home_Location<zone_itf*>();
+					//int O, D, H;
+					//O = orig->template uuid<int>();
+					//D = dest->template uuid<int>();
+					//H = home->template uuid<int>();
+					//if(is_external_internal_trip(O,D,H)) 
+					//{
+					//	int new_origin = get_nearest_external_location<ComponentType,CallerType,zone_itf*>(orig);
+					//	Push_To_Demand_Database<ComponentType,CallerType,TargetType>(act_record, new_origin);
+					//}
+					//else if (is_internal_external_trip(O,D,H))
+					//{
+					//	int new_destination = get_nearest_external_location<ComponentType,CallerType,zone_itf*>(dest);
+					//	Push_To_Demand_Database<ComponentType,CallerType,TargetType>(act_record, -1, new_destination);
+					//}
 				}
 				//----------------------------------------------------------
 				//==========================================================

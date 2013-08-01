@@ -380,7 +380,7 @@ namespace Scenario_Components
 
 				//===============================================
 				// set control parameters
-				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(1234567.0);
+				if (cfgReader.getParameter("seed", iseed<unsigned long*>()) != PARAMETER_FOUND) iseed<unsigned long>(0);
 				if (cfgReader.getParameter("node_control_flag", intersection_control_flag<int*>())!= PARAMETER_FOUND) intersection_control_flag<int>(0.0);
 				if (cfgReader.getParameter("ramp_metering_flag", ramp_metering_flag<bool*>())!= PARAMETER_FOUND) ramp_metering_flag<bool>(false);
 				if (cfgReader.getParameter("demand_od_flag", demand_od_flag<int*>())!= PARAMETER_FOUND) demand_od_flag<int>(1);
