@@ -644,8 +644,6 @@
     <ClInclude Include="Geometry_Implementation.h" />
     <ClInclude Include="Network_Event_Implementations.h" />
     <ClInclude Include="Network_Event_Prototype.h" />
-    <ClInclude Include="File_Reader.h" />
-    <ClInclude Include="File_Writer.h" />
     <ClInclude Include="Intersection_Control_Prototype.h" />
     <ClInclude Include="Intersection_Prototype.h" />
     <ClInclude Include="linker.h" />

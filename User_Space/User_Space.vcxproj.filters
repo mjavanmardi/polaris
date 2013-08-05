@@ -184,12 +184,6 @@
     <ClInclude Include="Linker_Implementations.h">
       <Filter>Implementations\PopSyn</Filter>
     </ClInclude>
-    <ClInclude Include="File_Reader.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
-    <ClInclude Include="File_Writer.h">
-      <Filter>Prototypes\PopSyn</Filter>
-    </ClInclude>
     <ClInclude Include="linker.h">
       <Filter>Prototypes\PopSyn</Filter>
     </ClInclude>

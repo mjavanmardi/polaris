@@ -22,6 +22,10 @@ namespace Person_Components
 			vector<shared_ptr<polaris::io::Trip>> trip_records[_num_threads];
 			vector<shared_ptr<polaris::io::Trip>> trip_records_buffer[_num_threads];
 
+			float expected_ttime[_num_threads];
+			float actual_ttime[_num_threads];
+			int num_acts_in_interval[_num_threads];
+
 			vector<string>* buff;
 			vector<string>* current;
 			vector<shared_ptr<polaris::io::Trip>>* trip_buff;
@@ -62,8 +66,8 @@ namespace Person_Components
 				}
 
 
-				this->Logging_Interval<ComponentType,CallerType,Time_Minutes>(15);
-				this->Next_Logging_Time<ComponentType,CallerType,Time_Minutes>(15);
+				this->Logging_Interval<ComponentType,CallerType,Time_Minutes>(5);
+				this->Next_Logging_Time<ComponentType,CallerType,Time_Minutes>(5);
 				Simulation_Timestep_Increment first_time = this->Next_Logging_Time<ComponentType,CallerType,Simulation_Timestep_Increment>();
 				load_event(ComponentType,Logging_Conditional,Write_Data_To_File_Event,first_time,0,NULLTYPE);
 
@@ -114,7 +118,7 @@ namespace Person_Components
 				filename_moe << "moe_demand.csv";
 				this->_demand_moe_file.open(filename_moe.str());
 				if (!this->_demand_moe_file.is_open())THROW_EXCEPTION("ERROR: demand moe file could not be created.");
-				this->_demand_moe_file <<"TIME(s),LOST_ACTIVITY_TIME(min),Cancelled_Acts_Count"<<endl;
+				this->_demand_moe_file <<"TIME(s),LOST_ACTIVITY_TIME(min),Cancelled_Acts_Count,acts_completed,avg_expected_ttime,avg_actual_ttime"<<endl;
 			}
 
 			feature_implementation void Add_Record(TargetType act_record, bool is_executed)
@@ -137,10 +141,17 @@ namespace Person_Components
 				location_itf* loc = act->template Location<location_itf*>();
 
 				// determine delay, using current iteration as the arrival time
-				float expected_start = act->template Start_Time<Time_Minutes>();
-				float actual_start = GLOBALS::Simulation_Time.template Current_Time<Time_Minutes>();
-				float delay = std::max<float>(actual_start - expected_start,0.0f);
-				this->_activity_time_lost += delay;
+				if (is_executed)
+				{
+					float expected_start = act->template Start_Time<Time_Minutes>();
+					float actual_start = GLOBALS::Simulation_Time.template Current_Time<Time_Minutes>();
+					float delay = std::max<float>(actual_start - expected_start,0.0f);
+					this->_activity_time_lost += delay;
+
+					expected_ttime[_thread_id] += (float)act->Expected_Travel_Time<Time_Seconds>();
+					actual_ttime[_thread_id] += (float)act->Actual_Travel_Time<Time_Seconds>();
+					num_acts_in_interval[_thread_id]++;
+				}
 
 
 				// count the number of acts added
@@ -368,11 +379,30 @@ namespace Person_Components
 					}
 					this->_executed_acts_file << endl;
 
-					// write to the lost activity time file
-					this->_demand_moe_file << _iteration << "," << this->_activity_time_lost << endl;
 
-					// write to the cancelled activities file
-					this->_demand_moe_file << _iteration << "," << this->_cancelled_activities << endl;
+					//=================================================================================
+					// write to the Demand MOE File
+					this->_demand_moe_file << _iteration << "," << this->_activity_time_lost;
+
+					// write the cancelled activities 
+					this->_demand_moe_file << "," << this->_cancelled_activities;
+
+					// write the average expected and actual travel times over the current interval
+					float actual_ttime_sum=0;
+					float expected_ttime_sum=0;
+					float acts_in_interval = 0;
+					for (int i=0; i < _num_threads; i++)
+					{
+						actual_ttime_sum += actual_ttime[i];
+						expected_ttime_sum += expected_ttime[i];
+						acts_in_interval += num_acts_in_interval[i];
+						actual_ttime[i]=0;
+						expected_ttime[i]=0;
+						num_acts_in_interval[i]=0;
+					}
+					this->_demand_moe_file << "," << acts_in_interval;
+					this->_demand_moe_file << "," << expected_ttime_sum / acts_in_interval;
+					this->_demand_moe_file << "," << actual_ttime_sum / acts_in_interval<<endl;
 				}
 
 
