@@ -394,9 +394,16 @@ namespace Routing_Components
 
 			feature_prototype void Schedule_Route_Computation(int time_to_depart)
 			{
-				load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
-				//departure_time<int>(time_to_depart);
-				//load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route_Using_Snapshot,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+				typedef Scenario_Prototype<typename Component_Type::Master_Type::scenario_type> _Scenario_Interface;
+				if (((_Scenario_Interface*)_global_scenario)->template routing_with_snapshots<bool>())
+				{
+					departure_time<int>(time_to_depart);
+					load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route_Using_Snapshot,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+				}
+				else
+				{
+					load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+				}
 			}
 
 			feature_prototype void Schedule_Route_Computation(int time_to_depart, int planning_time, bool use_snapshot)

@@ -34,4 +34,8 @@
     <LocalDebuggerWorkingDirectory>..\..\Test_Data\Chicago_City_Network</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NetworkModel|x64'">
+    <LocalDebuggerWorkingDirectory>..\..\trb2014\normal_day_from_snap_shots</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

@@ -456,6 +456,22 @@ namespace Network_Components
 				}
 			}
 
+			if (((_Scenario_Interface*)_global_scenario)->template output_analzye_link_group_moe_for_assignment_interval<bool>())
+			{
+				define_container_and_value_interface_unqualified_container(_Analyze_Link_Groups_Container_Interface, _Analyze_Link_Group_Interface, type_of(analyze_link_groups_container), Random_Access_Sequence_Prototype, Analyze_Link_Group_Components::Prototypes::Analyze_Link_Group, ComponentType);
+				define_component_interface(_Network_Event_Interface, typename _Analyze_Link_Group_Interface::get_type_of(event), Network_Event_Components::Prototypes::Network_Event, ComponentType);
+				typename _Analyze_Link_Groups_Container_Interface::iterator analyze_link_group_itr;
+				for(analyze_link_group_itr = _analyze_link_groups_container.begin(); analyze_link_group_itr != _analyze_link_groups_container.end(); analyze_link_group_itr++)
+				{
+					_Analyze_Link_Group_Interface* analyze_link_group = (_Analyze_Link_Group_Interface*)(*analyze_link_group_itr);
+					_Network_Event_Interface* event = analyze_link_group->template event<_Network_Event_Interface*>();
+					//if (time <= event->template end_time<int>() + ((_Scenario_Interface*)_global_scenario)->template event_impact_time<int>())
+					{
+						analyze_link_group->template output_moe<NT>(time);
+					}
+				}
+			}
+
 			if (((_Scenario_Interface*)_global_scenario)->template DB_output_link_moe_for_assignment_interval<bool>())
 			{
 				shared_ptr<LinkMOE> moe_rec(nullptr);
@@ -540,6 +556,64 @@ namespace Network_Components
 					<< endl;
 				}
 			}
+
+			feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::read_analyze_link_groups()
+			{
+				typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Network_Event<typename MasterType::base_network_event_type> _Network_Event_Interface;
+				define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, NULLTYPE);
+				define_container_and_value_interface_unqualified_container(_Analyze_Link_Groups_Container_Interface, _Analyze_Link_Group_Interface, type_of(analyze_link_groups_container), Random_Access_Sequence_Prototype, Analyze_Link_Group_Components::Prototypes::Analyze_Link_Group, ComponentType);
+
+				string line;
+				vector<string> tokens;
+
+				fstream& _analyze_link_groups_file = ((_Scenario_Interface*)_global_scenario)->template analyze_link_groups_file<fstream&>();
+				getline(_analyze_link_groups_file, line); // skip "number_of_groups" label
+				getline(_analyze_link_groups_file, line); // get number of groups
+				int num_of_groups = atoi(line.c_str());
+				for (int i = 0; i < num_of_groups; i++)
+				{
+					_Analyze_Link_Group_Interface* analyze_link_group = (_Analyze_Link_Group_Interface*)Allocate<typename MasterType::analyze_link_group_type>();
+					_Network_Event_Interface* event = (_Network_Event_Interface*)Allocate<typename MasterType::base_network_event_type>();
+					
+					getline(_analyze_link_groups_file, line); // skip "event_start_time,event_end_time" label
+					// read in start time and end time
+					getline(_analyze_link_groups_file, line);
+					
+					string_split(tokens, line);
+					event->template start_time<int>(atoi(tokens[0].c_str()));
+					event->template end_time<int>(atoi(tokens[1].c_str()));
+
+					analyze_link_group->template event<_Network_Event_Interface*>(event);
+					analyze_link_group->template initialize<NT>(i);
+
+					getline(_analyze_link_groups_file, line); // skip "affected_links" label
+
+					// read affected links
+					getline(_analyze_link_groups_file, line);
+					string_split(tokens, line);
+					for (int j = 0; j < (int)tokens.size(); j++)
+					{
+						int link_id = atoi(tokens[j].c_str());
+						unordered_map<int,vector<typename MasterType::link_type*>>& db_map=((Network_Prototype<typename type_of(MasterType::network),ComponentType>*)_global_network)->template db_id_to_links_map<unordered_map<int,vector<typename MasterType::link_type*>>&>();
+
+						if(db_map.count(link_id))
+						{
+							vector<typename MasterType::link_type*>& links=db_map[link_id];
+
+							typename vector<typename type_of(MasterType::link)*>::iterator vitr;
+
+							for(vitr=links.begin();vitr!=links.end();vitr++)
+							{
+								_Link_Interface* link = (_Link_Interface*)(*vitr);
+								analyze_link_group->template links_container<_Links_Container_Interface&>().push_back(link);
+							}
+						}
+					}
+					_analyze_link_groups_container.push_back(analyze_link_group);
+				}
+			}
+
 		//feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::output_moe()
 		//{
 		//	define_component_interface(_Scenario_Interface, type_of(scenario_reference), Scenario_Components::Prototypes::Scenario_Prototype, ComponentType);

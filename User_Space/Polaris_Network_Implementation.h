@@ -3,6 +3,7 @@
 #include "Traffic_Management_Center_Prototype.h"
 #include "Network_Event_Prototype.h"
 #include "Polaris_Link_Implementation.h"
+#include "Polaris_Analyze_Link_Group_Implementation.h" 
 
 namespace Network_Components
 {
@@ -49,7 +50,7 @@ namespace Network_Components
 			float network_avg_link_travel_time_ratio;
 		};
 
-		implementation struct Polaris_Network_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>
+		implementation struct Polaris_Network_Implementation:public Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType,true>
 		{
 			typedef typename Polaris_Component<APPEND_CHILD(Polaris_Network_Implementation),MasterType,Execution_Object,ParentType>::Component_Type ComponentType;
 
@@ -101,6 +102,8 @@ namespace Network_Components
 			member_data(_lock, network_vht_vehicle_based_update_lock, none, none);
 
 			member_container(vector<typename MasterType::routable_network_type*>, network_snapshot_container, none, none);
+			
+			member_container(vector<typename MasterType::analyze_link_group_type*>, analyze_link_groups_container, none, none);
 
 			typedef unordered_map<int,vector<typename MasterType::link_type*>> id_to_links_map_type;
 			member_data(id_to_links_map_type, db_id_to_links_map, none, none);
@@ -160,6 +163,10 @@ namespace Network_Components
 				if (((_Scenario_Interface*)_global_scenario)->template read_network_snapshots<bool>())
 				{
 					read_snapshots();
+				}
+				if (((_Scenario_Interface*)_global_scenario)->template load_analyze_link_groups_from_file<bool>())
+				{
+					read_analyze_link_groups<ComponentType,CallerType,TargetType>();
 				}
 				_network_vht = 0.0;
 				_network_vmt = 0.0;
@@ -948,6 +955,8 @@ namespace Network_Components
 			feature_implementation void write_network_link_turn_time();
 			
 			feature_implementation void write_output_summary();
+
+			feature_implementation void read_analyze_link_groups();
 
 			//==================================================================================================================
 			/// Convert network data from Polaris structure to C++ data structure to be written to a file

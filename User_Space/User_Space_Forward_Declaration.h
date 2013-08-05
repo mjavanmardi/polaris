@@ -244,3 +244,10 @@ namespace Network_Components
 		forward_declare_prototype struct Network_DB_Reader_Prototype;
 	}
 };
+namespace Analyze_Link_Group_Components
+{
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Analyze_Link_Group;
+	}
+};

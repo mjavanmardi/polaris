@@ -183,6 +183,8 @@ namespace Network_Components
 			feature_accessor(in_network_vht_vehicle_based, none, none);
 			feature_accessor(out_network_vht_vehicle_based_update_lock, none, none);
 			feature_accessor(network_vht_vehicle_based, none, none);
+			feature_accessor(analyze_link_groups_container, none, none);
+
 			//------------------------------------------------------------------------------------------------------------------
 
 

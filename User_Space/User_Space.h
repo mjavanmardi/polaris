@@ -56,6 +56,7 @@ void* _global_person_logger;
 // NETWORK_EVENT COMPONENTS
 
 #include "Network_Event_Implementations.h"
+#include "Polaris_Analyze_Link_Group_Implementation.h"
 
 #ifndef EXCLUDE_DEMAND
 // PERSON AGENT COMPONENTS

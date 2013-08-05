@@ -316,5 +316,11 @@
     <ClInclude Include="Polaris_Ramp_Metering_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Analyze_Link_Group_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Polaris_Analyze_Link_Group_Implementation.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

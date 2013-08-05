@@ -636,6 +636,7 @@
     <ClInclude Include="Advisory_ITS_Prototype.h" />
     <ClInclude Include="Activity_Timing_Choice_Prototype.h" />
     <ClInclude Include="Advisory_Radio_Implementation.h" />
+    <ClInclude Include="Analyze_Link_Group_Prototype.h" />
     <ClInclude Include="Demand_Prototype.h" />
     <ClInclude Include="Depot_Implementation.h" />
     <ClInclude Include="Destination_Choice_Implementation.h" />
@@ -675,6 +676,7 @@
     <ClInclude Include="Person_Scheduler_Prototype.h" />
     <ClInclude Include="Plan_Prototype.h" />
     <ClInclude Include="Polaris_Activity_Location_Implementation.h" />
+    <ClInclude Include="Polaris_Analyze_Link_Group_Implementation.h" />
     <ClInclude Include="Polaris_Demand_Implementation.h" />
     <ClInclude Include="Polaris_Intersection_Control_Implementation.h" />
     <ClInclude Include="Polaris_Intersection_Implementation.h" />

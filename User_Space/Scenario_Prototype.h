@@ -224,6 +224,7 @@ namespace Scenario_Components
 			
 			feature_accessor(write_network_snapshots, none, none);
 			feature_accessor(read_network_snapshots, none, none);
+			feature_accessor(routing_with_snapshots, none, none);
 			feature_accessor(input_network_snapshots_file_path_name, none, none);	
 			feature_accessor(write_skim_tables,none,none);
 			feature_accessor(read_skim_tables,none,none);
@@ -244,6 +245,10 @@ namespace Scenario_Components
 			feature_accessor(output_link_moe_for_assignment_interval, none, none);
 			feature_accessor(output_turn_movement_moe_for_assignment_interval, none, none);
 			feature_accessor(output_network_moe_for_assignment_interval, none, none);
+			feature_accessor(output_analzye_link_group_moe_for_assignment_interval, none, none);
+			feature_accessor(load_analyze_link_groups_from_file, none, none);
+			feature_accessor(analyze_link_groups_file_path_name, none, none);
+			feature_accessor(analyze_link_groups_file, none, none);
 
 			feature_accessor(use_tmc, none, none);
 			feature_accessor(use_network_events, none, none);
@@ -464,6 +469,8 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("output_network_moe_for_simulation_interval", output_network_moe_for_simulation_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_simulation_interval<bool>(false);
 				if (cfgReader.getParameter("write_network_snapshots", write_network_snapshots<bool*>())!= PARAMETER_FOUND) write_network_snapshots<bool>(false);
 				if (cfgReader.getParameter("read_network_snapshots", read_network_snapshots<bool*>())!= PARAMETER_FOUND) read_network_snapshots<bool>(false);
+				if (cfgReader.getParameter("routing_with_snapshots", routing_with_snapshots<bool*>())!= PARAMETER_FOUND) routing_with_snapshots<bool>(false);
+
 				if (cfgReader.getParameter("input_network_snapshots_file_path_name", input_network_snapshots_file_path_name<string*>())!= PARAMETER_FOUND) input_network_snapshots_file_path_name<string>("input_network_snapshots");
 				
 				if (cfgReader.getParameter("write_skim_tables", this->write_skim_tables<bool*>()) != PARAMETER_FOUND) this->write_skim_tables<bool>(false);
@@ -481,6 +488,9 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("output_link_moe_for_assignment_interval", output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_link_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("output_turn_movement_moe_for_assignment_interval", output_turn_movement_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_turn_movement_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("output_network_moe_for_assignment_interval", output_network_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_network_moe_for_assignment_interval<bool>(true);
+				if (cfgReader.getParameter("output_analzye_link_group_moe_for_assignment_interval", output_analzye_link_group_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) output_analzye_link_group_moe_for_assignment_interval<bool>(false);
+				if (cfgReader.getParameter("load_analyze_link_groups_from_file", load_analyze_link_groups_from_file<bool*>())!= PARAMETER_FOUND) load_analyze_link_groups_from_file<bool>(false);
+				if (cfgReader.getParameter("analyze_link_groups_file_path_name", analyze_link_groups_file_path_name<string*>())!= PARAMETER_FOUND) analyze_link_groups_file_path_name<string>("analyze_link_groups");
 
 				if (cfgReader.getParameter("DB_output_link_moe_for_assignment_interval", DB_output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) DB_output_link_moe_for_assignment_interval<bool>(false);
 
@@ -929,12 +939,12 @@ namespace Scenario_Components
 						getline(historic_link_moe_file<fstream&>(),aLine); // skip the first line
 					}
 				}
-				if (read_network_snapshots<bool>())
+				if (read_network_snapshots<bool>() || routing_with_snapshots<bool>())
 				{
 					input_network_snapshots_file<fstream&>().open(input_network_snapshots_file_path_name<string&>(), fstream::in);
 					if (!input_network_snapshots_file<fstream&>().is_open())
 					{
-						THROW_EXCEPTION(endl << "read_network_snapshots is enabled but network snapshots file " << input_network_snapshots_file_path_name<string&>() << " cannot be opened." << endl);
+						THROW_EXCEPTION(endl << "read_network_snapshots/routing_with_snapshots is enabled but network snapshots file " << input_network_snapshots_file_path_name<string&>() << " cannot be opened." << endl);
 					}
 				}
 				if (read_normal_day_link_moe<bool>())
@@ -948,6 +958,14 @@ namespace Scenario_Components
 					{
 						string aLine;
 						getline(normal_day_link_moe_file<fstream&>(),aLine); // skip the first line
+					}
+				}
+				if (load_analyze_link_groups_from_file<bool>())
+				{
+					analyze_link_groups_file<fstream&>().open(analyze_link_groups_file_path_name<string&>(), fstream::in);
+					if (!analyze_link_groups_file<fstream&>().is_open())
+					{
+						THROW_EXCEPTION(endl << "load_analyze_link_groups_from_file is enabled but analyze link groups file " << analyze_link_groups_file_path_name<string&>() << " cannot be openned." << endl);
 					}
 				}
 			}

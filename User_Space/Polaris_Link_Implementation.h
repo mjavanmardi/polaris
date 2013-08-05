@@ -13,6 +13,7 @@
 #include "Link_Control_Prototype.h"
 #include "Advisory_ITS_Prototype.h"
 #include "Sensor_Prototype.h"
+#include "Movement_Plan_Prototype.h"
 
 namespace Link_Components
 {

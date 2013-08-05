@@ -120,6 +120,7 @@ namespace Scenario_Components
 
 			member_data(bool, write_network_snapshots, none, none);
 			member_data(bool, read_network_snapshots, none, none);
+			member_data(bool, routing_with_snapshots, none, none);
 			member_data(string, input_network_snapshots_file_path_name, none, none);
 
 			member_data(bool, compare_with_historic_moe, none, none);
@@ -137,6 +138,10 @@ namespace Scenario_Components
 			member_data(bool, output_link_moe_for_assignment_interval, none, none);
 			member_data(bool, output_turn_movement_moe_for_assignment_interval, none, none);
 			member_data(bool, output_network_moe_for_assignment_interval, none, none);
+			member_data(bool, output_analzye_link_group_moe_for_assignment_interval, none, none);
+			member_data(bool, load_analyze_link_groups_from_file, none, none);
+			member_data(string, analyze_link_groups_file_path_name, none, none);
+			member_data(fstream, analyze_link_groups_file, none, none);
 			
 			member_data(bool, DB_output_link_moe_for_assignment_interval, none, none);
 

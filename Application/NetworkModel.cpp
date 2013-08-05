@@ -118,6 +118,9 @@ struct MasterType
 
 	typedef Vehicle_Components::Implementations::Polaris_Switch_Decision_Data_Implementation<MasterType> switch_decision_data_type;
 
+	typedef Analyze_Link_Group_Components::Implementations::Polaris_Analyze_Link_Group_Implementation<MasterType> analyze_link_group_type;
+
+
     //typedef Person_Components::Implementations::CTRAMP_Person_Planner_Implementation<MasterType, person_type> person_planner_type;
 
     //typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<MasterType,person_type> person_properties_type;
