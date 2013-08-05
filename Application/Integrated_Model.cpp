@@ -72,6 +72,8 @@ struct MasterType
 	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Implementation<M> phase_type;
 	typedef Intersection_Control_Components::Implementations::Polaris_Phase_Movement_Implementation<M> phase_movement_type;
 	typedef Intersection_Control_Components::Implementations::Polaris_Approach_Implementation<M> approach_type;
+	
+	typedef Analyze_Link_Group_Components::Implementations::Polaris_Analyze_Link_Group_Implementation<MasterType> analyze_link_group_type;
 
 	typedef Plan_Components::Implementations::Polaris_Plan_Implementation<M> plan_type;
 
