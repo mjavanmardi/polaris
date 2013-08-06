@@ -52,7 +52,7 @@ endif()
 
 if (UNIX)
 	set(DEPS_DIR /mnt/lustre/home/vsokolov/opt)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -O2")
 else()
 	set(DEPS_DIR C:/opt/polarisdeps)
 	set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} c:/opt/polarisdeps/x64/lib;C:/glew-1.7.0/lib;C:/plplot/lib)
