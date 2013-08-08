@@ -924,6 +924,14 @@ namespace Vehicle_Components
 						key_value_pair.second=str_buf;				
 						memset(&str_buf[0],0,128);
 						bucket.push_back(key_value_pair);
+						// activity destination
+						ss.str("");
+						ss << "Act "<<i<<": Location destination";
+						key_value_pair.first=ss.str();
+						sprintf(str_buf, "%d", act->Location<Activity_Location_Interface*>()->uuid<int>());
+						key_value_pair.second=str_buf;				
+						memset(&str_buf[0],0,128);
+						bucket.push_back(key_value_pair);
 					}
 				}
 //#endif

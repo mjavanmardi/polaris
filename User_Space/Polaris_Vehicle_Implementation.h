@@ -465,7 +465,7 @@ namespace Vehicle_Components
 					float link_travel_time = routable_link->template travel_time<float>();
 
 					current_route_link_sum_to_destination += route_link-> template internal_id<int>();
-					current_route_time_to_destination += link_travel_time;
+					//current_route_time_to_destination += link_travel_time;
 					if (itr < trajectory.end() - 1)
 					{
 						_Trajectory_Unit_Interface* next_trajectory_unit = (_Trajectory_Unit_Interface*)(*(itr+1));
@@ -508,7 +508,7 @@ namespace Vehicle_Components
 				((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>(current_time + current_route_time_to_destination);
 				float arrival_time_diff = ((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>() - current_eta;
 				int routed_travel_time = ((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>();
-				((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>(current_time - departure_time + current_route_time_to_destination);
+				//((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>(current_time - departure_time + current_route_time_to_destination);
 			}
 		};
 	}

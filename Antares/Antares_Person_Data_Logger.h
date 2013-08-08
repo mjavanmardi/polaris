@@ -268,7 +268,7 @@ namespace Person_Components
 
 			void plot_demand_moes()
 			{
-				cout << endl << "Plot demand MOEs";
+				//cout << endl << "Plot demand MOEs";
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 #pragma pack(push,1)
 				struct Plot_Element

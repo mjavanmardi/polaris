@@ -507,9 +507,36 @@ namespace Link_Components
 					int routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
 					float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0;
 					
-					if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template arrival_delay_ratio_threshold_for_enroute_switching<float>() && current_travel_time - routed_travel_time > 300 && routed_travel_time > 300)
+					if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_ratio_for_enroute_switching<float>() && current_travel_time - routed_travel_time > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>())
 					{
-						//cout << "current_travel_time = " << current_travel_time << ", routed_travel_time = " << routed_travel_time << ", observed_delay_ratio = " << observed_delay_ratio << endl;
+						//cout << "vehicle id: " << vehicle->uuid<int>() << ", departure time: " << mp->template departed_time<Time_Seconds>() <<"current trajectory position: " << position_index << ", current_travel_time = " << current_travel_time << ", routed_travel_time = " << routed_travel_time << ", observed_delay_ratio = " << observed_delay_ratio << endl;
+						
+
+						////TODO: remove  ===== TEMP: Print vehicle trajectory prior to route switch
+						//int num_links = (int)mp->template trajectory_container<_Trajectory_Container_Interface&>().size();
+						//for (int route_link_counter=0;route_link_counter<num_links;route_link_counter++)
+						//{
+
+						//	_Trajectory_Unit_Interface* trajectory_unit = mp->template trajectory_container<_Trajectory_Container_Interface&>()[route_link_counter];
+						//	_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+						//	int route_link_id = route_link->template uuid<int>();
+						//	int route_link_enter_time = trajectory_unit->template enter_time<int>();
+						//	float route_link_delayed_time = float(trajectory_unit->template delayed_time<float>()/60.0f);
+						//		
+						//	int route_link_exit_time = mp->template get_route_link_exit_time<NULLTYPE>(route_link_counter);
+						//	float route_link_travel_time = float((route_link_exit_time - route_link_enter_time)/60.0f);
+					
+						//	cout <<endl
+						//		<<route_link_counter + 1 << ","
+						//		<<route_link_id << ","
+						//		<<convert_seconds_to_hhmmss(route_link_enter_time) << ","
+						//		<<trajectory_unit->estimated_link_accepting_time<int>() << ","
+						//		<<route_link_travel_time << ","
+						//		<<route_link_delayed_time
+						//		<<endl;
+						//}
+
+
 						enroute_switching_decision = true;
 					}
 					else
@@ -522,11 +549,7 @@ namespace Link_Components
 								if (!vehicle->template enroute_updated<bool>())
 								{
 									double r1 = Uniform_RNG.Next_Rand<double>();//vehicle->template rng_stream<RNG_Components::RngStream&>().RandU01();
-									if (r1 <= vehicle->template information_compliance_rate<double>())
-									{
-										enroute_switching_decision = true;
-										//cout<< "informed vehicle switching..." <<endl;
-									}
+									if (r1 <= vehicle->template information_compliance_rate<double>()) enroute_switching_decision = true;
 								}
 							}
 						}
@@ -567,25 +590,6 @@ namespace Link_Components
 									/// exploit
 									if (vms || har)
 										enroute_switching_decision = vehicle->template exploit_events_set<unordered_set<_Network_Event_Interface*>&>(events_set);
-
-									//if (enroute_switching_decision)
-									//{
-									//	if (vms && har)
-									//	{
-									//		cout<< "uninformed vehicle switching...vms or/and har" <<endl;
-									//	}
-									//	else
-									//	{
-									//		if (vms)
-									//		{
-									//			cout<< "uninformed vehicle switching...vms" <<endl;
-									//		}
-									//		else
-									//		{
-									//			cout<< "uninformed vehicle switching...har" <<endl;
-									//		}
-									//	}
-									//}
 								}
 							}
 						}

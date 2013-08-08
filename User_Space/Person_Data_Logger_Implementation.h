@@ -23,6 +23,7 @@ namespace Person_Components
 			vector<shared_ptr<polaris::io::Trip>> trip_records_buffer[_num_threads];
 
 			float expected_ttime[_num_threads];
+			float routed_ttime[_num_threads];
 			float actual_ttime[_num_threads];
 			int num_acts_in_interval[_num_threads];
 
@@ -118,7 +119,7 @@ namespace Person_Components
 				filename_moe << "moe_demand.csv";
 				this->_demand_moe_file.open(filename_moe.str());
 				if (!this->_demand_moe_file.is_open())THROW_EXCEPTION("ERROR: demand moe file could not be created.");
-				this->_demand_moe_file <<"TIME(s),LOST_ACTIVITY_TIME(min),Cancelled_Acts_Count,acts_completed,avg_expected_ttime,avg_actual_ttime"<<endl;
+				this->_demand_moe_file <<"TIME(s),LOST_ACTIVITY_TIME(min),Cancelled_Acts_Count,acts_completed,avg_expected_ttime,avg_routed_ttime,avg_actual_ttime"<<endl;
 			}
 
 			feature_implementation void Add_Record(TargetType act_record, bool is_executed)
@@ -129,6 +130,7 @@ namespace Person_Components
 
 				stringstream s;
 				typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type> act_record_itf;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type> movement_itf;
 				typedef Activity_Location_Components::Prototypes::Activity_Location_Prototype<typename MasterType::activity_location_type> location_itf;
 				typedef Zone_Components::Prototypes::Zone_Prototype<typename MasterType::zone_type> zone_itf;
 				
@@ -150,6 +152,7 @@ namespace Person_Components
 
 					expected_ttime[_thread_id] += (float)act->Expected_Travel_Time<Time_Seconds>();
 					actual_ttime[_thread_id] += (float)act->Actual_Travel_Time<Time_Seconds>();
+					routed_ttime[_thread_id] += (float)act->movement_plan<movement_itf*>()->routed_travel_time<float>();
 					num_acts_in_interval[_thread_id]++;
 				}
 
@@ -198,7 +201,7 @@ namespace Person_Components
 
 				// Movement plans
 
-				define_component_interface(movement_itf,typename act_record_itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
+				//define_component_interface(movement_itf,typename act_record_itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 				movement_itf* move = act->template movement_plan<movement_itf*>();
 
 				stringstream m;
@@ -389,19 +392,23 @@ namespace Person_Components
 
 					// write the average expected and actual travel times over the current interval
 					float actual_ttime_sum=0;
+					float routed_ttime_sum=0;
 					float expected_ttime_sum=0;
 					float acts_in_interval = 0;
 					for (int i=0; i < _num_threads; i++)
 					{
 						actual_ttime_sum += actual_ttime[i];
 						expected_ttime_sum += expected_ttime[i];
+						routed_ttime_sum += routed_ttime[i];
 						acts_in_interval += num_acts_in_interval[i];
 						actual_ttime[i]=0;
 						expected_ttime[i]=0;
+						routed_ttime[i]=0;
 						num_acts_in_interval[i]=0;
 					}
 					this->_demand_moe_file << "," << acts_in_interval;
 					this->_demand_moe_file << "," << expected_ttime_sum / acts_in_interval;
+					this->_demand_moe_file << "," << routed_ttime_sum / acts_in_interval;
 					this->_demand_moe_file << "," << actual_ttime_sum / acts_in_interval<<endl;
 				}
 

@@ -212,64 +212,6 @@ namespace Activity_Components
 				// route if planning router specified
 				if(scenario->template do_planner_routing<bool>()) planner->template Schedule_New_Routing<_movement_plan_itf*>(_iteration+1, move);
 
-				// check that origin and destination are valid
-				//if (orig != nullptr && dest != nullptr) 
-				//{
-				//	// If the trip is valid, assign to a movement plan and add to the schedule
-				//	if (orig->template origin_links<_links_container_itf&>().size() != 0 && dest->template origin_links<_links_container_itf&>().size() != 0)
-				//	{		
-				//		// add attributes to plan
-				//		move->template origin<_activity_location_itf*>(orig);
-				//		move->template destination<_activity_location_itf*>(dest);
-				//		move->template origin<_link_itf*>(orig->template origin_links<_links_container_itf&>().at(0));
-				//		move->template destination<_link_itf*>(dest->template origin_links<_links_container_itf&>().at(0));
-
-				//		if (move->template origin<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0 || move->template destination<_link_itf*>()->template outbound_turn_movements<_turns_container_itf*>()->size() == 0)
-				//		{
-				//			_link_itf* o_link =move->template origin<_link_itf*>();
-				//			_link_itf* d_link =move->template destination<_link_itf*>();
-				//			//THROW_WARNING("WARNING: cannot route trip as orig or dest links do not have valid turn movements: [Perid.actid,acttype,orig_link,dest_link,orig_zone,dest_zone]: "<<concat(this->Parent_ID<ComponentType,CallerType,int>()) << "." << concat(this->Activity_Plan_ID<ComponentType, CallerType,int>()) <<", " << concat(this->Activity_Type<ComponentType, CallerType,ACTIVITY_TYPES>()) << ", " <<o_link->uuid<int>() << ", " << d_link->uuid<int>() << ", "  << orig->zone<_zone_itf*>()->uuid<int>() << ", " << dest->zone<_zone_itf*>()->uuid<int>());
-				//			return;
-				//		}
-				//		
-				//		// Add to plan to router schedule only if the trip involves movement, otherwise return
-				//		if (orig->template internal_id<int>() == dest->template internal_id<int>()) 
-				//		{
-				//			return;
-				//		}
-
-				//		// shift departure time by estimated travel time, and make sure that it does not occur before next iteration
-				//		_skim_itf* skim = person->template network_reference<_network_itf*>()->template skimming_faculty<_skim_itf*>();	
-				//		Simulation_Timestep_Increment ttime = skim->template Get_LOS<Target_Type<NT,Simulation_Timestep_Increment,int,Vehicle_Components::Types::Vehicle_Type_Keys>>(orig->template zone<_zone_itf*>()->template uuid<int>(),dest->template zone<_zone_itf*>()->template uuid<int>(),Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-				//		this->Expected_Travel_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(ttime);
-				//		Simulation_Timestep_Increment depart = this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>() - ttime;
-				//		if (depart < _iteration+1)
-				//		{
-				//			depart = _iteration+1;
-				//			this->Start_Time<ComponentType,CallerType,Simulation_Timestep_Increment>(depart + ttime);
-				//		}
-
-				//		// schedule the routing and do routin if requested through scenario, otherwise move to the activity scheduling phase
-				//		move->template departed_time<Simulation_Timestep_Increment>(depart);
-				//		if(scenario->template do_planner_routing<bool>()) planner->template Schedule_New_Routing<_movement_plan_itf*>(_iteration+1, move);
-				//	}
-				//	else
-				//	{
-				//		move->template origin<_activity_location_itf*>(orig);
-				//		move->template destination<_activity_location_itf*>(dest);
-				//		THROW_WARNING("WARNING: movement from " << orig->template uuid<int>() << " to " << dest->template uuid<int>() << ", can not happen as no origin / destination links are available for the locations.");
-				//	}
-				//}
-				//else
-				//{
-				//	//----------------------------------------------------------------
-				//	// Print to log file
-				//	stringstream s;
-				//	s <<"ACTIVITY NOT SCHEDULED, null origin or destination: "<< person->template uuid<int>();
-				//	s << "," <<orig << ", " <<dest<<endl;
-				//	//planner->template Write_To_Log<stringstream&>(s);
-				//	//----------------------------------------------------------------
-				//}
 			}
 			feature_implementation void Add_Activity_To_Schedule_Event_Handler()
 			{
@@ -1606,9 +1548,6 @@ namespace Activity_Components
 				this->_Activity_Plan_ID = obj->Activity_Plan_ID<char>();
 				this->_Activity_Type = (char)obj->Activity_Type<Types::ACTIVITY_TYPES>();
 				this->Location<ComponentType,CallerType,location_itf*>(obj->Location<location_itf*>());
-				//this->Duration<ComponentType,CallerType,Time_Minutes>(obj->Duration<Time_Minutes>());
-				//this->Start_Time<ComponentType,CallerType,Time_Minutes>(obj->Start_Time<Time_Minutes>());
-				//this->Travel_Time<ComponentType,CallerType,Time_Minutes>(obj->Expected_Travel_Time<Time_Minutes>());
 			}
 
 			// Fundamental activity properties

@@ -37,6 +37,7 @@ namespace File_IO
 		bool WriteArray(T* t, int num_to_write)
 		{
 			_file.write((char*)t, sizeof(T) * num_to_write);
+			_file.flush();
 			//if (!_file){ _file.clear(); return false;}
 			return true;
 		}

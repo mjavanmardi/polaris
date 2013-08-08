@@ -247,6 +247,8 @@ namespace Network_Skimming_Components
 			// link-to-zone mapping for use in skimming
 			member_associative_container(concat(dense_hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),origin_node_to_zone_map,none,none);
 			member_associative_container(concat(dense_hash_map<long,Location_To_Zone_Map_Item<NULLTYPE>*>),destination_node_to_zone_map,none,none);
+			member_associative_container(concat(dense_hash_map<long,int>),zone_origins_count,none,none);
+			member_associative_container(concat(dense_hash_map<long,int>),zone_destinations_count,none,none);
 
 			member_data(Counter, timer,none,none);
 			member_data(bool, write_output, none,none);
@@ -269,13 +271,17 @@ namespace Network_Skimming_Components
 				// initialize dense_hash_map keys
 				this->_mode_skim_table_container.set_empty_key(-1);
 				this->_mode_skim_table_container.set_deleted_key(-2);
+				this->_zone_origins_count.set_empty_key(-1);
+				this->_zone_origins_count.set_deleted_key(-2);
+				this->_zone_destinations_count.set_empty_key(-1);
+				this->_zone_destinations_count.set_deleted_key(-2);
 
 				// create interface to this and set skimming parameters
 				typedef Prototypes::Network_Skimming_Prototype<ComponentType,ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
 				pthis->template update_increment<Time_Hours>(1);
 				pthis->template scheduled_update_time<Simulation_Timestep_Increment>(0.0);
-				pthis->template nodes_per_zone<long>(1);
+				pthis->template nodes_per_zone<long>(4);
 
 				// add the available modes for the current model
 				this->_available_modes_container.push_back(Vehicle_Components::Types::Vehicle_Type_Keys::SOV);

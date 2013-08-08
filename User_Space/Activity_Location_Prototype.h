@@ -66,6 +66,37 @@ namespace Activity_Location_Components
 			feature_accessor(x_position, none, none);
 			feature_accessor(y_position, none, none);
 			feature_accessor(z_position, none, none);
+
+			feature bool Has_Valid_Origin_Link()
+			{
+				define_container_and_value_interface(links_itf,link_itf,typename get_type_of(origin_links),Random_Access_Sequence_Prototype,Link_Components::Prototypes::Link_Prototype,ComponentType);			
+				define_container_and_value_interface(turns_itf,turn_itf,typename link_itf::get_type_of(outbound_turn_movements),Random_Access_Sequence_Prototype,Turn_Movement_Components::Prototypes::Movement_Prototype,ComponentType);
+				
+				typename links_itf::iterator link_itr = this->origin_links<links_itf*>()->begin();
+				if (link_itr != this->origin_links<links_itf*>()->end()	)
+				{
+					link_itf* link = *link_itr;
+					if (link->template outbound_turn_movements<turns_itf*>()->size() > 0) return true;
+					else return false;
+				}
+				else return false;
+
+			}
+			feature bool Has_Valid_Destination_Link()
+			{
+				define_container_and_value_interface(links_itf,link_itf,typename get_type_of(destination_links),Random_Access_Sequence_Prototype,Link_Components::Prototypes::Link_Prototype,ComponentType);			
+				define_container_and_value_interface(turns_itf,turn_itf,typename link_itf::get_type_of(outbound_turn_movements),Random_Access_Sequence_Prototype,Turn_Movement_Components::Prototypes::Movement_Prototype,ComponentType);
+				
+				typename links_itf::iterator link_itr = this->destination_links<links_itf*>()->begin();
+				if (link_itr != this->destination_links<links_itf*>()->end()	)
+				{
+					link_itf* link = *link_itr;
+					if (link->template outbound_turn_movements<turns_itf*>()->size() > 0) return true;
+					else return false;
+				}
+				else return false;
+
+			}
 		};
 	}
 }

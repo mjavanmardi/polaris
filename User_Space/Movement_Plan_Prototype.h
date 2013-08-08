@@ -154,7 +154,7 @@ namespace Movement_Plan_Components
 					vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::unqualified_value_type*>((typename TargetType::Component_Type::unqualified_value_type*)*itr);
 					//vehicle_trajectory_data->Initialize<_Link_Interface*>((_Link_Interface*)*itr);
 					if (arrival_time_itr != reversed_arrival_time_container.rbegin())
-						vehicle_trajectory_data->template estimated_link_accepting_time<int>(*(arrival_time_itr - 1));
+						vehicle_trajectory_data->template estimated_link_accepting_time<int>(*(arrival_time_itr /*- 1*/));
 					else
 						vehicle_trajectory_data->template estimated_link_accepting_time<int>(0.0f);
 					trajectory.push_back(vehicle_trajectory_data);
@@ -179,7 +179,7 @@ namespace Movement_Plan_Components
 				for(itr = path_container.rbegin() + 1, arrival_time_itr = reversed_arrival_time_container.rbegin() + 1; itr != path_container.rend(); itr++,arrival_time_itr++)
 				{
 					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
-					vehicle_trajectory_data->template estimated_link_accepting_time<int>(*(arrival_time_itr - 1) + stored_ttime);
+					vehicle_trajectory_data->template estimated_link_accepting_time<int>(*(arrival_time_itr/* - 1*/) + stored_ttime);
 					vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::unqualified_value_type*>((typename TargetType::Component_Type::unqualified_value_type*)*itr);
 					trajectory.push_back(vehicle_trajectory_data);
 				}
