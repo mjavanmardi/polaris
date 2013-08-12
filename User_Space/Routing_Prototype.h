@@ -398,7 +398,7 @@ namespace Routing_Components
 				if (((_Scenario_Interface*)_global_scenario)->template routing_with_snapshots<bool>())
 				{
 					departure_time<int>(time_to_depart);
-					load_event(ComponentType,ComponentType::Compute_Route_Condition,Compute_Route_Using_Snapshot,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+					load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route_Using_Snapshot,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
 				}
 				else
 				{
@@ -476,6 +476,7 @@ namespace Routing_Components
 					mp->template valid_trajectory<bool>(true);
 					mp->template routed_travel_time<float>(routed_travel_time);
 					mp->template estimated_time_of_arrival<Simulation_Timestep_Increment>(mp->template absolute_departure_time<int>() + routed_travel_time);
+					mp->template estimated_travel_time_when_departed<float>(routed_travel_time);
 					// print out and break when scheduling departure for veh_id 101319
 					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
 					{

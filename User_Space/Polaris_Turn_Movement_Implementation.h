@@ -212,17 +212,20 @@ namespace Turn_Movement_Components
 				if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() == Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
 				{
 					float turn_movement_flow_leftover = _movement_flow + _movement_capacity_leftover;
-
-					int num_transfer_vehicles_of_turn_movement = (int)(turn_movement_flow_leftover);
-					turn_movement_flow_leftover -= num_transfer_vehicles_of_turn_movement;
-					
-					///protect float precision
-					if (turn_movement_flow_leftover >= 0.995)
+					int num_transfer_vehicles_of_turn_movement;
+					if (turn_movement_flow_leftover < 0.0f)
 					{
-						num_transfer_vehicles_of_turn_movement++;
-						turn_movement_flow_leftover = 0.0f;
+						num_transfer_vehicles_of_turn_movement = 0;
+						_movement_capacity_leftover = turn_movement_flow_leftover;
 					}
-					_movement_capacity_leftover = turn_movement_flow_leftover;
+					else
+					{
+						num_transfer_vehicles_of_turn_movement = (int)(turn_movement_flow_leftover);
+						turn_movement_flow_leftover -= num_transfer_vehicles_of_turn_movement;
+						// borrow from next simulation interval
+						num_transfer_vehicles_of_turn_movement++;
+						_movement_capacity_leftover = turn_movement_flow_leftover - 1.0f;
+					}
 					_movement_flow = float(num_transfer_vehicles_of_turn_movement);
 				}
 				if (_movement_flow > _vehicles_container.size())

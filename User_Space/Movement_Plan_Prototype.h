@@ -81,8 +81,8 @@ namespace Movement_Plan_Components
 			feature_accessor(destination_activity_reference,none,none);
 			feature_accessor(routed_travel_time,none,none);
 			feature_accessor(estimated_time_of_arrival,none,none);
-			feature_accessor(travel_time_when_routed, none, none);
-			
+			feature_accessor(estimated_travel_time_when_departed, none, none);
+			feature_accessor(number_of_switches, none, none);
 			feature_accessor(absolute_departure_time, none, none);
 			feature_accessor(is_integrated, none,none);
 
@@ -159,6 +159,7 @@ namespace Movement_Plan_Components
 						vehicle_trajectory_data->template estimated_link_accepting_time<int>(0.0f);
 					trajectory.push_back(vehicle_trajectory_data);
 				}
+				number_of_switches<int>(0.0);
 			}
 
 			feature_prototype void update_trajectory(TargetType& path_container, vector<float>& reversed_arrival_time_container)
@@ -183,6 +184,7 @@ namespace Movement_Plan_Components
 					vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::unqualified_value_type*>((typename TargetType::Component_Type::unqualified_value_type*)*itr);
 					trajectory.push_back(vehicle_trajectory_data);
 				}
+				number_of_switches<int&>()++;
 			}
 
 			feature_prototype void advance_trajectory()

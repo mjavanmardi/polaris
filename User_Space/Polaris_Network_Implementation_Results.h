@@ -54,7 +54,9 @@ namespace Network_Components
 						int departure_time = movement_plan->template departed_time<Time_Seconds>();
 						int arrival_time = movement_plan->template arrived_time<Time_Seconds>();
 						float travel_time = float ((arrival_time - departure_time)/60.0f);
-
+						float estimated_travel_time_when_departed = movement_plan->template estimated_travel_time_when_departed<float>() / 60.0f;
+						float travel_time_ratio = travel_time / estimated_travel_time_when_departed;
+						int number_of_switches = movement_plan->template number_of_switches<int>();
 							
 						vehicle_trajectory_file
 							<< vehicle_id << ","
@@ -67,32 +69,35 @@ namespace Network_Components
 							<< num_links << ","
 							<< convert_seconds_to_hhmmss(departure_time)<< ","
 							<< convert_seconds_to_hhmmss(arrival_time)<< ","
-							<< travel_time
+							<< travel_time << ","
+							<< estimated_travel_time_when_departed << ","
+							<< travel_time_ratio << ","
+							<< number_of_switches << ","
 							<<endl;
 
-						float path_delayed_time = 0;
-						for (int route_link_counter=0;route_link_counter<num_links;route_link_counter++)
-						{
+						//float path_delayed_time = 0;
+						//for (int route_link_counter=0;route_link_counter<num_links;route_link_counter++)
+						//{
 
-							_Trajectory_Unit_Interface* trajectory_unit = movement_plan->template trajectory_container<_Trajecotry_Container_Interface&>()[route_link_counter];
-							_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
-							int route_link_id = route_link->template uuid<int>();
-							int route_link_enter_time = trajectory_unit->template enter_time<int>();
-							float route_link_delayed_time = float(trajectory_unit->template delayed_time<float>()/60.0f);
-								
-							int route_link_exit_time = movement_plan->template get_route_link_exit_time<NULLTYPE>(route_link_counter);
-							float route_link_travel_time = float((route_link_exit_time - route_link_enter_time)/60.0f);
+						//	_Trajectory_Unit_Interface* trajectory_unit = movement_plan->template trajectory_container<_Trajecotry_Container_Interface&>()[route_link_counter];
+						//	_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+						//	int route_link_id = route_link->template uuid<int>();
+						//	int route_link_enter_time = trajectory_unit->template enter_time<int>();
+						//	float route_link_delayed_time = float(trajectory_unit->template delayed_time<float>()/60.0f);
+						//		
+						//	int route_link_exit_time = movement_plan->template get_route_link_exit_time<NULLTYPE>(route_link_counter);
+						//	float route_link_travel_time = float((route_link_exit_time - route_link_enter_time)/60.0f);
 
-							path_delayed_time+=route_link_delayed_time;
+						//	path_delayed_time+=route_link_delayed_time;
 					
-							vehicle_trajectory_file
-								<<route_link_counter + 1 << ","
-								<<route_link_id << ","
-								<<convert_seconds_to_hhmmss(route_link_enter_time) << ","
-								<<route_link_travel_time << ","
-								<<route_link_delayed_time
-								<<endl;
-						}
+						//	vehicle_trajectory_file
+						//		<<route_link_counter + 1 << ","
+						//		<<route_link_id << ","
+						//		<<convert_seconds_to_hhmmss(route_link_enter_time) << ","
+						//		<<route_link_travel_time << ","
+						//		<<route_link_delayed_time
+						//		<<endl;
+						//}
 
 						//deallocate vehicle
 						vehicle->template clear_trajectory<NT>();
@@ -307,6 +312,7 @@ namespace Network_Components
 					<< scenario->template network_cumulative_switched_decisions<int>() << ","
 					<< _network_vmt << ","
 					<< _network_vht << ","
+					<< scenario->template network_average_trip_travel_time<float>() << ","
                     << convert_seconds_to_hhmmss(elapsed_time).c_str() << ","
 					<< _this_ptr->template start_of_current_simulation_interval_absolute<int>() << ","
 					<< physicalMemoryUsedByProcess/1000000 << ","

@@ -610,8 +610,10 @@ namespace Link_Components
 					{
 						_link_destination_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
 					}
-
-					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>();
+					int departure_time = mp->template departed_time<Time_Seconds>();
+					int arrival_time = mp->template arrived_time<Time_Seconds>();
+					float travel_time = float ((arrival_time - departure_time)/60.0f);
+					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>(travel_time);
 					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
 				}
 				else
@@ -687,17 +689,18 @@ namespace Link_Components
 						//link_origin_departed_flow_allowed = min(link_origin_departed_flow_allowed,_link_capacity);	//////////////////////////capacity
 						
 						link_origin_departed_flow_allowed += _link_origin_loaded_capacity_leftover;
-						num_link_origin_departed_vehicles_allowed = int(link_origin_departed_flow_allowed);
-						link_origin_departed_flow_allowed -= float(num_link_origin_departed_vehicles_allowed);
 
-						///protect float precision
-						if (link_origin_departed_flow_allowed >= 0.995)
+						if (link_origin_departed_flow_allowed < 0.0f)
 						{
-							num_link_origin_departed_vehicles_allowed++;
-							link_origin_departed_flow_allowed = 0.0f;
+							num_link_origin_departed_vehicles_allowed = 0;
+							_link_origin_loaded_capacity_leftover = link_origin_departed_flow_allowed;
 						}
-
-						_link_origin_loaded_capacity_leftover = link_origin_departed_flow_allowed;
+						else
+						{
+							// borrow from next simulation interval
+							num_link_origin_departed_vehicles_allowed++;
+							_link_origin_loaded_capacity_leftover = link_origin_departed_flow_allowed - 1.0f;
+						}
 					}
 					else
 					{

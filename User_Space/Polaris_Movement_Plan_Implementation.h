@@ -73,6 +73,8 @@ namespace Movement_Plan_Components
 
 			member_component(typename MasterType::plan_type, plan, none, none);
 			member_data(int, routed_travel_time, none, none);
+			member_data(int, estimated_travel_time_when_departed, none, none);
+			member_data(int, number_of_switches, none, none);
 			member_data(int, estimated_time_of_arrival, none, none);
 			member_data(bool, is_integrated, none, none);
 

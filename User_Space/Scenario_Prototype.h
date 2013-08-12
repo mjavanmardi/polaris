@@ -135,6 +135,7 @@ namespace Scenario_Components
 			feature_accessor(network_in_network_vehicles, none, none);
 			feature_accessor(network_cumulative_arrived_vehicles, none, none);
 			feature_accessor(network_cumulative_switched_decisions, none, none);
+			feature_accessor(network_average_trip_travel_time, none, none);
 
 			feature_accessor(input_dir_name, none, none);
 			feature_accessor(output_dir_name, none, none);
@@ -448,6 +449,7 @@ namespace Scenario_Components
 				network_in_network_vehicles<int>(0.0);
 				network_cumulative_arrived_vehicles<int>(0.0);
 				network_cumulative_switched_decisions<int>(0.0);
+				network_average_trip_travel_time<float>(0.0f);
 
 				assignment_time_in_seconds<double>(0.0);
 			    simulation_time_in_seconds<double>(0.0);
@@ -553,6 +555,7 @@ namespace Scenario_Components
 				network_in_network_vehicles<int>(0.0);
 				network_cumulative_arrived_vehicles<int>(0.0);
 				network_cumulative_switched_decisions<int>(0.0);
+				network_average_trip_travel_time<float>(0.0f);
 
 				assignment_time_in_seconds<double>(0.0);
 			    simulation_time_in_seconds<double>(0.0);
@@ -610,7 +613,7 @@ namespace Scenario_Components
 			#ifdef _WIN32		
 				while (_mkdir(temp_dir_name.c_str())==-1)
 			#else
-				while (!mkdir(temp_dir_name.c_str(), 0777)==-1)
+				while (mkdir(temp_dir_name.c_str(), 0777)==-1)
 			#endif
 				{
 					dir_id.str(""); 
@@ -642,7 +645,10 @@ namespace Scenario_Components
 						<< "num_links" << ","
 						<< "departure_time" << ","
 						<< "arrival_time" << ","
-						<< "travel_time"
+						<< "travel_time" << ","
+						<< "routed_travel_time" << ","
+						<< "travel_time_ratio" << ","
+						<< "num_switches" << ","
 						<<endl;
 
 					vehicle_trajectory_file<fstream&>() 
@@ -831,6 +837,7 @@ namespace Scenario_Components
 						//<< "output_time_in_seconds"
 						<< "VMT" << ","
 						<< "VHT" << ","
+						<< "avg_travel_time" << ","
 						<< "wallclock_time" << ","
 						<< "simulated_time" << ","
 						<< "physical_memory_usage" << ","
@@ -1030,9 +1037,9 @@ namespace Scenario_Components
 				this_component()->template increase_network_cumulative_switched_decisions<ComponentType,CallerType,TargetType>();
 			}
 
-			feature_prototype void increase_network_cumulative_arrived_vehicles()
+			feature_prototype void increase_network_cumulative_arrived_vehicles(float travel_time)
 			{
-				this_component()->template increase_network_cumulative_arrived_vehicles<ComponentType,CallerType,TargetType>();
+				this_component()->template increase_network_cumulative_arrived_vehicles<ComponentType,CallerType,TargetType>(travel_time);
 			}
 
 			//feature_prototype void output(std::string s)

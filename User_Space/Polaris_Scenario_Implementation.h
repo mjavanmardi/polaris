@@ -108,6 +108,7 @@ namespace Scenario_Components
 			member_data(int, network_in_network_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, network_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, network_cumulative_switched_decisions, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, network_average_trip_travel_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_data(int, rng_type, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
@@ -196,9 +197,10 @@ namespace Scenario_Components
 				UNLOCK(_statistics_update_lock);			
 			}
 
-			feature_implementation void increase_network_cumulative_arrived_vehicles()
+			feature_implementation void increase_network_cumulative_arrived_vehicles(float travel_time)
 			{
 				LOCK(_statistics_update_lock);
+				_network_average_trip_travel_time = (_network_average_trip_travel_time * _network_cumulative_arrived_vehicles + travel_time) / ((float)_network_cumulative_arrived_vehicles + 1.0f);
 				_network_cumulative_arrived_vehicles++;
 				UNLOCK(_statistics_update_lock);			
 			}
