@@ -150,9 +150,9 @@ namespace Person_Components
 					float delay = std::max<float>(actual_start - expected_start,0.0f);
 					this->_activity_time_lost += delay;
 
-					expected_ttime[_thread_id] += (float)act->Expected_Travel_Time<Time_Seconds>();
-					actual_ttime[_thread_id] += (float)act->Actual_Travel_Time<Time_Seconds>();
-					routed_ttime[_thread_id] += (float)act->movement_plan<movement_itf*>()->routed_travel_time<float>();
+					expected_ttime[_thread_id] += (float)act->template Expected_Travel_Time<Time_Seconds>();
+					actual_ttime[_thread_id] += (float)act->template Actual_Travel_Time<Time_Seconds>();
+					routed_ttime[_thread_id] += (float)act->template movement_plan<movement_itf*>()->template routed_travel_time<float>();
 					num_acts_in_interval[_thread_id]++;
 				}
 

@@ -146,9 +146,9 @@ namespace Network_Skimming_Components
 				origin_map_itf* origin_map = this->template origin_node_to_zone_map<origin_map_itf*>();
 				destination_map_itf* destination_map = this->template destination_node_to_zone_map<destination_map_itf*>();
 				zones_itf* zones_container = network->template zones_container<zones_itf*>();
-				locations_itf& locations_container = network->activity_locations_container<locations_itf&>();
-				zone_origins_itf& zone_origins_count = this->zone_origins_count<zone_origins_itf&>();
-				zone_destinations_itf& zone_destinations_count = this->zone_destinations_count<zone_destinations_itf&>();
+				locations_itf& locations_container = network->template activity_locations_container<locations_itf&>();
+				zone_origins_itf& zone_origins_count = this->template zone_origins_count<zone_origins_itf&>();
+				zone_destinations_itf& zone_destinations_count = this->template zone_destinations_count<zone_destinations_itf&>();
 
 				//=================================================================================================
 				// Loop through zones, choose origin points to route from, and add to maps
@@ -157,9 +157,9 @@ namespace Network_Skimming_Components
 				for (itr= zones_container->begin();itr != zones_container->end(); ++itr)
 				{
 					zone_itf* orig_zone = itr->second;
-					locations_itf& origin_locations = orig_zone->origin_activity_locations<locations_itf&>();
+					locations_itf& origin_locations = orig_zone->template origin_activity_locations<locations_itf&>();
 					int num_locations = (int)origin_locations.size();
-					zone_origins_count.insert(pair<long,int>(orig_zone->internal_id<long>(),0));
+					zone_origins_count.insert(pair<long,int>(orig_zone->template internal_id<long>(),0));
 					
 					// Add all locations to list if less than the number required
 					if (num_locations <= this->nodes_per_zone<int>())
@@ -167,14 +167,14 @@ namespace Network_Skimming_Components
 						for (int i=0; i<num_locations; i++)
 						{
 							location_itf* loc = origin_locations[i];
-							if (!loc->Has_Valid_Origin_Link<bool>() || origin_map->find(loc->internal_id<long>()) != origin_map->end()) continue;
+							if (!(loc->template Has_Valid_Origin_Link<bool>()) || origin_map->find(loc->template internal_id<long>()) != origin_map->end()) continue;
 
 							origin_item_itf* orig_item = (origin_item_itf*)Allocate<typename get_type_of(origin_node_to_zone_map)::unqualified_value_type>();
 							orig_item->template initialize<Target_Type<NULLTYPE,NULLTYPE,long,float>>(loc->template internal_id<long>(),orig_zone->template internal_id<long>(),1.0/this->template nodes_per_zone<float>());
 					
 							pair<long,origin_item_itf*> item = pair<long,origin_item_itf*>(loc->template internal_id<long>(),orig_item);
 							origin_map->insert(item);
-							zone_origins_count.find(orig_zone->internal_id<long>())->second++;
+							zone_origins_count.find(orig_zone->template internal_id<long>())->second++;
 						}
 					}
 					// otherwise choose randomly
@@ -189,7 +189,7 @@ namespace Network_Skimming_Components
 							location_itf* loc = origin_locations[rand_loc_index];
 
 							// If the location does not have valid links or is already in the list, skip
-							if (!loc->Has_Valid_Origin_Link<bool>() || origin_map->find(loc->internal_id<long>()) != origin_map->end()) continue;
+							if (!(loc->template Has_Valid_Origin_Link<bool>()) || origin_map->find(loc->template internal_id<long>()) != origin_map->end()) continue;
 
 							// Create a new node_to_zone_map item for later lookup
 							origin_item_itf* orig_item = (origin_item_itf*)Allocate<typename get_type_of(origin_node_to_zone_map)::unqualified_value_type>();
@@ -198,10 +198,10 @@ namespace Network_Skimming_Components
 							// Insert to the list, and update the origin node counts
 							pair<long,origin_item_itf*> item = pair<long,origin_item_itf*>(loc->template internal_id<long>(),orig_item);
 							origin_map->insert(item);
-							zone_origins_count.find(orig_zone->internal_id<long>())->second++;
+							zone_origins_count.find(orig_zone->template internal_id<long>())->second++;
 						}
 					}
-					if (zone_origins_count.find(orig_zone->internal_id<long>())->second == 0) THROW_EXCEPTION("Origin zone '" << orig_zone->uuid<long>() << "' has no valid activity locations, can not skim to this zone.");
+					if (zone_origins_count.find(orig_zone->template internal_id<long>())->second == 0) THROW_EXCEPTION("Origin zone '" << orig_zone->template uuid<long>() << "' has no valid activity locations, can not skim to this zone.");
 				}
 
 				//=================================================================================================
@@ -209,9 +209,9 @@ namespace Network_Skimming_Components
 				for (itr= zones_container->begin();itr != zones_container->end(); ++itr)
 				{
 					zone_itf* orig_zone = itr->second;
-					locations_itf& origin_locations = orig_zone->destination_activity_locations<locations_itf&>();
+					locations_itf& origin_locations = orig_zone->template destination_activity_locations<locations_itf&>();
 					int num_locations = (int)origin_locations.size();
-					zone_destinations_count.insert(pair<long,int>(orig_zone->internal_id<long>(),0));
+					zone_destinations_count.insert(pair<long,int>(orig_zone->template internal_id<long>(),0));
 					
 					// Add all locations to list if less than the number required
 					if (num_locations <= this->nodes_per_zone<int>())
@@ -219,14 +219,14 @@ namespace Network_Skimming_Components
 						for (int i=0; i<num_locations; i++)
 						{
 							location_itf* loc = origin_locations[i];
-							if (!loc->Has_Valid_Destination_Link<bool>() || destination_map->find(loc->internal_id<long>()) != destination_map->end()) continue;
+							if (!loc->template Has_Valid_Destination_Link<bool>() || destination_map->find(loc->template internal_id<long>()) != destination_map->end()) continue;
 
 							origin_item_itf* orig_item = (origin_item_itf*)Allocate<typename get_type_of(origin_node_to_zone_map)::unqualified_value_type>();
 							orig_item->template initialize<Target_Type<NULLTYPE,NULLTYPE,long,float>>(loc->template internal_id<long>(),orig_zone->template internal_id<long>(),1.0/this->template nodes_per_zone<float>());
 					
 							pair<long,origin_item_itf*> item = pair<long,origin_item_itf*>(loc->template internal_id<long>(),orig_item);
 							destination_map->insert(item);
-							zone_destinations_count.find(orig_zone->internal_id<long>())->second++;
+							zone_destinations_count.find(orig_zone->template internal_id<long>())->second++;
 						}
 					}
 					// otherwise choose randomly
@@ -241,7 +241,7 @@ namespace Network_Skimming_Components
 							location_itf* loc = origin_locations[rand_loc_index];
 
 							// If the location does not have valid links or is already in the list, skip
-							if (!loc->Has_Valid_Destination_Link<bool>() || destination_map->find(loc->internal_id<long>()) != destination_map->end()) continue;
+							if (!loc->template Has_Valid_Destination_Link<bool>() || destination_map->find(loc->template internal_id<long>()) != destination_map->end()) continue;
 
 							// Create a new node_to_zone_map item for later lookup
 							origin_item_itf* orig_item = (origin_item_itf*)Allocate<typename get_type_of(origin_node_to_zone_map)::unqualified_value_type>();
@@ -250,10 +250,10 @@ namespace Network_Skimming_Components
 							// Insert to the list, and update the origin node counts
 							pair<long,origin_item_itf*> item = pair<long,origin_item_itf*>(loc->template internal_id<long>(),orig_item);
 							destination_map->insert(item);
-							zone_destinations_count.find(orig_zone->internal_id<long>())->second++;
+							zone_destinations_count.find(orig_zone->template internal_id<long>())->second++;
 						}
 					}
-					if (zone_destinations_count.find(orig_zone->internal_id<long>())->second == 0) THROW_EXCEPTION("Origin zone '" << orig_zone->uuid<long>() << "' has no valid activity locations, can not skim to this zone.");
+					if (zone_destinations_count.find(orig_zone->template internal_id<long>())->second == 0) THROW_EXCEPTION("Origin zone '" << orig_zone->template uuid<long>() << "' has no valid activity locations, can not skim to this zone.");
 				}
 
 
@@ -483,9 +483,9 @@ namespace Network_Skimming_Components
 						(*itr)->template Update_LOS<NULLTYPE>();
 
 						// If this is the first iteration and skims were not read from input initialize all of the time periods, otherwise break
-						typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+						typedef Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
 						_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
-						if (_iteration > 0 || scenario->read_skim_tables<bool>())	break;
+						if (_iteration > 0 || scenario->template read_skim_tables<bool>())	break;
 					}
 				}
 				return true;
@@ -635,7 +635,7 @@ namespace Network_Skimming_Components
 				define_container_and_value_interface(locations_itf,location_itf,typename network_itf::get_type_of(activity_locations_container),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 				/*define_container_and_value_interface(destinations_itf,destination_itf,zone_itf::get_type_of(destination_activity_locations),Random_Access_Sequence_Prototype,Link_Components::Prototypes::Link_Prototype,ComponentType);*/
 				define_container_and_value_interface(links_itf,link_itf,typename location_itf::get_type_of(origin_links),Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
 				_Scenario_Interface* scenario = (_Scenario_Interface*)_global_scenario;
 
 				network_itf* network = this->network_reference<network_itf*>();
@@ -664,7 +664,7 @@ namespace Network_Skimming_Components
 				typedef typename skim_table_itf::size_type size_t;
 				typename skim_table_itf::iterator skim_table_itr = los->begin();
 				matrix<float> los_old;
-				if (scenario->read_skim_tables<bool>()) los_old.Copy(*los_ptr);
+				if (scenario->template read_skim_tables<bool>()) los_old.Copy(*los_ptr);
 				los->resize(los->dimensions(),0);
 
 				// fit characteristics initialized
@@ -693,17 +693,17 @@ namespace Network_Skimming_Components
 						long dest_link_id = (*(dest_node->template destination_links<links_itf*>()->begin()))->template uuid<long>();
 						long dest_zone_index = dest->template zone_index<long>();
 						float time = tree->template Get_Tree_Results_For_Destination<typename skimmer_itf::Component_Type::Stored_Time_Type>(dest_link_index);
-						link_itf* dest_link = network->links_container<links_itf&>()[dest_link_index];
+						link_itf* dest_link = network->template links_container<links_itf&>()[dest_link_index];
 						
 						// calculate weight based onnumber of routed od pairs
-						zone_origin_count_itr = skim->zone_origins_count<zone_location_count_itf&>().find(orig_zone_index);
-						zone_destination_count_itr = skim->zone_destinations_count<zone_location_count_itf&>().find(dest_zone_index);
+						zone_origin_count_itr = skim->template zone_origins_count<zone_location_count_itf&>().find(orig_zone_index);
+						zone_destination_count_itr = skim->template zone_destinations_count<zone_location_count_itf&>().find(dest_zone_index);
 
 						float weight = 1.0 / ((float)zone_origin_count_itr->second * (float)zone_destination_count_itr->second);
 
 						if (time > 1440)
 						{
-							links_itf::iterator link_itr = dest_node->template destination_links<links_itf*>()->begin();
+							typename links_itf::iterator link_itr = dest_node->template destination_links<links_itf*>()->begin();
 							for (;link_itr != dest_node->template destination_links<links_itf*>()->end(); ++link_itr)
 							{
 								THROW_WARNING("Skimming error, destination ID '" << dest_node->uuid<int>() << "', is inaccessible from zone index '" << orig_zone_index <<"' .  Destination link ID: "  << (*link_itr)->uuid<long>()<<". Check network for proper connectivity." <<endl);
@@ -711,7 +711,7 @@ namespace Network_Skimming_Components
 						}
 
 						if (dest_zone_index == orig_zone_index) time = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,typename skimmer_itf::Component_Type::Stored_Time_Type,Time_Minutes>>(2.0);
-						if (scenario->read_skim_tables<bool>()) 
+						if (scenario->template read_skim_tables<bool>()) 
 						{
 							float time_old = los_old[pair<size_t,size_t>(orig_zone_index,dest_zone_index)];
 							sum_of_deviation += (time-time_old);
@@ -726,7 +726,7 @@ namespace Network_Skimming_Components
 							(*los)[pair<size_t,size_t>(orig_zone_index,dest_zone_index)] += time*weight;
 					}
 				}
-				if (scenario->read_skim_tables<bool>()) 
+				if (scenario->template read_skim_tables<bool>()) 
 				{
 					this->weighted_deviation<float>(sum_of_deviation/sum_of_weight);
 					this->max_deviation<float>(max_dev);

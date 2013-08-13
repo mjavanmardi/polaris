@@ -9,7 +9,7 @@ option(NetworkModelApplication		"Build only network model"			OFF)
 option(Antares						"Build with Antares"				OFF)
 option(IntegratedModelApplication	"Build integrated model"			OFF)
 option(ItsMockup					"Build ItsMockup project"			OFF)
-option(Tests						"Build Unit Tests"					ON)
+option(Tests						"Build Unit Tests"					OFF)
 option(MT							"Build with MSVC using /MT flag"	OFF)
 option(ALL							"Build all of the projects"			OFF)
 
