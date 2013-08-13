@@ -109,6 +109,9 @@ namespace Scenario_Components
 			member_data(int, network_cumulative_arrived_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(int, network_cumulative_switched_decisions, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, network_average_trip_travel_time, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, network_cumulative_switched_decisions_excessive_delay, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, network_cumulative_switched_decisions_realtime_informed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, network_cumulative_switched_decisions_ITS_informed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_data(int, rng_type, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
@@ -166,6 +169,7 @@ namespace Scenario_Components
 			member_data(bool, use_realtime_travel_time_for_enroute_switching, none, none);
 			member_data(double, minimum_delay_ratio_for_enroute_switching, none, none);
 			member_data(double, minimum_delay_seconds_for_enroute_switching, none, none);
+			member_data(bool, enroute_switching_on_excessive_delay, none, none);
 
 			member_data(bool, multimodal_network_input, none, none);
 
@@ -205,10 +209,27 @@ namespace Scenario_Components
 				UNLOCK(_statistics_update_lock);			
 			}
 			
-			feature_implementation void increase_network_cumulative_switched_decisions()
+			feature_implementation void increase_network_cumulative_switched_decisions(int cause_for_switching)
 			{
 				LOCK(_statistics_update_lock);
 				_network_cumulative_switched_decisions++;
+				switch(cause_for_switching)
+				{
+				case Scenario_Components::Types::Cause_For_Enroute_Switching::EXCESSIVE_DELAY:
+					_network_cumulative_switched_decisions_excessive_delay++;
+					break;
+				case Scenario_Components::Types::Cause_For_Enroute_Switching::REALTIME_INFORMED:
+					_network_cumulative_switched_decisions_realtime_informed++;
+					break;
+				case Scenario_Components::Types::Cause_For_Enroute_Switching::ITS_INFORMED:
+					_network_cumulative_switched_decisions_ITS_informed++;
+					break;
+				default:
+					cout << "Unknown cause for switching." << endl;
+					assert(false);
+					break;
+				}
+
 				UNLOCK(_statistics_update_lock);			
 			}
 

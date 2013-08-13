@@ -100,9 +100,9 @@ namespace Vehicle_Components
 				movement_plan<_Movement_Plan_Interface*>()->template arrive_to_destination<NULLTYPE>();
 			}
 			
-			feature_prototype void enroute_switching()
+			feature_prototype void enroute_switching(int cause_for_switching)
 			{
-				this_component()->template enroute_switching<ComponentType,CallerType, TargetType>();
+				this_component()->template enroute_switching<ComponentType,CallerType, TargetType>(cause_for_switching);
 			}
 
 			feature_prototype bool exploit_events_set(TargetType events_set)

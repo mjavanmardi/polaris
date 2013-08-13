@@ -174,7 +174,7 @@ namespace Vehicle_Components
 				return event_found_flag;
 			}
 
-			feature_implementation void update_enroute_switch_decisions()
+			feature_implementation void update_enroute_switch_decisions(int cause_for_switching)
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type,ComponentType> _Scenario_Interface;
 				define_component_interface(_Movement_Plan_Interface, type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
@@ -199,10 +199,10 @@ namespace Vehicle_Components
 				}
 				switch_decisions_container<ComponentType,CallerType,_Switch_Decision_Data_Container_Interface&>().push_back(switch_decision_data);
 
-				((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_switched_decisions<NULLTYPE>();
+				((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_switched_decisions<NULLTYPE>(cause_for_switching);
 			}
 
-			feature_implementation void enroute_switching()
+			feature_implementation void enroute_switching(int cause_for_switching)
 			{
 				define_component_interface(_Traveler_Interface, type_of(traveler), Traveler_Components::Prototypes::Traveler_Prototype, ComponentType);
 				//define_component_interface(_Routing_Interface, typename _Traveler_Interface::get_type_of(router), Routing_Components::Prototypes::Routing_Prototype, ComponentType);
@@ -341,7 +341,7 @@ namespace Vehicle_Components
 						if (best_route_time_to_destination < current_route_time_to_destination*(1.0 - _relative_indifference_band_route_choice) &&
 							best_route_time_to_destination < (current_route_time_to_destination - _minimum_travel_time_saving))
 						{
-							update_enroute_switch_decisions<ComponentType, CallerType, TargetType>();
+							update_enroute_switch_decisions<ComponentType, CallerType, TargetType>(cause_for_switching);
 							((_Movement_Plan_Interface*)_movement_plan)->template update_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>(), reversed_arrival_time_container);
 
 							int current_time = ((_Regular_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();

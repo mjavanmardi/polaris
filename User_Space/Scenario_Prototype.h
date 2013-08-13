@@ -64,6 +64,13 @@ namespace Scenario_Components
 				PROPORTION_TO_LINK,
 				PROPORTION_TO_LANE,
 			};
+
+			enum Cause_For_Enroute_Switching
+			{
+				EXCESSIVE_DELAY = 0,
+				REALTIME_INFORMED,
+				ITS_INFORMED
+			};
 	}
 
 	namespace Concepts
@@ -136,6 +143,9 @@ namespace Scenario_Components
 			feature_accessor(network_cumulative_arrived_vehicles, none, none);
 			feature_accessor(network_cumulative_switched_decisions, none, none);
 			feature_accessor(network_average_trip_travel_time, none, none);
+			feature_accessor(network_cumulative_switched_decisions_excessive_delay, none, none);
+			feature_accessor(network_cumulative_switched_decisions_realtime_informed, none, none);
+			feature_accessor(network_cumulative_switched_decisions_ITS_informed, none, none);
 
 			feature_accessor(input_dir_name, none, none);
 			feature_accessor(output_dir_name, none, none);
@@ -270,6 +280,7 @@ namespace Scenario_Components
 			feature_accessor(minimum_delay_ratio_for_enroute_switching, none, none);
 			feature_accessor(minimum_delay_seconds_for_enroute_switching, none, none);
 			feature_accessor(multimodal_network_input, none, none);
+			feature_accessor(enroute_switching_on_excessive_delay, none, none);
 
 			feature_prototype void read_scenario_data(char* filename)
 			{
@@ -511,6 +522,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("use_realtime_travel_time_for_enroute_switching", use_realtime_travel_time_for_enroute_switching<bool*>())!= PARAMETER_FOUND) use_realtime_travel_time_for_enroute_switching<bool>(false);
 				if (cfgReader.getParameter("minimum_delay_ratio_for_enroute_switching", minimum_delay_ratio_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_delay_ratio_for_enroute_switching<double>(2.0f);
 				if (cfgReader.getParameter("minimum_delay_seconds_for_enroute_switching", minimum_delay_seconds_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_delay_seconds_for_enroute_switching<double>(300.0f);
+				if (cfgReader.getParameter("enroute_switching_on_excessive_delay", enroute_switching_on_excessive_delay<bool*>())!= PARAMETER_FOUND) enroute_switching_on_excessive_delay<bool>(true);
 				if (cfgReader.getParameter("multimodal_network_input", multimodal_network_input<bool*>())!= PARAMETER_FOUND) multimodal_network_input<bool>(false);
 
 				if (cfgReader.getParameter("calculate_realtime_moe", calculate_realtime_moe<bool*>())!= PARAMETER_FOUND) calculate_realtime_moe<bool>(true);
@@ -838,6 +850,9 @@ namespace Scenario_Components
 						<< "VMT" << ","
 						<< "VHT" << ","
 						<< "avg_travel_time" << ","
+						<< "delay_inducted_switches" << ","
+						<< "realtime_inducted_switches" << ","
+						<< "its_inducted_switches" << ","
 						<< "wallclock_time" << ","
 						<< "simulated_time" << ","
 						<< "physical_memory_usage" << ","
@@ -1032,9 +1047,9 @@ namespace Scenario_Components
 				this_component()->template decrease_network_in_network_vehicles<ComponentType,CallerType,TargetType>();
 			}
 
-			feature_prototype void increase_network_cumulative_switched_decisions()
+			feature_prototype void increase_network_cumulative_switched_decisions(int cause_for_switching)
 			{
-				this_component()->template increase_network_cumulative_switched_decisions<ComponentType,CallerType,TargetType>();
+				this_component()->template increase_network_cumulative_switched_decisions<ComponentType,CallerType,TargetType>(cause_for_switching);
 			}
 
 			feature_prototype void increase_network_cumulative_arrived_vehicles(float travel_time)
