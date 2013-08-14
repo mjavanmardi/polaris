@@ -211,22 +211,21 @@ namespace Turn_Movement_Components
 				_movement_flow = (float) min(min((double)_movement_demand,(double)_movement_capacity),(double)_movement_supply);
 				if (((_Scenario_Interface*)_global_scenario)->template rng_type<int>() == Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC)
 				{
-					float turn_movement_flow_leftover = _movement_flow + _movement_capacity_leftover;
-					int num_transfer_vehicles_of_turn_movement;
-					if (turn_movement_flow_leftover < 0.0f)
+					float total_movement_flow = _movement_flow + _movement_capacity_leftover;
+					if (total_movement_flow < 0.0f)
 					{
-						num_transfer_vehicles_of_turn_movement = 0;
-						_movement_capacity_leftover = turn_movement_flow_leftover;
+						_movement_flow = 0.0f;
+						_movement_capacity_leftover = total_movement_flow;
 					}
 					else
 					{
-						num_transfer_vehicles_of_turn_movement = (int)(turn_movement_flow_leftover);
-						turn_movement_flow_leftover -= num_transfer_vehicles_of_turn_movement;
+						int num_transfer_vehicles_of_turn_movement = (int)(total_movement_flow);
 						// borrow from next simulation interval
-						num_transfer_vehicles_of_turn_movement++;
-						_movement_capacity_leftover = turn_movement_flow_leftover - 1.0f;
+						_movement_flow = num_transfer_vehicles_of_turn_movement + 1;
+						// _movement_flow should not be greater than _movement_demand
+						_movement_flow = (float)min((double)_movement_flow, (double)_movement_demand);
+						_movement_capacity_leftover = total_movement_flow - _movement_flow;
 					}
-					_movement_flow = float(num_transfer_vehicles_of_turn_movement);
 				}
 				if (_movement_flow > _vehicles_container.size())
 				{
