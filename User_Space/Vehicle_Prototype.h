@@ -94,10 +94,9 @@ namespace Vehicle_Components
 			feature_prototype void unload()
 			{
 				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
-				this_component()->template unload<ComponentType,CallerType, TargetType>();
-
 				movement_plan<_Movement_Plan_Interface*>()->template is_integrated<bool>(is_integrated<bool>());
 				movement_plan<_Movement_Plan_Interface*>()->template arrive_to_destination<NULLTYPE>();
+				this_component()->template unload<ComponentType,CallerType, TargetType>();
 			}
 			
 			feature_prototype void enroute_switching(int cause_for_switching)

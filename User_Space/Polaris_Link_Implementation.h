@@ -207,7 +207,7 @@ namespace Link_Components
 			struct Link_MOE_Data normal_day_link_moe_data;
 			struct Link_MOE_Data realtime_link_moe_data;
 
-			vector<struct Link_MOE_Data> td_link_moe_data_array;
+			//vector<struct Link_MOE_Data> td_link_moe_data_array;
 
 		//==================================================================================================================
 		/// Events
@@ -818,7 +818,7 @@ namespace Link_Components
 					_cached_link_upstream_cumulative_vehicles_array[j] = 0;
 				}
 
-				td_link_moe_data_array.clear();
+				//td_link_moe_data_array.clear();
 				initialize_moe();
 				_weather_event_to_process = false;
 				_current_weather_event = nullptr;
@@ -926,7 +926,7 @@ namespace Link_Components
 
 				link_moe_data.link_travel_time_ratio = link_moe_data.link_travel_time /	(_length/5280.0f/(_original_free_flow_speed/60.0f));
 
-				td_link_moe_data_array.push_back(link_moe_data);
+				//td_link_moe_data_array.push_back(link_moe_data);
 
 			}
 

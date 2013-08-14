@@ -107,7 +107,12 @@ namespace Vehicle_Components
 				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
 
 				_Trajectory_Container_Interface& trajectory = ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
-				trajectory.clear();
+				for (int i = 0; i < (int)trajectory.size(); i++)
+				{
+					Free<typename _Trajectory_Unit_Interface::Component_Type>((typename _Trajectory_Unit_Interface::Component_Type*)trajectory[i]);
+				}				
+				_Trajectory_Container_Interface::Component_Type().swap((_Trajectory_Container_Interface::Component_Type&)trajectory);
+				trajectory.resize(0);
 			}
 
 			feature_implementation void load_register()

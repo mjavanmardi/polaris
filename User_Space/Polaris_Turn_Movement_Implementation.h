@@ -122,7 +122,7 @@ namespace Turn_Movement_Components
 
 			struct Movement_MOE_Data realtime_movement_moe_data;
 
-			vector<struct Movement_MOE_Data> td_movement_moe_data_array;
+			//vector<struct Movement_MOE_Data> td_movement_moe_data_array;
 
 			Polaris_Movement_Implementation()
 			{
@@ -463,7 +463,7 @@ namespace Turn_Movement_Components
 					_minimum_merge_rate = 0.2;
 				}
 
-				td_movement_moe_data_array.clear();
+				//td_movement_moe_data_array.clear();
 
 				initialize_moe();
 			}
@@ -521,7 +521,7 @@ namespace Turn_Movement_Components
 			{
 				typedef typename MasterType::link_type _link_component_type;
 				movement_moe_data.inbound_link_turn_time = (((_link_component_type*)_inbound_link)->_link_fftt/60.0f + movement_moe_data.turn_penalty);
-				td_movement_moe_data_array.push_back(movement_moe_data);
+				//td_movement_moe_data_array.push_back(movement_moe_data);
 			}
 		};
 	}
