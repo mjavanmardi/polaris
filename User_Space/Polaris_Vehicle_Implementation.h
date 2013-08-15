@@ -111,8 +111,8 @@ namespace Vehicle_Components
 				{
 					Free<typename _Trajectory_Unit_Interface::Component_Type>((typename _Trajectory_Unit_Interface::Component_Type*)trajectory[i]);
 				}				
-				_Trajectory_Container_Interface::Component_Type().swap((_Trajectory_Container_Interface::Component_Type&)trajectory);
-				trajectory.resize(0);
+				typedef typename _Trajectory_Container_Interface::Component_Type trajectory_container_type;
+				trajectory_container_type().swap((trajectory_container_type&)trajectory);
 			}
 
 			feature_implementation void load_register()
