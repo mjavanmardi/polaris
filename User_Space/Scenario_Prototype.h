@@ -147,6 +147,8 @@ namespace Scenario_Components
 			feature_accessor(network_cumulative_switched_decisions_realtime_informed, none, none);
 			feature_accessor(network_cumulative_switched_decisions_ITS_informed, none, none);
 
+			feature_accessor(network_in_system_vehicles, none, none); // vehicles that are currently loaded
+
 			feature_accessor(input_dir_name, none, none);
 			feature_accessor(output_dir_name, none, none);
 				
@@ -461,6 +463,7 @@ namespace Scenario_Components
 				network_cumulative_arrived_vehicles<int>(0.0);
 				network_cumulative_switched_decisions<int>(0.0);
 				network_average_trip_travel_time<float>(0.0f);
+				network_in_system_vehicles<int>(0.0);
 
 				assignment_time_in_seconds<double>(0.0);
 			    simulation_time_in_seconds<double>(0.0);
@@ -568,6 +571,8 @@ namespace Scenario_Components
 				network_cumulative_arrived_vehicles<int>(0.0);
 				network_cumulative_switched_decisions<int>(0.0);
 				network_average_trip_travel_time<float>(0.0f);
+
+				network_in_system_vehicles<int>(0.0);
 
 				assignment_time_in_seconds<double>(0.0);
 			    simulation_time_in_seconds<double>(0.0);
@@ -920,7 +925,7 @@ namespace Scenario_Components
 				string out_network_moe_file_name = output_dir_name<string&>() + "moe_network.csv";
 				out_network_moe_file<fstream&>().open(out_network_moe_file_name, fstream::out);
 				//out_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_flow_rate_in_vphpl,avg_link_out_flow_rate_in_vphpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,vht,vmt,assignment_calculation_time_in_second,simulation_calculation_time_in_second,operation_calculation_time_in_second,output_calculation_time_in_second\n";
-				out_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_flow_rate_in_vphpl,avg_link_out_flow_rate_in_vphpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,vht,vmt\n";
+				out_network_moe_file<fstream&>() << "clock,time,num_loaded_vehicle,num_departed_vehicle,num_arrived_vehicle,avg_link_time_in_min,avg_link_speed_in_mph,avg_link_density_in_vpmpl,avg_link_in_flow_rate_in_vphpl,avg_link_out_flow_rate_in_vphpl,avg_link_in_volume,avg_link_out_volume,avg_link_time_ratio,avg_link_speed_ratio,avg_link_density_ratio,avg_link_in_flow_ratio,avg_link_out_flow_ratio,vmt,vht\n";
 
 				//link
 				string out_link_moe_file_name = output_dir_name<string&>() + "moe_link.csv";
@@ -1042,9 +1047,19 @@ namespace Scenario_Components
 				this_component()->template increase_network_in_network_vehicles<ComponentType,CallerType,TargetType>();
 			}
 
+			feature_prototype void increase_network_in_system_vehicles()
+			{
+				this_component()->template increase_network_in_system_vehicles<ComponentType,CallerType,TargetType>();
+			}
+
 			feature_prototype void decrease_network_in_network_vehicles()
 			{
 				this_component()->template decrease_network_in_network_vehicles<ComponentType,CallerType,TargetType>();
+			}
+
+			feature_prototype void decrease_network_in_system_vehicles()
+			{
+				this_component()->template decrease_network_in_system_vehicles<ComponentType,CallerType,TargetType>();
 			}
 
 			feature_prototype void increase_network_cumulative_switched_decisions(int cause_for_switching)

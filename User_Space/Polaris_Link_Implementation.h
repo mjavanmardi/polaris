@@ -428,15 +428,25 @@ namespace Link_Components
 #endif
 			{
 				define_container_and_value_interface_unqualified_container(_Link_Origin_Vehicles_Container_Interface, _Vehicle_Interface,type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Network_Interface;
+
+				int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>();
+
 				_link_origin_cumulative_arrived_vehicles++;
 				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
 
 				LOCK(_link_lock);
-
 				_link_origin_vehicle_array.push_back((typename MasterType::vehicle_type*)vehicle);
-				vehicle->template load<Vehicle_Components::Types::Load_To_Entry_Queue>();
-
 				UNLOCK(_link_lock);
+				
+				vehicle->template load<Vehicle_Components::Types::Load_To_Entry_Queue>();
+				
+				((_Scenario_Interface*)_global_scenario)->template increase_network_in_system_vehicles<NULLTYPE>();
+				_Movement_Plan_Interface* mp = vehicle->template movement_plan<_Movement_Plan_Interface*>();
+				int adjustment = current_time - mp->template departed_time<Time_Seconds>();
+				((_Network_Interface*)_global_network)->template update_network_vht_compensation<NT>(adjustment);
 			}
 
 			feature_implementation void accept_vehicle(TargetType veh,requires(check_2(CallerType,typename MasterType::movement_type,is_same) || check_2(CallerType,ComponentType,is_same)))
@@ -601,6 +611,7 @@ namespace Link_Components
 					float travel_time = float ((arrival_time - departure_time)/60.0f);
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>(travel_time);
 					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
+					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_system_vehicles<NULLTYPE>();
 				}
 				else
 				{
@@ -720,6 +731,7 @@ namespace Link_Components
 				define_container_and_value_interface_unqualified_container(_Vehicles_Origin_Container_Interface, _Vehicle_Interface, type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				typedef Link_Components::Prototypes::Link_Prototype<typename MasterType::link_type, ComponentType> _Link_Interface;
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
+				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type> _Network_Interface;
 
 				_Vehicle_Interface* vehicle;
 				for (int iv=0;iv<num_departed_vehicles;iv++)
@@ -736,6 +748,7 @@ namespace Link_Components
 					((_Link_Interface*)this)->template push_vehicle<_Vehicle_Interface*>(vehicle);
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_departed_vehicles<NULLTYPE>();
 					((_Scenario_Interface*)_global_scenario)->template increase_network_in_network_vehicles<NULLTYPE>();
+
 				}
 			}
 

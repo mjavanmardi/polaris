@@ -101,6 +101,10 @@ namespace Network_Components
 			member_data(float, network_vht_vehicle_based, none, none);
 			member_data(_lock, network_vht_vehicle_based_update_lock, none, none);
 
+			member_data(float, network_vht_in_network_based, none, none);
+			member_data(_lock, network_vht_compensation_update_lock, none, none);
+			member_data(int, network_vht_compensation, none, none);
+
 			member_container(vector<typename MasterType::routable_network_type*>, network_snapshot_container, none, none);
 			
 			member_container(vector<typename MasterType::analyze_link_group_type*>, analyze_link_groups_container, none, none);
@@ -154,6 +158,7 @@ namespace Network_Components
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				UNLOCK(_network_vht_vehicle_based_update_lock);
+				UNLOCK(_network_vht_compensation_update_lock);
 				initialize_intersection_control<ComponentType,CallerType,TargetType>();
 				initialize_links<ComponentType,CallerType,TargetType>();
 				initialize_intersections<ComponentType,CallerType,TargetType>();
@@ -171,6 +176,7 @@ namespace Network_Components
 				_network_vht = 0.0;
 				_network_vmt = 0.0;
 				_out_network_vht_vehicle_based = 0.0;
+				_network_vht_vehicle_based = 0;
 				initialize_moe();
 				initialize_network_agent<ComponentType,CallerType,TargetType>();
 			}
@@ -429,6 +435,7 @@ namespace Network_Components
 				{
 					((typename MasterType::network_type*)_this)->_in_network_vht_vehicle_based = 0.0;
 				}
+				((typename MasterType::network_type*)_this)->_network_vht_compensation = 0;
 			}
 
 			void read_historic_link_moe()
@@ -593,6 +600,9 @@ namespace Network_Components
 				if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>())
 				{
 					_this_ptr->template scenario_reference<_Scenario_Interface*>()->template close_files<NULLTYPE>();
+					//((typename MasterType::network_type*)_this_ptr)->add_in_network_to_VHT<ComponentType,ComponentType,NT>();
+					//cout << "final vht = " << ((typename MasterType::network_type*)_this_ptr)->_network_vht_in_network_based << endl;
+					//system("pause");
 					exit(0);
 				}
 
@@ -600,6 +610,45 @@ namespace Network_Components
 				//((typename MasterType::network_type*)_this)->template update_vehicle_locations<NULLTYPE,NULLTYPE,NULLTYPE>();
 				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
 			}
+
+			//feature_implementation void add_in_network_to_VHT()
+			//{
+			//	define_container_and_value_interface_unqualified_container(_Intersections_Container_Interface, _Intersection_Interface, type_of(intersections_container), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Intersection_Prototype, ComponentType);
+			//	define_container_and_value_interface(_Inbound_Outbound_Movements_Container_Interface, _Inbound_Outbound_Movements_Interface, typename _Intersection_Interface::get_type_of(inbound_outbound_movements), Random_Access_Sequence_Prototype, Intersection_Components::Prototypes::Inbound_Outbound_Movements_Prototype, ComponentType);
+			//	define_container_and_value_interface(_Outbound_Movements_Container_Interface, _Outbound_Movement_Interface, typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+			//	define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename _Outbound_Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+			//	define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
+
+			//	typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type, ComponentType> _Network_Interface;
+			//	int current_time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_relative<int>();
+			//	typename _Intersections_Container_Interface::iterator intersection_itr;
+			//	for (intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
+			//	{
+			//		_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersection_itr);
+			//		_Inbound_Outbound_Movements_Container_Interface& _inbound_outbound_movements = intersection->inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>();
+			//		typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_outbound_movements_itr;
+			//		for (inbound_outbound_movements_itr=_inbound_outbound_movements.begin();inbound_outbound_movements_itr!=_inbound_outbound_movements.end();inbound_outbound_movements_itr++)
+			//		{
+			//			_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
+			//			_Outbound_Movements_Container_Interface& outbound_movements_container = inbound_outbound_movements->template outbound_movements<_Outbound_Movements_Container_Interface&>();
+			//			typename _Outbound_Movements_Container_Interface::iterator outbound_movement_itr;
+			//			for (outbound_movement_itr=outbound_movements_container.begin();outbound_movement_itr!=outbound_movements_container.end();outbound_movement_itr++)
+			//			{
+			//				//num_vehicles_in_link += int(((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template vehicles_container<_Vehicles_Container_Interface&>().size());
+			//				typename _Vehicles_Container_Interface::iterator vehicle_itr;
+			//				_Vehicles_Container_Interface& vehicles = ((_Outbound_Movement_Interface*)(*outbound_movement_itr))->template vehicles_container<_Vehicles_Container_Interface&>();
+
+			//				for (vehicle_itr=vehicles.begin();vehicle_itr!=vehicles.end();vehicle_itr++)
+			//				{
+			//					_Movement_Plan_Interface* mp = ((_Vehicle_Interface*)(*vehicle_itr))->template movement_plan<_Movement_Plan_Interface*>();
+			//					float adjustment = float(current_time - mp->departed_time<Time_Seconds>()) / 3600.0f; 
+			//					_network_vht_in_network_based += adjustment;
+			//				}
+			//			}
+			//		}
+			//	}
+			//}
+
 
 			feature_implementation void update_vehicle_locations()
 			{
@@ -622,7 +671,9 @@ namespace Network_Components
 				//{
 				//	((_Intersection_Interface*)(*intersection_itr))->template calculate_moe_for_simulation_interval<NULLTYPE>();
 				//}
-				
+				float vht_increase = float(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() * ((_Scenario_Interface*)_global_scenario)->template network_in_system_vehicles<int>()) / 3600.0f;
+				vht_increase += (float)_network_vht_compensation / 3600.0f;
+				_network_vht_in_network_based += vht_increase;
 				if (((_Scenario_Interface*)_global_scenario)->template calculate_realtime_moe<bool>())
 				{
 					calculate_realtime_network_moe();
@@ -944,6 +995,13 @@ namespace Network_Components
 				LOCK(_network_vht_vehicle_based_update_lock);
 				_out_network_vht_vehicle_based += increase;
 				UNLOCK(_network_vht_vehicle_based_update_lock);
+			}
+
+			feature_implementation void update_network_vht_compensation(int adjustment)
+			{
+				LOCK(_network_vht_compensation_update_lock);
+				_network_vht_compensation += adjustment;
+				UNLOCK(_network_vht_compensation_update_lock);
 			}
 			
 			feature_implementation void write_node_control_state();

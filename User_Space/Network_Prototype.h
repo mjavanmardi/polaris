@@ -336,6 +336,11 @@ namespace Network_Components
 			{
 				this_component()->template increase_out_network_vht_vehicle_based<ComponentType,CallerType,TargetType>(increase);
 			}
+			feature_prototype void update_network_vht_compensation(int adjustment)
+			{
+				this_component()->template update_network_vht_compensation<ComponentType,CallerType,TargetType>(adjustment);
+			}
+			
 		};
 
 	}

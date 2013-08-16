@@ -311,7 +311,7 @@ namespace Network_Components
                     << scenario->template network_in_network_vehicles<int>() << ","
 					<< scenario->template network_cumulative_switched_decisions<int>() << ","
 					<< _network_vmt << ","
-					<< _network_vht << ","
+					<< _network_vht_in_network_based << ","
 					<< scenario->template network_average_trip_travel_time<float>() << ","
 					<< scenario->template network_cumulative_switched_decisions_excessive_delay<int>() << ","
 					<< scenario->template network_cumulative_switched_decisions_realtime_informed<int>() << ","
@@ -319,7 +319,7 @@ namespace Network_Components
                     << convert_seconds_to_hhmmss(elapsed_time).c_str() << ","
 					<< _this_ptr->template start_of_current_simulation_interval_absolute<int>() << ","
 					<< physicalMemoryUsedByProcess/1000000 << ","
-					<< int(float(physicalMemoryUsedByProcess)/float(totalPhysicalMemory)*100.0)
+					<< int(float(physicalMemoryUsedByProcess)/float(totalPhysicalMemory)*100.0) << ","
                     <<endl;
 		}
 
@@ -407,7 +407,7 @@ namespace Network_Components
 					<< realtime_network_moe_data.network_avg_link_density_ratio << ","
 					<< realtime_network_moe_data.network_avg_link_queue_length << ","
 					<< _network_vmt << ","
-					<< _network_vht << ","
+					<< _network_vht_in_network_based << ","
 					<< ((_Scenario_Interface*)_global_scenario)->template network_cumulative_loaded_vehicles<int>() << ","
 					<< ((_Scenario_Interface*)_global_scenario)->template network_cumulative_departed_vehicles<int>() << ","
 					<< ((_Scenario_Interface*)_global_scenario)->template network_in_network_vehicles<int>() << ","
@@ -555,9 +555,8 @@ namespace Network_Components
 					<< network_moe_data.network_avg_link_density_ratio << ","
 					<< network_moe_data.network_avg_link_in_flow_ratio << ","
 					<< network_moe_data.network_avg_link_out_flow_ratio << ","
-					<< _network_vht_vehicle_based << ","
 					<< _network_vmt << ","
-					<< _network_vht << ","
+					<< _network_vht_in_network_based 
 					//<< network_moe_data.assignment_calculation_time << ","
 					//<< network_moe_data.simulation_calculation_time << ","
 					//<< network_moe_data.operation_calculation_time << ","

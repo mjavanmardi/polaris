@@ -112,6 +112,8 @@ namespace Scenario_Components
 			member_data(float, network_cumulative_switched_decisions_excessive_delay, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, network_cumulative_switched_decisions_realtime_informed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, network_cumulative_switched_decisions_ITS_informed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			
+			member_data(int, network_in_system_vehicles, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
 			member_data(int, rng_type, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 
@@ -201,6 +203,13 @@ namespace Scenario_Components
 				UNLOCK(_statistics_update_lock);			
 			}
 
+			feature_implementation void increase_network_in_system_vehicles()
+			{
+				LOCK(_statistics_update_lock);
+				_network_in_system_vehicles++;
+				UNLOCK(_statistics_update_lock);			
+			}
+
 			feature_implementation void increase_network_cumulative_arrived_vehicles(float travel_time)
 			{
 				LOCK(_statistics_update_lock);
@@ -237,6 +246,13 @@ namespace Scenario_Components
 			{
 				LOCK(_statistics_update_lock);
 				_network_in_network_vehicles--;
+				UNLOCK(_statistics_update_lock);			
+			}
+
+			feature_implementation void decrease_network_in_system_vehicles()
+			{
+				LOCK(_statistics_update_lock);
+				_network_in_system_vehicles--;
 				UNLOCK(_statistics_update_lock);			
 			}
 
