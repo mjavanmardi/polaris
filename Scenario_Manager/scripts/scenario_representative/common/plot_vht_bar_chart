@@ -44,7 +44,9 @@ do
         ;;
     *) echo not recognized type
     esac
-    vht=`tail -n1 ${target_dir}/${dir}/moe_network.csv | cut -d',' -f18`
+    scenario_file=${target_dir}/${dir}/scenario.json
+    output_dir_name=`grep output_dir_name ${scenario_file} | cut -d' ' -f3 | cut -d'"' -f2`
+    vht=`tail -n1 ${target_dir}/${dir}/${output_dir_name}/moe_network.csv | cut -d',' -f19`
     echo ${label} ${vht} >> vht_bar_chart.dat
     tmp=`python weather_probability.py ${dir} ${vht} ${weighted_vht}`
     weighted_vht=${tmp}

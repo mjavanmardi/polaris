@@ -26,9 +26,11 @@ for dir in $dirs
 do
     if [ $i == 1 ] 
     then 
-        echo plot \[\"00:00:00\":\"24:00:00\"\]\[:\] \'${target_dir}/${scenarios[$i]}/moe_network.csv\' every ::2 using 1:7 title \'${scenarios[$i]}\' with line $i, \\ >> plt.tmp
+        scenario_file=${target_dir}/${dir}/scenario.json
+        output_dir_name=`grep output_dir_name ${scenario_file} | cut -d' ' -f3 | cut -d'"' -f2`
+        echo plot \[\"00:00:00\":\"24:00:00\"\]\[:\] \'${target_dir}/${dir}/${output_dir_name}/moe_network.csv\' every ::2 using 1:7 title \'${scenarios[$i]}\' with line $i, \\ >> plt.tmp
     else
-        echo \'${target_dir}/${scenarios[$i]}/moe_network.csv\' every ::2 using 1:7 title \'${scenarios[$i]}\' with line $i, \\ >> plt.tmp
+        echo \'${target_dir}/${dir}/${output_dir_name}/moe_network.csv\' every ::2 using 1:7 title \'${scenarios[$i]}\' with line $i, \\ >> plt.tmp
     fi
     let i=i+1
 done
@@ -46,9 +48,11 @@ for dir in $dirs
 do
     if [ $i == 1 ] 
     then 
-        echo plot \[\"00:00:00\":\"24:00:00\"\]\[lower_bound:\] \'${target_dir}/${scenarios[$i]}/moe_network.csv\' every ::2 using 1:7 title \'${scenarios[$i]}\' with line $i, \\ >> plt.tmp
+        scenario_file=${target_dir}/${dir}/scenario.json
+        output_dir_name=`grep output_dir_name ${scenario_file} | cut -d' ' -f3 | cut -d'"' -f2`
+        echo plot \[\"00:00:00\":\"24:00:00\"\]\[lower_bound:\] \'${target_dir}/${dir}/${output_dir_name}/moe_network.csv\' every ::2 using 1:7 title \'${scenarios[$i]}\' with line $i, \\ >> plt.tmp
     else
-        echo \'${target_dir}/${scenarios[$i]}/moe_network.csv\' every ::2 using 1:7 title \'${scenarios[$i]}\' with line $i, \\ >> plt.tmp
+        echo \'${target_dir}/${dir}/${output_dir_name}/moe_network.csv\' every ::2 using 1:7 title \'${scenarios[$i]}\' with line $i, \\ >> plt.tmp
     fi
     let i=i+1
 done

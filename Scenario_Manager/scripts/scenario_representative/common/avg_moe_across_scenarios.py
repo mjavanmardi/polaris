@@ -17,7 +17,9 @@ for scenario in scenarios:
             scenario_probabilities[scenario] = float(weather_factor_table.get('probability'))
 
 for scenario in scenarios:
-    file = open(target_dir+ "/" + scenario + "/moe_network.csv", "r")
+    scenario_json = simplejson.load(open(target_dir+ "/" + scenario + "/scenario.json", "r"))
+    output_dir_name = scenario_json.get('output_dir_name')
+    file = open(target_dir+ "/" + scenario + "/" + output_dir_name + "/moe_network.csv", "r")
     scenario_lines[scenario] = []
     start_flag = True;
     for line in file:

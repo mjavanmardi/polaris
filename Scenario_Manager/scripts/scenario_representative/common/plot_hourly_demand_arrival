@@ -4,7 +4,9 @@ data_dir=../results
 scenarios=`ls ${target_dir}` 
 for scenario in $scenarios
 do
-    tail -n +2 ${target_dir}/${scenario}/moe_network.csv | awk -f hourly_demand_arrival.awk > $data_dir/${scenario}_hourly_demand_arrival.csv
+    scenario_file=${target_dir}/${scenario}/scenario.json
+    output_dir_name=`grep output_dir_name ${scenario_file} | cut -d' ' -f3 | cut -d'"' -f2`
+    tail -n +2 ${target_dir}/${scenario}/${output_dir_name}/moe_network.csv | awk -f hourly_demand_arrival.awk > $data_dir/${scenario}_hourly_demand_arrival.csv
 done
 
 awk -f hourly_demand_arrival.awk ${data_dir}/combined_moe_network.csv > $data_dir/combined_hourly_demand_arrival.csv

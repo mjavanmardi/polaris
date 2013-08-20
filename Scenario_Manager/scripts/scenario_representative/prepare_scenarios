@@ -10,8 +10,6 @@ if [ -d "workspaces/$target_scenario" ]; then
 fi
 
 mkdir workspaces/$target_scenario
-chmod +x common/deljobs common/display common/monitor common/plot_all common/plot_*
-chmod +x plot_*
 cp -rf common workspaces/$target_scenario/bin
 mkdir workspaces/$target_scenario/results
 mkdir workspaces/$target_scenario/scenarios
@@ -22,4 +20,4 @@ echo python weather_prepare.py $source_dir $path_dir/workspaces/$target_scenario
 python weather_prepare.py $source_dir $path_dir/workspaces/$target_scenario/scenarios
 echo python weather_submit.py $path_dir/workspaces/$target_scenario/scenarios
 python weather_submit.py $path_dir/workspaces/$target_scenario/scenarios
-./monitor 
+bash monitor 

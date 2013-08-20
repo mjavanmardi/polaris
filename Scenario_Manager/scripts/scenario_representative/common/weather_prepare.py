@@ -99,7 +99,7 @@ def prepare_pbs(weather_factor_table):
     pbs_file.write('#\n')
     pbs_file.write('cd ' + target_dir + '\n')
     pbs_file.write('#\n')
-    pbs_file.write('./NetworkModel\n')
+    pbs_file.write('./application\n')
     pbs_file.close()
     """subprocess.call(['qsub', pbs_name])"""
 
