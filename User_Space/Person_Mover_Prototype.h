@@ -66,7 +66,7 @@ namespace Prototypes
 			if (routing_timestep < _iteration) routing_timestep = _iteration;
 
 
-			// Do pretrip rerouting if car has realtime info
+			// Do pretrip replanning if car has realtime info
 			bool has_pretrip_info = person->template has_pretrip_information<bool>();
 
 

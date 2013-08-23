@@ -39,9 +39,9 @@ namespace PopSyn
 			member_component(typename MasterType::RNG, Rand,none,none);
 			member_component(typename MasterType::region, parent_reference, none,none);
 	
-			typedef unordered_multimap<uint, typename MasterType::person_static_properties_type*> __sample_map_type;		
+			typedef unordered_multimap<uint, typename MasterType::household_static_properties_type*> __sample_map_type;		
 			member_associative_container(__sample_map_type, Sample_Data, none, none); 
-			member_container(vector<typename MasterType::person_type*>, Synthetic_Persons_Container,none,none);
+			member_container(vector<typename MasterType::household_type*>, Synthetic_Households_Container,none,none);
 			member_container(vector<int>, Activity_Locations_Container,none,none);
 		};
 

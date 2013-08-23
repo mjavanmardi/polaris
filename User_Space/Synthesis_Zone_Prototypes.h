@@ -209,8 +209,8 @@ namespace PopSyn
 			
 
 				// Get pointers to the regional and zonal household samples
-				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, Person_Components::Prototypes::Person_Properties ,NULLTYPE);
-				sample_itf* sample = Region_Sample_Ptr;
+				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, Household_Components::Prototypes::Household_Properties ,NULLTYPE);
+				sample_itf* sample = (sample_itf*)Region_Sample_Ptr;
 				sample_itf* zone_sample = this->Sample_Data<sample_itf*>();
 				
 				// Get interface to the zone random number generator
@@ -245,9 +245,11 @@ namespace PopSyn
 					//----------------------------------------------------------------------------------
 					// grab all sample units which link to this cell and make num_required attempts to add each unit in the range
 					range = sample->equal_range(index);
-					stored_pop_unit = range.first->second;
+					
 					while (range.first != range.second)
 					{
+						stored_pop_unit = range.first->second;
+
 						int num_generated=0;
 						double w = range.first->second->template Weight<double>();
 
@@ -261,7 +263,7 @@ namespace PopSyn
 								num_generated++;// += (int)(1.0 / settings.template Percentage_to_synthesize<double>());
 
 								// create the actual person agent from the census static properties and add to the zones created person agent list
-								this->Create_Person<pop_unit_itf*>(stored_pop_unit);
+								this->Create_Household<pop_unit_itf*>(stored_pop_unit);
 
 								num_created++;// += (int)(1.0 / settings.template Percentage_to_synthesize<double>());
 							}
@@ -279,7 +281,7 @@ namespace PopSyn
 					while (num_required > 1.0 /*/ settings.template Percentage_to_synthesize<double>()*/)
 					{
 						// create the actual person agent
-						this->Create_Person<pop_unit_itf*>(stored_pop_unit);
+						this->Create_Household<pop_unit_itf*>(stored_pop_unit);
 						num_created++;	//+=(int)(1.0 /*/ settings.template Percentage_to_synthesize<double>()*/);
 						num_required--;	//-=(int)(1.0 /*/ settings.template Percentage_to_synthesize<double>()*/);
 					}
@@ -289,7 +291,7 @@ namespace PopSyn
 					if (num_required > 0.0 && rand.template Next_Rand<double>() < num_required /** settings.template Percentage_to_synthesize<double>()*/)
 					{
 						// create the actual person agent
-						this->Create_Person<pop_unit_itf*>(stored_pop_unit);
+						this->Create_Household<pop_unit_itf*>(stored_pop_unit);
 						num_created++;	//+=(int)(1.0 / settings.template Percentage_to_synthesize<double>());
 						num_required--;	//-=(int)(1.0 / settings.template Percentage_to_synthesize<double>());
 					}
@@ -306,27 +308,42 @@ namespace PopSyn
 				assert_check_as_given(TargetType, is_pointer,"Is not a pointer");
 				assert_check(TargetType, Containers::Concepts::Is_Associative, "Container is not associative.");
 			}
-			feature_prototype void Create_Person(TargetType static_properties)
+			feature_prototype void Create_Household(TargetType static_properties)
 			{
 				define_component_interface(_Network_Interface,typename ComponentType::Master_Type::network_type,Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_component_interface(_Scenario_Interface,typename ComponentType::Master_Type::scenario_type,Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
-				define_container_and_value_interface(persons_itf, person_itf, typename get_type_of(Synthetic_Persons_Container), Containers::Random_Access_Sequence_Prototype, Person_Components::Prototypes::Person, NULLTYPE);
-				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, Person_Components::Prototypes::Person_Properties ,NULLTYPE);
-				persons_itf* person_container = (persons_itf*)this->Synthetic_Persons_Container<persons_itf*>();
+				define_container_and_value_interface(households_itf, household_itf, typename get_type_of(Synthetic_Households_Container), Containers::Random_Access_Sequence_Prototype, Household_Components::Prototypes::Household, NULLTYPE);
+				define_container_and_value_interface(persons_itf, person_itf, typename household_itf::get_type_of(Persons_Container), Containers::Random_Access_Sequence_Prototype, Person_Components::Prototypes::Person, NULLTYPE);
+				// interface to the ACS sample data classes
+				define_container_and_value_interface(sample_itf, pop_unit_itf, typename get_type_of(Sample_Data), Associative_Container_Prototype, Household_Components::Prototypes::Household_Properties ,NULLTYPE);
+				define_container_and_value_interface(person_sample_itf, person_unit_itf, typename pop_unit_itf::get_type_of(Persons_Container), Random_Access_Sequence_Prototype, Person_Components::Prototypes::Person_Properties ,NULLTYPE);
+				households_itf* household_container = (households_itf*)this->Synthetic_Households_Container<persons_itf*>();
 
-				person_itf* person=(person_itf*)Allocate<typename get_type_of(Synthetic_Persons_Container)::unqualified_value_type>();
-				//person->network_reference<_Network_Interface*>(this->network_reference<_Network_Interface*>());
-				//person->scenario_reference<_Scenario_Interface*>(this->scenario_reference<_Scenario_Interface*>());	
-				person->template Static_Properties<pop_unit_itf*>(static_properties);
-				person_container->push_back(person);
-				//person->Initialize<int>(id);
+				// create new household using sample unit
+				household_itf* hh=(household_itf*)Allocate<typename get_type_of(Synthetic_Households_Container)::unqualified_value_type>();
+				hh->template Static_Properties<pop_unit_itf*>(static_properties);
+
+				pop_unit_itf* pop_unit = (pop_unit_itf*)static_properties;
+				person_sample_itf* person_units = pop_unit->Persons_Container<person_sample_itf*>();
+
+				// create new person agent from each person unit properties class in the hh unit properties class
+				typename person_sample_itf::iterator person_unit_itr = person_units->begin();
+				for (;person_unit_itr != person_units->end(); ++person_unit_itr)
+				{
+					person_itf* person =(person_itf*)Allocate<typename person_itf::Component_Type>();
+					person->template Static_Properties<person_unit_itf*>(*person_unit_itr);
+					hh->Persons_Container<persons_itf&>().push_back(person);
+					person->template Household<household_itf*>(hh);
+				}
+				//
+				household_container->push_back(hh);
 			}
 
 			//===================================================================================================================================
 			// Accessor for the Joint Distribution (IPF and CO only) and marginal distributions used in synthesis
 			feature_accessor(Target_Joint_Distribution,none,none);
 			feature_accessor(Target_Marginal_Distribution,none,none);
-			feature_accessor(Synthetic_Persons_Container,none,none);
+			feature_accessor(Synthetic_Households_Container,none,none);
 			feature_accessor(Activity_Locations_Container,none,none);
 
 			//===================================================================================================================================

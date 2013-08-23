@@ -170,6 +170,13 @@ namespace Person_Components {
 	}
 };
 
+namespace Household_Components {
+	namespace Prototypes
+	{
+		forward_declare_prototype struct Household;
+	}
+};
+
 namespace Plan_Components {
 	namespace Prototypes
 	{

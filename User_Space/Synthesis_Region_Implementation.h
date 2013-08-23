@@ -17,10 +17,16 @@ namespace PopSyn
 			member_pointer(ostream,Output_Stream,none,none);
 			member_component(typename MasterType::popsyn_solver, parent_reference, none,none);
 
+			typedef dense_hash_map<double, typename MasterType::household_static_properties_type*> __temp_sample_map_type;		
+			member_associative_container(__temp_sample_map_type, Temporary_Sample_Data, none, none); 
+
 			feature_implementation void Initialize()
 			{
 				this->_Synthesis_Zone_Collection.set_empty_key(-1);
 				this->_Synthesis_Zone_Collection.set_deleted_key(-2);
+
+				this->_Temporary_Sample_Data.set_empty_key(-1);
+				this->_Temporary_Sample_Data.set_deleted_key(-2);
 			}
 			feature_implementation TargetType scenario_reference()
 			{

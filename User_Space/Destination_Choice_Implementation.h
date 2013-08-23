@@ -229,7 +229,7 @@ namespace Person_Components
 
 				if (selected == nullptr )
 				{
-					THROW_WARNING("WARNING: selected is null - no destination choice made, index = " << selected_index);
+					THROW_WARNING("WARNING: selected is null - no destination choice made, index = " << selected_index <<", prev/next="<<prev->template zone<_Zone_Interface*>()->uuid<int>() << "/"<<next->template zone<_Zone_Interface*>()->uuid<int>());
 					return nullptr;
 				}
 

@@ -104,7 +104,8 @@ namespace Scenario_Components
 		{
 			tag_as_prototype;
 
-
+			feature_accessor(output_results_database_name, none, none);
+			feature_accessor(output_demand_database_name, none, none);
 
 			feature_accessor(simulation_interval_length, none, none);
 			feature_accessor(assignment_interval_length, none, none);
@@ -621,6 +622,7 @@ namespace Scenario_Components
 
 			feature_prototype void open_output_files()
 			{
+
 				//===================================================
 				// manage output directory
 				//---------------------------------------------------
@@ -645,6 +647,24 @@ namespace Scenario_Components
 
 				string out_skim_path = output_dir_name<string>().append(this->output_skim_file_path_name<string&>());
 				this->output_skim_file_path_name<string&>(out_skim_path);
+
+
+				//----------------------
+				// results database
+				string results_name = output_dir_name<string>().append(this->database_name<string&>());
+				unique_ptr<odb::database> db(create_sqlite_database(results_name, polaris::io::db_inventory[1]));
+				this->output_results_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[1]));
+				odb::transaction t(db->begin());
+				t.commit();
+
+				//----------------------
+				// results database
+				results_name = output_dir_name<string>().append(this->database_name<string&>());
+				unique_ptr<odb::database> db2(create_sqlite_database(results_name, polaris::io::db_inventory[2]));
+				this->output_demand_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[2]));
+				odb::transaction t2(db2->begin());
+				t2.commit();
+
 
 				//vehicle trajectory
 				vehicle_trajectory_file_name<string&>().assign(output_dir_name<string&>() + "vehicle_trajectory.csv");

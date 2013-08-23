@@ -445,7 +445,7 @@ namespace Person_Components
 			feature_accessor(Income,none,none);
 
 			// Non-static properties
-			feature_accessor(home_location_id,none,none);
+//			feature_accessor(home_location_id,none,none);
 			feature_accessor(work_location_id,none,none);
 			feature_accessor(school_location_id,none,none);
 			feature_method_1_arg(Average_Activity_Frequency, act_type, check_2(typename TargetType::ParamType, ACTIVITY_TYPES, is_same));

@@ -172,11 +172,15 @@ struct MasterType
 };
 
 ostream* stream_ptr;
-void run_with_input_from_db();
+void run_with_input_from_db(char* scenario_filename);
 void run_with_input_from_files();
 
 int main(int argc, char* argv[])
 {
+
+	char* scenario_filename = "scenario.json";
+	if (argc >= 2) scenario_filename = argv[1];
+
 	cout << "Running NetworkModel" << endl;
 	if (argc > 1 && strcmp(argv[1], "input_from_files") == 0)
 	{
@@ -187,13 +191,13 @@ int main(int argc, char* argv[])
 	{
 
 		cout << "Input from DB" << endl;
-		run_with_input_from_db();
+		run_with_input_from_db(scenario_filename);
 
 	}
 }
 
 
-void run_with_input_from_db()
+void run_with_input_from_db(char* scenario_filename)
 {
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
@@ -226,7 +230,7 @@ void run_with_input_from_db()
 	network->scenario_reference<_Scenario_Interface*>(scenario);
 	
 	cout << "reading scenario data..." <<endl;
-	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>("scenario.json");
+	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
 
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);

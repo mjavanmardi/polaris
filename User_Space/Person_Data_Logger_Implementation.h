@@ -58,12 +58,11 @@ namespace Person_Components
 
 				if (scenario->template write_demand_to_database<bool>())
 				{
-					string name(scenario->template database_name<string&>());
-					this->_db_ptr = open_sqlite_database<shared_ptr<odb::database> > (name);
+					string name(scenario->template output_demand_database_name<string&>());
+					this->_db_ptr = open_sqlite_database_single<shared_ptr<odb::database> > (name);
 					odb::transaction t(this->_db_ptr->begin());
 					this->_db_ptr->execute("delete from trip");
 					t.commit();
-					//this->_t = new odb::transaction(this->_db_ptr->begin());
 				}
 
 
@@ -565,6 +564,7 @@ namespace Person_Components
 				define_component_interface(movement_itf,typename act_itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 				define_component_interface(planner_itf,typename act_itf::get_type_of(Parent_Planner),Prototypes::Person_Planner,ComponentType);
 				define_component_interface(person_itf,typename planner_itf::get_type_of(Parent_Person),Prototypes::Person,ComponentType);
+				define_component_interface(household_itf,typename person_itf::get_type_of(Household),Household_Components::Prototypes::Household,ComponentType);
 
 				act_itf* act = (act_itf*)act_record;
 				movement_itf* move = act->template movement_plan<movement_itf*>();
@@ -572,19 +572,20 @@ namespace Person_Components
 				location_itf* dest = move->template destination<location_itf*>();
 				planner_itf* planner = act->template Parent_Planner<planner_itf*>();
 				person_itf* person = planner->template Parent_Person<person_itf*>();		
+				household_itf* hh = person->template Household<household_itf*>();
 
 				// Do Stuff to write trip to demand database....
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
 				
 				shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
 				trip_rec->setConstraint(0);
-				trip_rec->setPerson(1);
+				trip_rec->setPerson(person->template uuid<int>());
 				trip_rec->setTrip(act->template Activity_Plan_ID<int>());
 				if (new_destination<0) trip_rec->setDestination(dest->template uuid<int>());
 				else trip_rec->setDestination(new_destination);
 				trip_rec->setDuration(act->template Duration<Time_Seconds>());
 				trip_rec->setEnd(act->template End_Time<Time_Seconds>());
-				trip_rec->setHhold(person->template uuid<int>());
+				trip_rec->setHhold(hh->template uuid<int>());
 				trip_rec->setMode(0);
 				if (new_origin <0) trip_rec->setOrigin(orig->template uuid<int>());
 				else trip_rec->setOrigin(new_origin);

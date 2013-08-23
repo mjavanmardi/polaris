@@ -56,7 +56,7 @@ namespace Person_Components
 
 			// local data members
 			member_prototype(Prototypes::Person, Parent_Person, typename MasterType::person_type, none, none);
-			member_data(int, home_location_id, none, none);
+			//member_data(int, home_location_id, none, none);
 			member_data(int, work_location_id, none, none);
 			member_data(int, school_location_id, none, none);
 			
@@ -97,28 +97,28 @@ namespace Person_Components
 				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
 
 				// initialize location indices
-				_home_location_id = -1;
+				//_home_location_id = -1;
 				_work_location_id = -1;
 				_school_location_id = -1;
 				
 				// Available locations
 				activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
 
-				// assign person to a random activity location in the zone				
-				if (loc_indices->size() == 0)
-				{
-					_home_location_id= (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * activity_locations->size());
-				}
-				else
-				{
-					int index = -1;
-					index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * loc_indices->size());
-					_home_location_id = loc_indices->at(index);
-				}
+				//// assign person to a random activity location in the zone				
+				//if (loc_indices->size() == 0)
+				//{
+				//	_home_location_id= (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * activity_locations->size());
+				//}
+				//else
+				//{
+				//	int index = -1;
+				//	index = (int)((GLOBALS::Uniform_RNG.template Next_Rand<float>()*0.9999999) * loc_indices->size());
+				//	_home_location_id = loc_indices->at(index);
+				//}
 
-				// get the polaris zone of the synthesized person and increment its population counter;
-				_Zone_Interface* pzone = _Parent_Person->template Home_Location<_Zone_Interface*>();
-				pzone->template population<int&>()++;
+				//// get the polaris zone of the synthesized person and increment its population counter;
+				//_Zone_Interface* pzone = _Parent_Person->template Home_Location<_Zone_Interface*>();
+				//pzone->template population<int&>()++;
 
 				// Assign workers to a work location
 				pop_unit_itf* properties = _Parent_Person->template Static_Properties<pop_unit_itf*>();

@@ -20,6 +20,8 @@ namespace Person_Components
 
 			typedef typename MasterType::person_data_logger_type person_data_logger_type;
 
+			// Parent agent
+			member_prototype(Household_Components::Prototypes::Household, Household, typename MasterType::household_type,none,none);
 
 			//=======================================================================================================================================================================
 			// DATA MEMBERS
@@ -94,9 +96,6 @@ namespace Person_Components
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			feature_implementation void Initialize(TargetType id)
 			{	
-				// Set the initial iteration to process
-				//this->First_Iteration<ComponentType,CallerType,Time_Minutes>(1.0);
-
 				// Create and Initialize the Properties faculty
 				_Properties = (Properties_interface*)Allocate<type_of(Properties)>();
 				_Properties->template Initialize<void>();
@@ -166,8 +165,9 @@ namespace Person_Components
 			}
 			tag_feature_as_available(Initialize);
 
-			feature_implementation void Set_Home_Location()
+			feature_implementation void Set_Locations()
 			{
+				// This call sets the work/school locations from the properties sub class and uses the functions below
 				_Properties->template Initialize<Target_Type<NT,void,home_synthesis_zone_interface*> >(this->_home_synthesis_zone);
 			}
 

@@ -91,7 +91,7 @@ namespace Prototypes
 			typedef Person<ComponentType, ComponentType> _Person_Interface;
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
-			pthis->template Set_Home_Location<NT>();
+			pthis->template Set_Locations<NT>();
 		}
 		declare_feature_event(Print_Preplanned_Activities_Event)
 		{
@@ -127,48 +127,48 @@ namespace Prototypes
 		}
 
 		// Initializers
-		feature_prototype void Initialize(TargetType id, requires(check(ComponentType,Concepts::Has_Initialize)))
+		feature_prototype void Initialize(TargetType id, requires(check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Execution_Object,is_same)))
 		{
 			this->First_Iteration<Simulation_Timestep_Increment>(_iteration+1);
 			this_component()->template Initialize<ComponentType,CallerType, TargetType>(id);	
 			load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
+		feature_prototype void Initialize(TargetType id, requires(check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
+		{
+			this_component()->template Initialize<ComponentType,CallerType, TargetType>(id);	
+		}
 		feature_prototype void Initialize(TargetType id, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
-		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref/*,requires(check(ComponentType,Concepts::Has_Initialize))*/)
+		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref,requires(/*check(ComponentType,Concepts::Has_Initialize) && */check_2(typename ComponentType::Object_Type,Execution_Object,is_same)))
 		{
 			this->First_Iteration<Simulation_Timestep_Increment>(_iteration+1);
 			this_component()->template Initialize<ComponentType,CallerType, TargetType>(id, home_zone, network_ref, scenario_ref);		
 			load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
 		}
-		//feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref,requires(!check(ComponentType,Concepts::Has_Initialize)))
-		//{
-		//	assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-		//}
-		//feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type trip, requires(check(ComponentType,Concepts::Has_Initialize)))
-		//{
-		//	this_component()->Initialize<ComponentType,CallerType, TargetType>(id, trip);
-		//	load_event(ComponentType,Agent_Conditional,Agent_Event,this->First_Iteration<Simulation_Timestep_Increment>(),0,NULLTYPE);
-		//}
-		//feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type trip, requires(!check(ComponentType,Concepts::Has_Initialize)))
-		//{
-		//	assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-		//}
+		feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref,requires(/*check(ComponentType,Concepts::Has_Initialize) && */check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
+		{
+			this_component()->template Initialize<ComponentType,CallerType, TargetType>(id, home_zone, network_ref, scenario_ref);		
+		}
+		/*feature_prototype void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref,requires(!check(ComponentType,Concepts::Has_Initialize)))
+		{
+			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+		}*/
 
 		// Sub-component accessors	
 
-		feature_prototype void Set_Home_Location()
+		feature_prototype void Set_Locations()
 		{
 			define_component_interface(location_itf,typename get_type_of(current_location),Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
 
 			// set the home/workplace/school locations on event
-			this_component()->template Set_Home_Location<ComponentType,CallerType, TargetType>();
+			this_component()->template Set_Locations<ComponentType,CallerType, TargetType>();
 
 			// start the agent off at home
 			this->current_location<location_itf*>(this->Home_Location<location_itf*>());
 		}
+		feature_accessor(Household,none,none);
 		feature_accessor(Planning_Faculty,none,none);
 		feature_accessor(Perception_Faculty,none,none);
 		feature_accessor(Scheduling_Faculty,none,none);
@@ -202,8 +202,15 @@ namespace Prototypes
 		}
 
 		// Accessors for setting the home/work locations (stores only an index into the network_reference::activity_locations_container) - overloaded to return either th loc_index, the location interface or the zone interface
-		feature_prototype TargetType Home_Location(requires(check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location) && check_as_given(TargetType,is_pointer)))
+		feature_prototype TargetType Home_Location()
 		{
+			define_component_interface(household_itf,typename get_type_of(Household),Household_Components::Prototypes::Household,ComponentType);
+			household_itf* household = this->Household<household_itf*>();
+			return household->template Home_Location<TargetType>();					
+		}
+		/*feature_prototype TargetType Home_Location(requires(check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location) && check_as_given(TargetType,is_pointer)))
+		{
+			define_component_interface(household_itf,typename get_type_of(Household),Household_Components::Prototypes::Household,ComponentType);
 			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
 			define_component_interface(perception_itf,typename get_type_of(Perception_Faculty),Person_Perception,ComponentType);
 			define_component_interface(network_itf, typename perception_itf::get_type_of(Network),Network_Components::Prototypes::Network_Prototype,ComponentType);
@@ -212,6 +219,8 @@ namespace Prototypes
 			properties_itf* properties = this->Properties<properties_itf*>();
 			network_itf* network = this->Perception_Faculty<perception_itf*>()->template Network<network_itf*>();
 			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
+
+			household_itf* household = this->Household<household_itf*>();
 			
 			int loc_id = properties->template home_location_id<int>();
 			return (TargetType)(*locations)[loc_id];						
@@ -240,22 +249,22 @@ namespace Prototypes
 		{
 			assert_check(TargetType,is_integral,"Error, Home_Location can only be requested as an Integral type - which returns location index, or as an Activity_Location refernence type, which returns the actual location.");
 		}
-		feature_prototype void Home_Location(TargetType location_index, requires(check(TargetType, is_integral)))
-		{
-			define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
-			define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
-			define_container_and_value_interface(activity_locations_container_itf, activity_location_itf, typename network_itf::get_type_of(activity_locations_container), Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
-			properties_itf* properties = this->Properties<properties_itf*>();
-			network_itf* network = this->network_reference<network_itf*>();
-			activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
+	*/	//feature_prototype void Home_Location(TargetType location_index, requires(check(TargetType, is_integral)))
+		//{
+		//	define_component_interface(properties_itf,typename get_type_of(Properties),Person_Properties,ComponentType);
+		//	define_component_interface(network_itf, typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+		//	define_container_and_value_interface(activity_locations_container_itf, activity_location_itf, typename network_itf::get_type_of(activity_locations_container), Containers::Random_Access_Sequence_Prototype,Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+		//	properties_itf* properties = this->Properties<properties_itf*>();
+		//	network_itf* network = this->network_reference<network_itf*>();
+		//	activity_locations_container_itf* locations = network->template activity_locations_container<activity_locations_container_itf*>();
 
-			if (location_index < 0 || location_index >= locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.  Index out of range (0,"<<locations->size()<<").");
-			properties->template home_location_id<TargetType>(location_index);
-		}
-		feature_prototype void Home_Location(TargetType location_index, requires(check(TargetType, !is_integral)))
-		{
-			assert_check(TargetType, is_integral, "Error, Home_Location can only be set by passing an integral index from network::activity_locations_container");
-		}
+		//	if (location_index < 0 || location_index >= locations->size()) THROW_EXCEPTION("Error: location index "<<location_index<<" does not exist in network locations container.  Index out of range (0,"<<locations->size()<<").");
+		//	properties->template home_location_id<TargetType>(location_index);
+		//}
+		//feature_prototype void Home_Location(TargetType location_index, requires(check(TargetType, !is_integral)))
+		//{
+		//	assert_check(TargetType, is_integral, "Error, Home_Location can only be set by passing an integral index from network::activity_locations_container");
+		//}
 		
 		feature_prototype TargetType Work_Location(requires(check(TargetType, Activity_Location_Components::Concepts::Is_Activity_Location) && check_as_given(TargetType,is_pointer)))
 		{

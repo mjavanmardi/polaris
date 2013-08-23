@@ -71,4 +71,7 @@ void* _global_person_logger;
 #include "Person_Perception_Implementation.h"
 #include "Person_Implementations.h"
 #include "Person_Data_Logger_Implementation.h"
+
+#include "Household_Properties_Implemenations.h"
+#include "Household_Implementations.h"
 #endif

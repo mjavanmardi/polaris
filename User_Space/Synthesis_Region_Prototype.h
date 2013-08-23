@@ -30,6 +30,8 @@ namespace PopSyn
 				load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population, PopSyn::Types::POPSYN_ITERATIONS::MAIN_PROCESS,PopSyn::Types::POPSYN_SUBITERATIONS::PROCESS,NULLTYPE);
 			}
 
+			feature_accessor(Temporary_Sample_Data,none,none);
+
 			//==============================================================================================================
 			// This handles the main population synthesis loop on the region-level, calls IPF and Selection for each zone
 			declare_feature_conditional(Call_Synthesize_Population_Conditional)

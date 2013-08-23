@@ -193,6 +193,19 @@ inline DBPtrType open_sqlite_database(const std::string& name)
 	return db;
 }
 
+template <class DBPtrType>
+inline DBPtrType open_sqlite_database_single(const std::string& name)
+{
+	using namespace polaris::io;
+	DBPtrType db (new odb::sqlite::database (name, SQLITE_OPEN_READWRITE));	
+	
+
+	odb::connection_ptr c (db->connection ());
+	c->execute("PRAGMA synchronous = OFF");
+	c->execute("PRAGMA journal_mode = MEMORY");
+	return db;
+}
+
 inline shared_ptr<odb::database> open_sqlite_database_shared(const std::string& name)
 {
 	using namespace polaris::io;
@@ -260,6 +273,18 @@ inline unique_ptr<odb::database> open_sqlite_database(const std::string& name)
 	}
 	return db;
 }
+
+//inline unique_ptr<odb::database> open_sqlite_database_single(const std::string& name)
+//{
+//	using namespace polaris::io;
+//	unique_ptr<odb::database> db (new odb::sqlite::database (name, SQLITE_OPEN_READWRITE));	
+//	
+//
+//	odb::connection_ptr c (db->connection ());
+//	c->execute("PRAGMA synchronous = OFF");
+//	c->execute("PRAGMA journal_mode = MEMORY");
+//	return db;
+//}
 
 inline unique_ptr<odb::database> open_sqlite_demand_database(const std::string& name)
 {

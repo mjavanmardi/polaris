@@ -66,6 +66,7 @@ namespace File_IO
 			// get header row
 			if (header)
 			{
+				_header.clear();
 				string line;
 				getline(_file,line);
 				tokenize(line,_header);

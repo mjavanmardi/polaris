@@ -1,5 +1,11 @@
 //#define SHOW_WARNINGS
 
+#ifdef _DEBUG
+#define SHOW_WARNINGS
+#else
+//#define SHOW_WARNINGS
+#endif
+
 #include "Polaris_PCH.h"
 
 
@@ -94,6 +100,7 @@ struct MasterType
 	typedef Demand_Components::Implementations::Polaris_Demand_Implementation<MasterType> demand_type;
 
 	typedef Person_Components::Implementations::Person_Implementation<M> person_type;
+	typedef Household_Components::Implementations::Household_Implementation<M> household_type;
 
 	typedef Person_Components::Implementations::POLARIS_Person_Planner_Implementation<M, person_type> person_planner_type;
 	typedef Person_Components::Implementations::Person_Mover_Implementation<M, person_type> person_mover_type;
@@ -102,7 +109,8 @@ struct MasterType
 	typedef Person_Components::Implementations::CTRAMP_Activity_Generator_Implementation<M, person_type> activity_generator_type;
 	typedef Person_Components::Implementations::ADAPTS_Person_Properties_Implementation<M,person_type> person_properties_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<M> person_static_properties_type;
-	
+	typedef Household_Components::Implementations::ADAPTS_Household_Properties_Implementation<M,person_type> household_properties_type;
+	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<M> household_static_properties_type;
 	
 	typedef RNG_Components::Implementations::RngStream_Implementation<M> RNG;
 
@@ -190,7 +198,6 @@ int main(int argc,char** argv)
 	char* scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
 
-	
 	//==================================================================================================================================
 	// NETWORK MODEL STUFF
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -240,8 +247,6 @@ int main(int argc,char** argv)
 	
 	cout << "initializing simulation..." <<endl;	
 	network->simulation_initialize<NULLTYPE>();
-
-
 
 	define_component_interface(_Operation_Interface, MasterType::operation_type, Operation_Components::Prototypes::Operation_Prototype, NULLTYPE);
 	_Operation_Interface* operation = (_Operation_Interface*)Allocate<MasterType::operation_type>();

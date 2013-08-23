@@ -39,16 +39,22 @@ public:
 	static int region_id_col;
 	static int sample_id_col;
 	static int sample_weight_col;
+
+	static int person_region_id_col;
+	static int person_sample_id_col;
+	
 	static int region_in_zone_id_col;
 
 	/** Initializer*/
 	static void Init_Linker(vector<int> &dim_sizes, string link_file_path);
 	static void Read_Linker_File(vector<int> &dim_sizes);
 	static string const * const Sample_File_Path(){ return &sample_file_path;}
+	static string const * const Person_File_Path(){ return &person_sample_file_path;}
 	static string const * const Marg_File_Path(){ return &marg_file_path;}
 
 	/** fill ranges*/
 	static void set_pums_id_col(int column, int sampleid_column, int weight_column) {region_id_col=column; sample_id_col = sampleid_column; sample_weight_col=weight_column;}
+	static void set_person_id_col(int column, int sampleid_column) {person_region_id_col=column; person_sample_id_col = sampleid_column;}
 	static void set_pums_col(int dim, int column) {if (dim < _pums_file_link.size()) _pums_file_link[dim] = column; else {cout<<"Error: dimension outside of bounds when setting pums column."<<endl; return;}}
 	static void set_sf3_id_col(int zone, int region) {region_in_zone_id_col=region; zone_id_col=zone;}
 	static void set_sf3_col(int dim, int index, double low, double high, int column)
@@ -75,6 +81,7 @@ public:
 	static int& get_sf3_column(int dim, int index){return _sf3_file_link[dim][index];}
 
 	static const vector<int>& get_pums_data_cols(){return _pums_file_data_cols;}
+	static const vector<int>& get_person_data_cols(){return _person_file_data_cols;}
 
 	/** Find the variable index for a given dimension-value pair*/
 	static int find_index_in_dimension(int dim, double value)
@@ -95,6 +102,9 @@ private:
 	static string marg_file_path;
 	static string sample_file_path;
 	static vector<int> _pums_file_data_cols;
+
+	static string person_sample_file_path;
+	static vector<int> _person_file_data_cols;
 };
 
 
@@ -103,24 +113,28 @@ int Linker::zone_id_col;
 int Linker::region_in_zone_id_col;
 int Linker::sample_id_col;
 int Linker::sample_weight_col;
+int Linker::person_region_id_col;
+int Linker::person_sample_id_col;
 vector<int> Linker::_pums_file_link;
 vector<int> Linker::_pums_file_data_cols;
+vector<int> Linker::_person_file_data_cols;
 
 vector<vector<High_Low>> Linker::_ranges;
 vector<vector<int>> Linker::_sf3_file_link;
 File_IO::File_Reader Linker::_fr;
 string Linker::marg_file_path;
 string Linker::sample_file_path;
+string Linker::person_sample_file_path;
 
 void Linker::Init_Linker(vector<int> &dim_sizes, string link_file_path)
 {
 	zone_id_col =-1;
 	region_id_col=-1;
 	region_in_zone_id_col=-1;
+	person_region_id_col=-1;
 
 	_fr.Open(link_file_path, false);
 	Read_Linker_File(dim_sizes);
-
 }
 
 void Linker::Read_Linker_File(vector<int> &dim_sizes)
@@ -144,6 +158,10 @@ void Linker::Read_Linker_File(vector<int> &dim_sizes)
 		if (key == "REGIONFILE")
 		{
 			Linker::sample_file_path = _fr.Get_String(1);
+		}
+		else if (key == "PERSONFILE")
+		{
+			Linker::person_sample_file_path = _fr.Get_String(1);
 		}
 		else if (key == "ZONEFILE")
 		{
@@ -182,6 +200,12 @@ void Linker::Read_Linker_File(vector<int> &dim_sizes)
 			if (_fr.Get_Data<int>(col, 1) && _fr.Get_Data<int>(col2,2) && _fr.Get_Data<int>(col3,3)) set_pums_id_col(col, col2, col3);
 			else {cout<<"Error: region id column not set"<<endl; return;}
 		}
+		else if (key == "PERSON")
+		{
+			int col, col2;
+			if (_fr.Get_Data<int>(col, 1) && _fr.Get_Data<int>(col2,2)) set_person_id_col(col, col2);
+			else {cout<<"Error: person region id column not set"<<endl; return;}
+		}
 		else if (key == "REGIONDATA")
 		{
 			int size = _fr.Line_Length();
@@ -190,6 +214,16 @@ void Linker::Read_Linker_File(vector<int> &dim_sizes)
 				int col;
 				_fr.Get_Data<int>(col, i);
 				_pums_file_data_cols.push_back(col);
+			}
+		}
+		else if (key == "PERSONDATA")
+		{
+			int size = _fr.Line_Length();
+			for (int i = 1; i<size; i++)
+			{
+				int col;
+				_fr.Get_Data<int>(col, i);
+				_person_file_data_cols.push_back(col);
 			}
 		}
 		else if (key == "ZONE")

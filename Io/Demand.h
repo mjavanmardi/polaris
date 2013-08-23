@@ -120,6 +120,43 @@ private:
 
 };
 
+#pragma db object //table("PERSON")
+class Person
+{
+public:
+    // Default Constructor
+    Person () {}        
+	Person (int id_, int school_location_id_, int work_location_id_, shared_ptr<Household> household_)
+	: id (id_), school_location_id (school_location_id_), work_location_id (work_location_id_), household (household_)
+	{
+	}
+	Person (int id_, int school_location_id_, int work_location_id_)
+	: id (id_), school_location_id (school_location_id_), work_location_id (work_location_id_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const int& getSchool_Location_Id () const {return school_location_id;}
+	void setSchool_Location_Id (const int& school_location_id_) {school_location_id = school_location_id_;}
+	const int& getWork_Location_Id () const {return work_location_id;}
+	void setWork_Location_Id (const int& work_location_id_) {work_location_id = work_location_id_;}
+	const shared_ptr<Household> getHousehold () const {return household;}
+	void setHousehold (const shared_ptr<Household> household_) {household = household_;}
+	const unsigned int& getPrimaryKey () const {return person;}
+	const unsigned int& getperson () const {return person;}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db id auto
+	unsigned int person;
+	int id;
+	int school_location_id;
+	int work_location_id;
+	#pragma db not_null
+	shared_ptr<Household> household;
+};
+
 
 #pragma db object //table("VEHICLE")
 class Vehicle

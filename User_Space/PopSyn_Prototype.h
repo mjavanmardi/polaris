@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Person_Prototype.h"
+#include "Household_Prototype.h"
 #include "User_Space_Includes.h"
-#include "Synthesis_Region_Implementation.h"
-#include "Network_Prototype.h"
-#include "Scenario_Prototype.h"
+#include "linker.h"
+//#include "Synthesis_Region_Implementation.h"
+//#include "Network_Prototype.h"
+//#include "Scenario_Prototype.h"
 
 namespace PopSyn
 {
@@ -78,36 +80,52 @@ namespace PopSyn
 			//----------------------------------------------------------------
 			// Main analysis loop events, used to separate operations into different timesteps
 			//----------------------------------------------------------------
-			// 1.) Startup Event - Reads inputs and allocates analysis objects (at timestep 1)
+			// 1.) Startup Event - Reads inputs and allocates analysis objects (at Iteration = 0, timestep 1)
 			declare_feature_conditional(Start_Popsyn_Conditional)
 			{
 				ComponentType* pthis = (ComponentType*)_this;
-				switch (_sub_iteration)
+				if (_iteration == 0 || _iteration == 1)
 				{
-				case POPSYN_SUBITERATIONS::INITIALIZE:
+					switch (_sub_iteration)
+					{
+					case POPSYN_SUBITERATIONS::INITIALIZE:
+						response.result = true;
+						response.next._iteration = _iteration;
+						response.next._sub_iteration = POPSYN_SUBITERATIONS::START_TIMING;
+						break;
+					case POPSYN_SUBITERATIONS::START_TIMING:
+						response.result = true;
+						pthis->Swap_Event(&Start_Main_Timer<NULLTYPE>);
+						response.next._iteration = POPSYN_ITERATIONS::MAIN_PROCESS;
+						response.next._sub_iteration = POPSYN_SUBITERATIONS::STOP_TIMING;
+						break;
+					case POPSYN_SUBITERATIONS::STOP_TIMING:
+						response.result = true;
+						pthis->Swap_Event(&Stop_Main_Timer<NULLTYPE>);
+						response.next._iteration = _iteration;
+						response.next._sub_iteration = POPSYN_SUBITERATIONS::OUTPUT;
+						break;
+					case POPSYN_SUBITERATIONS::OUTPUT:
+						response.result = true;
+						pthis->Swap_Event(&Output_Popsyn_Event<NULLTYPE>);
+						response.next._iteration = 3;
+						response.next._sub_iteration = 0;
+						break;
+					default:
+						response.result = false;
+						response.next._iteration = END;
+						response.next._sub_iteration = 0;
+					}
+				}
+				else if (_iteration == 3)
+				{
 					response.result = true;
-					response.next._iteration = _iteration;
-					response.next._sub_iteration = POPSYN_SUBITERATIONS::START_TIMING;
-					break;
-				case POPSYN_SUBITERATIONS::START_TIMING:
-					response.result = true;
-					pthis->Swap_Event(&Start_Main_Timer<NULLTYPE>);
-					response.next._iteration = POPSYN_ITERATIONS::MAIN_PROCESS;
-					response.next._sub_iteration = POPSYN_SUBITERATIONS::STOP_TIMING;
-					break;
-				case POPSYN_SUBITERATIONS::STOP_TIMING:
-					response.result = true;
-					pthis->Swap_Event(&Stop_Main_Timer<NULLTYPE>);
-					response.next._iteration = _iteration;
-					response.next._sub_iteration = POPSYN_SUBITERATIONS::OUTPUT;
-					break;
-				case POPSYN_SUBITERATIONS::OUTPUT:
-					response.result = true;
-					pthis->Swap_Event(&Output_Popsyn_Event<NULLTYPE>);
+					pthis->Swap_Event(&Output_Popsyn_To_DB_Event<NULLTYPE>);
 					response.next._iteration = END;
 					response.next._sub_iteration = 0;
-					break;
-				default:
+				}
+				else
+				{
 					response.result = false;
 					response.next._iteration = END;
 					response.next._sub_iteration = 0;
@@ -132,8 +150,7 @@ namespace PopSyn
 				Linker linker = Linker();
 				File_IO::File_Writer fw, fw_sample;
 				ofstream& out = this->Output_Stream<ofstream&>();
-
-
+				
 				//===============================================================================================================
 				// Initialize settings
 				//---------------------------------------------------------------------------------------------------------------
@@ -158,6 +175,7 @@ namespace PopSyn
 				typedef typename region_collection_type::unqualified_value_type			region_type;
 				typedef typename region_type::Sample_Data_type							sample_collection_type;
 				typedef typename sample_collection_type::unqualified_value_type			sample_type;
+				typedef typename region_type::Temporary_Sample_Data_type				temporary_sample_collection_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
 				typedef typename zone_collection_type::unqualified_value_type			zone_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
@@ -165,7 +183,9 @@ namespace PopSyn
 
 				define_container_and_value_interface_unqualified_container(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
 				define_container_and_value_interface_unqualified_container(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
-				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,Person_Components::Prototypes::Person_Properties,ComponentType);
+				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,Household_Components::Prototypes::Household_Properties,ComponentType);
+				define_container_and_value_interface_unqualified_container(temp_sample_data_itf,temp_pop_unit_itf,temporary_sample_collection_type,Associative_Container_Prototype,Household_Components::Prototypes::Household_Properties,ComponentType);
+				define_container_and_value_interface_unqualified_container(person_sample_data_itf,person_unit_itf,typename pop_unit_itf::get_type_of(Persons_Container),Containers::Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person_Properties,ComponentType);
 				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
 				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
 	
@@ -184,12 +204,12 @@ namespace PopSyn
 
 
 				//===============================================================================================================
-				// read region file, fill sample data
+				// read region household file, fill sample data
 				//---------------------------------------------------------------------------------------------------------------
 				File_IO::File_Reader fr;
 				if (!fr.Open(*linker.Sample_File_Path())) 
 				{
-					cout<<endl<<"Ending. Press any key."<<endl; cin>>ans; return EXIT_FAILURE;
+					cout<<endl<<"Could not open region sample file path. Press any key."<<endl; cin>>ans; return EXIT_FAILURE;
 				}
 
 				// references to the various region components
@@ -197,6 +217,7 @@ namespace PopSyn
 				joint_itf* dist;
 				marginal_itf* marg,  *regional_marg;
 				sample_data_itf* sample;
+				temp_sample_data_itf* temp_sample;
 
 				while(fr.Read())
 				{
@@ -243,6 +264,7 @@ namespace PopSyn
 					marg = new_region->template Target_Marginal_Distribution<marginal_itf*>();
 					sample = new_region->template Sample_Data<sample_data_itf*>();
 
+					
 					double x;
 					for (int i=0; i<ndim; i++)
 					{
@@ -266,8 +288,72 @@ namespace PopSyn
 					// Update the sample and joint distribution with the current population unit
 					sample->insert(p->template Index<typename sample_collection_type::key_type>(), p);
 					(*dist)[index] += weight;
+					
+					// also add to temporary sample data, so that the person file records can attach to household records
+					//temp_sample->insert((typename temporary_sample_collection_type::key_type)sample_id,p);
+					pair<typename temporary_sample_collection_type::key_type,pop_unit_itf*> item = pair<typename temporary_sample_collection_type::key_type,pop_unit_itf*>(sample_id,p);
+					new_region->template Temporary_Sample_Data<temp_sample_data_itf*>()->insert(item);
 				}
 				fr.Close();
+
+
+
+				//===============================================================================================================
+				// read region person file, fill sample data
+				//---------------------------------------------------------------------------------------------------------------
+				if (!fr.Open(*linker.Person_File_Path())) 
+				{
+					cout<<endl<<"Could not open person file path. Press any key."<<endl; cin>>ans; return EXIT_FAILURE;
+				}
+
+				// references to the various region components
+				typename temp_sample_data_itf::iterator sample_itr;
+
+				while(fr.Read())
+				{
+					typename regions_itf::key_type ID;
+		
+					// read the region data from input file
+					if(!fr.Get_Data<typename regions_itf::key_type>(ID,linker.person_region_id_col)) break; 
+
+					if ((region_itr = regions->find(ID)) == regions->end())
+					{
+						THROW_WARNING("Sample from person file has non-existent region id.");
+					}
+					else
+					{
+						new_region = region_itr->second;
+
+						// next add the sample data
+						temp_sample = new_region->Temporary_Sample_Data<temp_sample_data_itf*>();
+
+						// get characteristics from file
+						typename person_unit_itf::get_type_of(ID) sample_id;
+						fr.Get_Data<typename person_unit_itf::get_type_of(ID)>(sample_id,linker.person_sample_id_col);
+						vector<double> data;
+						fr.Get_Data<double>(data,linker.get_person_data_cols());
+
+						// create new person unit
+						person_unit_itf* p = (person_unit_itf*)Allocate<typename person_unit_itf::Component_Type>();
+						p->ID(sample_id);
+						p->template Characteristics<Target_Type<NT,void,vector<double>*> >(&data);
+
+						// find the household that the person belongs to and add
+						sample_itr = temp_sample->find(sample_id);
+						if (sample_itr != temp_sample->end())
+						{
+							pop_unit_itf* pop_unit = sample_itr->second;
+							pop_unit->Persons_Container<person_sample_data_itf*>()->push_back(p);
+						}
+						else
+						{
+							THROW_WARNING("Warning: person sample unit refers to non-existent household sample unit, observation ignored.");
+						}
+						
+					}
+				}
+				fr.Close();
+
 
 
 				//===============================================================================================================
@@ -389,7 +475,7 @@ namespace PopSyn
 				assert_check(ComponentType,Concepts::Uses_Linker_File,"This popsyn type does not use linker file setup.");
 			}
 			
-			// 2.) Start timing event - called before individual objects begin processing (at timestep 3)
+			// 2.) Start timing event - called before individual objects begin processing (at Iteration = 0, timestep 3)
 			declare_feature_event(Start_Main_Timer)
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
@@ -400,7 +486,7 @@ namespace PopSyn
 				this->timer<Counter&>().Start();
 			}
 			
-			// 3.) Stop timing event - called after individual objects end processing (at timestep 5)
+			// 3.) Stop timing event - called after individual objects end processing (at Iteration = 0, timestep 5)
 			declare_feature_event(Stop_Main_Timer)
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
@@ -412,7 +498,7 @@ namespace PopSyn
 				//cout << endl<<"freq: " << this->timer<Counter&>().get_freq_value() << ", start: "<<this->timer<Counter&>().get_start_value() <<", l: "<<this->timer<Counter&>().get_l_value();
 			}
 			
-			// 4.) Output results event - called after timing is stopped (at timestep 7)
+			// 4.) Output results event - called after timing is stopped (at Iteration = 0, timestep 7)
 			declare_feature_event(Output_Popsyn_Event)
 			{
 				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
@@ -428,18 +514,20 @@ namespace PopSyn
 				typedef typename sample_collection_type::unqualified_value_type			sample_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
 				typedef typename zone_collection_type::unqualified_value_type			zone_type;
-				typedef typename zone_type::get_type_of(Synthetic_Persons_Container)	person_collection_type;
-				typedef typename person_collection_type::unqualified_value_type			person_type;
+				typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
+				typedef typename household_collection_type::unqualified_value_type		household_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
 				//---------------------------------------------------------------------------------------------
 				// Interface defines for sub_objects
 				define_container_and_value_interface_unqualified_container(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
 				define_container_and_value_interface_unqualified_container(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
-				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,Person_Components::Prototypes::Person_Properties,ComponentType);
+				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,Household_Components::Prototypes::Household_Properties,ComponentType);
+				define_container_and_value_interface(person_sample_data_itf,person_unit_itf,typename pop_unit_itf::get_type_of(Persons_Container),Random_Access_Sequence_Prototype,Household_Components::Prototypes::Household_Properties,ComponentType);
 				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
 				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
-				define_container_and_value_interface_unqualified_container(persons_collection_itf, person_itf,person_collection_type,Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person,ComponentType);
+				define_container_and_value_interface_unqualified_container(household_collection_itf, household_itf,household_collection_type,Random_Access_Sequence_Prototype,Household_Components::Prototypes::Household,ComponentType);
+				define_container_and_value_interface(person_collection_itf, person_itf,typename household_itf::get_type_of(Persons_Container),Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person,ComponentType);
 				define_simple_container_interface(activity_location_ids_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);				
 				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
 				define_component_interface(scenario_itf,typename get_type_of(scenario_reference),Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
@@ -454,7 +542,7 @@ namespace PopSyn
 
 				typename regions_itf::iterator r_itr;
 				typename zones_itf::iterator z_itr;
-				typename persons_collection_itf::iterator p_itr;
+				typename household_collection_itf::iterator p_itr;
 
 				// initialize all of the synthesized individuals and assign unique ids
 				long uuid = 0; // globally unique person id
@@ -475,24 +563,32 @@ namespace PopSyn
 						activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
 
 						// loop through each synthesized person
-						persons_collection_itf* persons = zone->template Synthetic_Persons_Container<persons_collection_itf*>();
-						for (p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+						household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
+						for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
 						{
 							// update synthesizing persons counter
 							if (counter % 10000 == 0) cout << '\r' << "Initializing Agents: " << counter;
-							person_itf* person = *p_itr;
+							household_itf* hh = *p_itr;
 
-							// initialize the person - allocates all person subcomponents
-							//person->network_reference<network_itf*>(network);
-							person->template Initialize<Target_Type<NT,void,long,zone_itf*, network_itf*, scenario_itf*> >(uuid, zone, network, scenario);
-							pop_unit_itf* pop = person->template Static_Properties<pop_unit_itf*>();
-														
+							// initialize the hh - allocates all hh subcomponents
+							hh->template Initialize<Target_Type<NT,void,long,zone_itf*, network_itf*, scenario_itf*> >(uuid, zone, network, scenario);
+
+							person_collection_itf* persons = hh->Persons_Container<person_collection_itf*>();
+
+							long perid=0;
+							for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+							{		
+								person_itf* person = (person_itf*)(*p_itr);
+								person->template Initialize<Target_Type<NT,void,long,zone_itf*, network_itf*, scenario_itf*> >(perid, zone, network, scenario);
+								++perid;
+							}
+
 							++uuid;
 							++counter;
 						}
 					}
 				}
-				cout <<endl<<endl<<"Total Persons Synthesized: "<<uuid<<endl<<endl;
+				cout <<endl<<endl<<"Total Households Synthesized: "<<uuid<<endl<<endl;
 
 
 				// Handle file output if needed
@@ -523,13 +619,13 @@ namespace PopSyn
 							// write th full population results
 							if (pthis->write_full_output_flag<bool>() == true)
 							{
-								persons_collection_itf* sample = zone->template Synthetic_Persons_Container<persons_collection_itf*>();	
-								person_itf* person;
-								for (typename persons_collection_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
+								household_collection_itf* sample = zone->template Synthetic_Households_Container<household_collection_itf*>();	
+								household_itf* hh;
+								for (typename household_collection_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
 								{
-									person = *s_itr;
-									pop_unit_itf* p = person->template Static_Properties<pop_unit_itf*>();
-									sample_out << "ZONE_ID: "<<zone->template ID<long long int>() << endl << "ID: " << person->template uuid<uint>() << ",  weight: "<<p->template Weight<float>() <<", index: "<<p->template Index<uint>() << ", Gender: "<<p->template Gender<Person_Components::Types::GENDER>();
+									hh = *s_itr;
+									pop_unit_itf* p = hh->template Static_Properties<pop_unit_itf*>();
+									sample_out << "ZONE_ID: "<<zone->template ID<long long int>() << endl << "ID: " << hh->template uuid<uint>() << ", ACS_ID: " << p->template ID<double>() << ",  weight: "<<p->template Weight<float>() <<", index: "<<p->template Index<uint>() << ", Gender: "<<p->template Household_type<Household_Components::Types::HHTYPE>();
 								}
 							}
 						}
@@ -542,6 +638,123 @@ namespace PopSyn
 				popsyn_log.close();
 			}
 			
+			// 5.) Write output to database (at Iteration 2)
+			declare_feature_event(Output_Popsyn_To_DB_Event)
+			{
+				Population_Synthesizer_Prototype<ComponentType,CallerType>* pthis = (Population_Synthesizer_Prototype<ComponentType,CallerType>*)_this;
+
+				//---------------------------------------------------------------------------------------------
+				// Type defines for sub_objects
+				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
+				typedef typename region_collection_type::unqualified_value_type			region_type;
+				typedef typename region_type::Sample_Data_type							sample_collection_type;
+				typedef typename sample_collection_type::unqualified_value_type			sample_type;
+				typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
+				typedef typename zone_collection_type::unqualified_value_type			zone_type;
+				typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
+				typedef typename household_collection_type::unqualified_value_type		household_type;
+				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
+				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
+				//---------------------------------------------------------------------------------------------
+				// Interface defines for sub_objects
+				define_container_and_value_interface_unqualified_container(regions_itf,region_itf,region_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Region_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
+				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,Household_Components::Prototypes::Household_Properties,ComponentType);
+				define_container_and_value_interface(person_sample_data_itf,person_unit_itf,typename pop_unit_itf::get_type_of(Persons_Container),Random_Access_Sequence_Prototype,Household_Components::Prototypes::Household_Properties,ComponentType);
+				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
+				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
+				define_container_and_value_interface_unqualified_container(household_collection_itf, household_itf,household_collection_type,Random_Access_Sequence_Prototype,Household_Components::Prototypes::Household,ComponentType);
+				define_container_and_value_interface(person_collection_itf, person_itf,typename household_itf::get_type_of(Persons_Container),Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person,ComponentType);
+				define_simple_container_interface(activity_location_ids_itf,typename zone_itf::get_type_of(Activity_Locations_Container),Containers::Random_Access_Sequence_Prototype,int,ComponentType);				
+				define_component_interface(network_itf,typename get_type_of(network_reference),Network_Components::Prototypes::Network_Prototype,ComponentType);
+				define_component_interface(scenario_itf,typename get_type_of(scenario_reference),Scenario_Components::Prototypes::Scenario_Prototype,ComponentType);
+				define_container_and_value_interface(activity_locations_itf, activity_location_itf,typename network_itf::get_type_of(activity_locations_container),Containers::Random_Access_Sequence_Prototype, Activity_Location_Components::Prototypes::Activity_Location_Prototype,ComponentType);
+				define_container_and_value_interface(_Zone_Container_Interface, _Zone_Interface,typename network_itf::get_type_of(zones_container),Containers::Associative_Container_Prototype, Zone_Components::Prototypes::Zone_Prototype,ComponentType);
+				
+				regions_itf* regions = pthis->Synthesis_Regions_Collection<regions_itf*>();
+				network_itf* network = pthis->network_reference<network_itf*>();
+				scenario_itf* scenario = pthis->scenario_reference<scenario_itf*>();
+				activity_locations_itf* activity_locations = network->template activity_locations_container<activity_locations_itf*>();
+				
+
+				// EXIT if no request to write the demand to database
+				if (!scenario->template write_demand_to_database<bool>()) return;
+
+				// Start database transaction
+				try
+				{
+					string name(scenario->output_demand_database_name<string&>());
+					unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(name));
+					odb::transaction t(db->begin());
+				
+
+					typename regions_itf::iterator r_itr;
+					typename zones_itf::iterator z_itr;
+					typename household_collection_itf::iterator p_itr;
+					int counter = 0;
+
+					// Loop through all regions
+					for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
+					{
+						region_itf* region = r_itr->second;
+						zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
+						// loop through zones in each region
+						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
+						{
+							zone_itf* zone = z_itr->second;
+							activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
+
+							// loop through each synthesized person
+							household_collection_itf* households = zone->template Synthetic_Households_Container<household_collection_itf*>();
+							for (p_itr = households->begin(); p_itr != households->end(); ++p_itr)
+							{
+								// update synthesizing persons counter
+								if (counter % 10000 == 0) cout << '\r' << "Writing Agents to database:           " << counter;
+								household_itf* hh = *p_itr;
+								pop_unit_itf* hh_unit = hh->Static_Properties<pop_unit_itf*>();
+							
+								// create household record
+								shared_ptr<polaris::io::Household> hh_rec(new polaris::io::Household());
+								hh_rec->setHhold(hh->uuid<int>());
+								hh_rec->setPersons(hh_unit->Household_size<int>());
+								hh_rec->setWorkers(hh_unit->Number_of_workers<int>());
+								hh_rec->setVehicles(hh_unit->Number_of_vehicles<int>());
+								hh_rec->setLocation(hh->Home_Location<activity_location_itf*>()->uuid<int>());
+								//push to database
+								db->persist(hh_rec);
+
+								person_collection_itf* persons = hh->Persons_Container<person_collection_itf*>();
+
+								for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
+								{		
+									person_itf* person = (person_itf*)(*p_itr);
+
+									shared_ptr<polaris::io::Person> per_rec(new polaris::io::Person());
+									per_rec->setId(person->uuid<int>());
+									if (person->School_Location<int>() >= 0)
+										per_rec->setSchool_Location_Id(person->School_Location<activity_location_itf*>()->uuid<int>());
+									if (person->Work_Location<int>() >= 0)
+										per_rec->setWork_Location_Id(person->Work_Location<activity_location_itf*>()->uuid<int>());
+									per_rec->setHousehold(hh_rec);
+									//push to database
+									db->persist(per_rec);
+
+									counter++;
+								}
+
+							}
+						}
+					}
+					t.commit();
+				}
+				catch (odb::sqlite::database_exception ex)
+				{
+					cout << endl << ex.what();
+				}
+
+				
+			}
+
 			//----------------------------------------------------------------
 			// Required Features - necessary for any synthesis routine
 			feature_accessor(Synthesis_Regions_Collection,none,none);

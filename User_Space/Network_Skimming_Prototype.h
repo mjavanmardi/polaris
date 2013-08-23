@@ -681,7 +681,7 @@ namespace Network_Skimming_Components
 					// find the origin reference in origin map and get the zone index of the origin
 					if ((orig_itr = origin_map->find(orig)) == origin_map->end()) assert(false);
 					long orig_zone_index = orig_itr->second->template zone_index<long>();
-					
+					long orig_loc_index = orig_itr->second->template loc_index<long>();
 
 					// search each link for required links from destination_map and update LOS table with the results
 					for (dest_itr = destination_map->begin(); dest_itr !=destination_map->end(); ++dest_itr)
@@ -706,7 +706,7 @@ namespace Network_Skimming_Components
 							typename links_itf::iterator link_itr = dest_node->template destination_links<links_itf*>()->begin();
 							for (;link_itr != dest_node->template destination_links<links_itf*>()->end(); ++link_itr)
 							{
-								THROW_WARNING("Skimming error, destination ID '" << dest_node->uuid<int>() << "', is inaccessible from zone index '" << orig_zone_index <<"' .  Destination link ID: "  << (*link_itr)->uuid<long>()<<". Check network for proper connectivity." <<endl);
+								THROW_WARNING("Skimming error, destination ID '" << dest_node->uuid<int>() << "', is inaccessible from zone index '" << orig_zone_index <<"', location ID '"<< (*activity_locations)[orig_loc_index]->template uuid<int>()<< " .  Destination link ID: "  << (*link_itr)->uuid<long>()<<". Check network for proper connectivity." <<endl);
 							}
 						}
 
