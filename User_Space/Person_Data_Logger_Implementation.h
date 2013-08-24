@@ -584,7 +584,8 @@ namespace Person_Components
 				if (new_destination<0) trip_rec->setDestination(dest->template uuid<int>());
 				else trip_rec->setDestination(new_destination);
 				trip_rec->setDuration(act->template Duration<Time_Seconds>());
-				trip_rec->setEnd(act->template End_Time<Time_Seconds>());
+				//trip_rec->setEnd(act->template End_Time<Time_Seconds>());
+				trip_rec->setEnd(move->template arrived_time<Time_Seconds>());
 				trip_rec->setHhold(hh->template uuid<int>());
 				trip_rec->setMode(0);
 				if (new_origin <0) trip_rec->setOrigin(orig->template uuid<int>());
@@ -592,7 +593,8 @@ namespace Person_Components
 				trip_rec->setPartition(0);
 				trip_rec->setPassengers(0);
 				trip_rec->setPurpose(0);
-				trip_rec->setStart(act->template Start_Time<Time_Seconds>());
+				//trip_rec->setStart(act->template Start_Time<Time_Seconds>());
+				trip_rec->setStart(move->template departed_time<Time_Seconds>());
 				trip_rec->setTour(0);
 				trip_rec->setPriority(0);
 				trip_rec->setVehicle(1);
