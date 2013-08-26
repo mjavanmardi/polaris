@@ -739,6 +739,8 @@ namespace PopSyn
 									//push to database
 									db->persist(per_rec);
 
+									person->person_record<shared_ptr<polaris::io::Person>>(per_rec);
+
 									counter++;
 								}
 

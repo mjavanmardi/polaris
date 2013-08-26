@@ -185,6 +185,7 @@ namespace Prototypes
 		feature_accessor(network_reference,none,none);
 		feature_accessor(scenario_reference,none,none);
 
+
 		// Basic property members
 		feature_accessor(uuid,none,none);
 		feature_accessor(internal_id,none,none);
@@ -193,6 +194,9 @@ namespace Prototypes
 		feature_accessor(Write_Activity_Files,none,none);
 		feature_accessor(Activity_Record_Container,none,none);
 		feature_accessor(current_location,none,none);
+
+		// Database record for this person
+		feature_accessor(person_record, none, none);
 
 		feature_prototype void Arrive_At_Destination()
 		{

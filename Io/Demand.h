@@ -15,6 +15,8 @@ class Vehicle;
 class Trip;
 class Plan;
 class Taveler;
+class Person;
+class Activity;
 
 
 #pragma db object //table("SELECTION")
@@ -199,6 +201,54 @@ private:
 
 };
 
+
+#pragma db object
+class Activity
+{
+public:
+    // Default Constructor
+    Activity () {}        
+	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_, shared_ptr<Person> person_, shared_ptr<Trip> trip_)
+	: id (id_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_), person (person_), trip (trip_)
+	{
+	}
+	Activity (int id_, int location_id_, double start_time_, double duration_, std::string mode_, std::string type_)
+	: id (id_), location_id (location_id_), start_time (start_time_), duration (duration_), mode (mode_), type (type_)
+	{
+	}
+	//Accessors
+	const int& getId () const {return id;}
+	void setId (const int& id_) {id = id_;}
+	const int& getLocation_Id () const {return location_id;}
+	void setLocation_Id (const int& location_id_) {location_id = location_id_;}
+	const double& getStart_Time () const {return start_time;}
+	void setStart_Time (const double& start_time_) {start_time = start_time_;}
+	const double& getDuration () const {return duration;}
+	void setDuration (const double& duration_) {duration = duration_;}
+	const std::string& getMode () const {return mode;}
+	void setMode (const std::string& mode_) {mode = mode_;}
+	const std::string& getType () const {return type;}
+	void setType (const std::string& type_) {type = type_;}
+	const shared_ptr<Person> getPerson () const {return person;}
+	void setPerson (const shared_ptr<Person> person_) {person = person_;}
+	const shared_ptr<Trip> getTrip () const {return trip;}
+	void setTrip (const shared_ptr<Trip> trip_) {trip = trip_;}
+	//Data Fields
+private:
+	friend class odb::access;
+	#pragma db auto id
+	int id;
+	int location_id;
+	double start_time;
+	double duration;
+	std::string mode;
+	std::string type;
+	#pragma db not_null
+	shared_ptr<Person> person;
+	shared_ptr<Trip> trip;
+};
+
+
 #pragma db object //table("TRIP")
 class Trip
 {
@@ -272,6 +322,7 @@ private:
 	int partition;
 
 };
+
 
 #pragma db object //table("PLAN")
 class Plan

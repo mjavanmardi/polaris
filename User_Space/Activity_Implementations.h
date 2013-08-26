@@ -323,7 +323,44 @@ namespace Activity_Components
 			{
 
 			}
-		
+
+			feature_implementation string Get_Type_String()
+			{
+				if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::AT_HOME_ACTIVITY)
+					return string("HOME");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::EAT_OUT_ACTIVITY)
+					return string("EAT OUT");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::ERRANDS_ACTIVITY)
+					return string("ERRANDS");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::HEALTHCARE_ACTIVITY)
+					return string("HEALTHCARE");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::LEISURE_ACTIVITY)
+					return string("LEISURE");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::MAJOR_SHOPPING_ACTIVITY)
+					return string("SHOP-MAJOR");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::OTHER_SHOPPING_ACTIVITY)
+					return string("SHOP-OTHER");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::PERSONAL_BUSINESS_ACTIVITY)
+					return string("PERSONAL");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::PICK_UP_OR_DROP_OFF_ACTIVITY)
+					return string("PICKUP-DROPOFF");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::PRIMARY_WORK_ACTIVITY)
+					return string("WORK");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::RECREATION_ACTIVITY)
+					return string("RECREATION");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::RELIGIOUS_OR_CIVIC_ACTIVITY)
+					return string("RELIGIOUS-CIVIC");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::SCHOOL_ACTIVITY)
+					return string("SCHOOL");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::SERVICE_VEHICLE_ACTIVITY)
+					return string("SERVICE");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::SOCIAL_ACTIVITY)
+					return string("SOCIAL");
+				else if (_Activity_Type == Activity_Components::Types::ACTIVITY_TYPES::WORK_AT_HOME_ACTIVITY)
+					return string("WORK AT HOME");
+				else
+					return string ("OTHER");
+			}		
 		};
 
 

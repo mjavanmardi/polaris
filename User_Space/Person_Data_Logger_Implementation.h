@@ -21,6 +21,8 @@ namespace Person_Components
 			vector<string> output_data_buffer[_num_threads];
 			vector<shared_ptr<polaris::io::Trip>> trip_records[_num_threads];
 			vector<shared_ptr<polaris::io::Trip>> trip_records_buffer[_num_threads];
+			vector<shared_ptr<polaris::io::Activity>> activity_records[_num_threads];
+			vector<shared_ptr<polaris::io::Activity>> activity_records_buffer[_num_threads];
 
 			float expected_ttime[_num_threads];
 			float routed_ttime[_num_threads];
@@ -31,6 +33,8 @@ namespace Person_Components
 			vector<string>* current;
 			vector<shared_ptr<polaris::io::Trip>>* trip_buff;
 			vector<shared_ptr<polaris::io::Trip>>* trip_current;
+			vector<shared_ptr<polaris::io::Activity>>* activity_buff;
+			vector<shared_ptr<polaris::io::Activity>>* activity_current;
 
 			member_data(ofstream, log, none, none);
 			member_data(string, filename, none, none);
@@ -78,6 +82,9 @@ namespace Person_Components
 
 				trip_buff = trip_records_buffer;
 				trip_current = trip_records;
+
+				activity_buff = activity_records_buffer;
+				activity_current = activity_records;
 
 				// Initialize log file
 				stringstream filename("");
@@ -319,6 +326,10 @@ namespace Person_Components
 					pthis->trip_buff = pthis->trip_current;
 					pthis->trip_current = tmp_trip;
 
+					vector<shared_ptr<polaris::io::Activity>>* tmp_act = pthis->activity_buff;
+					pthis->activity_buff = pthis->activity_current;
+					pthis->activity_current = tmp_act;
+
 					response.next._iteration = _iteration;
 					response.next._sub_iteration = 1;
 					response.result = true;
@@ -424,6 +435,10 @@ namespace Person_Components
 					{
 						this->_db_ptr->persist(*itr);
 					}
+					for (vector<shared_ptr<polaris::io::Activity>>::iterator itr = activity_current[i].begin(); itr != activity_current[i].end(); ++itr)
+					{
+						this->_db_ptr->persist(*itr);
+					}
 					t.commit();
 					}
 					catch (odb::sqlite::database_exception ex)
@@ -432,12 +447,7 @@ namespace Person_Components
 					}
 
 					trip_current[i].clear();
-					// remove dynamically allocated trip records
-					//while (trip_current[i].size() > 0)
-					//{
-					//	delete trip_current[i].back();
-					//	trip_current[i].pop_back();
-					//}
+					activity_current[i].clear();
 				}
 			}
 			feature_implementation void Write_Summary_Data_To_File()
@@ -574,45 +584,57 @@ namespace Person_Components
 				person_itf* person = planner->template Parent_Person<person_itf*>();		
 				household_itf* hh = person->template Household<household_itf*>();
 
-				// Do Stuff to write trip to demand database....
-				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() != Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return;
-				
+			
+
+				//==============================================================================================
+				// write trips, only if auto mode used
 				shared_ptr<polaris::io::Trip> trip_rec(new polaris::io::Trip());
-				trip_rec->setConstraint(0);
-				trip_rec->setPerson(person->template uuid<int>());
-				trip_rec->setTrip(act->template Activity_Plan_ID<int>());
-				if (new_destination<0) trip_rec->setDestination(dest->template uuid<int>());
-				else trip_rec->setDestination(new_destination);
-				trip_rec->setDuration(act->template Duration<Time_Seconds>());
-				//trip_rec->setEnd(act->template End_Time<Time_Seconds>());
-				trip_rec->setEnd(move->template arrived_time<Time_Seconds>());
-				trip_rec->setHhold(hh->template uuid<int>());
-				trip_rec->setMode(0);
-				if (new_origin <0) trip_rec->setOrigin(orig->template uuid<int>());
-				else trip_rec->setOrigin(new_origin);
-				trip_rec->setPartition(0);
-				trip_rec->setPassengers(0);
-				trip_rec->setPurpose(0);
-				//trip_rec->setStart(act->template Start_Time<Time_Seconds>());
-				trip_rec->setStart(move->template departed_time<Time_Seconds>());
-				trip_rec->setTour(0);
-				trip_rec->setPriority(0);
-				trip_rec->setVehicle(1);
-				trip_rec->setType(0);
+				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+				{				
+					trip_rec->setConstraint(0);
+					trip_rec->setPerson(person->template uuid<int>());
+					trip_rec->setTrip(act->template Activity_Plan_ID<int>());
+					if (new_destination<0) trip_rec->setDestination(dest->template uuid<int>());
+					else trip_rec->setDestination(new_destination);
+					trip_rec->setDuration(act->template Duration<Time_Seconds>());
+					//trip_rec->setEnd(act->template End_Time<Time_Seconds>());
+					trip_rec->setEnd(move->template arrived_time<Time_Seconds>());
+					trip_rec->setHhold(hh->template uuid<int>());
+					trip_rec->setMode(0);
+					if (new_origin <0) trip_rec->setOrigin(orig->template uuid<int>());
+					else trip_rec->setOrigin(new_origin);
+					trip_rec->setPartition(0);
+					trip_rec->setPassengers(0);
+					trip_rec->setPurpose(0);
+					//trip_rec->setStart(act->template Start_Time<Time_Seconds>());
+					trip_rec->setStart(move->template departed_time<Time_Seconds>());
+					trip_rec->setTour(0);
+					trip_rec->setPriority(0);
+					trip_rec->setVehicle(1);
+					trip_rec->setType(0);
+					// add trip to the buffer for the current thread
+					trip_buff[_thread_id].push_back(trip_rec);
+				}
 
-				// add trip to the buffer for the current thread
-				trip_buff[_thread_id].push_back(trip_rec);
 
-				//try
-				//{
-				//	odb::transaction t(this->_db_ptr->begin());
-				//	this->_db_ptr->persist(trip_rec);
-				//	t.commit();
-				//}
-				//catch (odb::sqlite::database_exception ex)
-				//{
-				//	cout << ex.message()<<endl;
-				//}
+				//==============================================================================================
+				// write activity to database
+				shared_ptr<polaris::io::Activity> act_rec(new polaris::io::Activity());
+				if (new_destination<0)
+					act_rec->setLocation_Id(dest->uuid<int>());
+				else 
+					act_rec->setLocation_Id(new_destination);
+				act_rec->setStart_Time (act->template Start_Time<Time_Seconds>());
+				act_rec->setDuration (act->template Duration<Time_Seconds>());
+				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV)
+					act_rec->setMode ("AUTO");
+				else
+					act_rec->setMode ("TRANSIT");
+				act_rec->setType (act->Get_Type_String<NT>());
+				act_rec->setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
+				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) act_rec->setTrip (trip_rec);			
+				activity_buff[_thread_id].push_back(act_rec);
+
 			}
 		};
 	}

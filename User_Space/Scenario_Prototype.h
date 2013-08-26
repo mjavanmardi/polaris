@@ -658,7 +658,7 @@ namespace Scenario_Components
 				t.commit();
 
 				//----------------------
-				// results database
+				// demand database
 				results_name = output_dir_name<string>().append(this->database_name<string&>());
 				unique_ptr<odb::database> db2(create_sqlite_database(results_name, polaris::io::db_inventory[2]));
 				this->output_demand_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[2]));

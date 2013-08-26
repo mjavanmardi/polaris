@@ -74,6 +74,8 @@ namespace Person_Components
 			member_data(bool,has_pretrip_information,check_2(ReturnValueType,bool,is_same), check_2(SetValueType,bool,is_same));
 			member_data(bool,has_done_replanning,check_2(ReturnValueType,bool,is_same), check_2(SetValueType,bool,is_same));
 
+			member_data(shared_ptr<polaris::io::Person>, person_record, none,none);
+
 			// First iteration  - sets the next iteration after all planning is completed
 			member_component_and_feature_accessor(First_Iteration, Value, Basic_Units::Prototypes::Time_Prototype, Basic_Units::Implementations::Time_Implementation<NT>);
 

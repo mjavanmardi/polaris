@@ -428,6 +428,10 @@ namespace Activity_Components
 			// Primary Activity attribute accessors
 			//-------------------------------------------
 			feature_accessor(Activity_Type, none,none);
+			feature string Get_Type_String()
+			{
+				return this_component()->template Get_Type_String<ComponentType,CallerType,TargetType>();
+			}
 			feature_accessor(Location, check(ReturnValueType,Activity_Location_Components::Concepts::Is_Activity_Location), check(SetValueType,Activity_Location_Components::Concepts::Is_Activity_Location));
 			feature_accessor(Mode, none, none);
 			feature_accessor(Start_Time, check(ReturnValueType,Basic_Units::Concepts::Is_Time_Value), check(SetValueType,Basic_Units::Concepts::Is_Time_Value)); 
