@@ -574,7 +574,7 @@ namespace Person_Components
 				define_component_interface(movement_itf,typename act_itf::get_type_of(movement_plan),Movement_Plan_Components::Prototypes::Movement_Plan_Prototype,ComponentType);
 				define_component_interface(planner_itf,typename act_itf::get_type_of(Parent_Planner),Prototypes::Person_Planner,ComponentType);
 				define_component_interface(person_itf,typename planner_itf::get_type_of(Parent_Person),Prototypes::Person,ComponentType);
-				define_component_interface(household_itf,typename person_itf::get_type_of(Household),Household_Components::Prototypes::Household,ComponentType);
+				define_component_interface(household_itf,typename person_itf::get_type_of(Parent_Household),Household_Components::Prototypes::Household,ComponentType);
 
 				act_itf* act = (act_itf*)act_record;
 				movement_itf* move = act->template movement_plan<movement_itf*>();
@@ -582,7 +582,7 @@ namespace Person_Components
 				location_itf* dest = move->template destination<location_itf*>();
 				planner_itf* planner = act->template Parent_Planner<planner_itf*>();
 				person_itf* person = planner->template Parent_Person<person_itf*>();		
-				household_itf* hh = person->template Household<household_itf*>();
+				household_itf* hh = person->template Parent_Household<household_itf*>();
 
 			
 
@@ -621,7 +621,7 @@ namespace Person_Components
 				// write activity to database
 				shared_ptr<polaris::io::Activity> act_rec(new polaris::io::Activity());
 				if (new_destination<0)
-					act_rec->setLocation_Id(dest->uuid<int>());
+					act_rec->setLocation_Id(dest->template uuid<int>());
 				else 
 					act_rec->setLocation_Id(new_destination);
 				act_rec->setStart_Time (act->template Start_Time<Time_Seconds>());
@@ -630,7 +630,7 @@ namespace Person_Components
 					act_rec->setMode ("AUTO");
 				else
 					act_rec->setMode ("TRANSIT");
-				act_rec->setType (act->Get_Type_String<NT>());
+				act_rec->setType (act->template Get_Type_String<NT>());
 				act_rec->setPerson (person->template person_record<shared_ptr<polaris::io::Person>>());
 				if (act->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>() == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) act_rec->setTrip (trip_rec);			
 				activity_buff[_thread_id].push_back(act_rec);

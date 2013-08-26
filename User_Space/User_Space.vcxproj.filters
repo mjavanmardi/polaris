@@ -316,5 +316,17 @@
     <ClInclude Include="Polaris_Analyze_Link_Group_Implementation.h">
       <Filter>Implementations</Filter>
     </ClInclude>
+    <ClInclude Include="Household_Implementations.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Household_Properties_Implemenations.h">
+      <Filter>Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Household_Properties_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Household_Prototype.h">
+      <Filter>Prototypes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

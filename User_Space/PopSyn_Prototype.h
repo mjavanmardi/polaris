@@ -185,7 +185,7 @@ namespace PopSyn
 				define_container_and_value_interface_unqualified_container(zones_itf,zone_itf,zone_collection_type,Associative_Container_Prototype,PopSyn::Prototypes::Synthesis_Zone_Prototype,ComponentType);
 				define_container_and_value_interface_unqualified_container(sample_data_itf,pop_unit_itf,sample_collection_type,Associative_Container_Prototype,Household_Components::Prototypes::Household_Properties,ComponentType);
 				define_container_and_value_interface_unqualified_container(temp_sample_data_itf,temp_pop_unit_itf,temporary_sample_collection_type,Associative_Container_Prototype,Household_Components::Prototypes::Household_Properties,ComponentType);
-				define_container_and_value_interface_unqualified_container(person_sample_data_itf,person_unit_itf,typename pop_unit_itf::get_type_of(Persons_Container),Containers::Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person_Properties,ComponentType);
+				define_container_and_value_interface(person_sample_data_itf,person_unit_itf,typename pop_unit_itf::get_type_of(Persons_Container),Containers::Random_Access_Sequence_Prototype,Person_Components::Prototypes::Person_Properties,ComponentType);
 				define_simple_container_interface(joint_itf,joint_dist_type,Multidimensional_Random_Access_Array_Prototype, typename joint_dist_type::unqualified_value_type ,NULLTYPE);
 				define_simple_container_interface(marginal_itf,marg_dist_type,Multidimensional_Random_Access_Array_Prototype, typename marg_dist_type::unqualified_value_type ,NULLTYPE);
 	
@@ -325,7 +325,7 @@ namespace PopSyn
 						new_region = region_itr->second;
 
 						// next add the sample data
-						temp_sample = new_region->Temporary_Sample_Data<temp_sample_data_itf*>();
+						temp_sample = new_region->template Temporary_Sample_Data<temp_sample_data_itf*>();
 
 						// get characteristics from file
 						typename person_unit_itf::get_type_of(ID) sample_id;
@@ -343,7 +343,7 @@ namespace PopSyn
 						if (sample_itr != temp_sample->end())
 						{
 							pop_unit_itf* pop_unit = sample_itr->second;
-							pop_unit->Persons_Container<person_sample_data_itf*>()->push_back(p);
+							pop_unit->template Persons_Container<person_sample_data_itf*>()->push_back(p);
 						}
 						else
 						{
@@ -573,7 +573,7 @@ namespace PopSyn
 							// initialize the hh - allocates all hh subcomponents
 							hh->template Initialize<Target_Type<NT,void,long,zone_itf*, network_itf*, scenario_itf*> >(uuid, zone, network, scenario);
 
-							person_collection_itf* persons = hh->Persons_Container<person_collection_itf*>();
+							person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
 
 							long perid=0;
 							for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
@@ -683,7 +683,7 @@ namespace PopSyn
 				// Start database transaction
 				try
 				{
-					string name(scenario->output_demand_database_name<string&>());
+					string name(scenario->template output_demand_database_name<string&>());
 					unique_ptr<odb::database> db (open_sqlite_database_single<unique_ptr<odb::database> >(name));
 					odb::transaction t(db->begin());
 				
@@ -711,35 +711,35 @@ namespace PopSyn
 								// update synthesizing persons counter
 								if (counter % 10000 == 0) cout << '\r' << "Writing Agents to database:           " << counter;
 								household_itf* hh = *p_itr;
-								pop_unit_itf* hh_unit = hh->Static_Properties<pop_unit_itf*>();
+								pop_unit_itf* hh_unit = hh->template Static_Properties<pop_unit_itf*>();
 							
 								// create household record
 								shared_ptr<polaris::io::Household> hh_rec(new polaris::io::Household());
-								hh_rec->setHhold(hh->uuid<int>());
-								hh_rec->setPersons(hh_unit->Household_size<int>());
-								hh_rec->setWorkers(hh_unit->Number_of_workers<int>());
-								hh_rec->setVehicles(hh_unit->Number_of_vehicles<int>());
-								hh_rec->setLocation(hh->Home_Location<activity_location_itf*>()->uuid<int>());
+								hh_rec->setHhold(hh->template uuid<int>());
+								hh_rec->setPersons(hh_unit->template Household_size<int>());
+								hh_rec->setWorkers(hh_unit->template Number_of_workers<int>());
+								hh_rec->setVehicles(hh_unit->template Number_of_vehicles<int>());
+								hh_rec->setLocation(hh->template Home_Location<activity_location_itf*>()->template uuid<int>());
 								//push to database
 								db->persist(hh_rec);
 
-								person_collection_itf* persons = hh->Persons_Container<person_collection_itf*>();
+								person_collection_itf* persons = hh->template Persons_Container<person_collection_itf*>();
 
 								for (typename person_collection_itf::iterator p_itr = persons->begin(); p_itr != persons->end(); ++p_itr)
 								{		
 									person_itf* person = (person_itf*)(*p_itr);
 
 									shared_ptr<polaris::io::Person> per_rec(new polaris::io::Person());
-									per_rec->setId(person->uuid<int>());
-									if (person->School_Location<int>() >= 0)
-										per_rec->setSchool_Location_Id(person->School_Location<activity_location_itf*>()->uuid<int>());
-									if (person->Work_Location<int>() >= 0)
-										per_rec->setWork_Location_Id(person->Work_Location<activity_location_itf*>()->uuid<int>());
+									per_rec->setId(person->template uuid<int>());
+									if (person->template School_Location<int>() >= 0)
+										per_rec->setSchool_Location_Id(person->template School_Location<activity_location_itf*>()->template uuid<int>());
+									if (person->template Work_Location<int>() >= 0)
+										per_rec->setWork_Location_Id(person->template Work_Location<activity_location_itf*>()->template uuid<int>());
 									per_rec->setHousehold(hh_rec);
 									//push to database
 									db->persist(per_rec);
 
-									person->person_record<shared_ptr<polaris::io::Person>>(per_rec);
+									person->template person_record<shared_ptr<polaris::io::Person>>(per_rec);
 
 									counter++;
 								}

@@ -40,19 +40,19 @@ namespace Household_Components
 			// component versions
 			check_typed_member(has_gender,Gender, Types::HHTYPE);
 			check_getter(has_race,Race);
-			check_typed_member(has_employment_status,Employment_Status, Types::EMPLOYMENT_STATUS);
+			check_typed_member(has_employment_status,Employment_Status, Person_Components::Types::EMPLOYMENT_STATUS);
 
 			check_getter(has_work_travel_time,Journey_To_Work_Travel_Time);
-			check_typed_member(has_work_travel_mode,Journey_To_Work_Mode, Types::JOURNEY_TO_WORK_MODE);
+			check_typed_member(has_work_travel_mode,Journey_To_Work_Mode, Person_Components::Types::JOURNEY_TO_WORK_MODE);
 			check_getter(has_work_arrival_time,Journey_To_Work_Arrival_Time);
 
 			// prototype versions
-			check_typed_member(has_gender_prototype,Component_Type::Gender, Types::GENDER);
+			check_typed_member(has_gender_prototype,Component_Type::Gender, Person_Components::Types::GENDER);
 			check_getter(has_race_prototype,Component_Type::Race);
-			check_typed_member(has_employment_status_prototype,Component_Type::Employment_Status, Types::EMPLOYMENT_STATUS);
+			check_typed_member(has_employment_status_prototype,Component_Type::Employment_Status, Person_Components::Types::EMPLOYMENT_STATUS);
 
 			check_getter(has_work_travel_time_prototype,Component_Type::Journey_To_Work_Travel_Time);
-			check_typed_member(has_work_travel_mode_prototype,Component_Type::Journey_To_Work_Mode, Types::JOURNEY_TO_WORK_MODE);
+			check_typed_member(has_work_travel_mode_prototype,Component_Type::Journey_To_Work_Mode, Person_Components::Types::JOURNEY_TO_WORK_MODE);
 			check_getter(has_work_arrival_time_prototype,Component_Type::Journey_To_Work_Arrival_Time);
 
 			// concept checks

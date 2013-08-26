@@ -174,6 +174,7 @@ namespace Household_Components {
 	namespace Prototypes
 	{
 		forward_declare_prototype struct Household;
+		forward_declare_prototype struct Household_Properties;
 	}
 };
 

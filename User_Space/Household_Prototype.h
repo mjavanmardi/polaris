@@ -45,7 +45,7 @@ namespace Prototypes
 		feature_prototype void Initialize(TargetType id, requires(check(ComponentType,Concepts::Has_Initialize)))
 		{
 			this_component()->template Initialize<ComponentType,CallerType, TargetType>(id);	
-			pthis->template Set_Home_Location<NT>();
+			this->template Set_Home_Location<NT>();
 		}
 		feature_prototype void Initialize(TargetType id, requires(!check(ComponentType,Concepts::Has_Initialize)))
 		{

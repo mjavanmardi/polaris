@@ -21,7 +21,7 @@ namespace Person_Components
 			typedef typename MasterType::person_data_logger_type person_data_logger_type;
 
 			// Parent agent
-			member_prototype(Household_Components::Prototypes::Household, Household, typename MasterType::household_type,none,none);
+			member_prototype(Household_Components::Prototypes::Household, Parent_Household, typename MasterType::household_type,none,none);
 
 			//=======================================================================================================================================================================
 			// DATA MEMBERS

@@ -642,6 +642,10 @@
     <ClInclude Include="Destination_Choice_Implementation.h" />
     <ClInclude Include="Detector_Implementation.h" />
     <ClInclude Include="Geometry_Implementation.h" />
+    <ClInclude Include="Household_Implementations.h" />
+    <ClInclude Include="Household_Properties_Implemenations.h" />
+    <ClInclude Include="Household_Properties_Prototype.h" />
+    <ClInclude Include="Household_Prototype.h" />
     <ClInclude Include="Network_Event_Implementations.h" />
     <ClInclude Include="Network_Event_Prototype.h" />
     <ClInclude Include="Intersection_Control_Prototype.h" />

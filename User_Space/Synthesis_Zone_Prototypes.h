@@ -324,7 +324,7 @@ namespace PopSyn
 				hh->template Static_Properties<pop_unit_itf*>(static_properties);
 
 				pop_unit_itf* pop_unit = (pop_unit_itf*)static_properties;
-				person_sample_itf* person_units = pop_unit->Persons_Container<person_sample_itf*>();
+				person_sample_itf* person_units = pop_unit->template Persons_Container<person_sample_itf*>();
 
 				// create new person agent from each person unit properties class in the hh unit properties class
 				typename person_sample_itf::iterator person_unit_itr = person_units->begin();
@@ -332,8 +332,8 @@ namespace PopSyn
 				{
 					person_itf* person =(person_itf*)Allocate<typename person_itf::Component_Type>();
 					person->template Static_Properties<person_unit_itf*>(*person_unit_itr);
-					hh->Persons_Container<persons_itf&>().push_back(person);
-					person->template Household<household_itf*>(hh);
+					hh->template Persons_Container<persons_itf&>().push_back(person);
+					person->template Parent_Household<household_itf*>(hh);
 				}
 				//
 				household_container->push_back(hh);
