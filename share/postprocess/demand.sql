@@ -133,3 +133,42 @@ FROM
 	Trip
 GROUP BY 
 	destination;
+	
+	
+--############################################################
+-- GENERATE TRAVEL TIME BY ACTIVITY TYPE DISTRIBUTION
+DROP TABLE IF EXISTS Activity_TTime_tmp;
+CREATE TABLE Activity_TTime_tmp As
+SELECT Activity.location_id, Activity.start_time AS Start, round((end-start)/60) AS TTime, Activity.Mode, Activity.type, id
+FROM Trip
+INNER JOIN Activity
+ON Activity.trip=Trip.trip_id;
+
+
+DROP TABLE IF EXISTS Activity_TTime_Distribution;
+CREATE TABLE Activity_TTime_Distribution As
+SELECT 
+	TTime,
+        sum(CASE WHEN type= 'EAT OUT' THEN id/id END) as EAT_OUT,
+	sum(CASE WHEN type= 'ERRANDS' THEN id/id END) as ERRANDS,
+        sum(CASE WHEN type= 'HEALTHCARE' THEN id/id END) as HEALTHCARE,
+	sum(CASE WHEN type= 'HOME' THEN id/id END) as HOME,
+        sum(CASE WHEN type= 'LEISURE' THEN id/id END) as LEISURE,
+	sum(CASE WHEN type= 'PERSONAL' THEN id/id END) as PERSONAL,
+        sum(CASE WHEN type= 'RELIGIOUS-CIVIC' THEN id/id END) as RELIGIOUS,
+	sum(CASE WHEN type= 'SCHOOL' THEN id/id END) as SCHOOL,
+        sum(CASE WHEN type= 'SERVICE' THEN id/id END) as SERVICE,
+	sum(CASE WHEN type= 'SHOP-MAJOR' THEN id/id END) as SHOP_MAJOR,
+	sum(CASE WHEN type= 'SOCIAL' THEN id/id END) as SOCIAL,
+        sum(CASE WHEN type= 'WORK' THEN id/id END) as WORK,
+	sum(CASE WHEN type= 'SHOP-OTHER' THEN id/id END) as SHOP_OTHER,
+	sum(id/id) AS total
+FROM 
+	Activity_TTime_tmp
+GROUP BY 
+	TTime;
+
+DROP TABLE IF EXISTS Activity_TTime_tmp;
+
+
+
