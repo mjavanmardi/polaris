@@ -268,7 +268,9 @@ namespace Scenario_Components
 			feature_accessor(use_network_events, none, none);
 
 			feature_accessor(DB_output_link_moe_for_assignment_interval, none, none);
-
+			
+			feature_accessor(write_ttime_distribution_from_network_model, none, none);
+			feature_accessor(ttime_distribution_file, none, none);
 			/// enroute switching parameters
 			feature_accessor(pretrip_informed_market_share,none,none);
 			feature_accessor(realtime_informed_vehicle_market_share, none, none);
@@ -510,6 +512,7 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("analyze_link_groups_file_path_name", analyze_link_groups_file_path_name<string*>())!= PARAMETER_FOUND) analyze_link_groups_file_path_name<string>("analyze_link_groups");
 
 				if (cfgReader.getParameter("DB_output_link_moe_for_assignment_interval", DB_output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) DB_output_link_moe_for_assignment_interval<bool>(false);
+				if (cfgReader.getParameter("write_ttime_distribution_from_network_model", write_ttime_distribution_from_network_model<bool*>())!= PARAMETER_FOUND) write_ttime_distribution_from_network_model<bool>(false);
 
 				if (cfgReader.getParameter("use_tmc", use_tmc<bool*>())!= PARAMETER_FOUND) use_tmc<bool>(false);
 				if (cfgReader.getParameter("use_network_events", use_network_events<bool*>())!= PARAMETER_FOUND) use_network_events<bool>(false);
@@ -963,6 +966,32 @@ namespace Scenario_Components
 				output_network_snapshots_file<fstream&>() << "time\t maximum_free_flow_speed" << endl;
 				output_network_snapshots_file<fstream&>() << "inbound_link_uuid\t inbound_link_dbid\t inbound_link_direction\t inbound_link_travel_time\t number_of_movements" << endl;
 				output_network_snapshots_file<fstream&>() << "movement_uuid\t movement_forward_link_turn_travel_time";
+
+				if (write_ttime_distribution_from_network_model<bool>())
+				{
+					if(vehicle_transfer_file<fstream&>().is_open()) 
+					{ 
+						string ttime_distribution_file_name = output_dir_name<string&>() + "network_ttime_distribution.csv";
+						ttime_distribution_file<fstream&>().open(ttime_distribution_file_name, fstream::out);
+						if(ttime_distribution_file<fstream&>().is_open()) 
+						{
+							int num_epoches = 24*60/5 + 1;
+							
+							ttime_distribution_file<fstream&>() << "TIME(s)";
+							for(int i = 1; i <= num_epoches; i++)
+							{
+								ttime_distribution_file<fstream&>() << "," << i * 5;
+							}
+							ttime_distribution_file<fstream&>() << endl;
+						}
+						else
+						{
+							cout << "Cannot open file - "
+								<< ttime_distribution_file_name
+								<< endl;
+						}
+					}
+				}
 			};
 
 			feature_prototype void open_input_files()
@@ -1043,6 +1072,8 @@ namespace Scenario_Components
 				out_network_moe_file<fstream&>().close();
 
 				output_network_snapshots_file<fstream&>().close();
+
+				if (write_ttime_distribution_from_network_model<bool>()) ttime_distribution_file<fstream&>().close();
 			};
 
 			feature_prototype void close_input_files()

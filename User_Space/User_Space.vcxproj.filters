@@ -27,6 +27,12 @@
     <Filter Include="Prototypes\Person Components">
       <UniqueIdentifier>{ca1c4ec1-8a3b-4979-99b8-42916ca6db3d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Implementations\Household_Components">
+      <UniqueIdentifier>{d3c7af87-21fa-4be7-bf49-b26ff5763309}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Prototypes\Household_Components">
+      <UniqueIdentifier>{fc85c438-5ae7-4a3e-b37e-0944a084c246}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="User_Space.cpp">
@@ -317,16 +323,16 @@
       <Filter>Implementations</Filter>
     </ClInclude>
     <ClInclude Include="Household_Implementations.h">
-      <Filter>Implementations</Filter>
+      <Filter>Implementations\Household_Components</Filter>
     </ClInclude>
     <ClInclude Include="Household_Properties_Implemenations.h">
-      <Filter>Implementations</Filter>
+      <Filter>Implementations\Household_Components</Filter>
     </ClInclude>
     <ClInclude Include="Household_Properties_Prototype.h">
-      <Filter>Prototypes</Filter>
+      <Filter>Prototypes\Household_Components</Filter>
     </ClInclude>
     <ClInclude Include="Household_Prototype.h">
-      <Filter>Prototypes</Filter>
+      <Filter>Prototypes\Household_Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

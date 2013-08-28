@@ -153,7 +153,8 @@ namespace Scenario_Components
 			member_data(fstream, analyze_link_groups_file, none, none);
 			
 			member_data(bool, DB_output_link_moe_for_assignment_interval, none, none);
-
+			member_data(bool, write_ttime_distribution_from_network_model, none, none);
+			member_data(fstream, ttime_distribution_file, none, none);
 			member_data(bool, output_link_moe_for_simulation_interval, none, none);
 			member_data(bool, output_turn_movement_moe_for_simulation_interval, none, none);
 			member_data(bool, output_network_moe_for_simulation_interval, none, none);

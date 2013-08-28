@@ -126,6 +126,9 @@ namespace Network_Components
 			member_data(time_to_snapshot_map_type, network_snapshots, none, none);
 			member_data(vector<int>, snapshot_times, none, none);
 
+			vector<int> ttime_distribution;
+			member_data(_lock, ttime_distribution_lock, none, none);
+
 			typedef union {
 				struct
 				{
@@ -159,6 +162,7 @@ namespace Network_Components
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 				UNLOCK(_network_vht_vehicle_based_update_lock);
 				UNLOCK(_network_vht_compensation_update_lock);
+				UNLOCK(_ttime_distribution_lock);
 				initialize_intersection_control<ComponentType,CallerType,TargetType>();
 				initialize_links<ComponentType,CallerType,TargetType>();
 				initialize_intersections<ComponentType,CallerType,TargetType>();
@@ -179,6 +183,45 @@ namespace Network_Components
 				_network_vht_vehicle_based = 0;
 				initialize_moe();
 				initialize_network_agent<ComponentType,CallerType,TargetType>();
+				int num_epoches = 24*60/5 + 1;
+				ttime_distribution.resize(num_epoches);
+				for (int i = 0; i < (int)ttime_distribution.size(); i++)
+				{
+					ttime_distribution[i] = 0;
+				}
+			}
+
+			feature_implementation void update_ttime_distribution(int ttime)
+			{
+				LOCK(_ttime_distribution_lock);
+				//if (ttime < 5) ttime_distribution[0]++;
+				//else if (ttime < 10) ttime_distribution[1]++;
+				//else if (ttime < 15) ttime_distribution[2]++;
+				//else if (ttime < 20) ttime_distribution[3]++;
+				//else if (ttime < 25) ttime_distribution[4]++;
+				//else if (ttime < 30) ttime_distribution[5]++;
+				//else if (ttime < 35) ttime_distribution[6]++;
+				//else if (ttime < 40) ttime_distribution[7]++;
+				//else if (ttime < 45) ttime_distribution[8]++;
+				//else if (ttime < 50) ttime_distribution[9]++;
+				//else if (ttime < 55) ttime_distribution[10]++;
+				//else if (ttime < 60) ttime_distribution[11]++;
+				//else if (ttime < 65) ttime_distribution[12]++;
+				//else if (ttime < 70) ttime_distribution[13]++;
+				//else if (ttime < 75) ttime_distribution[14]++;
+				//else if (ttime < 80) ttime_distribution[15]++;
+				//else if (ttime < 85) ttime_distribution[16]++;
+				//else if (ttime < 90) ttime_distribution[17]++;
+				//else if (ttime < 95) ttime_distribution[18]++;
+				//else if (ttime < 100) ttime_distribution[19]++;
+				//else if (ttime < 105) ttime_distribution[20]++;
+				//else if (ttime < 110) ttime_distribution[21]++;
+				//else if (ttime < 115) ttime_distribution[22]++;
+				//else if (ttime < 120) ttime_distribution[23]++;
+				//else  ttime_distribution[24]++;
+				int index = ttime / 5;
+				ttime_distribution[index]++;
+				UNLOCK(_ttime_distribution_lock);
 			}
 
 			void read_snapshots()
@@ -602,7 +645,6 @@ namespace Network_Components
 					_this_ptr->template scenario_reference<_Scenario_Interface*>()->template close_files<NULLTYPE>();
 					//((typename MasterType::network_type*)_this_ptr)->add_in_network_to_VHT<ComponentType,ComponentType,NT>();
 					//cout << "final vht = " << ((typename MasterType::network_type*)_this_ptr)->_network_vht_in_network_based << endl;
-					//system("pause");
 					exit(0);
 				}
 
@@ -687,11 +729,15 @@ namespace Network_Components
 					//	((_Intersection_Interface*)(*intersection_itr))->template calculate_moe_for_assignment_interval<NULLTYPE>();
 					//	((_Intersection_Interface*)(*intersection_itr))->template update_in_network_vehicle_vht<NT>();
 					//}
-					_network_vht_vehicle_based = _in_network_vht_vehicle_based + _out_network_vht_vehicle_based;
+					//_network_vht_vehicle_based = _in_network_vht_vehicle_based + _out_network_vht_vehicle_based;
 					link_moe_post_process();
 					update_moe_for_assignment_interval_with_links();
 					update_moe_for_assignment_interval();
 					output_moe_for_assignment_interval<ComponentType, CallerType, TargetType>();
+					if (((_Scenario_Interface*)_global_scenario)->template write_ttime_distribution_from_network_model<bool>())
+					{
+						write_ttime_distribution<ComponentType,CallerType,TargetType>();
+					}
 					reset_moe_for_assignment_interval();
 				}
 			}
@@ -1063,7 +1109,7 @@ namespace Network_Components
 			//------------------------------------------------------------------------------------------------------------------			
 			feature_implementation void output_moe_for_simulation_interval();
 			feature_implementation void output_moe_for_assignment_interval();
-
+			feature_implementation void write_ttime_distribution();
 			//==================================================================================================================
 			/// network events
 			//------------------------------------------------------------------------------------------------------------------

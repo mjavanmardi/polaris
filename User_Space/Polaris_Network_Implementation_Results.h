@@ -108,6 +108,21 @@ namespace Network_Components
 
 		};
 
+		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_ttime_distribution()
+		{
+			typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;	
+			typedef Network_Prototype<typename MasterType::network_type> _Network_Interface;
+
+			fstream& ttime_distribution_file = ((_Scenario_Interface*)_global_scenario)->template ttime_distribution_file<fstream&>();
+			int current_time = ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>();
+			ttime_distribution_file << current_time;
+			for (int j=0; j < (int)ttime_distribution.size(); j++)
+			{
+				ttime_distribution_file <<","<< ttime_distribution[j];
+			}
+			ttime_distribution_file << endl;
+		}
+
 		feature_implementation_definition void Polaris_Network_Implementation<MasterType,ParentType,InheritanceList>::write_network_link_flow()
 		{
 			define_container_and_value_interface_unqualified_container(_Links_Container_Interface, _Link_Interface, type_of(links_container), Random_Access_Sequence_Prototype, Link_Components::Prototypes::Link_Prototype, ComponentType);

@@ -77,13 +77,13 @@ namespace Vehicle_Components
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 				typedef Movement_Plan_Components::Prototypes::Movement_Plan_Prototype<typename MasterType::movement_plan_type,ComponentType> _Movement_Plan_Interface;
 				_simulation_status = Types::Vehicle_Status_Keys::OUT_NETWORK;
-				
-				int departure_time = ((_Movement_Plan_Interface*)_movement_plan)->template departed_time<Time_Seconds>();
-				int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-				float travel_time = float ((current_time - departure_time)/3600.0f);
+				//int travel_time = (movement_plan<ComponentType,CallerType,_Movement_Plan_Interface*>()->template arrived_time<Time_Seconds>() - movement_plan<ComponentType,CallerType,_Movement_Plan_Interface*>()->template departed_time<Time_Seconds>()) / 60;
 
-				((_Network_Interface*)_global_network)->template increase_out_network_vht_vehicle_based<NT>(travel_time);
-				 
+				////((_Network_Interface*)_global_network)->template increase_out_network_vht_vehicle_based<NT>(travel_time);
+				//if (((_Scenario_Interface*)_global_scenario)->template write_ttime_distribution_from_network_model<bool>())
+				//{
+				//	((_Network_Interface*)_global_network)->template update_ttime_distribution<NT>(travel_time);
+				//}				
 				if (!((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
 					clear_trajectory<ComponentType,CallerType,TargetType>();
 			}

@@ -340,7 +340,10 @@ namespace Network_Components
 			{
 				this_component()->template update_network_vht_compensation<ComponentType,CallerType,TargetType>(adjustment);
 			}
-			
+			feature_prototype void update_ttime_distribution(int ttime)
+			{
+				this_component()->template update_ttime_distribution<ComponentType,CallerType,TargetType>(ttime);
+			}
 		};
 
 	}

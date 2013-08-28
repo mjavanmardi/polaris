@@ -92,6 +92,7 @@ namespace Movement_Plan_Components
 				typedef Network_Components::Prototypes::Network_Prototype<typename MasterType::network_type,ComponentType> _Network_Interface;
 				_trajectory_container[_current_trajectory_index]->_delayed_time = 0.0;
 				this->template arrived_time<ComponentType,CallerType,Simulation_Timestep_Increment>( ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_relative<int>() );
+
 			}
 
 			feature_implementation void transfer_to_next_link(int delayed_time)
