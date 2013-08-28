@@ -1,0 +1,15 @@
+; the next section is mandatory
+[general]
+name=POLARIS Analyzer
+qgisMinimumVersion=2.0
+description=This is the plugin to be used to post process results of POLARIS runs
+category=Vector
+version=version 0.1
+; end of mandatory metadata
+
+; start of optional metadata
+author=Vadim Sokolov
+email=vsokolov@anl.gov
+class_name=Polaris
+icon=icons/logo.png
+changelog=no changes yet
