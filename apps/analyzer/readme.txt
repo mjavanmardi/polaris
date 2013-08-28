@@ -1,0 +1,2 @@
+Downloaded and installed PyQT4 on local machine, then copied it to OSGeo4W\apps\python27\lib\site-packages
+Downloaded OpenLayer plugin from http://www.qgis.nl/2013/06/30/english-temporary-fix-for-openlayers-plugin/?lang=en
