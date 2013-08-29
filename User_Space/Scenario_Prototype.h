@@ -107,6 +107,7 @@ namespace Scenario_Components
 			feature_accessor(output_results_database_name, none, none);
 			feature_accessor(output_demand_database_name, none, none);
 
+
 			feature_accessor(simulation_interval_length, none, none);
 			feature_accessor(assignment_interval_length, none, none);
 
@@ -271,6 +272,7 @@ namespace Scenario_Components
 			
 			feature_accessor(write_ttime_distribution_from_network_model, none, none);
 			feature_accessor(ttime_distribution_file, none, none);
+			feature_accessor(vehicle_trajectory_output_threshold, none, none);
 			/// enroute switching parameters
 			feature_accessor(pretrip_informed_market_share,none,none);
 			feature_accessor(realtime_informed_vehicle_market_share, none, none);
@@ -513,6 +515,7 @@ namespace Scenario_Components
 
 				if (cfgReader.getParameter("DB_output_link_moe_for_assignment_interval", DB_output_link_moe_for_assignment_interval<bool*>())!= PARAMETER_FOUND) DB_output_link_moe_for_assignment_interval<bool>(false);
 				if (cfgReader.getParameter("write_ttime_distribution_from_network_model", write_ttime_distribution_from_network_model<bool*>())!= PARAMETER_FOUND) write_ttime_distribution_from_network_model<bool>(false);
+				if (cfgReader.getParameter("vehicle_trajectory_output_threshold", vehicle_trajectory_output_threshold<int*>())!= PARAMETER_FOUND) vehicle_trajectory_output_threshold<int>(-1.0);
 
 				if (cfgReader.getParameter("use_tmc", use_tmc<bool*>())!= PARAMETER_FOUND) use_tmc<bool>(false);
 				if (cfgReader.getParameter("use_network_events", use_network_events<bool*>())!= PARAMETER_FOUND) use_network_events<bool>(false);
@@ -625,7 +628,6 @@ namespace Scenario_Components
 
 			feature_prototype void open_output_files()
 			{
-
 				//===================================================
 				// manage output directory
 				//---------------------------------------------------
@@ -688,7 +690,10 @@ namespace Scenario_Components
 						<< "travel_time" << ","
 						<< "routed_travel_time" << ","
 						<< "travel_time_ratio" << ","
+						<< "trip_length" << ","
 						<< "num_switches" << ","
+						<< "loading_delay" << ","
+						<< "entry_queue_length" << ","
 						<<endl;
 
 					vehicle_trajectory_file<fstream&>() 

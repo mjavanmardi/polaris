@@ -445,13 +445,14 @@ namespace Link_Components
 				_Vehicle_Interface* vehicle = (_Vehicle_Interface*)veh;
 
 				LOCK(_link_lock);
-				_link_origin_vehicle_array.push_back((typename MasterType::vehicle_type*)vehicle);
+				_link_origin_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
 				UNLOCK(_link_lock);
 				
 				vehicle->template load<Vehicle_Components::Types::Load_To_Entry_Queue>();
 				
 				((_Scenario_Interface*)_global_scenario)->template increase_network_in_system_vehicles<NULLTYPE>();
 				_Movement_Plan_Interface* mp = vehicle->template movement_plan<_Movement_Plan_Interface*>();
+				mp->template entry_time<int>(current_time);
 				int adjustment = current_time - mp->template departed_time<Time_Seconds>();
 				((_Network_Interface*)_global_network)->template update_network_vht_compensation<NT>(adjustment);
 			}
@@ -615,7 +616,7 @@ namespace Link_Components
 					}
 					int departure_time = mp->template departed_time<Time_Seconds>();
 					int arrival_time = mp->template arrived_time<Time_Seconds>();
-					float travel_time = float(arrival_time - departure_time)/60.0f;
+					float travel_time = float ((arrival_time - departure_time)/60.0f);
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_arrived_vehicles<NULLTYPE>(travel_time);
 					((_Network_Interface*)_global_network)->template update_ttime_distribution<NT>((int)travel_time);
 					((_Scenario_Interface*)_global_scenario)->template decrease_network_in_network_vehicles<NULLTYPE>();
@@ -659,11 +660,9 @@ namespace Link_Components
 				_link_origin_departed_vehicles = 0;
 				_link_origin_loaded_vehicles = 0;
 				//arrived vehicles at current interval
-				int current_position = _link_origin_vehicle_current_position;
-				if(current_position<(int)_link_origin_vehicle_array.size())
-				{
-					queue_vehicles<ComponentType,CallerType,TargetType>(current_position);
-				}
+
+				queue_vehicles<ComponentType,CallerType,TargetType>();
+
 
 				//have demand
 				if(_link_origin_arrived_vehicles>0)
@@ -732,6 +731,7 @@ namespace Link_Components
 						load_vehicles<ComponentType,CallerType,TargetType>(num_departed_vehicles);
 					}
 				}
+				_link_origin_vehicle_current_position = (int)_link_origin_vehicle_queue.size();
 			}
 			
 			feature_implementation void load_vehicles(int num_departed_vehicles)
@@ -760,22 +760,18 @@ namespace Link_Components
 				}
 			}
 
-			feature_implementation void queue_vehicles(int current_position)
+			feature_implementation void queue_vehicles()
 			{
 				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type, ComponentType> _Scenario_Interface;
 				define_container_and_value_interface_unqualified_container(_Vehicles_Origin_Container_Interface, _Vehicle_Interface, type_of(link_origin_vehicle_array), Random_Access_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 				define_container_interface_unqualified_container(_Vehicle_Origin_Queue_Interface, type_of(link_origin_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 
-				for(int iv=current_position;iv<(int)_link_origin_vehicle_array.size();iv++)
+				int new_origin_arrived = (int)_link_origin_vehicle_queue.size() - _link_origin_vehicle_current_position;
+				_link_origin_arrived_vehicles += new_origin_arrived;
+				_link_origin_loaded_vehicles += new_origin_arrived;
+				_link_origin_cumulative_arrived_vehicles += new_origin_arrived;
+				for (int i = 0; i < new_origin_arrived; i++)
 				{
-					//update current position
-					_link_origin_vehicle_current_position++;
-					_Vehicle_Interface* vehicle = (_Vehicle_Interface*)link_origin_vehicle_array<ComponentType,CallerType,_Vehicles_Origin_Container_Interface&>()[iv];
-					link_origin_vehicle_queue<ComponentType,CallerType,_Vehicle_Origin_Queue_Interface&>().push_back(vehicle);
-					_link_origin_arrived_vehicles++;
-					_link_origin_loaded_vehicles++;
-					_link_origin_cumulative_arrived_vehicles++;
-//cout << "scenario pointer = " << _global_scenario << endl;
 					((_Scenario_Interface*)_global_scenario)->template increase_network_cumulative_loaded_vehicles<NULLTYPE>();
 				}
 			}

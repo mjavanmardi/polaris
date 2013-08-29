@@ -158,7 +158,9 @@ namespace Scenario_Components
 			member_data(bool, output_link_moe_for_simulation_interval, none, none);
 			member_data(bool, output_turn_movement_moe_for_simulation_interval, none, none);
 			member_data(bool, output_network_moe_for_simulation_interval, none, none);
-
+			
+			member_data(int, vehicle_trajectory_output_threshold, none, none);
+			
 			member_data(bool, use_tmc, none, none);
 			member_data(bool, use_network_events, none, none);
 

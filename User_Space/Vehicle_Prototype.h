@@ -77,7 +77,7 @@ namespace Vehicle_Components
 			feature_accessor(minimum_travel_time_saving, none, none);
 			feature_accessor(enroute_updated, none, none);
 
-
+			feature_accessor(entry_queue_length, none, none);
 			feature_prototype void advance()
 			{
 				define_component_interface(_Movement_Plan_Interface, typename get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);

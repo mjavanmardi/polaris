@@ -25,7 +25,7 @@ namespace Network_Components
 			define_container_and_value_interface_unqualified_container(_Zones_Container_Interface, _Zone_Interface, type_of(zones_container), Random_Access_Sequence_Prototype, Zone_Components::Prototypes::Zone_Prototype, ComponentType);
 			define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename _Link_Interface::get_type_of(link_destination_vehicle_queue), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
 			define_component_interface(_Movement_Plan_Interface, typename _Vehicle_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);				
-			define_container_and_value_interface(_Trajecotry_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype, ComponentType);
+			define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename _Movement_Plan_Interface::get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Movement_Plan_Components::Prototypes::Trajectory_Unit_Prototype, ComponentType);
 			typedef Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
 			fstream& vehicle_trajectory_file = scenario_reference<ComponentType,CallerType,_Scenario_Interface*>()->template vehicle_trajectory_file<fstream&>();
 				
@@ -49,7 +49,7 @@ namespace Network_Components
 						int destination_activity_location_index = 0;
 						int origin_link_index = movement_plan->template origin<_Link_Interface*>()->template uuid<int>();
 						int destination_link_index = movement_plan->template destination<_Link_Interface*>()->template uuid<int>();
-						int num_links = (int)movement_plan->template trajectory_container<_Trajecotry_Container_Interface&>().size();
+						int num_links = (int)movement_plan->template trajectory_container<_Trajectory_Container_Interface&>().size();
 
 						int departure_time = movement_plan->template departed_time<Time_Seconds>();
 						int arrival_time = movement_plan->template arrived_time<Time_Seconds>();
@@ -57,29 +57,40 @@ namespace Network_Components
 						float estimated_travel_time_when_departed = movement_plan->template estimated_travel_time_when_departed<float>() / 60.0f;
 						float travel_time_ratio = travel_time / estimated_travel_time_when_departed;
 						int number_of_switches = movement_plan->template number_of_switches<int>();
-							
-						vehicle_trajectory_file
-							<< vehicle_id << ","
-							<< 0 << ","
-							<< 0 << ","
-							<< 0 << ","
-							<< 0 << ","
-							<< origin_link_index << ","
-							<< destination_link_index << ","
-							<< num_links << ","
-							<< convert_seconds_to_hhmmss(departure_time)<< ","
-							<< convert_seconds_to_hhmmss(arrival_time)<< ","
-							<< travel_time << ","
-							<< estimated_travel_time_when_departed << ","
-							<< travel_time_ratio << ","
-							<< number_of_switches << ","
-							<<endl;
+						float trip_length = movement_plan->template route_length<float>();
+						int entry_time = movement_plan->template entry_time<int>();
+						_Trajectory_Container_Interface& trajectory = ((_Movement_Plan_Interface*)movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
+						_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)trajectory[0];
+						int origin_loading_time = trajectory_unit->template enter_time<int>();
+						int loading_delay = origin_loading_time - entry_time;
+						if (travel_time > ((_Scenario_Interface*)_global_scenario)->template vehicle_trajectory_output_threshold<float>())
+						{
+							vehicle_trajectory_file
+								<< vehicle_id << ","
+								<< 0 << ","
+								<< 0 << ","
+								<< 0 << ","
+								<< 0 << ","
+								<< origin_link_index << ","
+								<< destination_link_index << ","
+								<< num_links << ","
+								<< convert_seconds_to_hhmmss(departure_time)<< ","
+								<< convert_seconds_to_hhmmss(arrival_time)<< ","
+								<< travel_time << ","
+								<< estimated_travel_time_when_departed << ","
+								<< travel_time_ratio << ","
+								<< trip_length << ","
+								<< number_of_switches << ","
+								<< loading_delay << ","
+								<< vehicle->template entry_queue_length<int>() << ","
+								<<endl;
+						}
 
 						//float path_delayed_time = 0;
 						//for (int route_link_counter=0;route_link_counter<num_links;route_link_counter++)
 						//{
 
-						//	_Trajectory_Unit_Interface* trajectory_unit = movement_plan->template trajectory_container<_Trajecotry_Container_Interface&>()[route_link_counter];
+						//	_Trajectory_Unit_Interface* trajectory_unit = movement_plan->template trajectory_container<_Trajectory_Container_Interface&>()[route_link_counter];
 						//	_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
 						//	int route_link_id = route_link->template uuid<int>();
 						//	int route_link_enter_time = trajectory_unit->template enter_time<int>();

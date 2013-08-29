@@ -85,6 +85,8 @@ namespace Movement_Plan_Components
 			feature_accessor(number_of_switches, none, none);
 			feature_accessor(absolute_departure_time, none, none);
 			feature_accessor(is_integrated, none,none);
+			feature_accessor(route_length, none, none);
+			feature_accessor(entry_time, none, none);
 
 			// overloaded origin and destination, depending on targetType
 			feature_prototype void origin(TargetType activity_location, requires(check(TargetType,Activity_Location_Components::Concepts::Is_Activity_Location)))
@@ -160,6 +162,7 @@ namespace Movement_Plan_Components
 					trajectory.push_back(vehicle_trajectory_data);
 				}
 				number_of_switches<int>(0.0);
+				update_route_length<NT>();
 			}
 
 			feature_prototype void update_trajectory(TargetType& path_container, vector<float>& reversed_arrival_time_container)
@@ -185,6 +188,22 @@ namespace Movement_Plan_Components
 					trajectory.push_back(vehicle_trajectory_data);
 				}
 				number_of_switches<int&>()++;
+				update_route_length<NT>();
+			}
+
+			feature_prototype void update_route_length()
+			{
+				define_container_and_value_interface(_Trajectory_Container_Interface, _Trajectory_Unit_Interface, typename get_type_of(trajectory_container), Random_Access_Sequence_Prototype, Trajectory_Unit_Prototype, ComponentType);
+				define_component_interface(_Link_Interface, typename _Trajectory_Unit_Interface::get_type_of(link), Link_Components::Prototypes::Link_Prototype, ComponentType);
+				
+				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
+				route_length<float>(0.0);
+				typename _Trajectory_Container_Interface::iterator itr;
+				for (itr = trajectory.begin(); itr != trajectory.end(); itr++)
+				{
+					_Trajectory_Unit_Interface* vehicle_trajectory_data = (_Trajectory_Unit_Interface*)(*itr);
+					route_length<float&>() += vehicle_trajectory_data->template link<_Link_Interface*>()->template length<float>() / 5280.0;
+				}
 			}
 
 			feature_prototype void advance_trajectory()
