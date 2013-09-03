@@ -702,8 +702,9 @@ namespace Link_Components
 						else
 						{
 							// borrow from next simulation interval
+							num_link_origin_departed_vehicles_allowed = (int)link_origin_departed_flow_allowed;
 							num_link_origin_departed_vehicles_allowed++;
-							_link_origin_loaded_capacity_leftover = link_origin_departed_flow_allowed - 1.0f;
+							_link_origin_loaded_capacity_leftover = link_origin_departed_flow_allowed - num_link_origin_departed_vehicles_allowed;
 						}
 					}
 					else
