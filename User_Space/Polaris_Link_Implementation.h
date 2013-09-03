@@ -668,21 +668,21 @@ namespace Link_Components
 				if(_link_origin_arrived_vehicles>0)
 				{
 					//check available spaces
-					//float link_available_spaces = _link_supply - _link_upstream_arrived_vehicles;
+					float link_available_spaces = _link_supply - _link_upstream_arrived_vehicles;
 					//int num_link_origin_departed_vehicles_allowed = (int) link_available_spaces;
 
-					int num_vehicles_in_link = 0;
-				    typename _Movements_Container_Interface::iterator outbound_itr;
-					_Movement_Interface* outbound_movement;
-					
-					for(outbound_itr=_outbound_turn_movements.begin();outbound_itr!=_outbound_turn_movements.end();outbound_itr++)
-					{
-						outbound_movement=(_Movement_Interface*)(*outbound_itr);
-						num_vehicles_in_link += int(outbound_movement->template vehicles_container<_Vehicles_Container_Interface&>().size());
-					}
-					num_vehicles_in_link += (int)_current_vehicle_queue.size();
-					//float link_available_spaces = (float)(this->link_supply_array[outbound_link_index]- this->link_upstream_arrived_vehicles_array[outbound_link_index]);
-					float link_available_spaces = (float)(_link_supply - num_vehicles_in_link);
+					//int num_vehicles_in_link = 0;
+				 //   typename _Movements_Container_Interface::iterator outbound_itr;
+					//_Movement_Interface* outbound_movement;
+					//
+					//for(outbound_itr=_outbound_turn_movements.begin();outbound_itr!=_outbound_turn_movements.end();outbound_itr++)
+					//{
+					//	outbound_movement=(_Movement_Interface*)(*outbound_itr);
+					//	num_vehicles_in_link += int(outbound_movement->template vehicles_container<_Vehicles_Container_Interface&>().size());
+					//}
+					//num_vehicles_in_link += (int)_current_vehicle_queue.size();
+					////float link_available_spaces = (float)(this->link_supply_array[outbound_link_index]- this->link_upstream_arrived_vehicles_array[outbound_link_index]);
+					//float link_available_spaces = (float)(_link_supply - num_vehicles_in_link);
 				
 					int num_link_origin_departed_vehicles_allowed = 0 ;// max(0,int(link_available_spaces));
 					
