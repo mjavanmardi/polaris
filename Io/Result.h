@@ -416,7 +416,7 @@ class LinkMOE
 public:
 	// Default Constructor
 	LinkMOE () {}        
-	LinkMOE (int id_, int link_uid_, int start_time_, int end_time_, float link_travel_time_, float link_travel_time_standard_deviation_, float link_queue_length_, float link_travel_delay_, float link_travel_delay_standard_deviation_, float link_speed_, float link_density_, float link_in_flow_rate_, float link_out_flow_rate_, float link_in_volume_, float link_out_volume_, float link_speed_ratio_, float link_in_flow_ratio_, float link_out_flow_ratio_, float link_density_ratio_, float link_travel_time_ratio_, float num_vehicles_in_link_)
+	LinkMOE (int id_, int link_uid_, int link_type, int start_time_, int end_time_, float link_travel_time_, float link_travel_time_standard_deviation_, float link_queue_length_, float link_travel_delay_, float link_travel_delay_standard_deviation_, float link_speed_, float link_density_, float link_in_flow_rate_, float link_out_flow_rate_, float link_in_volume_, float link_out_volume_, float link_speed_ratio_, float link_in_flow_ratio_, float link_out_flow_ratio_, float link_density_ratio_, float link_travel_time_ratio_, float num_vehicles_in_link_)
 		: id (id_), link_uid (link_uid_), start_time (start_time_), end_time (end_time_), link_travel_time (link_travel_time_), link_travel_time_standard_deviation (link_travel_time_standard_deviation_), link_queue_length (link_queue_length_), link_travel_delay (link_travel_delay_), link_travel_delay_standard_deviation (link_travel_delay_standard_deviation_), link_speed (link_speed_), link_density (link_density_), link_in_flow_rate (link_in_flow_rate_), link_out_flow_rate (link_out_flow_rate_), link_in_volume (link_in_volume_), link_out_volume (link_out_volume_), link_speed_ratio (link_speed_ratio_), link_in_flow_ratio (link_in_flow_ratio_), link_out_flow_ratio (link_out_flow_ratio_), link_density_ratio (link_density_ratio_), link_travel_time_ratio (link_travel_time_ratio_), num_vehicles_in_link (num_vehicles_in_link_)
 	{
 	}
@@ -425,6 +425,8 @@ public:
 	void setId (const int& id_) {id = id_;}
 	const int& getLink_Uid () const {return link_uid;}
 	void setLink_Uid (const int& link_uid_) {link_uid = link_uid_;}
+	const int& getLink_Type () const {return link_type;}
+	void setLink_Type (const int& link_type_) {link_type = link_type_;}
 	const int& getStart_Time () const {return start_time;}
 	void setStart_Time (const int& start_time_) {start_time = start_time_;}
 	const int& getEnd_Time () const {return end_time;}
@@ -470,6 +472,7 @@ private:
 	int id;
 #pragma db not_null
 	int link_uid;
+	int link_type;
 	int start_time;
 	int end_time;
 	float link_travel_time;

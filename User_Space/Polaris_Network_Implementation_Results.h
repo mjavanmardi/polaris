@@ -457,37 +457,72 @@ namespace Network_Components
 				// output link moe
 				typedef typename MasterType::link_type _link_component_type;
 				typename _Links_Container_Interface::iterator link_itr;
+				LinkMOE link_moe_db_record;
 				for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
 				{
 					_link_component_type* link = (_link_component_type*)(*link_itr);
-					((_Scenario_Interface*)_global_scenario)->template out_link_moe_file<fstream&>()
-						<< convert_seconds_to_hhmmss(time).c_str() << ","
-						<< time << ","
-						<< link->_uuid << ","
-						<< link->_dbid << ","
-						<< link->_direction << ","
-						<< link->_upstream_intersection->_uuid << ","
-						<< link->_downstream_intersection->_uuid << ","
-						<< link->_link_type << ","	
-						<< link->link_moe_data.link_travel_time << ","
-						<< link->link_moe_data.link_travel_time_standard_deviation << ","
-						<< link->link_moe_data.link_travel_delay << ","
-						<< link->link_moe_data.link_travel_delay_standard_deviation << ","
-						<< link->link_moe_data.link_queue_length << ","
-						<< link->link_moe_data.link_speed << ","
-						<< link->link_moe_data.link_density << ","
-						<< link->link_moe_data.link_in_flow_rate << ","
-						<< link->link_moe_data.link_out_flow_rate << ","
-						<< link->link_moe_data.link_in_volume << ","
-						<< link->link_moe_data.link_out_volume << ","
-						<< link->link_moe_data.link_travel_time_ratio << ","
-						<< link->link_moe_data.link_speed_ratio << ","
-						<< link->link_moe_data.link_density_ratio << ","
-						<< link->link_moe_data.link_in_flow_ratio << ","
-						<< link->link_moe_data.link_out_flow_ratio << ","
-						<< link->_link_vht << ","
-						<< link->_link_vmt
-						<< endl;
+					shared_ptr<polaris::io::LinkMOE> link_moe_db_record(new polaris::io::LinkMOE());
+					
+					link_moe_db_record->setLink_Uid(link->_uuid);
+					link_moe_db_record->setLink_Type(link->_link_type);
+					link_moe_db_record->setStart_Time(time);
+					link_moe_db_record->setEnd_Time(time + ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>());
+					link_moe_db_record->setLink_Travel_Time(link->link_moe_data.link_travel_time);
+					link_moe_db_record->setLink_Travel_Time_Standard_Deviation(link->link_moe_data.link_travel_time_standard_deviation);
+					link_moe_db_record->setLink_Queue_Length(link->link_moe_data.link_queue_length);
+					link_moe_db_record->setLink_Travel_Delay(link->link_moe_data.link_travel_delay);
+					link_moe_db_record->setLink_Travel_Delay_Standard_Deviation(link->link_moe_data.link_travel_delay_standard_deviation);
+					link_moe_db_record->setLink_Speed(link->link_moe_data.link_speed);
+					link_moe_db_record->setLink_Density(link->link_moe_data.link_density);
+					link_moe_db_record->setLink_In_Flow_Rate(link->link_moe_data.link_in_flow_rate);
+					link_moe_db_record->setLink_Out_Flow_Rate(link->link_moe_data.link_out_flow_rate);
+					link_moe_db_record->setLink_In_Volume(link->link_moe_data.link_in_volume);
+					link_moe_db_record->setLink_Out_Volume(link->link_moe_data.link_out_volume);
+					link_moe_db_record->setLink_Speed_Ratio(link->link_moe_data.link_speed_ratio);
+					link_moe_db_record->setLink_In_Flow_Ratio(link->link_moe_data.link_in_flow_ratio);
+					link_moe_db_record->setLink_Out_Flow_Ratio(link->link_moe_data.link_out_flow_ratio);
+					link_moe_db_record->setLink_Density_Ratio(link->link_moe_data.link_density_ratio);
+					link_moe_db_record->setLink_Travel_Time_Ratio(link->link_moe_data.link_travel_time_ratio);
+					shared_ptr<odb::database> db_ptr = ((_Scenario_Interface*)_global_scenario)->template result_db_ptr<shared_ptr<odb::database>>();
+					try
+					{
+						odb::transaction t(db_ptr->begin());
+						db_ptr->persist(link_moe_db_record);
+						t.commit();
+					}
+					catch (odb::sqlite::database_exception ex)
+					{
+						cout << ex.message()<<endl;
+					}
+
+					//((_Scenario_Interface*)_global_scenario)->template out_link_moe_file<fstream&>()
+					//	<< convert_seconds_to_hhmmss(time).c_str() << ","
+					//	<< time << ","
+					//	<< link->_uuid << ","
+					//	<< link->_dbid << ","
+					//	<< link->_direction << ","
+					//	<< link->_upstream_intersection->_uuid << ","
+					//	<< link->_downstream_intersection->_uuid << ","
+					//	<< link->_link_type << ","	
+					//	<< link->link_moe_data.link_travel_time << ","
+					//	<< link->link_moe_data.link_travel_time_standard_deviation << ","
+					//	<< link->link_moe_data.link_travel_delay << ","
+					//	<< link->link_moe_data.link_travel_delay_standard_deviation << ","
+					//	<< link->link_moe_data.link_queue_length << ","
+					//	<< link->link_moe_data.link_speed << ","
+					//	<< link->link_moe_data.link_density << ","
+					//	<< link->link_moe_data.link_in_flow_rate << ","
+					//	<< link->link_moe_data.link_out_flow_rate << ","
+					//	<< link->link_moe_data.link_in_volume << ","
+					//	<< link->link_moe_data.link_out_volume << ","
+					//	<< link->link_moe_data.link_travel_time_ratio << ","
+					//	<< link->link_moe_data.link_speed_ratio << ","
+					//	<< link->link_moe_data.link_density_ratio << ","
+					//	<< link->link_moe_data.link_in_flow_ratio << ","
+					//	<< link->link_moe_data.link_out_flow_ratio << ","
+					//	<< link->_link_vht << ","
+					//	<< link->_link_vmt
+					//	<< endl;
 				}
 			}
 

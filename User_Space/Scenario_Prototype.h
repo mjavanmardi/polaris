@@ -265,6 +265,9 @@ namespace Scenario_Components
 			feature_accessor(analyze_link_groups_file_path_name, none, none);
 			feature_accessor(analyze_link_groups_file, none, none);
 
+			feature_accessor(result_db_ptr, none, none);
+			feature_accessor(output_result_database_name, none, none);
+
 			feature_accessor(use_tmc, none, none);
 			feature_accessor(use_network_events, none, none);
 
@@ -541,7 +544,6 @@ namespace Scenario_Components
 				input_dir_name<string&>() = "";
 				open_output_files<NULLTYPE>();
 				open_input_files<NULLTYPE>();
-
 			}
 
 			feature_prototype void read_scenario_data(network_models::network_information::scenario_data_information::ScenarioData& scenario_data)
@@ -661,6 +663,8 @@ namespace Scenario_Components
 				this->output_results_database_name(polaris::io::make_name(results_name, polaris::io::db_inventory[1]));
 				odb::transaction t(db->begin());
 				t.commit();
+				shared_ptr<odb::database> db_ptr = open_sqlite_database_single<shared_ptr<odb::database> > (output_results_database_name<string>());				
+				result_db_ptr<shared_ptr<odb::database>>(db_ptr);
 
 				//----------------------
 				// demand database
