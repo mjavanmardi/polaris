@@ -24,6 +24,9 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Compile Include="db_plot1.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="embedding_in_qt4.py" />
     <Compile Include="geo_tools.py" />
     <Compile Include="mpl.py" />
@@ -34,8 +37,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="__init__.py" />
+    <Content Include="compile_qt.bat">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="metadata.txt" />
     <Content Include="readme.txt" />
+    <Content Include="ui_polaris.ui">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>

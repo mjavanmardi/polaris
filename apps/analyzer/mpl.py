@@ -9,9 +9,7 @@ class MyMplCanvas(FigureCanvas):
         self.axes = fig.add_subplot(111)
         # We want the axes cleared every time plot() is called
         self.axes.hold(True)
-
         self.compute_initial_figure()
-
         #
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
