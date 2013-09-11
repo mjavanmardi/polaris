@@ -5,3 +5,4 @@ set PythonPath=%PythonPath%;%python_path%\lib\site-packages
 c:\Python27\python.exe %python_path%\lib\site-packages\PyQt4\uic\pyuic.py ui_polaris.ui -o ui_polaris.py
 c:\Python27\python.exe %python_path%\lib\site-packages\PyQt4\uic\pyuic.py ui_db_plot.ui -o db_plot.py
 c:\Python27\python.exe %python_path%\lib\site-packages\PyQt4\uic\pyuic.py ui_db_plot1.ui -o db_plot1.py
+c:\Python27\python.exe %python_path%\lib\site-packages\PyQt4\uic\pyuic.py ui_time_span.ui -o ui_time_span.py

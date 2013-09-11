@@ -19,15 +19,19 @@ except AttributeError:
     _fromUtf8 = lambda s: s
 from db_plot import Ui_DBPlot
 from db_plot1 import Ui_DBPlot1
+from ui_time_span import Ui_timeSpanDialog
 import re
 class CreateLayerTread(QtCore.QThread):
     partDone = QtCore.pyqtSignal(int)
     allDone = QtCore.pyqtSignal()
-    def __init__(self, db_path):
+    def __init__(self, db_path, start_time, end_time):
         QtCore.QThread.__init__(self)
         self.db_path = db_path
         self.n = 1000000
         self.count = 0
+        self.start_time = start_time
+        self.end_time = end_time
+        QtGui.QMessageBox.about(None, "Genrating Layer", "Start time: %s\nEnd time: %s"%(str(self.start_time), str(self.end_time)))
     def status(self):
         self.count += 1
         self.partDone.emit(self.count*self.n)
@@ -79,8 +83,8 @@ class CreateLayerTread(QtCore.QThread):
         avg(num_vehicles_in_link) as num_vehicles_in_link,
         avg(link_speed) as link_speed
         from LinkMOE, link 
-        where start_time < 60*60*8 and start_time > 60*60*7.8 and link.link == LinkMOE.link_uid/2 and lanes_ab > 0 
-        group by link_uid""")        
+        where start_time < ? and start_time > ? and link.link == LinkMOE.link_uid/2 and lanes_ab > 0 
+        group by link_uid""", (self.end_time, self.start_time,))        
         self.conn.commit()        
         c.execute("select RecoverGeometryColumn('link_moe', 'GEO',  26916, 'LINESTRING', 'XY')")
         c.commit()
@@ -137,6 +141,24 @@ class DBPlot1(QtGui.QWidget):
         self.fig.axes.set_xlabel(str(xcol).capitalize())
         self.fig.axes.set_ylabel(str(ycol).capitalize())
         self.fig.draw()
+
+class TimeSpanDialog(QtGui.QDialog):
+    ok_signal = QtCore.pyqtSignal(int, int)
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.ui = Ui_timeSpanDialog()
+        self.ui.setupUi(self)
+        QtCore.QObject.connect(self.ui.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), self.accept)
+    def accept(self):
+        start = self.ui.timeStart.time()
+        end = self.ui.timeEnd.time()
+        start_sec = start.hour()*60*60 + start.minute()*60 + start.second()
+        end_sec = end.hour()*60*60 + end.minute()*60 + end.second()
+        #QtGui.QMessageBox.about(self, "Debug", str(start_sec))
+        #QtGui.QMessageBox.about(self, "Debug", str(end_sec))
+        self.ok_signal.emit(start_sec,end_sec)
+        self.close()
+
 
 #DD MATPLOTLIB TO THE db plot widget
 class DBPlot(QtGui.QWidget): 
@@ -293,9 +315,11 @@ class PolarisDialog(QtGui.QMainWindow):
         display_name = 'Link MOE'
         vlayer = QgsVectorLayer(uri.uri(), display_name, 'spatialite')   
         QgsMapLayerRegistry.instance().addMapLayer(vlayer)
-    def crate_new_layer(self):
+    
+    def start_generating_layer(self, start, end):
         self.update_status_message(-10)
-        self.th = CreateLayerTread("../test_case/chicago-Supply.sqlite")
+        
+        self.th = CreateLayerTread("../test_case/chicago-Supply.sqlite", start, end)
         self.update_status_message(-9)
         #QtCore.QObject.connect( self.th, QtCore.SIGNAL("update(QString)"), self.update_status_message )
         self.th.partDone.connect(self.update_status_message)
@@ -303,7 +327,11 @@ class PolarisDialog(QtGui.QMainWindow):
         self.update_status_message(-8)
         self.th.start()
 
-        #iface.addVectorLayer(uri.uri(), display_name, 'spatialite')
+    def crate_new_layer(self):
+        self.tsd = TimeSpanDialog()
+        self.tsd.ok_signal.connect(self.start_generating_layer)
+        self.tsd.exec_()
+
 
         
         

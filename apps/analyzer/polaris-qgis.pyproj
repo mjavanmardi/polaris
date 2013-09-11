@@ -36,6 +36,9 @@
     <Compile Include="ui_polaris.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ui_time_span.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="__init__.py" />
     <Content Include="compile_qt.bat">
       <SubType>Content</SubType>
@@ -43,6 +46,9 @@
     <Content Include="metadata.txt" />
     <Content Include="readme.txt" />
     <Content Include="ui_polaris.ui">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ui_time_span.ui">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>
