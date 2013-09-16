@@ -221,7 +221,10 @@ namespace Turn_Movement_Components
 					{
 						int num_transfer_vehicles_of_turn_movement = (int)(total_movement_flow);
 						// borrow from next simulation interval
-						_movement_flow = num_transfer_vehicles_of_turn_movement + 1;
+						if (total_movement_flow - num_transfer_vehicles_of_turn_movement > 0.005)
+							_movement_flow = num_transfer_vehicles_of_turn_movement + 1;
+						else
+							_movement_flow = num_transfer_vehicles_of_turn_movement;
 						// _movement_flow should not be greater than _movement_demand
 						_movement_flow = (float)min((double)_movement_flow, (double)_movement_demand);
 						_movement_capacity_leftover = total_movement_flow - _movement_flow;

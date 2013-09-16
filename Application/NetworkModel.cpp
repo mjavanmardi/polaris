@@ -409,7 +409,7 @@ void run_with_input_from_files()
 	scenario->write_network_snapshots<bool>(false);
 	scenario->read_network_snapshots<bool>(false);
 	scenario->write_network_link_turn_time<bool>(false);
-	scenario->output_network_moe_for_simulation_interval<bool>(true);
+	scenario->output_network_moe_for_simulation_interval<bool>(false);
 	scenario->output_link_moe_for_assignment_interval<bool>(true);
 	scenario->output_network_moe_for_assignment_interval<bool>(true);
 	scenario->calculate_realtime_moe<bool>(true);
@@ -417,6 +417,7 @@ void run_with_input_from_files()
 	scenario->read_normal_day_link_moe<bool>(false);
 	scenario->rng_type<int>(Scenario_Components::Types::RNG_Type_Keys::DETERMINISTIC);
 	scenario->merging_mode<int>(Scenario_Components::Types::Merging_Mode_Keys::PROPORTION_TO_LANE);
+	scenario->enroute_switching_enabled<bool>(false);
 	scenario->write_vehicle_trajectory<bool>(false);
 	//scenario->compare_with_moe_reference<bool>(false);
 

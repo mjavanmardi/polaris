@@ -132,6 +132,7 @@ namespace Link_Components
 			member_data(float, backward_wave_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, jam_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, critical_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
+			member_data(float, num_vehicles_under_jam_density, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, original_free_flow_speed, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, original_maximum_flow_rate, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
 			member_data(float, original_speed_limit, check(ReturnValueType, is_arithmetic), check(SetValueType, is_arithmetic));
@@ -319,6 +320,7 @@ namespace Link_Components
 					
 				//supply(a,t) = Kj(a,t)*L(a)*nlanes(a,t) + N(a,L(a),t-bwtt) -N(a,0,t-1) = backward wave propogation in link
 				link_available_spaces = num_vehicles_under_jam_density_on_inbound_link + link_downstream_cumulative_vehicles_by_t_minus_bwtt - link_upstream_cumulative_vehicles_by_t_minus_one;
+				//link_available_spaces = min((float)link_available_spaces, float(num_vehicles_under_jam_density_on_inbound_link - num_vehicles_in_link<ComponentType,CallerType,TargetType>()));
 				_link_supply = max(0.0,(double)link_available_spaces);
 
 				float current_link_capacity = 0.0;
@@ -612,7 +614,9 @@ namespace Link_Components
 
 					if (((_Scenario_Interface*)_global_scenario)->template write_vehicle_trajectory<bool>())
 					{
+						LOCK(_link_lock);
 						_link_destination_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
+						UNLOCK(_link_lock);
 					}
 					int departure_time = mp->template departed_time<Time_Seconds>();
 					int arrival_time = mp->template arrived_time<Time_Seconds>();
@@ -628,6 +632,7 @@ namespace Link_Components
 					int current_time = ((_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
 					int pdt = current_time + _link_fftt;
 
+					LOCK(_link_lock);
 					if (_current_vehicle_queue.size() >= 1)
 					{
 						_Vehicle_Interface* last_vehicle = (_Vehicle_Interface*)_current_vehicle_queue.back();
@@ -636,6 +641,7 @@ namespace Link_Components
 					}
 					vehicle->template downstream_preferred_departure_time<int>(pdt);
 					_current_vehicle_queue.push_back((typename MasterType::vehicle_type*)vehicle);
+					UNLOCK(_link_lock);
 				}
 			}
 
@@ -713,6 +719,8 @@ namespace Link_Components
 						//link_origin_departed_flow_allowed = min(link_origin_departed_flow_allowed,_link_capacity);	////////////////////capacity
 
 						num_link_origin_departed_vehicles_allowed = int(link_origin_departed_flow_allowed);
+						if (link_origin_departed_flow_allowed - num_link_origin_departed_vehicles_allowed > 0.005)
+							num_link_origin_departed_vehicles_allowed++;
 						link_origin_departed_flow_allowed -= float(num_link_origin_departed_vehicles_allowed);
 
 						if (link_origin_departed_flow_allowed>0.0)
@@ -799,8 +807,10 @@ namespace Link_Components
 				_link_origin_loaded_capacity_leftover = 0.0;
 					
 				//supply
-				_link_supply = _num_lanes * _length * _jam_density/5280.0f;
-				_link_supply = max(_num_lanes * 2.0f,_link_supply);
+				_num_vehicles_under_jam_density = _num_lanes * _length * _jam_density/5280.0f;
+				_num_vehicles_under_jam_density = max(_num_lanes * 2.0f,_num_vehicles_under_jam_density);
+
+				_link_supply = _num_vehicles_under_jam_density;
 					
 				//cumulative vehicles
 				_link_destination_arrived_vehicles = 0;
@@ -947,6 +957,25 @@ namespace Link_Components
 				//td_link_moe_data_array.push_back(link_moe_data);
 
 			}
+
+			feature_implementation int num_vehicles_in_link()
+			{
+				define_container_and_value_interface_unqualified_container(_Movements_Container_Interface, _Movement_Interface, type_of(outbound_turn_movements), Random_Access_Sequence_Prototype, Turn_Movement_Components::Prototypes::Movement_Prototype, ComponentType);
+				define_container_and_value_interface(_Vehicles_Container_Interface, _Vehicle_Interface, typename _Movement_Interface::get_type_of(vehicles_container), Back_Insertion_Sequence_Prototype, Vehicle_Components::Prototypes::Vehicle_Prototype, ComponentType);
+				typedef Scenario_Components::Prototypes::Scenario_Prototype<typename MasterType::scenario_type> _Scenario_Interface;
+
+				int num_vehicles_in_link = 0;
+				typename _Movements_Container_Interface::iterator outbound_itr;
+				_Movement_Interface* outbound_movement;
+					
+				for(outbound_itr=_outbound_turn_movements.begin();outbound_itr!=_outbound_turn_movements.end();outbound_itr++)
+				{
+					outbound_movement=(_Movement_Interface*)(*outbound_itr);
+					num_vehicles_in_link += int(outbound_movement->template vehicles_container<_Vehicles_Container_Interface&>().size());
+				}
+				num_vehicles_in_link += (int)_current_vehicle_queue.size();
+				return num_vehicles_in_link;
+			}		
 
 			feature_implementation void Initialize()
 			{

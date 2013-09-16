@@ -465,6 +465,7 @@ namespace Network_Components
 					
 					link_moe_db_record->setLink_Uid(link->_uuid);
 					link_moe_db_record->setLink_Type(link->_link_type);
+					link_moe_db_record->setLink_Length(link->_length);
 					link_moe_db_record->setStart_Time(time);
 					link_moe_db_record->setEnd_Time(time + ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>());
 					link_moe_db_record->setLink_Travel_Time(link->link_moe_data.link_travel_time);

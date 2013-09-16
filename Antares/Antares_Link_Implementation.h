@@ -1169,7 +1169,7 @@ namespace Link_Components
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		int Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::base_height = 700;
 		template<typename MasterType,typename ParentType,typename InheritanceList>
-		float Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::_vehicle_length = 13.5;
+		float Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::_vehicle_length = 5280/220; // space occupied by a vehicle under jam density
 		template<typename MasterType,typename ParentType,typename InheritanceList>
 		float Antares_Link_Implementation<MasterType,ParentType,InheritanceList>::_link_shift = 20;
 	}

@@ -162,6 +162,7 @@ namespace Link_Components
 			feature_accessor(free_flow_speed, none, none);
 			feature_accessor(backward_wave_speed, none, none);
 			feature_accessor(jam_density, none, none);
+			feature_accessor(num_vehicles_under_jam_density, none,none);
 			feature_accessor(critical_density, none, none);
 			feature_accessor(link_num_vehicles_in_queue, none, none);
 			feature_accessor(num_vehicles_on_link, none, none);
