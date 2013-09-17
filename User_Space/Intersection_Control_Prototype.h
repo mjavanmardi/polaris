@@ -243,51 +243,52 @@ namespace Intersection_Control_Components
 						//allowed
 						if (inbound_movement->template movement_rule<int>() == ALLOWED)
 						{
-							if (outbound_link->template link_type<int>() != ARTERIAL || inbound_movements_container.size() <=2)
-							{
-								if (inbound_movement->template movement_type<int>() == THROUGH_TURN)
-								{
-									inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
-								}
-								else
-								{
-									if (outbound_link->template link_type<int>() == ARTERIAL)
-									{
-										//operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.6f;
-										inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
-									}
-									else
-									{
-										//operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.9f;
-										inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
-									}
-								}
-							}
-							else
-							{
-								inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
+							inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>() / float(inbound_movements_container.size()));
+							//if (outbound_link->template link_type<int>() != ARTERIAL || inbound_movements_container.size() <=2)
+							//{
+							//	if (inbound_movement->template movement_type<int>() == THROUGH_TURN)
+							//	{
+							//		inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
+							//	}
+							//	else
+							//	{
+							//		if (outbound_link->template link_type<int>() == ARTERIAL)
+							//		{
+							//			//operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.6f;
+							//			inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
+							//		}
+							//		else
+							//		{
+							//			//operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.9f;
+							//			inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
+							//		}
+							//	}
+							//}
+							//else
+							//{
+							//	inbound_movement->template green_time<float>(((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>()*1.0f);
 
-								//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == THROUGH_TURN)
-								//{
-								//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*1.0f/
-								//		((inbound_turn_movement_size)*1.0f);
-								//}
-								//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == RIGHT_TURN)
-								//{
-								//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.9f/
-								//		((inbound_turn_movement_size)*1.0f);
-								//}
-								//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == LEFT_TURN)
-								//{
-								//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.9f/
-								//		((inbound_turn_movement_size)*1.0f);
-								//}
-								//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == U_TURN)
-								//{
-								//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.8f/
-								//		((inbound_turn_movement_size)*1.0f);
-								//}
-							}
+							//	//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == THROUGH_TURN)
+							//	//{
+							//	//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*1.0f/
+							//	//		((inbound_turn_movement_size)*1.0f);
+							//	//}
+							//	//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == RIGHT_TURN)
+							//	//{
+							//	//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.9f/
+							//	//		((inbound_turn_movement_size)*1.0f);
+							//	//}
+							//	//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == LEFT_TURN)
+							//	//{
+							//	//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.9f/
+							//	//		((inbound_turn_movement_size)*1.0f);
+							//	//}
+							//	//if (network_data.turn_movement_data_array[inbound_turn_movement_index].turn_movement_type == U_TURN)
+							//	//{
+							//	//	operation_data.turn_movement_green_time_array[inbound_turn_movement_index] = scenario_data.simulation_interval_length*0.8f/
+							//	//		((inbound_turn_movement_size)*1.0f);
+							//	//}
+							//}
 						}
 
 						//prihibited

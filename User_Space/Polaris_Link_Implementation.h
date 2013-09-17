@@ -293,8 +293,8 @@ namespace Link_Components
 
 				//jam density * length * num_lanes = Kj(a,t)*L(a)*nlanes(a,t)
 					
-				float num_vehicles_under_jam_density_on_inbound_link = _num_lanes * _jam_density * _length/5280.0f;
-				num_vehicles_under_jam_density_on_inbound_link = max(_num_lanes*2.0f,num_vehicles_under_jam_density_on_inbound_link);
+				//float num_vehicles_under_jam_density_on_inbound_link = _num_lanes * _jam_density * _length/5280.0f;
+				//num_vehicles_under_jam_density_on_inbound_link = max(_num_lanes*2.0f,num_vehicles_under_jam_density_on_inbound_link);
 
 				int t_minus_one_fftt = -1;
 				int link_upstream_cumulative_vehicles_by_t_minus_one = 0;	
@@ -319,8 +319,8 @@ namespace Link_Components
 				}
 					
 				//supply(a,t) = Kj(a,t)*L(a)*nlanes(a,t) + N(a,L(a),t-bwtt) -N(a,0,t-1) = backward wave propogation in link
-				link_available_spaces = num_vehicles_under_jam_density_on_inbound_link + link_downstream_cumulative_vehicles_by_t_minus_bwtt - link_upstream_cumulative_vehicles_by_t_minus_one;
-				//link_available_spaces = min((float)link_available_spaces, float(num_vehicles_under_jam_density_on_inbound_link - num_vehicles_in_link<ComponentType,CallerType,TargetType>()));
+				link_available_spaces = _num_vehicles_under_jam_density + link_downstream_cumulative_vehicles_by_t_minus_bwtt - link_upstream_cumulative_vehicles_by_t_minus_one;
+				link_available_spaces = min((float)link_available_spaces, float(_num_vehicles_under_jam_density - num_vehicles_in_link<ComponentType,CallerType,TargetType>()));
 				_link_supply = max(0.0,(double)link_available_spaces);
 
 				float current_link_capacity = 0.0;
@@ -358,18 +358,20 @@ namespace Link_Components
 
 				upstream_cumulative_departed_vehicles = max(0,upstream_cumulative_departed_vehicles);
 
-				if (t_minus_bwtt>-1)
-				{
-					int jam_vehicles = (int) (_num_lanes * _length * _jam_density/5280.0f);
-					jam_vehicles = max(_num_lanes*2,jam_vehicles);
+				//if (t_minus_bwtt>-1)
+				//{
+				//	int jam_vehicles = (int) (_num_lanes * _length * _jam_density/5280.0f);
+				//	jam_vehicles = max(_num_lanes*2,jam_vehicles);
 
-					int cached=_cached_link_downstream_cumulative_vehicles_array[t_minus_bwtt]+jam_vehicles;
-					_link_upstream_cumulative_vehicles = min(upstream_cumulative_departed_vehicles,cached);
-				}
-				else
-				{
-					_link_upstream_cumulative_vehicles = upstream_cumulative_departed_vehicles;
-				}
+				//	int cached=_cached_link_downstream_cumulative_vehicles_array[t_minus_bwtt]+jam_vehicles;
+				//	_link_upstream_cumulative_vehicles = min(upstream_cumulative_departed_vehicles,cached);
+				//}
+				//else
+				//{
+				//	_link_upstream_cumulative_vehicles = upstream_cumulative_departed_vehicles;
+				//}
+				
+				_link_upstream_cumulative_vehicles = upstream_cumulative_departed_vehicles;
 
 				int t_fftt = -1;
 				int t_bwtt = -1;
@@ -902,8 +904,8 @@ namespace Link_Components
 				realtime_link_moe_data.link_in_flow_rate = (realtime_link_moe_data.link_in_volume * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>())) / _num_lanes;
 				realtime_link_moe_data.link_out_flow_rate = (realtime_link_moe_data.link_out_volume * 3600.0f / (((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>())) / _num_lanes;
 
-				realtime_link_moe_data.link_out_flow_ratio = realtime_link_moe_data.link_out_flow_rate / _maximum_flow_rate;
-				realtime_link_moe_data.link_in_flow_ratio = realtime_link_moe_data.link_in_flow_rate / _maximum_flow_rate;
+				realtime_link_moe_data.link_out_flow_ratio = realtime_link_moe_data.link_out_flow_rate / _original_maximum_flow_rate;
+				realtime_link_moe_data.link_in_flow_ratio = realtime_link_moe_data.link_in_flow_rate / _original_maximum_flow_rate;
 				realtime_link_moe_data.link_queue_length = _link_num_vehicles_in_queue;
 
 				realtime_link_moe_data.link_travel_time_ratio = realtime_link_moe_data.link_travel_time / (_length/5280.0f/_original_free_flow_speed * 60.0f);
@@ -946,9 +948,9 @@ namespace Link_Components
 				//ratio
 				link_moe_data.link_density_ratio = link_moe_data.link_density / _jam_density;
 				
-				link_moe_data.link_in_flow_ratio = link_moe_data.link_in_flow_rate / _maximum_flow_rate;
+				link_moe_data.link_in_flow_ratio = link_moe_data.link_in_flow_rate / _original_maximum_flow_rate;
 				
-				link_moe_data.link_out_flow_ratio = link_moe_data.link_out_flow_rate / _maximum_flow_rate;
+				link_moe_data.link_out_flow_ratio = link_moe_data.link_out_flow_rate / _original_maximum_flow_rate;
 
 				link_moe_data.link_speed_ratio = link_moe_data.link_speed /	_original_free_flow_speed;
 
