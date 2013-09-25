@@ -1,0 +1,502 @@
+#pragma once
+///----------------------------------------------------------------------------------------------------
+/// Forms.h - POLARIS Forms Library
+///----------------------------------------------------------------------------------------------------
+
+#include "Requirements.h"
+
+namespace polaris
+{
+
+	///----------------------------------------------------------------------------------------------------
+	/// General Macros
+	///----------------------------------------------------------------------------------------------------
+
+	#define this_component() ((ComponentType*)this)
+
+	#define type_of(NAME) NAME##_type
+	#define get_type_of(NAME) Component_Type::NAME##_type
+
+	///----------------------------------------------------------------------------------------------------
+	/// prototype - standard declarator for all prototypes
+	///----------------------------------------------------------------------------------------------------
+
+	#define prototype template<typename ComponentType>
+
+	#define tag_as_prototype\
+		typedef ComponentType Component_Type;\
+		typedef typename ComponentType::Master_Type Master_Type;\
+		typedef true_type Is_Prototype;\
+		const int Identify() const {return this_component()->Identify();}\
+		template<typename TargetType> bool Is_Type() const {return this_component()->Identify() == TargetType::component_index;}
+
+	///----------------------------------------------------------------------------------------------------
+	/// implementation - standard declarator for all implementations
+	///----------------------------------------------------------------------------------------------------
+
+	#define implementation template<typename MasterType,typename InheritanceList = NULLTYPELIST,template<class,class,class> class InheritanceTemplate = NULLTEMPLATE_3>
+
+	///----------------------------------------------------------------------------------------------------
+	/// declare_event - header for a basic event feature
+	///----------------------------------------------------------------------------------------------------
+
+	struct event_type{};
+
+	#define declare_event(EVENT_NAME)\
+		typedef event_type EVENT_NAME##_event_tag;\
+		static void EVENT_NAME(void* _this,Event_Response& resp)
+
+	///----------------------------------------------------------------------------------------------------
+	/// declare_feature_communication_handler - header for a basic handler feature
+	///----------------------------------------------------------------------------------------------------
+
+	struct communication_handler_type{};
+
+	#define declare_communication_handler(HANDLER_NAME)\
+		typedef communication_handler_type HANDLER_NAME##_communication_handler_tag;\
+		template<typename TargetType> static void HANDLER_NAME(void* _this,char* message)
+
+	///----------------------------------------------------------------------------------------------------
+	/// define_get_set_checks - implements a mini-concept to check for implementation existence
+	///----------------------------------------------------------------------------------------------------
+
+	//#define define_feature_exists_check(NAME, CHECK_ALIAS)\
+	//	public:\
+	//	template<typename T>\
+	//	struct CHECK_ALIAS\
+	//	{\
+	//	template<typename U> static small_type has_matching_typename(typename U::NAME##_feature_tag*);\
+	//		template<typename U> static large_type has_matching_typename(...);\
+	//		static const bool member_exists=sizeof(has_matching_typename<T>(0))==success;\
+	//		template<class U,bool B> struct p_conditional{typedef false_type type;};\
+	//		template<class U> struct p_conditional<U,true>{typedef typename is_same<typename U::NAME##_feature_tag,true_type>::type type;};\
+	//		static const bool value=(member_exists && p_conditional<T,member_exists>::type::value);\
+	//	};
+	//
+	//#define define_get_exists_check(NAME, GET_ALIAS)\
+	//	public:\
+	//	template<typename T>\
+	//	struct GET_ALIAS\
+	//	{\
+	//		template<typename U> static small_type has_matching_typename(typename U::NAME##_getter_tag*);\
+	//		template<typename U> static large_type has_matching_typename(...);\
+	//		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	//	};
+	//
+	//#define define_set_exists_check(NAME, SET_ALIAS)\
+	//	public:\
+	//	template<typename T>\
+	//	struct SET_ALIAS\
+	//	{\
+	//		template<typename U> static small_type has_matching_typename(typename U::NAME##_setter_tag*);\
+	//		template<typename U> static large_type has_matching_typename(...);\
+	//		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	//	};
+	//
+	//#define define_get_exists_delay_check(NAME, GET_ALIAS)\
+	//	public:\
+	//	template<typename T>\
+	//	struct GET_ALIAS\
+	//	{\
+	//		template<typename U> static small_type has_matching_typename(typename U::NAME##_getter_tag*);\
+	//		template<typename U> static large_type has_matching_typename(...);\
+	//		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	//	};
+	//
+	//#define define_set_exists_delay_check(NAME, SET_ALIAS)\
+	//	public:\
+	//	template<typename T>\
+	//	struct SET_ALIAS\
+	//	{\
+	//		template<typename U> static small_type has_matching_typename(typename U::NAME##_setter_tag*);\
+	//		template<typename U> static large_type has_matching_typename(...);\
+	//		static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+	//	};
+	//
+	//#define define_get_set_exists_check(NAME, GET_ALIAS, SET_ALIAS) define_get_exists_check(NAME, GET_ALIAS) define_set_exists_check(NAME, SET_ALIAS)
+	//#define define_get_set_exists_delay_check(NAME, GET_ALIAS, SET_ALIAS) define_get_exists_delay_check(NAME, GET_ALIAS) define_set_exists_delay_check(NAME, SET_ALIAS)
+
+	///----------------------------------------------------------------------------------------------------
+	/// tag_feature_as_available - generically tag a feature as available
+	///----------------------------------------------------------------------------------------------------
+
+	#define tag_feature_as_available(NAME) typedef true_type NAME##_feature_tag;
+
+	///----------------------------------------------------------------------------------------------------
+	/// tag_getter_as_available - tags the getter as available
+	///----------------------------------------------------------------------------------------------------
+
+	struct getter_type{};
+
+	#define tag_getter_as_available(NAME) typedef getter_type NAME##_getter_tag;
+
+	///----------------------------------------------------------------------------------------------------
+	/// tag_setter_as_available - tags the setter as available
+	///----------------------------------------------------------------------------------------------------
+
+	struct setter_type{};
+
+	#define tag_setter_as_available(NAME) typedef setter_type NAME##_setter_tag;
+
+	///============================================================================
+	/// tag_getter_setter_as_available - tag getter and setter as available
+	///----------------------------------------------------------------------------------------------------
+
+	#define tag_getter_setter_as_available(NAME) tag_getter_as_available(NAME);tag_setter_as_available(NAME)
+
+	///----------------------------------------------------------------------------------------------------
+	/// accessor - implements the standard get / set accessors
+	///		includes a tagless check on whether the implementation has corresponding accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		public:\
+			template<typename TypeChecked>\
+			struct NAME##_set_check\
+			{\
+				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
+				struct function_check{ static const bool value = true; };\
+				template<typename U>\
+				struct function_check<U,true>\
+				{\
+					template<typename V> static small_type has_matching_named_member(void (V::* arg)(NT,char(*)[1]) = &V::NAME<NT>);\
+					template<typename V> static large_type has_matching_named_member(...);\
+					\
+					template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
+					struct form_check{ static const bool value = false; };\
+					\
+					template<typename V> static small_type has_matching_formed_member( void (V::* arg)(NT,char(*)[1]) );\
+					template<typename V> static large_type has_matching_formed_member(...);\
+					\
+					template<typename V>\
+					struct form_check<V,true>{ static const int value = (sizeof(has_matching_formed_member<V>(&V::NAME<NT>))==success);};\
+					\
+					static const bool value = form_check<U>::value;\
+				};\
+				\
+				static const bool value = function_check<TypeChecked>::value;\
+			};\
+			template<typename TargetType>\
+			void NAME(TargetType set_value,requires(check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+			{\
+				this_component()->template NAME<TargetType>(set_value);\
+			}\
+			template<typename TargetType>\
+			void NAME(TargetType set_value,requires(!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+			{\
+				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists ---------]\n\n");\
+				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+			\
+			template<typename TypeChecked>\
+			struct NAME##_get_check\
+			{\
+				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
+				struct function_check{ static const bool value = true; };\
+				template<typename U>\
+				struct function_check<U,true>\
+				{\
+					template<typename V> static small_type has_matching_named_member(NT (V::* arg)(char(*)[1]) = &V::NAME<NT>);\
+					template<typename V> static large_type has_matching_named_member(...);\
+					\
+					template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
+					struct form_check{ static const bool value = false; };\
+					\
+					template<typename V> static small_type has_matching_formed_member( NT (V::* arg)(char(*)[1]) );\
+					template<typename V> static large_type has_matching_formed_member(...);\
+					\
+					template<typename V>\
+					struct form_check<V,true>{ static const int value = (sizeof(has_matching_formed_member<V>(&V::NAME<NT>))==success);};\
+					\
+					static const bool value = form_check<U>::value;\
+				};\
+				\
+				static const bool value = function_check<TypeChecked>::value;\
+			};\
+			template<typename TargetType>\
+			TargetType NAME(requires(check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+			{\
+				return this_component()->template NAME<TargetType>();\
+			}\
+			template<typename TargetType>\
+			TargetType NAME(requires(!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+			{\
+				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
+				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+
+	///----------------------------------------------------------------------------------------------------
+	/// explicit_accessor - implements get / set accessors which explicitly access stated value
+	///		includes a tagless check on whether the implementation has corresponding accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define explicit_accessor(ACCESS_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		public:\
+			template<typename TypeChecked>\
+			struct NAME##_set_check\
+			{\
+				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
+				struct function_check{ static const bool value = true; };\
+				template<typename U>\
+				struct function_check<U,true>\
+				{\
+					template<typename V> static small_type has_matching_named_member(void (V::* arg)(NT,char(*)[1]) = &V::NAME<NT>);\
+					template<typename V> static large_type has_matching_named_member(...);\
+					\
+					template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
+					struct form_check{ static const bool value = false; };\
+					\
+					template<typename V> static small_type has_matching_formed_member( void (V::* arg)(NT,char(*)[1]) );\
+					template<typename V> static large_type has_matching_formed_member(...);\
+					\
+					template<typename V>\
+					struct form_check<V,true>{ static const int value = (sizeof(has_matching_formed_member<V>(&V::NAME<NT>))==success);};\
+					\
+					static const bool value = form_check<U>::value;\
+				};\
+				\
+				static const bool value = function_check<TypeChecked>::value;\
+			};\
+			template<typename TargetType>\
+			void NAME(ACCESS_TYPE set_value,requires(check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+			{\
+				this_component()->template NAME<ACCESS_TYPE>(set_value);\
+			}\
+			template<typename TargetType>\
+			void NAME(ACCESS_TYPE set_value,requires(!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+			{\
+				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists ---------]\n\n");\
+				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+			\
+			template<typename TypeChecked>\
+			struct NAME##_get_check\
+			{\
+				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
+				struct function_check{ static const bool value = true; };\
+				template<typename U>\
+				struct function_check<U,true>\
+				{\
+					template<typename V> static small_type has_matching_named_member(NT (V::* arg)(char(*)[1]) = &V::NAME<NT>);\
+					template<typename V> static large_type has_matching_named_member(...);\
+					\
+					template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
+					struct form_check{ static const bool value = false; };\
+					\
+					template<typename V> static small_type has_matching_formed_member( NT (V::* arg)(char(*)[1]) );\
+					template<typename V> static large_type has_matching_formed_member(...);\
+					\
+					template<typename V>\
+					struct form_check<V,true>{ static const int value = (sizeof(has_matching_formed_member<V>(&V::NAME<NT>))==success);};\
+					\
+					static const bool value = form_check<U>::value;\
+				};\
+				\
+				static const bool value = function_check<TypeChecked>::value;\
+			};\
+			template<typename TargetType>\
+			ACCESS_TYPE NAME(requires(check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+			{\
+				return this_component()->template NAME<ACCESS_TYPE>();\
+			}\
+			template<typename TargetType>\
+			ACCESS_TYPE NAME(requires(!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+			{\
+				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
+				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+
+	///----------------------------------------------------------------------------------------------------
+	/// tag_based_accessor - implements the standard get / set accessors
+	///		includes a tag-based check on whether the implementation has corresponding accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define tag_based_accessor(NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		public:\
+			template<typename T>\
+			struct NAME##_set_check\
+			{\
+				template<typename U> static small_type has_matching_typename(typename U::NAME##_setter_tag*);\
+				template<typename U> static large_type has_matching_typename(...);\
+				static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+			};\
+			template<typename TargetType>\
+			void NAME(TargetType set_value,requires(check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+			{\
+				this_component()->template NAME<TargetType>(set_value);\
+			}\
+			template<typename TargetType>\
+			void NAME(TargetType set_value,requires(!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+			{\
+				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists, did you remember to use the macro \"tag_setter_as_available\"? ---------]\n\n");\
+				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+			template<typename T>\
+			struct NAME##_get_check\
+			{\
+				template<typename U> static small_type has_matching_typename(typename U::NAME##_getter_tag*);\
+				template<typename U> static large_type has_matching_typename(...);\
+				static const bool value=sizeof(has_matching_typename<T>(0))==success;\
+			};\
+			template<typename TargetType>\
+			TargetType NAME(requires(check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+			{\
+				return this_component()->template NAME<TargetType>();\
+			}\
+			template<typename TargetType>\
+			TargetType NAME(requires(!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+			{\
+				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists, did you remember to use the macro \"tag_getter_as_available\"? ---------]\n\n");\
+				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+
+	///----------------------------------------------------------------------------------------------------
+	/// m_data – member creator, type-definition and basic accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define m_data(DATA_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+			DATA_TYPE _##NAME;\
+		public:\
+			typedef remove_pointer<DATA_TYPE>::type NAME##_type;\
+			typedef DATA_TYPE NAME##_raw_type;\
+			template<typename TargetType>\
+			TargetType NAME(requires(      (!check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(      (check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(&_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(      (!check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(*_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(      (check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(!(GETTER_REQUIREMENTS)))\
+			{static_assert((GETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(      (!check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(DATA_TYPE)(value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(      (check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(DATA_TYPE)(*value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(      (!check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=((DATA_TYPE)(&value));}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(      (check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(DATA_TYPE)(value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value, requires(!(SETTER_REQUIREMENTS)))\
+			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+
+	///----------------------------------------------------------------------------------------------------
+	/// prototype_accessor - implements the standard get / set accessors for a prototype
+	///		includes a tagless check on whether the implementation has corresponding accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define prototype_accessor(PROTOTYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+		public:\
+			template<typename TypeChecked>\
+			struct NAME##_set_check\
+			{\
+				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
+				struct function_check{ static const bool value = true; };\
+				template<typename U>\
+				struct function_check<U,true>\
+				{\
+					template<typename V> static small_type has_matching_named_member(void (V::* arg)(NT,char(*)[1]) = &V::NAME<NT>);\
+					template<typename V> static large_type has_matching_named_member(...);\
+					\
+					template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
+					struct form_check{ static const bool value = false; };\
+					\
+					template<typename V> static small_type has_matching_formed_member( void (V::* arg)(NT,char(*)[1]) );\
+					template<typename V> static large_type has_matching_formed_member(...);\
+					\
+					template<typename V>\
+					struct form_check<V,true>{ static const int value = (sizeof(has_matching_formed_member<V>(&V::NAME<NT>))==success);};\
+					\
+					static const bool value = form_check<U>::value;\
+				};\
+				\
+				static const bool value = function_check<TypeChecked>::value;\
+			};\
+			template<typename TargetType>\
+			void NAME(PROTOTYPE<TargetType>* set_value,requires(check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+			{\
+				this_component()->template NAME<PROTOTYPE<TargetType>*>(set_value);\
+			}\
+			template<typename TargetType>\
+			void NAME(PROTOTYPE<TargetType>* set_value,requires(!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+			{\
+				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists ---------]\n\n");\
+				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+			\
+			template<typename TypeChecked>\
+			struct NAME##_get_check\
+			{\
+				template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
+				struct function_check{ static const bool value = true; };\
+				template<typename U>\
+				struct function_check<U,true>\
+				{\
+					template<typename V> static small_type has_matching_named_member(NT (V::* arg)(char(*)[1]) = &V::NAME<NT>);\
+					template<typename V> static large_type has_matching_named_member(...);\
+					\
+					template<typename V,bool Perform_Check = (sizeof(has_matching_named_member<U>(nullptr))==success)>\
+					struct form_check{ static const bool value = false; };\
+					\
+					template<typename V> static small_type has_matching_formed_member( NT (V::* arg)(char(*)[1]) );\
+					template<typename V> static large_type has_matching_formed_member(...);\
+					\
+					template<typename V>\
+					struct form_check<V,true>{ static const int value = (sizeof(has_matching_formed_member<V>(&V::NAME<NT>))==success);};\
+					\
+					static const bool value = form_check<U>::value;\
+				};\
+				\
+				static const bool value = function_check<TypeChecked>::value;\
+			};\
+			template<typename TargetType>\
+			PROTOTYPE<TargetType>* NAME(requires(check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+			{\
+				return this_component()->template NAME<PROTOTYPE<TargetType>*>();\
+			}\
+			template<typename TargetType>\
+			PROTOTYPE<TargetType>* NAME(requires(!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+			{\
+				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
+				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+
+	///----------------------------------------------------------------------------------------------------
+	/// m_prototype – member prototype creator, type-definition and basic accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define m_prototype(DATA_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
+			DATA_TYPE* _##NAME;\
+		public:\
+			typedef typename DATA_TYPE::Component_Type NAME##_type;\
+			typedef DATA_TYPE NAME##_interface_type;\
+			template<typename TargetType>\
+			TargetType NAME(requires(      (!check(TargetType,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(*_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(      (check(TargetType,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			{return (TargetType)(_##NAME);}\
+			template<typename TargetType>\
+			TargetType NAME(requires(!(GETTER_REQUIREMENTS)))\
+			{static_assert((GETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(      (!check(TargetType,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=((DATA_TYPE)(&value));}\
+			template<typename TargetType>\
+			void NAME(TargetType value,requires(      (check(TargetType,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(DATA_TYPE)(value);}\
+			template<typename TargetType>\
+			void NAME(TargetType value, requires(!(SETTER_REQUIREMENTS)))\
+			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+
+}
