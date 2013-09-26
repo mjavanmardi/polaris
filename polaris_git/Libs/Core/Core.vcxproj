@@ -138,6 +138,7 @@
     <ClInclude Include="Function_Signature.h" />
     <ClInclude Include="Generic.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Local_Concepts.h" />
     <ClInclude Include="Memory_Allocation.h" />
     <ClInclude Include="Polaris_Component.h" />
     <ClInclude Include="Requirements.h" />
