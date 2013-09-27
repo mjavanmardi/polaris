@@ -308,8 +308,9 @@ namespace polaris
 		Execution_Block* current_block;
 
 		// Computing blocks here is safe because they will not be added or removed until later
-		unsigned int suggested_blocks_per_execution_segment = (int)(((float)_active_blocks.size())/((float)execution_segments_per_thread() * (float)num_sim_threads()));
-		const unsigned int blocks_per_execution_segment = max(suggested_blocks_per_execution_segment,1);
+		const unsigned int suggested_blocks_per_execution_segment = (int)(((float)_active_blocks.size())/((float)execution_segments_per_thread() * (float)num_sim_threads()));
+		const unsigned int min_blocks = 1;
+		const unsigned int blocks_per_execution_segment = max(suggested_blocks_per_execution_segment,min_blocks);
 
 		// loop over the execution blocks which are active this event step
 		for( boost::intrusive::list<Execution_Block>::iterator itr = _active_blocks.begin(); itr != _active_blocks.end(); )

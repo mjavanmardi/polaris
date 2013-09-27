@@ -140,6 +140,7 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Local_Concepts.h" />
     <ClInclude Include="Memory_Allocation.h" />
+    <ClInclude Include="Multi_Buffer.h" />
     <ClInclude Include="Polaris_Component.h" />
     <ClInclude Include="Requirements.h" />
     <ClInclude Include="Runtime_Checking.h" />

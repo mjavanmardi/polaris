@@ -23,6 +23,8 @@ namespace polaris
 
 	#define prototype template<typename ComponentType>
 
+	#define MT MasterType
+
 	#define tag_as_prototype\
 		typedef ComponentType Component_Type;\
 		typedef typename ComponentType::Master_Type Master_Type;\
@@ -177,12 +179,12 @@ namespace polaris
 				static const bool value = function_check<TypeChecked>::value;\
 			};\
 			template<typename TargetType>\
-			void NAME(TargetType set_value,requires(check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+			void NAME(TargetType set_value,requires(TargetType,check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
 			{\
 				this_component()->template NAME<TargetType>(set_value);\
 			}\
 			template<typename TargetType>\
-			void NAME(TargetType set_value,requires(!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+			void NAME(TargetType set_value,requires(TargetType,!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists ---------]\n\n");\
 				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -214,12 +216,12 @@ namespace polaris
 				static const bool value = function_check<TypeChecked>::value;\
 			};\
 			template<typename TargetType>\
-			TargetType NAME(requires(check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+			TargetType NAME(requires(TargetType,check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
 			{\
 				return this_component()->template NAME<TargetType>();\
 			}\
 			template<typename TargetType>\
-			TargetType NAME(requires(!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+			TargetType NAME(requires(TargetType,!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
 				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -258,12 +260,12 @@ namespace polaris
 				static const bool value = function_check<TypeChecked>::value;\
 			};\
 			template<typename TargetType>\
-			void NAME(ACCESS_TYPE set_value,requires(check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+			void NAME(ACCESS_TYPE set_value,requires(TargetType,check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
 			{\
 				this_component()->template NAME<ACCESS_TYPE>(set_value);\
 			}\
 			template<typename TargetType>\
-			void NAME(ACCESS_TYPE set_value,requires(!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+			void NAME(ACCESS_TYPE set_value,requires(TargetType,!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists ---------]\n\n");\
 				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -295,12 +297,12 @@ namespace polaris
 				static const bool value = function_check<TypeChecked>::value;\
 			};\
 			template<typename TargetType>\
-			ACCESS_TYPE NAME(requires(check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+			ACCESS_TYPE NAME(requires(TargetType,check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
 			{\
 				return this_component()->template NAME<ACCESS_TYPE>();\
 			}\
 			template<typename TargetType>\
-			ACCESS_TYPE NAME(requires(!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+			ACCESS_TYPE NAME(requires(TargetType,!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
 				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -321,12 +323,12 @@ namespace polaris
 				static const bool value=sizeof(has_matching_typename<T>(0))==success;\
 			};\
 			template<typename TargetType>\
-			void NAME(TargetType set_value,requires(check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+			void NAME(TargetType set_value,requires(TargetType,check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
 			{\
 				this_component()->template NAME<TargetType>(set_value);\
 			}\
 			template<typename TargetType>\
-			void NAME(TargetType set_value,requires(!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+			void NAME(TargetType set_value,requires(TargetType,!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists, did you remember to use the macro \"tag_setter_as_available\"? ---------]\n\n");\
 				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -339,12 +341,12 @@ namespace polaris
 				static const bool value=sizeof(has_matching_typename<T>(0))==success;\
 			};\
 			template<typename TargetType>\
-			TargetType NAME(requires(check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+			TargetType NAME(requires(TargetType,check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
 			{\
 				return this_component()->template NAME<TargetType>();\
 			}\
 			template<typename TargetType>\
-			TargetType NAME(requires(!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+			TargetType NAME(requires(TargetType,!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists, did you remember to use the macro \"tag_getter_as_available\"? ---------]\n\n");\
 				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -357,37 +359,37 @@ namespace polaris
 	#define m_data(DATA_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 			DATA_TYPE _##NAME;\
 		public:\
-			typedef remove_pointer<DATA_TYPE>::type NAME##_type;\
+			typedef typename remove_pointer<DATA_TYPE>::type NAME##_type;\
 			typedef DATA_TYPE NAME##_raw_type;\
 			template<typename TargetType>\
-			TargetType NAME(requires(      (!check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\
 			template<typename TargetType>\
-			TargetType NAME(requires(      (check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(&_##NAME);}\
 			template<typename TargetType>\
-			TargetType NAME(requires(      (!check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(*_##NAME);}\
 			template<typename TargetType>\
-			TargetType NAME(requires(      (check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\
 			template<typename TargetType>\
-			TargetType NAME(requires(!(GETTER_REQUIREMENTS)))\
+			TargetType NAME(requires(TargetType,!(GETTER_REQUIREMENTS)))\
 			{static_assert((GETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(      (!check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=(DATA_TYPE)(value);}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(      (check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && !check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=(DATA_TYPE)(*value);}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(      (!check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=((DATA_TYPE)(&value));}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(      (check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && check(DATA_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=(DATA_TYPE)(value);}\
 			template<typename TargetType>\
-			void NAME(TargetType value, requires(!(SETTER_REQUIREMENTS)))\
+			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
 			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 
 	///----------------------------------------------------------------------------------------------------
@@ -423,12 +425,12 @@ namespace polaris
 				static const bool value = function_check<TypeChecked>::value;\
 			};\
 			template<typename TargetType>\
-			void NAME(PROTOTYPE<TargetType>* set_value,requires(check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+			void NAME(PROTOTYPE<TargetType>* set_value,requires(TargetType,check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
 			{\
 				this_component()->template NAME<PROTOTYPE<TargetType>*>(set_value);\
 			}\
 			template<typename TargetType>\
-			void NAME(PROTOTYPE<TargetType>* set_value,requires(!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+			void NAME(PROTOTYPE<TargetType>* set_value,requires(TargetType,!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists ---------]\n\n");\
 				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -460,12 +462,12 @@ namespace polaris
 				static const bool value = function_check<TypeChecked>::value;\
 			};\
 			template<typename TargetType>\
-			PROTOTYPE<TargetType>* NAME(requires(check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+			PROTOTYPE<TargetType>* NAME(requires(TargetType,check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
 			{\
 				return this_component()->template NAME<PROTOTYPE<TargetType>*>();\
 			}\
 			template<typename TargetType>\
-			PROTOTYPE<TargetType>* NAME(requires(!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+			PROTOTYPE<TargetType>* NAME(requires(TargetType,!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
 				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -481,22 +483,22 @@ namespace polaris
 			typedef typename DATA_TYPE::Component_Type NAME##_type;\
 			typedef DATA_TYPE NAME##_interface_type;\
 			template<typename TargetType>\
-			TargetType NAME(requires(      (!check(TargetType,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(*_##NAME);}\
 			template<typename TargetType>\
-			TargetType NAME(requires(      (check(TargetType,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\
 			template<typename TargetType>\
-			TargetType NAME(requires(!(GETTER_REQUIREMENTS)))\
+			TargetType NAME(requires(TargetType,!(GETTER_REQUIREMENTS)))\
 			{static_assert((GETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(      (!check(TargetType,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=((DATA_TYPE)(&value));}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(      (check(TargetType,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
-			{_##NAME=(DATA_TYPE)(value);}\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			{_##NAME=(DATA_TYPE*)(value);}\
 			template<typename TargetType>\
-			void NAME(TargetType value, requires(!(SETTER_REQUIREMENTS)))\
+			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
 			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
 
 }

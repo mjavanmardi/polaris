@@ -78,4 +78,26 @@ namespace polaris
 	template<typename MasterType,typename InheritanceList,typename ObjectType>
 	typename Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type* const Polaris_Component<MasterType,InheritanceList,ObjectType>::component_manager 
 		= Add_Component_Manager( new Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type() );
+
+
+	template<typename MasterType,typename InheritanceList>
+	class Polaris_Component<MasterType,InheritanceList,NT>
+	{
+	public:
+		Polaris_Component(){}
+
+		const int Identify() const{return -1;}
+
+		typedef MasterType Master_Type;
+
+		typedef InheritanceList Inheritance_List;
+		
+		typedef typename TypeAt<InheritanceList,1>::Result Component_Type;
+		typedef Component_Type ComponentType;
+
+		static const int component_id;
+	};
+
+	template<typename MasterType,typename InheritanceList>
+	const int Polaris_Component<MasterType,InheritanceList,NT>::component_id = -1;
 }

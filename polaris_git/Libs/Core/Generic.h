@@ -27,6 +27,8 @@ namespace polaris
 	template<typename A,typename B> struct NULLTEMPLATE_2{};
 	template<typename A,typename B,typename C> struct NULLTEMPLATE_3{};
 	template<typename A,typename B,typename C,typename D> struct NULLTEMPLATE_4{};
+	template<typename A,typename B,typename C,typename D,typename E> struct NULLTEMPLATE_5{};
+	template<typename A,typename B,typename C,typename D,typename E,typename F> struct NULLTEMPLATE_6{};
 
 	///----------------------------------------------------------------------------------------------------
 	/// TypeList Definition

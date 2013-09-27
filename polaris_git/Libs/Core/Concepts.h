@@ -33,8 +33,12 @@ namespace polaris
 	#define assert_default_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 	#define assert_sub_check_2(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS,ERROR_MESSAGE) static_assert(CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 
-	#define requires(...) char(*)[__VA_ARGS__ && True_Concept<TargetType>::value]=NULL
+	#define delay_compilation(A_TEMPLATE_ARGUMENT) True_Concept<A_TEMPLATE_ARGUMENT>::value
+
+	//#define requires(...) char(*)[__VA_ARGS__ && True_Concept<TargetType>::value]=NULL
 	
+	#define requires(TEMPLATE_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION,...) char(*)[__VA_ARGS__ && True_Concept<TEMPLATE_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION>::value]=NULL
+
 	#define method_requires(...) char(*)[__VA_ARGS__]=NULL
 
 	#define check(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<TYPE_TO_TEST>::value
@@ -46,7 +50,7 @@ namespace polaris
 	#define null_requirement char(*)[1]=nullptr
 	#define null_rq char(*)[1]=nullptr
 
-	#define _none true
+	#define NONE true
 	
 	///============================================================================
 	/// IF - standard compile-time IF statement

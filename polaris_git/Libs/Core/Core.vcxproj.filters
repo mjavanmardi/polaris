@@ -125,5 +125,8 @@
     <ClInclude Include="Local_Concepts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Multi_Buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
