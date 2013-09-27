@@ -20,6 +20,8 @@ namespace polaris
 	typedef volatile unsigned int _atomic_counter;
 #endif
 
+	static int thread_id(){return __thread_id;}
+
 #ifdef _MSC_VER
 	#define SLEEP(Seconds) Sleep(Seconds*1000)
 	#include <intrin.h>

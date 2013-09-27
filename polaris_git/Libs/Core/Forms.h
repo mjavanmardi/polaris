@@ -36,7 +36,7 @@ namespace polaris
 	/// implementation - standard declarator for all implementations
 	///----------------------------------------------------------------------------------------------------
 
-	#define implementation template<typename MasterType,typename InheritanceList = NULLTYPELIST,template<class,class,class> class InheritanceTemplate = NULLTEMPLATE_3>
+	#define implementation template<typename MasterType,typename InheritanceList = NULLTYPELIST>
 
 	///----------------------------------------------------------------------------------------------------
 	/// declare_event - header for a basic event feature
