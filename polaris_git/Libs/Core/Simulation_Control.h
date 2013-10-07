@@ -26,6 +26,26 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
+	DataType* Object_Lookup(int uuid)
+	{
+		bool object_found = false;
+
+		for(unsigned int i=0;i<(num_sim_threads()+1);i++)
+		{
+			if(DataType::component_manager->_object_repository[i].count(uuid))
+			{
+				return (DataType*)DataType::component_manager->_object_repository[i][uuid];
+			}
+		}
+		
+		return nullptr;
+	}
+
+	///----------------------------------------------------------------------------------------------------
+	/// Average_Execution_Objects_Hint - provide a hint to the engine about number of objects expected
+	///----------------------------------------------------------------------------------------------------
+
+	template<typename DataType>
 	void Average_Execution_Objects_Hint(unsigned int value);
 
 	///----------------------------------------------------------------------------------------------------
@@ -47,6 +67,7 @@ namespace polaris
 		virtual Component_Manager_Types Component_Manager_Type(){ return NULL_MANAGER; }
 
 		boost::unordered::unordered_map<int,pair<int,void(NULLTYPE::*)(void)>> function_map;
+		boost::unordered_map<int,void*>* _object_repository;
 	};
 
 	extern int __component_counter;

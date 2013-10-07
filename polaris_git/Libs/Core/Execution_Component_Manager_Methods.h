@@ -74,7 +74,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Execution_Component_Manager<DataType>::Allocate()
+	DataType* Execution_Component_Manager<DataType>::Allocate(int uuid)
 	{
 		// Check whether thread has memory of this type available
 		if( _blocks_with_free_cells[__thread_id].empty() )
@@ -206,6 +206,9 @@ namespace polaris
 
 		// allocate an object from the block itself
 		Byte* return_memory = (Byte*)free_block->Allocate<DataType>();
+
+		// add information about the uuid
+		_object_repository[__thread_id][uuid] = return_memory;
 
 		new (return_memory) DataType();
 

@@ -54,7 +54,7 @@ namespace polaris
 	class Polaris_Component : public ObjectType
 	{
 	public:
-		Polaris_Component():ObjectType(component_id){}
+		Polaris_Component(int uuid = -1):ObjectType(component_id,uuid){}
 
 		const int Identify() const{return _component_id;}
 

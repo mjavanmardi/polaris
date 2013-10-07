@@ -20,9 +20,9 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Allocate(void)
+	DataType* Allocate(int uuid = -1)
 	{
-		return (DataType*)((DataType::component_manager)->Allocate());
+		return (DataType*)((DataType::component_manager)->Allocate(uuid));
 	}
 
 	template<typename DataType>

@@ -13,9 +13,13 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>
-	DataType* Data_Component_Manager<DataType>::Allocate( )
+	DataType* Data_Component_Manager<DataType>::Allocate(int uuid)
 	{
-		return new DataType();
+		DataType* return_memory = new DataType();
+		// add information about the uuid
+		_object_repository[__thread_id][uuid] = return_memory;
+
+		return return_memory;
 	}
 
 	///----------------------------------------------------------------------------------------------------

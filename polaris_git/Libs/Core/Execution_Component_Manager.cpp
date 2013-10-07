@@ -18,6 +18,8 @@ namespace polaris
 		_blocks_with_free_cells = new boost::container::deque<Execution_Block*>[num_sim_threads() + 1];
 		_num_empty_blocks = new _atomic_counter[num_sim_threads() + 1]();
 
+		_object_repository = new boost::unordered_map<int,void*>[num_sim_threads() + 1];
+
 		_tex_next_revision = __revision_omega;
 		_tex_next_next_revision = __revision_omega;
 
