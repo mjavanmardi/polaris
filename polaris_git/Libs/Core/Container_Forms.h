@@ -90,6 +90,54 @@ namespace polaris
 	};
 
 	///----------------------------------------------------------------------------------------------------
+	/// Prototype_Sequence - stl Sequence for POLARIS prototypes
+	///----------------------------------------------------------------------------------------------------
+
+	template<typename ComponentType,template<typename T> class value_prototype>
+	struct Prototype_Sequence
+	{
+		typedef ComponentType Component_Type;
+		typedef true_type Is_Prototype;
+
+		//typedef Input_Iterator<typename ComponentType::iterator> iterator;
+		typedef typename ComponentType::iterator iterator;
+		typedef typename ComponentType::size_type size_type;
+
+		typedef value_prototype<typename remove_pointer<typename ComponentType::value_type>::type>* value_type;
+		typedef value_type T;
+
+		iterator begin(){return ((ComponentType*)this)->begin();}
+
+		iterator end(){return ((ComponentType*)this)->end();}
+	
+		size_type size(){return ((ComponentType*)this)->size();}
+
+		size_type max_size(){return ((ComponentType*)this)->size();}
+
+		bool empty(){return ((ComponentType*)this)->empty();}
+
+		T& front(){return (T)(((ComponentType*)this)->front());}
+
+		iterator insert(iterator p, T& t){return ((ComponentType*)this)->insert(p,(typename ComponentType::value_type&)t);}
+
+		void insert(iterator p, size_type n, T t){return ((ComponentType*)this)->insert(p,n);}
+
+		void insert(iterator p, iterator i, iterator j){return ((ComponentType*)this)->insert(p,i,j);}
+
+		iterator erase(iterator p){return ((ComponentType*)this)->erase(p);}
+	
+		iterator erase(iterator p, iterator q){return ((ComponentType*)this)->erase(p,q);}
+
+		void clear(){return ((ComponentType*)this)->clear();}
+
+		void resize(size_type n){return ((ComponentType*)this)->resize(n);}
+	
+		void resize(size_type n, T t){return ((ComponentType*)this)->resize(n,t);}
+
+		void pop_front(){((ComponentType*)this)->pop_front();}
+	};
+
+	///----------------------------------------------------------------------------------------------------
 	/// Back_Insertion_Sequence - stl Back Insertion Sequence prototype
 	///----------------------------------------------------------------------------------------------------
 
@@ -561,12 +609,12 @@ namespace polaris
 				static const bool value = function_check<TypeChecked>::value;\
 			};\
 			template<typename TargetType>\
-			void NAME(CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE<get_value_type(TargetType)>*>* set_value,requires(TargetType,check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
+			void NAME(CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE>* set_value,requires(TargetType,check(ComponentType,NAME##_set_check) && (SETTER_REQUIREMENTS)))\
 			{\
-				this_component()->template NAME<CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE<get_value_type(TargetType)>*>*>(set_value);\
+				this_component()->template NAME<CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE>*>(set_value);\
 			}\
 			template<typename TargetType>\
-			void NAME(CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE<get_value_type(TargetType)>*>* set_value,requires(TargetType,!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
+			void NAME(CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE>* set_value,requires(TargetType,!check(ComponentType,NAME##_set_check) || !(SETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_set_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a setter for " #NAME " exists ---------]\n\n");\
 				static_assert(SETTER_REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");\
@@ -598,12 +646,12 @@ namespace polaris
 				static const bool value = function_check<TypeChecked>::value;\
 			};\
 			template<typename TargetType>\
-			CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE<get_value_type(TargetType)>*>* NAME(requires(TargetType,check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
+			CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE>* NAME(requires(TargetType,check(ComponentType,NAME##_get_check) && (GETTER_REQUIREMENTS)))\
 			{\
-				return this_component()->template NAME<CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE<get_value_type(TargetType)>*>*>();\
+				return this_component()->template NAME<CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE>*>();\
 			}\
 			template<typename TargetType>\
-			CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE<get_value_type(TargetType)>*>* NAME(requires(TargetType,!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
+			CONTAINER_PROTOTYPE<TargetType,VALUE_PROTOTYPE>* NAME(requires(TargetType,!check(ComponentType,NAME##_get_check) || !(GETTER_REQUIREMENTS)))\
 			{\
 				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
 				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
