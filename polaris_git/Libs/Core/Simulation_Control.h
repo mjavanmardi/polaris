@@ -22,7 +22,7 @@ namespace polaris
 	inline long long preallocation_bytes();
 
 	///----------------------------------------------------------------------------------------------------
-	/// Average_Execution_Objects_Hint - provide a hint to the engine about number of objects expected
+	/// Object_Lookup - look up any object of any type by uuid
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename DataType>

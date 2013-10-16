@@ -30,7 +30,8 @@ namespace polaris
 		typedef typename ComponentType::Master_Type Master_Type;\
 		typedef true_type Is_Prototype;\
 		const int Identify() const {return this_component()->Identify();}\
-		template<typename TargetType> bool Is_Type() const {return this_component()->Identify() == TargetType::component_index;}
+		template<typename TargetType> bool Is_Type() const {return this_component()->Identify() == TargetType::component_index;}\
+		const int uuid(){return this_component()->uuid();}
 
 	///----------------------------------------------------------------------------------------------------
 	/// implementation - standard declarator for all implementations
@@ -226,6 +227,39 @@ namespace polaris
 				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
 				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
 			}\
+
+	///----------------------------------------------------------------------------------------------------
+	/// typed_accessor - implements get / set accessors which explicitly access stated value
+	///		includes a tagless check on whether the implementation has corresponding accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define typed_accessor(ACCESS_TYPE,NAME)\
+		public:\
+			void NAME(ACCESS_TYPE set_value)\
+			{\
+				this_component()->template NAME<ACCESS_TYPE>(set_value);\
+			}\
+			ACCESS_TYPE NAME()\
+			{\
+				return this_component()->template NAME<ACCESS_TYPE>();\
+			}
+
+	///----------------------------------------------------------------------------------------------------
+	/// typed_accessor - implements get / set accessors which explicitly access stated value
+	///		includes a tagless check on whether the implementation has corresponding accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define t_data(DATA_TYPE,NAME)\
+		DATA_TYPE _##NAME;\
+		public:\
+			void NAME(DATA_TYPE set_value)\
+			{\
+				_##NAME = set_value;\
+			}\
+			DATA_TYPE NAME()\
+			{\
+				return _##NAME;\
+			}
 
 	///----------------------------------------------------------------------------------------------------
 	/// explicit_accessor - implements get / set accessors which explicitly access stated value

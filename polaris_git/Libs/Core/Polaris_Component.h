@@ -56,6 +56,7 @@ namespace polaris
 	public:
 		Polaris_Component(int uuid = -1):ObjectType(component_id,uuid){}
 
+		const int uuid(){ return _uuid; }
 		const int Identify() const{return _component_id;}
 
 		typedef MasterType Master_Type;
