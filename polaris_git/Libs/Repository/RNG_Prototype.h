@@ -1,7 +1,8 @@
 #pragma once
-#include "Repository_Includes.h"
+#include "Dependencies.h"
 #include <time.h>
 
+namespace polaris{
 namespace RNG_Components
 {
 	namespace Types
@@ -12,23 +13,23 @@ namespace RNG_Components
 	{
 		concept struct Is_RNG
 		{
-			check_feature(Has_Rand_Defined,Next_Rand);
-			check_feature(Has_Rand_Defined_Prototype, Component_Type::Next_Rand);
+			check_typedef_name(Has_Rand_Defined,Next_Rand);
+			check_typedef_name(Has_Rand_Defined_Prototype, Component_Type::Next_Rand);
 			define_default_check(Has_Rand_Defined || Has_Rand_Defined_Prototype);
 		};
 	}
 	
 	namespace Prototypes
 	{
-		prototype struct RNG_Prototype ADD_DEBUG_INFO
+		prototype struct RNG
 		{
 			tag_as_prototype;
 
-			feature_prototype void Initialize()
+			void Initialize()
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>();
+				this_component()->Initialize();
 			}
-			feature_prototype void Initialize(	TargetType seed_value,
+			template<typename ValueType> void Initialize(	TargetType seed_value,
 												TargetType min = (TargetType)0,
 												TargetType max = (TargetType)1,
 												TargetType location = (TargetType)0,
@@ -36,38 +37,40 @@ namespace RNG_Components
 												TargetType shape = (TargetType)1,
 												requires(check(TargetType,is_arithmetic)))
 			{
-				this_component()->Initialize<ComponentType,CallerType,TargetType>(seed_value, min, max, location, scale, shape);
+				this_component()->Initialize<ValueType>(seed_value, min, max, location, scale, shape);
 			}
-			feature_prototype void Initialize(	TargetType seed_value,
-												TargetType min = (TargetType)0,
-												TargetType max = (TargetType)1,
-												TargetType location = (TargetType)0,
-												TargetType scale = (TargetType)1,
-												TargetType shape = (TargetType)1,
-												requires(check(TargetType,!is_arithmetic)))
+			template<typename ValueType> void Initialize(	ValueType seed_value,
+												ValueType min = (TargetType)0,
+												ValueType max = (TargetType)1,
+												ValueType location = (TargetType)0,
+												ValueType scale = (TargetType)1,
+												ValueType shape = (TargetType)1,
+												requires(check(ValueType,!is_arithmetic)))
 			{
-				assert_check(TargetType,is_arithmetic,"Error, the specified TargetType does not satisfy the 'is_arithmetic' concept");
+				assert_default_check(ValueType,is_arithmetic,"Error, the specified TargetType does not satisfy the 'is_arithmetic' concept");
 			}
 
-			feature_prototype TargetType Next_Rand()
+			template<typename ValueType> ValueType Next_Rand()
 			{
-				return this_component()->Next_Rand<ComponentType,CallerType,TargetType>();
+				return this_component()->Next_Rand<ValueType>();
 			}
 
-			feature_accessor(seed, check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			accessor(seed, check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 			
-			feature_accessor(minimum,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			accessor(minimum,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 
-			feature_accessor(maximum,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			accessor(maximum,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 
-			feature_accessor(location,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			accessor(location,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 
-			feature_accessor(shape,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			accessor(shape,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 
-			feature_accessor(scale,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
+			accessor(scale,check(ReturnValueType,is_arithmetic),check(SetValueType,is_arithmetic));
 		};
 	}
 
 }
 
-using namespace RNG_Components::Prototypes;
+using namespace RNG_Components;
+
+}

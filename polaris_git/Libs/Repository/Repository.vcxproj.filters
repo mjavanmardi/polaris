@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Population_Synthesis">
+      <UniqueIdentifier>{fc85dc2f-26d3-422b-851d-4dbf6cadcdba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Basic_Unit_Implementations.h">
@@ -25,6 +28,39 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dependencies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PopSyn_Implementations.h">
+      <Filter>Header Files\Population_Synthesis</Filter>
+    </ClInclude>
+    <ClInclude Include="PopSyn_Prototype.h">
+      <Filter>Header Files\Population_Synthesis</Filter>
+    </ClInclude>
+    <ClInclude Include="Synthesis_Region_Implementation.h">
+      <Filter>Header Files\Population_Synthesis</Filter>
+    </ClInclude>
+    <ClInclude Include="Synthesis_Region_Prototype.h">
+      <Filter>Header Files\Population_Synthesis</Filter>
+    </ClInclude>
+    <ClInclude Include="Synthesis_Zone_Implementations.h">
+      <Filter>Header Files\Population_Synthesis</Filter>
+    </ClInclude>
+    <ClInclude Include="Synthesis_Zone_Prototypes.h">
+      <Filter>Header Files\Population_Synthesis</Filter>
+    </ClInclude>
+    <ClInclude Include="Choice_Model_Implementations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Choice_Model_Prototypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RNG_Implementations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RNG_Prototype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RngStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
