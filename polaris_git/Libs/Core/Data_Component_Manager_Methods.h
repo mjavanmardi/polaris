@@ -16,6 +16,9 @@ namespace polaris
 	DataType* Data_Component_Manager<DataType>::Allocate(int uuid)
 	{
 		DataType* return_memory = new DataType();
+
+		((DataType*)return_memory)->_uuid = uuid;
+
 		// add information about the uuid
 		_object_repository[__thread_id][uuid] = return_memory;
 

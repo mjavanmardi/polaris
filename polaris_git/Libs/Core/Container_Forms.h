@@ -96,6 +96,9 @@ namespace polaris
 	template<typename ComponentType,template<typename T> class value_prototype>
 	struct Prototype_Sequence
 	{
+		static_assert(is_pointer<typename ComponentType::value_type>::value,"Container must hold pointer types");
+		//requires_typedef_type(contains_prototype,Is_Prototype,true_type);
+
 		typedef ComponentType Component_Type;
 		typedef true_type Is_Prototype;
 
@@ -103,7 +106,7 @@ namespace polaris
 		typedef typename ComponentType::iterator iterator;
 		typedef typename ComponentType::size_type size_type;
 
-		typedef value_prototype<typename remove_pointer<typename ComponentType::value_type>::type>* value_type;
+		typedef value_prototype<typename remove_pointer<typename ComponentType::value_type>::type::Component_Type>* value_type;
 		typedef value_type T;
 
 		iterator begin(){return ((ComponentType*)this)->begin();}
@@ -118,7 +121,7 @@ namespace polaris
 
 		T& front(){return (T)(((ComponentType*)this)->front());}
 
-		iterator insert(iterator p, T& t){return ((ComponentType*)this)->insert(p,(typename ComponentType::value_type&)t);}
+		iterator insert(iterator p, T t){return ((ComponentType*)this)->insert(p,t);}
 
 		void insert(iterator p, size_type n, T t){return ((ComponentType*)this)->insert(p,n);}
 
@@ -151,6 +154,67 @@ namespace polaris
 		typedef typename ComponentType::iterator iterator;
 		typedef typename ComponentType::size_type size_type;
 		typedef T value_type;
+
+		iterator begin(){return (iterator)((ComponentType*)this)->begin();}
+
+		iterator end(){return (iterator)((ComponentType*)this)->end();}
+	
+		size_type size(){return ((ComponentType*)this)->size();}
+
+		size_type max_size(){return ((ComponentType*)this)->size();}
+
+		bool empty(){return ((ComponentType*)this)->empty();}
+
+		T& front(){return (T)(((ComponentType*)this)->front());}
+
+		//iterator insert(iterator p, T t){return ((ComponentType*)this)->insert(p,t);}
+		iterator insert(iterator p, T& t){return ((ComponentType*)this)->insert(p,(typename ComponentType::value_type&)t);}
+
+		void insert(iterator p, size_type n, T t){return ((ComponentType*)this)->insert(p,n);}
+
+		void insert(iterator p, iterator i, iterator j){return ((ComponentType*)this)->insert(p,i,j);}
+
+		iterator erase(iterator p){return ((ComponentType*)this)->erase(p);}
+	
+		iterator erase(iterator p, iterator q){return ((ComponentType*)this)->erase(p,q);}
+
+		void clear(){return ((ComponentType*)this)->clear();}
+
+		void resize(size_type n){return ((ComponentType*)this)->resize(n);}
+	
+		void resize(size_type n, T t){return ((ComponentType*)this)->resize(n,t);}
+
+		T back(){return (T)(((ComponentType*)this)->back());}
+	
+		void push_back(T& t){return ((ComponentType*)this)->push_back((typename ComponentType::value_type&)t);}
+	
+		void push_back(T&& t){return ((ComponentType*)this)->push_back((typename ComponentType::value_type&&)t);}
+	
+		void pop_back(){((ComponentType*)this)->pop_back();}
+
+		void pop_front(){((ComponentType*)this)->pop_front();}
+
+		void sort(){((ComponentType*)this)->sort();}
+	};
+	
+	///----------------------------------------------------------------------------------------------------
+	/// Prototype_Back_Insertion_Sequence - stl Back Insertion Sequence prototype
+	///----------------------------------------------------------------------------------------------------
+	
+	template<typename ComponentType,template<typename T> class value_prototype>
+	struct Prototype_Back_Insertion_Sequence
+	{
+		static_assert(is_pointer<typename ComponentType::value_type>::value,"Container must hold pointer types");
+		//requires_typedef_type(contains_prototype,Is_Prototype,true_type);
+
+		typedef ComponentType Component_Type;
+		typedef true_type Is_Prototype;
+
+		//typedef Input_Iterator<typename ComponentType::iterator> iterator;
+		typedef typename ComponentType::iterator iterator;
+		typedef typename ComponentType::size_type size_type;
+		typedef value_prototype<typename remove_pointer<typename ComponentType::value_type>::type::Component_Type>* value_type;
+		typedef value_type T;
 
 		iterator begin(){return (iterator)((ComponentType*)this)->begin();}
 

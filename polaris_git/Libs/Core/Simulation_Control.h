@@ -4,6 +4,7 @@
 ///----------------------------------------------------------------------------------------------------
 
 #include "Globals.h"
+#include "Polaris_Variables.h"
 
 namespace polaris
 {
@@ -20,6 +21,8 @@ namespace polaris
 	inline unsigned int max_free_blocks();
 	inline unsigned int num_free_blocks_buffer();
 	inline long long preallocation_bytes();
+
+	typedef Basic_Units::Time_Variables::Time_Seconds Simulation_Timestep_Increment;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Object_Lookup - look up any object of any type by uuid
