@@ -10,6 +10,7 @@
 #include <boost/container/set.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/unordered/unordered_map.hpp>
+#include <boost/unordered/unordered_set.hpp>
 
 //#include <deque>
 //#include <list>

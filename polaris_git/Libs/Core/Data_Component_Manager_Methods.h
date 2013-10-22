@@ -7,7 +7,6 @@
 
 namespace polaris
 {
-
 	///----------------------------------------------------------------------------------------------------
 	/// Allocate - Allocate a Data object of given type in a multi-threaded paradigm
 	///----------------------------------------------------------------------------------------------------
@@ -16,8 +15,11 @@ namespace polaris
 	DataType* Data_Component_Manager<DataType>::Allocate(int uuid)
 	{
 		DataType* return_memory = new DataType();
+		
 		// add information about the uuid
 		_object_repository[__thread_id][uuid] = return_memory;
+		
+		((DataType*)return_memory)->_uuid = uuid;
 
 		return return_memory;
 	}

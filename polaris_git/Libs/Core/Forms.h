@@ -251,6 +251,7 @@ namespace polaris
 
 	#define t_data(DATA_TYPE,NAME)\
 		DATA_TYPE _##NAME;\
+		typedef remove_pointer<DATA_TYPE>::type NAME##_type;\
 		public:\
 			void NAME(DATA_TYPE set_value)\
 			{\
