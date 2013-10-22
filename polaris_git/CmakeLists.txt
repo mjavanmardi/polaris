@@ -1,0 +1,40 @@
+PROJECT(polaris CXX)
+cmake_minimum_required(VERSION 2.8)
+set(DEPS_DIR C:/opt/polarisdeps)
+
+SET(BOOST_ROOT C:/opt/boost_1_54_0)
+find_package(Boost 1.54)
+IF (Boost_FOUND)
+    INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+ENDIF()
+
+find_path(malloc_include windows/gperftools/tcmalloc.h PATHS ${DEPS_DIR}/gperftools-2.1/src)
+include_directories(${malloc_include})
+
+include_directories(${DEPS_DIR}/gtest-1.7.0/include)
+find_library(gtest NAMES gtest  HINTS ${DEPS_DIR}/gtest-1.7.0/msvc/gtest-md/Release)
+find_library(libtcmalloc NAMES libtcmalloc_minimal  HINTS ${DEPS_DIR}/gperftools-2.1/Release)
+
+include_directories(Libs/Core)
+include_directories(Libs)
+
+include_directories(${DEPS_DIR}/libodb-2.2.2)
+include_directories(${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0)
+include_directories(${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite)
+
+
+find_library(odb NAMES  odb HINTS ${DEPS_DIR}/libodb-2.2.2/lib64)
+find_library(odb_d NAMES  odb-d HINTS ${DEPS_DIR}/libodb-2.2.2/lib64)
+find_library(odb_sqlite NAMES  odb-sqlite HINTS ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/lib64)
+find_library(odb_sqlite_d NAMES  odb-sqlite-d HINTS ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/lib64)
+find_library(sqlite3 sqlite3 HINTS  C:/opt/polarisdeps/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite/lib64)
+find_library(sqlite3_d sqlite3-d HINTS  C:/opt/polarisdeps/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite/lib64)
+set(iolibs io optimized ${odb}  optimized ${sqlite3} optimized ${odb_sqlite} debug ${odb_d} debug ${sqlite3_d} debug ${odb_sqlite_d})
+
+
+add_subdirectory (Libs/Core) 
+add_subdirectory (Libs/Antares) 
+add_subdirectory (Libs/Repository) 
+add_subdirectory (Libs/io) 
+add_subdirectory (Apps/Core_Tests) 
+add_subdirectory (Apps/io_demo) 

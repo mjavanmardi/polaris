@@ -29,6 +29,7 @@
 //#include "Antares_Person_Data_Logger.h"
 
 #include "Navigation.h"
+#include "Primitives.h"
 #include "Render.h"
 #include "Identify.h"
 #include "Render_2D.h"

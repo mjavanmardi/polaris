@@ -17,6 +17,9 @@ namespace polaris
 	#define type_of(NAME) NAME##_type
 	#define get_type_of(NAME) Component_Type::NAME##_type
 
+	#define NONE true
+	#define NA false
+
 	///----------------------------------------------------------------------------------------------------
 	/// prototype - standard declarator for all prototypes
 	///----------------------------------------------------------------------------------------------------
@@ -341,6 +344,22 @@ namespace polaris
 			{\
 				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
 				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
+			}\
+
+	///----------------------------------------------------------------------------------------------------
+	/// typed_accessor - implements get / set accessors which explicitly access stated value
+	///		includes a tagless check on whether the implementation has corresponding accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define typed_accessor(ACCESS_TYPE,NAME)\
+		public:\
+			void NAME(ACCESS_TYPE set_value)\
+			{\
+				this_component()->template NAME<ACCESS_TYPE>(set_value);\
+			}\
+			ACCESS_TYPE NAME()\
+			{\
+				return this_component()->template NAME<ACCESS_TYPE>();\
 			}\
 
 	///----------------------------------------------------------------------------------------------------

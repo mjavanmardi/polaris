@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A6001372-EE62-4652-9DF5-3488687B7C74}</ProjectGuid>
-    <RootNamespace>Antares</RootNamespace>
+    <ProjectGuid>{9F4B522A-A3D0-4613-8D28-CBA9C8EBF0E8}</ProjectGuid>
+    <RootNamespace>Demo</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -40,7 +40,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -86,11 +86,15 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Libs\Core;C:\opt\polarisdeps\boost_1_54_0;C:\opt\polarisdeps\gperftools-2.1\src;C:\opt\polarisdeps\gtest-1.7.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\opt\polarisdeps\gperftools-2.1\Release</AdditionalLibraryDirectories>
+      <ForceSymbolReferences>__tcmalloc;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <AdditionalDependencies>C:\opt\polarisdeps\gtest-1.7.0\msvc\gtest-md\Release\gtest.lib;libtcmalloc_minimal.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -99,64 +103,26 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Libs\Core;$(SolutionDir)\Libs\Antares;C:\opt\polarisdeps\glew-1.7.0\include;C:\opt\polarisdeps\boost_1_54_0;C:\opt\polarisdeps\gperftools-2.1\src;C:\opt\polarisdeps\gtest-1.7.0\include;C:\opt\polarisdeps\wxWidgets-2.9.3\include\;C:\opt\polarisdeps\wxWidgets-2.9.3\include\msvc;C:\opt\polarisdeps\plplot\include\plplot</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Libs\Antares;$(SolutionDir)\Libs\Core;C:\opt\polarisdeps\glew-1.7.0\include;C:\opt\polarisdeps\boost_1_54_0;C:\opt\polarisdeps\gperftools-2.1\src;C:\opt\polarisdeps\gtest-1.7.0\include;C:\opt\polarisdeps\wxWidgets-2.9.3\include\;C:\opt\polarisdeps\wxWidgets-2.9.3\include\msvc;C:\opt\polarisdeps\plplot\include\plplot</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_UNICODE;GLEW_STATIC;ANTARES;IntegratedModelApplication;DBIO;WIN32;WINVER=0x0600;__WXMSW__;_WINDOWS;_MBCS;wxUSE_GUI=1;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\opt\polarisdeps\wxWidgets-2.9.3\lib\vc_lib;$(SolutionDir)$(Platform)\$(Configuration);C:\opt\polarisdeps\plplot\lib;C:\opt\polarisdeps\gperftools-2.1\Release</AdditionalLibraryDirectories>
+      <ForceSymbolReferences>__tcmalloc;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <AdditionalDependencies>C:\opt\polarisdeps\gtest-1.7.0\msvc\gtest-md\Release\gtest.lib;plplotd.lib;plplotcxxd.lib;csirocsa.lib;qsastime.lib;plplotwxwidgetsd.lib;libtcmalloc_minimal.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;antares.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <Lib>
-      <AdditionalLibraryDirectories>C:\opt\polarisdeps\gperftools-2.1\Release;C:\opt\polarisdeps\glew-1.7.0\lib;$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\Release\;C:\opt\polarisdeps\wxWidgets-2.9.3\lib\vc_lib;C:\opt\polarisdeps\plplot\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Antares.h" />
-    <ClInclude Include="Antares_App.h" />
-    <ClInclude Include="Antares_Frame.h" />
-    <ClInclude Include="Antares_Frame_Implementation.h" />
-    <ClInclude Include="Dependencies.h" />
-    <ClInclude Include="Antares_Layer.h" />
-    <ClInclude Include="Antares_Layer_Implementation.h" />
-    <ClInclude Include="Attributes_Panel.h" />
-    <ClInclude Include="Attributes_Panel_Implementation.h" />
-    <ClInclude Include="Canvas.h" />
-    <ClInclude Include="Canvas_Implementation.h" />
-    <ClInclude Include="Conductor.h" />
-    <ClInclude Include="Conductor_Implementation.h" />
-    <ClInclude Include="Control_Dialog.h" />
-    <ClInclude Include="Control_Dialog_Implementation.h" />
-    <ClInclude Include="Control_Panel.h" />
-    <ClInclude Include="Control_Panel_Implementation.h" />
-    <ClInclude Include="Draw_Layer.h" />
-    <ClInclude Include="Draw_Layer_2D.h" />
-    <ClInclude Include="Geometry.h" />
-    <ClInclude Include="Geometry_Implementation.h" />
-    <ClInclude Include="Identify.h" />
-    <ClInclude Include="Information_Page.h" />
-    <ClInclude Include="Information_Page_Implementation.h" />
-    <ClInclude Include="Information_Panel.h" />
-    <ClInclude Include="Information_Panel_Implementation.h" />
-    <ClInclude Include="Layer_Management.h" />
-    <ClInclude Include="Layer_Options.h" />
-    <ClInclude Include="Layer_Options_Implementation.h" />
-    <ClInclude Include="Navigation.h" />
-    <ClInclude Include="Primitives.h" />
-    <ClInclude Include="Render.h" />
-    <ClInclude Include="Render_2D.h" />
-    <ClInclude Include="Splash_Panel.h" />
-    <ClInclude Include="Splash_Panel_Implementation.h" />
-    <ClInclude Include="Time_Panel.h" />
-    <ClInclude Include="Time_Panel_Implementation.h" />
-    <ClInclude Include="Visibility_Testing.h" />
+    <ClCompile Include="Demo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Antares.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Core\Core.vcxproj">
+    <ProjectReference Include="..\..\Libs\Antares\Antares.vcxproj">
+      <Project>{a6001372-ee62-4652-9df5-3488687b7c74}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libs\Core\Core.vcxproj">
       <Project>{f4bd5a4b-b932-40df-9f09-531ef60745fa}</Project>
     </ProjectReference>
   </ItemGroup>

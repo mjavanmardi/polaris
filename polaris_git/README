@@ -1,0 +1,14 @@
+Building Using cmake
+You can download cmake from here http://www.cmake.org/files/v2.8/cmake-2.8.12-win32-x86.zip
+Make sure it is added to the PATH
+
+Open CmakeLists.txt and make sure that BOOST_ROOT is set up properly
+
+run the following commands:
+mkdir build
+cd build
+cmake -G"Visual Studio 10 Win64" ..
+
+This will generate a polaris.sln file you can open in Visual Studio 10
+
+Switch to MinSizeRel and build
