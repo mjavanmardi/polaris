@@ -30,21 +30,24 @@ namespace polaris
 	{
 		//tag_as_prototype;
 
-		int id() { return this_component()->id<int>(); }
+		void Copy(Input_Connected_Edge<ComponentType>& copy) { this_component()->Copy((ComponentType&)copy); }
+
+		long long id() { return this_component()->id<long long>(); }
 
 		float pos_x() { return this_component()->pos_x<float>(); }
 		float pos_y() { return this_component()->pos_y<float>(); }
 
-		Sequence<typename ComponentType::forward_edge_ids_type,int>* forward_edge_ids(){ return this_component()->forward_edge_ids< Sequence<typename ComponentType::forward_edge_ids_type,int>* >(); }
+		Sequence<typename ComponentType::forward_edge_ids_type,long long>* forward_edge_ids(){ return this_component()->forward_edge_ids< Sequence<typename ComponentType::forward_edge_ids_type,long long>* >(); }
 
-		Sequence<typename ComponentType::backward_edge_ids_type,int>* backward_edge_ids(){ return this_component()->backward_edge_ids< Sequence<typename ComponentType::backward_edge_ids_type,int>* >(); }
+		Sequence<typename ComponentType::backward_edge_ids_type,long long>* backward_edge_ids(){ return this_component()->backward_edge_ids< Sequence<typename ComponentType::backward_edge_ids_type,long long>* >(); }
 	};
 
 	prototype struct Input_Node
 	{
 		//tag_as_prototype;
+		void Copy(ComponentType& copy) { this_component()->Copy(copy); }
 
-		int id() { return this_component()->id<int>(); }
+		long long id() { return this_component()->id<long long>(); }
 
 		float pos_x() { return this_component()->pos_x<float>(); }
 		float pos_y() { return this_component()->pos_y<float>(); }
@@ -53,11 +56,12 @@ namespace polaris
 	prototype struct Input_Edge
 	{
 		//tag_as_prototype;
+		void Copy(ComponentType& copy) { this_component()->Copy(copy); }
 
-		int id() { return this_component()->id<int>(); }
+		long long id() { return this_component()->id<long long>(); }
 
-		unsigned int in_node_id() { return this_component()->in_node_id<int>(); }
-		unsigned int out_node_id() { return this_component()->out_node_id<int>(); }
+		unsigned int in_node_id() { return this_component()->in_node_id<long long>(); }
+		unsigned int out_node_id() { return this_component()->out_node_id<long long>(); }
 	};
 
 
@@ -75,7 +79,7 @@ namespace polaris
 			void edge(Packed_Edge* value){ ((neighbor_type*)this)->edge(value); }
 		};
 
-		const int id(){ return this_component()->id(); }
+		const long long id(){ return this_component()->id(); }
 
 		const float pos_x(){ return this_component()->pos_x(); }
 		const float pos_y(){ return this_component()->pos_y(); }
@@ -116,7 +120,7 @@ namespace polaris
 			return this_component()->Copy_Graph((ComponentType*)io_copy,callback);
 		}
 
-		void Update_Edge(int id, typename edge_update_callback<edge_type>::type callback = nullptr)
+		void Update_Edge(long long id, typename edge_update_callback<edge_type>::type callback = nullptr)
 		{
 			this_component()->Update_Edge(id,callback);
 		}
@@ -127,19 +131,24 @@ namespace polaris
 		}
 
 		template<typename ExtendedInterface>
-		Packed_Edge<edge_type,ExtendedInterface>* Get_Edge(int id)
+		Packed_Edge<edge_type,ExtendedInterface>* Get_Edge(long long id)
 		{
 			return this_component()->Get_Edge< Packed_Edge<edge_type,ExtendedInterface>* >(id);
 		}
-
+		
 		template<typename ExtendedInterface>
 		Sequence<edges_type,Packed_Edge<edge_type,ExtendedInterface>*>* edges()
 		{
-			return this_component()->edges< Sequence<edges_type,Packed_Edge<edge_type,InheritedPrototype>*>* >();
+			return this_component()->edges< Sequence<edges_type,Packed_Edge<edge_type,ExtendedInterface>*>* >();
+		}
+
+		Sequence<edges_type,Packed_Edge<edge_type,NT>*>* edges()
+		{
+			return this_component()->edges< Sequence<edges_type,Packed_Edge<edge_type,NT>*>* >();
 		}
 	};
 	
-	prototype struct Graph_Assembler_Edge
+	prototype struct Graph_Assembler_Connected_Edge
 	{
 		tag_as_prototype;
 

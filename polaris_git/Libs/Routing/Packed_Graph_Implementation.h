@@ -11,13 +11,11 @@ namespace polaris
 		struct Neighbor_Edge : public Neighbor_Attribute_Set
 		{
 			typedef Packed_Edge_Implementation edge_type;
-			
-			float weight(){ return 0.0f; }
 
 			Neighbor_Edge* next(){ return (Neighbor_Edge*)(this + 1); }
 
-			Packed_Edge_Implementation* edge(){ return _edge; }
-			void edge(Packed_Edge_Implementation* value){ _edge = value; }
+			inline Packed_Edge_Implementation* edge(){ return _edge; }
+			inline void edge(Packed_Edge_Implementation* value){ _edge = value; }
 			
 			Packed_Edge_Implementation* _edge;
 		};
@@ -35,8 +33,8 @@ namespace polaris
 		const int num_backward_edges(){ return _num_backward_edges; }
 		void num_backward_edges(const int value){ _num_backward_edges = value; }
 
-		int _id;
-		const int id(){ return _id; }
+		long long _id;
+		const long long id(){ return _id; }
 
 		Neighbor_Edge* forward_edges(){ return (Neighbor_Edge*)(((char*)this) + sizeof(Packed_Edge_Implementation)); }
 		const Neighbor_Edge* const end_forward_edges(){ return (const Neighbor_Edge* const)(((char*)this) + sizeof(Packed_Edge_Implementation) + sizeof(Neighbor_Edge) * _num_forward_edges); }
@@ -81,7 +79,7 @@ namespace polaris
 		typedef typename Edge_Type::neighbor_type neighbor_type;
 		typedef Packed_Graph_Implementation output_graph_type;
 
-		void Update_Edge(int id, typename edge_update_callback<edge_type>::type callback = nullptr)
+		void Update_Edge(long long id, typename edge_update_callback<edge_type>::type callback = nullptr)
 		{
 			if(_packed_edge_reference.count(id))
 			{
@@ -128,13 +126,14 @@ namespace polaris
 
 			memcpy((void*)new_graph_data,old_graph_data,_graph_size);
 
-
 			packed_edge_type* current_edge = (packed_edge_type*)new_graph_data;
 
 			if(callback == nullptr)
 			{
 				while(current_edge != (packed_edge_type*)(new_graph_data + _graph_size))
 				{
+					cout << "Done Copying! " << _graph_size << endl;
+
 					copy->_edges.push_back(current_edge);
 					copy->_packed_edge_reference[current_edge->id()] = current_edge;
 
@@ -375,7 +374,7 @@ namespace polaris
 					
 
 					// contains the original pointer, can use this to establish internal pointer linkage
-					int id = neighbor_itr->edge()->id();
+					long long id = neighbor_itr->edge()->id();
 
 					//cout << "Updating neighbor: " << id << endl;
 
@@ -389,7 +388,7 @@ namespace polaris
 				for( packed_edge_type::Neighbor_Edge* neighbor_itr = current_edge->backward_edges(); neighbor_itr != end_backward_neighbor_itr; neighbor_itr = neighbor_itr->next() )
 				{
 					// contains the original pointer, can use this to establish internal pointer linkage
-					int id = neighbor_itr->edge()->id();
+					long long id = neighbor_itr->edge()->id();
 
 					packed_edge_type* new_neighbor_edge = copy->_packed_edge_reference[id];
 					neighbor_itr->edge(new_neighbor_edge);
@@ -587,7 +586,7 @@ namespace polaris
 					
 
 					// contains the original pointer, can use this to establish internal pointer linkage
-					int id = neighbor_itr->edge()->id();
+					long long id = neighbor_itr->edge()->id();
 
 					//cout << "Updating neighbor: " << id << endl;
 
@@ -601,7 +600,7 @@ namespace polaris
 				for( packed_edge_type::Neighbor_Edge* neighbor_itr = current_edge->backward_edges(); neighbor_itr != end_backward_neighbor_itr; neighbor_itr = neighbor_itr->next() )
 				{
 					// contains the original pointer, can use this to establish internal pointer linkage
-					int id = neighbor_itr->edge()->id();
+					long long id = neighbor_itr->edge()->id();
 
 					packed_edge_type* new_neighbor_edge = copy->_packed_edge_reference[id];
 					neighbor_itr->edge(new_neighbor_edge);
@@ -612,22 +611,27 @@ namespace polaris
 		}
 
 		template<typename TargetType>
-		TargetType Get_Edge(int id)
+		TargetType Get_Edge(long long id)
 		{
-			return (TargetType)_packed_edge_reference[id];
+			if(!_packed_edge_reference.count(id)) return nullptr;
+			else return (TargetType)_packed_edge_reference[id];
 		}
 
 		template<typename Input_Edge_Type>
 		void Add_Edge(Input_Connected_Edge<Input_Edge_Type>* new_edge)
 		{
 			if(_ordered_input_edge_reference == nullptr) _ordered_input_edge_reference = new boost::container::vector<void*>();
-			if(_input_edge_reference == nullptr) _input_edge_reference = new unordered_map<int, void*>();
+			if(_input_edge_reference == nullptr) _input_edge_reference = new boost::unordered::unordered_map<long long, void*>();
 
-			if(_input_edge_reference->count(new_edge->id())) THROW_WARNING("Edge id " << new_edge->id() << " already exists!");
+			Input_Connected_Edge<Input_Edge_Type>* new_edge_copy = (Input_Connected_Edge<Input_Edge_Type>*)new Input_Edge_Type();
 
-			(*_input_edge_reference)[new_edge->id()] = new_edge;
+			new_edge->Copy(*new_edge_copy);
 
-			_ordered_input_edge_reference->push_back(new_edge);
+			if(_input_edge_reference->count(new_edge_copy->id())) THROW_WARNING("Edge id " << new_edge_copy->id() << " already exists!");
+
+			(*_input_edge_reference)[new_edge_copy->id()] = new_edge_copy;
+
+			_ordered_input_edge_reference->push_back(new_edge_copy);
 		}
 		
 		template<typename Input_Edge_Type>
@@ -635,7 +639,7 @@ namespace polaris
 		{
 			if(!Check_Graph_Consistency<Input_Edge_Type>()){exit(0);}
 
-			Reorder_Graph<Input_Edge_Type>();
+			//Reorder_Graph<Input_Edge_Type>();
 
 			_graph_size = Compute_Graph_Size<Input_Edge_Type>();
 
@@ -644,6 +648,16 @@ namespace polaris
 			Arrange_Packed_Edge_Graph<Input_Edge_Type>();
 
 			Construct_Packed_Edge_Graph<Input_Edge_Type>( construction_callback );
+
+			for(boost::container::vector<void*>::iterator itr = _ordered_input_edge_reference->begin();itr!=_ordered_input_edge_reference->end();itr++)
+			{
+				delete ((Input_Edge_Type*) (*itr));
+			}
+
+			//for(boost::unordered::unordered_map<long long, void*>::iterator itr = _input_edge_reference->begin();itr!=_input_edge_reference->end();itr++)
+			//{
+			//	delete ((Input_Edge_Type*) itr->second);
+			//}
 
 			delete _ordered_input_edge_reference;
 			delete _input_edge_reference;
@@ -655,26 +669,34 @@ namespace polaris
 		void Add_Edge(Input_Edge<Input_Edge_Type>* new_edge)
 		{
 			if(_ordered_input_edge_node_reference == nullptr) _ordered_input_edge_node_reference = new boost::container::vector<void*>();
-			if(_input_edge_node_reference == nullptr) _input_edge_node_reference = new unordered_map<int, void*>();
+			if(_input_edge_node_reference == nullptr) _input_edge_node_reference = new boost::unordered::unordered_map<int, void*>();
 
-			if(_input_edge_node_reference->count(new_edge->id())) THROW_WARNING("Edge id " << new_edge->id() << " already exists!");
+			Input_Edge<Input_Edge_Type>* new_edge_copy = (Input_Edge<Input_Edge_Type>*)new Input_Edge_Type();
 
-			(*_input_edge_node_reference)[new_edge->id()] = new_edge;
+			new_edge->Copy(*new_edge_copy);
 
-			_ordered_input_edge_node_reference->push_back(new_edge);
+			if(_input_edge_node_reference->count(new_edge_copy->id())) THROW_WARNING("Edge id " << new_edge_copy->id() << " already exists!");
+
+			(*_input_edge_node_reference)[new_edge_copy->id()] = new_edge_copy;
+
+			_ordered_input_edge_node_reference->push_back(new_edge_copy);
 		}
 		
 		template<typename Input_Node_Type>
 		void Add_Node(Input_Node<Input_Node_Type>* new_node)
 		{
 			if(_ordered_input_node_reference == nullptr) _ordered_input_node_reference = new boost::container::vector<void*>();
-			if(_input_node_reference == nullptr) _input_node_reference = new unordered_map<int, void*>();
+			if(_input_node_reference == nullptr) _input_node_reference = new boost::unordered::unordered_map<int, void*>();
 
-			if(_input_node_reference->count(new_node->id())) THROW_WARNING("Node id " << new_node->id() << " already exists!");
+			Input_Node<Input_Node_Type>* new_node_copy = (Input_Node<Input_Node_Type>*)new Input_Node_Type();
 
-			(*_input_node_reference)[new_node->id()] = new_node;
+			new_node->Copy(*new_node_copy);
 
-			_ordered_input_node_reference->push_back(new_node);
+			if(_input_node_reference->count(new_node_copy->id())) THROW_WARNING("Node id " << new_node_copy->id() << " already exists!");
+
+			(*_input_node_reference)[new_node_copy->id()] = new_node;
+
+			_ordered_input_node_reference->push_back(new_node_copy);
 		}
 
 		template<typename Input_Edge_Type,typename Input_Node_Type>
@@ -696,8 +718,17 @@ namespace polaris
 
 			for(boost::container::vector<void*>::iterator itr = _ordered_input_edge_reference->begin();itr!=_ordered_input_edge_reference->end();itr++)
 			{
-				Input_Edge_Proxy<MT>* edge = (Input_Edge_Proxy<MT>*) *itr;
-				delete edge;
+				delete ((Input_Edge_Proxy<MT>*) (*itr));
+			}
+
+			for(boost::container::vector<void*>::iterator itr = _ordered_input_edge_node_reference->begin();itr!=_ordered_input_edge_node_reference->end();itr++)
+			{
+				delete ((Input_Edge_Type*) (*itr));
+			}
+			
+			for(boost::container::vector<void*>::iterator itr = _ordered_input_node_reference->begin();itr!=_ordered_input_node_reference->end();itr++)
+			{
+				delete ((Input_Node_Type*) (*itr));
 			}
 
 			delete _ordered_input_edge_reference;
@@ -716,11 +747,11 @@ namespace polaris
 		template<typename Input_Edge_Type,typename Input_Node_Type>
 		void Convert_To_Edge_Based()
 		{
-			unordered_map<int,boost::container::vector<int>> outbound_edge_ids_by_node;
-			unordered_map<int,boost::container::vector<int>> inbound_edge_ids_by_node;
+			boost::unordered::unordered_map<int,boost::container::vector<int>> outbound_edge_ids_by_node;
+			boost::unordered::unordered_map<int,boost::container::vector<int>> inbound_edge_ids_by_node;
 
 			_ordered_input_edge_reference = new boost::container::vector<void*>();
-			_input_edge_reference = new unordered_map<int, void*>();
+			_input_edge_reference = new boost::unordered::unordered_map<int, void*>();
 		
 			for(boost::container::vector<void*>::iterator itr = _ordered_input_edge_node_reference->begin();itr!=_ordered_input_edge_node_reference->end();itr++)
 			{
@@ -775,11 +806,11 @@ namespace polaris
 		{
 			bool status = true;
 		
-			for(unordered_map<int,void*>::iterator itr = _input_edge_reference->begin(); itr != _input_edge_reference->end(); itr++)
+			for(boost::unordered::unordered_map<long long,void*>::iterator itr = _input_edge_reference->begin(); itr != _input_edge_reference->end(); itr++)
 			{
-				Sequence<typename Input_Edge_Type::forward_edge_ids_type,int>* forward_edges = ((Input_Connected_Edge<Input_Edge_Type>*)itr->second)->forward_edge_ids();
+				Sequence<typename Input_Edge_Type::forward_edge_ids_type,long long>* forward_edges = ((Input_Connected_Edge<Input_Edge_Type>*)itr->second)->forward_edge_ids();
 
-				for(Sequence<typename Input_Edge_Type::forward_edge_ids_type,int>::iterator neighbor_itr = forward_edges->begin(); neighbor_itr != forward_edges->end(); neighbor_itr++)
+				for(Sequence<typename Input_Edge_Type::forward_edge_ids_type,long long>::iterator neighbor_itr = forward_edges->begin(); neighbor_itr != forward_edges->end(); neighbor_itr++)
 				{
 					if(!_input_edge_reference->count( *neighbor_itr ))
 					{
@@ -788,9 +819,9 @@ namespace polaris
 					}
 				}
 
-				Sequence<typename Input_Edge_Type::backward_edge_ids_type,int>* backward_edges = ((Input_Connected_Edge<Input_Edge_Type>*)itr->second)->backward_edge_ids();
+				Sequence<typename Input_Edge_Type::backward_edge_ids_type,long long>* backward_edges = ((Input_Connected_Edge<Input_Edge_Type>*)itr->second)->backward_edge_ids();
 
-				for(Sequence<typename Input_Edge_Type::backward_edge_ids_type,int>::iterator neighbor_itr = backward_edges->begin(); neighbor_itr != backward_edges->end(); neighbor_itr++)
+				for(Sequence<typename Input_Edge_Type::backward_edge_ids_type,long long>::iterator neighbor_itr = backward_edges->begin(); neighbor_itr != backward_edges->end(); neighbor_itr++)
 				{
 					if(!_input_edge_reference->count( *neighbor_itr ))
 					{
@@ -806,7 +837,7 @@ namespace polaris
 		template<typename Input_Edge_Type>
 		float Compute_Fitness(boost::container::vector<Input_Connected_Edge<Input_Edge_Type>*>* edges)
 		{
-			boost::unordered_map< int, Input_Connected_Edge<Input_Edge_Type>** > edge_address_map;
+			boost::unordered::unordered_map< long long, Input_Connected_Edge<Input_Edge_Type>** > edge_address_map;
 
 			for(boost::container::vector<Input_Connected_Edge<Input_Edge_Type>*>::iterator itr = edges->begin();itr!=edges->end();itr++)
 			{
@@ -815,13 +846,13 @@ namespace polaris
 
 			float fitness = 0.0f;
 
-			Sequence<typename Input_Edge_Type::forward_edge_ids_type,int>* forward_edge_ids;
+			Sequence<typename Input_Edge_Type::forward_edge_ids_type,long long>* forward_edge_ids;
 
 			for(boost::container::vector<Input_Connected_Edge<Input_Edge_Type>*>::iterator itr = edges->begin();itr!=edges->end();itr++)
 			{
 				forward_edge_ids = (*itr)->forward_edge_ids();
 
-				for( Sequence<typename Input_Edge_Type::forward_edge_ids_type,int>::iterator fwd_itr = forward_edge_ids->begin();fwd_itr!=forward_edge_ids->end();fwd_itr++ )
+				for( Sequence<typename Input_Edge_Type::forward_edge_ids_type,long long>::iterator fwd_itr = forward_edge_ids->begin();fwd_itr!=forward_edge_ids->end();fwd_itr++ )
 				{
 					fitness += abs(edge_address_map[(*itr)->id()] - edge_address_map[(*fwd_itr)]);
 				}
@@ -839,7 +870,7 @@ namespace polaris
 		
 			boost::container::vector< Input_Connected_Edge<Input_Edge_Type>* > reordered_edges;
 
-			Reorder_Layer<Input_Edge_Type,2,5>(num_layers, (boost::container::vector<Input_Connected_Edge<Input_Edge_Type>*>*)_ordered_input_edge_reference, &reordered_edges);
+			Reorder_Layer<Input_Edge_Type,3,10>(num_layers, (boost::container::vector<Input_Connected_Edge<Input_Edge_Type>*>*)_ordered_input_edge_reference, &reordered_edges);
 		
 			cout << "Updated Fitness: " << Compute_Fitness( &reordered_edges ) << endl;
 
@@ -1020,9 +1051,9 @@ namespace polaris
 			
 				edge_itr = edge_memory->forward_edges();
 
-				Sequence<typename Input_Edge_Type::forward_edge_ids_type,int>* forward_edges = ((Input_Connected_Edge<Input_Edge_Type>*) *itr)->forward_edge_ids();
+				Sequence<typename Input_Edge_Type::forward_edge_ids_type,long long>* forward_edges = ((Input_Connected_Edge<Input_Edge_Type>*) *itr)->forward_edge_ids();
 
-				for(Sequence<typename Input_Edge_Type::forward_edge_ids_type,int>::iterator neighbor_itr = forward_edges->begin(); neighbor_itr != forward_edges->end(); neighbor_itr++, edge_itr++)
+				for(Sequence<typename Input_Edge_Type::forward_edge_ids_type,long long>::iterator neighbor_itr = forward_edges->begin(); neighbor_itr != forward_edges->end(); neighbor_itr++, edge_itr++)
 				{
 					edge_itr->edge( (edge_type*)_packed_edge_reference[(*neighbor_itr)] );
 				}
@@ -1030,9 +1061,9 @@ namespace polaris
 				
 				edge_itr = edge_memory->backward_edges();
 
-				Sequence<typename Input_Edge_Type::backward_edge_ids_type,int>* backward_edges = ((Input_Connected_Edge<Input_Edge_Type>*) *itr)->backward_edge_ids();
+				Sequence<typename Input_Edge_Type::backward_edge_ids_type,long long>* backward_edges = ((Input_Connected_Edge<Input_Edge_Type>*) *itr)->backward_edge_ids();
 
-				for(Sequence<typename Input_Edge_Type::backward_edge_ids_type,int>::iterator neighbor_itr = backward_edges->begin(); neighbor_itr != backward_edges->end(); neighbor_itr++, edge_itr++)
+				for(Sequence<typename Input_Edge_Type::backward_edge_ids_type,long long>::iterator neighbor_itr = backward_edges->begin(); neighbor_itr != backward_edges->end(); neighbor_itr++, edge_itr++)
 				{
 					edge_itr->edge( (edge_type*)_packed_edge_reference[(*neighbor_itr)] );
 				}
@@ -1105,17 +1136,17 @@ namespace polaris
 
 
 		boost::container::vector<void*>* _ordered_input_edge_reference;
-		unordered_map<int, void*>* _input_edge_reference;
+		boost::unordered::unordered_map<long long, void*>* _input_edge_reference;
 	
 		boost::container::vector<void*>* _ordered_input_edge_node_reference;
-		unordered_map<int, void*>* _input_edge_node_reference;
+		boost::unordered::unordered_map<long long, void*>* _input_edge_node_reference;
 
 		boost::container::vector<void*>* _ordered_input_node_reference;
-		unordered_map<int, void*>* _input_node_reference;
+		boost::unordered::unordered_map<long long, void*>* _input_node_reference;
 
 		typedef Packed_Edge_Implementation<typename edge_type::attributes_type,typename edge_type::neighbor_attributes_type> packed_edge_type;
 
 		m_container(boost::container::vector<packed_edge_type*>,edges,NONE,NONE);
-		unordered_map<int, packed_edge_type*> _packed_edge_reference;
+		boost::unordered::unordered_map<long long, packed_edge_type*> _packed_edge_reference;
 	};
 }

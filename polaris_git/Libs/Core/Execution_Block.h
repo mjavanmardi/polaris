@@ -62,6 +62,8 @@ namespace polaris
 
 		inline bool Visiting(){ return _ptex_next_revision == revision(); }
 
+		inline volatile unsigned int thread_processing(){return _thread_processing;}
+
 		static const unsigned int _data_offset;
 
 	private:

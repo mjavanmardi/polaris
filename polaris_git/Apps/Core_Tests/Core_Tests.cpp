@@ -1,4 +1,4 @@
-#include "Core.h"
+#include "Core\Core.h"
 
 #include "gtest\gtest.h"
 #include <random>

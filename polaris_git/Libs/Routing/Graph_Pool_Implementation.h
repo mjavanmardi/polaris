@@ -11,7 +11,7 @@ namespace polaris
 		typedef typename Graph_Type graph_type;
 		typedef typename graph_type::edge_type edge_type;
 
-		unordered_map<int,Interactive_Graph<graph_type>*> _graph_pool;
+		boost::unordered::unordered_map<int,Interactive_Graph<graph_type>*> _graph_pool;
 		unsigned int _stored_graphs;
 
 		unsigned int Add_Graph(Interactive_Graph<graph_type>* graph)
@@ -34,11 +34,11 @@ namespace polaris
 			}
 		}
 
-		void Update_Edge(int id, boost::container::vector<int>* graph_set = nullptr, typename edge_update_callback<edge_type>::type callback = nullptr)
+		void Update_Edge(long long id, boost::container::vector<int>* graph_set = nullptr, typename edge_update_callback<edge_type>::type callback = nullptr)
 		{
 			if(graph_set == nullptr)
 			{
-				for(unordered_map<int,Interactive_Graph<graph_type>*>::iterator itr = _graph_pool.begin();itr!=_graph_pool.end();itr++)
+				for(boost::unordered::unordered_map<int,Interactive_Graph<graph_type>*>::iterator itr = _graph_pool.begin();itr!=_graph_pool.end();itr++)
 				{
 					itr->second->Update_Edge(id,callback);
 				}
@@ -59,11 +59,11 @@ namespace polaris
 			}	
 		}
 
-		void Update_Edges(boost::container::vector<int>* edge_set = nullptr, boost::container::vector<int>* graph_set = nullptr, typename edge_update_callback<edge_type>::type callback = nullptr)
+		void Update_Edges(boost::container::vector<long long>* edge_set = nullptr, boost::container::vector<int>* graph_set = nullptr, typename edge_update_callback<edge_type>::type callback = nullptr)
 		{
 			if(graph_set == nullptr)
 			{
-				for(unordered_map<int,Interactive_Graph<graph_type>*>::iterator itr = _graph_pool.begin();itr!=_graph_pool.end();itr++)
+				for(boost::unordered::unordered_map<int,Interactive_Graph<graph_type>*>::iterator itr = _graph_pool.begin();itr!=_graph_pool.end();itr++)
 				{
 					itr->second->Update_Edges(edge_set,callback);
 				}
@@ -83,8 +83,5 @@ namespace polaris
 				}
 			}			
 		}
-
-
-
 	};
 }

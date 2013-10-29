@@ -11,16 +11,16 @@ namespace polaris
 
 		typedef typename ComponentType::neighbor_type neighbor_type;
 
-		const int id(){ return this_component()->id(); }
+		const long long id(){ return this_component()->id(); }
 	
 		const int num_forward_edges(){ return this_component()->num_forward_edges(); }
 		Dijkstra_Neighbor<neighbor_type>* forward_edges(){ return (Dijkstra_Neighbor<neighbor_type>*)this_component()->forward_edges(); }
 		const Dijkstra_Neighbor<neighbor_type>* const end_forward_edges(){ return (const Dijkstra_Neighbor<neighbor_type>* const)this_component()->end_forward_edges(); }
 
-		float f_score(){ return this_component()->f_score(); }
-		void f_score(float value){ this_component()->f_score(value); }
+		float cost_from_origin(){ return this_component()->cost_from_origin(); }
+		void cost_from_origin(float value){ this_component()->cost_from_origin(value); }
 
-		float weight(){ return this_component()->weight(); }
+		float cost(){ return this_component()->cost(); }
 	
 	
 		bool marked_for_reset(){ return this_component()->marked_for_reset(); }
@@ -42,7 +42,7 @@ namespace polaris
 	{
 		typedef typename ComponentType::edge_type edge_type;
 
-		//float weight(){ return this_component()->weight(); }
+		//float cost(){ return this_component()->cost(); }
 		Dijkstra_Edge<edge_type>* edge(){ return (Dijkstra_Edge<edge_type>*)this_component()->edge(); }
 		Dijkstra_Neighbor* next(){ return (Dijkstra_Neighbor*)this_component()->next(); }
 	};
@@ -54,7 +54,7 @@ namespace polaris
 		typedef typename ComponentType::edge_type edge_type;
 		typedef typename ComponentType::edges_type edges_type;
 
-		Dijkstra_Edge<edge_type>* Get_Edge(int id){ return this_component()->Get_Edge< Dijkstra_Edge<edge_type>* >(id); }
+		Dijkstra_Edge<edge_type>* Get_Edge(long long id){ return this_component()->Get_Edge< Dijkstra_Edge<edge_type>* >(id); }
 
 		Prototype_Sequence<edges_type,Dijkstra_Edge>* edges()
 		{
@@ -74,7 +74,7 @@ namespace polaris
 		Dijkstra_Edge<edge_type>* start = graph->Get_Edge(start_id);
 		Dijkstra_Edge<edge_type>* end = graph->Get_Edge(end_id);
 
-		start->f_score(0.0f);
+		start->cost_from_origin(0.0f);
 
 		if(!start->marked_for_reset())
 		{
@@ -105,7 +105,7 @@ namespace polaris
 				break;
 			}
 
-			if( current->f_score() == FLT_MAX )
+			if( current->cost_from_origin() == FLT_MAX )
 			{
 				break;
 			}
@@ -121,9 +121,9 @@ namespace polaris
 
 				if(current_neighbor->in_closed_set()) continue;
 
-				float alt_score = current->f_score() + current_neighbor->weight();
+				float alt_score = current->cost_from_origin() + current_neighbor->cost();
 
-				if(alt_score < current_neighbor->f_score())
+				if(alt_score < current_neighbor->cost_from_origin())
 				{
 					if(!current_neighbor->marked_for_reset())
 					{
@@ -131,7 +131,7 @@ namespace polaris
 						current_neighbor->marked_for_reset(true);
 					}
 
-					current_neighbor->f_score(alt_score);
+					current_neighbor->cost_from_origin(alt_score);
 					current_neighbor->came_from(current);
 
 					open_set.erase( open_set.iterator_to(*((edge_type*)current_neighbor) ) );

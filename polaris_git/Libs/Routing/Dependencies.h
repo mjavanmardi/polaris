@@ -1,4 +1,4 @@
 #pragma once
-#include "Core.h"
+#include "Core\Core.h"
 #include "boost\intrusive\set.hpp"
 #include <fstream>

@@ -57,7 +57,7 @@ namespace polaris
 		{
 			// Create data containers if not otherwise created
 			if( _data_lookup == nullptr ) _data_lookup = new boost::unordered::unordered_map< edge_id, boost::container::vector< pair< field_hash_code, boost::container::vector< void* > > > >();
-			if( _field_lookup == nullptr ) _field_lookup = new unordered_map< field_hash_code, pair<field_index,field_size> >();
+			if( _field_lookup == nullptr ) _field_lookup = new boost::unordered::unordered_map< field_hash_code, pair<field_index,field_size> >();
 			if( _ordered_data_lookup == nullptr ) _ordered_data_lookup = new boost::container::vector<edge_id>();
 			if( _ordered_field_lookup == nullptr ) _ordered_field_lookup = new boost::container::vector<field_hash_code>();
 
@@ -157,8 +157,8 @@ namespace polaris
 			delete _field_lookup;
 			delete _ordered_field_lookup;
 
-			return ((Packed_Data_Set<packed_data_set_type>*)this);
 			*/
+			return ((Packed_Data_Set<packed_data_set_type>*)this);
 		}
 
 		unsigned int _field_counter;

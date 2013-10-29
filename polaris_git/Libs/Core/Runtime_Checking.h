@@ -12,8 +12,8 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	#define ENABLE_MESSAGES
-	//#define ENABLE_WARNINGS
-	//#define ENABLE_EXCEPTIONS
+	#define ENABLE_WARNINGS
+	#define ENABLE_EXCEPTIONS
 	//#define ENABLE_DEBUG_MESSAGES
 
 	///----------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ namespace polaris
 	#endif
 
 	#ifdef ENABLE_WARNINGS
-		#define THROW_WARNING(...) cout << "\n" << "WARNING: "<< __FILE__ << " at " << __LINE__ << "\n\t" << __VA_ARGS << endl;
+		#define THROW_WARNING(...) cout << "\n" << "WARNING: "<< __FILE__ << " at " << __LINE__ << "\n\t" << __VA_ARGS__ << endl;
 	#else 
 		#define THROW_WARNING(...) ;
 	#endif

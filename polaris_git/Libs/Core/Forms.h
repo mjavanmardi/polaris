@@ -247,23 +247,6 @@ namespace polaris
 				return this_component()->template NAME<ACCESS_TYPE>();\
 			}
 
-	///----------------------------------------------------------------------------------------------------
-	/// typed_accessor - implements get / set accessors which explicitly access stated value
-	///		includes a tagless check on whether the implementation has corresponding accessors
-	///----------------------------------------------------------------------------------------------------
-
-	#define t_data(DATA_TYPE,NAME)\
-		DATA_TYPE _##NAME;\
-		typedef remove_pointer<DATA_TYPE>::type NAME##_type;\
-		public:\
-			void NAME(DATA_TYPE set_value)\
-			{\
-				_##NAME = set_value;\
-			}\
-			DATA_TYPE NAME()\
-			{\
-				return _##NAME;\
-			}
 
 	///----------------------------------------------------------------------------------------------------
 	/// explicit_accessor - implements get / set accessors which explicitly access stated value
@@ -344,22 +327,6 @@ namespace polaris
 			{\
 				static_assert(NAME##_get_check<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a getter for " #NAME " exists ---------]\n\n");\
 				static_assert(GETTER_REQUIREMENTS,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");\
-			}\
-
-	///----------------------------------------------------------------------------------------------------
-	/// typed_accessor - implements get / set accessors which explicitly access stated value
-	///		includes a tagless check on whether the implementation has corresponding accessors
-	///----------------------------------------------------------------------------------------------------
-
-	#define typed_accessor(ACCESS_TYPE,NAME)\
-		public:\
-			void NAME(ACCESS_TYPE set_value)\
-			{\
-				this_component()->template NAME<ACCESS_TYPE>(set_value);\
-			}\
-			ACCESS_TYPE NAME()\
-			{\
-				return this_component()->template NAME<ACCESS_TYPE>();\
 			}\
 
 	///----------------------------------------------------------------------------------------------------
@@ -445,6 +412,74 @@ namespace polaris
 			template<typename TargetType>\
 			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\
 			{static_assert((SETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more setter requirements for \"" #NAME"\" could not be satisfied: { "#SETTER_REQUIREMENTS" } ---------]\n\n");}\
+
+	///----------------------------------------------------------------------------------------------------
+	/// t_* - implements get / set and member placement which explicitly access stated value
+	///		includes a tagless check on whether the implementation has corresponding accessors
+	///----------------------------------------------------------------------------------------------------
+
+	#define t_data(DATA_TYPE,NAME)\
+			DATA_TYPE _##NAME;\
+			typedef DATA_TYPE NAME##_type;\
+		public:\
+			void NAME(DATA_TYPE set_value)\
+			{\
+				_##NAME = set_value;\
+			}\
+			DATA_TYPE NAME()\
+			{\
+				return _##NAME;\
+			}
+
+	#define t_object(DATA_TYPE,NAME)\
+			DATA_TYPE _##NAME;\
+			typedef DATA_TYPE NAME##_type;\
+		public:\
+			void NAME(DATA_TYPE& set_value)\
+			{\
+				_##NAME = set_value;\
+			}\
+			DATA_TYPE& NAME()\
+			{\
+				return _##NAME;\
+			}
+
+	#define t_pointer(DATA_TYPE,NAME)\
+			DATA_TYPE _##NAME;\
+			typedef DATA_TYPE NAME##_type;\
+		public:\
+			void NAME(DATA_TYPE set_value)\
+			{\
+				_##NAME = set_value;\
+			}\
+			DATA_TYPE NAME()\
+			{\
+				return _##NAME;\
+			}
+
+	//#define t_data(DATA_TYPE,NAME)\
+	//	DATA_TYPE _##NAME;\
+	//	typedef remove_pointer<DATA_TYPE>::type NAME##_type;\
+	//	template<bool Condition>\
+	//	struct DATA_TYPE##_IF\
+	//	{\
+	//		typedef DATA_TYPE type;\
+	//	};\
+	//	template<>\
+	//	struct DATA_TYPE##_IF<false>\
+	//	{\
+	//		typedef DATA_TYPE& type;\
+	//	};\
+	//	typedef typename DATA_TYPE##_IF<is_pointer<DATA_TYPE>::value>::type NAME##_access_type;\
+	//	public:\
+	//		void NAME(NAME##_access_type set_value)\
+	//		{\
+	//			_##NAME = set_value;\
+	//		}\
+	//		NAME##_access_type NAME()\
+	//		{\
+	//			return _##NAME;\
+	//		}
 
 	///----------------------------------------------------------------------------------------------------
 	/// prototype_accessor - implements the standard get / set accessors for a prototype

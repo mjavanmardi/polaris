@@ -20,7 +20,7 @@ namespace polaris
 			return this_component()->Get_Graph(graph);
 		}
 
-		void Update_Edge(int id, boost::container::vector<int>* graph_set = nullptr, typename edge_update_callback<edge_type>::type callback = nullptr)
+		void Update_Edge(long long id, boost::container::vector<int>* graph_set = nullptr, typename edge_update_callback<edge_type>::type callback = nullptr)
 		{
 			this_component()->Update_Edge(id,graph_set,callback);
 		}

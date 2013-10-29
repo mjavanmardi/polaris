@@ -1,2 +1,2 @@
-add_executable(core_test Core_Tests.cpp)	
-target_link_libraries(core_test ${gtest} ${libtcmalloc} core)	
+add_executable(Core_Tests Core_Tests.cpp)	
+target_link_libraries(Core_Tests ${gtest} ${libtcmalloc} Core)	

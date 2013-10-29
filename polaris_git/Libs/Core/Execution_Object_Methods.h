@@ -46,7 +46,7 @@ namespace polaris
 			#ifdef SAFE_MODE
 				LOCK(_optex_lock);
 			#elif defined ENABLE_WARNINGS
-				if( Visiting() && _execution_block->_thread_processing!=__thread_id )
+				if( Visiting() && _execution_block->thread_processing()!=__thread_id )
 				{
 					THROW_WARNING("Unreliable Loading of object: " << typeid(DataType).name() << " at step: " << iteration () << "," << sub_iteration());
 				}

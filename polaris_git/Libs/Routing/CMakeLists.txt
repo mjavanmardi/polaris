@@ -4,4 +4,4 @@ file(GLOB_RECURSE hppfiles
 file(GLOB_RECURSE cppfiles
 	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 	*.cpp)	
-add_library(Core ${cppfiles} ${hppfiles})	
+add_library(Routing ${cppfiles} ${hppfiles})
