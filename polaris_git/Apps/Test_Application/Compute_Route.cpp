@@ -194,10 +194,6 @@ struct A_Star_Attributes : public set_base_hook<optimize_size<false>>
 	{  return lhs._cost_origin_destination == rhs._cost_origin_destination;  }
 };
 
-
-
-
-
 struct Dijkstra_Attributes : public set_base_hook< optimize_size<false> >
 {
 	void reset()
@@ -1017,77 +1013,91 @@ void Clean_Up()
 
 int main()
 {
-	MasterType::a_star_graph_type a_star_graph_stack;
-	
-	Graph_Assembler_Connected_Edge<MasterType::a_star_graph_assembler_type>* a_star_graph_assembler = (Graph_Assembler_Connected_Edge<MasterType::a_star_graph_assembler_type>*)&a_star_graph_stack;
+	//EPSG:4326 -t_srs EPSG:26916
+	FILE* output = _popen("ECHO -87.77410482 41.87632184 | gdaltransform.exe -s_srs EPSG:4326 -t_srs EPSG:26916","rb");
 
-	Read_Calendar(string("calendar.txt"));
+	int c;
 
-	cout << "Calendar Read" << endl;
-	
-	Read_Trips(string("trips.txt"));
+	do 
+	{
+		c = fgetc (output);
+		cout << (char)c << endl;
+	} while (c != EOF);
 
-	cout << "Trips Read" << endl;
-
-	Read_Stops(string("stops.txt"));
-	
-	cout << "Stops Read" << endl;
-
-	Read_Stop_Times(string("stop_times.txt"));
-	
-	cout << "Stop Times Read" << endl;
-	
-	Build_Graph(a_star_graph_assembler,30*60);
-	
-	cout << "Graph Built" << endl;
-	
-	stop_times_map.~unordered_map();
-	stop_data_map.~unordered_map();
-	valid_services.~unordered_set();
-
-	Interactive_Graph<MasterType::a_star_graph_type>* a_star_graph = a_star_graph_assembler->Compile_Graph<MasterType::input_edge_type>( &A_Star_Attributes::construct_connected_edge );
-
-	cout << "Graph Compiled: " << a_star_graph->edges()->size() << endl;
-
-
-
-	transit_edge_id origin;
-
-	origin.composite_id.time = 14*60*60+57*60;
-	origin.composite_id.trip_index = trip_uuid_index_map[42060791492];
-
-	transit_edge_id destination;
-
-	destination.composite_id.time = 16*60*60+2*60;
-	destination.composite_id.trip_index = trip_uuid_index_map[42060791492];
-	
-
-	//Sequence<MasterType::a_star_graph_type::edges_type,Packed_Edge<MasterType::a_star_graph_type::edge_type,NT>*>* edges = a_star_graph->edges();
+	//MasterType::a_star_graph_type a_star_graph_stack;
 	//
+	//Graph_Assembler_Connected_Edge<MasterType::a_star_graph_assembler_type>* a_star_graph_assembler = (Graph_Assembler_Connected_Edge<MasterType::a_star_graph_assembler_type>*)&a_star_graph_stack;
+
+	//Read_Calendar(string("calendar.txt"));
+
+	//cout << "Calendar Read" << endl;
+	//
+	//Read_Trips(string("trips.txt"));
+
+	//cout << "Trips Read" << endl;
+
+	//Read_Stops(string("stops.txt"));
+	//
+	//cout << "Stops Read" << endl;
+
+	//Read_Stop_Times(string("stop_times.txt"));
+	//
+	//cout << "Stop Times Read" << endl;
+	//
+	//Build_Graph(a_star_graph_assembler,30*60);
+	//
+	//cout << "Graph Built" << endl;
+	//
+	//stop_times_map.~unordered_map();
+	//stop_data_map.~unordered_map();
+	//valid_services.~unordered_set();
+
+	//Interactive_Graph<MasterType::a_star_graph_type>* a_star_graph = a_star_graph_assembler->Compile_Graph<MasterType::input_edge_type>( &A_Star_Attributes::construct_connected_edge );
+
+	//cout << "Graph Compiled: " << a_star_graph->edges()->size() << endl;
+
+
+
+	//transit_edge_id origin;
+
+	//origin.composite_id.time = 14*60*60+57*60;
+	//origin.composite_id.trip_index = trip_uuid_index_map[42060791492];
+
+	//transit_edge_id destination;
+
+	//destination.composite_id.time = 16*60*60+2*60;
+	//destination.composite_id.trip_index = trip_uuid_index_map[42060791492];
+
+	//boost::container::deque<long long> out_path;
+
+
+	//A_Star_Edge<typename MasterType::a_star_edge_type>* end = A_Star((A_Star_Graph<typename MasterType::a_star_graph_type>*)a_star_graph,origin.id,destination.id,out_path);
+
+	//cout << "Done Routing!" << endl;
+
 	//transit_edge_id current_edge;
 
-	//for(Sequence<MasterType::a_star_graph_type::edges_type,Packed_Edge<MasterType::a_star_graph_type::edge_type,NT>*>::iterator itr = edges->begin();itr!=edges->end();itr++)
+	//for(boost::container::deque<long long>::iterator itr = out_path.begin();itr!=out_path.end();itr++)
 	//{
-	//	current_edge.id = (*itr)->id();
+	//	current_edge.id = *itr;
 
 	//	cout << current_edge.composite_id.time << "," << trip_index_uuid_map[current_edge.composite_id.trip_index] << endl;
 	//}
 
-	boost::container::deque<long long> out_path;
 
 
-	A_Star_Edge<typename MasterType::a_star_edge_type>* end = A_Star((A_Star_Graph<typename MasterType::a_star_graph_type>*)a_star_graph,origin.id,destination.id,out_path);
 
-	cout << "Done Routing!" << endl;
 
-	transit_edge_id current_edge;
 
-	for(boost::container::deque<long long>::iterator itr = out_path.begin();itr!=out_path.end();itr++)
-	{
-		current_edge.id = *itr;
 
-		cout << current_edge.composite_id.time << "," << trip_index_uuid_map[current_edge.composite_id.trip_index] << endl;
-	}
+
+
+
+
+
+
+
+
 
 	//for(boost::unordered::unordered_map<long long,boost::container::vector<stop_time>>::iterator itr = stop_times_map.begin();itr!=stop_times_map.end();itr++)
 	//{
