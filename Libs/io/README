@@ -1,0 +1,88 @@
+Building on Windows
+===================
+Download and unzip the following files:
+http://www.codesynthesis.com/download/odb/2.2/odb-2.2.0-i686-windows.zip
+http://www.codesynthesis.com/download/odb/2.2/libodb-2.2.2.zip
+http://www.codesynthesis.com/download/odb/2.2/libodb-sqlite-2.2.0.zip
+
+Install libodb and libodb-sqlite by following the instructions in the corresponding INSTALL files.
+You can also download all of theose compiled from 
+http://sourceforge.net/projects/polaris-t/files/polarisdeps.7z/download
+make sure that you copy the polarisdeps folder to c:\opt
+if you have access to TRACC internal drive you can copy the folder from
+\\P071162\shared2\POLARIS\polarisdeps
+
+
+
+Building on Linux
+===================
+Download and unzip the following files:
+http://www.codesynthesis.com/download/odb/2.2/libodb-2.2.2.zip
+http://www.codesynthesis.com/download/odb/2.2/libodb-sqlite-2.2.0.zip 
+
+Download and install the odb compiler for your platform from http://www.codesynthesis.com/download/odb/2.2/
+
+For example for Debian x32 it would be http://www.codesynthesis.com/download/odb/2.2/odb_2.2.0-1_i386.deb
+On zyphyr cluster the odb is installed in /mnt/lustre/app/polaris/bin, so just append it ot your path
+
+ 
+
+
+If you do have root access, then install libodb and libodb-sqlite by following the instructions in the corresponding INSTALL files.
+
+If you do not have root access on the machince make sure you specify the prefix
+crate two folders $HOME/odb and $HOME/odb_src
+unzip libodb and libodb-sqlite to $HOME/odb_src
+then run 
+cd $HOME/odb_src/libodb-2.2.2
+./configure --prefix=$HOME/odb
+make
+make install
+
+cd $HOME/odb_src/libodb-sqlite-2.2.0
+./configure --prefix=$HOME/odb --with-libodb=../libodb-2.2.2
+make
+make install
+
+Once you've installed the libodb and libodb-sqlite, you have all of the dependencies to build polaris_io.  
+
+Gettgin spatialite support:
+cd
+mkdir ~/spatialite
+wget http://www.gaia-gis.it/gaia-sins/freexl-1.0.0e.zip
+unzip freexl-1.0.0e.zip
+cd freexl-1.0.0e/
+./configure --prefix=$HOME/spatialite
+make install
+cd
+
+
+wget http://download.osgeo.org/geos/geos-3.3.8.tar.bz2
+bunzip2 geos-3.3.8.tar.bz2 
+tar -xf geos-3.3.8.tar
+cd geos-3.3.8
+./configure --prefix=$HOME/spatialite
+make -j32
+make install
+cd 
+
+wget http://download.osgeo.org/proj/proj-4.8.0.zip
+unzip proj-4.8.0.zip
+cd proj-4.8.0
+./configure --prefix=$HOME/spatialite
+make
+make install
+cd 
+
+wget http://www.gaia-gis.it/gaia-sins/libspatialite-4.0.0.zip
+unzip libspatialite-4.0.0.zip
+cd libspatialite-4.0.0
+env CPPFLAGS=-I$HOME/spatialite/include LDFLAGS=-L$HOME/spatialite/lib ./configure --prefix=$HOME/spatialite --with-geosconfig=$HOME/spatialite/bin/geos-config
+make
+make install-strip
+cd
+
+To get gtest working 
+cd db_unittest in the polaris source
+wget https://googletest.googlecode.com/files/gtest-1.6.0.zip
+
