@@ -1,4 +1,13 @@
+POLARIS Dependencies
+-----------------------------------------------------------------------------------------------
+download polaris_dependencies.zip from link provided
+extract to c:\  -  there should now be directories c:\plplot and c:\opt\polarisdeps with the required libraries
+copy glew32.dll and libtcmalloc_minimal.dll from c:\opt\polaris_deps to the working directory of the project you are running (directory where the built executable resides)
+*NOTE: when building project make sure to use Release - x64 configuration
+
+
 Building Using cmake
+-----------------------------------------------------------------------------------------------
 You can download cmake from here http://www.cmake.org/files/v2.8/cmake-2.8.12-win32-x86.zip
 Make sure it is added to the PATH
 
@@ -12,3 +21,5 @@ cmake -G"Visual Studio 10 Win64" ..
 This will generate a polaris.sln file you can open in Visual Studio 10
 
 Switch to MinSizeRel and build
+
+
