@@ -2,7 +2,9 @@
 #include <vector>
 #define PI 3.14159265359
 
+// include polaris namespace, everything written in a polaris prototype/implementation file should be inside the polaris namespace
 using namespace polaris;
+
 int link_count;
 int node_count;
 
@@ -10,9 +12,9 @@ int node_count;
 //---------------------------------------------------
 // SCENARIO DEFINITIONS
 //---------------------------------------------------
-//#define RANDOM_SIGNALS
+#define RANDOM_SIGNALS
 //#define COORDINATED_SIGNALS
-#define PROGRESSION_SIGNALS
+
 
 
 // forward declarations: use to declare a prototype which is used in a class before it is defined (i.e. used in node definition but defined later), this is needed when there are circular dependencies
@@ -586,7 +588,7 @@ implementation struct Agent_Implementation : public Polaris_Component<MasterType
 	m_prototype(Router<typename MasterType::router_type>, router, NONE, NONE);
 	m_container(std::vector<link_itf*>, path, NONE, NONE);
 
-	// typedefs dependent on data members
+	// typedefs dependent on data members - make sure to place this after the m_data statement which creates the referenced member
 	typedef Prototype_Back_Insertion_Sequence<typename get_type_of(network_reference)::get_type_of(links), Link> links_container_itf;
 	typedef typename links_container_itf::iterator link_iterator;
 
@@ -607,6 +609,7 @@ implementation struct Agent_Implementation : public Polaris_Component<MasterType
 		_vehicles_layer->Initialize<NT>(cfg);
 	}
 
+	// Agent initializer - creates and draws agent at starting position, loads the starting event
 	template<typename NetworkType, typename LinkType> void Initialize(NetworkType network_ref, LinkType starting_link, LinkType destination_link)
 	{
 		typedef Node<typename MasterType::node_type> node_interface;
@@ -629,6 +632,7 @@ implementation struct Agent_Implementation : public Polaris_Component<MasterType
 		_centroid._y = a_node->coordinate<Point_3D<NT>>()._y;
 	}
 
+	// Agent router, calls the internal router feature to create a new route
 	template<typename LinkType> void Set_Path(LinkType origin_link, LinkType destination_link)
 	{
 		_path.clear();
@@ -645,6 +649,10 @@ implementation struct Agent_Implementation : public Polaris_Component<MasterType
 		cout << endl;
 	}
 
+	// Movement event, and associated event function
+	// Check the conditions for movement in the next movement timestep (i.e. is there a node within the distance that will be moved in the next iteration based on current travel speed?
+	// If no node, move distance = speed/_iteration_length
+	// If node, check if a) trip is ended b) light is green b.1) go straight or turn c) stop at red in which case load the Stop event
 	static void Do_Move(Agent_Implementation* _this,Event_Response& response)
 	{
 		response.next._iteration = iteration() + 1;
@@ -686,6 +694,7 @@ implementation struct Agent_Implementation : public Polaris_Component<MasterType
 				if (_path_location_index >= _path.size())
 				{
 					cout << "Trip over.  Starting new trip" << endl;
+					Sleep(1000);
 
 					// get a new link ID to route to, make sure it is not same as current link ID, or out of bounds
 					int size = _network_reference->links<links_container_itf*>()->size();
@@ -740,6 +749,8 @@ implementation struct Agent_Implementation : public Polaris_Component<MasterType
 		Sleep(50);
 	}
 
+	// Stop event and associated stop function, this draws the stopped vehicle
+	// Continues to draw the stopped vehicle until the signal at next_node changes to green
 	static void Do_Stop(Agent_Implementation* _this,Event_Response& response)
 	{
 		response.next._iteration = iteration() + 1;
@@ -771,6 +782,7 @@ implementation struct Agent_Implementation : public Polaris_Component<MasterType
 		Sleep(50);
 	}
 
+	// Drawing functions for 3D vehicle layer
 	void Draw(float rotation_rad, True_Color_RGBA<NT> _color)
 	{
 		/// DRAW BOTTOM ///
@@ -1026,6 +1038,10 @@ struct MasterType
 	typedef Link_Implementation<MasterType> link_type;
 	typedef Node_Implementation<MasterType> node_type;
 	typedef Network_Implementation<MasterType> network_type;
+
+	// Change the router here to whatever router you want to implement, 
+	// as long as router_type matches the simple router prototype the agent will still function properly
+	// for now you can use 'Random_Walk_Router_Implementation' or 'Dead_Reckoning_Router_Implementation'
 	typedef Dead_Reckoning_Router_Implementation<MasterType> router_type;
 };
 
@@ -1077,12 +1093,17 @@ int main()
 
 	//---------------------------------------------------
 	// Allocate the network and push the links to the network links container
+	// *note here that allocation returns a pointer to a MasterType::network_type object, which is then cast to an interface to that object for ease of use
 	network_itf* network = (network_itf*)Allocate<MasterType::network_type>();
+	// call an accessor from the network interface to get the links container
 	links_container_itf* links = network->links<links_container_itf*>();
 
 
-	//---------------------------------------------------
-	// Create grid network automatically, based on specified number of rows/columns
+	//=================================================================================================
+	// Create grid network automatically, based on specified number of rows/columns 
+	// - adjust net_width , net_height, start_x and start_y if the grid does not fit on your screen
+	// - the following code allocates a rowsXcols grid of nodes, then allocates and initializes links between those nodes
+	//-------------------------------------------------------------------------------------------------
 	int rows = 5;
 	int cols = 6;
 	float start_x = -1500.0;
@@ -1101,7 +1122,13 @@ int main()
 			node_itf* n = (node_itf*)Allocate<MasterType::node_type>(node_count); ++node_count;
 			float x = start_x + net_width/cols * j;
 			float y = start_y + net_height/rows * i;
+		// Modify the signal starting time, based on signal coordination type
+		#ifdef RANDOM_SIGNALS
+			int start = rand()%60;
+			n->Initialize(x,y,60,40,start);
+		#else
 			n->Initialize(x,y,60,40,0);
+		#endif
 			nodes[i].push_back(n);
 		}
 	}
@@ -1144,9 +1171,12 @@ int main()
 		rev_link->Initialize<node_itf>(nodes[i+1][i+1], nodes[i][i],link_width);
 		links->push_back(rev_link);
 	}
+	//-------------------------------------------------------------------------------------------------
 
 
+	//=================================================================================================
 	// allocate the traveler agent, and assign it a router
+	//-------------------------------------------------------------------------------------------------
 	agent_itf* agent = (agent_itf*)Allocate<MasterType::agent_type>();
 	router_itf* router = (router_itf*)Allocate<MasterType::router_type>();
 	router->network_reference<network_itf*>(network);
