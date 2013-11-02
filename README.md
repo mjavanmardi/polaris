@@ -8,6 +8,8 @@ It provides implementation of vented models
 in transportation community so that those 
 can be reused by application developers.
 
+The project is distributed under BSD liense.
+
 Building Using Cmake
 --------------------
 You can download cmake from here [here](http://www.cmake.org/files/v2.8/cmake-2.8.12-win32-x86.zip "cmake").
