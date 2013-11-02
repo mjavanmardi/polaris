@@ -26,6 +26,7 @@ using std::unique_ptr;
 #include "Supply-odb.hxx"
 #include "System-odb.hxx"
 #include "Result-odb.hxx"
+#include "Gtfs-odb.hxx"
 
 #include <iostream>
 #include <fstream>
@@ -47,6 +48,7 @@ namespace io
 	{		
 		std::vector<string> result;
 		result.push_back("Supply");
+		result.push_back("Gtfs");
 		result.push_back("Result");
 		result.push_back("Demand");
 		result.push_back("System");
@@ -79,7 +81,7 @@ inline sqlite3* open_raw_sqlite_database(const std::string& name)
 	//char sql[1024];
 	char *err_msg = NULL;
 	sqlite3* db_handle;
-	ret = sqlite3_open_v2(make_name(name,"Supply").c_str(), &db_handle, SQLITE_OPEN_READWRITE , NULL);
+	ret = sqlite3_open_v2(name.c_str(), &db_handle, SQLITE_OPEN_READWRITE , NULL);
 	if (ret != SQLITE_OK)
 	{
 		fprintf (stderr, "Error: %s\n", err_msg);
@@ -121,9 +123,9 @@ inline int attach_spatialite(sqlite3* db_handle, bool init)
 	sqlite3_enable_load_extension (db_handle, 1);
 	#if defined _MSC_VER
 		#if defined _WIN64
-			strcpy (sql, "SELECT load_extension('c:/opt/polarisdeps/x64/bin/libspatialite-4.dll')");
+			strcpy (sql, "SELECT load_extension('libspatialite-4.dll')");
 		#else
-			strcpy (sql, "SELECT load_extension('c:/opt/polarisdeps/Win32/bin/libspatialite-4.dll')");
+			strcpy (sql, "SELECT load_extension('libspatialite-4.dll')");
 		#endif
 	#elif defined (__GNUC__)
 		std::cout << "SELECT load_extension('libspatialite.so')\n";
@@ -131,6 +133,7 @@ inline int attach_spatialite(sqlite3* db_handle, bool init)
 	#else
 		exit(1);
 	#endif
+	
 	ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);
 	if (ret != SQLITE_OK)
 	{
@@ -149,17 +152,22 @@ inline int attach_spatialite(sqlite3* db_handle, bool init)
 		}
 	}
 		//fprintf(stderr, "\n\n**** SpatiaLite loaded as an extension ***\n\n");
-
 	return ret;
 }
 
-inline sqlite3* open_spatialite_database(const std::string& name, bool init = true)
+inline sqlite3* open_spatialite_database(const std::string& prefix, bool init = true, const std::string& suffix="")
 {
 	using namespace polaris::io;
 	int ret;
 	char *err_msg = NULL;
 	sqlite3* db_handle;
-	db_handle = open_raw_sqlite_database(name);
+	string db_path;
+	if (suffix=="")
+		db_path = make_name(suffix,"Supply");
+	else
+		db_path = make_name(prefix, suffix);
+	std::cout << db_path << "\n";
+	db_handle = open_raw_sqlite_database(db_path);
 	assert(db_handle != NULL);
 	ret = attach_spatialite(db_handle, init);
 	assert(ret == SQLITE_OK);

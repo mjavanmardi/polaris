@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<root>
+	<type name="LinkList" pragma="object">
+		<field name="id" type="int" pragma="auto id"/>
+		<field name="links" type="std::vector&lt;int &gt;"/>	
+	</type>	
+	<type name="Component" pragma="object">
+		<field name="id" type="int" pragma="id"/>
+		<field name="name" type="std::string"/>>
+		<field name="icon" type="std::string"/>
+		<field name="actions" type="std::vector&lt;weak_ptr&lt;Action&gt; &gt;" pragma="inverse(component)"/>	
+	</type>	
+	<type name="VMS" pragma="object">
+		<field pragma="auto id" name="id" type="int"/>
+		<field name="component" type="shared_ptr&lt;Component&gt;" pragma="not_null"/>
+		<field name="link" type="int"/>
+		<field name="dir" type="int"/>
+		<field name="offset" type="float"/>	
+		<field name="setback" type="float"/>	
+		<field pragma="default(-1)" name="initial_event" type="int"/>
+	</type>	
+	<type name="HAR" pragma="object">
+		<field pragma="auto id" name="id" type="int"/>
+		<field name="component" type="shared_ptr&lt;Component&gt;" pragma="not_null"/>
+		<field name="link" type="int"/>
+		<field name="dir" type="int"/>
+		<field name="offset" type="float"/>	
+		<field name="setback" type="float"/>	
+		<field pragma="default(-1)" name="initial_event" type="int"/>
+		<field name="links" type="shared_ptr&lt;LinkList&gt;"/>		
+	</type>		
+	<type name="VSS" pragma="object">
+		<field pragma="auto id" name="id" type="int"/>
+		<field name="component" type="shared_ptr&lt;Component&gt;" pragma="not_null"/>
+		<field name="link" type="int"/>
+		<field name="dir" type="int"/>
+		<field name="offset" type="float"/>	
+		<field name="setback" type="float"/>	
+		<field pragma="default(35)" name="initial_speed" type="int"/>	
+		<field pragma="default(&quot;list(35,40,45,55,60)&quot;)" name="speed" type="std::string"/>	
+		<field name="links" type="shared_ptr&lt;LinkList&gt;"/>
+	</type>		
+	<type name="Depot" pragma="object">
+		<field pragma="auto id" name="id" type="int"/>
+		<field name="component" type="shared_ptr&lt;Component&gt;" pragma="not_null"/>
+		<field name="link" type="int"/>
+		<field name="dir" type="int"/>
+		<field name="offset" type="float"/>	
+		<field name="setback" type="float"/>	
+		<field name="policy" type="std::string"/>	
+		<field name="links" type="shared_ptr&lt;LinkList&gt;"/>	
+		<field pragma="default(99999)" name="fleet_size" type="int"/>	
+		<field pragma="default(99999)" name="available" type="int"/>	
+	</type>	
+	<type name="OpenShoulder" pragma="object">
+		<field pragma="auto id" name="id" type="int"/>
+		<field name="component" type="shared_ptr&lt;Component&gt;" pragma="not_null"/>
+		<field name="links" type="shared_ptr&lt;LinkList&gt;"/>	
+		<field pragma="default(false)" name="open" type="bool"/>	
+	</type>		
+	<type name="Action" pragma="object">
+		<field name="id" type="int" pragma="auto id"/>
+		<field name="component" type="shared_ptr&lt;Component&gt;" pragma="not_null"/>
+		<field name="keys" type="std::vector&lt;shared_ptr&lt;Action_Key&gt; &gt;"/>	
+		<field name="name" type="std::string"/>
+		<field name="note" type="std::string"/>
+	</type>
+	<type name="Action_Key" pragma="object">
+		<field name="key" type="std::string" pragma="id"/>
+		<field name="value_type" type="std::string"/>
+		<field name="value_constraint" type="std::string"/>
+		<field name="required" type="bool"/>		
+		<field name="note" type="std::string"/>
+	</type>		
+</root>

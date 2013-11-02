@@ -10,7 +10,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 #Compiler flags for release mode applied to all projects
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj")
 
 #Variable to indicate where boost lives
 set(BOOST_ROOT C:/opt/polarisdeps/boost_1_54_0)
@@ -71,6 +71,7 @@ add_subdirectory (Libs/Core)
 #add_subdirectory (Libs/Antares) 
 add_subdirectory (Libs/Repository) 
 add_subdirectory (Libs/Io) 
+add_subdirectory (Libs/spatial) 
 add_subdirectory (Libs/Routing) 
 
 #Apply CMake over POLARIS application project structure

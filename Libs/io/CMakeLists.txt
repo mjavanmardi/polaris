@@ -1,4 +1,4 @@
-set(io_headers Demand.h Supply.h Result.h System.h Network_Event.h)
+set(io_headers Demand.h Supply.h Result.h System.h Network_Event.h gtfs.h)
 
 if (UNIX)
 	set(odb_path /mnt/lustre/app/polaris/bin/odb)

@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<root>
+	<type name="Gtfs_Agency" pragma="object">
+		<field name="agency_id" type="std::string" pragma="id"/>
+		<field name="agency_name" type="std::string" pragma="not_null"/>
+		<field name="agency_url" type="std::string" pragma="not_null"/>
+		<field name="agency_timezone" type="std::string" pragma="not_null"/>
+		<field name="agency_lang" type="std::string"/>
+		<field name="agency_phone" type="std::string"/>
+		<field name="agency_fare_url" type="std::string"/>
+	</type>	
+	<type name="Gtfs_Stop" pragma="object table(&quot;gtfs_stops&quot;)">
+		<field name="stop_id" type="std::string" pragma="id"/>
+		<field name="stop_code" type="std::string"/>
+		<field name="stop_name" type="std::string" pragma="not_null"/>
+		<field name="stop_lat" type="double"/>
+		<field name="stop_lon" type="double"/>
+		<field name="zone_id" type="int"/>
+		<field name="stop_url" type="std::string"/>
+        <field name="location_type" type="int"/>
+        <field name="parent_station" type="shared_ptr&lt;Gtfs_Stop&gt;"/>
+        <field name="stop_timezone" type="std::string"/>
+        <field name="wheelchair_boarding" type="int"/>
+	</type>	    
+
+	<type name="Gtfs_Route_type" pragma="object">
+		<field name="route_type" type="int" pragma="id"/>
+		<field name="description" type="std::string"/>
+	</type>	
+	<type name="Gtfs_Route" pragma="object table(&quot;gtfs_routes&quot;)">
+		<field name="route_id" type="std::string" pragma="id"/>
+		<field name="agency_id" type="shared_ptr&lt;Gtfs_Agency&gt;"/>
+		<field name="route_short_name" type="std::string" pragma="default(&quot;&quot;)"/>
+		<field name="route_long_name" type="std::string" pragma="default(&quot;&quot;)"/>
+		<field name="route_desc" type="std::string"/>
+		<field name="route_type" type="shared_ptr&lt;Gtfs_Route_type&gt;"/>
+		<field name="route_url" type="std::string"/>
+		<field name="route_color" type="std::string"/>
+		<field name="route_text_color" type="std::string"/>
+	</type>	
+	<type name="Gtfs_Direction" pragma="object">
+		<field name="direction_id" type="int" pragma="id"/>
+		<field name="description" type="std::string"/>
+	</type> 
+    <type name="Gtfs_Trip" pragma="object table(&quot;gtfs_trips&quot;)">
+		<field name="route_id" type="shared_ptr&lt;Gtfs_Route&gt;"/>
+		<field name="service_id" type="shared_ptr&lt;Gtfs_Calendar&gt;"/>
+		<field name="trip_id" type="std::string" pragma="id"/>
+		<field name="trip_headsign" type="std::string"/>
+		<field name="direction_id" type="shared_ptr&lt;Gtfs_Direction&gt;"/>
+		<field name="block_id" type="std::string"/>
+		<field name="shape_id" type="std::string"/>
+		<field name="wheelchair_accessible" type="int"/>        
+	</type>	
+	<type name="Gtfs_Pickup_dropoff_types" pragma="object">
+		<field name="type_id" type="int" pragma="id"/>
+		<field name="description" type="std::string"/>
+	</type>     
+	<type name="Gtfs_Stop_times" pragma="object no_id">
+		<field name="trip_id" type="shared_ptr&lt;Gtfs_Trip&gt;"/>
+		<field name="arrival_time" type="std::string"/>
+		<field name="departure_time" type="std::string"/>
+		<field name="stop_id" type="shared_ptr&lt;Gtfs_Stop&gt;"/>
+		<field name="stop_sequence" type="int" pragme="not_null"/>
+		<field name="stop_headsign" type="std::string"/>
+		<field name="pickup_type" type="shared_ptr&lt;Gtfs_Pickup_dropoff_types&gt;"/>
+		<field name="drop_off_type" type="shared_ptr&lt;Gtfs_Pickup_dropoff_types&gt;"/>
+		<field name="shape_dist_traveled" type="double"/>
+		<field name="arrival_time_seconds" type="int"/>
+		<field name="departure_time_seconds" type="int"/>
+	</type>     
+	<type name="Gtfs_Calendar" pragma="object">
+		<field name="service_id" type="std::string" pragma="id"/>
+		<field name="monday" type="int" pragme="not_null"/>
+		<field name="tuesday" type="int" pragme="not_null"/>
+		<field name="wednesday" type="int" pragme="not_null"/>
+		<field name="thursday" type="int" pragme="not_null"/>
+		<field name="friday" type="int" pragme="not_null"/>
+		<field name="saturday" type="int" pragme="not_null"/>
+		<field name="sunday" type="int" pragme="not_null"/>
+		<field name="start_date" type="int" pragme="not_null"/>
+		<field name="end_date" type="int" pragme="not_null"/>
+	</type>     
+</root>
