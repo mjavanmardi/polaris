@@ -12,7 +12,7 @@
 #include "wx\listctrl.h"
 
 #include "wxPLplotwindow.h"
-#include "Core.h"
+#include "Core/Core.h"
 #include "Geometry_Implementation.h"
 
 typedef void (*selection_callback_type)(const boost::container::list<void*>&,const boost::container::list<void*>&,const boost::container::list<void*>&,boost::container::vector<pair<string,string>>&);
