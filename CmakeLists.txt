@@ -10,9 +10,9 @@ option(Antares						"Build with Antares"				OFF)
 set(DEPS_DIR C:/opt/polarisdeps)
 
 #Variables designating where the output files go
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/bin)
 
 #Compiler flags for release mode applied to all projects
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj")
@@ -29,8 +29,8 @@ else()
 endif()
 
 #Allow Access to Project-level Directories
-include_directories(Libs)
-include_directories(Apps)
+include_directories(libs)
+include_directories(apps)
 
 #TC_Malloc include and library dependencies
 include_directories(${DEPS_DIR}/gperftools-2.1/src)
@@ -46,43 +46,22 @@ include_directories(${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0)
 include_directories(${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite)
 
 #ODB library dependencies
-#find_library(odb NAMES odb HINTS ${DEPS_DIR}/libodb-2.2.2/lib64)
-#find_library(odb_d NAMES odb-d HINTS ${DEPS_DIR}/libodb-2.2.2/lib64)
-#find_library(odb_sqlite NAMES odb-sqlite HINTS ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/lib64)
-#find_library(odb_sqlite_d NAMES odb-sqlite-d HINTS ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/lib64)
-#find_library(sqlite3 sqlite3 HINTS C:/opt/polarisdeps/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite/lib64)
-#find_library(sqlite3_d sqlite3-d HINTS C:/opt/polarisdeps/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite/lib64)
-#set(iolibs io optimized ${odb} optimized ${sqlite3} optimized ${odb_sqlite} debug ${odb_d} debug ${sqlite3_d} debug ${odb_sqlite_d})
 set(odb ${DEPS_DIR}/libodb-2.2.2/lib64/odb.lib)
 set(odb_sqlite ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/lib64/odb-sqlite.lib)
 set(sqlite3 ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite/lib64/sqlite3.lib)
-set(iolibs io ${odb} ${sqlite3} ${odb_sqlite})
-
-#glew include and library dependencies
-#include_directories(${DEPS_DIR}/glew-1.7.0/include)
-#find_library(glew NAMES glew32  HINTS ${DEPS_DIR}/glew-1.7.0/lib)
-
-#wxWidgets include and library dependencies
-#include_directories(${DEPS_DIR}/wxWidgets-2.9.3/include)
-#include_directories(${DEPS_DIR}/wxWidgets-2.9.3/include/msvc)
-#find_library(wx NAMES wx HINTS ${DEPS_DIR}/wxWidgets-2.9.3/lib/vc_lib)
-
-#plplot include and library dependencies
-#include_directories(${DEPS_DIR}/plplot/include/plplot)
-
+set(iolibs Io ${odb} ${sqlite3} ${odb_sqlite})
 
 #Apply CMake over POLARIS library project structure
-add_subdirectory (Libs/Core) 
-#add_subdirectory (Libs/Antares) 
-add_subdirectory (Libs/Repository) 
-add_subdirectory (Libs/Io) 
-add_subdirectory (Libs/spatial) 
-add_subdirectory (Libs/Routing) 
+add_subdirectory (libs/core) 
+add_subdirectory (libs/repository) 
+add_subdirectory (libs/io) 
+add_subdirectory (libs/spatial) 
+add_subdirectory (libs/routing) 
 
 #Apply CMake over POLARIS application project structure
-add_subdirectory (Apps/Core_Tests) 
-add_subdirectory (Apps/io_demo) 
-add_subdirectory (Apps/test) 
+add_subdirectory (apps/core_tests) 
+add_subdirectory (apps/io_demo) 
+add_subdirectory (apps/test) 
  
 if (MSVC AND Antares)
 	include_directories(${DEPS_DIR}/glew-1.7.0/include)
@@ -112,6 +91,6 @@ if (MSVC AND Antares)
 	ADD_DEFINITIONS( -D_CRT_SECURE_NO_DEPRECATE )
 	ADD_DEFINITIONS( -D_CRT_NONSTDC_NO_DEPRECATE )	
     set(antareslibs antares ${glew} ${plplotd} ${plplotcxxd} ${csirocsa} ${qsastime} ${plplotwxwidgetsd})    
-    add_subdirectory (Libs/Antares)
-    add_subdirectory (Apps/Demo)
+    add_subdirectory (libs/antares)
+    add_subdirectory (apps/demo)
 endif()
