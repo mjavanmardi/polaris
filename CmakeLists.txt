@@ -61,6 +61,7 @@ add_subdirectory (libs/routing)
 #Apply CMake over POLARIS application project structure
 add_subdirectory (apps/core_tests) 
 add_subdirectory (apps/io_demo) 
+add_subdirectory (apps/demo) 
 add_subdirectory (apps/test) 
  
 if (MSVC AND Antares)

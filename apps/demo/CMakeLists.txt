@@ -1,2 +1,2 @@
-add_executable(demo Demo.cpp)	
-target_link_libraries(demo ${libtcmalloc} ${antareslibs} Core)	
+add_executable(Demo Demo.cpp)	
+target_link_libraries(Demo ${libtcmalloc} ${antareslibs} Core)	
