@@ -1,0 +1,97 @@
+PROJECT(polaris CXX)
+cmake_minimum_required(VERSION 2.8)
+
+#options to be used while running cmake
+option(Antares						"Build with Antares"				OFF)
+
+
+
+#Variable to indicate where most external dependencies live
+set(DEPS_DIR C:/opt/polarisdeps)
+
+#Variables designating where the output files go
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/bin)
+
+#Compiler flags for release mode applied to all projects
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj")
+
+#Variable to indicate where boost lives
+set(BOOST_ROOT ${DEPS_DIR}/boost_1_54_0)
+find_package(Boost 1.54)
+
+if(Boost_FOUND)
+	#Boost include dependencies
+    include_directories(${Boost_INCLUDE_DIRS})
+else()
+	message(FATAL_ERROR "Boost not found!")
+endif()
+
+#Allow Access to Project-level Directories
+include_directories(libs)
+include_directories(apps)
+
+#TC_Malloc include and library dependencies
+include_directories(${DEPS_DIR}/gperftools-2.1/src)
+find_library(libtcmalloc NAMESlibtcmalloc_minimal libtcmalloc_minimal.a  HINT "/usr/lib/" ${DEPS_DIR}/gperftools-2.1/Release)
+message(STATUS ""${libtcmalloc})
+#Google Testing Framework include and library dependencies
+include_directories(${DEPS_DIR}/gtest-1.7.0/include)
+find_library(gtest NAMES gtest  HINTS ${DEPS_DIR}/gtest-1.7.0/msvc/gtest-md/Release)
+if (UNIX)
+	find_package(GTest REQUIRED)
+	include_directories(${GTEST_INCLUDE_DIR})
+	set(gtest ${GTEST_LIBRARIES})
+endif()
+#ODB include dependencies
+include_directories(${DEPS_DIR}/libodb-2.2.2)
+include_directories(${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0)
+include_directories(${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite)
+
+#ODB library dependencies
+set(odb ${DEPS_DIR}/libodb-2.2.2/lib64/odb.lib)
+set(odb_sqlite ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/lib64/odb-sqlite.lib)
+set(sqlite3 ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite/lib64/sqlite3.lib)
+set(iolibs Io ${odb} ${sqlite3} ${odb_sqlite})
+
+#Apply CMake over POLARIS library project structure
+add_subdirectory (libs/core) 
+add_subdirectory (libs/repository) 
+add_subdirectory (libs/io) 
+add_subdirectory (libs/spatial) 
+add_subdirectory (libs/routing) 
+
+#Apply CMake over POLARIS application project structure
+add_subdirectory (apps/core_tests) 
+add_subdirectory (apps/io_demo) 
+add_subdirectory (apps/test) 
+ 
+if (MSVC AND Antares)
+	include_directories(${DEPS_DIR}/glew-1.7.0/include)
+	include_directories(${DEPS_DIR}/plplot/include/plplot)
+	include_directories(${DEPS_DIR}/wxWidgets-2.9.3/include)
+	include_directories(${DEPS_DIR}/wxWidgets-2.9.3/include/msvc)
+    set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${DEPS_DIR}/glew-1.7.0/lib ${DEPS_DIR}/plplot/lib)
+    link_directories( ${LINK_DIRECTORIES} ${DEPS_DIR}/wxWidgets-2.9.3/lib/vc_lib )
+    find_library(glew glew32s)
+	find_library(plplotd plplotd)
+	find_library(plplotcxxd plplotcxxd )
+	find_library(csirocsa csirocsa)
+	find_library(qsastime qsastime)
+	find_library(plplotwxwidgetsd plplotwxwidgetsd )
+    
+	ADD_DEFINITIONS( -D_UNICODE )
+	ADD_DEFINITIONS( -DNDEBUG )
+	ADD_DEFINITIONS( -DGLEW_STATIC )
+	ADD_DEFINITIONS( -DWIN32 )
+	ADD_DEFINITIONS( -DWINVER=0x0600 )
+	ADD_DEFINITIONS( -D__WXMSW__ )
+	ADD_DEFINITIONS( -D_WINDOWS )
+	ADD_DEFINITIONS( -DwxUSE_GUI=1 )
+	ADD_DEFINITIONS( -D_CRT_SECURE_NO_DEPRECATE )
+	ADD_DEFINITIONS( -D_CRT_NONSTDC_NO_DEPRECATE )	
+    set(antareslibs antares ${glew} ${plplotd} ${plplotcxxd} ${csirocsa} ${qsastime} ${plplotwxwidgetsd})    
+    add_subdirectory (libs/antares)
+    add_subdirectory (apps/demo)
+endif()
