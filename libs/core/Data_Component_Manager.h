@@ -27,6 +27,8 @@ namespace polaris
 	class Data_Component_Manager : public Data_Component_Manager_Base
 	{
 	public:
+		typedef DataType managed_type;
+
 		DataType* Allocate( int uuid = -1 );
 		DataType* Allocate_Array( unsigned int num );
 

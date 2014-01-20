@@ -24,7 +24,7 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 	/// FORWARD_SIMULATION_MODE - Enforces monotonically forward stepping simulation
 	///----------------------------------------------------------------------------------------------------
-	//#define FORWARD_SIMULATION_MODE
+	#define FORWARD_SIMULATION_MODE
 
 	///----------------------------------------------------------------------------------------------------
 	/// PERFORMANCE_MODE - Disables all safeties during run to maximize performance

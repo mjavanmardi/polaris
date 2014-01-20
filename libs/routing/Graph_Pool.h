@@ -1,5 +1,5 @@
 #pragma once
-#include "Interactive_Graph.h"
+#include "Dependencies.h"
 
 namespace polaris
 {
@@ -7,14 +7,13 @@ namespace polaris
 	{
 		tag_as_prototype;
 
-		typedef typename ComponentType::edge_type edge_type;
 		typedef typename ComponentType::graph_type graph_type;
 		
 		unsigned int Add_Graph(Interactive_Graph<graph_type>* graph)
 		{
 			return this_component()->Add_Graph(graph);
 		}
-		
+
 		Interactive_Graph<graph_type>* Get_Graph(unsigned int graph_id)
 		{
 			return this_component()->Get_Graph(graph);

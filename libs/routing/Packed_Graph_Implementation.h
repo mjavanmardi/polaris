@@ -53,8 +53,6 @@ namespace polaris
 		}
 	};
 
-
-
 	template<typename MasterType, typename InheritanceList = NULLTYPELIST, typename Edge_Type = NT>
 	struct Packed_Graph_Implementation : public Polaris_Component<MasterType,INHERIT(Packed_Graph_Implementation)>
 	{

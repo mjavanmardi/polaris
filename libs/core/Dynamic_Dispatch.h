@@ -36,10 +36,12 @@ namespace polaris
 	}
 
 	typedef Polaris_Component<NT,NULLTYPELIST,Execution_Object> NC;
-
+	
 	///----------------------------------------------------------------------------------------------------
 	/// Dynamic_Dispatch - run time dispatch to function matching alias, signature, and component_id
 	///----------------------------------------------------------------------------------------------------
+
+	// USAGE NOTE: Dynamic_Dispatch(ALIAS,FUNCTION_SIGNATURE)(arg1,arg2,...)
 
 	#ifdef SAFE_MODE
 		#define Dynamic_Dispatch(ALIAS,FUNCTION_SIGNATURE)\
@@ -57,7 +59,7 @@ namespace polaris
 
 	#ifdef SAFE_MODE
 		#define Bind_Function(ALIAS,FUNCTION_SIGNATURE,COMPONENT,FUNCTION_NAME)\
-			if(!((Component_Manager_Base*)__all_components).count(COMPONENT::component_id)) cout << "No Matching Component to Bind: " << #FUNCTION_NAME << endl;\
+			if(!(__all_components.count(COMPONENT::component_id))) cout << "No Matching Component to Bind: " << #FUNCTION_NAME << endl;\
 			else ((Component_Manager_Base*)__all_components[COMPONENT::component_id])->function_map[ static_hash(#ALIAS) ] = pair<int,void(NULLTYPE::*)(void)>( FUNCTION_SIGNATURE::function_id,(Member_Function_Signature<>::function_type)&COMPONENT::FUNCTION_NAME)
 	#else
 		#define Bind_Function(ALIAS,FUNCTION_SIGNATURE,COMPONENT,FUNCTION_NAME)\

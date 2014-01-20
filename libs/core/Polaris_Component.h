@@ -40,9 +40,9 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	template<typename Component_Manager_Type>
-	static Component_Manager_Type* Add_Component_Manager(Component_Manager_Type* val)
+	static Component_Manager_Type* Add_Component_Manager(Component_Manager_Type* val, int component_id)
 	{
-		__all_components.push_back((Component_Manager_Base*)val);
+		__all_components[component_id] = (Component_Manager_Base*)val;
 		return val;
 	}
 
@@ -74,12 +74,11 @@ namespace polaris
 	};
 
 	template<typename MasterType,typename InheritanceList,typename ObjectType>
-	const int Polaris_Component<MasterType,InheritanceList,ObjectType>::component_id = ++__component_counter;
+	const int Polaris_Component<MasterType,InheritanceList,ObjectType>::component_id = typeid(Polaris_Component<MasterType,InheritanceList,ObjectType>).hash_code();
 	
 	template<typename MasterType,typename InheritanceList,typename ObjectType>
 	typename Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type* const Polaris_Component<MasterType,InheritanceList,ObjectType>::component_manager 
-		= Add_Component_Manager( new Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type() );
-
+		= Add_Component_Manager( new Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type(), Polaris_Component<MasterType,InheritanceList,ObjectType>::component_id );
 
 	template<typename MasterType,typename InheritanceList>
 	class Polaris_Component<MasterType,InheritanceList,NT>

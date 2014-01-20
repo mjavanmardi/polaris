@@ -82,6 +82,8 @@ namespace polaris
 	class Execution_Component_Manager : public Execution_Component_Manager_Base
 	{
 	public:
+		typedef DataType managed_type;
+
 		Execution_Component_Manager(){_name = typeid(DataType).name();}
 
 		virtual void Initialize()

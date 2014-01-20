@@ -17,7 +17,7 @@ namespace polaris
 	/// Null Type Definitions
 	///----------------------------------------------------------------------------------------------------
 
-	struct NULLTYPE{};
+	struct NULLTYPE{typedef NULLTYPE Master_Type;};
 
 	typedef NULLTYPE NT;
 
@@ -48,6 +48,7 @@ namespace polaris
 	#define TYPELIST_5(T1,T2,T3,T4,T5) TypeList<T1,TYPELIST_4(T2,T3,T4,T5)>
 
 	#define NULLTYPELIST TypeList<NULLTYPE,NULLTYPE>
+	#define NTL TypeList<NULLTYPE,NULLTYPE>
 	#define INHERIT(IMPLEMENTATION) typename Append<InheritanceList,IMPLEMENTATION<MasterType>>::Result
 
 	///----------------------------------------------------------------------------------------------------

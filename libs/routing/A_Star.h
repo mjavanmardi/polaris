@@ -128,42 +128,46 @@ namespace polaris
 
 			for(A_Star_Neighbor<neighbor_type>* neighbor_itr = current->forward_edges(); neighbor_itr != end_neighbor_itr; neighbor_itr = neighbor_itr->next())
 			{
-				A_Star_Edge<edge_type>* current_neighbor = neighbor_itr->edge();
+			//  THIS MAY VERY WELL BE WRONG!
+			//	A_Star_Edge<edge_type>* current_neighbor = neighbor_itr->edge();
 
-				if(current_neighbor->in_closed_set()) continue;
+			//	if(current_neighbor->in_closed_set()) continue;
 
-				float time_from_origin = current_neighbor->time_from_origin() + current_neighbor->time_cost() + neighbor_itr->time_cost();
-				float cost_from_origin = current_neighbor->cost_from_origin() + current_neighbor->cost() + neighbor_itr->cost();
+			//	//float time_from_origin = current_neighbor->time_from_origin() + current_neighbor->time_cost() + neighbor_itr->time_cost();
+			//	//float cost_from_origin = current_neighbor->cost_from_origin() + current_neighbor->cost() + neighbor_itr->cost();
 
-				bool tentative_better=false;
+			//	float time_from_origin = current->time_from_origin() + current_neighbor->time_cost() + neighbor_itr->time_cost();
+			//	float cost_from_origin = current->cost_from_origin() + current_neighbor->cost() + neighbor_itr->cost();
 
-				if(!current_neighbor->in_open_set()) tentative_better = true;
-				else if(cost_from_origin < current_neighbor->cost_from_origin()) tentative_better = true;
+			//	bool tentative_better=false;
 
-				if(tentative_better)
-				{
-					if(!current_neighbor->marked_for_reset())
-					{
-						modified_edges.push_back(current_neighbor);
-						current_neighbor->marked_for_reset(true);
-					}
+			//	if(!current_neighbor->in_open_set()) tentative_better = true;
+			//	else if(cost_from_origin < current_neighbor->cost_from_origin()) tentative_better = true;
 
-					current_neighbor->came_from(current);
-					current_neighbor->cost_from_origin(cost_from_origin);
+			//	if(tentative_better)
+			//	{
+			//		if(!current_neighbor->marked_for_reset())
+			//		{
+			//			modified_edges.push_back(current_neighbor);
+			//			current_neighbor->marked_for_reset(true);
+			//		}
 
-					current_neighbor->time_from_origin(time_from_origin);
+			//		current_neighbor->came_from(current);
+			//		current_neighbor->cost_from_origin(cost_from_origin);
 
-					float neighbor_cost_origin_destination = cost_from_origin + current_neighbor->cost_between(end);
+			//		current_neighbor->time_from_origin(time_from_origin);
 
-					current_neighbor->cost_origin_destination(neighbor_cost_origin_destination);
+			//		float neighbor_cost_origin_destination = cost_from_origin + current_neighbor->cost_between(end);
 
-					if( current_neighbor->in_open_set() ) open_set.erase( open_set.iterator_to( *((edge_type*)current_neighbor) ) );
+			//		current_neighbor->cost_origin_destination(neighbor_cost_origin_destination);
 
-					open_set.insert( *((edge_type*)current_neighbor) );
+			//		if( current_neighbor->in_open_set() ) open_set.erase( open_set.iterator_to( *((edge_type*)current_neighbor) ) );
 
-					current_neighbor->in_open_set(true);
-				}
-			}
+			//		open_set.insert( *((edge_type*)current_neighbor) );
+
+			//		current_neighbor->in_open_set(true);
+			//	}
+			//}
 		}
 
 		for(boost::container::deque< A_Star_Edge<edge_type>* >::iterator itr = modified_edges.begin();itr!=modified_edges.end();itr++)

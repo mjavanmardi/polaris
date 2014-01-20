@@ -81,7 +81,7 @@ namespace polaris
 			modified_edges.push_back(start);
 			start->marked_for_reset(true);
 		}
-	
+		
 		boost::intrusive::multiset< edge_type > open_set;
 
 		typedef typename Dijkstra_Graph<GraphType>::edges_type edges_type;
