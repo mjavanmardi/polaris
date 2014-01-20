@@ -42,10 +42,17 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj"
 	endif()
 
 	#TC_Malloc include and library dependencies
-	include_directories(${DEPS_DIR}/gperftools-2.1/src)
-	find_library(libtcmalloc NAMESlibtcmalloc_minimal libtcmalloc_minimal.a  HINT "/usr/lib/" ${DEPS_DIR}/gperftools-2.1/Release)
-	message(STATUS ""${libtcmalloc})
-
+	if (UNIX)
+		include_directories(${DEPS_DIR}/gperftools-2.1/src)
+		find_library(libtcmalloc NAMES libtcmalloc_minimal libtcmalloc_minimal.a  HINT "/usr/lib/" ${DEPS_DIR}/gperftools-2.1/Release)
+		message(STATUS ""${libtcmalloc})
+	endif()
+	
+	if (MSVC)
+		include_directories(${DEPS_DIR}/gperftools-2.1/src)
+		find_library(libtcmalloc NAMES libtcmalloc_minimal  HINTS ${DEPS_DIR}/gperftools-2.1/Release)
+	endif()
+	
 	#Google Testing Framework include and library dependencies
 	include_directories(${DEPS_DIR}/gtest-1.7.0/include)
 	find_library(gtest NAMES gtest  HINTS ${DEPS_DIR}/gtest-1.7.0/msvc/gtest-md/Release)
