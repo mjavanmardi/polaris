@@ -32,3 +32,4 @@ foreach (headerfile ${io_headers})
 endforeach()
 
 add_library(Io ${srcfiles} ${headerfiles})
+set_target_properties(Io PROPERTIES FOLDER libs)

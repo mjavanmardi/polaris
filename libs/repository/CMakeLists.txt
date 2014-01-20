@@ -1,5 +1,6 @@
-file(GLOB_RECURSE hppfiles
-	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-	*.h)	
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)
+source_group("Implementations" _Implementation*..h$)
+source_group("Prototypes" _Prototype*..h$)
 add_library(Repository Repository.cpp ${hppfiles})
-target_link_libraries(Repository)	
+target_link_libraries(Repository)
+set_target_properties(Repository PROPERTIES FOLDER libs)

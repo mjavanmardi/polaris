@@ -1,7 +1,6 @@
-file(GLOB_RECURSE hppfiles
-	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-	*.h)	
-file(GLOB_RECURSE cppfiles
-	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-	*.cpp)	
-add_library(antares ${cppfiles} ${hppfiles})
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)	
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
+source_group("Implementations" _Implementation.h$)
+source_group("Prototypes" _Prototype.h$)
+add_library(Antares ${cppfiles} ${hppfiles})
+set_target_properties(Antares PROPERTIES FOLDER libs)
