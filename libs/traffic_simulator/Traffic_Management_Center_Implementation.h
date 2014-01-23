@@ -242,7 +242,7 @@ namespace Traffic_Management_Center_Components
 			m_data(boost::container::vector<Base_Network_Event_Interface*>,tracked_events, NONE, NONE);
 
 			//                                          name of the function
-			template<typename ComponentType,typename TargetType> void TMC_Conditional()
+			template<typename TargetType> void TMC_Conditional()
 			{
 				response.next.iteration() = iteration() + 5*60;
 				response.next._subiteration() = 1;

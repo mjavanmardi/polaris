@@ -29,7 +29,7 @@ namespace Sensor_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Link_Sensor),Data_Object>::Component_Type ComponentType;
 			typedef Scenario<typename MasterType::scenario_type> Scenario_Interface;
 
-			template<typename ComponentType,typename TargetType> void Sensor_Conditional()
+			template<typename TargetType> void Sensor_Conditional()
 			{
 				response.next.iteration() = iteration() + ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 				response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;

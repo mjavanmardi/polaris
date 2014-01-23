@@ -198,7 +198,7 @@ namespace Network_Event_Components
 				cout << endl << "Total Locations: " << all_locations->size() << ", Affected Locations: " << this->_affected_locations.size() << ", Unaffected Locations: " << this->_unaffected_locations.size();
 			}
 			
-			template<typename ComponentType,typename TargetType> void Incident_Conditional()
+			template<typename TargetType> void Incident_Conditional()
 			{
 				ComponentType* pthis = (ComponentType*)_this;
 				
