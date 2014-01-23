@@ -83,6 +83,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj"
 
 #Allow Access to Project-level Directories
 include_directories(libs)
+include_directories(libs/io)
+include_directories(libs/core)
 include_directories(apps)
 include_directories(tests)
 
