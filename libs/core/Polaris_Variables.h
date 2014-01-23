@@ -136,5 +136,6 @@ using namespace Basic_Units::Area_Variables;
 using namespace Basic_Units::Volume_Variables;
 using namespace Basic_Units::Unit_Rate_Variables;
 using namespace Basic_Units::Speed_Variables;
+using namespace Basic_Units::Currency_Variables;
 }
 

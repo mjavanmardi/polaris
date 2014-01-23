@@ -92,6 +92,8 @@ add_subdirectory (libs/repository)
 add_subdirectory (libs/io) 
 add_subdirectory (libs/spatial) 
 add_subdirectory (libs/routing) 
+add_subdirectory (libs/traffic_simulator)
+add_subdirectory (libs/scenario_manager)
 
 #Apply CMake over POLARIS tests project structure
 add_subdirectory (tests/core_tests)
@@ -99,7 +101,8 @@ add_subdirectory (tests/core_tests)
 #Apply CMake over POLARIS application project structure
 add_subdirectory (apps/io_demo) 
 add_subdirectory (apps/test) 
- 
+add_subdirectory (apps/fixed_demand_simulator) 
+
 if (MSVC AND Antares)
 	include_directories(${DEPS_DIR}/glew-1.7.0/include)
 	include_directories(${DEPS_DIR}/plplot/include/plplot)

@@ -1,8 +1,8 @@
 #pragma once
 #include "Basic_Units_Prototypes.h"
 
-namespace polaris{
-	
+namespace polaris
+{
 namespace Basic_Units
 {
 	namespace Implementations
@@ -14,11 +14,13 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic Length base clase.
-		implementation struct Length_Implementation : public Polaris_Component<MasterType,INHERIT(Length_Implementation),Data_Object>
+		implementation struct Length_Implementation : public Polaris_Component<MasterType,INHERIT(Length_Implementation),NULLTYPE>
 		{
 			typedef true_type Length_tag;
 			typedef true_type Inches_tag;
-			m_data(Value_Type,Value,NONE,NONE);
+			m_data(Value_Type,Value, NONE, NONE);
+			tag_getter_as_available(Value);
+			tag_setter_as_available(Value);
 		};
 
 		//================================================================================================
@@ -31,7 +33,7 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic Time base clase and Time Horizon Classes.
-		implementation struct Time_Implementation : public Polaris_Component<MasterType,INHERIT(Time_Implementation),Data_Object>
+		implementation struct Time_Implementation : public Polaris_Component<MasterType,INHERIT(Time_Implementation),NULLTYPE>
 		{
 			Time_Implementation()
 			{
@@ -39,12 +41,14 @@ namespace Basic_Units
 			}
 			typedef true_type Time_tag;
 			typedef true_type Seconds_tag;
-			m_data(Value_Type,Value,NONE,NONE);
+			m_data(Value_Type,Value, NONE, NONE);
+			tag_getter_as_available(Value);
+			tag_setter_as_available(Value);
 		};
 
 		//================================================================================================
 		/// Time Horizon base clase.
-		//implementation struct Horizon_Implementation : public Time_Implementation<MasterType,ParentType,APPEND_CHILD(Horizon_Implementation)>{ typedef true_type Horizon_tag; typedef true_type Impulsive_tag;};
+		implementation struct Horizon_Implementation : public Time_Implementation<MasterType,INHERIT(Horizon_Implementation)>{ typedef true_type Horizon_tag; typedef true_type Impulsive_tag;};
 
 		//================================================================================================
 		/// Basic Rate and Speed base classes.
@@ -61,16 +65,19 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic Currency base clase.
-		implementation struct Currency_Implementation : public Polaris_Component<MasterType,INHERIT(Currency_Implementation)>
+		implementation struct Currency_Implementation : public Polaris_Component<MasterType,INHERIT(Currency_Implementation),NULLTYPE>
 		{
 			typedef true_type Currency_tag;
 			typedef true_type Cents_tag; 
-			m_data(Value_Type,Value,NONE,NONE);
+			m_data(Value_Type,Value, NONE, NONE);
+			tag_getter_as_available(Value);
+			tag_setter_as_available(Value);
 		};
+		//implementation struct _Currency {typedef true_type Currency_tag; typedef true_type Cents_tag; m_data(Value_Type,Value, NONE, NONE);};		
 	}
 }
 
-
+}
 namespace GLOBALS
 {
 //=================================================================================================================
@@ -81,28 +88,30 @@ struct _Simulation_Timer
 {
 	template<typename TargetType> TargetType Current_Time()
 	{
-		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Base_Time_Type>>((typename Base_Time_Type::ValueType)_iteration);
+//TODO
+//		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Base_Time_Type>>((typename Base_Time_Type::ValueType)iteration());
 	}
 	template<typename InputType, typename TargetType> TargetType Future_Time(InputType Additional_Time_Increment)
 	{
 		Simulation_Timestep_Increment current_time;
-		current_time = (Simulation_Timestep_Increment)_iteration;
-		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,Simulation_Timestep_Increment,InputType>>(Additional_Time_Increment);
-		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Simulation_Timestep_Increment>>(current_time + additional_time);
+		current_time = (Simulation_Timestep_Increment)iteration();
+//TODO
+//		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,Simulation_Timestep_Increment,InputType>>(Additional_Time_Increment);
+//TODO
+//		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Simulation_Timestep_Increment>>(current_time + additional_time);
 	}
 	template<typename InputType> Simulation_Timestep_Increment Convert_Time_To_Simulation_Timestep(InputType Time)
 	{
-		return Basic_Units::Prototypes::Time_Prototype<Basic_Time>::Convert_Value<Target_Type<NT,Simulation_Timestep_Increment,InputType>>(Time);
+//TODO
+//		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NT,Simulation_Timestep_Increment,InputType>>(Time);
 
 	}
 };
 
 static _Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;
 
-static Basic_Units::Prototypes::Time_Prototype<Basic_Time> Time_Converter;
+static Basic_Units::Prototypes::Time<Basic_Time> Time_Converter;
 
 }
 
 using namespace GLOBALS;
-
-}

@@ -5,4 +5,3 @@
 #include "System-odb.hxx"
 #include "Result-odb.hxx"
 #include "Network_Event-odb.hxx"
-#include "Supply.h"

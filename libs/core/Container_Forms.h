@@ -814,31 +814,31 @@ namespace polaris
 			typedef typename remove_pointer<CONTAINER_TYPE>::type NAME##_type;\
 			typedef CONTAINER_TYPE NAME##_raw_type;\
 			template<typename TargetType>\
-			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(CONTAINER_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\
 			template<typename TargetType>\
-			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && !check(CONTAINER_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(&_##NAME);}\
 			template<typename TargetType>\
-			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(CONTAINER_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(*_##NAME);}\
 			template<typename TargetType>\
-			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(CONTAINER_TYPE,is_pointer)) && (GETTER_REQUIREMENTS)       ))\
+			TargetType NAME(requires(TargetType,      (check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,!(GETTER_REQUIREMENTS)))\
 			{static_assert((GETTER_REQUIREMENTS) && True_Concept<TargetType>::value,"\n\n\n[--------- One or more getter requirements for \"" #NAME"\" could not be satisfied: { "#GETTER_REQUIREMENTS" } ---------]\n\n");}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && !check(CONTAINER_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=(CONTAINER_TYPE)(value);}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && !check(CONTAINER_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=(CONTAINER_TYPE)(*value);}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && check(CONTAINER_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (!check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=((CONTAINER_TYPE)(&value));}\
 			template<typename TargetType>\
-			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && check(CONTAINER_TYPE,is_pointer)) && (SETTER_REQUIREMENTS)       ))\
+			void NAME(TargetType value,requires(TargetType,      (check(TargetType,is_pointer) && check(concat(CONTAINER_TYPE),is_pointer)) && (SETTER_REQUIREMENTS)       ))\
 			{_##NAME=(CONTAINER_TYPE)(value);}\
 			template<typename TargetType>\
 			void NAME(TargetType value, requires(TargetType,!(SETTER_REQUIREMENTS)))\

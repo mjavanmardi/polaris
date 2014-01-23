@@ -17,7 +17,7 @@ namespace polaris
 	/// Null Type Definitions
 	///----------------------------------------------------------------------------------------------------
 
-	struct NULLTYPE{typedef NULLTYPE Master_Type;};
+	struct NULLTYPE{};
 
 	typedef NULLTYPE NT;
 
@@ -181,5 +181,193 @@ namespace polaris
 
 	template<class Head,class Tail,unsigned int i>
 	struct IsTrue<TypeList<Head,Tail>,i>{ static const bool value=Head::value && IsTrue<Tail,i-1>::value; };
+
+	////-----------------------------------------------------------------
+	//// Feature Dispatcher
+	////
+	//// Pass control to a specified feature of a type from a list of types from an anonymous pointer to a feature
+	//#define define_feature_dispatcher(FEATURE_NAME, DISPATCH_ALIAS)\
+	//template <class TList> struct DISPATCH_ALIAS;\
+	//template <>\
+	//struct DISPATCH_ALIAS<NULLTYPE>\
+	//{\
+	//	template<class HeadComponentType, typename TargetType>\
+	//	static inline typename TargetType::ReturnType Start_Dispatch(void* obj)\
+	//	{\
+	//		THROW_EXCEPTION("ERROR: type id: " << ((generic_implementation<NT>*)obj)->Identify() << " not found in typelist");\
+	//	}\
+	//};\
+	//template <class Head, class Tail>\
+	//struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
+	//{\
+	//	define_feature_exists_check(FEATURE_NAME, FEATURE_NAME##_exists)\
+	//	template<class HeadType_As_Given, typename TargetType>\
+	//	static inline typename TargetType::ReturnType Start_Dispatch(void* obj, requires(HeadType_As_Given,check(HeadType_As_Given, Is_Polaris_Prototype) || check(HeadType_As_Given, Is_Polaris_Component)))\
+	//	{\
+	//		return DISPATCH_ALIAS<TypeList<HeadType_As_Given, Tail> >::template Dispatch<typename HeadType_As_Given::Component_Type,HeadType_As_Given, TargetType>(obj);\
+	//	}\
+	//	template<class HeadType_As_Given, typename TargetType>\
+	//	static inline typename TargetType::ReturnType Start_Dispatch(void* obj, requires(HeadType_As_Given,!check(HeadType_As_Given, Is_Polaris_Prototype) && !check(HeadType_As_Given, Is_Polaris_Component)))\
+	//	{\
+	//		assert_check(HeadType_As_Given, Is_Polaris_Prototype, "Type is not a valid polaris prototype or component." );\
+	//	}\
+	//	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
+	//	static inline typename TargetType::ReturnType Dispatch(void* obj, requires(HeadType_As_Given,check(HeadType_As_Given, Is_Polaris_Prototype) && check(HeadComponentType,FEATURE_NAME##_exists)))\
+	//	{\
+	//		if(((generic_implementation<NT>*)obj)->Identify() == Head::Component_Type::component_index)\
+	//		{\
+	//			return (typename TargetType::ReturnType)((Head*)obj)->template FEATURE_NAME<typename TargetType::ControlType>();\
+	//		}\
+	//		else\
+	//		{\
+	//			return DISPATCH_ALIAS<Tail>::template Start_Dispatch<typename TypeAt<Tail,0>::Result, TargetType>(obj);\
+	//		}\
+	//	}\
+	//	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
+	//	static inline typename TargetType::ReturnType Dispatch(void* obj, requires(HeadType_As_Given,check(HeadType_As_Given, Is_Polaris_Component) && check(HeadComponentType,FEATURE_NAME##_exists)))\
+	//	{\
+	//		if(((generic_implementation<NT>*)obj)->Identify() == Head::Component_Type::component_index)\
+	//		{\
+	//			return (typename TargetType::ReturnType)((Head*)obj)->template FEATURE_NAME<HeadType_As_Given, HeadType_As_Given, typename TargetType::ControlType>();\
+	//		}\
+	//		else\
+	//		{\
+	//			return DISPATCH_ALIAS<Tail>::template Start_Dispatch<typename TypeAt<Tail,0>::Result, TargetType>(obj);\
+	//		}\
+	//	}\
+	//	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
+	//	static inline typename TargetType::ReturnType  Dispatch(void* obj, requires( (!check(HeadType_As_Given, Is_Polaris_Component) && !check(HeadType_As_Given, Is_Polaris_Prototype))))\
+	//	{\
+	//		assert_check(HeadType_As_Given, Is_Polaris_Prototype, "Type is not a valid polaris prototype or component." );\
+	//	}\
+	//	template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
+	//	static inline typename TargetType::ReturnType  Dispatch(void* obj, requires( (check(HeadType_As_Given, Is_Polaris_Component) || check(HeadType_As_Given, Is_Polaris_Prototype)) && !check(HeadComponentType,FEATURE_NAME##_exists)))\
+	//	{\
+	//		assert_check(HeadComponentType, FEATURE_NAME##_exists, "" #FEATURE_NAME "does not exist.  Make sure to 'tag_feature_as_available' if the feature does exist in the component." );\
+	//	}\
+	//};
+	//#define dispatch_to_feature(DISPATCHER_ALIAS, TYPELIST, OBJECT, TARGETTYPE_STRUCT_WITH_CONTROLTYPE_FOR_DISPATCH_TARGET_AND_RETURNTYPE_DEFINED, ...)\
+	//	DISPATCHER_ALIAS<TYPELIST>::template Start_Dispatch<typename TypeAt<TYPELIST,0>::Result, concat(TARGETTYPE_STRUCT_WITH_CONTROLTYPE_FOR_DISPATCH_TARGET_AND_RETURNTYPE_DEFINED,__VA_ARGS__)>(OBJECT);
+
+
+
+
+
+	#define define_static_typelist_loop(FEATURE_NAME, DISPATCH_ALIAS)\
+		template <class TList> struct DISPATCH_ALIAS;\
+		template <>\
+		struct DISPATCH_ALIAS<NULLTYPE>\
+		{\
+			template<class HeadComponentType, typename TargetType>\
+			static inline void Start_Dispatch(void* obj)\
+			{\
+			}\
+		};\
+		template <class Head, class Tail>\
+		struct DISPATCH_ALIAS<TypeList<Head, Tail> >\
+		{\
+			template<class HeadType_As_Given, typename TargetType>\
+			static inline void Start_Dispatch(void* obj)\
+			{\
+				DISPATCH_ALIAS<TypeList<HeadType_As_Given, Tail> >::template Dispatch<HeadType_As_Given::Component_Type,HeadType_As_Given, TargetType>(obj);\
+			}\
+			template<class HeadComponentType, class HeadType_As_Given, class TargetType>\
+			static inline void Dispatch(void* obj)\
+			{\
+				Head::template FEATURE_NAME<HeadType_As_Given, HeadType_As_Given, NT>(obj);\
+				DISPATCH_ALIAS<Tail>::template Start_Dispatch<TypeAt<Tail,0>::Result, TargetType>(obj);\
+			}\
+		};
+
+	#define execute_static_typelist_loop(DISPATCHER_ALIAS, TYPELIST, OBJECT_PTR)\
+			DISPATCHER_ALIAS<TYPELIST>::template Start_Dispatch<TypeAt<TYPELIST,0>::Result, NT>(OBJECT_PTR);
+
+
+
+
+
+
+	//#define feature_method_void(FEATURE_NAME, REQUIREMENTS)\
+	//	public:\
+	//		define_feature_exists_check(FEATURE_NAME, FEATURE_NAME##_exists);\
+	//		template<typename ReturnValueType>\
+	//		ReturnValueType FEATURE_NAME(requires_getter(check(ComponentType,FEATURE_NAME##_exists) && (REQUIREMENTS)))\
+	//		{\
+	//			return (ReturnValueType)this_component()->template FEATURE_NAME<ComponentType,CallerType,ReturnValueType>();\
+	//		}\
+	//		template<typename ReturnValueType>\
+	//		ReturnValueType FEATURE_NAME(requires_getter(!check(ComponentType,FEATURE_NAME##_exists) || !(REQUIREMENTS)))\
+	//		{\
+	//			static_assert(FEATURE_NAME##_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_as_available\"? ---------]\n\n");\
+	//			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
+	//		}
+
+	//#define feature_method_1_arg(FEATURE_NAME, ARG, REQUIREMENTS)\
+	//	public:\
+	//		define_feature_exists_check(FEATURE_NAME##_1args, FEATURE_NAME##_1args_exists);\
+	//		template<typename TargetType>\
+	//		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG,requires( check(TargetType,Is_Target_Type_Struct) && check(ComponentType,FEATURE_NAME##_1args_exists) && (REQUIREMENTS) ) )\
+	//		{\
+	//			return (typename TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG);\
+	//		}\
+	//		template<typename TargetType>\
+	//		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG,requires(!check(TargetType,Is_Target_Type_Struct)  || !check(ComponentType,FEATURE_NAME##_1args_exists) || !(REQUIREMENTS)))\
+	//		{\
+	//			static_assert(FEATURE_NAME##_1args_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_as_available\"? ---------]\n\n");\
+	//			assert_check(TargetType, Is_Target_Type_Struct, "Must use a Target_Type struct for the target type when using the feature_method macro_1.");\
+	//			assert_sub_check(TargetType, Is_Target_Type_Struct, has_ReturnType, "Check1 fail");\
+	//			assert_sub_check(TargetType, Is_Target_Type_Struct, has_ParamType, "Check2 fail");\
+	//			assert_sub_check(TargetType, Is_Target_Type_Struct, has_Param2Type, "Check3 fail");\
+	//			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
+	//		}
+	//	
+	//#define feature_method_2_arg(FEATURE_NAME, ARG1, ARG2, REQUIREMENTS)\
+	//	public:\
+	//		define_feature_exists_check(FEATURE_NAME##_2args, FEATURE_NAME##_2args_exists);\
+	//		template<typename TargetType>\
+	//		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,requires(check(ComponentType,FEATURE_NAME##_2args_exists) && check(TargetType,Is_Target_Type_Struct) && (REQUIREMENTS) ) )\
+	//		{\
+	//			return (typename TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2);\
+	//		}\
+	//		template<typename TargetType>\
+	//		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,requires(!check(ComponentType,FEATURE_NAME##_2args_exists) || !check(TargetType,Is_Target_Type_Struct)  || !(REQUIREMENTS)))\
+	//		{\
+	//			static_assert(FEATURE_NAME##_2args_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_signature_as_available\"? ---------]\n\n");\
+	//			static_assert(Is_Target_Type_Struct<TargetType>::value,"\n\n\n[--------- Must use a Target_Type struct for the target type when using the feature_method macro_1.---------]\n\n");\
+	//			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
+	//		}
+
+	//#define feature_method_3_arg(FEATURE_NAME, ARG1, ARG2, ARG3, REQUIREMENTS)\
+	//	public:\
+	//		define_feature_exists_check(FEATURE_NAME##_3args, FEATURE_NAME##_3args_exists);\
+	//		template<typename TargetType>\
+	//		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2, typename TargetType::Param3Type ARG3,requires(check(ComponentType,FEATURE_NAME##_3args_exists) && check(TargetType,Is_Target_Type_Struct) && (REQUIREMENTS) ) )\
+	//		{\
+	//			return (typename TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2,ARG3);\
+	//		}\
+	//		template<typename TargetType>\
+	//		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2, typename TargetType::Param3Type ARG3,requires(!check(ComponentType,FEATURE_NAME##_3args_exists) || !check(TargetType,Is_Target_Type_Struct)  || !(REQUIREMENTS)))\
+	//		{\
+	//			static_assert(FEATURE_NAME##_3args_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_signature_as_available\"? ---------]\n\n");\
+	//			static_assert(Is_Target_Type_Struct<TargetType>::value,"\n\n\n[--------- Must use a Target_Type struct for the target type when using the feature_method macro_1.---------]\n\n");\
+	//			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
+	//		}
+
+	//#define feature_method_4_arg(FEATURE_NAME, ARG1, ARG2, ARG3, ARG4, REQUIREMENTS)\
+	//	public:\
+	//		define_feature_exists_check(FEATURE_NAME##_4args, FEATURE_NAME##_4args_exists);\
+	//		template<typename TargetType>\
+	//		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,typename TargetType::Param3Type ARG3, typename TargetType::Param4Type ARG4,requires(check(ComponentType,FEATURE_NAME##_4args_exists) && check(TargetType,Is_Target_Type_Struct) && (REQUIREMENTS) ) )\
+	//		{\
+	//			return (typename TargetType::ReturnType)this_component()->template FEATURE_NAME<ComponentType,CallerType,TargetType>(ARG1,ARG2,ARG3,ARG4);\
+	//		}\
+	//		template<typename TargetType>\
+	//		typename TargetType::ReturnType FEATURE_NAME(typename TargetType::ParamType ARG1, typename TargetType::Param2Type ARG2,typename TargetType::Param3Type ARG3, typename TargetType::Param4Type ARG4,requires(!check(ComponentType,FEATURE_NAME##_4args_exists) || !check(TargetType,Is_Target_Type_Struct)  || !(REQUIREMENTS)))\
+	//		{\
+	//			static_assert(FEATURE_NAME##_4args_exists<ComponentType>::value,"\n\n\n[--------- Can't guarantee that a feature_implementation for " #FEATURE_NAME " exists, did you remember to use the macro \"tag_feature_as_available\"? ---------]\n\n");\
+	//			static_assert(Is_Target_Type_Struct<TargetType>::value,"\n\n\n[--------- Must use a Target_Type struct for the target type when using the feature_method macro_1.---------]\n\n");\
+	//			static_assert(REQUIREMENTS,"\n\n\n[--------- One or more setter requirements for \"" #FEATURE_NAME"\" could not be satisfied: { "#REQUIREMENTS" } ---------]\n\n");\
+	//		}
+	//#define tag_feature_signature_as_available(FEATURE_NAME,NUM_ARGS) typedef true_type FEATURE_NAME##_##NUM_ARGS##args_feature_tag;
 
 }

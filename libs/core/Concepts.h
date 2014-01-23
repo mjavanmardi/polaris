@@ -33,6 +33,8 @@ namespace polaris
 	#define assert_default_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 	#define assert_sub_check_2(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS,ERROR_MESSAGE) static_assert(CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
 
+	#define assert_check(TYPE_TO_TEST,CONCEPT_NAME,ERROR_MESSAGE) static_assert(CONCEPT_NAME<strip_modifiers(TYPE_TO_TEST)>::value,"\n\n\n[--------- "#ERROR_MESSAGE" ---------]\n\n")
+
 	#define delay_compilation(A_TEMPLATE_ARGUMENT) True_Concept<A_TEMPLATE_ARGUMENT>::value
 
 	//#define requires(...) char(*)[__VA_ARGS__ && True_Concept<TargetType>::value]=NULL
@@ -52,6 +54,8 @@ namespace polaris
 
 	#define NONE true
 	
+	NULLTYPE null_argument;
+
 	///============================================================================
 	/// IF - standard compile-time IF statement
 	///============================================================================

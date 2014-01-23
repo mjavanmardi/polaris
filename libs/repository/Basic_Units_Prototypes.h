@@ -1,23 +1,23 @@
 #pragma once
-#include "Dependencies.h"
+#include "Repository_Includes.h"
 
-//template<typename TargetType, typename InputType>
-//TargetType Round(InputType value, requires(check(TargetType, is_integral) && check(InputType,is_arithmetic) && (check(InputType,!is_integral))))
-//{
-//	InputType remain = value - (InputType)((TargetType)value);
-//	if (remain >= 0.5) return (TargetType)(value - remain + 1);
-//	else return (TargetType)(value - remain);
-//}
-//template<typename TargetType, typename InputType>
-//TargetType Round(InputType value, requires(check(TargetType, !is_integral) || check(InputType,!is_arithmetic) || (check(InputType,is_integral))))
-//{
-//	assert_check(TargetType,is_integral,"ReturnType must be integral");
-//	assert_check(InputType,is_arithmetic,"InputType must be arithmetic");
-//	assert_check(InputType,!is_integral,"InputType must be floating point type");
-//}
+template<typename TargetType, typename InputType>
+TargetType Round(InputType value, requires(TargetType,check(strip_modifiers(TargetType), is_integral) && check(InputType,is_arithmetic) && (check(InputType,!is_integral))))
+{
+	InputType remain = value - (InputType)((TargetType)value);
+	if (remain >= 0.5) return (TargetType)(value - remain + 1);
+	else return (TargetType)(value - remain);
+}
+template<typename TargetType, typename InputType>
+TargetType Round(InputType value, requires(TargetType,check(strip_modifiers(TargetType), !is_integral) || check(InputType,!is_arithmetic) || (check(InputType,is_integral))))
+{
+	assert_check(strip_modifiers(TargetType),is_integral,"ReturnType must be integral");
+	assert_check(InputType,is_arithmetic,"InputType must be arithmetic");
+	assert_check(InputType,!is_integral,"InputType must be floating point type");
+}
 
-namespace polaris{
-
+namespace polaris
+{
 namespace Basic_Units
 {
 	//==========================================================================
@@ -57,49 +57,6 @@ namespace Basic_Units
 
 	namespace Concepts
 	{
-		concept struct Is_Polaris_Component
-		{
-			// Basic check to satisfy polaris component requirements
-			check_typedef_name(has_parent_type,Parent_Type);
-			check_typedef_name(has_group_list,Group_List);
-			check_typedef_name(has_object_type,Object_Type);
-			check_typedef_name(has_master_type,Master_Type);
-
-			// subchecks which can be used to identify object type
-			check_typedef_type(is_data_object,Object_Type, Data_Object);
-			check_typedef_type(is_execution_object,Object_Type, Execution_Object);
-	
-			// check to make sure it is not a debug version of prototype (i.e. debug prototypes will satisfy all of the above checks due to inheriting from COmponent_Type
-			check_typedef_type(has_prototype_tag,Is_Prototype, true_type);
-
-			// default check when concept is used
-			define_default_check(!has_prototype_tag && has_parent_type && has_group_list && has_object_type && has_master_type && (is_data_object || is_execution_object));
-		};
-
-
-		concept struct Is_Polaris_Prototype
-		{
-			check_typedef_name(has_component_type,Component_Type);
-			check_typedef_name(has_caller_type,Caller_Type);
-			check_typedef_type(has_prototype_tag,Is_Prototype, true_type);
-			define_default_check(has_component_type && has_caller_type && has_prototype_tag);
-		};
-
-		concept struct Has_Value
-		{
-			check_template_method_name(has_value,Value);
-			define_default_check(has_value);
-		};
-		/*concept struct Has_Getter
-		{
-			check_template_method_type(has_getter,Value,concat(Member_Function_Signature<T,NT>),NT);
-			define_default_check(has_getter);
-		};
-		concept struct Has_Setter
-		{
-			check_template_method_type(has_setter,Value,concat(Member_Function_Signature<T,void,NT>),NT);
-			define_default_check(has_setter);
-		};*/
 		#pragma region Length Concepts
 		concept struct Is_Length_Value
 		{
@@ -116,13 +73,13 @@ namespace Basic_Units
 		/// Check if a type meets the requirements of being a basic 'Area' component
 		concept struct Is_Length_Component
 		{
-			check_concept(Is_Component,Is_Polaris_Component,T,V);
-			check_concept(Is_Length, Is_Length_Value,T,V);
+			check_concept(Is_Component,Is_Polaris_Component, T, V);
+			check_concept(Is_Length, Is_Length_Value, T, V);
 			define_default_check(Is_Component && Is_Length);
 		};
 		concept struct Is_Length_Prototype
 		{
-			check_concept(Is_Prototype,Is_Polaris_Prototype,T,V);
+			check_concept(Is_Prototype,Is_Prototype, T, V);
 			check_typedef_type(Is_Length, Component_Type::Length_tag, true_type);
 			define_default_check(Is_Prototype && Is_Length);
 		};
@@ -138,13 +95,13 @@ namespace Basic_Units
 		/// Check if a type meets the requirements of being a basic 'Area' component
 		concept struct Is_Area_Component
 		{
-			check_concept(Is_Component,Is_Polaris_Component,T,V);
-			check_concept(Is_Area, Is_Area_Value,T,V);
+			check_concept(Is_Component,Is_Polaris_Component, T, V);
+			check_concept(Is_Area, Is_Area_Value, T, V);
 			define_default_check(Is_Component && Is_Area);
 		};
 		concept struct Is_Area_Prototype
 		{
-			check_concept(Is_Prototype,Is_Polaris_Prototype,T,V);
+			check_concept(Is_Prototype,Is_Prototype, T, V);
 			check_typedef_type(Is_Area, Component_Type::Area_tag, true_type);
 			define_default_check(Is_Area && Is_Prototype);
 		};
@@ -161,13 +118,13 @@ namespace Basic_Units
 		/// Check if a type meets the requirements of being a basic 'Time' component
 		concept struct Is_Volume_Component
 		{
-			check_concept(Is_Component,Is_Polaris_Component,T,V);
-			check_concept(Is_Volume,Is_Volume_Value,T,V);
+			check_concept(Is_Component,Is_Polaris_Component, T, V);
+			check_concept(Is_Volume,Is_Volume_Value, T, V);
 			define_default_check(Is_Component && Is_Volume);
 		};
 		concept struct Is_Volume_Prototype
 		{
-			check_concept(Is_Prototype,Is_Polaris_Prototype,T,V);
+			check_concept(Is_Prototype,Is_Prototype, T, V);
 			check_typedef_type(Is_Volume, Component_Type::Volume_tag, true_type);
 			define_default_check(Is_Volume && Is_Prototype);
 		};
@@ -189,13 +146,13 @@ namespace Basic_Units
 		/// Check if a type meets the requirements of being a basic 'Time' component
 		concept struct Is_Time_Component
 		{
-			check_concept(Is_Component,Is_Polaris_Component,T,V);
-			check_concept(Is_Time, Is_Time_Value,T,V);
+			check_concept(Is_Component,Is_Polaris_Component, T, V);
+			check_concept(Is_Time, Is_Time_Value, T, V);
 			define_default_check(Is_Component && Is_Time);
 		};
 		concept struct Is_Time_Prototype
 		{
-			check_concept(Is_Prototype,Is_Polaris_Prototype,T,V);
+			check_concept(Is_Prototype,Is_Prototype, T, V);
 			check_typedef_type(Has_Time, Component_Type::Time_tag, true_type);
 			define_default_check(Is_Prototype && Has_Time);
 		};
@@ -206,39 +163,39 @@ namespace Basic_Units
 		concept struct Is_Rate_Value
 		{
 			check_typedef_type(Is_Rate, Rate_tag, true_type);
-			check_concept(Is_Time, Concepts::Is_Time_Value,T,V);
+			check_concept(Is_Time, Concepts::Is_Time_Value, T, V);
 			define_default_check(Is_Rate && Is_Time);
 		};
 		/// Check if a type meets the requirements of being a basic 'Time' component
 		concept struct Is_Rate_Component
 		{
-			check_concept(Is_Component,Is_Polaris_Component,T,V);
+			check_concept(Is_Component,Is_Polaris_Component, T, V);
 			check_typedef_type(Is_Rate, Rate_tag, true_type);
 			define_default_check(Is_Component && Is_Rate);
 		};
 		concept struct Is_Rate_Prototype
 		{
-			check_concept(Is_Prototype,Is_Polaris_Prototype,T,V);
+			check_concept(Is_Prototype,Is_Prototype, T, V);
 			check_typedef_type(Is_Rate, Component_Type::Rate_tag, true_type);
 			define_default_check(Is_Rate && Is_Prototype);
 		};
 		concept struct Is_Speed_Value
 		{
 			check_typedef_type(Is_Speed, Speed_tag, true_type);
-			check_concept(Is_Time, Concepts::Is_Time_Value,T,V);
-			check_concept(Is_Length, Concepts::Is_Length_Value,T,V);
+			check_concept(Is_Time, Concepts::Is_Time_Value, T, V);
+			check_concept(Is_Length, Concepts::Is_Length_Value, T, V);
 			define_default_check(Is_Speed && Is_Time && Is_Length);
 		};
 		/// Check if a type meets the requirements of being a basic 'Time' component
 		concept struct Is_Speed_Component
 		{
-			check_concept(Is_Component,Is_Polaris_Component,T,V);
+			check_concept(Is_Component,Is_Polaris_Component, T, V);
 			check_typedef_type(Is_Speed, Speed_tag, true_type);
 			define_default_check(Is_Component && Is_Speed);
 		};
 		concept struct Is_Speed_Prototype
 		{
-			check_concept(Is_Prototype,Is_Polaris_Prototype,T,V);
+			check_concept(Is_Prototype,Is_Prototype, T, V);
 			check_typedef_type(Is_Speed, Component_Type::Speed_tag, true_type);
 			define_default_check(Is_Speed && Is_Prototype);
 		};
@@ -259,13 +216,13 @@ namespace Basic_Units
 		/// Check if a type meets the requirements of being a basic 'Time' component
 		concept struct Is_Currency_Component
 		{
-			check_concept(Is_Component,Is_Polaris_Component,T,V);
-			check_concept(Is_Currency, Is_Currency_Value,T,V);
+			check_concept(Is_Component,Is_Polaris_Component, T, V);
+			check_concept(Is_Currency, Is_Currency_Value, T, V);
 			define_default_check(Is_Component && Is_Currency);
 		};
 		concept struct Is_Currency_Prototype
 		{
-			check_concept(Is_Prototype,Is_Polaris_Prototype,T,V);
+			check_concept(Is_Prototype,Is_Prototype, T, V);
 			check_typedef_type(Is_Currency, Component_Type::Currency_tag, true_type);
 			define_default_check(Is_Prototype && Is_Currency);
 		};
@@ -277,339 +234,440 @@ namespace Basic_Units
 		//------------------------------------------------------------------------------------------------------------------
 		/// RENAME THE Inteface struct below.  This is the inteface to a POLARIS component
 		//------------------------------------------------------------------------------------------------------------------
-		prototype struct Length_Prototype
+		prototype struct Length
 		{
 			tag_as_prototype;
 
-			//define_get_set_exists_check(Value, Get_Value_exists, Set_Value_exists);
-			template<typename ReturnValueType> ReturnValueType Value(requires(ReturnValueType,check(ComponentType,Concepts::Has_Value) && check(ReturnValueType,Concepts::Is_Length_Value)))
+			define_get_set_exists_check(Value, Get_Value_exists, Set_Value_exists);
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Length_Value)))
 			{
-				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
+				return TargetType(this_component()->template Value<Value_Type>() * Conversion_Factor<TargetType>());
 			}
-			template<typename ReturnValueType> ReturnValueType Value(requires(ReturnValueType,check(ComponentType,!Concepts::Has_Value) || check(ReturnValueType,!Concepts::Is_Length_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Length_Value)))
 			{
-				assert_default_check(ComponentType,Concepts::Has_Value, "Getter does not exists for this accessor.");
-				assert_default_check(ReturnValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
+				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
 			}
-			template<typename SetValueType> void Value(SetValueType value, requires(SetValueType,check(ComponentType,Concepts::Has_Value) && check(SetValueType,Concepts::Is_Length_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Length_Value)))
 			{
-				this_component()->template Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
+				this_component()->template Value<Value_Type>(value / Conversion_Factor<TargetType>());
 			}
-			template<typename SetValueType> void Value(SetValueType value, requires(SetValueType,check(ComponentType,!Concepts::Has_Value) || check(SetValueType,!Concepts::Is_Length_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Length_Value)))
 			{
-				assert_default_check(ComponentType,Concepts::Has_Value, "Setter does not exists for this accessor.");
-				assert_default_check(SetValueType,Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
-			}
-
-			template<typename ReturnType, typename ParamType> static ReturnType Convert_Value(ParamType input_value, requires(ReturnType, check(ParamType,Concepts::Is_Length_Value) && check(ReturnType,Concepts::Is_Length_Value)))
-			{
-				Value_Type convert_component_value_to_param = Conversion_Factor<ParamType>();
-				Value_Type convert_component_value_to_return = Conversion_Factor<ReturnType>();
-				return ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
-			}
-			template<typename ReturnType, typename ParamType> static ReturnType Convert_Value(ParamType input_value, requires(ReturnType, check(ParamType,!Concepts::Is_Length_Value) || check(ReturnType,!Concepts::Is_Length_Value)))
-			{
-				assert_default_check(ReturnType,Concepts::Is_Length_Value, "TargetTyp::ReturnType is not a valid length value structure.");
-				assert_default_check(ParamType,Concepts::Is_Length_Value, "TargetType::ParamType is not a valid length value structure.");
+				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
 			}
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Length_Value) && check(typename TargetType::ReturnType,Concepts::Is_Length_Value)))
+			{
+				Value_Type convert_component_value_to_param = Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = Conversion_Factor<typename TargetType::ReturnType>();
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+			}
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Length_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Length_Value)))
+			{
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
+				assert_check(typename TargetType::ReturnType,Concepts::Is_Length_Value, "TargetTyp::ReturnType is not a valid length value structure.");
+				assert_check(typename TargetType::ParamType,Concepts::Is_Length_Value, "TargetType::ParamType is not a valid length value structure.");
+			}
+
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{
 				return (Value_Type)1.0;
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{		
 				return (Value_Type)0.0328084;
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{
 				return (Value_Type)0.393701;				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{
 				return (Value_Type)1.0 / (Value_Type)100000.0;
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{
 				return (Value_Type)1.0 / (Value_Type)100.0;
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{
 				return (Value_Type)(1.0 / 160934.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{
 				return (Value_Type)(30.48);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{		
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{
 				return (Value_Type)(12.0);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{
 				return (Value_Type)(1.0 / 3280.84);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{
 				return (Value_Type)(0.3048);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{
 				return (Value_Type)(1.0 / 5280.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{
 				return (Value_Type)(2.54);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{		
 				return (Value_Type)(1.0/12.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{
 				return (Value_Type)(1.0);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{
 				return (Value_Type)(2.54/100000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{
 				return (Value_Type)(0.0254);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{
 				return (Value_Type)(0.0833333 / 5280.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{
 				return (Value_Type)(100000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{		
 				return (Value_Type)(3280.84);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{
 				return (Value_Type)(39370.1);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{
 				return (Value_Type)(1000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{
 				return (Value_Type)(0.621371);
 			};
 				
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{
 				return (Value_Type)(100.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{		
 				return (Value_Type)(3.28084);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{
 				return (Value_Type)(39.3701);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{
 				return (Value_Type)(0.001);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{
 				return (Value_Type)(0.000621371);
 			};
 					
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{
 				return (Value_Type)(160934.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{		
 				return (Value_Type)(5280.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{
 				return (Value_Type)(63360.0);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{
 				return (Value_Type)(1.60934);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{
 				return (Value_Type)(1609.34);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{
 				return (Value_Type)(1.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, !(
-				(sub_check(TargetType,Concepts::Is_Length_Value, Is_Centimeters) || sub_check(TargetType,Concepts::Is_Length_Value, Is_Feet) || sub_check(TargetType,Concepts::Is_Length_Value, Is_Inches) || 
-				sub_check(TargetType,Concepts::Is_Length_Value, Is_Kilometers) || sub_check(TargetType,Concepts::Is_Length_Value, Is_Meters) || sub_check(TargetType,Concepts::Is_Length_Value, Is_Miles)) &&
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,!(
+				(sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) || sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) || sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) || 
+				sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) || sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) || sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles)) &&
 				(sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters) || sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet) || sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches) || 
 				sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers) || sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters) || sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles))) ))
 			{
-				assert_check(TargetType,Concepts::Is_Length_Value,"The specified TargetType is not a valid spatial measurement Data Structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value,"The specified TargetType is not a valid spatial measurement Data Structure.");
 			}
 		};
 
+		prototype struct Width : public Length<ComponentType>
+		{
+			template<typename TargetType> TargetType Value()
+			{
+				return ((Length<ComponentType>*)this)->template Value<TargetType>();
+			}
 
-		prototype struct Time_Prototype
+			template<typename TargetType> void Value(TargetType value)
+			{
+				((Length<ComponentType>*)this)->template Value<TargetType>(value);
+			}
+		};
+
+		prototype struct Height : public Length<ComponentType>
+		{
+			template<typename TargetType> TargetType Value()
+			{
+				return ((Length<ComponentType>*)this)->template Value<TargetType>();
+			}
+
+			template<typename TargetType> void Value(TargetType value)
+			{
+				((Length<ComponentType>*)this)->template Value<TargetType>(value);
+			}
+		};
+
+		prototype struct Area : public Length<ComponentType>
+		{
+			typedef Length<ComponentType> base_type;
+			template<typename TargetType> TargetType Value(requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Area_Value)))
+			{		
+				return ((Length<ComponentType>*)this)->template Value<TargetType>()*((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>();
+			}
+			template<typename TargetType> TargetType Value(requires(TargetType,check(strip_modifiers(TargetType),!Concepts::Is_Area_Value)))
+			{
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Area_Value,"Your target type is not identified as an area measure.");
+			}
+
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Area_Value)))
+			{
+				((Length<ComponentType>*)this)->template Value<TargetType>(value / ((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>());
+			}
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(strip_modifiers(TargetType),!Concepts::Is_Area_Value)))
+			{
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Area_Value,"Your target type is not identified as an area measure.");
+			}
+
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Area_Value) && check(typename TargetType::ReturnType,Concepts::Is_Area_Value)))
+			{
+				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
+				Value_Type conversion = convert_component_value_to_return / convert_component_value_to_param;
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * pow(conversion,2.0));
+			}
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Area_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Area_Value)))
+			{
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
+				assert_check(typename TargetType::ReturnType,Concepts::Is_Area_Value, "TargetType::ReturnType is not a valid area value structure.");
+				assert_check(typename TargetType::ParamType,Concepts::Is_Area_Value, "TargetType::ParamType is not a valid area value structure.");
+			}
+		};
+
+		prototype struct Volume : protected  Length<ComponentType>
+		{
+			typedef Length<ComponentType> base_type;
+
+			template<typename TargetType>  TargetType Value(requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Volume_Value)))
+			{		
+				return ((Length<ComponentType>*)this)->template Value<TargetType>()*((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>()*((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>();
+			}
+			template<typename TargetType>  TargetType Value(requires(TargetType,check(strip_modifiers(TargetType),!Concepts::Is_Volume_Value)))
+			{
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.");
+			}
+
+			template<typename TargetType>  void Value(TargetType value,requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Volume_Value)))
+			{
+				((Length<ComponentType>*)this)->template Value<TargetType>(value / ((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>() / ((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>());
+			}
+			template<typename TargetType>  void Value(TargetType value, requires(TargetType,check(strip_modifiers(TargetType),!Concepts::Is_Volume_Value)))
+			{
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.");
+			}
+
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Volume_Value) && check(typename TargetType::ReturnType,Concepts::Is_Volume_Value)))
+			{
+				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
+				Value_Type conversion = convert_component_value_to_return / convert_component_value_to_param;
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * pow(conversion,3.0));
+			}
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Volume_Value) || check(typename TargetType::ParamType,!Concepts::Is_Volume_Value)))
+			{
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
+				assert_check(typename TargetType::ReturnType,Concepts::Is_Volume_Value, "TargetType::ReturnType is not a valid volume value structure.");
+				assert_check(typename TargetType::ParamType,Concepts::Is_Volume_Value, "TargetType::ParamType is not a valid volume value structure.");
+			}
+		};
+
+		prototype struct Time
 		{
 			tag_as_prototype;
 
-			template<typename ReturnValueType> ReturnValueType Value(requires(ReturnValueType, check(ComponentType,Concepts::Has_Value) && check(ReturnValueType,Concepts::Is_Time_Value)))
+			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value)))
 			{
-				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * Conversion_Factor<ReturnValueType>());
+				return TargetType(this_component()->template Value<Value_Type>() * Conversion_Factor<TargetType>());
 			}
-			template<typename ReturnValueType> ReturnValueType Value(requires(ReturnValueType, check(ComponentType,!Concepts::Has_Value) || check(ReturnValueType,!Concepts::Is_Time_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Time_Value)))
 			{
-				assert_default_check(ComponentType,Concepts::Has_Value, "Getter does not exists for this accessor.");
-				assert_default_check(ReturnValueType,Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
+				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
-			template<typename SetValueType> void Value(SetValueType value, requires(SetValueType, check(ComponentType,Concepts::Has_Value) && check(SetValueType,Concepts::Is_Time_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value)))
 			{
-				this_component()->template Value<ComponentType,CallerType,Value_Type>(value / Conversion_Factor<SetValueType>());
+				this_component()->template Value<Value_Type>(value / Conversion_Factor<TargetType>());
 			}
-			template<typename SetValueType> void Value(SetValueType value, requires(SetValueType, check(ComponentType,!Concepts::Has_Value) || check(SetValueType,!Concepts::Is_Time_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Time_Value)))
 			{
-				assert_default_check(ComponentType,Concepts::Has_Value, "Setter does not exists for this accessor.");
-				assert_default_check(SetValueType,Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
+				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			
-			template<typename ReturnType, typename ParamType> static ReturnType Convert_Value(ParamType input_value, requires(ReturnType, check(ParamType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
 			{
-				Value_Type convert_component_value_to_param = Time_Prototype::Conversion_Factor<ParamType>();
-				Value_Type convert_component_value_to_return = Time_Prototype::Conversion_Factor<ReturnType>();
-				return ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = Time::Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = Time::Conversion_Factor<typename TargetType::ReturnType>();
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
-			template<typename ReturnType, typename ParamType> static ReturnType Convert_Value(ParamType input_value, requires(ReturnType, check(ParamType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
 			{
-				assert_default_check(ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
-				assert_default_check(ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
+				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
+				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
 			}
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
 			{
 				return (Value_Type)(864000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
 			{
 				return (Value_Type)(24.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
 			{
 				return (Value_Type)(1440.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
 			{
 				return (Value_Type)(86400.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
 			{
 				return (Value_Type)(1.0 / 864000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
 			{
 				return (Value_Type)(1.0/36000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
 			{
 				return (Value_Type)(1.0/600.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
 			{
 				return (Value_Type)(0.1);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
 			{
 				return (Value_Type)(1.0/24.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
 			{
 				return (Value_Type)(36000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
 			{
 				return (Value_Type)(60.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
 			{
 				return (Value_Type)(3600.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
 			{
 				return (Value_Type)(1.0/1440.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
 			{
 				return (Value_Type)(600.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
 			{
 				return (Value_Type)(1.0/60.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
 			{
 				return (Value_Type)(60.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
 			{
 				return (Value_Type)(1.0/ 86400.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
 			{
 				return (Value_Type)(10.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
 			{
 				return (Value_Type)(1.0/3600.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
 			{
 				return (Value_Type)(1.0/60.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType, sub_check(TargetType,Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
 			{
 				return (Value_Type)(1.0);
 			};
@@ -617,68 +675,228 @@ namespace Basic_Units
 			// Time value accessors for:
 			//------------------------------------------------------------------------------------------------
 			/// Time component accessor - returns the requested portion of the current time
-			accessor(Time_Component,NONE,NONE);
+			accessor(Time_Component, NONE, NONE);
 			/// Display the time
 			template<typename TargetType> void Write()
 			{
-				//cout <<"Total Seconds: "<<pthis->Total_Seconds<ComponentType, CallerType, TargetType>()<<endl;
+				//cout <<"Total Seconds: "<<pthis->Total_Seconds<  TargetType>()<<endl;
 				cout << "Day "<< this->Time_Component<Time_Days>()<<":  ";
 				cout << this->Time_Component<Time_Hours>()<<":"<<this->Time_Component<Time_Minutes>()<<":"<<this->Time_Component<Time_Seconds>()<<"."<< this->Time_Component<Time_DRSeconds>();
 			}
 		};
 
-
-		prototype struct Speed_Prototype : protected Time_Prototype<ComponentType>, protected Length_Prototype<ComponentType>
+		prototype struct Rate : protected Time<ComponentType>
 		{
 			tag_as_prototype;
-			typedef Length_Prototype<ComponentType> length_base;
-			typedef Time_Prototype<ComponentType> time_base;
+			typedef Time<ComponentType> base_type;
 
-			template<typename ReturnValueType> ReturnValueType Value(requires(ReturnValueType, check(ComponentType,Concepts::Has_Value) && check(ComponentType, Concepts::Is_Speed_Component) && check(ReturnValueType,Concepts::Is_Speed_Value)))
+			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value)))
 			{
-				ReturnValueType len_val = length_base::template Conversion_Factor<ReturnValueType>();
-				ReturnValueType time_val = time_base::template Conversion_Factor<ReturnValueType>();
-				return ReturnValueType(this_component()->template Value<ComponentType,CallerType,Value_Type>() * len_val / time_val );
+				TargetType val = base_type::template Conversion_Factor<TargetType>();
+				return TargetType(this_component()->template Value<Value_Type>() / val);
 			}
-			template<typename ReturnValueType> ReturnValueType Value(requires(ReturnValueType, !check(ComponentType,Concepts::Has_Value) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(ReturnValueType,Concepts::Is_Speed_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Time_Value)))
 			{
-				assert_default_check(ComponentType,Concepts::Has_Value, "Getter does not exists for this accessor.");
-				assert_default_check(ReturnValueType,Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
-				assert_default_check(ComponentType,Concepts::Is_Speed_Component, "The specified ComponentType is not a valid Speed component, ensure that ComponentType is tagged as a Speed_Type and has Value member}");
+				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
 			}
-			template<typename SetValueType> void Value(SetValueType value, requires(SetValueType, check(ComponentType,Concepts::Has_Value) && check(ComponentType, Concepts::Is_Speed_Component) && check(SetValueType,Concepts::Is_Speed_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value)))
 			{
-				SetValueType len_val = length_base::template Conversion_Factor<SetValueType>();
-				SetValueType time_val = time_base::template Conversion_Factor<SetValueType>();
-				this_component()->template Value<ComponentType,CallerType,Value_Type>(Value_Type(value * time_val / len_val));
+				this_component()->template Value<Value_Type>(value * base_type::template Conversion_Factor<TargetType>());
 			}
-			template<typename SetValueType> void Value(SetValueType value, requires(SetValueType, !check(ComponentType,Concepts::Has_Value) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(SetValueType,Concepts::Is_Speed_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Time_Value)))
 			{
-				assert_default_check(ComponentType,Concepts::Has_Value, "Setter does not exists for this accessor.");
-				assert_default_check(SetValueType,Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
-				assert_default_check(ComponentType,Concepts::Is_Speed_Component, "The specified ComponentType is not a valid Speed component, ensure that ComponentType is tagged as a Speed_Type and has Value member}");
+				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
+			}
+			
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
+			{
+				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+			}
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
+			{
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
+				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
+				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
+			}
+		};
+
+		prototype struct Speed : protected Time<ComponentType>, protected Length<ComponentType>
+		{
+			tag_as_prototype;
+			typedef Length<ComponentType> length_base;
+			typedef Time<ComponentType> time_base;
+
+			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(ComponentType, Concepts::Is_Speed_Component) && check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
+			{
+				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
+				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
+				return TargetType(this_component()->template Value<Value_Type>() * len_val / time_val );
+			}
+			template<typename TargetType> TargetType Value(requires(TargetType,!check(ComponentType,Get_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
+			{
+				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
+				assert_check(ComponentType,Concepts::Is_Speed_Component, "The specified ComponentType is not a valid Speed component, ensure that ComponentType is tagged as a Speed_Type and has Value member}");
+			}
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(ComponentType, Concepts::Is_Speed_Component) && check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
+			{
+				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
+				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
+				this_component()->template Value<Value_Type>(Value_Type(value * time_val / len_val));
+			}
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,!check(ComponentType,Set_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
+			{
+				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
+				assert_sub_check(ComponentType,Is_Polaris_Component,has_this_type, "Doesn't have This_Type");
+				assert_sub_check(ComponentType,Is_Polaris_Component,has_parent_type,"Doesn't have Parent_Type");
+				assert_sub_check(ComponentType,Is_Polaris_Component,has_group_list,"Doesn't have Group_List");
+				assert_sub_check(ComponentType,Is_Polaris_Component,has_object_type,"Doesn't have Object_Type");
+				assert_sub_check(ComponentType,Is_Polaris_Component,has_master_type,"Doesn't have Master_Type");
+				assert_sub_check(ComponentType,Concepts::Is_Speed_Component,Is_Speed,"The CompentType is not tagged with Speed_tag.");
+				assert_check(ComponentType,Concepts::Is_Speed_Component, "The specified ComponentType is not a valid Speed component, ensure that ComponentType is tagged as a Speed_Type and has Value member}");
 
 
 			}
 			
-			template<typename ReturnType, typename ParamType> static ReturnType Convert_Value(ParamType input_value, requires(ReturnType, check(ParamType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
 			{
-				Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<ParamType>();
-				Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<ReturnType>();
-				return ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<typename TargetType::ReturnType>();
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
 			}
-			template<typename ReturnType, typename ParamType> static ReturnType Convert_Value(ParamType input_value, requires(ReturnType, check(ParamType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
 			{
-				assert_default_check(ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
-				assert_default_check(ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
+				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
+				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
 			}
 		};
 		
+		prototype struct Currency
+		{
+			tag_as_prototype;
+
+			define_get_set_exists_check(Value, Get_Value_exists, Set_Value_exists);
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Currency_Value)))
+			{
+				return TargetType(this_component()->template Value<Value_Type>() * Conversion_Factor<TargetType>());
+			}
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Currency_Value)))
+			{
+				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Currency data structure.");
+			}
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Currency_Value)))
+			{
+				this_component()->template Value<Value_Type>(value / Conversion_Factor<TargetType>());
+			}
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Currency_Value)))
+			{
+				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, "The specified TargetType is not a valid Currency data structure.");
+			}
+
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Currency_Value) && check(typename TargetType::ReturnType,Concepts::Is_Currency_Value)))
+			{
+				Value_Type convert_component_value_to_param = Conversion_Factor<typename TargetType::ParamType>();
+				Value_Type convert_component_value_to_return = Conversion_Factor<typename TargetType::ReturnType>();
+				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+			}
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Currency_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Currency_Value)))
+			{
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
+				assert_check(typename TargetType::ReturnType,Concepts::Is_Length_Value, "TargetTyp::ReturnType is not a valid length value structure.");
+				assert_check(typename TargetType::ParamType,Concepts::Is_Length_Value, "TargetType::ParamType is not a valid length value structure.");
+			}
+
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
+			{
+				return (Value_Type)1.0;
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
+			{		
+				return (Value_Type)0.01;
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
+			{
+				return (Value_Type)0.00001;				
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
+			{
+				return (Value_Type)0.00000001;
+			};
+
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
+			{
+				return (Value_Type)(100.0);
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
+			{		
+				return (Value_Type)(1.0);
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
+			{
+				return (Value_Type)(0.001);				
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
+			{
+				return (Value_Type)(0.000001);
+			};
+
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
+			{
+				return (Value_Type)(100000.0);
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
+			{		
+				return (Value_Type)(1000.0);
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
+			{
+				return (Value_Type)(1.0);				
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
+			{
+				return (Value_Type)(0.001);
+			};
+
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
+			{
+				return (Value_Type)(100000000.0);
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
+			{		
+				return (Value_Type)(1000000.0);
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
+			{
+				return (Value_Type)(1000.0);				
+			};
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
+			{
+				return (Value_Type)(1.0);
+			};
+
+
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,!(
+				(sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) || sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Dollars) || sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Thousand_Dollars) || 
+				sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Million_Dollars)) &&
+				(sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents) || sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars) || sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars) || 
+				sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars))) ))
+			{
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value,"The specified TargetType is not a valid spatial measurement Data Structure.");
+			}
+		};
 	}
 
 }
-
+}
 using namespace Basic_Units::Concepts;
 using namespace Basic_Units::Prototypes;
-
-}

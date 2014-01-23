@@ -1,4 +1,4 @@
-set(io_headers Demand.h Supply.h Result.h System.h Network_Event.h Gtfs.h)
+set(io_headers Demand.h Supply.h Result.h System.h Network_Event.h)
 
 if (UNIX)
 	set(odb_path /mnt/lustre/app/polaris/bin/odb)
@@ -7,7 +7,7 @@ else()
 endif()
 
 #file(GLOB headerfiles *.h)
-set(headerfiles ${io_headers} Database.h Utils.h)
+set(headerfiles ${io_headers} database.h Utils.h)
 
 
 foreach (headerfile ${io_headers})

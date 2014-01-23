@@ -42,10 +42,17 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj"
 	endif()
 
 	#TC_Malloc include and library dependencies
-	include_directories(${DEPS_DIR}/gperftools-2.1/src)
-	find_library(libtcmalloc NAMESlibtcmalloc_minimal libtcmalloc_minimal.a  HINT "/usr/lib/" ${DEPS_DIR}/gperftools-2.1/Release)
-	message(STATUS ""${libtcmalloc})
-
+	if (UNIX)
+		include_directories(${DEPS_DIR}/gperftools-2.1/src)
+		find_library(libtcmalloc NAMES libtcmalloc_minimal libtcmalloc_minimal.a  HINT "/usr/lib/" ${DEPS_DIR}/gperftools-2.1/Release)
+		message(STATUS ""${libtcmalloc})
+	endif()
+	
+	if (MSVC)
+		include_directories(${DEPS_DIR}/gperftools-2.1/src)
+		find_library(libtcmalloc NAMES libtcmalloc_minimal  HINTS ${DEPS_DIR}/gperftools-2.1/Release)
+	endif()
+	
 	#Google Testing Framework include and library dependencies
 	include_directories(${DEPS_DIR}/gtest-1.7.0/include)
 	find_library(gtest NAMES gtest  HINTS ${DEPS_DIR}/gtest-1.7.0/msvc/gtest-md/Release)
@@ -85,6 +92,8 @@ add_subdirectory (libs/repository)
 add_subdirectory (libs/io) 
 add_subdirectory (libs/spatial) 
 add_subdirectory (libs/routing) 
+add_subdirectory (libs/traffic_simulator)
+add_subdirectory (libs/scenario_manager)
 
 #Apply CMake over POLARIS tests project structure
 add_subdirectory (tests/core_tests)
@@ -92,7 +101,8 @@ add_subdirectory (tests/core_tests)
 #Apply CMake over POLARIS application project structure
 add_subdirectory (apps/io_demo) 
 add_subdirectory (apps/test) 
- 
+add_subdirectory (apps/fixed_demand_simulator) 
+
 if (MSVC AND Antares)
 	include_directories(${DEPS_DIR}/glew-1.7.0/include)
 	include_directories(${DEPS_DIR}/plplot/include/plplot)

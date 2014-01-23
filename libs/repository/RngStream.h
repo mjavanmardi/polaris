@@ -79,8 +79,8 @@ namespace RNG_Components
 	public:
 
 	StlRngStream();
-	std::mt19937_64 generator;  
-	std::uniform_real_distribution<double> distribution;
+	mt19937_64 generator;  
+	uniform_real_distribution<double> distribution;
 	double RandU01();
 	void SetSeed(unsigned long iseed);
 	double triangular_random_variate(double u, double a, double b, double mean);
@@ -322,3 +322,4 @@ namespace RNG_Components
 
 	} // end of anonymous namespace
 }
+

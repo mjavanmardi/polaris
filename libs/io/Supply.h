@@ -242,49 +242,93 @@ class ZoneLandUse
 public:
 	// Default Constructor
 	ZoneLandUse () {}        
-	ZoneLandUse (int zone_, int area_, int area_res_low_, int area_res_hi_, int area_comm_, int area_ind_, int pop_hh_, int pop_per_, int pop_gq_, int emp_tot_, int emp_ret_)
-	: zone (zone_), area (area_), area_res_low (area_res_low_), area_res_hi (area_res_hi_), area_comm (area_comm_), area_ind (area_ind_), pop_hh (pop_hh_), pop_per (pop_per_), pop_gq (pop_gq_), emp_tot (emp_tot_), emp_ret (emp_ret_)
+	ZoneLandUse (int zone_,  float area_,  float entertainment_area_,  float industrial_area_,  float institutional_area_,  float mixed_use_area_,  float office_area_,  float other_area_,  float residential_area_,  float retail_area_,  float school_area_,  int pop_households_,  int pop_persons_,  int pop_group_quarters_,  int employment_total_,  int employment_retail_,  int employment_government_,  int employment_manufacturing_,  int employment_services_,  int employment_industrial_,  int employment_other_)
+	: zone(zone_), area(area_), entertainment_area(entertainment_area_), industrial_area(industrial_area_), institutional_area(institutional_area_), mixed_use_area(mixed_use_area_), office_area(office_area_), other_area(other_area_), residential_area(residential_area_), retail_area(retail_area_), school_area(school_area_), pop_households(pop_households_), pop_persons(pop_persons_), pop_group_quarters(pop_group_quarters_), employment_total(employment_total_), employment_retail(employment_retail_), employment_government(employment_government_), employment_manufacturing(employment_manufacturing_), employment_services(employment_services_), employment_industrial(employment_industrial_), employment_other(employment_other_)
 	{
 	}
 	//Accessors
+
 	const int& getPrimaryKey () const {return zone;}
-	const int& getZone () const {return zone;}
-	void setZone (const int& zone_) {zone = zone_;}
-	const int& getArea () const {return area;}
-	void setArea (const int& area_) {area = area_;}
-	const int& getArea_Res_Low () const {return area_res_low;}
-	void setArea_Res_Low (const int& area_res_low_) {area_res_low = area_res_low_;}
-	const int& getArea_Res_Hi () const {return area_res_hi;}
-	void setArea_Res_Hi (const int& area_res_hi_) {area_res_hi = area_res_hi_;}
-	const int& getArea_Comm () const {return area_comm;}
-	void setArea_Comm (const int& area_comm_) {area_comm = area_comm_;}
-	const int& getArea_Ind () const {return area_ind;}
-	void setArea_Ind (const int& area_ind_) {area_ind = area_ind_;}
-	const int& getPop_Hh () const {return pop_hh;}
-	void setPop_Hh (const int& pop_hh_) {pop_hh = pop_hh_;}
-	const int& getPop_Per () const {return pop_per;}
-	void setPop_Per (const int& pop_per_) {pop_per = pop_per_;}
-	const int& getPop_Gq () const {return pop_gq;}
-	void setPop_Gq (const int& pop_gq_) {pop_gq = pop_gq_;}
-	const int& getEmp_Tot () const {return emp_tot;}
-	void setEmp_Tot (const int& emp_tot_) {emp_tot = emp_tot_;}
-	const int& getEmp_Ret () const {return emp_ret;}
-	void setEmp_Ret (const int& emp_ret_) {emp_ret = emp_ret_;}
-//Data Fields
-private:
+	const int& getZone() const{return zone;}
+	void setZone(const int& zone_){zone= zone_;}
+
+	const float& getPercent_white() const{return percent_white;}
+	void setPercent_white(const float& percent_white_){percent_white= percent_white_;}
+	const float& getPercent_black() const{return percent_black;}
+	void setPercent_black(const float& percent_black_){percent_black= percent_black_;}
+	const float& getHH_inc_avg() const{return hh_inc_avg;}
+	void setHH_inc_avg(const float& hh_inc_avg_){hh_inc_avg= hh_inc_avg_;}
+
+	const float& getArea() const{return area;}
+	void setArea(const float& area_){area= area_;}
+	const float& getEntertainment_area() const{return entertainment_area;}
+	void setEntertainment_area(const float& entertainment_area_){entertainment_area= entertainment_area_;}
+	const float& getIndustrial_area() const{return industrial_area;}
+	void setIndustrial_area(const float& industrial_area_){industrial_area= industrial_area_;}
+	const float& getInstitutional_area() const{return institutional_area;}
+	void setInstitutional_area(const float& institutional_area_){institutional_area= institutional_area_;}
+	const float& getMixed_use_area() const{return mixed_use_area;}
+	void setMixed_use_area(const float& mixed_use_area_){mixed_use_area= mixed_use_area_;}
+	const float& getOffice_area() const{return office_area;}
+	void setOffice_area(const float& office_area_){office_area= office_area_;}
+	const float& getOther_area() const{return other_area;}
+	void setOther_area(const float& other_area_){other_area= other_area_;}
+	const float& getResidential_area() const{return residential_area;}
+	void setResidential_area(const float& residential_area_){residential_area= residential_area_;}
+	const float& getRetail_area() const{return retail_area;}
+	void setRetail_area(const float& retail_area_){retail_area= retail_area_;}
+	const float& getSchool_area() const{return school_area;}
+	void setSchool_area(const float& school_area_){school_area= school_area_;}
+	const int& getPop_households() const{return pop_households;}
+	void setPop_households(const int& pop_households_){pop_households= pop_households_;}
+	const int& getPop_persons() const{return pop_persons;}
+	void setPop_persons(const int& pop_persons_){pop_persons= pop_persons_;}
+	const int& getPop_group_quarters() const{return pop_group_quarters;}
+	void setPop_group_quarters(const int& pop_group_quarters_){pop_group_quarters= pop_group_quarters_;}
+	const int& getEmployment_total() const{return employment_total;}
+	void setEmployment_total(const int& employment_total_){employment_total= employment_total_;}
+	const int& getEmployment_retail() const{return employment_retail;}
+	void setEmployment_retail(const int& employment_retail_){employment_retail= employment_retail_;}
+	const int& getEmployment_government() const{return employment_government;}
+	void setEmployment_government(const int& employment_government_){employment_government= employment_government_;}
+	const int& getEmployment_manufacturing() const{return employment_manufacturing;}
+	void setEmployment_manufacturing(const int& employment_manufacturing_){employment_manufacturing= employment_manufacturing_;}
+	const int& getEmployment_services() const{return employment_services;}
+	void setEmployment_services(const int& employment_services_){employment_services= employment_services_;}
+	const int& getEmployment_industrial() const{return employment_industrial;}
+	void setEmployment_industrial(const int& employment_industrial_){employment_industrial= employment_industrial_;}
+	const int& getEmployment_other() const{return employment_other;}
+	void setEmployment_other(const int& employment_other_){employment_other= employment_other_;}
+
+	
+//Data Fields	
+private:	
 	friend class odb::access;
 	#pragma db id
 	int zone;
-	int area;
-	int area_res_low;
-	int area_res_hi;
-	int area_comm;
-	int area_ind;
-	int pop_hh;
-	int pop_per;
-	int pop_gq;
-	int emp_tot;
-	int emp_ret;
+	float percent_white;
+	float percent_black;
+	float hh_inc_avg;
+	float area;
+	float entertainment_area;
+	float industrial_area;
+	float institutional_area;
+	float mixed_use_area;
+	float office_area;
+	float other_area;
+	float residential_area;
+	float retail_area;
+	float school_area;
+	int pop_households;
+	int pop_persons;
+	int pop_group_quarters;
+	int employment_total;
+	int employment_retail;
+	int employment_government;
+	int employment_manufacturing;
+	int employment_services;
+	int employment_industrial;
+	int employment_other;
 };
 
 #pragma db object
