@@ -85,7 +85,7 @@ namespace Activity_Components
 			//===========================================
 			// Activity Plan execution scheduling functionality
 			//-------------------------------------------
-			template<typename TargetType> void Activity_Planning_Conditional()
+			static void Activity_Planning_Conditional(ComponentType* _this,Event_Response& response)
 			{		
 				//----------------------------------------------
 				// CONDITIONALS FOR BASIC ACTIVITY PLAN SCHEDULING
@@ -103,8 +103,8 @@ namespace Activity_Components
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Duration_Planning_Event<NULLTYPE>);
-					this_ptr->template Duration_Planning_Time<Revision&>().iteration() = END;
-					this_ptr->template Duration_Planning_Time<Revision&>()._subiteration() = END;
+					this_ptr->template Duration_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Duration_Planning_Time<Revision&>()._sub_iteration = END;
 					
 					// Determine the next event to fire
 					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Involved_Persons_Planning_Time<Revision&>())) this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Involved_Persons_Planning_Time<Revision&>(),true);
@@ -114,8 +114,8 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>(),true);
 					else
 					{
-						response.next.iteration() = iteration()+5;
-						response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
+						response.next._iteration = _iteration+5;
+						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
@@ -124,8 +124,8 @@ namespace Activity_Components
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Involved_Persons_Planning_Event<NULLTYPE>);
-					this_ptr->template Involved_Persons_Planning_Time<Revision&>().iteration() = END;
-					this_ptr->template Involved_Persons_Planning_Time<Revision&>()._subiteration() = END;
+					this_ptr->template Involved_Persons_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Involved_Persons_Planning_Time<Revision&>()._sub_iteration = END;
 
 					// Determine the next event to fire
 					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Duration_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Duration_Planning_Time<Revision&>(),true);
@@ -135,8 +135,8 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>(),true);
 					else
 					{
-						response.next.iteration() = iteration()+5;
-						response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
+						response.next._iteration = _iteration+5;
+						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
@@ -145,8 +145,8 @@ namespace Activity_Components
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Location_Planning_Event<NULLTYPE>);
-					this_ptr->template Location_Planning_Time<Revision&>().iteration() = END;
-					this_ptr->template Location_Planning_Time<Revision&>()._subiteration() = END;
+					this_ptr->template Location_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Location_Planning_Time<Revision&>()._sub_iteration = END;
 
 					// Determine the next event to fire
 					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Involved_Persons_Planning_Time<Revision&>())) this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Involved_Persons_Planning_Time<Revision&>(),true);
@@ -156,8 +156,8 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>(),true);
 					else
 					{
-						response.next.iteration() = iteration()+5;
-						response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
+						response.next._iteration = _iteration+5;
+						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
@@ -166,8 +166,8 @@ namespace Activity_Components
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Mode_Planning_Event<NULLTYPE>);
-					this_ptr->template Mode_Planning_Time<Revision&>().iteration() = END;
-					this_ptr->template Mode_Planning_Time<Revision&>()._subiteration() = END;
+					this_ptr->template Mode_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Mode_Planning_Time<Revision&>()._sub_iteration = END;
 
 					// Determine the next event to fire
 					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Involved_Persons_Planning_Time<Revision&>())) this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Involved_Persons_Planning_Time<Revision&>(),true);
@@ -177,8 +177,8 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>(),true);
 					else
 					{
-						response.next.iteration() = iteration()+5;
-						response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
+						response.next._iteration = _iteration+5;
+						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
@@ -187,8 +187,8 @@ namespace Activity_Components
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Start_Time_Planning_Event<NULLTYPE>);
-					this_ptr->template Start_Time_Planning_Time<Revision&>().iteration() = END;
-					this_ptr->template Start_Time_Planning_Time<Revision&>()._subiteration() = END;
+					this_ptr->template Start_Time_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Start_Time_Planning_Time<Revision&>()._sub_iteration = END;
 									
 					// Determine the next event to fire
 					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Involved_Persons_Planning_Time<Revision&>())) this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Involved_Persons_Planning_Time<Revision&>(),true);
@@ -198,8 +198,8 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Route_Planning_Time<Revision&>()))			this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Route_Planning_Time<Revision&>(),true);
 					else
 					{
-						response.next.iteration() = iteration()+5;
-						response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
+						response.next._iteration = _iteration+5;
+						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
 				//------------------------------------------------------------------------------------------------------------------------------
@@ -208,8 +208,8 @@ namespace Activity_Components
 				{
 					// swap in durtion planning event, and make sure it won't be called again
 					_pthis->Swap_Event((Event)&Activity_Planner::Route_Planning_Event<NULLTYPE>);
-					this_ptr->template Route_Planning_Time<Revision&>().iteration() = END;
-					this_ptr->template Route_Planning_Time<Revision&>()._subiteration() = END;
+					this_ptr->template Route_Planning_Time<Revision&>()._iteration = END;
+					this_ptr->template Route_Planning_Time<Revision&>()._sub_iteration = END;
 									
 					// Determine the next event to fire
 					if		(this_ptr->Is_Minimum_Plan_Time(this_ptr->template Involved_Persons_Planning_Time<Revision&>())) this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Involved_Persons_Planning_Time<Revision&>(),true);
@@ -219,16 +219,16 @@ namespace Activity_Components
 					else if (this_ptr->Is_Minimum_Plan_Time(this_ptr->template Start_Time_Planning_Time<Revision&>()))		this_ptr->template Set_As_Next_Revison<NT>(response,this_ptr->template Start_Time_Planning_Time<Revision&>(),true);
 					else
 					{
-						response.next.iteration() = iteration()+5;
-						response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
+						response.next._iteration = _iteration+5;
+						response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
-				else if (_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
+				else if (sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
 				{
 					// add activity to schedule
 					_pthis->Swap_Event((Event)&Activity_Planner::Add_Activity_To_Schedule_Event<NULLTYPE>);
-					response.next.iteration() = END;
-					response.next._subiteration() = END;
+					response.next._iteration = END;
+					response.next._sub_iteration = END;
 				}
 				// catch any subiteration()s which have been modified (currenlty limited to routing, which can be changed by start_time_plan iteration)
 				// this will hit only if start time plan iteration is called immidiately
@@ -236,15 +236,15 @@ namespace Activity_Components
 				else
 				{
 					Revision& route_itr = this_ptr->template Route_Planning_Time<Revision&>();
-					if(route_itr.iteration()  < (int)END && route_itr.iteration() >= iteration()) 
+					if(route_itr._iteration  < (int)END && route_itr._iteration >= _iteration) 
 					{
-						response.next.iteration() = route_itr.iteration();
-						response.next._subiteration() = route_itr._subiteration();
+						response.next._iteration = route_itr._iteration;
+						response.next._sub_iteration = route_itr._sub_iteration;
 					}
 					else
 					{
-						response.next.iteration() = END;
-						response.next._subiteration() = END;
+						response.next._iteration = END;
+						response.next._sub_iteration = END;
 					}
 					response.result = false;
 				}
@@ -254,8 +254,8 @@ namespace Activity_Components
 			template<typename TargetType> void Set_As_Next_Revison(Event_Response& response, Revision& revision, bool result)
 			{
 				response.result = result;
-				response.next.iteration() = revision.iteration();
-				response.next._subiteration() = revision._subiteration();
+				response.next._iteration = revision._iteration;
+				response.next._sub_iteration = revision._sub_iteration;
 			}
 			template<typename TargetType> void Unschedule_Activity_Events()
 			{
@@ -265,18 +265,18 @@ namespace Activity_Components
 				Revision& location = this->Location_Planning_Time<Revision&>();
 				Revision& start_time = this->Start_Time_Planning_Time<Revision&>();
 				Revision& route = this->Route_Planning_Time<Revision&>();
-				persons.iteration() = END+1;
-				persons._subiteration() = END+1;
-				mode.iteration() = END+1;
-				mode._subiteration() = END+1;
-				duration.iteration() = END+1;
-				duration._subiteration() = END+1;
-				location.iteration() = END+1;
-				location._subiteration() = END+1;
-				start_time.iteration() = END+1;
-				start_time._subiteration() = END+1;
-				route.iteration() = END+1;
-				route._subiteration() = END+1;
+				persons._iteration = END+1;
+				persons._sub_iteration = END+1;
+				mode._iteration = END+1;
+				mode._sub_iteration = END+1;
+				duration._iteration = END+1;
+				duration._sub_iteration = END+1;
+				location._iteration = END+1;
+				location._sub_iteration = END+1;
+				start_time._iteration = END+1;
+				start_time._sub_iteration = END+1;
+				route._iteration = END+1;
+				route._sub_iteration = END+1;
 			}
 			template<typename TargetType> bool Is_Minimum_Plan_Time(TargetType plan_time, requires(TargetType,check_2(TargetType, Revision,is_same)))
 			{
@@ -290,7 +290,7 @@ namespace Activity_Components
 
 				if (rev._revision <= persons._revision && rev._revision <= mode._revision && 
 					rev._revision <= duration._revision && rev._revision <= location._revision && 
-					rev._revision <= start_time._revision && rev._revision <= route._revision && rev.iteration() != END)
+					rev._revision <= start_time._revision && rev._revision <= route._revision && rev._iteration != END)
 				{
 					// set next revision
 					return true;
@@ -299,7 +299,7 @@ namespace Activity_Components
 			}
 			template<typename TargetType> bool Is_Current_Iteration(TargetType plan_time, requires(TargetType,check_2(TargetType, Revision,is_same)))
 			{
-				return (plan_time.iteration() == iteration() && plan_time._subiteration() == _subiteration());
+				return (plan_time._iteration == _iteration && plan_time._sub_iteration == _sub_iteration);
 			}
 
 			//===========================================
@@ -315,8 +315,8 @@ namespace Activity_Components
 			template<typename TargetType> void Location_Planning_Event_Handler()
 			{
 				this_component()->template Location_Planning_Event_Handler<TargetType>();
-				this->Location_Planning_Time<Revision&>().iteration() = END+1;
-				this->Location_Planning_Time<Revision&>()._subiteration() = END+1;
+				this->Location_Planning_Time<Revision&>()._iteration = END+1;
+				this->Location_Planning_Time<Revision&>()._sub_iteration = END+1;
 			}
 			declare_event(Mode_Planning_Event)
 			{
@@ -328,8 +328,8 @@ namespace Activity_Components
 			template<typename TargetType> void Mode_Planning_Event_Handler()
 			{
 				this_component()->template Mode_Planning_Event_Handler<TargetType>();
-				this->Mode_Planning_Time<Revision&>().iteration() = END+1;
-				this->Mode_Planning_Time<Revision&>()._subiteration() = END+1;
+				this->Mode_Planning_Time<Revision&>()._iteration = END+1;
+				this->Mode_Planning_Time<Revision&>()._sub_iteration = END+1;
 			}
 			declare_event(Start_Time_Planning_Event)
 			{
@@ -341,8 +341,8 @@ namespace Activity_Components
 			template<typename TargetType> void Start_Time_Planning_Event_Handler()
 			{
 				this_component()->template Start_Time_Planning_Event_Handler<TargetType>();
-				this->Start_Time_Planning_Time<Revision&>().iteration() = END+1;
-				this->Start_Time_Planning_Time<Revision&>()._subiteration() = END+1;
+				this->Start_Time_Planning_Time<Revision&>()._iteration = END+1;
+				this->Start_Time_Planning_Time<Revision&>()._sub_iteration = END+1;
 			}
 			declare_event(Duration_Planning_Event)
 			{
@@ -355,8 +355,8 @@ namespace Activity_Components
 			{
 				this_component()->template Duration_Planning_Event_Handler<TargetType>();
 				// set duration planning time schedule to END - duration Is Planned
-				this->Duration_Planning_Time<Revision&>().iteration() = END;
-				this->Duration_Planning_Time<Revision&>()._subiteration() = END;
+				this->Duration_Planning_Time<Revision&>()._iteration = END;
+				this->Duration_Planning_Time<Revision&>()._sub_iteration = END;
 			}
 			declare_event(Involved_Persons_Planning_Event)
 			{
@@ -368,8 +368,8 @@ namespace Activity_Components
 			template<typename TargetType> void Involved_Persons_Planning_Event_Handler()
 			{
 				this_component()->template Involved_Persons_Planning_Event_Handler<TargetType>();
-				this->Involved_Persons_Planning_Time<Revision&>().iteration() = END+1;
-				this->Involved_Persons_Planning_Time<Revision&>()._subiteration() = END+1;
+				this->Involved_Persons_Planning_Time<Revision&>()._iteration = END+1;
+				this->Involved_Persons_Planning_Time<Revision&>()._sub_iteration = END+1;
 			}
 			declare_event(Route_Planning_Event)
 			{
@@ -381,8 +381,8 @@ namespace Activity_Components
 			template<typename TargetType> void Route_Planning_Event_Handler()
 			{
 				this_component()->template Route_Planning_Event_Handler<TargetType>();
-				this->Route_Planning_Time<Revision&>().iteration() = END+1;
-				this->Route_Planning_Time<Revision&>()._subiteration() = END+1;
+				this->Route_Planning_Time<Revision&>()._iteration = END+1;
+				this->Route_Planning_Time<Revision&>()._sub_iteration = END+1;
 			}
 			declare_event(Add_Activity_To_Schedule_Event)
 			{
@@ -509,25 +509,25 @@ namespace Activity_Components
 
 				// Load the first event
 				if (Is_Minimum_Plan_Time(persons)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Involved_Persons_Planning_Event, persons.iteration(), persons._subiteration(),NT);
+//load_event(ComponentType,Activity_Planning_Conditional, Involved_Persons_Planning_Event, persons._iteration, persons._sub_iteration,NT);
 				else if (Is_Minimum_Plan_Time(mode)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Mode_Planning_Event, mode.iteration(), mode._subiteration(),NT);
+//load_event(ComponentType,Activity_Planning_Conditional, Mode_Planning_Event, mode._iteration, mode._sub_iteration,NT);
 				else if (Is_Minimum_Plan_Time(duration)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Duration_Planning_Event, duration.iteration(), duration._subiteration(),NT);
+//load_event(ComponentType,Activity_Planning_Conditional, Duration_Planning_Event, duration._iteration, duration._sub_iteration,NT);
 				else if (Is_Minimum_Plan_Time(location)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Location_Planning_Event, location.iteration(), location._subiteration(),NT);
+//load_event(ComponentType,Activity_Planning_Conditional, Location_Planning_Event, location._iteration, location._sub_iteration,NT);
 				else if (Is_Minimum_Plan_Time(start_time)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Start_Time_Planning_Event, start_time.iteration(), start_time._subiteration(),NT);
+//load_event(ComponentType,Activity_Planning_Conditional, Start_Time_Planning_Event, start_time._iteration, start_time._sub_iteration,NT);
 				else if (Is_Minimum_Plan_Time(route)) //TODO
-//load_event(ComponentType,Activity_Planning_Conditional, Route_Planning_Event, route.iteration(), route._subiteration(),NT);
+//load_event(ComponentType,Activity_Planning_Conditional, Route_Planning_Event, route._iteration, route._sub_iteration,NT);
 				else 
 				{
 					stringstream err;
 					err << "ERROR: Invalid planning times set: ";
-					err << endl << "Duration: "<<duration.iteration() <<","<<duration._subiteration();
-					err << endl << "Start: "<<start_time.iteration() <<","<<start_time._subiteration();
-					err << endl << "Location: "<<location.iteration() <<","<<location._subiteration(); 
-					err << endl << "Route: "<<route.iteration() <<","<<route._subiteration(); 
+					err << endl << "Duration: "<<duration._iteration <<","<<duration._sub_iteration;
+					err << endl << "Start: "<<start_time._iteration <<","<<start_time._sub_iteration;
+					err << endl << "Location: "<<location._iteration <<","<<location._sub_iteration; 
+					err << endl << "Route: "<<route._iteration <<","<<route._sub_iteration; 
 					THROW_EXCEPTION(err);
 				}
 			}

@@ -102,9 +102,9 @@ namespace Choice_Model_Components
 
 			template<typename TargetType> void Initialize()
 			{
-				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Random_Access_Sequence,void*,ComponentType);
-				define_simple_container_interface(utilities_itf,typename get_type_of(choice_utilities),Random_Access_Sequence,float,ComponentType);
-				define_simple_container_interface(probabilities_itf,typename get_type_of(choice_probabilities),Random_Access_Sequence,float,ComponentType);
+				typedef Random_Access_Sequence<typename get_type_of(choice_options),void*> choice_options_itf;
+				typedef Random_Access_Sequence<typename get_type_of(choice_utilities),float> utilities_itf;
+				typedef Random_Access_Sequence<typename get_type_of(choice_probabilities),float> probabilities_itf;
 				choice_options_itf* options = this->choice_options<choice_options_itf*>();
 				utilities_itf* util = this->choice_utilities<utilities_itf*>();
 				probabilities_itf* prob = this->choice_probabilities<probabilities_itf*>();
@@ -113,28 +113,28 @@ namespace Choice_Model_Components
 				prob->clear();
 			}
 
-			template<typename TargetType> void Add_Choice_Option(TargetType choice_option, requires(TargetType,check(typename remove_pointer<TargetType>::type, Concepts::Is_Choice_Option_Prototype) && check(typename remove_pointer<TargetType>::type,is_pointer)))
+			template<typename TargetType> void Add_Choice_Option(TargetType choice_option, requires(TargetType,check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) && check(strip_modifiers(TargetType),is_pointer)))
 			{
 				// Validate that TargetType is in AvailableTypes
 				if (IndexOf<typename Component_Type::TList,strip_modifiers(TargetType) >::value < 0) THROW_EXCEPTION("ERROR: TargetType is not a member of AvailableTypes TypeList.");
 
 				// Push item into boost::container::vector as anonymous
-				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Random_Access_Sequence,void*,ComponentType);
+				typedef Random_Access_Sequence<typename get_type_of(choice_options),void*> choice_options_itf;
 				choice_options_itf* options = this->choice_options<choice_options_itf*>();
 				options->push_back((void*)choice_option);				
 			}
-			template<typename TargetType> void Add_Choice_Option(TargetType choice_option, requires(TargetType,!check(typename remove_pointer<TargetType>::type, Concepts::Is_Choice_Option_Prototype) || !check(typename remove_pointer<TargetType>::type,is_pointer)))
+			template<typename TargetType> void Add_Choice_Option(TargetType choice_option, requires(TargetType,!check(strip_modifiers(TargetType), Concepts::Is_Choice_Option_Prototype) || !check(strip_modifiers(TargetType),is_pointer)))
 			{
-				assert_sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Choice_Option_Prototype, has_calculate_utility,  "TargetType does not have Calculate_Utility feature.");
-				assert_sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Choice_Option_Prototype, is_prototype,  "TargetType is not a valid prototype.");
+				assert_sub_check(strip_modifiers(TargetType),Concepts::Is_Choice_Option_Prototype, has_calculate_utility,  "TargetType does not have Calculate_Utility feature.");
+				assert_sub_check(strip_modifiers(TargetType),Concepts::Is_Choice_Option_Prototype, is_prototype,  "TargetType is not a valid prototype.");
 			}
 						
 			/// EVALUATE THE AVAILABLE CHOICES (i.e. CALCULATE UTILITY, SET PROBABILITIES, ETC.)
 			template<typename TargetType> void Evaluate_Choices(requires(TargetType,check(ComponentType, Concepts::Is_MNL_Model)))
 			{	
-				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Random_Access_Sequence,void*,ComponentType);
-				define_simple_container_interface(utilities_itf,typename get_type_of(choice_utilities),Random_Access_Sequence,double,ComponentType);
-				define_simple_container_interface(probabilities_itf,typename get_type_of(choice_probabilities),Random_Access_Sequence,double,ComponentType);
+				typedef Random_Access_Sequence<typename get_type_of(choice_options),void*> choice_options_itf;
+				typedef Random_Access_Sequence<typename get_type_of(choice_utilities),double> utilities_itf;
+				typedef Random_Access_Sequence<typename get_type_of(choice_probabilities),double> probabilities_itf;
 
 				// Local type definition option
 				choice_options_itf* choices =	this->choice_options<choice_options_itf*>();
@@ -196,8 +196,8 @@ namespace Choice_Model_Components
 			/// SELECT FROM THE AVAILABLE CHOICES FOR SIMULATION
 			template<typename TargetType> TargetType Choose(int& selected_index, requires(TargetType,check(ComponentType, Concepts::Is_Probabilistic)))
 			{
-				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Random_Access_Sequence,void*,ComponentType);
-				define_simple_container_interface(probabilities_itf,typename get_type_of(choice_probabilities),Random_Access_Sequence,double,ComponentType);
+				typedef Random_Access_Sequence<typename get_type_of(choice_options),void*> choice_options_itf;
+				typedef Random_Access_Sequence<typename get_type_of(choice_probabilities),double> probabilities_itf;
 
 				// Local type definition option
 				choice_options_itf* choices = this->choice_options<choice_options_itf*>();
@@ -231,7 +231,7 @@ namespace Choice_Model_Components
 		 
 			template<typename TargetType> TargetType Choice_At(int selected_index)
 			{
-				define_simple_container_interface(choice_options_itf,typename get_type_of(choice_options),Random_Access_Sequence,void*,ComponentType);
+				typedef Random_Access_Sequence<typename get_type_of(choice_options),void*> choice_options_itf;
 
 				// Local type definition option
 				choice_options_itf* choices = this->choice_options<choice_options_itf*>();

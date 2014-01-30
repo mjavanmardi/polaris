@@ -60,28 +60,26 @@ namespace Depot_Components
 				}
 			}
 
-			template<typename ComponentType,typename TargetType>
-			static void Depot_Condition(void* _this,Event_Response& response)
+			static void Depot_Conditional(ComponentType* _this,Event_Response& response)
 			{
-				response.next.iteration() = iteration() + 60;
-				response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
+				response.next._iteration = iteration() + 60;
+				response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
 
-				response.result = true;
+				//response.result = true;
 
 				//Swap_Event(&Depot_Event<TargetType>);
 			}
 			
-			template<typename ComponentType,typename TargetType>
-			static void Depot_Event(void* _this)
-			{
-				// Do Nothing Currently
-			}
+			// template<typename ComponentType,typename TargetType>
+			// static void Depot_Event(void* _this)
+			// {
+				// // Do Nothing Currently
+			// }
 
 			template<typename TargetType> void Initialize(polaris::io::Depot& instance)
 			{
+				Load_Event<ComponentType>(&Depot_Conditional,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
 				
-//TODO
-//				Load_Event<ComponentType>(&ComponentType::template Depot_Condition<NT,NT>,&ComponentType::template Depot_Event<NT,NT>,((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS);
 				////TODO
 //load_event(ComponentType,Depot_Condition,Depot_Event, ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS,NULLTYPE);
 				using namespace polaris::io;

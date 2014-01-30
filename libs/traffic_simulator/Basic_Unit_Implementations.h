@@ -70,6 +70,8 @@ namespace Basic_Units
 			typedef true_type Currency_tag;
 			typedef true_type Cents_tag; 
 			m_data(Value_Type,Value, NONE, NONE);
+			tag_getter_as_available(Value);
+			tag_setter_as_available(Value);
 		};
 		//implementation struct _Currency {typedef true_type Currency_tag; typedef true_type Cents_tag; m_data(Value_Type,Value, NONE, NONE);};		
 	}
@@ -87,12 +89,12 @@ struct _Simulation_Timer
 	template<typename TargetType> TargetType Current_Time()
 	{
 //TODO
-//		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Base_Time_Type>>((typename Base_Time_Type::ValueType)_iteration);
+//		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Base_Time_Type>>((typename Base_Time_Type::ValueType)iteration());
 	}
 	template<typename InputType, typename TargetType> TargetType Future_Time(InputType Additional_Time_Increment)
 	{
 		Simulation_Timestep_Increment current_time;
-		current_time = (Simulation_Timestep_Increment)_iteration;
+		current_time = (Simulation_Timestep_Increment)iteration();
 //TODO
 //		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,Simulation_Timestep_Increment,InputType>>(Additional_Time_Increment);
 //TODO

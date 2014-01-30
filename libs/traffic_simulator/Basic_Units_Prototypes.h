@@ -2,16 +2,16 @@
 #include "Repository_Includes.h"
 
 template<typename TargetType, typename InputType>
-TargetType Round(InputType value, requires(TargetType,check(typename remove_pointer<TargetType>::type, is_integral) && check(InputType,is_arithmetic) && (check(InputType,!is_integral))))
+TargetType Round(InputType value, requires(TargetType,check(strip_modifiers(TargetType), is_integral) && check(InputType,is_arithmetic) && (check(InputType,!is_integral))))
 {
 	InputType remain = value - (InputType)((TargetType)value);
 	if (remain >= 0.5) return (TargetType)(value - remain + 1);
 	else return (TargetType)(value - remain);
 }
 template<typename TargetType, typename InputType>
-TargetType Round(InputType value, requires(TargetType,check(typename remove_pointer<TargetType>::type, !is_integral) || check(InputType,!is_arithmetic) || (check(InputType,is_integral))))
+TargetType Round(InputType value, requires(TargetType,check(strip_modifiers(TargetType), !is_integral) || check(InputType,!is_arithmetic) || (check(InputType,is_integral))))
 {
-	assert_check(typename remove_pointer<TargetType>::type,is_integral,"ReturnType must be integral");
+	assert_check(strip_modifiers(TargetType),is_integral,"ReturnType must be integral");
 	assert_check(InputType,is_arithmetic,"InputType must be arithmetic");
 	assert_check(InputType,!is_integral,"InputType must be floating point type");
 }
@@ -239,195 +239,195 @@ namespace Basic_Units
 			tag_as_prototype;
 
 			define_get_set_exists_check(Value, Get_Value_exists, Set_Value_exists);
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Length_Value)))
 			{
 				return TargetType(this_component()->template Value<Value_Type>() * Conversion_Factor<TargetType>());
 			}
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(typename remove_pointer<TargetType>::type,!Concepts::Is_Length_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Length_Value)))
 			{
 				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Length_Value)))
 			{
 				this_component()->template Value<Value_Type>(value / Conversion_Factor<TargetType>());
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(typename remove_pointer<TargetType>::type,!Concepts::Is_Length_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Length_Value)))
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
 			}
 
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Length_Value) && check(typename TargetType::ReturnType,Concepts::Is_Length_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Length_Value) && check(typename TargetType::ReturnType,Concepts::Is_Length_Value)))
 			{
 				Value_Type convert_component_value_to_param = Conversion_Factor<typename TargetType::ParamType>();
 				Value_Type convert_component_value_to_return = Conversion_Factor<typename TargetType::ReturnType>();
 				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Length_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Length_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Length_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Length_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Length_Value, "TargetTyp::ReturnType is not a valid length value structure.");
 				assert_check(typename TargetType::ParamType,Concepts::Is_Length_Value, "TargetType::ParamType is not a valid length value structure.");
 			}
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{
 				return (Value_Type)1.0;
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{		
 				return (Value_Type)0.0328084;
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{
 				return (Value_Type)0.393701;				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{
 				return (Value_Type)1.0 / (Value_Type)100000.0;
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{
 				return (Value_Type)1.0 / (Value_Type)100.0;
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
 			{
 				return (Value_Type)(1.0 / 160934.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{
 				return (Value_Type)(30.48);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{		
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{
 				return (Value_Type)(12.0);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{
 				return (Value_Type)(1.0 / 3280.84);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{
 				return (Value_Type)(0.3048);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet)))
 			{
 				return (Value_Type)(1.0 / 5280.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{
 				return (Value_Type)(2.54);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{		
 				return (Value_Type)(1.0/12.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{
 				return (Value_Type)(1.0);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{
 				return (Value_Type)(2.54/100000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{
 				return (Value_Type)(0.0254);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches)))
 			{
 				return (Value_Type)(0.0833333 / 5280.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{
 				return (Value_Type)(100000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{		
 				return (Value_Type)(3280.84);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{
 				return (Value_Type)(39370.1);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{
 				return (Value_Type)(1000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers)))
 			{
 				return (Value_Type)(0.621371);
 			};
 				
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{
 				return (Value_Type)(100.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{		
 				return (Value_Type)(3.28084);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{
 				return (Value_Type)(39.3701);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{
 				return (Value_Type)(0.001);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters)))
 			{
 				return (Value_Type)(0.000621371);
 			};
 					
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{
 				return (Value_Type)(160934.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{		
 				return (Value_Type)(5280.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{
 				return (Value_Type)(63360.0);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{
 				return (Value_Type)(1.60934);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{
 				return (Value_Type)(1609.34);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles)))
 			{
 				return (Value_Type)(1.0);
 			};
 
 			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,!(
-				(sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Centimeters) || sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Feet) || sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Inches) || 
-				sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Kilometers) || sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Meters) || sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, Is_Miles)) &&
+				(sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) || sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Feet) || sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Inches) || 
+				sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Kilometers) || sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Meters) || sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Miles)) &&
 				(sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters) || sub_check(ComponentType,Concepts::Is_Length_Value, Is_Feet) || sub_check(ComponentType,Concepts::Is_Length_Value, Is_Inches) || 
 				sub_check(ComponentType,Concepts::Is_Length_Value, Is_Kilometers) || sub_check(ComponentType,Concepts::Is_Length_Value, Is_Meters) || sub_check(ComponentType,Concepts::Is_Length_Value, Is_Miles))) ))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value,"The specified TargetType is not a valid spatial measurement Data Structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value,"The specified TargetType is not a valid spatial measurement Data Structure.");
 			}
 		};
 
@@ -460,34 +460,34 @@ namespace Basic_Units
 		prototype struct Area : public Length<ComponentType>
 		{
 			typedef Length<ComponentType> base_type;
-			template<typename TargetType> TargetType Value(requires(TargetType,check(typename remove_pointer<TargetType>::type,Concepts::Is_Area_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Area_Value)))
 			{		
 				return ((Length<ComponentType>*)this)->template Value<TargetType>()*((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>();
 			}
-			template<typename TargetType> TargetType Value(requires(TargetType,check(typename remove_pointer<TargetType>::type,!Concepts::Is_Area_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(strip_modifiers(TargetType),!Concepts::Is_Area_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Area_Value,"Your target type is not identified as an area measure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Area_Value,"Your target type is not identified as an area measure.");
 			}
 
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(typename remove_pointer<TargetType>::type,Concepts::Is_Area_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Area_Value)))
 			{
 				((Length<ComponentType>*)this)->template Value<TargetType>(value / ((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>());
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(typename remove_pointer<TargetType>::type,!Concepts::Is_Area_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(strip_modifiers(TargetType),!Concepts::Is_Area_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Area_Value,"Your target type is not identified as an area measure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Area_Value,"Your target type is not identified as an area measure.");
 			}
 
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Area_Value) && check(typename TargetType::ReturnType,Concepts::Is_Area_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Area_Value) && check(typename TargetType::ReturnType,Concepts::Is_Area_Value)))
 			{
 				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
 				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
 				Value_Type conversion = convert_component_value_to_return / convert_component_value_to_param;
 				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * pow(conversion,2.0));
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Area_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Area_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Area_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Area_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Area_Value, "TargetType::ReturnType is not a valid area value structure.");
 				assert_check(typename TargetType::ParamType,Concepts::Is_Area_Value, "TargetType::ParamType is not a valid area value structure.");
 			}
@@ -497,34 +497,34 @@ namespace Basic_Units
 		{
 			typedef Length<ComponentType> base_type;
 
-			template<typename TargetType>  TargetType Value(requires(TargetType,check(typename remove_pointer<TargetType>::type,Concepts::Is_Volume_Value)))
+			template<typename TargetType>  TargetType Value(requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Volume_Value)))
 			{		
 				return ((Length<ComponentType>*)this)->template Value<TargetType>()*((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>()*((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>();
 			}
-			template<typename TargetType>  TargetType Value(requires(TargetType,check(typename remove_pointer<TargetType>::type,!Concepts::Is_Volume_Value)))
+			template<typename TargetType>  TargetType Value(requires(TargetType,check(strip_modifiers(TargetType),!Concepts::Is_Volume_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.");
 			}
 
-			template<typename TargetType>  void Value(TargetType value,requires(TargetType,check(typename remove_pointer<TargetType>::type,Concepts::Is_Volume_Value)))
+			template<typename TargetType>  void Value(TargetType value,requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_Volume_Value)))
 			{
 				((Length<ComponentType>*)this)->template Value<TargetType>(value / ((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>() / ((Length<ComponentType>*)this)->template Conversion_Factor<TargetType>());
 			}
-			template<typename TargetType>  void Value(TargetType value, requires(TargetType,check(typename remove_pointer<TargetType>::type,!Concepts::Is_Volume_Value)))
+			template<typename TargetType>  void Value(TargetType value, requires(TargetType,check(strip_modifiers(TargetType),!Concepts::Is_Volume_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.");
 			}
 
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Volume_Value) && check(typename TargetType::ReturnType,Concepts::Is_Volume_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Volume_Value) && check(typename TargetType::ReturnType,Concepts::Is_Volume_Value)))
 			{
 				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
 				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
 				Value_Type conversion = convert_component_value_to_return / convert_component_value_to_param;
 				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * pow(conversion,3.0));
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Volume_Value) || check(typename TargetType::ParamType,!Concepts::Is_Volume_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Volume_Value) || check(typename TargetType::ParamType,!Concepts::Is_Volume_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Volume_Value, "TargetType::ReturnType is not a valid volume value structure.");
 				assert_check(typename TargetType::ParamType,Concepts::Is_Volume_Value, "TargetType::ParamType is not a valid volume value structure.");
 			}
@@ -535,139 +535,139 @@ namespace Basic_Units
 			tag_as_prototype;
 
 			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value)))
 			{
 				return TargetType(this_component()->template Value<Value_Type>() * Conversion_Factor<TargetType>());
 			}
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(typename remove_pointer<TargetType>::type,!Concepts::Is_Time_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Time_Value)))
 			{
 				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value)))
 			{
 				this_component()->template Value<Value_Type>(value / Conversion_Factor<TargetType>());
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(typename remove_pointer<TargetType>::type,!Concepts::Is_Time_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Time_Value)))
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
 			{
 				Value_Type convert_component_value_to_param = Time::Conversion_Factor<typename TargetType::ParamType>();
 				Value_Type convert_component_value_to_return = Time::Conversion_Factor<typename TargetType::ReturnType>();
 				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
 				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
 			}
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
 			{
 				return (Value_Type)(864000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
 			{
 				return (Value_Type)(24.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
 			{
 				return (Value_Type)(1440.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
 			{
 				return (Value_Type)(86400.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
 			{
 				return (Value_Type)(1.0 / 864000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
 			{
 				return (Value_Type)(1.0/36000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
 			{
 				return (Value_Type)(1.0/600.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_DRSeconds)))
 			{
 				return (Value_Type)(0.1);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
 			{
 				return (Value_Type)(1.0/24.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
 			{
 				return (Value_Type)(36000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
 			{
 				return (Value_Type)(60.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Hours)))
 			{
 				return (Value_Type)(3600.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
 			{
 				return (Value_Type)(1.0/1440.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
 			{
 				return (Value_Type)(600.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
 			{
 				return (Value_Type)(1.0/60.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
 			{
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Minutes)))
 			{
 				return (Value_Type)(60.0);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
 			{
 				return (Value_Type)(1.0/ 86400.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_DRSeconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
 			{
 				return (Value_Type)(10.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Hours) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
 			{
 				return (Value_Type)(1.0/3600.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Minutes) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
 			{
 				return (Value_Type)(1.0/60.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Seconds) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Seconds)))
 			{
 				return (Value_Type)(1.0);
 			};
@@ -691,35 +691,35 @@ namespace Basic_Units
 			typedef Time<ComponentType> base_type;
 
 			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value)))
 			{
 				TargetType val = base_type::template Conversion_Factor<TargetType>();
 				return TargetType(this_component()->template Value<Value_Type>() / val);
 			}
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(typename remove_pointer<TargetType>::type,!Concepts::Is_Time_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Time_Value)))
 			{
 				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(typename remove_pointer<TargetType>::type,Concepts::Is_Time_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Time_Value)))
 			{
 				this_component()->template Value<Value_Type>(value * base_type::template Conversion_Factor<TargetType>());
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(typename remove_pointer<TargetType>::type,!Concepts::Is_Time_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Time_Value)))
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
 			{
 				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
 				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
 				return typename TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
 				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
 			}
@@ -732,28 +732,28 @@ namespace Basic_Units
 			typedef Time<ComponentType> time_base;
 
 			define_get_set_exists_check(Value,Get_Value_exists, Set_Value_exists);
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(ComponentType, Concepts::Is_Speed_Component) && check(typename remove_pointer<TargetType>::type,Concepts::Is_Speed_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(ComponentType, Concepts::Is_Speed_Component) && check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
 			{
 				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
 				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
 				return TargetType(this_component()->template Value<Value_Type>() * len_val / time_val );
 			}
-			template<typename TargetType> TargetType Value(requires(TargetType,!check(ComponentType,Get_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(typename remove_pointer<TargetType>::type,Concepts::Is_Speed_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,!check(ComponentType,Get_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
 			{
 				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
 				assert_check(ComponentType,Concepts::Is_Speed_Component, "The specified ComponentType is not a valid Speed component, ensure that ComponentType is tagged as a Speed_Type and has Value member}");
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(ComponentType, Concepts::Is_Speed_Component) && check(typename remove_pointer<TargetType>::type,Concepts::Is_Speed_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(ComponentType, Concepts::Is_Speed_Component) && check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
 			{
 				TargetType len_val = length_base::template Conversion_Factor<TargetType>();
 				TargetType time_val = time_base::template Conversion_Factor<TargetType>();
 				this_component()->template Value<Value_Type>(Value_Type(value * time_val / len_val));
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,!check(ComponentType,Set_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(typename remove_pointer<TargetType>::type,Concepts::Is_Speed_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,!check(ComponentType,Set_Value_exists) || !check(ComponentType, Concepts::Is_Speed_Component) || !check(strip_modifiers(TargetType),Concepts::Is_Speed_Value)))
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Speed_Value, "The specified TargetType is not a valid Speed data structure, ensure that TargetType has tags: {Speed_Type, Length_Type and Time_Type}");
 				assert_sub_check(ComponentType,Is_Polaris_Component,has_this_type, "Doesn't have This_Type");
 				assert_sub_check(ComponentType,Is_Polaris_Component,has_parent_type,"Doesn't have Parent_Type");
 				assert_sub_check(ComponentType,Is_Polaris_Component,has_group_list,"Doesn't have Group_List");
@@ -765,15 +765,15 @@ namespace Basic_Units
 
 			}
 			
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
 			{
 				Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<typename TargetType::ParamType>();
 				Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<typename TargetType::ReturnType>();
 				return typename TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
 				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
 			}
@@ -784,114 +784,114 @@ namespace Basic_Units
 			tag_as_prototype;
 
 			define_get_set_exists_check(Value, Get_Value_exists, Set_Value_exists);
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,Get_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Currency_Value)))
 			{
 				return TargetType(this_component()->template Value<Value_Type>() * Conversion_Factor<TargetType>());
 			}
-			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(typename remove_pointer<TargetType>::type,!Concepts::Is_Currency_Value)))
+			template<typename TargetType> TargetType Value(requires(TargetType,check(ComponentType,!Get_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Currency_Value)))
 			{
 				assert_check(ComponentType,Get_Value_exists, "Getter does not exists for this accessor.");
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Length_Value, "The specified TargetType is not a valid Currency data structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Currency data structure.");
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,Set_Value_exists) && check(strip_modifiers(TargetType),Concepts::Is_Currency_Value)))
 			{
 				this_component()->template Value<Value_Type>(value / Conversion_Factor<TargetType>());
 			}
-			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(typename remove_pointer<TargetType>::type,!Concepts::Is_Currency_Value)))
+			template<typename TargetType> void Value(TargetType value, requires(TargetType,check(ComponentType,!Set_Value_exists) || check(strip_modifiers(TargetType),!Concepts::Is_Currency_Value)))
 			{
 				assert_check(ComponentType,Set_Value_exists, "Setter does not exists for this accessor.");
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, "The specified TargetType is not a valid Currency data structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, "The specified TargetType is not a valid Currency data structure.");
 			}
 
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Currency_Value) && check(typename TargetType::ReturnType,Concepts::Is_Currency_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Currency_Value) && check(typename TargetType::ReturnType,Concepts::Is_Currency_Value)))
 			{
 				Value_Type convert_component_value_to_param = Conversion_Factor<typename TargetType::ParamType>();
 				Value_Type convert_component_value_to_return = Conversion_Factor<typename TargetType::ReturnType>();
 				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(typename remove_pointer<TargetType>::type,!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Currency_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Currency_Value)))
+			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Currency_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Currency_Value)))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
+				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
 				assert_check(typename TargetType::ReturnType,Concepts::Is_Length_Value, "TargetTyp::ReturnType is not a valid length value structure.");
 				assert_check(typename TargetType::ParamType,Concepts::Is_Length_Value, "TargetType::ParamType is not a valid length value structure.");
 			}
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
 			{
 				return (Value_Type)1.0;
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
 			{		
 				return (Value_Type)0.01;
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
 			{
 				return (Value_Type)0.00001;				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))
 			{
 				return (Value_Type)0.00000001;
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
 			{
 				return (Value_Type)(100.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
 			{		
 				return (Value_Type)(1.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
 			{
 				return (Value_Type)(0.001);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars)))
 			{
 				return (Value_Type)(0.000001);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
 			{
 				return (Value_Type)(100000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
 			{		
 				return (Value_Type)(1000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
 			{
 				return (Value_Type)(1.0);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars)))
 			{
 				return (Value_Type)(0.001);
 			};
 
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
 			{
 				return (Value_Type)(100000000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
 			{		
 				return (Value_Type)(1000000.0);
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Thousand_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
 			{
 				return (Value_Type)(1000.0);				
 			};
-			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
+			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Million_Dollars) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars)))
 			{
 				return (Value_Type)(1.0);
 			};
 
 
 			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,!(
-				(sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Cents) || sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Dollars) || sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Thousand_Dollars) || 
-				sub_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value, Is_Million_Dollars)) &&
+				(sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) || sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Dollars) || sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Thousand_Dollars) || 
+				sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Million_Dollars)) &&
 				(sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents) || sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Dollars) || sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Thousand_Dollars) || 
 				sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Million_Dollars))) ))
 			{
-				assert_check(typename remove_pointer<TargetType>::type,Concepts::Is_Currency_Value,"The specified TargetType is not a valid spatial measurement Data Structure.");
+				assert_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value,"The specified TargetType is not a valid spatial measurement Data Structure.");
 			}
 		};
 	}

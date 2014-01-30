@@ -195,7 +195,7 @@ namespace Person_Components
 					Revision& location = act->template Location_Planning_Time<Revision&>();
 					Revision& start = act->template Start_Time_Planning_Time<Revision&>();
 					Revision& route = act->template Route_Planning_Time<Revision&>();
-					s << "\tPlan times (loc,start,route): "<<location.iteration()<<"."<<location._subiteration()<<" , " << start.iteration() <<"."<<start._subiteration()<<" , " << route.iteration()<<"."<<route._subiteration();
+					s << "\tPlan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
 					buff[__thread_id].push_back(s.str());
 					return;
 				}
@@ -205,7 +205,7 @@ namespace Person_Components
 				Revision& start = act->template Stored_Start_Time_Planning_Time<Revision&>();
 				Revision& route = act->template Stored_Route_Planning_Time<Revision&>();
 				s << PERSON_ID.str()  << "\t"<<act->template Activity_Plan_ID<int>()<<"\t" << act->template Get_Type_String<NT>() << "\t"<<zone->template uuid<int>()<<"\t";
-				s << "Plan times (loc,start,route): "<<location.iteration()<<"."<<location._subiteration()<<" , " << start.iteration() <<"."<<start._subiteration()<<" , " << route.iteration()<<"."<<route._subiteration();
+				s << "Plan times (loc,start,route): "<<location._iteration<<"."<<location._sub_iteration<<" , " << start._iteration <<"."<<start._sub_iteration<<" , " << route._iteration<<"."<<route._sub_iteration;
 					
 				if (!is_executed)
 				{
@@ -315,7 +315,7 @@ namespace Person_Components
 				this->_replanned_activities++;
 			}
 
-			template<typename TargetType> void Logging_Conditional()
+			static void Logging_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				typedef typename MasterType::person_data_logger_type this_type;
 				typedef Prototypes::Person_Data_Logger<typename MasterType::person_data_logger_type> _Interface;
@@ -326,7 +326,7 @@ namespace Person_Components
 				this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>(iteration() + this_ptr->template Logging_Interval<Simulation_Timestep_Increment>());
 
 				// swap buffer and current for output strings and trip records
-				if(_subiteration() == 0)
+				if(sub_iteration() == 0)
 				{				
 					boost::container::vector<string>* tmp = pthis->buff;
 					pthis->buff = pthis->current;
@@ -340,20 +340,20 @@ namespace Person_Components
 					pthis->activity_buff = pthis->activity_current;
 					pthis->activity_current = tmp_act;
 
-					response.next.iteration() = iteration();
-					response.next._subiteration() = 1;
+					response.next._iteration = _iteration;
+					response.next._sub_iteration = 1;
 					response.result = true;
 				}
-				else if (_subiteration() < num_sim_threads())
+				else if (sub_iteration() < num_sim_threads())
 				{
-					response.next.iteration() = iteration();
-					response.next._subiteration() = _subiteration()+1;
+					response.next._iteration = _iteration;
+					response.next._sub_iteration = _sub_iteration+1;
 					response.result = true;
 				}
 				else
 				{
-					response.next.iteration() = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
-					response.next._subiteration() = 0;
+					response.next._iteration = this_ptr->template Next_Logging_Time<Simulation_Timestep_Increment>();
+					response.next._sub_iteration = 0;
 					response.result = false;
 				}
 
@@ -367,7 +367,7 @@ namespace Person_Components
 			}
 			template<typename TargetType> void Write_Data_To_File()
 			{
-				int i = _subiteration();
+				int i = sub_iteration();
 
 				// write out strings in the current buffer to log file and clear it
 				for (boost::container::vector<string>::iterator itr = current[i].begin(); itr != current[i].end(); ++itr)
@@ -469,7 +469,7 @@ namespace Person_Components
 				//	cout << endl << "Number of activity type : " << num_acts[i];
 				//}
 
-				int i = _subiteration();
+				int i = sub_iteration();
 
 				// display the ttime and executed activity count distributions once
 				if (i == 0)

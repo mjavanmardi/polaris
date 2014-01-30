@@ -68,10 +68,10 @@ namespace Network_Components
 
 			m_container(boost::container::vector<typename MasterType::routable_network_type*>, realtime_routable_networks_container, NONE, NONE);
 
-			template<typename ComponentType,  typename TargetType>
+			template<typename TargetType>
 			TargetType routable_network(){return (TargetType)(_routable_networks_container[__thread_id]);}tag_getter_as_available(routable_network);
 
-			template<typename ComponentType,  typename TargetType>
+			template<typename TargetType>
 			TargetType realtime_routable_network(){return (TargetType)(_realtime_routable_networks_container[__thread_id]);}tag_getter_as_available(realtime_routable_network);
 
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, turn_movements_container, NONE, NONE);
@@ -440,27 +440,31 @@ namespace Network_Components
 			template<typename TargetType> void initialize_network_agent()
 			{
 				typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
-				//TODO
+				////TODO
 //load_event(ComponentType,ComponentType::template End_Iteration_Conditional,ComponentType::template End_Iteration_Handler, ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION,NULLTYPE);
-                _start_cpu_time_in_seconds = (long)get_current_cpu_time_in_seconds();
+                
+				Load_Event<ComponentType>(&ComponentType::End_Iteration_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION);
+				_start_cpu_time_in_seconds = (long)get_current_cpu_time_in_seconds();
  			}
 
-			template<typename TargetType> void End_Iteration_Conditional()
+			static void End_Iteration_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
-				if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION)
+				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION)
 				{
-					((typename MasterType::network_type*)_this)->Swap_Event((Event)&Snapshot_Subiteration_Handler<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration();
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_COMPUTATION_SUB_ITERATION;
+					//((typename MasterType::network_type*)_this)->Swap_Event((Event)&Snapshot_Subiteration_Handler<NULLTYPE>);
+					//response.result=true;
+					_this->Snapshot_Subiteration_Handler();
+					response.next._iteration=iteration();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_COMPUTATION_SUB_ITERATION;
 				}
-				else if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_COMPUTATION_SUB_ITERATION)
+				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_COMPUTATION_SUB_ITERATION)
 				{
-					((typename MasterType::network_type*)_this)->Swap_Event((Event)&End_Iteration_Handler<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION;
+					//((typename MasterType::network_type*)_this)->Swap_Event((Event)&End_Iteration_Handler<NULLTYPE>);
+					//response.result=true;
+					_this->End_Iteration_Handler();
+					response.next._iteration=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::NETWORK_SNAPSHOT_SUB_ITERATION;
 				} 
 				else
 				{
@@ -469,32 +473,33 @@ namespace Network_Components
 				}
 			}
 
-			declare_event(Snapshot_Subiteration_Handler)
+			//declare_event(Snapshot_Subiteration_Handler)
+			void Snapshot_Subiteration_Handler()
 			{
 				typedef Network<typename MasterType::network_type> _Network_Interface;
 				typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
-				if (((_Network_Interface*)_this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template snapshot_period<int>() == 0)
+				if (((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template snapshot_period<int>() == 0)
 				{
 					//((typename MasterType::network_type*)_this)->create_snapshot();
 					if (((_Scenario_Interface*)_global_scenario)->template write_network_snapshots<bool>())
 					{
 						cout << "wrting network snapshot" << endl;
-						((typename MasterType::network_type*)_this)->output_snapshot();
+						((typename MasterType::network_type*)this)->output_snapshot();
 					}
 				}
-				if (((_Scenario_Interface*)_global_scenario)->template compare_with_historic_moe<bool>() && ((_Network_Interface*)_this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				if (((_Scenario_Interface*)_global_scenario)->template compare_with_historic_moe<bool>() && ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{
-					((typename MasterType::network_type*)_this)->read_historic_link_moe();
+					((typename MasterType::network_type*)this)->read_historic_link_moe();
 				}
-				if (((_Scenario_Interface*)_global_scenario)->template read_normal_day_link_moe<bool>() && ((_Network_Interface*)_this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				if (((_Scenario_Interface*)_global_scenario)->template read_normal_day_link_moe<bool>() && ((_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>() % ((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{
-					((typename MasterType::network_type*)_this)->read_normal_day_link_moe();
+					((typename MasterType::network_type*)this)->read_normal_day_link_moe();
 				}
-				if (((((_Network_Interface*)_this)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+				if (((((_Network_Interface*)this)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{
-					((typename MasterType::network_type*)_this)->_in_network_vht_vehicle_based = 0.0;
+					((typename MasterType::network_type*)this)->_in_network_vht_vehicle_based = 0.0;
 				}
-				((typename MasterType::network_type*)_this)->_network_vht_compensation = 0;
+				((typename MasterType::network_type*)this)->_network_vht_compensation = 0;
 			}
 
 			void read_historic_link_moe()
@@ -663,11 +668,12 @@ namespace Network_Components
 				return (TargetType)routable_network;
 			}
 
-			declare_event(End_Iteration_Handler)
+			//declare_event(End_Iteration_Handler)
+			void End_Iteration_Handler()
 			{
 				typedef Network<typename MasterType::network_type> _Network_Interface;
 				typedef  Scenario_Components::Prototypes::Scenario< type_of(scenario_reference)> _Scenario_Interface;
-				_Network_Interface* _this_ptr = (_Network_Interface*)_this;
+				_Network_Interface* _this_ptr = (_Network_Interface*)this;
 				if (_this_ptr->template start_of_current_simulation_interval_absolute<int>() > _this_ptr->template scenario_reference<_Scenario_Interface*>()->template simulation_end_time<int>())
 				{
 					_this_ptr->template scenario_reference<_Scenario_Interface*>()->template close_files<NULLTYPE>();
@@ -676,9 +682,9 @@ namespace Network_Components
 					exit(0);
 				}
 
-				((typename MasterType::network_type*)_this)->template calculate_moe<NULLTYPE,NULLTYPE,NULLTYPE>();
-				//((typename MasterType::network_type*)_this)->template update_vehicle_locations<NULLTYPE,NULLTYPE,NULLTYPE>();
-				((typename MasterType::network_type*)_this)->template printResults<NULLTYPE,NULLTYPE,NULLTYPE>();
+				((typename MasterType::network_type*)this)->template calculate_moe<NULLTYPE>();
+				//((typename MasterType::network_type*)this)->template update_vehicle_locations<NULLTYPE,NULLTYPE,NULLTYPE>();
+				((typename MasterType::network_type*)this)->template printResults<NULLTYPE>();
 			}
 
 			//template<typename TargetType> void add_in_network_to_VHT()

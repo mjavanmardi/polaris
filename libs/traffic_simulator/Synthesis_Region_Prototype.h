@@ -35,18 +35,18 @@ namespace PopSyn
 
 			//==============================================================================================================
 			// This handles the main population synthesis loop on the region-level, calls IPF and Selection for each zone
-			template<typename TargetType> void Call_Synthesize_Population_Conditional()
+			static void Call_Synthesize_Population_Conditional(ComponentType* _this,Event_Response& response)
 			{
-				if (_subiteration() == PopSyn::Types::POPSYN_SUBITERATIONS::PROCESS)
+				if (sub_iteration() == PopSyn::Types::POPSYN_SUBITERATIONS::PROCESS)
 				{
 					response.result = true;
-					response.next.iteration() = END;
-					response.next._subiteration() = 0;
+					response.next._iteration = END;
+					response.next._sub_iteration = 0;
 				}
 				else
 				{
-					response.next.iteration() = END;
-					response.next._subiteration() = 0;
+					response.next._iteration = END;
+					response.next._sub_iteration = 0;
 				}
 			}
 			declare_event(Call_Synthesize_Population)

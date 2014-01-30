@@ -454,16 +454,17 @@ namespace Routing_Components
 			//==================================================================================================
 
 
-			template<typename TargetType> void Compute_Route_Condition()
+			static void Compute_Route_Condition(ComponentType* _this,Event_Response& response)
 			{
 				typedef Routing_Components::Prototypes::Routing<typename MasterType::routing_type> _Routing_Interface;
 				typedef  Traveler_Components::Prototypes::Traveler< type_of(traveler)> _Traveler_Interface;
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
-				if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION)
+				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION)
 				{
-					response.result=true;
-					response.next.iteration()=END;
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION;
+					//response.result=true;
+					response.next._iteration=END;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION;
+					_this_ptr->Compute_Route<NT>();
 				}
 				else
 				{
@@ -471,7 +472,7 @@ namespace Routing_Components
 					cout << "Should never reach here in routing conditional!" << endl;
 				}
 
-				CHECK_CONDITIONAL
+				//CHECK_CONDITIONAL
 			}
 
 			// don't need ifdef here - just change the typedef of MasterType::person_type to traveler_implemenationt in the mastertype definition
@@ -536,24 +537,24 @@ namespace Routing_Components
 		implementation struct Skim_Routing_Implementation: public Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation), 512U>
 		{
 			typedef typename  Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation), 512U>::Component_Type ComponentType;
-			template<typename TargetType> void Compute_Route_Condition()
+			static void Compute_Route_Condition(ComponentType* _this,Event_Response& response)
 			{
 				typedef Routing_Components::Prototypes::Routing<ComponentType> _Routing_Interface;
 				
 				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
-				if(_subiteration() == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
+				if(sub_iteration() == Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING)
 				{
 					if (iteration() >= (int)_this_ptr->start_time<Simulation_Timestep_Increment>() && iteration() < (int)_this_ptr->end_time<Simulation_Timestep_Increment>())
 					{
 						response.result=true;
-						response.next.iteration()=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
-						response.next._subiteration()=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
+						response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
+						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
 					}
 					else
 					{
 						response.result=false;
-						response.next.iteration()=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
-						response.next._subiteration()=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
+						response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
+						response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
 					}
 				}
 				else

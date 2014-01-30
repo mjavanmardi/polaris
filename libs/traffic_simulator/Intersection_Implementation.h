@@ -581,8 +581,9 @@ namespace Intersection_Components
 				{
 					((_Intersection_Control_Interface*)_intersection_control)->template Initialize<NULLTYPE>();
 					int start_iteration = ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1;
-					//TODO
-//load_event(ComponentType,ComponentType::template Newells_Conditional,ComponentType::template Compute_Step_Flow,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,NULLTYPE);
+					Load_Event<ComponentType>(&ComponentType::Newells_Conditional,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION);
+					////TODO
+//load_event(ComponentType,,ComponentType::template Compute_Step_Flow,start_iteration,Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION,NULLTYPE);
 				}
 			}
 			
@@ -595,7 +596,7 @@ namespace Intersection_Components
 					_Outbound_Inbound_Movements_Interface* outbound_inbound_movements = (_Outbound_Inbound_Movements_Interface*)(*outbound_inbound_movements_itr);
 					
 					_Link_Interface* outbound_link=outbound_inbound_movements->template outbound_link_reference<_Link_Interface*>();
-					_link_component_type* outbound_link_component = ((_outbound_inbound_movements_component_type*)(*outbound_inbound_movements_itr))->_outbound_link_reference;
+					_link_component_type* outbound_link_component = (_link_component_type*)((_outbound_inbound_movements_component_type*)(*outbound_inbound_movements_itr))->_outbound_link_reference;
 					outbound_link_component->link_moe_data.link_queue_length += outbound_link_component->_link_num_vehicles_in_queue;
 					outbound_link_component->realtime_link_moe_data.link_in_volume = 0.0f;
 					_Inbound_Movements_Container_Interface& inbound_movements_container = outbound_inbound_movements->template inbound_movements<_Inbound_Movements_Container_Interface&>();
@@ -612,7 +613,7 @@ namespace Intersection_Components
 				{
 					_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
 					_Link_Interface* inbound_link=inbound_outbound_movements->template inbound_link_reference<_Link_Interface*>();
-					_link_component_type* inbound_link_component = ((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->_inbound_link_reference;
+					_link_component_type* inbound_link_component = (_link_component_type*)((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->_inbound_link_reference;
 
 					float avg_turn_penalty = 0.0f;
 					int allowed_movement_size = 0;
@@ -674,7 +675,7 @@ namespace Intersection_Components
 				{
 					_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
 					_Link_Interface* inbound_link=inbound_outbound_movements->template inbound_link_reference<_Link_Interface*>();
-					_link_component_type* inbound_link_component = ((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->_inbound_link_reference;
+					_link_component_type* inbound_link_component = (_link_component_type*)((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->_inbound_link_reference;
 				
 					float avg_turn_penalty = 0.0f;
 					float avg_turn_penalty_standard_deviation = 0.0f;
@@ -717,7 +718,7 @@ namespace Intersection_Components
 				for (inbound_outbound_movements_itr=_inbound_outbound_movements.begin();inbound_outbound_movements_itr!=_inbound_outbound_movements.end();inbound_outbound_movements_itr++)
 				{
 					_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
-					_link_component_type* inbound_link_component = ((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->_inbound_link_reference;
+					_link_component_type* inbound_link_component = (_link_component_type*)((_inbound_outbound_movements_component_type*)(*inbound_outbound_movements_itr))->_inbound_link_reference;
 					float link_speed = inbound_link_component->realtime_link_moe_data.link_speed;
 
 					float travel_distance = (link_speed * 5280.0f / 3600.0f) * ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<float>();
@@ -766,49 +767,53 @@ namespace Intersection_Components
 				}
 			}
 
-			template<typename TargetType> void Newells_Conditional()
+			static void Newells_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				typename MasterType::intersection_type* _pthis = (typename MasterType::intersection_type*)_this;
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
 				
-				if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION)
+				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION)
 				{
-					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Compute_Step_Flow<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration();
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION;
+					//((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Compute_Step_Flow<NULLTYPE>);
+					_pthis->Compute_Step_Flow();
+					//response.result=true;
+					response.next._iteration=iteration();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION;
 				}
-				//else if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION)
+				//else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION)
 				//{
 
 				//	((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Origin_Loading_Step<NULLTYPE>);
 				//	response.result=true;
-				//	response.next.iteration()=iteration();
-				//	response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION;
+				//	response.next._iteration=_iteration;
+				//	response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION;
 				//} 
-				else if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION)
+				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION)
 				{
 
-					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Network_State_Update<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration();
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION;
+					//((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Network_State_Update<NULLTYPE>);
+					_pthis->Network_State_Update();
+					//response.result=true;
+					response.next._iteration=iteration();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION;
 				} 
-				else if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION)
+				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION)
 				{
 
-					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&ComponentType::template Intersection_REALTIME_MOE_Update<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration();
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_MOE_COMPUTATION_SUB_ITERATION;
+					//((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&ComponentType::template Intersection_REALTIME_MOE_Update<NULLTYPE>);
+					_pthis->Intersection_REALTIME_MOE_Update();
+					//response.result=true;
+					response.next._iteration=iteration();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_MOE_COMPUTATION_SUB_ITERATION;
 				}
-				else if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_MOE_COMPUTATION_SUB_ITERATION)
+				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_MOE_COMPUTATION_SUB_ITERATION)
 				{
 
-					((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Intersection_MOE_Update<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION;
+					//((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Intersection_MOE_Update<NULLTYPE>);
+					_pthis->Intersection_MOE_Update();
+					//response.result=true;
+					response.next._iteration=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_COMPUTE_STEP_FLOW_SUB_ITERATION;
 				}
 				else
 				{
@@ -817,9 +822,10 @@ namespace Intersection_Components
 				}
 			}
 
-			declare_event(Compute_Step_Flow)
+			//declare_event(Compute_Step_Flow)
+			void Compute_Step_Flow()
 			{
-				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)this;
 				//step 2: turn vehicles updating based on node control and link management, inbound link demand, and outbound link supply
 				_this_ptr->template turn_movement_capacity_update<NULLTYPE>(); 
 				//step 3: allocate link supply to inbound turn movements according to a given merging policy
@@ -833,24 +839,27 @@ namespace Intersection_Components
 				//_this_ptr->template origin_link_loading<NULLTYPE>();
 			}
 
-			declare_event(Origin_Loading_Step)
+			//declare_event(Origin_Loading_Step)
+			void Origin_Loading_Step()
 			{
-				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)this;
 				//step 6: origin link loading
 				//_this_ptr->template origin_link_loading<NULLTYPE>();
 			}
 
-			declare_event(Network_State_Update)
+			//declare_event(Network_State_Update)
+			void Network_State_Update()
 			{
 				//typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
-				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)this;
 				//step 9: intersection network state update
 				_this_ptr->template network_state_update<NULLTYPE>();
 			}
 
-			declare_event(Intersection_REALTIME_MOE_Update)
+			//declare_event(Intersection_REALTIME_MOE_Update)
+			void Intersection_REALTIME_MOE_Update()
 			{
-				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)this;
 				//step 10: intersection realtime MOE update
 
 				if (((_Scenario_Interface*)_global_scenario)->template calculate_realtime_moe<bool>())
@@ -859,9 +868,10 @@ namespace Intersection_Components
 				}
 			}
 
-			declare_event(Intersection_MOE_Update)
+			//declare_event(Intersection_MOE_Update)
+			void Intersection_MOE_Update()
 			{
-				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)_this;
+				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)this;
 				//step 11: intersection MOE update
 				if(((((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>()+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
 				{

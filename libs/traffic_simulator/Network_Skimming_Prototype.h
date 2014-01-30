@@ -42,42 +42,42 @@ namespace Network_Skimming_Components
 			//=============================================
 			// Primary events
 			//---------------------------------------------
-			template<typename TargetType> void Skim_Table_Update_Conditional()
+			static void Skim_Table_Update_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				typedef Network_Skimming<ComponentType> _Skim_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Skim_Interface* this_ptr=(_Skim_Interface*)_pthis;
 
-				if (_subiteration() == 0)
+				if (sub_iteration() == 0)
 				{
-					response.next.iteration() = iteration();
-					response.next._subiteration() = Types::SUB_ITERATIONS::INITIALIZE;
+					response.next._iteration = _iteration;
+					response.next._sub_iteration = Types::SUB_ITERATIONS::INITIALIZE;
 					response.result = false;
 				}
-				else if (_subiteration() == Types::SUB_ITERATIONS::INITIALIZE)
+				else if (sub_iteration() == Types::SUB_ITERATIONS::INITIALIZE)
 				{
-					response.next.iteration() = iteration();
-					response.next._subiteration() = Types::SUB_ITERATIONS::PROCESS;
+					response.next._iteration = _iteration;
+					response.next._sub_iteration = Types::SUB_ITERATIONS::PROCESS;
 					response.result = false;
 				}
-				else if (_subiteration() == Types::SUB_ITERATIONS::PROCESS)
+				else if (sub_iteration() == Types::SUB_ITERATIONS::PROCESS)
 				{
 					_pthis->Swap_Event((Event)&Process_Skim_Trees_Event<NULLTYPE>);
-					response.next.iteration() = iteration();
-					response.next._subiteration() = Types::SUB_ITERATIONS::UPDATE;
+					response.next._iteration = _iteration;
+					response.next._sub_iteration = Types::SUB_ITERATIONS::UPDATE;
 					response.result = true;
 				}
-				else if (_subiteration() == Types::SUB_ITERATIONS::UPDATE)
+				else if (sub_iteration() == Types::SUB_ITERATIONS::UPDATE)
 				{
 					_pthis->Swap_Event((Event)&Update_Skim_Tables_Event<NULLTYPE>);
-					response.next.iteration() = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
-					response.next._subiteration() = 0;
+					response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
+					response.next._sub_iteration = 0;
 					response.result = true;
 				}
 				else
 				{
-					response.next.iteration() = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
-					response.next._subiteration() = 0;
+					response.next._iteration = Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template update_increment<Simulation_Timestep_Increment>());
+					response.next._sub_iteration = 0;
 					response.result = true;
 				}
 			}

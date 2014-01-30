@@ -31,8 +31,8 @@ namespace Sensor_Components
 
 			template<typename TargetType> void Sensor_Conditional()
 			{
-				response.next.iteration() = iteration() + ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-				response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
+				response.next._iteration = _iteration + ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+				response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
 
 				response.result = true;
 			}

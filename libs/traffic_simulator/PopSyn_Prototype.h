@@ -83,54 +83,54 @@ namespace PopSyn
 			// Main analysis loop events, used to separate operations into different timesteps
 			//----------------------------------------------------------------
 			// 1.) Startup Event - Reads inputs and allocates analysis objects (at Iteration = 0, timestep 1)
-			template<typename TargetType> void Start_Popsyn_Conditional()
+			static void Start_Popsyn_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				ComponentType* pthis = (ComponentType*)_this;
 				if (iteration() == 0 || iteration() == 1)
 				{
-					switch (_subiteration())
+					switch (sub_iteration())
 					{
 					case POPSYN_SUBITERATIONS::INITIALIZE:
 						response.result = true;
-						response.next.iteration() = iteration();
-						response.next._subiteration() = POPSYN_SUBITERATIONS::START_TIMING;
+						response.next._iteration = _iteration;
+						response.next._sub_iteration = POPSYN_SUBITERATIONS::START_TIMING;
 						break;
 					case POPSYN_SUBITERATIONS::START_TIMING:
 						response.result = true;
 						pthis->Swap_Event(&Start_Main_Timer<NULLTYPE>);
-						response.next.iteration() = POPSYN_ITERATIONS::MAIN_PROCESS;
-						response.next._subiteration() = POPSYN_SUBITERATIONS::STOP_TIMING;
+						response.next._iteration = POPSYN_ITERATIONS::MAIN_PROCESS;
+						response.next._sub_iteration = POPSYN_SUBITERATIONS::STOP_TIMING;
 						break;
 					case POPSYN_SUBITERATIONS::STOP_TIMING:
 						response.result = true;
 						pthis->Swap_Event(&Stop_Main_Timer<NULLTYPE>);
-						response.next.iteration() = iteration();
-						response.next._subiteration() = POPSYN_SUBITERATIONS::OUTPUT;
+						response.next._iteration = _iteration;
+						response.next._sub_iteration = POPSYN_SUBITERATIONS::OUTPUT;
 						break;
 					case POPSYN_SUBITERATIONS::OUTPUT:
 						response.result = true;
 						pthis->Swap_Event(&Output_Popsyn_Event<NULLTYPE>);
-						response.next.iteration() = 3;
-						response.next._subiteration() = 0;
+						response.next._iteration = 3;
+						response.next._sub_iteration = 0;
 						break;
 					default:
 						response.result = false;
-						response.next.iteration() = END;
-						response.next._subiteration() = 0;
+						response.next._iteration = END;
+						response.next._sub_iteration = 0;
 					}
 				}
 				else if (iteration() == 3)
 				{
 					response.result = true;
 					pthis->Swap_Event(&Output_Popsyn_To_DB_Event<NULLTYPE>);
-					response.next.iteration() = END;
-					response.next._subiteration() = 0;
+					response.next._iteration = END;
+					response.next._sub_iteration = 0;
 				}
 				else
 				{
 					response.result = false;
-					response.next.iteration() = END;
-					response.next._subiteration() = 0;
+					response.next._iteration = END;
+					response.next._sub_iteration = 0;
 				}
 				
 				

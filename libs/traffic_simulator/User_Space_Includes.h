@@ -20,9 +20,9 @@ using namespace __gnu_cxx;
 #endif
 
 
-#define CHECK_CONDITIONAL if(response.next.iteration() < iteration() || response.next.iteration() == iteration() && response.next._subiteration() <= _subiteration())\
+#define CHECK_CONDITIONAL if(response.next._iteration < _iteration || response.next._iteration == _iteration && response.next._sub_iteration <= _sub_iteration)\
 {\
-	THROW_EXCEPTION("ERROR, can't go back in time.  Trying to schedule for iteration " << response.next.iteration() << "."<<response.next._subiteration() <<", at iteration "<<iteration() <<"."<<_subiteration());\
+	THROW_EXCEPTION("ERROR, can't go back in time.  Trying to schedule for iteration " << response.next._iteration << "."<<response.next._sub_iteration <<", at iteration "<<_iteration <<"."<<_sub_iteration);\
 }
 
 #define WHILE_PRINT(value)

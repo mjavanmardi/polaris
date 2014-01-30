@@ -244,7 +244,7 @@ namespace Vehicle_Components
 				{
 					((_Vehicle_Interface*)this)->template unload<NULLTYPE>();
 				}
-				((_Link_Interface*)link)->template push_vehicle<_Vehicle_Interface*>((_Vehicle_Interface*)this);
+				((_Link_Interface*)link)->template push_vehicle_from_network<_Vehicle_Interface*>((_Vehicle_Interface*)this);
 			}
 
 
@@ -393,34 +393,34 @@ namespace Vehicle_Components
 //load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template Vehicle_Action,first_triggeriteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION,NULLTYPE);
 			}
 
-			template<typename TargetType> void Vehicle_Action_Condition()
+			static void Vehicle_Action_Condition(ComponentType* _this,Event_Response& response)
 			{
 				if (((_Vehicle_Interface*)_this)->template simulation_status<Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::OUT_NETWORK)
 				{
 					response.result=false;
-					response.next.iteration()=END;
+					response.next._iteration=END;
 				}
-				else if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION)
+				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION)
 				{
 					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
 					response.result=true;
 					if (((_Vehicle_Interface*)_this)->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::IN_NETWORK)
 					{
-						response.next.iteration()=iteration();
-						response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
+						response.next._iteration=_iteration;
+						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
 					}
 					else
 					{
-						response.next.iteration()=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-						response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION;
+						response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION;
 					}
 				}
-				else if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION)
+				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION)
 				{
 					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
 					response.result=true;
-					response.next.iteration()=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
+					response.next._iteration=_iteration + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
 				}
 				else
 				{

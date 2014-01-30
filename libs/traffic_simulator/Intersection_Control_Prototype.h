@@ -2,6 +2,7 @@
 #include "User_Space_Includes.h"
 #include "Link_Prototype.h"
 #include "Scenario_Prototype.h"
+#include "Turn_Movement_Prototype.h"
 extern void* _global_scenario;
 
 namespace Intersection_Control_Components
@@ -123,6 +124,9 @@ namespace Intersection_Control_Components
 			accessor(minor_approach_data_array, NONE, NONE);
 		};
 
+		using namespace Intersection_Control_Components::Types;
+		using namespace Turn_Movement_Components::Types;
+		
 		prototype struct Intersection_Control
 		{
 			tag_as_prototype;
@@ -1171,9 +1175,11 @@ namespace Intersection_Control_Components
 				typedef  Scenario_Components::Prototypes::Scenario< typename _Network_Interface::get_type_of(scenario_reference)> _Scenario_Interface;
 				//TODO
 //load_event(ComponentType,Newells_Conditional,Compute_Step_Control,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION,NULLTYPE);
+			
+				this_component()->Load_Event<ComponentType>(&Newells_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION);
 			}
 
-			template<typename TargetType> void Newells_Conditional()
+			static void Newells_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				typedef Intersection_Control<ComponentType> _Intersection_Control_Interface;
 				typedef Intersection_Components::Prototypes::Intersection<typename get_type_of(intersection)> _Intersection_Interface;
@@ -1181,12 +1187,15 @@ namespace Intersection_Control_Components
 				typedef  Scenario_Components::Prototypes::Scenario< typename _Network_Interface::get_type_of(scenario_reference)> _Scenario_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Intersection_Control_Interface* _this_ptr=(_Intersection_Control_Interface*)_this;
-				if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION)
+				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION)
 				{
-					_pthis->Swap_Event((Event)&Intersection_Control::Compute_Step_Control<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION;
+					//_pthis->Swap_Event((Event)&Intersection_Control::Compute_Step_Control<NULLTYPE>);
+					
+					_this_ptr->Compute_Step_Control<NULLTYPE>();
+					
+					//response.result=true;
+					response.next._iteration=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::CONTROL_SUB_ITERATION;
 
 				}
 				else
@@ -1196,10 +1205,11 @@ namespace Intersection_Control_Components
 				}
 			}
 
-			declare_event(Compute_Step_Control)
+			//declare_event(Compute_Step_Control)
+			template<typename TargetType> void Compute_Step_Control()
 			{
 				typedef Intersection_Control<ComponentType> _Intersection_Control_Interface;
-				_Intersection_Control_Interface* _this_ptr=(_Intersection_Control_Interface*)_this;
+				_Intersection_Control_Interface* _this_ptr=(_Intersection_Control_Interface*)this;
 				//step 1: update control
 				_this_ptr->template intersection_control_update<NULLTYPE>();
 			}

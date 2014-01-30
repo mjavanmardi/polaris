@@ -40,17 +40,22 @@ namespace Zone_Components
 				pthis->update_increment<Time_Minutes>(2);
 				//TODO
 //load_event(ComponentType,Default_Zone_Conditional,Default_Zone_Event,concat(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(2)),0,NULLTYPE);
+				//TODO
+				//Load_Event<ComponentType>(&ComponentType::Default_Zone_Conditional,concat(Simulation_Time.Future_Time<Time_Minutes,Simulation_Timestep_Increment>(2)),0);
 			}
-			template<typename TargetType> void Default_Zone_Conditional()
+			static void Default_Zone_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				_this_interface* pthis = (_this_interface*)_this;
 
-				response.result=true;
-				response.next.iteration()=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(pthis->update_increment<Simulation_Timestep_Increment>());
-				response.next._subiteration()=Types::ZONE_UPDATE_SUBITERATION;
+				//response.result=true;
+				response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(pthis->update_increment<Simulation_Timestep_Increment>());
+				response.next._sub_iteration=Types::ZONE_UPDATE_SUBITERATION;
+				
+				_this->Default_Zone_Event();
 			}
 
-			declare_event(Default_Zone_Event)
+			//declare_event(Default_Zone_Event)
+			void Default_Zone_Event()
 			{
 				//_this_interface* pthis = (_this_interface*)_this;
 

@@ -145,7 +145,8 @@ namespace polaris
 	extern const Revision __revision_omega;
 
 	// indicate end of simulation
-	#define END Revision(num_iterations() + 1,0)
+	//#define END Revision(num_iterations() + 1,0)
+	#define END num_iterations() + 1
 
 	// indicate agent to be freed
 	extern const Revision __revision_free;

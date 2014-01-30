@@ -242,24 +242,24 @@ namespace Traffic_Management_Center_Components
 			m_data(boost::container::vector<Base_Network_Event_Interface*>,tracked_events, NONE, NONE);
 
 			//                                          name of the function
-			template<typename TargetType> void TMC_Conditional()
+			static void TMC_Conditional(ComponentType* _this,Event_Response& response)
 			{
-				response.next.iteration() = iteration() + 5*60;
-				response.next._subiteration() = 1;
+				response.next._iteration = iteration() + 5*60;
+				response.next._sub_iteration = 1;
 
 				//this variable specifies whether the the Event function will be called
-				response.result = true;
+				//response.result = true;
+				
+				_this->TMC_Event();
 			}
 
-			declare_event(TMC_Event)
+			void TMC_Event()
 			{
-				ComponentType* pthis = (ComponentType*)_this;
+				Load_New_Events<NT>();
 
-				pthis->template Load_New_Events<NT>();
+				Analyze_Sensors();
 
-				pthis->Analyze_Sensors();
-
-				pthis->template DecideOnEventsToBeDisplayed<NT>();
+				DecideOnEventsToBeDisplayed<NT>();
 			}
 
 			void Analyze_Sensors()
@@ -294,7 +294,7 @@ namespace Traffic_Management_Center_Components
 
 				my_weakcc.Run(my_digraph);
 
-				const boost::unordered::unordered_map<int, std::vector<int> >& link_components = my_weakcc.LinkComponents();
+				const boost::unordered::unordered_map<int, boost::container::vector<int> >& link_components = my_weakcc.LinkComponents();
 				boost::container::vector<typename MasterType::link_type*> affected_links;
 				
 				//cout << "Done analyzing, number of congestion events: " << link_components.size() << endl;
@@ -398,8 +398,7 @@ namespace Traffic_Management_Center_Components
 			{
 				this_component()->template Read_Database<TargetType>();
 
-//TODO
-//				((ComponentType*)this)->template Load_Event<ComponentType>(&ComponentType::template TMC_Conditional<NT,NT>,&ComponentType::template TMC_Event<NT,NT>, 0, 1);
+				Load_Event<ComponentType>(&ComponentType::TMC_Conditional, 0, 1);
 			}
 
 			/// This function reads the speed data from LinkMOE data and uses is to train the outliers detector

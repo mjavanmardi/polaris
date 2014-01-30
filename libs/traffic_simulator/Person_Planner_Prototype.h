@@ -51,7 +51,7 @@ namespace Person_Components
 			tag_as_prototype;
 		 
 			// Conditonal handling and helper functions
-			template<typename TargetType> void Planning_Conditional()
+			static void Planning_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				//----------------------------------------------
 				// CONDITIONALS FOR BASIC AGENT SCHEDULING
@@ -81,7 +81,7 @@ namespace Person_Components
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// SETUP SUBITERATION, set up future subiteration() schedule
-				if (_subiteration() == 0)
+				if (sub_iteration() == 0)
 				{
 					// If activity generation is to be performed, do that next
 					if(this_ptr->template Next_Activity_Generation_Time<Time_Seconds>() == Simulation_Time.template Current_Time<Time_Seconds>()) 
@@ -104,7 +104,7 @@ namespace Person_Components
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// ACTIVITY GENERATION SUBITERATION, swap in the activity-generation event and set up future subiteration() schedule
-				else if (_subiteration() == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
+				else if (sub_iteration() == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
 				{
 					_pthis->Swap_Event((Event)&Person_Planner::Activity_Generation_Event<NULLTYPE>);
 					this_ptr->template Go_To_Subiteration<NT>(Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING,true,response);
@@ -112,7 +112,7 @@ namespace Person_Components
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// MOVEMENT PLANNING SUBITERATION, swap in the movement planning event and set up future subiteration() schedule
-				else if (_subiteration() == Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING)
+				else if (sub_iteration() == Types::PLANNING_ITERATION_STEP_KEYS::MOVEMENT_PLANNING)
 				{
 					_pthis->Swap_Event((Event)&Person_Planner::Movement_Planning_Event<NULLTYPE>);
 					this_ptr->template Go_To_Next_Iteration<NT>(true,response);
@@ -131,14 +131,14 @@ namespace Person_Components
 			}
 			template<typename TargetType> void Go_To_Subiteration(Person_Components::Types::PLANNING_ITERATION_STEP_KEYS subiteration(), bool do_current_event, Event_Response& response)
 			{
-				response.next.iteration() = iteration();
-				response.next._subiteration() = subiteration();
+				response.next._iteration = _iteration;
+				response.next._sub_iteration = sub_iteration;
 				response.result = do_current_event;
 			}
 			template<typename TargetType> void Go_To_Next_Iteration(bool do_current_event, Event_Response& response)
 			{
-				response.next.iteration() = Round<long,double>(Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Planning_Time_Increment<Simulation_Timestep_Increment>()));
-				response.next._subiteration() = 0;
+				response.next._iteration = Round<long,double>(Simulation_Time.template Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Planning_Time_Increment<Simulation_Timestep_Increment>()));
+				response.next._sub_iteration = 0;
 				response.result = do_current_event;
 			}
 		

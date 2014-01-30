@@ -54,9 +54,9 @@ namespace Turn_Movement_Components
             typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename replicas_container_type::value_type>::type> _Replica_Interface;
             typedef Random_Access_Sequence<replicas_container_type,_Replica_Interface*> _Replicas_Container_Interface;
 			
-			template<typename ComponentType, typename TargetType>
+			template<typename TargetType>
 			TargetType forward_link_turn_travel_time(){return (TargetType)(_forward_link_turn_travel_time);} tag_getter_as_available(forward_link_turn_travel_time);
-			template<typename ComponentType, typename TargetType>
+			template<typename TargetType>
 			void forward_link_turn_travel_time(TargetType set_value)
 			{
 				_forward_link_turn_travel_time = (float)set_value;
@@ -72,9 +72,9 @@ namespace Turn_Movement_Components
 
 			float _forward_link_turn_travel_time;
 
-			template<typename ComponentType, typename TargetType>
+			template<typename TargetType>
 			TargetType realtime_forward_link_turn_travel_time(){return (TargetType)(_realtime_forward_link_turn_travel_time);} tag_getter_as_available(realtime_forward_link_turn_travel_time);
-			template<typename ComponentType, typename TargetType>
+			template<typename TargetType>
 			void realtime_forward_link_turn_travel_time(TargetType set_value)
 			{
 				_realtime_forward_link_turn_travel_time = (float)set_value;

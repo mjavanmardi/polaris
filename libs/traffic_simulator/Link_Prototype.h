@@ -202,16 +202,26 @@ namespace Link_Components
 			//visualized link
 			accessor(displayed_line, NONE, NONE);
 
-			template<typename TargetType> void push_vehicle(TargetType vehicle)
+			template<typename TargetType> void push_vehicle_from_origin(TargetType vehicle)
 			{
-				accept_vehicle<TargetType>(vehicle);
+				accept_vehicle_from_origin<TargetType>(vehicle);
 			}
-
-			template<typename TargetType> void accept_vehicle(TargetType vehicle)
+			
+			template<typename TargetType> void push_vehicle_from_network(TargetType vehicle)
 			{
-				this_component()->template accept_vehicle<TargetType>(vehicle);
+				accept_vehicle_from_network<TargetType>(vehicle);
 			}
-
+			
+			template<typename TargetType> void accept_vehicle_from_origin(TargetType vehicle)
+			{
+				this_component()->template accept_vehicle_from_origin<TargetType>(vehicle);
+			}
+			
+			template<typename TargetType> void accept_vehicle_from_network(TargetType vehicle)
+			{
+				this_component()->template accept_vehicle_from_network<TargetType>(vehicle);
+			}
+			
 			template<typename TargetType> void link_supply_update()
 			{
 				this_component()->template link_supply_update<TargetType>();

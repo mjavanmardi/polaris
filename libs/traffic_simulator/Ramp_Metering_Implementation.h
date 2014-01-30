@@ -102,23 +102,25 @@ namespace Ramp_Metering_Components
 				_operation_status = true;
 				//TODO
 //load_event(ComponentType, ComponentType::Ramp_Metering_Conditional,ComponentType::Ramp_Metering,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION,NULLTYPE);
+				
+				Load_Event<ComponentType>(&ComponentType::Ramp_Metering_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION);
 			}
 
-			template<typename TargetType> void Ramp_Metering_Conditional()
+			static void Ramp_Metering_Conditional(ComponentType* _this,Event_Response& response)
 			{
-				//cout << "Ramp meter firing: " << iteration() << "," << _subiteration() << " : " << Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION << endl;
+				//cout << "Ramp meter firing: " << _iteration << "," << sub_iteration() << " : " << Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION << endl;
 
 				typedef Ramp_Metering<ComponentType> _Ramp_Metering_Interface;
 				typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 				typedef Network<typename MasterType::network_type> _Network_Interface;
 				ComponentType* _pthis = (ComponentType*)_this;
 				_Ramp_Metering_Interface* _this_ptr=(_Ramp_Metering_Interface*)_this;
-				if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION)
+				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION)
 				{
 					//((typename MasterType::ramp_metering_type*)_this)->Swap_Event((Event)&Ramp_Metering<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION;
+					//response.result=true;
+					response.next._iteration=iteration() + ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::RAMP_METERING_SUB_ITERATION;
 
 				}
 				else
@@ -128,7 +130,7 @@ namespace Ramp_Metering_Components
 				}
 			}
 
-			declare_event(Ramp_Metering)
+			declare_event(Ramp_Metering_Event)
 			{
 				typedef Ramp_Metering<ComponentType> _Ramp_Metering_Interface;
 				_Ramp_Metering_Interface* _this_ptr=(_Ramp_Metering_Interface*)_this;

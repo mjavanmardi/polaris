@@ -61,7 +61,7 @@ namespace Prototypes
 		tag_as_prototype;
 
 		// Event handling
-		template<typename TargetType> void Agent_Conditional()
+		static void Agent_Conditional(ComponentType* _this,Event_Response& response)
 		{
 			typedef Person_Planner<typename get_type_of(Planning_Faculty)> planner_itf;
 			typedef Person<ComponentType> _Person_Interface;
@@ -74,16 +74,16 @@ namespace Prototypes
 			if (iteration() == pthis->template First_Iteration<Simulation_Timestep_Increment>())
 			{
 				Simulation_Timestep_Increment first_plan_time = planner->template Next_Planning_Time<Simulation_Timestep_Increment>() + planner->template Planning_Time_Increment<Simulation_Timestep_Increment>();
-				response.next.iteration() = first_plan_time;
-				response.next._subiteration() = 0;
+				response.next._iteration = first_plan_time;
+				response.next._sub_iteration = 0;
 				response.result = true;
 			}
 			// then, prior to the first planning period, dump all preplanned activities to file
 			else
 			{	
 				_pthis->Swap_Event((Event)&Person::Print_Preplanned_Activities_Event<NULLTYPE>);
-				response.next.iteration() = END;
-				response.next._subiteration() = 0;
+				response.next._iteration = END;
+				response.next._sub_iteration = 0;
 				response.result = true;
 			}
 

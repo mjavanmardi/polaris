@@ -25,7 +25,7 @@ namespace Person_Components
 			tag_as_prototype;
 		 
 			// Conditonal handling and helper functions
-			template<typename TargetType> void Generator_Conditional()
+			static void Generator_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				//----------------------------------------------
 				// CONDITIONALS FOR BASIC ACTIVITY GENERATION
@@ -36,7 +36,7 @@ namespace Person_Components
 
 				//------------------------------------------------------------------------------------------------------------------------------
 				// ACTIVITY GENERATION SUBITERATION, swap in the activity-generation event and set up future subiteration() schedule
-				if (_subiteration() == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
+				if (sub_iteration() == Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION)
 				{
 					this_ptr->Go_To_Next_Iteration<NT>(true,response);
 				}
@@ -52,8 +52,8 @@ namespace Person_Components
 			}
 			template<typename TargetType> void Go_To_Next_Iteration(bool do_current_event, Event_Response& response)
 			{
-				response.next.iteration() = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Generation_Time_Increment<Simulation_Timestep_Increment>()));
-				response.next._subiteration() = Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION;
+				response.next._iteration = Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this->Generation_Time_Increment<Simulation_Timestep_Increment>()));
+				response.next._sub_iteration = Types::PLANNING_ITERATION_STEP_KEYS::ACTIVITY_GENERATION;
 				response.result = do_current_event;
 			}
 		

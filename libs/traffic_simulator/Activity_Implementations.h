@@ -129,12 +129,12 @@ namespace Activity_Components
 			m_data(Revision,Stored_Involved_Persons_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 			m_data(Revision,Stored_Route_Planning_Time,check_2(strip_modifiers(TargetType),Revision,is_same), check_2(strip_modifiers(TargetType),Revision,is_same));
 
-			template<typename TargetType> bool Location_Is_Planned(){return (_Location_Planning_Time.iteration() >= (int)END && _Location_Planning_Time._subiteration() >= (int)END);} tag_feature_as_available(Location_Is_Planned);
-			template<typename TargetType> bool Mode_Is_Planned(){return (_Mode_Planning_Time.iteration() >= (int)END && _Mode_Planning_Time._subiteration() >= (int)END);}	tag_feature_as_available(Mode_Is_Planned);
-			template<typename TargetType> bool Duration_Is_Planned(){return (_Duration_Planning_Time.iteration() >= (int)END && _Duration_Planning_Time._subiteration() >= (int)END);}	tag_feature_as_available(Duration_Is_Planned);
-			template<typename TargetType> bool Involved_Persons_Is_Planned(){return (_Involved_Persons_Planning_Time.iteration() >= (int)END && _Involved_Persons_Planning_Time._subiteration() >= (int)END);}	tag_feature_as_available(Involved_Persons_Is_Planned);
-			template<typename TargetType> bool Start_Is_Planned(){return (_Start_Time_Planning_Time.iteration() >= (int)END && _Start_Time_Planning_Time._subiteration() >= (int)END);} tag_feature_as_available(Start_Is_Planned);
-			template<typename TargetType> bool Route_Is_Planned(){return (_Route_Planning_Time.iteration() >=(int)END && _Route_Planning_Time._subiteration() >= (int)END);} tag_feature_as_available(Route_Is_Planned);
+			template<typename TargetType> bool Location_Is_Planned(){return (_Location_Planning_Time._iteration >= (int)END && _Location_Planning_Time._sub_iteration >= (int)END);} tag_feature_as_available(Location_Is_Planned);
+			template<typename TargetType> bool Mode_Is_Planned(){return (_Mode_Planning_Time._iteration >= (int)END && _Mode_Planning_Time._sub_iteration >= (int)END);}	tag_feature_as_available(Mode_Is_Planned);
+			template<typename TargetType> bool Duration_Is_Planned(){return (_Duration_Planning_Time._iteration >= (int)END && _Duration_Planning_Time._sub_iteration >= (int)END);}	tag_feature_as_available(Duration_Is_Planned);
+			template<typename TargetType> bool Involved_Persons_Is_Planned(){return (_Involved_Persons_Planning_Time._iteration >= (int)END && _Involved_Persons_Planning_Time._sub_iteration >= (int)END);}	tag_feature_as_available(Involved_Persons_Is_Planned);
+			template<typename TargetType> bool Start_Is_Planned(){return (_Start_Time_Planning_Time._iteration >= (int)END && _Start_Time_Planning_Time._sub_iteration >= (int)END);} tag_feature_as_available(Start_Is_Planned);
+			template<typename TargetType> bool Route_Is_Planned(){return (_Route_Planning_Time._iteration >=(int)END && _Route_Planning_Time._sub_iteration >= (int)END);} tag_feature_as_available(Route_Is_Planned);
 
 			// Basic Activity Events - Plan route and add to schedule
 			template<typename TargetType> void Initialize(TargetType act_type)
@@ -158,19 +158,19 @@ namespace Activity_Components
 				Revision & persons = this->Involved_Persons_Planning_Time<  Revision&>();
 				Revision &route = this->Route_Planning_Time<  Revision&>();
 				
-				start.iteration() = END;				
-				dur.iteration() = END;				
-				loc.iteration() = END;				
-				mode.iteration() = END;				
-				persons.iteration() = END;			
-				route.iteration() = min(iteration()+1, (int)planning_time);
+				start._iteration = END;				
+				dur._iteration = END;				
+				loc._iteration = END;				
+				mode._iteration = END;				
+				persons._iteration = END;			
+				route._iteration = min(_iteration+1, (int)planning_time);
 
-				start._subiteration() = 0;	
-				dur._subiteration() = 0;
-				loc._subiteration() = 0;
-				mode._subiteration() = 0;
-				persons._subiteration() = 0;
-				route._subiteration() = 5;	
+				start._sub_iteration = 0;	
+				dur._sub_iteration = 0;
+				loc._sub_iteration = 0;
+				mode._sub_iteration = 0;
+				persons._sub_iteration = 0;
+				route._sub_iteration = 5;	
 			}
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
@@ -279,7 +279,7 @@ namespace Activity_Components
 						scheduler->template Add_Movement_Plan<_movement_plan_itf*>(move);
 
 					}
-					else THROW_WARNING("WARNING: ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< concat(this->Activity_Plan_ID<int>()) << "," <<concat(move->template origin<_activity_location_itf*>()->template uuid<int>()) << ", " <<concat(move->template destination<_activity_location_itf*>()->template uuid<int>())<< ",at iteration " << iteration() << "." << _subiteration()<<". Scheduled for route planning @ " << move->template planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->template departed_time<Simulation_Timestep_Increment>());		
+					else THROW_WARNING("WARNING: ACTIVITY NOT SCHEDULED, no valid route found from origin to destination. (PERID,ACTID,O,D) "<< person->template uuid<int>() <<","<< concat(this->Activity_Plan_ID<int>()) << "," <<concat(move->template origin<_activity_location_itf*>()->template uuid<int>()) << ", " <<concat(move->template destination<_activity_location_itf*>()->template uuid<int>())<< ",at iteration " << _iteration << "." << sub_iteration()<<". Scheduled for route planning @ " << move->template planning_time<Simulation_Timestep_Increment>() << ", and departure @ " << move->template departed_time<Simulation_Timestep_Increment>());		
 				}
 				else
 				{
@@ -733,19 +733,19 @@ namespace Activity_Components
 
 				int route_sub = max(start_sub,max(dur_sub,max(loc_sub,max(mode_sub,inv_sub)))) + 1;
 
-				start.iteration() = max(iteration()+1, (int)planning_time);
-				dur.iteration() = END; //dur.iteration() = max(iteration()+1, (int)planning_time);
-				loc.iteration() = max(iteration()+1,(int)planning_time);
-				mode.iteration() = max(iteration()+1, (int)planning_time);
-				persons.iteration() = max(iteration()+1, (int)planning_time);
-				route.iteration() = max(iteration()+1, (int)planning_time);
+				start._iteration = max(_iteration+1, (int)planning_time);
+				dur._iteration = END; //dur._iteration = max(_iteration+1, (int)planning_time);
+				loc._iteration = max(_iteration+1,(int)planning_time);
+				mode._iteration = max(_iteration+1, (int)planning_time);
+				persons._iteration = max(_iteration+1, (int)planning_time);
+				route._iteration = max(_iteration+1, (int)planning_time);
 				
-				start._subiteration() = start_sub;
-				dur._subiteration() = END; //dur._subiteration() = dur_sub;
-				loc._subiteration() = loc_sub;
-				mode._subiteration() = mode_sub;
-				persons._subiteration() = inv_sub;
-				route._subiteration() = route_sub;
+				start._sub_iteration = start_sub;
+				dur._sub_iteration = END; //dur._sub_iteration = dur_sub;
+				loc._sub_iteration = loc_sub;
+				mode._sub_iteration = mode_sub;
+				persons._sub_iteration = inv_sub;
+				route._sub_iteration = route_sub;
 			}
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
@@ -930,7 +930,7 @@ namespace Activity_Components
 				{
 					Time_Minutes start_minutes = (int)(pthis->template Start_Time<Time_Minutes>() - (exp_ttime * 2.0));
 					int start_increment = max<int>(Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), iteration());
-					pthis->template Route_Planning_Time<Revision&>().iteration() = start_increment;
+					pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
 				}
 				//---------------------------
 				// Disaggregate plan routing
@@ -938,7 +938,7 @@ namespace Activity_Components
 				{
 					Simulation_Timestep_Increment start_seconds = pthis->template Start_Time<Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
 					int start_increment = max<int>(start_seconds, iteration());
-					pthis->template Route_Planning_Time<Revision&>().iteration() = start_increment;
+					pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
 				}	
 				POP_FROM_STACK;
 			}
@@ -1041,18 +1041,18 @@ namespace Activity_Components
 			{
 				base_type* base_this = (base_type*)this;
 
-				base_this->template Start_Time_Planning_Time<  Revision&>().iteration() = max(iteration()+1, (int)planning_time);
-				base_this->template Start_Time_Planning_Time<  Revision&>()._subiteration() = 0;
-				base_this->template Duration_Planning_Time<  Revision&>().iteration() = max(iteration()+1, (int)planning_time);
-				base_this->template Duration_Planning_Time<  Revision&>()._subiteration() = 1;
-				base_this->template Location_Planning_Time<  Revision&>().iteration() = max(iteration()+1, (int)planning_time);
-				base_this->template Location_Planning_Time<  Revision&>()._subiteration() = 2;
-				base_this->template Mode_Planning_Time<  Revision&>().iteration() = max(iteration()+1, (int)planning_time);
-				base_this->template Mode_Planning_Time<  Revision&>()._subiteration() = 3;
-				base_this->template Involved_Persons_Planning_Time<  Revision&>().iteration() = max(iteration()+1, (int)planning_time);
-				base_this->template Involved_Persons_Planning_Time<  Revision&>()._subiteration() = 4;
-				base_this->template Route_Planning_Time<  Revision&>().iteration() = max(iteration()+1, (int)planning_time);
-				base_this->template Route_Planning_Time<  Revision&>()._subiteration() = 5;
+				base_this->template Start_Time_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Start_Time_Planning_Time<  Revision&>()._sub_iteration = 0;
+				base_this->template Duration_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Duration_Planning_Time<  Revision&>()._sub_iteration = 1;
+				base_this->template Location_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Location_Planning_Time<  Revision&>()._sub_iteration = 2;
+				base_this->template Mode_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Mode_Planning_Time<  Revision&>()._sub_iteration = 3;
+				base_this->template Involved_Persons_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Involved_Persons_Planning_Time<  Revision&>()._sub_iteration = 4;
+				base_this->template Route_Planning_Time<  Revision&>()._iteration = max(_iteration+1, (int)planning_time);
+				base_this->template Route_Planning_Time<  Revision&>()._sub_iteration = 5;
 			}
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{
@@ -1244,7 +1244,7 @@ namespace Activity_Components
 				{
 					Time_Minutes start_minutes = (int)(pthis->template Start_Time<Time_Minutes>() - (exp_ttime * 2.0));
 					int start_increment = max<int>(Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(start_minutes), iteration());
-					pthis->template Route_Planning_Time<Revision&>().iteration() = start_increment;
+					pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
 				}
 				//---------------------------
 				// Disaggregate plan routing
@@ -1252,7 +1252,7 @@ namespace Activity_Components
 				{
 					Simulation_Timestep_Increment start_seconds = pthis->template Start_Time<Simulation_Timestep_Increment>() - Simulation_Time.template Convert_Time_To_Simulation_Timestep<Time_Minutes>(exp_ttime * 2.0);
 					int start_increment = max<int>(start_seconds, iteration());
-					pthis->template Route_Planning_Time<Revision&>().iteration() = start_increment;
+					pthis->template Route_Planning_Time<Revision&>()._iteration = start_increment;
 				}
 
 				POP_FROM_STACK;
@@ -1466,18 +1466,18 @@ namespace Activity_Components
 			{
 				base_type* base_this = (base_type*)this;
 
-				base_this->template Start_Time_Planning_Time<  Revision&>().iteration() = END+1;
-				base_this->template Start_Time_Planning_Time<  Revision&>()._subiteration() = END+1;
-				base_this->template Duration_Planning_Time<  Revision&>().iteration() = END+1;
-				base_this->template Duration_Planning_Time<  Revision&>()._subiteration() = END+1;
-				base_this->template Location_Planning_Time<  Revision&>().iteration() = END+1;
-				base_this->template Location_Planning_Time<  Revision&>()._subiteration() = END+1;
-				base_this->template Mode_Planning_Time<  Revision&>().iteration() = END+1;
-				base_this->template Mode_Planning_Time<  Revision&>()._subiteration() = END+1;
-				base_this->template Involved_Persons_Planning_Time<  Revision&>().iteration() = END+1;
-				base_this->template Involved_Persons_Planning_Time<  Revision&>()._subiteration() = END+1;
-				base_this->template Route_Planning_Time<  Revision&>().iteration() = iteration()+1;
-				base_this->template Route_Planning_Time<  Revision&>()._subiteration() = Scenario_Components::Types::ACTIVITY_ATTRIBUTE_PLANNING_SUB_ITERATION;
+				base_this->template Start_Time_Planning_Time<  Revision&>()._iteration = END+1;
+				base_this->template Start_Time_Planning_Time<  Revision&>()._sub_iteration = END+1;
+				base_this->template Duration_Planning_Time<  Revision&>()._iteration = END+1;
+				base_this->template Duration_Planning_Time<  Revision&>()._sub_iteration = END+1;
+				base_this->template Location_Planning_Time<  Revision&>()._iteration = END+1;
+				base_this->template Location_Planning_Time<  Revision&>()._sub_iteration = END+1;
+				base_this->template Mode_Planning_Time<  Revision&>()._iteration = END+1;
+				base_this->template Mode_Planning_Time<  Revision&>()._sub_iteration = END+1;
+				base_this->template Involved_Persons_Planning_Time<  Revision&>()._iteration = END+1;
+				base_this->template Involved_Persons_Planning_Time<  Revision&>()._sub_iteration = END+1;
+				base_this->template Route_Planning_Time<  Revision&>()._iteration = _iteration+1;
+				base_this->template Route_Planning_Time<  Revision&>()._sub_iteration = Scenario_Components::Types::ACTIVITY_ATTRIBUTE_PLANNING_SUB_ITERATION;
 			}
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time, requires(TargetType,!check_2(TargetType, Simulation_Timestep_Increment, is_same)))
 			{

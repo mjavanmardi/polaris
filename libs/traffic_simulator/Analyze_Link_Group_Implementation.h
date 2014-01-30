@@ -40,6 +40,8 @@ namespace Analyze_Link_Group_Components
 				typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
 				typedef typename MasterType::link_type _link_component_type;
+				typedef typename MasterType::intersection_type _intersection_component_type;
+				
 				typename _Links_Container_Interface::iterator link_itr;
 				for(link_itr = _links_container.begin(); link_itr != _links_container.end(); link_itr++)
 				{
@@ -50,8 +52,8 @@ namespace Analyze_Link_Group_Components
 						<< link->_uuid << ","
 						<< link->_dbid << ","
 						<< link->_direction << ","
-						<< link->_upstream_intersection->_uuid << ","
-						<< link->_downstream_intersection->_uuid << ","
+						<< ((_intersection_component_type*)(link->_upstream_intersection))->_uuid << ","
+						<< ((_intersection_component_type*)(link->_downstream_intersection))->_uuid << ","
 						<< link->_link_type << ","	
 						<< link->link_moe_data.link_travel_time << ","
 						<< link->link_moe_data.link_travel_time_standard_deviation << ","

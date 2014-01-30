@@ -80,22 +80,22 @@ namespace Routing_Components
 			template<typename TargetType> void Evaluate_Condition(Event_Response& response, requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_One_To_One_Router)))
 			{
 				response.result=true;
-				response.next.iteration()=END;
-				response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION;
+				response.next._iteration=END;
+				response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION;
 			}
 			template<typename TargetType> void Evaluate_Condition(Event_Response& response, requires(TargetType,check(strip_modifiers(TargetType),Concepts::Is_One_To_All_Router)))
 			{
 				if (iteration() >= _this_ptr->template start_time<Simulation_Timestep_Increment>() && iteration() < _this_ptr->end_time<Simulation_Timestep_Increment>())
 				{
 					response.result=true;
-					response.next.iteration()=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
-					response.next._subiteration()=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
+					response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
+					response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
 				}
 				else
 				{
 					response.result=false;
-					response.next.iteration()=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
-					response.next._subiteration()=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
+					response.next._iteration=Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(_this_ptr->update_increment<Simulation_Timestep_Increment>());
+					response.next._sub_iteration=Network_Skimming_Components::Types::SUB_ITERATIONS::PATH_BUILDING;
 				}
 			}
 			template<typename TargetType> void Evaluate_Condition(Event_Response& response, requires(TargetType,check(strip_modifiers(TargetType),!Concepts::Is_One_To_All_Router) && check(strip_modifiers(TargetType),!Concepts::Is_One_To_One_Router)))
@@ -168,7 +168,7 @@ namespace Routing_Components
 				_Routable_Link_Interface* current_link=origin_link_ptr;
 
 
-				boost::container::vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< vector<_Routable_Link_Interface*>& >();
+				boost::container::vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< boost::container::vector<_Routable_Link_Interface*>& >();
 				if(current_link->template reset_list_status<bool>()==0)
 				{
 					reset_links_container.push_back(current_link);
@@ -344,7 +344,7 @@ namespace Routing_Components
 				new_cost = next_cost;
 				_Routable_Link_Interface* current_link=origin_link_ptr;
 
-				boost::container::vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< vector<_Routable_Link_Interface*>& >();
+				boost::container::vector<_Routable_Link_Interface*>& reset_links_container=routable_net->template reset_links< boost::container::vector<_Routable_Link_Interface*>& >();
 				if(current_link->template reset_list_status<bool>()==0)
 				{
 					reset_links_container.push_back(current_link);
@@ -421,6 +421,8 @@ namespace Routing_Components
 				{
 					//TODO
 //load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+					
+					this_component()->Load_Event<ComponentType>(&ComponentType::Compute_Route_Condition,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
 				}
 			}
 
@@ -433,6 +435,8 @@ namespace Routing_Components
 				{
 					//TODO
 //load_event(ComponentType,ComponentType::template Compute_Route_Condition,Compute_Route,planning_time,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION,NULLTYPE);
+					
+					this_component()->Load_Event<ComponentType>(&ComponentType::Compute_Route_Condition,time_to_depart,Scenario_Components::Types::Type_Sub_Iteration_keys::ROUTING_SUB_ITERATION);
 				}
 			}
 #ifndef EXCLUDE_DEMAND
@@ -468,11 +472,11 @@ namespace Routing_Components
 			}
 #endif
 			//first event
-			declare_event(Compute_Route)
+			template<typename TargetType> void Compute_Route()
 			{
 				typedef Routing_Components::Prototypes::Routing<ComponentType> _Routing_Interface;
 				typedef Link_Components::Prototypes::Link<typename ComponentType::routable_link_type> _Routable_Link_Interface;
-				_Routing_Interface* _this_ptr=(_Routing_Interface*)_this;
+				_Routing_Interface* _this_ptr=(_Routing_Interface*)this;
 				typedef Network_Components::Prototypes::Network<typename ComponentType::routable_network_type> _Routable_Network_Interface;
 				typedef  Network_Components::Prototypes::Network< typename get_type_of(network)> _Regular_Network_Interface;
 				typedef  Scenario_Components::Prototypes::Scenario< typename _Regular_Network_Interface::get_type_of(scenario_reference)> _Scenario_Interface;

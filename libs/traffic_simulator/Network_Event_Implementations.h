@@ -74,8 +74,7 @@ namespace Network_Event_Components
 
 				if(start < _end_time)
 				{
-//TODO
-//					((ComponentType*)this)->template Load_Event<ComponentType>(&ComponentType::template Incident_Conditional<NT,NT>,&ComponentType::template Incident_Event<NT,NT>, start, 0);
+					Load_Event<ComponentType>(&ComponentType::Incident_Conditional,start, 0);
 				}
 				else
 				{
@@ -198,27 +197,27 @@ namespace Network_Event_Components
 				cout << endl << "Total Locations: " << all_locations->size() << ", Affected Locations: " << this->_affected_locations.size() << ", Unaffected Locations: " << this->_unaffected_locations.size();
 			}
 			
-			template<typename TargetType> void Incident_Conditional()
+			static void Incident_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				ComponentType* pthis = (ComponentType*)_this;
 				
 				if( iteration() >= pthis->_end_time )
 				{
-					response.next.iteration() = END;
-					response.next._subiteration() = 0;
+					response.next._iteration = END;
+					response.next._sub_iteration = 0;
 				}
 				else if(iteration() < pthis->_start_time)
 				{
-					response.next.iteration() = pthis->_start_time;
-					response.next._subiteration() = 0;
+					response.next._iteration = pthis->_start_time;
+					response.next._sub_iteration = 0;
 				}
 				else
 				{
-					response.next.iteration() = iteration() + 1;
-					response.next._subiteration() = 0;
+					response.next._iteration = iteration() + 1;
+					response.next._sub_iteration = 0;
 				}
-
-				response.result = true;
+				
+				_this->Incident_Event();
 			}
 
 			template<typename TargetType> void Notify_Subscribers()
@@ -231,24 +230,22 @@ namespace Network_Event_Components
 
 					for(typename boost::container::vector<Link_Interface*>::iterator itr=_affected_links.begin();itr!=_affected_links.end();itr++)
 					{
-						(*callback)( (void*)(*itr), (Network_Event<NT>*)this );
+						(*callback)( (void*)(*itr), (Network_Event<ComponentType>*)this );
 					}
 				}
 			}
 
-			declare_event(Incident_Event)
+			void Incident_Event()
 			{
-				ComponentType* pthis = (ComponentType*)_this;
-
-				if(iteration() == pthis->_start_time)
+				if(iteration() == _start_time)
 				{
-					pthis->_active = true;
-					pthis->Notify_Subscribers<NT>();
+					_active = true;
+					Notify_Subscribers<NT>();
 				}
-				else if(iteration() == pthis->_end_time)
+				else if(iteration() == _end_time)
 				{
-					pthis->_active = false;
-					pthis->Notify_Subscribers<NT>();
+					_active = false;
+					Notify_Subscribers<NT>();
 				}
 			}
 
@@ -597,7 +594,7 @@ namespace Network_Event_Components
 
 			template<typename TargetType> void Get_Network_Events(int link_id,boost::container::vector< Network_Event<TargetType>* >& container/*,requires(TargetType,check_2(TargetType,typename type_of(MasterType::weather_network_event),is_same) || check_2(typename type_of(MasterType::traffic_management_center),is_same))*/)
 			{
-				boost::container::list<Network_Event<TargetType,NT>*>* events_of_type = (list<Network_Event<TargetType,NT>*>*) & (_network_event_container[TargetType::component_id]);
+				boost::container::list<Network_Event<TargetType,NT>*>* events_of_type = (boost::container::list<Network_Event<TargetType,NT>*>*) & (_network_event_container[TargetType::component_id]);
 
 				for(typename boost::container::list< Network_Event<TargetType,NT>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{
@@ -621,7 +618,7 @@ namespace Network_Event_Components
 
 			template<typename TargetType> void Get_Network_Events( boost::container::vector< Network_Event<TargetType>* >& container, requires(TargetType,!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
-				boost::container::list<Network_Event<TargetType>*>* events_of_type = (list<Network_Event<TargetType>*>*) & (_network_event_container[TargetType::component_id]);
+				boost::container::list<Network_Event<TargetType>*>* events_of_type = (boost::container::list<Network_Event<TargetType>*>*) & (_network_event_container[TargetType::component_id]);
 
 				for(typename boost::container::list< Network_Event<TargetType>* >::iterator itr=events_of_type->begin();itr!=events_of_type->end();itr++)
 				{

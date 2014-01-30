@@ -68,11 +68,11 @@ namespace polaris
 
 		bool empty(){return ((ComponentType*)this)->empty();}
 
-		T& front(){return (T)(((ComponentType*)this)->front());}
+		T& front(){return (T&)(((ComponentType*)this)->front());}
 
 		iterator insert(iterator p, T& t){return ((ComponentType*)this)->insert(p,(typename ComponentType::value_type&)t);}
 
-		void insert(iterator p, size_type n, T t){return ((ComponentType*)this)->insert(p,n);}
+		void insert(iterator p, size_type n, T& t){return ((ComponentType*)this)->insert(p,n);}
 
 		void insert(iterator p, iterator i, iterator j){return ((ComponentType*)this)->insert(p,i,j);}
 
@@ -84,7 +84,7 @@ namespace polaris
 
 		void resize(size_type n){return ((ComponentType*)this)->resize(n);}
 	
-		void resize(size_type n, T t){return ((ComponentType*)this)->resize(n,t);}
+		void resize(size_type n, T& t){return ((ComponentType*)this)->resize(n,t);}
 
 		void pop_front(){((ComponentType*)this)->pop_front();}
 	};
@@ -119,11 +119,11 @@ namespace polaris
 
 		bool empty(){return ((ComponentType*)this)->empty();}
 
-		T& front(){return (T)(((ComponentType*)this)->front());}
+		T& front(){return (T&)(((ComponentType*)this)->front());}
 
 		iterator insert(iterator p, T t){return ((ComponentType*)this)->insert(p,t);}
 
-		void insert(iterator p, size_type n, T t){return ((ComponentType*)this)->insert(p,n);}
+		void insert(iterator p, size_type n, T& t){return ((ComponentType*)this)->insert(p,n);}
 
 		void insert(iterator p, iterator i, iterator j){return ((ComponentType*)this)->insert(p,i,j);}
 
@@ -135,7 +135,7 @@ namespace polaris
 
 		void resize(size_type n){return ((ComponentType*)this)->resize(n);}
 	
-		void resize(size_type n, T t){return ((ComponentType*)this)->resize(n,t);}
+		void resize(size_type n, T& t){return ((ComponentType*)this)->resize(n,t);}
 
 		void pop_front(){((ComponentType*)this)->pop_front();}
 	};
@@ -165,12 +165,12 @@ namespace polaris
 
 		bool empty(){return ((ComponentType*)this)->empty();}
 
-		T& front(){return (T)(((ComponentType*)this)->front());}
+		T& front(){return (T&)(((ComponentType*)this)->front());}
 
 		//iterator insert(iterator p, T t){return ((ComponentType*)this)->insert(p,t);}
 		iterator insert(iterator p, T& t){return ((ComponentType*)this)->insert(p,(typename ComponentType::value_type&)t);}
 
-		void insert(iterator p, size_type n, T t){return ((ComponentType*)this)->insert(p,n);}
+		void insert(iterator p, size_type n, T& t){return ((ComponentType*)this)->insert(p,n);}
 
 		void insert(iterator p, iterator i, iterator j){return ((ComponentType*)this)->insert(p,i,j);}
 
@@ -182,9 +182,9 @@ namespace polaris
 
 		void resize(size_type n){return ((ComponentType*)this)->resize(n);}
 	
-		void resize(size_type n, T t){return ((ComponentType*)this)->resize(n,t);}
+		void resize(size_type n, T& t){return ((ComponentType*)this)->resize(n,t);}
 
-		T back(){return (T)(((ComponentType*)this)->back());}
+		T& back(){return (T&)(((ComponentType*)this)->back());}
 	
 		void push_back(T& t){return ((ComponentType*)this)->push_back((typename ComponentType::value_type&)t);}
 	
@@ -290,11 +290,11 @@ namespace polaris
 
 		bool empty(){return ((ComponentType*)this)->empty();}
 
-		T front(){return (T)(((ComponentType*)this)->front());}
+		T& front(){return (T&)(((ComponentType*)this)->front());}
 
-		iterator insert(iterator p, T t){return ((ComponentType*)this)->insert(p,t);}
+		iterator insert(iterator p, T& t){return ((ComponentType*)this)->insert(p,t);}
 	
-		void insert(iterator p, size_type n, T t){return ((ComponentType*)this)->insert(p,n,t);}
+		void insert(iterator p, size_type n, T& t){return ((ComponentType*)this)->insert(p,n,t);}
 
 		void insert(iterator p, iterator i, iterator j){return ((ComponentType*)this)->insert(p,i,j);}
 
@@ -306,9 +306,9 @@ namespace polaris
 
 		void resize(size_type n){return ((ComponentType*)this)->resize(n);}
 	
-		void resize(size_type n, T t){return ((ComponentType*)this)->resize(n,t);}
+		void resize(size_type n, T& t){return ((ComponentType*)this)->resize(n,t);}
 
-		T back(){return (T)(((ComponentType*)this)->back());}
+		T& back(){return (T&)(((ComponentType*)this)->back());}
 	
 		void push_back(T& t){return ((ComponentType*)this)->push_back((typename ComponentType::value_type&)t);}
 

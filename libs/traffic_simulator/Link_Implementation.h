@@ -773,40 +773,46 @@ namespace Link_Components
 
 			template<typename TargetType> void Initialize()
 			{
+				Load_Event<ComponentType>(&ComponentType::Newells_Conditional,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION);
+			
 				//TODO
 //load_event(ComponentType,ComponentType::template Newells_Conditional,ComponentType::template Update_Events,((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1,Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION,NULLTYPE);
 			}
 
-			template<typename TargetType> void Newells_Conditional()
+			static void Newells_Conditional(ComponentType* _this,Event_Response& response)
 			{
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
-				if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION)
+				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Update_Events<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration();
-					response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION;
+					//((typename MasterType::link_type*)_this)->Swap_Event((Event)&Update_Events<NULLTYPE>);
+					//response.result=true;
+					_this->Update_Events();
+					response.next._iteration=iteration();
+					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION;
 				}
-				else if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
+				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Supply_Update<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration();
-					response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_ORIGIN_LINK_LOADING_SUB_ITERATION;
+					//((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Supply_Update<NULLTYPE>);
+					//response.result=true;
+					_this->Compute_Step_Flow_Supply_Update();
+					response.next._iteration=iteration();
+					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_ORIGIN_LINK_LOADING_SUB_ITERATION;
 				}
-				else if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_ORIGIN_LINK_LOADING_SUB_ITERATION)
+				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_ORIGIN_LINK_LOADING_SUB_ITERATION)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Origin_Link_Loading<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration();
-					response.next._subiteration() = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION;
+					//((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Origin_Link_Loading<NULLTYPE>);
+					//response.result=true;
+					_this->Compute_Step_Origin_Link_Loading();
+					response.next._iteration=iteration();
+					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION;
 				}
-				else if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION)
+				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Link_Moving<NULLTYPE>);
-					response.result=true;
-					response.next.iteration()=iteration()+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION;
+					//((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Link_Moving<NULLTYPE>);
+					//response.result=true;
+					_this->Compute_Step_Flow_Link_Moving();
+					response.next._iteration=iteration()+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION;
 				}
 				else
 				{
@@ -815,9 +821,10 @@ namespace Link_Components
 				}
 			}
 
-			declare_event(Update_Events)
+			//declare_event(Update_Events)
+			void Update_Events()
 			{
-				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
+				_Link_Interface* _this_ptr=(_Link_Interface*)this;
 				_this_ptr->template handle_events<NT>();
 			}
 
@@ -888,7 +895,7 @@ namespace Link_Components
 				if (_weather_event_to_process)
 				{
 					_weather_event_to_process = false;
-					if (_current_weather_event->_active)
+					if (((typename MasterType::weather_network_event_type*)_current_weather_event)->_active)
 					{
 						process_weather_event<typename MasterType::weather_network_event_type*>();
 					}
@@ -902,7 +909,7 @@ namespace Link_Components
 				if (_accident_event_to_process)
 				{
 					_accident_event_to_process = false;
-					if (_current_accident_event->_active)
+					if (((typename MasterType::accident_network_event_type*)_current_accident_event)->_active)
 					{
 						process_accident_event<typename MasterType::accident_network_event_type*>();
 					}
@@ -914,23 +921,26 @@ namespace Link_Components
 				}
 			}
 
-			declare_event(Compute_Step_Flow_Supply_Update)
+			//declare_event(Compute_Step_Flow_Supply_Update)
+			void Compute_Step_Flow_Supply_Update()
 			{
-				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
+				_Link_Interface* _this_ptr=(_Link_Interface*)this;
 				//step 1: link supply update based on a given traffic flow model
 				_this_ptr->template link_supply_update<NULLTYPE>();
 			}
 
-			declare_event(Compute_Step_Origin_Link_Loading)
+			//declare_event(Compute_Step_Origin_Link_Loading)
+			void Compute_Step_Origin_Link_Loading()
 			{
-				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
+				_Link_Interface* _this_ptr=(_Link_Interface*)this;
 				//step 6: origin link loading
 				_this_ptr->template origin_link_loading<RNG_Components::RngStream&>();
 			}
 
-			declare_event(Compute_Step_Flow_Link_Moving)
+			//declare_event(Compute_Step_Flow_Link_Moving)
+			void Compute_Step_Flow_Link_Moving()
 			{
-				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
+				_Link_Interface* _this_ptr=(_Link_Interface*)this;
 				//step 7: link moving -- no link moving in Newell's simplified model -- it can be used to determine turn bay curve
 				_this_ptr->template link_moving<NULLTYPE>();
 				//step 8: link network state update

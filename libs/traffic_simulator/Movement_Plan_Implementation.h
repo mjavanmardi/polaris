@@ -26,7 +26,7 @@ namespace Movement_Plan_Components
 
 			template<typename TargetType> void Initialize(TargetType link_val)
 			{
-				_link = (type_of(link)*)link_val;
+				_link = (Null_Prototype<typename MasterType::link_type>*)(type_of(link)*)link_val;
 				_enter_time = 0.0;
 				_delayed_time=0.0;
 			}
@@ -84,7 +84,7 @@ namespace Movement_Plan_Components
 			m_data(float, route_length, NONE, NONE);
 			m_data(int, entry_time, NONE, NONE);
 
-			template<typename ComponentType,  typename TargetType>
+			template<typename TargetType>
 			TargetType absolute_departure_time()
 			{
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;

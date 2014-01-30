@@ -48,14 +48,14 @@ namespace Traveler_Components
 //load_event(ComponentType,Departure_Conditional,Set_Departure,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION,NULLTYPE);
 			}
 
-			template<typename TargetType> void Departure_Conditional()
+			static void Departure_Conditional(ComponentType* _this,Event_Response& response)
 			{
-				if(_subiteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION)
+				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION)
 				{
 					((ComponentType*)_this)->Swap_Event((Event)&Traveler::Set_Departure<NULLTYPE>);
 					response.result=true;
-					response.next.iteration()=END;
-					response.next._subiteration()=Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION;
+					response.next._iteration=END;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION;
 				}
 			}
 

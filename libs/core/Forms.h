@@ -36,7 +36,7 @@ namespace polaris
 		typedef typename ComponentType::Master_Type Master_Type;\
 		typedef true_type Is_Prototype;\
 		const int Identify() const {return this_component()->Identify();}\
-		template<typename TargetType> bool Is_Type() const {return this_component()->Identify() == TargetType::component_index;}\
+		template<typename TargetType> bool Is_Type() const {return this_component()->Identify() == TargetType::component_id;}\
 		const int uuid(){return this_component()->uuid();}
 
 	prototype struct Null_Prototype{typedef ComponentType Component_Type;};
