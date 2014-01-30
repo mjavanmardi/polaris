@@ -32,7 +32,7 @@ namespace PopSyn
 
 			//----------------------------------------------------------------
 			// Schedules the first event from above
-			template<typename TargetType> void Initialize(typename TargetType::ParamType network, typename TargetType::Param2Type scenario, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType, Network_Components::Concepts::Is_Transportation_Network) && check(typename TargetType::Param2Type, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data)))
+			template<typename NetworkType> void Initialize(typename TargetType::ParamType network, typename TargetType::Param2Type scenario, requires(NetworkType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType, Network_Components::Concepts::Is_Transportation_Network) && check(typename TargetType::Param2Type, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data)))
 			{
 				// Allocate IPF Solver and get Settings from scenario reference
 				typedef PopSyn::Prototypes::Solver_Settings<typename get_type_of(Solution_Settings)> solver_itf;
@@ -174,9 +174,9 @@ namespace PopSyn
 
 				// Define iterators and get pointer to the region collection
 				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
-				typedef typename region_collection_type::value_type			region_type;
+				typedef typename region_collection_type::value_type						region_type;
 				typedef typename region_type::Sample_Data_type							sample_collection_type;
-				typedef typename sample_collection_type::value_type			sample_type;
+				typedef typename sample_collection_type::value_type						sample_type;
 				typedef typename region_type::Temporary_Sample_Data_type				temporary_sample_collection_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
 				typedef typename zone_collection_type::value_type			zone_type;
@@ -186,8 +186,8 @@ namespace PopSyn
 				typedef PopSyn::Prototypes::Synthesis_Region<typename remove_pointer<typename region_collection_type::value_type>::type> region_itf;
 				typedef Pair_Associative_Container<region_collection_type,region_itf*> regions_itf;
 
-				typedef PopSyn::Prototypes::Synthesis_Zone<typename remove_pointer<typename zone_collection_type::value_type>::type> zone_itf;
-				typedef Pair_Associative_Container<zone_collection_type,zone_itf*> zones_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone<typename remove_pointer<typename zone_collection_type::data_type>::type> zone_itf;
+				typedef Pair_Associative_Container<zone_collection_type,typename region_itf::Component_Type::id_type,zone_itf*> zones_itf;
 
 				typedef Household_Components::Prototypes::Household_Properties<typename remove_pointer<typename sample_collection_type::value_type>::type> pop_unit_itf;
 				typedef Pair_Associative_Container<sample_collection_type,pop_unit_itf*> sample_data_itf;

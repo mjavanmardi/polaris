@@ -85,6 +85,10 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj"
 include_directories(libs)
 include_directories(libs/io)
 include_directories(libs/core)
+include_directories(libs/repository) 
+include_directories(libs/traffic_simulator)
+include_directories(libs/scenario_manager)
+include_directories(libs/population_synthesis)
 include_directories(apps)
 include_directories(tests)
 
