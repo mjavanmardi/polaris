@@ -20,7 +20,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/bin)
 
 #Compiler flags for release mode applied to all projects
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj")
-
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 
 
 
@@ -50,7 +50,9 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj"
 	
 	if (MSVC)
 		include_directories(${DEPS_DIR}/gperftools-2.1/src)
-		find_library(libtcmalloc NAMES libtcmalloc_minimal  HINTS ${DEPS_DIR}/gperftools-2.1/Release)
+		find_library(libtcmalloc-r NAMES libtcmalloc_minimal  HINTS ${DEPS_DIR}/gperftools-2.1/Release)
+		find_library(libtcmalloc-d NAMES libtcmalloc_minimal-debug  HINTS ${DEPS_DIR}/gperftools-2.1/Debug)
+		set(libtcmalloc optimized ${libtcmalloc-r} debug ${libtcmalloc-d})
 	endif()
 	
 	#Google Testing Framework include and library dependencies
@@ -69,9 +71,13 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 /MD /W2 /Oi /bigobj"
 
 	#ODB library dependencies
 	set(odb ${DEPS_DIR}/libodb-2.2.2/lib64/odb.lib)
+	set(odb-d ${DEPS_DIR}/libodb-2.2.2/lib64/odb-d.lib)
 	set(odb_sqlite ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/lib64/odb-sqlite.lib)
+	set(odb_sqlite-d ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/lib64/odb-sqlite-d.lib)
 	set(sqlite3 ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite/lib64/sqlite3.lib)
-	set(iolibs Io ${odb} ${sqlite3} ${odb_sqlite})
+	set(sqlite3-d ${DEPS_DIR}/libodb-2.2.2/libodb-sqlite-2.2.0/etc/sqlite/lib64/sqlite3-d.lib)
+	# set(iolibs Io ${odb} ${sqlite3} ${odb_sqlite})
+	set(iolibs Io optimized ${odb}  optimized ${sqlite3} optimized ${odb_sqlite} debug ${odb-d} debug ${sqlite3-d} debug ${odb_sqlite-d})
 #}
 
 

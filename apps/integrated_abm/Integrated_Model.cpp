@@ -9,6 +9,7 @@
 #endif
 
 #include "Polaris_PCH.h"
+#include "Repository.h"
 
 
 // SET THE DEBUG VERSION TO SIMULATE ONLY ONE AGENT
@@ -491,3 +492,26 @@ int main(int argc,char** argv)
 }
 #endif
 
+
+
+int main(int argc, char* argv[])
+{
+	Simulation_Configuration cfg;
+	cfg.Single_Threaded_Setup(1000);
+	INITIALIZE_SIMULATION(cfg);
+
+
+	Feet f = 1.0;
+	Meters m;
+
+	polaris::Basic_Units::Prototypes::Length<polaris::Basic_Units::Implementations::Length_Implementation<NT>> p_length;
+
+	p_length.Value<Feet>(f);
+	m = p_length.Value<Meters>();
+
+	cout << f <<" feet = " << m << " meters.";
+	
+	char ans;
+	cin >> ans;
+
+}
