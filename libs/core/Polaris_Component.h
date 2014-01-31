@@ -42,7 +42,9 @@ namespace polaris
 	template<typename Component_Manager_Type>
 	static Component_Manager_Type* Add_Component_Manager(Component_Manager_Type* val, int component_id)
 	{
-		__all_components[component_id] = (Component_Manager_Base*)val;
+		if(__all_components==nullptr) __all_components=new boost::unordered::unordered_map<unsigned int, Component_Manager_Base*>();
+
+		(*__all_components)[component_id] = (Component_Manager_Base*)val;
 		return val;
 	}
 
@@ -78,7 +80,8 @@ namespace polaris
 	
 	template<typename MasterType,typename InheritanceList,typename ObjectType>
 	typename Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type* const Polaris_Component<MasterType,InheritanceList,ObjectType>::component_manager 
-		= Add_Component_Manager( new Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type(), Polaris_Component<MasterType,InheritanceList,ObjectType>::component_id );
+		= Add_Component_Manager( new Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type(), typeid(Polaris_Component<MasterType,InheritanceList,ObjectType>).hash_code() );
+	//	= Add_Component_Manager( new Polaris_Component<MasterType,InheritanceList,ObjectType>::Component_Manager_Type(), Polaris_Component<MasterType,InheritanceList,ObjectType>::component_id );
 
 	template<typename MasterType,typename InheritanceList>
 	class Polaris_Component<MasterType,InheritanceList,NT>
