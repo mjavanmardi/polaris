@@ -258,17 +258,16 @@ namespace Basic_Units
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Length data structure.");
 			}
 
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Length_Value) && check(typename TargetType::ReturnType,Concepts::Is_Length_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType, check(InputType,Concepts::Is_Length_Value) && check(ReturnType,Concepts::Is_Length_Value)))
 			{
-				Value_Type convert_component_value_to_param = Conversion_Factor<typename TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = Conversion_Factor<typename TargetType::ReturnType>();
-				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = Conversion_Factor<typename InputType>();
+				Value_Type convert_component_value_to_return = Conversion_Factor<typename ReturnType>();
+				return typename ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Length_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Length_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType, check(InputType,!Concepts::Is_Length_Value) || check(ReturnType,!Concepts::Is_Length_Value)))
 			{
-				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
-				assert_check(typename TargetType::ReturnType,Concepts::Is_Length_Value, "TargetTyp::ReturnType is not a valid length value structure.");
-				assert_check(typename TargetType::ParamType,Concepts::Is_Length_Value, "TargetType::ParamType is not a valid length value structure.");
+				assert_check(typename ReturnType,Concepts::Is_Length_Value, "ReturnType is not a valid length value structure.");
+				assert_check(typename InputType,Concepts::Is_Length_Value, "InputTypee is not a valid length value structure.");
 			}
 
 			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, Is_Centimeters) && sub_check(ComponentType,Concepts::Is_Length_Value, Is_Centimeters)))
@@ -478,18 +477,17 @@ namespace Basic_Units
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Area_Value,"Your target type is not identified as an area measure.");
 			}
 
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Area_Value) && check(typename TargetType::ReturnType,Concepts::Is_Area_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType, check(InputType,Concepts::Is_Area_Value) && check(ReturnType,Concepts::Is_Area_Value)))
 			{
-				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
+				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<InputType>();
+				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<ReturnType>();
 				Value_Type conversion = convert_component_value_to_return / convert_component_value_to_param;
-				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * pow(conversion,2.0));
+				return ReturnType((Value_Type)(input_value.Value) * pow(conversion,2.0));
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Area_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Area_Value)))
+			template<typename InputType, typename ReturnType>  static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Area_Value) || check(ReturnType,!Concepts::Is_Area_Value)))
 			{
-				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
-				assert_check(typename TargetType::ReturnType,Concepts::Is_Area_Value, "TargetType::ReturnType is not a valid area value structure.");
-				assert_check(typename TargetType::ParamType,Concepts::Is_Area_Value, "TargetType::ParamType is not a valid area value structure.");
+				assert_check(ReturnType,Concepts::Is_Area_Value, "ReturnType is not a valid area value structure.");
+				assert_check(InputType,Concepts::Is_Area_Value, "InputType is not a valid area value structure.");
 			}
 		};
 
@@ -515,18 +513,17 @@ namespace Basic_Units
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Volume_Value,"Your target type is not identified as a volume measure.");
 			}
 
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Volume_Value) && check(typename TargetType::ReturnType,Concepts::Is_Volume_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Volume_Value) && check(ReturnType,Concepts::Is_Volume_Value)))
 			{
-				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
+				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<InputType>();
+				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<ReturnType>();
 				Value_Type conversion = convert_component_value_to_return / convert_component_value_to_param;
-				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * pow(conversion,3.0));
+				return typename ReturnType((Value_Type)(input_value.Value) * pow(conversion,3.0));
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Volume_Value) || check(typename TargetType::ParamType,!Concepts::Is_Volume_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Volume_Value) || check(ReturnType,!Concepts::Is_Volume_Value)))
 			{
-				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
-				assert_check(typename TargetType::ReturnType,Concepts::Is_Volume_Value, "TargetType::ReturnType is not a valid volume value structure.");
-				assert_check(typename TargetType::ParamType,Concepts::Is_Volume_Value, "TargetType::ParamType is not a valid volume value structure.");
+				assert_check(ReturnType,Concepts::Is_Volume_Value, "ReturnType is not a valid volume value structure.");
+				assert_check(InputType,Concepts::Is_Volume_Value, "InputType is not a valid volume value structure.");
 			}
 		};
 
@@ -554,17 +551,16 @@ namespace Basic_Units
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
 			{
-				Value_Type convert_component_value_to_param = Time::Conversion_Factor<typename TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = Time::Conversion_Factor<typename TargetType::ReturnType>();
-				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = Time::Conversion_Factor<InputType>();
+				Value_Type convert_component_value_to_return = Time::Conversion_Factor<ReturnType>();
+				return ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
 			{
-				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
-				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
-				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
+				assert_check(InputType,Concepts::Is_Time_Value,"InputType is not a valid Time type.");
+				assert_check(ReturnType,Concepts::Is_Time_Value,"ReturnType is not a valid Time type.");
 			}
 
 			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Time_Value, Is_Days) && sub_check(ComponentType,Concepts::Is_Time_Value, Is_Days)))
@@ -711,17 +707,16 @@ namespace Basic_Units
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Length_Value, "The specified TargetType is not a valid Time data structure.");
 			}
 			
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
 			{
-				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<typename TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<typename TargetType::ReturnType>();
-				return typename TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = base_type::template Conversion_Factor<InputType>();
+				Value_Type convert_component_value_to_return = base_type::template Conversion_Factor<ReturnType>();
+				return ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
 			{
-				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
-				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
-				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
+				assert_check(InputType,Concepts::Is_Time_Value,"InputType is not a valid Time type.");
+				assert_check(ReturnType,Concepts::Is_Time_Value,"ReturnType is not a valid Time type.");
 			}
 		};
 
@@ -765,17 +760,16 @@ namespace Basic_Units
 
 			}
 			
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Time_Value) && check(typename TargetType::ReturnType,Concepts::Is_Time_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,Concepts::Is_Time_Value) && check(ReturnType,Concepts::Is_Time_Value)))
 			{
-				Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<typename TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<typename TargetType::ReturnType>();
-				return typename TargetType::ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = time_base::template Conversion_Factor<InputType>();
+				Value_Type convert_component_value_to_return = time_base::template Conversion_Factor<ReturnType>();
+				return ReturnType((Value_Type)(input_value.Value) / convert_component_value_to_return * convert_component_value_to_param);
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Time_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Time_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Time_Value) || check(ReturnType,!Concepts::Is_Time_Value)))
 			{
-				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct,"TargetType is not a valid target type struct.");
-				assert_check(typename TargetType::ParamType,Concepts::Is_Time_Value,"TargetType::ParamType is not a valid Time type.");
-				assert_check(typename TargetType::ReturnType,Concepts::Is_Time_Value,"TargetType::ReturnType is not a valid Time type.");
+				assert_check(InputType,Concepts::Is_Time_Value,"InputType is not a valid Time type.");
+				assert_check(ReturnType,Concepts::Is_Time_Value,"ReturnType is not a valid Time type.");
 			}
 		};
 		
@@ -803,17 +797,16 @@ namespace Basic_Units
 				assert_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, "The specified TargetType is not a valid Currency data structure.");
 			}
 
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check(typename TargetType::ParamType,Concepts::Is_Currency_Value) && check(typename TargetType::ReturnType,Concepts::Is_Currency_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType, Concepts::Is_Currency_Value) && check(ReturnType,Concepts::Is_Currency_Value)))
 			{
-				Value_Type convert_component_value_to_param = Conversion_Factor<typename TargetType::ParamType>();
-				Value_Type convert_component_value_to_return = Conversion_Factor<typename TargetType::ReturnType>();
-				return typename TargetType::ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
+				Value_Type convert_component_value_to_param = Conversion_Factor<InputType>();
+				Value_Type convert_component_value_to_return = Conversion_Factor<ReturnType>();
+				return ReturnType((Value_Type)(input_value.Value) * convert_component_value_to_return / convert_component_value_to_param);
 			}
-			template<typename TargetType> static typename TargetType::ReturnType Convert_Value(typename TargetType::ParamType input_value, requires(TargetType,check(strip_modifiers(TargetType),!Is_Target_Type_Struct) || check(typename TargetType::ParamType,!Concepts::Is_Currency_Value) || check(typename TargetType::ReturnType,!Concepts::Is_Currency_Value)))
+			template<typename InputType, typename ReturnType> static ReturnType Convert_Value(InputType input_value, requires(InputType,check(InputType,!Concepts::Is_Currency_Value) || check(ReturnType,!Concepts::Is_Currency_Value)))
 			{
-				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "TargetType is not a valid Target_Type_Struct structure.");
-				assert_check(typename TargetType::ReturnType,Concepts::Is_Length_Value, "TargetTyp::ReturnType is not a valid length value structure.");
-				assert_check(typename TargetType::ParamType,Concepts::Is_Length_Value, "TargetType::ParamType is not a valid length value structure.");
+				assert_check(ReturnType,Concepts::Is_Length_Value, "ReturnType is not a valid length value structure.");
+				assert_check(InputType,Concepts::Is_Length_Value, "InputType is not a valid length value structure.");
 			}
 
 			template<typename TargetType> static Value_Type Conversion_Factor(requires(TargetType,sub_check(strip_modifiers(TargetType),Concepts::Is_Currency_Value, Is_Cents) && sub_check(ComponentType,Concepts::Is_Currency_Value, Is_Cents)))

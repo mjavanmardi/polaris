@@ -14,7 +14,7 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic Length base clase.
-		implementation struct Length_Implementation : public Polaris_Component<MasterType,INHERIT(Length_Implementation),NULLTYPE>
+		implementation struct Length_Implementation : public Polaris_Component<MasterType,INHERIT(Length_Implementation)>
 		{
 			typedef true_type Length_tag;
 			typedef true_type Inches_tag;
@@ -33,7 +33,7 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic Time base clase and Time Horizon Classes.
-		implementation struct Time_Implementation : public Polaris_Component<MasterType,INHERIT(Time_Implementation),NULLTYPE>
+		implementation struct Time_Implementation : public Polaris_Component<MasterType,INHERIT(Time_Implementation)>
 		{
 			Time_Implementation()
 			{
@@ -65,7 +65,7 @@ namespace Basic_Units
 
 		//================================================================================================
 		/// Basic Currency base clase.
-		implementation struct Currency_Implementation : public Polaris_Component<MasterType,INHERIT(Currency_Implementation),NULLTYPE>
+		implementation struct Currency_Implementation : public Polaris_Component<MasterType,INHERIT(Currency_Implementation)>
 		{
 			typedef true_type Currency_tag;
 			typedef true_type Cents_tag; 
@@ -88,23 +88,18 @@ struct _Simulation_Timer
 {
 	template<typename TargetType> TargetType Current_Time()
 	{
-//TODO
-//		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Base_Time_Type>>((typename Base_Time_Type::ValueType)iteration());
+		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<TargetType,Base_Time_Type>((typename Base_Time_Type::ValueType)iteration());
 	}
 	template<typename InputType, typename TargetType> TargetType Future_Time(InputType Additional_Time_Increment)
 	{
 		Simulation_Timestep_Increment current_time;
 		current_time = (Simulation_Timestep_Increment)iteration();
-//TODO
-//		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,Simulation_Timestep_Increment,InputType>>(Additional_Time_Increment);
-//TODO
-//		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NULLTYPE,TargetType,Simulation_Timestep_Increment>>(current_time + additional_time);
+		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Simulation_Timestep_Increment,InputType>(Additional_Time_Increment);
+		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<TargetType,Simulation_Timestep_Increment>(current_time + additional_time);
 	}
 	template<typename InputType> Simulation_Timestep_Increment Convert_Time_To_Simulation_Timestep(InputType Time)
 	{
-//TODO
-//		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<NT,Simulation_Timestep_Increment,InputType>>(Time);
-
+		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Simulation_Timestep_Increment,InputType>(Time);
 	}
 };
 

@@ -492,8 +492,47 @@ int main(int argc,char** argv)
 }
 #endif
 
+prototype struct Test_Agent
+{
+	template<typename T> void Initialize()
+	{
+		this_component()->Initialize<T>();
+	}
+};
+implementation struct Test_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Test_Agent_Implementation),Execution_Object>
+{
+	typedef typename Polaris_Component<MasterType,INHERIT(Test_Agent_Implementation),Execution_Object>::Component_Type ComponentType;
+	typedef Test_Agent<ComponentType> agent_itf;
 
+	template<typename T> void Initialize()
+	{
+		Load_Event<ComponentType>(&ComponentType::Agent_Event,1,0);
+			
+	}
+	static void Agent_Event(ComponentType* _this,Event_Response& response)
+	{
+		agent_itf* _this_ptr=(agent_itf*)_this;
+		
+		if (iteration() % 100 == 0)
+		{
+			cout <<"The time is: " << GLOBALS::Simulation_Time.Current_Time<Time_Minutes>()<<" minutes.";
+			response.next._iteration=iteration()+1;
+			response.next._sub_iteration = 0;
+		}
+		
+		else
+		{
+			response.next._iteration=iteration()+1;
+			response.next._sub_iteration = 0;
+		}
+	}
+};
 
+struct MasterType
+{
+	typedef polaris::Basic_Units::Implementations::Length_Implementation<MasterType> length_type;
+	typedef polaris::Basic_Units::Implementations::Time_Implementation<MasterType> time_type;
+};
 int main(int argc, char* argv[])
 {
 	Simulation_Configuration cfg;
@@ -501,17 +540,30 @@ int main(int argc, char* argv[])
 	INITIALIZE_SIMULATION(cfg);
 
 
-	Feet f = 1.0;
+	Feet f = 10.0;
+	Time_Seconds s = 7200.0;
 	Meters m;
+	Time_Hours h;
 
-	polaris::Basic_Units::Prototypes::Length<polaris::Basic_Units::Implementations::Length_Implementation<NT>> p_length;
+	polaris::Basic_Units::Prototypes::Length<MasterType::length_type>* p_length = (polaris::Basic_Units::Prototypes::Length<MasterType::length_type>*)Allocate<MasterType::length_type>();
+	polaris::Basic_Units::Prototypes::Time<MasterType::time_type>* p_time = (polaris::Basic_Units::Prototypes::Time<MasterType::time_type>*)Allocate<MasterType::time_type>();
 
-	p_length.Value<Feet>(f);
-	m = p_length.Value<Meters>();
+	p_length->Value<Feet>(f);
+	p_time->Value<Time_Seconds>(s);
+	m = p_length->Value<Meters>();
+	h = p_time->Value<Time_Hours>();
+	m = p_length->Convert_Value<Feet,Meters>(f);
+	cout << f <<" feet = " << m << " meters."<<endl;
+	cout << s <<" seconds = " << h << " hours.";
 
-	cout << f <<" feet = " << m << " meters.";
-	
+	typedef Test_Agent<Test_Agent_Implementation<NT>> agent_itf;
+	agent_itf* agent = (agent_itf*)Allocate<Test_Agent_Implementation<NT>>();
+	agent->Initialize<NT>();
+
+
+
+	START();
+
 	char ans;
 	cin >> ans;
-
 }

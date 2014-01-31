@@ -166,6 +166,10 @@ namespace GLOBALS
 		typedef RNG_Components::Implementations::MT_Probability_Double<NULLTYPE> RNG_type;
 		_Global_RNG()
 		{
+			
+		}
+		void Initialize()
+		{
 			//TODO: Initialize after start up
 			thread_rng = new RNG_type[num_sim_threads()];
 		
@@ -240,6 +244,10 @@ namespace GLOBALS
 		typedef RNG_Components::Implementations::MT_Normal_Double<NULLTYPE> RNG_type;
 
 		_Global_Normal_RNG()
+		{
+			
+		}
+		void Initialize()
 		{
 			thread_rng = new RNG_type[num_sim_threads()];
 			
