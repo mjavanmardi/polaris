@@ -27,8 +27,8 @@ namespace Zone_Components
 
 			Zone_Implementation()
 			{
-				production_counter = new int[num_sim_threads()];
-				attraction_counter = new int[num_sim_threads()];
+				production_counter = new int[num_sim_threads()+1];
+				attraction_counter = new int[num_sim_threads()+1];
 				_uuid = -1;
 				_internal_id = -2;
 			}
@@ -60,7 +60,7 @@ namespace Zone_Components
 				//_this_interface* pthis = (_this_interface*)_this;
 
 				//cout <<endl<<"Productions= " << pthis->production_count<int>() << ", Attractions= " << pthis->attraction_count<int>();
-				//for (int i=0; i < num_sim_threads(); i++)
+				//for (int i=0; i < num_sim_threads()+1; i++)
 				//{
 				//	((ComponentType*)_this)->production_counter[i]=0;
 				//	((ComponentType*)_this)->attraction_counter[i]=0;
@@ -118,19 +118,19 @@ namespace Zone_Components
 			// production and attraction counters
 			template<typename TargetType> void reset_counters()
 			{
-				for (int i=0; i< num_sim_threads(); i++) production_counter[i]=0;
-				for (int i=0; i< num_sim_threads(); i++) attraction_counter[i]=0;
+				for (int i=0; i< num_sim_threads()+1; i++) production_counter[i]=0;
+				for (int i=0; i< num_sim_threads()+1; i++) attraction_counter[i]=0;
 			}
 			template<typename TargetType> TargetType production_count(requires(TargetType,check(strip_modifiers(TargetType), !is_reference) && check(strip_modifiers(TargetType), is_integral)))
 			{
 				TargetType productions = 0;
-				for (int i=0; i< num_sim_threads(); i++) productions+=production_counter[i];
+				for (int i=0; i< num_sim_threads()+1; i++) productions+=production_counter[i];
 				return productions;
 			} 	
 			template<typename TargetType> TargetType attraction_count(requires(TargetType,check(strip_modifiers(TargetType), !is_reference) && check(strip_modifiers(TargetType), is_integral)))
 			{
 				int attractions = 0;
-				for (int i=0; i< num_sim_threads(); i++) attractions+=attraction_counter[i];
+				for (int i=0; i< num_sim_threads()+1; i++) attractions+=attraction_counter[i];
 				return attractions;
 			}
 			template<typename TargetType> TargetType production_count(requires(TargetType,check(strip_modifiers(TargetType), is_reference) && check(strip_modifiers(TargetType), is_integral)))

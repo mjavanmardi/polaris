@@ -17,7 +17,7 @@ namespace polaris
 		DataType* return_memory = new DataType();
 		
 		// add information about the uuid
-		_object_repository[__thread_id][uuid] = return_memory;
+		if(uuid!=-1) _object_repository[__thread_id][uuid] = return_memory;
 		
 		((DataType*)return_memory)->_uuid = uuid;
 

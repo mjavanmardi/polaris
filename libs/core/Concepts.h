@@ -46,6 +46,9 @@ namespace polaris
 	#define check(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<TYPE_TO_TEST>::value
 	#define check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::value
 
+	#define check_stripped_type(TYPE_TO_TEST,CONCEPT_NAME) CONCEPT_NAME<strip_modifiers(TYPE_TO_TEST)>::value
+	#define check_stripped_type_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME) CONCEPT_NAME<concat(strip_modifiers(TYPE_TO_TEST_1),strip_modifiers(TYPE_TO_TEST_2))>::value
+
 	#define sub_check(TYPE_TO_TEST,CONCEPT_NAME,SUB_CHECK_ALIAS) CONCEPT_NAME<TYPE_TO_TEST>::SUB_CHECK_ALIAS
 	#define sub_check_2(TYPE_TO_TEST_1,TYPE_TO_TEST_2,CONCEPT_NAME,SUB_CHECK_ALIAS) CONCEPT_NAME<concat(TYPE_TO_TEST_1,TYPE_TO_TEST_2)>::SUB_CHECK_ALIAS
 

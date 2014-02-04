@@ -171,9 +171,9 @@ namespace GLOBALS
 		void Initialize()
 		{
 			//TODO: Initialize after start up
-			thread_rng = new RNG_type[num_sim_threads()];
+			thread_rng = new RNG_type[num_sim_threads()+1];
 		
-			for (int i=0; i < num_sim_threads(); i++)
+			for (unsigned int i=0; i < num_sim_threads()+1; i++)
 			{
 				typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
@@ -184,7 +184,7 @@ namespace GLOBALS
 		template <typename TargetType>
 		void Set_Seed(TargetType random_seed)
 		{
-			for (int i=0; i < num_sim_threads(); i++)
+			for (unsigned int i=0; i < num_sim_threads()+1; i++)
 			{
 				typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
@@ -194,7 +194,7 @@ namespace GLOBALS
 		template <typename TargetType>
 		void Set_Seed()
 		{
-			for (int i=0; i < num_sim_threads(); i++)
+			for (unsigned int i=0; i < num_sim_threads()+1; i++)
 			{
 				TargetType random_seed = time(NULL);
 				typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
@@ -209,6 +209,10 @@ namespace GLOBALS
 		{
 			typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
 			rng_itf* rng = (rng_itf*)&this->thread_rng[__thread_id];
+
+			int local_sim_threads =	num_sim_threads()+1;
+			int local_tid = __thread_id;
+			bool pause = true;
 
 			return rng->Next_Rand<double>();
 		}
@@ -249,9 +253,9 @@ namespace GLOBALS
 		}
 		void Initialize()
 		{
-			thread_rng = new RNG_type[num_sim_threads()];
+			thread_rng = new RNG_type[num_sim_threads()+1];
 			
-			for (int i=0; i < num_sim_threads(); i++)
+			for (unsigned int i=0; i < num_sim_threads()+1; i++)
 			{
 				typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
@@ -263,7 +267,7 @@ namespace GLOBALS
 		template <typename TargetType>
 		void Set_Seed(TargetType random_seed)
 		{
-			for (int i=0; i < num_sim_threads(); i++)
+			for (unsigned int i=0; i < num_sim_threads()+1; i++)
 			{
 				typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
 				rng_itf* rng = (rng_itf*)&this->thread_rng[i];
@@ -273,7 +277,7 @@ namespace GLOBALS
 		template <typename TargetType>
 		void Set_Seed()
 		{
-			for (int i=0; i < num_sim_threads(); i++)
+			for (unsigned int i=0; i < num_sim_threads()+1; i++)
 			{
 				TargetType random_seed = time(NULL);
 				typedef RNG_Components::Prototypes::RNG<RNG_type> rng_itf;
@@ -314,6 +318,7 @@ namespace GLOBALS
 		 RNG_type* thread_rng;
 	};
 
+	//TODO: should be extern
 	static _Global_Normal_RNG<NULLTYPE> Normal_RNG;
 }
 

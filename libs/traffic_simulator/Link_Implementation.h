@@ -203,7 +203,6 @@ namespace Link_Components
 			m_data(float, link_vmt, NONE, NONE);
 			
 			m_data(float, link_vht, NONE, NONE);
-
 			m_data(float, C, NONE, NONE);
 			m_data(float, Q, NONE, NONE);
 
@@ -213,6 +212,42 @@ namespace Link_Components
 			struct Link_MOE_Data realtime_link_moe_data;
 
 			//boost::container::vector<struct Link_MOE_Data> td_link_moe_data_array;
+		//==================================================================================================================
+		/// travel_time
+		//------------------------------------------------------------------------------------------------------------------
+	
+			template<typename TargetType> TargetType travel_time(null_requirement){return (TargetType)(_travel_time);}
+			template<typename TargetType> void travel_time(TargetType set_value,null_requirement)
+			{
+				typedef Link<typename MasterType::routable_link_type> replica_interface;
+				_travel_time = (float)set_value;
+				// update replicas
+				typename replicas_container_type::iterator replica_itr;
+				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
+				{
+					replica_interface* replica = (replica_interface*)(*replica_itr);
+					replica->template travel_time<float>(_travel_time);
+				}
+			}
+
+			float _travel_time;
+
+
+			template<typename TargetType> TargetType realtime_travel_time(null_requirement){return (TargetType)(_realtime_travel_time);}
+			template<typename TargetType> void realtime_travel_time(TargetType set_value,null_requirement)
+			{
+				typedef Link<typename MasterType::routable_link_type> replica_interface;
+				_realtime_travel_time = (float)set_value;
+				// update replicas
+				typename replicas_container_type::iterator replica_itr;
+				for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
+				{
+					replica_interface* replica = (replica_interface*)(*replica_itr);
+					replica->template travel_time<float>(_realtime_travel_time);
+				}
+			}
+
+			float _realtime_travel_time;
 
 		//==================================================================================================================
 		/// Events
@@ -226,6 +261,7 @@ namespace Link_Components
 			typedef typename MasterType::base_network_event_type base_network_event_type;
 			typedef Network_Event<base_network_event_type> _Network_Event_Interface;
 			m_container(boost::container::vector<_Network_Event_Interface*>, advisory_radio_events, NONE, NONE);
+			
 
 		//==================================================================================================================
 		/// ITS
@@ -237,41 +273,7 @@ namespace Link_Components
 			m_prototype(Advisory_ITS< typename MasterType::variable_speed_sign_type>, variable_speed_sign, NONE, NONE);
 			m_prototype(Sensor< typename MasterType::link_sensor_type>, link_sensor, NONE, NONE);
 
-		//==================================================================================================================
-		/// travel_time
-		//------------------------------------------------------------------------------------------------------------------
-			typedef Link<typename MasterType::routable_link_type> replica_interface;
-			template<typename TargetType> TargetType travel_time(){return (TargetType)(_travel_time);} tag_getter_as_available(travel_time);
-			template<typename TargetType> void travel_time(TargetType set_value)
-			{
-				_travel_time = (float)set_value;
-				// update replicas
-				typename replicas_container_type::iterator replica_itr;
-				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
-				{
-					replica_interface* replica = (replica_interface*)(*replica_itr);
-					replica->template travel_time<float>(_travel_time);
-				}
-			}
-			tag_setter_as_available(travel_time);
 
-			float _travel_time;
-
-			template<typename TargetType> TargetType realtime_travel_time(){return (TargetType)(_realtime_travel_time);} tag_getter_as_available(realtime_travel_time);
-			template<typename TargetType> void realtime_travel_time(TargetType set_value)
-			{
-				_realtime_travel_time = (float)set_value;
-				// update replicas
-				typename replicas_container_type::iterator replica_itr;
-				for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
-				{
-					replica_interface* replica = (replica_interface*)(*replica_itr);
-					replica->template travel_time<float>(_realtime_travel_time);
-				}
-			}
-			tag_setter_as_available(realtime_travel_time);
-
-			float _realtime_travel_time;
 
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Network_Interface;
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;

@@ -811,8 +811,7 @@ namespace polaris
 	#define m_container(CONTAINER_TYPE,NAME,GETTER_REQUIREMENTS,SETTER_REQUIREMENTS)\
 			CONTAINER_TYPE _##NAME;\
 		public:\
-			typedef typename remove_pointer<CONTAINER_TYPE>::type NAME##_type;\
-			typedef CONTAINER_TYPE NAME##_raw_type;\
+			typedef CONTAINER_TYPE NAME##_type;\
 			template<typename TargetType>\
 			TargetType NAME(requires(TargetType,      (!check(TargetType,is_pointer) && !check(concat(CONTAINER_TYPE),is_pointer)) && (GETTER_REQUIREMENTS)       ))\
 			{return (TargetType)(_##NAME);}\
