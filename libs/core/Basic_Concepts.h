@@ -31,15 +31,57 @@ namespace polaris
 		define_default_check(!has_prototype_tag && has_parent_type && has_group_list && has_object_type && has_master_type && (is_data_object || is_execution_object));
 	};
 
-	concept struct Is_Target_Type_Struct
-	{
-		check_typedef_name(check1,ReturnType);
-		check_typedef_name(check2,ParamType);
-		check_typedef_name(check3,Param2Type);
+	//concept struct Is_Target_Type_Struct
+	//{
+	//	check_typedef_name(check1,ReturnType);
+	//	check_typedef_name(check2,ParamType);
+	//	check_typedef_name(check3,Param2Type);
 
-		define_sub_check(has_ReturnType, check1);
-		define_sub_check(has_ParamType, check2);
-		define_sub_check(has_Param2Type, check3);
-		define_default_check(check1 && check2 && check3);
-	};
+	//	define_sub_check(has_ReturnType, check1);
+	//	define_sub_check(has_ParamType, check2);
+	//	define_sub_check(has_Param2Type, check3);
+	//	define_default_check(check1 && check2 && check3);
+	//};
+
+	namespace Container_Concepts
+	{
+		concept struct Is_Iterable
+		{
+			check_concept(is_prototype, polaris::Is_Prototype, T, V);
+			check_typedef_name(has_iterator,iterator);
+			check_method_name(has_begin, begin);
+			check_method_name(has_end, end);
+			check_method_name(has_insert, insert);
+			define_default_check(is_prototype && has_iterator && has_begin && has_end && has_insert);
+		};
+		concept struct Is_Back_Insertion_Sequence
+		{
+			check_concept(is_iterable, Is_Iterable,T,V);
+			check_method_name(has_front, front);
+			check_method_name(has_back, back);
+			check_method_name(has_push_back, push_back);
+			check_method_name(has_pop_back, pop_back);
+			define_default_check(is_iterable && has_front && has_back && has_push_back && has_pop_back);
+		};
+		concept struct Is_Random_Access_Sequence
+		{
+			check_concept(is_back_insertion_sequence, Is_Back_Insertion_Sequence,T,V);
+			check_method_name(has_at, at);
+			define_default_check(is_back_insertion_sequence && has_at);
+		};
+		concept struct Is_Multidimensional_Random_Access_Sequence
+		{
+			check_concept(is_random_access, Is_Random_Access_Sequence,T,V);
+			check_method_name(has_dimensions, dimensions);
+			check_typedef_name(has_index_type,index_type);
+			define_default_check(is_random_access && has_dimensions && has_index_type);
+		};
+		concept struct Is_Associative
+		{
+			check_concept(is_iterable, Is_Iterable,T,V);
+			check_method_name(has_find, find);
+			check_method_name(has_equal_range, equal_range);
+			define_default_check(is_iterable && has_find && has_equal_range);
+		};
+	}
 }
