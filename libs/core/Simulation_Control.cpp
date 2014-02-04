@@ -12,7 +12,7 @@ namespace polaris
 #endif
 
 	int __component_counter = -1;
-	boost::unordered::unordered_map<unsigned int, Component_Manager_Base*>* __all_components = nullptr;
+	boost::unordered::unordered_map<size_t, Component_Manager_Base*>* __all_components = nullptr;
 
 	const Revision __revision_omega = Revision(INT_MAX,0);
 	const Revision __revision_free = Revision();

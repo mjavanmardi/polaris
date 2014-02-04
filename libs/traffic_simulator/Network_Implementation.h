@@ -55,14 +55,16 @@ namespace Network_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Network_Implementation),Execution_Object>::Component_Type ComponentType;
 
 			m_data(typename MasterType::network_db_reader_type*, db_reader, NONE, NONE);
-			typedef boost::unordered::unordered_map<long long,void*> type_of_link_dbid_dir_to_ptr_map;
-			m_data(type_of_link_dbid_dir_to_ptr_map, link_dbid_dir_to_ptr_map, NONE, NONE);
+			//typedef boost::unordered::unordered_map<long long,void*> type_of_link_dbid_dir_to_ptr_map;
+			//m_data(concat(boost::unordered::unordered_map<long long,void*>), link_dbid_dir_to_ptr_map, NONE, NONE);
+			m_data(concat(std::unordered_map<long long,void*>), link_dbid_dir_to_ptr_map, NONE, NONE);
 
 			m_data(float, max_free_flow_speed, NONE, NONE);
 
 			m_container(boost::container::vector<typename MasterType::intersection_type*>, intersections_container, NONE, NONE);
 
 			m_container(boost::container::vector<typename MasterType::link_type*>, links_container, NONE, NONE);
+			//m_container(boost::container::vector<Link<typename MasterType::link_type>*>, links_container, NONE, NONE);
 
 			m_container(boost::container::vector<typename MasterType::routable_network_type*>, routable_networks_container, NONE, NONE);
 
@@ -389,7 +391,7 @@ namespace Network_Components
 				typedef  Random_Access_Sequence< type_of(routable_networks_container), _Routable_Network_Interface*> _Routable_Networks_Container_Interface;
 
 				network_snapshot_replicas_container_type network_snapshot_replicas_container;
-				for(int i=0;i<num_sim_threads();i++)
+				for(unsigned int i=0;i<num_sim_threads()+1;i++)
 				{
 					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
 //TODO
@@ -991,7 +993,8 @@ namespace Network_Components
 			template<typename TargetType> void construct_network_cost()
 			{
 				// break up between links and movements
-				typedef  Link_Components::Prototypes::Link<typename remove_pointer<typename  type_of(links_container)::value_type>::type>  _Link_Interface;
+				//typedef  Link_Components::Prototypes::Link<typename remove_pointer<typename  type_of(links_container)::value_type>::type>  _Link_Interface;
+				typedef  Link_Components::Prototypes::Link<typename MasterType::link_type>  _Link_Interface;
 				typedef  Random_Access_Sequence< type_of(links_container), _Link_Interface*> _Links_Container_Interface;
 
 				typename _Links_Container_Interface::iterator links_itr;
@@ -1005,7 +1008,9 @@ namespace Network_Components
 					_max_free_flow_speed = max(_max_free_flow_speed,free_flow_speed);
 
 					link_travel_time = max((float)1.0,link_travel_time);
+
 					link->template travel_time<float>(link_travel_time);
+					//link->num_lanes<float>(link_travel_time);
 				}
 		
 				typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(turn_movements_container)::value_type>::type>  _Turn_Movement_Interface;
@@ -1039,7 +1044,7 @@ namespace Network_Components
 				typedef  Network_Components::Prototypes::Network<typename remove_pointer<typename  type_of(routable_networks_container)::value_type>::type>  _Routable_Network_Interface;
 				typedef  Random_Access_Sequence< type_of(routable_networks_container), _Routable_Network_Interface*> _Routable_Networks_Container_Interface;
 
-				for(int i=0;i<num_sim_threads();i++)
+				for(unsigned int i=0;i<num_sim_threads()+1;i++)
 				{
 					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
 					routable_network->template read_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
@@ -1054,7 +1059,7 @@ namespace Network_Components
 				typedef  Network_Components::Prototypes::Network<typename remove_pointer<typename  type_of(routable_networks_container)::value_type>::type>  _Routable_Network_Interface;
 				typedef  Random_Access_Sequence< type_of(routable_networks_container), _Routable_Network_Interface*> _Routable_Networks_Container_Interface;
 
-				for(int i=0;i<num_sim_threads();i++)
+				for(unsigned int i=0;i<num_sim_threads()+1;i++)
 				{
 					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
 					routable_network->template read_realtime_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
@@ -1135,9 +1140,11 @@ namespace Network_Components
 			//------------------------------------------------------------------------------------------------------------------		
 			template<typename TargetType> void read_network_data(Network_Components::Types::Network_IO_Maps& net_io_maps)
 			{
+				_db_reader = Allocate<type_of(db_reader)>();
 				typedef Prototypes::Network_DB_Reader<type_of(db_reader)> _DB_Interface;
-				_DB_Interface* db = (_DB_Interface*)&_db_reader;
+				_DB_Interface* db = (_DB_Interface*)_db_reader;
 				db->template network_reference<ComponentType*>((ComponentType*)this);
+
 				db->template read_network_data<Network_Components::Types::Network_IO_Maps&>(net_io_maps);
 			}
 

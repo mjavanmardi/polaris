@@ -222,7 +222,7 @@ namespace Network_Event_Components
 
 			template<typename TargetType> void Notify_Subscribers()
 			{
-				int subscriber = Link_Interface::Component_Type::component_id;
+				size_t subscriber = Link_Interface::Component_Type::component_id;
 
 				if(_callbacks_by_component_id.count(subscriber))
 				{
@@ -262,14 +262,14 @@ namespace Network_Event_Components
 			static m_data(boost::container::vector<string>,event_keys, NONE, NONE);
 			static m_prototype(Network_Event_Manager<typename type_of(MasterType::network_event_manager)>,network_event_manager, NONE, NONE);
 			
-			static m_data(concat(boost::unordered::unordered_map<int,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_id, NONE, NONE);
+			static m_data(concat(boost::unordered::unordered_map<size_t,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_id, NONE, NONE);
 		};
 		
 		template<typename MasterType,typename InheritanceList>
 		boost::container::vector<string> Base_Network_Event<MasterType,InheritanceList>::_event_keys;
 		
 		template<typename MasterType,typename InheritanceList>
-		boost::unordered::unordered_map<int,typename Network_Event_Callback<typename Base_Network_Event<MasterType,InheritanceList>::ComponentType>::type> Base_Network_Event<MasterType,InheritanceList>::_callbacks_by_component_id;
+		boost::unordered::unordered_map<size_t,typename Network_Event_Callback<typename Base_Network_Event<MasterType,InheritanceList>::ComponentType>::type> Base_Network_Event<MasterType,InheritanceList>::_callbacks_by_component_id;
 
 		template<typename MasterType,typename InheritanceList>
 		Network_Event_Manager<typename type_of(MasterType::network_event_manager)>* Base_Network_Event<MasterType,InheritanceList>::_network_event_manager;
@@ -633,7 +633,7 @@ namespace Network_Event_Components
 			
 			template<typename TargetType> void Get_Network_Events( boost::container::vector< Network_Event<TargetType>* >& container, requires(TargetType,check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
 			{
-				for(typename boost::unordered::unordered_map< int, boost::container::list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
+				for(typename boost::unordered::unordered_map< size_t, boost::container::list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
 				{
 					boost::container::list< Base_Network_Event_Interface* >* events_of_type=&h_itr->second;
 
@@ -672,7 +672,7 @@ namespace Network_Event_Components
 				}
 			}
 
-			m_data( concat(boost::unordered::unordered_map< int, boost::container::list<Base_Network_Event_Interface*> >), network_event_container, NONE , NONE);
+			m_data( concat(boost::unordered::unordered_map< size_t, boost::container::list<Base_Network_Event_Interface*> >), network_event_container, NONE , NONE);
 		};
 	}
 

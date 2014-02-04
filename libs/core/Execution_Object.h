@@ -19,9 +19,9 @@ namespace polaris
 	public:
 		Base_Object():_component_id(-1){}
 		
-		Base_Object(int component_id,int uuid): _component_id(component_id),_uuid(uuid){}
+		Base_Object(size_t component_id,int uuid): _component_id(component_id),_uuid(uuid){}
 
-		int _component_id;
+		size_t _component_id;
 		int _uuid;
 	};
 	
@@ -34,7 +34,7 @@ namespace polaris
 	public:
 		Execution_Object():Base_Object(){ _next_revision = __revision_omega; }
 
-		Execution_Object(int component_id,int uuid):Base_Object(component_id,uuid){ _next_revision = __revision_omega; }
+		Execution_Object(size_t component_id,int uuid):Base_Object(component_id,uuid){ _next_revision = __revision_omega; }
 		
 		//----------------------------------------------------------------------------------------------------
 		// Simulation functions

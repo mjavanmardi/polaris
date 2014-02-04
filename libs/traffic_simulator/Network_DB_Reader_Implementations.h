@@ -190,16 +190,20 @@ namespace Network_Components
 					//cout << "\t" << counter << endl;
 					if(db_itr->getLanes_Ab()>0)
 					{
-						link=(_Link_Interface*)Allocate<typename _Link_Interface::Component_Type>();
+						link=(_Link_Interface*)Allocate<typename MasterType::link_type>();
 						
 						link_id_dir.id=db_itr->getLink();
 						link_id_dir.dir=0;
 
 						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir]=link;
 
-						typedef typename MasterType::network_type::type_of_link_dbid_dir_to_ptr_map link_dbid_dir_to_ptr_map_type;
-						link_dbid_dir_to_ptr_map_type& link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type&>();
-						link_dbid_dir_to_ptr_map[link_id_dir.id_dir] = link;
+						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+						//link_dbid_dir_to_ptr_map_type& link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type&>();
+						//link_dbid_dir_to_ptr_map[link_id_dir.id_dir] = link;
+
+						link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
+						
+						(*link_dbid_dir_to_ptr_map)[link_id_dir.id_dir] = link;
 
 						link->template dbid<int>(db_itr->getLink());
 						link->template direction<int>(0.0);
@@ -310,7 +314,7 @@ namespace Network_Components
 
 						net_io_maps.link_id_dir_to_ptr[link_id_dir.id_dir]=link;
 						
-						typedef typename MasterType::network_type::type_of_link_dbid_dir_to_ptr_map link_dbid_dir_to_ptr_map_type;
+						typedef typename MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
 						link_dbid_dir_to_ptr_map_type& link_dbid_dir_to_ptr_map = _network_reference->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type&>();
 						link_dbid_dir_to_ptr_map[link_id_dir.id_dir] = link;
 

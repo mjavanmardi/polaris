@@ -213,6 +213,8 @@ namespace polaris
 
 	extern World* _world;
 
+	static unsigned int num_threads(){return _world->num_sim_threads()+1;}
+
 	static int iteration(){return _world->iteration();}
 	//static void iteration(unsigned int value){_world->iteration(value);}
 

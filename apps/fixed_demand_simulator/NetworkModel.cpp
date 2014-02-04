@@ -42,8 +42,8 @@ struct MasterType
 	typedef Link_Components::Implementations::Link_Implementation<MasterType> link_type;
 	typedef Intersection_Components::Implementations::Intersection_Implementation<MasterType> intersection_type;
 	typedef Vehicle_Components::Implementations::Vehicle_Implementation<MasterType> vehicle_type;
-
 #endif
+
 	//==============================================================================================
 	// Signalization Types
 	//typedef Signal_Components::Components::HCM_Signal_Full<T>::type				SIGNAL_TYPE;
@@ -177,6 +177,9 @@ void run_with_input_from_db(char* scenario_filename);
 
 int main(int argc, char* argv[])
 {
+	Simulation_Configuration cfg;
+	cfg.Single_Threaded_Setup(1000);
+	INITIALIZE_SIMULATION(cfg);
 
 	char* scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
@@ -199,6 +202,7 @@ int main(int argc, char* argv[])
 
 void run_with_input_from_db(char* scenario_filename)
 {
+
 	Network_Components::Types::Network_IO_Maps network_io_maps;
 	typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::ODB_Network,Network_Components::Types::Network_IO_Maps&> Net_IO_Type;
 
@@ -219,6 +223,9 @@ void run_with_input_from_db(char* scenario_filename)
 	//network_models::network_information::operation_data_information::OperationData operation_data_for_output;
 	//network_models::initialization(scenario_data_for_output,network_data_for_output,demand_data_for_output,operation_data_for_output);
 
+	GLOBALS::Normal_RNG.Initialize();
+	GLOBALS::Uniform_RNG.Initialize();
+
 	cout << "allocating data structures..." <<endl;	
 
 	typedef Scenario<typename MasterType::scenario_type> _Scenario_Interface;
@@ -232,6 +239,10 @@ void run_with_input_from_db(char* scenario_filename)
 	
 	cout << "reading scenario data..." <<endl;
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
+
+	typedef MasterType::network_type::link_dbid_dir_to_ptr_map_type link_dbid_dir_to_ptr_map_type;
+
+	link_dbid_dir_to_ptr_map_type* link_dbid_dir_to_ptr_map = network->template link_dbid_dir_to_ptr_map<link_dbid_dir_to_ptr_map_type*>();
 
 	cout << "reading network data..." <<endl;	
 	network->read_network_data<Net_IO_Type>(network_io_maps);

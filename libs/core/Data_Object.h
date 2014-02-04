@@ -15,6 +15,6 @@ namespace polaris
 	{
 	public:
 		Data_Object():Base_Object(){}
-		Data_Object(int component_id,int uuid = -1):Base_Object(component_id,uuid){}
+		Data_Object(size_t component_id,int uuid = -1):Base_Object(component_id,uuid){}
 	};
 }
