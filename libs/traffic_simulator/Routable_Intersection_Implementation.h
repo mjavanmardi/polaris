@@ -52,7 +52,8 @@ namespace Intersection_Components
 			typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<MasterType> inbound_outbound_movements_container_element_type;
 			m_container(boost::container::vector<inbound_outbound_movements_container_element_type*>, inbound_outbound_movements, NONE, NONE);
 
-			template<typename TargetType> void construct_routable_from_regular(typename TargetType::ParamType regular_intersection, typename TargetType::Param2Type linksMap)
+			//template<typename TargetType> void construct_routable_from_regular(typename TargetType::ParamType regular_intersection, typename TargetType::Param2Type linksMap)
+			template<typename RegularIntersectionParamType,typename LinksMapParamType> void construct_routable_from_regular(RegularIntersectionParamType regular_intersection, LinksMapParamType linksMap)
 			{
 				typedef Intersection<typename MasterType::intersection_type> _Regular_Intersection_Interface;
 				typedef  Intersection_Components::Prototypes::Outbound_Inbound_Movements<typename remove_pointer< typename _Regular_Intersection_Interface::get_type_of(outbound_inbound_movements)::value_type>::type>  _Regular_Outbound_Inbound_Movements_Interface;
@@ -179,7 +180,7 @@ namespace Intersection_Components
 				}
 			}
 			
-			template<typename TargetType> void set_forward_link_turn_travel_time(typename TargetType::ParamType movement_travel_time_map)
+			template<typename TargetType> void set_forward_link_turn_travel_time(TargetType movement_travel_time_map)
 			{
 				typedef Intersection<typename MasterType::routable_intersection_type> _Routable_Intersection_Interface;
 				typedef  Intersection_Components::Prototypes::Inbound_Outbound_Movements<typename remove_pointer< typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements)::value_type>::type>  _Routable_Inbound_Outbound_Movements_Interface;

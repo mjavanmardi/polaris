@@ -128,8 +128,12 @@ namespace Routing_Components
 					_Regular_Intersection_Interface* regular_intersection = (_Regular_Intersection_Interface*)(*regular_intersection_itr);
 					_Routable_Intersection_Interface* routable_intersection =  (_Routable_Intersection_Interface*)Allocate<typename _Routable_Intersection_Interface::Component_Type>();
 					typedef dense_hash_map<int,_Routable_Link_Interface*>& linksMapType;
-//TODO
-//					routable_intersection->template construct_routable_from_regular<Target_Type<NULLTYPE,void,_Regular_Intersection_Interface*,linksMapType>>(regular_intersection, linksMap);
+					
+					//routable_intersection->template construct_routable_from_regular<Target_Type<NULLTYPE,void,_Regular_Intersection_Interface*,linksMapType>>(regular_intersection, linksMap);
+					
+					routable_intersection->template construct_routable_from_regular<_Regular_Intersection_Interface*,linksMapType>(regular_intersection, linksMap);
+					
+					//Target_Type<NULLTYPE,void,_Regular_Intersection_Interface*,linksMapType>
 
 					intersections_container<_Routable_Intersections_Container_Interface&>().push_back(routable_intersection);
 					intersectionsMap.insert(pair<int, _Routable_Intersection_Interface*>(regular_intersection->template internal_id<int>(), routable_intersection));
@@ -329,8 +333,8 @@ namespace Routing_Components
 					typedef dense_hash_map<int,_Routable_Link_Interface*>& linksMapType;
 //TODO
 //					routable_intersection->template construct_routable_from_regular<Target_Type<NULLTYPE,void,_Regular_Intersection_Interface*,linksMapType>>(regular_intersection, linksMap);
-//TODO
-//					routable_intersection->template set_forward_link_turn_travel_time<Target_Type<NULLTYPE,void,typename MasterType::network_type::id_to_travel_time_map_type&>>(movement_travel_time_map);
+
+					routable_intersection->template set_forward_link_turn_travel_time<typename MasterType::network_type::id_to_travel_time_map_type&>(movement_travel_time_map);
 					intersections_container<_Routable_Intersections_Container_Interface&>().push_back(routable_intersection);
 					intersectionsMap.insert(pair<int, _Routable_Intersection_Interface*>(regular_intersection->template internal_id<int>(), routable_intersection));
 				}

@@ -257,17 +257,22 @@ namespace Intersection_Components
 				this_component()->template Initialize<TargetType>();
 			}
 
-			template<typename TargetType> void construct_routable_from_regular(typename TargetType::ParamType regular_intersection_param, typename TargetType::Param2Type linksMap_param)
-			{
-				this_component()->template construct_routable_from_regular<TargetType>(regular_intersection_param, linksMap_param);
-			}
+			//template<typename TargetType> void construct_routable_from_regular(typename TargetType::ParamType regular_intersection_param, typename TargetType::Param2Type linksMap_param)
+			//{
+			//	this_component()->template construct_routable_from_regular<TargetType>(regular_intersection_param, linksMap_param);
+			//}
 			
+			template<typename RegularIntersectionParamType,typename LinksMapParamType> void construct_routable_from_regular(RegularIntersectionParamType regular_intersection_param, LinksMapParamType linksMap_param)
+			{
+				this_component()->template construct_routable_from_regular<RegularIntersectionParamType,LinksMapParamType>(regular_intersection_param, linksMap_param);
+			}
+
 			template<typename TargetType> void construct_realtime_routable_from_regular(typename TargetType::ParamType regular_intersection_param, typename TargetType::Param2Type linksMap_param)
 			{
 				this_component()->template construct_realtime_routable_from_regular<TargetType>(regular_intersection_param, linksMap_param);
 			}
 			
-			template<typename TargetType> void set_forward_link_turn_travel_time(typename TargetType::ParamType movement_travel_time_map)
+			template<typename TargetType> void set_forward_link_turn_travel_time(TargetType movement_travel_time_map)
 			{
 				this_component()->template set_forward_link_turn_travel_time<TargetType>(movement_travel_time_map);
 			}

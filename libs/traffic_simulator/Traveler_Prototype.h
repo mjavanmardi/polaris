@@ -44,50 +44,13 @@ namespace Traveler_Components
 				itf->template Schedule_Route_Computation<NULLTYPE>(departed_time);
 				
 				// other stuff than routing
-				//TODO
-//load_event(ComponentType,Departure_Conditional,Set_Departure,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION,NULLTYPE);
+
+				this_component()->Load_Event<ComponentType>(&ComponentType::Departure_Conditional,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION);
+
+				//load_event(ComponentType,Departure_Conditional,Set_Departure,departed_time,Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION,NULLTYPE);
 			}
 
-			static void Departure_Conditional(ComponentType* _this,Event_Response& response)
-			{
-				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION)
-				{
-					((ComponentType*)_this)->Swap_Event((Event)&Traveler::Set_Departure<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=END;
-					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::TRAVELER_SET_DEPARTURE_SUB_ITERATION;
-				}
-			}
 
-			declare_event(Set_Departure)
-			{
-				// Create alias for this to use in conditional
-				typedef Traveler<ComponentType> _this_Interface;
-				ComponentType* _pthis = (ComponentType*)_this;
-				_this_Interface* this_ptr=(_this_Interface*)_pthis;
-
-				// Here to add code for setting departure of the traveler other than routing; routing is scheduled in Schedule_New_Departure
-				typedef  Vehicle_Components::Prototypes::Vehicle< typename get_type_of(vehicle)> Vehicle_Itf;
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan< typename Vehicle_Itf::get_type_of(movement_plan)> movement_itf;
-				typedef  Routing_Components::Prototypes::Routing< typename get_type_of(router)> Routing_Itf;
-				typedef  Network_Components::Prototypes::Network< typename Routing_Itf::get_type_of(network)> network_itf;
-				typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename network_itf::get_type_of(links_container)::value_type>::type>  link_itf;
-				typedef Random_Access_Sequence< typename network_itf::get_type_of(links_container), link_itf*> links;
-
-	
-				Vehicle_Itf* vehicle = this_ptr->template vehicle<Vehicle_Itf*>();
-				link_itf* origin_link = vehicle->template movement_plan<movement_itf*>()->template origin<link_itf*>();
-				
-				if (!vehicle->template movement_plan<movement_itf*>()->template valid_trajectory<bool>())
-				{
-					return;
-				}
-				// Schedule the routing if the vehicle is not already in the network, otherwise return false
-				if (vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::UNLOADED || vehicle->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Vehicle_Components::Types::Vehicle_Status_Keys::OUT_NETWORK)
-				{
-					origin_link->push_vehicle(vehicle);
-				}
-			}
 		};
 	}
 }

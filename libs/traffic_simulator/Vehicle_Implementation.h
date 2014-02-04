@@ -388,7 +388,7 @@ namespace Vehicle_Components
 			template<typename TargetType> void start_agent()
 			{
 				_suggested_action = Vehicle_Components::Types::DO_NOTHING;
-				int first_triggeriteration() = ((iteration() / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()) + 1) * ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1;
+				int first_trigger_iteration = ((iteration() / ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()) + 1) * ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() - 1;
 				//TODO
 //load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template Vehicle_Action,first_triggeriteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION,NULLTYPE);
 			}
