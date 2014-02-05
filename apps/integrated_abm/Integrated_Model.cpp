@@ -10,6 +10,7 @@
 
 #include "Polaris_PCH.h"
 #include "Repository.h"
+#include "Population_Synthesis.h"
 
 
 // SET THE DEBUG VERSION TO SIMULATE ONLY ONE AGENT
@@ -257,7 +258,7 @@ int main(int argc,char** argv)
 	network->read_network_data<Net_IO_Type>(network_io_maps);
 
 	cout << "converting network data..." << endl;
-	network->write_network_data<Target_Type<NULLTYPE,void,network_models::network_information::network_data_information::NetworkData&>>(network_data_for_output);
+	network->write_network_data<network_models::network_information::network_data_information::NetworkData&>(network_data_for_output);
 	//network_models::network_information::network_data_information::write_network_data("", network_data_for_output);
 	//cout<<"writing network data..."<<endl;
 	//network_models::network_information::network_data_information::write_network_data(output_dir_name,network_data_for_output);
@@ -460,7 +461,7 @@ int main(int argc,char** argv)
 	//----------------------------------------------------------------------------------------------------------------------------------
 	define_component_interface(popsyn_itf,MasterType::popsyn_solver,PopSyn::Prototypes::Population_Synthesizer_Prototype,NULLTYPE);
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
-	popsyn->Initialize<Target_Type<NT,NT,_Network_Interface*, _Scenario_Interface*> >(network,scenario);
+	popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(network,scenario);
 	//----------------------------------------------------------------------------------------------------------------------------------
 
 	//==================================================================================================================================
@@ -494,9 +495,28 @@ int main(int argc,char** argv)
 
 prototype struct Test_Agent
 {
+	tag_as_prototype;
+
 	template<typename T> void Initialize()
 	{
 		this_component()->Initialize<T>();
+	}
+	define_feature_exists_check(test_feature, test_feature_exists);
+	template<typename T> void test_feature(requires(T,check(ComponentType,test_feature_exists)))
+	{
+		this_component()->test_feature<T>();
+	}
+	template<typename T> void test_feature(requires(T,!check(ComponentType,test_feature_exists)))
+	{
+		assert_check(ComponentType,test_feature_exists,"Test feature does not exist.");
+	}
+	template<typename T> void test_concept(requires(T,check_2(T,float,is_same)))
+	{
+		cout <<"good";
+	}
+	template<typename T> void test_concept(requires(T,!check_2(T,float,is_same)))
+	{
+		assert_check_2(T,float,is_same,"Error, T must be a float type.");
 	}
 };
 implementation struct Test_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Test_Agent_Implementation),Execution_Object>
@@ -515,7 +535,7 @@ implementation struct Test_Agent_Implementation : public Polaris_Component<Maste
 		
 		if (iteration() % 100 == 0)
 		{
-			cout <<"The time is: " << GLOBALS::Simulation_Time.Current_Time<Time_Minutes>()<<" minutes.";
+			cout <<"The iteration is: "<< iteration() <<". The time is: " << GLOBALS::Simulation_Time.Current_Time<Time_Minutes>()<<" minutes."<<endl;
 			response.next._iteration=iteration()+1;
 			response.next._sub_iteration = 0;
 		}
@@ -532,6 +552,17 @@ struct MasterType
 {
 	typedef polaris::Basic_Units::Implementations::Length_Implementation<MasterType> length_type;
 	typedef polaris::Basic_Units::Implementations::Time_Implementation<MasterType> time_type;
+	typedef PopSyn::Implementations::Synthesis_Zone_Implementation<MasterType> zone;
+	typedef PopSyn::Implementations::Synthesis_Region_Implementation<MasterType> region;
+	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> IPF_Solver_Settings;
+	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> popsyn_solver;
+	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<MasterType> person_static_properties_type;
+	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<MasterType> household_static_properties_type;
+	typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
+	typedef NULLTYPE household_type;
+	typedef NULLTYPE person_type;
+	typedef NULLTYPE scenario_type;
+	typedef NULLTYPE network_type;
 };
 int main(int argc, char* argv[])
 {
@@ -554,12 +585,18 @@ int main(int argc, char* argv[])
 	h = p_time->Value<Time_Hours>();
 	m = p_length->Convert_Value<Feet,Meters>(f);
 	cout << f <<" feet = " << m << " meters."<<endl;
-	cout << s <<" seconds = " << h << " hours.";
+	cout << s <<" seconds = " << h << " hours."<<endl<<endl;
 
 	typedef Test_Agent<Test_Agent_Implementation<NT>> agent_itf;
 	agent_itf* agent = (agent_itf*)Allocate<Test_Agent_Implementation<NT>>();
 	agent->Initialize<NT>();
 
+	agent->test_concept<float>();
+
+	// POPSYN STUFF
+	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::popsyn_solver> popsyn_itf;
+	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
+	popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(nullptr,nullptr);
 
 
 	START();

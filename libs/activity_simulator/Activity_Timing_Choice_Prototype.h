@@ -18,39 +18,36 @@ namespace Person_Components
 
 			//template<typename TargetType> void Plan_Activity_Start_Time(TargetType activity_ref, requires(TargetType,check(strip_modifiers(TargetType), Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			//{
-//TODO
-//			//	Time_Seconds start = this->Get_Start_Time<Target_Type<NT,Time_Seconds,TargetType>>(activity_ref);
+			//	Time_Seconds start = this->Get_Start_Time<TargetType,Time_Seconds>(activity_ref);
 			//	Activity_Components::Prototypes::Activity_Planner<typename TargetType::Component_Type>* act = (Activity_Components::Prototypes::Activity_Planner<typename TargetType::Component_Type>*)activity_ref;
 			//	act->Start_Time<Time_Seconds>(start);
 			//};
 			//template<typename TargetType> void Plan_Activity_Duration(TargetType activity_ref, requires(TargetType,check(strip_modifiers(TargetType), Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			//{
-//TODO
-//			//	Time_Seconds dur = this->Get_Duration<Target_Type<NT,Time_Seconds,TargetType>>(activity_ref);
+			//	Time_Seconds dur = this->Get_Duration<TargetType,Time_Seconds>(activity_ref);
 			//	Activity_Components::Prototypes::Activity_Planner<typename TargetType::Component_Type>* act = (Activity_Components::Prototypes::Activity_Planner<typename TargetType::Component_Type>*)activity_ref;
 			//	act->Duration<Time_Seconds>(dur);
 			//};
 			//template<typename TargetType> void Plan_Activity_Start_Time_and_Duration(TargetType activity_ref, requires(TargetType,check(strip_modifiers(TargetType), Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			//{
-//TODO
-//			//	pair<Time_Seconds,Time_Seconds> start_dur = this->Get_Start_Time_and_Duration<Target_Type<NT,Time_Seconds,TargetType>>(activity_ref);
+			//	pair<Time_Seconds,Time_Seconds> start_dur = this->Get_Start_Time_and_Duration<TargetType,Time_Seconds>(activity_ref);
 			//	Activity_Components::Prototypes::Activity_Planner<typename TargetType::Component_Type>* act = (Activity_Components::Prototypes::Activity_Planner<typename TargetType::Component_Type>*)activity_ref;
 			//	act->Start_Time<Time_Seconds>(start_dur.first);
 			//	act->Duration<Time_Seconds>(start_dur.second);
 			//};
 
 
-			template<typename TargetType> typename TargetType::ReturnType Get_Start_Time(typename TargetType::ParamType activity_ref, requires(TargetType,check(typename TargetType::ParamType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(typename TargetType::ReturnType,Is_Time_Value)))
+			template<typename ActivityRefType, typename ReturnType> ReturnType Get_Start_Time(ActivityRefType activity_ref, requires(ActivityRefType,check(ActivityRefType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(ReturnType,Is_Time_Value)))
 			{
-				this_component()->template Get_Start_Time<TargetType>();
+				return this_component()->template Get_Start_Time<ActivityRefType, ReturnType>();
 			}
-			template<typename TargetType> typename TargetType::ReturnType Get_Duration(typename TargetType::ParamType activity_ref, requires(TargetType,check(typename TargetType::ParamType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(typename TargetType::ReturnType,Is_Time_Value)))
+			template<typename ActivityRefType, typename ReturnType> ReturnType Get_Duration(ActivityRefType activity_ref, requires(ActivityRefType,check(ActivityRefType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(ReturnType,Is_Time_Value)))
 			{
-				this_component()->template Get_Duration<TargetType>();
+				return this_component()->template Get_Duration<ActivityRefType, ReturnType>();
 			}
-			template<typename TargetType> pair<typename TargetType::ReturnType,typename TargetType::ReturnType> Get_Start_Time_and_Duration(typename TargetType::ParamType activity_ref, requires(TargetType,check(typename TargetType::ParamType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(typename TargetType::ReturnType,Is_Time_Value)))
+			template<typename ActivityRefType, typename ReturnType> pair<ReturnType,ReturnType> Get_Start_Time_and_Duration(ActivityRefType activity_ref, requires(ActivityRefType,check(ActivityRefType, Activity_Components::Concepts::Is_Activity_Plan_Prototype) && check(ReturnType,Is_Time_Value)))
 			{
-				return this_component()->template Get_Start_Time_and_Duration<TargetType>(activity_ref);
+				return this_component()->template Get_Start_Time_and_Duration<ActivityRefType, ReturnType>(activity_ref);
 			}
 		};
 	}

@@ -145,8 +145,23 @@ namespace Movement_Plan_Components
 			}
 
 #ifndef EXCLUDE_DEMAND 
-			template<typename TargetType>_method_void(Initialize, NONE);
-			template<typename TargetType>_method_1_arg(Initialize,movement_to_copy, NONE);
+			define_feature_exists_check(Initialize, Initialize_exists);
+			template<typename TargetType> void Initialize(requires(TargetType,check(ComponentType,Initialize_exists)))
+			{
+				this_component()->Initialize<TargetType>();
+			}
+			template<typename TargetType> void Initialize(requires(TargetType,!check(ComponentType,Initialize_exists)))
+			{
+				assert_check(ComponentType,Initialize_exists, "No Initialize method defined in component.");
+			}
+			template<typename TargetType> void Initialize(TargetType movement_to_copy, requires(TargetType,check(ComponentType,Initialize_exists)))
+			{
+				this_component()->Initialize<TargetType>(movement_to_copy);
+			}
+			template<typename TargetType> void Initialize(TargetType movement_to_copy, requires(TargetType,!check(ComponentType,Initialize_exists)))
+			{
+				assert_check(ComponentType,Initialize_exists, "No Initialize method defined in component.");
+			}
 #endif
 			template<typename TargetType> void set_trajectory(TargetType& path_container, boost::container::vector<float>& reversed_arrival_time_container)
 			{

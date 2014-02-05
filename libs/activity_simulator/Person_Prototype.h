@@ -153,33 +153,37 @@ namespace Prototypes
 
 			this_component()->template Initialize< TargetType>(id);	
 			//TODO
-//load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration,NULLTYPE);
+			//load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration,NULLTYPE);
 		}
 		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
 		{
 			this_component()->template Initialize< TargetType>(id);	
 		}
-		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,!check(ComponentType,Concepts::Has_Initialize)))
+		template<typename TargetType> void Initialize(TargetType id, requires(TargetType,!check(ComponentType,Concepts::Has_Initialize) || (check_2(typename ComponentType::Object_Type,Execution_Object,is_same) && check_2(typename ComponentType::Object_Type,Data_Object,is_same))))
 		{
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
+			assert_check_2(typename ComponentType::Object_Type,Execution_Object,is_same, "ComponentType must be an execution object, or ");
+			assert_check_2(typename ComponentType::Object_Type,Data_Object,is_same, "ComponentType must be an data object.");
 		}
-		template<typename TargetType> void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref,requires(TargetType,/*check(ComponentType,Concepts::Has_Initialize) && */check_2(typename ComponentType::Object_Type,Execution_Object,is_same)))
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneTypehome_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(TargetType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Execution_Object,is_same)))
 		{
 			this->First_Iteration<Simulation_Timestep_Increment>(iteration()+1);
 			int starting_subiteration = (int)(GLOBALS::Uniform_RNG.Next_Rand<float>()*30.0);
 
-			this_component()->template Initialize< TargetType>(id, home_zone, network_ref, scenario_ref);		
+			this_component()->template Initialize< IdType, SynthesisZoneType, NetworkRefType, ScenarioRefType>(id, home_zone, network_ref, scenario_ref);		
 			//TODO
-//load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration,NULLTYPE);
+			//load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration,NULLTYPE);
 		}
-		template<typename TargetType> void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref,requires(TargetType,/*check(ComponentType,Concepts::Has_Initialize) && */check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneTypehome_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(TargetType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
 		{
 			this_component()->template Initialize< TargetType>(id, home_zone, network_ref, scenario_ref);		
 		}
-		/*template<typename TargetType> void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref,requires(TargetType,!check(ComponentType,Concepts::Has_Initialize)))
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneTypehome_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(TargetType,!check(ComponentType,Concepts::Has_Initialize) || (!check_2(typename ComponentType::Object_Type,Execution_Object,is_same) && check_2(typename ComponentType::Object_Type,Data_Object,is_same))))
 		{
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
-		}*/
+			assert_check_2(typename ComponentType::Object_Type,Execution_Object,is_same, "ComponentType must be an execution object, or ");
+			assert_check_2(typename ComponentType::Object_Type,Data_Object,is_same, "ComponentType must be an data object.");
+		}
 
 		// Sub-component accessors	
 
@@ -519,7 +523,10 @@ namespace Prototypes
 			}
 			return s.str();
 		}
-		template<typename TargetType>_method_void(Sort_Activity_Records, NONE);
+		template<typename TargetType> void Sort_Activity_Records()
+		{
+			this_component()->Sort_Activity_Records<TargetType>();
+		}
 
 
 		// PASS-THROUGH FEATURES OF SUB-COMPONENTS
@@ -535,17 +542,17 @@ namespace Prototypes
 			scheduler_itf* scheduler = this->Scheduling_Faculty<scheduler_itf*>();
 			return scheduler->template current_activity_plan<TargetType>();
 		}
-		template<typename TargetType> typename TargetType::ReturnType next_activity_plan(typename TargetType::ParamType current_time_or_activity)
+		template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_time_or_activity)
 		{
 			typedef Prototypes::Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
 			scheduler_itf* scheduler = this->Scheduling_Faculty<scheduler_itf*>();
-			return scheduler->template next_activity_plan<TargetType>(current_time_or_activity);
+			return scheduler->template next_activity_plan<ParamType, ReturnType>(current_time_or_activity);
 		}
-		template<typename TargetType> typename TargetType::ReturnType previous_activity_plan(typename TargetType::ParamType current_time)
+		template<typename ParamType, typename ReturnType> typename ReturnType previous_activity_plan(ParamType current_time)
 		{
 			typedef Prototypes::Person_Scheduler<typename get_type_of(Scheduling_Faculty)> scheduler_itf;
 			scheduler_itf* scheduler = this->Scheduling_Faculty<scheduler_itf*>();
-			return scheduler->template previous_activity_plan<TargetType>(current_time);
+			return scheduler->template previous_activity_plan<ParamType, ReturnType>(current_time);
 		}
 		template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan)
 		{

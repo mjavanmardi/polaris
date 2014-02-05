@@ -1,6 +1,6 @@
 #pragma once
 
-#include "User_Space_Includes.h"
+#include "traffic_simulator\User_Space_Includes.h"
 //#include "Population_Unit_Prototype.h"
 
 
@@ -58,21 +58,21 @@ namespace PopSyn
 		};
 		concept struct Is_IPF_Capable
 		{
-			check_typename_defined(Has_Value_Type, Value_Type);
+			check_typedef_name(Has_Value_Type, Value_Type);
 			check_typedef_type(Has_Marginals, Has_Marginals_In_Distribution, true_type);
 			define_default_check(Has_Marginals && Has_Value_Type);
 		};
 
 		concept struct Is_Probabilistic_Selection
 		{
-			check_typename_defined(Has_Value_Type, Value_Type);
+			check_typedef_name(Has_Value_Type, Value_Type);
 			check_typedef_type(Has_Probabilistic_Selection_Defined, Probabilistic_Selection_Type, true_type);
 			define_default_check(Has_Probabilistic_Selection_Defined && Has_Value_Type);
 		};
 
 		concept struct Is_Loss_Function_Selection
 		{
-			check_typename_defined(Has_Value_Type, Value_Type);
+			check_typedef_name(Has_Value_Type, Value_Type);
 			check_typedef_type(Has_Loss_Function_Selection_Defined, Loss_Function_Selection_Type, true_type);
 			define_default_check(Has_Loss_Function_Selection_Defined && Has_Value_Type);
 		};
@@ -80,12 +80,12 @@ namespace PopSyn
 
 		concept struct Is_IPF_Solver_Setting
 		{
-			check_typed_member(Has_IPF_Tolerance_d, IPF_Tolerance, double);
-			check_typed_member(Has_IPF_Tolerance_f, IPF_Tolerance, float);
-			check_typed_member(Has_Max_Iterations_int, Max_Iterations, int);
-			check_typed_member(Has_Max_Iterations_uint, Max_Iterations, unsigned int);
-			check_typed_member(Has_Max_Iterations_long, Max_Iterations, long);
-			check_typed_member(Has_Max_Iterations_ulong, Max_Iterations, long);
+			check_data_member_type(Has_IPF_Tolerance_d, IPF_Tolerance, double);
+			check_data_member_type(Has_IPF_Tolerance_f, IPF_Tolerance, float);
+			check_data_member_type(Has_Max_Iterations_int, Max_Iterations, int);
+			check_data_member_type(Has_Max_Iterations_uint, Max_Iterations, unsigned int);
+			check_data_member_type(Has_Max_Iterations_long, Max_Iterations, long);
+			check_data_member_type(Has_Max_Iterations_ulong, Max_Iterations, long);
 
 			define_default_check((Has_IPF_Tolerance_d || Has_IPF_Tolerance_f) && (Has_Max_Iterations_int || Has_Max_Iterations_uint || Has_Max_Iterations_long || Has_Max_Iterations_ulong));
 		};
@@ -97,9 +97,9 @@ namespace PopSyn
 		{
 			tag_as_prototype;
 
-			template<typename TargetType> void Initialize(typename TargetType::ParamType tolerance, typename TargetType::ParamType percent_to_synthesize, typename TargetType::Param2Type iterations)
+			template<typename ParamType> void Initialize(ParamType tolerance, ParamType percent_to_synthesize, ParamType iterations)
 			{
-				this_component()->template Initialize<TargetType>(tolerance,percent_to_synthesize,iterations);
+				this_component()->template Initialize<ParamType>(tolerance,percent_to_synthesize,iterations);
 			}
 			accessor(Tolerance,check(strip_modifiers(TargetType), is_arithmetic), NONE);
 			accessor(Iterations,check(strip_modifiers(TargetType), is_arithmetic), NONE);
@@ -194,7 +194,7 @@ namespace PopSyn
 			//===================================================================================================================================
 			// Defintion of the Household/Person selection procedure - can be used for IPF, Combinatorial Optimization, etc. methods
 			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, 
-				requires(TargetType,check(ComponentType, Concepts::Is_Probabilistic_Selection)   && check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Concepts::Is_Associative)))
+				requires(TargetType,check(ComponentType, Concepts::Is_Probabilistic_Selection)   && check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative)))
 			{
 				typedef Network_Components::Prototypes::Network<typename ComponentType::Master_Type::network_type> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
@@ -304,7 +304,7 @@ namespace PopSyn
 				}		
 			}
 			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, 
-				requires(TargetType,!(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Concepts::Is_Associative))))
+				requires(TargetType,!(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative))))
 			{
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
 				assert_check(strip_modifiers(TargetType), is_pointer,"Is not a pointer");
@@ -370,9 +370,9 @@ namespace PopSyn
 			accessor(Solver_Settings, NONE, NONE);
 			accessor(Selection_Settings, NONE, NONE);
 
-			template<typename TargetType> typename TargetType::ReturnType Get_1D_Index(typename TargetType::ParamType& multi_dimensional_index_boost::container::vector)
+			template<typename ParamType, typename ReturnType> ReturnType Get_1D_Index(ParamType& multi_dimensional_index_vector)
 			{
-				return this_component()->template Get_1D_Index<TargetType>(multi_dimensional_index_boost::container::vector);
+				return this_component()->template Get_1D_Index<TargetType>(multi_dimensional_index_vector);
 			}
 		};
 

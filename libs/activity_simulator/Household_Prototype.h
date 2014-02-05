@@ -52,10 +52,14 @@ namespace Prototypes
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
 
-		template<typename TargetType> void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref,requires(TargetType,check(ComponentType,Concepts::Has_Initialize)))
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(ScenarioRefType,check(ComponentType,Concepts::Has_Initialize)))
 		{
 			this_component()->template Initialize< TargetType>(id, home_zone, network_ref, scenario_ref);		
 			this->template Set_Home_Location<NT>();
+		}
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(ScenarioRefType,!check(ComponentType,Concepts::Has_Initialize)))
+		{
+			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 		}
 
 		// Sub-component accessors	

@@ -17,18 +17,18 @@ namespace Prototypes
 		accessor(choice_set_size, NONE, NONE);
 		accessor(choice_model, NONE, NONE);	
 
-		template<typename TargetType> typename TargetType::ReturnType Choose_Mode(typename TargetType::ParamType activity, requires(TargetType,
-			check(typename TargetType::ParamType, is_pointer) &&
-			check_2(typename TargetType::ReturnType,Vehicle_Components::Types::Vehicle_Type_Keys,is_same)))
+		template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Mode(ActivityItfType activity, requires(ActivityItfType,
+			check(ActivityItfType, is_pointer) &&
+			check_2(ReturnType,Vehicle_Components::Types::Vehicle_Type_Keys,is_same)))
 		{
-			return this_component()->template Choose_Mode<TargetType>(activity);
+			return this_component()->template Choose_Mode<ActivityItfType, ReturnType>(activity);
 		}
-		template<typename TargetType> typename TargetType::ReturnType Choose_Mode(typename TargetType::ParamType activity, requires(TargetType,
-			!check(typename TargetType::ParamType, is_pointer) ||
-			!check_2(typename TargetType::ReturnType,Vehicle_Components::Types::Vehicle_Type_Keys,is_same)))
+		template<typename ActivityItfType, typename ReturnType>ReturnType Choose_Mode(ActivityItfType activity, requires(ActivityItfType,
+			!check(ActivityItfType, is_pointer) ||
+			!check_2(ReturnType,Vehicle_Components::Types::Vehicle_Type_Keys,is_same)))
 		{
-			assert_check(typename TargetType::ParamType, is_pointer, "Error, must pass activity for mode choice as a pointer.");
-			assert_check_2(typename TargetType::ReturnType,Vehicle_Components::Types::Vehicle_Type_Keys,is_same, "Must request return value as a Vehicle_Type_Keys type");
+			assert_check(ActivityItfType, is_pointer, "Error, must pass activity for mode choice as a pointer.");
+			assert_check_2(ReturnType,Vehicle_Components::Types::Vehicle_Type_Keys,is_same, "Must request return value as a Vehicle_Type_Keys type");
 		}
 	};
 

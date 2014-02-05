@@ -37,7 +37,7 @@ namespace Zone_Components
 		{
 			tag_as_prototype;
 
-			template<typename TargetType> void push_zone_information(typename TargetType::ParamType coordinates, void* this_ptr, typename TargetType::Param2Type productions, typename TargetType::Param2Type attractions)
+			template<typename ParamType, typename Param2Type> void push_zone_information(ParamType coordinates, void* this_ptr, Param2Type productions, Param2Type attractions)
 			{
 				this_component()->template accept_zone_information<TargetType>(coordinates, this_ptr, productions, attractions);
 			}
@@ -150,8 +150,7 @@ namespace Zone_Components
 				else if (id <= 350) auto_parking_cost = 1.5;
 				else auto_parking_cost = 0.0;
 
-//TODO
-//				return Basic_Units::Prototypes::Currency<Basic_Units::Implementations::Currency_Implementation<NT>,NT>::Convert_Value<Target_Type<NT,TargetType,Dollars>>(auto_parking_cost);
+				return GLOBALS::Currency_Converter.Convert_Value<Dollars,TargetType>(auto_parking_cost);
 			}
 
 			// features for counting productions and attractions, use TargetType as a reference to set for a specific thread and as a value to return the sum total

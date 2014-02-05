@@ -112,13 +112,10 @@ namespace Person_Components
 				zone = _destination->template zone<_Zone_Interface*>();
 
 				// get the deflected travel time due to the addition of the current activity
-//TODO
-//				ttime_before = los->template Get_TTime<Target_Type<NULLTYPE,Time_Minutes,_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys>>(_previous,_destination,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-//TODO
-//				ttime_after = los->template Get_TTime<Target_Type<NULLTYPE,Time_Minutes,_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys>>(_destination,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				ttime_before = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(_previous,_destination,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				ttime_after = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(_destination,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 				if (_previous == _next) ttime_without = 0;
-//TODO
-//				else ttime_without = los->template Get_TTime<Target_Type<NULLTYPE,Time_Minutes,_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys>>(_previous,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				else ttime_without = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(_previous,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 				ttime_deflected = ttime_before + ttime_after - ttime_without;
 				
 				// Get Income/race dif with zone
@@ -286,13 +283,10 @@ namespace Person_Components
 				zone = _destination->template zone<_Zone_Interface*>();
 
 				// get the deflected travel time due to the addition of the current activity
-//TODO
-//				ttime_before = los->template Get_TTime<Target_Type<NULLTYPE,Time_Minutes,_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys>>(_previous,_destination,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
-//TODO
-//				ttime_after = los->template Get_TTime<Target_Type<NULLTYPE,Time_Minutes,_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys>>(_destination,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				ttime_before = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(_previous,_destination,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				ttime_after = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(_destination,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 				if (_previous == _next) ttime_without = 0;
-//TODO
-//				else ttime_without = los->template Get_TTime<Target_Type<NULLTYPE,Time_Minutes,_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys>>(_previous,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				else ttime_without = los->template Get_TTime<_Activity_Location_Interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(_previous,_next,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 				ttime_deflected = ttime_before + ttime_after - ttime_without;
 				
 				// Get Income/race dif with zone
@@ -550,7 +544,7 @@ namespace Person_Components
 			}
 			tag_feature_as_available(Initialize);
 
-			template<typename TargetType> typename TargetType::ReturnType Choose_Destination(typename TargetType::ParamType activity, boost::container::vector<typename TargetType::ReturnType>* destinations_to_use=nullptr)
+			template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Destination(ActivityItfType activity, boost::container::vector<ReturnType>* destinations_to_use=nullptr)
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				
@@ -575,7 +569,7 @@ namespace Person_Components
 
 				// Create choice set
 				boost::container::vector<_Choice_Option_Interface*> loc_options;
-				fill_choice_boost::container::set<typename TargetType::ReturnType>(locations,loc_options,choice_model);
+				fill_choice_boost::container::set<ReturnType>(locations,loc_options,choice_model);
 
 				// Make choice
 				int selected_index = 0;
@@ -585,7 +579,7 @@ namespace Person_Components
 				_Choice_Option_Interface* selected = choice_model->template Choose<_Choice_Option_Interface*>(selected_index);
 
 				// Validate the return value
-				typename TargetType::ReturnType return_ptr = nullptr;
+				ReturnType return_ptr = nullptr;
 				if (selected == nullptr) 
 				{
 					//THROW_WARNING("WARNING: selected is null - no destination choice made, index = " << selected_index <<", prev/next="<<prev->template zone<_Zone_Interface*>()->uuid<int>() << "/"<<next->template zone<_Zone_Interface*>()->uuid<int>());
@@ -597,7 +591,7 @@ namespace Person_Components
 					cout << endl;
 				
 				}
-				else return_ptr = choice_model->template Choice_At<_Choice_Option_Interface*>(selected_index)->template destination<typename TargetType::ReturnType>();
+				else return_ptr = choice_model->template Choice_At<_Choice_Option_Interface*>(selected_index)->template destination<ReturnType>();
 
 				// free memory allocated locally
 				for (int i = 0; i < loc_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)loc_options[i]);
@@ -676,10 +670,8 @@ namespace Person_Components
 				bool restrict_choice_set = true;
 				if (this->_Current_Activity->Start_Is_Planned<bool>())
 				{
-//TODO
-//					prev_act = scheduler->previous_activity_plan<Target_Type<NT,Current_Activity_interface*,Time_Seconds>>(this->_Current_Activity->Start_Time<Time_Seconds>());
-//TODO
-//					next_act = scheduler->previous_activity_plan<Target_Type<NT,Current_Activity_interface*,Time_Seconds>>(this->_Current_Activity->Start_Time<Time_Seconds>());
+					prev_act = scheduler->previous_activity_plan<Time_Seconds,Current_Activity_interface*>(this->_Current_Activity->Start_Time<Time_Seconds>());
+					next_act = scheduler->previous_activity_plan<Time_Seconds,Current_Activity_interface*>(this->_Current_Activity->Start_Time<Time_Seconds>());
 					// check previous act, if it is not known or if its location is not know, do not restrict current choice set
 					if (prev_act == nullptr)
 					{

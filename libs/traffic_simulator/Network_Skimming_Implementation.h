@@ -234,8 +234,7 @@ namespace Network_Skimming_Components
 							continue;
 						}
 
-//TODO
-//						//if (dest_zone_index == orig_zone_index) time = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,typename skimmer_itf::Component_Type::Stored_Time_Type,Time_Minutes>>(2.0);
+						if (dest_zone_index == orig_zone_index) time = GLOBALS::Time_Converter.Convert_Value<Time_Minutes, typename skimmer_itf::Component_Type::Stored_Time_Type>(2.0);
 						if (orig_loc == dest_node) time = 0;
 
 						// if updating of a previous skim file is specified, include the old skim value in the weighting calculation
@@ -321,10 +320,10 @@ namespace Network_Skimming_Components
 
 				//outfile.close();
 			}
-			template<typename TargetType> typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_Index, typename TargetType::ParamType Destination_Index)
+			template<typename ParamType, typename ReturnType> ReturnType Get_LOS(ParamType Origin_Index, ParamType Destination_Index)
 			{		
 				PUSH_TO_STACK("Get_LOS");
-				typename TargetType::ReturnType ret_value = (typename TargetType::ReturnType)_skim_table[typename skim_table_itf::index_type(Origin_Index,Destination_Index)];
+				ReturnType ret_value = (ReturnType)_skim_table[typename skim_table_itf::index_type(Origin_Index,Destination_Index)];
 				POP_FROM_STACK;
 				return ret_value;
 			}
@@ -580,8 +579,7 @@ namespace Network_Skimming_Components
 
 				//===========================================================================
 				// create the skim_table time periods, for basic create only a single time period skim_table
-//TODO
-//				for (start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,Simulation_Timestep_Increment,Time_Hours>>(24.0); start = start + skim->template update_increment<Simulation_Timestep_Increment>())
+				for (start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + skim->template update_increment<Simulation_Timestep_Increment>())
 				{		
 					skim_table_itf* skim_table = (skim_table_itf*)Allocate<typename type_of(skims_by_time_container)::value_type>();
 					skim_table->template network_reference<network_itf*>(network);
@@ -631,8 +629,7 @@ namespace Network_Skimming_Components
 				for (zones_itf::iterator zone_itr = zones_container->begin(); zone_itr != zones_container->end(); ++zone_itr)
 				{
 					zone_itf* zone = (zone_itf*)(zone_itr->second);
-//TODO
-//					los_value_itf* los = skim->Get_LOS<Target_Type<NT,los_value_itf*, zone_itf*>>(zone, zone);
+					los_value_itf* los = skim->Get_LOS<zone_itf*,los_value_itf*>(zone, zone);
 
 					if (los->auto_distance<Miles>() > 1000)
 					{
@@ -699,12 +696,9 @@ namespace Network_Skimming_Components
 						if (zone == dzone) continue;
 
 						// get TTime by automobile and transit through skim interface, in minutes
-//TODO
-//						Time_Minutes ttime_auto_peak = skim->Get_TTime<Target_Type<NT,Time_Minutes,zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours>>(zone,dzone,Vehicle_Components::Types::SOV, 9.0);
-//TODO
-//						Time_Minutes ttime_auto_offpeak = skim->Get_TTime<Target_Type<NT,Time_Minutes,zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours>>(zone,dzone,Vehicle_Components::Types::SOV, 13.0);
-//TODO
-//						Time_Minutes ttime_transit = skim->Get_TTime<Target_Type<NT,Time_Minutes,zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys>>(zone,dzone,Vehicle_Components::Types::BUS);
+						Time_Minutes ttime_auto_peak = skim->Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 9.0);
+						Time_Minutes ttime_auto_offpeak = skim->Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes>(zone,dzone,Vehicle_Components::Types::SOV, 13.0);
+						Time_Minutes ttime_transit = skim->Get_TTime<zone_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Minutes>(zone,dzone,Vehicle_Components::Types::BUS);
 
 						// update the accessibilty factors: (1/Nz-1) * (sum(Emp * exp(alpha*ttime)))
 						C_gov += Nz_inv * dzone->employment_government<float>() * exp(alpha*ttime_auto_peak);

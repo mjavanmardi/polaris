@@ -145,7 +145,7 @@ namespace Movement_Plan_Components
 			typedef typename Movement_Plan_Implementation<MasterType, INHERIT(Movement_Plan_Record_Implementation)>::Component_Type ComponentType;
 			
 			// Initialize the record with an existing movement plan
-			template<typename TargetType> void Initialize(typename TargetType::ParamType movement_to_copy)
+			template<typename TargetType> void Initialize(TargetType movement_to_copy)
 			{
 				// get interface to the input parameter
 				typedef Prototypes::Movement_Plan<typename MasterType::movement_plan_type> movement_itf;
