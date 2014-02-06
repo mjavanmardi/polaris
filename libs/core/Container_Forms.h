@@ -475,9 +475,6 @@ namespace polaris
 		//iterator find ( const key_type& x ) { return ((ComponentType*)this)->find(x);} 
 
 		//pair<iterator,iterator>  equal_range ( const key_type& x ) { return ((ComponentType*)this)->equal_range(x);}
-
-
-
 	};
 
 	///----------------------------------------------------------------------------------------------------
@@ -510,23 +507,23 @@ namespace polaris
 
 		bool empty(){return ((ComponentType*)this)->empty();}
 
-		pair<iterator,bool> insert(pair<key_type,data_type>& p)
+		pair<iterator,bool>& insert(pair<key_type,data_type>& p)
 		{
 			pair<key_type,data_type> t = pair<key_type,data_type>(p.first,(data_type)(p.second));
 			return ((ComponentType*)this)->insert(t);
 		}
 
-		pair<iterator,bool> insert(pair<key_type,data_type>&& p)
+		pair<iterator,bool>& insert(pair<key_type,data_type>&& p)
 		{
 			pair<key_type,data_type> t = pair<key_type,data_type>(p.first,(data_type)(p.second));
 			return ((ComponentType*)this)->insert(t);
 		}
 
-		iterator insert(key_type key, data_type& value)
+		iterator insert(key_type& key, data_type& value)
 		{	
 			return ((ComponentType*)this)->insert(pair<key_type,data_type>(key,value));
 		}
-		iterator insert(key_type key, data_type&& value)
+		iterator insert(key_type& key, data_type&& value)
 		{
 			return ((ComponentType*)this)->insert(pair<key_type,data_type&&>(key,(data_type&&)value));
 		}
@@ -535,16 +532,16 @@ namespace polaris
 		//
 		//void insert(iterator p, iterator i, TargetValueType t){return ((ComponentType*)this)->insert(p,i,t);}
 
-		size_type erase (key_type key){return ((ComponentType*)this)->erase(key);}
+		size_type erase (key_type& key){return ((ComponentType*)this)->erase(key);}
 		iterator erase(iterator p){return ((ComponentType*)this)->erase(p);}
 		
 		iterator erase(iterator p, iterator q){return ((ComponentType*)this)->erase(p,q);}
 
 		void clear(){return ((ComponentType*)this)->clear();}
 
-		void set_empty_key(key_type key){((ComponentType*)this)->set_empty_key(key);}
+		void set_empty_key(key_type& key){((ComponentType*)this)->set_empty_key(key);}
 
-		void set_deleted_key(key_type key){((ComponentType*)this)->set_deleted_key(key);}
+		void set_deleted_key(key_type& key){((ComponentType*)this)->set_deleted_key(key);}
 
 		//key_compare key_comp() const { return ((ComponentType*)this)->key_comp();}
 
@@ -552,7 +549,7 @@ namespace polaris
 
 		iterator find ( const key_type& x ) { return ((ComponentType*)this)->find(x);} 
 
-		pair<iterator,iterator>  equal_range ( const key_type& x ) { return ((ComponentType*)this)->equal_range(x);}
+		pair<iterator,iterator>&  equal_range ( const key_type& x ) { return ((ComponentType*)this)->equal_range(x);}
 
 
 
