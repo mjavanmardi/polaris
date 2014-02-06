@@ -83,30 +83,36 @@ namespace GLOBALS
 //=================================================================================================================
 // SIMULATION TIMER DEFINITION - Used by agents as a wrapper for the global _iteration variable
 typedef Basic_Units::Implementations::Time_Implementation<NULLTYPE> Basic_Time;
+typedef Basic_Units::Implementations::Currency_Implementation<NT> Basic_Currency;
+typedef Basic_Units::Implementations::Length_Implementation<NT> Basic_Length;
+typedef Basic_Units::Implementations::Area_Implementation<NT> Basic_Area;
+
 template<typename Base_Time_Type>
 struct _Simulation_Timer
 {
 	template<typename TargetType> TargetType Current_Time()
 	{
-		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<TargetType,Base_Time_Type>((typename Base_Time_Type::ValueType)iteration());
+		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Base_Time_Type,TargetType>((typename Base_Time_Type::ValueType)iteration());
 	}
-	template<typename InputType, typename TargetType> TargetType Future_Time(InputType Additional_Time_Increment)
+	template<typename InputType, typename ReturnType> ReturnType Future_Time(InputType Additional_Time_Increment)
 	{
 		Simulation_Timestep_Increment current_time;
 		current_time = (Simulation_Timestep_Increment)iteration();
-		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Simulation_Timestep_Increment,InputType>(Additional_Time_Increment);
-		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Target_Type<TargetType,Simulation_Timestep_Increment>(current_time + additional_time);
+		Simulation_Timestep_Increment additional_time = Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<InputType, Simulation_Timestep_Increment>(Additional_Time_Increment);
+		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Simulation_Timestep_Increment, ReturnType>(current_time + additional_time);
 	}
 	template<typename InputType> Simulation_Timestep_Increment Convert_Time_To_Simulation_Timestep(InputType Time)
 	{
-		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<Simulation_Timestep_Increment,InputType>(Time);
+		return Basic_Units::Prototypes::Time<Basic_Time>::Convert_Value<InputType, Simulation_Timestep_Increment>(Time);
 	}
 };
 
 static _Simulation_Timer<Simulation_Timestep_Increment> Simulation_Time;
 
 static Basic_Units::Prototypes::Time<Basic_Time> Time_Converter;
-
+static Basic_Units::Prototypes::Currency<Basic_Currency> Currency_Converter;
+static Basic_Units::Prototypes::Length<Basic_Length> Length_Converter;
+static Basic_Units::Prototypes::Area<Basic_Area> Area_Converter;
 }
 
 using namespace GLOBALS;

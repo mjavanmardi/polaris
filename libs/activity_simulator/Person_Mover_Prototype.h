@@ -174,31 +174,34 @@ namespace Prototypes
 		//========================================================
 		// Main hook to person planner - called 5 minutes prior to estimated departure
 		//--------------------------------------------------------
-		template<typename TargetType> void Schedule_Movement(typename TargetType::ParamType departure_time, typename TargetType::Param2Type movement, requires(TargetType,
-			check(typename TargetType::ParamType, Basic_Units::Concepts::Is_Time_Value) && 
-			check(typename TargetType::Param2Type, Movement_Plan_Components::Concepts::Is_Movement_Plan) && 
-			(check(typename TargetType::Param2Type, is_pointer) || check(typename TargetType::Param2Type, is_reference))))
+		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
+			check(TimeType, Basic_Units::Concepts::Is_Time_Value) && 
+			check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) && 
+			(check(MovementItfType, is_pointer) || check(MovementItfType, is_reference))))
 		{
-			this->Movement<typename TargetType::Param2Type>(movement);
+			this->Movement<MovementItfType>(movement);
 			this->Movement_Scheduled<bool>(true);
 
 			// if departure_time is greater than current iteration, load pre-trip stuff on current iteration, otherwise skip pretrip and schedule departure
-			int iter = Simulation_Time.template Convert_Time_To_Simulation_Timestep<typename TargetType::ParamType>(iteration()+1);
+			int iter = Simulation_Time.template Convert_Time_To_Simulation_Timestep<TimeType>(iteration()+1);
 			if (departure_time > iteration() + 2) 
-				//TODO
+			{	//TODO
 //load_event(ComponentType,Movement_Conditional,Pretrip_Information_Acquisition_Event,iter,Scenario_Components::Types::PRETRIP_INFORMATION_ACQUISITION,NULLTYPE);
+			}
 			else 
+			{
 				//TODO
-//load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,iter,Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);					
+//load_event(ComponentType,Movement_Conditional,Pretrip_Routing_Event,iter,Scenario_Components::Types::END_OF_ITERATION,NULLTYPE);	
+			}
 		}
-		template<typename TargetType> void Schedule_Movement(typename TargetType::ParamType departure_time, typename TargetType::Param2Type movement, requires(TargetType,
-			!check(typename TargetType::ParamType, Basic_Units::Concepts::Is_Time_Value) || 
-			!check(typename TargetType::Param2Type, Movement_Plan_Components::Concepts::Is_Movement_Plan) || 
-			(!check(typename TargetType::Param2Type, is_pointer) && ! check(typename TargetType::Param2Type, is_reference))))
+		template<typename TimeType, typename MovementItfType> void Schedule_Movement(TimeType departure_time, MovementItfType movement, requires(MovementItfType,
+			!check(TimeType, Basic_Units::Concepts::Is_Time_Value) || 
+			!check(strip_modifiers(MovementItfType), Movement_Plan_Components::Concepts::Is_Movement_Plan) || 
+			(!check(MovementItfType, is_pointer) && !check(MovementItfType, is_reference))))
 		{
-			assert_check(typename TargetType::ParamType, Basic_Units::Concepts::Is_Time_Value, "Error, must use a valid time value when scheduling departure.");
-			assert_check(typename TargetType::Param2Type, Movement_Plan_Components::Concepts::Is_Movement_Plan, "Error, movement parameter is not a valid Movement_Plan interface.");
-			assert_check(typename TargetType::Param2Type, is_pointer, "Error, must pass movement plan interface as a pointer or reference.");
+			assert_check(TimeType, Basic_Units::Concepts::Is_Time_Value, "Error, must use a valid time value when scheduling departure.");
+			assert_check(MovementItfType, Movement_Plan_Components::Concepts::Is_Movement_Plan, "Error, movement parameter is not a valid Movement_Plan interface.");
+			assert_check(MovementItfType, is_pointer, "Error, must pass movement plan interface as a pointer or reference.");
 		}
 		
 			
@@ -346,18 +349,15 @@ namespace Prototypes
 					//if (activity->Location<location_itf*>() != nullptr) cout <<", zone="<<activity->Location<location_itf*>()->zone<zone_itf*>()->uuid<int>();
 				}
 
-//TODO
-//				activity_itf* prev_act = person->template previous_activity_plan<Target_Type<NT,activity_itf*,Simulation_Timestep_Increment>>(iteration());
+				activity_itf* prev_act = person->template previous_activity_plan<Simulation_Timestep_Increment,activity_itf*>(iteration());
 				if (prev_act == nullptr) orig = person->template Home_Location<location_itf*>();
 				else orig = prev_act->template Location<location_itf*>();
 
-//TODO
-//				activity_itf* next_act = person->template next_activity_plan<Target_Type<NT,activity_itf*,Simulation_Timestep_Increment>>(iteration());
+				activity_itf* next_act = person->template next_activity_plan<Simulation_Timestep_Increment,activity_itf*>(iteration());
 				if (next_act == nullptr) next = person->template Home_Location<location_itf*>();
 				else next = next_act->template Location<location_itf*>();
 
-//TODO
-//				dest = dest_chooser->template Choose_Destination<Target_Type<NT,location_itf*,activity_itf*>>(activity, unaffected_locations);
+				dest = dest_chooser->template Choose_Destination<activity_itf*,location_itf*>(activity, unaffected_locations);
 
 				if (dest != nullptr)
 				{
@@ -368,8 +368,7 @@ namespace Prototypes
 					
 					// cout << endl << "Destination Replanned for person '"<<person->Household<Household_Itf*>()->uuid<int>() <<"."<<person->uuid<int>()  <<"' due to weather, switch from zone '" << old_dest_id << "', to new zone '" << dest->zone<zone_itf*>()->uuid<int>()<<"'.";
 					
-//TODO
-//					Time_Seconds ttime = network->template Get_TTime<Target_Type<NT,Time_Seconds,location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds>>(orig, dest, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, iteration());
+					Time_Seconds ttime = network->template Get_TTime<location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Seconds,Time_Seconds>(orig, dest, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, iteration());
 
 					// update start time
 					Time_Seconds old_start = act->template Start_Time<Time_Seconds>();
@@ -742,8 +741,7 @@ namespace Prototypes
 			Time_Seconds new_end = act->End_Time<Time_Seconds>();
 			if (iteration() > act->Start_Time<Simulation_Timestep_Increment>())
 			{
-//TODO
-//				Activity_Itf* next_act = scheduler->template next_activity_plan<Target_Type<NT,Activity_Itf*, Activity_Itf*>>(act);
+				Activity_Itf* next_act = scheduler->template next_activity_plan<Activity_Itf*,Activity_Itf*>(act);
 				movement_itf* next_movement;
 				if (next_act != nullptr) next_movement = next_act->template movement_plan<movement_itf*>();
 
@@ -769,8 +767,7 @@ namespace Prototypes
 					while (true)
 					{
 						// get next activity 
-//TODO
-//						next_act = scheduler->template next_activity_plan<Target_Type<NT,Activity_Itf*, Activity_Itf*>>(act);
+						next_act = scheduler->template next_activity_plan<Activity_Itf*,Activity_Itf*>(act);
 						if (next_act == nullptr) break;
 
 						// get associated movement plan
@@ -820,8 +817,7 @@ namespace Prototypes
 
 			//=====================================================================
 			// Get the next scheduled activity if exists
-//TODO
-//			Activity_Itf* next_act = scheduler->template next_activity_plan<Target_Type<NT,Activity_Itf*, Simulation_Timestep_Increment>>(iteration());
+			Activity_Itf* next_act = scheduler->template next_activity_plan<Simulation_Timestep_Increment,Activity_Itf*>(iteration());
 
 			typedef  Person_Components::Prototypes::Person_Data_Logger< typename MasterType::person_data_logger_type> _Logger_Interface;
 			
@@ -832,8 +828,7 @@ namespace Prototypes
 			location_itf* orig = act->template Location<location_itf*>();
 			location_itf* home = person->template Home_Location<location_itf*>();
 
-//TODO
-//			Time_Seconds ttime_this_to_home = network->template Get_TTime<Target_Type<NT,Time_Seconds,location_itf*,MODE,Time_Seconds>>(orig,home,MODE::SOV,end_this);
+			Time_Seconds ttime_this_to_home = network->template Get_TTime<location_itf*,MODE,Time_Seconds,Time_Seconds>(orig,home,MODE::SOV,end_this);
 
 
 			// don't add additional movement if already at home, just update the end time of the current at home activity
@@ -864,8 +859,7 @@ namespace Prototypes
 				new_act->template Parent_Planner<Planner_Itf*>(planner);
 				new_act->Activity_Plan_ID<int>(scheduler->Activity_Count<int>() + 100);
 				Time_Seconds min_home_duration = 86400 - (end_this+ttime_this_to_home);
-//TODO
-//				new_act->template Initialize<Target_Type<NT,void,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>>(end_this,end_this+ttime_this_to_home, min_home_duration,act->template Mode<MODE>());
+				new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this,end_this+ttime_this_to_home, min_home_duration,act->template Mode<MODE>());
 				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
 
 				POP_FROM_STACK;
@@ -877,10 +871,8 @@ namespace Prototypes
 			// expected travel times
 			location_itf* dest = next_act->template Location<location_itf*>();
 			Time_Seconds begin_next = next_act->template Start_Time<Time_Seconds>();
-//TODO
-//			Time_Seconds ttime_this_to_next = network->template Get_TTime<Target_Type<NT,Time_Seconds,location_itf*,MODE,Time_Seconds>>(orig,dest,MODE::SOV,end_this);
-//TODO
-//			Time_Seconds ttime_home_to_next = network->template Get_TTime<Target_Type<NT,Time_Seconds,location_itf*,MODE,Time_Seconds>>(home,dest,MODE::SOV,end_this + ttime_this_to_home);
+			Time_Seconds ttime_this_to_next = network->template Get_TTime<location_itf*,MODE,Time_Seconds,Time_Seconds>(orig,dest,MODE::SOV,end_this);
+			Time_Seconds ttime_home_to_next = network->template Get_TTime<location_itf*,MODE,Time_Seconds,Time_Seconds>(home,dest,MODE::SOV,end_this + ttime_this_to_home);
 			Time_Seconds min_home_duration = min((float)ttime_this_to_home,(float)ttime_home_to_next);
 			min_home_duration = max((float)min_home_duration, 900.0f);
 
@@ -894,8 +886,7 @@ namespace Prototypes
 				at_home_activity_itf* new_act = (at_home_activity_itf*)Allocate<typename ComponentType::Master_Type::at_home_activity_plan_type>();
 				new_act->template Parent_Planner<Planner_Itf*>(planner);
 				new_act->Activity_Plan_ID<int>(scheduler->Activity_Count<int>() + 100);
-//TODO
-//				new_act->template Initialize<Target_Type<NT,void,Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>>(end_this, end_this+ttime_this_to_home, duration,act->template Mode<MODE>());
+				new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this, end_this+ttime_this_to_home, duration,act->template Mode<MODE>());
 			}
 
 			//=====================================================================

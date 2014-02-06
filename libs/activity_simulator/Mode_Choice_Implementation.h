@@ -158,9 +158,8 @@ namespace Person_Components
 
 				// get the travel time to the destination
 				los_itf* los;
-				if (_current_activity->Start_Is_Planned<bool>()) los = skim->template Get_LOS<Target_Type<NULLTYPE,los_itf*,_Activity_Location_Interface*, Time_Seconds>>(_previous_location,_destination, _current_activity->Start_Time<Time_Seconds>());
-//TODO
-//				else los = skim->template Get_LOS<Target_Type<NULLTYPE,los_itf*,_Activity_Location_Interface*, Time_Hours>>(_previous_location,_destination, 12.0);
+				if (_current_activity->Start_Is_Planned<bool>()) los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Seconds,los_itf*>(_previous_location,_destination, _current_activity->Start_Time<Time_Seconds>());
+				else los = skim->template Get_LOS<_Activity_Location_Interface*, Time_Hours,los_itf*>(_previous_location,_destination, 12.0);
 				
 				
 				// Get the differences in characteristics for transit compared to auto mode (CMAP model specified as difference)
@@ -427,7 +426,7 @@ namespace Person_Components
 			}
 			tag_feature_as_available(Initialize);
 
-			template<typename TargetType> typename TargetType::ReturnType Choose_Mode(typename TargetType::ParamType activity)
+			template<typename ActivityItfType, typename ReturnType> ReturnType Choose_Mode(ActivityItfType activity)
 			{
 				person_itf* _Parent_Person = _Parent_Planner->template Parent_Person<person_itf*>();
 				scheduler_itf* scheduler = _Parent_Person->Scheduling_Faculty<scheduler_itf*>();
@@ -454,14 +453,10 @@ namespace Person_Components
 				// If the start time is known, set the previous activity/location and the next activity/location to do mode choice planning
 				if (cur_act->Start_Is_Planned<bool>())
 				{
-//TODO
-//					prev_act = _Parent_Person->previous_activity_plan<Target_Type<NT,Activity_Plan*,Time_Seconds>>(cur_act->Start_Time<Time_Seconds>());
-//TODO
-//					prev_location = scheduler->previous_location<Target_Type<NT,_Activity_Location_Interface*,Activity_Plan*>>(cur_act);
-//TODO
-//					next_act = _Parent_Person->next_activity_plan<Target_Type<NT,Activity_Plan*,Time_Seconds>>(cur_act->Start_Time<Time_Seconds>());
-//TODO
-//					next_location = scheduler->next_location<Target_Type<NT,_Activity_Location_Interface*,Activity_Plan*>>(cur_act);
+					prev_act = _Parent_Person->previous_activity_plan<Time_Seconds,Activity_Plan*>(cur_act->Start_Time<Time_Seconds>());
+					prev_location = scheduler->previous_location<Activity_Plan*,_Activity_Location_Interface*>(cur_act);
+					next_act = _Parent_Person->next_activity_plan<Time_Seconds,Activity_Plan*>(cur_act->Start_Time<Time_Seconds>());
+					next_location = scheduler->next_location<Activity_Plan*,_Activity_Location_Interface*>(cur_act);
 				}
 				// Otherwise, next activities not known, assume start and end tour location is home
 				else
@@ -485,14 +480,14 @@ namespace Person_Components
 				_Choice_Option_Interface* choice = (_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
 				choice->Parent_Planner<Parent_Planner_interface*>(_Parent_Planner);
 				choice->mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::SOV);
-				choice->current_activity<typename TargetType::ParamType>(activity);
+				choice->current_activity<ActivityItfType>(activity);
 				choice_model->template Add_Choice_Option<_Choice_Option_Interface*>(choice);
 				mode_options.push_back(choice);
 				// add the transit choice option
 				choice = (_Choice_Option_Interface*)Allocate<typename MasterType::mode_choice_option_type>();
 				choice->Parent_Planner<Parent_Planner_interface*>(_Parent_Planner);
 				choice->mode_type<Vehicle_Components::Types::Vehicle_Type_Keys>(Vehicle_Components::Types::BUS);
-				choice->current_activity<typename TargetType::ParamType>(activity);
+				choice->current_activity<ActivityItfType>(activity);
 				choice->destination<_Activity_Location_Interface*>(dest_location);
 				choice->previous_activity<Activity_Plan*>(prev_act);
 				choice->previous_location<_Activity_Location_Interface*>(prev_location);
@@ -509,7 +504,7 @@ namespace Person_Components
 				Vehicle_Components::Types::Vehicle_Type_Keys selected_mode = Vehicle_Components::Types::Vehicle_Type_Keys::SOV;
 
 				if (selected == nullptr ) {THROW_WARNING("WARNING: selected is null - no mode choice made, defaulted to auto mode." << selected_index);}
-				else selected_mode = selected->mode_type<typename TargetType::ReturnType>();
+				else selected_mode = selected->mode_type<ReturnType>();
 
 				// free memory allocated locally
 				for (int i = 0; i < mode_options.size(); i++) Free<typename _Choice_Option_Interface::Component_Type>((typename _Choice_Option_Interface::Component_Type*)mode_options[i]);

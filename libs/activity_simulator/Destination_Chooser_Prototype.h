@@ -18,13 +18,13 @@ namespace Prototypes
 		accessor(choice_model, NONE, NONE);	
 		accessor(Current_Activity, NONE, NONE);
 
-		template<typename TargetType> typename TargetType::ReturnType Choose_Destination(typename TargetType::ParamType current_activity, boost::container::vector<typename TargetType::ReturnType>* destinations_to_use=nullptr, requires(TargetType,check(typename TargetType::ReturnType,is_pointer) && check(typename TargetType::ReturnType,Activity_Location_Components::Concepts::Is_Activity_Location)))
+		template<typename ActivityRefType, typename ReturnType> ReturnType Choose_Destination(ActivityRefType current_activity, boost::container::vector<ReturnType>* destinations_to_use=nullptr, requires(ActivityRefType,check(ActivityRefType,is_pointer) && check(strip_modifiers(ReturnType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 		{
-			return this_component()->template Choose_Destination<TargetType>(current_activity, destinations_to_use);
+			return this_component()->template Choose_Destination<ActivityRefType, ReturnType>(current_activity, destinations_to_use);
 		}
-		template<typename TargetType> TargetType Choose_Routine_Destination(Activity_Components::Types::ACTIVITY_TYPES act_type, boost::container::vector<TargetType>* destinations_to_use=nullptr, requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location)))
+		template<typename ReturnType> ReturnType Choose_Routine_Destination(Activity_Components::Types::ACTIVITY_TYPES act_type, boost::container::vector<ReturnType>* destinations_to_use=nullptr, requires(ReturnType,check(ReturnType,is_pointer) && check(strip_modifiers(ReturnType),Activity_Location_Components::Concepts::Is_Activity_Location)))
 		{
-			return this_component()->template Choose_Routine_Destination<TargetType>(act_type, destinations_to_use);
+			return this_component()->template Choose_Routine_Destination<ReturnType>(act_type, destinations_to_use);
 		}
 	};
 

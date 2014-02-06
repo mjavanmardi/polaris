@@ -359,20 +359,19 @@ namespace Network_Skimming_Components
 			// Primary function accessors - used to pass through to the specific skimm table based on time-key
 			//---------------------------------------------
 			// This returns the travel time based on the current simulation time
-			template<typename TargetType> typename TargetType::ReturnType Get_TTime(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator, requires(TargetType,check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
+			template<typename LocationType, typename ModeType, typename ReturnType> ReturnType Get_TTime(LocationType Origin, LocationType Destination, ModeType Mode_Indicator, requires(ReturnType,check(ReturnType, Basic_Units::Concepts::Is_Time_Value)))
 			{	
 				PUSH_TO_STACK("Get_TTime");
 
 				// call the get los function
-//TODO
-//				typename TargetType::ReturnType return_val = this->template Get_TTime<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, typename TargetType::Param2Type, Simulation_Timestep_Increment>>(Origin, Destination, Mode_Indicator, Simulation_Time.template Current_Time<Simulation_Timestep_Increment>());
+				ReturnType return_val = this->template Get_TTime<LocationType,ModeType, Simulation_Timestep_Increment,ReturnType>(Origin, Destination, Mode_Indicator, Simulation_Time.template Current_Time<Simulation_Timestep_Increment>());
 				POP_FROM_STACK;
 
 				return return_val;
 
 			}
 			// This returns the travel time during a specific time interval
-			template<typename TargetType> typename TargetType::ReturnType Get_TTime(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator, typename TargetType::Param3Type Start_Time, requires(TargetType,check(typename TargetType::ReturnType, Basic_Units::Concepts::Is_Time_Value)))
+			template<typename LocationType, typename ModeType, typename TimeType, typename ReturnType> ReturnType Get_TTime(LocationType Origin, LocationType Destination, ModeType Mode_Indicator, TimeType Start_Time, requires(ReturnType,check(ReturnType, Basic_Units::Concepts::Is_Time_Value)))
 			{
 				PUSH_TO_STACK("Get_TTime");
 
@@ -380,35 +379,31 @@ namespace Network_Skimming_Components
 				typedef (_skim_matrix_itf, _los_itf,typename _skim_itf::get_type_of(skim_table),Multidimensional_Random_Access_Array,Prototypes::LOS);
 				
 				// call the general get los function
-//TODO
-//				_los_itf* los_value = this->template Get_LOS<Target_Type<NULLTYPE,_los_itf*, typename TargetType::ParamType, typename TargetType::Param3Type>>(Origin, Destination, Start_Time);
+				_los_itf* los_value = this->template Get_LOS<LocationType,TimeType,ReturnType>(Origin, Destination, Start_Time);
 
 				POP_FROM_STACK;
 
 				// extract and return the auto travel time
-				if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return los_value->auto_ttime<typename TargetType::ReturnType>();
-//TODO
-//				else if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) return GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Hours>>(los_value->auto_distance<Miles>()/15.0); // assume bike speed of 15MPH
-//TODO
-//				else if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::WALK) return GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,typename TargetType::ReturnType,Time_Hours>>(los_value->auto_distance<Miles>()/3.0/0.9); // assume walk speed of 3MPH and reduce walk distance by 10%
-				else return (los_value->transit_ttime<typename TargetType::ReturnType>() + los_value->transit_wait_time<typename TargetType::ReturnType>() + los_value->transit_walk_access_time<typename TargetType::ReturnType>());
+				if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::SOV) return los_value->auto_ttime<ReturnType>();
+				else if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::BICYCLE) return GLOBALS::Time_Converter.Convert_Value<Time_Hours,ReturnType>(los_value->auto_distance<Miles>()/15.0); // assume bike speed of 15MPH
+				else if (Mode_Indicator == Vehicle_Components::Types::Vehicle_Type_Keys::WALK) return GLOBALS::Time_Converter.Convert_Value<Time_Hours,ReturnType>(los_value->auto_distance<Miles>()/3.0/0.9); // assume walk speed of 3MPH and reduce walk distance by 10%
+				else return (los_value->transit_ttime<ReturnType>() + los_value->transit_wait_time<ReturnType>() + los_value->transit_walk_access_time<ReturnType>());
 				
 			}
 			
 			// This returns the full level of service information for the O/D pair at the current time
-			template<typename TargetType> typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, requires(TargetType,check(typename TargetType::ReturnType, Concepts::Is_LOS_Prototype)))
+			template<typename LocationType, typename ReturnType> ReturnType Get_LOS(LocationType Origin, LocationType Destination, requires(ReturnType,check(ReturnType, Concepts::Is_LOS_Prototype)))
 			{		
 				PUSH_TO_STACK("Get_TTime");
 
 				// call the get los function
-//TODO
-//				typename TargetType::ReturnType ret_value = this->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType, typename TargetType::ParamType, Simulation_Timestep_Increment>>(Origin, Destination, Simulation_Time.template Current_Time<Simulation_Timestep_Increment>());
+				ReturnType ret_value = this->template Get_LOS<LocationType, Simulation_Timestep_Increment, ReturnType>(Origin, Destination, Simulation_Time.template Current_Time<Simulation_Timestep_Increment>());
 				
 				POP_FROM_STACK;
 				return ret_value;
 			}
 			// This returns the full level of service information for the O/D pair at a specific time
-			template<typename TargetType> typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Start_Time, requires(TargetType,check(typename TargetType::ReturnType, Concepts::Is_LOS_Prototype)))
+			template<typename LocationType, typename TimeType, typename ReturnType> ReturnType  Get_LOS(LocationType Origin, LocationType Destination, TimeType Start_Time, requires(ReturnType,check(ReturnType, Concepts::Is_LOS_Prototype)))
 			{
 				PUSH_TO_STACK("Get_TTime");
 
@@ -425,8 +420,8 @@ namespace Network_Skimming_Components
 				zone_itf *orig_zone, *dest_zone;
 
 				// Extract zone ID information from the input origin/destination type (either location or zone)
-				int Origin_Zone_ID = this->Get_Zone_ID<typename TargetType::ParamType>(Origin);
-				int Destination_Zone_ID = this->Get_Zone_ID<typename TargetType::ParamType>(Destination);
+				int Origin_Zone_ID = this->Get_Zone_ID<LocationType>(Origin);
+				int Destination_Zone_ID = this->Get_Zone_ID<LocationType>(Destination);
 
 				// Do a lookup to make sure the zone is in the network (may be able to remove this)
 				if ((zone_itr = zones->find(Origin_Zone_ID)) != zones->end()){ orig_zone = zone_itr->second;}
@@ -444,20 +439,17 @@ namespace Network_Skimming_Components
 				_skim_itf* skim_table;
 
 				// get only the HH:MM:SS portion of requested time if Time > 1 day
-//TODO
-//				int days = ((int)(GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,Time_Hours,typename TargetType::Param2Type>>(Start_Time))/24);
-//TODO
-//				typename TargetType::Param2Type rounded = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,typename TargetType::Param2Type,Time_Hours>>((float)days * 24.0);
-				typename TargetType::Param2Type remain = Start_Time - rounded;
+				int days = ((int)(GLOBALS::Time_Converter.Convert_Value<TimeType,Time_Hours>(Start_Time))/24);
+				typename TimeType rounded = GLOBALS::Time_Converter.Convert_Value<Time_Hours,TimeType>((float)days * 24.0);
+				typename TimeType remain = Start_Time - rounded;
 				
 				// go to skim table for requested time period
 				for (; itr != skims->end(); ++itr)
 				{
 					skim_table = *itr;
-					if (skim_table->template end_time<typename TargetType::Param2Type>() > remain)
+					if (skim_table->template end_time<TimeType>() > remain)
 					{
-//TODO
-//						typename TargetType::ReturnType return_val =  skim_table->template Get_LOS<Target_Type<NULLTYPE,typename TargetType::ReturnType,int>>(orig_zone->template internal_id<int>(), dest_zone->template internal_id<int>());
+						ReturnType return_val =  skim_table->template Get_LOS<int,ReturnType>(orig_zone->template internal_id<int>(), dest_zone->template internal_id<int>());
 						
 						POP_FROM_STACK;
 						return return_val;
@@ -523,8 +515,7 @@ namespace Network_Skimming_Components
 				
 				//===========================================================================
 				// create the skim_table time periods, for basic create only a single time period skim_table
-//TODO
-//				for (Simulation_Timestep_Increment start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Target_Type<NT,Simulation_Timestep_Increment,Time_Hours>>(24.0); start = start + update_increment)
+				for (Simulation_Timestep_Increment start = 0; start < GLOBALS::Time_Converter.template Convert_Value<Time_Hours,Simulation_Timestep_Increment>(24.0); start = start + update_increment)
 				{		
 					float* data = new float[num_zones*num_zones];
 
@@ -691,11 +682,11 @@ namespace Network_Skimming_Components
 				this_component()->Write_LOS<TargetType>();
 			}
 
-			template<typename TargetType> typename TargetType::ReturnType Get_LOS(typename TargetType::ParamType Origin_Index, typename TargetType::ParamType Destination_Index)
+			template<typename ParamType, typename ReturnType> ReturnType Get_LOS(ParamType Origin_Index, ParamType Destination_Index)
 			{
 				PUSH_TO_STACK("Get_LOS");
 
-				typename TargetType::ReturnType ret_value = this_component()->Get_LOS<TargetType>(Origin_Index,Destination_Index);
+				ReturnType ret_value = this_component()->Get_LOS<ParamType, ReturnType>(Origin_Index,Destination_Index);
 
 				POP_FROM_STACK;
 				return ret_value;

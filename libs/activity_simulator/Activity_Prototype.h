@@ -455,8 +455,7 @@ namespace Activity_Components
 
 			template<typename TargetType> TargetType Minimum_Duration(requires(TargetType,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value)))
 			{
-//TODO
-//				TargetType min_seconds = GLOBALS::Time_Converter.Convert_Value<Target_Type<NT,TargetType,Time_Seconds>>(330.0);
+				TargetType min_seconds = GLOBALS::Time_Converter.Convert_Value<Time_Seconds,TargetType>(330.0);
 				TargetType min_duration = this->Duration<TargetType>()*0.5;
 				
 				float val = max<float>(min_seconds,min_duration);
@@ -471,29 +470,29 @@ namespace Activity_Components
 			{
 				this_component()->template Initialize<TargetType>(activity);
 			}
-			template<typename TargetType> void Initialize(typename TargetType::ParamType act_type, typename TargetType::Param2Type planning_time, requires(TargetType,check(strip_modifiers(TargetType),Is_Target_Type_Struct) && check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same)))
+			template<typename ActivitytypeType, typename TimeType> void Initialize(ActivitytypeType act_type, TimeType planning_time, requires(ActivitytypeType,check_2(ActivitytypeType, Types::ACTIVITY_TYPES, is_same)))
 			{
-				this_component()->template Initialize< typename TargetType::ParamType>(act_type);
+				this_component()->template Initialize< ActivitytypeType>(act_type);
 				this->Set_Meta_Attributes<void>();
-				this->Set_Attribute_Planning_Times<typename TargetType::Param2Type>(planning_time);
+				this->Set_Attribute_Planning_Times<TimeType>(planning_time);
 			}
-			template<typename TargetType> void Initialize(typename TargetType::ParamType act_type, typename TargetType::Param2Type planning_time, requires(TargetType,!check(strip_modifiers(TargetType),Is_Target_Type_Struct) || !check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same)))
+			template<typename ActivitytypeType, typename TimeType> void Initialize(ActivitytypeType act_type, TimeType planning_time, requires(ActivitytypeType,!check_2(ActivitytypeType, Types::ACTIVITY_TYPES, is_same)))
 			{
-				assert_check(strip_modifiers(TargetType),Is_Target_Type_Struct, "The TargetType for Activity.Initialize must be a Target_Type struct.");
-				assert_check_2(typename TargetType::ParamType, Types::ACTIVITY_TYPES, is_same, "TargetType::ParamType must be an ActivityType enumerator");
+				assert_check_2(ActivitytypeType, Types::ACTIVITY_TYPES, is_same, "ActivitytypeType must be an ActivityType enumerator");
 			}
-			template<typename TargetType> void Initialize(typename TargetType::ParamType start_time, typename TargetType::ParamType duration, typename TargetType::Param2Type mode)
+			template<typename TimeType, typename ModeType> void Initialize(TimeType start_time, TimeType duration, ModeType mode)
 			{
-				this_component()->template Initialize<TargetType>(start_time,duration,mode);
+				this_component()->template Initialize<TimeType,ModeType>(start_time,duration,mode);
 				this->Set_Meta_Attributes<void>();
-				this->Set_Attribute_Planning_Times<typename TargetType::ParamType>(iteration());
+				this->Set_Attribute_Planning_Times<Simulation_Timestep_Increment>(iteration());
 			}
-			template<typename TargetType> void Initialize(typename TargetType::ParamType departure_time, typename TargetType::ParamType start_time, typename TargetType::ParamType duration, typename TargetType::Param2Type mode)
+			template<typename TimeType, typename ModeType> void Initialize(TimeType departure_time, TimeType start_time, TimeType duration, ModeType mode)
 			{
-				this_component()->template Initialize<TargetType>(departure_time,start_time,duration,mode);
+				this_component()->template Initialize<TimeType, ModeType>(departure_time,start_time,duration,mode);
 				this->Set_Meta_Attributes<void>();
-				this->Set_Attribute_Planning_Times<typename TargetType::ParamType>(iteration());
+				this->Set_Attribute_Planning_Times<Simulation_Timestep_Increment>(iteration());
 			}
+			
 			template<typename TargetType> void Set_Attribute_Planning_Times(TargetType planning_time)
 			{
 				// Call the model to determine the attribute planning times
@@ -531,7 +530,11 @@ namespace Activity_Components
 					THROW_EXCEPTION(err);
 				}
 			}
-			template<typename TargetType>_method_void(Set_Meta_Attributes, NONE);	
+			template<typename TargetType> void Set_Meta_Attributes()
+			{
+				this_component()->template Set_Meta_Attributes<TargetType>();
+			}
+
 			template<typename TargetType> void Update_Movement_Plan(TargetType origin, TargetType destination, Simulation_Timestep_Increment min_departure, requires(TargetType,check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location_Prototype)))
 			{
 				this_component()->Update_Movement_Plan<TargetType>(origin,destination,min_departure);
@@ -543,12 +546,30 @@ namespace Activity_Components
 			}
 
 			// features to check if activity attributes have been planned - calculated based on reviion times for attribute planes (true if set to END)
-			template<typename TargetType>_method_void(Location_Is_Planned,check_2(TargetType,bool,is_same));
-			template<typename TargetType>_method_void(Mode_Is_Planned,check_2(TargetType,bool,is_same));
-			template<typename TargetType>_method_void(Start_Is_Planned,check_2(TargetType,bool,is_same));
-			template<typename TargetType>_method_void(Duration_Is_Planned,check_2(TargetType,bool,is_same));
-			template<typename TargetType>_method_void(Involved_Persons_Is_Planned,check_2(TargetType,bool,is_same));
-			template<typename TargetType>_method_void(Route_Is_Planned,check_2(TargetType,bool,is_same));
+			template<typename TargetType> bool Location_Is_Planned()
+			{
+				return this_component()->Location_Is_Planned<TargetType>();
+			}
+			template<typename TargetType> bool Mode_Is_Planned()
+			{
+				return this_component()->Mode_Is_Planned<TargetType>();
+			}
+			template<typename TargetType> bool Start_Is_Planned()
+			{
+				return this_component()->Start_Is_Planned<TargetType>();
+			}
+			template<typename TargetType> bool Duration_Is_Planned()
+			{
+				return this_component()->Duration_Is_Planned<TargetType>();
+			}
+			template<typename TargetType> bool Involved_Persons_Is_Planned()
+			{
+				return this_component()->Involved_Persons_Is_Planned<TargetType>();
+			}
+			template<typename TargetType> bool Route_Is_Planned()
+			{
+				return this_component()->Route_Is_Planned<TargetType>();
+			}
 		};
 	}
 }

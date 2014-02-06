@@ -33,31 +33,47 @@ namespace Person_Components
 			accessor(Movement_Plans_Container, NONE, NONE);
 			accessor(Activity_Count, NONE, NONE);
 
-			template<typename TargetType>_method_void(Initialize, NONE);
+			template<typename TargetType> void Initialize()
+			{
+				this_component()->Initialize<TargetType>();
+			}
 
 			accessor(current_movement_plan, NONE, NONE);
 			accessor(current_activity_plan, NONE, NONE);
 			
-			template<typename TargetType> typename TargetType::ReturnType next_activity_plan(typename TargetType::ParamType current_time, requires(TargetType,check(typename TargetType::ParamType,Is_Time_Value)))
+			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_time, requires(TargetType,check(ParamType,Is_Time_Value)))
 			{
-				return this_component()->next_activity_plan<TargetType>(current_time);
+				return this_component()->next_activity_plan<ParamType, ReturnType>(current_time);
 			}
-			template<typename TargetType> typename TargetType::ReturnType next_activity_plan(typename TargetType::ParamType current_act, requires(TargetType,check(typename TargetType::ParamType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
+			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_act, requires(TargetType,check(ParamType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
-				return this_component()->next_activity_plan_by_act<typename TargetType::ParamType>(current_act);
+				return this_component()->next_activity_plan<ParamType, ReturnType>(current_act);
 			}
-			template<typename TargetType> typename TargetType::ReturnType next_activity_plan(typename TargetType::ParamType value, requires(TargetType,!check(typename TargetType::ParamType,Is_Time_Value) && !check(typename TargetType::ParamType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
+			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType value, requires(TargetType,!check(ParamType,Is_Time_Value) && !check(ParamType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
 			{
-				assert_check(typename TargetType::ParamType,Is_Time_Value, "target type must be either Time_Value type or");
-				assert_check(typename TargetType::ParamType,Activity_Components::Concepts::Is_Activity_Plan_Prototype, "must be an Activity_Plan prototype");
+				assert_check(ParamType,Is_Time_Value, "target type must be either Time_Value type or");
+				assert_check(ParamType,Activity_Components::Concepts::Is_Activity_Plan_Prototype, "must be an Activity_Plan prototype");
 			}
-			//feature_method_1_arg(next_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
-			template<typename TargetType>_method_1_arg(previous_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
-			template<typename TargetType>_method_1_arg(next_location, current_activity, check(typename TargetType::ParamType,is_pointer) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
-			template<typename TargetType>_method_1_arg(previous_location, current_activity, check(typename TargetType::ParamType,is_pointer) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
 			
-			//feature_method_1_arg(Resolve_Timing_Conflict, current_activity, check_2(typename TargetType::ReturnType,bool,is_same));
-
+			template<typename TimeType, typename ReturnType> ReturnType previous_activity_plan(TimeType current_time, requires(TimeType, check(TimeType,Is_Time_Value))) /*&& check(ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/
+			{
+				return this_component()->previous_activity_plan<TimeType,ReturnType>(current_time);
+			}
+			template<typename TimeType, typename ReturnType> ReturnType previous_activity_plan(TimeType current_time, requires(TimeType, !check(TimeType,Is_Time_Value))) /*&& check(ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/
+			{
+				assert_check(TimeType,Is_Time_Value,"TimeType is not a valid Time_Value type.");
+			}
+			
+			template<typename TargetType, typename ReturnType> ReturnType next_location(TargetType current_activity, requires(TargetType,check(TargetType,is_pointer))) /*&& check(ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/
+			{
+				this_component()->next_location<TaretType,ReturnType>(current_activity);
+			}
+			template<typename TargetType, typename ReturnType> ReturnType previous_location(TargetType current_activity, requires(TargetType,check(TargetType,is_pointer))) /*&& check(ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/
+			{
+				this_component()->previous_location<TaretType,ReturnType>(current_activity);
+			}
+			
+			
 			template<typename TargetType> bool Resolve_Timing_Conflict(TargetType current_activity, bool update_movement_plans=false)
 			{
 				return this_component()->Resolve_Timing_Conflict<TargetType>(current_activity, update_movement_plans);
@@ -79,7 +95,10 @@ namespace Person_Components
 				this_component()->template Remove_Activity_Plan<TargetType>(activity_plan);
 			}
 
-			template<typename TargetType>_method_void(Sort_Activity_Schedule, NONE);
+			template<typename TargetType> void Sort_Activity_Schedule()
+			{
+				this_component()->Sort_Activity_Schedule<TargetType>();
+			}
 		};
 	}
 

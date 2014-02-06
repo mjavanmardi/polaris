@@ -68,20 +68,19 @@ namespace Household_Components
 
 				
 			}
-			template<typename TargetType> void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref)
+			template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
 			{
-				this->Initialize< typename TargetType::ParamType>(id);
-				this->home_synthesis_zone< typename TargetType::Param2Type>(home_zone);
-				this->_network_reference = (network_reference_interface*)network_ref;
-				this->_scenario_reference = (scenario_reference_interface*)scenario_ref;
+				this->Initialize<IdType>(id);
+				this->home_synthesis_zone<SynthesisZoneType>(home_zone);
+				this->network_reference<NetworkRefType>network_ref;
+				this->scenario_reference<ScenarioRefType>scenario_ref;
 
 			}
 			tag_feature_as_available(Initialize);
 
 			template<typename TargetType> void Set_Home_Location()
 			{
-//TODO
-//				_Properties->template Initialize<Target_Type<NT,void,home_synthesis_zone_interface*> >(this->_home_synthesis_zone);
+				_Properties->template Initialize<home_synthesis_zone_interface*>(this->_home_synthesis_zone);
 			}
 
 		};

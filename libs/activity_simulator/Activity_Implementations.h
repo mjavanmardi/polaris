@@ -199,20 +199,16 @@ namespace Activity_Components
 				_activity_location_itf* orig;
 				_activity_location_itf* dest = this->Location<_activity_location_itf*>();
 				Time_Seconds start = this->Start_Time<Time_Seconds>();
-//TODO
-//				this_itf* prev_act = scheduler->template previous_activity_plan<Target_Type<NT,this_itf*, Time_Seconds>>(this->Start_Time<Time_Seconds>());		
+				this_itf* prev_act = scheduler->template previous_activity_plan<Time_Seconds,this_itf*>(this->Start_Time<Time_Seconds>());		
 				if (prev_act == nullptr)  orig = person->template Home_Location<_activity_location_itf*>();
 				else
 				{
 					orig = prev_act->template Location<_activity_location_itf*>();
 					// check if a stop at home will fit prior to activity
 					Time_Seconds time_before = start - (prev_act->template Start_Time<Time_Seconds>() + prev_act->template Duration<Time_Seconds>());
-//TODO
-//					Time_Seconds ttime_prev_to_home = network->template Get_TTime<Target_Type<NT,Time_Seconds,_activity_location_itf*,Vehicle_Type_Keys, Time_Seconds>>(orig, person->template Home_Location<_activity_location_itf*>(),SOV,start);
-//TODO
-//					Time_Seconds ttime_home_to_this = network->template Get_TTime<Target_Type<NT,Time_Seconds,_activity_location_itf*,Vehicle_Type_Keys, Time_Seconds>>(person->template Home_Location<_activity_location_itf*>(),dest, SOV,start);
-//TODO
-//					Time_Seconds ttime_prev_to_this = network->template Get_TTime<Target_Type<NT,Time_Seconds,_activity_location_itf*,Vehicle_Type_Keys, Time_Seconds>>(orig, dest, SOV, start);
+					Time_Seconds ttime_prev_to_home = network->template Get_TTime<_activity_location_itf*,Vehicle_Type_Keys, Time_Seconds,Time_Seconds>(orig, person->template Home_Location<_activity_location_itf*>(),SOV,start);
+					Time_Seconds ttime_home_to_this = network->template Get_TTime<_activity_location_itf*,Vehicle_Type_Keys, Time_Seconds,Time_Seconds>(person->template Home_Location<_activity_location_itf*>(),dest, SOV,start);
+					Time_Seconds ttime_prev_to_this = network->template Get_TTime<_activity_location_itf*,Vehicle_Type_Keys, Time_Seconds,Time_Seconds>(orig, dest, SOV, start);
 					// enough time between previous activity and this activity to go home, stay there for a minimimum amount of time (equal to the shortest leg of the return home trip) and get to this activity
 					float min_home_time = min((float)ttime_prev_to_home,(float)ttime_home_to_this);	
 					// don't reset origin, however, if this trip is a return-to-home trip
@@ -333,8 +329,7 @@ namespace Activity_Components
 						Simulation_Timestep_Increment start = this->Start_Time<Simulation_Timestep_Increment>();
 						Simulation_Timestep_Increment ttime;
 						if (orig == dest) ttime = 0;
-//TODO
-//						else ttime = network->template Get_TTime<Target_Type<NT,Simulation_Timestep_Increment,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Simulation_Timestep_Increment>>(orig, dest, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
+						else ttime = network->template Get_TTime<_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys,Simulation_Timestep_Increment,Simulation_Timestep_Increment>(orig, dest, Vehicle_Components::Types::Vehicle_Type_Keys::SOV, start);
 						this->Expected_Travel_Time<Simulation_Timestep_Increment>(ttime);
 
 						// recalculate the departure time based on new estimated travel time
@@ -519,10 +514,8 @@ namespace Activity_Components
 				if (static_props->template Age<int>() >= 65) Senior = 1;
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
 				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-//TODO
-//				AvgFreq = properties->template Average_Activity_Frequency<Target_Type<NT,float,ACTIVITY_TYPES>>(base_this->_Activity_Type);
-//TODO
-//				AvgDur = properties->template Average_Activity_Duration<Target_Type<NT,Time_Minutes,ACTIVITY_TYPES>>(base_this->_Activity_Type);
+				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float>(base_this->_Activity_Type);
+				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Minutes>(base_this->_Activity_Type);
 
 
 				//===========================================================================================================================
@@ -780,18 +773,14 @@ namespace Activity_Components
 				//if (bthis->template Start_Is_Planned<bool>())
 				//{
 				//	// set previous activity location, =home if no previous activity or if person can go home before current activity
-//TODO
-//				//	this_itf* previous = person->template previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->template Start_Time<Time_Seconds>());
+				//	this_itf* previous = person->template previous_activity_plan<Time_Seconds,this_itf*>(bthis->template Start_Time<Time_Seconds>());
 				//	if (previous == nullptr) prev_loc = home_loc;
-//TODO
-//				//	else prev_loc = scheduler->template previous_location<Target_Type<NT,_activity_location_itf**>>(this);
+				//	else prev_loc = scheduler->template previous_location<_activity_location_itf**>(this);
 
 				//	// set next activity location, =home if no next activity
-//TODO
-//				//	this_itf* next = person->template previous_activity_plan<Target_Type<NT,this_itf*,Time_Seconds>>(bthis->template Start_Time<Time_Seconds>());
+				//	this_itf* next = person->template previous_activity_plan<Time_Seconds,this_itf*>(bthis->template Start_Time<Time_Seconds>());
 				//	if (next == nullptr) next_loc = home_loc;
-//TODO
-//				//	else next_loc = scheduler->template next_location<Target_Type<NT,_activity_location_itf**>>(this);
+				//	else next_loc = scheduler->template next_location<_activity_location_itf**>(this);
 				//}
 				//// if the start time is not known, treat the tour as originating/destined for home
 				//else 
@@ -801,8 +790,7 @@ namespace Activity_Components
 				//}
 
 				// call destination choice - set to home of no location could be chosen
-//TODO
-//				_activity_location_itf* dest = dest_chooser->template Choose_Destination<Target_Type<NT,_activity_location_itf*,this_itf*>>(pthis);
+				_activity_location_itf* dest = dest_chooser->template Choose_Destination<this_itf*,_activity_location_itf*>(pthis);
 				
 
 				// check that origin and destination are valid
@@ -848,8 +836,7 @@ namespace Activity_Components
 				_network_itf* network = person->template network_reference<_network_itf*>();
 
 
-//TODO
-//				Vehicle_Components::Types::Vehicle_Type_Keys mode = mode_chooser->template Choose_Mode<Target_Type<NT, Vehicle_Components::Types::Vehicle_Type_Keys, this_itf*>>(pthis);	
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = mode_chooser->template Choose_Mode<this_itf*,Vehicle_Components::Types::Vehicle_Type_Keys>(pthis);	
 				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(mode);
 
 			}
@@ -872,8 +859,7 @@ namespace Activity_Components
 
 				// get the combined start time and duration
 				_timing_choice_itf* timing_planner = planner->template Timing_Chooser<_timing_choice_itf*>();
-//TODO
-//				pair<Time_Seconds,Time_Seconds> start_and_duration = timing_planner->template Get_Start_Time_and_Duration<Target_Type<NT,Time_Seconds,ComponentType*>>(this);
+				pair<Time_Seconds,Time_Seconds> start_and_duration = timing_planner->template Get_Start_Time_and_Duration<ComponentType*,Time_Seconds>(this);
 
 				// make sure start time is not prior to current iteration
 				Time_Seconds time_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(planner->template Planning_Time_Increment<Time_Seconds>());
@@ -916,8 +902,7 @@ namespace Activity_Components
 					_network_itf* network = person->template network_reference<_network_itf*>();
 					_activity_location_itf* orig = person->template Home_Location<_activity_location_itf*>();
 					_activity_location_itf* dest = pthis->template Location<_activity_location_itf*>();
-//TODO
-//					exp_ttime = network->template Get_TTime<Target_Type<NT,Time_Minutes,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes> >(orig,dest,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, pthis->template Start_Time<Time_Minutes>());
+					exp_ttime = network->template Get_TTime<_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Minutes, Time_Minutes>(orig,dest,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, pthis->template Start_Time<Time_Minutes>());
 				}			
 				exp_ttime = max<float>(exp_ttime,30.0f);
 
@@ -1134,8 +1119,7 @@ namespace Activity_Components
 				_mode_choice_itf* mode_chooser = planner->template Mode_Choice_Faculty<_mode_choice_itf*>();
 				_network_itf* network = person->template network_reference<_network_itf*>();
 
-//TODO
-//				Vehicle_Components::Types::Vehicle_Type_Keys mode = mode_chooser->template Choose_Mode<Target_Type<NT, Vehicle_Components::Types::Vehicle_Type_Keys, this_itf*>>(pthis);	
+				Vehicle_Components::Types::Vehicle_Type_Keys mode = mode_chooser->template Choose_Mode<this_itf*,Vehicle_Components::Types::Vehicle_Type_Keys>(pthis);	
 				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(mode);
 			}
 
@@ -1188,8 +1172,7 @@ namespace Activity_Components
 
 					// get the combined start time and duration
 					_timing_choice_itf* timing_planner = planner->template Timing_Chooser<_timing_choice_itf*>();
-//TODO
-//					pair<Time_Seconds,Time_Seconds> start_and_duration = timing_planner->template Get_Start_Time_and_Duration<Target_Type<NT,Time_Seconds,ComponentType*>>(this);
+					pair<Time_Seconds,Time_Seconds> start_and_duration = timing_planner->template Get_Start_Time_and_Duration<ComponentType*,Time_Seconds>(this);
 
 					// make sure start time is not prior to current iteration
 					Time_Seconds time_min = Simulation_Time.template Future_Time<Time_Seconds,Time_Seconds>(planner->template Planning_Time_Increment<Time_Seconds>());
@@ -1233,8 +1216,7 @@ namespace Activity_Components
 					_activity_location_itf* orig = person->template Home_Location<_activity_location_itf*>();
 					_activity_location_itf* dest = bthis->template Location<_activity_location_itf*>();
 
-//TODO
-//					exp_ttime = network->template Get_TTime<Target_Type<NT,Time_Minutes,_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours> >(orig,dest,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, pthis->template Start_Time<Time_Hours>());
+					exp_ttime = network->template Get_TTime<_activity_location_itf*,Vehicle_Components::Types::Vehicle_Type_Keys, Time_Hours,Time_Minutes >(orig,dest,Vehicle_Components::Types::Vehicle_Type_Keys::SOV, pthis->template Start_Time<Time_Hours>());
 				}
 				exp_ttime = max<float>(exp_ttime,30.0f);
 				
@@ -1293,10 +1275,8 @@ namespace Activity_Components
 				if (static_props->template Age<int>() >= 65) Senior = 1;
 				//if (PER.PersonData.ICT_Use != IctType.NULL || PER.PersonData.ICT_Use != IctType.UseLow) ICT_USE = 1;
 				if (static_props->template Journey_To_Work_Mode<Person_Components::Types::JOURNEY_TO_WORK_MODE>() == JOURNEY_TO_WORK_MODE::WORKMODE_WORK_AT_HOME) TELEWORK = 1;
-//TODO
-//				AvgFreq = properties->template Average_Activity_Frequency<Target_Type<NT,float,ACTIVITY_TYPES>>(base_this->_Activity_Type);
-//TODO
-//				AvgDur = properties->template Average_Activity_Duration<Target_Type<NT,Time_Minutes,ACTIVITY_TYPES>>(base_this->_Activity_Type);
+				AvgFreq = properties->template Average_Activity_Frequency<ACTIVITY_TYPES,float>(base_this->_Activity_Type);
+				AvgDur = properties->template Average_Activity_Duration<ACTIVITY_TYPES,Time_Minutes>(base_this->_Activity_Type);
 
 
 				//===========================================================================================================================
@@ -1445,7 +1425,7 @@ namespace Activity_Components
 
 
 			// Activity methods
-			template<typename TargetType> void Initialize(typename TargetType::ParamType departure_time, typename TargetType::ParamType start_time, typename TargetType::ParamType duration, typename TargetType::Param2Type mode)
+			template<typename TimeType, typename ModeType> void Initialize(TimeType departure_time, TimeType start_time, TimeType duration, ModeType mode)
 			{		
 				//UNLOCK(this->_update_lock);
 				this_itf* pthis = (this_itf*)this;
@@ -1454,11 +1434,11 @@ namespace Activity_Components
 				_person_itf* person = planner->template Parent_Person<_person_itf*>();
 				
 				pthis->template Activity_Type<Types::ACTIVITY_TYPES>(Types::ACTIVITY_TYPES::AT_HOME_ACTIVITY);
-				pthis->template Duration<typename TargetType::ParamType>(duration);
-				pthis->template Start_Time<typename TargetType::ParamType>(start_time);
+				pthis->template Duration<TimeType>(duration);
+				pthis->template Start_Time<TimeType>(start_time);
 				pthis->template Location<_activity_location_itf*>(person->template Home_Location<_activity_location_itf*>());
 				pthis->template Mode<Vehicle_Components::Types::Vehicle_Type_Keys>(mode);
-				pthis->template Fixed_Departure<typename TargetType::ParamType>(departure_time);
+				pthis->template Fixed_Departure<TimeType>(departure_time);
 				
 			}
 

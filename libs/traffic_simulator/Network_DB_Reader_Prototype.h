@@ -24,12 +24,12 @@ namespace Network_Components
 				this_component()->template read_network_data<TargetType>(data_source);
 			}
 
-			//template<typename TargetType> void read_network_data(requires(TargetType,!check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same) && !check_2(typename TargetType::NetIOType,Types::File_Network,is_same) && !check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same)))
+			//template<typename TargetType> void read_network_data(requires(TargetType,!check_2(NetIOType,Types::ODB_Network,is_same) && !check_2(NetIOType,Types::File_Network,is_same) && !check_2(NetIOType,Types::Regular_Network,is_same)))
 			//{
-			//	//assert_check(false,"TargetType::NetIOType is not supported");
-			//	assert_check_2(typename TargetType::NetIOType,Types::ODB_Network,is_same,"TargetType should indicate ODB_Network if you want to read it in with ODB");
-			//	assert_check_2(typename TargetType::NetIOType,Types::File_Network,is_same,"TargetType should indicate File_Network if you want to read from file");
-			//	assert_check_2(typename TargetType::NetIOType,Types::Regular_Network,is_same,"TargetType should indicate Regular_Network if you want to create a routable network from a regular network");
+			//	//assert_check(false,"NetIOType is not supported");
+			//	assert_check_2(NetIOType,Types::ODB_Network,is_same,"TargetType should indicate ODB_Network if you want to read it in with ODB");
+			//	assert_check_2(NetIOType,Types::File_Network,is_same,"TargetType should indicate File_Network if you want to read from file");
+			//	assert_check_2(NetIOType,Types::Regular_Network,is_same,"TargetType should indicate Regular_Network if you want to create a routable network from a regular network");
 			//}
 
 			template<typename TargetType> void write_network_data(typename TargetType::ParamType data_destination)

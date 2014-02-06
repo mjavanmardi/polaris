@@ -297,8 +297,7 @@ namespace Person_Components
 								return;
 							}
 							vehicle->template movement_plan<Movement_Plan*>(move);
-//TODO
-//							movement_faculty->template Schedule_Movement<Target_Type<NT,void,Simulation_Timestep_Increment,Movement_Plan*>>(move->template departed_time<Simulation_Timestep_Increment>(),move);
+							movement_faculty->template Schedule_Movement<Simulation_Timestep_Increment,Movement_Plan*>(move->template departed_time<Simulation_Timestep_Increment>(),move);
 						}
 	
 						//TODO: CHANGE SO THAT MULTIPLE MOVES CAN BE PLANNED PER PLANNING TIMESTEP - currently we are only simulating the first planned move, then throwing out the rest
@@ -411,8 +410,6 @@ namespace Person_Components
 			// Pass through members to scheduler class
 			//accessor(current_movement_plan, NONE, NONE);
 			//accessor(current_activity_plan, NONE, NONE);
-			//feature_method_1_arg(next_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) && check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype));
-			//feature_method_1_arg(previous_activity_plan, current_time, check(typename TargetType::ParamType,Is_Time_Value) /*&& check(typename TargetType::ReturnType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)*/);
 			template<typename TargetType> void Add_Movement_Plan(TargetType movement_plan)
 			{
 				this_component()->template Add_Movement_Plan<TargetType>(movement_plan);

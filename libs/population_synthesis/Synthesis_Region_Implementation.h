@@ -31,11 +31,13 @@ namespace PopSyn
 			template<typename TargetType> TargetType scenario_reference()
 			{
 				return this->parent_reference<type_of(parent_reference)&>().scenario_reference<TargetType>();
-			}tag_getter_as_available(scenario_reference);
+			}
+			tag_getter_as_available(scenario_reference);
 			template<typename TargetType> TargetType network_reference()
 			{
 				return this->parent_reference<type_of(parent_reference)&>().network_reference<TargetType>();
-			}tag_getter_as_available(network_reference);
+			}
+			tag_getter_as_available(network_reference);
 		};
 	}
 }

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "User_Space_Includes.h"
-//#include "Person_Prototype.h"
-//#include "PopSyn_Prototype.h"
+#include "traffic_simulator\User_Space_Includes.h"
+
 
 //---------------------------------------------------------
 //	POP_PROPERTIES OBJECT CLASS (i.e. HH, PERSON, VEHICLE, FIRM, etc.)
@@ -38,21 +37,21 @@ namespace Household_Components
 		concept struct Is_Census_ACS_Compliant
 		{
 			// component versions
-			check_typed_member(has_gender,Gender, Types::HHTYPE);
+			check_data_member_type(has_gender,Gender, Types::HHTYPE);
 			check_template_method_name(has_race,Race);
-			check_typed_member(has_employment_status,Employment_Status, Person_Components::Types::EMPLOYMENT_STATUS);
+			check_data_member_type(has_employment_status,Employment_Status, Person_Components::Types::EMPLOYMENT_STATUS);
 
 			check_template_method_name(has_work_travel_time,Journey_To_Work_Travel_Time);
-			check_typed_member(has_work_travel_mode,Journey_To_Work_Mode, Person_Components::Types::JOURNEY_TO_WORK_MODE);
+			check_data_member_type(has_work_travel_mode,Journey_To_Work_Mode, Person_Components::Types::JOURNEY_TO_WORK_MODE);
 			check_template_method_name(has_work_arrival_time,Journey_To_Work_Arrival_Time);
 
 			// prototype versions
-			check_typed_member(has_gender_prototype,Component_Type::Gender, Person_Components::Types::GENDER);
+			check_data_member_type(has_gender_prototype,Component_Type::Gender, Person_Components::Types::GENDER);
 			check_template_method_name(has_race_prototype,Component_Type::Race);
-			check_typed_member(has_employment_status_prototype,Component_Type::Employment_Status, Person_Components::Types::EMPLOYMENT_STATUS);
+			check_data_member_type(has_employment_status_prototype,Component_Type::Employment_Status, Person_Components::Types::EMPLOYMENT_STATUS);
 
 			check_template_method_name(has_work_travel_time_prototype,Component_Type::Journey_To_Work_Travel_Time);
-			check_typed_member(has_work_travel_mode_prototype,Component_Type::Journey_To_Work_Mode, Person_Components::Types::JOURNEY_TO_WORK_MODE);
+			check_data_member_type(has_work_travel_mode_prototype,Component_Type::Journey_To_Work_Mode, Person_Components::Types::JOURNEY_TO_WORK_MODE);
 			check_template_method_name(has_work_arrival_time_prototype,Component_Type::Journey_To_Work_Arrival_Time);
 
 			// concept checks
@@ -92,9 +91,35 @@ namespace Household_Components
 			accessor(home_location_id, NONE, NONE);
 			
 			// Pass through methods
-			template<typename TargetType>_method_void(Initialize,	check_2(TargetType,void,is_same));
-			template<typename TargetType>_method_1_arg(Initialize, home_zone, check_2(typename TargetType::ReturnType,void,is_same));
-			template<typename TargetType>_method_1_arg(Characteristics, data, check_2(typename TargetType::ParamType, boost::container::vector<double>*, is_same) && check_2(typename TargetType::ReturnType, void, is_same) );
+			define_feature_exists_check(Initialize,Initialize_exists);
+			template<typename TargetType> void Initialize(requires(TargetType, check(ComponentType,Initialize_exists)))
+			{
+				this_component()->Initialize<TargetType>();
+			}
+			template<typename TargetType> void Initialize(requires(TargetType, !check(ComponentType,Initialize_exists)))
+			{
+				assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
+			}
+
+			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, check(ComponentType,Initialize_exists)))
+			{
+				this_component()->Initialize<TargetType>(home_zone);
+			}
+			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, !check(ComponentType,Initialize_exists)))
+			{
+				assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
+			}
+
+			define_feature_exists_check(Characteristics,Characteristics_exists);
+			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, check(ComponentType, Characteristics_exists) && check_2(TargetType, boost::container::vector<double>*, is_same)))
+			{
+				this_component()->Characteristics<TargetType>(data);
+			}
+			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, !check(ComponentType, Characteristics_exists) || !check_2(TargetType, boost::container::vector<double>*, is_same)))
+			{
+				assert_check(ComponentType, Characteristics_exists, "No 'Characteristics' data member defined in component.");
+				assert_check(TargetType, Characteristics_exists, "'data' parameter must be passed as a pointer to a boost::vector of doubles.");
+			}
 
 			template<typename TargetType> void Normalize_Weight(TargetType normalization_factor, requires(TargetType,check(strip_modifiers(TargetType),is_arithmetic)))
 			{

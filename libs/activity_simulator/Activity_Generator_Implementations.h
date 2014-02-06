@@ -277,8 +277,7 @@ namespace Person_Components
 	
 				// Activity planning time
 				Simulation_Timestep_Increment plan_time = start_plan_time + activity_count;
-//TODO
-//				activity->template Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, plan_time);
+				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, plan_time);
 
 				((base_type*)this)->_Parent_Planner->template Add_Activity_Plan<Routine_Activity_Plan*>(activity);
 				activity_count++;
@@ -291,8 +290,7 @@ namespace Person_Components
 
 
 				Simulation_Timestep_Increment _plan_time = start_plan_time + activity_count;
-//TODO
-//				activity->template Initialize<Target_Type<NT,NT, ACTIVITY_TYPES, Simulation_Timestep_Increment> >(act_type, _plan_time);
+				activity->template Initialize<ACTIVITY_TYPES, Simulation_Timestep_Increment>(act_type, _plan_time);
 
 				((base_type*)this)->_Parent_Planner->template Add_Activity_Plan<Activity_Plan*>(activity);		
 				activity_count++;
@@ -303,8 +301,7 @@ namespace Person_Components
 				activity->template Parent_Planner<_planner_itf*>(base_type::_Parent_Planner);
 				activity->template Activity_Plan_ID<int>(activity_count);
 
-//TODO
-//				activity->template Initialize<Target_Type<NT,NT, Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys> >(0,0,END,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
+				activity->template Initialize<Simulation_Timestep_Increment, Vehicle_Components::Types::Vehicle_Type_Keys>(0,0,END,Vehicle_Components::Types::Vehicle_Type_Keys::SOV);
 
 				((base_type*)this)->_Parent_Planner->template Add_Activity_Plan<At_Home_Activity_Plan*>(activity);		
 				activity_count++;

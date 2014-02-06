@@ -169,13 +169,13 @@ namespace Person_Components
 
 				
 			}
-			template<typename TargetType> void Initialize(typename TargetType::ParamType id, typename TargetType::Param2Type home_zone, typename TargetType::Param3Type network_ref, typename TargetType::Param4Type scenario_ref)
+			template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref)
 			{
-				this->Initialize< typename TargetType::ParamType>(id);
-				this->home_synthesis_zone< typename TargetType::Param2Type>(home_zone);
-				this->_Perception_Faculty->template Network<typename TargetType::Param3Type>(network_ref);
-				this->_Perception_Faculty->template Scenario<typename TargetType::Param4Type>(scenario_ref);
-				this->_router->template network<typename TargetType::Param3Type>(network_ref);
+				this->Initialize<IdType>(id);
+				this->home_synthesis_zone<SynthesisZoneType>(home_zone);
+				this->_Perception_Faculty->template Network<NetworkRefType>(network_ref);
+				this->_Perception_Faculty->template Scenario<ScenarioRefType>(scenario_ref);
+				this->_router->template network<NetworkRefType>(network_ref);
 
 				// Randomly determine if person uses pretrip-information sources (Radio, internet, news, etc.)
 				scenario_reference_interface* scenario = this->scenario_reference<scenario_reference_interface*>();
@@ -186,8 +186,7 @@ namespace Person_Components
 			template<typename TargetType> void Set_Locations()
 			{
 				// This call sets the work/school locations from the properties sub class and uses the functions below
-//TODO
-//				_Properties->template Initialize<Target_Type<NT,void,home_synthesis_zone_interface*> >(this->_home_synthesis_zone);
+				_Properties->template Initialize<home_synthesis_zone_interface* >(this->_home_synthesis_zone);
 			}
 
 			template<typename TargetType> void Choose_Work_Location()
@@ -264,8 +263,7 @@ namespace Person_Components
 					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 					{
 						zone_interface* zone = z_itr->second;
-//TODO
-//						Time_Minutes t = network_reference<network_reference_interface*>()->template Get_TTime<Target_Type<NT,Time_Minutes,zone_interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Hours> >(orig,zone, Vehicle_Components::Types::SOV,7);
+						Time_Minutes t = network_reference<network_reference_interface*>()->template Get_TTime<zone_interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Hours,Time_Minutes>(orig,zone, Vehicle_Components::Types::SOV,7);
 						if (t > ttime - time_range_to_search && t < ttime + time_range_to_search && zone->template work_locations<locations_container_interface*>()->size() > 0 && zone->template employment_total<int>() > 0)
 						{
 							employment += zone->template employment_total<int>();
@@ -386,8 +384,7 @@ namespace Person_Components
 						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 						{
 							zone_interface* zone = z_itr->second;
-//TODO
-//							Time_Minutes t = network_reference<network_reference_interface*>()->template Get_TTime<Target_Type<NT,Time_Minutes,zone_interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Hours> >(orig,zone, Vehicle_Components::Types::SOV,9);
+							Time_Minutes t = network_reference<network_reference_interface*>()->template Get_TTime<zone_interface*,Vehicle_Components::Types::Vehicle_Type_Keys,Time_Hours,Time_Minutes>(orig,zone, Vehicle_Components::Types::SOV,9);
 							if (t < time_range_to_search && zone->template school_locations<locations_container_interface*>()->size() > 0)
 							{
 								school_locations += (int)zone->template school_locations<locations_container_interface*>()->size();

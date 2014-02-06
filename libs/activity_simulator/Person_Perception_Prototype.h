@@ -32,8 +32,14 @@ namespace Person_Components
 			accessor(Network, NONE, NONE);
 			accessor(Scenario, NONE, NONE);
 
-			template<typename TargetType>_method_void(Check_Network_State, NONE);
-			template<typename TargetType>_method_void(Initialize, NONE);
+			template<typename TargetType> void Check_Network_State()
+			{
+				this_component()->Check_Network_State<TargetType>();
+			}
+			template<typename TargetType> void Initialize()
+			{
+				this_component()->Initialize<TargetType>();
+			}
 		};
 	}
 

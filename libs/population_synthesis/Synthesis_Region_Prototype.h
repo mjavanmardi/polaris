@@ -1,6 +1,6 @@
 #pragma once
 
-#include "User_Space_Includes.h"
+#include "traffic_simulator\User_Space_Includes.h"
 #include "Synthesis_Zone_Implementations.h"
 
 
@@ -53,7 +53,7 @@ namespace PopSyn
 			{
 				((Synthesis_Region<ComponentType>*) _this)->template Synthesize_Population<NULLTYPE>();
 			}
-			template<typename TargetType> void Synthesize_Population(requires(TargetType,check(ComponentType,Concepts::Is_IPF_Capable)))
+			template<typename TargetType> void Synthesize_Population(requires(TargetType,check_stripped_type(ComponentType,Concepts::Is_IPF_Capable)))
 			{
 				typedef Prototypes::Synthesis_Zone<ComponentType> base_type;
 				base_type* base_itf = (base_type*)this;

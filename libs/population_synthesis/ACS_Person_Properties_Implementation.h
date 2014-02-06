@@ -1,13 +1,25 @@
 #pragma once
 
-#include "Population_Unit_Prototype.h"
+#include "activity_simulator\Person_Properties_Prototype.h"
+//#include "Person_Prototype.h"
+//#include "Movement_Plan_Prototype.h"
+//#include "Network_Skimming_Prototype.h"
+//#include "Activity_Prototype.h"
+//#include "Population_Unit_Implementations.h"
+//#include "Person_Implementations.h"
 
-namespace PopSyn
+namespace Person_Components
 {
 	namespace Implementations
 	{
-		implementation struct ADAPTS_Population_Unit_Implementation : public Polaris_Component< MasterType,INHERIT(ADAPTS_Population_Unit_Implementation), Data_Object>
+		//==================================================================================
+		/// Properties classes
+		//----------------------------------------------------------------------------------
+		implementation struct ACS_Person_Static_Properties_Implementation : public Polaris_Component< MasterType,INHERIT(ACS_Person_Static_Properties_Implementation), Data_Object>
 		{
+			// Tag as Implementation
+			typedef typename Polaris_Component<MasterType,INHERIT(ACS_Person_Static_Properties_Implementation),Data_Object>::Component_Type ComponentType;
+
 			//=================================================================
 			// Basic Person Characteristics Used in Popsyn algorithms
 			m_data(double,ID, NONE, NONE);
@@ -27,9 +39,39 @@ namespace PopSyn
 			m_data(Types::EDUCATION_LEVEL, Educational_Attainment, NONE, NONE);	
 			m_data(Types::EMPLOYMENT_STATUS, Employment_Status, NONE, NONE);
 			m_data(Types::EMPLOYMENT_INDUSTRY, Employment_Industry, NONE, NONE);	
+			template<typename TargetType> bool Is_Employed()
+			{
+				bool is_employed = false;
+				switch(this->_Employment_Status)
+				{
+					case EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_CIVILIAN_AT_WORK :
+					case EMPLOYMENT_STATUS::EMPLOYMENT_STATUS_ARMED_FORCES_AT_WORK :
+						is_employed=true;
+						break;
+					default:
+						is_employed=false;
+				}
+				return is_employed;
+			}
+			tag_feature_as_available(Is_Employed);
+			template<typename TargetType> bool Is_Student()
+			{
+				bool is_student = false;
+				switch(this->_School_Enrollment)
+				{
+					case SCHOOL_ENROLLMENT::ENROLLMENT_PRIVATE :
+					case SCHOOL_ENROLLMENT::ENROLLMENT_PUBLIC :
+						is_student=true;
+						break;
+					default:
+						is_student=false;
+				}
+				return is_student;
+			}
+			tag_feature_as_available(Is_Student);
 
 			m_data(int, Journey_To_Work_Vehicle_Occupancy, NONE, NONE);
-			m_data(int, Age, check(strip_modifiers(TargetType), is_integral),check(strip_modifiers(TargetType),is_integral));
+			m_data(int, Age, NONE, NONE);
 			
 			member_component_and_feature_accessor(Work_Hours, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Journey_To_Work_Travel_Time, Value, Basic_Units::Prototypes::Time, Basic_Units::Implementations::Time_Implementation<NT>);
@@ -44,7 +86,7 @@ namespace PopSyn
 				#pragma region CENSUS_CODE_SWITCH
 				switch(CENSUS_CODE)
 				{
-					case 1:  val=0; break;
+					case 1:  val = (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>() * 1440.0f); break;
 					case 2:  val=5; break;
 					case 3:  val=10; break;
 					case 4:  val=15; break;
@@ -329,47 +371,49 @@ namespace PopSyn
 					case 283:  val=1425; break;
 					case 284:  val=1430; break;
 					case 285:  val=1435; break;
-					default: val=540; /*THROW_WARNING("Warning, arrival time case value '"<<CENSUS_CODE<<"' found in census data input file is not a valid arrival time to work code.  Arrival time defaulting to 9:00 AM.");*/
+					default: val = 420 + (int)(GLOBALS::Uniform_RNG.template Next_Rand<float>() * 120.0f); /*THROW_WARNING("Warning, arrival time case value '"<<CENSUS_CODE<<"' found in census data input file is not a valid arrival time to work code.  Arrival time defaulting to 8:00 AM.");*/
 				}
 				#pragma endregion
 
 				typedef Basic_Units::Prototypes::Time<type_of(typename ComponentType::_Journey_To_Work_Arrival_Time)> _Journey_To_Work_Arrival_Time_itf;
 				_Journey_To_Work_Arrival_Time_itf* itf = this->template _Journey_To_Work_Arrival_Time<_Journey_To_Work_Arrival_Time_itf*>();
-				itf->Value<Time_Minutes>(val);
+				itf->template Value<Time_Minutes>(val);
 			}
 			template<typename TargetType> TargetType Journey_To_Work_Arrival_Time(requires(TargetType,check(strip_modifiers(TargetType),Basic_Units::Concepts::Is_Time_Value)))
 			{
 				typedef Basic_Units::Prototypes::Time<type_of(typename ComponentType::_Journey_To_Work_Arrival_Time)> _Journey_To_Work_Arrival_Time_itf;
 				_Journey_To_Work_Arrival_Time_itf* itf = this->template _Journey_To_Work_Arrival_Time<_Journey_To_Work_Arrival_Time_itf*>();
-				return itf->Value<TargetType>();
+				return itf->template Value<TargetType>();
 			}
 			tag_getter_setter_as_available(Journey_To_Work_Arrival_Time);
 
 			// Characteristics setter
-			template<typename TargetType> void Characteristics(boost::container::vector<TargetType>& data)
+			template<typename TargetType> void Characteristics(boost::container::vector<double>* data)
 			{
 				// these setters correspond exactly to the ACS-PUMS definitions and layout as given in pums_file.txt.  if pumsfile changes change these functions
-				typedef Prototypes::Population_Unit<ComponentType> this_itf;
+				typedef Prototypes::Person_Properties<ComponentType> this_itf;
 				this_itf* pthis = (this_itf*)this;
-
-				pthis->Age<int>(data[7]);
-				pthis->Class_of_worker<Types::CLASS_OF_WORKER>((Types::CLASS_OF_WORKER)(int)data[8]);
-				pthis->Educational_Attainment<Types::EDUCATION_LEVEL>((Types::EDUCATION_LEVEL)(int)data[17]);
-				pthis->Employment_Industry<Types::EMPLOYMENT_INDUSTRY>((Types::EMPLOYMENT_INDUSTRY)(int)data[23]);
-				pthis->Employment_Status<Types::EMPLOYMENT_STATUS>((Types::EMPLOYMENT_STATUS)(int)data[21]);
-				pthis->Gender<Types::GENDER>((Types::GENDER)(int)data[5]);
-				pthis->Income<Basic_Units::Currency_Variables::Dollars>(data[29]);
-				pthis->Journey_To_Work_Arrival_Time<int>(data[24]);
-				pthis->Journey_To_Work_Mode<Types::JOURNEY_TO_WORK_MODE>((Types::JOURNEY_TO_WORK_MODE)(int)data[11]);
-				pthis->Journey_To_Work_Travel_Time<Time_Minutes>(data[9]);
-				pthis->Journey_To_Work_Vehicle_Occupancy<int>(data[10]);
-				pthis->Marital_Status<Types::MARITAL_STATUS>((Types::MARITAL_STATUS)(int)data[12]);
-				pthis->Race<Types::RACE>((Types::RACE)(int)data[6]);
-				pthis->School_Enrollment<Types::SCHOOL_ENROLLMENT>((Types::SCHOOL_ENROLLMENT)(int)data[15]);
-				pthis->School_Grade_Level<Types::SCHOOL_GRADE_LEVEL>((Types::SCHOOL_GRADE_LEVEL)(int)data[16]);
-				pthis->Work_Hours<Time_Hours>(data[19]);
+				
+				pthis->Age<int>((*data)[7]);
+				pthis->Class_of_worker<Types::CLASS_OF_WORKER>((Types::CLASS_OF_WORKER)(int)(*data)[8]);
+				pthis->Educational_Attainment<Types::EDUCATION_LEVEL>((Types::EDUCATION_LEVEL)(int)(*data)[17]);
+				pthis->Employment_Industry<Types::EMPLOYMENT_INDUSTRY>((Types::EMPLOYMENT_INDUSTRY)(int)(*data)[23]);
+				pthis->Employment_Status<Types::EMPLOYMENT_STATUS>((Types::EMPLOYMENT_STATUS)(int)(*data)[21]);
+				pthis->Gender<Types::GENDER>((Types::GENDER)(int)(*data)[5]);
+				pthis->Income<Basic_Units::Currency_Variables::Dollars>((*data)[29]);
+				pthis->Journey_To_Work_Arrival_Time<int>((*data)[24]);
+				pthis->Journey_To_Work_Mode<Types::JOURNEY_TO_WORK_MODE>((Types::JOURNEY_TO_WORK_MODE)(int)(*data)[11]);
+				pthis->Journey_To_Work_Travel_Time<Time_Minutes>((*data)[9]);
+				pthis->Journey_To_Work_Vehicle_Occupancy<int>((*data)[10]);
+				pthis->Marital_Status<Types::MARITAL_STATUS>((Types::MARITAL_STATUS)(int)(*data)[12]);
+				pthis->Race<Types::RACE>((Types::RACE)(int)(*data)[6]);
+				pthis->School_Enrollment<Types::SCHOOL_ENROLLMENT>((Types::SCHOOL_ENROLLMENT)(int)(*data)[15]);
+				pthis->School_Grade_Level<Types::SCHOOL_GRADE_LEVEL>((Types::SCHOOL_GRADE_LEVEL)(int)(*data)[16]);
+				pthis->Work_Hours<Time_Hours>((*data)[19]);
 			}
-			tag_feature_as_available(Characteristics);
+			tag_feature_signature_as_available(Characteristics, 1);
 		};
+
 	}
 }
+
