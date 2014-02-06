@@ -268,9 +268,7 @@ namespace polaris
 		typedef ComponentType Component_Type;
 		typedef true_type Is_Prototype;
 
-		//typedef Input_Iterator<typename ComponentType::iterator> iterator;
 		typedef typename ComponentType::iterator iterator;
-		//typedef Input_Iterator<typename ComponentType::reverse_iterator> reverse_iterator;
 		typedef typename ComponentType::reverse_iterator reverse_iterator;
 	
 		typedef typename ComponentType::size_type size_type;
@@ -323,6 +321,89 @@ namespace polaris
 		const T& operator [](int i) const {return (T&)((*((ComponentType*)this))[i]);}
 
 		T& at(int i){return (T&)(((ComponentType*)this)->at(i));}
+	};
+
+	template<typename ComponentType,typename T> 
+	struct Multidimensional_Random_Access_Array ADD_DEBUG_INFO
+	{
+		typedef ComponentType Component_Type;
+		typedef true_type Is_Prototype;
+		typedef true_type Is_Sequence_Type;
+
+		typedef typename ComponentType::iterator iterator;
+
+		typedef typename ComponentType::size_type size_type;
+		typedef typename ComponentType::index_type index_type;
+		typedef typename ComponentType::const_index_type const_index_type;
+		typedef typename ComponentType::const_dimensional_type const_dimensional_type;
+
+		iterator begin(){return (iterator)((ComponentType*)this)->begin();}
+		iterator begin(size_type dim){return (iterator)((ComponentType*)this)->begin(dim);}
+		iterator begin(size_type dim, size_type index){return (iterator)((ComponentType*)this)->begin(dim,index);}
+
+		iterator end(){return (iterator)((ComponentType*)this)->end();}
+	
+		size_type size(){return ((ComponentType*)this)->size();}
+
+		size_type size(size_type dimension){return ((ComponentType*)this)->size(dimension);}
+
+		size_type num_dimensions(){return ((ComponentType*)this)->num_dimensions();}
+
+		const_dimensional_type dimensions(){return ((ComponentType*)this)->dimensions();}
+
+		size_type max_size(){return ((ComponentType*)this)->size();}
+
+		bool empty(){return ((ComponentType*)this)->empty();}
+
+		T& front(){return (T&)(((ComponentType*)this)->front());}
+		T& front(size_type dimension){return (T&)(((ComponentType*)this)->front(dimension));}
+		T& front(size_type dimension, size_type index){return (T&)(((ComponentType*)this)->front(dimension, index));}
+
+		void clear(){return ((ComponentType*)this)->clear();}
+
+		void scale(const T& value){((ComponentType*)this)->scale(value);} 
+
+		void Copy(const Multidimensional_Random_Access_Array<ComponentType,T>& obj)
+		{
+			((ComponentType*)this)->Copy(*((typename Multidimensional_Random_Access_Array<ComponentType,TargetValueType>::Component_Type*)&obj));
+		}
+		void Copy(const_index_type dim_sizes, T* data)
+		{
+			((ComponentType*)this)->Copy(dim_sizes, data);
+		}
+
+		void write(ostream& s){return ((ComponentType*)this)->print(s);}
+
+		void resize(const_dimensional_type n){return ((ComponentType*)this)->resize(n);}
+
+		void resize(const_dimensional_type n, T t){return ((ComponentType*)this)->resize(n,t);}
+
+		T& back(){return (T&)(((ComponentType*)this)->back());}
+		T& back(size_type dimension){return (T&)(((ComponentType*)this)->back(dimension));}
+		T& back(size_type dimension, size_type index){return (T&)(((ComponentType*)this)->back(dimension, index));}
+
+		T& operator [](const_index_type i){return (T&)((*((ComponentType*)this))[i]);}
+		const T& operator [](const_index_type i) const {return (T&)((*((ComponentType*)this))[i]);}
+		T& operator [](size_type i) {return (T&)((*((ComponentType*)this))[i]);}
+		const T& operator [](size_type i) const {return (T&)((*((ComponentType*)this))[i]);}
+
+		T& at(const_index_type i){return (T&)(((ComponentType*)this)->at(i));}
+
+		T* get_data_pointer(){return((ComponentType*)this)->get_data_pointer();}
+
+		// basic feature tags
+		typedef true_type begin_feature_tag;
+		typedef true_type end_feature_tag;
+		typedef true_type insert_feature_tag;
+		// back_insert feature tags
+		typedef true_type push_back_feature_tag;
+		typedef true_type pop_back_feature_tag;
+		typedef true_type front_feature_tag;
+		typedef true_type back_feature_tag;
+		// Random access feature tags
+		typedef true_type at_feature_tag;
+		// Multidimensional feature tags
+		typedef true_type dimensions_feature_tag;
 	};
 
 	///----------------------------------------------------------------------------------------------------
@@ -408,67 +489,70 @@ namespace polaris
 	{
 		typedef ComponentType Component_Type;
 		typedef true_type Is_Prototype;
+		typedef true_type Is_Associative_Type;
+
+		typedef typename ComponentType::size_type size_type;
 
 		typedef K key_type;
 		typedef T data_type;
 
 		typedef pair<const key_type, data_type> value_type;
 
-		//typedef Input_Iterator<typename ComponentType::iterator,ComponentType,CallerType,pair<key_type,TargetValueType>> iterator;
+		typedef typename ComponentType::iterator iterator;
 
-		//iterator begin(){return (iterator)((ComponentType*)this)->begin();}
+		iterator begin(){return (iterator)((ComponentType*)this)->begin();}
 
-		//iterator end(){return (iterator)((ComponentType*)this)->end();}
+		iterator end(){return (iterator)((ComponentType*)this)->end();}
+		
+		size_type size(){return ((ComponentType*)this)->size();}
+
+		size_type max_size(){return ((ComponentType*)this)->size();}
+
+		bool empty(){return ((ComponentType*)this)->empty();}
+
+		pair<iterator,bool> insert(pair<key_type,data_type>& p)
+		{
+			pair<key_type,data_type> t = pair<key_type,data_type>(p.first,(data_type)(p.second));
+			return ((ComponentType*)this)->insert(t);
+		}
+
+		pair<iterator,bool> insert(pair<key_type,data_type>&& p)
+		{
+			pair<key_type,data_type> t = pair<key_type,data_type>(p.first,(data_type)(p.second));
+			return ((ComponentType*)this)->insert(t);
+		}
+
+		iterator insert(key_type key, data_type& value)
+		{	
+			return ((ComponentType*)this)->insert(pair<key_type,data_type>(key,value));
+		}
+		iterator insert(key_type key, data_type&& value)
+		{
+			return ((ComponentType*)this)->insert(pair<key_type,data_type&&>(key,(data_type&&)value));
+		}
+
+		//iterator insert(iterator p, TargetValueType t){return ((ComponentType*)this)->insert(p,t);}
 		//
-		//size_type size(){return ((ComponentType*)this)->size();}
+		//void insert(iterator p, iterator i, TargetValueType t){return ((ComponentType*)this)->insert(p,i,t);}
 
-		//size_type max_size(){return ((ComponentType*)this)->size();}
+		size_type erase (key_type key){return ((ComponentType*)this)->erase(key);}
+		iterator erase(iterator p){return ((ComponentType*)this)->erase(p);}
+		
+		iterator erase(iterator p, iterator q){return ((ComponentType*)this)->erase(p,q);}
 
-		//bool empty(){return ((ComponentType*)this)->empty();}
+		void clear(){return ((ComponentType*)this)->clear();}
 
-		//pair<iterator,bool> insert(pair<key_type,TargetValueType>& p)
-		//{
-		//	pair<key_type,Val_Type> t = pair<key_type,Val_Type>(p.first,(Val_Type)(p.second));
-		//	return ((ComponentType*)this)->insert(t);
-		//}
+		void set_empty_key(key_type key){((ComponentType*)this)->set_empty_key(key);}
 
-		//pair<iterator,bool> insert(pair<key_type,TargetValueType>&& p)
-		//{
-		//	pair<key_type,Val_Type> t = pair<key_type,Val_Type>(p.first,(Val_Type)(p.second));
-		//	return ((ComponentType*)this)->insert(t);
-		//}
+		void set_deleted_key(key_type key){((ComponentType*)this)->set_deleted_key(key);}
 
-		//iterator insert(key_type key, TargetValueType& value)
-		//{	
-		//	return ((ComponentType*)this)->insert(pair<key_type,typename Component_Type::mapped_type>(key,(typename Component_Type::mapped_type)value));
-		//}
-		//iterator insert(key_type key, TargetValueType&& value)
-		//{
-		//	return ((ComponentType*)this)->insert(pair<key_type,typename Component_Type::mapped_type&&>(key,(typename Component_Type::mapped_type&&)value));
-		//}
+		//key_compare key_comp() const { return ((ComponentType*)this)->key_comp();}
 
-		////iterator insert(iterator p, TargetValueType t){return ((ComponentType*)this)->insert(p,t);}
-		////
-		////void insert(iterator p, iterator i, TargetValueType t){return ((ComponentType*)this)->insert(p,i,t);}
+		//value_compare value_comp() const { return ((ComponentType*)this)->value_comp();}
 
-		//size_type erase (key_type key){return ((ComponentType*)this)->erase(key);}
-		//iterator erase(iterator p){return ((ComponentType*)this)->erase(p);}
-		//
-		//iterator erase(iterator p, iterator q){return ((ComponentType*)this)->erase(p,q);}
+		iterator find ( const key_type& x ) { return ((ComponentType*)this)->find(x);} 
 
-		//void clear(){return ((ComponentType*)this)->clear();}
-
-		//void set_empty_key(key_type key){((ComponentType*)this)->set_empty_key(key);}
-
-		//void set_deleted_key(key_type key){((ComponentType*)this)->set_deleted_key(key);}
-
-		////key_compare key_comp() const { return ((ComponentType*)this)->key_comp();}
-
-		////value_compare value_comp() const { return ((ComponentType*)this)->value_comp();}
-
-		//iterator find ( const key_type& x ) { return ((ComponentType*)this)->find(x);} 
-
-		//pair<iterator,iterator>  equal_range ( const key_type& x ) { return ((ComponentType*)this)->equal_range(x);}
+		pair<iterator,iterator>  equal_range ( const key_type& x ) { return ((ComponentType*)this)->equal_range(x);}
 
 
 

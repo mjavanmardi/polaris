@@ -15,7 +15,8 @@ namespace PopSyn
 			m_prototype(PopSyn::Prototypes::Solver_Settings<typename MasterType::IPF_Solver_Settings>,Solution_Settings, NONE, NONE);
 			m_prototype(Null_Prototype<typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
 			m_prototype(Null_Prototype<typename MasterType::network_type>, network_reference, NONE, NONE);
-
+			m_prototype(PopSyn::Prototypes::Popsyn_File_Linker<typename MasterType::popsyn_file_linker_type>, file_linker, NONE,NONE);
+			
 			m_data(Counter, timer, NONE, NONE);
 			m_data(bool, write_marginal_output_flag,check(strip_modifiers(TargetType),is_integral),check(strip_modifiers(TargetType),is_integral));
 			m_data(bool, write_full_output_flag,check(strip_modifiers(TargetType),is_integral),check(strip_modifiers(TargetType),is_integral));

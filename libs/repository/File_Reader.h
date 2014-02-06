@@ -1,5 +1,7 @@
 #pragma once
 #include "Repository_Includes.h"
+#include <iostream>
+#include <fstream>
 
 namespace File_IO
 {
@@ -51,10 +53,11 @@ namespace File_IO
 	class File_Reader
 	{
 	public:
-		File_Reader(string delims = ",\t"){_open=false;_delims = delims;}
-		bool Open(string filepath, bool header=true)
+		bool Open(string filepath, bool header=true, string delims = ",\t")
 		{
-			// Attempt to open file
+			_open=false;
+			_delims = delims;
+			//Attempt to open file
 			_file.open(filepath);
 			if (!_file.is_open())
 			{
@@ -63,7 +66,7 @@ namespace File_IO
 			}
 			else _open=true;
 
-			// get header row
+			//get header row
 			if (header)
 			{
 				_header.clear();
@@ -88,7 +91,7 @@ namespace File_IO
 				return ret_val;
 			}
 			string line;
-			getline(_file,line);
+			std::getline(_file,line);
 			_string_data.clear();
 			tokenize(line, _string_data, _delims);
 			if (_string_data.size() < _header.size())
@@ -143,7 +146,6 @@ namespace File_IO
 				if(pos == string::npos)
 				{
 					pos = str.length();
-
 					if(pos != lastPos || !trimEmpty)
 					tokens.push_back(boost::container::vector<string>::value_type(str.data()+lastPos,
 							(boost::container::vector<string>::value_type::size_type)pos-lastPos ));

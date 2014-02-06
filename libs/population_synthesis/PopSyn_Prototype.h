@@ -3,9 +3,9 @@
 //#include "Person_Prototype.h"
 //#include "Household_Prototype.h"
 #include "traffic_simulator\User_Space_Includes.h"
-#include "linker.h"
+#include "Popsyn_File_Linker_Implementations.h"
 //#include "Synthesis_Region_Implementation.h"
-//#include "Network_Prototype.h"
+#include "Network_Prototype.h"
 //#include "Scenario_Prototype.h"
 
 
@@ -23,6 +23,27 @@ namespace PopSyn
 			check_data_member_name(Has_Use_Linker_File_Defined, _linker_file_path);
 			define_default_check(Has_Use_Linker_File_Defined);
 		};
+		concept struct Scenario_Has_Popsyn_Configuration_Data
+		{
+			check_template_method_name(has_percent_to_synthesize_p, Component_Type::percent_to_synthesize);
+			check_template_method_name(has_ipf_tolerance_p, Component_Type::ipf_tolerance);
+			check_template_method_name(has_marginal_tolerance_p, Component_Type::marginal_tolerance);
+			check_template_method_name(has_maximum_iterations_p, Component_Type::maximum_iterations);
+			check_template_method_name(has_write_marginal_output_p, Component_Type::write_marginal_output);
+			check_template_method_name(has_write_full_output_p, Component_Type::write_full_output);
+			check_template_method_name(has_popsyn_control_file_name_p, Component_Type::popsyn_control_file_name);
+
+			check_template_method_name(has_percent_to_synthesize, percent_to_synthesize);
+			check_template_method_name(has_ipf_tolerance, ipf_tolerance);
+			check_template_method_name(has_marginal_tolerance, marginal_tolerance);
+			check_template_method_name(has_maximum_iterations, maximum_iterations);
+			check_template_method_name(has_write_marginal_output,write_marginal_output);
+			check_template_method_name(has_write_full_output,write_full_output);
+			check_template_method_name(has_popsyn_control_file_name,popsyn_control_file_name);
+			define_sub_check(Has_Popsyn_Configuration_Data_Prototype, has_percent_to_synthesize_p && has_ipf_tolerance_p && has_marginal_tolerance_p && has_maximum_iterations_p && has_write_marginal_output_p && has_write_full_output_p && has_popsyn_control_file_name_p);
+			define_sub_check(Has_Popsyn_Configuration_Data_Component, has_percent_to_synthesize && has_ipf_tolerance && has_marginal_tolerance && has_maximum_iterations && has_write_marginal_output && has_write_full_output && has_popsyn_control_file_name);
+			define_default_check(Has_Popsyn_Configuration_Data_Prototype || Has_Popsyn_Configuration_Data_Component);
+		};
 	}
 
 	namespace Prototypes
@@ -32,8 +53,8 @@ namespace PopSyn
 			tag_as_prototype; // Declare class as a polaris prototype
 
 			//----------------------------------------------------------------
-			// Schedules the first event from above
-			template<typename NetworkType, typename ScenarioType> void Initialize(NetworkType network, ScenarioType scenario, requires(NetworkType, check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network) && check_stripped_type(ScenarioType, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data)))
+			// Initializers, with and without setting a network reference.  If the version without networktype is used the events which require network information are skipped
+			template<typename ScenarioType> void Initialize(ScenarioType scenario, requires(ScenarioType, check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data)))
 			{
 				// Allocate IPF Solver and get Settings from scenario reference
 				typedef PopSyn::Prototypes::Solver_Settings<typename get_type_of(Solution_Settings)> solver_itf;
@@ -45,10 +66,15 @@ namespace PopSyn
 				this->write_full_output_flag<bool>(scenario->template write_full_output<bool>());
 				this->linker_file_path<string>(scenario->template popsyn_control_file_name<string>());
 
+				// create file linker and initialize with the filepath
+				typedef PopSyn::Prototypes::Popsyn_File_Linker<typename get_type_of(file_linker)> linker_itf;
+				linker_itf* linker = (linker_itf*)Allocate<typename get_type_of(file_linker)>();
+				linker->Initialize(this->linker_file_path<string>());
+
 				// Add references to other objects to the population synthesizer
 				this->Solution_Settings<solver_itf*>(solver);
-				this->network_reference<NetworkType>(network);
 				this->scenario_reference<ScenarioType>(scenario);
+				this->network_reference<Null_Prototype<get_type_of(network_reference)>*>(nullptr);
 
 				// set up output files
 				stringstream pop_filename("");
@@ -67,16 +93,22 @@ namespace PopSyn
 				this->Log_File<ofstream&>().open(marg_filename.str(),ios_base::out);		
 		
 
-				this_component()->template Initialize<TargetType>();
+				this_component()->template Initialize<NT>();
 
-				Load_Event<ComponentType>(&ComponentType::Popsyn_Event_Controller,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::INITIALIZE);
+				((ComponentType*)this)->Load_Event<ComponentType>(&Popsyn_Event_Controller,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::INITIALIZE);
 			}
-			template<typename NetworkType, typename ScenarioType> void Initialize(NetworkType network, ScenarioType scenario, requires(NetworkType, !check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network) || !check_stripped_type(ScenarioType, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data)))
+			template<typename NetworkType, typename ScenarioType> void Initialize(NetworkType network, ScenarioType scenario, requires(NetworkType, check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network) && check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data)))
+			{
+				this->Initialize<ScenarioType>(scenario);
+				this->network_reference<NetworkType>(network);		
+			}
+			template<typename NetworkType, typename ScenarioType> void Initialize(NetworkType network, ScenarioType scenario, requires(NetworkType, !check_stripped_type(NetworkType, Network_Components::Concepts::Is_Transportation_Network) || !check_stripped_type(ScenarioType, Concepts::Scenario_Has_Popsyn_Configuration_Data)))
 			{
 				assert_check(NetworkType, Network_Components::Concepts::Is_Transportation_Network, "Error, the specified NetworkType is not a valid Transportation network.");
 				assert_check(ScenarioType, Scenario_Components::Concepts::Has_Popsyn_Configuration_Data, "Error, the specified ScenarioType is not a valid Scenario reference.");
 			}
 			
+
 			//----------------------------------------------------------------
 			// Main analysis loop events, used to separate operations into different timesteps
 			//----------------------------------------------------------------
@@ -90,7 +122,7 @@ namespace PopSyn
 					{
 					case POPSYN_SUBITERATIONS::INITIALIZE:
 						pthis->Start_Popsyn_Event<NT>();
-						response.next._iteration = _iteration;
+						response.next._iteration = iteration();
 						response.next._sub_iteration = POPSYN_SUBITERATIONS::START_TIMING;
 						break;
 					case POPSYN_SUBITERATIONS::START_TIMING:
@@ -100,7 +132,7 @@ namespace PopSyn
 						break;
 					case POPSYN_SUBITERATIONS::STOP_TIMING:
 						pthis->Stop_Timer_Event<NT>();
-						response.next._iteration = _iteration;
+						response.next._iteration = iteration();
 						response.next._sub_iteration = POPSYN_SUBITERATIONS::OUTPUT;
 						break;
 					case POPSYN_SUBITERATIONS::OUTPUT:
@@ -139,8 +171,7 @@ namespace PopSyn
 				timer.Start();
 				//------------------------
 
-				int ndim, ans;
-				Linker linker = Linker();
+
 //				File_IO::File_Writer fw, fw_sample;
 				ofstream& out = this->Output_Stream<ofstream&>();
 				
@@ -159,32 +190,35 @@ namespace PopSyn
 				//===============================================================================================================
 				// Initialize file linker
 				//---------------------------------------------------------------------------------------------------------------
-				boost::container::vector<int> dims;
-				linker.Init_Linker(dims, this->linker_file_path<string>().c_str());
-				ndim = (int)dims.size();
+				int ndim;
+				typedef PopSyn::Prototypes::Popsyn_File_Linker<typename get_type_of(file_linker)> linker_itf;
+				linker_itf* linker = this->file_linker<linker_itf*>();
+				ndim = linker->number_of_dimensions();
+				boost::container::vector<int>& dims = linker->dimension_sizes();
 
 				// Define iterators and get pointer to the region collection
-				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
-				typedef typename region_collection_type::value_type						region_type;
-				typedef typename region_type::Sample_Data_type							sample_collection_type;
-				typedef typename sample_collection_type::value_type						sample_type;
-				typedef typename region_type::Temporary_Sample_Data_type				temporary_sample_collection_type;
-				typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
-				typedef typename zone_collection_type::value_type			zone_type;
-				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
-				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
+				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
+				typedef typename strip_modifiers(region_collection_type::mapped_type)			region_type;
+				typedef typename region_type::Sample_Data_type									sample_collection_type;
+				typedef typename strip_modifiers(sample_collection_type::mapped_type)			sample_type;
+				typedef typename region_type::Temporary_Sample_Data_type						temporary_sample_collection_type;
+				typedef typename strip_modifiers(temporary_sample_collection_type::mapped_type)	temp_sample_type;
+				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
+				typedef typename strip_modifiers(zone_collection_type::mapped_type)				zone_type;
+				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
+				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
 
-				typedef PopSyn::Prototypes::Synthesis_Region<typename remove_pointer<typename region_collection_type::value_type>::type> region_itf;
-				typedef Pair_Associative_Container<region_collection_type,region_itf*> regions_itf;
+				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
+				typedef Pair_Associative_Container<region_collection_type,region_collection_type::key_type, region_itf*> regions_itf;
 
-				typedef PopSyn::Prototypes::Synthesis_Zone<typename remove_pointer<typename zone_collection_type::data_type>::type> zone_itf;
-				typedef Pair_Associative_Container<zone_collection_type,typename region_itf::Component_Type::id_type,zone_itf*> zones_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
+				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type,zone_itf*> zones_itf;
 
-				typedef Household_Components::Prototypes::Household_Properties<typename remove_pointer<typename sample_collection_type::value_type>::type> pop_unit_itf;
-				typedef Pair_Associative_Container<sample_collection_type,pop_unit_itf*> sample_data_itf;
+				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
+				typedef Pair_Associative_Container<sample_collection_type,sample_collection_type::key_type,pop_unit_itf*> sample_data_itf;
 
-				typedef Household_Components::Prototypes::Household_Properties<typename remove_pointer<typename temporary_sample_collection_type::value_type>::type> temp_pop_unit_itf;
-				typedef Pair_Associative_Container<temporary_sample_collection_type,temp_pop_unit_itf*> temp_sample_data_itf;
+				typedef Household_Components::Prototypes::Household_Properties<temp_sample_type> temp_pop_unit_itf;
+				typedef Pair_Associative_Container<temporary_sample_collection_type,temporary_sample_collection_type::key_type,temp_pop_unit_itf*> temp_sample_data_itf;
 
 				typedef Person_Components::Prototypes::Person_Properties<typename remove_pointer<typename pop_unit_itf::get_type_of(Persons_Container)::value_type>::type> person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container),person_unit_itf*> person_sample_data_itf;
@@ -209,9 +243,10 @@ namespace PopSyn
 				//===============================================================================================================
 				// read region household file, fill sample data
 				//---------------------------------------------------------------------------------------------------------------
-//				File_IO::File_Reader fr;
-				if (!fr.Open(*linker.Sample_File_Path())) 
+				File_IO::File_Reader fr;
+				if (!fr.Open(linker->sample_file_path(),true,",\t")) 
 				{
+					char ans;
 					cout<<endl<<"Could not open region sample file path. Press any key."<<endl; cin>>ans; return EXIT_FAILURE;
 				}
 
@@ -227,7 +262,7 @@ namespace PopSyn
 					typename regions_itf::key_type ID;
 		
 					// read the region data from input file
-					if(!fr.Get_Data<typename regions_itf::key_type>(ID,linker.region_id_col)) break; 
+					if(!fr.Get_Data<typename regions_itf::key_type>(ID,linker->region_id_column())) break; 
 
 					if ((region_itr = regions->find(ID)) == regions->end())
 					{
@@ -259,7 +294,7 @@ namespace PopSyn
 					}
 					else
 					{
-						new_region = region_itr->second;
+						new_region = (region_itf*)region_itr->second;
 					}
 					// next add the sample data
 					dist = new_region->template Target_Joint_Distribution<joint_itf*>();
@@ -270,16 +305,16 @@ namespace PopSyn
 					double x;
 					for (int i=0; i<ndim; i++)
 					{
-						fr.Get_Data<double>(x,linker.get_pums_column(i));
-						index[i] = linker.find_index_in_dimension(i,x);
+						fr.Get_Data<double>(x,linker->get_pums_column(i));
+						index[i] = linker->find_index_in_dimension(i,x);
 					}
 
 					typename sample_type::ID_type sample_id;
 					typename sample_type::Weight_type weight;
-					fr.Get_Data<typename sample_type::ID_type>(sample_id,linker.sample_id_col);
-					fr.Get_Data<typename sample_type::Weight_type>(weight, linker.sample_weight_col);
+					fr.Get_Data<typename sample_type::ID_type>(sample_id,linker->sample_id_column());
+					fr.Get_Data<typename sample_type::Weight_type>(weight, linker->sample_weight_column());
 					boost::container::vector<double> data;
-					fr.Get_Data<double>(data,linker.get_pums_data_cols());
+					fr.Get_Data<double>(data,linker->get_pums_data_columns());
 
 					pop_unit_itf* p = (pop_unit_itf*)Allocate<sample_type>();
 					p->ID(sample_id);
@@ -303,8 +338,9 @@ namespace PopSyn
 				//===============================================================================================================
 				// read region person file, fill sample data
 				//---------------------------------------------------------------------------------------------------------------
-				if (!fr.Open(*linker.Person_File_Path())) 
+				if (!fr.Open(linker->person_sample_file_path(),true,",\t")) 
 				{
+					char ans;
 					cout<<endl<<"Could not open person file path. Press any key."<<endl; cin>>ans; return EXIT_FAILURE;
 				}
 
@@ -316,7 +352,7 @@ namespace PopSyn
 					typename regions_itf::key_type ID;
 		
 					// read the region data from input file
-					if(!fr.Get_Data<typename regions_itf::key_type>(ID,linker.person_region_id_col)) break; 
+					if(!fr.Get_Data<typename regions_itf::key_type>(ID,linker->person_region_id_column())) break; 
 
 					if ((region_itr = regions->find(ID)) == regions->end())
 					{
@@ -324,16 +360,16 @@ namespace PopSyn
 					}
 					else
 					{
-						new_region = region_itr->second;
+						new_region = (region_itf*)region_itr->second;
 
 						// next add the sample data
 						temp_sample = new_region->template Temporary_Sample_Data<temp_sample_data_itf*>();
 
 						// get characteristics from file
 						typename person_unit_itf::get_type_of(ID) sample_id;
-						fr.Get_Data<typename person_unit_itf::get_type_of(ID)>(sample_id,linker.person_sample_id_col);
+						fr.Get_Data<typename person_unit_itf::get_type_of(ID)>(sample_id,linker->person_sample_id_column());
 						boost::container::vector<double> data;
-						fr.Get_Data<double>(data,linker.get_person_data_cols());
+						fr.Get_Data<double>(data,linker->get_person_data_columns());
 
 						// create new person unit
 						person_unit_itf* p = (person_unit_itf*)Allocate<typename person_unit_itf::Component_Type>();
@@ -344,7 +380,7 @@ namespace PopSyn
 						sample_itr = temp_sample->find(sample_id);
 						if (sample_itr != temp_sample->end())
 						{
-							pop_unit_itf* pop_unit = sample_itr->second;
+							pop_unit_itf* pop_unit = (pop_unit_itf*)sample_itr->second;
 							pop_unit->template Persons_Container<person_sample_data_itf*>()->push_back(p);
 						}
 						else
@@ -361,9 +397,10 @@ namespace PopSyn
 				//===============================================================================================================
 				// Read zone file, fill marginal data
 				//---------------------------------------------------------------------------------------------------------------
-//				File_IO::File_Reader zone_fr;
-				if (!zone_fr.Open(*linker.Marg_File_Path())) 
+				File_IO::File_Reader zone_fr;
+				if (!zone_fr.Open(linker->marg_file_path(),true,",\t")) 
 				{
+					char ans;
 					cout<<endl<<"Ending. Press any key."<<endl;	cin>>ans; return EXIT_FAILURE;
 				}
 				while(zone_fr.Read())
@@ -373,11 +410,11 @@ namespace PopSyn
 					double x;
 		
 					// get ID values for ZONE and REGION
-					if(!zone_fr.Get_Data<typename zone_type::ID_type>(ID,linker.zone_id_col))
+					if(!zone_fr.Get_Data<typename zone_type::ID_type>(ID,linker->zone_id_column()))
 					{
 						cout<<"ERROR: could not retrieve zone id from zone file"; return EXIT_FAILURE;
 					}
-					if(!zone_fr.Get_Data<typename regions_itf::key_type>(RID,linker.region_in_zone_id_col))
+					if(!zone_fr.Get_Data<typename regions_itf::key_type>(RID,linker->region_in_zone_id_column()))
 					{
 						cout<<"ERROR: could not retrieve region id from zone file"; return EXIT_FAILURE;
 					}
@@ -389,7 +426,7 @@ namespace PopSyn
 						cin>>RID;
 						return EXIT_FAILURE;
 					}
-					region_itf* region = region_itr->second;
+					region_itf* region = (region_itf*)region_itr->second;
 					regional_marg = region->template Target_Marginal_Distribution<marginal_itf*>();
 
 					// Read marginal data from file and add to ZONE
@@ -416,7 +453,7 @@ namespace PopSyn
 					{
 						for (typename marginal_itf::size_type j=0; j<dimensions[i]; j++)
 						{
-							if (!zone_fr.Get_Data<double>(x,linker.get_sf3_column(i,j))) break;
+							if (!zone_fr.Get_Data<double>(x,linker->get_sf3_column(i,j))) break;
 							(*marg)[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] = x;
 							(*regional_marg)[pair<typename marginal_itf::size_type,typename marginal_itf::size_type>(i,j)] += x;
 						}
@@ -427,7 +464,24 @@ namespace PopSyn
 				}
 				zone_fr.Close();
 
+				//===============================================================================================================
+				// Link the synthesizer zones to the activity locations in the network_reference, if it exists, otherwise ignore
+				this->Link_Zones_To_Network_Locations<NT>();				
+				//---------------------------------------------------------------------------------------------------------------
 
+				//------------------------
+				// TIMER
+				cout <<"Setup Runtime (ms): "<<timer.Stop();
+				//------------------------
+
+				return true;
+			}
+			template<typename TargetType> bool Start_Popsyn_Event(requires(TargetType,check_stripped_type(ComponentType,!Concepts::Uses_Linker_File)))
+			{
+				assert_check(ComponentType,Concepts::Uses_Linker_File,"This popsyn type does not use linker file setup.");
+			}
+			template<typename NetworkType> bool Link_Zones_To_Network_Locations(requires(ComponentType,check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
+			{
 				//===============================================================================================================
 				// Fill zonal activity_locations boost::container::list from network reference
 				//---------------------------------------------------------------------------------------------------------------
@@ -469,19 +523,13 @@ namespace PopSyn
 					}
 				}
 
-
-				//------------------------
-				// TIMER
-				cout <<"Setup Runtime (ms): "<<timer.Stop();
-				//------------------------
-
 				return true;
 			}
-			template<typename TargetType> bool Start_Popsyn_Event(requires(TargetType,check_stripped_type(ComponentType,!Concepts::Uses_Linker_File)))
+			template<typename NetworkType> bool Link_Zones_To_Network_Locations(requires(ComponentType,!check(NetworkType, Network_Components::Concepts::Is_Transportation_Network)))
 			{
-				assert_check(ComponentType,Concepts::Uses_Linker_File,"This popsyn type does not use linker file setup.");
+				return false;
 			}
-			
+
 			// 2.) Start timing event - called before individual objects begin processing (at Iteration = 0, timestep 3)
 			template<typename TargetType> void Start_Timer_Event()
 			{
@@ -496,7 +544,7 @@ namespace PopSyn
 			}
 			
 			// 4.) Output results event - called after timing is stopped (at Iteration = 0, timestep 7)
-			template<typename TargetType> void Output_Popsyn_event()
+			template<typename TargetType> void Output_Popsyn_Event()
 			{
 				ofstream& sample_out = this->Output_Stream<ofstream&>();
 				ofstream& marg_out = this->Marginal_Output_Stream<ofstream&>();
@@ -505,27 +553,27 @@ namespace PopSyn
 				//---------------------------------------------------------------------------------------------
 				// Type defines for sub_objects
 				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
-				typedef typename region_collection_type::value_type			region_type;
+				typedef typename strip_modifiers(region_collection_type::mapped_type)	region_type;
 				typedef typename region_type::Sample_Data_type							sample_collection_type;
-				typedef typename sample_collection_type::value_type			sample_type;
+				typedef typename strip_modifiers(sample_collection_type::mapped_type)	sample_type;
 				typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
-				typedef typename zone_collection_type::value_type			zone_type;
+				typedef typename strip_modifiers(zone_collection_type::mapped_type)		zone_type;
 				typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
-				typedef typename household_collection_type::value_type		household_type;
+				typedef typename strip_modifiers(household_collection_type::value_type) household_type;
 				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
 				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
 				//---------------------------------------------------------------------------------------------
 				// Interface defines for sub_objects
-				typedef PopSyn::Prototypes::Synthesis_Region<typename remove_pointer<typename region_collection_type::value_type>::type> region_itf;
-				typedef Pair_Associative_Container<region_collection_type,region_itf*> regions_itf;
+				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
+				typedef Pair_Associative_Container<region_collection_type,region_collection_type::key_type, region_itf*> regions_itf;
 
-				typedef PopSyn::Prototypes::Synthesis_Zone<typename remove_pointer<typename zone_collection_type::value_type>::type> zone_itf;
-				typedef Pair_Associative_Container<zone_collection_type,zone_itf*> zones_itf;
+				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
+				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type,zone_itf*> zones_itf;
 
-				typedef Household_Components::Prototypes::Household_Properties<typename remove_pointer<typename sample_collection_type::value_type>::type> pop_unit_itf;
-				typedef Pair_Associative_Container<sample_collection_type,pop_unit_itf*> sample_data_itf;
+				typedef Household_Components::Prototypes::Household_Properties<household_type> pop_unit_itf;
+				typedef Pair_Associative_Container<sample_collection_type,sample_collection_type::key_type, pop_unit_itf*> sample_data_itf;
 
-				typedef Household_Components::Prototypes::Household_Properties<typename remove_pointer<typename pop_unit_itf::get_type_of(Persons_Container)::value_type>::type> person_unit_itf;
+				typedef Person_Components::Prototypes::Person_Properties<typename remove_pointer<typename pop_unit_itf::get_type_of(Persons_Container)::value_type>::type> person_unit_itf;
 				typedef Random_Access_Sequence<typename pop_unit_itf::get_type_of(Persons_Container),person_unit_itf*> person_sample_data_itf;
 
 				typedef Multidimensional_Random_Access_Array<joint_dist_type, typename joint_dist_type::value_type > joint_itf;
@@ -792,6 +840,7 @@ namespace PopSyn
 			accessor(Solution_Settings, NONE, NONE);
 			accessor(scenario_reference, NONE, NONE);
 			accessor(network_reference, NONE, NONE);
+			accessor(file_linker, NONE,NONE);
 			accessor(timer, NONE, NONE);
 			accessor(write_marginal_output_flag, NONE, NONE);
 			accessor(write_full_output_flag, NONE, NONE);
