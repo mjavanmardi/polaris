@@ -178,7 +178,8 @@ void run_with_input_from_db(char* scenario_filename);
 int main(int argc, char* argv[])
 {
 	Simulation_Configuration cfg;
-	cfg.Single_Threaded_Setup(1000);
+	//cfg.Single_Threaded_Setup(1000);
+	cfg.Multi_Threaded_Setup(24*60*60,8);
 	INITIALIZE_SIMULATION(cfg);
 
 	char* scenario_filename = "scenario.json";

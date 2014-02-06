@@ -394,16 +394,22 @@ namespace polaris
 				// TEX slice wishes to return sooner in the future than already assumed
 				_tex_next_next_revision = tex_proposed_next_revision;
 			}
-			
+
 			if(++_tex_threads_counter == num_sim_threads())
 			{
 				// No more simulation threads will visit this TEX, update for next step
 				Update();
 
 				_tex_threads_counter = 0;
-			}
 
-			out_next_revision = _tex_next_revision;
+				out_next_revision = _tex_next_revision;
+			}
+			else
+			{
+				// the tex_next_revision hasn't been set yet to _tex_next_next_revision
+				out_next_revision = _tex_next_next_revision;
+			}
+			
 
 		UNLOCK(_tex_lock);
 	}
