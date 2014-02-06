@@ -43,6 +43,7 @@ namespace PopSyn
 			m_container(__sample_map_type, Sample_Data, NONE, NONE); 
 			m_container(boost::container::vector<typename MasterType::household_type*>, Synthetic_Households_Container, NONE, NONE);
 			m_container(boost::container::vector<int>, Activity_Locations_Container, NONE, NONE);
+
 		};
 
 		implementation struct Synthesis_Zone_Implementation : public Polaris_Component< MasterType,INHERIT(Synthesis_Zone_Implementation), Data_Object>, _Synthesis_Zone_Implementation<MasterType>

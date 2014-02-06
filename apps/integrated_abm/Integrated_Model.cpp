@@ -9,8 +9,11 @@
 #endif
 
 #include "Polaris_PCH.h"
-#include "Repository.h"
+//#include "core\Core.h"
+//#include "File_Reader.h"
+//#include "Repository.h"
 #include "Population_Synthesis.h"
+#include "Scenario_Implementation.h"
 
 
 // SET THE DEBUG VERSION TO SIMULATE ONLY ONE AGENT
@@ -493,9 +496,15 @@ int main(int argc,char** argv)
 }
 #endif
 
+
 prototype struct Test_Agent
 {
 	tag_as_prototype;
+
+	bool Test_Function(string arg1, bool arg2=true, string arg3="test")
+	{
+		return true;
+	}
 
 	template<typename T> void Initialize()
 	{
@@ -550,54 +559,47 @@ implementation struct Test_Agent_Implementation : public Polaris_Component<Maste
 
 struct MasterType
 {
+	typedef Scenario_Components::Implementations::Scenario_Implementation<MasterType> scenario_type;
 	typedef polaris::Basic_Units::Implementations::Length_Implementation<MasterType> length_type;
 	typedef polaris::Basic_Units::Implementations::Time_Implementation<MasterType> time_type;
 	typedef PopSyn::Implementations::Synthesis_Zone_Implementation<MasterType> zone;
 	typedef PopSyn::Implementations::Synthesis_Region_Implementation<MasterType> region;
 	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> IPF_Solver_Settings;
 	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> popsyn_solver;
+	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<MasterType> person_static_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<MasterType> household_static_properties_type;
 	typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
-	typedef NULLTYPE household_type;
+	typedef NULLCOMPONENT household_type;
 	typedef NULLTYPE person_type;
-	typedef NULLTYPE scenario_type;
 	typedef NULLTYPE network_type;
 };
+
 int main(int argc, char* argv[])
 {
 	Simulation_Configuration cfg;
 	cfg.Single_Threaded_Setup(1000);
 	INITIALIZE_SIMULATION(cfg);
 
+	//==================================================================================================================================
+	// Scenario initialization
+	//----------------------------------------------------------------------------------------------------------------------------------
+	char* scenario_filename = "scenario.json";
+	if (argc >= 2) scenario_filename = argv[1];
+	typedef Scenario_Components::Prototypes::Scenario<MasterType::scenario_type> _Scenario_Interface;
+	_Scenario_Interface* scenario=(_Scenario_Interface*)Allocate<MasterType::scenario_type>();
+	cout << "reading scenario data..." <<endl;
+	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
 
-	Feet f = 10.0;
-	Time_Seconds s = 7200.0;
-	Meters m;
-	Time_Hours h;
-
-	polaris::Basic_Units::Prototypes::Length<MasterType::length_type>* p_length = (polaris::Basic_Units::Prototypes::Length<MasterType::length_type>*)Allocate<MasterType::length_type>();
-	polaris::Basic_Units::Prototypes::Time<MasterType::time_type>* p_time = (polaris::Basic_Units::Prototypes::Time<MasterType::time_type>*)Allocate<MasterType::time_type>();
-
-	p_length->Value<Feet>(f);
-	p_time->Value<Time_Seconds>(s);
-	m = p_length->Value<Meters>();
-	h = p_time->Value<Time_Hours>();
-	m = p_length->Convert_Value<Feet,Meters>(f);
-	cout << f <<" feet = " << m << " meters."<<endl;
-	cout << s <<" seconds = " << h << " hours."<<endl<<endl;
 
 	typedef Test_Agent<Test_Agent_Implementation<NT>> agent_itf;
 	agent_itf* agent = (agent_itf*)Allocate<Test_Agent_Implementation<NT>>();
 	agent->Initialize<NT>();
 
-	agent->test_concept<float>();
-
 	// POPSYN STUFF
 	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::popsyn_solver> popsyn_itf;
 	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
-	popsyn->Initialize<_Network_Interface*, _Scenario_Interface*>(nullptr,nullptr);
-
+	popsyn->Initialize<_Scenario_Interface*>(scenario);
 
 	START();
 
