@@ -612,6 +612,8 @@ namespace Vehicle_Components
 			template<typename TargetType> void initialize()
 			{
 				_is_integrated=false;
+				
+				_simulation_status=Types::Vehicle_Status_Keys::UNLOADED;
 
 				///
 				//unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+_internal_id+1;
