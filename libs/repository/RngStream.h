@@ -79,7 +79,7 @@ namespace RNG_Components
 	public:
 
 	StlRngStream();
-	mt19937_64 generator;  
+	std::mt19937_64 generator;  
 	uniform_real_distribution<double> distribution;
 	double RandU01();
 	void SetSeed(unsigned long iseed);

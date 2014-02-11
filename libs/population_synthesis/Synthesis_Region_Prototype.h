@@ -27,19 +27,18 @@ namespace PopSyn
 			template<typename TargetType> void Initialize()
 			{
 				this_component()->template Initialize<TargetType>();
-				//TODO
-//load_event(ComponentType,Call_Synthesize_Population_Conditional,Call_Synthesize_Population, PopSyn::Types::POPSYN_ITERATIONS::MAIN_PROCESS,PopSyn::Types::POPSYN_SUBITERATIONS::PROCESS,NULLTYPE);
+				((ComponentType*)this)->Load_Event<ComponentType>(&Synthesize_Population_Conditional_Event,POPSYN_ITERATIONS::MAIN_INITIALIZE,POPSYN_SUBITERATIONS::PROCESS);
 			}
 
 			accessor(Temporary_Sample_Data, NONE, NONE);
 
 			//==============================================================================================================
 			// This handles the main population synthesis loop on the region-level, calls IPF and Selection for each zone
-			static void Call_Synthesize_Population_Conditional(ComponentType* _this,Event_Response& response)
+			static void Synthesize_Population_Conditional_Event(ComponentType* _this,Event_Response& response)
 			{
 				if (sub_iteration() == PopSyn::Types::POPSYN_SUBITERATIONS::PROCESS)
 				{
-					response.result = true;
+					((Synthesis_Region<ComponentType>*) _this)->template Synthesize_Population<NT>();
 					response.next._iteration = END;
 					response.next._sub_iteration = 0;
 				}
@@ -48,10 +47,6 @@ namespace PopSyn
 					response.next._iteration = END;
 					response.next._sub_iteration = 0;
 				}
-			}
-			declare_event(Call_Synthesize_Population)
-			{
-				((Synthesis_Region<ComponentType>*) _this)->template Synthesize_Population<NULLTYPE>();
 			}
 			template<typename TargetType> void Synthesize_Population(requires(TargetType,check_stripped_type(ComponentType,Concepts::Is_IPF_Capable)))
 			{
@@ -64,13 +59,15 @@ namespace PopSyn
 				// Get the solution settings
 				typedef typename get_type_of(Target_Joint_Distribution)::value_type value_type;
 				typedef Prototypes::Solver_Settings<typename get_type_of(Solver_Settings)> solution_settings_itf;
-				typedef Synthesis_Zone<typename remove_pointer<typename get_type_of(Synthesis_Zone_Collection)::value_type>::type> zone_itf;
-				typedef Pair_Associative_Container<typename get_type_of(Synthesis_Zone_Collection),zone_itf*> zones_itf;
+				//typedef Synthesis_Zone<typename remove_pointer<typename get_type_of(Synthesis_Zone_Collection)::value_type>::type> zone_itf;
+				typedef Pair_Associative_Container<typename get_type_of(Synthesis_Zone_Collection)> zones_itf;
+				typedef Synthesis_Zone<get_data_type(typename get_type_of(Synthesis_Zone_Collection))> zone_itf;
 
 				typedef Multidimensional_Random_Access_Array< typename get_type_of(Target_Joint_Distribution),value_type> mway_itf;
 				typedef Multidimensional_Random_Access_Array< typename get_type_of(Target_Marginal_Distribution),value_type> marg_itf;
-				typedef  Person_Components::Prototypes::Person_Properties <typename remove_pointer< typename get_type_of(Sample_Data)::value_type>::type>  pop_unit_itf;
-				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data), pop_unit_itf*> sample_itf;
+				//typedef  Person_Components::Prototypes::Person_Properties <typename remove_pointer< typename get_type_of(Sample_Data)::value_type>::type>  pop_unit_itf;
+				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
+				typedef  Person_Components::Prototypes::Person_Properties <get_data_type(typename get_type_of(Sample_Data))>  pop_unit_itf;
 
 				#pragma endregion
 				//==========================================================
@@ -85,6 +82,7 @@ namespace PopSyn
 				// MAIN SYNTHESIS ROUTINE. 
 				//----------------------------------------------------------
 				// A. Fit the region distribution to region marginal
+
 				base_itf->template Fit_Joint_Distribution_To_Marginal_Data<NULLTYPE>();
 
 				//----------------------------------------------------------

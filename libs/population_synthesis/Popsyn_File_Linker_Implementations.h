@@ -108,6 +108,7 @@ namespace PopSyn
 
 				_fr.Open(link_file_path, false,",\t");
 				Read_Linker_File();
+				_number_of_dimensions = (int)_dimension_sizes.size();
 			}
 
 			void Read_Linker_File()

@@ -34,25 +34,25 @@ namespace PopSyn
 		{
 			check_template_method_name(Has_Target_Joint_Distribution_P,Component_Type::Target_Joint_Distribution);
 			check_template_method_name(Has_Target_Marginal_Distribution_P,Component_Type::Target_Marginal_Distribution);
-			check_template_method_name(Has_Synthetic_Persons_Container_P,Component_Type::Synthetic_Persons_Container);
+			check_template_method_name(Has_Synthetic_Households_Container_P,Component_Type::Synthetic_Households_Container);
 			check_template_method_name(Has_Activity_Locations_Container_P,Component_Type::Activity_Locations_Container);
 			check_template_method_name(Has_scenario_reference_P, Component_Type::scenario_reference);
 			check_template_method_name(Has_network_reference_P, Component_Type::network_reference);
 
-			define_sub_check(Is_Synthesizer_Usable_Prototype, Has_Target_Joint_Distribution_P && Has_Target_Marginal_Distribution_P && Has_Synthetic_Persons_Container_P && Has_scenario_reference_P);
-			define_sub_check(Is_Simulator_Usable_Prototype, Has_network_reference_P && Has_Activity_Locations_Container_P && Has_Synthetic_Persons_Container_P);
-			define_sub_check(Is_Synthesis_Zone_Prototype, Is_Synthesizer_Usable_Prototype && Is_Simulator_Usable_Prototype);
+			define_sub_check(Is_Synthesis_Usable_Prototype, Has_Target_Joint_Distribution_P && Has_Target_Marginal_Distribution_P && Has_scenario_reference_P);
+			define_sub_check(Is_Simulator_Usable_Prototype, Has_Synthetic_Households_Container_P && Has_network_reference_P && Has_Activity_Locations_Container_P);
+			define_sub_check(Is_Synthesis_Zone_Prototype, Is_Synthesis_Usable_Prototype && Is_Simulator_Usable_Prototype);
 
 			check_template_method_name(Has_Target_Joint_Distribution,Target_Joint_Distribution);
 			check_template_method_name(Has_Target_Marginal_Distribution,Target_Marginal_Distribution);
-			check_template_method_name(Has_Synthetic_Persons_Container,Synthetic_Persons_Container);
+			check_template_method_name(Has_Synthetic_Households_Container,Synthetic_Households_Container);
 			check_template_method_name(Has_Activity_Locations_Container,Activity_Locations_Container);
 			check_template_method_name(Has_scenario_reference, scenario_reference);
 			check_template_method_name(Has_network_reference, network_reference);
 
-			define_sub_check(Is_Synthesizer_Usable, Has_Target_Joint_Distribution && Has_Target_Marginal_Distribution && Has_Synthetic_Persons_Container && Has_scenario_reference);
-			define_sub_check(Is_Simulator_Usable, Has_network_reference && Has_Activity_Locations_Container && Has_Synthetic_Persons_Container);
-			define_sub_check(Is_Synthesis_Zone_Component, Is_Synthesizer_Usable && Is_Simulator_Usable);
+			define_sub_check(Is_Synthesis_Usable, Has_Target_Joint_Distribution && Has_Target_Marginal_Distribution && Has_scenario_reference);
+			define_sub_check(Is_Simulator_Usable, Has_network_reference && Has_Synthetic_Households_Container && Has_Activity_Locations_Container);
+			define_sub_check(Is_Synthesis_Zone_Component, Is_Synthesis_Usable && Is_Simulator_Usable);
 
 			define_default_check(Is_Synthesis_Zone_Prototype || Is_Synthesis_Zone_Component);
 		};
@@ -109,6 +109,7 @@ namespace PopSyn
 		prototype struct Synthesis_Zone ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
+
 			template<typename TargetType> void Initialize()
 			{
 				this_component()->template Initialize<TargetType>();
@@ -124,8 +125,8 @@ namespace PopSyn
 
 				// IPF version of fitting the joint distribution to marginal distribution
 				typedef typename get_type_of(Target_Joint_Distribution)::value_type value_type;
-				typedef Multidimensional_Random_Access_Array< typename get_type_of(Target_Joint_Distribution),value_type> mway_itf;
-				typedef Multidimensional_Random_Access_Array<typename get_type_of(Target_Marginal_Distribution),value_type> marg_itf;
+				typedef Multidimensional_Random_Access_Array< typename get_type_of(Target_Joint_Distribution)> mway_itf;
+				typedef Multidimensional_Random_Access_Array<typename get_type_of(Target_Marginal_Distribution)> marg_itf;
 
 				typename mway_itf::iterator itr;
 				typename marg_itf::iterator marg_itr;
@@ -138,8 +139,9 @@ namespace PopSyn
 				typename mway_itf::size_type num_dim = (typename mway_itf::size_type)(dimensions.size());
 
 				// get the marginals
-				marg_itf& marg = this->Target_Marginal_Distribution<marg_itf&>();
-				
+				marg_itf& marg = this->Target_Marginal_Distribution<marg_itf&>();	
+
+
 				// Main Execution loop - loop over each dimension, and each index within each dimensions and fit to the marginal
 				value_type max_error = (value_type)INT_MAX;
 				uint iterations = 0;
@@ -178,7 +180,7 @@ namespace PopSyn
 
 					iterations++;
 				}
-						
+					
 			}
 			template<typename TargetType> void Fit_Joint_Distribution_To_Marginal_Data(requires(TargetType,check(ComponentType,!Concepts::Is_IPF_Capable)))
 			{
@@ -194,7 +196,7 @@ namespace PopSyn
 			//===================================================================================================================================
 			// Defintion of the Household/Person selection procedure - can be used for IPF, Combinatorial Optimization, etc. methods
 			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, 
-				requires(TargetType,check(ComponentType, Concepts::Is_Probabilistic_Selection)   && check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative)))
+				requires(TargetType,check(ComponentType, Concepts::Is_Probabilistic_Selection)  /*&& check(TargetType,is_pointer)*/ && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative)))
 			{
 				typedef Network_Components::Prototypes::Network<typename ComponentType::Master_Type::network_type> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
@@ -208,9 +210,9 @@ namespace PopSyn
 				mway.scale(settings.template Percentage_to_synthesize<double>());
 			
 
-				// Get pointers to the regional and zonal household samples
-				typedef  Household_Components::Prototypes::Household_Properties <typename remove_pointer< typename get_type_of(Sample_Data)::value_type>::type>  pop_unit_itf;
-				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data), pop_unit_itf*> sample_itf;
+				// Get pointers to the regional and zonal household samples		
+				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
+				typedef  Household_Components::Prototypes::Household_Properties <get_data_type( typename get_type_of(Sample_Data))>  pop_unit_itf;
 
 				sample_itf* sample = (sample_itf*)Region_Sample_Ptr;
 				sample_itf* zone_sample = this->Sample_Data<sample_itf*>();
@@ -227,11 +229,16 @@ namespace PopSyn
 				{
 					//----------------------------------------------------------------------------------
 					// get a pointer to the value of the iterator for IDE support
-					pop_unit_itf* stored_pop_unit;
+					pop_unit_itf* stored_pop_unit = (pop_unit_itf*)itr->second;
 
 					// get the current key (i.e. index into mway)
 					typename sample_itf::key_type index = itr->first;
 					double num_required = mway[index];
+
+					//if (stored_pop_unit->Household_size<int>() == 5)
+					//{
+					//	int tes = 1;
+					//}
 									
 					//----------------------------------------------------------------------------------
 					//get the cumulative weight of all items corresponding to current index
@@ -298,27 +305,33 @@ namespace PopSyn
 						num_required--;	//-=(int)(1.0 / settings.template Percentage_to_synthesize<double>());
 					}
 
-					// if at the end of the map, break so that increment does not go past end of data_structure
+					// if at the end of the map, break so that increment does not go past end of data_structure, otherwise step over all items in sample that had the same index and go to next index
 					itr = range.second;
 					if (itr == sample->end()) break;
 				}		
 			}
 			template<typename TargetType> void Select_Synthetic_Population_Units(TargetType Region_Sample_Ptr, 
-				requires(TargetType,!(check(ComponentType, Concepts::Is_Probabilistic_Selection) && check(strip_modifiers(TargetType),is_pointer) && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative))))
+				requires(TargetType,!(check(ComponentType, Concepts::Is_Probabilistic_Selection) /*&& check(TargetType,is_pointer)*/ && check(strip_modifiers(TargetType),polaris::Container_Concepts::Is_Associative))))
 			{
 				assert_check(ComponentType, Concepts::Is_Probabilistic_Selection,"Not probabilistic selection defined.");
-				assert_check(strip_modifiers(TargetType), is_pointer,"Is not a pointer");
-				assert_check(strip_modifiers(TargetType), Concepts::Is_Associative, "Container is not associative.");
+				/*assert_check(TargetType, is_pointer,"Is not a pointer");*/
+				assert_check(strip_modifiers(TargetType), polaris::Container_Concepts::Is_Associative, "Container is not associative.");
 			}
-			template<typename TargetType> void Create_Household(TargetType static_properties)
+			
+			//===================================================================================================================================
+			// This method creates the actual agent object - if the popsyn is linked to a simulation, otherwise it returns nothing (use this for popsyns which only output the results)
+			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype)))
 			{
 				typedef Network_Components::Prototypes::Network<typename ComponentType::Master_Type::network_type> _Network_Interface;
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
-				typedef  Household_Components::Prototypes::Household<typename remove_pointer< typename get_type_of(Synthetic_Households_Container)::value_type>::type>  household_itf;
-				typedef  Random_Access_Sequence< typename get_type_of(Synthetic_Households_Container), household_itf*> households_itf;
 
-				typedef  Person_Components::Prototypes::Person<typename remove_pointer< typename household_itf::get_type_of(Persons_Container)::value_type>::type>  person_itf;
-				typedef  Random_Access_Sequence< typename household_itf::get_type_of(Persons_Container), person_itf*> persons_itf;
+				typedef  Random_Access_Sequence< typename get_type_of(Synthetic_Households_Container)> households_itf;
+				typedef  Household_Components::Prototypes::Household<get_data_type(get_type_of(Synthetic_Households_Container))>  household_itf;
+				
+
+				typedef  Random_Access_Sequence< typename household_itf::get_type_of(Persons_Container)> persons_itf;
+				typedef  Person_Components::Prototypes::Person<get_data_type(typename household_itf::get_type_of(Persons_Container))>  person_itf;
+				
 
 				// interface to the ACS sample data classes
 				typedef  Household_Components::Prototypes::Household_Properties <typename remove_pointer< typename get_type_of(Sample_Data)::value_type>::type>  pop_unit_itf;
@@ -348,12 +361,54 @@ namespace PopSyn
 				//
 				household_container->push_back(hh);
 			}
+			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype)))
+			{
+				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
+				
+				typedef  Random_Access_Sequence< typename get_type_of(Synthetic_Households_Container)> households_itf;
+				typedef  Household_Components::Prototypes::Household_Properties<typename get_value_type( typename get_type_of(Synthetic_Households_Container))>  household_itf;
+				
+				typedef  Random_Access_Sequence<get_type_of(Synthetic_Persons_Container)> persons_itf;
+				typedef  Person_Components::Prototypes::Person_Properties<typename get_value_type(typename get_type_of(Synthetic_Persons_Container))>  person_itf;
+
+				// interface to the ACS sample data classes
+				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
+				typedef  Household_Components::Prototypes::Household_Properties <typename get_data_type(typename get_type_of(Sample_Data))>  pop_unit_itf;
+				
+				
+				typedef  Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
+				typedef  Person_Components::Prototypes::Person_Properties<typename get_value_type(typename pop_unit_itf::get_type_of(Persons_Container))>  person_unit_itf;
+				
+
+				households_itf* household_container = (households_itf*)this->Synthetic_Households_Container<households_itf*>();
+				persons_itf* person_container = (persons_itf*)this->Synthetic_Persons_Container<persons_itf*>();
+
+				// create new household using sample unit
+				pop_unit_itf* pop_unit = (pop_unit_itf*)static_properties;
+				person_sample_itf* person_units = pop_unit->template Persons_Container<person_sample_itf*>();
+
+				// create new person agent from each person unit properties class in the hh unit properties class
+				typename person_sample_itf::iterator person_unit_itr = person_units->begin();
+				for (;person_unit_itr != person_units->end(); ++person_unit_itr)
+				{
+					person_unit_itf* person =(person_unit_itf*)(*person_unit_itr);
+					person_container->push_back((person_itf*)person);
+				}
+				//
+				household_container->push_back((household_itf*)static_properties);
+			}
+			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype)))
+			{
+				assert_sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype, "The ComponentType must be at least simulation compatible to use this method, or ");
+				assert_sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype, "The ComponentType must be at least simulation compatible to use this method, or ");
+			}
 
 			//===================================================================================================================================
 			// Accessor for the Joint Distribution (IPF and CO only) and marginal distributions used in synthesis
 			accessor(Target_Joint_Distribution, NONE, NONE);
 			accessor(Target_Marginal_Distribution, NONE, NONE);
 			accessor(Synthetic_Households_Container, NONE, NONE);
+			accessor(Synthetic_Persons_Container, NONE, NONE);
 			accessor(Activity_Locations_Container, NONE, NONE);
 
 			//===================================================================================================================================
@@ -372,7 +427,7 @@ namespace PopSyn
 
 			template<typename ParamType, typename ReturnType> ReturnType Get_1D_Index(ParamType& multi_dimensional_index_vector)
 			{
-				return this_component()->template Get_1D_Index<TargetType>(multi_dimensional_index_vector);
+				return this_component()->template Get_1D_Index<ParamType,ReturnType>(multi_dimensional_index_vector);
 			}
 		};
 

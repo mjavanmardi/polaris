@@ -247,7 +247,7 @@ public:
 				size_type i = tmp.get_index(index);
 				(*itr) = tmp._data[i];
 			}
-			//else (*itr) = value;		
+			else (*itr) = value;		
 		}
 	}
 
@@ -421,7 +421,9 @@ void s_array<T>::print(ostream& stream)
 	{
 		for (uint j=0; j<_row_sizes[i]; j++)
 		{
-			stream<</*setw(10)<<*/this->operator[](index_type(i,j))<<"\t";
+			T& val = this->operator[](index_type(i,j));
+			if ((float)val < FLT_MIN) val = 0.0;
+			stream<<val<<"\t";
 		}
 		stream<<endl;
 	}
