@@ -6,7 +6,7 @@
 #include "Traveler_Prototype.h"
 #include "../Repository/RNG_Implementations.h"
 #ifndef EXCLUDE_DEMAND
-#include "Person_Prototype.h"
+#include "activity_simulator\Person_Prototype.h"
 #endif
 #include "Network_Event_Prototype.h"
 #include "Depot_Prototype.h"
@@ -420,7 +420,7 @@ namespace Link_Components
 
 
 #ifndef EXCLUDE_DEMAND
-			template<typename TargetType> void accept_vehicle(TargetType veh,requires(TargetType,check_2(typename MasterType::routing_type,is_same) || check(Traveler_Components::Concepts::Is_Traveler) || check(Person_Components::Concepts::Is_Person_Mover)))
+			template<typename TargetType> void accept_vehicle(TargetType veh/*,requires(TargetType,check_2(typename MasterType::routing_type,is_same) || check(Traveler_Components::Concepts::Is_Traveler) || check(Person_Components::Concepts::Is_Person_Mover))*/)
 #else
 			template<typename TargetType> void accept_vehicle_from_origin(TargetType veh)
 #endif

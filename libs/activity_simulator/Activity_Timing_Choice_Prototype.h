@@ -1,7 +1,7 @@
 #pragma once
-#include "User_Space_Includes.h"
-#include "Person_Prototype.h"
-#include "Activity_Prototype.h"
+#include "Activity_Simulator_Includes.h"
+//#include "Person_Prototype.h"
+//#include "Activity_Prototype.h"
 
 namespace Person_Components
 {

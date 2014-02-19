@@ -1,19 +1,19 @@
 #pragma once
 
-//#include "User_Space_Includes.h"
-#include "Activity_Prototype.h"
-#include "Network_Event_Prototype.h"
-#include "Activity_Location_Prototype.h"
-#include "Network_Prototype.h"
-#include "Zone_Prototype.h"
-#include "Movement_Plan_Prototype.h"
-#include "Network_Skimming_Prototype.h"
-#include "Person_Properties_Prototype.h"
-#include "Person_Planner_Prototype.h"
-#include "Person_Scheduler_Prototype.h"
-#include "Person_Perception_Prototype.h"
-#include "Person_Mover_Prototype.h"
-#include "Destination_Chooser_Prototype.h"
+#include "Activity_Simulator_Includes.h"
+//#include "Activity_Prototype.h"
+//#include "Network_Event_Prototype.h"
+//#include "Activity_Location_Prototype.h"
+//#include "Network_Prototype.h"
+//#include "Zone_Prototype.h"
+//#include "Movement_Plan_Prototype.h"
+//#include "Network_Skimming_Prototype.h"
+//#include "Person_Properties_Prototype.h"
+//#include "Person_Planner_Prototype.h"
+//#include "Person_Scheduler_Prototype.h"
+//#include "Person_Perception_Prototype.h"
+//#include "Person_Mover_Prototype.h"
+//#include "Destination_Chooser_Prototype.h"
 
 namespace Person_Components
 {
@@ -68,7 +68,7 @@ namespace Prototypes
 			ComponentType* _pthis = (ComponentType*)_this;
 			_Person_Interface* pthis =(_Person_Interface*)_pthis;
 			planner_itf* planner = pthis->template Planning_Faculty<planner_itf*>();
-			
+
 
 			// First do the 'Set Locations Event', 
 			if (iteration() == pthis->template First_Iteration<Simulation_Timestep_Increment>())
@@ -165,7 +165,7 @@ namespace Prototypes
 			assert_check_2(typename ComponentType::Object_Type,Execution_Object,is_same, "ComponentType must be an execution object, or ");
 			assert_check_2(typename ComponentType::Object_Type,Data_Object,is_same, "ComponentType must be an data object.");
 		}
-		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneTypehome_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(TargetType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Execution_Object,is_same)))
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(IdType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Execution_Object,is_same)))
 		{
 			this->First_Iteration<Simulation_Timestep_Increment>(iteration()+1);
 			int starting_subiteration = (int)(GLOBALS::Uniform_RNG.Next_Rand<float>()*30.0);
@@ -174,11 +174,11 @@ namespace Prototypes
 			//TODO
 			//load_event(ComponentType,Agent_Conditional,Set_Locations_Event,this->First_Iteration<Simulation_Timestep_Increment>(),starting_subiteration,NULLTYPE);
 		}
-		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneTypehome_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(TargetType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(IdType,check(ComponentType,Concepts::Has_Initialize) && check_2(typename ComponentType::Object_Type,Data_Object,is_same)))
 		{
 			this_component()->template Initialize< TargetType>(id, home_zone, network_ref, scenario_ref);		
 		}
-		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneTypehome_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(TargetType,!check(ComponentType,Concepts::Has_Initialize) || (!check_2(typename ComponentType::Object_Type,Execution_Object,is_same) && check_2(typename ComponentType::Object_Type,Data_Object,is_same))))
+		template<typename IdType, typename SynthesisZoneType, typename NetworkRefType, typename ScenarioRefType> void Initialize(IdType id, SynthesisZoneType home_zone, NetworkRefType network_ref, ScenarioRefType scenario_ref,requires(IdType,!check(ComponentType,Concepts::Has_Initialize) || (!check_2(typename ComponentType::Object_Type,Execution_Object,is_same) && check_2(typename ComponentType::Object_Type,Data_Object,is_same))))
 		{
 			assert_check(ComponentType,Concepts::Has_Initialize,"This ComponentType is not a valid Agent, does not have an initializer.   Did you forget to use tag_feature_as_available macro?");
 			assert_check_2(typename ComponentType::Object_Type,Execution_Object,is_same, "ComponentType must be an execution object, or ");

@@ -31,7 +31,7 @@ namespace Household_Components
 				
 			}
 			tag_feature_as_available(Initialize);
-			template<typename TargetType> void Initialize(TargetType home_synthesis_zone/*, requires(TargetType,check(typename TargetType, PopSyn::Concepts::Is_Synthesis_Zone) && check(typename TargetType, is_pointer))*/)
+			template<typename TargetType> void Initialize(TargetType home_synthesis_zone, requires(TargetType,check(strip_modifiers(TargetType), PopSyn::Concepts::Is_Synthesis_Zone) && check(typename TargetType, is_pointer)))
 			{	
 				//===============================================================================================================
 				// INITIALIZE HOME / WORK / SCHOOL LOCATIONS

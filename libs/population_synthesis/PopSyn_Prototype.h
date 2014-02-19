@@ -2,10 +2,10 @@
 
 //#include "Person_Prototype.h"
 //#include "Household_Prototype.h"
-#include "traffic_simulator\User_Space_Includes.h"
-#include "Popsyn_File_Linker_Implementations.h"
+#include "Population_Synthesis_Includes.h"
+//#include "Popsyn_File_Linker_Implementations.h"
 //#include "Synthesis_Region_Implementation.h"
-#include "Network_Prototype.h"
+//#include "Network_Prototype.h"
 //#include "Scenario_Prototype.h"
 
 
@@ -14,36 +14,6 @@ namespace PopSyn
 	namespace Types
 	{
 
-	}
-
-	namespace Concepts
-	{
-		concept struct Uses_Linker_File
-		{
-			check_data_member_name(Has_Use_Linker_File_Defined, _linker_file_path);
-			define_default_check(Has_Use_Linker_File_Defined);
-		};
-		concept struct Scenario_Has_Popsyn_Configuration_Data
-		{
-			check_template_method_name(has_percent_to_synthesize_p, Component_Type::percent_to_synthesize);
-			check_template_method_name(has_ipf_tolerance_p, Component_Type::ipf_tolerance);
-			check_template_method_name(has_marginal_tolerance_p, Component_Type::marginal_tolerance);
-			check_template_method_name(has_maximum_iterations_p, Component_Type::maximum_iterations);
-			check_template_method_name(has_write_marginal_output_p, Component_Type::write_marginal_output);
-			check_template_method_name(has_write_full_output_p, Component_Type::write_full_output);
-			check_template_method_name(has_popsyn_control_file_name_p, Component_Type::popsyn_control_file_name);
-
-			check_template_method_name(has_percent_to_synthesize, percent_to_synthesize);
-			check_template_method_name(has_ipf_tolerance, ipf_tolerance);
-			check_template_method_name(has_marginal_tolerance, marginal_tolerance);
-			check_template_method_name(has_maximum_iterations, maximum_iterations);
-			check_template_method_name(has_write_marginal_output,write_marginal_output);
-			check_template_method_name(has_write_full_output,write_full_output);
-			check_template_method_name(has_popsyn_control_file_name,popsyn_control_file_name);
-			define_sub_check(Has_Popsyn_Configuration_Data_Prototype, has_percent_to_synthesize_p && has_ipf_tolerance_p && has_marginal_tolerance_p && has_maximum_iterations_p && has_write_marginal_output_p && has_write_full_output_p && has_popsyn_control_file_name_p);
-			define_sub_check(Has_Popsyn_Configuration_Data_Component, has_percent_to_synthesize && has_ipf_tolerance && has_marginal_tolerance && has_maximum_iterations && has_write_marginal_output && has_write_full_output && has_popsyn_control_file_name);
-			define_default_check(Has_Popsyn_Configuration_Data_Prototype || Has_Popsyn_Configuration_Data_Component);
-		};
 	}
 
 	namespace Prototypes

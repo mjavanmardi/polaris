@@ -1,11 +1,11 @@
 #pragma once
-#include "User_Space_Includes.h"
-#include "Person_Prototype.h"
-#include "Person_Data_Logger_Prototype.h"
-#include "Activity_Location_Prototype.h"
-#include "Movement_Plan_Prototype.h"
-#include "Vehicle_Prototype.h"
-#include "Scenario_Prototype.h"
+#include "Activity_Simulator_Includes.h"
+//#include "Person_Prototype.h"
+//#include "Person_Data_Logger_Prototype.h"
+//#include "Activity_Location_Prototype.h"
+//#include "Movement_Plan_Prototype.h"
+//#include "Vehicle_Prototype.h"
+//#include "Scenario_Prototype.h"
 
 namespace Activity_Components
 {
@@ -55,6 +55,7 @@ namespace Activity_Components
 
 	namespace Concepts
 	{
+		
 		concept struct Is_Activity_Plan_Prototype
 		{
 			check_template_method_name(has_id,Component_Type::Activity_Plan_ID);
@@ -87,6 +88,7 @@ namespace Activity_Components
 			//-------------------------------------------
 			static void Activity_Planning_Conditional(ComponentType* _this,Event_Response& response)
 			{		
+				
 				//----------------------------------------------
 				// CONDITIONALS FOR BASIC ACTIVITY PLAN SCHEDULING
 				typedef Activity_Planner<ComponentType> _Activity_Interface;
@@ -574,5 +576,5 @@ namespace Activity_Components
 	}
 }
 
-using namespace Activity_Components::Prototypes;
-using namespace Activity_Components::Types;
+//using namespace Activity_Components::Prototypes;
+//using namespace Activity_Components::Types;

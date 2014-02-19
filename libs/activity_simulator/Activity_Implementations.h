@@ -18,7 +18,7 @@ namespace Activity_Components
 		//=======================================================================
 		// Activity Classes
 		//-----------------------------------------------------------------------
-		implementation struct Basic_Activity_Plan_Implementation : public Polaris_Component<MasterType,INHERIT(Basic_Activity_Plan_Implementation),Execution_Object,true>
+		implementation struct Basic_Activity_Plan_Implementation : public Polaris_Component<MasterType,INHERIT(Basic_Activity_Plan_Implementation),Execution_Object>
 		{
 			// Tag As Implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Basic_Activity_Plan_Implementation),Execution_Object>::Component_Type ComponentType;
@@ -1492,7 +1492,7 @@ namespace Activity_Components
 
 
 		// Stripped down activity record with minimal memory usage (used for storing and printing completed activities)
-		implementation struct Activity_Record : public Polaris_Component< MasterType,INHERIT(Activity_Record), Data_Object, ParentType>
+		implementation struct Activity_Record : public Polaris_Component< MasterType,INHERIT(Activity_Record), Data_Object>
 		{
 			// Tag as implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Activity_Record),Data_Object>::Component_Type ComponentType;

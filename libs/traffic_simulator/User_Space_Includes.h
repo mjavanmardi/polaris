@@ -3,6 +3,7 @@
 
 #include "../Repository/Repository.h"
 #include "User_Space_Forward_Declaration.h"
+#include "Traffic_Simulator_Concepts.h"
 
 
 //#include "RngStream.h"

@@ -6,23 +6,6 @@ namespace Traveler_Components
 	namespace Types
 	{
 	}
-
-	namespace Concepts
-	{
-		concept struct Is_Traveler_Prototype
-		{
-			check_template_method_name(has_router,ComponentType::router);
-			check_template_method_name(has_vehicle,ComponentType::vehicle);
-			define_default_check(has_router && has_vehicle);
-		};
-		concept struct Is_Traveler
-		{
-			check_template_method_name(has_router,router);
-			check_template_method_name(has_vehicle,vehicle);
-			check_concept(is_prototype, Is_Traveler_Prototype, T, V);
-			define_default_check(is_prototype || (has_router && has_vehicle));
-		};
-	}
 	
 	namespace Prototypes
 	{

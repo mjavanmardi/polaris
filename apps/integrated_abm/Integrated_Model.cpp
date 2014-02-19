@@ -12,6 +12,9 @@
 //#include "core\Core.h"
 //#include "File_Reader.h"
 //#include "Repository.h"
+
+#include "traffic_simulator\User_Space.h"
+#include "activity_simulator\Activity_Simulator.h"
 #include "Population_Synthesis.h"
 #include "Scenario_Implementation.h"
 
@@ -21,9 +24,10 @@
 //#define DEBUG_1
 #endif
 
-#ifdef DBIO
+
 #include "Application_Includes.h"
 
+#ifndef INTEGRATED_MODEL
 
 struct MasterType
 {
@@ -203,6 +207,16 @@ struct MasterType
 
 int main(int argc,char** argv)
 {
+	//==================================================================================================================================
+	// Allocation hints block
+	//----------------------------------------------------------------------------------------------------------------------------------
+	Average_Execution_Objects_Hint<MasterType::person_type>(9000000);
+	Average_Execution_Objects_Hint<MasterType::router_type>(9000000);
+	Average_Execution_Objects_Hint<MasterType::activity_type>(9000000*4);
+
+	//==================================================================================================================================
+	// Scenario initialization
+	//----------------------------------------------------------------------------------------------------------------------------------
 	typedef Network_Skimming_Components::Prototypes::LOS<MasterType::los_value_type> los_value_itf;
 	typedef Network_Skimming_Components::Prototypes::LOS<Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<NT>> los_invariant_value_itf;
 
@@ -496,6 +510,8 @@ int main(int argc,char** argv)
 }
 #endif
 
+
+#ifdef TEST_APPLICATION
 concept struct Concept_Test
 {
 	check_typedef_name(name1_check,name1);
@@ -643,3 +659,4 @@ int main(int argc, char* argv[])
 	char ans;
 	cin >> ans;
 }
+#endif

@@ -17,43 +17,6 @@ namespace Routing_Components
 	{
 	}
 
-	namespace Concepts
-	{
-		concept struct Is_One_To_One_Router_Prototype
-		{
-			check_template_method_name(has_routable_network, ComponentType::routable_network);
-			check_template_method_name(has_routable_origin, ComponentType::routable_origin);
-			check_template_method_name(has_routable_destination, ComponentType::routable_destination);
-			check_template_method_name(has_network, ComponentType::network);
-			check_template_method_name(has_vehicle, ComponentType::vehicle);
-			define_default_check(has_routable_network && has_routable_origin && has_routable_destination && has_network && has_vehicle );
-		};
-		concept struct Is_One_To_One_Router
-		{
-			check_template_method_name(has_routable_network, routable_network);
-			check_template_method_name(has_routable_origin, routable_origin);
-			check_template_method_name(has_routable_destination, routable_destination);
-			check_template_method_name(has_network, network);
-			check_template_method_name(has_vehicle, vehicle);
-			check_concept(is_one_to_one_prototype, Is_One_To_One_Router_Prototype, T, V);
-			define_default_check(is_one_to_one_prototype || (has_routable_network && has_routable_origin && has_routable_destination && has_network && has_vehicle ));
-		};
-
-		concept struct Is_One_To_All_Router_Prototype
-		{
-			check_template_method_name(Has_Link_Times_Container, ComponentType::travel_times_to_link_container);
-			check_concept(Has_One_To_One_Router, Is_One_To_One_Router_Prototype, T, V);
-			define_default_check(Has_One_To_One_Router && Has_Link_Times_Container);
-		};
-		concept struct Is_One_To_All_Router
-		{
-			check_template_method_name(Has_Link_Times_Container, travel_times_to_link_container);
-			check_concept(Has_One_To_One_Router, Is_One_To_One_Router, T, V);
-			check_concept(is_one_to_all_prototype, Is_One_To_All_Router_Prototype, T, V);
-			define_default_check(is_one_to_all_prototype || (Has_One_To_One_Router && Has_Link_Times_Container));
-		};
-	}
-	
 	namespace Prototypes
 	{
 

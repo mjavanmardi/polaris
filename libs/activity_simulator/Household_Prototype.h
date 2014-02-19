@@ -1,12 +1,10 @@
 #pragma once
 
 
-//#include "Activity_Prototype.h"
-//#include "Network_Event_Prototype.h"
-//#include "Activity_Location_Prototype.h"
-#include "Network_Prototype.h"
-#include "Zone_Prototype.h"
-#include "Household_Properties_Prototype.h"
+#include "Activity_Simulator_Includes.h"
+//#include "Network_Prototype.h"
+//#include "Zone_Prototype.h"
+//#include "Household_Properties_Prototype.h"
 
 
 namespace Household_Components

@@ -3,7 +3,7 @@
 #include "Routable_Link_Implementation.h"
 #include "Routable_Intersection_Implementation.h"
 #ifndef EXCLUDE_DEMAND
-#include "Person_Implementations.h"
+//#include "Person_Implementations.h"
 #endif
 #include <iostream>
 namespace Routing_Components
@@ -538,9 +538,9 @@ namespace Routing_Components
 		};
 
 #ifndef EXCLUDE_DEMAND
-		implementation struct Skim_Routing_Implementation: public Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation), 512U>
+		implementation struct Skim_Routing_Implementation: public Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation)>
 		{
-			typedef typename  Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation), 512U>::Component_Type ComponentType;
+			typedef typename  Routing_Implementation<MasterType,INHERIT(Skim_Routing_Implementation)>::Component_Type ComponentType;
 			static void Compute_Route_Condition(ComponentType* _this,Event_Response& response)
 			{
 				typedef Routing_Components::Prototypes::Routing<ComponentType> _Routing_Interface;

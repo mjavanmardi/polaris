@@ -21,33 +21,7 @@ namespace Link_Components
 		};
 	}
 
-	namespace Concepts
-	{
-		concept struct Is_Basic_Link_Prototype
-		{
-			check_template_method_name(has_upstream_intersection, Component_Type::upstream_intersection);
-			check_template_method_name(has_downstream_intersection, Component_Type::downstream_intersection);
-			check_template_method_name(has_network_reference, Component_Type::network_reference);
-			check_template_method_name(has_link_type, Component_Type::link_type);  
-			check_template_method_name(has_uuid, Component_Type::uuid); 
-			check_template_method_name(has_internal_id, Component_Type::internal_id); 
-			define_default_check(has_upstream_intersection && has_downstream_intersection && has_network_reference && has_link_type  && has_uuid && has_internal_id);
-		};
-		concept struct Is_Basic_Link
-		{
-			check_template_method_name(has_upstream_intersection, upstream_intersection);
-			check_template_method_name(has_downstream_intersection, downstream_intersection);
-			check_template_method_name(has_network_reference, network_reference);
-			check_template_method_name(has_link_type, link_type); 
-			check_template_method_name(has_uuid, uuid); 
-			check_template_method_name(has_internal_id, internal_id); 
 
-			check_concept(is_basic_link_prototype, Is_Basic_Link_Prototype, T, V);
-			define_sub_check(is_basic_link, has_upstream_intersection && has_downstream_intersection && has_network_reference && has_link_type  && has_uuid && has_internal_id);
-			define_default_check(is_basic_link || is_basic_link_prototype);
-		};
-	}
-	
 	namespace Prototypes
 	{
 		prototype struct Link ADD_DEBUG_INFO
