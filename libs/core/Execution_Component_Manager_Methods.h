@@ -58,11 +58,11 @@ namespace polaris
 			
 			if(num_sim_threads() > 1)
 			{
-				hint = min( max( (value / ((__execution_segments_per_thread + 1) * num_sim_threads())), 1) , __max_execution_objects_per_block );
+				hint = min( (unsigned int)max( (unsigned int)(value / ((execution_segments_per_thread() + 1) * num_sim_threads())), (unsigned int)1) , max_execution_objects_per_block() );
 			}
 			else
 			{
-				hint = __max_execution_objects_per_block;
+				hint = max_execution_objects_per_block();
 			}
 
 			DataType::component_manager->objects_per_block_hint(hint);
@@ -158,7 +158,7 @@ namespace polaris
 					// If this type is not being visited, simply append to active blocks, otherwise queue it
 					if(!Visiting())
 					{
-						_active_blocks.push_back( *free_block );
+						_active_blocks.push_back( free_block );
 
 						// Mark as active to inform the deactivation routines about its' list membership
 						free_block->activated(true);
@@ -194,7 +194,7 @@ namespace polaris
 			else
 			{
 				// Immediately move this into active
-				_active_blocks.push_back( *free_block );
+				_active_blocks.push_back( free_block );
 				
 				// Mark as active to inform the deactivation routines about its' list membership
 				free_block->activated(true);
@@ -313,14 +313,19 @@ namespace polaris
 		Execution_Block* current_block;
 
 		// Computing blocks here is safe because they will not be added or removed until later
-		const unsigned int suggested_blocks_per_execution_segment = (int)(((float)_active_blocks.size())/((float)execution_segments_per_thread() * (float)num_sim_threads()));
+		const unsigned int active_blocks_size = _active_blocks.size();
+		const unsigned int suggested_blocks_per_execution_segment = (int)(((float)active_blocks_size)/((float)execution_segments_per_thread() * (float)num_sim_threads()));
 		const unsigned int min_blocks = 1;
 		const unsigned int blocks_per_execution_segment = max(suggested_blocks_per_execution_segment,min_blocks);
+		unsigned int index = 0;
 
 		// loop over the execution blocks which are active this event step
-		for( boost::intrusive::list<Execution_Block>::iterator itr = _active_blocks.begin(); itr != _active_blocks.end(); )
+		//boost::intrusive::list<Execution_Block>::iterator itr = _active_blocks.begin();
+		boost::container::deque<Execution_Block*>::iterator itr = _active_blocks.begin();
+
+		while(true)
 		{
-			current_block = &(*itr);
+			current_block = (*itr);
 			unsigned int visitor_count = current_block->Reserve_Block();
 			
 			// if you are the first visitor, you have reserved a number of blocks equal to blocks_per_execution_segment
@@ -360,12 +365,18 @@ namespace polaris
 						current_block->Return_Block();		
 					}
 
+					++index;
+
 					// leave if all blocks have been visited
-					if(++itr == _active_blocks.end()) break;
+					if(index >= active_blocks_size) break;
+
+					 ++itr;
 
 					// move to next reserved block
-					current_block = &(*itr);
+					current_block = (*itr);
 				}
+
+				if(index >= active_blocks_size) break;
 			}
 			else
 			{
@@ -374,13 +385,21 @@ namespace polaris
 				{
 					current_block->Return_Block();
 				}
+				
+				index += blocks_per_execution_segment;
 
-				// skip over blocks_per_execution_segment blocks
-				for(unsigned int i=0; i < blocks_per_execution_segment; ++i)
-				{
-					// leave if all blocks have been visited
-					if(++itr == _active_blocks.end()) break;
-				}
+				if(index >= active_blocks_size) break;
+
+				//for(unsigned int i=0; i < blocks_per_execution_segment; ++i){++itr;}
+
+				itr = itr + blocks_per_execution_segment;
+
+				//// skip over blocks_per_execution_segment blocks
+				//for(unsigned int i=0; i < blocks_per_execution_segment; ++i)
+				//{
+				//	// leave if all blocks have been visited
+				//	if(++itr == _active_blocks.end()) break;
+				//}
 			}
 		}
 

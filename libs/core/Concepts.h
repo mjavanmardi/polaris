@@ -40,7 +40,7 @@ namespace polaris
 
 	//#define requires(...) char(*)[__VA_ARGS__ && True_Concept<TargetType>::value]=NULL
 	
-	#define requires(TEMPLATE_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION,...) char(*)[__VA_ARGS__ && True_Concept<TEMPLATE_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION>::value]=NULL
+	#define requires(TEMPLATE_METHOD_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION,...) char(*)[__VA_ARGS__ && True_Concept<TEMPLATE_METHOD_ARGUMENT_WHICH_WILL_BE_USED_TO_DEFER_METHOD_COMPILATION>::value]=NULL
 
 	#define method_requires(...) char(*)[__VA_ARGS__]=NULL
 
@@ -102,9 +102,6 @@ namespace polaris
 		static const bool value=false;
 	};
 
-
-
-
 	///----------------------------------------------------------------------------------------------------
 	/// Concept Checks
 	///----------------------------------------------------------------------------------------------------
@@ -123,11 +120,8 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-		struct data_check{ static const bool value = true; };\
-		\
 		template<typename U>\
-		struct data_check<U,true>{ static const bool value = __VA_ARGS__; };\
+		struct data_check{ static const bool value = __VA_ARGS__; };\
 		\
 		static const bool value = data_check<TypeChecked>::value;\
 	};\
@@ -137,15 +131,14 @@ namespace polaris
 	/// check_typedef_name - typedef of given name must exist
 	///----------------------------------------------------------------------------------------------------
 
+	
+
 	#define check_typedef_name(CHECK_ALIAS,NAME)\
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-		struct data_check{ static const bool value = true; };\
-		\
 		template<typename U>\
-		struct data_check<U,true>\
+		struct data_check\
 		{\
 			template<typename V> static small_type has_matching_named_member(typename V::##NAME*);\
 			template<typename V> static large_type has_matching_named_member(...);\
@@ -171,11 +164,8 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-		struct data_check{ static const bool value = true; };\
-		\
 		template<typename U>\
-		struct data_check<U,true>\
+		struct data_check\
 		{\
 			template<typename V> static small_type has_matching_named_member(typename V::##NAME*);\
 			template<typename V> static large_type has_matching_named_member(...);\
@@ -201,11 +191,8 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-		struct data_check{ static const bool value = true; };\
-		\
 		template<typename U>\
-		struct data_check<U,true>\
+		struct data_check\
 		{\
 			template<typename V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&V::NAME)>::type);\
 			template<typename V> static large_type has_matching_named_member(...);\
@@ -231,11 +218,8 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-		struct data_check{ static const bool value = true; };\
-		\
 		template<typename U>\
-		struct data_check<U,true>\
+		struct data_check\
 		{\
 			template<typename V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&V::NAME)>::type);\
 			template<typename V> static large_type has_matching_named_member(...);\
@@ -261,11 +245,8 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-		struct data_check{ static const bool value = true; };\
-		\
 		template<typename U>\
-		struct data_check<U,true>\
+		struct data_check\
 		{\
 			template<typename V> static small_type has_matching_named_member(typename is_member_object_pointer<decltype(&V::NAME)>::type);\
 			template<typename V> static large_type has_matching_named_member(...);\
@@ -291,11 +272,8 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-		struct function_check{ static const bool value = true; };\
-		\
 		template<typename U>\
-		struct function_check<U,true>\
+		struct function_check\
 		{\
 			template<typename V> static small_type has_matching_named_member(typename is_member_function_pointer<decltype(&V::NAME)>::type);\
 			template<typename V> static large_type has_matching_named_member(...);\
@@ -321,11 +299,8 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-		struct function_check{ static const bool value = true; };\
-		\
 		template<typename U>\
-		struct function_check<U,true>\
+		struct function_check\
 		{\
 			template<typename V> static small_type has_matching_named_member(typename is_member_function_pointer<decltype(&V::NAME)>::type);\
 			template<typename V> static large_type has_matching_named_member(...);\
@@ -351,10 +326,8 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-		struct function_check{ static const bool value = true; };\
 		template<typename U>\
-		struct function_check<U,true>\
+		struct function_check\
 		{\
 			template<typename V> static small_type has_matching_named_member(void (V::* arg)() = &V::NAME<NULLTYPE>);\
 			template<typename V> static large_type has_matching_named_member(...);\
@@ -380,10 +353,8 @@ namespace polaris
 	template<typename TypeChecked>\
 	struct CHECK_ALIAS##_procedure\
 	{\
-		template<typename U,bool Perform_Check = !is_same<U,NULLTYPE>::value>\
-		struct function_check{ static const bool value = true; };\
 		template<typename U>\
-		struct function_check<U,true>\
+		struct function_check\
 		{\
 			template<typename V> static small_type has_matching_named_member(void (V::* arg)() = &V::NAME<__VA_ARGS__>);\
 			template<typename V> static large_type has_matching_named_member(...);\

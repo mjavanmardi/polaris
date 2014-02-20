@@ -64,7 +64,9 @@ namespace polaris
 		unsigned int _ideal_cell_size;
 		
 		_atomic_counter _activated;
-		boost::intrusive::list<Execution_Block> _active_blocks;
+		//boost::intrusive::list<Execution_Block> _active_blocks;
+		boost::container::deque<Execution_Block*> _active_blocks;
+
 		boost::intrusive::list<Execution_Block> _queued_activated_blocks;
 		boost::container::deque<Execution_Block*> _queued_deactivated_blocks;
 		
