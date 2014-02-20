@@ -12,7 +12,8 @@ namespace polaris
 	///----------------------------------------------------------------------------------------------------
 
 	#define get_value_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::value_type>::type::Component_Type
-	#define get_data_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::data_type>::type::Component_Type
+	#define get_data_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::value_type::second_type>::type::Component_Type
+	//#define get_mapped_type(CONTAINERTYPE) typename remove_pointer<typename CONTAINERTYPE::mapped_type>::type::Component_Type
 
 	///----------------------------------------------------------------------------------------------------
 	/// Input_Iterator - stl Input_Iterator
@@ -262,7 +263,7 @@ namespace polaris
 	/// Random_Access_Sequence - stl Random Access Sequence prototype
 	///----------------------------------------------------------------------------------------------------
 
-	template<typename ComponentType,typename T>
+	template<typename ComponentType,typename T = typename ComponentType::value_type>
 	struct Random_Access_Sequence
 	{
 		typedef ComponentType Component_Type;
@@ -323,7 +324,7 @@ namespace polaris
 		T& at(int i){return (T&)(((ComponentType*)this)->at(i));}
 	};
 
-	template<typename ComponentType,typename T> 
+	template<typename ComponentType,typename T = typename ComponentType::value_type> 
 	struct Multidimensional_Random_Access_Array ADD_DEBUG_INFO
 	{
 		typedef ComponentType Component_Type;
@@ -365,7 +366,7 @@ namespace polaris
 
 		void Copy(const Multidimensional_Random_Access_Array<ComponentType,T>& obj)
 		{
-			((ComponentType*)this)->Copy(*((typename Multidimensional_Random_Access_Array<ComponentType,TargetValueType>::Component_Type*)&obj));
+			((ComponentType*)this)->Copy(*((typename Multidimensional_Random_Access_Array<ComponentType,T>::Component_Type*)&obj));
 		}
 		void Copy(const_index_type dim_sizes, T* data)
 		{
@@ -410,7 +411,7 @@ namespace polaris
 	/// Simple_Associative_Container - stl Simple Associative Container
 	///----------------------------------------------------------------------------------------------------
 
-	template<typename ComponentType,typename K> 
+	template<typename ComponentType,typename K = typename ComponentType::key_type> 
 	struct Simple_Associative_Container
 	{
 		typedef ComponentType Component_Type;
@@ -481,7 +482,7 @@ namespace polaris
 	/// Pair_Associative_Container - stl Pair Associative Container
 	///----------------------------------------------------------------------------------------------------
 
-	template<typename ComponentType,typename K,typename T> 
+	template<typename ComponentType,typename K = typename ComponentType::key_type,typename T = typename ComponentType::value_type::second_type> 
 	struct Pair_Associative_Container
 	{
 		typedef ComponentType Component_Type;
@@ -507,18 +508,22 @@ namespace polaris
 
 		bool empty(){return ((ComponentType*)this)->empty();}
 
-		pair<iterator,bool>& insert(pair<key_type,data_type>& p)
+		pair<iterator,bool> insert(pair<key_type,data_type>& p)
 		{
 			pair<key_type,data_type> t = pair<key_type,data_type>(p.first,(data_type)(p.second));
 			return ((ComponentType*)this)->insert(t);
 		}
 
-		pair<iterator,bool>& insert(pair<key_type,data_type>&& p)
+		pair<iterator,bool> insert(pair<key_type,data_type>&& p)
 		{
 			pair<key_type,data_type> t = pair<key_type,data_type>(p.first,(data_type)(p.second));
 			return ((ComponentType*)this)->insert(t);
 		}
 
+		//iterator insert(key_type& key, typename remove_pointer<data_type>::type* value)
+		//{	
+		//	return ((ComponentType*)this)->insert(pair<key_type,data_type>(key,value));
+		//}
 		iterator insert(key_type& key, data_type& value)
 		{	
 			return ((ComponentType*)this)->insert(pair<key_type,data_type>(key,value));
@@ -549,7 +554,7 @@ namespace polaris
 
 		iterator find ( const key_type& x ) { return ((ComponentType*)this)->find(x);} 
 
-		pair<iterator,iterator>&  equal_range ( const key_type& x ) { return ((ComponentType*)this)->equal_range(x);}
+		pair<iterator,iterator>  equal_range ( const key_type& x ) { return ((ComponentType*)this)->equal_range(x);}
 
 
 

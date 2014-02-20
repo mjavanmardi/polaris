@@ -14,7 +14,6 @@ namespace Person_Components
 			// Tag as implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Activity_Generator_Implementation),Data_Object>::Component_Type ComponentType;
 
-
 			// Pointer to the Parent class
 			m_prototype(Person_Components::Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
 
@@ -51,14 +50,14 @@ namespace Person_Components
 			typedef Prototypes::Activity_Generator<base_type,base_type> base_itf;
 			typedef  Prototypes::Person<typename base_type::type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
 
-			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
+			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person)))
 			{	
 			}
-			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
+			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,!Activity_Simulator::Person_Concepts::Is_Person)))
 			{	
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Initialize_Defined, "The specified ParentType is not a valid Person type.");
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Properties_Defined, "The specified ParentType does not have the required Properties member defined.");
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Planner_Defined, "The specified ParentType does not have the required Planner member defined.");
+				assert_sub_check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person,Has_Initialize_Defined, "The specified ParentType is not a valid Person type.");
+				assert_sub_check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person,Has_Properties_Defined, "The specified ParentType does not have the required Properties member defined.");
+				assert_sub_check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person,Has_Planner_Defined, "The specified ParentType does not have the required Planner member defined.");
 			}
 			tag_feature_as_available(Initialize);
 
@@ -140,14 +139,14 @@ namespace Person_Components
 			typedef Back_Insertion_Sequence< typename scheduler_itf::get_type_of(Movement_Plans_Container),Movement_Plan*> Movement_Plans;
 
 
-			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
+			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person)))
 			{	
 			}
-			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
+			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,!Activity_Simulator::Person_Concepts::Is_Person)))
 			{	
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Initialize_Defined, "The specified ParentType is not a valid Person type.");
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Properties_Defined, "The specified ParentType does not have the required Properties member defined.");
-				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Planner_Defined, "The specified ParentType does not have the required Planner member defined.");
+				assert_sub_check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person,Has_Initialize_Defined, "The specified ParentType is not a valid Person type.");
+				assert_sub_check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person,Has_Properties_Defined, "The specified ParentType does not have the required Properties member defined.");
+				assert_sub_check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person,Has_Planner_Defined, "The specified ParentType does not have the required Planner member defined.");
 			}
 			tag_feature_as_available(Initialize);
 

@@ -8,29 +8,6 @@ namespace Zone_Components
 	{
 	}
 
-	namespace Concepts
-	{
-		concept struct Is_Zone_Prototype
-		{
-			check_template_method_name(has_origin_activity_locations, Component_Type::origin_activity_locations);
-			check_template_method_name(has_destination_activity_locations, Component_Type::destination_activity_locations);
-			check_template_method_name(has_uuid, Component_Type::uuid); 
-			check_template_method_name(has_internal_id, Component_Type::internal_id); 
-			define_default_check(has_origin_activity_locations && has_destination_activity_locations && has_uuid && has_internal_id);
-		};
-		concept struct Is_Zone
-		{
-			check_template_method_name(has_origin_activity_locations, origin_activity_locations);
-			check_template_method_name(has_destination_activity_locations, destination_activity_locations);
-			check_template_method_name(has_uuid, uuid); 
-			check_template_method_name(has_internal_id, internal_id); 
-
-			check_concept(is_zone_prototype, Is_Zone_Prototype, T, V);
-			define_sub_check(is_zone_component, has_origin_activity_locations && has_destination_activity_locations && has_uuid && has_internal_id);
-			define_default_check(is_zone_component || is_zone_prototype);
-		};
-	}
-	
 	namespace Prototypes
 	{
 		prototype struct Graphical_Zone_Group ADD_DEBUG_INFO

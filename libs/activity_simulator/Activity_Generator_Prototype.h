@@ -1,6 +1,6 @@
 #pragma once
 
-#include "User_Space_Includes.h"
+#include "Activity_Simulator_Includes.h"
 //#include "Person_Prototype.h"
 
 
@@ -73,7 +73,7 @@ namespace Person_Components
 				this_ptr->template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(Round<long,double>(Simulation_Time.Future_Time<Simulation_Timestep_Increment,Simulation_Timestep_Increment>(this_ptr->template Generation_Time_Increment<Simulation_Timestep_Increment>())));
 			}
 
-			define_feature_exists_check(Initialize,Has_Initialize);
+			local_check_template_method_name(Has_Initialize,Initialize);
 			template<typename TargetType> void Initialize(requires(TargetType,check(ComponentType, Has_Initialize)))
 			{
 				typedef Prototypes::Person_Planner<typename get_type_of(Parent_Planner)> planner_itf;

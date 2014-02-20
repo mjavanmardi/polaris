@@ -1,6 +1,6 @@
 #pragma once
 
-#include "traffic_simulator\User_Space_Includes.h"
+#include "Activity_Simulator_Includes.h"
 
 
 //---------------------------------------------------------
@@ -59,6 +59,17 @@ namespace Household_Components
 			define_sub_check(has_journey_to_work_info, (has_work_travel_time && has_work_travel_mode && has_work_arrival_time) || (has_work_travel_time_prototype && has_work_travel_mode_prototype && has_work_arrival_time_prototype));
 			define_default_check(has_demographics && has_journey_to_work_info);
 		};
+
+		concept struct Initialize_exists
+		{
+			check_method_name(has_Initialize, Initialize);
+			define_default_check(has_Initialize);
+		};
+		concept struct Characteristics_exists
+		{
+			check_method_name(has_Characteristics, Characteristics);
+			define_default_check(has_Characteristics);
+		};
 	}
 	
 	namespace Prototypes
@@ -91,7 +102,7 @@ namespace Household_Components
 			accessor(home_location_id, NONE, NONE);
 			
 			// Pass through methods
-			define_feature_exists_check(Initialize,Initialize_exists);
+			local_check_template_method_name(Initialize_exists,Initialize);
 			template<typename TargetType> void Initialize(requires(TargetType, check(ComponentType,Initialize_exists)))
 			{
 				this_component()->Initialize<TargetType>();
@@ -101,16 +112,16 @@ namespace Household_Components
 				assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
 			}
 
-			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, check(ComponentType,Initialize_exists)))
+			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, check(ComponentType,Concepts::Initialize_exists)))
 			{
 				this_component()->Initialize<TargetType>(home_zone);
 			}
-			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, !check(ComponentType,Initialize_exists)))
+			template<typename TargetType> void Initialize(TargetType home_zone, requires(TargetType, !check(ComponentType,Concepts::Initialize_exists)))
 			{
 				assert_check(ComponentType,Initialize_exists,"No initializer defined for this component.");
 			}
 
-			define_feature_exists_check(Characteristics,Characteristics_exists);
+			local_check_template_method_name(Characteristics_exists,Characteristics);
 			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, check(ComponentType, Characteristics_exists) && check_2(TargetType, boost::container::vector<double>*, is_same)))
 			{
 				this_component()->Characteristics<TargetType>(data);

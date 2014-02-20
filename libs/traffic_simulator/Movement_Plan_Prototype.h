@@ -12,36 +12,7 @@ namespace Movement_Plan_Components
 		struct Load_To_Origin_Link{};
 	}
 
-	namespace Concepts
-	{	
-		concept struct Is_Movement_Plan_Prototype
-		{
-			check_template_method_name(has_trajectory, Component_Type::trajectory_container);
-			check_template_method_name(has_origin, Component_Type::origin);
-			check_template_method_name(has_destination, Component_Type::destination);
-			check_template_method_name(has_departed_time, Component_Type::departed_time);
-			check_template_method_name(has_arrived_time, Component_Type::arrived_time);
 
-			define_default_check(has_trajectory && has_origin && has_destination && has_departed_time && has_arrived_time);
-		};
-		concept struct Is_Movement_Plan
-		{
-			check_template_method_name(has_trajectory, trajectory_container);
-			check_template_method_name(has_origin, origin);
-			check_template_method_name(has_destination, destination);
-			check_template_method_name(has_departed_time, departed_time);
-			check_template_method_name(has_arrived_time, arrived_time);
-			check_concept(is_prototype, Is_Movement_Plan_Prototype, T, V);
-			define_default_check(is_prototype || (has_trajectory && has_origin && has_destination && has_departed_time && has_arrived_time));
-		};
-
-		concept struct Is_Movement_Record_Prototype
-		{
-			check_template_method_name(has_trajectory, Component_Type::trajectory_container);
-			define_default_check(has_trajectory);
-		};
-	}
-	
 	namespace Prototypes
 	{
 

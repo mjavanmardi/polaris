@@ -1,6 +1,6 @@
 #pragma once
 
-#include "traffic_simulator\User_Space_Includes.h"
+#include "Activity_Simulator_Includes.h"
 
 
 //---------------------------------------------------------
@@ -457,7 +457,7 @@ namespace Person_Components
 			accessor(work_location_id, NONE, NONE);
 			accessor(school_location_id, NONE, NONE);
 
-			define_feature_exists_check(Average_Activity_Frequency, Average_Activity_Frequency_exists);
+			local_check_template_method_name(Average_Activity_Frequency_exists,Average_Activity_Frequency);
 			template<typename TargetType, typename ReturnType> ReturnType Average_Activity_Frequency(TargetType act_type, requires(TargetType,check(ComponentType, Average_Activity_Frequency_exists)))
 			{
 				return this_component()->Average_Activity_Frequency<TargetType, ReturnType>(act_type);
@@ -476,7 +476,7 @@ namespace Person_Components
 				assert_check(ComponentType,Average_Activity_Frequency_exists, "Component has no Average_Activity_Frequency.");
 			}
 
-			define_feature_exists_check(Average_Activity_Duration, Average_Activity_Duration_exists);
+			local_check_template_method_name(Average_Activity_Duration_exists,Average_Activity_Duration);
 			template<typename TargetType, typename ReturnType> ReturnType Average_Activity_Duration(TargetType act_type, requires(TargetType,check(ComponentType, Average_Activity_Duration_exists)))
 			{
 				return this_component()->Average_Activity_Duration<TargetType, ReturnType>(act_type);
@@ -497,7 +497,7 @@ namespace Person_Components
 
 			
 			// Pass through methods
-			define_feature_exists_check(Initialize, Initialize_exists);
+			local_check_template_method_name(Initialize_exists,Initialize);
 			template<typename TargetType> void Initialize(requires(TargetType,check(ComponentType, Initialize_exists)))
 			{
 				this_component()->Initialize<TargetType>();
@@ -516,7 +516,7 @@ namespace Person_Components
 				assert_check(ComponentType,Initialize_exists,"ComponentType does not have 'Initialize' method defined.");
 			}
 
-			define_feature_exists_check(Is_Employed, Is_Employed_exists);
+			local_check_template_method_name(Is_Employed_exists,Is_Employed);
 			template<typename TargetType> bool Is_Employed(requires(TargetType,check(ComponentType, Is_Employed_exists)))
 			{
 				return this_component()->Is_Employed<TargetType>();
@@ -526,7 +526,7 @@ namespace Person_Components
 				assert_check(ComponentType,Is_Employed_exists,"ComponentType does not have 'Is_Employed' method defined.");
 			}
 
-			define_feature_exists_check(Is_Student, Is_Student_exists);
+			local_check_template_method_name(Is_Student_exists,Is_Student);
 			template<typename TargetType> bool Is_Student(requires(TargetType,check(ComponentType, Is_Student_exists)))
 			{
 				return this_component()->Is_Student<TargetType>();
@@ -536,7 +536,7 @@ namespace Person_Components
 				assert_check(ComponentType,Is_Student_exists,"ComponentType does not have 'Is_Student' method defined.");
 			}
 
-			define_feature_exists_check(Characteristics, Characteristics_exists);
+			local_check_template_method_name(Characteristics_exists,Characteristics);
 			template<typename TargetType> void Characteristics(TargetType data, requires(TargetType, check_2(TargetType, boost::container::vector<double>*, is_same) && check(ComponentType, Characteristics_exists)))
 			{
 				this_component()->Characteristics<TargetType>(data);

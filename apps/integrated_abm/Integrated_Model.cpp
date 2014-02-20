@@ -12,6 +12,9 @@
 //#include "core\Core.h"
 //#include "File_Reader.h"
 //#include "Repository.h"
+
+#include "traffic_simulator\User_Space.h"
+#include "activity_simulator\Activity_Simulator.h"
 #include "Population_Synthesis.h"
 #include "Scenario_Implementation.h"
 
@@ -21,9 +24,10 @@
 //#define DEBUG_1
 #endif
 
-#ifdef DBIO
+
 #include "Application_Includes.h"
 
+#ifndef INTEGRATED_MODEL
 
 struct MasterType
 {
@@ -203,6 +207,16 @@ struct MasterType
 
 int main(int argc,char** argv)
 {
+	//==================================================================================================================================
+	// Allocation hints block
+	//----------------------------------------------------------------------------------------------------------------------------------
+	Average_Execution_Objects_Hint<MasterType::person_type>(9000000);
+	Average_Execution_Objects_Hint<MasterType::router_type>(9000000);
+	Average_Execution_Objects_Hint<MasterType::activity_type>(9000000*4);
+
+	//==================================================================================================================================
+	// Scenario initialization
+	//----------------------------------------------------------------------------------------------------------------------------------
 	typedef Network_Skimming_Components::Prototypes::LOS<MasterType::los_value_type> los_value_itf;
 	typedef Network_Skimming_Components::Prototypes::LOS<Network_Skimming_Components::Implementations::LOS_Time_Invariant_Value_Implementation<NT>> los_invariant_value_itf;
 
@@ -497,6 +511,16 @@ int main(int argc,char** argv)
 #endif
 
 
+#ifdef TEST_APPLICATION
+concept struct Concept_Test
+{
+	check_typedef_name(name1_check,name1);
+	check_typedef_name(name2_check,name2);
+	define_sub_check(name1_subcheck, name1_check);
+	define_sub_check(name2_subcheck, name2_check);
+	define_default_check(name1_subcheck && name2_subcheck);
+};
+
 prototype struct Test_Agent
 {
 	tag_as_prototype;
@@ -519,19 +543,29 @@ prototype struct Test_Agent
 	{
 		assert_check(ComponentType,test_feature_exists,"Test feature does not exist.");
 	}
-	template<typename T> void test_concept(requires(T,check_2(T,float,is_same)))
+	template<typename T> void test_concept(requires(T,sub_check(ComponentType,Concept_Test, name1_subcheck)))
 	{
-		cout <<"good";
+		cout <<"good - name 1";
 	}
-	template<typename T> void test_concept(requires(T,!check_2(T,float,is_same)))
+	template<typename T> void test_concept(requires(T,!sub_check(ComponentType,Concept_Test, name1_subcheck) && sub_check(ComponentType,Concept_Test, name2_subcheck)))
 	{
-		assert_check_2(T,float,is_same,"Error, T must be a float type.");
+		cout <<"good - name 2";
+	}
+	template<typename T> void test_concept(requires(T,!sub_check(ComponentType,Concept_Test, name1_subcheck) && !sub_check(ComponentType,Concept_Test, name2_subcheck)))
+	{
+		assert_sub_check(ComponentType,Concept_Test, name1_subcheck,"Error, Concept_test name1 failed.");
+		assert_sub_check(ComponentType,Concept_Test, name2_subcheck,"Error, Concept_test name2 failed.");
 	}
 };
+
+
 implementation struct Test_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Test_Agent_Implementation),Execution_Object>
 {
 	typedef typename Polaris_Component<MasterType,INHERIT(Test_Agent_Implementation),Execution_Object>::Component_Type ComponentType;
 	typedef Test_Agent<ComponentType> agent_itf;
+
+	typedef double name1;
+	typedef double name2;
 
 	template<typename T> void Initialize()
 	{
@@ -562,24 +596,28 @@ struct MasterType
 	typedef Scenario_Components::Implementations::Scenario_Implementation<MasterType> scenario_type;
 	typedef polaris::Basic_Units::Implementations::Length_Implementation<MasterType> length_type;
 	typedef polaris::Basic_Units::Implementations::Time_Implementation<MasterType> time_type;
-	typedef PopSyn::Implementations::Synthesis_Zone_Implementation<MasterType> zone;
-	typedef PopSyn::Implementations::Synthesis_Region_Implementation<MasterType> region;
-	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> IPF_Solver_Settings;
-	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> popsyn_solver;
+	typedef PopSyn::Implementations::Synthesis_Zone_Implementation_Simple<MasterType> synthesis_zone_type;
+	typedef PopSyn::Implementations::Synthesis_Region_Implementation_Simple<MasterType> synthesis_region_type;
+	typedef PopSyn::Implementations::IPF_Solver_Settings_Implementation<MasterType> ipf_solver_settings_type;
+	typedef PopSyn::Implementations::ADAPTS_Population_Synthesis_Implementation<MasterType> population_synthesis_type;
 	typedef PopSyn::Implementations::Popsyn_File_Linker_Implementation<MasterType> popsyn_file_linker_type;
 	typedef Person_Components::Implementations::ACS_Person_Static_Properties_Implementation<MasterType> person_static_properties_type;
 	typedef Household_Components::Implementations::ACS_Household_Static_Properties_Implementation<MasterType> household_static_properties_type;
-	typedef RNG_Components::Implementations::RngStream_Implementation<MasterType> RNG;
+	typedef RNG_Components::Implementations::MT_Probability_Double<MasterType> rng_type;
 	typedef NULLCOMPONENT household_type;
 	typedef NULLTYPE person_type;
 	typedef NULLTYPE network_type;
 };
+
+
+
 
 int main(int argc, char* argv[])
 {
 	Simulation_Configuration cfg;
 	cfg.Single_Threaded_Setup(1000);
 	INITIALIZE_SIMULATION(cfg);
+
 
 	//==================================================================================================================================
 	// Scenario initialization
@@ -592,13 +630,28 @@ int main(int argc, char* argv[])
 	scenario->read_scenario_data<Scenario_Components::Types::ODB_Scenario>(scenario_filename);
 
 
-	typedef Test_Agent<Test_Agent_Implementation<NT>> agent_itf;
-	agent_itf* agent = (agent_itf*)Allocate<Test_Agent_Implementation<NT>>();
-	agent->Initialize<NT>();
+	//==================================================================================================================================
+	// Initialize global randon number generators - if seed set to zero or left blank use system time
+	//---------------------------------------------------------------------------------------------------------------------------------- 
+	int seed = scenario->iseed<int>();
+	GLOBALS::Normal_RNG.Initialize();
+	GLOBALS::Uniform_RNG.Initialize();
+	if (seed != 0)
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>(seed);
+		GLOBALS::Uniform_RNG.Set_Seed<int>(seed);
+	}
+	else
+	{
+		GLOBALS::Normal_RNG.Set_Seed<int>();
+		GLOBALS::Uniform_RNG.Set_Seed<int>();
+	}
 
-	// POPSYN STUFF
-	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::popsyn_solver> popsyn_itf;
-	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::popsyn_solver>();
+	//==================================================================================================================================
+	// Start population synthesis
+	//---------------------------------------------------------------------------------------------------------------------------------- 
+	typedef PopSyn::Prototypes::Population_Synthesizer<MasterType::population_synthesis_type> popsyn_itf;
+	popsyn_itf* popsyn = (popsyn_itf*)Allocate<MasterType::population_synthesis_type>();
 	popsyn->Initialize<_Scenario_Interface*>(scenario);
 
 	START();
@@ -606,3 +659,4 @@ int main(int argc, char* argv[])
 	char ans;
 	cin >> ans;
 }
+#endif

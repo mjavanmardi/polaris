@@ -1,7 +1,7 @@
 #pragma once
 
-#include "User_Space_Includes.h"
-//#include "Person_Prototype.h"
+#include "Activity_Simulator_Includes.h"
+//#include "Activity_Prototype.h"
 
 
 //---------------------------------------------------------
@@ -41,15 +41,15 @@ namespace Person_Components
 			accessor(current_movement_plan, NONE, NONE);
 			accessor(current_activity_plan, NONE, NONE);
 			
-			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_time, requires(TargetType,check(ParamType,Is_Time_Value)))
+			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_time, requires(ParamType,check(ParamType,Is_Time_Value)))
 			{
 				return this_component()->next_activity_plan<ParamType, ReturnType>(current_time);
 			}
-			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_act, requires(TargetType,check(ParamType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
+			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType current_act, requires(ParamType,check(ParamType,Activity_Components::Concepts::Is_Activity_Plan)))
 			{
 				return this_component()->next_activity_plan<ParamType, ReturnType>(current_act);
 			}
-			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType value, requires(TargetType,!check(ParamType,Is_Time_Value) && !check(ParamType,Activity_Components::Concepts::Is_Activity_Plan_Prototype)))
+			template<typename ParamType, typename ReturnType> ReturnType next_activity_plan(ParamType value, requires(ParamType,!check(ParamType,Is_Time_Value) && !check(ParamType,Activity_Components::Concepts::Is_Activity_Plan)))
 			{
 				assert_check(ParamType,Is_Time_Value, "target type must be either Time_Value type or");
 				assert_check(ParamType,Activity_Components::Concepts::Is_Activity_Plan_Prototype, "must be an Activity_Plan prototype");

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "User_Space_Includes.h"
+#include "Activity_Simulator_Includes.h"
 //#include "Person_Prototype.h"
 
 
@@ -326,7 +326,7 @@ namespace Person_Components
 				}
 			}
 
-			define_feature_exists_check(Initialize,Has_Initialize);
+			local_check_template_method_name(Has_Initialize,Initialize);
 			template<typename TargetType> void Initialize(requires(TargetType,check(ComponentType, Has_Initialize)))
 			{
 				this_component()->template Initialize< TargetType>();

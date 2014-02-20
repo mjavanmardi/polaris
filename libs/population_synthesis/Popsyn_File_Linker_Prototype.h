@@ -1,6 +1,6 @@
 #pragma once
 
-#include "traffic_simulator\User_Space_Includes.h"
+#include "Population_Synthesis_Includes.h"
 
 //---------------------------------------------------------
 //	POP_UNIT OBJECT CLASS (i.e. HH, PERSON, VEHICLE, FIRM, etc.)
@@ -38,7 +38,7 @@ namespace PopSyn
 		//	HOLDS INFO TO ENTER DATA INTO REGIONS/ZONES, FROM INPUT FILES
 		//
 		//--------------------------------------------------------------
-		prototype struct Popsyn_File_Linker
+		prototype struct Popsyn_File_Linker ADD_DEBUG_INFO
 		{
 			tag_as_prototype;
 
@@ -118,15 +118,15 @@ namespace PopSyn
 			}
 
 			/** Links the columns in the data files to dimensions/indices in the Region/Zone data table*/
-			int& get_pums_column(int dimension){return this_component()->get_pums_column(dimension)}
+			int& get_pums_column(int dimension){return this_component()->get_pums_column(dimension);}
 			/** Links the columns int the data files to dimensions/indices in the Region/Zone data table*/
-			int& get_sf3_column(int dim, int index){return this_component()->get_sf3_column(dim, index)}
+			int& get_sf3_column(int dim, int index){return this_component()->get_sf3_column(dim, index);}
 
-			boost::container::vector<int>& get_pums_data_columns(){return this_component()->get_pums_data_columns(dimension);}
-			boost::container::vector<int>& get_person_data_columns(){return this_component()->get_person_data_columns(dimension);}
+			boost::container::vector<int>& get_pums_data_columns(){return this_component()->get_pums_data_columns();}
+			boost::container::vector<int>& get_person_data_columns(){return this_component()->get_person_data_columns();}
 
 			/** Find the variable index for a given dimension-value pair*/
-			int find_index_in_dimension(int dim, double value){return this_component()->find_index_in_dimension(dim, value)}
+			int find_index_in_dimension(int dim, double value){return this_component()->find_index_in_dimension(dim, value);}
 		};
 	}
 }

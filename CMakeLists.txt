@@ -117,6 +117,7 @@ add_subdirectory (apps/io_demo)
 add_subdirectory (apps/test) 
 add_subdirectory (apps/fixed_demand_simulator) 
 add_subdirectory (apps/integrated_abm) 
+add_subdirectory (apps/population_synthesizer)
 
 if (MSVC AND Antares)
 	include_directories(${DEPS_DIR}/glew-1.7.0/include)

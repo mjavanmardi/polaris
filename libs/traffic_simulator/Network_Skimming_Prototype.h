@@ -20,16 +20,6 @@ namespace Network_Skimming_Components
 		};
 	}
 
-	namespace Concepts
-	{
-		concept struct Is_LOS_Prototype
-		{
-			check_template_method_name(has_auto_ttime, Component_Type::auto_ttime);
-			check_template_method_name(has_transit_ttime, Component_Type::transit_ttime);
-			define_default_check(has_auto_ttime && has_transit_ttime);
-		};
-	} 
-	
 	namespace Prototypes
 	{
 		template<typename ComponentType> struct Skim_Table;

@@ -24,8 +24,11 @@ namespace polaris
 	/// prototype - standard declarator for all prototypes
 	///----------------------------------------------------------------------------------------------------
 
-	//#define ADD_DEBUG_INFO : public ComponentType
+#ifdef _DEBUG
+	#define ADD_DEBUG_INFO : public ComponentType
+#else
 	#define ADD_DEBUG_INFO
+#endif
 
 	#define prototype template<typename ComponentType>
 
