@@ -1,6 +1,5 @@
 #pragma once
-#include "Packed_Graph_Implementation.h"
+#include "A_Star_Connection_Group.h"
+#include "A_Star_Edge_Implementation.h"
+#include "Routable_Agent_Implementation.h"
 #include "A_Star.h"
-#include "Dijkstra.h"
-#include "Graph_Pool_Implementation.h"
-#include "Packed_Data_Set_Implementation.h"

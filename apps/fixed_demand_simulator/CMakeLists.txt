@@ -1,3 +1,5 @@
-add_executable(Fixed_Demand_Simulator NetworkModel.cpp)	
-target_link_libraries(Fixed_Demand_Simulator ${libtcmalloc} ${antareslibs} ${iolibs} Scenario_Manager Core)
+file(GLOB_RECURSE hppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)	
+file(GLOB_RECURSE cppfiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)	
+add_executable(Fixed_Demand_Simulator NetworkModel.cpp)
+target_link_libraries(Fixed_Demand_Simulator ${libtcmalloc} ${antareslibs} ${iolibs} Scenario_Manager Core Routing)
 set_target_properties(Fixed_Demand_Simulator PROPERTIES FOLDER apps)
