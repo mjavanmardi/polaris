@@ -1169,6 +1169,8 @@ namespace Network_Components
 
 		implementation struct Integrated_Network_Implementation : public Network_Implementation<MasterType,INHERIT(Integrated_Network_Implementation)>
 		{
+			//typedef typename Network_Implementation<MasterType,INHERIT(Integrated_Network_Implementation)>::Component_Type ComponentType;
+			typedef MasterType Master_Type;
 
 			m_prototype(Null_Prototype<typename MasterType::network_skim_type>, skimming_faculty, NONE, NONE);
 

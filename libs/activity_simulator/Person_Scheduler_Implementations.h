@@ -13,7 +13,7 @@ namespace Person_Components
 		//==================================================================================
 		/// Planning classes
 		//----------------------------------------------------------------------------------
-		implementation struct General_Person_Scheduler_Implementation : public Polaris_Component<MasterType,INHERIT(General_Person_Scheduler_Implementation),Execution_Object,true>
+		implementation struct General_Person_Scheduler_Implementation : public Polaris_Component<MasterType,INHERIT(General_Person_Scheduler_Implementation),Execution_Object>
 		{
 			// Tag as implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Person_Scheduler_Implementation),Execution_Object>::Component_Type ComponentType;
@@ -165,7 +165,7 @@ namespace Person_Components
 
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				Parent_Person_interface* person = (Parent_Person_interface*)_Parent_Person;
+				Parent_Person_interface_type* person = (Parent_Person_interface_type*)_Parent_Person;
 
 				// if the start time of the activity has not been planned set the previous location to home
 				if (!act->template Start_Is_Planned<bool>()) return _Parent_Person->template Home_Location<ReturnType>();

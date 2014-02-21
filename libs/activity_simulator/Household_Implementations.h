@@ -22,8 +22,8 @@ namespace Household_Components
 			//=======================================================================================================================================================================
 			// DATA MEMBERS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			m_prototype(PopSyn::Prototypes::Synthesis_Zone< typename MasterType::zone>, home_synthesis_zone, NONE, NONE);	
-			m_prototype(Prototypes::Household_Properties< typename MasterType::household_properties_type>, Properties, NONE,check_2(ComponentType, Is_Same_Entity));
+			m_prototype(PopSyn::Prototypes::Synthesis_Zone< typename MasterType::synthesis_zone_type>, home_synthesis_zone, NONE, NONE);	
+			m_prototype(Prototypes::Household_Properties< typename MasterType::household_properties_type>, Properties, NONE,NONE);
 			m_prototype(Prototypes::Household_Properties<typename MasterType::household_static_properties_type>, Static_Properties, NONE, NONE);
 			
 			// Physical world elements
@@ -41,11 +41,11 @@ namespace Household_Components
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename network_reference_interface::get_type_of(zones_container)::value_type>::type>  zone_interface;
-			typedef Pair_Associative_Container< typename network_reference_interface::get_type_of(zones_container), zone_interface*> zones_container_interface;
+			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename network_reference_interface_type::get_type_of(zones_container)::value_type>::type>  zone_interface;
+			typedef Pair_Associative_Container< typename network_reference_interface_type::get_type_of(zones_container), zone_interface*> zones_container_interface;
 
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_reference_interface::get_type_of(activity_locations_container)::value_type>::type>  location_interface;
-			typedef Random_Access_Sequence< typename network_reference_interface::get_type_of(activity_locations_container), location_interface*> locations_container_interface;
+			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_reference_interface_type::get_type_of(activity_locations_container)::value_type>::type>  location_interface;
+			typedef Random_Access_Sequence< typename network_reference_interface_type::get_type_of(activity_locations_container), location_interface*> locations_container_interface;
 
 
 			//=======================================================================================================================================================================

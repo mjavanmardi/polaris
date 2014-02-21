@@ -24,10 +24,10 @@ namespace Link_Components
 
 	namespace Prototypes
 	{
-		prototype struct Link ADD_DEBUG_INFO
+		prototype struct Link
 		{
 			tag_as_prototype;
-			
+	
 			//==================================================================================================================
 			/// basic link
 			//------------------------------------------------------------------------------------------------------------------

@@ -9,7 +9,7 @@ namespace Person_Components
 		//==================================================================================
 		/// Person Agent classes
 		//----------------------------------------------------------------------------------
-		implementation struct Person_Mover_Implementation : public Polaris_Component<MasterType,INHERIT(Person_Mover_Implementation),Execution_Object,true>
+		implementation struct Person_Mover_Implementation : public Polaris_Component<MasterType,INHERIT(Person_Mover_Implementation),Execution_Object>
 		{
 			// Tag as Implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Person_Mover_Implementation),Execution_Object>::Component_Type ComponentType;

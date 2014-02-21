@@ -15,7 +15,7 @@ namespace Person_Components
 		//==================================================================================
 		/// Person Agent classes
 		//----------------------------------------------------------------------------------
-		implementation struct Person_Implementation : public Polaris_Component<MasterType,INHERIT(Person_Implementation),Execution_Object,true>
+		implementation struct Person_Implementation : public Polaris_Component<MasterType,INHERIT(Person_Implementation),Execution_Object>
 		{
 			// Tag as Implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Person_Implementation),Execution_Object>::Component_Type ComponentType;
@@ -89,7 +89,7 @@ namespace Person_Components
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 			typedef Prototypes::Person<ComponentType> this_itf;	
-			typedef Prototypes::Activity_Generator<typename Planning_Faculty_interface::get_type_of(Activity_Generation_Faculty)> generator_itf;
+			typedef Prototypes::Activity_Generator<typename Planning_Faculty_interface_type::get_type_of(Activity_Generation_Faculty)> generator_itf;
 			typedef Prototypes::Destination_Chooser<typename type_of(Planning_Faculty)::type_of(Destination_Choice_Faculty)> destination_choice_itf;
 			typedef Prototypes::Mode_Chooser<typename type_of(Planning_Faculty)::type_of(Mode_Choice_Faculty)> mode_choice_itf;
 			typedef Prototypes::Activity_Timing_Chooser<typename type_of(Planning_Faculty)::type_of(Timing_Chooser)> timing_choice_itf;

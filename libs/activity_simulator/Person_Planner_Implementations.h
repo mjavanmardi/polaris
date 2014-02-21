@@ -14,7 +14,7 @@ namespace Person_Components
 		//==================================================================================
 		/// Planning classes
 		//----------------------------------------------------------------------------------
-		implementation struct General_Person_Planner_Implementation : public Polaris_Component<MasterType,INHERIT(General_Person_Planner_Implementation),Execution_Object,true>
+		implementation struct General_Person_Planner_Implementation : public Polaris_Component<MasterType,INHERIT(General_Person_Planner_Implementation),Execution_Object>
 		{
 			// Tag as implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Person_Planner_Implementation),Execution_Object>::Component_Type ComponentType;
@@ -55,9 +55,9 @@ namespace Person_Components
 
 
 			// Interface definitions
-			typedef  Prototypes::Person_Scheduler< typename Parent_Person_interface::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
-			typedef  Scenario_Components::Prototypes::Scenario< typename Parent_Person_interface::get_type_of(scenario_reference)> _Scenario_Interface;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_interface::get_type_of(network_reference)> _Network_Interface;
+			typedef  Prototypes::Person_Scheduler< typename Parent_Person_interface_type::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
+			typedef  Scenario_Components::Prototypes::Scenario< typename Parent_Person_interface_type::get_type_of(scenario_reference)> _Scenario_Interface;
+			typedef  Network_Components::Prototypes::Network< typename Parent_Person_interface_type::get_type_of(network_reference)> _Network_Interface;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
 			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename _Network_Interface::get_type_of(activity_locations_container)::value_type>::type>  _Activity_Location_Interface;
 			typedef  Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container), _Activity_Location_Interface*> _Activity_Locations_Container_Interface;

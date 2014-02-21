@@ -6,7 +6,7 @@
 #include "activity_simulator\activity_simulator_forward_declaration.h"
 
 #include "population_synthesis\Population_Synthesis_Concepts.h"
-
+#include "population_synthesis\Population_Synthesis_Forward_Declaration.h"
 
 //#include "../Repository/Repository.h"
 //#include "Activity_Simulator_Forward_Declaration.h"

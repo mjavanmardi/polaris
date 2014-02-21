@@ -87,7 +87,7 @@ namespace Activity_Components
 			m_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility, NONE, NONE);
 
 			// Activity attributes
-			m_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype< typename MasterType::activity_location_type>, Location, check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location), check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location));
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, Location, check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location), check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location));
 			m_data(Vehicle_Components::Types::Vehicle_Type_Keys, Mode, NONE, NONE);
 			member_component_and_feature_accessor(Start_Time, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>)
 			member_component_and_feature_accessor(Duration, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>)
@@ -967,11 +967,11 @@ namespace Activity_Components
 			typedef  Pair_Associative_Container< typename _network_itf::get_type_of(zones_container), _zone_itf*> _zones_container_itf;
 
 		/*	typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container)::value_type>::type> _activity_plan_itf;
-		/*	typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),_activity_plan_itf*> _activity_plans_container_itf;
+			typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),_activity_plan_itf*> _activity_plans_container_itf;
 
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container)::value_type>::type> _movement_plan_itf;
 			typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),_movement_plan_itf*> _movement_plans_container_itf;
-
+		*/
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 
@@ -1376,11 +1376,11 @@ namespace Activity_Components
 			typedef  Pair_Associative_Container< typename _network_itf::get_type_of(zones_container), _zone_itf*> _zones_container_itf;
 
 		/*	typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container)::value_type>::type> _activity_plan_itf;
-		/*	typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),_activity_plan_itf*> _activity_plans_container_itf;
+			typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Activity_Container),_activity_plan_itf*> _activity_plans_container_itf;
 
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer< typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container)::value_type>::type> _movement_plan_itf;
 			typedef Back_Insertion_Sequence< typename type_of(base_type::Parent_Planner)::type_of(Movement_Plans_Container),_movement_plan_itf*> _movement_plans_container_itf;
-
+		*/
 			//================================================================================================================================================================================================
 			//================================================================================================================================================================================================
 
@@ -1417,11 +1417,6 @@ namespace Activity_Components
 				return Types::PLAN_HORIZON_VALUES::ROUTINE;
 			}
 			tag_getter_as_available(Involved_Persons_Plan_Horizon);
-			/*m_data(Types::FLEXIBILITY_VALUES, Location_Flexibility, NONE, NONE);
-			m_data(Types::FLEXIBILITY_VALUES, Mode_Flexibility, NONE, NONE);
-			m_data(Types::FLEXIBILITY_VALUES, Start_Time_Flexibility, NONE, NONE);
-			m_data(Types::FLEXIBILITY_VALUES, Duration_Flexibility, NONE, NONE);
-			m_data(Types::FLEXIBILITY_VALUES, Involved_Persons_Flexibility, NONE, NONE);*/
 
 
 			// Activity methods
@@ -1514,7 +1509,7 @@ namespace Activity_Components
 			// Fundamental activity properties
 			m_data(char, Activity_Plan_ID, NONE, NONE);
 			m_data(char, Activity_Type, NONE, NONE);
-			m_prototype(Activity_Location_Components::Prototypes::Activity_Location_Prototype< typename MasterType::activity_location_type>, Location, check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location), check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location));
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, Location, check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location), check(strip_modifiers(TargetType),Activity_Location_Components::Concepts::Is_Activity_Location));
 			m_data(Time_Minutes, Start_Time, check_2(TargetType,Time_Minutes, is_same),check_2(TargetType,Time_Minutes, is_same));
 			m_data(Time_Minutes, Duration, check_2(TargetType,Time_Minutes, is_same),check_2(TargetType,Time_Minutes, is_same));
 			m_data(Time_Minutes, Travel_Time, check_2(TargetType,Time_Minutes, is_same),check_2(TargetType,Time_Minutes, is_same));
@@ -1525,12 +1520,8 @@ namespace Activity_Components
 		//=======================================================================
 		// Static activity plan member initialization
 		//-----------------------------------------------------------------------
-		//static_array_definition(Basic_Activity_Plan_Implementation, Location_Planning_Counter, int);
-		static_array_definition(Basic_Activity_Plan_Implementation, Route_Planning_Counter, int);
-		//static_array_definition(Basic_Activity_Plan_Implementation, Scheduling_Counter, int);
-		//static_member_initialization(Basic_Activity_Plan_Implementation, Location_Planning_Count, 0);
-		static_member_initialization(Basic_Activity_Plan_Implementation, Route_Planning_Count, 0);
-		//static_member_initialization(Basic_Activity_Plan_Implementation, Scheduling_Count, 0);
+		template<typename MasterType, typename InheritanceList> int Basic_Activity_Plan_Implementation<MasterType,InheritanceList>::Route_Planning_Counter[];
+		template<typename MasterType, typename InheritanceList> int Basic_Activity_Plan_Implementation<MasterType,InheritanceList>::_Route_Planning_Count=0;
 		template<typename MasterType, typename InheritanceList> _lock Basic_Activity_Plan_Implementation<MasterType,  InheritanceList>::_update_lock = 0;
 	}
 }
