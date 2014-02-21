@@ -108,7 +108,7 @@ namespace polaris
 				Edge<stored_edge_type>* current_edge = (Edge<stored_edge_type>*)graph_itr;
 
 				current_input_edge->Construct_Edge_Attributes((Edge_Attributes_Type*)current_edge);
-				
+
 				_ordered_edge_reference->push_back( current_edge );
 				(*_edge_reference)[current_edge->edge_id()] = current_edge;
 
@@ -169,6 +169,46 @@ namespace polaris
 					connection_itr = connection_itr->Link_Edges(_graph_pool_reference);
 				}
 			}
+		}
+
+		virtual Interactive_Graph<ComponentType>* Create_Copy()
+		{
+			Graph_Implementation* copy = (Graph_Implementation*)new ComponentType();
+			
+			copy->_edge_reference = new boost::unordered::unordered_map<edge_id_type,Edge<stored_edge_type>*>();
+			copy->_ordered_edge_reference = new boost::container::vector<Edge<stored_edge_type>*>();
+
+			copy->_graph_id = _graph_id;
+
+			copy->_compiled = true;
+
+			copy->_graph_size = _graph_size;
+
+			copy->_graph = new char[copy->_graph_size];
+
+			memcpy(copy->_graph, _graph, copy->_graph_size);
+
+			const long long address_deviation = (long long) ((long long*)copy->_graph - (long long*)_graph);
+			
+			for(boost::container::vector<Edge<stored_edge_type>*>::iterator itr = _ordered_edge_reference->begin();itr != _ordered_edge_reference->end(); itr++)
+			{
+				Edge<stored_edge_type>* current_edge = (Edge<stored_edge_type>*) *itr;
+				Edge<stored_edge_type>* copy_edge = (Edge<stored_edge_type>*)(((long long*) *itr) + address_deviation);
+
+				copy->_ordered_edge_reference->push_back(copy_edge);
+
+				copy_edge->begin_connection_groups( (Anonymous_Connection_Group<Master_Type,base_edge_type>*)(((long long*)current_edge->begin_connection_groups())+address_deviation) );
+				copy_edge->end_connection_groups( (Anonymous_Connection_Group<Master_Type,base_edge_type>*)(((long long*)current_edge->end_connection_groups())+address_deviation) );
+
+				copy_edge->begin_connection_groups()->Unlink_Edges();
+			}
+
+			for(boost::unordered::unordered_map<edge_id_type,Edge<stored_edge_type>*>::iterator itr = _edge_reference->begin();itr != _edge_reference->end(); itr++)
+			{
+				(*copy->_edge_reference)[itr->first] = (Edge<stored_edge_type>*)(((long long*)itr->second) + address_deviation);
+			}
+
+			return (Interactive_Graph<ComponentType>*)copy;
 		}
 
 		boost::unordered::unordered_map<edge_id_type,void*>* _input_edge_reference;

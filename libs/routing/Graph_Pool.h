@@ -30,5 +30,10 @@ namespace polaris
 		{
 			return this_component()->Create_New_Graph<Graph_Type>();
 		}
+
+		Graph_Pool<ComponentType>* Create_Copy()
+		{
+			return this_component()->Create_Copy();
+		}
 	};
 }

@@ -12,6 +12,11 @@ namespace polaris
 	prototype struct Interactive_Graph
 	{
 		typedef typename ComponentType::base_edge_type base_edge_type;
+		
+		Interactive_Graph<ComponentType>* Create_Copy()
+		{
+			return this_component()->Create_Copy();
+		}
 
 		template<typename Edge_Type>
 		Edge<Edge_Type>* Get_Edge(edge_id_type edge_id)

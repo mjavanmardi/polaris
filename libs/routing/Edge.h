@@ -20,6 +20,8 @@ namespace polaris
 	{
 		virtual Anonymous_Connection_Group* Next_Connection_Group() = 0;
 
+		virtual Anonymous_Connection_Group* Unlink_Edges() = 0;
+
 		virtual Anonymous_Connection_Group* Link_Edges(void* graph_pool) = 0;
 
 		virtual Anonymous_Connection_Group* Visit_Neighbors(Routable_Agent<typename MasterType::routable_agent_type>* agent, void* current, Routing_Data<Base_Edge_Type>& routing_data) = 0;

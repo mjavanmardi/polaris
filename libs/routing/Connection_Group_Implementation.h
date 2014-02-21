@@ -22,9 +22,24 @@ namespace polaris
 		
 		typedef typename current_edge_type::base_edge_type base_edge_type;
 		typedef Connection_Attributes_Type connection_attributes_type;
-		
+
 		virtual Anonymous_Connection_Group* Next_Connection_Group()
 		{
+			return (Anonymous_Connection_Group*)end_forward_edges();
+		}
+
+		virtual Anonymous_Connection_Group* Unlink_Edges()
+		{
+			Connection_Implementation* forward_edge_itr = forward_edges();
+			const Connection_Implementation* const end = end_forward_edges();
+
+			while(forward_edge_itr != end)
+			{
+				forward_edge_itr->_edge_id = forward_edge_itr->_neighbor->edge_id();
+
+				forward_edge_itr = forward_edge_itr->next_connection();
+			}
+
 			return (Anonymous_Connection_Group*)end_forward_edges();
 		}
 
@@ -37,11 +52,10 @@ namespace polaris
 
 			global_edge_id linked_edge_id;
 			linked_edge_id.graph_id = _linked_graph;
-			
+
 			while(forward_edge_itr != end)
 			{
 				linked_edge_id.edge_id = forward_edge_itr->edge_id();
-				
 				forward_edge_itr->_neighbor = (neighbor_edge_type*)( current_graph_pool->Get_Edge<Neighbor_Graph_Type>(linked_edge_id) );
 
 				if(forward_edge_itr->_neighbor == nullptr)

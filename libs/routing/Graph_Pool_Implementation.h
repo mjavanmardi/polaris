@@ -70,6 +70,29 @@ namespace polaris
 			return graph;
 		}
 
+		Graph_Pool<ComponentType>* Create_Copy()
+		{
+			Graph_Pool_Implementation* copy = (Graph_Pool_Implementation*) new ComponentType();
+
+			copy->_num_graphs = _num_graphs;
+
+			for(boost::container::vector<void*>::iterator itr = _graphs.begin(); itr != _graphs.end(); itr++)
+			{
+				Interactive_Graph<base_graph_type>* current_graph = (Interactive_Graph<base_graph_type>*) *itr;
+
+				Graph_Assembler_Connected_Edge<base_graph_type>* copy_graph = (Graph_Assembler_Connected_Edge<base_graph_type>*)current_graph->Create_Copy();
+
+				copy->_graphs.push_back(copy_graph);
+
+				copy_graph->graph_pool_reference(copy);
+			}
+
+			copy->Link_Graphs();
+
+			return (Graph_Pool<ComponentType>*)copy;
+		}
+
+
 		boost::container::vector<void*> _graphs;
 
 		graph_id_type _num_graphs;
