@@ -11,7 +11,7 @@ namespace Person_Components
 		/// Planning classes
 		//----------------------------------------------------------------------------------
 
-		implementation struct Mode_Choice_Option : public Polaris_Component<MasterType,INHERIT(Mode_Choice_Option),Data_Object,true>
+		implementation struct Mode_Choice_Option : public Polaris_Component<MasterType,INHERIT(Mode_Choice_Option),Data_Object>
 		{
 			// Tag as Implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Mode_Choice_Option),Data_Object>::Component_Type ComponentType;
@@ -321,49 +321,50 @@ namespace Person_Components
 			}
 
 		};
-		#pragma region Choice option parameters
-		// INITIALIZE DESTINATION MODEL STATIC PARAMETERS
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_IVTT, 0.0186);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_CBD_IVTT, 0.0159);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_IVTT, 0.0114);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_CBD_IVTT, 0.0159);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_IVTT, 0.0114);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_CBD_IVTT, 0.0159);
 
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_WAIT, 0.0811);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_CBD_WAIT, 0.0173);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_WAIT, 0.0610);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_CBD_WAIT, 0.0173);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_WAIT, 0.0610);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_CBD_WAIT, 0.0173);
-			
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_TRANSFER, 0.0399);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_CBD_TRANSFER, 0.0290);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_TRANSFER, 0.0589);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_CBD_TRANSFER, 0.0290);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_TRANSFER, 0.0589);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_CBD_TRANSFER, 0.0290);
-			
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_WALK, 0.0584);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_CBD_WALK, 0.0486);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_WALK, 0.0663);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_CBD_WALK, 0.0486);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_WALK, 0.0663);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_CBD_WALK, 0.0486);
-			
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_COST, 0.00119);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_CBD_COST, 0.00141);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_COST, 0.00546);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_CBD_COST, 0.00141);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_COST, 0.00546);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_CBD_COST, 0.00141);
-			
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_BIAS, -2.0000);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHW_CBD_BIAS, -1.0000);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_BIAS, -1.9000);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BHO_CBD_BIAS, -1.0000);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_BIAS, -2.0000);
-		static_member_initialization(Person_Components::Implementations::Mode_Choice_Option, BNH_CBD_BIAS, -1.0000);
+		// INITIALIZE DESTINATION MODEL STATIC PARAMETERS
+		#pragma region Choice option parameters	
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_IVTT = 0.0186;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_IVTT = 0.0159;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_IVTT = 0.0114;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_IVTT = 0.0159;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_IVTT = 0.0114;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_IVTT) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_IVTT = 0.0159;
+
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_WAIT = 0.0811;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_WAIT = 0.0173;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_WAIT = 0.061;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_WAIT = 0.0173;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_WAIT = 0.061;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_WAIT) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_WAIT = 0.0173;
+
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_TRANSFER = 0.0399;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_TRANSFER = 0.029;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_TRANSFER = 0.0589;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_TRANSFER = 0.029;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_TRANSFER = 0.0589;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_TRANSFER) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_TRANSFER = 0.029;
+
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_WALK = 0.0584;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_WALK = 0.0486;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_WALK = 0.0663;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_WALK = 0.0486;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_WALK = 0.0663;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_WALK) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_WALK = 0.0486;
+
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_COST = 0.00119;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_COST = 0.00141;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_COST = 0.00546;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_COST = 0.00141;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_COST = 0.00546;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_COST) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_COST = 0.00141;
+
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_BIAS = -2;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHW_CBD_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BHW_CBD_BIAS = -1;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_BIAS = -1.9;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BHO_CBD_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BHO_CBD_BIAS = -1;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_BIAS = -2;
+		template<typename MasterType, typename InheritanceList> typename Mode_Choice_Option<MasterType, InheritanceList>::type_of(BNH_CBD_BIAS) Mode_Choice_Option<MasterType,InheritanceList>::_BNH_CBD_BIAS = -1;
 		#pragma endregion
 
 
@@ -516,7 +517,7 @@ namespace Person_Components
 		};
 		#pragma region Choice option parameters
 		// INITIALIZE DESTINATION MODEL STATIC PARAMETERS
-		static_member_definition(Person_Components::Implementations::Mode_Chooser_Implementation,choice_set_size);
+		template<typename MasterType, typename InheritanceList> typename Mode_Chooser_Implementation<MasterType, InheritanceList>::type_of(choice_set_size) Mode_Chooser_Implementation<MasterType,InheritanceList>::_choice_set_size;		
 		#pragma endregion
 
 	}

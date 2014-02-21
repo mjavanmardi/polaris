@@ -83,12 +83,12 @@ namespace Person_Components
 				//---------------------------------------------------------------------------------------------------------------
 				// get an interface to the given home zone;
 				typedef PopSyn::Prototypes::Synthesis_Zone<typename MasterType::zone> zone_itf;
-				typedef Prototypes::Person_Properties<typename Parent_Person_interface::get_type_of(Static_Properties)> pop_unit_itf;
+				typedef Prototypes::Person_Properties<typename Parent_Person_interface_type::get_type_of(Static_Properties)> pop_unit_itf;
 				
 				// useful interfaces
 				typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container),int> activity_location_ids_itf;
-				typedef Network_Components::Prototypes::Network<typename Parent_Person_interface::get_type_of(network_reference)> network_itf;
-				typedef Person_Planner<typename Parent_Person_interface::get_type_of(Planning_Faculty)> planner_itf;
+				typedef Network_Components::Prototypes::Network<typename Parent_Person_interface_type::get_type_of(network_reference)> network_itf;
+				typedef Person_Planner<typename Parent_Person_interface_type::get_type_of(Planning_Faculty)> planner_itf;
 				typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename network_itf::get_type_of(activity_locations_container)::value_type>::type>  activity_location_itf;
 				typedef Random_Access_Sequence<typename network_itf::get_type_of(activity_locations_container), activity_location_itf*> activity_locations_itf;
 

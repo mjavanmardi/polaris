@@ -17,7 +17,7 @@ namespace Person_Components
 			typedef pair<Time_Minutes,Time_Minutes> data_type;
 
 			typedef pair<float,data_type> record_type;
-			typedef map<float,data_type> map_type;
+			typedef std::map<float,data_type> map_type;
 
 
 			// pointer back to parent class
@@ -172,8 +172,8 @@ namespace Person_Components
 			}
 		};
 
-		static_member_initialization(Activity_Timing_Chooser_Implementation,is_initialized,false);
+		template<typename MasterType, typename InheritanceList> typename Activity_Timing_Chooser_Implementation<MasterType, InheritanceList>::type_of(is_initialized) Activity_Timing_Chooser_Implementation<MasterType,InheritanceList>::_is_initialized = false;
 		//static_member_definition(Activity_Timing_Chooser_Implementation, start_time_duration_container);
-		template<typename MasterType, typename InheritanceList> Pair_Associative_Container<boost::unordered::unordered_map<int, map<float,pair<Time_Minutes,Time_Minutes>>>> Activity_Timing_Chooser_Implementation<MasterType,  InheritanceList>::_start_time_duration_container;
+		template<typename MasterType, typename InheritanceList> Pair_Associative_Container<boost::unordered::unordered_map<int, std::map<float,pair<Time_Minutes,Time_Minutes>>>> Activity_Timing_Chooser_Implementation<MasterType,  InheritanceList>::_start_time_duration_container;
 	}
 }

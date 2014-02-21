@@ -47,8 +47,8 @@ namespace Person_Components
 			typedef General_Activity_Generator_Implementation<MasterType,  INHERIT(ADAPTS_Activity_Generator_Implementation)> base_type;
 			typedef typename base_type::Component_Type ComponentType;
 
-			typedef Prototypes::Activity_Generator<base_type,base_type> base_itf;
-			typedef  Prototypes::Person<typename base_type::type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
+			typedef Prototypes::Activity_Generator<base_type> base_itf;
+			typedef Prototypes::Person<typename base_type::type_of(Parent_Planner)::type_of(Parent_Person)> person_itf;
 
 			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,Activity_Simulator::Person_Concepts::Is_Person)))
 			{	
@@ -89,7 +89,7 @@ namespace Person_Components
 			typedef typename base_type::Component_Type ComponentType;
 
 			typedef base_type base;
-			typedef Prototypes::Activity_Generator<base_type,base_type> base_itf;
+			typedef Prototypes::Activity_Generator<base_type> base_itf;
 
 			// static discretionary activity generation model
 			static float work_activity_freq[8];
