@@ -35,6 +35,8 @@ namespace Movement_Plan_Components
 
 		implementation struct Movement_Plan_Implementation:public Polaris_Component<MasterType,INHERIT(Movement_Plan_Implementation),Data_Object>
 		{
+			static m_prototype(Network<typename MasterType::network_type>,network,NONE,NONE);
+
 			typedef Implementations::Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 			m_container(boost::container::vector<trajectory_unit_type*>, trajectory_container, NONE, NONE);
 			
@@ -117,6 +119,9 @@ namespace Movement_Plan_Components
 
 			m_data(bool, valid_trajectory, NONE, NONE);
 		};
+		
+		template<typename MasterType,typename InheritanceList>
+		Network<typename MasterType::network_type>* Movement_Plan_Implementation<MasterType,InheritanceList>::_network;
 
 		implementation struct Integrated_Movement_Plan_Implementation : public Movement_Plan_Implementation<MasterType, INHERIT(Integrated_Movement_Plan_Implementation)>
 		{

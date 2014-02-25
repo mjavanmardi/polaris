@@ -27,6 +27,8 @@ namespace polaris
 			_in_closed_set = false;
 			_marked_for_reset = false;
 			_in_open_set = false;
+
+			_came_from = nullptr;
 		}
 
 		t_data(float, x);

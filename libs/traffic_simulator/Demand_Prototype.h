@@ -79,7 +79,7 @@ namespace Demand_Components
 				typedef  Random_Access_Sequence< typename get_type_of(vehicles_container), _Vehicle_Interface*> _Vehicles_Container_Interface;
 
 				typedef Traveler_Components::Prototypes::Traveler<typename ComponentType::traveler_type> _Traveler_Interface;
-				typedef  Routing_Components::Prototypes::Routing< typename _Traveler_Interface::get_type_of(router)> _Routing_Interface;
+				typedef  Routing_Components::Prototypes::Routing< typename _Traveler_Interface::get_type_of(router) > _Routing_Interface;
 //				define_component_interface(_Plan_Interface, _Traveler_Interface::get_type_of(plan), Plan_Components::Prototypes::Plan_Prototype, ComponentType);
 //				define_component_interface(_Movement_Plan_Interface, _Plan_Interface::get_type_of(movement_plan), Movement_Plan_Components::Prototypes::Movement_Plan_Prototype, ComponentType);
 				typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer< typename get_type_of(vehicles_container)::value_type>::type>  _Vehicle_Interface;
@@ -99,6 +99,7 @@ namespace Demand_Components
 				
 				_Traveler_Interface* traveler;
 				_Vehicle_Interface* vehicle;
+
 				_Routing_Interface* router;
 //				_Plan_Interface* plan;
 				_Movement_Plan_Interface* movement_plan;
@@ -203,9 +204,12 @@ namespace Demand_Components
 					
 					traveler=(_Traveler_Interface*)Allocate<typename ComponentType::traveler_type>();
 					vehicle=(_Vehicle_Interface*)Allocate<typename _Vehicle_Interface::Component_Type>();
+
 					router=(_Routing_Interface*)Allocate<typename _Routing_Interface::Component_Type>();
-//					plan = (_Plan_Interface*)Allocate<typename _Plan_Interface::Component_Type>();
+
 					movement_plan = (_Movement_Plan_Interface*)Allocate<typename _Movement_Plan_Interface::Component_Type>();
+
+					movement_plan->network<_Network_Interface*>(network);
 
 					vehicle->template uuid<int>(++traveler_id_counter);
 					vehicle->template internal_id<int>(traveler_id_counter);
@@ -220,7 +224,8 @@ namespace Demand_Components
 					traveler->template router<_Routing_Interface*>(router);
 					traveler->template vehicle<_Vehicle_Interface*>(vehicle);
 
-					router->template traveler<_Traveler_Interface*>(traveler);
+					//TODO:ROUTING_OPERATION
+					//router->template traveler<_Traveler_Interface*>(traveler);
 					router->template network<_Network_Interface*>(network);
 
 					movement_plan->template origin<_Link_Interface*>(origin_link);
@@ -233,15 +238,16 @@ namespace Demand_Components
 
 					_Zone_Interface* origin_zone = origin_location->template zone<_Zone_Interface*>();
 					_Zone_Interface* destination_zone = destination_location->template zone<_Zone_Interface*>();
+					//TODO: commented out to quickly address compatibility
 					//movement_plan->template origin<_Zone_Interface*>(origin_zone);
 					//movement_plan->template destination<_Zone_Interface*>(destination_zone);
 
 					movement_plan->template departed_time<Time_Seconds>(departed_time);
 					movement_plan->template initialize_trajectory<NULLTYPE>();
 
-					router->template movement_plan<_Movement_Plan_Interface*>(movement_plan);
+					router->Attach_New_Movement_Plan<typename _Movement_Plan_Interface::Component_Type>(movement_plan);
 
-					traveler->template Schedule_New_Departure<NULLTYPE>(departed_time);
+					traveler->Schedule_New_Departure(departed_time);
 
 					vehicles_container<_Vehicles_Container_Interface&>().push_back(vehicle);
 

@@ -44,29 +44,35 @@ namespace Turn_Movement_Components
 
 			m_data(float, minimum_merge_rate, check(strip_modifiers(TargetType), is_arithmetic), check(strip_modifiers(TargetType), is_arithmetic));
 
-			m_container(boost::container::vector<typename MasterType::routable_movement_type*>, replicas_container, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::routable_movement_type*>, realtime_replicas_container, NONE, NONE);
+			//TODO:ROUTING
+			//m_container(boost::container::vector<typename MasterType::routable_movement_type*>, replicas_container, NONE, NONE);
+			//m_container(boost::container::vector<typename MasterType::routable_movement_type*>, realtime_replicas_container, NONE, NONE);
 
 
 			//==================================================================================================================
 			/// forward_link_turn_travel_time
 			//------------------------------------------------------------------------------------------------------------------
-            typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename replicas_container_type::value_type>::type> _Replica_Interface;
-            typedef Random_Access_Sequence<replicas_container_type,_Replica_Interface*> _Replicas_Container_Interface;
+            
+			
+			//TODO:ROUTING
+			//typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename replicas_container_type::value_type>::type> _Replica_Interface;
+            //typedef Random_Access_Sequence<replicas_container_type,_Replica_Interface*> _Replicas_Container_Interface;
 			
 			template<typename TargetType>
 			TargetType forward_link_turn_travel_time(){return (TargetType)(_forward_link_turn_travel_time);} tag_getter_as_available(forward_link_turn_travel_time);
+			
 			template<typename TargetType>
 			void forward_link_turn_travel_time(TargetType set_value)
 			{
 				_forward_link_turn_travel_time = (float)set_value;
+				//TODO:ROUTING_OPERATION
 				// update replicas
-				typename _Replicas_Container_Interface::iterator replica_itr;
-				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
-				{
-					_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-					replica->template forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
-				}
+				//typename _Replicas_Container_Interface::iterator replica_itr;
+				//for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
+				//{
+				//	_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
+				//	replica->template forward_link_turn_travel_time<float>(_forward_link_turn_travel_time);
+				//}
 			}
 			tag_setter_as_available(forward_link_turn_travel_time);
 
@@ -78,13 +84,14 @@ namespace Turn_Movement_Components
 			void realtime_forward_link_turn_travel_time(TargetType set_value)
 			{
 				_realtime_forward_link_turn_travel_time = (float)set_value;
+				//TODO:ROUTING_OPERATION
 				// update replicas
-				typename _Replicas_Container_Interface::iterator replica_itr;
-				for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
-				{
-					_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
-					replica->template forward_link_turn_travel_time<float>(_realtime_forward_link_turn_travel_time);
-				}
+				//typename _Replicas_Container_Interface::iterator replica_itr;
+				//for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
+				//{
+				//	_Replica_Interface* replica = (_Replica_Interface*)(*replica_itr);
+				//	replica->template forward_link_turn_travel_time<float>(_realtime_forward_link_turn_travel_time);
+				//}
 			}
 			tag_setter_as_available(realtime_forward_link_turn_travel_time);
 
@@ -335,7 +342,9 @@ namespace Turn_Movement_Components
 
 				if (((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>())
 				{
-					realtime_forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
+					//TODO:BIG_CHANGE
+					//realtime_forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
+					realtime_forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_outbound_link_arrived_time_based_experienced_link_turn_travel_delay);
 				}
 
 				if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
@@ -349,7 +358,9 @@ namespace Turn_Movement_Components
 					turn_travel_penalty = (float) ( turn_travel_penalty/((float)((_Scenario_Interface*)_global_scenario)->template num_simulation_intervals_per_assignment_interval<int>()) );
 					_turn_travel_penalty = turn_travel_penalty;
 					add_signal_penalty<TargetType>();
-					forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_turn_travel_penalty);
+					//TODO:BIG_CHANGE
+					//forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template travel_time<float>()+_turn_travel_penalty);
+					forward_link_turn_travel_time<float>(((_Link_Interface*)_inbound_link)->template link_fftt<float>()+_turn_travel_penalty);
 				}
 			}
 
@@ -360,23 +371,32 @@ namespace Turn_Movement_Components
                 bool eligible_for_signal_penalty = false;
 				float signal_control_penalty = 0.0;
                 if (inbound_link_type == Link_Components::Types::Link_Type_Keys::ARTERIAL || inbound_link_type == Link_Components::Types::Link_Type_Keys::LOCAL)
+				{
                     eligible_for_signal_penalty = true;
+				}
                 else
+				{
                     if (inbound_link_type == Link_Components::Types::Link_Type_Keys::ON_RAMP && (outbound_link_type != Link_Components::Types::Link_Type_Keys::FREEWAY && outbound_link_type != Link_Components::Types::Link_Type_Keys::EXPRESSWAY))
+					{
                         eligible_for_signal_penalty = true;
+					}
                     else
+					{
                         eligible_for_signal_penalty = false;
-                if (!eligible_for_signal_penalty)
+					}
+				}
+
+				if (!eligible_for_signal_penalty)
+				{
                     signal_control_penalty = 0.0;
+				}
                 else
                 {
                     float vc = ((_link_component_type*)_inbound_link)->link_moe_data.link_out_flow_ratio;
                     float cycle=75; // 75 seconds
                     float green;
-                    if (_movement_type == Turn_Movement_Components::Types::LEFT_TURN)
-                            green=5;
-                    else
-                            green=30;
+                    if (_movement_type == Turn_Movement_Components::Types::LEFT_TURN) green=5;
+                    else green=30;
                     float Du=6.8 * vc - 0.39 * green + 0.35 * cycle - 4.5;
                     Du = max(Du, 0.0f);
                     float Di = 2.7 * pow(vc,8) - 7.3 * (green / cycle) + 3.4;

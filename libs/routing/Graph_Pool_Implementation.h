@@ -72,6 +72,8 @@ namespace polaris
 
 		Graph_Pool<ComponentType>* Create_Copy()
 		{
+			//cout << typeid(ComponentType).name() << endl;
+
 			Graph_Pool_Implementation* copy = (Graph_Pool_Implementation*) new ComponentType();
 
 			copy->_num_graphs = _num_graphs;

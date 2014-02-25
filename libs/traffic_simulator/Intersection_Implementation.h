@@ -36,8 +36,6 @@ namespace Intersection_Components
 			// update state of outbound link and inbound movements
 			template<typename TargetType> void update_state()
 			{
-
-
 				//int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
 				((_Link_Interface*)_outbound_link_reference)->template travel_time<float>(((_Link_Interface*)_outbound_link_reference)->template link_fftt<float>());
 
@@ -778,7 +776,7 @@ namespace Intersection_Components
 					_pthis->Compute_Step_Flow();
 					//response.result=true;
 					response.next._iteration=iteration();
-					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION;
+					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION;
 				}
 				//else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_ORIGIN_LINK_LOADING_SUB_ITERATION)
 				//{
@@ -788,15 +786,15 @@ namespace Intersection_Components
 				//	response.next._iteration=_iteration;
 				//	response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION;
 				//} 
-				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION)
-				{
-
-					//((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Network_State_Update<NULLTYPE>);
-					_pthis->Network_State_Update();
-					//response.result=true;
-					response.next._iteration=iteration();
-					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION;
-				} 
+				//else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_NETWORK_STATE_UPDATE_SUB_ITERATION)
+				//{
+				//	//TODO:BIG_CHANGE!
+				//	//((typename MasterType::intersection_type*)_this)->Swap_Event((Event)&Network_State_Update<NULLTYPE>);
+				//	_pthis->Network_State_Update();
+				//	//response.result=true;
+				//	response.next._iteration=iteration();
+				//	response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION;
+				//} 
 				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::INTERSECTION_REALTIME_MOE_COMPUTATION_SUB_ITERATION)
 				{
 
@@ -852,6 +850,7 @@ namespace Intersection_Components
 			{
 				//typedef Intersection<typename MasterType::intersection_type> _Intersection_Interface;
 				_Intersection_Interface* _this_ptr=(_Intersection_Interface*)this;
+
 				//step 9: intersection network state update
 				_this_ptr->template network_state_update<NULLTYPE>();
 			}

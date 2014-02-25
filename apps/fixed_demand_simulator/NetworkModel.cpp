@@ -68,13 +68,14 @@ struct MasterType
 	
 	typedef Turn_Movement_Components::Implementations::Movement_Implementation<MasterType> turn_movement_type;
 
+	
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<MasterType> routable_network_type;
 	
+	//TODO:ROUTING
+	
 	typedef Routing_Components::Implementations::Routing_Implementation<MasterType> routing_type;
-
-	typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
-
-	typedef Link_Components::Implementations::Routable_Link_Implementation<MasterType> routable_link_type;
+	//typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<MasterType> routable_intersection_type;
+	//typedef Link_Components::Implementations::Routable_Link_Implementation<MasterType> routable_link_type;
 	
 	typedef Demand_Components::Implementations::Demand_Implementation<MasterType> demand_type;
 
@@ -86,11 +87,14 @@ struct MasterType
 
 	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<MasterType> outbound_inbound_movements_type;
 
-	typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<MasterType> routable_inbound_outbound_movements_type;
+	//TODO:ROUTING
+	//typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<MasterType> routable_inbound_outbound_movements_type;
 
-	typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<MasterType> routable_outbound_inbound_movements_type;
+	//TODO:ROUTING
+	//typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<MasterType> routable_outbound_inbound_movements_type;
 
-	typedef Intersection_Components::Implementations::Routable_Movement_Implementation<MasterType> routable_movement_type;
+	//TODO:ROUTING
+	//typedef Intersection_Components::Implementations::Routable_Movement_Implementation<MasterType> routable_movement_type;
 
 	typedef Operation_Components::Implementations::Operation_Implementation<MasterType> operation_type;
 	
@@ -169,6 +173,20 @@ struct MasterType
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
 
+
+	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
+
+	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
+	
+	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
+
+	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;
+
+	typedef Graph_Implementation<MasterType, NTL, static_edge_type> static_graph_type;
+
+	typedef Routing_Components::Types::static_to_static static_to_static_type;
+
+	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
 };
 
 ostream* stream_ptr;
@@ -178,9 +196,14 @@ void run_with_input_from_db(char* scenario_filename);
 int main(int argc, char* argv[])
 {
 	Simulation_Configuration cfg;
-	//cfg.Single_Threaded_Setup(1000);
+	//cfg.Single_Threaded_Setup(24*60*60);
 	cfg.Multi_Threaded_Setup(24*60*60,8);
 	INITIALIZE_SIMULATION(cfg);
+
+    Average_Execution_Objects_Hint<MasterType::routing_type>(2778495);
+    Average_Execution_Objects_Hint<MasterType::traveler_type>(2778495);
+    Average_Execution_Objects_Hint<MasterType::link_type>(55008);
+    Average_Execution_Objects_Hint<MasterType::intersection_type>(18904);
 
 	char* scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
@@ -408,6 +431,8 @@ void run_with_input_from_db(char* scenario_filename)
 		network->skimming_faculty<_network_skim_itf*>(skimmer);
 #endif
 		cout << "starting sim..." <<endl;
+
+		
 
 		START();
 

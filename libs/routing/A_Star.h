@@ -15,8 +15,13 @@ namespace polaris
 	};
 
 	template<typename MasterType,typename AgentType,typename GraphPoolType>
-	static void* A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id, global_edge_id& end_id, unsigned int start_time, boost::container::deque< global_edge_id >& out_path)
+	static float A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id, global_edge_id& end_id, unsigned int start_time, boost::container::deque< global_edge_id >& out_path, boost::container::deque< float >& out_cost)
 	{
+		if(end_id.edge_id == 7895)
+		{
+			bool pause = true;
+		}
+
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 
 		boost::container::deque< base_edge_type* > modified_edges;
@@ -24,10 +29,10 @@ namespace polaris
 		boost::intrusive::multiset< base_edge_type > open_set;
 
 		A_Star_Edge<base_edge_type>* start = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(start_id);
-		if(start == nullptr){ THROW_WARNING("Origin: " << start_id.edge_id << " not found in graph pool!"); return nullptr; }
+		if(start == nullptr){ THROW_WARNING("Origin: " << start_id.edge_id << " not found in graph pool!"); return 0.0f; }
 
 		A_Star_Edge<base_edge_type>* end = (A_Star_Edge<base_edge_type>*)graph_pool->Get_Edge(end_id);
-		if(end == nullptr){ THROW_WARNING("Destination: " << end_id.edge_id << " not found in graph!"); return nullptr; }
+		if(end == nullptr){ THROW_WARNING("Destination: " << end_id.edge_id << " not found in graph!"); return 0.0f; }
 
 
 		Routing_Data<base_edge_type> routing_data;
@@ -84,13 +89,11 @@ namespace polaris
 
 		}
 
-		for(boost::container::deque< base_edge_type* >::iterator itr = modified_edges.begin();itr!=modified_edges.end();itr++)
-		{
-			(*itr)->reset();
-		}
 		
 		global_edge_id global;
 		global.graph_id = 0;
+
+		float total_cost = 0.0f;
 
 		if(success)
 		{
@@ -102,6 +105,7 @@ namespace polaris
 				global.edge_id = current->_edge_id;
 				
 				out_path.push_back(global);
+				out_cost.push_back(current->_cost_from_origin);
 
 				current = (base_edge_type*)current->came_from();
 
@@ -109,16 +113,18 @@ namespace polaris
 
 				cached_current = current;
 			}
-
+			
 			std::reverse(out_path.begin(),out_path.end());
+			std::reverse(out_cost.begin(),out_cost.end());
 
-			return end;
+			total_cost = out_cost.back();
 		}
-		else
+			
+		for(boost::container::deque< base_edge_type* >::iterator itr = modified_edges.begin();itr!=modified_edges.end();itr++)
 		{
-			cout << "Failed to create route!" << endl;
-
-			return nullptr;
+			(*itr)->reset();
 		}
+
+		return total_cost;
 	}
 }

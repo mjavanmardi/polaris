@@ -29,10 +29,12 @@ namespace polaris
 		void time_from_origin(float value){ this_component()->time_from_origin(value); }
 
 		//float cost_between(A_Star_Edge* other){ return this_component()->cost_between(other); }
-		//float cost(){ return this_component()->cost(); }
-		//
-		//float time_cost(){ return this_component()->time_cost(); }
-		//
+		float cost(){ return this_component()->cost(); }
+		void cost(float value){ this_component()->cost(value); }
+		
+		float time_cost(){ return this_component()->time_cost(); }
+		void time_cost(float value){ this_component()->time_cost(value); }
+
 		Anonymous_Connection_Group<Master_Type,base_edge_type>* begin_connection_groups(){ return this_component()->begin_connection_groups(); }
 		const Anonymous_Connection_Group<Master_Type,base_edge_type>* const end_connection_groups(){ return this_component()->end_connection_groups(); }
 
