@@ -209,13 +209,14 @@ namespace Movement_Plan_Components
 
 			}
 
-			template<typename TargetType> void update_trajectory(TargetType& path_container, boost::container::vector<float>& reversed_arrival_time_container)
+			void update_trajectory(boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& arrival_time_container)
 			{
 				typedef  Trajectory_Unit<typename remove_pointer< typename get_type_of(trajectory_container)::value_type>::type>  _Trajectory_Unit_Interface;
 				typedef  Random_Access_Sequence< typename get_type_of(trajectory_container), _Trajectory_Unit_Interface*> _Trajectory_Container_Interface;
 
 				typedef  Link_Components::Prototypes::Link< typename _Trajectory_Unit_Interface::get_type_of(link)> _Link_Interface;
-				
+				typedef  Network_Components::Prototypes::Network< typename get_type_of(network) > Network_Interface;
+
 				_Trajectory_Container_Interface& trajectory=trajectory_container<_Trajectory_Container_Interface&>();
 				
 				//erase 
@@ -224,15 +225,31 @@ namespace Movement_Plan_Components
 				// add the time entering the current link to the relative estimated arrival time for the new trajectory_unit links
 				int stored_ttime = trajectory[current_trajectory_position<int&>()]->template enter_time<int>() - (int)this->departed_time<Time_Seconds>();
 
-				typename TargetType::reverse_iterator itr;
-				typename boost::container::vector<float>::reverse_iterator arrival_time_itr;
-				for(itr = path_container.rbegin() + 1, arrival_time_itr = reversed_arrival_time_container.rbegin() + 1; itr != path_container.rend(); itr++,arrival_time_itr++)
+				typename boost::container::deque<global_edge_id>::iterator path_itr;
+				typename boost::container::deque<float>::iterator arrival_time_itr;
+				
+				Network_Interface* net = network<Network_Interface*>();
+
+				for(path_itr = path_container.begin() + 1, arrival_time_itr = arrival_time_container.begin() + 1; path_itr != path_container.end(); path_itr++,arrival_time_itr++)
 				{
+					_Link_Interface* link = net->get_link_ptr< typename _Trajectory_Unit_Interface::get_type_of(link) >( path_itr->edge_id );
+
 					_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
 					vehicle_trajectory_data->template estimated_link_accepting_time<int>(*(arrival_time_itr/* - 1*/) + stored_ttime);
-					vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::value_type*>((typename TargetType::Component_Type::value_type*)*itr);
+					vehicle_trajectory_data->template Initialize<_Link_Interface*>( link );
 					trajectory.push_back(vehicle_trajectory_data);
 				}
+
+
+				//typename TargetType::reverse_iterator itr;
+				//typename boost::container::vector<float>::reverse_iterator arrival_time_itr;
+				//for(itr = path_container.rbegin() + 1, arrival_time_itr = reversed_arrival_time_container.rbegin() + 1; itr != path_container.rend(); itr++,arrival_time_itr++)
+				//{
+				//	_Trajectory_Unit_Interface* vehicle_trajectory_data=(_Trajectory_Unit_Interface*)Allocate<typename _Trajectory_Unit_Interface::Component_Type>();
+				//	vehicle_trajectory_data->template estimated_link_accepting_time<int>(*(arrival_time_itr/* - 1*/) + stored_ttime);
+				//	vehicle_trajectory_data->template Initialize<typename TargetType::Component_Type::value_type*>((typename TargetType::Component_Type::value_type*)*itr);
+				//	trajectory.push_back(vehicle_trajectory_data);
+				//}
 				number_of_switches<int&>()++;
 				update_route_length<NT>();
 			}

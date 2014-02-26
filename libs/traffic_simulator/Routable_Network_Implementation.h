@@ -146,7 +146,7 @@ namespace Routing_Components
 				}
 			}
 
-			void compute_static_network_path(unsigned int origin, unsigned int destination, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_static_network_path(unsigned int origin, unsigned int destination, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
 			{
 				Routable_Agent<typename MT::routable_agent_type> proxy_agent;
 
@@ -160,7 +160,9 @@ namespace Routing_Components
 				end.edge_id = destination;
 				end.graph_id = _static_network_graph_id;
 
-				A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,0,path_container,cost_container);
+				float routed_time = A_Star<MT,typename MT::routable_agent_type,typename MT::graph_pool_type>(&proxy_agent,_routable_graph_pool,start,end,0,path_container,cost_container);
+
+				return routed_time;
 			}
 
 			void update_edge_turn_cost(unsigned int edge_id,float edge_cost,unsigned int outbound_turn_index,float turn_cost)

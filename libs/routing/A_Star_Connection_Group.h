@@ -119,7 +119,7 @@ namespace polaris
 			if(current_neighbor->in_closed_set()) return;
 
 			//transit_edge_id id;
-			//
+			
 			//id.id = current->edge_id();
 
 			//transit_edge_id neighbor_id;

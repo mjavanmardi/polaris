@@ -150,9 +150,8 @@ namespace Network_Components
 				long long movement_id;
 			} long_hash_key_type;
 
-			typedef boost::unordered::unordered_map<long,typename MasterType::turn_movement_type*> type_of_link_turn_movement_map;
+			typedef boost::unordered::unordered_map<long long,typename MasterType::turn_movement_type*> type_of_link_turn_movement_map;
 			m_data(type_of_link_turn_movement_map, link_turn_movement_map, NONE, NONE);
-
 
 			m_container(boost::container::vector<Routable_Network<typename MasterType::routable_network_type>*>,routable_networks,NONE,NONE);
 

@@ -26,9 +26,9 @@ namespace Routing_Components
 				this_component()->construct_routable_network(source_network);
 			}
 
-			void compute_static_network_path(unsigned int origin, unsigned int destination, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
+			float compute_static_network_path(unsigned int origin, unsigned int destination, boost::container::deque<global_edge_id>& path_container, boost::container::deque<float>& cost_container)
 			{
-				this_component()->compute_static_network_path(origin,destination,path_container,cost_container);
+				return this_component()->compute_static_network_path(origin,destination,path_container,cost_container);
 			}
 
 			void test_routable_network()

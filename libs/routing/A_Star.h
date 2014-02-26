@@ -17,11 +17,6 @@ namespace polaris
 	template<typename MasterType,typename AgentType,typename GraphPoolType>
 	static float A_Star(Routable_Agent<AgentType>* agent, Graph_Pool<GraphPoolType>* graph_pool, global_edge_id& start_id, global_edge_id& end_id, unsigned int start_time, boost::container::deque< global_edge_id >& out_path, boost::container::deque< float >& out_cost)
 	{
-		if(end_id.edge_id == 7895)
-		{
-			bool pause = true;
-		}
-
 		typedef typename Graph_Pool<GraphPoolType>::base_edge_type base_edge_type;
 
 		boost::container::deque< base_edge_type* > modified_edges;
