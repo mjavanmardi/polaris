@@ -60,6 +60,8 @@ namespace polaris
 	
 	NULLTYPE null_argument;
 
+	static void* judge;
+
 	///============================================================================
 	/// IF - standard compile-time IF statement
 	///============================================================================
