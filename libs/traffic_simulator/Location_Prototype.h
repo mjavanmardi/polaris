@@ -13,7 +13,7 @@ namespace Location_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Location:public ComponentType
+		prototype struct Location
 		{
 			tag_as_prototype;
 

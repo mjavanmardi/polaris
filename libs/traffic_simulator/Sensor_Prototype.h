@@ -20,7 +20,7 @@ namespace Sensor_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Sensor:public ComponentType
+		prototype struct Sensor
 		{
 			tag_as_prototype;
 			

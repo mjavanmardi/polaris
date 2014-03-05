@@ -19,6 +19,11 @@ namespace Routing_Components
 			{
 				this_component()->update_edge_turn_cost(edge_id,edge_cost,outbound_turn_index,turn_cost);
 			}
+			
+			void update_edge_turn_costs(unsigned int edge_id,float edge_cost,boost::container::deque<float>& turn_costs)
+			{
+				this_component()->update_edge_turn_costs(edge_id,edge_cost,turn_costs);
+			}
 
 			template<typename Source_Network_Type>
 			void construct_routable_network(Network_Components::Prototypes::Network<Source_Network_Type>* source_network)

@@ -123,7 +123,7 @@ namespace Depot_Components
 				//_depot_service = new polaris::Depot( instance );
 			}
 
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Link_Components::Prototypes::Link<typename type_of(MasterType::link)> Link_Interface;
 			m_data(Link_Interface*,resident_link, NONE, NONE);
 			m_data(boost::container::vector<Link_Interface*>,covered_links, NONE, NONE);
 

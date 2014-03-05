@@ -14,7 +14,13 @@ namespace polaris
 		{
 			return this_component()->Get_Edge<Graph_Type>(gid);
 		}
-		
+
+		//template<typename Connection_Type>
+		//Connection<Connection_Type>* Get_Connection(global_edge_id& inbound_edge_id,global_edge_id& outbound_edge_id)
+		//{
+		//	return this_component()->Get_Connection<Connection_Type>(inbound_edge_id,outbound_edge_id);
+		//}
+
 		base_edge_type* Get_Edge(global_edge_id& gid)
 		{
 			return this_component()->Get_Edge(gid);

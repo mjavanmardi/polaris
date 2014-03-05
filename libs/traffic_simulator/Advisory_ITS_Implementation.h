@@ -91,7 +91,7 @@ namespace Advisory_ITS_Components
 			m_data(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>, current_events, NONE, NONE);
 			m_data(boost::container::vector<Network_Event_Components::Prototypes::Network_Event<typename type_of(MasterType::base_network_event)>*>, displayed_events, NONE, NONE);
 			
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Link_Components::Prototypes::Link<typename type_of(MasterType::link)> Link_Interface;
 			m_data(boost::container::vector<Link_Interface*>,covered_links, NONE, NONE);
 
 			m_prototype(Traffic_Management_Center<typename type_of(MasterType::traffic_management_center)>,traffic_management_center, NONE, NONE);

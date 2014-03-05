@@ -265,18 +265,18 @@ implementation struct Link_Implementation : public Polaris_Component<MasterType,
 
 		// drawing stuff
 		_heading = abs(atan(d_y/d_x));
-		if (d_x == 0 && d_y > 0) _heading = PI/2.0;
-		if (d_x == 0 && d_y <= 0) _heading = 3.0*PI/2.0;
-		if (d_x < 0 && d_y >= 0) _heading = PI - _heading;
-		if (d_x < 0 && d_y < 0) _heading = PI + _heading;
-		if (d_x > 0 && d_y < 0) _heading = 2.0*PI - _heading;
+		if (d_x == 0 && d_y > 0) _heading = (float)PI/2.0;
+		if (d_x == 0 && d_y <= 0) _heading = 3.0f*(float)PI/2.0f;
+		if (d_x < 0 && d_y >= 0) _heading = (float)PI - _heading;
+		if (d_x < 0 && d_y < 0) _heading = (float)PI + _heading;
+		if (d_x > 0 && d_y < 0) _heading = 2.0f*(float)PI - _heading;
 
 		//float angle = PI / 2.0 - atan(d_y/d_x);
 		float angle = PI/2.0 - _heading;
 		if (d_x == 0 && d_y > 0) angle = 0.0;
-		else if (d_x == 0 && d_y < 0) angle = PI;
-		float d_x_disp = (_width/* / 2.0*/) * cos(angle);
-		float d_y_disp = (_width/* / 2.0*/) * sin(angle);
+		else if (d_x == 0 && d_y < 0) angle = (float)PI;
+		float d_x_disp = (_width/* / 2.0*/) * (float)cos(angle);
+		float d_y_disp = (_width/* / 2.0*/) * (float)sin(angle);
 
 		Quad_Element_Colored elem;
 		int shade = (_speed_limit - 40)*10;
@@ -328,8 +328,8 @@ prototype struct Network
 {
 	tag_as_prototype;
 
-	typedef Node<typename Master_Type::node_type> node_itf;
-	typedef Link<typename Master_Type::link_type> link_itf;
+	typedef Node<typename ComponentType::Master_Type::node_type> node_itf;
+	typedef Link<typename ComponentType::Master_Type::link_type> link_itf;
 
 	accessor(links,NONE,NONE);
 
@@ -356,11 +356,11 @@ prototype struct Network
 		float d_y = point_b._y - point_a._y;
 
 		_heading = abs(atan(d_y/d_x));
-		if (d_x == 0 && d_y > 0) _heading = PI/2.0;
-		if (d_x == 0 && d_y <= 0) _heading = 3.0*PI/2.0;
-		if (d_x < 0 && d_y >= 0) _heading = PI - _heading;
-		if (d_x < 0 && d_y < 0) _heading = PI + _heading;
-		if (d_x > 0 && d_y < 0) _heading = 2.0*PI - _heading;
+		if (d_x == 0 && d_y > 0) _heading = (float)PI/2.0f;
+		if (d_x == 0 && d_y <= 0) _heading = 3.0f*(float)PI/2.0f;
+		if (d_x < 0 && d_y >= 0) _heading = (float)PI - _heading;
+		if (d_x < 0 && d_y < 0) _heading = (float)PI + _heading;
+		if (d_x > 0 && d_y < 0) _heading = 2.0f*(float)PI - _heading;
 
 		return _heading;
 	}
@@ -525,7 +525,7 @@ implementation struct Dead_Reckoning_Router_Implementation : public Polaris_Comp
 		
 
 			// otherwise go to outbound link with smallest difference from target heading
-			float min_d_heading = 3.0*PI;
+			float min_d_heading = (float)3.0*(float)PI;
 			link_itf* temp_link;
 			for (link_iterator link_itr = outbound_links->begin(); link_itr != outbound_links->end(); link_itr++)
 			{

@@ -33,7 +33,7 @@ prototype struct Antares_Layer
 		this_component()->Initialize<ComponentType,TargetType>(cfg);
 	}
 	
-	bool Identify_One(Point_3D<Master_Type>& point, int start_iteration, int end_iteration, ANTARES_SELECTION_MODE mode)
+	bool Identify_One(Point_3D<typename ComponentType::Master_Type>& point, int start_iteration, int end_iteration, ANTARES_SELECTION_MODE mode)
 	{
 		return this_component()->Identify_One(point,start_iteration,end_iteration,mode);
 	}
