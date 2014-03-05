@@ -1,5 +1,5 @@
 #pragma once
-#include "Graph_Implementation.h"
+#include "A_Star_Edge_Implementation.h"
 
 namespace polaris
 {
