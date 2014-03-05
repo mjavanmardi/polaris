@@ -12,7 +12,7 @@
 #include "wx\listctrl.h"
 
 #include "wxPLplotwindow.h"
-#include "io/Io.h"
+//#include "io/Io.h"
 
 #include "core/Core.h"
 

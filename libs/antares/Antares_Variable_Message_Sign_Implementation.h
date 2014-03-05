@@ -62,7 +62,7 @@ namespace Variable_Message_Sign_Components
 
 				
 				cfg.Configure_Static_Points();
-				cfg.head_texture = cfg.Add_Texture(string("VMS.png"));
+				cfg.head_texture = cfg.Add_Texture(string("C:\\opt\\polarisdeps\\antares\\VMS.png"));
 				cfg.grouped=false;
 				cfg.head_size_value=24;
 				cfg.head_accent_size_value=48;

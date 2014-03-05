@@ -44,7 +44,7 @@ namespace Depot_Components
 //				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer)>*, string& > >(string("Tow Truck Locations"));
 
 				cfg.Configure_Dynamic_Points();
-				cfg.head_texture = cfg.Add_Texture(string("Tow_Truck.png"));
+				cfg.head_texture = cfg.Add_Texture(string("C:\\opt\\polarisdeps\\antares\\Tow_Truck.png"));
 				cfg.grouped=false;
 				cfg.head_size_value=16;
 				cfg.head_accent_size_value=32;
@@ -368,7 +368,7 @@ namespace Depot_Components
 //				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer)>*, string& > >(string("Tow Truck Depot"));
 
 				cfg.Configure_Static_Points();
-				cfg.head_texture = cfg.Add_Texture(string("Depot.png"));
+				cfg.head_texture = cfg.Add_Texture(string("C:\\opt\\polarisdeps\\antares\\Depot.png"));
 				cfg.grouped=false;
 				cfg.head_size_value=32;
 				cfg.head_accent_size_value=64;

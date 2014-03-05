@@ -72,9 +72,9 @@ Time_Panel_Implementation<MasterType,InheritanceList>::Time_Panel_Implementation
 	//---- initialize and add the components ----
 	
 
-	_record_button=wxBitmap("Record.png",wxBITMAP_TYPE_PNG);
+	_record_button=wxBitmap("C:\\opt\\polarisdeps\\antares\\Record.png",wxBITMAP_TYPE_PNG);
 	
-	_stop_button=wxBitmap("Stop.png",wxBITMAP_TYPE_PNG);
+	_stop_button=wxBitmap("C:\\opt\\polarisdeps\\antares\\Stop.png",wxBITMAP_TYPE_PNG);
 
 	_record=new wxBitmapToggleButton(this,wxID_ANY,_record_button,wxDefaultPosition,wxSize(62,52));
 	Connect(_record->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnRecord));
@@ -155,8 +155,8 @@ Time_Panel_Implementation<MasterType,InheritanceList>::Time_Panel_Implementation
 	
 
 
-	_play_button=wxBitmap("Play.png",wxBITMAP_TYPE_PNG);
-	_pause_button=wxBitmap("Pause.png",wxBITMAP_TYPE_PNG);
+	_play_button=wxBitmap("C:\\opt\\polarisdeps\\antares\\Play.png",wxBITMAP_TYPE_PNG);
+	_pause_button=wxBitmap("C:\\opt\\polarisdeps\\antares\\Pause.png",wxBITMAP_TYPE_PNG);
 
 	_play=new wxBitmapToggleButton(this,wxID_ANY,_play_button,wxDefaultPosition,wxSize(62,52));
 	Connect(_play->GetId(),wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,wxCommandEventHandler(Time_Panel_Implementation::OnPlay));

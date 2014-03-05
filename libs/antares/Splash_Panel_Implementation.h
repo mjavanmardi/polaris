@@ -20,7 +20,7 @@ public:
 
 		SetBackgroundColour(wxColour(0,0,0));
 
-		_image.LoadFile("Logo.png",wxBITMAP_TYPE_PNG);
+		_image.LoadFile("C:\\opt\\polarisdeps\\antares\\Logo.png",wxBITMAP_TYPE_PNG);
 	}
 
 	virtual ~Splash_Panel_Implementation(void){};

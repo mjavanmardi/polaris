@@ -185,7 +185,7 @@ Antares_Implementation<MasterType,InheritanceList>::Antares_Implementation(wxFra
 	
 	//---- initialize icon ----
 
-	SetIcon( wxIcon("POLARIS_Icon.ico",wxBITMAP_TYPE_ICO) );
+	SetIcon( wxIcon("C:\\opt\\polarisdeps\\antares\\POLARIS_Icon.ico",wxBITMAP_TYPE_ICO) );
 
 	//---- initialize aui ----
 

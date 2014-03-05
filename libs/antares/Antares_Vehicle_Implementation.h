@@ -169,7 +169,7 @@ namespace Vehicle_Components
 				cfg.head_size_value=8;
 				cfg.pixel_size_callback = &pixel_size_callback;
 				cfg.accent_pixel_size_callback = &accented_pixel_size_callback;
-				cfg.head_texture = cfg.Add_Texture(string("Car_Front.png"));
+				cfg.head_texture = cfg.Add_Texture(string("C:\\opt\\polarisdeps\\antares\\Car_Front.png"));
 
 				//cfg.attributes_schema = string("ID,Status,Current_Link");
 				

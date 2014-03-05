@@ -211,7 +211,7 @@ namespace Ramp_Metering_Components
 				Antares_Layer_Configuration cfg;
 
 				cfg.Configure_Dynamic_Points();
-				cfg.head_texture = cfg.Add_Texture(string("Ramp_Meter.png"));
+				cfg.head_texture = cfg.Add_Texture(string("C:\\opt\\polarisdeps\\antares\\Ramp_Meter.png"));
 				cfg.grouped=false;
 				//cout << "Ramp meters go at offset: " << ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1 << " period " << ((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() << endl;
 
