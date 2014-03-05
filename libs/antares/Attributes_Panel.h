@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Dependencies.h"
+#include "Antares_Includes.h"
 
 //---------------------------------------------------------
 //	Attributes_Panel - attributes panel class definition
@@ -13,13 +13,13 @@ prototype struct Attributes_Panel
 {
 	tag_as_prototype;
 
-	//template<typename TargetType> void Push_Schema(typename TargetType::ParamType schema)
+	//feature_prototype void Push_Schema(typename TargetType::ParamType schema)
 	//{
-	//	this_component()->Push_Schema<ComponentType,TargetType>(schema);
+	//	this_component()->Push_Schema<ComponentType,CallerType,TargetType>(schema);
 	//}
-	
-	void Push_Attributes(boost::container::vector<pair<string,string>>& attributes)
+
+	template<typename TargetType> void Push_Attributes(typename TargetType::ParamType attributes)
 	{
-		this_component()->Push_Attributes(attributes);
+		this_component()->Push_Attributes<TargetType>(attributes);
 	}
 };

@@ -21,28 +21,37 @@ public:
 
 	typedef Antares_Layer<typename type_of(MasterType::antares_layer)> Antares_Layer_Interface;
 
-	void Scale_Coordinates(Point_3D<MasterType>& coordinates)
+	//void Custom_Draw();
+	//void Custom_Init();
+
+	template<typename TargetType> Point_3D<MasterType>& Scale_Coordinates(Point_3D<MasterType>& coordinates)
 	{
 		coordinates._x += _input_offset._x;
 		coordinates._y += _input_offset._y;
+
+		return coordinates;
 	}
 	
-	void Scale_Coordinates(Point_3D<NT>& coordinates)
+	template<typename TargetType> Point_3D<NT>& Scale_Coordinates(Point_3D<NT>& coordinates)
 	{
 		coordinates._x += _input_offset._x;
 		coordinates._y += _input_offset._y;
+
+		return coordinates;
 	}
 
-	template<typename ComponentType,typename TargetType> int Build_Texture(int width, int height, unsigned char* data);
-	Antares_Layer_Interface* Allocate_New_Layer(string& name);
-	void Toggle_Layer(int identifier,bool checked);
-	void Select_Layer(int identifier);
-	//template<typename ComponentType,typename TargetType> void Set_Mode(ANTARES_MODE mode);
+	template<typename TargetType> bool Clip_Coordinates(Point_3D<MasterType>& coordinates)
+	{
+		return ((coordinates._x < _canvas_bounds._xmin) || (coordinates._x > _canvas_bounds._xmax) || (coordinates._y < _canvas_bounds._ymin) || (coordinates._y > _canvas_bounds._ymax));
+	}
+
+	template<typename TargetType> int Build_Texture(int width, int height, unsigned char* data);
+	template<typename TargetType> Antares_Layer_Interface* Allocate_New_Layer(string& name);
+	template<typename TargetType> void Toggle_Layer(int identifier,bool checked);
+	template<typename TargetType> void Select_Layer(int identifier);
+	//feature_implementation void Set_Mode(ANTARES_MODE mode);
 
 	void Draw_Layer(int start_iteration, int end_iteration, Antares_Layer_Interface* layer);
-	
-	void Draw_Network();
-	void Draw_Vehicles(int current_iteration);
 
 	void Render(wxPaintEvent& event);
 	void OnResize(wxSizeEvent& event);
@@ -62,8 +71,13 @@ public:
 
 	void Add_Textures();
 
-	m_data(unsigned int*,texture_ids,NONE,NONE);
-	m_data(unsigned int,current_texture_index,NONE,NONE);
+	void Initialize_Recorder();
+	void Start_Recording();
+	void Stop_Recording();
+	void Record_Frame();
+
+	m_data(unsigned int*,texture_ids, NONE, NONE);
+	m_data(unsigned int,current_texture_index, NONE, NONE);
 
 	struct Queued_Texture
 	{
@@ -72,70 +86,80 @@ public:
 		int height;
 		unsigned char* data;
 	};
-	m_data(boost::container::vector<Queued_Texture>,queued_textures,NONE,NONE);
+	m_data(boost::container::vector<Queued_Texture>,queued_textures, NONE, NONE);
 
-	m_data(wxGLContext*,glcontext,NONE,NONE);
+	m_data(wxGLContext*,glcontext, NONE, NONE);
 
-	m_data(Rectangle_XY<MasterType>,canvas_bounds,NONE,NONE);
-	m_data(Point_2D<MasterType>,input_offset,NONE,NONE);
+	m_data(Rectangle_XY<MasterType>,canvas_bounds, NONE, NONE);
+	m_data(Point_2D<MasterType>,input_offset, NONE, NONE);
 
-	m_data(int,cached_iteration,NONE,NONE);
+	m_data(int,cached_iteration, NONE, NONE);
 
-	m_data(double,near_plane,NONE,NONE);
-	m_data(double,far_plane,NONE,NONE);
+	m_data(double,near_plane, NONE, NONE);
+	m_data(double,far_plane, NONE, NONE);
 	
-	m_data(double,win_z_mid,NONE,NONE);
+	m_data(double,win_z_mid, NONE, NONE);
 
-	m_data(float,panel_width,NONE,NONE);
-	m_data(float,panel_height,NONE,NONE);
-	m_data(double,scale,NONE,NONE);
+	m_data(float,panel_width, NONE, NONE);
+	m_data(float,panel_height, NONE, NONE);
+	m_data(double,scale, NONE, NONE);
 
-	m_data(double,x_rotation,NONE,NONE);
-	m_data(double,z_rotation,NONE,NONE);
-	m_data(double,x_translation,NONE,NONE);
-	m_data(double,y_translation,NONE,NONE);
+	m_data(double,x_rotation, NONE, NONE);
+	m_data(double,z_rotation, NONE, NONE);
+	m_data(double,x_translation, NONE, NONE);
+	m_data(double,y_translation, NONE, NONE);
 
-	m_data(double,meters_per_pixel_max,NONE,NONE);
-	m_data(double,meters_per_pixel_mid,NONE,NONE);
-	m_data(double,meters_per_pixel_min,NONE,NONE);
+	m_data(double,meters_per_pixel_max, NONE, NONE);
+	m_data(double,meters_per_pixel_mid, NONE, NONE);
+	m_data(double,meters_per_pixel_min, NONE, NONE);
 
-	m_data(Rectangle_XY<MasterType>,view_bounds,NONE,NONE);
+	m_data(Rectangle_XY<MasterType>,view_bounds, NONE, NONE);
 
-	m_data(bool,spatial_change,NONE,NONE);
-	m_data(bool,temporal_change,NONE,NONE);
+	m_data(bool,spatial_change, NONE, NONE);
+	m_data(bool,temporal_change, NONE, NONE);
 
-	//m_data(bool,left_down,NONE,NONE);
-	//m_data(bool,right_down,NONE,NONE);
+	m_data(bool,recording, NONE, NONE);
+	m_data(int,recording_index, NONE, NONE);
+	m_data(int,frame_counter, NONE, NONE);
+
+	//member_data(bool,left_down,none,none);
+	//member_data(bool,right_down,none,none);
 	
-	m_data(bool,alt_down,NONE,NONE);
-	m_data(bool,shift_down,NONE,NONE);
-	m_data(bool,ctrl_down,NONE,NONE);
+	m_data(bool,alt_down, NONE, NONE);
+	m_data(bool,shift_down, NONE, NONE);
+	m_data(bool,ctrl_down, NONE, NONE);
 	
-	m_data(double,x_start_utm,NONE,NONE);
-	m_data(double,y_start_utm,NONE,NONE);
+	m_data(double,x_start_utm, NONE, NONE);
+	m_data(double,y_start_utm, NONE, NONE);
 
-	m_data(int,x_start_win,NONE,NONE);
-	m_data(int,y_start_win,NONE,NONE);
+	m_data(int,x_start_win, NONE, NONE);
+	m_data(int,y_start_win, NONE, NONE);
 	
-	m_data(int,wheel_dir,NONE,NONE);
-	m_data(float,initial_scale,NONE,NONE);
+	m_data(int,wheel_dir, NONE, NONE);
+	m_data(float,initial_scale, NONE, NONE);
 
 	GLint viewport[4];
 	GLdouble modelview[16];
 	GLdouble projection[16];
 
-	//m_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,NONE,NONE);
+	//member_prototype(Network_Prototype,graphical_network,typename MasterType::graphical_network_type,none,none);
 
-	m_prototype(Time_Panel<typename MasterType::type_of(time_panel)>,time_panel,NONE,NONE);
-	m_prototype(Information_Panel<typename MasterType::type_of(information_panel)>,information_panel,NONE,NONE);
-	m_prototype(Control_Panel<typename MasterType::type_of(control_panel)>,control_panel,NONE,NONE);
-	m_prototype(Layer_Options<typename MasterType::type_of(layer_options)>,layer_options,NONE,NONE);
-	m_prototype(Attributes_Panel<typename MasterType::type_of(attributes_panel)>,attributes_panel,NONE,NONE);
+	m_prototype(Time_Panel<typename MasterType::type_of(time_panel)>,time_panel, NONE, NONE);
+	m_prototype(Information_Panel<typename MasterType::type_of(information_panel)>,information_panel, NONE, NONE);
+	m_prototype(Control_Panel<typename MasterType::type_of(control_panel)>,control_panel, NONE, NONE);
+	m_prototype(Layer_Options<typename MasterType::type_of(layer_options)>,layer_options, NONE, NONE);
+	m_prototype(Attributes_Panel<typename MasterType::type_of(attributes_panel)>,attributes_panel, NONE, NONE);
 
 	boost::container::list<Antares_Layer_Interface*> _layers;
-	m_data(Antares_Layer_Interface*,selected_layer,NONE,NONE);
+	m_data(Antares_Layer_Interface*,selected_layer, NONE, NONE);
 
-	//m_data(ANTARES_MODE,interaction_mode,NONE,NONE);	
+	//member_data(ANTARES_MODE,interaction_mode,none,none);
+
+	HANDLE in_read;
+	HANDLE in_write;
+
+	STARTUPINFOA start_info;
+	PROCESS_INFORMATION process_info;
 };
 
 static _lock _canvas_lock;
@@ -191,7 +215,8 @@ Canvas_Implementation<MasterType,InheritanceList>::Canvas_Implementation(wxFrame
 	_spatial_change=true;
 	_temporal_change=false;
 	_cached_iteration=-1;
-	
+
+
 	//---- construct layers ----
 
 	_selected_layer=nullptr;
@@ -230,8 +255,20 @@ void Canvas_Implementation<MasterType,InheritanceList>::Initialize(float xmin,fl
 		_far_plane=(_canvas_bounds._xmax-_canvas_bounds._xmin)/(tan(25.0*.0174532925)*4.0)*10000.0+200.0*(_canvas_bounds._xmax-_canvas_bounds._xmin);
 	}
 
+	//Custom_Init();
+
 	// connect the paint handler
 	Connect(wxEVT_PAINT,wxPaintEventHandler(Canvas_Implementation::Render));
+
+
+
+
+
+
+	Initialize_Recorder();
+
+
+
 }
 
 //---------------------------------------------------------
@@ -260,10 +297,13 @@ void Canvas_Implementation<MasterType,InheritanceList>::Initialize_GLCanvas()
 	//glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	glEnable(GL_LINE_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+	glHint(GL_LINE_SMOOTH_HINT,GL_FASTEST);
 
 	//glEnable(GL_POLYGON_SMOOTH);
 	//glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
+
+	float anisotropic_level;
+	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropic_level);
 
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
@@ -271,6 +311,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Initialize_GLCanvas()
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+	glPixelStorei(GL_PACK_ALIGNMENT,1);
 
 	unsigned int null_texture;
 
@@ -286,7 +327,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Initialize_GLCanvas()
 
 
 template<typename MasterType,typename InheritanceList>
-template<typename ComponentType,typename TargetType>
+template<typename TargetType>
 int Canvas_Implementation<MasterType,InheritanceList>::Build_Texture(int width,int height,unsigned char* data)
 {
 	unsigned char* data_copy = new unsigned char[ width*height*4 ];
@@ -341,6 +382,10 @@ void Canvas_Implementation<MasterType,InheritanceList>::Add_Textures()
 	float anisotropic_level;
 	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropic_level);
 
+	anisotropic_level = min(anisotropic_level,2.0f);
+
+	//float border_color[3] = {0.0f,0.0f,0.0f};
+
 	for(boost::container::vector<Queued_Texture>::iterator itr = _queued_textures.begin();itr!=_queued_textures.end();itr++)
 	{
 		glBindTexture(GL_TEXTURE_2D, itr->tex_id);
@@ -349,9 +394,16 @@ void Canvas_Implementation<MasterType,InheritanceList>::Add_Textures()
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropic_level);
+
+		//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &border_color[0]);
+
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+
+		
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, itr->width, itr->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, itr->data);
 

@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Dependencies.h"
+#include "Antares_Includes.h"
 #include "Layer_Options.h"
 
 //---------------------------------------------------------
@@ -16,12 +16,12 @@ prototype struct Control_Dialog
 
 	template<typename TargetType> void Push_Schema(typename TargetType::ParamType attributes_schema,typename TargetType::Param2Type dropdown_schema)
 	{
-		this_component()->Push_Schema<ComponentType,TargetType>(attributes_schema,dropdown_schema);
+		this_component()->Push_Schema<TargetType>(attributes_schema,dropdown_schema);
 	}
 
 	template<typename TargetType> void Push_Attributes(typename TargetType::ParamType attributes)
 	{
-		this_component()->Push_Attributes<ComponentType,TargetType>(attributes);
+		this_component()->Push_Attributes<TargetType>(attributes);
 	}
 
 	template<typename TargetType> void ShowModal()
@@ -29,6 +29,6 @@ prototype struct Control_Dialog
 		this_component()->ShowModal();
 	}
 
-	accessor(submission_callback,NONE,NONE);
-	accessor(selected_object,NONE,NONE);
+	accessor(submission_callback, NONE, NONE);
+	accessor(selected_object, NONE, NONE);
 };

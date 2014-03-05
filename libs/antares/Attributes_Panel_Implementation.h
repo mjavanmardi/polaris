@@ -15,12 +15,12 @@ public:
 	Attributes_Panel_Implementation(wxFrame* parent);
 	virtual ~Attributes_Panel_Implementation(void){};
 
-	//template<typename ComponentType,typename TargetType> void Push_Schema(boost::container::vector<string>& attributes_schema);
-	void Push_Attributes(boost::container::vector<pair<string,string>>& attributes);
+	//feature_implementation void Push_Schema(vector<string>& attributes_schema);
+	template<typename TargetType> void Push_Attributes(boost::container::vector<pair<string,string>>& attributes);
 
-	m_data(wxListCtrl*,attributes_list,NONE,NONE);
+	m_data(wxListCtrl*,attributes_list, NONE, NONE);
 
-	m_data(wxBoxSizer*,sizer,NONE,NONE);
+	m_data(wxBoxSizer*,sizer, NONE, NONE);
 };
 
 //---------------------------------------------------------
@@ -36,7 +36,7 @@ Attributes_Panel_Implementation<MasterType,InheritanceList>::Attributes_Panel_Im
 
 	//---- initialize and add the components ----
 
-	_attributes_list=new wxListCtrl(this,wxID_ANY,wxDefaultPosition,wxSize(-1,500),wxLC_REPORT|wxLC_HRULES|wxLC_VRULES);
+	_attributes_list=new wxListCtrl(this,wxID_ANY,wxDefaultPosition,wxSize(-1,700),wxLC_REPORT|wxLC_HRULES|wxLC_VRULES);
 
 	
 	wxListItem columns[2];
@@ -49,8 +49,8 @@ Attributes_Panel_Implementation<MasterType,InheritanceList>::Attributes_Panel_Im
 	columns[1].SetText("Value");
 	_attributes_list->InsertColumn(1, columns[1]);
 
-	wxListItem atts_rows[25];
-	for(int i=0;i<25;i++)
+	wxListItem atts_rows[100];
+	for(int i=0;i<100;i++)
 	{
 		atts_rows[i].SetId(i);
 		_attributes_list->InsertItem(atts_rows[i]);
@@ -69,9 +69,9 @@ Attributes_Panel_Implementation<MasterType,InheritanceList>::Attributes_Panel_Im
 //	Push_Schema
 //--------------------------------------------------------
 
-//template<typename MasterType,typename InheritanceList>
-//template<typename ComponentType,typename TargetType>
-//void Attributes_Panel_Implementation<MasterType,InheritanceList>::Push_Schema(boost::container::vector<string>& attributes_schema)
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//template<typename ComponentType,typename CallerType,typename TargetType>
+//void Attributes_Panel_Implementation<MasterType,ParentType,InheritanceList>::Push_Schema(vector<string>& attributes_schema)
 //{
 //	for(int i=0;i<20;i++)
 //	{
@@ -81,7 +81,7 @@ Attributes_Panel_Implementation<MasterType,InheritanceList>::Attributes_Panel_Im
 //
 //	int atts_row_counter = 0;
 //
-//	boost::container::vector<string>::iterator itr;
+//	vector<string>::iterator itr;
 //
 //	for(itr=attributes_schema.begin();itr!=attributes_schema.end();itr++,atts_row_counter++)
 //	{
@@ -128,9 +128,10 @@ Attributes_Panel_Implementation<MasterType,InheritanceList>::Attributes_Panel_Im
 //--------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
+template<typename TargetType>
 void Attributes_Panel_Implementation<MasterType,InheritanceList>::Push_Attributes(boost::container::vector<pair<string,string>>& attributes)
 {
-	for(int i=0;i<30;i++)
+	for(int i=0;i<100;i++)
 	{
 		_attributes_list->SetItem(i,0,"");
 		_attributes_list->SetItem(i,1,"");
@@ -142,7 +143,7 @@ void Attributes_Panel_Implementation<MasterType,InheritanceList>::Push_Attribute
 
 	for(itr=attributes.begin();itr!=attributes.end();itr++,atts_row_counter++)
 	{
-		if(atts_row_counter == 30) break;
+		if(atts_row_counter == 100) break;
 
 		_attributes_list->SetItem(atts_row_counter,0,itr->first);
 		_attributes_list->SetItem(atts_row_counter,1,itr->second);

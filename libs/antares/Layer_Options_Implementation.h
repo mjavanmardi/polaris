@@ -19,21 +19,21 @@ implementation struct Layer_Options_Implementation:public Polaris_Component<Mast
 	//void OnNavigate(wxCommandEvent& event);
 	//void OnIdentify(wxCommandEvent& event);
 
-	//m_data(wxBitmapToggleButton,navigate,NONE,NONE);
-	//m_data(wxBitmapToggleButton,identify,NONE,NONE);
+	//member_pointer(wxBitmapToggleButton,navigate,none,none);
+	//member_pointer(wxBitmapToggleButton,identify,none,none);
 
-	//m_data(wxBitmap,navigate_bitmap,NONE,NONE);
-	//m_data(wxBitmap,identify_bitmap,NONE,NONE);
-	//m_data(wxBoxSizer,button_sizer,NONE,NONE);
+	//member_data(wxBitmap,navigate_bitmap,none,none);
+	//member_data(wxBitmap,identify_bitmap,none,none);
+	//member_pointer(wxBoxSizer,button_sizer,none,none);
 
-	m_data(wxCheckListBox*,layers,NONE,NONE);
+	m_data(wxCheckListBox*,layers, NONE, NONE);
 
-	m_data(wxBoxSizer*,sizer,NONE,NONE);
+	m_data(wxBoxSizer*,sizer, NONE, NONE);
 	
-	void Allocate_New_Layer(string& name);
-	template<typename ComponentType,typename TargetType> void Toggle_Named_Layer(string& name,bool check_state);
+	template<typename TargetType> void Allocate_New_Layer(string& name);
+	template<typename TargetType> void Toggle_Named_Layer(string& name,bool check_state);
 
-	m_prototype(Canvas<typename MasterType::type_of(canvas)>,canvas,NONE,NONE);
+	m_prototype(Canvas<typename MasterType::type_of(canvas)>,canvas, NONE, NONE);
 };
 
 //---------------------------------------------------------
@@ -85,7 +85,7 @@ Layer_Options_Implementation<MasterType,InheritanceList>::Layer_Options_Implemen
 //---------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
-template<typename ComponentType,typename TargetType>
+template<typename TargetType>
 void Layer_Options_Implementation<MasterType,InheritanceList>::Toggle_Named_Layer(string& name,bool check_state)
 {
 	int num_layers = _layers->GetCount();
@@ -109,6 +109,7 @@ void Layer_Options_Implementation<MasterType,InheritanceList>::Toggle_Named_Laye
 //---------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
+template<typename TargetType>
 void Layer_Options_Implementation<MasterType,InheritanceList>::Allocate_New_Layer(string& name)
 {
 	int layer_id=_layers->Append(name);
@@ -120,8 +121,8 @@ void Layer_Options_Implementation<MasterType,InheritanceList>::Allocate_New_Laye
 ////	OnNavigate - navigate button pressed
 ////---------------------------------------------------------
 //
-//template<typename MasterType,typename InheritanceList>
-//void Layer_Options_Implementation<MasterType,InheritanceList>::OnNavigate(wxCommandEvent& event)
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::OnNavigate(wxCommandEvent& event)
 //{
 //	_canvas->Set_Mode<NULLTYPE>(NAVIGATE);
 //	
@@ -132,8 +133,8 @@ void Layer_Options_Implementation<MasterType,InheritanceList>::Allocate_New_Laye
 ////	OnIdentify - identify button pressed
 ////---------------------------------------------------------
 //
-//template<typename MasterType,typename InheritanceList>
-//void Layer_Options_Implementation<MasterType,InheritanceList>::OnIdentify(wxCommandEvent& event)
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//void Layer_Options_Implementation<MasterType,ParentType,InheritanceList>::OnIdentify(wxCommandEvent& event)
 //{
 //	_canvas->Set_Mode<NULLTYPE>(IDENTIFY);
 //
@@ -149,7 +150,8 @@ void Layer_Options_Implementation<MasterType,InheritanceList>::OnSelectLayer(wxC
 {
 	int i=_layers->GetSelection();
 
-	_canvas->Select_Layer(i);
+//TODO
+//	_canvas->Select_Layer<Target_Type<NULLTYPE,void,int>>(i);
 }
 
 //---------------------------------------------------------
@@ -163,5 +165,6 @@ void Layer_Options_Implementation<MasterType,InheritanceList>::OnToggleLayer(wxC
 
 	bool checked=_layers->IsChecked(i);
 
-	_canvas->Toggle_Layer(i,checked);
+//TODO
+//	_canvas->Toggle_Layer<Target_Type<NULLTYPE,void,int,bool>>(i,checked);
 }

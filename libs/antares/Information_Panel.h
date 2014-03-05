@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Dependencies.h"
+#include "Antares_Includes.h"
 #include "Information_Page.h"
 
 //---------------------------------------------------------
@@ -14,15 +14,15 @@ prototype struct Information_Panel
 {
 	tag_as_prototype;
 	
-	void Render()
+	template<typename TargetType> void Render()
 	{
-		this_component()->Render();
+		this_component()->Render<TargetType>();
 	}
 	
-	//template<typename TargetType> typename TargetType::ReturnType Allocate_New_Layer(typename TargetType::ParamType name)
+	//feature_prototype typename TargetType::ReturnType Allocate_New_Layer(typename TargetType::ParamType name)
 	//{
-	//	return (TargetType::ReturnType)this_component()->Allocate_New_Layer<ComponentType,TargetType>(name);
+	//	return (TargetType::ReturnType)this_component()->Allocate_New_Layer<ComponentType,CallerType,TargetType>(name);
 	//}
 
-	//accessor(plotwindow,NONE,NONE);
+	//feature_accessor(plotwindow,none,none);
 };

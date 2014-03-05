@@ -17,11 +17,11 @@ public:
 	
 	typedef Antares_Layer<typename type_of(MasterType::antares_layer)> Antares_Layer_Interface;
 
-	template<typename ComponentType,typename TargetType> Antares_Layer_Interface* Allocate_New_Layer(string& name)
+	template<typename TargetType> Antares_Layer_Interface* Allocate_New_Layer(string& name)
 	{
 		Antares_Layer_Interface* new_layer=nullptr;
 
-		boost::container::list< Information_Page<typename MasterType::type_of(information_page),ComponentType>* >::iterator itr;
+		boost::container::list< Information_Page<typename MasterType::type_of(information_page)>* >::iterator itr;
 
 		bool blank_page_skipped=false;
 
@@ -49,20 +49,20 @@ public:
 		return new_layer;
 	}
 	
-	void Render();
+	template<typename TargetType> void Render();
 	
 	void OnSelect(wxAuiNotebookEvent& event);
 
 	//void OnResize(wxSizeEvent& event);
 
-	m_data(wxAuiNotebook*,information_book,NONE,NONE);
-	m_data(wxBoxSizer*,sizer,NONE,NONE);
+	m_data(wxAuiNotebook*,information_book, NONE, NONE);
+	m_data(wxBoxSizer*,sizer, NONE, NONE);
 	
-	m_data(int,cached_iteration,NONE,NONE);
+	m_data(int,cached_iteration, NONE, NONE);
 
 	boost::container::list< Information_Page<typename MasterType::type_of(information_page)>* > _2D_layers;
 
-	m_data(bool,initialized,NONE,NONE);
+	m_data(bool,initialized, NONE, NONE);
 };
 
 static _lock _plot_lock;
@@ -108,11 +108,11 @@ Information_Panel_Implementation<MasterType,InheritanceList>::Information_Panel_
 template<typename MasterType,typename InheritanceList>
 void Information_Panel_Implementation<MasterType,InheritanceList>::OnSelect(wxAuiNotebookEvent& event)
 {
-	Render();
+	Render<NT>();
 }
 
-//template<typename MasterType,typename InheritanceList>
-//void Information_Panel_Implementation<MasterType,InheritanceList>::OnResize(wxSizeEvent& event)
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::OnResize(wxSizeEvent& event)
 //{
 //	_box->SetDimension(wxPoint(0,0),GetSize());
 //}

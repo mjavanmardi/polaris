@@ -10,7 +10,7 @@
 //--------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
-template<typename ComponentType,typename TargetType>
+template<typename TargetType>
 void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(const int start_iteration, const int end_iteration)
 {
 	const bool draw=_layer->draw<bool>();
@@ -52,7 +52,7 @@ void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(con
 	{
 		const boost::container::vector<int>* geometry_by_thread = storage[current_iteration];
 
-		for(unsigned int i=0;i<num_antares_threads();i++)
+		for(int i=0;i<num_antares_threads();i++)
 		{
 			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
 			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
@@ -111,7 +111,7 @@ void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(con
 	{
 		const boost::container::vector<int>* geometry_by_thread = accent_storage[current_iteration];
 
-		for(unsigned int i=0;i<num_antares_threads();i++)
+		for(int i=0;i<num_antares_threads();i++)
 		{
 			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
 			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
@@ -203,7 +203,7 @@ void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(con
 	{
 		const boost::container::vector<int>* geometry_by_thread = storage[current_iteration];
 
-		for(unsigned int i=0;i<num_antares_threads();i++)
+		for(int i=0;i<num_antares_threads();i++)
 		{
 			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
 			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
@@ -250,7 +250,7 @@ void Information_Page_Implementation<MasterType,InheritanceList>::Draw_Layer(con
 	{
 		const boost::container::vector<int>* geometry_by_thread = accent_storage[current_iteration];
 
-		for(unsigned int i=0;i<num_antares_threads();i++)
+		for(int i=0;i<num_antares_threads();i++)
 		{
 			const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
 			const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);

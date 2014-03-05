@@ -15,13 +15,13 @@ public:
 	Information_Page_Implementation(wxWindow* parent);
 	virtual ~Information_Page_Implementation(void){};
 	
-	template<typename ComponentType,typename TargetType> void Draw_Layer(const int start_iteration, const int end_iteration);
+	template<typename TargetType> void Draw_Layer(const int start_iteration, const int end_iteration);
 
-	m_data(wxPLplotwindow*,plotwindow,NONE,NONE);
-	m_data(wxBoxSizer*,sizer,NONE,NONE);
+	m_data(wxPLplotwindow*,plotwindow, NONE, NONE);
+	m_data(wxBoxSizer*,sizer, NONE, NONE);
 
-	m_data(int,cached_iteration,NONE,NONE);
-	m_prototype(Antares_Layer<typename MasterType::type_of(antares_layer)>,layer,NONE,NONE);
+	m_data(int,cached_iteration, NONE, NONE);
+	m_prototype(Antares_Layer<typename MasterType::type_of(antares_layer)>,layer, NONE, NONE);
 };
 
 //---------------------------------------------------------
@@ -54,8 +54,9 @@ Information_Page_Implementation<MasterType,InheritanceList>::Information_Page_Im
 	_layer=nullptr;
 }
 
-//template<typename MasterType,typename InheritanceList>
-//void Information_Panel_Implementation<MasterType,InheritanceList>::OnResize(wxSizeEvent& event)
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//void Information_Panel_Implementation<MasterType,ParentType,InheritanceList>::OnResize(wxSizeEvent& event)
 //{
 //	_box->SetDimension(wxPoint(0,0),GetSize());
 //}
+

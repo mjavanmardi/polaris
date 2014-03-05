@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Dependencies.h"
+#include "Antares_Includes.h"
 #include "Layer_Options.h"
 
 //---------------------------------------------------------
@@ -14,6 +14,6 @@ prototype struct Control_Panel
 {
 	tag_as_prototype;
 
-	accessor(layer_options,NONE,NONE);
-	accessor(canvas,NONE,NONE);
+	accessor(layer_options, NONE, NONE);
+	accessor(canvas, NONE, NONE);
 };

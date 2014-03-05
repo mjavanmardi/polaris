@@ -3,9 +3,9 @@
 //*********************************************************
 
 #pragma once
-#include "Dependencies.h"
+#include "Antares_Includes.h"
 #include "Control_Dialog.h"
-
+#include "Geometry_Implementation.h"
 
 struct Antares_Layer_Configuration;
 
@@ -25,108 +25,130 @@ prototype struct Antares_Layer
 	
 	template<typename TargetType> void Push_Element(void* data, int iteration = iteration())
 	{
-		this_component()->Push_Element<ComponentType,TargetType>(data,iteration);
+		this_component()->Push_Element<TargetType>(data,iteration);
 	}
 
 	template<typename TargetType> void Initialize(Antares_Layer_Configuration& cfg)
 	{
-		this_component()->Initialize<ComponentType,TargetType>(cfg);
+		this_component()->Initialize<TargetType>(cfg);
 	}
 	
-	bool Identify_One(Point_3D<typename ComponentType::Master_Type>& point, int start_iteration, int end_iteration, ANTARES_SELECTION_MODE mode)
+	template<typename TargetType> bool Identify_One(typename TargetType::ParamType point, int start_iteration, int end_iteration, ANTARES_SELECTION_MODE mode)
 	{
-		return this_component()->Identify_One(point,start_iteration,end_iteration,mode);
+		return this_component()->Identify_One<TargetType>(point,start_iteration,end_iteration,mode);
 	}
 	
 	template<typename TargetType> void Select()
 	{
-		this_component()->Select<ComponentType,TargetType>();
+		this_component()->Select<TargetType>();
 	}
 	
 	template<typename TargetType> void Deselect_All()
 	{
-		this_component()->Deselect_All<ComponentType,TargetType>();
+		this_component()->Deselect_All<TargetType>();
 	}
 	
 	template<typename TargetType> void Double_Click()
 	{
-		this_component()->Double_Click<ComponentType,TargetType>();
+		this_component()->Double_Click<TargetType>();
 	}
 	
 	template<typename TargetType> void Clear_Accented()
 	{
-		this_component()->Clear_Accented<ComponentType,TargetType>();
+		this_component()->Clear_Accented<TargetType>();
 	}
 
 	template<typename TargetType> void Refresh_Selection()
 	{
-		this_component()->Refresh_Selection<ComponentType,TargetType>();
+		this_component()->Refresh_Selection<TargetType>();
 	}
 
-	accessor(list_index,NONE,NONE);
-	accessor(name,NONE,NONE);
+	accessor(list_index, NONE, NONE);
+	accessor(name, NONE, NONE);
 	
-	accessor(storage,NONE,NONE);
-	accessor(accent_storage,NONE,NONE);
+	accessor(storage, NONE, NONE);
+	accessor(accent_storage, NONE, NONE);
 	
-	accessor(draw,NONE,NONE);
+	accessor(draw, NONE, NONE);
 	
-	accessor(poly,NONE,NONE);
+	accessor(poly, NONE, NONE);
 
-	accessor(primitive_type,NONE,NONE);
-	accessor(head_size_value,NONE,NONE);
-	accessor(head_accent_size_value,NONE,NONE);
+	accessor(primitive_type, NONE, NONE);
+	accessor(head_size_value, NONE, NONE);
+	accessor(head_accent_size_value, NONE, NONE);
 
-	accessor(head_normal,NONE,NONE);
+	accessor(head_normal, NONE, NONE);
 
-	accessor(head_texture,NONE,NONE);	
-	accessor(texture_map,NONE,NONE);
+	accessor(head_texture, NONE, NONE);	
+	accessor(texture_map, NONE, NONE);
 
-	accessor(grouped,NONE,NONE);
-	accessor(group_color,NONE,NONE);
-	accessor(group_normal,NONE,NONE);
-	accessor(group_texture,NONE,NONE);
-	accessor(head_color,NONE,NONE);
+	accessor(grouped, NONE, NONE);
+	accessor(group_color, NONE, NONE);
+	accessor(group_normal, NONE, NONE);
+	accessor(group_texture, NONE, NONE);
+	accessor(head_color, NONE, NONE);
 
 
-	accessor(primitive_color,NONE,NONE);
-	accessor(primitive_normal,NONE,NONE);
-	accessor(primitive_texture,NONE,NONE);
-	accessor(primitive_stride,NONE,NONE);
-	accessor(vert_stride,NONE,NONE);	
-	accessor(vert_size,NONE,NONE);	
+	accessor(primitive_color, NONE, NONE);
+	accessor(primitive_normal, NONE, NONE);
+	accessor(primitive_texture, NONE, NONE);
+	accessor(primitive_stride, NONE, NONE);
+	accessor(vert_stride, NONE, NONE);	
+	accessor(vert_size, NONE, NONE);	
 	
-	//accessor(attributes_schema,NONE,NONE);
-	//accessor(selection_callback,NONE,NONE);
-	//accessor(submission_callback,NONE,NONE);
+	accessor(pixel_size_callback, NONE, NONE);
+	accessor(accent_pixel_size_callback, NONE, NONE);
 
-	accessor(data_stride,NONE,NONE);
+	//feature_accessor(attributes_schema,none,none);
+	//feature_accessor(selection_callback,none,none);
+	//feature_accessor(submission_callback,none,none);
 
-	accessor(attributes_panel,NONE,NONE);
-	accessor(layer_options,NONE,NONE);
+	accessor(data_stride, NONE, NONE);
 
-	accessor(selected_elements,NONE,NONE);
+	accessor(attributes_panel, NONE, NONE);
+	accessor(layer_options, NONE, NONE);
 
-	accessor(x_label,NONE,NONE);
-	accessor(y_label,NONE,NONE);
+	accessor(selected_elements, NONE, NONE);
+
+	accessor(x_label, NONE, NONE);
+	accessor(y_label, NONE, NONE);
 };
 
 template<typename MasterType>
 Antares_Layer<typename MasterType::antares_layer_type>* Allocate_New_Layer(string& name)
 {
-	return ((MasterType::canvas_type*)canvas)->Allocate_New_Layer(name);
+	return (Antares_Layer<typename MasterType::antares_layer_type>*)((typename MasterType::canvas_type*)canvas)->Allocate_New_Layer<MasterType>(name);
+}
+
+template<typename ComponentType>
+bool Clip_Coordinates(Point_3D<typename ComponentType::Master_Type>& coordinates)
+{
+	return ((ComponentType*)canvas)->Clip_Coordinates<NT,NT>(coordinates);
+}
+
+template<typename ComponentType>
+bool Clip_Coordinates(Point_3D<NT>& coordinates)
+{
+	return ((ComponentType*)canvas)->Clip_Coordinates<NT,NT>((Point_3D<ComponentType::Master_Type>&)coordinates);
 }
 
 template<typename MasterType>
-void Scale_Coordinates(Point_3D<NT>& coordinates)
+typename Point_3D<MasterType>& Scale_Coordinates(Point_3D<MasterType>& coordinates)
 {
-	((MasterType::canvas_type*)canvas)->Scale_Coordinates(coordinates);
+	return (Point_3D<MasterType>&)((typename MasterType::canvas_type*)canvas)->Scale_Coordinates<MasterType>(coordinates);
 }
 
-//typename TargetType::ReturnType Allocate_New_Plot_Layer(typename TargetType::ParamType name)
-//{
-//	return (TargetType::ReturnType)((ComponentType*)information_panel)->Allocate_New_Layer<ComponentType,TargetType>(name);
-//}
+template<typename MasterType>
+typename Point_3D<NT>& Scale_Coordinates(Point_3D<NT>& coordinates)
+{
+	return (Point_3D<NT>&)((typename MasterType::canvas_type*)canvas)->Scale_Coordinates<NT>(coordinates);
+}
+
+template<typename MasterType>
+Antares_Layer<typename MasterType::antares_layer_type>* Allocate_New_Plot_Layer(string& name)
+{
+	return (Antares_Layer<typename MasterType::antares_layer_type>*)((typename MasterType::information_panel_type*)information_panel)->Allocate_New_Layer<MasterType>(name);
+}
 
 //---------------------------------------------------------
 //	PrimitiveType - primitive type options
@@ -168,7 +190,7 @@ struct Antares_Layer_Configuration
 
 		storage_offset=iteration();
 		storage_size=1;
-		storage_period=num_iterations()+1;
+		storage_period=END;
 		
 		head_texture = 0;
 
@@ -197,6 +219,9 @@ struct Antares_Layer_Configuration
 
 		head_size_value=1;
 		head_accent_size_value=1;
+
+		pixel_size_callback=nullptr;
+		accent_pixel_size_callback=nullptr;
 
 		submission_callback=nullptr;
 		selection_callback=nullptr;
@@ -282,6 +307,21 @@ struct Antares_Layer_Configuration
 		group_normal=false;
 	}
 	
+	void Configure_Static_Triangles(True_Color_RGBA<NULLTYPE>& Color, int size)
+	{
+		Configure_Default();
+		primitive_type=_TRIANGLE;
+
+		head_color._r=Color._r;
+		head_color._g=Color._g;
+		head_color._b=Color._b;
+		head_color._a=Color._a;
+		
+		grouped=true;
+		group_color=false;
+		group_normal=false;
+	}
+
 	void Configure_Static_Polygons()
 	{
 		Configure_Default();
@@ -360,6 +400,9 @@ struct Antares_Layer_Configuration
 	submission_callback_type submission_callback;
 	selection_callback_type selection_callback;
 	double_click_callback_type double_click_callback;
+
+	pixel_size_callback_type pixel_size_callback;
+	pixel_size_callback_type accent_pixel_size_callback;
 
 	string x_label;
 	string y_label;

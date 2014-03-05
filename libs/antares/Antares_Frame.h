@@ -18,10 +18,10 @@ prototype struct Antares
 {
 	tag_as_prototype;
 
-	accessor(control_panel,NONE,NONE);
-	accessor(time_panel,NONE,NONE);
-	accessor(information_panel,NONE,NONE);
-	accessor(canvas,NONE,NONE);
-	accessor(aui_manager,NONE,NONE);
-	accessor(conductor,NONE,NONE);
+	accessor(control_panel, NONE, NONE);
+	accessor(time_panel, NONE, NONE);
+	accessor(information_panel, NONE, NONE);
+	accessor(canvas, NONE, NONE);
+	accessor(aui_manager, NONE, NONE);
+	accessor(conductor, NONE, NONE);
 };
