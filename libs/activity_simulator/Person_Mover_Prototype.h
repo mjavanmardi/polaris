@@ -277,8 +277,6 @@ namespace Prototypes
 
 		template<typename TargetType> void Evaluate_Network_Event(TargetType event, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Weather_Event_Prototype)))
 		{
-			PUSH_TO_STACK("Evaluate_Network_Event");
-
 			// interfaces
 			typedef  Person_Components::Prototypes::Person< typename get_type_of(Parent_Person)> Parent_Person_Itf;
 			typedef  Person_Components::Prototypes::Person< typename Parent_Person_Itf::get_type_of(Household)> Household_Itf;
@@ -380,8 +378,6 @@ namespace Prototypes
 					if (movement->template destination<location_itf*>() == nullptr) THROW_WARNING("ERROR: valid destination not set for activity.");
 				}
 			}
-
-			POP_FROM_STACK;
 		}
 		template<typename TargetType> void Evaluate_Network_Event(TargetType event, requires(TargetType,check(strip_modifiers(TargetType), Network_Event_Components::Concepts::Is_Accident_Event_Prototype)))
 		{
@@ -694,8 +690,6 @@ namespace Prototypes
 		//--------------------------------------------------------
 		template<typename TargetType> void Arrive_At_Destination()
 		{
-			PUSH_TO_STACK("Arrive_At_Destination");
-
 			// free up movement schedule
 			this->Movement_Scheduled<bool>(false);
 
@@ -845,7 +839,6 @@ namespace Prototypes
 				}
 				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
 
-				POP_FROM_STACK;
 				return;
 			}
 
@@ -862,7 +855,6 @@ namespace Prototypes
 				new_act->template Initialize<Time_Seconds,Vehicle_Components::Types::Vehicle_Type_Keys>(end_this,end_this+ttime_this_to_home, min_home_duration,act->template Mode<MODE>());
 				((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
 
-				POP_FROM_STACK;
 				return;
 			}
 			movement_itf* next_movement = next_act->template movement_plan<movement_itf*>();
@@ -904,7 +896,6 @@ namespace Prototypes
 			// Finally, log the activity
 			((_Logger_Interface*)_global_person_logger)->template Add_Record<Activity_Itf*>(act,true);
 
-			POP_FROM_STACK;
 		}
 
 		template<typename TargetType> void Schedule_Artificial_Arrival_Event()

@@ -52,6 +52,8 @@ namespace Network_Components
 
 		implementation struct Network_Implementation:public Polaris_Component<MasterType,INHERIT(Network_Implementation),Execution_Object>
 		{
+			typedef int My_Type;
+
 			typedef typename Polaris_Component<MasterType,INHERIT(Network_Implementation),Execution_Object>::Component_Type ComponentType;
 
 			m_data(typename MasterType::network_db_reader_type*, db_reader, NONE, NONE);
@@ -87,6 +89,10 @@ namespace Network_Components
 			m_container(boost::container::vector<typename MasterType::movement_type*>, movements_container, NONE, NONE);
 
 			m_container(boost::container::vector<typename MasterType::ramp_metering_type*>, ramp_metering_container, NONE, NONE);
+
+			//Null_Prototype<typename MasterType::scenario_type>* _scenario_reference;
+			//template<typename TargetType> void scenario_reference(TargetType val){}
+			//template<typename TargetType> TargetType scenario_reference(){return (TargetType)_scenario_reference;}
 
 			m_prototype(Null_Prototype<typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
 
@@ -1158,25 +1164,22 @@ namespace Network_Components
 			/// network events
 			//------------------------------------------------------------------------------------------------------------------
 
-			m_prototype(Network_Event_Manager< typename MasterType::network_event_manager_type>, network_event_manager, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::network_event_manager_type>, network_event_manager, NONE, NONE);
 
 			//==================================================================================================================
 			/// traffic management center
 			//------------------------------------------------------------------------------------------------------------------
-			m_prototype(Traffic_Management_Center< typename type_of(MasterType::traffic_management_center)>, traffic_management_center, NONE, NONE);
-
+			m_prototype(Null_Prototype< typename type_of(MasterType::traffic_management_center)>, traffic_management_center, NONE, NONE);
 		};
 
 		implementation struct Integrated_Network_Implementation : public Network_Implementation<MasterType,INHERIT(Integrated_Network_Implementation)>
 		{
-			//typedef typename Network_Implementation<MasterType,INHERIT(Integrated_Network_Implementation)>::Component_Type ComponentType;
-			typedef MasterType Master_Type;
+			typedef typename Network_Implementation<MasterType,INHERIT(Integrated_Network_Implementation)>::Component_Type ComponentType;
 
 			m_prototype(Null_Prototype<typename MasterType::network_skim_type>, skimming_faculty, NONE, NONE);
 
 			template<typename TargetType> typename TargetType::ReturnType Get_TTime(typename TargetType::ParamType Origin, typename TargetType::ParamType Destination, typename TargetType::Param2Type Mode_Indicator)
 			{
-				PUSH_TO_STACK("Get_TTime, network implementation");
 				Network_Implementation<MasterType>* base_this = (Network_Implementation<MasterType>*)this;
 				
 				typedef (skim_faculty_itf,type_of(skimming_faculty),Network_Skimming_Components::Prototypes::Network_Skimming);
@@ -1185,7 +1188,6 @@ namespace Network_Components
 
 				TargetType::ReturnType ret_value = skim_faculty->template Get_TTime<TargetType>(Origin,Destination,Mode_Indicator);
 
-				POP_FROM_STACK;
 				return ret_value;
 			}
 		

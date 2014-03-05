@@ -75,13 +75,13 @@ namespace Choice_Model_Components
 		concept struct Is_Probabilistic_Prototype
 		{
 			check_typedef_type(is_probabilistic_choice, Component_Type::Probabilistic_Choice_tag, true_type);
-			define_default_check(is_probabiboost::container::listic_choice);
+			define_default_check(is_probabilistic_choice);
 		};
 		concept struct Is_Probabilistic
 		{
 			check_typedef_type(is_probabilistic_choice, Probabilistic_Choice_tag, true_type);
 			check_concept(is_prototype, Is_Probabilistic_Prototype, T, V);
-			define_default_check(is_prototype || is_probabiboost::container::listic_choice);
+			define_default_check(is_prototype || is_probabilistic_choice);
 		};
 	}
 

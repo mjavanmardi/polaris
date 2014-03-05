@@ -122,7 +122,8 @@ namespace Movement_Plan_Components
 		{
 			typedef Movement_Plan_Implementation<MasterType, INHERIT(Integrated_Movement_Plan_Implementation)> Base_Type;
 			typedef typename Base_Type::Component_Type ComponentType;
-			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, destination_activity_reference, NONE, NONE);
+
+			m_prototype(Null_Prototype< typename MasterType::activity_type>, destination_activity_reference, NONE, NONE);
 			template<typename TargetType> void arrive_to_destination()
 			{
 				Base_Type* bthis = (Base_Type*)this;
@@ -172,7 +173,7 @@ namespace Movement_Plan_Components
 			}	 
 			tag_feature_signature_as_available(Initialize, 1);
 
-			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, destination_activity_reference, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::activity_type>, destination_activity_reference, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::link_type*>, trajectory_container, NONE, NONE);
 			m_data(bool, valid_trajectory, NONE, NONE);
 		};

@@ -44,7 +44,7 @@ namespace PopSyn
 		{
 		};
 
-		implementation struct Synthesis_Region_Implementation_Full : public Polaris_Component<MasterType,INHERIT(Synthesis_Region_Implementation_Full),Execution_Object>,  _Synthesis_Region_Implementation<MasterType>, _Synthesis_Zone_Implementation_With_Simulation<MasterType>
+		implementation struct Synthesis_Region_Implementation_Full : public Polaris_Component<MasterType,INHERIT(Synthesis_Region_Implementation_Full),Execution_Object>,  _Synthesis_Region_Implementation<MasterType>, _Synthesis_Zone_Implementation<MasterType>
 		{
 		};
 	}

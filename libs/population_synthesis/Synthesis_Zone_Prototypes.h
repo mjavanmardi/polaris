@@ -262,24 +262,24 @@ namespace PopSyn
 				typedef Scenario_Components::Prototypes::Scenario<typename ComponentType::Master_Type::scenario_type> _Scenario_Interface;
 
 				typedef  Random_Access_Sequence< typename get_type_of(Synthetic_Households_Container)> households_itf;
-				typedef  Household_Components::Prototypes::Household<get_data_type(get_type_of(Synthetic_Households_Container))>  household_itf;
+				typedef  Household_Components::Prototypes::Household<typename get_value_type(households_itf)>  household_itf;
 				
 
 				typedef  Random_Access_Sequence< typename household_itf::get_type_of(Persons_Container)> persons_itf;
-				typedef  Person_Components::Prototypes::Person<get_data_type(typename household_itf::get_type_of(Persons_Container))>  person_itf;
+				typedef  Person_Components::Prototypes::Person<typename get_value_type(persons_itf)>  person_itf;
 				
 
 				// interface to the ACS sample data classes
-				typedef  Household_Components::Prototypes::Household_Properties <typename remove_pointer< typename get_type_of(Sample_Data)::value_type>::type>  pop_unit_itf;
-				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data), pop_unit_itf*> sample_itf;
-
-				typedef  Person_Components::Prototypes::Person_Properties <typename remove_pointer< typename pop_unit_itf::get_type_of(Persons_Container)::value_type>::type>  person_unit_itf;
-				typedef  Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container), person_unit_itf*> person_sample_itf;
+				typedef  Pair_Associative_Container< typename get_type_of(Sample_Data)> sample_itf;
+				typedef  Household_Components::Prototypes::Household_Properties <typename get_data_type(sample_itf)>  pop_unit_itf;
+			
+				typedef  Random_Access_Sequence< typename pop_unit_itf::get_type_of(Persons_Container)> person_sample_itf;
+				typedef  Person_Components::Prototypes::Person_Properties <typename get_value_type(person_sample_itf)>  person_unit_itf;
 
 				households_itf* household_container = (households_itf*)this->Synthetic_Households_Container<persons_itf*>();
 
 				// create new household using sample unit
-				household_itf* hh=(household_itf*)Allocate<typename get_type_of(Synthetic_Households_Container)::value_type>();
+				household_itf* hh=(household_itf*)Allocate<typename get_value_type(households_itf)>();
 				hh->template Static_Properties<pop_unit_itf*>(static_properties);
 
 				pop_unit_itf* pop_unit = (pop_unit_itf*)static_properties;
@@ -290,12 +290,12 @@ namespace PopSyn
 				for (;person_unit_itr != person_units->end(); ++person_unit_itr)
 				{
 					person_itf* person =(person_itf*)Allocate<typename person_itf::Component_Type>();
-					person->template Static_Properties<person_unit_itf*>(*person_unit_itr);
-					hh->template Persons_Container<persons_itf&>().push_back(person);
+					person->template Static_Properties<person_unit_itf*>((person_unit_itf*)(*person_unit_itr));
+					hh->template Persons_Container<persons_itf&>().push_back((typename person_itf::Component_Type*)person);
 					person->template Household<household_itf*>(hh);
 				}
 				//
-				household_container->push_back(hh);
+				household_container->push_back((typename get_type_of(Synthetic_Households_Container)::value_type)hh);
 			}
 			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype)))
 			{

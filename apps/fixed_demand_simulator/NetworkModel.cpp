@@ -390,7 +390,7 @@ void run_with_input_from_db(char* scenario_filename)
 
 		if (scenario->use_network_events<bool>())
 		{
-			MasterType::link_type::subscribe_events();
+			MasterType::link_type::subscribe_events<NT>();
 		}
 #ifndef EXCLUDE_DEMAND
 		//==================================================================================================================================

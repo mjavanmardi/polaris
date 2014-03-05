@@ -59,7 +59,7 @@ namespace Activity_Location_Components
 				typename links_itf::iterator link_itr = this->origin_links<links_itf*>()->begin();
 				if (link_itr != this->origin_links<links_itf*>()->end()	)
 				{
-					link_itf* link = *link_itr;
+					link_itf* link = (link_itf*)(*link_itr);
 					if (link->template outbound_turn_movements<turns_itf*>()->size() > 0) return true;
 					else return false;
 				}

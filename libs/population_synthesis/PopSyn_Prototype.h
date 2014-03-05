@@ -525,27 +525,30 @@ namespace PopSyn
 				ofstream& marg_out = this->Marginal_Output_Stream<ofstream&>();
 				ofstream& popsyn_log = this->Log_File<ofstream&>();
 
+			
 				//---------------------------------------------------------------------------------------------
 				// Type defines for sub_objects
-				typedef typename get_type_of(Synthesis_Regions_Collection)				region_collection_type;
-				typedef typename strip_modifiers(region_collection_type::mapped_type)	region_type;
-				typedef typename region_type::Sample_Data_type							sample_collection_type;
-				typedef typename strip_modifiers(sample_collection_type::mapped_type)	sample_type;
-				typedef typename region_type::Synthesis_Zone_Collection_type			zone_collection_type;
-				typedef typename strip_modifiers(zone_collection_type::mapped_type)		zone_type;
-				typedef typename zone_type::get_type_of(Synthetic_Households_Container)	household_collection_type;
-				typedef typename strip_modifiers(household_collection_type::value_type) household_type;
-				typedef typename region_type::get_type_of(Target_Joint_Distribution)	joint_dist_type;
-				typedef typename region_type::get_type_of(Target_Marginal_Distribution)	marg_dist_type;
+				// Define iterators and get pointer to the region collection
+				typedef typename get_type_of(Synthesis_Regions_Collection)						region_collection_type;
+				typedef get_data_type(region_collection_type)									region_type;
+				typedef typename region_type::Sample_Data_type									sample_collection_type;
+				typedef get_data_type(sample_collection_type)									sample_type;
+				typedef typename region_type::Synthesis_Zone_Collection_type					zone_collection_type;
+				typedef get_data_type(zone_collection_type)										zone_type;
+				typedef typename zone_type::get_type_of(Synthetic_Households_Container)			household_collection_type;
+				typedef get_value_type(household_collection_type)								household_type;
+				typedef typename region_type::get_type_of(Target_Joint_Distribution)			joint_dist_type;
+				typedef typename region_type::get_type_of(Target_Marginal_Distribution)			marg_dist_type;
+
 				//---------------------------------------------------------------------------------------------
 				// Interface defines for sub_objects
 				typedef PopSyn::Prototypes::Synthesis_Region<region_type> region_itf;
-				typedef Pair_Associative_Container<region_collection_type,region_collection_type::key_type, region_itf*> regions_itf;
+				typedef Pair_Associative_Container<region_collection_type,region_collection_type::key_type, region_collection_type::mapped_type> regions_itf;
 
 				typedef PopSyn::Prototypes::Synthesis_Zone<zone_type> zone_itf;
 				typedef Pair_Associative_Container<zone_collection_type,zone_collection_type::key_type,zone_itf*> zones_itf;
 
-				typedef Household_Components::Prototypes::Household_Properties<household_type> pop_unit_itf;
+				typedef Household_Components::Prototypes::Household_Properties<sample_type> pop_unit_itf;
 				typedef Pair_Associative_Container<sample_collection_type,sample_collection_type::key_type, pop_unit_itf*> sample_data_itf;
 
 				typedef Person_Components::Prototypes::Person_Properties<typename remove_pointer<typename pop_unit_itf::get_type_of(Persons_Container)::value_type>::type> person_unit_itf;
@@ -553,11 +556,14 @@ namespace PopSyn
 
 				typedef Multidimensional_Random_Access_Array<joint_dist_type, typename joint_dist_type::value_type > joint_itf;
 				typedef Multidimensional_Random_Access_Array<marg_dist_type, typename marg_dist_type::value_type > marginal_itf;
-				typedef Household_Components::Prototypes::Household<typename remove_pointer<typename household_collection_type::value_type>::type>  household_itf;
-				typedef Random_Access_Sequence<household_collection_type, household_itf*> household_collection_itf;
 
-				typedef Person_Components::Prototypes::Person<typename remove_pointer<typename household_itf::get_type_of(Persons_Container)::value_type>::type>  person_itf;
-				typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container), person_itf*> person_collection_itf;
+
+				typedef Household_Components::Prototypes::Household<typename get_value_type(typename zone_type::type_of(Synthetic_Households_Container))>  household_itf;
+				typedef Random_Access_Sequence<typename zone_type::type_of(Synthetic_Households_Container)> household_collection_itf;
+
+				typedef Person_Components::Prototypes::Person<typename get_value_type(typename zone_type::type_of(Synthetic_Households_Container))>  person_itf;
+				typedef Random_Access_Sequence<typename household_itf::get_type_of(Persons_Container)> person_collection_itf;
+
 
 				typedef Random_Access_Sequence<typename zone_itf::get_type_of(Activity_Locations_Container),int> activity_location_ids_itf;
 				typedef Network_Components::Prototypes::Network<typename get_type_of(network_reference)> network_itf;
@@ -567,7 +573,8 @@ namespace PopSyn
 
 				typedef  Zone_Components::Prototypes::Zone<typename remove_pointer<typename network_itf::get_type_of(zones_container)::value_type>::type>  _Zone_Interface;
 				typedef Pair_Associative_Container<typename network_itf::get_type_of(zones_container), _Zone_Interface*> _Zone_Container_Interface;
-
+				
+				//-----------------------------------------
 				
 				regions_itf* regions = this->Synthesis_Regions_Collection<regions_itf*>();
 				network_itf* network = this->network_reference<network_itf*>();
@@ -589,12 +596,12 @@ namespace PopSyn
 				// Loop through all regions
 				for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 				{
-					region_itf* region = r_itr->second;
+					region_itf* region = (region_itf*)r_itr->second;
 					zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
 					// loop through zones in each region
 					for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 					{
-						zone_itf* zone = z_itr->second;
+						zone_itf* zone = (zone_itf*)z_itr->second;
 						activity_location_ids_itf* loc_indices = zone->template Activity_Locations_Container<activity_location_ids_itf*>();
 
 						// loop through each synthesized person
@@ -603,7 +610,7 @@ namespace PopSyn
 						{
 							// update synthesizing persons counter
 							if (counter % 10000 == 0) cout << '\r' << "Initializing Agents: " << counter;
-							household_itf* hh = *p_itr;
+							household_itf* hh = (household_itf*)*p_itr;
 
 							// initialize the hh - allocates all hh subcomponents
 							hh->template Initialize<long,zone_itf*, network_itf*, scenario_itf*>(uuid, zone, network, scenario);
@@ -627,7 +634,7 @@ namespace PopSyn
 
 
 				// Handle file output if needed
-				if (pthis->write_marginal_output_flag<bool>() == true || pthis->write_full_output_flag<bool>() == true)
+				if (this->write_marginal_output_flag<bool>() == true || this->write_full_output_flag<bool>() == true)
 				{
 
 					Counter timer;
@@ -635,14 +642,14 @@ namespace PopSyn
 
 					for (r_itr = regions->begin(); r_itr != regions->end(); ++r_itr)
 					{
-						region_itf* region = r_itr->second;
+						region_itf* region = (region_itf*)r_itr->second;
 						zones_itf* zones = region->template Synthesis_Zone_Collection<zones_itf*>();
 						for (z_itr = zones->begin(); z_itr != zones->end(); ++z_itr)
 						{
-							zone_itf* zone = z_itr->second;
+							zone_itf* zone = (zone_itf*)z_itr->second;
 
 							// write the marginal results
-							if (pthis->write_marginal_output_flag<bool>() == true )
+							if (this->write_marginal_output_flag<bool>() == true )
 							{
 								marg_out <<endl<<endl<<"ZONE_ID: "<<zone->template ID<long long int>();
 								//zone->template Target_Joint_Distribution<joint_itf*>()->write(marg_out);
@@ -652,13 +659,13 @@ namespace PopSyn
 							}
 
 							// write th full population results
-							if (pthis->write_full_output_flag<bool>() == true)
+							if (this->write_full_output_flag<bool>() == true)
 							{
 								household_collection_itf* sample = zone->template Synthetic_Households_Container<household_collection_itf*>();	
 								household_itf* hh;
 								for (typename household_collection_itf::iterator s_itr = sample->begin(); s_itr != sample->end(); ++s_itr)
 								{
-									hh = *s_itr;
+									hh = (household_itf*)(*s_itr);
 									pop_unit_itf* p = hh->template Static_Properties<pop_unit_itf*>();
 									sample_out << "ZONE_ID: "<<zone->template ID<long long int>() << endl << "ID: " << hh->template uuid<uint>() << ", ACS_ID: " << p->template ID<double>() << ",  weight: "<<p->template Weight<float>() <<", index: "<<p->template Index<uint>() << ", Gender: "<<p->template Household_type<Household_Components::Types::HHTYPE>();
 								}

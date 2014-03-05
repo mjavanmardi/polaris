@@ -26,8 +26,8 @@ namespace Network_Components
 		{
 			// Pointer to the Parent class
             typedef typename Polaris_Component<MasterType,INHERIT(Network_DB_Reader_Implementation),Execution_Object>::Component_Type ComponentType;
-			m_prototype(Prototypes::Network< typename MasterType::network_type>, network_reference, NONE, NONE);
-			m_prototype(Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
+			m_prototype(Network< typename MasterType::network_type>, network_reference, NONE, NONE);
+			m_prototype(Scenario< typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
 
 			//==================================================================================================================
 			/// read from database

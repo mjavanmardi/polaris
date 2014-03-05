@@ -6,7 +6,119 @@
 #include "Population_Synthesis.h"
 #include "Scenario_Implementation.h"
 
+#define TEST_APP
+#ifdef TEST_APP
 
+prototype struct Agent
+{
+	tag_as_prototype;
+
+	accessor(message,NONE,NONE);
+
+	template<typename T> void Initialize()
+	{
+		this_component()->Initialize<T>();
+	}	
+
+	accessor(data,NONE,NONE);
+
+};
+
+prototype struct Agent_Data
+{
+	tag_as_prototype;
+
+	accessor(val1,NONE,NONE);
+	accessor(val2,NONE,NONE);
+};
+
+
+implementation struct Base_Agent_Implementation : public Polaris_Component<MasterType,INHERIT(Base_Agent_Implementation),Execution_Object>
+{
+	typedef typename Polaris_Component<MasterType,INHERIT(Base_Agent_Implementation),Execution_Object>::Component_Type ComponentType;
+	typedef Agent<ComponentType> agent_itf;
+
+	typedef double name1;
+	typedef double name2;
+
+	m_prototype(Agent_Data< typename MasterType::data_type>, data, NONE, NONE);
+
+	template<typename T> void Initialize()
+	{
+		this->message(string("Test_Agent_Implementation"));
+		Load_Event<ComponentType>(&ComponentType::Agent_Event,1,0);			
+	}
+	static void Agent_Event(ComponentType* _this,Event_Response& response)
+	{
+		agent_itf* _this_ptr=(agent_itf*)_this;
+		
+		if (iteration() % 100 == 0)
+		{
+			cout <<_this_ptr->message<string>() << ": The iteration is: "<< iteration() <<". The time is: " << GLOBALS::Simulation_Time.Current_Time<Time_Minutes>()<<" minutes."<<endl;
+			response.next._iteration=iteration()+1;
+			response.next._sub_iteration = 0;
+		}
+		
+		else
+		{
+			response.next._iteration=iteration()+1;
+			response.next._sub_iteration = 0;
+		}
+	}
+
+	m_data(string, message,NONE,NONE);
+};
+
+implementation struct Inherited_Agent_Implementation : public Base_Agent_Implementation<MasterType, INHERIT(Inherited_Agent_Implementation)>
+{
+	template<typename T> void Initialize()
+	{
+		this->message(string("Inherited_Agent_Implementation"));
+		Load_Event<ComponentType>(&ComponentType::Agent_Event,1,0);			
+	}
+};
+
+implementation struct Agent_Data_Implementation : public Polaris_Component<MasterType,INHERIT(Agent_Data_Implementation)>
+{
+	m_data(int,val1,NONE,NONE);
+	m_data(int,val2,NONE,NONE);
+};
+
+struct MasterType
+{
+	typedef Inherited_Agent_Implementation<MT> agent_type;
+	typedef Agent_Data_Implementation<MT> data_type;
+};
+
+
+int main(int argc, char* argv[])
+{
+	Simulation_Configuration cfg;
+	cfg.Single_Threaded_Setup(1000);
+	INITIALIZE_SIMULATION(cfg);
+
+	//==================================================================================================================================
+	// Start test
+	//---------------------------------------------------------------------------------------------------------------------------------- 
+	typedef Agent<MasterType::agent_type> agent_itf;
+	agent_itf* my_agent = (agent_itf*)Allocate<MasterType::agent_type>();
+
+	typedef Agent<MasterType::data_type> data_itf;
+	data_itf* my_data = (data_itf*)Allocate<MasterType::data_type>();
+
+	my_agent->Initialize<NT>();
+	my_agent->data(my_data);
+
+	START();
+
+	char ans;
+	cout<<endl<<endl<<"done. Press 'any' key to exit.";
+	cin >> ans;
+}
+#endif
+
+
+#ifdef HIDE
 struct MasterType
 {
 	typedef Scenario_Components::Implementations::Scenario_Implementation<MasterType> scenario_type;
@@ -24,8 +136,6 @@ struct MasterType
 	typedef NULLTYPE person_type;
 	typedef NULLTYPE network_type;
 };
-
-
 
 
 int main(int argc, char* argv[])
@@ -76,3 +186,4 @@ int main(int argc, char* argv[])
 	cout<<endl<<endl<<"done. Press 'any' key to exit.";
 	cin >> ans;
 }
+#endif

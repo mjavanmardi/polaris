@@ -31,14 +31,14 @@ namespace Person_Components
 			}
 
 			// Pointer to the Parent class
-			m_prototype(Person_Components::Prototypes::Person< typename MasterType::person_type>, Parent_Person, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::person_type>, Parent_Person, NONE, NONE);
 
 			// Pointer to the child classses
 			//m_prototype(Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type>, Person_Scheduler, NONE, NONE);
-			m_prototype(Prototypes::Activity_Generator< typename MasterType::activity_generator_type>, Activity_Generation_Faculty, NONE, NONE);
-			m_prototype(Prototypes::Destination_Chooser< typename MasterType::person_destination_chooser_type>, Destination_Choice_Faculty, NONE, NONE);
-			m_prototype(Prototypes::Mode_Chooser< typename MasterType::person_mode_chooser_type>, Mode_Choice_Faculty, NONE, NONE);
-			m_prototype(Prototypes::Activity_Timing_Chooser< typename MasterType::activity_timing_chooser_type>, Timing_Chooser, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::activity_generator_type>, Activity_Generation_Faculty, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::person_destination_chooser_type>, Destination_Choice_Faculty, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::person_mode_chooser_type>, Mode_Choice_Faculty, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::activity_timing_chooser_type>, Timing_Chooser, NONE, NONE);
 
 			// Next Activity Generation Time member - used to schedule the next activity generation
 			member_component_and_feature_accessor(Next_Activity_Generation_Time, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
@@ -91,6 +91,13 @@ namespace Person_Components
 				scheduler->Add_Activity_Plan<TargetType>(activity_plan);
 
 			} tag_feature_as_available(Add_Activity_Plan);
+
+			template<typename TargetType> void Initialize(/*requires(TargetType,check(typename ComponentType::Parent_Type,Concepts::Is_Person))*/)
+			{	
+				base_type::template Generation_Time_Increment<Time_Minutes>(END);
+				base_type::template Planning_Time_Increment<Time_Minutes>(5);
+				base_type::template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(60);	
+			}
 		};
 		// static member definition
 		/*template<typename MasterType,  typename InheritanceList> ofstream General_Person_Planner_Implementation<MasterType,  InheritanceList>::logs[num_sim_threads()];
@@ -105,19 +112,19 @@ namespace Person_Components
 			typedef General_Person_Planner_Implementation<MasterType,  INHERIT(POLARIS_Person_Planner_Implementation)> base_type;
 			typedef typename base_type::Component_Type ComponentType;
 
-			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,Concepts::Is_Person)))
+			template<typename TargetType> void Initialize(/*requires(TargetType,check(typename ComponentType::Parent_Type,Concepts::Is_Person))*/)
 			{	
 				base_type::template Generation_Time_Increment<Time_Minutes>(END);
 				base_type::template Planning_Time_Increment<Time_Minutes>(5);
 				base_type::template Next_Activity_Generation_Time<Simulation_Timestep_Increment>(60);	
 			}
-			template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
+			/*template<typename TargetType> void Initialize(requires(TargetType,check(typename ComponentType::Parent_Type,!Concepts::Is_Person)))
 			{	
 				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Initialize_Defined, "The specified ParentType is not a valid Person type.");
 				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Properties_Defined, "The specified ParentType does not have the required Properties member defined.");
 				assert_sub_check(typename ComponentType::Parent_Type,Concepts::Is_Person,Has_Planner_Defined, "The specified ParentType does not have the required Planner member defined.");
 			}
-			tag_feature_as_available(Initialize);
+			tag_feature_as_available(Initialize);*/
 
 		};
 		

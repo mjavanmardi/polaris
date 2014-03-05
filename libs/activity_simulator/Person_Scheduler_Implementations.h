@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Person_Scheduler_Prototype.h"
 #include "Person_Prototype.h"
 #include "Movement_Plan_Prototype.h"
 #include "Activity_Prototype.h"
@@ -19,7 +20,7 @@ namespace Person_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Person_Scheduler_Implementation),Execution_Object>::Component_Type ComponentType;
 
 			// Pointer to the Parent class
-			m_prototype(Person_Components::Prototypes::Person< typename MasterType::person_type>, Parent_Person, NONE, NONE);
+			m_prototype(Null_Prototype< typename MasterType::person_type>, Parent_Person, NONE, NONE);
 			m_data(int, Activity_Count, NONE, NONE);
 
 			//Containers for activity planning events and movement planning events
@@ -161,8 +162,6 @@ namespace Person_Components
 
 			template<typename ActivityItfType, typename ReturnType> ReturnType previous_location(ActivityItfType current_activity)
 			{
-				PUSH_TO_STACK("previous_location");
-
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
 				Parent_Person_interface_type* person = (Parent_Person_interface_type*)_Parent_Person;
@@ -176,14 +175,12 @@ namespace Person_Components
 				// if no previous activity, person is at home
 				if (prev_act == nullptr)
 				{
-					POP_FROM_STACK;
 					return _Parent_Person->template Home_Location<ReturnType>();
 				}
 
 				// if previous act location is not planned treat person as if at home
 				if (!prev_act->template Location_Is_Planned<bool>())
 				{
-					POP_FROM_STACK;
 					return _Parent_Person->template Home_Location<ReturnType>();
 				}
 
@@ -197,7 +194,6 @@ namespace Person_Components
 				// if current location is in the process of being planned, use previous location as only deflected time matters
 				if (dest == nullptr) 
 				{
-					POP_FROM_STACK;
 					return (ReturnType)orig;
 				}
 
@@ -211,21 +207,17 @@ namespace Person_Components
 				if (ttime_prev_to_home + ttime_home_to_this < time_before - min_home_time) orig = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 
 				// return the expected origin
-				POP_FROM_STACK;
 				return (ReturnType)orig;
 			}
 			tag_feature_signature_as_available(previous_location,1);
 			template<typename ActivityItfType, typename ReturnType> ReturnType next_location(ActivityItfType current_activity)
 			{
-				PUSH_TO_STACK("next_location");
-
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
 
 				// if the start time of the activity has not been planned set the next location to home
 				if (!act->template Start_Is_Planned<bool>())
 				{
-					POP_FROM_STACK;
 					return _Parent_Person->template Home_Location<ReturnType>();
 				}
 				Time_Seconds end = act->template Start_Time<Time_Seconds>() + act->template Duration<Time_Seconds>();
@@ -236,14 +228,12 @@ namespace Person_Components
 				// if no next activity, person goes home
 				if (next_act == nullptr)
 				{
-					POP_FROM_STACK;
 					return _Parent_Person->template Home_Location<ReturnType>();
 				}
 
 				// if next act location is not planned treat person as if returning home
 				if (!next_act->template Location_Is_Planned<bool>()) 
 				{
-					POP_FROM_STACK;
 					return _Parent_Person->template Home_Location<ReturnType>();
 				}
 
@@ -257,7 +247,6 @@ namespace Person_Components
 				// if act is currently being planned (i.e. is_planned is true, but location pointer is null) then use next location
 				if (orig == nullptr)
 				{
-					POP_FROM_STACK;
 					return (ReturnType)dest;
 				}
 
@@ -271,7 +260,6 @@ namespace Person_Components
 				if (ttime_this_to_home + min_home_time + ttime_home_to_next  < time_after) dest = _Parent_Person->template Home_Location<_Activity_Location_Interface*>();
 
 				// return the expected origin
-				POP_FROM_STACK;
 				return (ReturnType)dest;
 			}
 			tag_feature_signature_as_available(next_location,1);
@@ -279,8 +267,6 @@ namespace Person_Components
 			// Simplified timing conflict resolution - only modifying the new activity
 			template<typename TargetType> bool Resolve_Timing_Conflict(TargetType current_activity, bool update_movement_plans)
 			{
-				PUSH_TO_STACK("Resolve_Timing_Conflict");
-
 				bool at_home_activity_modified = false;
 
 				Activity_Plan* act = (Activity_Plan*)current_activity;
@@ -292,7 +278,6 @@ namespace Person_Components
 				// if the start time of the activity has not been planned no way to identify timing conflicts
 				if (!act->template Start_Is_Planned<bool>())
 				{
-					POP_FROM_STACK;
 					return false;
 				}
 
@@ -387,7 +372,6 @@ namespace Person_Components
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
 						}
 					}
-					POP_FROM_STACK;
 					return true;
 				}
 				// 2. complex conflict, move and shorten
@@ -415,7 +399,6 @@ namespace Person_Components
 							next_move->template departed_time<Time_Seconds>(next_act->template Start_Time<Time_Seconds>() - ttime_next);
 						}
 					}
-					POP_FROM_STACK;
 					return true;
 				}
 				// 3. can't fit, delete activity
@@ -437,16 +420,12 @@ namespace Person_Components
 					{
 						if (at_home_activity_modified) prev_act->template End_Time<Time_Seconds>(END,false);
 					}
-					POP_FROM_STACK;
 					return false;
 				}
-				POP_FROM_STACK;
 			}
 			tag_feature_signature_as_available(Resolve_Timing_Conflict,1);
 			template<typename TargetType> void Resolve_At_Home_Timing_Conflict(TargetType current_activity, TargetType previous_activity)
 			{
-				PUSH_TO_STACK("Resolve_At_Home_Timing_Conflict");
-
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				Activity_Plan* prev_act = (Activity_Plan*)previous_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
@@ -455,7 +434,6 @@ namespace Person_Components
 				// if the start time of the activity has not been planned no way to identify timing conflicts
 				if (!act->template Start_Is_Planned<bool>())
 				{
-					POP_FROM_STACK;
 					return;
 				}
 
@@ -481,7 +459,6 @@ namespace Person_Components
 				// get maximum end time of current activity given departure time for next activity
 				new_end = act->template Start_Time<Time_Seconds>() - ttime;
 				prev_act->template End_Time<Time_Seconds>(new_end,false);
-				POP_FROM_STACK;
 			}
 			tag_feature_signature_as_available(Resolve_At_Home_Timing_Conflict,1);
 

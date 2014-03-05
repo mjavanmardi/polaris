@@ -42,27 +42,27 @@ namespace PopSyn
 			typedef boost::unordered_multimap<uint, Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*> __sample_map_type;		
 			m_container(__sample_map_type, Sample_Data, NONE, NONE); 
 
-			// Static versions of the agent containers
-			m_container(boost::container::vector<Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*>, Synthetic_Households_Container, NONE, NONE);
-			m_container(boost::container::vector<Person_Components::Prototypes::Person_Properties<typename MasterType::person_static_properties_type>*>, Synthetic_Persons_Container, NONE, NONE);
-		};
-
-		implementation struct _Synthesis_Zone_Implementation_With_Simulation : public _Synthesis_Zone_Implementation<MasterType>
-		{
-			m_container(boost::container::vector<Household_Components::Prototypes::Household_Properties<typename MasterType::household_type>*>, Synthetic_Households_Container, NONE, NONE);
-			m_container(boost::container::vector<int>, Activity_Locations_Container, NONE, NONE);
+			
 		};
 
 		implementation struct Synthesis_Zone_Implementation_Simple : public Polaris_Component< MasterType,INHERIT(Synthesis_Zone_Implementation_Simple), Data_Object>, _Synthesis_Zone_Implementation<MasterType>
 		{
 			// Tag as implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Synthesis_Zone_Implementation_Simple),Data_Object>::Component_Type ComponentType;
+
+			// Static versions of the agent containers
+			m_container(boost::container::vector<Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>*>, Synthetic_Households_Container, NONE, NONE);
+			m_container(boost::container::vector<Person_Components::Prototypes::Person_Properties<typename MasterType::person_static_properties_type>*>, Synthetic_Persons_Container, NONE, NONE);
 		};
 
-		implementation struct Synthesis_Zone_Implementation_Full : public Polaris_Component< MasterType,INHERIT(Synthesis_Zone_Implementation_Full), Data_Object>, _Synthesis_Zone_Implementation_With_Simulation<MasterType>
+		implementation struct Synthesis_Zone_Implementation_Full : public Polaris_Component< MasterType,INHERIT(Synthesis_Zone_Implementation_Full), Data_Object>, _Synthesis_Zone_Implementation<MasterType>
 		{
 			// Tag as implementation
 			typedef typename Polaris_Component<MasterType,INHERIT(Synthesis_Zone_Implementation_Full),Data_Object>::Component_Type ComponentType;
+
+			// Full versions of the agent containers
+			m_container(boost::container::vector<Household_Components::Prototypes::Household_Properties<typename MasterType::household_type>*>, Synthetic_Households_Container, NONE, NONE);
+			m_container(boost::container::vector<int>, Activity_Locations_Container, NONE, NONE);
 		};
 
 

@@ -411,7 +411,8 @@ namespace Routing_Components
 				typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename _Routable_Network_Interface::get_type_of(links_container)::value_type>::type>  _Routable_Link_Interface;
 				typedef  Random_Access_Sequence< typename _Routable_Network_Interface::get_type_of(links_container), _Routable_Link_Interface*> _Routable_Links_Container_Interface;
 
-				typedef (travel_times_itf, typename get_type_of(travel_times_to_link_container),Random_Access_Sequence, typename get_type_of(travel_times_to_link_container)::value_type);
+				//typedef (travel_times_itf, typename get_type_of(travel_times_to_link_container),Random_Access_Sequence, typename get_type_of(travel_times_to_link_container)::value_type);
+				typedef Random_Access_Sequence<typename get_type_of(travel_times_to_link_container), typename get_type_of(travel_times_to_link_container)::value_type> travel_times_itf;
 
 				travel_times_itf* travel_times = this->template travel_times_to_link_container<travel_times_itf*>();
 				_Routable_Network_Interface* routable_net= this->template routable_network<_Routable_Network_Interface*>();
