@@ -1,18 +1,18 @@
 #pragma once
-#ifdef ANTARES
-#include "gl\glew.h"
-#include "wx\glcanvas.h"
-
-#include "wx\wx.h"
-#include "wx\aui\aui.h"
-
-#include "wx\panel.h"
-#include "wx\tglbtn.h"
-
-#include "wx\listctrl.h"
-
-#include "wxPLplotwindow.h"
-#endif
+//#ifdef ANTARES
+//#include "gl\glew.h"
+//#include "wx\glcanvas.h"
+//
+//#include "wx\wx.h"
+//#include "wx\aui\aui.h"
+//
+//#include "wx\panel.h"
+//#include "wx\tglbtn.h"
+//
+//#include "wx\listctrl.h"
+//
+//#include "wxPLplotwindow.h"
+//#endif
 
 #include "Io/Io.h"
 
