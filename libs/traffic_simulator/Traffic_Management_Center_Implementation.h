@@ -2,7 +2,7 @@
 #include "Traffic_Management_Center_Prototype.h"
 //#include "Io\Geometry.h"
 #include "Sensor_Implementation.h"
-#include "Geometry_Implementation.h"
+//#include "Geometry_Implementation.h"
 
 
 namespace Traffic_Management_Center_Components

@@ -134,7 +134,7 @@ if (MSVC AND Antares)
 	find_library(csirocsa csirocsa)
 	find_library(qsastime qsastime)
 	find_library(plplotwxwidgetsd plplotwxwidgetsd )
-    
+	
 	ADD_DEFINITIONS( -D_UNICODE )
 	ADD_DEFINITIONS( -DNDEBUG )
 	#ADD_DEFINITIONS( -DGLEW_STATIC )
@@ -147,7 +147,7 @@ if (MSVC AND Antares)
 	ADD_DEFINITIONS( -D_CRT_SECURE_NO_DEPRECATE )
 	ADD_DEFINITIONS( -D_CRT_NONSTDC_NO_DEPRECATE )
 	ADD_DEFINITIONS( -DWXUSINGDLL  )
-    set(antareslibs Antares ${glew} ${plplotd} ${plplotcxxd} ${csirocsa} ${qsastime} ${plplotwxwidgetsd})    
+    set(antareslibs Antares ${glew} opengl32.lib glu32.lib ${plplotd} ${plplotcxxd} ${csirocsa} ${qsastime} ${plplotwxwidgetsd})    
     add_subdirectory (libs/antares)
 	add_subdirectory (apps/demo)
 	
