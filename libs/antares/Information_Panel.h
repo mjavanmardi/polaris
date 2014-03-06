@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 #include "Information_Page.h"
 
 //---------------------------------------------------------

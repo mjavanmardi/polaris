@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 #include "User_Space\Vehicle_Prototype.h"
 
 namespace Vehicle_Components

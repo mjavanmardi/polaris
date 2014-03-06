@@ -16,7 +16,7 @@ public:
 	virtual ~Attributes_Panel_Implementation(void){};
 
 	//feature_implementation void Push_Schema(vector<string>& attributes_schema);
-	template<typename TargetType> void Push_Attributes(boost::container::vector<pair<string,string>>& attributes);
+	void Push_Attributes(boost::container::vector<pair<string,string>>& attributes);
 
 	m_data(wxListCtrl*,attributes_list, NONE, NONE);
 
@@ -128,7 +128,6 @@ Attributes_Panel_Implementation<MasterType,InheritanceList>::Attributes_Panel_Im
 //--------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
-template<typename TargetType>
 void Attributes_Panel_Implementation<MasterType,InheritanceList>::Push_Attributes(boost::container::vector<pair<string,string>>& attributes)
 {
 	for(int i=0;i<100;i++)

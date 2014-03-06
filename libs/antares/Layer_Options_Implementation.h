@@ -30,7 +30,7 @@ implementation struct Layer_Options_Implementation:public Polaris_Component<Mast
 
 	m_data(wxBoxSizer*,sizer, NONE, NONE);
 	
-	template<typename TargetType> void Allocate_New_Layer(string& name);
+	void Allocate_New_Layer(string& name);
 	template<typename TargetType> void Toggle_Named_Layer(string& name,bool check_state);
 
 	m_prototype(Canvas<typename MasterType::type_of(canvas)>,canvas, NONE, NONE);
@@ -109,7 +109,6 @@ void Layer_Options_Implementation<MasterType,InheritanceList>::Toggle_Named_Laye
 //---------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
-template<typename TargetType>
 void Layer_Options_Implementation<MasterType,InheritanceList>::Allocate_New_Layer(string& name)
 {
 	int layer_id=_layers->Append(name);
@@ -150,8 +149,7 @@ void Layer_Options_Implementation<MasterType,InheritanceList>::OnSelectLayer(wxC
 {
 	int i=_layers->GetSelection();
 
-//TODO
-//	_canvas->Select_Layer<Target_Type<NULLTYPE,void,int>>(i);
+	_canvas->Select_Layer(i);
 }
 
 //---------------------------------------------------------
@@ -165,6 +163,5 @@ void Layer_Options_Implementation<MasterType,InheritanceList>::OnToggleLayer(wxC
 
 	bool checked=_layers->IsChecked(i);
 
-//TODO
-//	_canvas->Toggle_Layer<Target_Type<NULLTYPE,void,int,bool>>(i,checked);
+	_canvas->Toggle_Layer(i,checked);
 }

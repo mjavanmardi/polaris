@@ -10,7 +10,6 @@
 //--------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
-template<typename TargetType>
 bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(const Point_3D<MasterType>& point, int start_iteration, int end_iteration,ANTARES_SELECTION_MODE mode)
 {
 	unsigned char* best_element = nullptr;
@@ -32,11 +31,11 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 
 		int current_iteration=start_iteration;
 		
-		while(currentiteration() <= enditeration())
+		while(current_iteration <= end_iteration)
 		{
-			const boost::container::vector<int> (&geometry_by_thread)[_num_antares_threads] = _storage[currentiteration()];
+			const boost::container::vector<int>* geometry_by_thread = _storage[current_iteration];
 
-			for(int i=0;i<_num_antares_threads;i++)
+			for(int i=0;i<num_antares_threads();i++)
 			{
 				const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
 				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
@@ -126,7 +125,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 				}
 			}
 
-			currentiteration()++;
+			current_iteration++;
 		}
 
 	}
@@ -147,11 +146,11 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 
 		int current_iteration=start_iteration;
 		
-		while(currentiteration() <= enditeration())
+		while(current_iteration <= end_iteration)
 		{
-			const boost::container::vector<int> (&geometry_by_thread)[_num_antares_threads] = _storage[currentiteration()];
+			const boost::container::vector<int>* geometry_by_thread = _storage[current_iteration];
 
-			for(int i=0;i<_num_antares_threads;i++)
+			for(int i=0;i<num_antares_threads();i++)
 			{
 				const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
 				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
@@ -243,7 +242,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 				}
 			}
 
-			currentiteration()++;
+			current_iteration++;
 		}
 	}
 	else if(_primitive_type==_QUAD)
@@ -265,13 +264,13 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 
 		int current_iteration=start_iteration;
 		
-		while(currentiteration() <= enditeration())
+		while(current_iteration <= end_iteration)
 		{
 			if(found) break;
 
-			const boost::container::vector<int> (&geometry_by_thread)[_num_antares_threads] = _storage[currentiteration()];
+			const boost::container::vector<int>* geometry_by_thread = _storage[current_iteration];
 
-			for(int i=0;i<_num_antares_threads;i++)
+			for(unsigned int i=0;i<num_antares_threads();i++)
 			{
 				if(found) break;
 
@@ -371,7 +370,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 				}
 			}
 
-			currentiteration()++;
+			current_iteration++;
 		}
 	}
 	else if(_primitive_type==_POLYGON)
@@ -393,13 +392,13 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 
 		int current_iteration=start_iteration;
 		
-		while(currentiteration() <= enditeration())
+		while(current_iteration <= end_iteration)
 		{
 			if(found) break;
 
-			const boost::container::vector<int> (&geometry_by_thread)[_num_antares_threads] = _storage[currentiteration()];
+			const boost::container::vector<int>* geometry_by_thread = _storage[current_iteration];
 
-			for(int i=0;i<_num_antares_threads;i++)
+			for(unsigned int i=0;i<num_antares_threads();i++)
 			{
 				if(found) break;
 
@@ -466,7 +465,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 				}
 			}
 
-			currentiteration()++;
+			current_iteration++;
 		}
 	}
 
@@ -497,8 +496,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 
 				_selection_callback( _deselected_elements, _added_elements, _selected_elements, bucket );
 				
-//TODO
-//				_attributes_panel->Push_Attributes< Target_Type< NT, NT, boost::container::vector<pair<string,string>>& > >(bucket);
+				_attributes_panel->Push_Attributes(bucket);
 			}
 		}
 		else if(mode==CTRL_DOWN)
@@ -528,8 +526,8 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 
 				_selection_callback( _deselected_elements, _added_elements, _selected_elements, bucket );
 
-//TODO
-//				_attributes_panel->Push_Attributes< Target_Type< NT, NT, boost::container::vector<pair<string,string>>& > >(bucket);
+
+				_attributes_panel->Push_Attributes(bucket);
 			}
 		}
 

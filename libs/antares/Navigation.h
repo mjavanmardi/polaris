@@ -152,8 +152,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::OnLeftDown(wxMouseEvent&
 		location._y=(float)posY;
 		location._z=(float)posZ;
 
-//TODO
-//		if(_selected_layer->Identify_One<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(location,_cached_iteration,_cached_iteration,ANTARES_SELECTION_MODE::CTRL_DOWN))
+		if(_selected_layer->Identify_One(location,_cached_iteration,_cached_iteration,CTRL_DOWN))
 		{
 			Refresh();
 			_information_panel->Render<NT>();
@@ -246,8 +245,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::OnMotion(wxMouseEvent& e
 			location._y=(float)posY;
 			location._z=(float)posZ;
 
-//TODO
-//			if(_selected_layer->Identify_One<Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(location,_cached_iteration,_cached_iteration,ANTARES_SELECTION_MODE::ALT_DOWN))
+			if(_selected_layer->Identify_One(location,_cached_iteration,_cached_iteration,ALT_DOWN))
 			{
 				Refresh();
 				_information_panel->Render<NT>();

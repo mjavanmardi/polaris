@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 #include "Traffic_Simulator\Intersection_Implementation.h"
 
 namespace Intersection_Components

@@ -907,7 +907,7 @@ implementation struct Antares_Layer_Implementation:public Polaris_Component<Mast
 	
 	//template<typename TargetType> void Double_Click(requires(TargetType,!check_2(typename MasterType::canvas_type,is_same))){static_assert(false,"Caller Not a Canvas Object");}
 
-	template<typename TargetType> bool Identify_One(const Point_3D<MasterType>& point, int start_iteration, int end_iteration,ANTARES_SELECTION_MODE mode);
+	bool Identify_One(const Point_3D<MasterType>& point, int start_iteration, int end_iteration,ANTARES_SELECTION_MODE mode);
 
 	template<typename TargetType> void Clear_Accented()
 	{

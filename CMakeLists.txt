@@ -118,7 +118,7 @@ add_subdirectory (apps/io_demo)
 add_subdirectory (apps/fixed_demand_simulator) 
 add_subdirectory (apps/integrated_abm) 
 add_subdirectory (apps/population_synthesizer)
-add_subdirectory (apps/test) 
+
 
 if (MSVC AND Antares)
 	include_directories(${DEPS_DIR}/glew-1.7.0/include)
@@ -148,6 +148,8 @@ if (MSVC AND Antares)
     set(antareslibs Antares ${glew} ${plplotd} ${plplotcxxd} ${csirocsa} ${qsastime} ${plplotwxwidgetsd})    
     add_subdirectory (libs/antares)
 	add_subdirectory (apps/demo)
+	
+	add_subdirectory (apps/test) 
 endif()
 
 

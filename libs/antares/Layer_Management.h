@@ -25,8 +25,7 @@ typename Canvas_Implementation<MasterType,InheritanceList>::Antares_Layer_Interf
 	new_layer->attributes_panel<attributes_panel_interface_type*>(_attributes_panel);
 	new_layer->layer_options<layer_options_interface_type*>(_layer_options);
 
-//TODO
-//	_layer_options->Allocate_New_Layer<Target_Type<NULLTYPE,void,string&>>(name);
+	_layer_options->Allocate_New_Layer(name);
 
 	return new_layer;
 }
@@ -36,7 +35,6 @@ typename Canvas_Implementation<MasterType,InheritanceList>::Antares_Layer_Interf
 //---------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
-template<typename TargetType>
 void Canvas_Implementation<MasterType,InheritanceList>::Toggle_Layer(int identifier,bool checked)
 {
 	SetFocus();
@@ -62,7 +60,6 @@ void Canvas_Implementation<MasterType,InheritanceList>::Toggle_Layer(int identif
 //---------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
-template<typename TargetType>
 void Canvas_Implementation<MasterType,InheritanceList>::Select_Layer(int identifier)
 {
 	SetFocus();

@@ -47,8 +47,8 @@ public:
 
 	template<typename TargetType> int Build_Texture(int width, int height, unsigned char* data);
 	template<typename TargetType> Antares_Layer_Interface* Allocate_New_Layer(string& name);
-	template<typename TargetType> void Toggle_Layer(int identifier,bool checked);
-	template<typename TargetType> void Select_Layer(int identifier);
+	void Toggle_Layer(int identifier,bool checked);
+	void Select_Layer(int identifier);
 	//feature_implementation void Set_Mode(ANTARES_MODE mode);
 
 	void Draw_Layer(int start_iteration, int end_iteration, Antares_Layer_Interface* layer);

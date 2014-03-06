@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 
 //---------------------------------------------------------
 //	Layer_Options - layer options definition
@@ -15,9 +15,9 @@ prototype struct Layer_Options
 
 	accessor(canvas, NONE, NONE);
 
-	template<typename TargetType> typename TargetType::ReturnType Allocate_New_Layer(typename TargetType::ParamType name)
+	void Allocate_New_Layer(string& name)
 	{
-		return (TargetType::ReturnType)this_component()->Allocate_New_Layer<TargetType>(name);
+		this_component()->Allocate_New_Layer(name);
 	}
 
 	template<typename TargetType> void Toggle_Named_Layer(string& name,bool check_state)

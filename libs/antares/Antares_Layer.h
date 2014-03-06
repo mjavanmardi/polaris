@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 #include "Control_Dialog.h"
 #include "Geometry_Implementation.h"
 
@@ -33,9 +33,9 @@ prototype struct Antares_Layer
 		this_component()->Initialize<TargetType>(cfg);
 	}
 	
-	template<typename TargetType> bool Identify_One(typename TargetType::ParamType point, int start_iteration, int end_iteration, ANTARES_SELECTION_MODE mode)
+	bool Identify_One(Point_3D<typename Component_Type::Master_Type>& point, int start_iteration, int end_iteration, ANTARES_SELECTION_MODE mode)
 	{
-		return this_component()->Identify_One<TargetType>(point,start_iteration,end_iteration,mode);
+		return this_component()->Identify_One(point,start_iteration,end_iteration,mode);
 	}
 	
 	template<typename TargetType> void Select()

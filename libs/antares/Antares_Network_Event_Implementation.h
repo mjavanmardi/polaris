@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 #include "Traffic_Simulator\Network_Event_Implementations.h"
 
 namespace Network_Event_Components

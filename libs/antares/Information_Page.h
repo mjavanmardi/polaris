@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 
 //---------------------------------------------------------
 //	Information_Page - information page class definition

@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 #include "Traffic_Simulator\Variable_Message_Sign_Implementation.h"
 #include "Antares_Advisory_ITS_Implementation.h"
 

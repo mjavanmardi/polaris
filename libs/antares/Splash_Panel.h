@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 
 //---------------------------------------------------------
 //	Splash_Panel - information page class definition

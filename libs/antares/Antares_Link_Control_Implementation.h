@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 #include "Traffic_Simulator\Link_Control_Implementation.h"
 
 namespace Link_Control_Components

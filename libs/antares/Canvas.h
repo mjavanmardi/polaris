@@ -3,7 +3,7 @@
 //*********************************************************
 
 #pragma once
-#include "Antares_Includes.h"
+#include "Dependencies.h"
 #include "Antares_Layer.h"
 
 //---------------------------------------------------------
@@ -39,14 +39,14 @@ prototype struct Canvas
 	//	this_component()->Set_Mode<ComponentType,CallerType,TargetType>(mode);
 	//}
 
-	template<typename TargetType> typename TargetType::ReturnType Select_Layer(typename TargetType::ParamType name)
+	void Select_Layer(int name)
 	{
-		return (TargetType::ReturnType)this_component()->Select_Layer<TargetType>(name);
+		return this_component()->Select_Layer(name);
 	}
 	
-	template<typename TargetType> typename TargetType::ReturnType Toggle_Layer(typename TargetType::ParamType name,typename TargetType::Param2Type checked)
+	void Toggle_Layer(int name,bool checked)
 	{
-		return (TargetType::ReturnType)this_component()->Toggle_Layer<TargetType>(name,checked);
+		return this_component()->Toggle_Layer(name,checked);
 	}
 
 	template<typename TargetType> int Build_Texture(int width, int height, unsigned char* data)
