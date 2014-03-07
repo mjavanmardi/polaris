@@ -1,5 +1,5 @@
 #pragma once
-#include "Dependencies.h"
+#include "Graph.h"
 
 namespace polaris
 {
@@ -7,26 +7,39 @@ namespace polaris
 	{
 		tag_as_prototype;
 
-		typedef typename ComponentType::graph_type graph_type;
+		typedef typename ComponentType::base_edge_type base_edge_type;
 		
-		unsigned int Add_Graph(Interactive_Graph<graph_type>* graph)
+		template<typename Graph_Type>
+		Edge<typename Graph_Type::stored_edge_type>* Get_Edge(global_edge_id& gid)
 		{
-			return this_component()->Add_Graph(graph);
+			return this_component()->Get_Edge<Graph_Type>(gid);
 		}
 
-		Interactive_Graph<graph_type>* Get_Graph(unsigned int graph_id)
+		//template<typename Connection_Type>
+		//Connection<Connection_Type>* Get_Connection(global_edge_id& inbound_edge_id,global_edge_id& outbound_edge_id)
+		//{
+		//	return this_component()->Get_Connection<Connection_Type>(inbound_edge_id,outbound_edge_id);
+		//}
+
+		base_edge_type* Get_Edge(global_edge_id& gid)
 		{
-			return this_component()->Get_Graph(graph);
+			return this_component()->Get_Edge(gid);
 		}
 
-		void Update_Edge(long long id, boost::container::vector<int>* graph_set = nullptr, typename edge_update_callback<edge_type>::type callback = nullptr)
+		void Link_Graphs()
 		{
-			this_component()->Update_Edge(id,graph_set,callback);
+			this_component()->Link_Graphs();
 		}
 
-		void Update_Edges(boost::container::vector<int>* edge_set = nullptr, boost::container::vector<int>* graph_set = nullptr, typename edge_update_callback<edge_type>::type callback = nullptr)
+		template<typename Graph_Type>
+		Graph_Assembler_Connected_Edge<Graph_Type>* Create_New_Graph()
 		{
-			this_component()->Update_All_Edges(id,edge_set,graph_set,callback);
+			return this_component()->Create_New_Graph<Graph_Type>();
+		}
+
+		Graph_Pool<ComponentType>* Create_Copy()
+		{
+			return this_component()->Create_Copy();
 		}
 	};
 }

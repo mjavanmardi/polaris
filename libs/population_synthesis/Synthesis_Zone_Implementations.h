@@ -61,7 +61,7 @@ namespace PopSyn
 			typedef typename Polaris_Component<MasterType,INHERIT(Synthesis_Zone_Implementation_Full),Data_Object>::Component_Type ComponentType;
 
 			// Full versions of the agent containers
-			m_container(boost::container::vector<Household_Components::Prototypes::Household_Properties<typename MasterType::household_type>*>, Synthetic_Households_Container, NONE, NONE);
+			m_container(boost::container::vector<Household_Components::Prototypes::Household<typename MasterType::household_type>*>, Synthetic_Households_Container, NONE, NONE);
 			m_container(boost::container::vector<int>, Activity_Locations_Container, NONE, NONE);
 		};
 

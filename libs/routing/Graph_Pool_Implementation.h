@@ -3,85 +3,100 @@
 
 namespace polaris
 {
-	template<typename MasterType, typename InheritanceList = NULLTYPELIST, typename Graph_Type = NT>
-	struct Graph_Pool_Implementation : public Polaris_Component<MasterType,INHERIT(Graph_Pool_Implementation)>
+	template<typename MasterType, typename InheritanceList = NULLTYPELIST, typename Base_Graph_Type = NT>
+	struct Graph_Pool_Implementation : public Polaris_Component<MasterType, typename Append<InheritanceList,Graph_Pool_Implementation<MasterType,NTL,Base_Graph_Type>>::Result>
 	{
-		Graph_Pool_Implementation():_stored_graphs(0){}
+		Graph_Pool_Implementation():_num_graphs(0){}
 
-		typedef typename Graph_Type graph_type;
-		typedef typename graph_type::edge_type edge_type;
+		typedef Base_Graph_Type base_graph_type;
+		typedef typename base_graph_type::base_edge_type base_edge_type;
 
-		boost::unordered::unordered_map<int,Interactive_Graph<graph_type>*> _graph_pool;
-		unsigned int _stored_graphs;
-
-		unsigned int Add_Graph(Interactive_Graph<graph_type>* graph)
+		base_edge_type* Get_Edge(global_edge_id& gid)
 		{
-			_graph_pool[_stored_graphs] = graph;
-
-			return ++_stored_graphs;
-		}
-		
-		Interactive_Graph<graph_type>* Get_Graph(unsigned int graph_id)
-		{
-			if(_graph_pool.count(graph_id))
+			if( gid.graph_id < _graphs.size() && gid.graph_id >= 0 )
 			{
-				return _graph_pool[graph_id];
+				Interactive_Graph<base_graph_type>* current_graph = (Interactive_Graph<base_graph_type>*)_graphs[ gid.graph_id ];
+
+				return current_graph->Get_Edge(gid.edge_id);
 			}
 			else
 			{
-				THROW_WARNING("Graph: " << graph_id << " does not exist in pool!");
+				THROW_WARNING("Graph id: " << gid.graph_id << " not found");
+
 				return nullptr;
 			}
 		}
 
-		void Update_Edge(long long id, boost::container::vector<int>* graph_set = nullptr, typename edge_update_callback<edge_type>::type callback = nullptr)
+		template<typename Graph_Type>
+		Edge<typename Graph_Type::stored_edge_type>* Get_Edge(global_edge_id& gid)
 		{
-			if(graph_set == nullptr)
+			if( gid.graph_id < _graphs.size() && gid.graph_id >= 0 )
 			{
-				for(boost::unordered::unordered_map<int,Interactive_Graph<graph_type>*>::iterator itr = _graph_pool.begin();itr!=_graph_pool.end();itr++)
-				{
-					itr->second->Update_Edge(id,callback);
-				}
+				Interactive_Graph<Graph_Type>* current_graph = (Interactive_Graph<Graph_Type>*)_graphs[ gid.graph_id ];
+
+				return current_graph->Get_Edge<typename Graph_Type::stored_edge_type>(gid.edge_id);
 			}
 			else
 			{
-				for( boost::container::vector<int>::iterator itr = graph_set->begin();itr!=graph_set->end();itr++)
-				{
-					if(_graph_pool.count( *itr ))
-					{
-						_graph_pool[*itr]->Update_Edge(id,callback);
-					}
-					else
-					{
-						THROW_WARNING("Graph: " << *itr << " does not exist in pool!");
-					}
-				}
-			}	
+				THROW_WARNING("Graph id: " << gid.graph_id << " not found");
+
+				return nullptr;
+			}
 		}
 
-		void Update_Edges(boost::container::vector<long long>* edge_set = nullptr, boost::container::vector<int>* graph_set = nullptr, typename edge_update_callback<edge_type>::type callback = nullptr)
+		void Link_Graphs()
 		{
-			if(graph_set == nullptr)
+			for(boost::container::vector<void*>::iterator itr = _graphs.begin(); itr != _graphs.end(); itr++)
 			{
-				for(boost::unordered::unordered_map<int,Interactive_Graph<graph_type>*>::iterator itr = _graph_pool.begin();itr!=_graph_pool.end();itr++)
-				{
-					itr->second->Update_Edges(edge_set,callback);
-				}
+				Interactive_Graph<base_graph_type>* current_graph = (Interactive_Graph<base_graph_type>*) *itr;
+
+				current_graph->Link_Graph();
 			}
-			else
-			{
-				for( boost::container::vector<int>::iterator itr = graph_set->begin();itr!=graph_set->end();itr++)
-				{
-					if(_graph_pool.count(*itr))
-					{
-						_graph_pool[*itr]->Update_Edges(edge_set,callback);
-					}
-					else
-					{
-						THROW_WARNING("Graph: " << *itr << " does not exist in pool!");
-					}
-				}
-			}			
 		}
+
+		template<typename Graph_Type>
+		Graph_Assembler_Connected_Edge<Graph_Type>* Create_New_Graph()
+		{
+			//Graph_Assembler_Connected_Edge<Graph_Type>* graph = (Graph_Assembler_Connected_Edge<Graph_Type>*)Allocate<Graph_Type>();
+			Graph_Assembler_Connected_Edge<Graph_Type>* graph = (Graph_Assembler_Connected_Edge<Graph_Type>*)(new Graph_Type());
+
+			_graphs.push_back(graph);
+
+			graph->graph_pool_reference(this);
+			graph->graph_id( _num_graphs );
+
+			++_num_graphs;
+
+			return graph;
+		}
+
+		Graph_Pool<ComponentType>* Create_Copy()
+		{
+			//cout << typeid(ComponentType).name() << endl;
+
+			Graph_Pool_Implementation* copy = (Graph_Pool_Implementation*) new ComponentType();
+
+			copy->_num_graphs = _num_graphs;
+
+			for(boost::container::vector<void*>::iterator itr = _graphs.begin(); itr != _graphs.end(); itr++)
+			{
+				Interactive_Graph<base_graph_type>* current_graph = (Interactive_Graph<base_graph_type>*) *itr;
+
+				Graph_Assembler_Connected_Edge<base_graph_type>* copy_graph = (Graph_Assembler_Connected_Edge<base_graph_type>*)current_graph->Create_Copy();
+
+				copy->_graphs.push_back(copy_graph);
+
+				copy_graph->graph_pool_reference(copy);
+			}
+
+			copy->Link_Graphs();
+
+			return (Graph_Pool<ComponentType>*)copy;
+		}
+
+
+		boost::container::vector<void*> _graphs;
+
+		graph_id_type _num_graphs;
 	};
 }

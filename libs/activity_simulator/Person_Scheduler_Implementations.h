@@ -20,18 +20,18 @@ namespace Person_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(General_Person_Scheduler_Implementation),Execution_Object>::Component_Type ComponentType;
 
 			// Pointer to the Parent class
-			m_prototype(Null_Prototype< typename MasterType::person_type>, Parent_Person, NONE, NONE);
+			m_prototype(Prototypes::Person< typename MasterType::person_type>, Parent_Person, NONE, NONE);
 			m_data(int, Activity_Count, NONE, NONE);
 
 			//Containers for activity planning events and movement planning events
-			m_container(boost::container::list<typename MasterType::activity_type*>,Activity_Container, NONE, NONE);
-			m_container(boost::container::list<typename MasterType::movement_plan_type*>,Movement_Plans_Container, NONE, NONE);
+			m_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_type>*>,Activity_Container, NONE, NONE);
+			m_container(boost::container::list<Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type>*>,Movement_Plans_Container, NONE, NONE);
 
 			// Interface definitions
 			typedef  Household_Components::Prototypes::Household< typename type_of(Parent_Person)::type_of(Household)> _Household_Interface;
 			typedef  Scenario_Components::Prototypes::Scenario< typename type_of(Parent_Person)::type_of(scenario_reference)> _Scenario_Interface;
 			typedef  Network_Components::Prototypes::Network< typename type_of(Parent_Person)::type_of(network_reference)> _Network_Interface;
-			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
+			typedef  Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
 			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename _Network_Interface::get_type_of(activity_locations_container)::value_type>::type>  _Activity_Location_Interface;
 			typedef  Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container), _Activity_Location_Interface*> _Activity_Locations_Container_Interface;
 
@@ -41,14 +41,14 @@ namespace Person_Components
 			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename _Network_Interface::get_type_of(zones_container)::value_type>::type>  _Zone_Interface;
 			typedef  Pair_Associative_Container< typename _Network_Interface::get_type_of(zones_container), _Zone_Interface*> _Zones_Container_Interface;
 
-			typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer<typename  type_of(Activity_Container)::value_type>::type> Activity_Plan;
-			typedef Back_Insertion_Sequence< type_of(Activity_Container),Activity_Plan*> Activity_Plans;
+			typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer<typename type_of(Activity_Container)::value_type>::type> Activity_Plan;
+			typedef Back_Insertion_Sequence<typename type_of(Activity_Container),Activity_Plan*> Activity_Plans;
 
-			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer<typename  type_of(Movement_Plans_Container)::value_type>::type> Movement_Plan;
-			typedef Back_Insertion_Sequence< type_of(Movement_Plans_Container),Movement_Plan*> Movement_Plans;
+			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer<typename type_of(Movement_Plans_Container)::value_type>::type> Movement_Plan;
+			typedef Back_Insertion_Sequence<typename type_of(Movement_Plans_Container),Movement_Plan*> Movement_Plans;
 
 			typedef Activity_Components::Prototypes::Activity_Planner<typename remove_pointer< typename type_of(Parent_Person)::type_of(Activity_Record_Container)::value_type>::type> Activity_Record;
-			typedef Back_Insertion_Sequence< typename type_of(Parent_Person)::type_of(Activity_Record_Container),Activity_Record*> Activity_Records;
+			typedef Back_Insertion_Sequence<typename type_of(Parent_Person)::type_of(Activity_Record_Container),Activity_Record*> Activity_Records;
 
 			typedef Activity_Components::Prototypes::Activity_Planner<typename MasterType::at_home_activity_plan_type> At_Home_Activity_Plan;
 			// member features
@@ -164,7 +164,7 @@ namespace Person_Components
 			{
 				Activity_Plan* act = (Activity_Plan*)current_activity;
 				_Network_Interface* network = _Parent_Person->template network_reference<_Network_Interface*>();
-				Parent_Person_interface_type* person = (Parent_Person_interface_type*)_Parent_Person;
+				Parent_Person_type* person = (Parent_Person_type*)_Parent_Person;
 
 				// if the start time of the activity has not been planned set the previous location to home
 				if (!act->template Start_Is_Planned<bool>()) return _Parent_Person->template Home_Location<ReturnType>();

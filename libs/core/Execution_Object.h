@@ -19,9 +19,11 @@ namespace polaris
 	public:
 		Base_Object():_component_id(-1){}
 		
-		Base_Object(size_t component_id,int uuid): _component_id(component_id),_uuid(uuid){}
+		Base_Object(size_t component_id,int uuid): _component_id((unsigned int)component_id),_uuid(uuid){}
 
-		size_t _component_id;
+		//virtual void Allocate_Vtable(){}
+
+		unsigned int _component_id;
 		int _uuid;
 	};
 	

@@ -25,7 +25,7 @@ namespace polaris
 		const Revision update_revision(start_iteration,start_sub_iteration);
 		
 		#ifdef FORWARD_SIMULATION_MODE
-			if(update_revision <= revision() && update_revision != FREE)
+			if(update_revision <= revision() && update_revision != FREE && update_revision._revision != 0)
 			{
 				THROW_EXCEPTION("Simulation specified as Forward Simulation, error loading object: " << typeid(DataType).name() << " at step: " << iteration() << "," << sub_iteration() << " to step: " << update_revision._iteration << "," << update_revision._sub_iteration);
 			}

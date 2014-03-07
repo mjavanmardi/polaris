@@ -6,8 +6,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 
 #options to be used while running cmake
-option(Antares		"Build with Antares"	OFF)
-
+#option(Antares "Build with Antares" ON)
+set(Antares ON)
 
 
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER cmake)
@@ -114,10 +114,11 @@ add_subdirectory (tests/core_tests)
 
 #Apply CMake over POLARIS application project structure
 add_subdirectory (apps/io_demo) 
-add_subdirectory (apps/test) 
+
 add_subdirectory (apps/fixed_demand_simulator) 
 add_subdirectory (apps/integrated_abm) 
 add_subdirectory (apps/population_synthesizer)
+add_subdirectory (apps/test) 
 
 if (MSVC AND Antares)
 	include_directories(${DEPS_DIR}/glew-1.7.0/include)
@@ -126,6 +127,7 @@ if (MSVC AND Antares)
 	include_directories(${DEPS_DIR}/wxWidgets-2.9.3/include/msvc)
     set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${DEPS_DIR}/glew-1.7.0/lib ${DEPS_DIR}/plplot/lib)
     link_directories( ${LINK_DIRECTORIES} ${DEPS_DIR}/wxWidgets-2.9.3/lib/vc_lib )
+
     find_library(glew glew32s)
 	find_library(plplotd plplotd)
 	find_library(plplotcxxd plplotcxxd )
@@ -143,9 +145,9 @@ if (MSVC AND Antares)
 	ADD_DEFINITIONS( -DwxUSE_GUI=1 )
 	ADD_DEFINITIONS( -D_CRT_SECURE_NO_DEPRECATE )
 	ADD_DEFINITIONS( -D_CRT_NONSTDC_NO_DEPRECATE )	
-    set(antareslibs antares ${glew} ${plplotd} ${plplotcxxd} ${csirocsa} ${qsastime} ${plplotwxwidgetsd})    
+    set(antareslibs Antares ${glew} ${plplotd} ${plplotcxxd} ${csirocsa} ${qsastime} ${plplotwxwidgetsd})    
     add_subdirectory (libs/antares)
-    add_subdirectory (apps/demo)
+	add_subdirectory (apps/demo)
 endif()
 
 

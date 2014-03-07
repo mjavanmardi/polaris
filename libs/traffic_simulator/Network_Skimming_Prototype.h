@@ -143,12 +143,12 @@ namespace Network_Skimming_Components
 
 				typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename zone_itf::get_type_of(origin_activity_locations)::value_type>::type> location_itf;
 				typedef Random_Access_Sequence<typename zone_itf::get_type_of(origin_activity_locations),location_itf*> locations_itf;
-
-				typedef Link_Components::Prototypes::Link<typename remove_pointer<typename location_itf::get_type_of(origin_links)::value_type>::type> link_itf;
-				typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links),link_itf*> links_itf;
-
-				typedef Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename link_itf::get_type_of(outbound_turn_movements)::value_type>::type> turn_itf;
-				typedef Random_Access_Sequence<typename link_itf::get_type_of(outbound_turn_movements),turn_itf*> turns_itf;
+			
+				typedef Random_Access_Sequence<typename location_itf::get_type_of(origin_links)> links_itf;
+				typedef Link_Components::Prototypes::Link<typename get_value_type(links_itf)> link_itf;
+				
+				typedef Random_Access_Sequence<typename link_itf::get_type_of(outbound_turn_movements)> turns_itf;
+				typedef Turn_Movement_Components::Prototypes::Movement<typename get_value_type(turns_itf)> turn_itf;
 
 				/*typedef Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename get_type_of(origin_locations)::value_type>::type> origin_location_itf;
 				typedef Random_Access_Sequence<typename get_type_of(origin_locations),origin_location_itf*> origin_locations_itf;*/

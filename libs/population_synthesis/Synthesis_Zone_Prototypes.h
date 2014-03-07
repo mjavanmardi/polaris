@@ -263,7 +263,6 @@ namespace PopSyn
 
 				typedef  Random_Access_Sequence< typename get_type_of(Synthetic_Households_Container)> households_itf;
 				typedef  Household_Components::Prototypes::Household<typename get_value_type(households_itf)>  household_itf;
-				
 
 				typedef  Random_Access_Sequence< typename household_itf::get_type_of(Persons_Container)> persons_itf;
 				typedef  Person_Components::Prototypes::Person<typename get_value_type(persons_itf)>  person_itf;
@@ -291,11 +290,11 @@ namespace PopSyn
 				{
 					person_itf* person =(person_itf*)Allocate<typename person_itf::Component_Type>();
 					person->template Static_Properties<person_unit_itf*>((person_unit_itf*)(*person_unit_itr));
-					hh->template Persons_Container<persons_itf&>().push_back((typename person_itf::Component_Type*)person);
+					hh->template Persons_Container<persons_itf&>().push_back(person);
 					person->template Household<household_itf*>(hh);
 				}
 				//
-				household_container->push_back((typename get_type_of(Synthetic_Households_Container)::value_type)hh);
+				household_container->push_back(hh);
 			}
 			template<typename TargetType> void Create_Household(TargetType static_properties, requires(TargetType, !sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Simulator_Usable_Prototype) && sub_check(ComponentType, Concepts::Is_Synthesis_Zone, Is_Synthesis_Usable_Prototype)))
 			{

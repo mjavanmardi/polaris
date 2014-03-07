@@ -64,7 +64,7 @@ namespace Vehicle_Components
 
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
 			typedef  Switch_Decision_Data<typename remove_pointer<typename  type_of(switch_decisions_container)::value_type>::type>  _Switch_Decision_Data_Interface;
-			typedef  Random_Access_Sequence< type_of(switch_decisions_container), _Switch_Decision_Data_Interface*> _Switch_Decision_Data_Container_Interface;
+			typedef  Random_Access_Sequence<typename type_of(switch_decisions_container), _Switch_Decision_Data_Interface*> _Switch_Decision_Data_Container_Interface;
 
 			typedef  Link<typename remove_pointer< typename _Switch_Decision_Data_Interface::get_type_of(route_links_container)::value_type>::type>  _Link_Interface;
 			typedef  Random_Access_Sequence< typename _Switch_Decision_Data_Interface::get_type_of(route_links_container), _Link_Interface*> _Links_Container_Interface;
@@ -81,20 +81,20 @@ namespace Vehicle_Components
 			typedef  Random_Access_Sequence< typename _Link_Interface::get_type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Network_Event_Components::Prototypes::Network_Event<typename MasterType::base_network_event_type> _Network_Event_Interface;
-			typedef  Traveler_Components::Prototypes::Traveler< type_of(traveler)> _Traveler_Interface;
-			typedef Network_Components::Prototypes::Network<typename MasterType::routable_network_type> _Routable_Network_Interface;
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename _Routable_Network_Interface::get_type_of(reversed_path_container)::value_type>::type>  _Regular_Link_Interface;
-			typedef  Random_Access_Sequence< typename _Routable_Network_Interface::get_type_of(reversed_path_container), _Regular_Link_Interface*> _Reversed_Path_Container_Interface;
-
-			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename _Regular_Link_Interface::get_type_of(realtime_replicas_container)::value_type>::type>  _Routable_Link_Interface;
-			typedef  Random_Access_Sequence< typename _Regular_Link_Interface::get_type_of(realtime_replicas_container), _Routable_Link_Interface*> _Routable_Links_Container_Interface;
+			typedef  Traveler_Components::Prototypes::Traveler<typename type_of(traveler)> _Traveler_Interface;
+			
+			//TODO:ROUTING
+			//typedef Network_Components::Prototypes::Network<typename MasterType::routable_network_type> _Routable_Network_Interface;
+			//typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename _Routable_Network_Interface::get_type_of(reversed_path_container)::value_type>::type>  _Regular_Link_Interface;
+			//typedef  Random_Access_Sequence< typename _Routable_Network_Interface::get_type_of(reversed_path_container), _Regular_Link_Interface*> _Reversed_Path_Container_Interface;
+			//typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename _Regular_Link_Interface::get_type_of(realtime_replicas_container)::value_type>::type>  _Routable_Link_Interface;
+			//typedef  Random_Access_Sequence< typename _Regular_Link_Interface::get_type_of(realtime_replicas_container), _Routable_Link_Interface*> _Routable_Links_Container_Interface;
+			//typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Regular_Movement_Interface::get_type_of(realtime_replicas_container)::value_type>::type>  _Routable_Movement_Interface;
+			//typedef  Random_Access_Sequence< typename _Regular_Movement_Interface::get_type_of(realtime_replicas_container), _Routable_Movement_Interface*> _Routable_Movements_Container_Interface;
 
 			typedef Network_Components::Prototypes::Network<typename MasterType::network_type> _Regular_Network_Interface;
 			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Regular_Network_Interface::get_type_of(turn_movements_container)::value_type>::type>  _Regular_Movement_Interface;
 			typedef  Random_Access_Sequence< typename _Regular_Network_Interface::get_type_of(turn_movements_container), _Regular_Movement_Interface*> _Regular_Movements_Container_Interface;
-
-			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Regular_Movement_Interface::get_type_of(realtime_replicas_container)::value_type>::type>  _Routable_Movement_Interface;
-			typedef  Random_Access_Sequence< typename _Regular_Movement_Interface::get_type_of(realtime_replicas_container), _Routable_Movement_Interface*> _Routable_Movements_Container_Interface;
 
 			typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename _Regular_Network_Interface::get_type_of(links_container)::value_type>::type>  _Regular_Link_Interface3;
 			typedef  Random_Access_Sequence< typename _Regular_Network_Interface::get_type_of(links_container), _Regular_Link_Interface3*> _Regular_Links_Container_Interface;
@@ -247,7 +247,6 @@ namespace Vehicle_Components
 				((_Link_Interface*)link)->template push_vehicle_from_network<_Vehicle_Interface*>((_Vehicle_Interface*)this);
 			}
 
-
 			template<typename TargetType> void check_enroute_switching(_Link_Interface* link)
 			{
 				if (int(((_Link_Interface*)link)->template outbound_turn_movements<_Movements_Container_Interface&>().size()) <= 1)
@@ -276,7 +275,15 @@ namespace Vehicle_Components
 					_Trajectory_Unit_Interface* current_traj_unit = traj_container[position_index];
 					int routed_travel_time = current_traj_unit->template estimated_link_accepting_time<int>();
 					float observed_delay_ratio = routed_travel_time > 0 ? (float)current_travel_time / (float)routed_travel_time : 0;
-					if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_ratio_for_enroute_switching<float>() && current_travel_time - routed_travel_time > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>())
+					
+					// three conditions:
+					// - a person's perceived delay in arriving to their destination
+					// - a sufficient amount of time spent delayed
+					// - sufficiently far from their destination in absolute terms
+
+					if (observed_delay_ratio > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_ratio_for_enroute_switching<float>() &&
+						(current_travel_time - routed_travel_time) > ((_Scenario_Interface*)_global_scenario)->template minimum_delay_seconds_for_enroute_switching<float>() &&
+						( mp->estimated_time_of_arrival<float>() - iteration() ) < ((_Scenario_Interface*)_global_scenario)->template minimum_seconds_from_arrival_for_enroute_switching<float>())
 					{
 						double r0 = Uniform_RNG.Next_Rand<double>();
 
@@ -288,6 +295,7 @@ namespace Vehicle_Components
 						}
 					}
 				}
+
 				if (!enroute_switching_decision)
 				{
 
@@ -514,104 +522,256 @@ namespace Vehicle_Components
 
 			template<typename TargetType> void enroute_switching(int cause_for_switching)
 			{
-				int current_route_link_sum_to_destination = 0;
+				//TODO:ROUTING_OPERATION
+				/////calculate travel time of the best route
+				//_Regular_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Regular_Link_Interface*>();
+				//_Regular_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Regular_Link_Interface*>();
+				//_router->template routable_origin<_Regular_Link_Interface*>(origin_link);
+				//_router->template routable_destination<_Regular_Link_Interface*>(destination_link);
+
+
+				//TODO:ROUTING_OPERATION
+				//bool use_realtime_travel_time = ((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>();;
+				//_Routable_Network_Interface* routable_network_ptr;
+				//if (use_realtime_travel_time)
+				//{
+				//	routable_network_ptr = _router->template realtime_routable_network<_Routable_Network_Interface*>();
+				//}
+				//else
+				//{
+
+				//	routable_network_ptr = _router->template routable_network<_Routable_Network_Interface*>();
+				//}
+
+				//already commented out
+				////float routed_travel_time = router->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
+
+				//TODO:ROUTING_OPERATION
+				//float best_route_time_to_destination = _router->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr, reversed_arrival_time_container);
+
 				float current_route_time_to_destination = 0.0f;
 
-				update_eta<NULLTYPE>(current_route_link_sum_to_destination, current_route_time_to_destination);
+				update_eta<NULLTYPE>(current_route_time_to_destination);
+				_Network_Interface* net = (_Network_Interface*)_global_network;
 
-				///calcualte travel time of the best route
-				_Regular_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Regular_Link_Interface*>();
-				_Regular_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Regular_Link_Interface*>();
-				_router->template routable_origin<_Regular_Link_Interface*>(origin_link);
-				_router->template routable_destination<_Regular_Link_Interface*>(destination_link);
+				Routable_Network<typename MasterType::routable_network_type>* routable_net = net->routable_network<typename MasterType::routable_network_type>();
+				
+				_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Link_Interface*>();
+				_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Link_Interface*>();
 
-				bool use_realtime_travel_time = ((_Scenario_Interface*)_global_scenario)->template use_realtime_travel_time_for_enroute_switching<bool>();;
-				_Routable_Network_Interface* routable_network_ptr;
-				if (use_realtime_travel_time)
-				{
-					routable_network_ptr = _router->template realtime_routable_network<_Routable_Network_Interface*>();
-				}
-				else
-				{
+				boost::container::deque<global_edge_id> path_container;
+				boost::container::deque<float> cumulative_cost_container;
 
-					routable_network_ptr = _router->template routable_network<_Routable_Network_Interface*>();
-				}
-
-				//float routed_travel_time = router->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr);
 				int best_route_link_sum = 0;
-				boost::container::vector<float> reversed_arrival_time_container;
-				float best_route_time_to_destination = _router->template one_to_one_link_based_least_time_path_a_star<_Routable_Network_Interface*>(routable_network_ptr, reversed_arrival_time_container);
 
-				///find a new route using shortest path algorithm
-				//if (routed_travel_time >= 0.0)
+				float best_route_time_to_destination = routable_net->compute_static_network_path(origin_link->uuid<int>(),destination_link->uuid<int>(),path_container,cumulative_cost_container);
+
+
 				if (best_route_time_to_destination >= 0.0)
 				{	
-					if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
+					
+					if (path_container.size() == 0)
 					{
-						THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
-						THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->uuid<int>() << " and destination link uuid " << destination_link->uuid<int>());
+						//THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
+						THROW_EXCEPTION("no path between origin link uuid " << origin_link->uuid<int>() << " and destination link uuid " << destination_link->uuid<int>() << endl);
 					}
 					
-					typename _Reversed_Path_Container_Interface::iterator itr;
-					for(itr = routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin(); itr != routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().end(); itr++)
-					{
-						_Regular_Link_Interface* link = (_Regular_Link_Interface*)(*itr);
-						best_route_link_sum += link->template internal_id<int>();
-					}
-					_Regular_Link_Interface* regular_destination_link = (_Regular_Link_Interface*)(*(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin()));
-					_Routable_Link_Interface* routable_destination_link;
-					if (use_realtime_travel_time)
-					{
-						routable_destination_link = (_Routable_Link_Interface*)(regular_destination_link->template realtime_replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]);
-					}
-					else
-					{
-						routable_destination_link = (_Routable_Link_Interface*)(regular_destination_link->template replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]);
-					}
-					//float best_route_time_to_destination = routable_destination_link->template label_cost<float>();
+					//This code doesn't reliably verify that the path is new
+					//typename _Reversed_Path_Container_Interface::iterator itr;
+					//for(itr = routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin(); itr != routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().end(); itr++)
+					//{
+					//	_Regular_Link_Interface* link = (_Regular_Link_Interface*)(*itr);
+					//	best_route_link_sum += link->template internal_id<int>();
+					//}
+					//_Regular_Link_Interface* regular_destination_link = (_Regular_Link_Interface*)(*(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin()));
+					//_Routable_Link_Interface* routable_destination_link;
+					//if (use_realtime_travel_time)
+					//{
+					//	routable_destination_link = (_Routable_Link_Interface*)(regular_destination_link->template realtime_replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]);
+					//}
+					//else
+					//{
+					//	routable_destination_link = (_Routable_Link_Interface*)(regular_destination_link->template replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]);
+					//}
 
-					if (best_route_link_sum != current_route_link_sum_to_destination)
+					if (best_route_time_to_destination < current_route_time_to_destination)
 					{
 						if (best_route_time_to_destination < current_route_time_to_destination*(1.0 - _relative_indifference_band_route_choice) &&
 							best_route_time_to_destination < (current_route_time_to_destination - _minimum_travel_time_saving))
 						{
 							update_enroute_switch_decisions<  TargetType>(cause_for_switching);
-							((_Movement_Plan_Interface*)_movement_plan)->template update_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>(), reversed_arrival_time_container);
+							((_Movement_Plan_Interface*)_movement_plan)->update_trajectory(path_container, cumulative_cost_container);
 
 							int current_time = ((_Regular_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
-
-							//int current_eta = ((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>();
 							((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>(current_time + best_route_time_to_destination);
-							//int new_eta = ((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>();
-
-							//int routed_travel_time = ((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>();
-							//int time_saved = current_route_time_to_destination - best_route_time_to_destination;
+							
 							int departure_time = ((_Movement_Plan_Interface*)_movement_plan)->template absolute_departure_time<int>();
 							((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>(current_time - departure_time + best_route_time_to_destination);
-							//int new_routed_travel_time = ((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>();
+							///cout << "decided to switch" << endl;
+						}
+						else
+						{
+							//cout << "decided not to switch: " << best_route_time_to_destination << "," << current_route_time_to_destination << "," << current_route_time_to_destination*(1.0 - _relative_indifference_band_route_choice) << "," << (current_route_time_to_destination - _minimum_travel_time_saving) << "," << _minimum_travel_time_saving << "," << _relative_indifference_band_route_choice << endl;
+						}
+					}
+					else
+					{
 
-							/////en-route switching
-							//if (_enroute_information_type == Vehicle_Components::Types::Enroute_Information_Keys::WITH_REALTIME_INFORMATION)
-							//{
-								//cout<< "enroute switching...realtime informed vehicle  " << _internal_id << "'s #" << int(_switch_decisions_container.size()) << " switch with " << time_saved/60.0f << " minutes time saving." <<endl;
-							//}
-							//else
-							//{
-								//cout<< "enroute switching...realtime uninformed vehicle " << _internal_id << "'s #" << int(_switch_decisions_container.size()) << " switch with " << time_saved/60.0f << " minutes time saving." <<endl;
-							//}
-							//cout<< "current_time" << convert_seconds_to_hhmmss(current_time) <<endl;
-							//cout<< "departure_time" << convert_seconds_to_hhmmss(departure_time) <<endl;
-							//cout<< "current_route_time_to_destination = " << current_route_time_to_destination << " seconds, best_route_time_to_destination = " << best_route_time_to_destination << " seconds." <<endl;
-							//cout<< "current_travel_time = " << routed_travel_time << " minutes, new_travel_time = " << new_routed_travel_time << " seconds." <<endl;
-							//cout<< "current_eta = " << convert_seconds_to_hhmmss(current_eta) << ", new_eta = " << convert_seconds_to_hhmmss(new_eta) << "." <<endl;
+						if(best_route_time_to_destination != current_route_time_to_destination)
+						{
+							THROW_WARNING("eta error, best route time greater than current route time: " << best_route_time_to_destination << "," << current_route_time_to_destination);
+
+						//	_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
+						//	
+						//	float cost_sum = 0.0f;
+						//	
+						//	cout << "Routed cost container: " << endl;
+
+						//	for(boost::container::deque<float>::iterator itr = cumulative_cost_container.begin(); itr!=cumulative_cost_container.end();itr++)
+						//	{
+						//		cout << *itr << endl;
+						//	}
+						//	cout << "Routed cost profile: " << endl;
+
+						//	for(boost::container::deque<global_edge_id>::iterator itr = path_container.begin();itr!=path_container.end();)
+						//	{
+						//		_Link_Interface* link = net->get_link_ptr< typename MasterType::link_type >( itr->edge_id );
+
+						//		++itr;
+
+						//		if(itr!=path_container.end())
+						//		{
+						//			_Link_Interface* next_link = net->get_link_ptr< typename MasterType::link_type >( itr->edge_id );
+
+						//			//int inbound_link_id = link->template internal_id<int>();
+						//			//int outbound_link_id = next_link->template internal_id<int>();
+						//			int inbound_link_id = link->template uuid<int>();
+						//			int outbound_link_id = next_link->template uuid<int>();
+
+						//			typename MasterType::network_type::long_hash_key_type long_hash_key;
+						//			long_hash_key.inbound_link_id = inbound_link_id;
+						//			long_hash_key.outbound_link_id = outbound_link_id;
+						//			typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+
+						//			cout << link_turn_movement_map.count(long_hash_key.movement_id) << ": " << inbound_link_id << "," << outbound_link_id << "," << endl;
+
+						//			_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
+						//		
+						//			float current = regular_movement->template forward_link_turn_travel_time<float>();
+						//		
+						//			cost_sum+=current;
+
+						//			cout << link->uuid<int>() << " to " << next_link->uuid<int>() << "," << cost_sum << "," << current << endl;
+
+						//			cout << regular_movement->inbound_link<_Link_Interface*>()->uuid<int>() << " to " << regular_movement->outbound_link<_Link_Interface*>()->uuid<int>() << "," << regular_movement->template forward_link_turn_travel_time<float>() << endl;
+
+						//			cout << "Outbound turn movements summary: " << endl;
+
+						//			boost::container::vector<typename MasterType::turn_movement_type*>* movements = link->outbound_turn_movements<boost::container::vector<typename MasterType::turn_movement_type*>*>();
+
+						//			for(boost::container::vector<typename MasterType::turn_movement_type*>::iterator itr = movements->begin();itr!=movements->end();itr++)
+						//			{
+						//				Movement<typename MasterType::turn_movement_type>* current_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
+
+						//				cout << current_movement->inbound_link<_Link_Interface*>()->uuid<int>() << "," << current_movement->outbound_link<_Link_Interface*>()->uuid<int>() << "," << current_movement->forward_link_turn_travel_time<float>() << endl;
+						//			}
+						//		}
+						//	}
+
+						//	cost_sum = 0.0f;
+
+						//	cout << "Current cost profile: " << endl;
+						//
+						//	//_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
+						//	typename _Trajectory_Container_Interface::iterator itr;
+
+						//	for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
+						//	{
+						//		_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
+						//		_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+
+						//		if (itr < trajectory.end() - 1)
+						//		{
+						//			_Trajectory_Unit_Interface* next_trajectory_unit = (_Trajectory_Unit_Interface*)(*(itr+1));
+						//			_Link_Interface* next_route_link = next_trajectory_unit->template link<_Link_Interface*>();
+
+						//			//int inbound_link_id = route_link->template internal_id<int>();
+						//			//int outbound_link_id = next_route_link->template internal_id<int>();
+						//			int inbound_link_id = route_link->template uuid<int>();
+						//			int outbound_link_id = next_route_link->template uuid<int>();
+
+						//			typename MasterType::network_type::long_hash_key_type long_hash_key;
+						//			long_hash_key.inbound_link_id = inbound_link_id;
+						//			long_hash_key.outbound_link_id = outbound_link_id;
+						//			typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
+						//			_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
+
+						//			float current = regular_movement->template forward_link_turn_travel_time<float>();
+						//		
+						//			cost_sum+=current;
+
+						//			cout << route_link->uuid<int>() << " to " << next_route_link->uuid<int>() << "," << cost_sum << "," << current << endl;
+						//		}
+						//	}
 						}
 					}
 				}
+
+				///find a new route using shortest path algorithm
+				
+				
+				//already commented out
+				////if (routed_travel_time >= 0.0)
+
+				////TODO:ROUTING_OPERATION
+				//if (best_route_time_to_destination >= 0.0)
+				//{	
+				//	
+				//	if (routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() == 0)
+				//	{
+				//		THROW_WARNING(endl << "Error: path size is: " << routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().size() << endl);
+				//		THROW_EXCEPTION(endl << "no path between origin link uuid " << origin_link->uuid<int>() << " and destination link uuid " << destination_link->uuid<int>());
+				//	}
+				//	
+				//	typename _Reversed_Path_Container_Interface::iterator itr;
+				//	for(itr = routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin(); itr != routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().end(); itr++)
+				//	{
+				//		_Regular_Link_Interface* link = (_Regular_Link_Interface*)(*itr);
+				//		best_route_link_sum += link->template internal_id<int>();
+				//	}
+				//	_Regular_Link_Interface* regular_destination_link = (_Regular_Link_Interface*)(*(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>().begin()));
+				//	_Routable_Link_Interface* routable_destination_link;
+				//	if (use_realtime_travel_time)
+				//	{
+				//		routable_destination_link = (_Routable_Link_Interface*)(regular_destination_link->template realtime_replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]);
+				//	}
+				//	else
+				//	{
+				//		routable_destination_link = (_Routable_Link_Interface*)(regular_destination_link->template replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]);
+				//	}
+
+				//	if (best_route_link_sum != current_route_link_sum_to_destination)
+				//	{
+				//		if (best_route_time_to_destination < current_route_time_to_destination*(1.0 - _relative_indifference_band_route_choice) &&
+				//			best_route_time_to_destination < (current_route_time_to_destination - _minimum_travel_time_saving))
+				//		{
+				//			update_enroute_switch_decisions<  TargetType>(cause_for_switching);
+				//			((_Movement_Plan_Interface*)_movement_plan)->template update_trajectory<_Reversed_Path_Container_Interface>(routable_network_ptr->template reversed_path_container<_Reversed_Path_Container_Interface&>(), reversed_arrival_time_container);
+
+				//			int current_time = ((_Regular_Network_Interface*)_global_network)->template start_of_current_simulation_interval_absolute<int>();
+				//			((_Movement_Plan_Interface*)_movement_plan)->template estimated_time_of_arrival<float>(current_time + best_route_time_to_destination);
+				//			int departure_time = ((_Movement_Plan_Interface*)_movement_plan)->template absolute_departure_time<int>();
+				//			((_Movement_Plan_Interface*)_movement_plan)->template routed_travel_time<float>(current_time - departure_time + best_route_time_to_destination);
+				//		}
+				//	}
+				//}
 			}
 
 			template<typename TargetType> void initialize()
 			{
 				_is_integrated=false;
+				
+				_simulation_status=Types::Vehicle_Status_Keys::UNLOADED;
 
 				///
 				//unsigned long seed = ((_Scenario_Interface*)_global_scenario)->template iseed<unsigned int>()+_internal_id+1;
@@ -654,14 +814,13 @@ namespace Vehicle_Components
 				//Initialize<TargetType>();
 			}
 
-			template<typename TargetType> void update_eta(int& current_route_link_sum_to_destination, float& current_route_time_to_destination)
+			template<typename TargetType> void update_eta(float& current_route_time_to_destination)
 			{
-	
 				_Trajectory_Container_Interface& trajectory= ((_Movement_Plan_Interface*)_movement_plan)->template trajectory_container<_Trajectory_Container_Interface&>();
 				typename _Trajectory_Container_Interface::iterator itr;
 
-				_Regular_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Regular_Link_Interface*>();
-				_Regular_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Regular_Link_Interface*>();
+				_Link_Interface* origin_link = ((_Movement_Plan_Interface*)_movement_plan)->template current_link<_Link_Interface*>();
+				_Link_Interface* destination_link = ((_Movement_Plan_Interface*)_movement_plan)->template destination<_Link_Interface*>();
 				
 				///calculate travel time of current route
 
@@ -670,52 +829,52 @@ namespace Vehicle_Components
 				for (itr = (trajectory.begin() + ((_Movement_Plan_Interface*)_movement_plan)->template current_trajectory_position<int&>()); itr != trajectory.end(); itr++)
 				{
 					_Trajectory_Unit_Interface* trajectory_unit = (_Trajectory_Unit_Interface*)(*itr);
-					_Regular_Link_Interface* route_link = trajectory_unit->template link<_Regular_Link_Interface*>();
-					_Routable_Link_Interface* routable_link;
-					if (use_realtime_travel_time)
-					{
-						routable_link = (_Routable_Link_Interface*)(route_link->template realtime_replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]); 
-					}
-					else
-					{
-						routable_link = (_Routable_Link_Interface*)(route_link->template replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]); 
-					}
-					float link_travel_time = routable_link->template travel_time<float>();
+					_Link_Interface* route_link = trajectory_unit->template link<_Link_Interface*>();
+					//_Routable_Link_Interface* routable_link;
+					//if (use_realtime_travel_time)
+					//{
+					//	routable_link = (_Routable_Link_Interface*)(route_link->template realtime_replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]); 
+					//}
+					//else
+					//{
+					//	routable_link = (_Routable_Link_Interface*)(route_link->template replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]); 
+					//}
 
-					current_route_link_sum_to_destination += route_link-> template internal_id<int>();
-					//current_route_time_to_destination += link_travel_time;
 					if (itr < trajectory.end() - 1)
 					{
 						_Trajectory_Unit_Interface* next_trajectory_unit = (_Trajectory_Unit_Interface*)(*(itr+1));
-						_Regular_Link_Interface* next_route_link = next_trajectory_unit->template link<_Regular_Link_Interface*>();
+						_Link_Interface* next_route_link = next_trajectory_unit->template link<_Link_Interface*>();
 
-						_Routable_Link_Interface* next_routable_link;
-						if (use_realtime_travel_time)
-						{
-							next_routable_link = (_Routable_Link_Interface*)(next_route_link->template realtime_replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]); 
-						}
-						else
-						{
-							next_routable_link = (_Routable_Link_Interface*)(next_route_link->template replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]); 
-						}
+						//_Routable_Link_Interface* next_routable_link;
+						//if (use_realtime_travel_time)
+						//{
+						//	next_routable_link = (_Routable_Link_Interface*)(next_route_link->template realtime_replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]); 
+						//}
+						//else
+						//{
+						//	next_routable_link = (_Routable_Link_Interface*)(next_route_link->template replicas_container<_Routable_Links_Container_Interface&>()[__thread_id]); 
+						//}
 
-						int inbound_link_id = route_link->template internal_id<int>();
-						int outbound_link_id = next_route_link->template internal_id<int>();
+						//int inbound_link_id = route_link->template internal_id<int>();
+						//int outbound_link_id = next_route_link->template internal_id<int>();
+						int inbound_link_id = route_link->template uuid<int>();
+						int outbound_link_id = next_route_link->template uuid<int>();
+
 						typename MasterType::network_type::long_hash_key_type long_hash_key;
 						long_hash_key.inbound_link_id = inbound_link_id;
 						long_hash_key.outbound_link_id = outbound_link_id;
 						typename MasterType::network_type::link_turn_movement_map_type&  link_turn_movement_map = ((_Regular_Network_Interface*)_global_network)->template link_turn_movement_map<typename MasterType::network_type::link_turn_movement_map_type&>();
 						_Regular_Movement_Interface* regular_movement = (_Regular_Movement_Interface*)link_turn_movement_map[long_hash_key.movement_id];
-						_Routable_Movement_Interface* routable_movement;
-						if (use_realtime_travel_time)
-						{
-							routable_movement = (_Routable_Movement_Interface*)regular_movement->template realtime_replicas_container<_Routable_Movements_Container_Interface&>()[__thread_id]; 
-						}
-						else
-						{
-							routable_movement = (_Routable_Movement_Interface*)regular_movement->template replicas_container<_Routable_Movements_Container_Interface&>()[__thread_id]; 
-						}
-						float link_turn_travel_time = routable_movement->template forward_link_turn_travel_time<float>();
+						//_Routable_Movement_Interface* routable_movement;
+						//if (use_realtime_travel_time)
+						//{
+						//	routable_movement = (_Routable_Movement_Interface*)regular_movement->template realtime_replicas_container<_Routable_Movements_Container_Interface&>()[__thread_id]; 
+						//}
+						//else
+						//{
+						//	routable_movement = (_Routable_Movement_Interface*)regular_movement->template replicas_container<_Routable_Movements_Container_Interface&>()[__thread_id]; 
+						//}
+						float link_turn_travel_time = regular_movement->template forward_link_turn_travel_time<float>();
 						current_route_time_to_destination += link_turn_travel_time;
 					}
 				}

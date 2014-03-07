@@ -35,6 +35,8 @@ namespace Movement_Plan_Components
 
 		implementation struct Movement_Plan_Implementation:public Polaris_Component<MasterType,INHERIT(Movement_Plan_Implementation),Data_Object>
 		{
+			static m_prototype(Network<typename MasterType::network_type>,network,NONE,NONE);
+
 			typedef Implementations::Trajectory_Unit_Implementation<MasterType> trajectory_unit_type;
 			m_container(boost::container::vector<trajectory_unit_type*>, trajectory_container, NONE, NONE);
 			
@@ -117,13 +119,16 @@ namespace Movement_Plan_Components
 
 			m_data(bool, valid_trajectory, NONE, NONE);
 		};
+		
+		template<typename MasterType,typename InheritanceList>
+		Network<typename MasterType::network_type>* Movement_Plan_Implementation<MasterType,InheritanceList>::_network;
 
 		implementation struct Integrated_Movement_Plan_Implementation : public Movement_Plan_Implementation<MasterType, INHERIT(Integrated_Movement_Plan_Implementation)>
 		{
 			typedef Movement_Plan_Implementation<MasterType, INHERIT(Integrated_Movement_Plan_Implementation)> Base_Type;
 			typedef typename Base_Type::Component_Type ComponentType;
 
-			m_prototype(Null_Prototype< typename MasterType::activity_type>, destination_activity_reference, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, destination_activity_reference, NONE, NONE);
 			template<typename TargetType> void arrive_to_destination()
 			{
 				Base_Type* bthis = (Base_Type*)this;

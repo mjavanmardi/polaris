@@ -574,8 +574,10 @@ namespace Network_Components
 					outbound_link->template num_inbound_turn_lanes<int&>() += turn_movement->template num_turn_lanes<int>();
 					
 					turn_movement->template movement_rule<Turn_Movement_Components::Types::Turn_Movement_Rule_Keys>(Turn_Movement_Components::Types::ALLOWED);
-					int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template internal_id<int>();
-					int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template internal_id<int>();
+					//int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template internal_id<int>();
+					//int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template internal_id<int>();
+					int inbound_link_id = turn_movement->template inbound_link<_Link_Interface*>()->template uuid<int>();
+					int outbound_link_id = turn_movement->template outbound_link<_Link_Interface*>()->template uuid<int>();
 					typename MasterType::network_type::long_hash_key_type long_hash_key;
 					long_hash_key.inbound_link_id = inbound_link_id;
 					long_hash_key.outbound_link_id = outbound_link_id;

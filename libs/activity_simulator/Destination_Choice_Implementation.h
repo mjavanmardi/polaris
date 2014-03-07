@@ -18,7 +18,7 @@ namespace Person_Components
 
 
 			// Pointer to the Parent class
-			m_prototype(Null_Prototype< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
+			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
 
 			// PARAMETER DECLARATIONS
 			#pragma region DESTINATION CHOICE MODEL PARAMETERS
@@ -48,9 +48,9 @@ namespace Person_Components
 			static m_data(float, GAMMA_PICK, NONE, NONE);		static m_data(float, GAMMA_OTHER_WORK, NONE, NONE);		static m_data(float, GAMMA_SERVICE, NONE, NONE);		static m_data(float, GAMMA_MIN_SHOP, NONE, NONE);		static m_data(float, GAMMA_MAJ_SHOP, NONE, NONE);		static m_data(float, GAMMA_EAT_OUT, NONE, NONE);		static m_data(float, GAMMA_CIVIC, NONE, NONE);			static m_data(float, GAMMA_LEISURE, NONE, NONE);		static m_data(float, GAMMA_SOCIAL, NONE, NONE);		static m_data(float, GAMMA_OTHER, NONE, NONE);		
 			#pragma endregion
 
-			m_prototype(Null_Prototype< typename MasterType::activity_location_type>, previous, NONE, NONE );
-			m_prototype(Null_Prototype< typename MasterType::activity_location_type>, destination, NONE, NONE );
-			m_prototype(Null_Prototype< typename MasterType::activity_location_type>, next, NONE, NONE );
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, previous, NONE, NONE );
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, destination, NONE, NONE );
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, next, NONE, NONE );
 			m_data(Activity_Components::Types::ACTIVITY_TYPES, activity_type, NONE, NONE);
 			
 			//====================================================================================================================================
@@ -741,9 +741,9 @@ namespace Person_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(ADAPTS_Destination_Chooser_Implementation),Data_Object>::Component_Type ComponentType;
 
 			// Pointer to the Parent class
-			m_prototype(Null_Prototype< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
-			m_prototype(Null_Prototype< Destination_Choice_Model_Implementation<MasterType>>, Choice_Model, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::activity_type>, Current_Activity, NONE, NONE);
+			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
+			m_prototype(Choice_Model_Components::Prototypes::Choice_Model< Destination_Choice_Model_Implementation<MasterType>>, Choice_Model, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, Current_Activity, NONE, NONE);
 			
 			static m_data(int, choice_set_size, NONE, NONE);
 

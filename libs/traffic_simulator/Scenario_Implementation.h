@@ -191,6 +191,7 @@ namespace Scenario_Components
 			m_data(double, minimum_delay_seconds_for_enroute_switching, NONE, NONE);
 			m_data(bool, enroute_switching_on_excessive_delay, NONE, NONE);
 			m_data(double, enroute_excessive_delay_factor, NONE, NONE);
+			m_data(double, minimum_seconds_from_arrival_for_enroute_switching, NONE, NONE);
 
 			m_data(bool, multimodal_network_input, NONE, NONE);
 

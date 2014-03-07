@@ -16,9 +16,9 @@ namespace Activity_Location_Components
 		{
 			m_prototype(Null_Prototype<typename MasterType::zone_type>, zone, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::link_type*>, origin_links, NONE, NONE);
+			m_container(boost::container::vector<Link<typename MasterType::link_type>*>, origin_links, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::link_type*>, destination_links, NONE, NONE);
+			m_container(boost::container::vector<Link<typename MasterType::link_type>*>, destination_links, NONE, NONE);
 
 			m_container(boost::container::vector<float>, origin_link_choice_cdfs, NONE, NONE);
 

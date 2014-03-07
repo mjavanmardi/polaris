@@ -13,7 +13,7 @@ namespace Analyze_Link_Group_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Analyze_Link_Group:public ComponentType
+		prototype struct Analyze_Link_Group
 		{
 			tag_as_prototype;
 			accessor(links_container, NONE, NONE);

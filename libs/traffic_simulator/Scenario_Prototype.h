@@ -611,6 +611,7 @@ namespace Scenario_Components
 			accessor(use_realtime_travel_time_for_enroute_switching, NONE, NONE);
 			accessor(minimum_delay_ratio_for_enroute_switching, NONE, NONE);
 			accessor(minimum_delay_seconds_for_enroute_switching, NONE, NONE);
+			accessor(minimum_seconds_from_arrival_for_enroute_switching, NONE, NONE);
 			accessor(multimodal_network_input, NONE, NONE);
 			accessor(enroute_switching_on_excessive_delay, NONE, NONE);
 			accessor(enroute_excessive_delay_factor, NONE, NONE);
@@ -873,7 +874,9 @@ namespace Scenario_Components
 				if (cfgReader.getParameter("enroute_switching_on_excessive_delay", enroute_switching_on_excessive_delay<bool*>())!= PARAMETER_FOUND) enroute_switching_on_excessive_delay<bool>(true);
 				if (cfgReader.getParameter("multimodal_network_input", multimodal_network_input<bool*>())!= PARAMETER_FOUND) multimodal_network_input<bool>(false);
 				if (cfgReader.getParameter("enroute_excessive_delay_factor", enroute_excessive_delay_factor<double*>())!= PARAMETER_FOUND) enroute_excessive_delay_factor<double>(1.0);
+				if (cfgReader.getParameter("minimum_seconds_from_arrival_for_enroute_switching", minimum_seconds_from_arrival_for_enroute_switching<double*>())!= PARAMETER_FOUND) minimum_seconds_from_arrival_for_enroute_switching<double>(120.0f);
 
+				
 
 
 				if (cfgReader.getParameter("calculate_realtime_moe", calculate_realtime_moe<bool*>())!= PARAMETER_FOUND) calculate_realtime_moe<bool>(true);

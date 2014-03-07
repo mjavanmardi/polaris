@@ -29,8 +29,8 @@ namespace Household_Components
 			m_prototype(Household_Components::Prototypes::Household_Properties<typename MasterType::household_static_properties_type>, Static_Properties, NONE, NONE);
 			
 			// Physical world elements
-			m_prototype(Null_Prototype< typename MasterType::network_type>, network_reference, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
+			m_prototype(Network_Components::Prototypes::Network< typename MasterType::network_type>, network_reference, NONE, NONE);
+			m_prototype(Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
 
 			// Agent ID
 			m_data(long,uuid, NONE, NONE);
@@ -38,16 +38,16 @@ namespace Household_Components
 			
 	
 			// Household members
-			m_container(boost::container::vector<typename MasterType::person_type*>, Persons_Container, NONE, NONE);
+			m_container(boost::container::vector<Person_Components::Prototypes::Person<typename MasterType::person_type>*>, Persons_Container, NONE, NONE);
 
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename network_reference_interface_type::get_type_of(zones_container)::value_type>::type>  zone_interface;
-			typedef Pair_Associative_Container< typename network_reference_interface_type::get_type_of(zones_container), zone_interface*> zones_container_interface;
+			typedef  Zone_Components::Prototypes::Zone<typename remove_pointer< typename network_reference_type::get_type_of(zones_container)::value_type>::type>  zone_interface;
+			typedef Pair_Associative_Container< typename network_reference_type::get_type_of(zones_container), zone_interface*> zones_container_interface;
 
-			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_reference_interface_type::get_type_of(activity_locations_container)::value_type>::type>  location_interface;
-			typedef Random_Access_Sequence< typename network_reference_interface_type::get_type_of(activity_locations_container), location_interface*> locations_container_interface;
+			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename network_reference_type::get_type_of(activity_locations_container)::value_type>::type>  location_interface;
+			typedef Random_Access_Sequence< typename network_reference_type::get_type_of(activity_locations_container), location_interface*> locations_container_interface;
 
 
 			//=======================================================================================================================================================================
@@ -59,7 +59,7 @@ namespace Household_Components
 				//this->First_Iteration<Time_Minutes>(1.0);
 
 				// Create and Initialize the Properties faculty
-				_Properties = (Properties_interface_type*)Allocate<type_of(Properties)>();
+				_Properties = (Properties_type*)Allocate<type_of(Properties)>();
 				_Properties->template Initialize<void>();
 				_Properties->template Parent_Household<ComponentType*>(this);
 
@@ -82,7 +82,7 @@ namespace Household_Components
 
 			template<typename TargetType> void Set_Home_Location()
 			{
-				_Properties->template Initialize<home_synthesis_zone_interface_type*>(this->_home_synthesis_zone);
+				_Properties->template Initialize<home_synthesis_zone_type*>(this->_home_synthesis_zone);
 			}
 
 		};

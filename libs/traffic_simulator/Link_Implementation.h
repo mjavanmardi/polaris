@@ -155,7 +155,7 @@ namespace Link_Components
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, inbound_turn_movements, NONE, NONE);
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, outbound_turn_movements, NONE, NONE);
 
-			m_prototype(Null_Prototype<typename MasterType::network_type>, network_reference, NONE, NONE);
+			m_prototype(Network_Components::Prototypes::Network<typename MasterType::network_type>, network_reference, NONE, NONE);
 
 		//==================================================================================================================
 		/// Upstream and Downstream Intersections Reference
@@ -186,8 +186,10 @@ namespace Link_Components
 		//==================================================================================================================
 		/// Replicas Container
 		//------------------------------------------------------------------------------------------------------------------
-			m_container(boost::container::vector<typename MasterType::routable_link_type*>, replicas_container, NONE, NONE);
-			m_container(boost::container::vector<typename MasterType::routable_link_type*>, realtime_replicas_container, NONE, NONE);
+
+			//TODO:ROUTING
+			//m_container(boost::container::vector<typename MasterType::routable_link_type*>, replicas_container, NONE, NONE);
+			//m_container(boost::container::vector<typename MasterType::routable_link_type*>, realtime_replicas_container, NONE, NONE);
 
 		//==================================================================================================================
 		/// Replicas Containers
@@ -219,15 +221,17 @@ namespace Link_Components
 			template<typename TargetType> TargetType travel_time(null_requirement){return (TargetType)(_travel_time);}
 			template<typename TargetType> void travel_time(TargetType set_value,null_requirement)
 			{
-				typedef Link<typename MasterType::routable_link_type> replica_interface;
 				_travel_time = (float)set_value;
-				// update replicas
-				typename replicas_container_type::iterator replica_itr;
-				for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
-				{
-					replica_interface* replica = (replica_interface*)(*replica_itr);
-					replica->template travel_time<float>(_travel_time);
-				}
+
+				//TODO:ROUTING_OPERATION
+				//// update replicas
+				//typedef Link<typename MasterType::routable_link_type> replica_interface;
+				//typename replicas_container_type::iterator replica_itr;
+				//for (replica_itr=_replicas_container.begin(); replica_itr!=_replicas_container.end(); replica_itr++)
+				//{
+				//	replica_interface* replica = (replica_interface*)(*replica_itr);
+				//	replica->template travel_time<float>(_travel_time);
+				//}
 			}
 
 			float _travel_time;
@@ -236,15 +240,17 @@ namespace Link_Components
 			template<typename TargetType> TargetType realtime_travel_time(null_requirement){return (TargetType)(_realtime_travel_time);}
 			template<typename TargetType> void realtime_travel_time(TargetType set_value,null_requirement)
 			{
-				typedef Link<typename MasterType::routable_link_type> replica_interface;
 				_realtime_travel_time = (float)set_value;
-				// update replicas
-				typename replicas_container_type::iterator replica_itr;
-				for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
-				{
-					replica_interface* replica = (replica_interface*)(*replica_itr);
-					replica->template travel_time<float>(_realtime_travel_time);
-				}
+
+				////TODO:ROUTING_OPERATION
+				//// update replicas
+				//typedef Link<typename MasterType::routable_link_type> replica_interface;
+				//typename replicas_container_type::iterator replica_itr;
+				//for (replica_itr=_realtime_replicas_container.begin(); replica_itr!=_realtime_replicas_container.end(); replica_itr++)
+				//{
+				//	replica_interface* replica = (replica_interface*)(*replica_itr);
+				//	replica->template travel_time<float>(_realtime_travel_time);
+				//}
 			}
 
 			float _realtime_travel_time;
@@ -279,7 +285,7 @@ namespace Link_Components
 			typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
 			typedef Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type> _Vehicle_Interface;
 			typedef  Vehicle_Components::Prototypes::Vehicle<typename remove_pointer<typename type_of(link_origin_vehicle_queue)::value_type>::type>  _Vehicle_Interface1;
-			typedef  Random_Access_Sequence<type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
+			typedef  Random_Access_Sequence<typename type_of(link_origin_vehicle_queue), _Vehicle_Interface1*> _Vehicles_Container_Interface;
 
 			//typedef  Movement_Plan_Components::Prototypes::Movement_Plan< typename _Vehicle_Interface::get_type_of(movement_plan)> _Movement_Plan_Interface;
 			typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename MasterType::movement_plan_type> _Movement_Plan_Interface;
@@ -289,10 +295,10 @@ namespace Link_Components
 			typedef Network_Event<typename MasterType::weather_network_event_type> _Weather_Network_Event_Interface;
 			typedef Network_Event<typename MasterType::accident_network_event_type> _Accident_Network_Event_Interface;				
 			typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer<typename  type_of(outbound_turn_movements)::value_type>::type>  _Movement_Interface;
-			typedef  Random_Access_Sequence< type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
+			typedef  Random_Access_Sequence<typename type_of(outbound_turn_movements), _Movement_Interface*> _Movements_Container_Interface;
 
 			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> _Link_Interface;
-			typedef  Intersection_Components::Prototypes::Intersection< type_of(upstream_intersection)> _Intersection_Interface;
+			typedef  Intersection_Components::Prototypes::Intersection<typename type_of(upstream_intersection)> _Intersection_Interface;
 			typedef  Network_Event_Components::Prototypes::Network_Event_Manager< typename _Network_Interface::get_type_of(network_event_manager)> _Network_Event_Manager_Interface;
 			
 			Link_Implementation()
@@ -404,6 +410,41 @@ namespace Link_Components
 				_num_vehicles_on_link = _link_upstream_cumulative_vehicles - _link_downstream_cumulative_vehicles;
 
 				_link_downstream_cumulative_arrived_vehicles = link_shifted_cumulative_arrived_vehicles;
+
+
+				typedef network_reference_type::routable_networks_type routable_networks_type;
+
+				Prototype_Random_Access_Sequence<routable_networks_type,Routable_Network>* routable_networks = _network_reference->routable_networks<routable_networks_type>();
+
+
+				//Note, this variable is the delay for link + turn delay
+				//_outbound_link_arrived_time_based_experienced_link_turn_travel_delay
+
+				unsigned int outbound_turn_index = 0;
+
+				for(boost::container::vector<typename MasterType::turn_movement_type*>::iterator itr = _outbound_turn_movements.begin();itr!=_outbound_turn_movements.end();itr++,outbound_turn_index++)
+				{
+					Movement<typename MasterType::turn_movement_type>* turn_movement = (Movement<typename MasterType::turn_movement_type>*) *itr;
+
+
+					turn_movement->update_state<NT>();
+					
+					int current_simulation_interval_index = ((_Network_Interface*)_global_network)->template current_simulation_interval_index<int>();
+
+					if (((current_simulation_interval_index+1)*((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>())%((_Scenario_Interface*)_global_scenario)->template assignment_interval_length<int>() == 0)
+					{	
+						float cost_update = turn_movement->forward_link_turn_travel_time<float>();
+
+						for(Prototype_Random_Access_Sequence<routable_networks_type,Routable_Network>::iterator routable_itr = routable_networks->begin();routable_itr != routable_networks->end();routable_itr++)
+						{
+							Routable_Network<typename MasterType::routable_network_type>* current_network = *routable_itr;
+
+							current_network->update_edge_turn_cost(_uuid, _link_fftt, outbound_turn_index, cost_update-_link_fftt);
+						}
+					}
+
+				}
+
 			}
 
 // #ifndef EXCLUDE_DEMAND
@@ -609,7 +650,7 @@ namespace Link_Components
 				//_link_origin_cumulative_arrived_vehicles = 0;
 				//_link_origin_vehicle_array.clear();
 
-				_network_reference = (network_reference_interface_type*)network;
+				_network_reference = (network_reference_type*)network;
 
 				//init link simulation model
 				_link_capacity = 0;
@@ -951,27 +992,27 @@ namespace Link_Components
 			
 			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::variable_speed_sign)* vss)
 			{
-				_variable_speed_sign = (variable_speed_sign_interface_type*)vss;
+				_variable_speed_sign = (variable_speed_sign_type*)vss;
 			}
 			
 			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::variable_word_sign)* vws)
 			{
-				_variable_word_sign = (variable_word_sign_interface_type*)vws;
+				_variable_word_sign = (variable_word_sign_type*)vws;
 			}
 			
 			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::advisory_radio)* har)
 			{
-				_advisory_radio = (advisory_radio_interface_type*)har;
+				_advisory_radio = (advisory_radio_type*)har;
 			}
 
 			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::depot)* depot)
 			{
-				_depot = (depot_interface_type*)depot;
+				_depot = (depot_type*)depot;
 			}
 			
 			template<typename TargetType> void Accept_ITS( typename type_of(MasterType::link_sensor)* link_sensor)
 			{
-				_link_sensor = (link_sensor_interface_type*)link_sensor;
+				_link_sensor = (link_sensor_type*)link_sensor;
 			}
 
 

@@ -77,16 +77,16 @@ struct MasterType
 	typedef Routing_Components::Implementations::Routable_Network_Implementation<M> routable_network_type;
 	typedef Routing_Components::Implementations::Routing_Implementation<M> routing_type;
 	typedef Routing_Components::Implementations::Skim_Routing_Implementation<M> skim_routing_type;
-	typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<M> routable_intersection_type;
-	typedef Link_Components::Implementations::Routable_Link_Implementation<M> routable_link_type;
+	//typedef Intersection_Components::Implementations::Routable_Intersection_Implementation<M> routable_intersection_type;
+	//typedef Link_Components::Implementations::Routable_Link_Implementation<M> routable_link_type;
 	typedef Activity_Location_Components::Implementations::Activity_Location_Implementation<M> activity_location_type;
 	typedef Traveler_Components::Implementations::Traveler_Implementation<M> traveler_type;
 	typedef Vehicle_Components::Implementations::Switch_Decision_Data_Implementation<MasterType> switch_decision_data_type;
 	typedef Intersection_Components::Implementations::Inbound_Outbound_Movements_Implementation<M> inbound_outbound_movements_type;
 	typedef Intersection_Components::Implementations::Outbound_Inbound_Movements_Implementation<M> outbound_inbound_movements_type;
-	typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<M> routable_inbound_outbound_movements_type;
-	typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<M> routable_outbound_inbound_movements_type;
-	typedef Intersection_Components::Implementations::Routable_Movement_Implementation<M> routable_movement_type;
+	//typedef Intersection_Components::Implementations::Routable_Inbound_Outbound_Movements_Implementation<M> routable_inbound_outbound_movements_type;
+	//typedef Intersection_Components::Implementations::Routable_Outbound_Inbound_Movements_Implementation<M> routable_outbound_inbound_movements_type;
+	//typedef Intersection_Components::Implementations::Routable_Movement_Implementation<M> routable_movement_type;
 	typedef Operation_Components::Implementations::Operation_Implementation<M> operation_type;
 	typedef Intersection_Control_Components::Implementations::Intersection_Control_Implementation<M> intersection_control_type;
 	typedef Intersection_Control_Components::Implementations::Control_Plan_Implementation<M> control_plan_type;
@@ -205,6 +205,17 @@ struct MasterType
 	typedef TYPELIST_5(link_control_type,depot_type,advisory_radio_type,variable_word_sign_type,variable_speed_sign_type) its_component_types;
 
 	typedef Network_Event_Components::Implementations::Network_Event_Manager_Implementation<MasterType> network_event_manager_type;
+
+
+	typedef Routable_Agent_Implementation<MasterType> routable_agent_type;
+	typedef Graph_Implementation<MasterType, NTL, Base_Edge_A_Star<MasterType>> base_graph_type;
+	typedef Graph_Pool_Implementation<MasterType, NTL, base_graph_type> graph_pool_type;
+	typedef Edge_Implementation<Routing_Components::Types::static_attributes<MasterType>> static_edge_type;
+	typedef Graph_Implementation<MasterType, NTL, static_edge_type> static_graph_type;
+	typedef Routing_Components::Types::static_to_static static_to_static_type;
+	typedef Custom_Connection_Group<MasterType, static_graph_type, static_graph_type, static_to_static_type> static_to_static_connection_type;
+
+
 	#pragma endregion
 	//----------------------------------------------------------------------------------------------
 };

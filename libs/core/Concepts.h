@@ -58,8 +58,8 @@ namespace polaris
 
 	#define NONE true
 	
-	NULLTYPE null_argument;
-
+	static NULLTYPE null_argument;
+	
 	static void* judge;
 
 	///============================================================================

@@ -2,6 +2,8 @@
 #include "User_Space_Includes.h"
 #include "Activity_Location_Prototype.h"
 #include "Zone_Prototype.h"
+#include "Routable_Network_Prototype.h"
+
 //#include "../File_IO/utilities.h"
 //#include "../File_IO/network_data.h"
 //using namespace Basic_Units::Data_Structures;
@@ -63,13 +65,22 @@ namespace Network_Components
 			//==================================================================================================================
 			/// routable network
 			//------------------------------------------------------------------------------------------------------------------
-			accessor(routable_network, NONE, NONE);
-			accessor(realtime_routable_network, NONE, NONE);
-			accessor(routable_networks_container, NONE, NONE);
-			accessor(realtime_routable_networks_container, NONE, NONE);
-			accessor(scan_list, NONE, NONE);
-			accessor(reversed_path_container, NONE, NONE);
-			accessor(reset_links, NONE, NONE);
+
+			template<typename Routable_Network_Container_Type>
+			Prototype_Random_Access_Sequence<Routable_Network_Container_Type,Routable_Network>* routable_networks(){ return (Prototype_Random_Access_Sequence<Routable_Network_Container_Type,Routable_Network>*)this_component()->routable_networks<Routable_Network_Container_Type*>(); }
+
+			template<typename Routable_Network_Type>
+			Routable_Network<Routable_Network_Type>* routable_network(){ return this_component()->routable_network<Routable_Network_Type>( thread_id() ); }
+
+
+
+			//TODO:ROUTING
+			//accessor(realtime_routable_network, NONE, NONE);
+			//accessor(routable_networks_container, NONE, NONE);
+			//accessor(realtime_routable_networks_container, NONE, NONE);
+			//accessor(scan_list, NONE, NONE);
+			//accessor(reversed_path_container, NONE, NONE);
+			//accessor(reset_links, NONE, NONE);
 			//------------------------------------------------------------------------------------------------------------------
 
 			//==================================================================================================================
@@ -114,6 +125,12 @@ namespace Network_Components
 			/// traffic management center
 			//------------------------------------------------------------------------------------------------------------------
 			accessor(traffic_management_center, NONE, NONE);
+
+			template<typename Link_Type>
+			Link_Components::Prototypes::Link<Link_Type>* get_link_ptr(unsigned int uuid)
+			{
+				return this_component()->get_link_ptr<Link_Type>(uuid);
+			}
 
 			template<typename TargetType> void push_vehicle_coordinates(void)
 			{

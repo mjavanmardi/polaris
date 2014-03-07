@@ -18,13 +18,13 @@ namespace Person_Components
 
 
 			// data members
-			m_prototype(Null_Prototype< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::activity_type>, current_activity, NONE, NONE );
-			m_prototype(Null_Prototype< typename MasterType::activity_type>, previous_activity, NONE, NONE );
-			m_prototype(Null_Prototype< typename MasterType::activity_type>, next_activity, NONE, NONE );
-			m_prototype(Null_Prototype< typename MasterType::activity_location_type>, destination, NONE, NONE );
-			m_prototype(Null_Prototype< typename MasterType::activity_location_type>, previous_location, NONE, NONE );
-			m_prototype(Null_Prototype< typename MasterType::activity_location_type>, next_location, NONE, NONE );
+			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
+			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, current_activity, NONE, NONE );
+			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, previous_activity, NONE, NONE );
+			m_prototype(Activity_Components::Prototypes::Activity_Planner< typename MasterType::activity_type>, next_activity, NONE, NONE );
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, destination, NONE, NONE );
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, previous_location, NONE, NONE );
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, next_location, NONE, NONE );
 			m_data(Vehicle_Components::Types::Vehicle_Type_Keys, mode_type, NONE, NONE);
 			m_data(bool, home_based, NONE, NONE);
 			m_data(bool, auto_available, NONE, NONE);
@@ -380,8 +380,8 @@ namespace Person_Components
 			typedef typename Polaris_Component<MasterType,INHERIT(Mode_Chooser_Implementation),Data_Object>::Component_Type ComponentType;
 
 			// Pointer to the Parent class
-			m_prototype(Null_Prototype< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
-			m_prototype(Null_Prototype< Mode_Choice_Model_Implementation<MasterType>>, Choice_Model, NONE, NONE);
+			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>, Parent_Planner, NONE, NONE);
+			m_prototype(Choice_Model_Components::Prototypes::Choice_Model< Mode_Choice_Model_Implementation<MasterType>>, Choice_Model, NONE, NONE);
 			
 			static m_data(int, choice_set_size, NONE, NONE);
 

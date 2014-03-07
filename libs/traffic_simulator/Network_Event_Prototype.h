@@ -86,7 +86,7 @@ namespace Network_Event_Components
 			typedef void (*type)(void*,Prototypes::Network_Event<EventType>*);
 		};
 
-		prototype struct Network_Event_Manager:public ComponentType
+		prototype struct Network_Event_Manager
 		{
 			tag_as_prototype;
 			

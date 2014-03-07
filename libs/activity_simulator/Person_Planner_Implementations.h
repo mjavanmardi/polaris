@@ -31,14 +31,14 @@ namespace Person_Components
 			}
 
 			// Pointer to the Parent class
-			m_prototype(Null_Prototype< typename MasterType::person_type>, Parent_Person, NONE, NONE);
+			m_prototype(Prototypes::Person< typename MasterType::person_type>, Parent_Person, NONE, NONE);
 
 			// Pointer to the child classses
 			//m_prototype(Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type>, Person_Scheduler, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::activity_generator_type>, Activity_Generation_Faculty, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::person_destination_chooser_type>, Destination_Choice_Faculty, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::person_mode_chooser_type>, Mode_Choice_Faculty, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::activity_timing_chooser_type>, Timing_Chooser, NONE, NONE);
+			m_prototype(Prototypes::Activity_Generator< typename MasterType::activity_generator_type>, Activity_Generation_Faculty, NONE, NONE);
+			m_prototype(Prototypes::Destination_Chooser< typename MasterType::person_destination_chooser_type>, Destination_Choice_Faculty, NONE, NONE);
+			m_prototype(Prototypes::Mode_Chooser< typename MasterType::person_mode_chooser_type>, Mode_Choice_Faculty, NONE, NONE);
+			m_prototype(Prototypes::Activity_Timing_Chooser< typename MasterType::activity_timing_chooser_type>, Timing_Chooser, NONE, NONE);
 
 			// Next Activity Generation Time member - used to schedule the next activity generation
 			member_component_and_feature_accessor(Next_Activity_Generation_Time, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
@@ -48,16 +48,11 @@ namespace Person_Components
 			member_component_and_feature_accessor(Generation_Time_Increment, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 			member_component_and_feature_accessor(Next_Planning_Time, Value, Basic_Units::Prototypes::Time,Basic_Units::Implementations::Time_Implementation<NT>);
 
-			//Containers for activity planning events and movement planning events
-			//m_container(boost::container::list<typename MasterType::activity_type*>,Activity_Container, NONE, NONE);
-			//m_container(boost::container::list<typename MasterType::activity_record_type*>,Activity_Record_Container, NONE, NONE);
-			//m_container(boost::container::list<typename MasterType::movement_plan_type*>,Movement_Plans_Container, NONE, NONE);
-
 
 			// Interface definitions
-			typedef  Prototypes::Person_Scheduler< typename Parent_Person_interface_type::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
-			typedef  Scenario_Components::Prototypes::Scenario< typename Parent_Person_interface_type::get_type_of(scenario_reference)> _Scenario_Interface;
-			typedef  Network_Components::Prototypes::Network< typename Parent_Person_interface_type::get_type_of(network_reference)> _Network_Interface;
+			typedef  Prototypes::Person_Scheduler< typename Parent_Person_type::get_type_of(Scheduling_Faculty)> _Scheduler_Interface;
+			typedef  Scenario_Components::Prototypes::Scenario< typename Parent_Person_type::get_type_of(scenario_reference)> _Scenario_Interface;
+			typedef  Network_Components::Prototypes::Network< typename Parent_Person_type::get_type_of(network_reference)> _Network_Interface;
 			typedef Network_Skimming_Components::Prototypes::Network_Skimming< typename _Network_Interface::get_type_of(skimming_faculty)> _Skim_Interface;
 			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer< typename _Network_Interface::get_type_of(activity_locations_container)::value_type>::type>  _Activity_Location_Interface;
 			typedef  Random_Access_Sequence< typename _Network_Interface::get_type_of(activity_locations_container), _Activity_Location_Interface*> _Activity_Locations_Container_Interface;

@@ -777,7 +777,7 @@ namespace Network_Components
 							}
 						}
 					}
-					_analyze_link_groups_container.push_back(analyze_link_group);
+					_analyze_link_groups_container.push_back((MasterType::analyze_link_group_type*)analyze_link_group);
 				}
 			}
 

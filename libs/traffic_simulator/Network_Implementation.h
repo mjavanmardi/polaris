@@ -68,15 +68,19 @@ namespace Network_Components
 			m_container(boost::container::vector<typename MasterType::link_type*>, links_container, NONE, NONE);
 			//m_container(boost::container::vector<Link<typename MasterType::link_type>*>, links_container, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::routable_network_type*>, routable_networks_container, NONE, NONE);
+			//TODO:ROUTING
+			//m_container(boost::container::vector<typename MasterType::routable_network_type*>, routable_networks_container, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::routable_network_type*>, realtime_routable_networks_container, NONE, NONE);
+			//TODO:ROUTING
+			//m_container(boost::container::vector<typename MasterType::routable_network_type*>, realtime_routable_networks_container, NONE, NONE);
 
-			template<typename TargetType>
-			TargetType routable_network(){return (TargetType)(_routable_networks_container[__thread_id]);}tag_getter_as_available(routable_network);
+			//TODO:ROUTING
+			//template<typename TargetType>
+			//TargetType routable_network(){return (TargetType)(_routable_networks_container[__thread_id]);}tag_getter_as_available(routable_network);
 
-			template<typename TargetType>
-			TargetType realtime_routable_network(){return (TargetType)(_realtime_routable_networks_container[__thread_id]);}tag_getter_as_available(realtime_routable_network);
+			//TODO:ROUTING
+			//template<typename TargetType>
+			//TargetType realtime_routable_network(){return (TargetType)(_realtime_routable_networks_container[__thread_id]);}tag_getter_as_available(realtime_routable_network);
 
 			m_container(boost::container::vector<typename MasterType::turn_movement_type*>, turn_movements_container, NONE, NONE);
 
@@ -115,7 +119,8 @@ namespace Network_Components
 			m_data(_lock, network_vht_compensation_update_lock, NONE, NONE);
 			m_data(int, network_vht_compensation, NONE, NONE);
 
-			m_container(boost::container::vector<typename MasterType::routable_network_type*>, network_snapshot_container, NONE, NONE);
+			//TODO:ROUTING
+			//m_container(boost::container::vector<typename MasterType::routable_network_type*>, network_snapshot_container, NONE, NONE);
 			
 			m_container(boost::container::vector<typename MasterType::analyze_link_group_type*>, analyze_link_groups_container, NONE, NONE);
 
@@ -129,11 +134,14 @@ namespace Network_Components
 			boost::container::vector<struct MOE_Data> td_network_moe_data_array;
 
 			typedef boost::unordered::unordered_map<int,float> id_to_travel_time_map_type;
-			typedef typename MasterType::routable_network_type routable_network_type;
-			typedef boost::container::vector<routable_network_type*> network_snapshot_replicas_container_type;
-			typedef boost::unordered::unordered_map<int, network_snapshot_replicas_container_type> time_to_snapshot_map_type;
+			
+			//TODO:ROUTING
+			//typedef typename MasterType::routable_network_type routable_network_type;
+			//typedef boost::container::vector<routable_network_type*> network_snapshot_replicas_container_type;
+			//typedef boost::unordered::unordered_map<int, network_snapshot_replicas_container_type> time_to_snapshot_map_type;
+			//m_data(time_to_snapshot_map_type, network_snapshots, NONE, NONE);
+
 			typedef boost::container::vector<int> snapshot_times_container_type;
-			m_data(time_to_snapshot_map_type, network_snapshots, NONE, NONE);
 			m_data(boost::container::vector<int>, snapshot_times, NONE, NONE);
 
 			boost::container::vector<int> ttime_distribution;
@@ -148,8 +156,34 @@ namespace Network_Components
 				long long movement_id;
 			} long_hash_key_type;
 
-			typedef boost::unordered::unordered_map<long,typename MasterType::turn_movement_type*> type_of_link_turn_movement_map;
+			typedef boost::unordered::unordered_map<long long,typename MasterType::turn_movement_type*> type_of_link_turn_movement_map;
 			m_data(type_of_link_turn_movement_map, link_turn_movement_map, NONE, NONE);
+
+			m_container(boost::container::vector<Routable_Network<typename MasterType::routable_network_type>*>,routable_networks,NONE,NONE);
+
+			template<typename Routable_Network_Type>
+			Routable_Network<Routable_Network_Type>* routable_network(int thread_index){ return _routable_networks[thread_index]; }
+
+			template<typename Link_Type>
+			Link<Link_Type>* get_link_ptr(unsigned int uuid)
+			{
+				Types::Link_ID_Dir link_id_dir;
+
+				link_id_dir.id = uuid / 2;
+				link_id_dir.dir = uuid - (uuid / 2)*2;
+
+				if(_link_dbid_dir_to_ptr_map.count(link_id_dir.id_dir))
+				{
+					Link<Link_Type>* link = (Link<Link_Type>*)_link_dbid_dir_to_ptr_map[link_id_dir.id_dir];
+
+					return link;
+				}
+				else
+				{
+					return nullptr;
+				}
+
+			}
 
 			template<typename TargetType> void initialize_intersection_control()
 			{
@@ -179,8 +213,12 @@ namespace Network_Components
 				initialize_links<TargetType>();
 				initialize_intersections<TargetType>();
 				construct_network_cost<TargetType>();
-				construct_routable_network<TargetType>();
-				construct_realtime_routable_network<TargetType>();
+				
+				construct_routable_networks();
+				
+				//TODO:ROUTING_OPERATION
+				//construct_realtime_routable_network<TargetType>();
+				
 				if (((_Scenario_Interface*)_global_scenario)->template read_network_snapshots<bool>())
 				{
 					read_snapshots();
@@ -287,9 +325,11 @@ namespace Network_Components
 						else 
 						{
 							// construct routable network using collected data
-							network_snapshot_replicas_container_type network_snapshot_replicas_container;
-							network_snapshot_replicas_container = construct_routables_from_snapshot(current_time, maximum_free_flow_speed, link_travel_time_map, movement_travel_time_map);
-							_network_snapshots[current_time] = network_snapshot_replicas_container;
+							
+							//TODO:ROUTING_OPERATION
+							//network_snapshot_replicas_container_type network_snapshot_replicas_container;
+							//network_snapshot_replicas_container = construct_routables_from_snapshot(current_time, maximum_free_flow_speed, link_travel_time_map, movement_travel_time_map);
+							//_network_snapshots[current_time] = network_snapshot_replicas_container;
 							_snapshot_times.push_back(current_time);
 						}
 						link_travel_time_map.clear();
@@ -326,9 +366,10 @@ namespace Network_Components
 					}
 				}
 				// construct routable network using collected data
-				network_snapshot_replicas_container_type network_snapshot_replicas_container;
-				network_snapshot_replicas_container = construct_routables_from_snapshot(current_time, maximum_free_flow_speed, link_travel_time_map, movement_travel_time_map);
-				_network_snapshots[current_time] = network_snapshot_replicas_container;
+				//TODO:ROUTING_OPERATION
+				//network_snapshot_replicas_container_type network_snapshot_replicas_container;
+				//network_snapshot_replicas_container = construct_routables_from_snapshot(current_time, maximum_free_flow_speed, link_travel_time_map, movement_travel_time_map);
+				//_network_snapshots[current_time] = network_snapshot_replicas_container;
 				_snapshot_times.push_back(current_time);
 				//write_snapshot_from_snapshot_array();
 			}
@@ -391,21 +432,22 @@ namespace Network_Components
 				exit(0);
 			}
 
-			network_snapshot_replicas_container_type construct_routables_from_snapshot(int time, float maximum_free_flow_speed, id_to_travel_time_map_type& link_travel_time_map, id_to_travel_time_map_type& movement_travel_time_map)
-			{
-				typedef  Network_Components::Prototypes::Network<typename remove_pointer<typename  type_of(routable_networks_container)::value_type>::type>  _Routable_Network_Interface;
-				typedef  Random_Access_Sequence< type_of(routable_networks_container), _Routable_Network_Interface*> _Routable_Networks_Container_Interface;
-
-				network_snapshot_replicas_container_type network_snapshot_replicas_container;
-				for(unsigned int i=0;i<num_sim_threads()+1;i++)
-				{
-					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
-//TODO
-//					routable_network->template read_snapshot_data<Target_Type<NULLTYPE,void,id_to_travel_time_map_type&>>(maximum_free_flow_speed, link_travel_time_map, movement_travel_time_map);
-					network_snapshot_replicas_container.push_back((typename MasterType::routable_network_type*)routable_network);
-				}
-				return network_snapshot_replicas_container;
-			}
+			//TODO:ROUTING_OPERATION
+//			network_snapshot_replicas_container_type construct_routables_from_snapshot(int time, float maximum_free_flow_speed, id_to_travel_time_map_type& link_travel_time_map, id_to_travel_time_map_type& movement_travel_time_map)
+//			{
+//				typedef  Network_Components::Prototypes::Network<typename remove_pointer<typename  type_of(routable_networks_container)::value_type>::type>  _Routable_Network_Interface;
+//				typedef  Random_Access_Sequence< type_of(routable_networks_container), _Routable_Network_Interface*> _Routable_Networks_Container_Interface;
+//
+//				network_snapshot_replicas_container_type network_snapshot_replicas_container;
+//				for(unsigned int i=0;i<num_sim_threads()+1;i++)
+//				{
+//					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
+////TODO
+////					routable_network->template read_snapshot_data<Target_Type<NULLTYPE,void,id_to_travel_time_map_type&>>(maximum_free_flow_speed, link_travel_time_map, movement_travel_time_map);
+//					network_snapshot_replicas_container.push_back((typename MasterType::routable_network_type*)routable_network);
+//				}
+//				return network_snapshot_replicas_container;
+//			}
 
 			void initialize_moe()
 			{
@@ -599,58 +641,60 @@ namespace Network_Components
 
 			void output_snapshot()
 			{
-				typedef Network<typename MasterType::routable_network_type> _Routable_Network_Interface;
-				typedef Network<typename MasterType::network_type> _Regular_Network_Interface;
-				typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename _Routable_Network_Interface::get_type_of(links_container)::value_type>::type>  _Routable_Link_Interface;
-				typedef  Random_Access_Sequence< typename _Routable_Network_Interface::get_type_of(links_container), _Routable_Link_Interface*> _Routable_Links_Container_Interface;
+				//TODO:ROUTING_OPERATION
 
-				typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer< typename _Routable_Network_Interface::get_type_of(intersections_container)::value_type>::type>  _Routable_Intersection_Interface;
-				typedef  Random_Access_Sequence< typename _Routable_Network_Interface::get_type_of(intersections_container), _Routable_Intersection_Interface*> _Routable_Intersections_Container_Interface;
+				//typedef Network<typename MasterType::routable_network_type> _Routable_Network_Interface;
+				//typedef Network<typename MasterType::network_type> _Regular_Network_Interface;
+				//typedef  Link_Components::Prototypes::Link<typename remove_pointer< typename _Routable_Network_Interface::get_type_of(links_container)::value_type>::type>  _Routable_Link_Interface;
+				//typedef  Random_Access_Sequence< typename _Routable_Network_Interface::get_type_of(links_container), _Routable_Link_Interface*> _Routable_Links_Container_Interface;
 
-				typedef  Intersection_Components::Prototypes::Inbound_Outbound_Movements<typename remove_pointer< typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements)::value_type>::type>  _Inbound_Outbound_Movements_Interface;
-				typedef  Random_Access_Sequence< typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
+				//typedef  Intersection_Components::Prototypes::Intersection<typename remove_pointer< typename _Routable_Network_Interface::get_type_of(intersections_container)::value_type>::type>  _Routable_Intersection_Interface;
+				//typedef  Random_Access_Sequence< typename _Routable_Network_Interface::get_type_of(intersections_container), _Routable_Intersection_Interface*> _Routable_Intersections_Container_Interface;
 
-				typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements)::value_type>::type>  _Movement_Interface;
-				typedef  Random_Access_Sequence< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), _Movement_Interface*> _Movements_Container_Interface;
+				//typedef  Intersection_Components::Prototypes::Inbound_Outbound_Movements<typename remove_pointer< typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements)::value_type>::type>  _Inbound_Outbound_Movements_Interface;
+				//typedef  Random_Access_Sequence< typename _Routable_Intersection_Interface::get_type_of(inbound_outbound_movements), _Inbound_Outbound_Movements_Interface*> _Inbound_Outbound_Movements_Container_Interface;
 
-				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
-				typedef  Link_Components::Prototypes::Link< typename _Routable_Link_Interface::get_type_of(network_link_reference)> _Regular_Link_Interface;
+				//typedef  Turn_Movement_Components::Prototypes::Movement<typename remove_pointer< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements)::value_type>::type>  _Movement_Interface;
+				//typedef  Random_Access_Sequence< typename _Inbound_Outbound_Movements_Interface::get_type_of(outbound_movements), _Movement_Interface*> _Movements_Container_Interface;
 
-				_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)_routable_networks_container[0];
-				((_Scenario_Interface*)_global_scenario)->template output_network_snapshots_file<fstream&>() << endl << ((_Regular_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>() << "\t" << routable_network->template max_free_flow_speed<float>();
+				//typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface;
+				//typedef  Link_Components::Prototypes::Link< typename _Routable_Link_Interface::get_type_of(network_link_reference)> _Regular_Link_Interface;
 
-				_Routable_Intersections_Container_Interface& routable_intersections_container = routable_network->template intersections_container<_Routable_Intersections_Container_Interface&>();
-				typename _Routable_Intersections_Container_Interface::iterator intersection_itr;
-				for (intersection_itr = routable_intersections_container.begin(); intersection_itr != routable_intersections_container.end(); intersection_itr++)
-				{
-					_Routable_Intersection_Interface* intersection = (_Routable_Intersection_Interface*)(*intersection_itr);
-					_Inbound_Outbound_Movements_Container_Interface& routable_inbound_outbound_movements_container = intersection->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>();
-					typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_outbound_movements_itr;
-					for (inbound_outbound_movements_itr = routable_inbound_outbound_movements_container.begin(); inbound_outbound_movements_itr != routable_inbound_outbound_movements_container.end(); inbound_outbound_movements_itr++)
-					{
-						_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
-						_Routable_Link_Interface* inbound_link = inbound_outbound_movements->template inbound_link_reference<_Routable_Link_Interface*>();
-						_Movements_Container_Interface& outbound_movements = inbound_outbound_movements->template outbound_movements<_Movements_Container_Interface&>();
-						((_Scenario_Interface*)_global_scenario)->template output_network_snapshots_file<fstream&>()
-							<< endl
-							<< inbound_link->template uuid<int>() << "\t"
-							<< inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template dbid<int>() << "\t"
-							<< inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template direction<int>() << "\t"
-							<< inbound_link->template travel_time<float>() << "\t"
-							<< outbound_movements.size();
+				//_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)_routable_networks_container[0];
+				//((_Scenario_Interface*)_global_scenario)->template output_network_snapshots_file<fstream&>() << endl << ((_Regular_Network_Interface*)this)->template start_of_current_simulation_interval_absolute<int>() << "\t" << routable_network->template max_free_flow_speed<float>();
 
-						typename _Movements_Container_Interface::iterator movement_itr;
-						for (movement_itr = outbound_movements.begin(); movement_itr != outbound_movements.end(); movement_itr++)
-						{
-							_Movement_Interface* movement = (_Movement_Interface*)(*movement_itr);
-							
-							((_Scenario_Interface*)_global_scenario)->template output_network_snapshots_file<fstream&>()
-								<< endl
-								<< movement->template uuid<int>() << ","
-								<< movement->template forward_link_turn_travel_time<float>();
-						}
-					}
-				}
+				//_Routable_Intersections_Container_Interface& routable_intersections_container = routable_network->template intersections_container<_Routable_Intersections_Container_Interface&>();
+				//typename _Routable_Intersections_Container_Interface::iterator intersection_itr;
+				//for (intersection_itr = routable_intersections_container.begin(); intersection_itr != routable_intersections_container.end(); intersection_itr++)
+				//{
+				//	_Routable_Intersection_Interface* intersection = (_Routable_Intersection_Interface*)(*intersection_itr);
+				//	_Inbound_Outbound_Movements_Container_Interface& routable_inbound_outbound_movements_container = intersection->template inbound_outbound_movements<_Inbound_Outbound_Movements_Container_Interface&>();
+				//	typename _Inbound_Outbound_Movements_Container_Interface::iterator inbound_outbound_movements_itr;
+				//	for (inbound_outbound_movements_itr = routable_inbound_outbound_movements_container.begin(); inbound_outbound_movements_itr != routable_inbound_outbound_movements_container.end(); inbound_outbound_movements_itr++)
+				//	{
+				//		_Inbound_Outbound_Movements_Interface* inbound_outbound_movements = (_Inbound_Outbound_Movements_Interface*)(*inbound_outbound_movements_itr);
+				//		_Routable_Link_Interface* inbound_link = inbound_outbound_movements->template inbound_link_reference<_Routable_Link_Interface*>();
+				//		_Movements_Container_Interface& outbound_movements = inbound_outbound_movements->template outbound_movements<_Movements_Container_Interface&>();
+				//		((_Scenario_Interface*)_global_scenario)->template output_network_snapshots_file<fstream&>()
+				//			<< endl
+				//			<< inbound_link->template uuid<int>() << "\t"
+				//			<< inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template dbid<int>() << "\t"
+				//			<< inbound_link->template network_link_reference<_Regular_Link_Interface*>()->template direction<int>() << "\t"
+				//			<< inbound_link->template travel_time<float>() << "\t"
+				//			<< outbound_movements.size();
+
+				//		typename _Movements_Container_Interface::iterator movement_itr;
+				//		for (movement_itr = outbound_movements.begin(); movement_itr != outbound_movements.end(); movement_itr++)
+				//		{
+				//			_Movement_Interface* movement = (_Movement_Interface*)(*movement_itr);
+				//			
+				//			((_Scenario_Interface*)_global_scenario)->template output_network_snapshots_file<fstream&>()
+				//				<< endl
+				//				<< movement->template uuid<int>() << ","
+				//				<< movement->template forward_link_turn_travel_time<float>();
+				//		}
+				//	}
+				//}
 			}
 
 			template<typename TargetType> TargetType get_routable_network_from_snapshots(int current_time)
@@ -1043,34 +1087,35 @@ namespace Network_Components
 			}
 
 			// call it from initilization; move to implementation
-			template<typename TargetType> void construct_routable_network()
-			{
-				typedef Network<typename MasterType::network_type> _Regular_Network_Interface;
-				typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Regular_Network,_Regular_Network_Interface*> Net_IO_Type;
-				typedef  Network_Components::Prototypes::Network<typename remove_pointer<typename  type_of(routable_networks_container)::value_type>::type>  _Routable_Network_Interface;
-				typedef  Random_Access_Sequence< type_of(routable_networks_container), _Routable_Network_Interface*> _Routable_Networks_Container_Interface;
 
-				for(unsigned int i=0;i<num_sim_threads()+1;i++)
+			void construct_routable_networks()
+			{
+				Routable_Network<typename MasterType::routable_network_type>* routable_network = (Routable_Network<typename MasterType::routable_network_type>*)Allocate<MasterType::routable_network_type>();
+				_routable_networks.push_back(routable_network);
+				
+				routable_network->construct_routable_network<typename MasterType::network_type>( (Network<typename MasterType::network_type>*)this );
+
+				for(uint i=1;i<num_sim_threads();i++)
 				{
-					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
-					routable_network->template read_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
-					_routable_networks_container.push_back((typename MasterType::routable_network_type*)routable_network);
+					routable_network = routable_network->create_copy();
+					_routable_networks.push_back( routable_network );
 				}
 			}
 
 			template<typename TargetType> void construct_realtime_routable_network()
 			{
-				typedef Network<typename MasterType::network_type> _Regular_Network_Interface;
-				typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Regular_Network,_Regular_Network_Interface*> Net_IO_Type;
-				typedef  Network_Components::Prototypes::Network<typename remove_pointer<typename  type_of(routable_networks_container)::value_type>::type>  _Routable_Network_Interface;
-				typedef  Random_Access_Sequence< type_of(routable_networks_container), _Routable_Network_Interface*> _Routable_Networks_Container_Interface;
+				//TODO:ROUTING_OPERATION
+				//typedef Network<typename MasterType::network_type> _Regular_Network_Interface;
+				//typedef Network_Components::Types::Network_Initialization_Type<Network_Components::Types::Regular_Network,_Regular_Network_Interface*> Net_IO_Type;
+				//typedef  Network_Components::Prototypes::Network<typename remove_pointer<typename  type_of(routable_networks_container)::value_type>::type>  _Routable_Network_Interface;
+				//typedef  Random_Access_Sequence< type_of(routable_networks_container), _Routable_Network_Interface*> _Routable_Networks_Container_Interface;
 
-				for(unsigned int i=0;i<num_sim_threads()+1;i++)
-				{
-					_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
-					routable_network->template read_realtime_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
-					_realtime_routable_networks_container.push_back((typename MasterType::routable_network_type*)routable_network);
-				}
+				//for(unsigned int i=0;i<num_sim_threads()+1;i++)
+				//{
+				//	_Routable_Network_Interface* routable_network = (_Routable_Network_Interface*)Allocate<typename MasterType::routable_network_type>();
+				//	routable_network->template read_realtime_network_data<Net_IO_Type>((_Regular_Network_Interface*)this);
+				//	_realtime_routable_networks_container.push_back((typename MasterType::routable_network_type*)routable_network);
+				//}
 			}
 
 			//==================================================================================================================

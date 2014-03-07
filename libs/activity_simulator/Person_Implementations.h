@@ -24,23 +24,23 @@ namespace Person_Components
 			typedef typename MasterType::person_data_logger_type person_data_logger_type;
 
 			// Parent agent
-			m_prototype(Null_Prototype< typename MasterType::household_type>, Household, NONE, NONE);
+			m_prototype(Household_Components::Prototypes::Household< typename MasterType::household_type>, Household, NONE, NONE);
 
 			//=======================================================================================================================================================================
 			// DATA MEMBERS
 			//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-			m_prototype(Null_Prototype< typename MasterType::synthesis_zone_type>, home_synthesis_zone, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::vehicle_type>, vehicle, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::routing_type>, router, NONE, NONE);
+			m_prototype(PopSyn::Prototypes::Synthesis_Zone< typename MasterType::synthesis_zone_type>, home_synthesis_zone, NONE, NONE);
+			m_prototype(Vehicle_Components::Prototypes::Vehicle<typename MasterType::vehicle_type>, vehicle, NONE, NONE);
+			m_prototype(Routing_Components::Prototypes::Routing<typename MasterType::routing_type>, router, NONE, NONE);
 			
-			m_prototype(Null_Prototype<typename MasterType::person_mover_type>, Moving_Faculty, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::person_planner_type>, Planning_Faculty, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::person_scheduler_type>, Scheduling_Faculty, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::person_perception_type>, Perception_Faculty, NONE, NONE);
-			m_prototype(Null_Prototype< typename MasterType::person_properties_type>, Properties, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::person_static_properties_type>, Static_Properties, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Mover<typename MasterType::person_mover_type>, Moving_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Planner< typename MasterType::person_planner_type>, Planning_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Scheduler< typename MasterType::person_scheduler_type>, Scheduling_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Perception< typename MasterType::person_perception_type>, Perception_Faculty, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Properties< typename MasterType::person_properties_type>, Properties, NONE, NONE);
+			m_prototype(Person_Components::Prototypes::Person_Properties<typename MasterType::person_static_properties_type>, Static_Properties, NONE, NONE);
 			
-			m_prototype(Null_Prototype< typename MasterType::activity_location_type>, current_location, NONE, NONE);
+			m_prototype(Activity_Location_Components::Prototypes::Activity_Location< typename MasterType::activity_location_type>, current_location, NONE, NONE);
 
 			//m_prototype(Network_Components::Prototypes::Network< typename MasterType::network_type>, network_reference, NONE, NONE);
 			//m_prototype(Scenario_Components::Prototypes::Scenario< typename MasterType::scenario_type>, scenario_reference, NONE, NONE);
@@ -84,7 +84,7 @@ namespace Person_Components
 
 		
 			// Record of completed activities (stores a simplified subset of activity data)
-			m_container(boost::container::list<typename MasterType::activity_record_type*>, Activity_Record_Container, NONE, NONE);
+			m_container(boost::container::list<Activity_Components::Prototypes::Activity_Planner<typename MasterType::activity_record_type>*>, Activity_Record_Container, NONE, NONE);
 
 			//=======================================================================================================================================================================
 			// INTERFACE DEFINITIONS

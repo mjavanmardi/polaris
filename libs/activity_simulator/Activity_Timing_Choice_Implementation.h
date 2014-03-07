@@ -21,7 +21,7 @@ namespace Person_Components
 
 
 			// pointer back to parent class
-			m_prototype(Null_Prototype< typename MasterType::person_planner_type>,Parent_Planner, NONE, NONE);
+			m_prototype(Prototypes::Person_Planner< typename MasterType::person_planner_type>,Parent_Planner, NONE, NONE);
 
 
 			// static start time and duration lookup container for each activity type

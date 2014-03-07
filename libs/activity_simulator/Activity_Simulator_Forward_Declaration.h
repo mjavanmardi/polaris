@@ -166,6 +166,7 @@ namespace Person_Components {
 		template<typename ComponentType> struct Mode_Choice_Option;
 		template<typename ComponentType> struct Person_Planner;
 		template<typename ComponentType> struct Person_Properties;
+		template<typename ComponentType> struct Person_Perception;
 		template<typename ComponentType> struct Person_Scheduler;
 		template<typename ComponentType> struct Person_Mover;
 		template<typename ComponentType> struct Person_Data_Logger;

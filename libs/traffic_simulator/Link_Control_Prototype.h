@@ -13,7 +13,7 @@ namespace Link_Control_Components
 	
 	namespace Prototypes
 	{
-		prototype struct Link_Control:public ComponentType
+		prototype struct Link_Control
 		{
 			tag_as_prototype;
 			
