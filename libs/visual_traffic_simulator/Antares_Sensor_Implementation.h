@@ -69,8 +69,7 @@ namespace Sensor_Components
 			{
 				//InheritanceTemplate<MasterType,NT,INHERIT(Antares_Depot)>::Initialize_Type<NT>();
 
-//TODO
-//				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer)>*, string& > >(name);
+				_its_component_layer=Allocate_New_Layer<MT>(name);
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Dynamic_Lines();
@@ -78,7 +77,7 @@ namespace Sensor_Components
 				cfg.head_size_value=4;
 				cfg.head_accent_size_value=6;
 				cfg.selection_callback=&on_select;
-				cfg.targetsub_iteration()=0;
+				cfg.target_sub_iteration=0;
 				cfg.storage_offset=((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()*10-1;
 				cfg.group_color=true;
 				cfg.storage_period=((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()*10;
@@ -130,8 +129,7 @@ namespace Sensor_Components
 					current_segment->a._y = intersection->y_position<float>();
 					current_segment->a._z = 3;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+					Scale_Coordinates<MT>( current_segment->a );
 
 					intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
 
@@ -139,8 +137,7 @@ namespace Sensor_Components
 					current_segment->b._y = intersection->y_position<float>();
 					current_segment->b._z = 3;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+					Scale_Coordinates<MT>( current_segment->b );
 
 
 					_its_component_layer->Push_Element<Regular_Element>(&group);
@@ -155,7 +152,7 @@ namespace Sensor_Components
 
 			template<typename TargetType> void Initialize(TargetType configuration)
 			{
-				InheritanceTemplate<MasterType,NT,INHERIT(Antares_Fixed_Sensor)>::Initialize<TargetType>(configuration);
+				InheritanceTemplate<MasterType,INHERIT(Antares_Fixed_Sensor)>::Initialize<TargetType>(configuration);
 
 				//Link_Line_Segment* segments = new Link_Line_Segment[ 1 ];
 				//
@@ -243,8 +240,7 @@ namespace Sensor_Components
 				current_segment->a._y = intersection->y_position<float>();
 				current_segment->a._z = 3;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+				Scale_Coordinates<MT>( current_segment->a );
 
 				intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
 
@@ -252,8 +248,7 @@ namespace Sensor_Components
 				current_segment->b._y = intersection->y_position<float>();
 				current_segment->b._z = 3;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+				Scale_Coordinates<MT>( current_segment->b );
 				
 				_its_component_layer->Push_Element<Accented_Element>(&group);
 

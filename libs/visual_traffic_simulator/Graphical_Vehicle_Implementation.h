@@ -59,11 +59,10 @@ namespace Vehicle_Components
 
 			static void Initialize_Vehicle_Shapes_Layer()
 			{
-//TODO
-//				_vehicle_shapes=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_shapes),Graphical_Vehicle_Implementation>*, string& > >(string("Vehicles (shape)"));
+				_vehicle_shapes=Allocate_New_Layer<MT>(string("Vehicles (shape)"));
 				Antares_Layer_Configuration cfg;
 				cfg.dynamic_data=true;
-				cfg.targetsub_iteration()=Scenario_Components::Types::END_OF_ITERATION+1;
+				cfg.target_sub_iteration=Scenario_Components::Types::END_OF_ITERATION+1;
 				cfg.storage_offset=iteration();
 				cfg.storage_size=3;
 				cfg.storage_period=1;
@@ -85,8 +84,7 @@ namespace Vehicle_Components
 
 			static void Initialize_Vehicle_Points_Layer()
 			{
-//TODO
-//				_vehicle_points=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(vehicle_points),Graphical_Vehicle_Implementation>*, string& > >(string("Vehicles (point)"));
+				_vehicle_points=Allocate_New_Layer<MT>(string("Vehicles (point)"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Points();
 				cfg.primitive_color=true;
@@ -169,8 +167,7 @@ namespace Vehicle_Components
 				vehicle_center._x = u_x + distance_from_up * cos_alpha;
 				vehicle_center._y = u_y + distance_from_up * sin_alpha;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(vehicle_center);
+				Scale_Coordinates<MT>(vehicle_center);
 
 				// display on shape vehicle layer
 				float rear_x = vehicle_center._x - (Vehicle_Attribute_Shape::_vehicle_length / 2.0f) * cos_alpha;

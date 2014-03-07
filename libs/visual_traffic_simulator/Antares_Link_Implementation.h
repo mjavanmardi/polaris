@@ -233,24 +233,21 @@ namespace Link_Components
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Dynamic_Quads(True_Color_RGBA<NULLTYPE>(0,255,100,255),10);
 				cfg.storage_period = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
-				cfg.targetsub_iteration() = Scenario_Components::Types::END_OF_ITERATION + 1;
+				cfg.target_sub_iteration = Scenario_Components::Types::END_OF_ITERATION + 1;
 				cfg.storage_offset = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>() - 1;
 				cfg.primitive_color = true;
 				cfg.primitive_normal = true;
 				cfg.grouped = true;
 				cfg.group_color=false;
 				cfg.group_normal=false;
-				
-//TODO
-//				_link_travel_time_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_travel_time_layer)>*, string& > >(string("Link Travel Time"));
+
+				_link_travel_time_layer=Allocate_New_Layer<MT>(string("Link Travel Time"));
 				_link_travel_time_layer->Initialize<NULLTYPE>(cfg);
 
-//TODO
-//				_link_speed_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_speed_layer)>*, string& > >(string("Link Speed"));
+				_link_speed_layer=Allocate_New_Layer<MT>(string("Link Speed"));
 				_link_speed_layer->Initialize<NULLTYPE>(cfg);
 
-//TODO
-//				_link_density_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_density_layer)>*, string& > >(string("Link Density"));
+				_link_density_layer=Allocate_New_Layer<MT>(string("Link Density"));
 				_link_density_layer->Initialize<NULLTYPE>(cfg);
 
 //TODO
@@ -266,8 +263,8 @@ namespace Link_Components
 				//_link_density_ratio_layer->Initialize<NULLTYPE>(cfg);
 
 				cfg.grouped = false;
-//TODO
-//				_link_queue_length_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_queue_length_layer)>*, string& > >(string("Link Queue Length"));
+
+				_link_queue_length_layer=Allocate_New_Layer<MT>(string("Link Queue Length"));
 				_link_queue_length_layer->Initialize<NULLTYPE>(cfg);
 
 
@@ -819,13 +816,13 @@ namespace Link_Components
 				bucket.push_back(key_value_pair);
 				
 				key_value_pair.first="Upstream node";
-				sprintf(str_buf, "%d", _upstream_intersection->_internal_id);
+				sprintf(str_buf, "%d", _upstream_intersection->internal_id<int>());
 				key_value_pair.second=str_buf;				
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
 				
 				key_value_pair.first="Downstream node";
-				sprintf(str_buf, "%d", _downstream_intersection->_internal_id);
+				sprintf(str_buf, "%d", _downstream_intersection->internal_id<int>());
 				key_value_pair.second=str_buf;				
 				memset(&str_buf[0],0,128);
 				bucket.push_back(key_value_pair);
@@ -990,10 +987,10 @@ namespace Link_Components
 				_displayed_line.color = get_color_by_type(_link_type);
 				_displayed_line.data = (void*)(this);
 
-				float u_x = _upstream_intersection->_x_position;
-				float u_y = _upstream_intersection->_y_position;
-				float d_x = _downstream_intersection->_x_position;
-				float d_y = _downstream_intersection->_y_position;
+				float u_x = _upstream_intersection->x_position<float>();
+				float u_y = _upstream_intersection->y_position<float>();
+				float d_x = _downstream_intersection->x_position<float>();
+				float d_y = _downstream_intersection->y_position<float>();
 				float distance = sqrt((u_x - d_x) * (u_x - d_x) + (u_y - d_y) * (u_y - d_y));
 				float sin_alpha = (d_y - u_y) / distance;
 				float cos_alpha = (d_x - u_x) / distance;
@@ -1001,14 +998,14 @@ namespace Link_Components
 				_displayed_line.up_node._x = u_x + _link_shift * sin_alpha;
 				_displayed_line.up_node._y = u_y - _link_shift * cos_alpha;
 				_displayed_line.up_node._z = 0;
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(_displayed_line.up_node);
+
+				Scale_Coordinates<MT>(_displayed_line.up_node);
 				
 				_displayed_line.down_node._x = d_x + _link_shift * sin_alpha;
 				_displayed_line.down_node._y = d_y - _link_shift * cos_alpha;
 				_displayed_line.down_node._z = 0;
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>(_displayed_line.down_node);
+
+				Scale_Coordinates<MT>(_displayed_line.down_node);
 			}
 
 			True_Color_RGBA<NT> get_color_by_type(int link_type)

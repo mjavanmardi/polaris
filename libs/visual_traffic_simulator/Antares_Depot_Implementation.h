@@ -40,15 +40,14 @@ namespace Depot_Components
 			{
 				Antares_Layer_Configuration cfg;
 
-//TODO
-//				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer)>*, string& > >(string("Tow Truck Locations"));
+				_its_component_layer=Allocate_New_Layer<MT>(string("Tow Truck Locations"));
 
 				cfg.Configure_Dynamic_Points();
 				cfg.head_texture = cfg.Add_Texture(string("C:\\opt\\polarisdeps\\antares\\Tow_Truck.png"));
 				cfg.grouped=false;
 				cfg.head_size_value=16;
 				cfg.head_accent_size_value=32;
-				cfg.targetsub_iteration()=0;
+				cfg.target_sub_iteration=0;
 				cfg.storage_offset=((Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>()-1;
 				cfg.storage_period=60*5;
 				cfg.selection_callback=&on_select;
@@ -70,7 +69,7 @@ namespace Depot_Components
 
 
 
-				boost::container::vector<Link_Interface*>& event_links = net_event->affected_links< vector<Link_Interface*>& >();
+				boost::container::vector<Link_Interface*>& event_links = net_event->affected_links< boost::container::vector<Link_Interface*>& >();
 
 				if(event_links.size())
 				{
@@ -112,7 +111,7 @@ namespace Depot_Components
 					
 					ComponentType* its_component=(ComponentType*)selected.back();
 
-					boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >& current_events = its_component->_associated_depot->current_events< vector< Network_Event< typename type_of(MasterType::base_network_event) >* >& >();
+					boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >& current_events = its_component->_associated_depot->current_events< boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >& >();
 
 					for(boost::container::vector< Network_Event< typename type_of(MasterType::base_network_event) >* >::iterator itr=current_events.begin();itr!=current_events.end();itr++)
 					{
@@ -209,9 +208,8 @@ namespace Depot_Components
 				
 				its_location.position._x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
 				its_location.position._y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
-				
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
+
+				Scale_Coordinates<MT>( its_location.position );
 
 				_its_component_layer->Push_Element<Accented_Element>(&its_location);
 
@@ -238,8 +236,7 @@ namespace Depot_Components
 				link_line.up_node._y = intersection->y_position<float>();
 				link_line.up_node._z = 3;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.up_node );
+				Scale_Coordinates<MT>( link_line.up_node );
 
 				intersection = link->downstream_intersection< Intersection_Interface* >();
 
@@ -247,8 +244,7 @@ namespace Depot_Components
 				link_line.down_node._y = intersection->y_position<float>();
 				link_line.down_node._z = 3;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.down_node );
+				Scale_Coordinates<MT>( link_line.down_node );
 
 				MasterType::network_type::_link_lines->Push_Element<Accented_Element>(&link_line);
 			}
@@ -266,9 +262,9 @@ namespace Depot_Components
 			typedef typename Tow_Truck_Depot<MasterType,INHERIT(Antares_Tow_Truck_Depot)>::ComponentType ComponentType;
 			
 			typedef Link_Components::Implementations::Link_Line<MasterType> Link_Line;
-			typedef Intersection<typename type_of(MasterType::intersection)> Intersection_Interface;
-			typedef Depot<typename type_of(MasterType::depot)> Depot_Interface;
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<typename type_of(MasterType::intersection)> Intersection_Interface;
+			typedef Depot_Components::Prototypes::Depot<typename type_of(MasterType::depot)> Depot_Interface;
+			typedef Link_Components::Prototypes::Link<typename type_of(MasterType::link)> Link_Interface;
 
 #pragma pack(push,1)
 			struct ITS_Location
@@ -337,9 +333,8 @@ namespace Depot_Components
 						
 						truck_location.position._x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
 						truck_location.position._y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
-						
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( truck_location.position );
+
+						Scale_Coordinates<MT>( truck_location.position );
 
 						type_of(MasterType::tow_truck)::_its_component_layer->Push_Element<Regular_Element>(&truck_location);
 					}
@@ -360,12 +355,11 @@ namespace Depot_Components
 
 			template<typename TargetType> static void Initialize_Type()
 			{
-				Tow_Truck_Depot<MasterType,NT,INHERIT(Antares_Tow_Truck_Depot)>::Initialize_Type<NT>();
+				Tow_Truck_Depot<MasterType,INHERIT(Antares_Tow_Truck_Depot)>::Initialize_Type<NT>();
 
 				Antares_Layer_Configuration cfg;
 
-//TODO
-//				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer)>*, string& > >(string("Tow Truck Depot"));
+				_its_component_layer=Allocate_New_Layer<MT>(string("Tow Truck Depot"));
 
 				cfg.Configure_Static_Points();
 				cfg.head_texture = cfg.Add_Texture(string("C:\\opt\\polarisdeps\\antares\\Depot.png"));
@@ -401,9 +395,8 @@ namespace Depot_Components
 				its_location.position._x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
 				its_location.position._y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
 				its_location.position._z = 5;
-				
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
+
+				Scale_Coordinates<MT>( its_location.position );
 
 				_its_component_layer->Push_Element<Regular_Element>(&its_location);
 			}
@@ -444,9 +437,8 @@ namespace Depot_Components
 				
 				its_location.position._x = (upstream_intersection->x_position<float>() + downstream_intersection->x_position<float>())/2.0f;
 				its_location.position._y = (upstream_intersection->y_position<float>() + downstream_intersection->y_position<float>())/2.0f;
-					
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
+
+				Scale_Coordinates<MT>( its_location.position );
 
 				_its_component_layer->Push_Element<Accented_Element>(&its_location);
 
@@ -472,8 +464,7 @@ namespace Depot_Components
 					link_line.up_node._y = intersection->y_position<float>();
 					link_line.up_node._z = 3;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.up_node );
+					Scale_Coordinates<MT>( link_line.up_node );
 
 					intersection = link->downstream_intersection< Intersection_Interface* >();
 
@@ -481,8 +472,7 @@ namespace Depot_Components
 					link_line.down_node._y = intersection->y_position<float>();
 					link_line.down_node._z = 3;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.down_node );
+					Scale_Coordinates<MT>( link_line.down_node );
 
 					MasterType::network_type::_link_lines->Push_Element<Accented_Element>(&link_line);
 				}

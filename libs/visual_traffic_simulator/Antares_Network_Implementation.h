@@ -5,8 +5,8 @@
 #pragma once
 #include "Dependencies.h"
 #include "Traffic_Simulator\Network_Implementation.h"
-#include "Canvas.h"
-#include "Information_Panel.h"
+//#include "Antares\Canvas.h"
+//#include "Information_Panel.h"
 
 namespace Network_Components
 {
@@ -113,7 +113,7 @@ namespace Network_Components
 
 			template<typename TargetType> void set_network_bounds()
 			{
-				_network_bounds.reboost::container::set<type_of(network_bounds),Antares_Network_Implementation,NULLTYPE>();
+				_network_bounds.reset<NT>();
 				typename _Intersections_Container_Interface::iterator intersection_itr;
 				for(intersection_itr = _intersections_container.begin(); intersection_itr != _intersections_container.end(); intersection_itr++)
 				{
@@ -212,20 +212,20 @@ namespace Network_Components
 				pcfg.Configure_Plot();
 				pcfg.storage_period = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>();
 				pcfg.storage_offset = ((_Scenario_Interface*)_global_scenario)->simulation_interval_length<int>() - 1;
-				pcfg.targetsub_iteration() = Scenario_Components::Types::END_OF_ITERATION + 1;
+				pcfg.target_sub_iteration = Scenario_Components::Types::END_OF_ITERATION + 1;
 				pcfg.grouped = true;
 				pcfg.group_color = true;
 
 				pcfg.x_label = "time (second)";
 				
 				pcfg.y_label = "vechile-miles traveled";
-//TODO
-//				_network_vmt_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_vmt_layer),Antares_Network_Implementation>*, string& > >(string("VMT"));
+
+				_network_vmt_layer=Allocate_New_Plot_Layer<MT>(string("VMT"));
 				_network_vmt_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "vechiles-hours traveled";
-//TODO
-//				_network_vht_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_vht_layer),Antares_Network_Implementation>*, string& > >(string("VHT"));
+
+				_network_vht_layer=Allocate_New_Plot_Layer<MT>(string("VHT"));
 				_network_vht_layer->Initialize<NULLTYPE>(pcfg);
 
 				//pcfg.y_label = "cumulative loaded vehicles";
@@ -234,58 +234,58 @@ namespace Network_Components
 				//_network_cumulative_loaded_vehicles_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "cumulative departed vehicles";
-//TODO
-//				_network_cumulative_departed_vehicles_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_cumulative_departed_vehicles_layer),Antares_Network_Implementation>*, string& > >(string("cumulative departed"));
+
+				_network_cumulative_departed_vehicles_layer=Allocate_New_Plot_Layer<MT>(string("cumulative departed"));
 				_network_cumulative_departed_vehicles_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "cumulative arrived vehicles";
-//TODO
-//				_network_cumulative_arrived_vehicles_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_cumulative_arrived_vehicles_layer),Antares_Network_Implementation>*, string& > >(string("cumulative arrived"));
+
+				_network_cumulative_arrived_vehicles_layer=Allocate_New_Plot_Layer<MT>(string("cumulative arrived"));
 				_network_cumulative_arrived_vehicles_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "number of vehicles";
-//TODO
-//				_network_cumulative_combined_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_cumulative_combined_layer),Antares_Network_Implementation>*, string& > >(string("cumulative curves"));
+
+				_network_cumulative_combined_layer=Allocate_New_Plot_Layer<MT>(string("cumulative curves"));
 				_network_cumulative_combined_layer->Initialize<NULLTYPE>(pcfg);
 				
 				pcfg.y_label = "in-network vehicles";
-//TODO
-//				_network_in_network_vehicles_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_in_network_vehicles_layer),Antares_Network_Implementation>*, string& > >(string("in-network"));
+
+				_network_in_network_vehicles_layer=Allocate_New_Plot_Layer<MT>(string("in-network"));
 				_network_in_network_vehicles_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "link travel time (minute)";
-//TODO
-//				_network_avg_link_travel_time_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_travel_time_layer),Antares_Network_Implementation>*, string& > >(string("network avg link travel time"));
+
+				_network_avg_link_travel_time_layer=Allocate_New_Plot_Layer<MT>(string("network avg link travel time"));
 				_network_avg_link_travel_time_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "link speed (miles/hour)";
-//TODO
-//				_network_avg_link_speed_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_speed_layer),Antares_Network_Implementation>*, string& > >(string("network avg link speed"));
+
+				_network_avg_link_speed_layer=Allocate_New_Plot_Layer<MT>(string("network avg link speed"));
 				_network_avg_link_speed_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "link density (vehiles/mile/lane)";
-//TODO
-//				_network_avg_link_density_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_density_layer),Antares_Network_Implementation>*, string& > >(string("network avg link density"));
+
+				_network_avg_link_density_layer=Allocate_New_Plot_Layer<MT>(string("network avg link density"));
 				_network_avg_link_density_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "link travel time (minute)";
-//TODO
-//				_historic_link_travel_time_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(historic_link_travel_time_layer),Antares_Network_Implementation>*, string& > >(string("link travel time"));
+
+				_historic_link_travel_time_layer=Allocate_New_Plot_Layer<MT>(string("link travel time"));
 				_historic_link_travel_time_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "link speed (miles/hour)";
-//TODO
-//				_historic_link_speed_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(historic_link_speed_layer),Antares_Network_Implementation>*, string& > >(string("link speed"));
+
+				_historic_link_speed_layer=Allocate_New_Plot_Layer<MT>(string("link speed"));
 				_historic_link_speed_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "link density (vehiles/mile/lane)";
-//TODO
-//				_historic_link_density_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(historic_link_density_layer),Antares_Network_Implementation>*, string& > >(string("link density"));
+
+				_historic_link_density_layer=Allocate_New_Plot_Layer<MT>(string("link density"));
 				_historic_link_density_layer->Initialize<NULLTYPE>(pcfg);
 
 				//pcfg.y_label = "link travel time ratio";
-//TODO
-//				//_network_avg_link_travel_time_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_travel_time_ratio_layer),Antares_Network_Implementation>*, string& > >(string("avg link travel time ratio"));
+
+				//_network_avg_link_travel_time_ratio_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(network_avg_link_travel_time_ratio_layer),Antares_Network_Implementation>*, string& > >(string("avg link travel time ratio"));
 				//_network_avg_link_travel_time_ratio_layer->Initialize<NULLTYPE>(pcfg);
 
 				//pcfg.y_label = "link speed ratio";
@@ -332,8 +332,7 @@ namespace Network_Components
 
 			template<typename TargetType> void initialize_link_map_layers()
 			{
-//TODO
-//				_link_lines=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(link_lines),Antares_Network_Implementation>*, string& > >(string("Links"));
+				_link_lines=Allocate_New_Layer<MT>(string("Links"));
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Lines();
@@ -377,8 +376,7 @@ namespace Network_Components
 
 			template<typename TargetType> void initialize_intersection_map_layers()
 			{
-//TODO
-//				_intersection_polygons=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(intersection_polygons),Antares_Network_Implementation>*, string& > >(string("Intersections"));
+				_intersection_polygons=Allocate_New_Layer<MT>(string("Intersections"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Polygons();
 				cfg.draw=false;
@@ -402,8 +400,8 @@ namespace Network_Components
 					Point_3D<MasterType> v_node;
 					v_node._x = intersection->x_position<float>();
 					v_node._y = intersection->y_position<float>();
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(v_node);
+
+					Scale_Coordinates(v_node);
 
 					float x = v_node._x;
 					float y = v_node._y;

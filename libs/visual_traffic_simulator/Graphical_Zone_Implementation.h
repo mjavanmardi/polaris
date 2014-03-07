@@ -194,10 +194,8 @@ namespace Zone_Components
 				destination_col_center._x = coordinates._x + width*0.25;
 				destination_col_center._y = origin_col_center._y;
 
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(origin_col_center);
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NULLTYPE,void,Point_3D<MasterType>&>>(destination_col_center);
+				Scale_Coordinates<MT>(origin_col_center);
+				Scale_Coordinates<MT>(destination_col_center);
 
 				// construct and push to productions column
 				Types::Column<MasterType> origin_column = Types::Column<MasterType>(origin_col_center,width,height_prod, Types::GREEN_COLUMN);
@@ -215,8 +213,7 @@ namespace Zone_Components
 				// configure vehicle layer
 				cout << "configuring zone layer";
 
-//TODO
-//				_zone_centroids=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(zone_centroids)>*, string& > >(string("Zones"));
+				_zone_centroids=Allocate_New_Layer<MT>(string("Zones"));
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Quads(True_Color_RGBA<NULLTYPE>(0,255,100,255),10);
 
@@ -229,7 +226,7 @@ namespace Zone_Components
 
 				cfg.dynamic_data = true;
 				cfg.storage_period = 300;
-				cfg.targetsub_iteration() = Types::ZONE_UPDATE_SUBITERATION+1;
+				cfg.target_sub_iteration = Types::ZONE_UPDATE_SUBITERATION+1;
 				cfg.storage_offset = 60/*iteration()*/;
 				cfg.storage_size = 4;
 				cfg.primitive_color = true;

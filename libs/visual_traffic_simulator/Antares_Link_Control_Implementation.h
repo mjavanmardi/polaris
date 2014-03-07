@@ -29,8 +29,7 @@ namespace Link_Control_Components
 			{
 				InheritanceTemplate<MasterType,INHERIT(Antares_Link_Control)>::Initialize_Type<NT>();
 
-//TODO
-//				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer)>*, string& > >(name);
+				_its_component_layer=Allocate_New_Layer<MT>(name);
 
 				Antares_Layer_Configuration cfg;
 				cfg.Configure_Static_Lines();
@@ -195,8 +194,7 @@ namespace Link_Control_Components
 					current_segment->a._y = intersection->y_position<float>();
 					current_segment->a._z = 3;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+					Scale_Coordinates<MT>( current_segment->a );
 
 					intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
 
@@ -204,8 +202,7 @@ namespace Link_Control_Components
 					current_segment->b._y = intersection->y_position<float>();
 					current_segment->b._z = 3;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+					Scale_Coordinates<MT>( current_segment->b );
 
 					++current_segment;
 				}
@@ -217,7 +214,7 @@ namespace Link_Control_Components
 
 			template<typename TargetType> void Initialize(TargetType configuration)
 			{
-				InheritanceTemplate<MasterType,NT,INHERIT(Antares_Link_Control)>::Initialize<TargetType>(configuration);
+				InheritanceTemplate<MasterType,INHERIT(Antares_Link_Control)>::Initialize<TargetType>(configuration);
 
 				if(_covered_links.size())
 				{
@@ -242,8 +239,7 @@ namespace Link_Control_Components
 						current_segment->a._y = intersection->y_position<float>();
 						current_segment->a._z = 3;
 
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->a );
+						Scale_Coordinates<MT>( current_segment->a );
 
 						intersection = link->downstream_intersection< Intersection<typename type_of(MasterType::intersection)>* >();
 
@@ -251,8 +247,7 @@ namespace Link_Control_Components
 						current_segment->b._y = intersection->y_position<float>();
 						current_segment->b._z = 3;
 
-//TODO
-//						Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( current_segment->b );
+						Scale_Coordinates<MT>( current_segment->b );
 
 						++current_segment;
 					}

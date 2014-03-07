@@ -19,8 +19,8 @@ namespace Advisory_ITS_Components
 		{
 			typedef typename InheritanceTemplate<MasterType,INHERIT(Antares_Advisory_ITS)>::ComponentType ComponentType;
 
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
-			typedef Intersection<typename type_of(MasterType::intersection)> Intersection_Interface;
+			typedef Link_Components::Prototypes::Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Intersection_Components::Prototypes::Intersection<typename type_of(MasterType::intersection)> Intersection_Interface;
 
 			typedef Link_Components::Implementations::Link_Line<MasterType> Link_Line;
 
@@ -120,8 +120,8 @@ namespace Advisory_ITS_Components
 					its_location.position._y = (ymax + ymin)/2.0f;
 					its_location.position._z = 5;
 					
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
+
+					Scale_Coordinates<MT>( its_location.position );
 
 					_its_component_layer->Push_Element<Regular_Element>(&its_location);
 
@@ -323,8 +323,8 @@ namespace Advisory_ITS_Components
 				its_location.position._y = (ymax + ymin)/2.0f;
 				its_location.position._z = 5;
 					
-//TODO
-//				Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( its_location.position );
+
+				Scale_Coordinates<MT>( its_location.position );
 
 				_its_component_layer->Push_Element<Accented_Element>(&its_location);
 
@@ -362,8 +362,7 @@ namespace Advisory_ITS_Components
 					link_line.up_node._y = intersection->y_position<float>();
 					link_line.up_node._z = 3;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.up_node );
+					Scale_Coordinates<MT>( link_line.up_node );
 
 					intersection = link->downstream_intersection< Intersection_Interface* >();
 
@@ -371,8 +370,7 @@ namespace Advisory_ITS_Components
 					link_line.down_node._y = intersection->y_position<float>();
 					link_line.down_node._z = 3;
 
-//TODO
-//					Scale_Coordinates<typename MasterType::type_of(canvas),NT,Target_Type<NT,void,Point_3D<MasterType>&>>( link_line.down_node );
+					Scale_Coordinates<MT>( link_line.down_node );
 
 					MasterType::network_type::_link_lines->Push_Element<Accented_Element>(&link_line);
 				}

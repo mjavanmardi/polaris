@@ -54,6 +54,6 @@ prototype struct Rectangle
 	accessor(width, NONE, NONE);
 	accessor(height, NONE, NONE);
 
-	template<typename TargetType> void reset(){this_component()->reboost::container::set<TargetType>();}
+	template<typename TargetType> void reset(){this_component()->reset<TargetType>();}
 };
 }

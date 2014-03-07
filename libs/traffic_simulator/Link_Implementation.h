@@ -161,8 +161,8 @@ namespace Link_Components
 		/// Upstream and Downstream Intersections Reference
 		//------------------------------------------------------------------------------------------------------------------			
 
-			m_prototype(Null_Prototype<typename MasterType::intersection_type>, upstream_intersection, NONE, NONE);
-			m_prototype(Null_Prototype<typename MasterType::intersection_type>, downstream_intersection, NONE, NONE);
+			m_prototype(Intersection_Components::Prototypes::Intersection<typename MasterType::intersection_type>, upstream_intersection, NONE, NONE);
+			m_prototype(Intersection_Components::Prototypes::Intersection<typename MasterType::intersection_type>, downstream_intersection, NONE, NONE);
 
 		//==================================================================================================================
 		/// Containers of Cached Cumulative Vehicle Statistics

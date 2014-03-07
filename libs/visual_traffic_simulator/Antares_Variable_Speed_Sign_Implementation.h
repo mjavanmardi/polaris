@@ -128,8 +128,7 @@ namespace Variable_Message_Sign_Components
 				//_its_coverage_layer->Initialize<NULLTYPE>(cfg);
 
 
-//TODO
-//				_its_component_layer=Allocate_New_Layer< typename MasterType::type_of(canvas),NT,Target_Type< NT,Antares_Layer<type_of(its_component_layer)>*, string& > >(string("Variable Speed Signs"));
+				_its_component_layer=Allocate_New_Layer<MT>(string("Variable Speed Signs"));
 
 				
 				cfg.Configure_Static_Points();

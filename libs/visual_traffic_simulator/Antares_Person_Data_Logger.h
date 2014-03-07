@@ -227,38 +227,35 @@ namespace Person_Components
 				pcfg.Configure_Plot();
 				pcfg.storage_period = 900;
 				pcfg.storage_offset = 0;
-				pcfg.targetsub_iteration() = Scenario_Components::Types::END_OF_ITERATION + 1;
+				pcfg.target_sub_iteration = Scenario_Components::Types::END_OF_ITERATION + 1;
 				pcfg.grouped = true;
 				pcfg.group_color = true;
 
 				pcfg.x_label = "time (second)";
 				
 				pcfg.y_label = "Time lost (minutes)";
-//TODO
-//				_activity_time_lost_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(activity_time_lost_layer),Antares_Person_Data_Logger_Implementation>*, string& > >(string("Time Lost"));
+				_activity_time_lost_layer=Allocate_New_Plot_Layer<MT>(string("Time Lost"));
 				_activity_time_lost_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "Activity count";
-//TODO
-//				_replanned_activities_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(replanned_activities_layer),Antares_Person_Data_Logger_Implementation>*, string& > >(string("Replanned Activities"));
+				_replanned_activities_layer=Allocate_New_Plot_Layer<MT>(string("Replanned Activities"));
 				_replanned_activities_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.y_label = "Activities";
-//TODO
-//				_cancelled_activities_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(cancelled_activities_layer),Antares_Person_Data_Logger_Implementation>*, string& > >(string("Cancelled Activities"));
+				_cancelled_activities_layer=Allocate_New_Plot_Layer<MT>(string("Cancelled Activities"));
 				_cancelled_activities_layer->Initialize<NULLTYPE>(pcfg);
 
 				pcfg.x_label = "time (minutes)";
 				pcfg.y_label = "Travel Time Density";
-//TODO
-//				_ttime_distribution_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(ttime_distribution_layer),Antares_Person_Data_Logger_Implementation>*, string& > >(string("Travel Time Distribution"));
+
+				_ttime_distribution_layer=Allocate_New_Plot_Layer<MT>(string("Travel Time Distribution"));
 				_ttime_distribution_layer->Initialize<NULLTYPE>(pcfg);
 				
 
 				pcfg.x_label = "Work-home          Home          Work          Other-Work          School          MajShop          Shop          Service          Health          Personal          Errand          Pick/drop          Meal          Civic          Leisure          Recreation          Social          Transport          Other";
 				pcfg.y_label = "Activity counts";
-//TODO
-//				_activity_type_distribution_layer=Allocate_New_Plot_Layer< typename MasterType::type_of(information_panel),NT,Target_Type< NULLTYPE,Antares_Layer<type_of(activity_type_distribution_layer),Antares_Person_Data_Logger_Implementation>*, string& > >(string("Activity Type Distribution"));
+				
+				_activity_type_distribution_layer=Allocate_New_Plot_Layer<MT>(string("Activity Type Distribution"));
 				_activity_type_distribution_layer->Initialize<NULLTYPE>(pcfg);
 			}
 

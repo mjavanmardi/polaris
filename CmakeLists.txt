@@ -95,6 +95,7 @@ include_directories(libs/repository)
 include_directories(libs/traffic_simulator)
 include_directories(libs/scenario_manager)
 include_directories(libs/population_synthesis)
+include_directories(libs/visual_traffic_simulator)
 include_directories(apps)
 include_directories(tests)
 
@@ -104,7 +105,6 @@ add_subdirectory (libs/repository)
 add_subdirectory (libs/io) 
 add_subdirectory (libs/spatial) 
 add_subdirectory (libs/routing) 
-add_subdirectory (libs/traffic_simulator)
 add_subdirectory (libs/scenario_manager)
 add_subdirectory (libs/population_synthesis)
 add_subdirectory (libs/activity_simulator)
@@ -114,8 +114,6 @@ add_subdirectory (tests/core_tests)
 
 #Apply CMake over POLARIS application project structure
 add_subdirectory (apps/io_demo) 
-
-add_subdirectory (apps/fixed_demand_simulator) 
 add_subdirectory (apps/integrated_abm) 
 add_subdirectory (apps/population_synthesizer)
 
@@ -150,8 +148,9 @@ if (MSVC AND Antares)
     set(antareslibs Antares ${glew} opengl32.lib glu32.lib ${plplotd} ${plplotcxxd} ${csirocsa} ${qsastime} ${plplotwxwidgetsd})    
     add_subdirectory (libs/antares)
 	add_subdirectory (apps/demo)
-	
+	add_subdirectory (libs/visual_traffic_simulator)
 	add_subdirectory (apps/test) 
 endif()
 
-
+add_subdirectory (libs/traffic_simulator)
+add_subdirectory (apps/fixed_demand_simulator) 
