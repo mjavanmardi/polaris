@@ -233,9 +233,10 @@ namespace Vehicle_Components
 				}
 			}
 
-			declare_event(compute_vehicle_position)
+			//declare_event(compute_vehicle_position)
+			void compute_vehicle_position()
 			{
-				Antares_Vehicle_Implementation* pthis=(Antares_Vehicle_Implementation*)_this;
+				Antares_Vehicle_Implementation* pthis=(Antares_Vehicle_Implementation*)this;
 				if (pthis->simulation_status<Types::Vehicle_Status_Keys>() != Types::Vehicle_Status_Keys::IN_NETWORK) return;
 				pthis->update_vehicle_position<NT>();
 				if (_vehicle_shapes->template draw<bool>() || _vehicle_points->template draw<bool>())
@@ -294,7 +295,7 @@ namespace Vehicle_Components
 					int num_switch_decisions = (int)_switch_decisions_container.size();
 					
 					typedef Activity_Location<typename type_of(MasterType::activity_location)> Activity_Location_Interface;
-
+#ifdef INCLUDE_DEMAND
 					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;				
 					
 					if(person->has_done_replanning<bool>() && ((ComponentType*)this)->_is_integrated)
@@ -303,7 +304,9 @@ namespace Vehicle_Components
 						body_color._g = 100;
 						body_color._b = 255;
 					}
-					else if (num_switch_decisions > 0)
+					else
+#endif
+					if (num_switch_decisions > 0)
 					{
 						if (num_switch_decisions == 1)
 						{
@@ -1174,7 +1177,7 @@ namespace Vehicle_Components
 					int num_switch_decisions = (int)_switch_decisions_container.size();
 					
 					typedef Activity_Location<typename type_of(MasterType::activity_location)> Activity_Location_Interface;
-
+#ifdef INCLUDE_DEMAND
 					Person<typename ComponentType::traveler_type>* person=(Person<typename ComponentType::traveler_type>*)_traveler;				
 					
 					if(person->has_done_replanning<bool>() && ((ComponentType*)this)->_is_integrated)
@@ -1183,7 +1186,9 @@ namespace Vehicle_Components
 						coordinate.color._g = 100;
 						coordinate.color._b = 255;
 					}
-					else if (num_switch_decisions > 0)
+					else
+#endif
+					if (num_switch_decisions > 0)
 					{
 						if (num_switch_decisions == 1)
 						{
@@ -1255,7 +1260,6 @@ namespace Vehicle_Components
 				typedef Scenario_Components::Prototypes::Scenario<typename MasterType::scenario_type> _Scenario_Interface; 
 				if (((_Vehicle_Interface*)_this)->template simulation_status<Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::OUT_NETWORK)
 				{
-					response.result=false;
 					response.next._iteration=END;
 				}
 				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION && ((_Scenario_Interface*)_global_scenario)->template vehicle_taking_action<bool>())
@@ -1266,16 +1270,16 @@ namespace Vehicle_Components
 						assert(false);
 					}
 					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
-					_this->Vehicle_Action<NULLTYPE>();
-					response.result=true;
+					_this->Vehicle_Action();
+
 					if (((_Vehicle_Interface*)_this)->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::IN_NETWORK)
 					{
-						response.next._iteration=_iteration;
+						response.next._iteration=iteration();
 						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
 					}
 					else
 					{
-						response.next._iteration=_iteration;
+						response.next._iteration=iteration();
 						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 				}
@@ -1287,20 +1291,18 @@ namespace Vehicle_Components
 						assert(false);
 					}
 					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&Vehicle_Action<NULLTYPE>);
-					_this->Vehicle_Action<NULLTYPE>();
-					response.result=true;
-					response.next._iteration=_iteration;
+					_this->Vehicle_Action();
+					response.next._iteration=iteration();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 				}
 				else if (sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION)
 				{
 					//((typename MasterType::vehicle_type*)_this)->Swap_Event((Event)&compute_vehicle_position<NULLTYPE>);
-					_this->compute_vehicle_position<NULLTYPE>();
-					response.result=true;
+					_this->compute_vehicle_position();
 
 					if(!((_Scenario_Interface*)_global_scenario)->template vehicle_taking_action<bool>())
 					{
-						response.next._iteration=_iteration + 1;
+						response.next._iteration=iteration() + 1;
 						response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 					}
 					else
@@ -1308,19 +1310,19 @@ namespace Vehicle_Components
 						// depending on whether the next iteration is a simulation interval border iteration
 						if ((iteration() + 2) % ((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>() != 0)
 						{
-							response.next._iteration=_iteration + 1;
+							response.next._iteration=iteration() + 1;
 							response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION;
 						}
 						else
 						{
 							if (((_Vehicle_Interface*)_this)->template simulation_status<Vehicle_Components::Types::Vehicle_Status_Keys>() == Types::Vehicle_Status_Keys::IN_NETWORK)
 							{
-								response.next._iteration=_iteration + 1;
+								response.next._iteration=iteration() + 1;
 								response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_TRANSFER_SUB_ITERATION;
 							}
 							else
 							{
-								response.next._iteration=_iteration + 1;
+								response.next._iteration=iteration() + 1;
 								response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::VEHICLE_ACTION_ORIGIN_LOADING_SUB_ITERATION;
 							}
 						}

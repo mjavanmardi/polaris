@@ -1,11 +1,12 @@
 #define EXCLUDE_DEMAND
 
+#define ANTARES
+
 #include "Polaris_PCH.h"
 
 #define FOR_LINUX_PORTING
 #define SHOW_WARNINGS
 #include "Application_Includes.h"
-//#include "../File_IO/network_models.h"
 
 #ifdef EXCLUDE_DEMAND
 #include "Repository/RNG_Implementations.h"
@@ -204,7 +205,9 @@ int main(int argc, char* argv[])
     Average_Execution_Objects_Hint<MasterType::traveler_type>(2778495);
     Average_Execution_Objects_Hint<MasterType::link_type>(55008);
     Average_Execution_Objects_Hint<MasterType::intersection_type>(18904);
-
+#ifdef ANTARES
+	Average_Execution_Objects_Hint<MasterType::antares_layer_type>(10);
+#endif
 	char* scenario_filename = "scenario.json";
 	if (argc >= 2) scenario_filename = argv[1];
 

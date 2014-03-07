@@ -70,7 +70,7 @@ namespace Link_Components
 
 			template<typename TargetType> void Initialize()
 			{
-				((Link_Implementation<MasterType,INHERIT(Link_Implementation)>*)this)->Initialize<TargetType>();
+				((Link_Implementation<MasterType,INHERIT(Antares_Link_Implementation)>*)this)->Initialize<TargetType>();
 				// set bar attributes that are common for all MOEs.
 				initialize_column();
 
@@ -1079,37 +1079,47 @@ namespace Link_Components
 				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
 				if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Update_Events<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=_iteration;
+					//((typename MasterType::link_type*)_this)->Swap_Event((Event)&Update_Events<NULLTYPE>);
+					
+					_this->Update_Events();
+
+					response.next._iteration=iteration();
 					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION;
 				}
 				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_SUPPLY_UPDATE_SUB_ITERATION)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Supply_Update<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=_iteration;
+					//((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Supply_Update<NULLTYPE>);
+
+					_this->Compute_Step_Flow_Supply_Update();
+
+					response.next._iteration=iteration();
 					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_ORIGIN_LINK_LOADING_SUB_ITERATION;
 				}
 				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_ORIGIN_LINK_LOADING_SUB_ITERATION)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Origin_Link_Loading<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=_iteration;
+					//((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Origin_Link_Loading<NULLTYPE>);
+
+					_this->Compute_Step_Origin_Link_Loading();
+
+					response.next._iteration=iteration();
 					response.next._sub_iteration = Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION;
 				}
 				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::LINK_COMPUTE_STEP_FLOW_LINK_MOVING_SUB_ITERATION)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Link_Moving<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=_iteration;
+					//((typename MasterType::link_type*)_this)->Swap_Event((Event)&Compute_Step_Flow_Link_Moving<NULLTYPE>);
+
+					_this->Compute_Step_Flow_Link_Moving();
+
+					response.next._iteration=iteration();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS;
 				}
 				else if(sub_iteration() == Scenario_Components::Types::Type_Sub_Iteration_keys::MOE_VISUALIZATION_SUB_ITERATIONS)
 				{
-					((typename MasterType::link_type*)_this)->Swap_Event((Event)&Visualize_Link_MOE<NULLTYPE>);
-					response.result=true;
-					response.next._iteration=_iteration+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
+					//((typename MasterType::link_type*)_this)->Swap_Event((Event)&Visualize_Link_MOE<NULLTYPE>);
+
+					_this->Visualize_Link_MOE();
+
+					response.next._iteration=iteration()+((_Scenario_Interface*)_global_scenario)->template simulation_interval_length<int>();
 					response.next._sub_iteration=Scenario_Components::Types::Type_Sub_Iteration_keys::EVENTS_UPDATE_SUB_ITERATION;
 				}
 				else
@@ -1119,10 +1129,11 @@ namespace Link_Components
 				}
 			}
 			
-			declare_event(Visualize_Link_MOE)
+			//declare_event(Visualize_Link_MOE)
+			void Visualize_Link_MOE()
 			{
 				typedef Link<typename MasterType::link_type> _Link_Interface;
-				_Link_Interface* _this_ptr=(_Link_Interface*)_this;
+				_Link_Interface* _this_ptr=(_Link_Interface*)this;
 				_this_ptr->template visualize_moe<NULLTYPE>();
 			}
 

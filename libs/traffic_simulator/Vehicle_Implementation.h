@@ -115,8 +115,9 @@ namespace Vehicle_Components
 #ifdef ANTARES
 				else
 				{
+					Load_Event<ComponentType>(&ComponentType::Vehicle_Action_Condition,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION);
 					//TODO
-//load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template compute_vehicle_position,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION,NULLTYPE);
+					//load_event(ComponentType,ComponentType::template Vehicle_Action_Condition,ComponentType::template compute_vehicle_position,iteration(),Scenario_Components::Types::Type_Sub_Iteration_keys::END_OF_ITERATION,NULLTYPE);
 					((ComponentType*)this)->route_being_displayed = false;
 				}
 #endif
@@ -175,6 +176,7 @@ namespace Vehicle_Components
 				_Link_Interface* link = mp->template origin<_Link_Interface*>();
 				move_to_link<_Link_Interface*>((_Link_Interface*)link);
 				_simulation_status = Types::Vehicle_Status_Keys::IN_NETWORK;
+
 				update_network_vht_compensation<TargetType>();
 			}
 
@@ -437,9 +439,10 @@ namespace Vehicle_Components
 				}
 			}
 
-			declare_event(Vehicle_Action)
+			//declare_event(Vehicle_Action)
+			void Vehicle_Action()
 			{
-				((_Vehicle_Interface*)_this)->template take_action<NT>();
+				take_action<NT>();
 			}
 
 			template<typename TargetType> bool exploit_events_set(TargetType events_set)
