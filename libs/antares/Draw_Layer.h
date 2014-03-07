@@ -24,6 +24,9 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 	const Point_3D<MasterType> head_normal=layer->head_normal<Point_3D<MasterType>>();
 	const int head_size_value=layer->head_size_value<int>();
 	
+	const pixel_size_callback_type pixel_size_callback = layer->pixel_size_callback<pixel_size_callback_type>();
+	const pixel_size_callback_type accent_pixel_size_callback = layer->accent_pixel_size_callback<pixel_size_callback_type>();
+
 	const int head_accent_size_value=layer->head_accent_size_value<int>();
 	
 	const int head_texture=layer->head_texture<int>();
@@ -88,7 +91,8 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 			glEnable(GL_POINT_SPRITE);
 			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 		}
-		glPointSize(head_size_value);
+		if(pixel_size_callback!=nullptr) glPointSize((*pixel_size_callback)(_meters_per_pixel_mid));
+		else glPointSize(head_size_value);
 		glBegin(GL_POINTS);
 		break;
 	case _LINE:
@@ -97,7 +101,8 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 			glEnable(GL_POINT_SPRITE);
 			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 		}
-		glLineWidth(head_size_value);
+		if(pixel_size_callback!=nullptr) glLineWidth((*pixel_size_callback)(_meters_per_pixel_mid));
+		else glLineWidth(head_size_value);
 		glBegin(GL_LINES);
 		break;
 	case _TRIANGLE:
@@ -267,7 +272,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 		glEnd();
 	}
 
-	glDepthFunc(GL_ALWAYS);
+	glDepthFunc(GL_LEQUAL);
 
 	//---- draw layer accents in the second pass ----
 
@@ -277,12 +282,14 @@ void Canvas_Implementation<MasterType,InheritanceList>::Draw_Layer(int start_ite
 	{
 	case _POINT:
 		//glPointSize( ceil(5.0f*(float)head_size_value) );
-		glPointSize( head_accent_size_value );
+		if(accent_pixel_size_callback!=nullptr) glPointSize((*accent_pixel_size_callback)(_meters_per_pixel_mid));
+		else glPointSize(head_accent_size_value);
 		glBegin(GL_POINTS);
 		break;
 	case _LINE:
 		//glLineWidth( ceil(5.0f*(float)head_size_value) );
-		glLineWidth( head_accent_size_value );
+		if(accent_pixel_size_callback!=nullptr) glLineWidth((*accent_pixel_size_callback)(_meters_per_pixel_mid));
+		else glLineWidth(head_accent_size_value);
 		glBegin(GL_LINES);
 		break;
 	case _TRIANGLE:

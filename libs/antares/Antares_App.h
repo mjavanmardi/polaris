@@ -13,6 +13,7 @@ extern void* antares;
 extern void* canvas;
 extern void* information_panel;
 
+
 //---------------------------------------------------------
 //	START_UI - macro to start the UI
 //---------------------------------------------------------
@@ -65,7 +66,7 @@ public:
 
 		__thread_id = num_sim_threads();
 
-		main = new Antares_Implementation<MasterType>(nullptr);
+		main=new Antares_Implementation<MasterType>(nullptr);
 
 		canvas = main->_canvas;
 		information_panel = main->_information_panel;
@@ -75,7 +76,7 @@ public:
 
 		main->_canvas->Initialize(xmin,ymin,xmax,ymax);
 
-		main->_information_panel->Render();
+		main->_information_panel->Render<NULLTYPE>();
 
 		initialized=true;
 

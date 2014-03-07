@@ -18,15 +18,25 @@ prototype struct Canvas
 	{
 		this_component()->Initialize(xmin,ymin,xmax,ymax);
 	}
+	
+	template<typename TargetType> void Start_Recording()
+	{
+		this_component()->Start_Recording();
+	}
+	
+	template<typename TargetType> void Stop_Recording()
+	{
+		this_component()->Stop_Recording();
+	}
 
 	template<typename TargetType> void Refresh()
 	{
 		this_component()->Refresh();
 	}
 	
-	//template<typename TargetType> void Set_Mode(ANTARES_MODE mode)
+	//feature_prototype void Set_Mode(ANTARES_MODE mode)
 	//{
-	//	this_component()->Set_Mode<ComponentType,TargetType>(mode);
+	//	this_component()->Set_Mode<ComponentType,CallerType,TargetType>(mode);
 	//}
 
 	void Select_Layer(int name)
@@ -41,14 +51,22 @@ prototype struct Canvas
 
 	template<typename TargetType> int Build_Texture(int width, int height, unsigned char* data)
 	{
-		return this_component()->Build_Texture<ComponentType,TargetType>(width,height,data);
+		return this_component()->Build_Texture<TargetType>(width,height,data);
 	}
 
-	accessor(time_panel,NONE,NONE);
-	accessor(information_panel,NONE,NONE);
-	accessor(attributes_panel,NONE,NONE);
-	accessor(control_panel,NONE,NONE);
-	accessor(layer_options,NONE,NONE);
+	accessor(time_panel, NONE, NONE);
+	accessor(information_panel, NONE, NONE);
+	accessor(attributes_panel, NONE, NONE);
+	accessor(control_panel, NONE, NONE);
+	accessor(layer_options, NONE, NONE);
+	
+	accessor(scale, NONE, NONE);
+	accessor(x_rotation, NONE, NONE);
+	accessor(z_rotation, NONE, NONE);
+	accessor(x_translation, NONE, NONE);
+	accessor(y_translation, NONE, NONE);
 
-	accessor(graphical_network,NONE,NONE);
+	accessor(spatial_change, NONE, NONE);
+
+	accessor(graphical_network, NONE, NONE);
 };

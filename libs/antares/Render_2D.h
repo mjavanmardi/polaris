@@ -10,6 +10,7 @@
 //--------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
+template<typename TargetType>
 void Information_Panel_Implementation<MasterType,InheritanceList>::Render()
 {
 	LOCK(_plot_lock);
@@ -32,7 +33,7 @@ void Information_Panel_Implementation<MasterType,InheritanceList>::Render()
 	
 	UNLOCK(_plot_lock);
 
-	//boost::container::list< Information_Page<typename MasterType::type_of(information_page),ComponentType>* >::iterator itr;
+	//list< Information_Page<typename MasterType::type_of(information_page),ComponentType>* >::iterator itr;
 
 	//for(itr=_2D_layers.begin();itr!=_2D_layers.end();itr++)
 	//{

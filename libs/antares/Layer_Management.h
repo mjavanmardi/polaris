@@ -10,6 +10,7 @@
 //---------------------------------------------------------
 
 template<typename MasterType,typename InheritanceList>
+template<typename TargetType>
 typename Canvas_Implementation<MasterType,InheritanceList>::Antares_Layer_Interface* Canvas_Implementation<MasterType,InheritanceList>::Allocate_New_Layer(string& name)
 {
 	SetFocus();
@@ -83,3 +84,4 @@ void Canvas_Implementation<MasterType,InheritanceList>::Select_Layer(int identif
 
 	Refresh();
 }
+

@@ -45,7 +45,7 @@ void* _global_person_logger;
 
 // ITS COMPONENTS
 
-#include "Geometry_Implementation.h"
+//#include "Geometry_Implementation.h"
 #include "Advisory_Radio_Implementation.h"
 #include "Variable_Message_Sign_Implementation.h"
 #include "Depot_Implementation.h"

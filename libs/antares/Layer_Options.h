@@ -13,7 +13,7 @@ prototype struct Layer_Options
 {
 	tag_as_prototype;
 
-	accessor(canvas,NONE,NONE);
+	accessor(canvas, NONE, NONE);
 
 	void Allocate_New_Layer(string& name)
 	{
@@ -22,6 +22,6 @@ prototype struct Layer_Options
 
 	template<typename TargetType> void Toggle_Named_Layer(string& name,bool check_state)
 	{
-		this_component()->Toggle_Named_Layer<ComponentType,TargetType>(name,check_state);
+		this_component()->Toggle_Named_Layer<TargetType>(name,check_state);
 	}
 };

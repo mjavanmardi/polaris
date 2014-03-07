@@ -35,7 +35,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 		{
 			const boost::container::vector<int>* geometry_by_thread = _storage[current_iteration];
 
-			for(unsigned int i=0;i<num_antares_threads();i++)
+			for(int i=0;i<num_antares_threads();i++)
 			{
 				const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
 				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
@@ -150,7 +150,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 		{
 			const boost::container::vector<int>* geometry_by_thread = _storage[current_iteration];
 
-			for(unsigned int i=0;i<num_antares_threads();i++)
+			for(int i=0;i<num_antares_threads();i++)
 			{
 				const unsigned char* geometry_itr = (const unsigned char*)&geometry_by_thread[i].front();
 				const unsigned char* const geometry_end = geometry_itr+geometry_by_thread[i].size()*sizeof(int);
@@ -525,6 +525,7 @@ bool Antares_Layer_Implementation<MasterType,InheritanceList>::Identify_One(cons
 				boost::container::vector<pair<string,string>> bucket;
 
 				_selection_callback( _deselected_elements, _added_elements, _selected_elements, bucket );
+
 
 				_attributes_panel->Push_Attributes(bucket);
 			}

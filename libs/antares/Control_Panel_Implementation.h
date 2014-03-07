@@ -17,12 +17,12 @@ public:
 	Control_Panel_Implementation(wxFrame* parent);
 	virtual ~Control_Panel_Implementation(void){};
 
-	m_prototype(Layer_Options<typename MasterType::type_of(layer_options)>,layer_options,NONE,NONE);
-	m_prototype(Canvas<typename MasterType::type_of(canvas)>,canvas,NONE,NONE);
-	m_prototype(Splash_Panel<typename MasterType::type_of(splash_panel)>,splash_panel,NONE,NONE);
+	m_prototype(Layer_Options<typename MasterType::type_of(layer_options)>,layer_options, NONE, NONE);
+	m_prototype(Canvas<typename MasterType::type_of(canvas)>,canvas, NONE, NONE);
+	m_prototype(Splash_Panel<typename MasterType::type_of(splash_panel)>,splash_panel, NONE, NONE);
 
-	m_data(wxAuiNotebook*,control_book,NONE,NONE);
-	m_data(wxBoxSizer*,sizer,NONE,NONE);
+	m_data(wxAuiNotebook*,control_book, NONE, NONE);
+	m_data(wxBoxSizer*,sizer, NONE, NONE);
 };
 
 //---------------------------------------------------------

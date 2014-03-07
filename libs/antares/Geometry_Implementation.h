@@ -5,16 +5,14 @@
 #pragma once
 #include "Geometry.h"
 
-namespace polaris
-{
 //---------------------------------------------------------
 //	Point_2D - 2D point
 //---------------------------------------------------------
 
 implementation struct Point_2D : public Polaris_Component<MasterType,INHERIT(Point_2D),NULLTYPE>
 {
-	m_data(float,x,NONE,NONE);
-	m_data(float,y,NONE,NONE);
+	m_data(float,x, NONE, NONE);
+	m_data(float,y, NONE, NONE);
 };
 
 //---------------------------------------------------------
@@ -31,9 +29,9 @@ implementation struct Point_3D : public Polaris_Component<MasterType,INHERIT(Poi
 		return *this;
 	};
 
-	m_data(float,x,NONE,NONE);
-	m_data(float,y,NONE,NONE);
-	m_data(float,z,NONE,NONE);
+	m_data(float,x, NONE, NONE);
+	m_data(float,y, NONE, NONE);
+	m_data(float,z, NONE, NONE);
 };
 
 //---------------------------------------------------------
@@ -42,13 +40,13 @@ implementation struct Point_3D : public Polaris_Component<MasterType,INHERIT(Poi
 
 implementation struct Rectangle_XY : public Polaris_Component<MasterType,INHERIT(Rectangle_XY),NULLTYPE>
 {
-	m_data(float,xmin,NONE,NONE);
-	m_data(float,ymin,NONE,NONE);
+	m_data(float,xmin, NONE, NONE);
+	m_data(float,ymin, NONE, NONE);
 
-	m_data(float,xmax,NONE,NONE);
-	m_data(float,ymax,NONE,NONE);
+	m_data(float,xmax, NONE, NONE);
+	m_data(float,ymax, NONE, NONE);
 
-	template<typename ComponentType,typename TargetType> void reset()
+	template<typename TargetType> void reset()
 	{
 		_xmin=FLT_MAX;
 		_xmax=-FLT_MAX;
@@ -56,17 +54,17 @@ implementation struct Rectangle_XY : public Polaris_Component<MasterType,INHERIT
 		_ymax=-FLT_MAX;
 	}
 
-	template<typename ComponentType,typename TargetType> TargetType length()
+	template<typename TargetType> TargetType length()
 	{
 		return (TargetType)( _ymax-_ymin );
 	}
 	
-	template<typename ComponentType,typename TargetType> TargetType width()
+	template<typename TargetType> TargetType width()
 	{
 		return (TargetType)( _xmax-_xmin );
 	}
 
-	template<typename ComponentType,typename TargetType> TargetType height()
+	template<typename TargetType> TargetType height()
 	{
 		return 0;
 	}
@@ -78,9 +76,9 @@ implementation struct Rectangle_XY : public Polaris_Component<MasterType,INHERIT
 
 implementation struct True_Color_RGB : public Polaris_Component<MasterType,INHERIT(True_Color_RGB),NULLTYPE>
 {
-	m_data(unsigned char,r,NONE,NONE);
-	m_data(unsigned char,g,NONE,NONE);
-	m_data(unsigned char,b,NONE,NONE);
+	m_data(unsigned char,r, NONE, NONE);
+	m_data(unsigned char,g, NONE, NONE);
+	m_data(unsigned char,b, NONE, NONE);
 };
 
 //---------------------------------------------------------
@@ -101,10 +99,10 @@ implementation struct True_Color_RGBA : public Polaris_Component<MasterType,INHE
 		return *this;
 	};
 
-	m_data(unsigned char,r,NONE,NONE);
-	m_data(unsigned char,g,NONE,NONE);
-	m_data(unsigned char,b,NONE,NONE);
-	m_data(unsigned char,a,NONE,NONE);
+	m_data(unsigned char,r, NONE, NONE);
+	m_data(unsigned char,g, NONE, NONE);
+	m_data(unsigned char,b, NONE, NONE);
+	m_data(unsigned char,a, NONE, NONE);
 };
 
 //---------------------------------------------------------
@@ -163,7 +161,7 @@ static inline int X_Sort_Function (const void *rec1, const void *rec2)
 static inline bool In_Polygon(boost::container::vector<Point_3D<NULLTYPE>>& points, float x, float y)
 {
 	int num;
-	double x1, y1, x2, y2, xlist [100];
+	double x1, y1, x2, y2, xarray [100];
 	bool first, close_flag;
 
 	boost::container::vector<Point_3D<NULLTYPE>>::iterator point_itr, end_itr;
@@ -201,11 +199,11 @@ static inline bool In_Polygon(boost::container::vector<Point_3D<NULLTYPE>>& poin
 				}
 			} else if (y1 < y2) {
 				if (y1 <= y && y < y2) {
-					xlist [num++] = x1 + (y - y1) * (x2 - x1) / (y2 - y1);
+					xarray [num++] = x1 + (y - y1) * (x2 - x1) / (y2 - y1);
 				}
 			} else {
 				if (y2 < y && y <= y1) {
-					xlist [num++] = x2 + (y - y2) * (x1 - x2) / (y1 - y2);
+					xarray [num++] = x2 + (y - y2) * (x1 - x2) / (y1 - y2);
 				}
 			}
 		}
@@ -215,16 +213,16 @@ static inline bool In_Polygon(boost::container::vector<Point_3D<NULLTYPE>>& poin
 	if (num < 2) return (false);
 
 	if (num == 2) {
-		if (xlist [0] < xlist [1]) {
-			if (xlist [0] <= x && x <= xlist [1]) return (true);
+		if (xarray [0] < xarray [1]) {
+			if (xarray [0] <= x && x <= xarray [1]) return (true);
 		} else {
-			if (xlist [1] <= x && x <= xlist [0]) return (true);
+			if (xarray [1] <= x && x <= xarray [0]) return (true);
 		}
 	} else {
-		qsort (xlist, num, sizeof (double), X_Sort_Function);
+		qsort (xarray, num, sizeof (double), X_Sort_Function);
 
 		for (int i=0; i < num; i+=2) {
-			if (xlist [i] <= x && x <= xlist [i+1]) return (true);
+			if (xarray [i] <= x && x <= xarray [i+1]) return (true);
 		}
 	}
 	return (false);
@@ -245,5 +243,4 @@ static inline void Compute_Fast_Normal(Point_3D<NT>& a, Point_3D<NT>& b, Point_3
 	result._x/=unit_length;
 	result._y/=unit_length;
 	result._z/=unit_length;
-}
 }

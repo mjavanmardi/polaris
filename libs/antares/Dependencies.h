@@ -18,6 +18,7 @@
 typedef void (*selection_callback_type)(const boost::container::list<void*>&,const boost::container::list<void*>&,const boost::container::list<void*>&,boost::container::vector<pair<string,string>>&);
 typedef void (*double_click_callback_type)(const boost::container::list<void*>&,boost::container::vector<pair<string,string>>&,boost::container::vector<boost::container::vector<string>>&);
 typedef bool (*submission_callback_type)(const boost::container::list<void*>&,const boost::container::vector<string>&,const boost::container::vector<string>&);
+typedef float (*pixel_size_callback_type)(float);
 
 using namespace polaris;
 //#include "io/Io.h"

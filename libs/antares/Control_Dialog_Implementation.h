@@ -15,30 +15,30 @@ public:
 	Control_Dialog_Implementation(string&,const boost::container::list<void*>&,boost::container::vector<pair<string,string>>&,boost::container::vector<boost::container::vector<string>>&,submission_callback_type);
 	virtual ~Control_Dialog_Implementation(void){};
 
-	//template<typename ComponentType,typename TargetType> void Push_Schema(boost::container::vector<string>& attributes_schema,boost::container::vector<boost::container::vector<string>>& dropdown_schema);
-	//template<typename ComponentType,typename TargetType> void Push_Attributes(boost::container::vector<string>& attributes);
+	//feature_implementation void Push_Schema(vector<string>& attributes_schema,vector<vector<string>>& dropdown_schema);
+	//feature_implementation void Push_Attributes(vector<string>& attributes);
 
 	//void OnApply(wxCommandEvent& event);
 	void OnOk(wxCommandEvent& event);
 
-	m_data(wxListCtrl*,attributes_list,NONE,NONE);
+	m_data(wxListCtrl*,attributes_list, NONE, NONE);
 	
-	m_data(wxButton*,ok_button,NONE,NONE);
-	//m_data(wxButton*,apply_button,NONE,NONE);
-	//m_data(wxButton*,cancel_button,NONE,NONE);
+	m_data(wxButton*,ok_button, NONE, NONE);
+	//member_pointer(wxButton,apply_button,none,none);
+	//member_pointer(wxButton,cancel_button,none,none);
 
-	m_data(wxBoxSizer*,sizer,NONE,NONE);
-	m_data(wxBoxSizer*,button_sizer,NONE,NONE);
-	m_data(wxBoxSizer*,table_sizer,NONE,NONE);
-	m_data(wxBoxSizer*,dropdown_sizer,NONE,NONE);
+	m_data(wxBoxSizer*,sizer, NONE, NONE);
+	m_data(wxBoxSizer*,button_sizer, NONE, NONE);
+	m_data(wxBoxSizer*,table_sizer, NONE, NONE);
+	m_data(wxBoxSizer*,dropdown_sizer, NONE, NONE);
 
-	m_data(wxChoice**,dropdown_menus,NONE,NONE);
+	m_data(wxChoice**,dropdown_menus, NONE, NONE);
 
-	m_data(boost::container::list<void*>,selected_elements,NONE,NONE);
-	m_data(submission_callback_type,submission_callback,NONE,NONE);
+	m_data(boost::container::list<void*>,selected_elements, NONE,NONE/*check_2(typename MasterType::type_of(antares_layer),is_same)*/);
+	m_data(submission_callback_type,submission_callback, NONE,NONE/*check_2(typename MasterType::type_of(antares_layer),is_same)*/);
 	
-	m_data(int,num_attributes,NONE,NONE);
-	m_data(int,num_dropdowns,NONE,NONE);
+	m_data(int,num_attributes, NONE, NONE);
+	m_data(int,num_dropdowns, NONE, NONE);
 };
 
 //---------------------------------------------------------
@@ -178,9 +178,9 @@ Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implem
 ////	Push_Schema
 ////--------------------------------------------------------
 //
-//template<typename MasterType,typename InheritanceList>
-//template<typename ComponentType,typename TargetType>
-//void Control_Dialog_Implementation<MasterType,InheritanceList>::Push_Schema(boost::container::vector<string>& attributes_schema,boost::container::vector<boost::container::vector<string>>& dropdown_schema)
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//template<typename ComponentType,typename CallerType,typename TargetType>
+//void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Push_Schema(vector<string>& attributes_schema,vector<vector<string>>& dropdown_schema)
 //{
 //	//|wxSYSTEM_MENU|wxMAXIMIZE_BOX|wxCLOSE_BOX|wxMINIMIZE_BOX
 //
@@ -227,8 +227,8 @@ Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implem
 //	{
 //		wxString choices[20];
 //
-//		boost::container::vector<boost::container::vector<string>>::iterator vitr;
-//		boost::container::vector<string>::iterator itr;
+//		vector<vector<string>>::iterator vitr;
+//		vector<string>::iterator itr;
 //
 //		_dropdown_menus = new wxChoice* [ _num_dropdowns ];
 //		
@@ -292,7 +292,7 @@ Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implem
 //	int atts_row_counter = 0;
 //
 //
-//	boost::container::vector<string>::iterator itr;
+//	vector<string>::iterator itr;
 //
 //	for(itr=attributes_schema.begin();itr!=attributes_schema.end();itr++,atts_row_counter++)
 //	{
@@ -335,9 +335,9 @@ Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implem
 ////	Push_Attributes
 ////--------------------------------------------------------
 //
-//template<typename MasterType,typename InheritanceList>
-//template<typename ComponentType,typename TargetType>
-//void Control_Dialog_Implementation<MasterType,InheritanceList>::Push_Attributes(boost::container::vector<string>& attributes)
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//template<typename ComponentType,typename CallerType,typename TargetType>
+//void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::Push_Attributes(vector<string>& attributes)
 //{
 //	for(int i=0;i<_num_attributes;i++)
 //	{
@@ -346,7 +346,7 @@ Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implem
 //
 //	int atts_row_counter = 0;
 //
-//	boost::container::vector<string>::iterator itr;
+//	vector<string>::iterator itr;
 //
 //	for(itr=attributes.begin();itr!=attributes.end();itr++,atts_row_counter++)
 //	{
@@ -363,10 +363,10 @@ Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implem
 ////	OnApply
 ////--------------------------------------------------------
 //
-//template<typename MasterType,typename InheritanceList>
-//void Control_Dialog_Implementation<MasterType,InheritanceList>::OnApply(wxCommandEvent& event)
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//void Control_Dialog_Implementation<MasterType,ParentType,InheritanceList>::OnApply(wxCommandEvent& event)
 //{
-//	boost::container::vector<string> attributes_update;
+//	vector<string> attributes_update;
 //	string text;
 //
 //	if(_num_attributes)
@@ -388,7 +388,7 @@ Control_Dialog_Implementation<MasterType,InheritanceList>::Control_Dialog_Implem
 //		}
 //	}
 //	
-//	boost::container::vector<string> dropdowns_update;
+//	vector<string> dropdowns_update;
 //
 //	if(_num_dropdowns)
 //	{

@@ -9,6 +9,8 @@
 //	Render
 //--------------------------------------------------------
 
+static int image_counter = 0;
+
 template<typename MasterType,typename InheritanceList>
 void Canvas_Implementation<MasterType,InheritanceList>::Render(wxPaintEvent& event)
 {
@@ -76,6 +78,12 @@ void Canvas_Implementation<MasterType,InheritanceList>::Render(wxPaintEvent& eve
 
 	glFlush();
 	SwapBuffers();
+
+	if(_recording)
+	{
+		Record_Frame();
+	}
+
 
 	//---- indicate the spatial and temporal aspects of the rendering have been updated ----
 

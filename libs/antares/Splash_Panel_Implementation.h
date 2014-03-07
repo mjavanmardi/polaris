@@ -31,5 +31,5 @@ public:
 		dc.DrawBitmap(_image, 30, 0, false);
 	}
 
-	m_data(wxBitmap,image,NONE,NONE);
+	m_data(wxBitmap,image, NONE, NONE);
 };

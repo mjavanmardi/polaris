@@ -20,12 +20,16 @@ prototype struct Time_Panel
 
 	template<typename TargetType> bool Is_Running()
 	{
-		return this_component()->Is_Running<ComponentType,TargetType>();
+		return this_component()->Is_Running<TargetType>();
 	}
 
-	accessor(play,NONE,NONE);
-	accessor(play_button,NONE,NONE);
-	accessor(pause_button,NONE,NONE);
-	accessor(sizer,NONE,NONE);
-	accessor(time_display,NONE,NONE);
+	accessor(play, NONE, NONE);
+	accessor(play_button, NONE, NONE);
+	accessor(pause_button, NONE, NONE);
+	accessor(sizer, NONE, NONE);
+	accessor(time_display, NONE, NONE);
+
+	accessor(canvas, NONE, NONE);
+
+	accessor(delay, NONE, NONE);
 };

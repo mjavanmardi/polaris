@@ -9,9 +9,9 @@
 //	Set_Mode - handles mode change requests
 //---------------------------------------------------------
 
-//template<typename MasterType,typename InheritanceList>
-//template<typename ComponentType,typename TargetType>
-//void Canvas_Implementation<MasterType,InheritanceList>::Set_Mode(ANTARES_MODE mode)
+//template<typename MasterType,typename ParentType,typename InheritanceList>
+//template<typename ComponentType,typename CallerType,typename TargetType>
+//void Canvas_Implementation<MasterType,ParentType,InheritanceList>::Set_Mode(ANTARES_MODE mode)
 //{
 //	_interaction_mode=mode;
 //
@@ -155,7 +155,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::OnLeftDown(wxMouseEvent&
 		if(_selected_layer->Identify_One(location,_cached_iteration,_cached_iteration,CTRL_DOWN))
 		{
 			Refresh();
-			_information_panel->Render();
+			_information_panel->Render<NT>();
 		}
 	}
 
@@ -248,7 +248,7 @@ void Canvas_Implementation<MasterType,InheritanceList>::OnMotion(wxMouseEvent& e
 			if(_selected_layer->Identify_One(location,_cached_iteration,_cached_iteration,ALT_DOWN))
 			{
 				Refresh();
-				_information_panel->Render();
+				_information_panel->Render<NT>();
 			}
 		}
 	}
@@ -347,13 +347,13 @@ void Canvas_Implementation<MasterType,InheritanceList>::OnWheel(wxMouseEvent& ev
 		
 	if(_wheel_dir>0)
 	{
-		_scale=_scale*.8;
+		_scale=_scale*.9;
 		_spatial_change=true;
 		Refresh();
 	}
-	else if(_scale*1.0/.8 < _initial_scale*1.2)
+	else if(_scale*1.0/.9 < _initial_scale*1.2)
 	{
-		_scale=_scale*(1.0/.8);
+		_scale=_scale*(1.0/.9);
 		_spatial_change=true;
 		Refresh();
 	}
