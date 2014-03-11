@@ -618,7 +618,7 @@ namespace Network_Components
 				for(intersections_itr = intersections_container.begin(); intersections_itr != intersections_container.end(); intersections_itr++)
 				{
 					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersections_itr);
-					typename type_of(network_reference)::type_of(intersections_container)::type_of(value)& intersection_monitor=(typename type_of(network_reference)::type_of(intersections_container)::type_of(value)&)*intersection;
+					//typename type_of(network_reference)::type_of(intersections_container)::type_of(value)& intersection_monitor=(typename type_of(network_reference)::type_of(intersections_container)::type_of(value)&)*intersection;
 
 					_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
 					
@@ -990,7 +990,7 @@ namespace Network_Components
 				for(intersections_itr = intersections_container.begin(); intersections_itr != intersections_container.end(); intersections_itr++)
 				{
 					_Intersection_Interface* intersection = (_Intersection_Interface*)(*intersections_itr);
-					typename type_of(network_reference)::type_of(intersections_container)::type_of(value)& intersection_monitor=(typename type_of(network_reference)::type_of(intersections_container)::type_of(value)&)*intersection;
+					//typename type_of(network_reference)::type_of(intersections_container)::type_of(value)& intersection_monitor=(typename type_of(network_reference)::type_of(intersections_container)::type_of(value)&)*intersection;
 
 					_Links_Container_Interface& outbound_links = intersection->template outbound_links<_Links_Container_Interface&>();
 					_Links_Container_Interface& inbound_links = intersection->template inbound_links<_Links_Container_Interface&>();

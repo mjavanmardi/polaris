@@ -43,7 +43,7 @@ namespace Network_Event_Components
 		implementation struct Base_Network_Event : public Polaris_Component<MasterType,INHERIT(Base_Network_Event),Execution_Object>
 		{
 			typedef typename  Polaris_Component<MasterType,INHERIT(Base_Network_Event),Execution_Object>::Component_Type ComponentType;
-			typedef Link_Components::Prototypes::Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Link_Components::Prototypes::Link<typename MasterType::link_type> Link_Interface;
 			typedef Zone_Components::Prototypes::Zone<typename MasterType::zone_type> Zone_Interface;
 			typedef  Activity_Location_Components::Prototypes::Activity_Location<typename remove_pointer<typename Link_Interface::get_type_of(activity_locations)::value_type>::type> Location_Interface;
 			typedef Random_Access_Sequence<typename Link_Interface::get_type_of(activity_locations),Location_Interface*> Location_Container_Interface;
@@ -141,7 +141,7 @@ namespace Network_Event_Components
 				else
 				{
 
-					boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename type_of(MasterType::network)>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
+					boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>& db_map=((Network<typename MasterType::network_type>*)_global_network)->template db_id_to_links_map<boost::unordered::unordered_map<int,boost::container::vector<typename MasterType::link_type*>>&>();
 
 
 				
@@ -154,7 +154,7 @@ namespace Network_Event_Components
 						{
 							boost::container::vector<typename MasterType::link_type*>& links=db_map[link];
 
-							typename boost::container::vector<typename type_of(MasterType::link)*>::iterator vitr;
+							typename boost::container::vector<typename MasterType::link_type*>::iterator vitr;
 
 							for(vitr=links.begin();vitr!=links.end();vitr++)
 							{
@@ -184,7 +184,7 @@ namespace Network_Event_Components
 				}
 
 				// create the unaffected locations boost::container::list
-				Location_Container_Interface* all_locations = ((Network<typename type_of(MasterType::network)>*)_global_network)->template activity_locations_container<Location_Container_Interface*>();
+				Location_Container_Interface* all_locations = ((Network<typename MasterType::network_type>*)_global_network)->template activity_locations_container<Location_Container_Interface*>();
 				for (typename Location_Container_Interface::iterator litr = all_locations->begin(); litr != all_locations->end(); ++litr)
 				{
 					bool add = true;
@@ -260,7 +260,7 @@ namespace Network_Event_Components
 			m_data(string,notes, NONE, NONE);
 
 			static m_data(boost::container::vector<string>,event_keys, NONE, NONE);
-			static m_prototype(Null_Prototype<typename type_of(MasterType::network_event_manager)>,network_event_manager, NONE, NONE);
+			static m_prototype(Null_Prototype<typename MasterType::network_event_manager_type>,network_event_manager, NONE, NONE);
 			
 			static m_data(concat(boost::unordered::unordered_map<size_t,typename Network_Event_Callback<ComponentType>::type>),callbacks_by_component_id, NONE, NONE);
 		};
@@ -272,7 +272,7 @@ namespace Network_Event_Components
 		boost::unordered::unordered_map<size_t,typename Network_Event_Callback<typename Base_Network_Event<MasterType,InheritanceList>::ComponentType>::type> Base_Network_Event<MasterType,InheritanceList>::_callbacks_by_component_id;
 
 		template<typename MasterType,typename InheritanceList>
-		Network_Event_Manager<typename type_of(MasterType::network_event_manager)>* Base_Network_Event<MasterType,InheritanceList>::_network_event_manager;
+		Network_Event_Manager<typename MasterType::network_event_manager_type>* Base_Network_Event<MasterType,InheritanceList>::_network_event_manager;
 
 		implementation struct Weather_Network_Event : public Base_Network_Event<MasterType,INHERIT(Weather_Network_Event)>
 		{
@@ -498,13 +498,13 @@ namespace Network_Event_Components
 		implementation struct Network_Event_Manager_Implementation : public Polaris_Component<MasterType,INHERIT(Network_Event_Manager_Implementation),Data_Object>
 		{
 			typedef typename Polaris_Component<MasterType,INHERIT(Network_Event_Manager_Implementation),Data_Object>::Component_Type ComponentType;
-			typedef Network_Event<typename MasterType::type_of(base_network_event)> Base_Network_Event_Interface;
-			typedef Network_Event<typename MasterType::type_of(weather_network_event)> Weather_Network_Event_Interface;
-			typedef Network_Event<typename MasterType::type_of(accident_network_event)> Accident_Network_Event_Interface;
-			typedef Network_Event<typename MasterType::type_of(congestion_network_event)> Congestion_Network_Event_Interface;
-			typedef Network_Event<typename MasterType::type_of(lane_closure_network_event)> Lane_Closure_Network_Event_Interface;
+			typedef Network_Event<typename MasterType::base_network_event_type> Base_Network_Event_Interface;
+			typedef Network_Event<typename MasterType::weather_network_event_type> Weather_Network_Event_Interface;
+			typedef Network_Event<typename MasterType::accident_network_event_type> Accident_Network_Event_Interface;
+			typedef Network_Event<typename MasterType::congestion_network_event_type> Congestion_Network_Event_Interface;
+			typedef Network_Event<typename MasterType::lane_closure_network_event_type> Lane_Closure_Network_Event_Interface;
 			
-			typedef Link<typename type_of(MasterType::link)> Link_Interface;
+			typedef Link<typename MasterType::link_type> Link_Interface;
 
 			template<typename TargetType> void Push_Subscriber(typename Network_Event_Callback<TargetType>::type callback)
 			{
@@ -562,28 +562,28 @@ namespace Network_Event_Components
 
 						if(name == "Weather")
 						{
-							Weather_Network_Event_Interface* net_event = (Weather_Network_Event_Interface*)Allocate<typename MasterType::type_of(weather_network_event)>();
+							Weather_Network_Event_Interface* net_event = (Weather_Network_Event_Interface*)Allocate<typename MasterType::weather_network_event_type>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
 							net_event->template Start<NT>();
 							Add_Network_Event<typename Weather_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Accident")
 						{
-							Accident_Network_Event_Interface* net_event = (Accident_Network_Event_Interface*)Allocate<typename MasterType::type_of(accident_network_event)>();
+							Accident_Network_Event_Interface* net_event = (Accident_Network_Event_Interface*)Allocate<typename MasterType::accident_network_event_type>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
 							net_event->template Start<NT>();
 							Add_Network_Event<typename Accident_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Congestion")
 						{
-							Congestion_Network_Event_Interface* net_event = (Congestion_Network_Event_Interface*)Allocate<typename MasterType::type_of(congestion_network_event)>();
+							Congestion_Network_Event_Interface* net_event = (Congestion_Network_Event_Interface*)Allocate<typename MasterType::congestion_network_event_type>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
 							net_event->template Start<NT>();
 							Add_Network_Event<typename Congestion_Network_Event_Interface::ComponentType>(net_event);
 						}
 						else if(name == "Lane Closure")
 						{
-							Lane_Closure_Network_Event_Interface* net_event = (Lane_Closure_Network_Event_Interface*)Allocate<typename MasterType::type_of(lane_closure_network_event)>();
+							Lane_Closure_Network_Event_Interface* net_event = (Lane_Closure_Network_Event_Interface*)Allocate<typename MasterType::lane_closure_network_event_type>();
 							net_event->Initialize< weak_ptr<io::Event_Instance>& >(_ptr);
 							net_event->template Start<NT>();
 							Add_Network_Event<typename Lane_Closure_Network_Event_Interface::ComponentType>(net_event);
@@ -616,7 +616,7 @@ namespace Network_Event_Components
 				}
 			}
 
-			template<typename TargetType> void Get_Network_Events( boost::container::vector< Network_Event<TargetType>* >& container, requires(TargetType,!check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
+			template<typename TargetType> void Get_Network_Events( boost::container::vector< Network_Event<TargetType>* >& container, requires(TargetType,!check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
 			{
 				boost::container::list<Network_Event<TargetType>*>* events_of_type = (boost::container::list<Network_Event<TargetType>*>*) & (_network_event_container[TargetType::component_id]);
 
@@ -631,7 +631,7 @@ namespace Network_Event_Components
 				}
 			}
 			
-			template<typename TargetType> void Get_Network_Events( boost::container::vector< Network_Event<TargetType>* >& container, requires(TargetType,check_2(TargetType,typename type_of(MasterType::base_network_event),is_same)))
+			template<typename TargetType> void Get_Network_Events( boost::container::vector< Network_Event<TargetType>* >& container, requires(TargetType,check_2(TargetType,typename MasterType::base_network_event_type,is_same)))
 			{
 				for(typename boost::unordered::unordered_map< size_t, boost::container::list<Base_Network_Event_Interface*> >::iterator h_itr=_network_event_container.begin();h_itr!=_network_event_container.end();h_itr++)
 				{
@@ -643,7 +643,7 @@ namespace Network_Event_Components
 
 						if(network_event->template active<bool>())
 						{
-							container.push_back( (Network_Event<typename MasterType::type_of(base_network_event)>*) *itr );
+							container.push_back( (Network_Event<typename MasterType::base_network_event_type>*) *itr );
 						}
 					}
 				}

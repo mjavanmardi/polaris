@@ -27,7 +27,7 @@ namespace Traveler_Components
 
 			void Initiate_Departure()
 			{
-				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename vehicle_type::get_type_of(movement_plan)> Movement_Interface;
+				typedef Movement_Plan_Components::Prototypes::Movement_Plan<typename remove_pointer<vehicle_type>::type::get_type_of(movement_plan)> Movement_Interface;
 				typedef  Link_Components::Prototypes::Link<typename Movement_Interface::get_type_of(origin)>  Link_Interface;
 				
 				Movement_Interface* attached_movement_plan = _vehicle->template movement_plan<Movement_Interface*>();
